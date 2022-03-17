@@ -1,0 +1,14 @@
+{
+  "recommendations": [
+    "EditorConfig.EditorConfig",
+    "bungcip.better-toml",
+    "denoland.vscode-deno",
+    "dprint.dprint",
+    "esbenp.prettier-vscode",
+    "matklad.rust-analyzer",
+    "ms-azuretools.vscode-docker",
+    "serayuzgur.crates",
+    "streetsidesoftware.code-spell-checker",
+    "vadimcn.vscode-lldb"
+  ]
+}

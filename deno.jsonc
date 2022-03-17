@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "checkJs": false,
+    "experimentalDecorators": false,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noUncheckedIndexedAccess": true
+  },
+  "lint": {
+    "files": {
+      "exclude": ["target"],
+      "include": ["."]
+    },
+    "rules": {
+      "exclude": [
+        "ban-types",
+        "no-empty",
+        "no-explicit-any",
+        "no-namespace",
+        "require-await"
+      ],
+      "tags": ["recommended"]
+    }
+  },
+  "importMap": "./import_map.json",
+  "include": ["."]
+}

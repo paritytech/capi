@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Deno",
+      "type": "pwa-node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "run",
+        "--inspect-brk",
+        "-c",
+        "deno.jsonc",
+        "-A",
+        "--no-check=remote",
+        "--import-map=import_map.json",
+        "${file}"
+      ],
+      "attachSimplePort": 9229
+    }
+  ]
+}

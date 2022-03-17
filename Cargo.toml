@@ -1,0 +1,54 @@
+[package]
+name = "mod"
+version = "0.1.0"
+edition = "2021"
+description = "Awesome Wasm Possum"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+path = "root.rs"
+
+[features]
+default = ["console_error_panic_hook", "crypto", "frame_metadata_fixtures", "scale_fixtures"]
+crypto = []
+frame_metadata_fixtures = []
+scale_fixtures = []
+
+[dependencies]
+base58 = { version = "0.2.0" }
+blake2 = { version = "0.10.4" }
+byteorder = { version = "1.4.3" }
+cfg-if = { version = "1.0.0" }
+console_error_panic_hook = { version = "0.1.7", optional = true }
+frame-metadata = { version = "15.0.0" }
+frame-support = { version = "3.0.0" }
+getrandom = { version = "0.2.5", features = ["js"] }
+hex = { version = "0.4.3" }
+js-sys = { version = "0.3.56" }
+parity-scale-codec = { version = "3.0.0", features = ["derive"] }
+paste = { version = "1.0.6" }
+serde = { version = "1.0.136", features = ["derive"] }
+serde_json = { version = "1.0.79" }
+sha2 = { version = "0.10.0", features = ["default"] }
+# TODO: resolve the descendant dep conflict in which specifying v 5.0.0 breaks cargo.
+sp-core = { version = "*" }
+sp-core-hashing = { version = "4.0.0" }
+# TODO: same issue here.
+sp-keyring = { version = "*" }
+tiny-bip39 = { version = "0.8.2" }
+twox-hash = { version = "1.6.2" }
+wasm-bindgen = { version = "0.2.79" }
+wasm-bindgen-futures = { version = "0.4.29" }
+wee_alloc = { version = "0.4.5" }
+
+[profile.release]
+codegen-units = 1
+incremental = true
+lto = true
+opt-level = 'z'
+
+[profile.bench]
+codegen-units = 1
+incremental = true
+lto = true
+opt-level = 'z'

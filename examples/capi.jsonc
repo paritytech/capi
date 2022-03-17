@@ -1,0 +1,12 @@
+{
+  "$schema": "../target/schema.json",
+  "chains": {
+    "polkadot": "wss://rpc.polkadot.io"
+  },
+  "target": {
+    "capi": {
+      "vendored": ".."
+    },
+    "outDir": "generated"
+  }
+}
