@@ -13,7 +13,8 @@ In addition to the following todos, the codebase is scattered with `TODO` commen
 
 ## Workflow-related
 
-- Stop committing directly to main / branch protections
+- CI testing
+- CI-produced dependency update PRs ([udd](https://github.com/hayd/deno-udd))
 - Format task
 - API Reference gen
 - Dependency / lock management
