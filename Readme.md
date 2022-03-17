@@ -9,9 +9,9 @@ Capi (Chain API) is a TypeScript toolkit for crafting interactions with Substrat
 At a birds-eye view, **there are two distinct versions of the Capi developer experience**:
 
 - [A "dynamic" DX](./_/assets/dynamic_dx.md) for developers who do not have ahead-of-time knowledge of which chain(s) they are targeting. Their programs must reflect on chain capabilities and derive transcoders at runtime.
-- [A "statically-generated" DX](./_/assets/static_dx.md) for developers who know which chain(s) they are targeting. These developers use the Capi CLI to generate efficient, type-safe bindings to chain resources.
+- [A statically generated DX](./_/assets/static_dx.md) for developers who do know which chain(s) they are targeting. These developers use the Capi CLI to generate efficient, type-safe bindings to chain resources.
 
-Both of these DXs are powered by [an underlying functional effect system](./_/assets/effects.md), inspired by [Zio](https://zio.dev/) and [EffectTS](https://github.com/effect-ts). Such systems abstract over computation (in our case network interactions) such that it can be reduced and cooperatively scheduled (among other optimizations). Effects also offer type-safe error handling, dependency injection and a pleasant, functional-feeling DX.
+Both of these DXs are powered by [an underlying functional effect system](./_/assets/effects.md), inspired by [Zio](https://zio.dev/) and [EffectTS](https://github.com/effect-ts). These systems abstract over computation (in our case network interactions) such that it can be reduced and cooperatively scheduled (among other optimizations). Effects also offer type-safe error handling, dependency injection and a pleasant, functional-feeling DX.
 
 ## Testing
 
@@ -52,7 +52,7 @@ You may have noticed that the Capi repository looks somewhat different from a tr
 
 We no longer need to think about the separation of code for the sake of packaging. We can think about separation of code in terms of what best suits our development needs.
 
-For example, exports of [`_/util/bearer.ts`](./_/util/bearer.ts) can be imported directly into any other TypeScript file, without specifying the dependency in a package manifest. We are free to use `bearer.ts` in out-of-band processes, the CLI or even GitHub action scripts. From anywhere in the repository, we can import and use any code. No configuration overhead.
+For example, exports of [`_/util/types.ts`](./_/util/types.ts) can be imported directly into any other TypeScript file, without specifying the dependency in a package manifest. We are free to use `bearer.ts` in out-of-band processes, the CLI or even GitHub action scripts. From anywhere in the repository, we can import and use any code. No configuration overhead.
 
 When it comes time to [build our code](./_/tasks/build_npm.ts) for NPM distribution, [DNT](https://github.com/denoland/dnt) takes care of transforming our dependency graph into something that NodeJS projects will understand.
 

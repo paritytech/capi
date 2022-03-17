@@ -91,7 +91,7 @@ The error types of `A` and `B` are generic, which means we can never truly handl
 
 Let's go over one final pain point: optimizing execution.
 
-We don't want to accidentally allocate all of the JS thread's processing to a blocking operation. We don't want to accidentally send duplicate requests. We don't want to keep connections alive for longer than they are needed. These are just a few of the considerations that go into a good JavaScript-network interactions. In practice, these considerations pose great difficulty.
+We don't want to accidentally allocate all of the JS thread's processing to a blocking operation. We don't want to accidentally send duplicate requests. We don't want to keep connections alive for longer than they are needed. These are just a few of the considerations that go into smooth JavaScript-network interactions. In practice, these considerations pose great difficulty.
 
 Imagine you're forming a derived request, wherein `requestC` accepts the result of `requestA` and `requestB`.
 
@@ -156,7 +156,7 @@ As you can see, we specify that the `Ok` value or `A` is of type `number`. We al
 The type of `getRand` is equivalent to the following:
 
 ```ts
-type GetRand = sys.Effect<GetRandR, any, number, {}, any>;
+sys.Effect<GetRandR, any, number, {}, any>;
 ```
 
 What exactly are these type parameters?
@@ -172,7 +172,7 @@ type Effect<
 ```
 
 - `R` is the runtime requirement previously mentioned
-- `E` is an `Error` subtype
+- `E` is an `Error` subtype (or union of `Error` subtypes)
 - `A` is the type of of whatever value was returned, wrapped in an `ok` call
 - `D` is a record, whose values are also effects
 - `C` is a phantom type, which we'll eventually use to constrain the mixing and matching of cross-chain effects
@@ -240,7 +240,7 @@ Now let's run the fiber.
 const result = await fiber.run();
 ```
 
-And surely enough, we either get an `Ok`, containing a numeric value:
+And surely enough, we either get an `Ok`, containing a numeric value...
 
 ```sh
 { ok: 3.3287550827663788 }
