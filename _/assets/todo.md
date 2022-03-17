@@ -16,6 +16,7 @@ In addition to the following todos, the codebase is scattered with `TODO` commen
 - CI testing
 - CI-produced dependency update PRs ([udd](https://github.com/hayd/deno-udd))
 - Format task
+- Stalebot? [This config is nice](https://github.com/denoland/deno/blob/main/.github/stale.yml).
 - API Reference gen
 - Dependency / lock management
 - Changelog gen
