@@ -1,0 +1,17 @@
+name: Configure
+on:
+  push:
+    paths:
+      - ".github/labels.yml"
+    branches:
+      - main
+jobs:
+  configure:
+    name: Configure
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@1.0.0
+      - uses: micnncim/action-label-syncer@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}

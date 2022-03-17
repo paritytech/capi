@@ -54,3 +54,5 @@ typeof
 keypair
 todos
 polkassembly
+syncer
+micnncim
