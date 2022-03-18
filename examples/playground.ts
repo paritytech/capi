@@ -5,10 +5,10 @@ import * as rpc from "/rpc/mod.ts";
 import * as sys from "/system/mod.ts";
 
 const resource = sys.Resource.ProxyWebSocketUrl(sys.lift(POLKADOT_RPC_URL));
-const rpcMethods = rpc.SystemProperties(resource);
+const rpcMethods = rpc.SystemHealth(resource);
 const result = await sys.Fiber(rpcMethods, new sys.WebSocketConnections(), {});
 if (result instanceof Error) {
   result;
 } else {
-  console.log(result.value.tokenSymbol);
+  console.log(result.value.shouldHavePeers);
 }

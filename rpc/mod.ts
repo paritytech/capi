@@ -6,6 +6,7 @@ export * from "./StateGetMetadata.ts";
 export * from "./StateGetStorage.ts";
 export * from "./SystemChain.ts";
 export * from "./SystemChainType.ts";
+export * from "./SystemHealth.ts";
 export * from "./SystemName.ts";
 export * from "./SystemProperties.ts";
 export * from "./SystemVersion.ts";
