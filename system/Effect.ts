@@ -110,6 +110,12 @@ export type AnyEffectA<A> = Effect<any, Result<any, A>, any>;
 
 export type AnyDeps = Record<PropertyKey, AnyEffect>;
 export type Resolved<D extends AnyDeps> = { [K in keyof D]: D[K][_A] };
+
+export type ResolvedHomomorphic<D> = { [K in keyof D]: ResolvedHomomorphic._0<D[K]> };
+namespace ResolvedHomomorphic {
+  export type _0<T> = T extends AnyEffect ? T[_A] : T;
+}
+
 export type WideErrorAsNever<E> = [Error] extends [E] ? never : E;
 
 export const lift = <A>(a: A): Effect<{}, Result<never, A>, {}> => {
@@ -124,4 +130,18 @@ export const accessor = <Source extends AnyEffect>(source: Source) => {
       return ok(select(resolved.source));
     });
   };
+};
+
+export const all = <Sources extends AnyEffect[]>(...sources: Sources) => {
+  const sourcesSafe: Record<number, AnyEffect> = {};
+  for (let i = 0; i < sources.length; i++) {
+    sourcesSafe[i] = sources[i]!;
+  }
+  return effect<ResolvedHomomorphic<Sources>>()("All", sourcesSafe, async (_, resolved) => {
+    const sourcesResolved: any[] = [];
+    for (let i = 0; i < sources.length; i++) {
+      sourcesResolved.push(resolved[i]);
+    }
+    return ok(sourcesResolved as ResolvedHomomorphic<Sources>);
+  });
 };
