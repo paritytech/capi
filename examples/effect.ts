@@ -2,43 +2,59 @@
 
 import * as sys from "/system/mod.ts";
 
+const three = sys.lift(3 as const);
+const four = sys.lift(4 as const);
+
 interface AddR {
   add(a: number, b: number): number;
 }
 
-const AddToThree = <Target extends sys.AnyEffectA<number>>(target: Target) => {
-  return sys.effect<number, AddR>()(
-    "AddToThree",
-    { target },
-    async (runtime, resolved) => {
-      return sys.ok(runtime.add(resolved.target, 3));
-    },
-  );
-};
+class ZeroError extends Error {}
 
-interface RandRuntime {
+const seven = sys.effect<number, AddR>()("Seven", { three, four }, async (runtime, resolved) => {
+  const added = runtime.add(resolved.three, resolved.four);
+  if (added === 0) {
+    return new ZeroError();
+  }
+  return sys.ok(added);
+});
+
+interface RandR {
   rand(): number;
 }
-class RandomIsGtPoint5 extends Error {
-  readonly name = "is_gt_point_5";
+
+class GtPoint5Error extends Error {}
+
+const rand = sys.effect<number, RandR>()("Rand", {}, async (runtime) => {
+  const generated = runtime.rand();
+  if (generated > .5) {
+    return new GtPoint5Error();
+  }
+  return sys.ok(generated);
+});
+
+interface RMultiply {
+  mul(a: number, b: number): number;
 }
-const GetRand = () => {
-  return sys.effect<number, RandRuntime>()(
-    "GetRand",
-    {},
-    async (runtime, _) => {
-      const x = runtime.rand();
-      if (x > .5) {
-        return new RandomIsGtPoint5();
-      }
-      return sys.ok(x);
-    },
-  );
+
+const multiply = <
+  A extends sys.AnyEffectA<number>,
+  B extends sys.AnyEffectA<number>,
+>(
+  a: A,
+  b: B,
+) => {
+  return sys.effect<number, RMultiply>()("Multiply", { a, b }, async (runtime, resolved) => {
+    return sys.ok(runtime.mul(resolved.a, resolved.b));
+  });
 };
 
-const result = await sys.Fiber(AddToThree(GetRand()), new sys.WebSocketConnections(), {
+const result = await sys.Fiber(multiply(seven, rand), new sys.WebSocketConnections(), {
   add(a, b) {
     return a + b;
+  },
+  mul(a, b) {
+    return a * b;
   },
   rand() {
     return Math.random();
