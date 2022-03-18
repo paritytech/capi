@@ -1,13 +1,14 @@
 import { Connections } from "/system/Connections.ts";
 import { Context } from "/system/Context.ts";
 import * as Z from "/system/Effect.ts";
+import { Result } from "/system/Result.ts";
 import { abortable } from "std/async/abortable.ts";
 
 export const Fiber = async <Root extends Z.AnyEffect>(
   root: Root,
   connections: Connections,
   runtime: Root[Z._R],
-): Promise<Z.Result<Root[Z._E] | Error, Root[Z._A]>> => {
+): Promise<Result<Root[Z._E] | Error, Root[Z._A]>> => {
   const context = new Context(root, connections);
   const result = await next(root, runtime, context);
   await Promise.all(context.cleanup.map((cb) => cb()));
@@ -22,7 +23,7 @@ const next = async (
   root: Z.AnyEffect,
   runtime: unknown,
   context: Context,
-): Promise<Z.Result<Error, unknown>> => {
+): Promise<Result<Error, unknown>> => {
   const depsEntries: [PropertyKey, Z.AnyEffect][] = Object.entries(root.deps);
   try {
     const depsPending: Promise<unknown>[] = [];

@@ -1,6 +1,7 @@
-import { UnionToIntersection, ValueOf } from "/_/util/types.ts";
+import * as u from "/_/util/mod.ts";
 import { Context } from "/system/Context.ts";
 import { Sha256 } from "std/hash/sha256.ts";
+import { AnyResult, Ok, ok, Result } from "./Result.ts";
 
 /** Requirements */
 export const _R: unique symbol = Symbol();
@@ -40,15 +41,14 @@ export enum EffectFlags {
  * @see https://zio.dev/version-1.x/datatypes/core/zio
  */
 export class Effect<
-  R,
-  E extends Error,
-  A,
+  R extends Record<PropertyKey, any>,
+  EA extends AnyResult,
   D extends AnyDeps,
   C,
 > {
-  [_R]!: R & UnionToIntersection<ValueOf<D>[_R]>;
-  [_E]!: E | ValueOf<D>[_E];
-  [_A]!: A;
+  [_R]!: R & u.UnionToIntersection<u.ValueOf<D>[_R]>;
+  [_E]!: Extract<EA, Error> | WideErrorAsNever<u.ValueOf<D>[_E]>;
+  [_A]!: Extract<EA, Ok<any>>["value"];
   [_C]!: C;
 
   /**
@@ -64,7 +64,7 @@ export class Effect<
       runtime: R,
       deps: Resolved<D>,
       context: Context,
-    ) => Promise<Result<E, A>>,
+    ) => Promise<EA>,
     readonly flags: number,
   ) {}
 
@@ -89,11 +89,11 @@ export class Effect<
 
 export const effect = <
   A,
-  R = {},
+  R extends Record<PropertyKey, any> = {},
   C = any,
 >() => {
   return <
-    E extends Error,
+    EA extends Result<Error, A>,
     D extends AnyDeps,
   >(
     tag: string,
@@ -102,9 +102,9 @@ export const effect = <
       runtime: R,
       deps: Resolved<D>,
       context: Context,
-    ) => Promise<Result<E, A>>,
+    ) => Promise<EA>,
     flags: number = EffectFlags.None,
-  ): Effect<R, E, A, D, C> => {
+  ): Effect<R, EA, D, C> => {
     return new Effect(tag, deps, run, flags);
   };
 };
@@ -113,32 +113,17 @@ export const effect = <
  * The following types are useful for constraining parameters. The individual slots are typed as `any` as to spare
  * the checker from recursing (which would result in circularity errors stemming from `Effect[_R]` and `Effect[_E]`).
  */
-export type AnyEffect = Effect<any, any, any, any, any>;
-export type AnyEffectA<A> = Effect<any, any, A, any, any>;
+export type AnyEffect = Effect<any, any, any, any>;
+export type AnyEffectA<A> = Effect<any, Result<any, A>, any, any>;
 
-export const lift = <A>(a: A) => {
+export type AnyDeps = Record<PropertyKey, AnyEffect>;
+export type Resolved<D extends AnyDeps> = { [K in keyof D]: D[K][_A] };
+export type WideErrorAsNever<E> = [Error] extends [E] ? never : E;
+
+export const lift = <A>(a: A): Effect<{}, Result<never, A>, {}, any> => {
   return effect<A>()("Lift", {}, async () => {
     return ok(a);
   });
-};
-
-// TODO: do we even want this
-// TODO: do error types flow through?
-export const use = <
-  Source extends AnyEffect,
-  E extends Error,
-  R,
->(
-  source: Source,
-  use: (resolved: Source[_A]) => Result<E, R>,
-) => {
-  return effect<R>()(
-    "Use",
-    { source },
-    async (_, resolved) => {
-      return use(resolved.source);
-    },
-  );
 };
 
 export const accessor = <Source extends AnyEffect>(source: Source) => {
@@ -148,25 +133,3 @@ export const accessor = <Source extends AnyEffect>(source: Source) => {
     });
   };
 };
-
-export type AnyDeps = Record<PropertyKey, Effect<any, any, any, any, any>>;
-
-export type Resolved<D extends AnyDeps> = { [K in keyof D]: D[K][_A] };
-
-export const ErrorCtor = <Name extends string>(name: Name) => {
-  return class extends Error {
-    readonly name: Name = name;
-  };
-};
-
-export class Ok<A> {
-  constructor(readonly value: A) {}
-}
-export const ok = <A>(value: A): Ok<A> => {
-  return new Ok(value);
-};
-
-export type Result<
-  E extends Error,
-  A,
-> = E | Ok<A>;

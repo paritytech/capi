@@ -22,4 +22,8 @@ const storageMapValue = frame.StorageMapValue(storageEntry, sys.lift(pubKeyBytes
 // Initiate the request
 const result = await sys.Fiber(storageMapValue, new sys.WebSocketConnections(), {});
 
-console.log(result);
+if (result instanceof Error) {
+  console.log(result);
+} else {
+  console.log(result.value);
+}

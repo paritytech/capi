@@ -1,5 +1,10 @@
-import * as Z from "/system/Effect.ts";
+import * as u from "/_/util/mod.ts";
 import * as async from "std/async/mod.ts";
+
+// Refine
+export type CloseError = ClosedConnectionBeforePendingResolved | AttemptedCloseOfNonexistentConnection;
+export class AttemptedCloseOfNonexistentConnection extends u.ErrorCtor("AttemptedCloseOfNonexistentConnection") {}
+export class ClosedConnectionBeforePendingResolved extends u.ErrorCtor("ClosedConnectionBeforePendingResolved") {}
 
 // TODO: fine-tune Error types!
 
@@ -24,15 +29,15 @@ export interface Connections<Beacon = any> {
     beacon: Beacon,
     payload: Payload,
   ): void;
-  receive(payload: Payload): Promise<string>;
+  receive(payload: Payload): Promise<unknown>;
 }
 
 export class WebSocketConnections implements Connections<string> {
   // #abortController = new AbortController();
   #connections: Record<string, WebSocket> = {};
   #egress: Record<string, Payload[]> = {};
-  #callbackById: Record<string, (response: string) => void> = {};
-  #inflight = new Map<Payload, async.Deferred<string>>();
+  #callbackById: Record<string, (response: unknown) => void> = {};
+  #inflight = new Map<Payload, async.Deferred<unknown>>();
 
   open(url: string): void {
     const connection = new WebSocket(url);
@@ -106,8 +111,8 @@ export class WebSocketConnections implements Connections<string> {
     }
   }
 
-  receive(payload: Payload): Promise<string> {
-    const pending = async.deferred<string>();
+  receive(payload: Payload): Promise<unknown> {
+    const pending = async.deferred<unknown>();
     this.#inflight.set(payload, pending);
     this.#callbackById[payload.id] = (result) => {
       this.#inflight.delete(payload);
@@ -117,8 +122,3 @@ export class WebSocketConnections implements Connections<string> {
     return pending;
   }
 }
-
-// Refine
-export type CloseError = ClosedConnectionBeforePendingResolved | AttemptedCloseOfNonexistentConnection;
-export class AttemptedCloseOfNonexistentConnection extends Z.ErrorCtor("AttemptedCloseOfNonexistentConnection") {}
-export class ClosedConnectionBeforePendingResolved extends Z.ErrorCtor("ClosedConnectionBeforePendingResolved") {}

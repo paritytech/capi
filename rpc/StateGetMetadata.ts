@@ -1,4 +1,5 @@
-import { call } from "/rpc/common.ts";
+import * as u from "/_/util/mod.ts";
+import * as common from "/rpc/common.ts";
 import * as sys from "/system/mod.ts";
 
 export const StateGetMetadata = <
@@ -9,7 +10,7 @@ export const StateGetMetadata = <
     "StateGetMetadata",
     { resource },
     async (_, resolved) => {
-      return call(resolved.resource, "state_getMetadata");
+      return common.call(resolved.resource, "state_getMetadata", u.isString);
     },
   );
 };

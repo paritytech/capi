@@ -1,5 +1,6 @@
 import { Payload } from "/system/Connections.ts";
 import * as Z from "/system/Effect.ts";
+import * as sys from "/system/mod.ts";
 
 /**
  * TODO: return means of actually interacting (a layer on top of `system/Connections`).
@@ -9,7 +10,7 @@ import * as Z from "/system/Effect.ts";
 export interface ResourceResolved<Beacon> {
   beacon: Beacon;
   send(payload: Payload): void;
-  receive(payload: Payload): Promise<string>;
+  receive(payload: Payload): Promise<unknown>;
 }
 
 export namespace Resource {
@@ -22,12 +23,14 @@ export namespace Resource {
         ctx.cleanup.push(async () => {
           ctx.connections.close(resolved.beacon);
         });
-        return Z.ok({
+        return sys.ok({
           beacon: resolved.beacon,
-          send: (payload) => {
+          // TODO: why isn't `Payload` inferred?
+          send: (payload: Payload) => {
             return ctx.connections.send(resolved.beacon, payload);
           },
-          receive: (payload) => {
+          // TODO: why isn't `Payload` inferred?
+          receive: (payload: Payload) => {
             return ctx.connections.receive(payload);
           },
         });

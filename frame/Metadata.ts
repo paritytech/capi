@@ -1,3 +1,4 @@
+import * as u from "/_/util/mod.ts";
 import * as m from "/frame_metadata/mod.ts";
 import * as rpc from "/rpc/mod.ts";
 import * as sys from "/system/mod.ts";
@@ -27,4 +28,4 @@ export const Metadata = <
   );
 };
 
-export class MalformedResponseErr extends sys.ErrorCtor("MalformedResponse") {}
+export class MalformedResponseErr extends u.ErrorCtor("MalformedResponse") {}
