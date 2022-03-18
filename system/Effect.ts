@@ -15,10 +15,6 @@ export type _E = typeof _E;
 export const _A: unique symbol = Symbol();
 export type _A = typeof _A;
 
-/** Compatibility */
-export const _C: unique symbol = Symbol();
-export type _C = typeof _C;
-
 /**
  * For now, use of `EffectFlags` is limited. In the future, this will serve as a means of signaling different
  * potential for optimizing effect execution.
@@ -44,12 +40,10 @@ export class Effect<
   R extends Record<PropertyKey, any>,
   EA extends AnyResult,
   D extends AnyDeps,
-  C,
 > {
   [_R]!: R & u.UnionToIntersection<u.ValueOf<D>[_R]>;
   [_E]!: Extract<EA, Error> | WideErrorAsNever<u.ValueOf<D>[_E]>;
   [_A]!: Extract<EA, Ok<any>>["value"];
-  [_C]!: C;
 
   /**
    * @param tag This is used for stack traces, constant folding and serialization
@@ -90,7 +84,6 @@ export class Effect<
 export const effect = <
   A,
   R extends Record<PropertyKey, any> = {},
-  C = any,
 >() => {
   return <
     EA extends Result<Error, A>,
@@ -104,7 +97,7 @@ export const effect = <
       context: Context,
     ) => Promise<EA>,
     flags: number = EffectFlags.None,
-  ): Effect<R, EA, D, C> => {
+  ): Effect<R, EA, D> => {
     return new Effect(tag, deps, run, flags);
   };
 };
@@ -113,14 +106,14 @@ export const effect = <
  * The following types are useful for constraining parameters. The individual slots are typed as `any` as to spare
  * the checker from recursing (which would result in circularity errors stemming from `Effect[_R]` and `Effect[_E]`).
  */
-export type AnyEffect = Effect<any, any, any, any>;
-export type AnyEffectA<A> = Effect<any, Result<any, A>, any, any>;
+export type AnyEffect = Effect<any, any, any>;
+export type AnyEffectA<A> = Effect<any, Result<any, A>, any>;
 
 export type AnyDeps = Record<PropertyKey, AnyEffect>;
 export type Resolved<D extends AnyDeps> = { [K in keyof D]: D[K][_A] };
 export type WideErrorAsNever<E> = [Error] extends [E] ? never : E;
 
-export const lift = <A>(a: A): Effect<{}, Result<never, A>, {}, any> => {
+export const lift = <A>(a: A): Effect<{}, Result<never, A>, {}> => {
   return effect<A>()("Lift", {}, async () => {
     return ok(a);
   });
