@@ -6,12 +6,8 @@ export interface RpcMethodsOk {
   version: number;
 }
 
-export const isRpcMethodsOk = (inQuestion: unknown): inQuestion is RpcMethodsOk => {
-  return !!(
-    inQuestion
-    && Array.isArray((inQuestion as any).methods)
-    && typeof (inQuestion as any).version === "number"
-  );
+export const isRpcMethodsOk = (inQuestion: any): inQuestion is RpcMethodsOk => {
+  return !!(inQuestion && Array.isArray(inQuestion.methods) && typeof inQuestion.version === "number");
 };
 
 export const RpcMethods = <

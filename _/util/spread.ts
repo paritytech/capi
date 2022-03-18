@@ -4,6 +4,6 @@ export const spreadableOptional = <
 >(
   key: Key,
   value: Value,
-): {} | { [_ in Key]: Value } => {
-  return value ? { [key]: value } : {};
+): Value extends undefined ? {} : { [_ in Key]: Value } => {
+  return value ? { [key]: value } : {} as any;
 };
