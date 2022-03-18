@@ -5,7 +5,7 @@ import * as rpc from "/rpc/mod.ts";
 import * as sys from "/system/mod.ts";
 
 const resource = sys.Resource.ProxyWebSocketUrl(sys.lift(POLKADOT_RPC_URL));
-const rpcMethods = rpc.SystemName(resource);
+const rpcMethods = rpc.SystemVersion(resource);
 const result = await sys.Fiber(rpcMethods, new sys.WebSocketConnections(), {});
 if (result instanceof Error) {
   result;
