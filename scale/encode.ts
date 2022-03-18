@@ -70,19 +70,31 @@ export const u256: Encoder<bigint> = (value) => {
 };
 
 export const i8: Encoder<number> = (value) => {
-  return (encoderState) => {};
+  return (encoderState) => {
+    encoderState.dv.setInt8(encoderState.idx, value);
+    encoderState.idx += 1;
+  };
 };
 
 export const i16: Encoder<number> = (value) => {
-  return (encoderState) => {};
+  return (encoderState) => {
+    encoderState.dv.setInt16(encoderState.idx, value, true);
+    encoderState.idx += 2;
+  };
 };
 
 export const i32: Encoder<number> = (value) => {
-  return (encoderState) => {};
+  return (encoderState) => {
+    encoderState.dv.setInt32(encoderState.idx, value, true);
+    encoderState.idx += 4;
+  };
 };
 
 export const i64: Encoder<bigint> = (value) => {
-  return (encoderState) => {};
+  return (encoderState) => {
+    encoderState.dv.setBigInt64(encoderState.idx, value, true);
+    encoderState.idx += 8;
+  };
 };
 
 export const i128: Encoder<bigint> = (value) => {

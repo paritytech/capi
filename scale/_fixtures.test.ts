@@ -15,9 +15,6 @@ const tmpSkip: Record<"decode" | "encode", Record<string, true>> = {
     U128: true,
   },
   encode: {
-    I8: true,
-    I16: true,
-    I32: true,
     I64: true,
     U16: true,
     U32: true,
