@@ -2,22 +2,23 @@
 
 import { POLKADOT_RPC_URL } from "/_/constants/chains/url.ts";
 import * as frame from "/frame/mod.ts";
+import * as prim from "/primitives/mod.ts";
 import * as sys from "/system/mod.ts";
-import * as crypto from "/target/wasm/crypto/mod.js";
-import * as hex from "std/encoding/hex.ts";
 
-const POLKASSEMBLY_ADDR = "13SceNt2ELz3ti4rnQbY1snpYH4XE4fLFsW8ph9rpwJd6HFC" as const;
-const polkassemblyPubKey = crypto.decodeSs58(POLKASSEMBLY_ADDR);
-export const pubKeyBytes = hex.decode(polkassemblyPubKey);
-
-// Bind to a specific chain via a proxy URL
+// Represent a chain via a proxy URL
 const chain = frame.Chain.ProxyWebSocketUrl(sys.lift(POLKADOT_RPC_URL));
 
-// Bind to a specific storage entry of the chain
+// Represent a storage entry of the chain
 const storageEntry = frame.StorageEntry(chain, "System", "Account");
 
-// Bind to a value of the storage entry
-const storageMapValue = frame.StorageMapValue(storageEntry, sys.lift(pubKeyBytes));
+// Represent a public key via an Ss58 address
+const pubKey = prim.PubKey.Ss58Text(sys.lift("13SceNt2ELz3ti4rnQbY1snpYH4XE4fLFsW8ph9rpwJd6HFC"));
+
+// Specifically, we want that key's bytes
+const pubKeyBytes = sys.accessor(pubKey)((x) => x.bytes);
+
+// Use those bytes to get a representation of the user's balance
+const storageMapValue = frame.StorageMapValue(storageEntry, pubKeyBytes);
 
 // Initiate the request
 const result = await sys.Fiber(storageMapValue, new sys.WebSocketConnections(), {});
