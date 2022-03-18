@@ -11,7 +11,7 @@ type TransformerResultByKind = m.EnsureAllTypeDefKindsAccountedFor<{
   [m.TypeDefKind.Sequence]: never;
   [m.TypeDefKind.FixedLenArray]: never;
   [m.TypeDefKind.Tuple]: never;
-  [m.TypeDefKind.Primitive]: never;
+  [m.TypeDefKind.Primitive]: ts.PropertyAccessExpression;
   [m.TypeDefKind.Compact]: never;
   [m.TypeDefKind.BitSequence]: never;
 }>;
@@ -46,8 +46,8 @@ export const TypeDecoder = (
       [m.TypeDefKind.Tuple]() {
         asserts.unimplemented();
       },
-      [m.TypeDefKind.Primitive]() {
-        asserts.unimplemented();
+      [m.TypeDefKind.Primitive](typeDef) {
+        return Leaf(typeDef.kind)(decodeNamespaceIdent);
       },
       [m.TypeDefKind.Compact]() {
         asserts.unimplemented();
@@ -72,7 +72,13 @@ export const TypeDecoder = (
         [f.createVariableDeclaration(
           f.createIdentifier(`decode${capitalizeFirstLetter(storageEntry.name)}`),
           undefined,
-          undefined,
+          f.createTypeReferenceNode(
+            f.createQualifiedName(
+              decodeNamespaceIdent,
+              f.createIdentifier("Decoder"),
+            ),
+            [f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)], // TODO: swap with actual
+          ),
           TyIDecoder(storageEntry.type.value),
         )],
         ts.NodeFlags.Const,
