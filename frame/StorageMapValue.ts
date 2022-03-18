@@ -1,7 +1,7 @@
 import { StorageEntryResolved } from "/frame/StorageEntry.ts";
 import { StorageKeyEncoded } from "/frame/StorageKeyEncoded.ts";
 import { TypeDecoded } from "/frame/TypeDecoded.ts";
-import * as rpc from "/rpc/StateGetStorage.ts";
+import * as rpc from "/rpc/State/GetStorage.ts";
 import * as sys from "/system/mod.ts";
 
 export const StorageMapValue = <

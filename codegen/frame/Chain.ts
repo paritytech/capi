@@ -12,7 +12,9 @@ import * as asserts from "std/testing/asserts.ts";
 
 const getMetadata = async (wsUrl: string): Promise<m.MetadataContainer> => {
   const chain = frame.Chain.ProxyWebSocketUrl(sys.lift(wsUrl));
-  const result = await sys.Fiber(chain, new sys.WebSocketConnections(), {});
+  const result = await sys.Fiber(chain, {
+    connections: new sys.WebSocketConnections(),
+  });
   asserts.assert(!(result instanceof Error));
   return result.value.metadata;
 };
@@ -43,22 +45,20 @@ export async function* FrameChainSourceFileIter(
     } else { /* Is inlineable (primitive, compact, tuple or array) */ }
   }
 
-  if (false as boolean) { // TODO: get rid of this line
-    for (let palletI = 0; palletI < metadata.raw.pallets.length; palletI++) {
-      const pallet = metadata.raw.pallets[palletI]!;
+  for (let palletI = 0; palletI < metadata.raw.pallets.length; palletI++) {
+    const pallet = metadata.raw.pallets[palletI]!;
 
-      if (pallet.storage) {
-        for (let storageEntryI = 0; storageEntryI < pallet.storage.entries.length; storageEntryI++) {
-          const storageEntry = pallet.storage.entries[storageEntryI]!;
-          const sourceFileDir = path.join(outDir, pallet.name, "storage");
-          const sourceFilePath = path.join(sourceFileDir, `${storageEntry.name}.ts`);
-          yield SourceFile(sourceFilePath, [
-            Import(sourceFileDir, decodeNamespaceIdent, "scale", "decode"),
-            pallet.name === "System" && storageEntry.name === "Account"
-              ? TypeDecoder(decodeNamespaceIdent, metadata, storageEntry)
-              : Import(sourceFileDir, f.createIdentifier("SOMETHING")),
-          ])(config);
-        }
+    if (pallet.storage) {
+      for (let storageEntryI = 0; storageEntryI < pallet.storage.entries.length; storageEntryI++) {
+        const storageEntry = pallet.storage.entries[storageEntryI]!;
+        const sourceFileDir = path.join(outDir, pallet.name, "storage");
+        const sourceFilePath = path.join(sourceFileDir, `${storageEntry.name}.ts`);
+        yield SourceFile(sourceFilePath, [
+          Import(sourceFileDir, decodeNamespaceIdent, "scale", "decode"),
+          pallet.name === "System" && storageEntry.name === "Account"
+            ? TypeDecoder(decodeNamespaceIdent, metadata, storageEntry)
+            : Import(sourceFileDir, f.createIdentifier("SOMETHING")),
+        ])(config);
       }
     }
   }

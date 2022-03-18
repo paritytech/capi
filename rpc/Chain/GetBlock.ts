@@ -1,6 +1,7 @@
 import * as common from "/rpc/common.ts";
 import * as sys from "/system/mod.ts";
 
+// TODO: how do we differentiate blocks from signed blocks?
 export interface ChainGetBlockResolved {
   block: {
     extrinsics: string[];
