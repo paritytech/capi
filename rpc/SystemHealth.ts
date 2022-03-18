@@ -20,7 +20,7 @@ export const SystemHealth = <
   return sys.effect<SystemHealthResolved>()(
     "SystemHealth",
     { resource },
-    async (_, resolved) => {
+    (_, resolved) => {
       return common.call(resolved.resource, "system_health", isSystemHealthResolved);
     },
   );

@@ -9,7 +9,7 @@ export const SystemVersion = <
   return sys.effect<string>()(
     "SystemVersion",
     { resource },
-    async (_, resolved) => {
+    (_, resolved) => {
       return common.call(resolved.resource, "system_version", u.isStr);
     },
   );

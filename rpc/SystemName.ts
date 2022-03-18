@@ -9,7 +9,7 @@ export const SystemName = <
   return sys.effect<string>()(
     "SystemName",
     { resource },
-    async (_, resolved) => {
+    (_, resolved) => {
       return common.call(resolved.resource, "system_name", u.isStr);
     },
   );

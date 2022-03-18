@@ -9,7 +9,7 @@ export const StateGetMetadata = <
   return sys.effect<string>()(
     "StateGetMetadata",
     { resource },
-    async (_, resolved) => {
+    (_, resolved) => {
       return common.call(resolved.resource, "state_getMetadata", u.isStr);
     },
   );

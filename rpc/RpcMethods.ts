@@ -17,7 +17,7 @@ export const RpcMethods = <
   return sys.effect<RpcMethodsResolved>()(
     "RpcMethods",
     { resource },
-    async (_, resolved) => {
+    (_, resolved) => {
       return common.call(resolved.resource, "rpc_methods", isRpcMethodsResolved);
     },
   );

@@ -32,7 +32,7 @@ export const ChainGetBlock = <
   return sys.effect<ChainGetBlockResolved>()(
     "ChainGetBlock",
     { resource, hash },
-    async (_, resolved) => {
+    (_, resolved) => {
       return common.call(
         resolved.resource,
         "chain_getBlock",

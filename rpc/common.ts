@@ -1,8 +1,8 @@
 import * as u from "/_/util/mod.ts";
 import * as sys from "/system/mod.ts";
 
-export type RpcErr = SomeRpcErr;
-export class SomeRpcErr extends u.ErrorCtor("SomeRpcErr") {}
+export type RpcErr = FailedValidationError;
+export class FailedValidationError extends u.ErrorCtor("SomeRpcErr") {}
 
 export const call = async <
   Beacon,
@@ -25,5 +25,5 @@ export const call = async <
   if (isExpectedResolvedValue(result)) {
     return sys.ok(result);
   }
-  return new SomeRpcErr(); //
+  return new FailedValidationError(); // TODO: provide more info
 };

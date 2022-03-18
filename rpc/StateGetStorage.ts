@@ -13,7 +13,7 @@ export const StateGetStorage = <
   return sys.effect<string>()(
     "StateGetStorage",
     { resource, key },
-    async (_, resolved) => {
+    (_, resolved) => {
       return common.call(resolved.resource, "state_getStorage", u.isStr, resolved.key);
     },
   );

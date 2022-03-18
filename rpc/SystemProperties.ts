@@ -22,7 +22,7 @@ export const SystemProperties = <
   return sys.effect<SystemPropertiesResolved>()(
     "SystemProperties",
     { resource },
-    async (_, resolved) => {
+    (_, resolved) => {
       return common.call(resolved.resource, "system_properties", isSystemPropertiesResolved);
     },
   );

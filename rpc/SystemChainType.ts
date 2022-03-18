@@ -22,7 +22,7 @@ export const SystemChainType = <
   return sys.effect<string>()(
     "SystemChainType",
     { resource },
-    async (_, resolved) => {
+    (_, resolved) => {
       return common.call(resolved.resource, "system_chainType", u.isStr);
     },
   );

@@ -13,7 +13,7 @@ export const ChainGetBlockHash = <
   return sys.effect<string>()(
     "ChainGetBlockHash",
     { resource, height },
-    async (_, resolved) => {
+    (_, resolved) => {
       return common.call(
         resolved.resource,
         "chain_getBlockHash",
