@@ -7,19 +7,21 @@ import * as sys from "/system/mod.ts";
 const resourceUrl = sys.lift(MOONBEAM_RPC_URL);
 const resource = sys.Resource.ProxyWebSocketUrl(resourceUrl);
 
-const systemHealth = rpc.SystemHealth(resource);
-const systemLocalListenAddresses = rpc.SystemLocalListenAddresses(resource);
-const systemName = rpc.SystemName(resource);
-const all = sys.all(systemHealth, systemLocalListenAddresses, systemName);
+// const systemHealth = rpc.SystemHealth(resource);
+// const systemLocalListenAddresses = rpc.SystemLocalListenAddresses(resource);
+// const systemName = rpc.SystemName(resource);
+// const all = sys.all(systemHealth, systemLocalListenAddresses, systemName);
 
-const result = await sys.Fiber(all, {
+const systemSyncState = rpc.SystemSyncState(resource);
+
+const result = await sys.Fiber(systemSyncState, {
   connections: new sys.WebSocketConnections(),
 });
 
 if (result instanceof Error) {
   result;
 } else {
-  console.log(result.value);
+  console.log(result.value.currentBlock);
   // console.log(result.value.isSyncing);
   // result.value.forEach((value) => {
   //   switch (value) {

@@ -13,4 +13,5 @@ export * from "./SystemName.ts";
 export * from "./SystemNodeRoles.ts";
 export * from "./SystemProperties.ts";
 export * from "./SystemReservedPeers.ts";
+export * from "./SystemSyncState.ts";
 export * from "./SystemVersion.ts";
