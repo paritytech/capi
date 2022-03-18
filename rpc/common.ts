@@ -11,7 +11,7 @@ export const call = async <
 >(
   resource: sys.ResourceResolved<Beacon>,
   method: string,
-  validateOk: (okValue: unknown) => okValue is Asserted,
+  validateOk: (okValue: any) => okValue is Asserted,
   ...params: Params
 ): Promise<sys.Result<RpcErr, Asserted>> => {
   const payload: sys.Payload = {

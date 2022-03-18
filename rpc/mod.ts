@@ -7,4 +7,5 @@ export * from "./StateGetStorage.ts";
 export * from "./SystemChain.ts";
 export * from "./SystemChainType.ts";
 export * from "./SystemName.ts";
+export * from "./SystemProperties.ts";
 export * from "./SystemVersion.ts";
