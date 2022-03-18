@@ -4,6 +4,7 @@ export * from "./ChainGetFinalizedHead.ts";
 export * from "./RpcMethods.ts";
 export * from "./StateGetMetadata.ts";
 export * from "./StateGetStorage.ts";
+export * from "./SystemChain.ts";
 export * from "./SystemChainType.ts";
 export * from "./SystemName.ts";
 export * from "./SystemVersion.ts";
