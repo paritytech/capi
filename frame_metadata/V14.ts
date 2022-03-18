@@ -59,8 +59,8 @@ export const primitiveTypeDefKind: d.Decoder<PrimitiveTypeDefKind> = d.Union(
 
 export interface TaggedUnionMember {
   name: string;
-  fields?: Field[];
-  docs?: string[];
+  fields: Field[];
+  docs: string[];
 }
 export const taggedUnionMember: d.Decoder<TaggedUnionMember> = d.Record(
   d.RecordField("name", d.str),
@@ -167,10 +167,10 @@ export const param: d.Decoder<Param> = d.Record(
 );
 
 export interface Type {
-  path?: string[];
-  params?: Param[];
+  path: string[];
+  params: Param[];
   def: TypeDef;
-  docs?: string[];
+  docs: string[];
 }
 export const type_: d.Decoder<Type> = d.Record(
   d.SkipRecordField(dp.compactAsNum), // id
@@ -277,7 +277,7 @@ export interface Pallet {
   storage?: Storage;
   calls?: TypeBearer;
   event?: TypeBearer;
-  constants?: Constant[];
+  constants: Constant[];
   error?: TypeBearer;
 }
 export const pallet: d.Decoder<Pallet> = d.Record(
