@@ -28,7 +28,6 @@ export enum EffectFlags {
  * The `Effect` type is at the heart of the Capi DX. It is the means by which we model and compose computation.
  * Loosely based on Zio's concept of a `ZIO`, effects describe properties such as...
  *
- * - Compatibility (via the `C` phantom)
  * - Runtime requirements / dependency injection
  * - Any errors produced (either by its own computation or that of its dependencies)
  * - The ok / successful result type
