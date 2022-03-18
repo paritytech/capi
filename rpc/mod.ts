@@ -4,3 +4,4 @@ export * from "./ChainGetFinalizedHead.ts";
 export * from "./RpcMethods.ts";
 export * from "./StateGetMetadata.ts";
 export * from "./StateGetStorage.ts";
+export * from "./SystemChainType.ts";
