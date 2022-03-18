@@ -1,7 +1,7 @@
 import * as common from "/rpc/common.ts";
 import * as sys from "/system/mod.ts";
 
-export interface ChainGetBlockOk {
+export interface ChainGetBlockResolved {
   block: {
     extrinsics: string[];
     header: {
@@ -17,7 +17,7 @@ export interface ChainGetBlockOk {
   justification: null; // TODO...
 }
 
-export const isChainGetBlockOk = (inQuestion: any): inQuestion is ChainGetBlockOk => {
+export const isChainGetBlockResolved = (inQuestion: any): inQuestion is ChainGetBlockResolved => {
   return typeof inQuestion === "object" && inQuestion.block && inQuestion.block.header;
 };
 
@@ -29,14 +29,14 @@ export const ChainGetBlock = <
   resource: Resource,
   hash: Hash,
 ) => {
-  return sys.effect<ChainGetBlockOk>()(
+  return sys.effect<ChainGetBlockResolved>()(
     "ChainGetBlock",
     { resource, hash },
     async (_, resolved) => {
       return common.call(
         resolved.resource,
         "chain_getBlock",
-        isChainGetBlockOk,
+        isChainGetBlockResolved,
         ...(resolved.hash ? [resolved.hash] : []),
       );
     },

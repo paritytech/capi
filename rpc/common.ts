@@ -7,13 +7,13 @@ export class SomeRpcErr extends u.ErrorCtor("SomeRpcErr") {}
 export const call = async <
   Beacon,
   Params extends string[],
-  Asserted,
+  ExpectedResolvedValue,
 >(
   resource: sys.ResourceResolved<Beacon>,
   method: string,
-  validateOk: (okValue: any) => okValue is Asserted,
+  isExpectedResolvedValue: (resolvedValue: any) => resolvedValue is ExpectedResolvedValue,
   ...params: Params
-): Promise<sys.Result<RpcErr, Asserted>> => {
+): Promise<sys.Result<RpcErr, ExpectedResolvedValue>> => {
   const payload: sys.Payload = {
     id: sys.Id(),
     method,
@@ -22,7 +22,7 @@ export const call = async <
   const responsePending = resource.receive(payload);
   resource.send(payload);
   const result = await responsePending;
-  if (validateOk(result)) {
+  if (isExpectedResolvedValue(result)) {
     return sys.ok(result);
   }
   return new SomeRpcErr(); //
