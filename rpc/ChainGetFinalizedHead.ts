@@ -7,6 +7,6 @@ export const ChainGetFinalizedHead = <
   Resource extends sys.AnyEffectA<sys.ResourceResolved<Beacon>>,
 >(resource: Resource) => {
   return sys.effect<string>()("ChainGetFinalizedHead", { resource }, async (_, resolved) => {
-    return common.call(resolved.resource, "chain_getFinalizedHead", u.isString);
+    return common.call(resolved.resource, "chain_getFinalizedHead", u.isStr);
   });
 };

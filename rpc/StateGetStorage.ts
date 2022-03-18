@@ -14,7 +14,7 @@ export const StateGetStorage = <
     "StateGetStorage",
     { resource, key },
     async (_, resolved) => {
-      return common.call(resolved.resource, "state_getStorage", u.isString, resolved.key);
+      return common.call(resolved.resource, "state_getStorage", u.isStr, resolved.key);
     },
   );
 };

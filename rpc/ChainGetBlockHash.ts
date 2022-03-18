@@ -17,7 +17,7 @@ export const ChainGetBlockHash = <
       return common.call(
         resolved.resource,
         "chain_getBlockHash",
-        u.isString, // Validate that it is a hex string?
+        u.isStr, // Validate that it is a hex string?
         ...(resolved.height ? [resolved.height] : []),
       );
     },

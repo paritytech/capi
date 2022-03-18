@@ -18,8 +18,7 @@ export const RpcMethods = <
     "RpcMethods",
     { resource },
     async (_, resolved) => {
-      const x = await common.call(resolved.resource, "rpc_methods", isRpcMethodsOk);
-      return x;
+      return common.call(resolved.resource, "rpc_methods", isRpcMethodsOk);
     },
   );
 };

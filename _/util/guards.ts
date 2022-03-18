@@ -1,4 +1,4 @@
-export const isString = (inQuestion: any): inQuestion is string => {
+export const isStr = (inQuestion: any): inQuestion is string => {
   return typeof inQuestion === "string";
 };
 

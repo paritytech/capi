@@ -23,7 +23,7 @@ export const SystemChainType = <
     "SystemChainType",
     { resource },
     async (_, resolved) => {
-      return common.call(resolved.resource, "system_chainType", u.isAny);
+      return common.call(resolved.resource, "system_chainType", u.isStr);
     },
   );
 };

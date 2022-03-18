@@ -10,7 +10,7 @@ export const StateGetMetadata = <
     "StateGetMetadata",
     { resource },
     async (_, resolved) => {
-      return common.call(resolved.resource, "state_getMetadata", u.isString);
+      return common.call(resolved.resource, "state_getMetadata", u.isStr);
     },
   );
 };
