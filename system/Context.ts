@@ -1,4 +1,3 @@
-import { Connections } from "/system/Connections.ts";
 import * as Z from "/system/Effect.ts";
 
 export class Context {
@@ -7,8 +6,5 @@ export class Context {
   controller = new AbortController();
   cleanup: (() => Promise<void>)[] = [];
 
-  constructor(
-    readonly root: Z.AnyEffect,
-    readonly connections: Connections,
-  ) {}
+  constructor(readonly root: Z.AnyEffect) {}
 }

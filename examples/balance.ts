@@ -21,7 +21,9 @@ const pubKeyBytes = sys.accessor(pubKey)((x) => x.bytes);
 const storageMapValue = frame.StorageMapValue(storageEntry, pubKeyBytes);
 
 // Initiate the request
-const result = await sys.Fiber(storageMapValue, new sys.WebSocketConnections(), {});
+const result = await sys.Fiber(storageMapValue, {
+  connections: new sys.WebSocketConnections(),
+});
 
 if (result instanceof Error) {
   console.log(result);

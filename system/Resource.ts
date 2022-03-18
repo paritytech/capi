@@ -1,6 +1,10 @@
-import { Payload } from "/system/Connections.ts";
+import { Connections, Payload } from "/system/Connections.ts";
 import * as Z from "/system/Effect.ts";
 import * as sys from "/system/mod.ts";
+
+export interface ResourceRuntime<Beacon> {
+  connections: Connections<Beacon>;
+}
 
 /**
  * TODO: return means of actually interacting (a layer on top of `system/Connections`).
@@ -14,24 +18,27 @@ export interface ResourceResolved<Beacon> {
 }
 
 export namespace Resource {
-  export const ProxyWebSocketUrl = <Beacon extends string>(beacon: Z.AnyEffectA<Beacon>) => {
-    return Z.effect<ResourceResolved<Beacon>>()(
+  export const ProxyWebSocketUrl = <
+    BeaconResolved extends string,
+    Beacon extends Z.AnyEffectA<BeaconResolved>,
+  >(beacon: Beacon) => {
+    return Z.effect<ResourceResolved<Beacon>, ResourceRuntime<BeaconResolved>>()(
       "Resource.ProxyWebSocketUrl",
       { beacon },
-      async (_0, resolved, ctx) => {
-        ctx.connections.open(resolved.beacon);
+      async (runtime, resolved, ctx) => {
+        runtime.connections.open(resolved.beacon);
         ctx.cleanup.push(async () => {
-          ctx.connections.close(resolved.beacon);
+          runtime.connections.close(resolved.beacon);
         });
         return sys.ok({
           beacon: resolved.beacon,
           // TODO: why isn't `Payload` inferred?
           send: (payload: Payload) => {
-            return ctx.connections.send(resolved.beacon, payload);
+            return runtime.connections.send(resolved.beacon, payload);
           },
           // TODO: why isn't `Payload` inferred?
           receive: (payload: Payload) => {
-            return ctx.connections.receive(payload);
+            return runtime.connections.receive(payload);
           },
         });
       },

@@ -10,10 +10,11 @@ export interface StorageEntryResolved<Beacon> {
 
 export const StorageEntry = <
   Beacon,
+  Chain extends sys.AnyEffectA<ChainResolved<Beacon>>,
   PalletName extends string,
   StorageEntryName extends string,
 >(
-  chain: sys.AnyEffectA<ChainResolved<Beacon>>,
+  chain: Chain,
   palletName: PalletName,
   storageEntryName: StorageEntryName,
 ) => {

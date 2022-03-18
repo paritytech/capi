@@ -49,7 +49,7 @@ const multiply = <
   });
 };
 
-const result = await sys.Fiber(multiply(seven, rand), new sys.WebSocketConnections(), {
+const result = await sys.Fiber(multiply(seven, rand), {
   add(a, b) {
     return a + b;
   },

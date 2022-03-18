@@ -4,13 +4,16 @@ import { MOONBEAM_RPC_URL } from "/_/constants/chains/url.ts";
 import * as rpc from "/rpc/mod.ts";
 import * as sys from "/system/mod.ts";
 
-const resource = sys.Resource.ProxyWebSocketUrl(sys.lift(MOONBEAM_RPC_URL));
+const resourceUrl = sys.lift(MOONBEAM_RPC_URL);
+const resource = sys.Resource.ProxyWebSocketUrl(resourceUrl);
 const effect = rpc.SystemHealth(resource);
-const result = await sys.Fiber(effect, new sys.WebSocketConnections(), {});
+const result = await sys.Fiber(effect, {
+  connections: new sys.WebSocketConnections(),
+});
 if (result instanceof Error) {
   result;
 } else {
-  console.log(result.value.peers);
+  console.log(result);
   // result.value.forEach((value) => {
   //   switch (value) {
   //     case rpc.NodeRoleKind.Full: {

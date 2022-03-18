@@ -86,7 +86,7 @@ export const effect = <
 >() => {
   return <
     EA extends Result<Error, A>,
-    D extends AnyDeps,
+    D extends AnyDeps = Record<never, never>,
   >(
     tag: string,
     deps: D,

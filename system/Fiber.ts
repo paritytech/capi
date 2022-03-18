@@ -1,4 +1,3 @@
-import { Connections } from "/system/Connections.ts";
 import { Context } from "/system/Context.ts";
 import * as Z from "/system/Effect.ts";
 import { Result } from "/system/Result.ts";
@@ -6,10 +5,9 @@ import { abortable } from "std/async/abortable.ts";
 
 export const Fiber = async <Root extends Z.AnyEffect>(
   root: Root,
-  connections: Connections,
   runtime: Root[Z._R],
 ): Promise<Result<Root[Z._E] | Error, Root[Z._A]>> => {
-  const context = new Context(root, connections);
+  const context = new Context(root);
   const result = await next(root, runtime, context);
   await Promise.all(context.cleanup.map((cb) => cb()));
   return result;

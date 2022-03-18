@@ -8,10 +8,13 @@ export interface ChainResolved<Beacon> {
 }
 
 export namespace Chain {
-  export const ProxyWebSocketUrl = <Beacon extends string>(beacon: sys.AnyEffectA<Beacon>) => {
+  export const ProxyWebSocketUrl = <
+    BeaconResolved extends string,
+    Beacon extends sys.AnyEffectA<BeaconResolved>,
+  >(beacon: Beacon) => {
     const resource = sys.Resource.ProxyWebSocketUrl(beacon);
     const metadata = Metadata(resource);
-    return sys.effect<ChainResolved<Beacon>>()(
+    return sys.effect<ChainResolved<BeaconResolved>>()(
       "FrameChain",
       { resource, metadata },
       async (_, resolved) => {
