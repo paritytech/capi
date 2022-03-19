@@ -1,5 +1,3 @@
-#!/usr/bin/env -S deno run -A --no-check=remote --import-map=import_map.json
-
 import { COPYRIGHT, DESCRIPTION, LICENSE_NAME, REPO, VERSION } from "/_/constants/mod.ts";
 import * as fs from "std/fs/mod.ts";
 import * as path from "std/path/mod.ts";

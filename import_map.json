@@ -8,7 +8,6 @@
     "typescript": "https://esm.sh/typescript",
     "x/case/": "https://deno.land/x/case@v2.1.0/",
     "x/conditional_type_checks/": "https://deno.land/x/conditional_type_checks@1.0.5/",
-    "x/deno_doc/": "https://deno.land/x/deno_doc@v0.32.0/",
     "x/deno_graph": "https://deno.land/x/deno_graph@0.24.0",
     "x/dnt/": "https://deno.land/x/dnt@0.22.0/",
     "x/dprint/": "https://deno.land/x/dprint@0.2.0/",

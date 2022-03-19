@@ -33,7 +33,7 @@ Make sure you have the following installed on your machine (and please submit is
 After cloning the repository, CD into it and execute the following.
 
 ```sh
-./_/task.ts bootstrap
+deno task bootstrap
 ```
 
 ### Running an Example

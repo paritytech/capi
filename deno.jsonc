@@ -23,5 +23,14 @@
     }
   },
   "importMap": "./import_map.json",
-  "include": ["."]
+  "include": ["."],
+  "tasks": {
+    "download_frame_metadata": "deno run -A --no-check=remote _/tasks/download_frame_metadata.ts",
+    "build_wasm": "deno run -A --no-check=remote _/tasks/build_wasm.ts",
+    "star": "deno run -A --no-check=remote _/tasks/star.ts",
+    "cache_deps": "deno cache --no-check=remote target/star.ts",
+    "build_json_schemas": "deno run -A --no-check=remote _/tasks/build_json_schemas.ts",
+    "bootstrap": "deno task download_frame_metadata && deno task build_wasm && deno task star && deno task cache_deps && deno task build_json_schemas",
+    "lock": "deno cache --lock=lock.json --lock-write --no-check=remote target/star.ts"
+  }
 }

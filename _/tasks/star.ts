@@ -4,7 +4,7 @@ import ts from "typescript";
 
 const f = ts.factory;
 
-const DEST = path.join("target", "_star.ts");
+const DEST = path.join("target", "star.ts");
 const tsPathRegex = path.globToRegExp("**/*.ts");
 const tsPathIter = fs.walk(".", {
   match: [tsPathRegex],

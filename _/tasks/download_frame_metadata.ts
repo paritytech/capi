@@ -1,5 +1,3 @@
-#!/usr/bin/env -S deno run -A --no-check=remote --import-map=import_map.json
-
 import * as chainUris from "/_/constants/chains/url.ts";
 import * as hex from "std/encoding/hex.ts";
 import * as fs from "std/fs/mod.ts";
