@@ -66,6 +66,9 @@ export const TypeDecoder = (
       return (factories[ty.def._tag] as any)(ty.def);
     };
 
+    // const storageEntryTypePath = metadata.raw.types[storageEntry.type.value]?.path;
+    // console.log(storageEntryTypePath);
+
     const statement = f.createVariableStatement(
       [f.createModifier(ts.SyntaxKind.ExportKeyword)],
       f.createVariableDeclarationList(

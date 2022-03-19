@@ -30,6 +30,7 @@ export async function* FrameChainSourceFileIter(
   const metadata = await getMetadata(resource);
   const outDir = path.join(config.outDirAbs, "frame", alias);
   const decodeNamespaceIdent = f.createUniqueName("d");
+  const typeNameAndPathEntryByIndex: Record<number, [string, string[]]> = {};
 
   for (let typeI = 0; typeI < metadata.raw.types.length; typeI++) {
     const type = metadata.raw.types[typeI]!;
@@ -39,6 +40,7 @@ export async function* FrameChainSourceFileIter(
       const finalPathPiece = type.path[finalI]!;
       const sourceFileDir = path.join(outDir, ...type.path.slice(0, finalI));
       const sourceFilePath = path.join(sourceFileDir, `${finalPathPiece}.ts`);
+      typeNameAndPathEntryByIndex[typeI] = [finalPathPiece, type.path];
       yield SourceFile(sourceFilePath, [
         Type(finalPathPiece, type, metadata),
       ])(config);
@@ -59,9 +61,13 @@ export async function* FrameChainSourceFileIter(
         storageFileNames.push(fileName);
         const sourceFilePath = path.join(sourceFileDir, fileName);
         if (pallet.name === "System" && storageEntry.name === "Account") {
-          console.log(sourceFilePath);
+          const nameAndPathEntry = typeNameAndPathEntryByIndex[storageEntry.type.value];
+          asserts.assert(nameAndPathEntry);
+          console.log(nameAndPathEntry);
           yield SourceFile(sourceFilePath, [
             Import(sourceFileDir, decodeNamespaceIdent, "scale", "decode"),
+            // ImportNamed(sourceFileDir, ""),
+            // TODO: re-arrange params & perhaps abstract into a `Ctx` of some sort.
             TypeDecoder(decodeNamespaceIdent, metadata, storageEntry),
           ])(config);
         }
