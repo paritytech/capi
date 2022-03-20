@@ -1,4 +1,5 @@
 import * as u from "/_/util/mod.ts";
+import { ConnectionPool, Payload } from "/connection/common.ts";
 import * as async from "std/async/mod.ts";
 
 // Refine
@@ -8,31 +9,7 @@ export class ClosedConnectionBeforePendingResolved extends u.ErrorCtor("ClosedCo
 
 // TODO: fine-tune Error types!
 
-// TODO: rethink id management
-export const Id: (() => string) = (() => {
-  let count = 0;
-  return () => {
-    return (count++).toString();
-  };
-})();
-
-export interface Payload {
-  id: string;
-  method: string;
-  params: string[];
-}
-
-export interface Connections<Beacon = any> {
-  open(beacon: Beacon): void;
-  close(beacon: Beacon): void;
-  send(
-    beacon: Beacon,
-    payload: Payload,
-  ): void;
-  receive(payload: Payload): Promise<unknown>;
-}
-
-export class WebSocketConnections implements Connections<string> {
+export class WebSocketConnectionPool implements ConnectionPool<string> {
   // #abortController = new AbortController();
   #connections: Record<string, WebSocket> = {};
   #egress: Record<string, Payload[]> = {};

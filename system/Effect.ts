@@ -132,6 +132,16 @@ export const accessor = <Source extends AnyEffect>(source: Source) => {
   };
 };
 
+export type DepList<Deps extends (AnyEffect | undefined)[]> = {
+  [Key in keyof Deps]: DepListHomomorphic<Deps[Key]>;
+};
+type DepListHomomorphic<D> = D extends AnyEffect ? D : never;
+export const depList = <Deps extends (AnyEffect | undefined)[]>(...deps: Deps): DepList<Deps> => {
+  return deps.reduce((acc, dep) => {
+    return [...acc, ...(dep ? [dep] : [])];
+  }, [] as any as AnyEffect[]) as DepList<Deps>;
+};
+
 export const all = <Sources extends AnyEffect[]>(...sources: Sources) => {
   const sourcesSafe: Record<number, AnyEffect> = {};
   for (let i = 0; i < sources.length; i++) {

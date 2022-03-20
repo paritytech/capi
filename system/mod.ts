@@ -1,4 +1,3 @@
-export * from "./Connections.ts";
 export * from "./Context.ts";
 export * from "./Effect.ts";
 export * from "./Fiber.ts";

@@ -8,7 +8,8 @@
       "**/.git/objects/**": true,
       "**/.git/subtree-cache/**": true,
       "target/**": true
-    }
+    },
+    "dprint.path": "/home/vscode/.dprint/bin/dprint"
   },
   "extensions": [
     "EditorConfig.EditorConfig",
@@ -22,6 +23,6 @@
     "streetsidesoftware.code-spell-checker",
     "vadimcn.vscode-lldb"
   ],
-  "postCreateCommand": "./_/tasks/bootstrap.ts",
+  "postCreateCommand": "deno task bootstrap",
   "remoteUser": "vscode"
 }

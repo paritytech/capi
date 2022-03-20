@@ -1,16 +1,11 @@
-import { Connections, Payload } from "/system/Connections.ts";
+import { ConnectionPool, Payload } from "/connection/mod.ts";
 import * as Z from "/system/Effect.ts";
 import * as sys from "/system/mod.ts";
 
 export interface ResourceRuntime<Beacon> {
-  connections: Connections<Beacon>;
+  connections: ConnectionPool<Beacon>;
 }
 
-/**
- * TODO: return means of actually interacting (a layer on top of `system/Connections`).
- * For now, we simply return the supplied beacon value and initialize all (as sockets)
- * at the `Fiber` root.
- */
 export interface ResourceResolved<Beacon> {
   beacon: Beacon;
   send(payload: Payload): void;
@@ -26,6 +21,7 @@ export namespace Resource {
       "Resource.ProxyWebSocketUrl",
       { beacon },
       async (runtime, resolved, ctx) => {
+        // In the future, set conditions to time-out the connection and tracked inflight
         runtime.connections.open(resolved.beacon);
         ctx.cleanup.push(async () => {
           runtime.connections.close(resolved.beacon);

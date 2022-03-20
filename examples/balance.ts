@@ -1,8 +1,9 @@
 #!/usr/bin/env -S deno run -A --no-check=remote --import-map=import_map.json
 
 import { POLKADOT_RPC_URL } from "/_/constants/chains/url.ts";
+import * as c from "/connection/mod.ts";
 import * as frame from "/frame/mod.ts";
-import * as prim from "/primitives/mod.ts";
+import * as prim from "/primitive/mod.ts";
 import * as sys from "/system/mod.ts";
 
 // Represent a chain via a proxy URL
@@ -22,7 +23,7 @@ const storageMapValue = frame.StorageMapValue(storageEntry, pubKeyBytes);
 
 // Initiate the request
 const result = await sys.Fiber(storageMapValue, {
-  connections: new sys.WebSocketConnections(),
+  connections: new c.WebSocketConnectionPool(),
 });
 
 if (result instanceof Error) {

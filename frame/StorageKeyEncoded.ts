@@ -1,20 +1,19 @@
-import { spreadableOptional } from "/_/util/mod.ts";
 import { MetadataContainer } from "/frame_metadata/Container.ts";
 import { encodeStorageMapKey } from "/frame_metadata/StorageKeyEncoder.ts";
 import * as sys from "/system/mod.ts";
+
+// TODO:
 
 export const StorageKeyEncoded = <
   Metadata extends sys.AnyEffectA<MetadataContainer>,
   PalletName extends sys.AnyEffectA<string>,
   StorageEntryName extends sys.AnyEffectA<string>,
-  KeyA extends sys.AnyEffect,
-  KeyB extends sys.AnyEffect,
+  Keys extends [keyA?: sys.AnyEffect, keyB?: sys.AnyEffect],
 >(
   metadata: Metadata,
   palletName: PalletName,
   storageEntryName: StorageEntryName,
-  keyA?: KeyA,
-  keyB?: KeyB,
+  ...keys: Keys
 ) => {
   return sys.effect<string>()(
     "FrameStorageKeyEncoded",
@@ -22,10 +21,7 @@ export const StorageKeyEncoded = <
       metadata,
       palletName,
       storageEntryName,
-
-      // TODO: do we truly want this...
-      ...spreadableOptional("keyA", keyA),
-      ...spreadableOptional("keyB", keyB),
+      keys: sys.all(...sys.depList(...keys)),
     },
     async (_, resolved) => {
       return sys.ok(
@@ -33,8 +29,8 @@ export const StorageKeyEncoded = <
           resolved.metadata,
           resolved.palletName,
           resolved.storageEntryName,
-          resolved.keyA,
-          resolved.keyB,
+          resolved.keys[0],
+          resolved.keys[1],
         ),
       );
     },

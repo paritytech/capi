@@ -23,6 +23,8 @@ export const StorageMapValue = <
   const resource = a((r) => r.chain.resource);
 
   const keyEncoded = StorageKeyEncoded(metadata, palletName, name, keyA, keyB);
+  // TODO: fix this
+  const x = keyEncoded.deps.keys.deps[1]; // TODO: should be `AnyEffect`... definitively
   const getStorageResult = rpc.StateGetStorage(resource, keyEncoded);
   return TypeDecoded(metadata, typeIndex, getStorageResult);
 };
