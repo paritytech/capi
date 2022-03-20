@@ -5,6 +5,7 @@ import { TypeDecoder } from "/codegen/frame/TypeDecoder.ts";
 import { Import } from "/codegen/Import.ts";
 import { SourceFile } from "/codegen/SourceFile.ts";
 import { Config } from "/config/mod.ts";
+import { WebSocketConnectionPool } from "/connection/mod.ts";
 import * as frame from "/frame/mod.ts";
 import * as m from "/frame_metadata/mod.ts";
 import * as sys from "/system/mod.ts";
@@ -15,7 +16,7 @@ import ts from "typescript";
 const getMetadata = async (wsUrl: string): Promise<m.MetadataContainer> => {
   const chain = frame.Chain.ProxyWebSocketUrl(sys.lift(wsUrl));
   const result = await sys.Fiber(chain, {
-    connections: new sys.WebSocketConnections(),
+    connections: new WebSocketConnectionPool(),
   });
   asserts.assert(!(result instanceof Error));
   return result.value.metadata;
