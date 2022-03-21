@@ -1,5 +1,3 @@
-#!/usr/bin/env -S deno run -A --no-check=remote --import-map=import_map.json
-
 import { POLKADOT_RPC_URL } from "/_/constants/chains/url.ts";
 import * as c from "/connection/mod.ts";
 import * as frame from "/frame/mod.ts";

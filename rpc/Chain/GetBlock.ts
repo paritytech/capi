@@ -38,7 +38,9 @@ export const ChainGetBlock = <
         resolved.resource,
         "chain_getBlock",
         isChainGetBlockResolved,
-        ...(resolved.hash ? [resolved.hash] : []),
+        // Interesting that `[resolved.hash]` is being widened to `(string | undefined)[]`...
+        // TODO: investigate why the widening ^ –– explicit `as const` should NOT be necessary here
+        ...(resolved.hash ? [resolved.hash] as const : []),
       );
     },
   );

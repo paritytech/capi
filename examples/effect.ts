@@ -1,5 +1,3 @@
-#!/usr/bin/env -S deno run -A --no-check=remote --import-map=import_map.json
-
 import * as sys from "/system/mod.ts";
 
 const three = sys.lift(3 as const);

@@ -106,13 +106,14 @@ export const effect = <
  * the checker from recursing (which would result in circularity errors stemming from `Effect[_R]` and `Effect[_E]`).
  */
 export type AnyEffect = Effect<any, any, any>;
-export type AnyEffectA<A> = Effect<any, Result<any, A>, any>;
+export type AnyEffectA<A> = Effect<any, Result<Error, A>, any>;
 
 export type AnyDeps = Record<PropertyKey, AnyEffect>;
 export type Resolved<D extends AnyDeps> = { [K in keyof D]: D[K][_A] };
 
-export type ResolvedHomomorphic<D> = { [K in keyof D]: ResolvedHomomorphic._0<D[K]> };
-namespace ResolvedHomomorphic {
+export type AllResolved<D> = { [K in keyof D]: AllResolved._0<D[K]> };
+namespace AllResolved {
+  // Homomorphic mapping
   export type _0<T> = T extends AnyEffect ? T[_A] : T;
 }
 
@@ -132,14 +133,19 @@ export const accessor = <Source extends AnyEffect>(source: Source) => {
   };
 };
 
-export type DepList<Deps extends (AnyEffect | undefined)[]> = {
-  [Key in keyof Deps]: DepListHomomorphic<Deps[Key]>;
+export const undef = effect<undefined>()("Undefined", {}, () => Promise.resolve(ok(undefined)));
+export type Undef = Effect<{}, Ok<undefined>, {}>;
+
+export type Rest<Deps extends (AnyEffect | undefined)[]> = {
+  [Key in keyof Deps]: Deps[Key] extends AnyEffect ? Deps[Key]
+    : Deps[Key] extends AnyEffect | Undef ? Extract<Deps[Key], AnyEffect> | Undef
+    : never;
 };
-type DepListHomomorphic<D> = D extends AnyEffect ? D : never;
-export const depList = <Deps extends (AnyEffect | undefined)[]>(...deps: Deps): DepList<Deps> => {
-  return deps.reduce((acc, dep) => {
-    return [...acc, ...(dep ? [dep] : [])];
-  }, [] as any as AnyEffect[]) as DepList<Deps>;
+export const rest = <Deps extends (AnyEffect | undefined)[]>(...deps: Deps) => {
+  const undefSwapped = deps.reduce<AnyEffect[]>((acc, dep) => {
+    return [...acc, ...(dep ? [dep] : [undef])];
+  }, []);
+  return all(...undefSwapped as Rest<Deps>);
 };
 
 export const all = <Sources extends AnyEffect[]>(...sources: Sources) => {
@@ -147,11 +153,11 @@ export const all = <Sources extends AnyEffect[]>(...sources: Sources) => {
   for (let i = 0; i < sources.length; i++) {
     sourcesSafe[i] = sources[i]!;
   }
-  return effect<ResolvedHomomorphic<Sources>>()("All", sourcesSafe, async (_, resolved) => {
+  return effect<AllResolved<Sources>>()("All", sourcesSafe, async (_, resolved) => {
     const sourcesResolved: any[] = [];
     for (let i = 0; i < sources.length; i++) {
       sourcesResolved.push(resolved[i]);
     }
-    return ok(sourcesResolved as ResolvedHomomorphic<Sources>);
+    return ok(sourcesResolved as AllResolved<Sources>);
   });
 };

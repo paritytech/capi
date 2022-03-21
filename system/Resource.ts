@@ -13,27 +13,22 @@ export interface ResourceResolved<Beacon> {
 }
 
 export namespace Resource {
-  export const ProxyWebSocketUrl = <
-    BeaconResolved extends string,
-    Beacon extends Z.AnyEffectA<BeaconResolved>,
-  >(beacon: Beacon) => {
-    return Z.effect<ResourceResolved<Beacon>, ResourceRuntime<BeaconResolved>>()(
+  export const ProxyWebSocketUrl = <Beacon extends Z.AnyEffectA<string>>(beacon: Beacon) => {
+    return Z.effect<ResourceResolved<Beacon[sys._A]>, ResourceRuntime<Beacon[sys._A]>>()(
       "Resource.ProxyWebSocketUrl",
       { beacon },
       async (runtime, resolved, ctx) => {
-        // In the future, set conditions to time-out the connection and tracked inflight
+        // TODO: set conditions to time-out the connection and tracked inflight
         runtime.connections.open(resolved.beacon);
         ctx.cleanup.push(async () => {
           runtime.connections.close(resolved.beacon);
         });
-        return sys.ok({
+        return sys.ok<ResourceResolved<Beacon[sys._A]>>({
           beacon: resolved.beacon,
-          // TODO: why isn't `Payload` inferred?
-          send: (payload: Payload) => {
+          send: (payload) => {
             return runtime.connections.send(resolved.beacon, payload);
           },
-          // TODO: why isn't `Payload` inferred?
-          receive: (payload: Payload) => {
+          receive: (payload) => {
             return runtime.connections.receive(payload);
           },
         });
