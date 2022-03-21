@@ -10,17 +10,7 @@ await fs.emptyDir(outDir);
 await Promise.all([
   build({
     importMap: "import_map.json",
-    entryPoints: [
-      "_/constants/mod.ts",
-      "_/util/mod.ts",
-      "system/mod.ts",
-      "frame/mod.ts",
-      "frame_metadata/mod.ts",
-      "target/wasm/crypto/mod.js", // remove top-level await & ensure dts files referenced
-      "rpc/mod.ts",
-      "config/mod.ts",
-      "codegen/mod.ts",
-    ],
+    entryPoints: ["mod.ts"],
     outDir,
     package: {
       name: "capi-beta",

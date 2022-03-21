@@ -15,9 +15,8 @@ import ts from "typescript";
 
 const getMetadata = async (wsUrl: string): Promise<m.MetadataContainer> => {
   const chain = frame.Chain.ProxyWebSocketUrl(sys.lift(wsUrl));
-  const result = await sys.Fiber(chain, {
-    connections: new WebSocketConnectionPool(),
-  });
+  const fiber = new sys.Fiber(chain);
+  const result = await fiber.run({ connections: new WebSocketConnectionPool() });
   asserts.assert(!(result instanceof Error));
   return result.value.metadata;
 };

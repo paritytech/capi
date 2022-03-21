@@ -1,6 +1,6 @@
 import * as u from "/_/util/mod.ts";
-import * as common from "/rpc/common.ts";
-import * as sys from "/system/mod.ts";
+import { call } from "/rpc/common.ts";
+import * as s from "/system/mod.ts";
 
 // // TODO: do we want to type the ok value as a tagged union instead?
 // export enum ChainTypeKind {
@@ -17,13 +17,13 @@ import * as sys from "/system/mod.ts";
 
 export const SystemChainType = <
   Beacon,
-  Resource extends sys.AnyEffectA<sys.ResourceResolved<Beacon>>,
+  Resource extends s.AnyEffectA<s.ResourceResolved<Beacon>>,
 >(resource: Resource) => {
-  return sys.effect<string>()(
+  return s.effect<string>()(
     "SystemChainType",
     { resource },
     (_, resolved) => {
-      return common.call(resolved.resource, "system_chainType", u.isStr);
+      return call(resolved.resource, "system_chainType", u.isStr);
     },
   );
 };

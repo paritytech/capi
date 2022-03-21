@@ -1,16 +1,16 @@
 import * as u from "/_/util/mod.ts";
-import * as common from "/rpc/common.ts";
-import * as sys from "/system/mod.ts";
+import { call } from "/rpc/common.ts";
+import * as s from "/system/mod.ts";
 
 export const SystemLocalPeerId = <
   Beacon,
-  Resource extends sys.AnyEffectA<sys.ResourceResolved<Beacon>>,
+  Resource extends s.AnyEffectA<s.ResourceResolved<Beacon>>,
 >(resource: Resource) => {
-  return sys.effect<string>()(
+  return s.effect<string>()(
     "SystemLocalPeerId",
     { resource },
     (_, resolved) => {
-      return common.call(resolved.resource, "system_localPeerId", u.isStr);
+      return call(resolved.resource, "system_localPeerId", u.isStr);
     },
   );
 };

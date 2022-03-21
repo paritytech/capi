@@ -1,5 +1,5 @@
 import * as common from "/rpc/common.ts";
-import * as sys from "/system/mod.ts";
+import * as s from "/system/mod.ts";
 
 export interface SystemPropertiesResolved {
   ss58Format: number; // TODO: literally-type this
@@ -17,9 +17,9 @@ export const isSystemPropertiesResolved = (
 
 export const SystemProperties = <
   Beacon,
-  Resource extends sys.AnyEffectA<sys.ResourceResolved<Beacon>>,
+  Resource extends s.AnyEffectA<s.ResourceResolved<Beacon>>,
 >(resource: Resource) => {
-  return sys.effect<SystemPropertiesResolved>()(
+  return s.effect<SystemPropertiesResolved>()(
     "SystemProperties",
     { resource },
     (_, resolved) => {

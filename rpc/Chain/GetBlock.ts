@@ -1,5 +1,5 @@
-import * as common from "/rpc/common.ts";
-import * as sys from "/system/mod.ts";
+import { call } from "/rpc/common.ts";
+import * as s from "/system/mod.ts";
 
 // TODO: how do we differentiate blocks from signed blocks?
 export interface ChainGetBlockResolved {
@@ -24,17 +24,17 @@ export const isChainGetBlockResolved = (inQuestion: any): inQuestion is ChainGet
 
 export const ChainGetBlock = <
   Beacon,
-  Resource extends sys.AnyEffectA<sys.ResourceResolved<Beacon>>,
-  Hash extends sys.AnyEffectA<string | undefined>,
+  Resource extends s.AnyEffectA<s.ResourceResolved<Beacon>>,
+  Hash extends s.AnyEffectA<string | undefined>,
 >(
   resource: Resource,
   hash: Hash,
 ) => {
-  return sys.effect<ChainGetBlockResolved>()(
+  return s.effect<ChainGetBlockResolved>()(
     "ChainGetBlock",
     { resource, hash },
     (_, resolved) => {
-      return common.call(
+      return call(
         resolved.resource,
         "chain_getBlock",
         isChainGetBlockResolved,

@@ -1,7 +1,6 @@
 import * as u from "/_/util/mod.ts";
 import { Context } from "/system/Context.ts";
 import { Sha256 } from "std/hash/sha256.ts";
-import { AnyResult, Ok, ok, Result } from "./Result.ts";
 
 /** Requirements */
 export const _R: unique symbol = Symbol();
@@ -37,12 +36,12 @@ export enum EffectFlags {
  */
 export class Effect<
   R extends Record<PropertyKey, any>,
-  EA extends AnyResult,
+  EA extends u.AnyResult,
   D extends AnyDeps,
 > {
   [_R]!: R & u.UnionToIntersection<u.ValueOf<D>[_R]>;
   [_E]!: Extract<EA, Error> | WideErrorAsNever<u.ValueOf<D>[_E]>;
-  [_A]!: Extract<EA, Ok<any>>["value"];
+  [_A]!: Extract<EA, u.Ok<any>>["value"];
 
   /**
    * @param tag This is used for stack traces, constant folding and serialization
@@ -85,7 +84,7 @@ export const effect = <
   R extends Record<PropertyKey, any> = {},
 >() => {
   return <
-    EA extends Result<Error, A>,
+    EA extends u.Result<Error, A>,
     D extends AnyDeps = Record<never, never>,
   >(
     tag: string,
@@ -106,58 +105,9 @@ export const effect = <
  * the checker from recursing (which would result in circularity errors stemming from `Effect[_R]` and `Effect[_E]`).
  */
 export type AnyEffect = Effect<any, any, any>;
-export type AnyEffectA<A> = Effect<any, Result<Error, A>, any>;
+export type AnyEffectA<A> = Effect<any, u.Result<Error, A>, any>;
 
 export type AnyDeps = Record<PropertyKey, AnyEffect>;
 export type Resolved<D extends AnyDeps> = { [K in keyof D]: D[K][_A] };
 
-export type AllResolved<D> = { [K in keyof D]: AllResolved._0<D[K]> };
-namespace AllResolved {
-  // Homomorphic mapping
-  export type _0<T> = T extends AnyEffect ? T[_A] : T;
-}
-
 export type WideErrorAsNever<E> = [Error] extends [E] ? never : E;
-
-export const lift = <A>(a: A): Effect<{}, Result<never, A>, {}> => {
-  return effect<A>()("Lift", {}, async () => {
-    return ok(a);
-  });
-};
-
-export const accessor = <Source extends AnyEffect>(source: Source) => {
-  return <A>(select: (source: Source[_A]) => A) => {
-    return effect<A>()("Accessor", { source }, async (_, resolved) => {
-      return ok(select(resolved.source));
-    });
-  };
-};
-
-export const undef = effect<undefined>()("Undefined", {}, () => Promise.resolve(ok(undefined)));
-export type Undef = Effect<{}, Ok<undefined>, {}>;
-
-export type Rest<Deps extends (AnyEffect | undefined)[]> = {
-  [Key in keyof Deps]: Deps[Key] extends AnyEffect ? Deps[Key]
-    : Deps[Key] extends AnyEffect | Undef ? Extract<Deps[Key], AnyEffect> | Undef
-    : never;
-};
-export const rest = <Deps extends (AnyEffect | undefined)[]>(...deps: Deps) => {
-  const undefSwapped = deps.reduce<AnyEffect[]>((acc, dep) => {
-    return [...acc, ...(dep ? [dep] : [undef])];
-  }, []);
-  return all(...undefSwapped as Rest<Deps>);
-};
-
-export const all = <Sources extends AnyEffect[]>(...sources: Sources) => {
-  const sourcesSafe: Record<number, AnyEffect> = {};
-  for (let i = 0; i < sources.length; i++) {
-    sourcesSafe[i] = sources[i]!;
-  }
-  return effect<AllResolved<Sources>>()("All", sourcesSafe, async (_, resolved) => {
-    const sourcesResolved: any[] = [];
-    for (let i = 0; i < sources.length; i++) {
-      sourcesResolved.push(resolved[i]);
-    }
-    return ok(sourcesResolved as AllResolved<Sources>);
-  });
-};

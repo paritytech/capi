@@ -1,20 +1,18 @@
 import { MOONBEAM_RPC_URL } from "/_/constants/chains/url.ts";
-import * as c from "/connection/mod.ts";
-import * as rpc from "/rpc/mod.ts";
-import * as sys from "/system/mod.ts";
+import * as c from "/mod.ts";
 
-const resourceUrl = sys.lift(MOONBEAM_RPC_URL);
-const resource = sys.Resource.ProxyWebSocketUrl(resourceUrl);
+const resourceUrl = c.lift(MOONBEAM_RPC_URL);
+const resource = c.Resource.ProxyWebSocketUrl(resourceUrl);
 
-const systemHealth = rpc.SystemHealth(resource);
-const systemLocalListenAddresses = rpc.SystemLocalListenAddresses(resource);
-const systemName = rpc.SystemName(resource);
-const all = sys.all(systemHealth, systemLocalListenAddresses, systemName);
-const repeatAll = sys.all(all, all, all);
+const systemHealth = c.SystemHealth(resource);
+const systemLocalListenAddresses = c.SystemLocalListenAddresses(resource);
+const systemName = c.SystemName(resource);
+const all = c.all(systemHealth, systemLocalListenAddresses, systemName);
+const repeatedThrice = c.all(all, all, all);
 
-const result = await sys.Fiber(repeatAll, {
-  connections: new c.WebSocketConnectionPool(),
-});
+const connections = new c.WebSocketConnectionPool();
+const fiber = new c.Fiber(repeatedThrice);
+const result = await fiber.run({ connections });
 
 if (result instanceof Error) {
   console.log(result);

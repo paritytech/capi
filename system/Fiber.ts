@@ -1,28 +1,29 @@
+import * as u from "/_/util/mod.ts";
 import { Context } from "/system/Context.ts";
-import * as Z from "/system/Effect.ts";
-import { Result } from "/system/Result.ts";
+import * as z from "/system/Effect.ts";
 import { abortable } from "std/async/abortable.ts";
 
-export const Fiber = async <Root extends Z.AnyEffect>(
-  root: Root,
-  runtime: Root[Z._R],
-): Promise<Result<Root[Z._E] | Error, Root[Z._A]>> => {
-  const context = new Context(root);
-  const result = await next(root, runtime, context);
-  await Promise.all(context.cleanup.map((cb) => cb()));
-  return result;
-};
+export class Fiber<Root extends z.AnyEffect> {
+  constructor(readonly root: Root) {}
+
+  async run(runtime: Root[z._R]): Promise<u.Result<Root[z._E] | Error, Root[z._A]>> {
+    const context = new Context(this.root);
+    const result = await next(this.root, runtime, context);
+    await Promise.all(context.cleanup.map((cb) => cb()));
+    return result;
+  }
+}
 
 // TODO: make this stack-based?
 // TODO: story around cancellation / abort controller usage
 // TODO: introduce suspend / resume
 // TODO: OPTIMIZE!
 const next = async (
-  root: Z.AnyEffect,
+  root: z.AnyEffect,
   runtime: unknown,
   context: Context,
-): Promise<Result<Error, unknown>> => {
-  const depsEntries: [PropertyKey, Z.AnyEffect][] = Object.entries(root.deps);
+): Promise<u.Result<Error, unknown>> => {
+  const depsEntries: [PropertyKey, z.AnyEffect][] = Object.entries(root.deps);
   try {
     const depsPending: Promise<unknown>[] = [];
     for (let i = 0; i < depsEntries.length; i++) {
@@ -42,7 +43,7 @@ const next = async (
             }
             return result.value;
           })(),
-          context.controller.signal,
+          context.abortController.signal,
         );
         context.visited.set(dep, depPending);
         depsPending.push(depPending);

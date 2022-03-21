@@ -1,17 +1,14 @@
 import * as u from "/_/util/mod.ts";
 import * as m from "/frame_metadata/mod.ts";
 import * as rpc from "/rpc/mod.ts";
-import * as sys from "/system/mod.ts";
+import * as s from "/system/mod.ts";
 
 const EXPECTED_PREFIX = "0x6d657461";
 const EXPECTED_PREFIX_LEN = 10;
 
-export const Metadata = <
-  Beacon,
-  Resource extends sys.AnyEffectA<sys.ResourceResolved<Beacon>>,
->(resource: Resource) => {
+export const Metadata = <Resource extends s.AnyEffectA<s.ResourceResolved<any>>>(resource: Resource) => {
   const getMetadataResult = rpc.StateGetMetadata(resource);
-  return sys.effect<m.MetadataContainer>()(
+  return s.effect<m.MetadataContainer>()(
     "FrameMetadata",
     { getMetadataResult },
     async (_, resolved) => {
@@ -19,7 +16,7 @@ export const Metadata = <
         return new MalformedResponseErr("Something");
       }
       try {
-        return sys.ok(new m.MetadataContainer(resolved.getMetadataResult.substring(EXPECTED_PREFIX_LEN)));
+        return u.ok(new m.MetadataContainer(resolved.getMetadataResult.substring(EXPECTED_PREFIX_LEN)));
       } catch (e) {
         // Decoding error.
         return new MalformedResponseErr();

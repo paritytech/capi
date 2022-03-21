@@ -1,6 +1,6 @@
 import * as u from "/_/util/mod.ts";
 import * as c from "/connection/mod.ts";
-import * as sys from "/system/mod.ts";
+import * as s from "/system/mod.ts";
 
 export type RpcErr = FailedValidationError;
 export class FailedValidationError extends u.ErrorCtor("SomeRpcErr") {}
@@ -12,11 +12,11 @@ export const call = async <
   Params extends string[],
   ExpectedResolvedValue,
 >(
-  resource: sys.ResourceResolved<Beacon>,
+  resource: s.ResourceResolved<Beacon>,
   method: string,
   isExpectedResolvedValue: (resolvedValue: any) => resolvedValue is ExpectedResolvedValue,
   ...params: Params
-): Promise<sys.Result<RpcErr, ExpectedResolvedValue>> => {
+): Promise<u.Result<RpcErr, ExpectedResolvedValue>> => {
   const payload: c.Payload = {
     id: c.Id(),
     method,
@@ -26,7 +26,7 @@ export const call = async <
   resource.send(payload);
   const result = await responsePending;
   if (isExpectedResolvedValue(result)) {
-    return sys.ok(result);
+    return u.ok(result);
   }
   return new FailedValidationError(); // TODO: provide more info
 };

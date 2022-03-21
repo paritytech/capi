@@ -1,28 +1,29 @@
 import { POLKADOT_RPC_URL } from "/_/constants/chains/url.ts";
-import * as c from "/connection/mod.ts";
-import * as frame from "/frame/mod.ts";
-import * as prim from "/primitive/mod.ts";
-import * as sys from "/system/mod.ts";
+import * as c from "/mod.ts";
 
 // Represent a chain via a proxy URL
-const chain = frame.Chain.ProxyWebSocketUrl(sys.lift(POLKADOT_RPC_URL));
+const chain = c.Chain.ProxyWebSocketUrl(c.lift(POLKADOT_RPC_URL));
 
 // Represent a storage entry of the chain
-const storageEntry = frame.StorageEntry(chain, "System", "Account");
+const storageEntry = c.StorageEntry(chain, "System", "Account");
 
 // Represent a public key via an Ss58 address
-const pubKey = prim.PubKey.Ss58Text(sys.lift("13SceNt2ELz3ti4rnQbY1snpYH4XE4fLFsW8ph9rpwJd6HFC"));
+const pubKey = c.PubKey.Ss58Text(c.lift("13SceNt2ELz3ti4rnQbY1snpYH4XE4fLFsW8ph9rpwJd6HFC"));
 
 // Specifically, we want that key's bytes
-const pubKeyBytes = sys.accessor(pubKey)((x) => x.bytes);
+const pubKeyBytes = c.then(pubKey)((x) => x.bytes);
 
 // Use those bytes to get a representation of the user's balance
-const storageMapValue = frame.StorageMapValue(storageEntry, pubKeyBytes);
+const storageMapValue = c.StorageMapValue(storageEntry, pubKeyBytes);
 
-// Initiate the request
-const result = await sys.Fiber(storageMapValue, {
-  connections: new c.WebSocketConnectionPool(),
-});
+// Create a connection pool
+const connections = new c.WebSocketConnectionPool();
+
+// Spawn a fiber
+const fiber = new c.Fiber(storageMapValue);
+
+// Run the fiber
+const result = await fiber.run({ connections });
 
 if (result instanceof Error) {
   console.log(result);

@@ -1,5 +1,5 @@
-import * as common from "/rpc/common.ts";
-import * as sys from "/system/mod.ts";
+import { call } from "/rpc/common.ts";
+import * as s from "/system/mod.ts";
 
 export interface RpcMethodsResolved {
   methods: string[];
@@ -12,13 +12,13 @@ export const isRpcMethodsResolved = (inQuestion: any): inQuestion is RpcMethodsR
 
 export const RpcMethods = <
   Beacon,
-  Resource extends sys.AnyEffectA<sys.ResourceResolved<Beacon>>,
+  Resource extends s.AnyEffectA<s.ResourceResolved<Beacon>>,
 >(resource: Resource) => {
-  return sys.effect<RpcMethodsResolved>()(
+  return s.effect<RpcMethodsResolved>()(
     "RpcMethods",
     { resource },
     (_, resolved) => {
-      return common.call(resolved.resource, "rpc_methods", isRpcMethodsResolved);
+      return call(resolved.resource, "rpc_methods", isRpcMethodsResolved);
     },
   );
 };

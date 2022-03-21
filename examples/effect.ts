@@ -1,7 +1,8 @@
-import * as sys from "/system/mod.ts";
+import * as u from "/_/util/mod.ts";
+import * as s from "/system/mod.ts";
 
-const three = sys.lift(3 as const);
-const four = sys.lift(4 as const);
+const three = s.lift(3 as const);
+const four = s.lift(4 as const);
 
 interface AddR {
   add(a: number, b: number): number;
@@ -9,12 +10,12 @@ interface AddR {
 
 class ZeroError extends Error {}
 
-const seven = sys.effect<number, AddR>()("Seven", { three, four }, async (runtime, resolved) => {
+const seven = s.effect<number, AddR>()("Seven", { three, four }, async (runtime, resolved) => {
   const added = runtime.add(resolved.three, resolved.four);
   if (added === 0) {
     return new ZeroError();
   }
-  return sys.ok(added);
+  return u.ok(added);
 });
 
 interface RandR {
@@ -23,12 +24,12 @@ interface RandR {
 
 class GtPoint5Error extends Error {}
 
-const rand = sys.effect<number, RandR>()("Rand", {}, async (runtime) => {
+const rand = s.effect<number, RandR>()("Rand", {}, async (runtime) => {
   const generated = runtime.rand();
   if (generated > .5) {
     return new GtPoint5Error();
   }
-  return sys.ok(generated);
+  return u.ok(generated);
 });
 
 interface RMultiply {
@@ -36,18 +37,19 @@ interface RMultiply {
 }
 
 const multiply = <
-  A extends sys.AnyEffectA<number>,
-  B extends sys.AnyEffectA<number>,
+  A extends s.AnyEffectA<number>,
+  B extends s.AnyEffectA<number>,
 >(
   a: A,
   b: B,
 ) => {
-  return sys.effect<number, RMultiply>()("Multiply", { a, b }, async (runtime, resolved) => {
-    return sys.ok(runtime.mul(resolved.a, resolved.b));
+  return s.effect<number, RMultiply>()("Multiply", { a, b }, async (runtime, resolved) => {
+    return u.ok(runtime.mul(resolved.a, resolved.b));
   });
 };
 
-const result = await sys.Fiber(multiply(seven, rand), {
+const fiber = new s.Fiber(multiply(seven, rand));
+const result = await fiber.run({
   add(a, b) {
     return a + b;
   },
