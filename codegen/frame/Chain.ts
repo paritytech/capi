@@ -1,15 +1,11 @@
-import { f, scaleDecodeNamespaceIdent } from "/codegen/common.ts";
 import { FrameContext } from "/codegen/frame/Context.ts";
 import { Type } from "/codegen/frame/Type.ts";
 import { TypeDecoder } from "/codegen/frame/TypeDecoder.ts";
-import { CapiImportSpecifier, NamespacedImport } from "/codegen/Import.ts";
 import { SourceFile } from "/codegen/SourceFile.ts";
 import { Config } from "/config/mod.ts";
 import { WebSocketConnectionPool } from "/connection/mod.ts";
 import * as frame from "/frame/mod.ts";
-import * as m from "/frame_metadata/mod.ts";
 import * as s from "/system/mod.ts";
-import * as path from "std/path/mod.ts";
 import * as asserts from "std/testing/asserts.ts";
 import ts from "typescript";
 
@@ -27,16 +23,16 @@ export async function* FrameChainSourceFileIter(
 
   for (let entryI = 0; entryI < context.typeDescriptorByIEntries.length; entryI++) {
     const typeMetadataByIdEntry = context.typeDescriptorByIEntries[entryI]!;
-    const [typeI, { name, sourceFileDir, sourceFilePath, raw }] = typeMetadataByIdEntry;
+    const [_0, typeDescriptor] = typeMetadataByIdEntry;
+    const { sourceFilePath, importDeclarations } = typeDescriptor;
 
-    const importDeclarations: ts.ImportDeclaration[] = [
-      NamespacedImport(scaleDecodeNamespaceIdent, CapiImportSpecifier(config, sourceFileDir, ["scale", "decode"])),
-    ];
+    const typeDeclarationStatements = Type(context, typeDescriptor);
+    // const typeDecoder = TypeDecoder(context, typeDescriptor);
 
     yield SourceFile(sourceFilePath, [
       ...importDeclarations,
-      // Type(name, type, metadata),
-      // TypeDecoder(decodeNamespaceIdent, parseInt(typeI), name, metadata),
+      ...typeDeclarationStatements,
+      // typeDecoder,
     ]);
   }
 }

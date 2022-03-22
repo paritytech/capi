@@ -27,6 +27,7 @@ await Promise.all([
     scriptModule: false, // re-enable once top-level await removed from wasm bindings
     shims: {
       deno: true,
+      webSocket: true,
     },
     test: false,
     typeCheck: false,

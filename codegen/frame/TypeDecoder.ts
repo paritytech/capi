@@ -1,5 +1,7 @@
 import { FrameContext, FrameTypeDescriptor } from "/codegen/frame/Context.ts";
+import { NamedImport } from "/codegen/Import.ts";
 import * as m from "/frame_metadata/mod.ts";
+import * as path from "std/path/mod.ts";
 import * as asserts from "std/testing/asserts.ts";
 import ts from "typescript";
 import { camelCase } from "x/case/mod.ts";
@@ -8,7 +10,7 @@ import { comment, f, placeholderFn, scaleDecodeNamespaceIdent } from "../common.
 
 type TransformerResultByKind = m.EnsureAllTypeDefKindsAccountedFor<{
   [m.TypeDefKind.Record]: ts.CallExpression;
-  [m.TypeDefKind.TaggedUnion]: ts.ArrowFunction;
+  [m.TypeDefKind.TaggedUnion]: ts.CallExpression;
   [m.TypeDefKind.Sequence]: ts.ArrowFunction;
   [m.TypeDefKind.FixedLenArray]: ts.ArrowFunction;
   [m.TypeDefKind.Tuple]: ts.ArrowFunction;
@@ -16,6 +18,13 @@ type TransformerResultByKind = m.EnsureAllTypeDefKindsAccountedFor<{
   [m.TypeDefKind.Compact]: ts.PropertyAccessExpression;
   [m.TypeDefKind.BitSequence]: ts.ArrowFunction;
 }>;
+
+const ensureRelative = (inQuestion: string): string => {
+  if (inQuestion.startsWith(".")) {
+    return inQuestion;
+  }
+  return `./${inQuestion}`;
+};
 
 // TODO: have to be able to communicate the binding from within `Import` call
 export const TypeDecoder = (
@@ -26,15 +35,57 @@ export const TypeDecoder = (
     [m.TypeDefKind.Record](typeDef) {
       return Record(
         ...typeDef.fields.map((field, i) => {
-          return RecordField(
-            field.name === undefined ? i.toString() : camelCase(field.name),
-            Leaf("TODO"),
-          );
+          const fieldName = field.name === undefined ? i.toString() : camelCase(field.name);
+          const fieldType = context.metadata.raw.types[field.type];
+          asserts.assert(fieldType);
+          if (fieldType.path.length > 0) {
+            const typeNameI = fieldType.path.length - 1;
+            const typeName = fieldType.path[typeNameI]!;
+            const importedDecodeIdent = f.createIdentifier(`decode${capitalizeFirstLetter(typeName)}`);
+            descriptor.importDeclarations.push(
+              NamedImport(
+                importedDecodeIdent,
+                ensureRelative(
+                  path.relative(descriptor.sourceFileDir, path.join(context.typesOutDir, ...fieldType.path))
+                    .split(path.sep).join("/").concat(".ts"),
+                ),
+              ),
+            );
+            return RecordField(fieldName, importedDecodeIdent);
+          } else {
+            return RecordField(fieldName, (this[fieldType.def._tag] as any)(fieldType.def));
+          }
         }),
       );
     },
-    [m.TypeDefKind.TaggedUnion]() {
-      return placeholderFn;
+    [m.TypeDefKind.TaggedUnion](def) {
+      console.log(descriptor.sourceFilePath);
+      return f.createCallExpression(
+        f.createPropertyAccessExpression(
+          scaleDecodeNamespaceIdent,
+          f.createIdentifier("Tagged"),
+        ),
+        undefined,
+        [
+          f.createPropertyAccessExpression(
+            f.createIdentifier("TODOtagEnumIdent"),
+            f.createIdentifier("TODOtagEnumMemberIdent"),
+          ),
+          ...def.members.map((member) => {
+            return f.createCallExpression(
+              f.createPropertyAccessExpression(
+                scaleDecodeNamespaceIdent,
+                f.createIdentifier("RecordField"),
+              ),
+              undefined,
+              [
+                f.createStringLiteral(member.name),
+                Leaf("TODO"),
+              ],
+            );
+          }),
+        ],
+      );
     },
     [m.TypeDefKind.Sequence]() {
       return placeholderFn;
@@ -92,7 +143,7 @@ export const Record = (...fields: ts.CallExpression[]) => {
 
 export const RecordField = (
   key: string,
-  decoder: ts.PropertyAccessExpression | ts.CallExpression,
+  decoder: ts.PropertyAccessExpression | ts.CallExpression | ts.Identifier,
 ) => {
   return f.createCallExpression(
     f.createPropertyAccessExpression(

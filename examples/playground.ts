@@ -10,9 +10,7 @@ const systemName = c.SystemName(resource);
 const all = c.all(systemHealth, systemLocalListenAddresses, systemName);
 const repeatedThrice = c.all(all, all, all);
 
-const connections = new c.WebSocketConnectionPool();
-const fiber = new c.Fiber(repeatedThrice);
-const result = await fiber.run({ connections });
+const result = await new c.Fiber(repeatedThrice).run({ connections: new c.WebSocketConnectionPool() });
 
 if (result instanceof Error) {
   console.log(result);

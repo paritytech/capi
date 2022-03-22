@@ -1,6 +1,8 @@
 import { UnionToIntersection } from "/_/util/mod.ts";
 import * as asserts from "std/testing/asserts.ts";
 
+export * from "./decode-patterns.ts";
+
 export interface State {
   idx: number;
   bytes: Uint8Array;

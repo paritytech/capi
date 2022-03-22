@@ -16,14 +16,8 @@ const pubKeyBytes = c.then(pubKey)((x) => x.bytes);
 // Use those bytes to get a representation of the user's balance
 const storageMapValue = c.StorageMapValue(storageEntry, pubKeyBytes);
 
-// Create a connection pool
-const connections = new c.WebSocketConnectionPool();
-
 // Spawn a fiber
-const fiber = new c.Fiber(storageMapValue);
-
-// Run the fiber
-const result = await fiber.run({ connections });
+const result = await new c.Fiber(storageMapValue).run({ connections: new c.WebSocketConnectionPool() });
 
 if (result instanceof Error) {
   console.log(result);
