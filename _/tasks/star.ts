@@ -11,7 +11,7 @@ const tsPathIter = fs.walk(".", {
   skip: [
     new RegExp(DEST),
     path.globToRegExp("target/**/*.ts"),
-    path.globToRegExp("examples/.capi/**/*.ts"),
+    path.globToRegExp("examples/generated/**/*.ts"),
   ],
 });
 const importDeclarations: ts.ImportDeclaration[] = [];

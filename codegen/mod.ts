@@ -4,7 +4,7 @@ import * as asserts from "std/testing/asserts.ts";
 import ts from "typescript";
 
 export async function* SourceFileIter(config: Config): AsyncGenerator<ts.SourceFile, void, void> {
-  for (const [alias, resource] of Object.entries(config.configRaw.chains)) {
+  for (const [alias, resource] of Object.entries(config.raw.chains)) {
     if (typeof resource !== "string") {
       asserts.unimplemented();
     }

@@ -5,14 +5,13 @@ import * as path from "std/path/mod.ts";
 export interface ConfigProps {
   configPath: string;
   baseDir: string;
-  outDir: string;
 }
 
 export class Config {
   baseDirAbs;
   configPathAbs;
   configPathCwdRelative;
-  configRaw;
+  raw;
   outDirAbs;
 
   constructor(props: ConfigProps) {
@@ -23,13 +22,12 @@ export class Config {
     this.baseDirAbs = path.join(Deno.cwd(), props.baseDir);
     this.configPathAbs = path.join(this.baseDirAbs, props.configPath);
     this.configPathCwdRelative = path.relative(Deno.cwd(), this.configPathAbs);
-    this.outDirAbs = path.join(this.baseDirAbs, props.outDir);
 
     const rawConfig = JSON.parse(new TextDecoder().decode(Deno.readFileSync(this.configPathCwdRelative)));
     const validationResult = validateConfig(rawConfig);
     switch (validationResult._tag) {
       case "RawConfig": {
-        this.configRaw = validationResult.rawConfig;
+        this.raw = validationResult.rawConfig;
         break;
       }
       case "Diagnostics": {
@@ -38,5 +36,7 @@ export class Config {
         Deno.exit(1);
       }
     }
+
+    this.outDirAbs = path.join(this.baseDirAbs, this.raw.target.outDir);
   }
 }

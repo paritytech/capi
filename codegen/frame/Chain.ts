@@ -1,81 +1,68 @@
-import { f } from "/codegen/common.ts";
-import { ExportStar } from "/codegen/Export.ts";
+import { f, scaleDecodeNamespaceIdent } from "/codegen/common.ts";
+import { FrameContext } from "/codegen/frame/Context.ts";
 import { Type } from "/codegen/frame/Type.ts";
 import { TypeDecoder } from "/codegen/frame/TypeDecoder.ts";
-import { Import } from "/codegen/Import.ts";
+import { CapiImportSpecifier, NamespacedImport } from "/codegen/Import.ts";
 import { SourceFile } from "/codegen/SourceFile.ts";
 import { Config } from "/config/mod.ts";
 import { WebSocketConnectionPool } from "/connection/mod.ts";
 import * as frame from "/frame/mod.ts";
 import * as m from "/frame_metadata/mod.ts";
-import * as sys from "/system/mod.ts";
+import * as s from "/system/mod.ts";
 import * as path from "std/path/mod.ts";
 import * as asserts from "std/testing/asserts.ts";
 import ts from "typescript";
 
-const getMetadata = async (wsUrl: string): Promise<m.MetadataContainer> => {
-  const chain = frame.Chain.ProxyWebSocketUrl(sys.lift(wsUrl));
-  const fiber = new sys.Fiber(chain);
-  const result = await fiber.run({ connections: new WebSocketConnectionPool() });
-  asserts.assert(!(result instanceof Error));
-  return result.value.metadata;
-};
-
-// TODO: have to be able to communicate the binding from within `Import` call
+// TODO: make this compatible with string lists & chain specs
 export async function* FrameChainSourceFileIter(
   config: Config,
-  alias: string,
-  resource: string, // Todo: make this compatible with string lists & chain specs
+  chainAlias: string,
+  beacon: string,
 ): AsyncGenerator<ts.SourceFile, void, void> {
-  const metadata = await getMetadata(resource);
-  const outDir = path.join(config.outDirAbs, "frame", alias);
-  const decodeNamespaceIdent = f.createUniqueName("d");
-  const typeNameAndPathEntryByIndex: Record<number, [string, string[]]> = {};
+  const fiber = new s.Fiber(frame.Metadata(s.Resource.ProxyWebSocketUrl(s.lift(beacon))));
+  const result = await fiber.run({ connections: new WebSocketConnectionPool() });
+  asserts.assert(!(result instanceof Error));
+  const metadata = result.value;
+  const context = new FrameContext(config, chainAlias, beacon, metadata);
 
-  for (let typeI = 0; typeI < metadata.raw.types.length; typeI++) {
-    const type = metadata.raw.types[typeI]!;
-    if (type.path && type.path.length > 0) {
-      // Is a composite or variant.
-      const finalI = type.path.length - 1;
-      const finalPathPiece = type.path[finalI]!;
-      const sourceFileDir = path.join(outDir, ...type.path.slice(0, finalI));
-      const sourceFilePath = path.join(sourceFileDir, `${finalPathPiece}.ts`);
-      typeNameAndPathEntryByIndex[typeI] = [finalPathPiece, type.path];
-      yield SourceFile(sourceFilePath, [
-        Type(finalPathPiece, type, metadata),
-      ])(config);
-    } else { /* Is inlineable (primitive, compact, tuple or array) */ }
-  }
+  for (let entryI = 0; entryI < context.typeDescriptorByIEntries.length; entryI++) {
+    const typeMetadataByIdEntry = context.typeDescriptorByIEntries[entryI]!;
+    const [typeI, { name, sourceFileDir, sourceFilePath, raw }] = typeMetadataByIdEntry;
 
-  for (let palletI = 0; palletI < metadata.raw.pallets.length; palletI++) {
-    const pallet = metadata.raw.pallets[palletI]!;
+    const importDeclarations: ts.ImportDeclaration[] = [
+      NamespacedImport(scaleDecodeNamespaceIdent, CapiImportSpecifier(config, sourceFileDir, ["scale", "decode"])),
+    ];
 
-    if (pallet.storage) {
-      const sourceFileDir = path.join(outDir, pallet.name, "storage");
-      const modFilePath = path.join(sourceFileDir, "mod.ts");
-      const storageFileNames: string[] = [];
-
-      for (let storageEntryI = 0; storageEntryI < pallet.storage.entries.length; storageEntryI++) {
-        const storageEntry = pallet.storage.entries[storageEntryI]!;
-        const fileName = `${storageEntry.name}.ts`;
-        storageFileNames.push(fileName);
-        const sourceFilePath = path.join(sourceFileDir, fileName);
-        if (pallet.name === "System" && storageEntry.name === "Account") {
-          const nameAndPathEntry = typeNameAndPathEntryByIndex[storageEntry.type.value];
-          asserts.assert(nameAndPathEntry);
-          console.log(nameAndPathEntry);
-          yield SourceFile(sourceFilePath, [
-            Import(sourceFileDir, decodeNamespaceIdent, "scale", "decode"),
-            // ImportNamed(sourceFileDir, ""),
-            // TODO: re-arrange params & perhaps abstract into a `Ctx` of some sort.
-            TypeDecoder(decodeNamespaceIdent, metadata, storageEntry),
-          ])(config);
-        }
-      }
-
-      yield SourceFile(modFilePath, storageFileNames.map((storageFileName) => ExportStar(`./${storageFileName}`)))(
-        config,
-      );
-    }
+    yield SourceFile(sourceFilePath, [
+      ...importDeclarations,
+      // Type(name, type, metadata),
+      // TypeDecoder(decodeNamespaceIdent, parseInt(typeI), name, metadata),
+    ]);
   }
 }
+
+// Is inlineable (primitive, compact, tuple or array)
+// switch (type.def._tag) {
+//   case m.TypeDefKind.Sequence: {
+//     const typeParamI = type.def.typeParam;
+//     const typeParam = metadata.raw.types[typeParamI];
+//     const typeParamPath = typeParam?.path;
+//     if (typeParamPath && typeParamPath.length > 0) {
+//       // importDeclarations.
+//     }
+//     break;
+//   }
+//   case m.TypeDefKind.Tuple: {
+//     const typeReferenceNodes = type.def.fields.map((field) => {
+//       const elementType = metadata.raw.types[field];
+//       asserts.assert(elementType);
+//       visited[elementType.def._tag] = true;
+//       return f.createTypeReferenceNode(f.createIdentifier("A"), undefined);
+//     });
+//     typeNodeByI[typeI] = f.createTupleTypeNode(typeReferenceNodes);
+//     break;
+//   }
+//   case m.TypeDefKind.FixedLenArray: {
+//     break;
+//   }
+// }

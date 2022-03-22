@@ -11,17 +11,6 @@ export const codegen = c.command({
   name: "codegen",
   args: {
     ...common.args,
-    outDir: c.option({
-      type: c.string,
-      long: "out-dir",
-      short: "o",
-      description: "The directory into which the code should be generated.",
-      defaultValueIsSerializable: true,
-      env: "CAPI_OUT_DIR",
-      defaultValue() {
-        return ".capi";
-      },
-    }),
     noClean: c.flag({
       long: "no-clean",
       defaultValue() {
@@ -33,7 +22,6 @@ export const codegen = c.command({
     const config = new Config({
       configPath: args.config,
       baseDir: args.baseDir,
-      outDir: args.outDir,
     });
     const printer = ts.createPrinter({
       omitTrailingSemicolon: false,
@@ -44,7 +32,7 @@ export const codegen = c.command({
     }
     const sourceFileIter = SourceFileIter(config);
     const pending: Promise<void>[] = [];
-    const format = config.configRaw.target.skipFormatting
+    const format = config.raw.target.skipFormatting
       ? ((_0: string, source: string): string => source)
       : (() => {
         const formatter = createFromBuffer(Deno.readFileSync("_/assets/dprint_typescript.wasm"));
@@ -53,6 +41,7 @@ export const codegen = c.command({
       })();
     for await (const sourceFile of sourceFileIter) {
       pending.push((async () => {
+        // console.log(`Writing "${sourceFile.fileName}"`);
         await fs.ensureFile(sourceFile.fileName);
         const generated = printer.printFile(sourceFile);
         const formatted = format(sourceFile.fileName, generated);

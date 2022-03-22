@@ -7,7 +7,7 @@
     "arrowFunction.useParentheses": "force"
   },
   "includes": ["**.{dockerfile,json,md,toml,ts}"],
-  "excludes": ["examples/.capi", "target"],
+  "excludes": ["examples/generated", "target"],
   "plugins": [
     "https://plugins.dprint.dev/typescript-0.64.0.wasm",
     "https://plugins.dprint.dev/json-0.14.1.wasm",

@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run -A --no-check=remote --import-map=import_map.json
+#!/usr/bin/env -S deno run -A --no-check=remote
 
 import { NAME } from "/_/constants/project_meta.ts";
 import { VERSION } from "/_/constants/version.ts";

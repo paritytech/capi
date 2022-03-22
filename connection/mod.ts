@@ -1,2 +1,2 @@
 export * from "./common.ts";
-export * from "./Pool.ts";
+export * from "./WebSocket.ts";

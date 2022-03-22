@@ -1,15 +1,13 @@
-import { f, Factory } from "/codegen/common.ts";
+import { f } from "/codegen/common.ts";
 import ts from "typescript";
 
-export const ExportStar = (from: string): Factory<[ts.ExportDeclaration]> => {
-  return (_config) => {
-    return [f.createExportDeclaration(
-      undefined,
-      undefined,
-      false,
-      undefined,
-      f.createStringLiteral(from),
-      undefined,
-    )];
-  };
+export const ExportStar = (moduleSpecifierText: string): ts.ExportDeclaration => {
+  return f.createExportDeclaration(
+    undefined,
+    undefined,
+    false,
+    undefined,
+    f.createStringLiteral(moduleSpecifierText),
+    undefined,
+  );
 };

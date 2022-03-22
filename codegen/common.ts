@@ -1,19 +1,48 @@
-import { Config } from "/config/mod.ts";
 import ts from "typescript";
 
 export const f = ts.factory;
-
-export type Factory<T extends ts.Node | ts.Node[]> = (config: Config) => T;
-export type AnyFactory = Factory<ts.Node | ts.Node[]>;
 
 export const newLine: ts.Statement = f.createIdentifier("\n") as any;
 
 // TODO: fine-tune treatment of whitespace
 export const comment = (target: ts.Statement | ts.PropertySignature, commentText: string): void => {
-  ts.addSyntheticLeadingComment(
-    target,
-    ts.SyntaxKind.MultiLineCommentTrivia,
-    `* ${commentText}`,
+  ts.addSyntheticLeadingComment(target, ts.SyntaxKind.MultiLineCommentTrivia, `* ${commentText}`, true);
+};
+
+export const scaleDecodeNamespaceIdent = f.createUniqueName("d");
+
+export const placeholderFn = f.createArrowFunction(
+  undefined,
+  undefined,
+  [],
+  undefined,
+  f.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
+  f.createBlock(
+    [
+      f.createIfStatement(
+        f.createAsExpression(
+          f.createTrue(),
+          f.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword),
+        ),
+        f.createBlock(
+          [f.createThrowStatement(f.createNewExpression(
+            f.createIdentifier("Error"),
+            undefined,
+            [],
+          ))],
+          true,
+        ),
+        undefined,
+      ),
+      f.createReturnStatement(f.createAsExpression(
+        f.createIdentifier("undefined"),
+        f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
+      )),
+    ],
     true,
-  );
+  ),
+);
+
+export const PropertySignature = (key: string, type: ts.TypeReferenceNode | ts.LiteralTypeNode) => {
+  return f.createPropertySignature(undefined, f.createIdentifier(key), undefined, type);
 };
