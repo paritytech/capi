@@ -45,7 +45,7 @@ export const placeholderFn = f.createArrowFunction(
 
 export const PropertySignature = (
   key: string,
-  type: ts.TypeReferenceNode | ts.LiteralTypeNode | ts.KeywordTypeNode,
+  type: ts.TypeReferenceNode | ts.LiteralTypeNode | ts.KeywordTypeNode | ts.TupleTypeNode | ts.ArrayTypeNode,
 ) => {
   return f.createPropertySignature(undefined, f.createIdentifier(key), undefined, type);
 };

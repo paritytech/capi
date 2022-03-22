@@ -166,10 +166,10 @@ export const param: d.Decoder<Param> = d.Record(
   d.RecordField("type", d.Option(dp.compactAsNum)),
 );
 
-export interface Type {
+export interface Type<Def extends TypeDef = TypeDef> {
   path: string[];
   params: Param[];
-  def: TypeDef;
+  def: Def;
   docs: string[];
 }
 export const type_: d.Decoder<Type> = d.Record(
