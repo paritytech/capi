@@ -26,13 +26,15 @@ export async function* FrameChainSourceFileIter(
   for (let i = 0; i < typeDescriptors.length; i++) {
     const typeDescriptor = typeDescriptors[i]!;
 
-    const typeDeclarationStatements = Type(context, typeDescriptor);
-    // const typeDecoder = TypeDecoder(context, typeDescriptor);
+    const typeDeclarationStatements = new Type(context, typeDescriptor).digest();
+    const typeDecoder = new TypeDecoder(context, typeDescriptor).digest();
+
+    console.log(typeDescriptor.sourceFilePath);
 
     yield SourceFile(typeDescriptor.sourceFilePath, [
       ...typeDescriptor.importDeclarations,
       ...typeDeclarationStatements,
-      // typeDecoder,
+      typeDecoder,
     ]);
   }
 }

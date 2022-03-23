@@ -1,6 +1,6 @@
 import { MetadataContainer } from "/frame_metadata/Container.ts";
 import * as m from "/frame_metadata/V14.ts";
-import { StorageTransformers } from "/frame_metadata/Visitor.ts";
+import { TypeDefVisitor } from "/frame_metadata/Visitor.ts";
 import { Tagged } from "/scale/decode-patterns.ts";
 import * as d from "/scale/decode.ts";
 import * as asserts from "std/testing/asserts.ts";
@@ -25,59 +25,63 @@ const primitiveDecoders: {
   [m.PrimitiveTypeDefKind.I256]: d.i256,
 };
 
-export const FrameTypeDecoder = (
-  metadata: MetadataContainer,
-  typeI: number,
-): d.UnknownDecoder => {
-  const decodeFields = (fields: m.Field[]): d.AnyRecordField[] => {
-    return fields.map((field, i) => {
-      return d.RecordField(field.name === undefined ? i : field.name, TyIDecoder(field.type));
-    });
-  };
+type FrameTypeVisitor = TypeDefVisitor<{ [_ in m.TypeDefKind]: d.AnyDecoder }>;
 
-  const factories: StorageTransformers<{ [_ in m.TypeDefKind]: d.AnyDecoder }> = {
-    [m.TypeDefKind.Record](typeDef) {
-      return d.Record(...decodeFields(typeDef.fields));
-    },
+export class FrameTypeDecoder implements FrameTypeVisitor {
+  constructor(
+    readonly metadata: MetadataContainer,
+    readonly typeI: number,
+  ) {}
 
-    [m.TypeDefKind.TaggedUnion](typeDef) {
-      return d.Union(
-        ...typeDef.members.map((member) => {
-          return Tagged(member.name, ...decodeFields(member.fields || []));
-        }),
-      );
-    },
+  digest(): d.UnknownDecoder {
+    return this.visit(this.typeI);
+  }
 
-    [m.TypeDefKind.Sequence](typeDef) {
-      return d.Tuple(TyIDecoder(typeDef.typeParam));
-    },
-
-    [m.TypeDefKind.FixedLenArray](typeDef) {
-      return d.FixedSizeArray(TyIDecoder(typeDef.typeParam), typeDef.len);
-    },
-
-    [m.TypeDefKind.Tuple](typeDef) {
-      return d.Tuple(...typeDef.fields.map(TyIDecoder));
-    },
-
-    [m.TypeDefKind.Primitive](typeDef) {
-      return primitiveDecoders[typeDef.kind];
-    },
-
-    [m.TypeDefKind.Compact](_typeDef) {
-      asserts.unimplemented();
-    },
-
-    [m.TypeDefKind.BitSequence](_typeDef) {
-      asserts.unimplemented();
-    },
-  };
-
-  const TyIDecoder = (i: number): d.AnyDecoder => {
-    const ty = metadata.raw.types[i];
+  visit(i: number): d.AnyDecoder {
+    const ty = this.metadata.raw.types[i];
     asserts.assert(ty);
-    return (factories[ty.def._tag] as any)(ty.def);
-  };
+    return (this[ty.def._tag] as any)(ty.def);
+  }
 
-  return TyIDecoder(typeI);
-};
+  decodeFields(fields: m.Field[]): d.AnyRecordField[] {
+    return fields.map((field, i) => {
+      return d.RecordField(field.name === undefined ? i : field.name, this.visit(field.type));
+    });
+  }
+
+  Record(typeDef: m.RecordTypeDef) {
+    return d.Record(...this.decodeFields(typeDef.fields));
+  }
+
+  TaggedUnion(typeDef: m.TaggedUnionTypeDef) {
+    return d.Union(
+      ...typeDef.members.map((member) => {
+        return Tagged(member.name, ...this.decodeFields(member.fields || []));
+      }),
+    );
+  }
+
+  Sequence(typeDef: m.SequenceTypeDef) {
+    return d.Tuple(this.visit(typeDef.typeParam));
+  }
+
+  FixedLenArray(typeDef: m.FixedLenArrayTypeDef) {
+    return d.FixedSizeArray(this.visit(typeDef.typeParam), typeDef.len);
+  }
+
+  Tuple(typeDef: m.TupleTypeDef) {
+    return d.Tuple(...typeDef.fields.map(this.visit));
+  }
+
+  Primitive(typeDef: m.PrimitiveTypeDef) {
+    return primitiveDecoders[typeDef.kind];
+  }
+
+  Compact() {
+    return d.compact;
+  }
+
+  BitSequence(typeDef: m.BitSequenceTypeDef) {
+    return asserts.unimplemented();
+  }
+}

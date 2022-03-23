@@ -19,7 +19,7 @@ export const TypeDecoded = <
     { metadata, index, encoded },
     async (_, resolved) => {
       return u.ok(d.run(
-        FrameTypeDecoder(resolved.metadata, resolved.index),
+        new FrameTypeDecoder(resolved.metadata, resolved.index).digest(),
         hex.decode(new TextEncoder().encode(resolved.encoded.substring(2))),
       ));
     },

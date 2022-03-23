@@ -4,8 +4,20 @@ import { Config } from "/config/mod.ts";
 import * as m from "/frame_metadata/mod.ts";
 import * as path from "std/path/mod.ts";
 import ts from "typescript";
+import capitalizeFirstLetter from "x/case/upperFirstCase.ts";
+
+// TODO: move this elsewhere / swap out with equivalent std path util (if exists)
+const ensureRelative = (inQuestion: string): string => {
+  if (inQuestion.startsWith(".")) {
+    return inQuestion;
+  }
+  return `./${inQuestion}`;
+};
 
 export class FrameTypeDescriptor<Def extends m.TypeDef = m.TypeDef> {
+  importedNames: Record<string, true> = {};
+  importedDecoderNames: Record<string, true> = {};
+
   // TODO: ordering
   constructor(
     readonly i: number,
@@ -15,16 +27,31 @@ export class FrameTypeDescriptor<Def extends m.TypeDef = m.TypeDef> {
     readonly nameIdent: ts.Identifier,
     readonly raw: m.Type<Def>,
     readonly importDeclarations: ts.ImportDeclaration[],
-    readonly importedNames: Record<string, true>,
+    readonly decoderName: string,
+    readonly decoderNameIdent: ts.Identifier,
   ) {}
 
-  addNamedImport(importTypeDescriptor: FrameTypeDescriptor) {
+  relativeImportSpecifierText(to: FrameTypeDescriptor): string {
+    return ensureRelative(path.relative(this.sourceFileDir, to.sourceFilePath).split(path.sep).join("/"));
+  }
+
+  importType(importTypeDescriptor: FrameTypeDescriptor) {
     // Safeguard against multiple imports of same name... pesky monomorphization
     if (!this.importedNames[importTypeDescriptor.name]) {
-      const importSpecifier = path.relative(this.sourceFileDir, importTypeDescriptor.sourceFilePath)
-        .split(path.sep).join("/");
-      this.importDeclarations.push(NamedImport(importTypeDescriptor.nameIdent, importSpecifier));
+      this.importDeclarations.push(
+        NamedImport(importTypeDescriptor.nameIdent, this.relativeImportSpecifierText(importTypeDescriptor)),
+      );
       this.importedNames[importTypeDescriptor.name] = true;
+    }
+  }
+
+  importDecoder(importTypeDescriptor: FrameTypeDescriptor) {
+    // Safeguard against multiple imports of same name... pesky monomorphization
+    if (!this.importedDecoderNames[importTypeDescriptor.decoderName]) {
+      this.importDeclarations.push(
+        NamedImport(importTypeDescriptor.decoderNameIdent, this.relativeImportSpecifierText(importTypeDescriptor)),
+      );
+      this.importedDecoderNames[importTypeDescriptor.decoderName] = true;
     }
   }
 }
@@ -55,6 +82,8 @@ export class FrameContext {
           scaleDecodeNamespaceIdent,
           CapiImportSpecifier(config, sourceFileDir, ["scale", "decode"]),
         );
+        const decoderName = `decode${capitalizeFirstLetter(name)}`;
+        const decoderNameIdent = f.createIdentifier(decoderName);
         this.typeDescriptorByI[i] = new FrameTypeDescriptor(
           i,
           sourceFileDir,
@@ -63,7 +92,8 @@ export class FrameContext {
           f.createIdentifier(name),
           raw,
           [scaleImport],
-          {},
+          decoderName,
+          decoderNameIdent,
         );
       }
     }
