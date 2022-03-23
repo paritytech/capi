@@ -1,5 +1,3 @@
-// TODO: high priority: make optionality the default for fields containing empty arrays or optional values
-
 import { Tagged } from "/_/util/mod.ts";
 import * as dp from "/scale/decode-patterns.ts";
 import * as d from "/scale/decode.ts";

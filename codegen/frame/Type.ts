@@ -3,7 +3,7 @@ import { FrameContext, FrameTypeDescriptor } from "/codegen/frame/Context.ts";
 import * as m from "/frame_metadata/mod.ts";
 import * as asserts from "std/testing/asserts.ts";
 import ts from "typescript";
-import camelCase from "x/case/camelCase.ts";
+import { camelCase, pascalCase } from "x/case/mod.ts";
 
 type RecordStatements = [ts.InterfaceDeclaration];
 type TaggedUnionStatements = [ts.TypeAliasDeclaration, ...[ts.EnumDeclaration, ...ts.InterfaceDeclaration[]] | []];
@@ -26,6 +26,7 @@ type TypeDecoderVisitor = Omit<
 export class Type implements TypeDecoderVisitor {
   #typeDescriptorByI;
   #types;
+  #isOptionByI;
 
   constructor(
     context: FrameContext,
@@ -33,6 +34,7 @@ export class Type implements TypeDecoderVisitor {
   ) {
     this.#typeDescriptorByI = context.typeDescriptorByI;
     this.#types = context.metadata.raw.types;
+    this.#isOptionByI = context.isOptionByI;
   }
 
   digest(): Digest {
@@ -41,7 +43,6 @@ export class Type implements TypeDecoderVisitor {
         return this.Record(this.descriptor as any /* TODO: create guards to narrow */);
       }
       case m.TypeDefKind.TaggedUnion: {
-        // console.log(descriptor.sourceFilePath);
         return this.TaggedUnion(this.descriptor as any /* TODO: create guards to narrow */);
       }
       default: {
@@ -70,7 +71,22 @@ export class Type implements TypeDecoderVisitor {
       case m.TypeDefKind.BitSequence: {
         return this.BitSequence(def);
       }
-      case m.TypeDefKind.TaggedUnion:
+      case m.TypeDefKind.TaggedUnion: {
+        if (this.#isOptionByI[i]) {
+          const some = def.members[1];
+          asserts.assert(some?.name === "Some" && some.fields.length === 1);
+          const someValue = some.fields[0];
+          asserts.assert(someValue);
+          const someValueType = this.#types[someValue.type];
+          asserts.assert(someValueType);
+          console.log(this.descriptor.sourceFilePath);
+          return f.createUnionTypeNode([
+            f.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword),
+            this.visit(someValueType.def, someValue.type),
+          ]);
+        }
+        return this.TypeReference(i);
+      }
       case m.TypeDefKind.Record: {
         return this.TypeReference(i);
       }
@@ -126,16 +142,15 @@ export class Type implements TypeDecoderVisitor {
     const variantDeclarations: ts.InterfaceDeclaration[] = [];
     const unionMemberIdents: ts.Identifier[] = [];
     const tagEnumMembers: ts.EnumMember[] = [];
-    const tagEnumIdent = f.createIdentifier(`${descriptor.name}Tag`);
 
     for (let i = 0; i < descriptor.raw.def.members.length; i++) {
       const member = descriptor.raw.def.members[i]!;
       const memberName = f.createIdentifier(member.name);
       unionMemberIdents.push(memberName);
 
-      const memberTagName = isNaN(Number(member.name)) ? member.name : `_${member.name}`;
+      const memberTagName = pascalCase(isNaN(Number(member.name)) ? member.name : `_${member.name}`);
       const memberTagIdent = f.createIdentifier(memberTagName);
-      tagEnumMembers.push(f.createEnumMember(memberTagIdent, f.createStringLiteral(member.name)));
+      tagEnumMembers.push(f.createEnumMember(memberTagIdent, f.createStringLiteral(memberTagName)));
 
       const decl = f.createInterfaceDeclaration(
         undefined,
@@ -146,7 +161,7 @@ export class Type implements TypeDecoderVisitor {
         [
           PropertySignature(
             "_tag",
-            f.createTypeReferenceNode(f.createQualifiedName(tagEnumIdent, memberTagIdent), undefined),
+            f.createTypeReferenceNode(f.createQualifiedName(descriptor.tagEnumIdent, memberTagName), undefined),
           ),
           ...member.fields.map((field, i) => {
             const fieldType = this.#types[field.type];
@@ -179,7 +194,7 @@ export class Type implements TypeDecoderVisitor {
     const enumDeclaration = f.createEnumDeclaration(
       undefined,
       [f.createModifier(ts.SyntaxKind.ExportKeyword), f.createModifier(ts.SyntaxKind.ConstKeyword)],
-      tagEnumIdent,
+      descriptor.tagEnumIdent,
       tagEnumMembers,
     );
 

@@ -1,9 +1,8 @@
 import { FrameContext, FrameTypeDescriptor } from "/codegen/frame/Context.ts";
 import * as m from "/frame_metadata/mod.ts";
-import * as d from "/scale/decode.ts";
 import * as asserts from "std/testing/asserts.ts";
 import ts from "typescript";
-import { camelCase } from "x/case/mod.ts";
+import { camelCase, pascalCase } from "x/case/mod.ts";
 import capitalizeFirstLetter from "x/case/upperFirstCase.ts";
 import { comment, f, placeholderFn, scaleDecodeNamespaceIdent } from "../common.ts";
 
@@ -70,7 +69,7 @@ export class TypeDecoder implements TypeDecoderVisitor {
     return statement;
   }
 
-  visit(def: m.TypeDef, i: number) {
+  visit(def: m.TypeDef, i: number): ts.PropertyAccessExpression | ts.CallExpression | ts.Identifier {
     switch (def._tag) {
       case m.TypeDefKind.BitSequence: {
         return this.BitSequence(def);
@@ -94,6 +93,23 @@ export class TypeDecoder implements TypeDecoderVisitor {
         return this.Reference(i);
       }
       case m.TypeDefKind.TaggedUnion: {
+        if (this.context.isOptionByI[i]) {
+          const some = def.members[1];
+          asserts.assert(some?.name === "Some" && some.fields.length === 1);
+          const someValue = some.fields[0];
+          asserts.assert(someValue);
+          const someValueType = this.types[someValue.type];
+          asserts.assert(someValueType);
+          console.log(this.descriptor.sourceFilePath);
+          return f.createCallExpression(
+            f.createPropertyAccessExpression(
+              scaleDecodeNamespaceIdent,
+              f.createIdentifier("Option"),
+            ),
+            undefined,
+            [this.visit(someValueType.def, someValue.type)],
+          );
+        }
         return this.Reference(i);
       }
     }
@@ -126,8 +142,6 @@ export class TypeDecoder implements TypeDecoderVisitor {
   }
 
   TaggedUnion(def: m.TaggedUnionTypeDef): ts.CallExpression {
-    // TODO: do this inside of descriptor
-    const tagEnumIdent = f.createIdentifier(`${this.descriptor.name}Tag`);
     return f.createCallExpression(
       f.createPropertyAccessExpression(
         scaleDecodeNamespaceIdent,
@@ -143,8 +157,8 @@ export class TypeDecoder implements TypeDecoderVisitor {
           undefined,
           [
             f.createPropertyAccessExpression(
-              tagEnumIdent,
-              f.createIdentifier(capitalizeFirstLetter(member.name)),
+              this.descriptor.tagEnumIdent,
+              f.createIdentifier(pascalCase(member.name)),
             ),
             ...member.fields.map((field, i) => {
               const fieldType = this.context.metadata.raw.types[field.type];
@@ -194,10 +208,7 @@ export class TypeDecoder implements TypeDecoderVisitor {
       return this.visit(fieldType.def, field);
     });
     return f.createCallExpression(
-      f.createPropertyAccessExpression(
-        scaleDecodeNamespaceIdent,
-        f.createIdentifier("Tuple"),
-      ),
+      f.createPropertyAccessExpression(scaleDecodeNamespaceIdent, f.createIdentifier("Tuple")),
       undefined,
       fieldDecoderNodes,
     );
