@@ -117,7 +117,7 @@ export class TypeDecoder implements TypeDecoderVisitor {
         const fieldTypeDescriptor = this.context.typeDescriptorByI[field.type];
         if (fieldTypeDescriptor) {
           this.descriptor.importDecoder(fieldTypeDescriptor);
-          return this.RecordField(fieldName, this.descriptor.decoderNameIdent);
+          return this.RecordField(fieldName, fieldTypeDescriptor.decoderNameIdent);
         } else {
           return this.RecordField(fieldName, this.visit(fieldType.def, field.type));
         }
@@ -126,28 +126,44 @@ export class TypeDecoder implements TypeDecoderVisitor {
   }
 
   TaggedUnion(def: m.TaggedUnionTypeDef): ts.CallExpression {
+    // TODO: do this inside of descriptor
+    const tagEnumIdent = f.createIdentifier(`${this.descriptor.name}Tag`);
     return f.createCallExpression(
       f.createPropertyAccessExpression(
         scaleDecodeNamespaceIdent,
-        f.createIdentifier("Tagged"),
+        f.createIdentifier("Union"),
       ),
       undefined,
-      [
-        f.createPropertyAccessExpression(
-          f.createIdentifier("TODOtagEnumIdent"),
-          f.createIdentifier("TODOtagEnumMemberIdent"),
-        ),
-        ...def.members.map((member) => {
-          return f.createCallExpression(
-            f.createPropertyAccessExpression(scaleDecodeNamespaceIdent, f.createIdentifier("RecordField")),
-            undefined,
-            [
-              f.createStringLiteral(member.name),
-              this.Leaf("TODO"),
-            ],
-          );
-        }),
-      ],
+      def.members.map((member) => {
+        return f.createCallExpression(
+          f.createPropertyAccessExpression(
+            scaleDecodeNamespaceIdent,
+            f.createIdentifier("Tagged"),
+          ),
+          undefined,
+          [
+            f.createPropertyAccessExpression(
+              tagEnumIdent,
+              f.createIdentifier(capitalizeFirstLetter(member.name)),
+            ),
+            ...member.fields.map((field, i) => {
+              const fieldType = this.context.metadata.raw.types[field.type];
+              asserts.assert(fieldType);
+              return f.createCallExpression(
+                f.createPropertyAccessExpression(
+                  scaleDecodeNamespaceIdent,
+                  f.createIdentifier("RecordField"),
+                ),
+                undefined,
+                [
+                  f.createStringLiteral(field.name || i.toString()),
+                  this.visit(fieldType.def, field.type),
+                ],
+              );
+            }),
+          ],
+        );
+      }),
     );
   }
 
