@@ -3,6 +3,7 @@ import { FrameContext, FrameTypeDescriptor } from "/codegen/frame/Context.ts";
 import * as m from "/frame_metadata/mod.ts";
 import * as asserts from "std/testing/asserts.ts";
 import ts from "typescript";
+import camelCase from "x/case/camelCase.ts";
 
 type RecordStatements = [ts.InterfaceDeclaration];
 type TaggedUnionStatements = [ts.TypeAliasDeclaration, ...[ts.EnumDeclaration, ...ts.InterfaceDeclaration[]] | []];
@@ -87,7 +88,7 @@ export class Type implements TypeDecoderVisitor {
         const fieldType = this.#types[field.type];
         asserts.assert(fieldType);
         const fieldTypeNode = this.visit(fieldType.def, field.type);
-        const propertySignature = PropertySignature(field.name || i.toString(), fieldTypeNode);
+        const propertySignature = PropertySignature(field.name ? camelCase(field.name) : i.toString(), fieldTypeNode);
         comment(propertySignature, field.docs.join("\n"));
         return propertySignature;
       }) || [],
@@ -210,16 +211,18 @@ export class Type implements TypeDecoderVisitor {
       case m.PrimitiveTypeDefKind.I8:
       case m.PrimitiveTypeDefKind.I16:
       case m.PrimitiveTypeDefKind.I32:
+      case m.PrimitiveTypeDefKind.U8:
+      case m.PrimitiveTypeDefKind.U16:
+      case m.PrimitiveTypeDefKind.U32: {
+        return f.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword);
+      }
       case m.PrimitiveTypeDefKind.I64:
       case m.PrimitiveTypeDefKind.I128:
       case m.PrimitiveTypeDefKind.I256:
-      case m.PrimitiveTypeDefKind.U8:
-      case m.PrimitiveTypeDefKind.U16:
-      case m.PrimitiveTypeDefKind.U32:
       case m.PrimitiveTypeDefKind.U64:
       case m.PrimitiveTypeDefKind.U128:
       case m.PrimitiveTypeDefKind.U256: {
-        return f.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword);
+        return f.createKeywordTypeNode(ts.SyntaxKind.BigIntKeyword);
       }
       case m.PrimitiveTypeDefKind.Bool: {
         return f.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword);
