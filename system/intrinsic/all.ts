@@ -19,9 +19,9 @@ export class All<Elements extends (z.AnyEffect | undefined)[]> extends z.Effect<
 > {
   constructor(readonly elements: Elements) {
     const elementRec: Record<number, z.AnyEffect> = {};
-    for (let i = 0; i < elements.length; i++) {
-      elementRec[i] = elements[i] || none;
-    }
+    elements.forEach((element, i) => {
+      elementRec[i] = element || none;
+    });
     super("All", elementRec as UndefinedElementsToNone<Elements>, async (_, resolved) => {
       const elementsResolved: any[] = [];
       for (let i = 0; i < elements.length; i++) {

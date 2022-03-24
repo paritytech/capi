@@ -46,9 +46,9 @@ export class WebSocketConnectionPool implements ConnectionPool<string> {
 
       const egress = this.#egress[url];
       if (egress) {
-        for (let i = 0; i < egress.length; i++) {
-          this.send(url, egress[i]!);
-        }
+        egress.forEach((value) => {
+          this.send(url, value);
+        });
         delete this.#egress[url];
       }
     };

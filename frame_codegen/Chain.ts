@@ -1,5 +1,5 @@
 import { AnonymousType } from "/frame_codegen/AnonymousType.ts";
-import { isNamedType } from "/frame_codegen/NamedType.ts";
+import { isNamedType, NamedType } from "/frame_codegen/NamedType.ts";
 import { RecordType } from "/frame_codegen/RecordType.ts";
 import { TaggedUnionType } from "/frame_codegen/TaggedUnionType.ts";
 import { Type } from "/frame_codegen/Type.ts";
@@ -8,74 +8,67 @@ import * as path from "std/path/mod.ts";
 import * as asserts from "std/testing/asserts.ts";
 import ts from "typescript";
 
-const JunctionsJoined = (rawType: m.Type): string => {
-  return rawType.path.join("::");
-};
-
 export class Chain {
-  rootType!: Type;
   typeByI: Record<number, Type> = {};
+  typeByPath: Record<string, Type> = {};
 
   constructor(
     public alias: string,
     public metadata: m.MetadataContainer,
-    public prev?: Chain,
+    public prev?: Chain, // TODO: incremental & watch
   ) {
     asserts.assert(metadata.raw.types.length > 0); // TODO: other metadata validations?
     this.loadTypes();
   }
 
+  getType = (i: number): Type => {
+    const type = this.typeByI[i];
+    asserts.assert(type);
+    return type;
+  };
+
   loadTypes() {
-    let prev: Type | undefined;
-    const overloadsByJunctionsJoined: Record<string, m.Param[][]> = {};
-    for (let i = 0; i < this.metadata.raw.types.length; i++) {
-      const rawType = this.metadata.raw.types[i]!;
-      let current: Type;
-      const junctionsJoined = JunctionsJoined(rawType);
-      let overloads: m.Param[][] | undefined = overloadsByJunctionsJoined[junctionsJoined];
-      if (rawType.params.length > 0) {
-        if (overloads) {
-          overloads.push(rawType.params);
-        } else {
-          overloadsByJunctionsJoined[junctionsJoined] = [rawType.params];
-          overloads = overloadsByJunctionsJoined[junctionsJoined];
-        }
-      }
+    this.metadata.raw.types.forEach((rawType) => {
+      const typePath = rawType.path.join("::");
+      let type: Type;
       switch (rawType.def._tag) {
-        case m.TypeDefKind.Record: {
-          current = new RecordType(rawType as m.Type<m.RecordTypeDef>, overloads);
-          break;
-        }
+        case m.TypeDefKind.Record:
         case m.TypeDefKind.TaggedUnion: {
-          current = new TaggedUnionType(rawType as m.Type<m.TaggedUnionTypeDef>, overloads);
+          const alreadyExists = this.typeByPath[typePath];
+          if (alreadyExists) {
+            type = alreadyExists;
+            if (rawType.params.length > 0) {
+              (type as NamedType).overload(rawType.params);
+            }
+          } else {
+            switch (rawType.def._tag) {
+              case m.TypeDefKind.Record: {
+                type = new RecordType(this, rawType as m.Type<m.RecordTypeDef>);
+                break;
+              }
+              case m.TypeDefKind.TaggedUnion: {
+                type = new TaggedUnionType(this, rawType as m.Type<m.TaggedUnionTypeDef>);
+                break;
+              }
+            }
+          }
           break;
         }
         default: {
-          current = new AnonymousType(rawType as m.Type<Exclude<m.TypeDef, m.NamedTypeDef>>, overloads);
+          type = new AnonymousType(this, rawType as m.Type<Exclude<m.TypeDef, m.NamedTypeDef>>);
           break;
         }
       }
-      this.typeByI[i] = current;
-      if (prev) {
-        prev.next = current;
-      }
-      prev = current;
-    }
-    this.rootType = this.typeByI[0]!;
+      this.typeByPath[typePath] = type;
+      this.typeByI[rawType.i] = type;
+    });
   }
 
   *typeSourceFiles(chainOutDirAbs: string): Generator<ts.SourceFile, void, void> {
-    const alreadyYielded: Record<string, true> = {};
-    let current: Type | undefined = this.rootType;
-    while (current) {
-      const junctionsJoined = JunctionsJoined(current.rawType);
-      if (!alreadyYielded[junctionsJoined]) {
-        if (isNamedType(current)) {
-          yield current.sourceFile(chainOutDirAbs);
-        }
-        alreadyYielded[junctionsJoined] = true;
+    for (const type of Object.values(this.typeByPath)) {
+      if (isNamedType(type)) {
+        yield type.sourceFile(chainOutDirAbs);
       }
-      current = current.next;
     }
   }
 

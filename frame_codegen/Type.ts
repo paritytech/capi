@@ -1,5 +1,7 @@
 import { AnonymousType } from "/frame_codegen/AnonymousType.ts";
-import { RecordType } from "/frame_codegen/RecordType.ts";
-import { TaggedUnionType } from "/frame_codegen/TaggedUnionType.ts";
+import { NamedType } from "/frame_codegen/NamedType.ts";
+import ts from "typescript";
 
-export type Type = AnonymousType | RecordType | TaggedUnionType;
+export type Type = AnonymousType | NamedType;
+
+export type AddImport = (typeDesc: NamedType) => ts.Identifier;
