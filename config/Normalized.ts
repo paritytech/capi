@@ -1,33 +1,38 @@
 // import { initLogs } from "/cli/logging.ts";
+import { RawConfig } from "/config/Raw.ts";
 import { validateConfig } from "/config/validate.ts";
 import * as path from "std/path/mod.ts";
 
-export interface ConfigProps {
-  configPath: string;
-  baseDir: string;
-}
+export class Config implements RawConfig {
+  chains;
+  lock;
+  target;
 
-export class Config {
   baseDirAbs;
   configPathAbs;
   configPathCwdRelative;
-  raw;
   outDirAbs;
 
-  constructor(props: ConfigProps) {
+  constructor(
+    readonly configPath: string,
+    readonly baseDir: string,
+  ) {
     // TODO: flesh out CLI-wide logging story.
     // const validationLogs = initLogs();
 
     // TODO: more normalization? What if a user supplies an already-absolute path?
-    this.baseDirAbs = path.join(Deno.cwd(), props.baseDir);
-    this.configPathAbs = path.join(this.baseDirAbs, props.configPath);
+    this.baseDirAbs = path.join(Deno.cwd(), baseDir);
+    this.configPathAbs = path.join(this.baseDirAbs, configPath);
     this.configPathCwdRelative = path.relative(Deno.cwd(), this.configPathAbs);
 
     const rawConfig = JSON.parse(new TextDecoder().decode(Deno.readFileSync(this.configPathCwdRelative)));
     const validationResult = validateConfig(rawConfig);
     switch (validationResult._tag) {
       case "RawConfig": {
-        this.raw = validationResult.rawConfig;
+        const raw = validationResult.rawConfig;
+        this.chains = raw.chains;
+        this.lock = raw.lock;
+        this.target = raw.target;
         break;
       }
       case "Diagnostics": {
@@ -37,6 +42,6 @@ export class Config {
       }
     }
 
-    this.outDirAbs = path.join(this.baseDirAbs, this.raw.target.outDir);
+    this.outDirAbs = path.join(this.baseDirAbs, this.target.outDir);
   }
 }

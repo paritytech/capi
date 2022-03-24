@@ -166,7 +166,10 @@ export class Type implements TypeDecoderVisitor {
           ...member.fields.map((field, i) => {
             const fieldType = this.#types[field.type];
             asserts.assert(fieldType);
-            const fieldTypeNode = PropertySignature(field.name || i.toString(), this.visit(fieldType.def, field.type));
+            const fieldTypeNode = PropertySignature(
+              field.name === undefined ? i.toString() : camelCase(field.name),
+              this.visit(fieldType.def, field.type),
+            );
             comment(fieldTypeNode, field.docs.join("\n"));
             return fieldTypeNode;
           }) || [],

@@ -170,7 +170,8 @@ export class TypeDecoder implements TypeDecoderVisitor {
                 ),
                 undefined,
                 [
-                  f.createStringLiteral(field.name || i.toString()),
+                  // TODO: extract handling of field names
+                  f.createStringLiteral(field.name === undefined ? i.toString() : camelCase(field.name)),
                   this.visit(fieldType.def, field.type),
                 ],
               );

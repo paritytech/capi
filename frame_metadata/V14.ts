@@ -2,6 +2,8 @@ import { Tagged } from "/_/util/mod.ts";
 import * as dp from "/scale/decode-patterns.ts";
 import * as d from "/scale/decode.ts";
 
+export type NamedTypeDef = RecordTypeDef | TaggedUnionTypeDef;
+
 // TODO: "As"-ify all compacts that WILL be represented as `number` in TS.
 // TODO: should we get rid of all `index` fields, given that they'll be accessible through reflection?
 
@@ -58,12 +60,13 @@ export const primitiveTypeDefKind: d.Decoder<PrimitiveTypeDefKind> = d.Union(
 export interface TaggedUnionMember {
   name: string;
   fields: Field[];
+  i: number;
   docs: string[];
 }
 export const taggedUnionMember: d.Decoder<TaggedUnionMember> = d.Record(
   d.RecordField("name", d.str),
   d.RecordField("fields", d.UnknownSizeArray(field)),
-  d.SkipRecordField(d.u8), // index
+  d.RecordField("i", d.u8), // index
   d.RecordField("docs", d.UnknownSizeArray(d.str)),
 );
 
@@ -165,13 +168,14 @@ export const param: d.Decoder<Param> = d.Record(
 );
 
 export interface Type<Def extends TypeDef = TypeDef> {
+  i: number;
   path: string[];
   params: Param[];
   def: Def;
   docs: string[];
 }
 export const type_: d.Decoder<Type> = d.Record(
-  d.SkipRecordField(dp.compactAsNum), // id
+  d.RecordField("i", dp.compactAsNum),
   d.RecordField("path", d.UnknownSizeArray(d.str)),
   d.RecordField("params", d.UnknownSizeArray(param)),
   d.RecordField("def", typeDef),
@@ -277,6 +281,7 @@ export interface Pallet {
   event?: TypeBearer;
   constants: Constant[];
   error?: TypeBearer;
+  i: number;
 }
 export const pallet: d.Decoder<Pallet> = d.Record(
   d.RecordField("name", d.str),
@@ -285,7 +290,7 @@ export const pallet: d.Decoder<Pallet> = d.Record(
   d.RecordField("event", d.Option(typeBearer)),
   d.RecordField("constants", d.UnknownSizeArray(constant)),
   d.RecordField("error", d.Option(typeBearer)),
-  d.SkipRecordField(d.u8), // index
+  d.RecordField("i", d.u8),
 );
 
 export interface SignedExtensionMetadata {
