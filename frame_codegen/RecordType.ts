@@ -5,8 +5,11 @@ import ts from "typescript";
 export type RecordTypeStatements = [ts.InterfaceDeclaration];
 
 export class RecordType extends NamedTypeBase<RecordTypeStatements, m.RecordTypeDef> {
-  constructor(rawType: m.Type<m.RecordTypeDef>) {
-    super(rawType);
+  constructor(
+    rawType: m.Type<m.RecordTypeDef>,
+    overloads?: m.Param[][],
+  ) {
+    super(rawType, overloads);
   }
 
   get statements(): RecordTypeStatements {

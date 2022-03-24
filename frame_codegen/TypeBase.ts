@@ -8,7 +8,10 @@ export abstract class TypeBase<TypeDef extends m.TypeDef> {
   #imports = new Map<NamedType, ts.Identifier>();
   next?: Type;
 
-  constructor(readonly rawType: m.Type<TypeDef>) {}
+  constructor(
+    readonly rawType: m.Type<TypeDef>,
+    readonly overloads?: m.Param[][],
+  ) {}
 
   import(typeDesc: NamedType): ts.Identifier {
     const existing = this.#imports.get(typeDesc);

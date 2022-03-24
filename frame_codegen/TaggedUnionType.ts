@@ -8,11 +8,18 @@ export type TaggedUnionStatements = [
 ];
 
 export class TaggedUnionType extends NamedTypeBase<TaggedUnionStatements, m.TaggedUnionTypeDef> {
-  constructor(rawType: m.Type<m.TaggedUnionTypeDef>) {
-    super(rawType);
+  constructor(
+    rawType: m.Type<m.TaggedUnionTypeDef>,
+    overloads?: m.Param[][],
+  ) {
+    super(rawType, overloads);
   }
 
   get statements(): TaggedUnionStatements {
+    if (this.name === "Option") {
+      console.log(this);
+      console.log("\n\n");
+    }
     return [] as any;
   }
 }
