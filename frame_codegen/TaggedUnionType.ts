@@ -1,4 +1,3 @@
-import { Chain } from "/frame_codegen/Chain.ts";
 import { NamedTypeBase } from "/frame_codegen/NamedTypeBase.ts";
 import * as m from "/frame_metadata/mod.ts";
 import ts from "typescript";

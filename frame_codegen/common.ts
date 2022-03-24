@@ -1,6 +1,4 @@
 import { EMPTY } from "/_/constants/common.ts";
-import { isNamedType, NamedType } from "/frame_codegen/NamedType.ts";
-import * as m from "/frame_metadata/mod.ts";
 import ts from "typescript";
 
 export const nf = ts.factory;

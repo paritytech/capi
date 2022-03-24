@@ -1,5 +1,4 @@
 import { nf } from "/frame_codegen/common.ts";
-import { isNamedType } from "/frame_codegen/NamedType.ts";
 import { NamedTypeBase } from "/frame_codegen/NamedTypeBase.ts";
 import { TypeParams } from "/frame_codegen/TypeParams.ts";
 import * as m from "/frame_metadata/mod.ts";
@@ -9,6 +8,7 @@ export type RecordTypeStatements = [ts.InterfaceDeclaration];
 
 export class RecordType extends NamedTypeBase<RecordTypeStatements, m.RecordTypeDef> {
   get statements(): RecordTypeStatements {
+    console.log(this.rawType.path);
     const typeParams = TypeParams(this);
     const propertySignatures = this.rawType.def.fields.map(this.#FieldPropertySignature);
     return [nf.createInterfaceDeclaration(
@@ -21,17 +21,16 @@ export class RecordType extends NamedTypeBase<RecordTypeStatements, m.RecordType
     )];
   }
 
-  #FieldPropertySignature(
+  #FieldPropertySignature = (
     rawField: m.Field,
     i: number,
-  ): ts.PropertySignature {
+  ): ts.PropertySignature => {
     const type = this.chain.getType(rawField.type);
-    const typeNode = isNamedType(type) ? nf.createTypeReferenceNode(this.addImport(type)) : type.node;
     return nf.createPropertySignature(
       undefined,
       nf.createIdentifier(rawField.name || i.toString()),
       undefined,
-      typeNode,
+      type.node(this),
     );
-  }
+  };
 }

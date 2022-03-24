@@ -32,7 +32,7 @@ export class FrameCodegen {
           // TODO: add to diagnostics
           throw result;
         }
-        this.chainByAlias[chainAlias] = new Chain(chainAlias, result.value, this.chainByAlias[chainAlias]);
+        this.chainByAlias[chainAlias] = new Chain(chainAlias, result.value, this.chainByAlias[chainAlias], this.config);
       })());
     }
     await Promise.all(pending);

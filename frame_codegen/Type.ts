@@ -1,7 +1,7 @@
-import { AnonymousType } from "/frame_codegen/AnonymousType.ts";
 import { NamedType } from "/frame_codegen/NamedType.ts";
+import { TypeBase } from "/frame_codegen/TypeBase.ts";
 import ts from "typescript";
 
-export type Type = AnonymousType | NamedType;
+export type Type = TypeBase | NamedType;
 
 export type AddImport = (typeDesc: NamedType) => ts.Identifier;

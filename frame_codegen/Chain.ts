@@ -1,8 +1,9 @@
-import { AnonymousType } from "/frame_codegen/AnonymousType.ts";
+import { Config } from "/config/mod.ts";
 import { isNamedType, NamedType } from "/frame_codegen/NamedType.ts";
 import { RecordType } from "/frame_codegen/RecordType.ts";
 import { TaggedUnionType } from "/frame_codegen/TaggedUnionType.ts";
 import { Type } from "/frame_codegen/Type.ts";
+import { TypeBase } from "/frame_codegen/TypeBase.ts";
 import * as m from "/frame_metadata/mod.ts";
 import * as path from "std/path/mod.ts";
 import * as asserts from "std/testing/asserts.ts";
@@ -15,7 +16,8 @@ export class Chain {
   constructor(
     public alias: string,
     public metadata: m.MetadataContainer,
-    public prev?: Chain, // TODO: incremental & watch
+    public prev: Chain | undefined, // TODO: incremental & watch
+    public config: Config,
   ) {
     asserts.assert(metadata.raw.types.length > 0); // TODO: other metadata validations?
     this.loadTypes();
@@ -55,7 +57,7 @@ export class Chain {
           break;
         }
         default: {
-          type = new AnonymousType(this, rawType as m.Type<Exclude<m.TypeDef, m.NamedTypeDef>>);
+          type = new TypeBase(this, rawType as m.Type<Exclude<m.TypeDef, m.NamedTypeDef>>);
           break;
         }
       }
