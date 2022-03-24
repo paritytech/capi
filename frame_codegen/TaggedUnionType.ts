@@ -9,13 +9,6 @@ export type TaggedUnionStatements = [
 ];
 
 export class TaggedUnionType extends NamedTypeBase<TaggedUnionStatements, m.TaggedUnionTypeDef> {
-  constructor(
-    chain: Chain,
-    rawType: m.Type<m.TaggedUnionTypeDef>,
-  ) {
-    super(chain, rawType);
-  }
-
   get statements(): TaggedUnionStatements {
     return [] as any;
   }

@@ -5,7 +5,7 @@ import * as m from "/frame_metadata/mod.ts";
 import ts from "typescript";
 
 export abstract class TypeBase<TypeDef extends m.TypeDef> {
-  #imports = new Map<NamedType, ts.Identifier>();
+  imports = new Map<NamedType, ts.Identifier>();
 
   constructor(
     readonly chain: Chain,
@@ -13,12 +13,12 @@ export abstract class TypeBase<TypeDef extends m.TypeDef> {
   ) {}
 
   addImport = (typeDesc: NamedType) => {
-    const existing = this.#imports.get(typeDesc);
+    const existing = this.imports.get(typeDesc);
     if (existing) {
       return existing;
     }
     const newlyCreated = nf.createUniqueName(typeDesc.name);
-    this.#imports.set(typeDesc, newlyCreated);
+    this.imports.set(typeDesc, newlyCreated);
     return newlyCreated;
   };
 
@@ -29,7 +29,7 @@ export abstract class TypeBase<TypeDef extends m.TypeDef> {
 
   get importStatements(): ts.ImportDeclaration[] {
     const statements: ts.ImportDeclaration[] = [];
-    for (const [type, ident] of this.#imports.entries()) {
+    for (const [type, ident] of this.imports.entries()) {
       statements.push(nf.createImportDeclaration(
         undefined,
         undefined,
