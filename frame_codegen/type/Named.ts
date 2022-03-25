@@ -2,10 +2,12 @@ import { intersperse } from "/_/util/mod.ts";
 import { Chain } from "/frame_codegen/Chain.ts";
 import { newLine, nf, SourceFile } from "/frame_codegen/common.ts";
 import { Type } from "/frame_codegen/type/Base.ts";
+import { toAst } from "/frame_codegen/type/toAst.ts";
 import * as m from "/frame_metadata/mod.ts";
 import * as path from "std/path/mod.ts";
 import * as asserts from "std/testing/asserts.ts";
 import ts from "typescript";
+import { camelCase } from "x/case/mod.ts";
 
 export abstract class NamedType<
   TypeDef extends m.NamedTypeDef = m.NamedTypeDef,
@@ -24,11 +26,9 @@ export abstract class NamedType<
     super(chain, rawType);
     this.overloads = rawType.params.length > 0 ? [rawType.params] : [];
     asserts.assert(rawType.path.length > 0);
-    const lastJunctionI = rawType.path.length - 1;
-    const lastJunction = rawType.path[lastJunctionI];
-    asserts.assert(lastJunction);
-    this.name = lastJunction;
-    this.nameIdent = nf.createIdentifier(lastJunction);
+    const lastPathPieceI = rawType.path.length - 1;
+    this.name = rawType.path[lastPathPieceI]!;
+    this.nameIdent = nf.createIdentifier(this.name);
     this.chainOutDirRelativeSourceFilePath = path.join(...rawType.path).concat(".ts");
   }
 
@@ -55,6 +55,19 @@ export abstract class NamedType<
     const newlyCreated = nf.createUniqueName(typeDesc.name);
     this.imports.set(typeDesc, newlyCreated);
     return newlyCreated;
+  };
+
+  FieldPropertySignature = (
+    rawField: m.Field,
+    i: number,
+  ): ts.PropertySignature => {
+    const type = this.chain.getType(rawField.type);
+    return nf.createPropertySignature(
+      undefined,
+      nf.createIdentifier(rawField.name ? camelCase(rawField.name) : i.toString()),
+      undefined,
+      toAst(this, type),
+    );
   };
 
   SourceFile = (): ts.SourceFile => {

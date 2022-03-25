@@ -40,7 +40,6 @@ export class FrameCodegen {
   }
 
   *sourceFiles(): Generator<ts.SourceFile, void, void> {
-    asserts.assert(this.config);
     for (const chain of Object.values(this.chainByAlias)) {
       yield* chain.sourceFiles();
     }
