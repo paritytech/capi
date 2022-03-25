@@ -1,9 +1,8 @@
-import { Config } from "/config/mod.ts";
-import { isNamedType, NamedType } from "/frame_codegen/NamedType.ts";
-import { RecordType } from "/frame_codegen/RecordType.ts";
-import { TaggedUnionType } from "/frame_codegen/TaggedUnionType.ts";
-import { Type } from "/frame_codegen/Type.ts";
-import { TypeBase } from "/frame_codegen/TypeBase.ts";
+import { FrameCodegen } from "/frame_codegen/mod.ts";
+import { Type } from "/frame_codegen/type/Base.ts";
+import { NamedType } from "/frame_codegen/type/Named.ts";
+import { RecordType } from "/frame_codegen/type/Record.ts";
+import { TaggedUnionType } from "/frame_codegen/type/TaggedUnion.ts";
 import * as m from "/frame_metadata/mod.ts";
 import * as path from "std/path/mod.ts";
 import * as asserts from "std/testing/asserts.ts";
@@ -12,22 +11,17 @@ import ts from "typescript";
 export class Chain {
   typeByI: Record<number, Type> = {};
   typeByPath: Record<string, Type> = {};
+  typesOurDirAbs;
 
   constructor(
+    public codegen: FrameCodegen,
     public alias: string,
     public metadata: m.MetadataContainer,
     public prev: Chain | undefined, // TODO: incremental & watch
-    public config: Config,
   ) {
-    asserts.assert(metadata.raw.types.length > 0); // TODO: other metadata validations?
+    this.typesOurDirAbs = path.join(this.codegen.config.outDirAbs, "_types");
     this.loadTypes();
   }
-
-  getType = (i: number): Type => {
-    const type = this.typeByI[i];
-    asserts.assert(type);
-    return type;
-  };
 
   loadTypes() {
     this.metadata.raw.types.forEach((rawType) => {
@@ -45,6 +39,7 @@ export class Chain {
           } else {
             switch (rawType.def._tag) {
               case m.TypeDefKind.Record: {
+                // TODO: get it to narrow type based on current branch
                 type = new RecordType(this, rawType as m.Type<m.RecordTypeDef>);
                 break;
               }
@@ -57,7 +52,7 @@ export class Chain {
           break;
         }
         default: {
-          type = new TypeBase(this, rawType as m.Type<Exclude<m.TypeDef, m.NamedTypeDef>>);
+          type = new Type(this, rawType as m.Type<Exclude<m.TypeDef, m.NamedTypeDef>>);
           break;
         }
       }
@@ -66,17 +61,22 @@ export class Chain {
     });
   }
 
-  *typeSourceFiles(chainOutDirAbs: string): Generator<ts.SourceFile, void, void> {
+  getType(i: number): Type {
+    const type = this.typeByI[i];
+    asserts.assert(type);
+    return type;
+  }
+
+  *typeSourceFiles(): Generator<ts.SourceFile, void, void> {
     for (const type of Object.values(this.typeByPath)) {
-      if (isNamedType(type)) {
-        yield type.sourceFile(chainOutDirAbs);
+      if (type instanceof NamedType) {
+        yield type.SourceFile();
       }
     }
   }
 
-  *sourceFiles(outDirAbs: string): Generator<ts.SourceFile, void, void> {
-    const chainOutDirAbs = path.join(outDirAbs, this.alias);
-    yield* this.typeSourceFiles(chainOutDirAbs);
+  *sourceFiles(): Generator<ts.SourceFile, void, void> {
+    yield* this.typeSourceFiles();
     // TODO: storage effects, misc
   }
 }

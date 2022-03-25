@@ -1,16 +1,16 @@
 import { Chain } from "/frame_codegen/Chain.ts";
 import { nf, SourceFile } from "/frame_codegen/common.ts";
-import { NamedType } from "/frame_codegen/NamedType.ts";
-import { TypeBase } from "/frame_codegen/TypeBase.ts";
+import { Type } from "/frame_codegen/type/Base.ts";
 import * as m from "/frame_metadata/mod.ts";
 import * as path from "std/path/mod.ts";
 import * as asserts from "std/testing/asserts.ts";
 import ts from "typescript";
 
-export abstract class NamedTypeBase<
-  Statements extends ts.Statement[],
-  TypeDef extends m.NamedTypeDef,
-> extends TypeBase<TypeDef> {
+export abstract class NamedType<
+  TypeDef extends m.NamedTypeDef = m.NamedTypeDef,
+  Statements extends ts.Statement[] = ts.Statement[],
+> extends Type<TypeDef> {
+  imports = new Map<NamedType, ts.Identifier>();
   name;
   nameIdent;
   chainOutDirRelativeSourceFilePath;
@@ -31,6 +31,20 @@ export abstract class NamedTypeBase<
     this.chainOutDirRelativeSourceFilePath = path.join(...rawType.path).concat(".ts");
   }
 
+  abstract get statements(): Statements;
+
+  // TODO: fix this
+  importPathFrom = (to: NamedType): string => {
+    return path.relative(
+      path.join(...this.rawType.path.slice(0, this.rawType.path.length - 2)),
+      path.join(...to.rawType.path),
+    ).split(path.sep).join("/").concat(".ts");
+  };
+
+  overload = (params: m.Param[]): void => {
+    this.overloads.push(params);
+  };
+
   addImport = (typeDesc: NamedType) => {
     const existing = this.imports.get(typeDesc);
     if (existing) {
@@ -41,7 +55,16 @@ export abstract class NamedTypeBase<
     return newlyCreated;
   };
 
-  get importStatements(): ts.ImportDeclaration[] {
+  SourceFile = (): ts.SourceFile => {
+    const sourceFilePath = path.join(this.chain.typesOurDirAbs, this.chainOutDirRelativeSourceFilePath);
+    const statements = this.statements;
+    return SourceFile(sourceFilePath, [
+      ...this.ImportStatements(),
+      ...statements,
+    ]);
+  };
+
+  ImportStatements = (): ts.ImportDeclaration[] => {
     const statements: ts.ImportDeclaration[] = [];
     for (const [type, ident] of this.imports.entries()) {
       statements.push(nf.createImportDeclaration(
@@ -56,25 +79,10 @@ export abstract class NamedTypeBase<
             ident,
           )]),
         ),
-        nf.createStringLiteral(type.importPathFrom(this)),
+        nf.createStringLiteral(this.importPathFrom(type)),
         undefined,
       ));
     }
     return statements;
-  }
-
-  overload(params: m.Param[]): void {
-    this.overloads.push(params);
-  }
-
-  abstract get statements(): Statements;
-
-  sourceFile(chainOutDir: string): ts.SourceFile {
-    const sourceFilePath = path.join(chainOutDir, this.chainOutDirRelativeSourceFilePath);
-    const statements = this.statements;
-    return SourceFile(sourceFilePath, [
-      ...this.importStatements,
-      ...statements,
-    ]);
-  }
+  };
 }

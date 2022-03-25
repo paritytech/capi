@@ -2,7 +2,7 @@
 
 import { MetadataContainer } from "/frame_metadata/Container.ts";
 import * as m from "/frame_metadata/V14.ts";
-import { StorageTransformers } from "/frame_metadata/Visitor.ts";
+import { TypeDefVisitor } from "/frame_metadata/Visitor.ts";
 import { Tagged } from "/scale/decode-patterns.ts";
 import * as e from "/scale/encode.ts";
 import * as asserts from "std/testing/asserts.ts";

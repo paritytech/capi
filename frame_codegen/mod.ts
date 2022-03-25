@@ -8,9 +8,14 @@ import ts from "typescript";
 
 export class FrameCodegen {
   chainByAlias: Record<string, Chain> = {};
+  config;
+  connections = new WebSocketConnectionPool();
 
-  constructor(private config: Config) {}
+  constructor(initialConfig: Config) {
+    this.config = initialConfig;
+  }
 
+  /** We expect for this method to be called at least once before asking for a source file gen */
   async update(newConfig?: Config): Promise<void> {
     if (newConfig) {
       // TODO: analyze difference incase diagnostics need to be created
@@ -18,29 +23,39 @@ export class FrameCodegen {
     }
 
     const pending: Promise<void>[] = [];
-    const connections = new WebSocketConnectionPool();
     for (const [chainAlias, beacon] of Object.entries(this.config.chains)) {
-      if (typeof beacon !== "string") {
-        asserts.unimplemented();
+      if (typeof beacon === "object") {
+        asserts.unimplemented("Have not yet implemented support for chain specs as beacons");
       }
-      const resource = s.Resource.ProxyWebSocketUrl(s.lift(beacon));
-      const metadata = f.Metadata(resource);
-      const fiber = new s.Fiber(metadata);
       pending.push((async () => {
-        const result = await fiber.run({ connections });
-        if (result instanceof Error) {
-          // TODO: add to diagnostics
-          throw result;
-        }
-        this.chainByAlias[chainAlias] = new Chain(chainAlias, result.value, this.chainByAlias[chainAlias], this.config);
+        this.chainByAlias[chainAlias] = new Chain(
+          this,
+          chainAlias,
+          await this.#getMetadata(beacon),
+          this.chainByAlias[chainAlias],
+        );
       })());
     }
     await Promise.all(pending);
   }
 
   *sourceFiles(): Generator<ts.SourceFile, void, void> {
+    asserts.assert(this.config);
     for (const chain of Object.values(this.chainByAlias)) {
-      yield* chain.sourceFiles(this.config.outDirAbs);
+      yield* chain.sourceFiles();
+    }
+  }
+
+  async #getMetadata(beacon: string) {
+    const resource = s.Resource.ProxyWebSocketUrl(s.lift(beacon));
+    const metadata = f.Metadata(resource);
+    const fiber = new s.Fiber(metadata);
+    const result = await fiber.run({ connections: this.connections });
+    if (result instanceof Error) {
+      // TODO: add to diagnostics
+      throw result;
+    } else {
+      return result.value;
     }
   }
 }

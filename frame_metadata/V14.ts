@@ -3,6 +3,7 @@ import * as dp from "/scale/decode-patterns.ts";
 import * as d from "/scale/decode.ts";
 
 export type NamedTypeDef = RecordTypeDef | TaggedUnionTypeDef;
+export type NamedType = Type<NamedTypeDef>;
 
 // TODO: "As"-ify all compacts that WILL be represented as `number` in TS.
 // TODO: should we get rid of all `index` fields, given that they'll be accessible through reflection?

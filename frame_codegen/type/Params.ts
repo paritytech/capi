@@ -1,5 +1,5 @@
 import { nf } from "/frame_codegen/common.ts";
-import { isNamedType, NamedType } from "/frame_codegen/NamedType.ts";
+import { NamedType } from "/frame_codegen/type/Named.ts";
 import ts from "typescript";
 
 const NoConstraint: unique symbol = Symbol("NoConstraint");
@@ -16,7 +16,7 @@ export const TypeParams = (type: NamedType) => {
         }
         if (typeParam.type) {
           const typeParamType = type.chain.getType(typeParam.type);
-          if (isNamedType(typeParamType)) {
+          if (typeParamType instanceof NamedType) {
             const importName = type.addImport(typeParamType);
             constraintGroups[i]![1].push(importName);
           } else {
