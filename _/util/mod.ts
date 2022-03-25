@@ -1,3 +1,4 @@
+export * from "./Array.ts";
 export * from "./bearer.ts";
 export * from "./error.ts";
 export * from "./fn.ts";

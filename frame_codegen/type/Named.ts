@@ -1,5 +1,6 @@
+import { intersperse } from "/_/util/mod.ts";
 import { Chain } from "/frame_codegen/Chain.ts";
-import { nf, SourceFile } from "/frame_codegen/common.ts";
+import { newLine, nf, SourceFile } from "/frame_codegen/common.ts";
 import { Type } from "/frame_codegen/type/Base.ts";
 import * as m from "/frame_metadata/mod.ts";
 import * as path from "std/path/mod.ts";
@@ -35,10 +36,11 @@ export abstract class NamedType<
 
   // TODO: fix this
   importPathFrom = (to: NamedType): string => {
-    return path.relative(
-      path.join(...this.rawType.path.slice(0, this.rawType.path.length - 2)),
+    const maybeWithoutRelativePrefix = path.relative(
+      path.join(...this.rawType.path.slice(0, this.rawType.path.length - 1)),
       path.join(...to.rawType.path),
     ).split(path.sep).join("/").concat(".ts");
+    return maybeWithoutRelativePrefix.startsWith(".") ? maybeWithoutRelativePrefix : `./${maybeWithoutRelativePrefix}`;
   };
 
   overload = (params: m.Param[]): void => {
@@ -60,7 +62,8 @@ export abstract class NamedType<
     const statements = this.statements;
     return SourceFile(sourceFilePath, [
       ...this.ImportStatements(),
-      ...statements,
+      newLine,
+      ...intersperse(statements, newLine),
     ]);
   };
 

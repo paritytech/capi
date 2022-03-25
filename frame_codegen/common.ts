@@ -10,3 +10,5 @@ export const SourceFile = (
   const initialSourceFile = ts.createSourceFile(sourceFilePath, EMPTY, ts.ScriptTarget.ESNext, false, ts.ScriptKind.TS);
   return nf.updateSourceFile(initialSourceFile, statements);
 };
+
+export const newLine: ts.Statement = nf.createIdentifier("\n") as any;
