@@ -27,9 +27,8 @@ const buildWasm = async (feature: string): Promise<void> => {
 };
 
 // TODO: zip & inline! Perform gzip(base64(gzip(wasm))) like @tomaka does in Smoldot.
-buildWasm("scale_fixtures");
-buildWasm("frame_metadata_fixtures");
-buildWasm("crypto").then(() => {
-  const outWasmPath = path.join(OutDir("crypto"), "mod_bg.wasm");
-  return runCmd(["wasm-opt", "-g", "-Oz", outWasmPath, "-o", outWasmPath]);
-});
+await buildWasm("scale_fixtures");
+await buildWasm("frame_metadata_fixtures");
+await buildWasm("crypto");
+const outWasmPath = path.join(OutDir("crypto"), "mod_bg.wasm");
+await runCmd(["wasm-opt", "-g", "-Oz", outWasmPath, "-o", outWasmPath]);
