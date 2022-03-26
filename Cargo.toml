@@ -9,7 +9,7 @@ crate-type = ["cdylib", "rlib"]
 path = "root.rs"
 
 [features]
-default = ["console_error_panic_hook", "crypto", "frame_metadata_fixtures", "scale_fixtures"]
+default = ["console_error_panic_hook"]
 crypto = []
 frame_metadata_fixtures = []
 scale_fixtures = []
