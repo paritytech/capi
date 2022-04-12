@@ -1,7 +1,7 @@
 import * as c from "/cli/cmd-ts.ts";
 import * as common from "/cli/common.ts";
-import { SourceFileIter } from "/codegen/mod.ts";
 import { Config } from "/config/mod.ts";
+import { FrameCodegen } from "/frame_codegen/mod.ts";
 import * as fs from "std/fs/mod.ts";
 import ts from "typescript";
 import { createFromBuffer } from "x/dprint/mod.ts";
@@ -19,10 +19,7 @@ export const codegen = c.command({
     }),
   },
   async handler(args) {
-    const config = new Config({
-      configPath: args.config,
-      baseDir: args.baseDir,
-    });
+    const config = new Config(args.config, args.baseDir);
     const printer = ts.createPrinter({
       omitTrailingSemicolon: false,
       removeComments: false,
@@ -30,16 +27,19 @@ export const codegen = c.command({
     if (!args.noClean) {
       await fs.emptyDir(config.outDirAbs);
     }
-    const sourceFileIter = SourceFileIter(config);
+
+    const context = new FrameCodegen(config);
+    await context.update();
+
     const pending: Promise<void>[] = [];
-    const format = config.raw.target.skipFormatting
+    const format = config.target.skipFormatting
       ? ((_0: string, source: string): string => source)
       : (() => {
         const formatter = createFromBuffer(Deno.readFileSync("_/assets/dprint_typescript.wasm"));
         formatter.setConfig({ indentWidth: dprintConfig.indentWidth }, dprintConfig.typescript);
         return formatter.formatText;
       })();
-    for await (const sourceFile of sourceFileIter) {
+    for await (const sourceFile of context.sourceFiles()) {
       pending.push((async () => {
         // console.log(`Writing "${sourceFile.fileName}"`);
         await fs.ensureFile(sourceFile.fileName);

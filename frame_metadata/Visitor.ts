@@ -1,14 +1,11 @@
-import { TagBearer } from "/_/util/bearer.ts";
+import { LookupOf, TagBearer } from "/_/util/mod.ts";
 import * as V14 from "/frame_metadata/V14.ts";
 
-export type UnknownByTypeDefKind = { [Tag in V14.TypeDefKind]: unknown };
-export type EnsureAllTypeDefKindsAccountedFor<T extends UnknownByTypeDefKind> = T;
-
-export type StorageTransformer<Tag extends V14.TypeDefKind, Results extends UnknownByTypeDefKind> = (
-  this: StorageTransformers<Results>,
+export type TypeDefVisitorMethod<Tag extends V14.TypeDefKind, Results extends LookupOf<V14.TypeDefKind>> = (
+  this: TypeDefVisitor<Results>,
   typeDef: V14.TypeDef & TagBearer<Tag>,
 ) => Results[Tag];
 
-export type StorageTransformers<Results extends UnknownByTypeDefKind> = {
-  [Tag in V14.TypeDefKind]: StorageTransformer<Tag, Results>;
+export type TypeDefVisitor<Results extends LookupOf<V14.TypeDefKind>> = {
+  [Tag in V14.TypeDefKind]: TypeDefVisitorMethod<Tag, Results>;
 };
