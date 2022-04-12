@@ -6,7 +6,15 @@ const OutDir = (feature: string) => {
 };
 
 const buildWasm = async (feature: string): Promise<void> => {
-  await runCmd(["cargo", "build", "--features", feature, "--release", "--target", "wasm32-unknown-unknown"]);
+  await runCmd([
+    "cargo",
+    "build",
+    "--features",
+    feature,
+    "--release",
+    "--target",
+    "wasm32-unknown-unknown",
+  ]);
   await runCmd([
     "wasm-bindgen",
     path.join("target", "wasm32-unknown-unknown", "release", "mod.wasm"),
@@ -18,12 +26,9 @@ const buildWasm = async (feature: string): Promise<void> => {
   ]);
 };
 
-await Promise.all([
-  // TODO: zip & inline! Perform gzip(base64(gzip(wasm))) like @tomaka does in Smoldot.
-  buildWasm("scale_fixtures"),
-  buildWasm("frame_metadata_fixtures"),
-  buildWasm("crypto").then(() => {
-    const outWasmPath = path.join(OutDir("crypto"), "mod_bg.wasm");
-    return runCmd(["wasm-opt", "-g", "-Oz", outWasmPath, "-o", outWasmPath]);
-  }),
-]);
+// TODO: zip & inline! Perform gzip(base64(gzip(wasm))) like @tomaka does in Smoldot.
+await buildWasm("scale_fixtures");
+await buildWasm("frame_metadata_fixtures");
+await buildWasm("crypto");
+const outWasmPath = path.join(OutDir("crypto"), "mod_bg.wasm");
+await runCmd(["wasm-opt", "-g", "-Oz", outWasmPath, "-o", outWasmPath]);
