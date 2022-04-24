@@ -29,13 +29,11 @@
     "build_wasm": "deno run -A --no-check=remote _/tasks/build_wasm.ts",
     "star": "deno run -A --no-check=remote _/tasks/star.ts && deno task cache_deps",
     "cache_deps": "deno cache --no-check=remote target/star.ts",
-    "build_json_schemas": "deno run -A --no-check=remote _/tasks/build_json_schemas.ts",
     "build_npm": "deno run -A --no-check=remote _/tasks/build_npm.ts",
-    "bootstrap": "deno task download_frame_metadata && deno task build_wasm && deno task star && deno task build_json_schemas",
+    "bootstrap": "deno task download_frame_metadata && deno task build_wasm && deno task star",
     "lock": "deno cache --lock=lock.json --lock-write --no-check=remote target/star.ts",
     "example:balance": "deno run -A --no-check=remote examples/balance.ts",
     "example:effect": "deno run -A --no-check=remote examples/effect.ts",
-    "example:playground": "deno run -A --no-check=remote examples/playground.ts",
-    "example:codegen": "./cli/bin.ts frame codegen --base-dir examples"
+    "example:playground": "deno run -A --no-check=remote examples/playground.ts"
   }
 }
