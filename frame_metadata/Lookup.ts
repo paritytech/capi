@@ -1,50 +1,53 @@
-import { MetadataRawV14, Pallet, StorageEntry } from "/frame_metadata/V14.ts";
-import * as asserts from "std/testing/asserts.ts";
+import * as m from "./Metadata.ts";
 
-export class MetadataLookup {
+type StorageEntryByNameByPalletName = Record<string, Record<string, m.StorageEntry>>;
+
+export class Lookup {
   indexed = false;
-  palletIdByName: Record<string, number> = {};
-  storageEntryIdByNameByPalletId: Record<number, Record<string, number>> = {};
+  palletByName: Record<string, m.Pallet> = {};
+  storageEntryByNameByPalletName: StorageEntryByNameByPalletName = {};
 
-  constructor(readonly raw: MetadataRawV14) {}
+  constructor(readonly metadata: m.Metadata) {}
 
   ensureIndexed = (): void => {
     if (!this.indexed) {
-      this.indexed = true;
-      this.raw.pallets.forEach((pallet, palletI) => {
-        // TODO: `Pallet["index"]` vs. `palletI`... should we even decode the index, or leave it off?
-        this.palletIdByName[pallet.name] = palletI;
-
-        pallet.storage?.entries.forEach((entry, entryI) => {
-          this.storageEntryIdByNameByPalletId[palletI] = this.storageEntryIdByNameByPalletId[palletI] || {};
-          this.storageEntryIdByNameByPalletId[palletI]![entry.name] = entryI;
+      this.metadata.pallets.forEach((pallet) => {
+        this.palletByName[pallet.name] = pallet;
+        const palletEntries: Record<string, m.StorageEntry> = {};
+        this.storageEntryByNameByPalletName[pallet.name] = palletEntries;
+        pallet.storage?.entries.forEach((entry) => {
+          palletEntries[entry.name] = entry;
         });
       });
+      this.indexed = true;
     }
   };
 
-  getPallet = (palletName: string): Pallet => {
+  getPalletByName = (palletName: string) => {
     this.ensureIndexed();
-    const palletI = this.palletIdByName[palletName];
-    asserts.assert(typeof palletI === "number");
-    const pallet = this.raw.pallets[palletI];
-    asserts.assert(pallet);
+    const pallet = this.palletByName[palletName];
+    if (!pallet) {
+      throw new PalletDne();
+    }
     return pallet;
   };
 
-  getStorageEntry = (
+  getStorageEntryByNameAndPalletName = (
     palletName: string,
     storageEntryName: string,
-  ): StorageEntry => {
+  ): m.StorageEntry => {
     this.ensureIndexed();
-    const palletI = this.palletIdByName[palletName];
-    asserts.assert(typeof palletI === "number");
-    const palletStorageEntryIByNames = this.storageEntryIdByNameByPalletId[palletI];
-    asserts.assert(palletStorageEntryIByNames);
-    const storageEntryId = palletStorageEntryIByNames[storageEntryName];
-    asserts.assert(typeof storageEntryId === "number");
-    const storageEntry = this.raw.pallets[palletI]?.storage?.entries?.[storageEntryId];
-    asserts.assert(storageEntry);
+    const palletStorageEntries = this.storageEntryByNameByPalletName[palletName];
+    if (!palletStorageEntries) {
+      throw new PalletDne();
+    }
+    const storageEntry = palletStorageEntries[storageEntryName];
+    if (!storageEntry) {
+      throw new StorageEntryDne();
+    }
     return storageEntry;
   };
 }
+
+class PalletDne extends Error {}
+class StorageEntryDne extends Error {}

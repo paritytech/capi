@@ -8,7 +8,7 @@
   "[yaml]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "deno.codeLens.testArgs": ["--no-check=remote", "--allow-all"],
+  "deno.codeLens.testArgs": ["--no-check=remote", "-A", "-L=info"],
   "deno.config": "./deno.jsonc",
   "deno.enable": true,
   "deno.importMap": "./import_map.json",

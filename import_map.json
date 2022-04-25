@@ -2,16 +2,12 @@
   "imports": {
     "./": "./",
     "/": "./",
-    "cmd-ts": "https://cdn.esm.sh/v66/cmd-ts@0.10.0/es2021/cmd-ts.js",
-    "octokit": "https://cdn.esm.sh/v66/octokit@1.7.1/es2021/octokit.js",
     "std/": "https://deno.land/std@0.127.0/",
-    "typescript": "https://esm.sh/typescript",
     "x/case/": "https://deno.land/x/case@v2.1.0/",
     "x/conditional_type_checks/": "https://deno.land/x/conditional_type_checks@1.0.5/",
-    "x/deno_graph": "https://deno.land/x/deno_graph@0.24.0",
+    "x/deno_graph/": "https://deno.land/x/deno_graph@0.24.0/",
     "x/dnt/": "https://deno.land/x/dnt@0.22.0/",
-    "x/dprint/": "https://deno.land/x/dprint@0.2.0/",
-    "x/oak": "https://deno.land/x/oak@v10.4.0",
-    "x/typebox": "https://deno.land/x/typebox@0.23.4/src/typebox.ts"
+    "x/scale/": "https://deno.land/x/scale@v0.1.0-beta.4/",
+    "typescript": "https://esm.sh/typescript"
   }
 }

@@ -58,3 +58,4 @@ polkassembly
 syncer
 micnncim
 stalebot
+pendings

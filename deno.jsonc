@@ -34,6 +34,8 @@
     "lock": "deno cache --lock=lock.json --lock-write --no-check=remote target/star.ts",
     "example:balance": "deno run -A --no-check=remote examples/balance.ts",
     "example:effect": "deno run -A --no-check=remote examples/effect.ts",
-    "example:playground": "deno run -A --no-check=remote examples/playground.ts"
+    "example:playground": "deno run -A --no-check=remote examples/playground.ts",
+    "test": "deno test -A --no-check=remote -L=info",
+    "update_snapshots": "deno test -A --no-check=remote -L=info -- --update"
   }
 }
