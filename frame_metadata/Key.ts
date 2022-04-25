@@ -41,7 +41,7 @@ export const encodeKey = (
   if (storageEntry._tag === m.StorageEntryTypeKind.Plain) {
     return finalize(pallet.name, storageEntry.name);
   }
-  const keyTypeCodec = deriveCodec(0);
+  const keyTypeCodec = deriveCodec(storageEntry.key);
   const keyBytes = new Uint8Array((keys as unknown[]).reduce<number[]>((acc, key, i) => {
     const encoded = keyTypeCodec.encode(key);
     const hasherKind = storageEntry.hashers[i];

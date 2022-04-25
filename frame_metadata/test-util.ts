@@ -14,16 +14,24 @@ export type ValidateCodecSignature<
   _IsValid extends IsExact<T, s.Native<C>>,
 > = never;
 
-export const getLookupAndDeriveCodec = async (
-  networkName: typeof CHAIN_URL_LOOKUP[number][0],
-): Promise<[Lookup, DeriveCodec]> => {
+export interface ChainInfo {
+  deriveCodec: DeriveCodec;
+  metadata: m.Metadata;
+  lookup: Lookup;
+}
+
+export const getLookupAndDeriveCodec = async (networkName: typeof CHAIN_URL_LOOKUP[number][0]): Promise<ChainInfo> => {
   const metadataEncoded = await Deno.readTextFile(
     path.join("target", "frame_metadata", `${networkName}.scale`),
   );
   const metadata = m.fromPrefixedHex(metadataEncoded);
   const lookup = new Lookup(metadata);
   const deriveCodec = DeriveCodec(metadata);
-  return [lookup, deriveCodec];
+  return {
+    deriveCodec,
+    metadata,
+    lookup,
+  };
 };
 
 export const accountId32Bytes = hex.decode(

@@ -1,7 +1,7 @@
 import * as asserts from "std/testing/asserts.ts";
 import { accountId32, accountId32Bytes, getLookupAndDeriveCodec } from "./test-util.ts";
 
-const [lookup, deriveCodec] = await getLookupAndDeriveCodec("polkadot");
+const { lookup, deriveCodec } = await getLookupAndDeriveCodec("polkadot");
 
 Deno.test("AccountId32", async () => {
   const codec = deriveCodec(0);
@@ -29,15 +29,7 @@ Deno.test("AccountInfo", async () => {
 });
 
 Deno.test("Auction AuctionInfo", async () => {
-  const auctionInfoStorageEntry = lookup.getStorageEntryByNameAndPalletName("Auctions", "AuctionInfo");
-  const codec = deriveCodec(auctionInfoStorageEntry.value);
-  const decoded = [8, 9945400];
-  const encoded = codec.encode(decoded);
-  asserts.assertEquals(codec.decode(encoded), decoded);
-});
-
-Deno.test("Auction AuctionInfo", async () => {
-  const auctionInfoStorageEntry = lookup.getStorageEntryByNameAndPalletName("Auctions", "AuctionInfo");
+  const auctionInfoStorageEntry = lookup.getStorageEntryByPalletNameAndName("Auctions", "AuctionInfo");
   const codec = deriveCodec(auctionInfoStorageEntry.value);
   const decoded = [8, 9945400];
   const encoded = codec.encode(decoded);
@@ -45,7 +37,7 @@ Deno.test("Auction AuctionInfo", async () => {
 });
 
 Deno.test("Auction Winning", async () => {
-  const auctionWinningStorageEntry = lookup.getStorageEntryByNameAndPalletName("Auctions", "Winning");
+  const auctionWinningStorageEntry = lookup.getStorageEntryByPalletNameAndName("Auctions", "Winning");
   const codec = deriveCodec(auctionWinningStorageEntry.value);
   const decoded = [
     ...Array(7).fill(undefined),
@@ -58,7 +50,7 @@ Deno.test("Auction Winning", async () => {
 
 // TODO: revisit
 Deno.test("Babe Authorities", { ignore: true }, async () => {
-  const babeAuthoritiesStorageEntry = lookup.getStorageEntryByNameAndPalletName("Babe", "Authorities");
+  const babeAuthoritiesStorageEntry = lookup.getStorageEntryByPalletNameAndName("Babe", "Authorities");
   const codec = deriveCodec(babeAuthoritiesStorageEntry.value);
   const decoded = {
     0: [
