@@ -5,7 +5,7 @@ import { accountId32, getLookupAndDeriveCodec } from "./test-util.ts";
 
 const { lookup, deriveCodec, metadata } = await getLookupAndDeriveCodec("polkadot");
 
-Deno.test("Polkadot System Accounts", () => {
+Deno.test("System Accounts Key", () => {
   const pallet = lookup.getPalletByName("System");
   const storageEntry = lookup.getStorageEntryByPalletAndName(pallet, "Account");
   const key = encodeKey(deriveCodec, defaultHashers, pallet, storageEntry, accountId32);

@@ -1,16 +1,20 @@
+import { POLKADOT_RPC_URL } from "/_/constants/chains/url.ts";
+import { WsConnections } from "/connections/mod.ts";
+import * as hex from "std/encoding/hex.ts";
 import * as asserts from "std/testing/asserts.ts";
-import { accountId32, accountId32Bytes, getLookupAndDeriveCodec } from "./test-util.ts";
+import { defaultHashers, encodeKey } from "./Key.ts";
+import { accountId32, accountId32Bytes, getLookupAndDeriveCodec, State } from "./test-util.ts";
 
 const { lookup, deriveCodec } = await getLookupAndDeriveCodec("polkadot");
 
-Deno.test("AccountId32", async () => {
+Deno.test("Derive AccountId32 Codec", async () => {
   const codec = deriveCodec(0);
   const encoded = codec.encode(accountId32);
   asserts.assertEquals(encoded, accountId32Bytes);
   asserts.assertEquals(codec.decode(encoded), accountId32);
 });
 
-Deno.test("AccountInfo", async () => {
+Deno.test("Derive AccountInfo Codec", async () => {
   const codec = deriveCodec(3);
   const decoded = {
     nonce: 4,
@@ -28,7 +32,7 @@ Deno.test("AccountInfo", async () => {
   asserts.assertEquals(codec.decode(encoded), decoded);
 });
 
-Deno.test("Auction AuctionInfo", async () => {
+Deno.test("Derive Auctions AuctionInfo Storage Entry Codec", async () => {
   const auctionInfoStorageEntry = lookup.getStorageEntryByPalletNameAndName("Auctions", "AuctionInfo");
   const codec = deriveCodec(auctionInfoStorageEntry.value);
   const decoded = [8, 9945400];
@@ -36,7 +40,7 @@ Deno.test("Auction AuctionInfo", async () => {
   asserts.assertEquals(codec.decode(encoded), decoded);
 });
 
-Deno.test("Auction Winning", async () => {
+Deno.test("Derive Auction Winning Storage Entry Codec", async () => {
   const auctionWinningStorageEntry = lookup.getStorageEntryByPalletNameAndName("Auctions", "Winning");
   const codec = deriveCodec(auctionWinningStorageEntry.value);
   const decoded = [
@@ -50,33 +54,36 @@ Deno.test("Auction Winning", async () => {
 
 // TODO: revisit
 Deno.test("Babe Authorities", { ignore: true }, async () => {
-  const babeAuthoritiesStorageEntry = lookup.getStorageEntryByPalletNameAndName("Babe", "Authorities");
-  const codec = deriveCodec(babeAuthoritiesStorageEntry.value);
-  const decoded = {
-    0: [
-      [{ 0: accountId32 }, 1],
-      [{ 0: accountId32 }, 1],
-      [{ 0: accountId32 }, 1],
-      [{ 0: accountId32 }, 1],
-      [{ 0: accountId32 }, 1],
-      [{ 0: accountId32 }, 1],
-    ],
-  };
-  // const manual = s.record([
-  //   0,
-  //   s.array(
-  //     s.tuple(
-  //       s.record([0, s.record([0, s.sizedArray(s.u8, 32)])]),
-  //       s.u64,
-  //     ),
-  //   ),
-  // ]);
-  // console.log(manual.encode(decoded as any));
-  // const encoded = codec.encode(decoded);
-  // asserts.assertEquals(codec.decode(encoded), decoded);
+  // const babe = lookup.getPalletByName("Babe");
+  // const babeAuthorities = lookup.getStorageEntryByPalletAndName(babe, "Authorities");
+
+  const result = await State.getStorage("wss://kusama-rpc.polkadot.io", lookup, deriveCodec, "Babe", "Authorities");
+  console.log(result);
+  // const decoded = {
+  //   0: [
+  //     [{ 0: { 0: accountId32 } }, 1n],
+  //     [{ 0: { 0: accountId32 } }, 1n],
+  //     [{ 0: { 0: accountId32 } }, 1n],
+  //     [{ 0: { 0: accountId32 } }, 1n],
+  //     [{ 0: { 0: accountId32 } }, 1n],
+  //     [{ 0: { 0: accountId32 } }, 1n],
+  //   ],
+  // };
+  // const encoded = babeAuthoritiesValueCodec.encode(decoded);
+  // console.log(encoded);
+  // asserts.assertEquals(babeAuthoritiesValueCodec.decode(encoded), decoded);
 });
 
-Deno.test("Balances Locks", async () => {
+Deno.test("Balances Locks", { only: true }, async () => {
+  const result = await State.getStorage(
+    "wss://kusama-rpc.polkadot.io",
+    lookup,
+    deriveCodec,
+    "System",
+    "Account",
+    accountId32,
+  );
+  console.log(result);
   // const balancesLockStorageEntry = lookup.getStorageEntryByNameAndPalletName("Balances", "Locks");
   // const codec = deriveCodec(balancesLockStorageEntry.value);
   // const decoded = {

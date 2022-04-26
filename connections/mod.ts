@@ -1,4 +1,4 @@
-import { Connections } from "../common.ts";
+import { Connections } from "./common.ts";
 import { WsConnection } from "./Connection.ts";
 
 export class WsConnections implements Connections<string> {

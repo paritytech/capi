@@ -1,12 +1,12 @@
 import * as a from "std/async/mod.ts";
 import * as asserts from "std/testing/asserts.ts";
-import { Connection, Payload } from "../common.ts";
+import { Connection, Payload } from "./common.ts";
 
 export class WsConnection implements Connection {
   #connection;
   #id = 0;
   #payloads = new Map<number, Payload>();
-  #pending: Record<number, a.Deferred<Event | MessageEvent>> = {};
+  #pending: Record<number, a.Deferred<string | undefined>> = {};
 
   constructor(readonly url: string) {
     this.#connection = new Promise<WebSocket>((resolve, reject) => {
@@ -59,12 +59,6 @@ export class WsConnection implements Connection {
     const connection = await this.#connection;
     const payload = this.#payloads.get(id);
     asserts.assert(payload);
-    console.log({
-      jsonrpc: "2.0",
-      id,
-      method: payload.method,
-      params: payload.params,
-    });
     connection.send(JSON.stringify({
       jsonrpc: "2.0",
       id,
@@ -73,8 +67,8 @@ export class WsConnection implements Connection {
     }));
   };
 
-  receive = (id: number): Promise<unknown> => {
-    const pending = a.deferred<Event | MessageEvent>();
+  receive = (id: number): Promise<string | undefined> => {
+    const pending = a.deferred<string | undefined>();
     this.#pending[id] = pending;
     return pending;
   };
@@ -91,7 +85,6 @@ export class WsConnection implements Connection {
     asserts.assert(pending);
     this.#payloads.delete(id);
     delete this.#pending[id];
-
     const err = data.error;
     if (err) {
       const { code, message } = err;
@@ -99,8 +92,8 @@ export class WsConnection implements Connection {
       pending.reject(new ServerErrResponse(code, message));
     } else {
       const result = data.result;
-      asserts.assert(typeof result === "string");
-      pending.resolve(data.result);
+      asserts.assert(typeof result === "string" || result === null);
+      pending.resolve(data.result || undefined);
     }
   };
 }
