@@ -35,6 +35,7 @@
     "example:balance": "deno run -A --no-check=remote examples/balance.ts",
     "example:effect": "deno run -A --no-check=remote examples/effect.ts",
     "example:playground": "deno run -A --no-check=remote examples/playground.ts",
+    "example:ws": "deno run -A --no-check=remote connection/test.ts",
     "test": "deno test -A --no-check=remote -L=info",
     "update_snapshots": "deno test -A --no-check=remote -L=info -- --update"
   }

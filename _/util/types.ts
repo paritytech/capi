@@ -19,3 +19,10 @@ export type AsKeyof<K, T> = K extends keyof T ? K : never;
 //     [Key in keyof T as undefined extends T[Key] ? Key : never]: Key;
 //   };
 // }
+
+export type EnsureLookup<
+  K extends PropertyKey,
+  Lookup extends {
+    [_ in K]: unknown;
+  },
+> = Lookup;

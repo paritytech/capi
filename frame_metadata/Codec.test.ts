@@ -1,8 +1,4 @@
-import { POLKADOT_RPC_URL } from "/_/constants/chains/url.ts";
-import { WsConnections } from "/connections/mod.ts";
-import * as hex from "std/encoding/hex.ts";
 import * as asserts from "std/testing/asserts.ts";
-import { defaultHashers, encodeKey } from "./Key.ts";
 import { accountId32, accountId32Bytes, getLookupAndDeriveCodec, State } from "./test-util.ts";
 
 const { lookup, deriveCodec } = await getLookupAndDeriveCodec("polkadot");
@@ -74,7 +70,7 @@ Deno.test("Babe Authorities", { ignore: true }, async () => {
   // asserts.assertEquals(babeAuthoritiesValueCodec.decode(encoded), decoded);
 });
 
-Deno.test("Balances Locks", { only: true }, async () => {
+Deno.test("Balances Locks", { ignore: true }, async () => {
   const result = await State.getStorage(
     "wss://kusama-rpc.polkadot.io",
     lookup,

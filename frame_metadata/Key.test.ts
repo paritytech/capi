@@ -15,7 +15,7 @@ Deno.test("System Accounts Key", () => {
   );
 });
 
-Deno.test("Auction Winning Key", { only: true }, async () => {
+Deno.test("Auction Winning Key", async () => {
   const pallet = lookup.getPalletByName("Auctions");
   const storageEntry = lookup.getStorageEntryByPalletAndName(pallet, "Winning");
   const key = encodeKey(deriveCodec, defaultHashers, pallet, storageEntry, 5);
