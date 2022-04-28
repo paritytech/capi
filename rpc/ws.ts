@@ -1,5 +1,5 @@
 import * as a from "std/async/mod.ts";
-import { Connection, ConnectionListener } from "./base.ts";
+import { Connection, ConnectionListener, ConnectionPool, ConnectionPoolFactory } from "./common.ts";
 
 export class WsConnection implements Connection {
   users = 1;
@@ -100,6 +100,7 @@ export class WsConnection implements Connection {
         listener(parsed);
       }
     } else {
+      console.log({ ERROR: message });
       // TODO
       throw new Error();
     }
@@ -107,7 +108,7 @@ export class WsConnection implements Connection {
 }
 
 // TODO: decide whether to use `WeakRef` to auto-decrement/release the connection
-export class WsConnectionContext {
+export class WsConnectionPool implements ConnectionPool<string> {
   #entries = new Map<string, WsConnection>();
 
   use = async (url: string) => {
@@ -124,3 +125,7 @@ export class WsConnectionContext {
     return connection;
   };
 }
+
+export const wsConnectionPool: ConnectionPoolFactory<string> = () => {
+  return new WsConnectionPool();
+};

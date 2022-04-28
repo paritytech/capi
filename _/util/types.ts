@@ -22,7 +22,8 @@ export type AsKeyof<K, T> = K extends keyof T ? K : never;
 
 export type EnsureLookup<
   K extends PropertyKey,
+  ValueConstraint,
   Lookup extends {
-    [_ in K]: unknown;
+    [_ in K]: ValueConstraint;
   },
 > = Lookup;

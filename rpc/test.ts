@@ -1,12 +1,11 @@
 import { POLKADOT_RPC_URL } from "/_/constants/chains/url.ts";
-import { STATE__GET_METADATA } from "./base.ts";
-import { WsConnectionContext } from "./ws.ts";
+import { MethodName, wsConnectionPool } from "./mod.ts";
 
-const connections = new WsConnectionContext();
+const connections = wsConnectionPool();
 const connection = await connections.use(POLKADOT_RPC_URL);
 const result = await connection.ask({
   id: connection.nextId,
-  method: STATE__GET_METADATA,
+  method: MethodName.ChainGetBlock,
   params: [],
 });
 console.log(result);

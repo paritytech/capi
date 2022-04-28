@@ -1,5 +1,5 @@
 import { CHAIN_URL_LOOKUP } from "/_/constants/chains/url.ts";
-import { WsConnections } from "/connections/mod.ts";
+import { WsConnectionContext } from "/connection/ws.ts";
 import * as hex from "std/encoding/hex.ts";
 import * as path from "std/path/mod.ts";
 import { IsExact } from "x/conditional_type_checks/mod.ts";
@@ -57,22 +57,22 @@ export namespace State {
     const pallet = lookup.getPalletByName(palletName);
     const storageEntry = lookup.getStorageEntryByPalletAndName(pallet, storageEntryName);
     const key = encodeKey(deriveCodec, defaultHashers, pallet, storageEntry, ...keys);
-    const connections = new WsConnections();
-    const connection = connections.use(url);
-    const id = connection.definePayload({
+    const connections = new WsConnectionContext();
+    const connection = await connections.use(url);
+    const id = connection.nextId;
+    const message = await connection.ask({
+      id,
       method: "state_getStorage",
       params: [key],
     });
-    const resultPending = connection.receive(id);
-    await connection.sendPayload(id);
-    const resultScaleHex = (await resultPending) as string | undefined;
+    const resultScaleHex = (message as any).result as string | undefined;
     if (resultScaleHex === undefined) {
       return;
     }
     const resultScaleBytes = hex.decode(new TextEncoder().encode(resultScaleHex.substring(2)));
     const valueCodec = deriveCodec(storageEntry.value);
     const decoded = valueCodec.decode(resultScaleBytes);
-    await connection.close();
+    await connection.deref();
     return decoded;
   };
 }
