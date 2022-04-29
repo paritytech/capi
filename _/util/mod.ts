@@ -8,5 +8,6 @@ export * from "./mapped.ts";
 export * from "./Result.ts";
 export * from "./runCmd.ts";
 export * from "./spread.ts";
+export * from "./TaggedUnion.ts";
 export * from "./testing.ts";
 export * from "./types.ts";

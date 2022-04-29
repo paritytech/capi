@@ -1,20 +1,10 @@
 import * as u from "/_/util/mod.ts";
-import { ChainGetBlockResult } from "./chain.ts";
-import {
-  SystemChainTypeResult,
-  SystemHealthResult,
-  SystemNodeRolesResult,
-  SystemPropertiesResult,
-  SystemSyncStateResult,
-} from "./system.ts";
-
-export * from "./chain.ts";
-export * from "./system.ts";
 
 export const enum MethodName {
   ChainGetBlock = "chain_getBlock",
   ChainGetBlockHash = "chain_getBlockHash",
   ChainGetFinalizedHead = "chain_getFinalizedHead",
+  ChainSubscribeAllHeads = "chain_subscribeAllHeads",
 
   SystemChain = "system_chain",
   SystemChainType = "system_chainType",
@@ -33,9 +23,10 @@ export const enum MethodName {
 }
 
 export type IoLookup = u.EnsureLookup<MethodName, [string[], unknown], {
-  [MethodName.ChainGetBlock]: [[string], ChainGetBlockResult];
+  [MethodName.ChainGetBlock]: [[] | [string], ChainGetBlockResult];
   [MethodName.ChainGetBlockHash]: [[string], string];
   [MethodName.ChainGetFinalizedHead]: [[string], string];
+  [MethodName.ChainSubscribeAllHeads]: [[], unknown];
 
   [MethodName.SystemChain]: [[], string];
   [MethodName.SystemChainType]: [[], SystemChainTypeResult];
@@ -52,3 +43,54 @@ export type IoLookup = u.EnsureLookup<MethodName, [string[], unknown], {
   [MethodName.StateGetMetadata]: [[string], string];
   [MethodName.StateGetStorage]: [[string], string];
 }>;
+
+// TODO: how do we differentiate blocks from signed blocks?
+export interface ChainGetBlockResult {
+  block: {
+    extrinsics: string[];
+    header: {
+      digest: {
+        logs: string[];
+      };
+      extrinsicsRoot: string;
+      number: string;
+      parentHash: string;
+      stateRoot: string;
+    };
+  };
+  justifications: null; // TODO...
+}
+
+export const enum SystemChainTypeResult {
+  Development = "Development",
+  Local = "Local",
+  Live = "Live",
+  Custom = "Custom",
+}
+
+export interface SystemHealthResult {
+  isSyncing: boolean;
+  peers: number;
+  shouldHavePeers: boolean;
+}
+
+export enum SystemNodeRoleKind {
+  Full = "Full",
+  LightClient = "LightClient",
+  Authority = "Authority",
+}
+// TODO: narrow to possible sets
+export type SystemNodeRolesResult = SystemNodeRoleKind[];
+
+export interface SystemPropertiesResult {
+  // TODO: literally-type this
+  ss58Format: number;
+  tokenDecimals: number;
+  tokenSymbol: string;
+}
+
+export interface SystemSyncStateResult {
+  currentBlock: number;
+  highestBlock: number;
+  startingBlock: number;
+}

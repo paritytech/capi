@@ -7,6 +7,7 @@ export class WsConnection implements Connection {
   #ws;
   #nextId = 0;
   #listeners = new Map<ConnectionListener, true>();
+  #wrappedListeners = new Map<ConnectionListener, ConnectionListener>();
 
   constructor(
     readonly url: string,
@@ -39,36 +40,80 @@ export class WsConnection implements Connection {
     return pending;
   };
 
-  get nextId(): number {
-    return this.#nextId++;
-  }
-
-  send: Connection["send"] = (props) => {
-    this.#ws.send(JSON.stringify({
-      jsonrpc: "2.0",
-      ...props,
-    }));
+  payload: Connection["payload"] = (method, ...params) => {
+    const id = (this.#nextId++).toString();
+    return {
+      id,
+      method,
+      params,
+      toString() {
+        return JSON.stringify({
+          jsonrpc: "2.0",
+          id,
+          method,
+          params,
+        });
+      },
+    };
   };
 
-  ask: Connection["ask"] = (props) => {
+  send: Connection["send"] = (payload) => {
+    this.#ws.send(payload.toString());
+  };
+
+  receive: Connection["receive"] = (payload) => {
     const pending = a.deferred();
     const handler = async (message: unknown) => {
-      if (typeof message === "object" && message !== null && (message as { id?: number }).id === props.id) {
+      if (typeof message === "object" && message !== null && (message as { id?: string }).id === payload.id) {
         this.removeListener(handler);
         pending.resolve(message);
       }
       // TODO: retry logic after certain amount of time?
     };
     this.addListener(handler);
-    this.send(props);
-    return pending;
+    // TODO: type this better
+    return pending as any;
+  };
+
+  ask: Connection["ask"] = (method, ...params) => {
+    const payload = this.payload(method, ...params);
+    const pending = this.receive(payload);
+    this.send(payload);
+    // TODO: enable user-specified validation/guard here?
+    return pending as any;
+  };
+
+  on: Connection["on"] = (payload, listener) => {
+    const wrapped: ConnectionListener = (e) => {
+      if (e.id === payload.id) {
+        // TODO: clean up
+        listener(e as any);
+      }
+    };
+    this.#wrappedListeners.set(listener as ConnectionListener, wrapped);
+    this.addListener(wrapped);
+  };
+
+  off: Connection["off"] = (listener) => {
+    const unwrapped = this.#wrappedListeners.get(listener as ConnectionListener);
+    if (!unwrapped) {
+      throw new Error();
+    }
+    this.removeListener(unwrapped);
+    this.#wrappedListeners.delete(listener as ConnectionListener);
   };
 
   addListener: Connection["addListener"] = (listener) => {
+    if (this.#listeners.has(listener)) {
+      throw new Error();
+    }
     this.#listeners.set(listener, true);
   };
 
   removeListener: Connection["removeListener"] = (listener) => {
+    if (!this.#listeners.has(listener)) {
+      throw new Error();
+    }
     this.#listeners.delete(listener);
   };
 

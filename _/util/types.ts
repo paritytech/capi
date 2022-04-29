@@ -27,3 +27,5 @@ export type EnsureLookup<
     [_ in K]: ValueConstraint;
   },
 > = Lookup;
+
+export type Flatten<T> = T extends Function ? T : { [K in keyof T]: T[K] };
