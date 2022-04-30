@@ -1,6 +1,6 @@
 import { RpcClient, RpcClientFactory } from "./Base.ts";
 
-export class Pool<Beacon> {
+export class RpcClientPool<Beacon> {
   #clients = new Map<Beacon, RpcClient>();
 
   constructor(readonly factory: RpcClientFactory<Beacon>) {}
@@ -18,6 +18,6 @@ export class Pool<Beacon> {
   };
 }
 
-export const pool = <Beacon>(factory: RpcClientFactory<Beacon>) => {
-  return new Pool(factory);
+export const rpcClientPool = <Beacon>(factory: RpcClientFactory<Beacon>) => {
+  return new RpcClientPool(factory);
 };

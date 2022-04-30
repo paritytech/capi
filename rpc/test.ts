@@ -1,9 +1,9 @@
 import { POLKADOT_RPC_URL } from "/_/constants/chains/url.ts";
 import * as a from "std/async/mod.ts";
-import { Init, IsCorrespondingRes, pool, StateGetMetadataRes, wsRpcClient } from "./mod.ts";
+import { Init, IsCorrespondingRes, rpcClientPool, StateGetMetadataRes, wsRpcClient } from "./mod.ts";
 
-const clients = pool(wsRpcClient);
-const client = await clients.ref(POLKADOT_RPC_URL);
+const clientPool = rpcClientPool(wsRpcClient);
+const client = await clientPool.ref(POLKADOT_RPC_URL);
 const stateGetMetadataInit: Init = {
   jsonrpc: "2.0",
   id: client.uid(),
