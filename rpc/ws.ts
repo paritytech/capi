@@ -7,7 +7,10 @@ export class WsRpcClient implements RpcClient {
   #nextId = 0;
   #listeners = new Map<ListenerCb, boolean>();
 
-  constructor(readonly url: string) {
+  constructor(
+    readonly url: string,
+    readonly onClose?: () => void,
+  ) {
     this.#ws = new WebSocket(url);
     this.#ws.addEventListener("error", this.#onError);
     this.#ws.addEventListener("message", this.#onMessage);
@@ -44,6 +47,7 @@ export class WsRpcClient implements RpcClient {
     };
     this.#ws.addEventListener("close", onClose);
     this.#ws.close();
+    this.onClose?.(); // TODO: ensure this works
     return pending;
   };
 
@@ -81,8 +85,11 @@ export class WsRpcClient implements RpcClient {
   };
 }
 
-export const wsRpcClient: RpcClientFactory<string> = async (url) => {
-  const rpcClient = new WsRpcClient(url);
+export const wsRpcClient: RpcClientFactory<string> = async (
+  url,
+  onClose,
+) => {
+  const rpcClient = new WsRpcClient(url, onClose);
   await rpcClient.opening();
   return rpcClient;
 };

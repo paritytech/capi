@@ -1,20 +1,20 @@
 import { POLKADOT_RPC_URL } from "/_/constants/chains/url.ts";
 import * as a from "std/async/mod.ts";
-import { Init, IsCorrespondingRes, StateGetMetadataRes, wsRpcClient } from "./mod.ts";
+import { Init, IsCorrespondingRes, pool, StateGetMetadataRes, wsRpcClient } from "./mod.ts";
 
-const client = await wsRpcClient(POLKADOT_RPC_URL);
-
+const clients = pool(wsRpcClient);
+const client = await clients.ref(POLKADOT_RPC_URL);
 const stateGetMetadataInit: Init = {
   jsonrpc: "2.0",
   id: client.uid(),
   method: "state_getMetadata",
   params: [],
 };
-
-const isStateGetMetadataInit = IsCorrespondingRes(stateGetMetadataInit);
+const isStateGetMetadataInitRes = IsCorrespondingRes(stateGetMetadataInit);
 const pending = a.deferred<StateGetMetadataRes>();
 const stopListening = client.listen(async (res) => {
-  if (isStateGetMetadataInit(res)) {
+  if (isStateGetMetadataInitRes(res)) {
+    // TODO: why is signature not narrow here?
     pending.resolve(res);
   }
 });

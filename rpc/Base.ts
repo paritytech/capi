@@ -10,4 +10,7 @@ export interface RpcClient {
   close: () => Promise<void>;
 }
 
-export type RpcClientFactory<Beacon> = (beacon: Beacon) => Promise<RpcClient>;
+export type RpcClientFactory<Beacon> = (
+  beacon: Beacon,
+  onClose?: () => void,
+) => Promise<RpcClient>;
