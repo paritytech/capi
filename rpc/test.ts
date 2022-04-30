@@ -1,19 +1,25 @@
 import { POLKADOT_RPC_URL } from "/_/constants/chains/url.ts";
-import { EgressMessage, MethodName } from "./method_info/mod.ts";
-import { WsRpcClient } from "./ws.ts";
+import { Init, IsCorrespondingNotif, IsCorrespondingRes, WsRpcClient } from "./mod.ts";
+
+// Message vs. notification corresponds to
 
 const client = new WsRpcClient(POLKADOT_RPC_URL);
 await client.opening();
-const id = client.uid();
-const message: EgressMessage = {
+
+const stateGetMetadataInit: Init = {
   jsonrpc: "2.0",
-  id,
-  method: MethodName.StateGetMetadata,
+  id: client.uid(),
+  method: "state_getMetadata",
   params: [],
 };
-const stopListening = client.listen(async (egressMessage) => {
-  console.log(egressMessage);
-  stopListening();
-  await client.close();
+const isStateGetMetadataInit = IsCorrespondingRes(stateGetMetadataInit);
+
+const stopListening = client.listen(async (res) => {
+  if (isStateGetMetadataInit(res)) {
+    res;
+    console.log(res);
+    stopListening();
+    await client.close();
+  }
 });
-client.send(message);
+client.send(stateGetMetadataInit);

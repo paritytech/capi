@@ -1,11 +1,11 @@
 import * as a from "std/async/mod.ts";
-import { Listener, RpcClient, StopListening } from "./Base.ts";
-import { EgressMessage } from "./method_info/mod.ts";
+import { ListenerCb, RpcClient, RpcClientFactory, StopListening } from "./Base.ts";
+import { Init } from "./messages/types.ts";
 
 export class WsRpcClient implements RpcClient {
   #ws;
   #nextId = 0;
-  #listeners = new Map<Listener, boolean>();
+  #listeners = new Map<ListenerCb, boolean>();
 
   constructor(readonly url: string) {
     this.#ws = new WebSocket(url);
@@ -51,19 +51,17 @@ export class WsRpcClient implements RpcClient {
     return (this.#nextId++).toString();
   };
 
-  listen = (listener: Listener): StopListening => {
+  listen = (listener: ListenerCb): StopListening => {
     if (this.#listeners.has(listener)) {
       throw new Error();
     }
     this.#listeners.set(listener, true);
     return () => {
-      if (!this.#listeners.delete(listener)) {
-        throw new Error();
-      }
+      this.#listeners.delete(listener);
     };
   };
 
-  send = (egressMessage: EgressMessage): void => {
+  send = (egressMessage: Init): void => {
     this.#ws.send(JSON.stringify(egressMessage));
   };
 
@@ -82,3 +80,9 @@ export class WsRpcClient implements RpcClient {
     }
   };
 }
+
+export const wsRpcClient: RpcClientFactory<string> = async (url) => {
+  const rpcClient = new WsRpcClient(url);
+  await rpcClient.opening();
+  return rpcClient;
+};

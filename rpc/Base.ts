@@ -1,33 +1,13 @@
-import { EgressMessage, IngressMessage } from "./method_info/mod.ts";
+import { Init, Notif, Res } from "./messages/types.ts";
 
-export type Listener = (message: IngressMessage) => void;
+export type ListenerCb<Message extends Res | Notif = Res | Notif> = (message: Message) => void;
 export type StopListening = () => void;
 
 export interface RpcClient {
-  opening: () => Promise<void>;
   uid: () => string;
-  send: (message: EgressMessage) => void;
-  listen: (listener: Listener) => StopListening;
+  send: (message: Init) => void;
+  listen: (listenerCb: ListenerCb) => StopListening;
   close: () => Promise<void>;
 }
 
-// const connections = Connections();
-// const connection = await connections.ref("...");
-// const payload = EgressMessage({
-//   id: connection.uid(),
-//   method: "state_getMetadata",
-//   params: [],
-// });
-// const isPayloadResponse = IngressGuard<MethodName.StateGetMetadata>((message) => {
-//   if (message.result && message.result.id === payload.id) {
-//     return true;
-//   }
-//   return false;
-// });
-// const stop = connection.listen((message) => {
-//   if (isPayloadResponse(message)) {
-//     console.log(message);
-//     stop();
-//     connection.deref();
-//   }
-// });
+export type RpcClientFactory<Beacon> = (beacon: Beacon) => Promise<RpcClient>;
