@@ -11,6 +11,15 @@ import { StateGetStorageEgressMessage, StateGetStorageIngressMessage } from "./s
 import { SystemChainTypeEgressMessage, SystemChainTypeIngressMessage } from "./system/ChainType.ts";
 import { SystemHealthEgressMessage, SystemHealthIngressMessage } from "./system/Health.ts";
 
+export * from "./chain/GetBlock.ts";
+export * from "./chain/GetBlockHash.ts";
+export * from "./chainHead/unstable/Follow.ts";
+export { MethodName } from "./common.ts";
+export * from "./state/GetMetadata.ts";
+export * from "./state/GetStorage.ts";
+export * from "./system/ChainType.ts";
+export * from "./system/Health.ts";
+
 export type EgressMessage =
   | ChainGetBlockEgressMessage
   | ChainGetBlockHashEgressMessage

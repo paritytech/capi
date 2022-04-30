@@ -1,32 +1,14 @@
-import { MethodInfoByName, SubscriptionMethodInfo } from "./method_info/mod.ts";
+import { EgressMessage, IngressMessage } from "./method_info/mod.ts";
 
-export interface OpaqueIngressMessage<
-  Id_ extends Id = Id,
-  MethodName extends keyof MethodInfoByName = keyof MethodInfoByName,
-> extends JsonRpcVersionBearer {
-  id: Id_;
-  result: MethodInfoByName[MethodName]["result"];
-}
+export type Listener = (message: IngressMessage) => void;
+export type StopListening = () => void;
 
-export interface SubscriptionIngressMessage<
-  Id_ extends Id = Id,
-  MethodName extends keyof MethodInfoByName = keyof MethodInfoByName,
-> extends JsonRpcVersionBearer {
-  method: MethodName;
-  params: {
-    subscription: Id_;
-    result: MethodInfoByName[MethodName]["notificationResult"];
-  };
-}
-
-// export type IngressMessage<EgressMessage_ extends EgressMessage = EgressMessage> = {
-//   [MethodName in keyof MethodInfoByName]: MethodInfoByName[EgressMessage["method"]] extends
-//     // SubscriptionMethodInfo<infer Name, infer Params, infer Err, infer InitResult, infer NotificationResult> ? OpaqueIngressMessage<>
-//     : never;
-// };
-
-export interface RpcConnection {
-  send: (props: EgressMessage) => void;
+export interface RpcClient {
+  opening: () => Promise<void>;
+  uid: () => string;
+  send: (message: EgressMessage) => void;
+  listen: (listener: Listener) => StopListening;
+  close: () => Promise<void>;
 }
 
 // const connections = Connections();
