@@ -1,10 +1,8 @@
 import { POLKADOT_RPC_URL } from "/_/constants/chains/url.ts";
-import { Init, IsCorrespondingNotif, IsCorrespondingRes, WsRpcClient } from "./mod.ts";
+import * as a from "std/async/mod.ts";
+import { Init, IsCorrespondingRes, StateGetMetadataRes, wsRpcClient } from "./mod.ts";
 
-// Message vs. notification corresponds to
-
-const client = new WsRpcClient(POLKADOT_RPC_URL);
-await client.opening();
+const client = await wsRpcClient(POLKADOT_RPC_URL);
 
 const stateGetMetadataInit: Init = {
   jsonrpc: "2.0",
@@ -12,14 +10,16 @@ const stateGetMetadataInit: Init = {
   method: "state_getMetadata",
   params: [],
 };
-const isStateGetMetadataInit = IsCorrespondingRes(stateGetMetadataInit);
 
+const isStateGetMetadataInit = IsCorrespondingRes(stateGetMetadataInit);
+const pending = a.deferred<StateGetMetadataRes>();
 const stopListening = client.listen(async (res) => {
   if (isStateGetMetadataInit(res)) {
-    res;
-    console.log(res);
-    stopListening();
-    await client.close();
+    pending.resolve(res);
   }
 });
 client.send(stateGetMetadataInit);
+console.log(await pending);
+// console.log(await a.deadline(pending, 800));
+stopListening();
+await client.close();
