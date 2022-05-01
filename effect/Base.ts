@@ -45,3 +45,7 @@ export type Resolved<D extends AnyEffect[]> = {
 namespace Resolved {
   export type _0<T> = T extends AnyEffectA<infer A> ? A : T;
 }
+
+export type AsAnyEffectAList<D extends any[]> =
+  & Array<any>
+  & { [I in keyof D]: AnyEffectA<D[I]> };

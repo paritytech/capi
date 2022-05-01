@@ -12,6 +12,7 @@ export class RpcClientPool<Beacon> {
     }
     const client = await this.factory(beacon, () => {
       this.#clients.delete(beacon);
+      return true;
     });
     this.#clients.set(beacon, client);
     return client;

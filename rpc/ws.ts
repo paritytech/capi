@@ -9,7 +9,7 @@ export class WsRpcClient implements RpcClient {
 
   constructor(
     readonly url: string,
-    readonly onClose?: () => void,
+    readonly derefHook: () => boolean,
   ) {
     this.#ws = new WebSocket(url);
     this.#ws.addEventListener("error", this.#onError);
@@ -37,18 +37,19 @@ export class WsRpcClient implements RpcClient {
     }
   };
 
-  close = async (): Promise<void> => {
-    const pending = a.deferred<void>();
-    const onClose = () => {
-      this.#ws.removeEventListener("error", this.#onError);
-      this.#ws.removeEventListener("message", this.#onMessage);
-      this.#ws.removeEventListener("close", onClose);
-      pending.resolve();
-    };
-    this.#ws.addEventListener("close", onClose);
-    this.#ws.close();
-    this.onClose?.(); // TODO: ensure this works
-    return pending;
+  deref = async (): Promise<void> => {
+    if (this.derefHook()) {
+      const pending = a.deferred<void>();
+      const onClose = () => {
+        this.#ws.removeEventListener("error", this.#onError);
+        this.#ws.removeEventListener("message", this.#onMessage);
+        this.#ws.removeEventListener("close", onClose);
+        pending.resolve();
+      };
+      this.#ws.addEventListener("close", onClose);
+      this.#ws.close();
+      return pending;
+    }
   };
 
   uid = (): string => {

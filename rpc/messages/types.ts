@@ -30,6 +30,16 @@ export type Init =
   | SystemChainTypeInit
   | SystemHealthInit;
 
+export type InitByName = EnsureMethodLookup<Init, {
+  chain_getBlock: ChainGetBlockInit;
+  chain_getBlockHash: ChainGetBlockHashInit;
+  chainHead_unstable_follow: ChainHeadUnstableFollowInit;
+  state_getMetadata: StateGetMetadataInit;
+  state_getStorage: StateGetStorageInit;
+  system_chainType: SystemChainTypeInit;
+  system_health: SystemHealthInit;
+}>;
+
 export type Res =
   | ChainGetBlockRes
   | ChainGetBlockHashRes

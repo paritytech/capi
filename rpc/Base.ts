@@ -7,10 +7,10 @@ export interface RpcClient {
   uid: () => string;
   send: (message: Init) => void;
   listen: (listenerCb: ListenerCb) => StopListening;
-  close: () => Promise<void>;
+  deref: () => Promise<void>;
 }
 
 export type RpcClientFactory<Beacon> = (
   beacon: Beacon,
-  onClose?: () => void,
+  derefHook: () => boolean,
 ) => Promise<RpcClient>;
