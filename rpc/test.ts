@@ -20,6 +20,5 @@ const stopListening = client.listen(async (res) => {
 });
 client.send(stateGetMetadataInit);
 console.log(await pending);
-// console.log(await a.deadline(pending, 800));
 stopListening();
 await client.close();
