@@ -1,5 +1,4 @@
-import { _A, _E, _R, AnyEffect, AnyEffectA, Effect } from "./Base.ts";
-import { exec } from "./Exec.ts";
+import * as Z from "./mod.ts";
 
 class RandE extends Error {}
 
@@ -7,9 +6,9 @@ interface RandR {
   rand(): number;
 }
 
-class Rand extends Effect<RandR, RandE, number, []> {
+class Rand extends Z.Effect<RandR, RandE, number, []> {
   constructor() {
-    super([], (runtime) => {
+    super([], async (runtime) => {
       return runtime.rand();
     });
   }
@@ -26,10 +25,10 @@ export interface AddR {
   add(a: number, b: number): number;
 }
 
-export class Add<Values extends AnyEffectA<number>[]> extends Effect<AddR, AddE, number, Values> {
+export class Add<Values extends Z.AnyEffectA<number>[]> extends Z.Effect<AddR, AddE, number, Values> {
   values;
   constructor(...values: Values) {
-    super(values, (runtime, ...values) => {
+    super(values, async (runtime, ...values) => {
       return values.reduce<number>((acc, cur) => {
         return runtime.add(acc, cur);
       }, 0);
@@ -38,7 +37,7 @@ export class Add<Values extends AnyEffectA<number>[]> extends Effect<AddR, AddE,
   }
 }
 
-export const add = <Values extends AnyEffectA<number>[]>(...values: Values): Add<Values> => {
+export const add = <Values extends Z.AnyEffectA<number>[]>(...values: Values): Add<Values> => {
   return new Add(...values);
 };
 
@@ -50,15 +49,15 @@ interface DoubleR {
   double(n: number): number;
 }
 
-class Double<N extends AnyEffectA<number>> extends Effect<DoubleR, DoubleE, number, [N]> {
+class Double<N extends Z.AnyEffectA<number>> extends Z.Effect<DoubleR, DoubleE, number, [N]> {
   constructor(readonly value: N) {
-    super([value], (runtime, resolved) => {
+    super([value], async (runtime, resolved) => {
       return runtime.double(resolved);
     });
   }
 }
 
-export const double = <N extends AnyEffectA<number>>(value: N): Double<N> => {
+export const double = <N extends Z.AnyEffectA<number>>(value: N): Double<N> => {
   return new Double(value);
 };
 
@@ -66,9 +65,9 @@ export const double = <N extends AnyEffectA<number>>(value: N): Double<N> => {
 
 class RandomlyThrowErr extends Error {}
 
-class RandomlyThrow<E extends AnyEffect> extends Effect<{}, RandomlyThrowErr, E[_A], [E]> {
+class RandomlyThrow<A, E extends Z.AnyEffectA<A>> extends Z.Effect<{}, RandomlyThrowErr, A, [E]> {
   constructor(readonly effect: E) {
-    super([effect], (_, e) => {
+    super([effect], async (_, e) => {
       if (Math.random() > .5) {
         throw new RandomlyThrowErr();
       }
@@ -77,7 +76,7 @@ class RandomlyThrow<E extends AnyEffect> extends Effect<{}, RandomlyThrowErr, E[
   }
 }
 
-export const randomlyThrow = <E extends AnyEffect>(effect: E): RandomlyThrow<E> => {
+export const randomlyThrow = <A, E extends Z.AnyEffectA<A>>(effect: E): RandomlyThrow<A, E> => {
   return new RandomlyThrow(effect);
 };
 
@@ -88,11 +87,9 @@ const b = double(a);
 const c = add(a, b);
 const d = randomlyThrow(c);
 
-console.log(d);
+// console.log(c.toString());
 
-console.log(d.toString());
-
-const e = exec(d);
+const e = Z.exec(d);
 
 const result = await e.run({
   add(a, b) {

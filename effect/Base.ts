@@ -24,7 +24,7 @@ export abstract class Effect<
     readonly run: (
       runtime: R,
       ...resolved: Resolved<D>
-    ) => E | A,
+    ) => Promise<E | A>,
   ) {}
 
   toString(): string {
