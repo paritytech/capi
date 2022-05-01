@@ -27,12 +27,14 @@ export interface AddR {
 }
 
 export class Add<Values extends AnyEffectA<number>[]> extends Effect<AddR, AddE, number, Values> {
+  values;
   constructor(...values: Values) {
     super(values, (runtime, ...values) => {
       return values.reduce<number>((acc, cur) => {
         return runtime.add(acc, cur);
       }, 0);
     });
+    this.values = values;
   }
 }
 
@@ -49,7 +51,7 @@ interface DoubleR {
 }
 
 class Double<N extends AnyEffectA<number>> extends Effect<DoubleR, DoubleE, number, [N]> {
-  constructor(value: N) {
+  constructor(readonly value: N) {
     super([value], (runtime, resolved) => {
       return runtime.double(resolved);
     });
@@ -65,7 +67,7 @@ export const double = <N extends AnyEffectA<number>>(value: N): Double<N> => {
 class RandomlyThrowErr extends Error {}
 
 class RandomlyThrow<E extends AnyEffect> extends Effect<{}, RandomlyThrowErr, E[_A], [E]> {
-  constructor(effect: E) {
+  constructor(readonly effect: E) {
     super([effect], (_, e) => {
       if (Math.random() > .5) {
         throw new RandomlyThrowErr();
@@ -85,6 +87,11 @@ const a = rand();
 const b = double(a);
 const c = add(a, b);
 const d = randomlyThrow(c);
+
+console.log(d);
+
+console.log(d.toString());
+
 const e = exec(d);
 
 const result = await e.run({

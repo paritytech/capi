@@ -14,7 +14,6 @@ export abstract class Effect<
   E extends Error,
   A,
   D extends AnyEffect[],
-  T extends E | A = E | A,
 > {
   [_R]!: R & UnionToIntersection<Extract<D[number], AnyEffect>[_R]>;
   [_E]!: E | Extract<D[number], AnyEffect>[_E];
@@ -25,12 +24,20 @@ export abstract class Effect<
     readonly run: (
       runtime: R,
       ...resolved: Resolved<D>
-    ) => T,
+    ) => E | A,
   ) {}
+
+  toString(): string {
+    const name = this.constructor.name;
+    if (this.deps.length > 0) {
+      return `${name}(${this.deps.map((value) => value.toString()).join(",")})`;
+    }
+    return name;
+  }
 }
 
-export type AnyEffect = Effect<any, any, any, any, any>;
-export type AnyEffectA<A> = Effect<any, any, A, any, any>;
+export type AnyEffect = Effect<any, any, any, any>;
+export type AnyEffectA<A> = Effect<any, any, A, any>;
 
 export type Resolved<D extends AnyEffect[]> = {
   [K in keyof D]: Resolved._0<D[K]>;
