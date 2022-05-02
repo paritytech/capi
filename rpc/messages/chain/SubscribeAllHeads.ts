@@ -1,10 +1,10 @@
-import { InitBase, ResBase } from "../common.ts";
+import { InitBase, NotifBase, ResBase } from "../common.ts";
 
 export type ChainSubscribeAllHeadsInit = InitBase<"chain_subscribeAllHeads">;
 
 export type ChainSubscribeAllHeadsRes = ResBase<string>;
 
-export type ChainSubscribeAllHeadsNotif = ResBase<{
+export type ChainSubscribeAllHeadsNotif = NotifBase<"chain_subscribeAllHeads", {
   digest: {
     logs: string[];
   };

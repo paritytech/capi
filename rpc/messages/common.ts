@@ -1,8 +1,11 @@
 export type MethodName =
+  | "account_nextIndex"
+  | "author_hasKey"
   | "chain_getBlock"
   | "chain_getBlockHash"
   | "chain_subscribeAllHeads"
   | "chainHead_unstable_follow"
+  | "rpc_methods"
   | "state_getMetadata"
   | "state_getStorage"
   | "system_chainType"
@@ -10,16 +13,17 @@ export type MethodName =
 
 export type EnsureMethodLookup<
   Constraint,
-  Lookup extends {
-    [_ in MethodName]: Constraint;
-  },
+  Lookup extends { [_ in MethodName]: Constraint },
 > = Lookup;
 
 export type IsSubscription = EnsureMethodLookup<boolean, {
+  account_nextIndex: false;
+  author_hasKey: false;
   chain_getBlock: false;
   chain_getBlockHash: false;
   chain_subscribeAllHeads: true;
   chainHead_unstable_follow: true;
+  rpc_methods: false;
   state_getMetadata: false;
   state_getStorage: false;
   system_chainType: false;
@@ -30,18 +34,8 @@ export type SubscriptionMethodName = keyof {
   [N in keyof IsSubscription as IsSubscription[N] extends true ? N : never]: undefined;
 };
 
-export type EnsureSubscriptionMethodLookup<
-  Constraint,
-  Lookup extends {
-    [_ in SubscriptionMethodName]: Constraint;
-  },
-> = Lookup;
-
-export const JSON_RPC_VERSION = "2.0";
-export type JSON_RPC_VERSION = typeof JSON_RPC_VERSION;
-
 interface JsonRpcVersionBearer {
-  jsonrpc: JSON_RPC_VERSION;
+  jsonrpc: "2.0";
 }
 
 export interface InitBase<
