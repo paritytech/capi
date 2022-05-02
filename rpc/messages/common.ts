@@ -1,6 +1,7 @@
 export type MethodName =
   | "chain_getBlock"
   | "chain_getBlockHash"
+  | "chain_subscribeAllHeads"
   | "chainHead_unstable_follow"
   | "state_getMetadata"
   | "state_getStorage"
@@ -17,6 +18,7 @@ export type EnsureMethodLookup<
 export type IsSubscription = EnsureMethodLookup<boolean, {
   chain_getBlock: false;
   chain_getBlockHash: false;
+  chain_subscribeAllHeads: true;
   chainHead_unstable_follow: true;
   state_getMetadata: false;
   state_getStorage: false;
