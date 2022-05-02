@@ -61,3 +61,4 @@ stalebot
 pendings
 deref
 notif
+finalised

@@ -1,8 +1,18 @@
 export type MethodName =
   | "account_nextIndex"
   | "author_hasKey"
+  | "author_hasSessionKeys"
+  | "author_pendingExtrinsics"
+  | "author_removeExtrinsics"
+  | "author_rotateKeys"
+  | "author_submitAndWatchExtrinsic"
+  | "author_submitExtrinsic"
+  | "author_unwatchExtrinsic"
+  | "babe_epochAuthorship"
   | "chain_getBlock"
   | "chain_getBlockHash"
+  | "chain_getFinalisedHead"
+  | "chain_getFinalizedHead"
   | "chain_subscribeAllHeads"
   | "chainHead_unstable_follow"
   | "rpc_methods"
@@ -19,8 +29,18 @@ export type EnsureMethodLookup<
 export type IsSubscription = EnsureMethodLookup<boolean, {
   account_nextIndex: false;
   author_hasKey: false;
+  author_hasSessionKeys: false;
+  author_pendingExtrinsics: false;
+  author_removeExtrinsics: false;
+  author_rotateKeys: false;
+  author_submitAndWatchExtrinsic: true;
+  author_submitExtrinsic: false;
+  author_unwatchExtrinsic: false;
+  babe_epochAuthorship: false;
   chain_getBlock: false;
   chain_getBlockHash: false;
+  chain_getFinalisedHead: false;
+  chain_getFinalizedHead: false;
   chain_subscribeAllHeads: true;
   chainHead_unstable_follow: true;
   rpc_methods: false;
