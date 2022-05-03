@@ -46,12 +46,14 @@ export type InitByName = {
 export type GetInit<N extends Name> = InitByName[N];
 export type Init = GetInit<Name>;
 
-export type ResByName = { [N in Name]: ResBase<ReturnType<Lookup[N]>> };
+export type ResByName = {
+  [N in Name]: ResBase<ReturnType<Lookup[N]> extends Subscription ? string : ReturnType<Lookup[N]>>;
+};
 export type GetRes<N extends Name> = ResByName[N];
 export type Res = GetRes<Name>;
 
 export type NotifByName = {
-  [N in Name as ReturnType<Lookup[N]> extends Subscription<any> ? N : never]: NotifBase<
+  [N in Name as ReturnType<Lookup[N]> extends Subscription ? N : never]: NotifBase<
     N,
     ReturnType<Lookup[N]> extends Subscription<infer R> ? R : never
   >;
@@ -64,10 +66,11 @@ export type IngressMessage = Res | Notif;
 
 type EnsureLookup<T extends Record<string, (...args: any[]) => any>> = T;
 
-type Subscription<X> = {
-  subscription: X;
+type Subscription<NotificationResult = any> = {
+  notificationResult: NotificationResult;
 };
 
+// Modeled closely after https://github.com/paritytech/smoldot/blob/82836f4f2af4dd1716c57c14a4f591c7b1043950/src/json_rpc/methods.rs#L338-L479
 export type Lookup = EnsureLookup<{
   account_nextIndex: TODO;
   author_hasKey(pubKey: string, keyType: string): string;

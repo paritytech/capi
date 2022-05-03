@@ -52,25 +52,11 @@ export const subscribe = async <Method extends m.SubscriptionName>(
   params: m.InitByName[Method]["params"],
   listenerCb: ListenerCb<m.NotifByName[Method]>,
 ): Promise<StopListening> => {
-  const init: m.Init = {
-    jsonrpc: "2.0",
-    id: client.uid(),
-    method,
-    params: params as any,
-  };
-  const isCorrespondingRes = IsCorrespondingRes(init);
-  let id: string | undefined;
+  const initRes = await call(client, method, params);
   const stopListening = client.listen(async (res) => {
-    if (isCorrespondingRes(res)) {
-      // TODO
-      id = (res as any as m.ResByName[Method]).result as any as string;
-    } else {
-      // @ts-ignore
-      if (isNotif(res) && res.params.subscription === id) {
-        listenerCb(res as m.NotifByName[Method]);
-      }
+    if (isNotif(res) && res.params.subscription === initRes.result) {
+      listenerCb(res as m.NotifByName[Method]);
     }
   });
-  client.send(init);
   return stopListening;
 };

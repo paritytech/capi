@@ -7,10 +7,7 @@ export class WsRpcClient implements RpcClient {
   #nextId = 0;
   #listeners = new Map<ListenerCb, boolean>();
 
-  constructor(
-    readonly url: string,
-    readonly derefHook: () => boolean,
-  ) {
+  constructor(readonly url: string) {
     this.#ws = new WebSocket(url);
     this.#ws.addEventListener("error", this.#onError);
     this.#ws.addEventListener("message", this.#onMessage);
@@ -37,19 +34,17 @@ export class WsRpcClient implements RpcClient {
     }
   };
 
-  deref = async (): Promise<void> => {
-    if (this.derefHook()) {
-      const pending = a.deferred<void>();
-      const onClose = () => {
-        this.#ws.removeEventListener("error", this.#onError);
-        this.#ws.removeEventListener("message", this.#onMessage);
-        this.#ws.removeEventListener("close", onClose);
-        pending.resolve();
-      };
-      this.#ws.addEventListener("close", onClose);
-      this.#ws.close();
-      return pending;
-    }
+  close = async (): Promise<void> => {
+    const pending = a.deferred<void>();
+    const onClose = () => {
+      this.#ws.removeEventListener("error", this.#onError);
+      this.#ws.removeEventListener("message", this.#onMessage);
+      this.#ws.removeEventListener("close", onClose);
+      pending.resolve();
+    };
+    this.#ws.addEventListener("close", onClose);
+    this.#ws.close();
+    return pending;
   };
 
   uid = (): string => {
@@ -86,11 +81,8 @@ export class WsRpcClient implements RpcClient {
   };
 }
 
-export const wsRpcClient: RpcClientFactory<string> = async (
-  url,
-  onClose,
-) => {
-  const rpcClient = new WsRpcClient(url, onClose);
+export const wsRpcClient: RpcClientFactory<string> = async (url) => {
+  const rpcClient = new WsRpcClient(url);
   await rpcClient.opening();
   return rpcClient;
 };

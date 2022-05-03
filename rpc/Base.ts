@@ -1,16 +1,16 @@
-import { Init, Notif, Res } from "./messages.ts";
+import { IngressMessage, Init } from "./messages.ts";
 
-export type ListenerCb<Message extends Res | Notif = Res | Notif> = (message: Message) => void;
+export type ListenerCb<IngressMessage_ extends IngressMessage = IngressMessage> = (
+  ingressMessage: IngressMessage_,
+) => void;
+
 export type StopListening = () => void;
 
 export interface RpcClient {
   uid: () => string;
-  send: (message: Init) => void;
+  send: (egressMessage: Init) => void;
   listen: (listenerCb: ListenerCb) => StopListening;
-  deref: () => Promise<void>;
+  close: () => Promise<void>;
 }
 
-export type RpcClientFactory<Beacon> = (
-  beacon: Beacon,
-  derefHook: () => boolean,
-) => Promise<RpcClient>;
+export type RpcClientFactory<Beacon> = (beacon: Beacon) => Promise<RpcClient>;
