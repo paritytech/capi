@@ -30,7 +30,7 @@ export const call = async <Method extends m.Name>(
   const init: m.Init = {
     jsonrpc: "2.0",
     id: client.uid(),
-    method,
+    method: method as any,
     params: params as any,
   };
   const isCorrespondingRes = IsCorrespondingRes(init);
@@ -63,7 +63,7 @@ export const subscribe = async <Method extends m.SubscriptionName>(
   const stopListening = client.listen(async (res) => {
     if (isCorrespondingRes(res)) {
       // TODO
-      id = (res as m.ResByName[Method]).result as string;
+      id = (res as any as m.ResByName[Method]).result as any as string;
     } else {
       // @ts-ignore
       if (isNotif(res) && res.params.subscription === id) {

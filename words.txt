@@ -62,3 +62,7 @@ pendings
 deref
 notif
 finalised
+childstate
+offchain
+unfollow
+multiaddr
