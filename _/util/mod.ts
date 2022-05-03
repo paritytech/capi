@@ -1,5 +1,6 @@
 export * from "./Array.ts";
 export * from "./bearer.ts";
+export * from "./branded.ts";
 export * from "./error.ts";
 export * from "./fn.ts";
 export * from "./guards.ts";
