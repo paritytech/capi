@@ -1,6 +1,6 @@
 import * as a from "std/async/mod.ts";
 import { ListenerCb, RpcClient, RpcClientFactory, StopListening } from "./Base.ts";
-import { Init } from "./messages/types.ts";
+import { Init } from "./messages.ts";
 
 export class WsRpcClient implements RpcClient {
   #ws;

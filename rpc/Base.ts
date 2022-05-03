@@ -1,4 +1,4 @@
-import { Init, Notif, Res } from "./messages/types.ts";
+import { Init, Notif, Res } from "./messages.ts";
 
 export type ListenerCb<Message extends Res | Notif = Res | Notif> = (message: Message) => void;
 export type StopListening = () => void;
