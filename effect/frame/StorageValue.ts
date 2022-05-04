@@ -7,14 +7,14 @@ export class StorageValue<
   Beacon extends AnyEffect,
   StorageEntry extends AnyEffectA<m.StorageEntry>,
   EncodedStorageValue extends AnyEffectA<string>,
-> extends Effect<{}, never, unknown, [StorageValueCodec<Beacon, StorageEntry>, EncodedStorageValue]> {
+> extends Effect<{}, never, { value: unknown }, [StorageValueCodec<Beacon, StorageEntry>, EncodedStorageValue]> {
   constructor(
-    beacon: Beacon,
-    storageEntry: StorageEntry,
-    encodedStorageValue: EncodedStorageValue,
+    readonly beacon: Beacon,
+    readonly storageEntry: StorageEntry,
+    readonly encodedStorageValue: EncodedStorageValue,
   ) {
     super([storageValueCodec(beacon, storageEntry), encodedStorageValue], async (_, codec, encoded) => {
-      return codec.decode(u.hexToU8a(encoded));
+      return { value: codec.decode(u.hexToU8a(encoded)) };
     });
   }
 }

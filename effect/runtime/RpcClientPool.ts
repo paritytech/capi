@@ -1,7 +1,7 @@
-import { RpcClientPool } from "/rpc/mod.ts";
+import { RpcClientFactory } from "/rpc/mod.ts";
 
-export interface RpcClientPoolRuntime<Beacon> {
-  rpcClientPool: RpcClientPool<Beacon>;
+export interface RpcClientFactoryRuntime<Beacon> {
+  rpcClientFactory: RpcClientFactory<Beacon>;
 }
 
-export class RpcClientPoolRuntimeError extends Error {}
+export class RpcClientFactoryRuntimeError extends Error {}

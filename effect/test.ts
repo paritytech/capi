@@ -5,22 +5,18 @@ import * as z from "./mod.ts";
 
 const beacon = z.lift(POLKADOT_RPC_URL);
 const pallet = z.pallet(beacon, z.lift("Timestamp"));
-const entry = z.storageEntry(beacon, pallet, z.lift("Now"));
+const entry = z.StorageEntry.fromPalletAndName(beacon, pallet, z.lift("Now"));
+const storageKey = z.StorageKey.from(beacon, pallet, entry);
+const storageValueRes = z.rpcCall(beacon, z.lift("state_getStorage" as const), storageKey);
+const storageValueEncoded = z.then(storageValueRes)((e) => e.result);
+const storageValue = z.storageValue(beacon, entry, storageValueEncoded);
 
-const storageKey = z.StorageKey.from(
-  z.lift(POLKADOT_RPC_URL),
-  z.lift("Timestamp"),
-  z.lift("Now"),
-);
-const rpcCall = z.rpcCall(z.lift(POLKADOT_RPC_URL), z.lift("state_getStorage" as const), storageKey);
-const decoded = z.storageValue(z.lift(POLKADOT_RPC_URL), entry, z.then(rpcCall)((e) => e.result));
-const result = await z.exec(decoded).run({
+const result = await z.exec(storageValue).run({
   hashers: defaultHashers,
-  rpcClientPool: rpc.rpcClientPool(rpc.wsRpcClient as any),
+  rpcClientFactory: rpc.wsRpcClient,
 });
 if (result instanceof Error) {
   console.log(result);
 } else {
   console.log(result);
 }
-// const e = z.rpcCall(z.lift(POLKADOT_RPC_URL), z.lift("state_getMetadata" as const));

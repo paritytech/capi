@@ -9,8 +9,8 @@ export class Codec<
   TypeI extends AnyEffectA<number>,
 > extends Effect<{}, CodecError, s.Codec<unknown>, [DeriveCodec<Beacon>, TypeI]> {
   constructor(
-    beacon: Beacon,
-    typeI: TypeI,
+    readonly beacon: Beacon,
+    readonly typeI: TypeI,
   ) {
     super([deriveCodec(beacon), typeI], async (_, deriveCodec, typeIResolved) => {
       return deriveCodec(typeIResolved);

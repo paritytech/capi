@@ -1,5 +1,5 @@
 import { _A, AnyEffect, AnyEffectA, AsAnyEffectAList, Effect } from "/effect/Base.ts";
-import { RpcClientPoolRuntime, RpcClientPoolRuntimeError } from "/effect/runtime/RpcClientPool.ts";
+import { RpcClientFactoryRuntime, RpcClientFactoryRuntimeError } from "/effect/runtime/RpcClientPool.ts";
 import * as rpc from "/rpc/mod.ts";
 
 export class RpcCall<
@@ -7,8 +7,8 @@ export class RpcCall<
   Method extends AnyEffectA<rpc.Name>,
   Params extends AsAnyEffectAList<rpc.Init<Method[_A]>["params"]>,
 > extends Effect<
-  RpcClientPoolRuntime<Beacon>,
-  RpcClientPoolRuntimeError,
+  RpcClientFactoryRuntime<Beacon[_A]>,
+  RpcClientFactoryRuntimeError,
   rpc.OkRes<Method[_A]>,
   [Beacon, Method, ...Params]
 > {
@@ -18,9 +18,11 @@ export class RpcCall<
     ...params: Params
   ) {
     super([beacon, method, ...params], async (runtime, beacon, method, ...params) => {
-      const client = await runtime.rpcClientPool.ref(beacon);
+      const client = await runtime.rpcClientFactory(beacon);
       // TODO: fix this typing
-      return rpc.call(client, method, params as any) as any;
+      const result = await rpc.call(client, method, params as any) as any;
+      await client.close();
+      return result;
     });
   }
 }

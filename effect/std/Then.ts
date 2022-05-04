@@ -1,4 +1,4 @@
-import { _A, AnyEffect, Effect } from "../Base.ts";
+import { _A, AnyEffect, Effect, Id } from "../Base.ts";
 
 type UseResolvedTarget<
   Target extends AnyEffect,
@@ -10,18 +10,20 @@ export class Then<
   Into,
 > extends Effect<{}, never, Into, [Target]> {
   constructor(
-    target: Target,
-    useResolvedTarget: UseResolvedTarget<Target, Into>,
+    readonly target: Target,
+    readonly useResolvedTarget: UseResolvedTarget<Target, Into>,
   ) {
     super([target], async (_, resolvedTarget) => {
       return useResolvedTarget(resolvedTarget);
     });
   }
+
+  get structure(): string {
+    return `Then(${this.target.structure},${Id(this.useResolvedTarget)})`;
+  }
 }
 
-export const then = <
-  Target extends AnyEffect,
->(target: Target) => {
+export const then = <Target extends AnyEffect>(target: Target) => {
   return <Into>(useResolvedTarget: UseResolvedTarget<Target, Into>) => {
     return new Then(target, useResolvedTarget);
   };

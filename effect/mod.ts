@@ -10,7 +10,6 @@ export * from "./frame/StorageKey.ts";
 export * from "./frame/StorageValue.ts";
 export * from "./frame/StorageValueCodec.ts";
 export * from "./rpc/Call.ts";
-export * from "./rpc/Subscription.ts";
 export * from "./std/All.ts";
 export * from "./std/Lift.ts";
 export * from "./std/Then.ts";

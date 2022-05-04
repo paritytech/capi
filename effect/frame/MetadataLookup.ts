@@ -7,7 +7,7 @@ export class MetadataLookupError extends Error {}
 export class MetadataLookup<Beacon extends AnyEffect>
   extends Effect<{}, MetadataLookupError, m.Lookup, [Metadata<Beacon>]>
 {
-  constructor(beacon: Beacon) {
+  constructor(readonly beacon: Beacon) {
     super([metadata(beacon)], async (_, metadataResolved) => {
       return new m.Lookup(metadataResolved);
     });

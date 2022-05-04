@@ -9,8 +9,8 @@ export class Pallet<
   Name extends AnyEffectA<string>,
 > extends Effect<{}, PalletError, m.Pallet, [MetadataLookup<Beacon>, Name]> {
   constructor(
-    beacon: Beacon,
-    name: Name,
+    readonly beacon: Beacon,
+    readonly name: Name,
   ) {
     super([metadataLookup(beacon), name], async (_, metadataLookup, name) => {
       return metadataLookup.getPalletByName(name);

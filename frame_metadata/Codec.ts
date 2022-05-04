@@ -61,7 +61,6 @@ export const DeriveCodec = (metadata: m.Metadata): DeriveCodec => {
     },
     visit: (i) => {
       const type_ = metadata.types[i]!;
-      // console.log(type_);
       switch (type_._tag) {
         case m.TypeKind.Struct: {
           return visitors[m.TypeKind.Struct](type_);

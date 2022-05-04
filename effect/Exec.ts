@@ -1,25 +1,26 @@
-import { _A, _E, _R, AnyEffect } from "./Base.ts";
+import { _A, _E, _R, AnyEffect, Effect } from "./Base.ts";
 
 export class Exec<Root extends AnyEffect> {
-  resolved = new Map<AnyEffect, unknown>();
+  executions = new Map<AnyEffect, Promise<unknown>>();
 
   constructor(readonly root: Root) {}
 
   #runEffect = async (
     runtime: Root[_R],
-    effect: AnyEffect,
+    effect: Effect<any, Error, any, AnyEffect[]>,
   ): Promise<unknown> => {
-    const depsResolved = await Promise.all((effect.deps as AnyEffect[]).map((dep) => {
+    console.log(effect.structure);
+    const depsResolved = await Promise.all(effect.deps.map((dep) => {
       return this.#runEffect(runtime, dep);
     }));
     try {
-      const previous = this.resolved.get(effect);
+      const previous = this.executions.get(effect);
       if (previous) {
         return previous;
       }
-      const resolved = await effect.run(runtime, ...depsResolved);
-      this.resolved.set(effect, resolved);
-      return resolved;
+      const pending = effect.run(runtime, ...depsResolved);
+      this.executions.set(effect, pending);
+      return await pending;
     } catch (e) {
       if (e instanceof Error) {
         return e;

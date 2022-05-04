@@ -9,8 +9,8 @@ export class StorageValueCodec<
   StorageEntry extends AnyEffectA<m.StorageEntry>,
 > extends Effect<{}, never, s.Codec<unknown>, [Codec<Beacon, Then<StorageEntry, number>>, StorageEntry]> {
   constructor(
-    beacon: Beacon,
-    storageEntry: StorageEntry,
+    readonly beacon: Beacon,
+    readonly storageEntry: StorageEntry,
   ) {
     const storageEntryTypeI = then(storageEntry)((resolved) => {
       return resolved.value;

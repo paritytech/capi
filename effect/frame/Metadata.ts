@@ -9,7 +9,7 @@ export class MetadataDecodeError extends Error {}
 export class Metadata<Beacon extends AnyEffect>
   extends Effect<{}, MetadataDecodeError, m.Metadata, [RpcCall<Beacon, Lift<"state_getMetadata">, []>]>
 {
-  constructor(beacon: Beacon) {
+  constructor(readonly beacon: Beacon) {
     const stateGetMetadataCall = rpcCall(beacon, lift("state_getMetadata" as const));
     // TODO: make resolved naming consistent
     super([stateGetMetadataCall], async (_, metadataResolved) => {

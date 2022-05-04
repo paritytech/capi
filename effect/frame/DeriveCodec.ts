@@ -7,7 +7,7 @@ export class DeriveCodecError extends Error {}
 export class DeriveCodec<Beacon extends AnyEffect>
   extends Effect<{}, DeriveCodecError, m.DeriveCodec, [Metadata<Beacon>]>
 {
-  constructor(beacon: Beacon) {
+  constructor(readonly beacon: Beacon) {
     super([metadata(beacon)], async (_, metadataResolved) => {
       return m.DeriveCodec(metadataResolved);
     });

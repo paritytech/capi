@@ -8,9 +8,9 @@ export class StorageEntry<
   StorageEntryName extends AnyEffectA<string>,
 > extends Effect<{}, never, m.StorageEntry, [MetadataLookup<Beacon>, Pallet, StorageEntryName]> {
   constructor(
-    beacon: Beacon,
-    pallet: Pallet,
-    storageEntryName: StorageEntryName,
+    readonly beacon: Beacon,
+    readonly pallet: Pallet,
+    readonly storageEntryName: StorageEntryName,
   ) {
     super([metadataLookup(beacon), pallet, storageEntryName], async (_, metadataLookup, pallet, storageEntryName) => {
       return metadataLookup.getStorageEntryByPalletAndName(pallet, storageEntryName);
@@ -18,14 +18,16 @@ export class StorageEntry<
   }
 }
 
-export const storageEntry = <
-  Beacon extends AnyEffect,
-  Pallet extends AnyEffectA<m.Pallet>,
-  StorageEntryName extends AnyEffectA<string>,
->(
-  beacon: Beacon,
-  pallet: Pallet,
-  storageEntryName: StorageEntryName,
-): StorageEntry<Beacon, Pallet, StorageEntryName> => {
-  return new StorageEntry(beacon, pallet, storageEntryName);
-};
+export namespace StorageEntry {
+  export const fromPalletAndName = <
+    Beacon extends AnyEffect,
+    Pallet extends AnyEffectA<m.Pallet>,
+    StorageEntryName extends AnyEffectA<string>,
+  >(
+    beacon: Beacon,
+    pallet: Pallet,
+    storageEntryName: StorageEntryName,
+  ): StorageEntry<Beacon, Pallet, StorageEntryName> => {
+    return new StorageEntry(beacon, pallet, storageEntryName);
+  };
+}

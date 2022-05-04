@@ -27,16 +27,34 @@ export abstract class Effect<
     ) => Promise<E | A>,
   ) {}
 
-  toString(): string {
-    const name = this.constructor.name;
-    if (this.deps.length > 0) {
-      return `${name}(${this.deps.map((value) => value.toString()).join(",")})`;
-    }
-    return name;
+  get structure(): string {
+    return `${this.constructor.name}(${
+      this.deps.map((dep) => {
+        return dep.structure;
+      }).join(",")
+    })`;
   }
 }
 
-export type AnyEffect = Effect<any, any, any, any>;
+export const IdFactory = () => {
+  let id = 0;
+  const cache = new Map<unknown, number>();
+  return (value: unknown): number => {
+    const existing = cache.get(value);
+    if (existing) {
+      return existing;
+    }
+    cache.set(value, id++);
+    return id;
+  };
+};
+
+export const Id = IdFactory();
+
+export const NonIdempotent: unique symbol = Symbol();
+export type NonIdempotent = typeof NonIdempotent;
+
+export type AnyEffect = Effect<any, any, any, Effect<any, any, any, any>[]>;
 export type AnyEffectA<A> = Effect<any, any, A, any>;
 
 export type Resolved<D extends AnyEffect[]> = {
