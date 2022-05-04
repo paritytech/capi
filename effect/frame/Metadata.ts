@@ -1,5 +1,5 @@
 import { AnyEffect, Effect } from "/effect/Base.ts";
-import { RpcCall, rpcCall } from "/effect/primitive/RpcCall.ts";
+import { RpcCall, rpcCall } from "/effect/rpc/Call.ts";
 import { Lift, lift } from "/effect/std/Lift.ts";
 import * as m from "/frame_metadata/mod.ts";
 

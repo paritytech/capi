@@ -1,11 +1,16 @@
+import * as u from "/_/util/mod.ts";
 import * as a from "std/async/mod.ts";
 import { ListenerCb, RpcClient, StopListening } from "./Base.ts";
 import * as m from "./messages.ts";
 
-export const isRes = <InQuestion extends m.IngressMessage>(
+export const isOkRes = <InQuestion extends m.IngressMessage>(
   inQuestion: InQuestion,
-): inQuestion is Extract<m.Res, InQuestion> => {
+): inQuestion is Extract<m.OkRes, InQuestion> => {
   return "id" in inQuestion;
+};
+
+export const isErrRes = (inQuestion: m.IngressMessage): inQuestion is m.ErrRes => {
+  return "error" in inQuestion;
 };
 
 export const isNotif = <InQuestion extends m.IngressMessage>(
@@ -17,8 +22,8 @@ export const isNotif = <InQuestion extends m.IngressMessage>(
 export const IsCorrespondingRes = <Init_ extends m.Init>(init: Init_) => {
   return <InQuestion extends m.IngressMessage>(
     inQuestion: InQuestion,
-  ): inQuestion is Extract<InQuestion, m.ResByName[Init_["method"]]> => {
-    return isRes(inQuestion) && inQuestion.id === init.id;
+  ): inQuestion is Extract<InQuestion, m.OkResByName[Init_["method"]] | m.ErrRes> => {
+    return (isOkRes(inQuestion) || isErrRes(inQuestion)) && inQuestion.id === init.id;
   };
 };
 
@@ -26,24 +31,29 @@ export const call = async <Method extends m.Name>(
   client: RpcClient,
   method: Method,
   params: m.InitByName[Method]["params"],
-): Promise<m.ResByName[Method]> => {
+): Promise<u.Flatten<m.OkResByName[Method] | m.ErrRes>> => {
   const init: m.Init = {
     jsonrpc: "2.0",
     id: client.uid(),
     method: method as any,
-    params: params as any,
+    params: params.map((param) => {
+      if (param instanceof u.Branded) {
+        return param.raw;
+      }
+      return param;
+    }),
   };
   const isCorrespondingRes = IsCorrespondingRes(init);
-  const pending = a.deferred<m.ResByName[Method]>();
+  const pending = a.deferred<m.OkResByName[Method]>();
   const stopListening = client.listen(async (res) => {
     if (isCorrespondingRes(res)) {
-      pending.resolve(res as m.ResByName[Method]);
+      pending.resolve(res as m.OkResByName[Method]);
     }
   });
   client.send(init);
   const result = await pending;
   stopListening();
-  return result;
+  return result as any;
 };
 
 export const subscribe = async <Method extends m.SubscriptionName>(
@@ -53,6 +63,9 @@ export const subscribe = async <Method extends m.SubscriptionName>(
   listenerCb: ListenerCb<m.NotifByName[Method]>,
 ): Promise<StopListening> => {
   const initRes = await call(client, method, params);
+  if (isErrRes(initRes)) {
+    throw new Error(); // TODO
+  }
   const stopListening = client.listen(async (res) => {
     if (isNotif(res) && res.params.subscription === initRes.result) {
       listenerCb(res as m.NotifByName[Method]);

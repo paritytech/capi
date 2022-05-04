@@ -15,8 +15,8 @@ export abstract class Effect<
   A,
   D extends AnyEffect[],
 > {
-  [_R]!: R & UnionToIntersection<Extract<D[number], AnyEffect>[_R]>;
-  [_E]!: E | Extract<D[number], AnyEffect>[_E];
+  [_R]!: R & UnionToIntersection<D[number][_R]>;
+  [_E]!: E | D[number][_E];
   [_A]!: A;
 
   constructor(
@@ -46,6 +46,4 @@ namespace Resolved {
   export type _0<T> = T extends AnyEffectA<infer A> ? A : T;
 }
 
-export type AsAnyEffectAList<D extends any[]> =
-  & Array<any>
-  & { [I in keyof D]: AnyEffectA<D[I]> };
+export type AsAnyEffectAList<D extends any[]> = any[] & { [I in keyof D]: AnyEffectA<D[I]> };

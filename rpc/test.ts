@@ -5,6 +5,7 @@ const pool = rpcClientPool(wsRpcClient);
 const client = await pool.ref(POLKADOT_RPC_URL);
 
 // const stopListening = await subscribe(client, "chain_subscribeAllHeads", [], (message) => {
+//   message;
 //   console.log(message);
 // });
 // setTimeout(() => {
@@ -12,6 +13,6 @@ const client = await pool.ref(POLKADOT_RPC_URL);
 //   pool.deref(POLKADOT_RPC_URL);
 // }, 100000);
 
-const result = await call(client, "subscribe_newHead", []);
-console.log(result.result);
+const result = await call(client, "state_getMetadata", []);
+console.log(result);
 pool.deref(POLKADOT_RPC_URL);

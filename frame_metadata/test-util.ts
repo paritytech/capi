@@ -1,5 +1,5 @@
 import { CHAIN_URL_LOOKUP } from "/_/constants/chains/url.ts";
-import { WsConnectionContext } from "/connection/ws.ts";
+import { call, wsRpcClient } from "/rpc/mod.ts";
 import * as hex from "std/encoding/hex.ts";
 import * as path from "std/path/mod.ts";
 import { IsExact } from "x/conditional_type_checks/mod.ts";
@@ -57,14 +57,8 @@ export namespace State {
     const pallet = lookup.getPalletByName(palletName);
     const storageEntry = lookup.getStorageEntryByPalletAndName(pallet, storageEntryName);
     const key = encodeKey(deriveCodec, defaultHashers, pallet, storageEntry, ...keys);
-    const connections = new WsConnectionContext();
-    const connection = await connections.use(url);
-    const id = connection.nextId;
-    const message = await connection.ask({
-      id,
-      method: "state_getStorage",
-      params: [key],
-    });
+    const client = await wsRpcClient(url);
+    const message = await call(client, "state_getStorage", [key]);
     const resultScaleHex = (message as any).result as string | undefined;
     if (resultScaleHex === undefined) {
       return;
@@ -72,7 +66,7 @@ export namespace State {
     const resultScaleBytes = hex.decode(new TextEncoder().encode(resultScaleHex.substring(2)));
     const valueCodec = deriveCodec(storageEntry.value);
     const decoded = valueCodec.decode(resultScaleBytes);
-    await connection.deref();
+    await client.close();
     return decoded;
   };
 }

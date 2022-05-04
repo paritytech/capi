@@ -1,77 +1,54 @@
-import {
-  Block,
-  Cow,
-  Head,
-  NetworkConfig,
-  RuntimeVersion,
-  StorageChangeSet,
-  SystemHealth,
-  SystemPeer,
-} from "./common.ts";
+import * as r from "./results/mod.ts";
 
 interface JsonRpcVersionBearer {
   jsonrpc: "2.0";
 }
+interface IdBearer {
+  id: string;
+}
+interface MethodBearer<Method extends Name> {
+  method: Method;
+}
 
 export interface InitBase<
-  MethodName extends string,
+  MethodName_ extends Name,
   Params extends unknown[],
-> extends JsonRpcVersionBearer {
-  id: string;
-  method: MethodName;
+> extends JsonRpcVersionBearer, IdBearer, MethodBearer<MethodName_> {
   params: Params;
 }
 
-export interface ResBase<Result> extends JsonRpcVersionBearer {
-  id: string;
+export interface OkResBase<Result> extends JsonRpcVersionBearer, IdBearer {
   result: Result;
 }
 
 export interface NotifBase<
-  MethodName extends string,
+  Method extends Name,
   Result,
-> extends JsonRpcVersionBearer {
-  method: MethodName;
+> extends JsonRpcVersionBearer, MethodBearer<Method> {
   params: {
     subscription: string;
     result: Result;
   };
 }
 
-export type Name = keyof Lookup;
+// TODO: narrow
+export interface ErrRes extends JsonRpcVersionBearer {
+  id: string;
+  error: {
+    code: number;
+    message: string;
+  };
+}
 
-export type InitByName = {
-  [N in Name]: InitBase<N, Parameters<Lookup[N]>>;
-};
-export type GetInit<N extends Name> = InitByName[N];
-export type Init = GetInit<Name>;
+type EnsureMethodLookup<T extends Record<string, (...args: any[]) => any>> = T;
 
-export type ResByName = {
-  [N in Name]: ResBase<ReturnType<Lookup[N]> extends Subscription ? string : ReturnType<Lookup[N]>>;
-};
-export type GetRes<N extends Name> = ResByName[N];
-export type Res = GetRes<Name>;
+const _N: unique symbol = Symbol();
+type Subscription<NotificationResult = any> = { [_N]: NotificationResult };
 
-export type NotifByName = {
-  [N in Name as ReturnType<Lookup[N]> extends Subscription ? N : never]: NotifBase<
-    N,
-    ReturnType<Lookup[N]> extends Subscription<infer R> ? R : never
-  >;
-};
-export type SubscriptionName = keyof NotifByName;
-export type GetNotif<N extends SubscriptionName> = NotifByName[N];
-export type Notif = GetNotif<SubscriptionName>;
-
-export type IngressMessage = Res | Notif;
-
-type EnsureLookup<T extends Record<string, (...args: any[]) => any>> = T;
-
-type Subscription<NotificationResult = any> = {
-  notificationResult: NotificationResult;
-};
+type TODO = (...args: unknown[]) => unknown;
 
 // Modeled closely after https://github.com/paritytech/smoldot/blob/82836f4f2af4dd1716c57c14a4f591c7b1043950/src/json_rpc/methods.rs#L338-L479
-export type Lookup = EnsureLookup<{
+export type Lookup = EnsureMethodLookup<{
   account_nextIndex: TODO;
   author_hasKey(pubKey: string, keyType: string): string;
   author_hasSessionKeys(): string;
@@ -82,7 +59,7 @@ export type Lookup = EnsureLookup<{
   author_unwatchExtrinsic(subscription: string): unknown;
   babe_epochAuthorship(_: unknown): unknown;
   chain_getBlock(blockHash?: string): {
-    block: Block;
+    block: r.Block;
     justifications: null; // TODO...
   };
   chain_getBlockHash(height?: number): string;
@@ -90,8 +67,8 @@ export type Lookup = EnsureLookup<{
   chain_getFinalizedHead: TODO;
   chain_getFinalisedHead: Lookup["chain_getFinalizedHead"];
   chain_getHeader: TODO;
-  chain_subscribeAllHeads(): Subscription<Head>;
-  chain_subscribeFinalizedHeads(): Subscription<Head /* TODO: narrow to finalized? */>;
+  chain_subscribeAllHeads(): Subscription<r.Head>;
+  chain_subscribeFinalizedHeads(): Subscription<r.Head /* TODO: narrow to finalized? */>;
   chain_subscribeFinalisedHeads: Lookup["chain_subscribeFinalizedHeads"];
   chain_subscribeNewHeads(): Subscription<unknown>;
   subscribe_newHead: Lookup["chain_subscribeNewHeads"];
@@ -102,7 +79,7 @@ export type Lookup = EnsureLookup<{
   chain_unsubscribeNewHeads(subscription: string): boolean;
   unsubscribe_newHead: Lookup["chain_unsubscribeNewHeads"];
   chain_unsubscribeNewHead: Lookup["chain_unsubscribeNewHeads"];
-  chainHead_unstable_follow(runtimeUpdates: boolean): Subscription<ChainHeadUnstableFollowEvent>;
+  chainHead_unstable_follow(runtimeUpdates: boolean): Subscription<r.ChainHeadUnstableFollowEvent>;
   childstate_getKeys: TODO;
   childstate_getStorage: TODO;
   childstate_getStorageHash: TODO;
@@ -112,7 +89,7 @@ export type Lookup = EnsureLookup<{
   offchain_localStorageSet: TODO;
   payment_queryInfo(extrinsic: string, hash?: string): {
     weight: number;
-    class: DispatchClassKind;
+    class: r.DispatchClassKind;
     partial_fee: number;
   };
   rpc_methods(): string[];
@@ -124,15 +101,18 @@ export type Lookup = EnsureLookup<{
   state_getMetadata(blockHash?: string): string;
   state_getPairs: TODO;
   state_getReadProof: TODO;
-  state_getRuntimeVersion(at?: string): RuntimeVersion;
+  state_getRuntimeVersion(at?: string): r.RuntimeVersion;
   chain_getRuntimeVersion: Lookup["state_getRuntimeVersion"];
-  state_getStorage(key: string, blockHash?: string): string;
+  state_getStorage(
+    key: string,
+    blockHash?: string,
+  ): string;
   state_getStorageHash: TODO;
   state_getStorageHashAt: Lookup["state_getStorageHash"];
   state_getStorageSize: TODO;
   state_getStorageSizeAt: Lookup["state_getStorageSize"];
   state_queryStorage: TODO;
-  state_queryStorageAt(keys: string[], at?: string): StorageChangeSet;
+  state_queryStorageAt(keys: string[], at?: string): r.StorageChangeSet;
   state_subscribeRuntimeVersion: TODO;
   chain_subscribeRuntimeVersion: Lookup["state_subscribeRuntimeVersion"];
   state_subscribeStorage(list: string[]): TODO;
@@ -141,103 +121,74 @@ export type Lookup = EnsureLookup<{
   state_unsubscribeStorage(subscription: string): boolean;
   system_accountNextIndex(account: string): number;
   system_addReservedPeer: TODO;
-  system_chain(): Cow;
-  system_chainType(): SystemChainTypeKind;
+  system_chain(): string;
+  system_chainType(): r.SystemChainTypeKind;
   system_dryRun: TODO;
   system_dryRunAt: Lookup["system_dryRun"];
-  system_health(): SystemHealth;
+  system_health(): r.SystemHealth;
   system_localListenAddresses(): string[];
-  system_localPeerId(): Cow;
-  system_name(): Cow;
+  system_localPeerId(): string;
+  system_name(): string;
   system_networkState: TODO;
   system_nodeRoles: TODO;
-  system_peers(): SystemPeer[];
+  system_peers(): r.SystemPeer[];
   system_properties: TODO;
   system_removeReservedPeer: TODO;
-  system_version(): Cow;
+  system_version(): string;
   chainHead_unstable_body(
     followSubscription: string,
-    networkConfig?: NetworkConfig,
-  ): Cow;
+    networkConfig?: r.NetworkConfig,
+  ): string;
   chainHead_unstable_call(
     hash: string | undefined,
-    fn: Cow,
+    fn: string,
     callParameters: string,
-    networkConfig?: NetworkConfig,
-  ): Cow;
+    networkConfig?: r.NetworkConfig,
+  ): string;
   chainHead_unstable_genesisHash(): string;
   chainHead_unstable_header(
-    followSubscription: Cow,
+    followSubscription: string,
     hash: string,
   ): string | undefined;
-  chainHead_unstable_stopBody(subscription: Cow): void;
-  chainHead_unstable_stopCall(subscription: Cow): void;
-  chainHead_unstable_stopStorage(subscription: Cow): void;
+  chainHead_unstable_stopBody(subscription: string): void;
+  chainHead_unstable_stopCall(subscription: string): void;
+  chainHead_unstable_stopStorage(subscription: string): void;
   chainHead_unstable_storage(
     hash: string,
     childKey?: string,
-    networkConfig?: NetworkConfig,
-  ): Cow;
-  chainHead_unstable_unfollow(followSubscription: Cow): void;
+    networkConfig?: r.NetworkConfig,
+  ): string;
+  chainHead_unstable_unfollow(followSubscription: string): void;
   chainHead_unstable_unpin(
-    followSubscription: Cow,
+    followSubscription: string,
     hash: string,
   ): void;
-  chainSpec_unstable_chainName(): Cow;
+  chainSpec_unstable_chainName(): string;
   chainSpec_unstable_genesisHash(): string;
   chainSpec_unstable_properties(): unknown;
-  sudo_unstable_p2pDiscover(multiaddr: Cow): void;
-  sudo_unstable_version(): Cow;
-  transaction_unstable_submitAndWatch(transaction: string): Cow;
-  transaction_unstable_unwatch(subscription: Cow): void;
+  sudo_unstable_p2pDiscover(multiaddr: string): void;
+  sudo_unstable_version(): string;
+  transaction_unstable_submitAndWatch(transaction: string): string;
+  transaction_unstable_unwatch(subscription: string): void;
 }>;
 
-type TODO = (...args: unknown[]) => unknown;
+export type Name = keyof Lookup;
 
-export type ChainHeadUnstableFollowEvent =
-  | ChainHeadUnstableFollowInitializedEvent
-  | ChainHeadUnstableFollowNewBlockEvent
-  | ChainHeadUnstableFollowBestBlockChangedEvent
-  | ChainHeadUnstableFollowFinalizedEvent
-  | ChainHeadUnstableFollowStopEvent;
-export type ChainHeadUnstableFollowEventKind =
-  | "initialized"
-  | "newBlock"
-  | "bestBlockChanged"
-  | "finalized"
-  | "stop";
-interface ChainHeadUnstableFollowEventBase<Kind extends ChainHeadUnstableFollowEventKind> {
-  event: Kind;
-}
-export interface ChainHeadUnstableFollowInitializedEvent extends ChainHeadUnstableFollowEventBase<"initialized"> {
-  finalizedBlockHash: string;
-  finalizedBlockRuntime: string;
-}
-export interface ChainHeadUnstableFollowNewBlockEvent extends ChainHeadUnstableFollowEventBase<"newBlock"> {
-  blockHash: string;
-  parentBlockHash: string;
-  newRuntime: null; // TODO
-}
-export interface ChainHeadUnstableFollowBestBlockChangedEvent
-  extends ChainHeadUnstableFollowEventBase<"bestBlockChanged">
-{
-  bestBlockHash: string;
-}
-export interface ChainHeadUnstableFollowFinalizedEvent extends ChainHeadUnstableFollowEventBase<"finalized"> {
-  finalizedBlocksHashes: string[];
-  prunedBlocksHashes: string[];
-}
-export type ChainHeadUnstableFollowStopEvent = ChainHeadUnstableFollowEventBase<"stop">;
+export type InitByName = { [N in Name]: InitBase<N, Parameters<Lookup[N]>> };
+export type Init<N extends Name = Name> = InitByName[N];
 
-export const enum SystemChainTypeKind {
-  Development = "Development",
-  Local = "Local",
-  Live = "Live",
-  Custom = "Custom",
-}
+export type OkResByName = {
+  [N in Name]: OkResBase<ReturnType<Lookup[N]> extends Subscription ? string : ReturnType<Lookup[N]>>;
+};
+export type OkRes<N extends Name = Name> = OkResByName[N];
 
-export const enum DispatchClassKind {
-  Normal = "normal",
-  Operational = "operational",
-  Mandatory = "mandatory",
-}
+export type NotifByName = {
+  [N in Name as ReturnType<Lookup[N]> extends Subscription ? N : never]: NotifBase<
+    N,
+    ReturnType<Lookup[N]> extends Subscription<infer R> ? R : never
+  >;
+};
+export type SubscriptionName = keyof NotifByName;
+export type Notif<N extends SubscriptionName = SubscriptionName> = NotifByName[N];
+
+export type IngressMessage = OkRes | ErrRes | Notif;

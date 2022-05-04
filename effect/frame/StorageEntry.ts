@@ -1,48 +1,31 @@
 import { AnyEffect, AnyEffectA, Effect } from "/effect/Base.ts";
-import { RpcCall, rpcCall } from "/effect/primitive/RpcCall.ts";
-import { Lift, lift } from "/effect/std/Lift.ts";
-import * as s from "x/scale/mod.ts";
-
-export class StorageEntryError extends Error {}
-
-export interface StorageEntryResolved {
-  decoded: unknown;
-}
+import { MetadataLookup, metadataLookup } from "/effect/frame/MetadataLookup.ts";
+import * as m from "/frame_metadata/mod.ts";
 
 export class StorageEntry<
   Beacon extends AnyEffect,
-  Key extends AnyEffectA<string>,
-  ValueCodec extends AnyEffectA<s.Codec>,
-> extends Effect<
-  {},
-  StorageEntryError,
-  StorageEntryResolved,
-  [RpcCall<Beacon, Lift<"state_getStorage">, [Key]>, ValueCodec]
-> {
+  Pallet extends AnyEffectA<m.Pallet>,
+  StorageEntryName extends AnyEffectA<string>,
+> extends Effect<{}, never, m.StorageEntry, [MetadataLookup<Beacon>, Pallet, StorageEntryName]> {
   constructor(
     beacon: Beacon,
-    key: Key,
-    valueCodec: ValueCodec,
+    pallet: Pallet,
+    storageEntryName: StorageEntryName,
   ) {
-    const stateGetStorageCall = rpcCall(beacon, lift("state_getStorage" as const), key);
-    // TODO: make resolved naming consistent
-    super([stateGetStorageCall, valueCodec], async (_, { result }, valueCodec) => {
-      return {
-        // TODO
-        decoded: undefined, // valueCodec.decode(result);
-      };
+    super([metadataLookup(beacon), pallet, storageEntryName], async (_, metadataLookup, pallet, storageEntryName) => {
+      return metadataLookup.getStorageEntryByPalletAndName(pallet, storageEntryName);
     });
   }
 }
 
 export const storageEntry = <
   Beacon extends AnyEffect,
-  Key extends AnyEffectA<string>,
-  ValueCodec extends AnyEffectA<s.Codec>,
+  Pallet extends AnyEffectA<m.Pallet>,
+  StorageEntryName extends AnyEffectA<string>,
 >(
   beacon: Beacon,
-  key: Key,
-  valueCodec: ValueCodec,
-): StorageEntry<Beacon, Key, ValueCodec> => {
-  return new StorageEntry(beacon, key, valueCodec);
+  pallet: Pallet,
+  storageEntryName: StorageEntryName,
+): StorageEntry<Beacon, Pallet, StorageEntryName> => {
+  return new StorageEntry(beacon, pallet, storageEntryName);
 };

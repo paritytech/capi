@@ -1,23 +1,19 @@
 import { AnyEffect, AnyEffectA, Effect } from "/effect/Base.ts";
-import { DeriveCodec, deriveCodec } from "/effect/primitive/DeriveCodec.ts";
+import { DeriveCodec, deriveCodec } from "/effect/frame/DeriveCodec.ts";
 import * as s from "x/scale/mod.ts";
 
 export class CodecError extends Error {}
 
-export interface CodecResolved {
-  decoded: unknown;
-}
-
 export class Codec<
   Beacon extends AnyEffect,
   TypeI extends AnyEffectA<number>,
-> extends Effect<{}, CodecError, s.Codec, [DeriveCodec<Beacon>, TypeI]> {
+> extends Effect<{}, CodecError, s.Codec<unknown>, [DeriveCodec<Beacon>, TypeI]> {
   constructor(
     beacon: Beacon,
     typeI: TypeI,
   ) {
-    super([deriveCodec(beacon), typeI], async (_, deriveCodecResolved, typeIResolved) => {
-      return deriveCodecResolved(typeIResolved);
+    super([deriveCodec(beacon), typeI], async (_, deriveCodec, typeIResolved) => {
+      return deriveCodec(typeIResolved);
     });
   }
 }
