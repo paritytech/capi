@@ -1,39 +1,43 @@
+import * as a from "std/async/mod.ts";
 import { _A, _E, _R, AnyEffect, Effect } from "./Base.ts";
 
 export class Exec<Root extends AnyEffect> {
-  executions = new Map<AnyEffect, Promise<unknown>>();
+  cache = new Map<string, Promise<unknown>>();
 
   constructor(readonly root: Root) {}
 
-  #runEffect = async (
+  #runEffect = (
     runtime: Root[_R],
     effect: Effect<any, Error, any, AnyEffect[]>,
-  ): Promise<unknown> => {
-    console.log(effect.structure);
-    const depsResolved = await Promise.all(effect.deps.map((dep) => {
-      return this.#runEffect(runtime, dep);
-    }));
-    try {
-      const previous = this.executions.get(effect);
-      if (previous) {
-        return previous;
-      }
-      const pending = effect.run(runtime, ...depsResolved);
-      this.executions.set(effect, pending);
-      return await pending;
-    } catch (e) {
-      if (e instanceof Error) {
-        return e;
-      }
-      return new Error();
+  ): string => {
+    const cacheKey = effect.cacheKey;
+    if (!this.cache.has(cacheKey)) {
+      effect.deps.forEach((dep) => {
+        this.#runEffect(runtime, dep);
+      });
+      const pending = a.deferred();
+      this.cache.set(cacheKey, pending);
+      Promise.all(effect.deps.map((dep) => {
+        return this.cache.get(dep.cacheKey);
+      })).then((depsResolved) => {
+        effect.run(runtime, ...depsResolved).then((resolved) => {
+          pending.resolve(resolved);
+        });
+      }).catch((e) => {
+        pending.reject(e);
+      });
     }
+    return cacheKey;
   };
 
   run = (runtime: Root[_R]): Promise<Root[_E] | Root[_A]> => {
-    return this.#runEffect(runtime, this.root);
+    const cacheKey = this.#runEffect(runtime, this.root);
+    return this.cache.get(cacheKey)!;
   };
 }
 
 export const exec = <Root extends AnyEffect>(root: Root): Exec<Root> => {
   return new Exec(root);
 };
+
+export class UnknownExecError extends Error {}

@@ -7,7 +7,7 @@ export class Lift<A> extends Effect<{}, never, A, []> {
     });
   }
 
-  get structure(): string {
+  get cacheKey(): string {
     return `Lift(${Id(this.value).toString()})`;
   }
 }

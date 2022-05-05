@@ -18,8 +18,8 @@ export class Then<
     });
   }
 
-  get structure(): string {
-    return `Then(${this.target.structure},${Id(this.useResolvedTarget)})`;
+  get cacheKey(): string {
+    return `Then(${this.target.cacheKey},${Id(this.useResolvedTarget)})`;
   }
 }
 

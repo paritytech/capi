@@ -27,10 +27,10 @@ export abstract class Effect<
     ) => Promise<E | A>,
   ) {}
 
-  get structure(): string {
+  get cacheKey(): string {
     return `${this.constructor.name}(${
       this.deps.map((dep) => {
-        return dep.structure;
+        return dep.cacheKey;
       }).join(",")
     })`;
   }
