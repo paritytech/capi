@@ -10,7 +10,12 @@ export class Metadata<Beacon extends AnyResolvable>
 {
   constructor(readonly beacon: Beacon) {
     super([rpcCall(beacon, "state_getMetadata")], async (_, metadata) => {
-      return m.fromPrefixedHex(metadata.result);
+      try {
+        return m.fromPrefixedHex(metadata.result);
+      } catch (e) {
+        console.error(e);
+        return new MetadataDecodeError();
+      }
     });
   }
 }

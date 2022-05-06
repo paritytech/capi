@@ -21,6 +21,7 @@ export class Exec<Root extends AnyEffect> {
           return cached;
         }
         const pending = this.#runEffect(runtime, dep);
+        // TODO: cancel and return error if rejects
         this.#cache.set(cacheKey, pending);
         return pending;
       }

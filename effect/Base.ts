@@ -58,7 +58,6 @@ export type AnyEffectA<A> = Effect<any, any, A, any>;
 export type AnyEffect = AnyEffectA<any>;
 export type AnyResolvableA<A> = A | AnyEffectA<A>;
 export type AnyResolvable = AnyResolvableA<any>;
-export type Resolved<T extends AnyResolvable> = T extends AnyResolvableA<infer A> ? A : T;
+export type Resolved<T extends AnyResolvable> = T extends AnyEffectA<infer A> ? A : T;
 export type DepsResolved<D extends any[]> = { [K in keyof D]: Resolved<D[K]> };
-// TODO: make as resolvable
-export type Unresolved<D extends any[]> = any[] & { [I in keyof D]: AnyEffectA<D[I]> };
+export type MaybeUnresolved<D extends unknown[]> = any[] & { [I in keyof D]: AnyResolvableA<D[I]> };

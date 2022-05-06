@@ -36,7 +36,7 @@ export const encodeKey = (
   hashers: HasherLookup,
   pallet: m.Pallet,
   storageEntry: m.StorageEntry,
-  ...keys: [] | [unknown] | [unknown, unknown]
+  ...keys: [a?: unknown, b?: unknown]
 ): string => {
   if (storageEntry._tag === m.StorageEntryTypeKind.Plain) {
     return finalize(pallet.name, storageEntry.name);
