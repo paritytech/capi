@@ -1,6 +1,6 @@
-import { AnyEffect, Effect, Resolved } from "../Base.ts";
+import { AnyEffect, DepsResolved, Effect } from "../Base.ts";
 
-export class All<E extends AnyEffect[]> extends Effect<{}, never, Resolved<E>, E> {
+export class All<E extends AnyEffect[]> extends Effect<{}, never, DepsResolved<E>, E> {
   constructor(...effects: E) {
     super(effects, async (_, ...resolved) => {
       return resolved;

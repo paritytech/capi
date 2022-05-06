@@ -5,7 +5,7 @@ export * from "./frame/DeriveCodec.ts";
 export * from "./frame/Metadata.ts";
 export * from "./frame/MetadataLookup.ts";
 export * from "./frame/Pallet.ts";
-export * from "./frame/StorageEntry.ts";
+export * from "./frame/StorageEntryMeta.ts";
 export * from "./frame/StorageKey.ts";
 export * from "./frame/StorageValue.ts";
 export * from "./frame/StorageValueCodec.ts";

@@ -1,12 +1,12 @@
 import * as u from "/_/util/mod.ts";
-import { AnyEffect, AnyEffectA, Effect } from "/effect/Base.ts";
+import { AnyResolvable, AnyResolvableA, Effect } from "/effect/Base.ts";
 import { StorageValueCodec, storageValueCodec } from "/effect/frame/StorageValueCodec.ts";
 import * as m from "/frame_metadata/mod.ts";
 
 export class StorageValue<
-  Beacon extends AnyEffect,
-  StorageEntry extends AnyEffectA<m.StorageEntry>,
-  EncodedStorageValue extends AnyEffectA<string>,
+  Beacon extends AnyResolvable,
+  StorageEntry extends AnyResolvableA<m.StorageEntry>,
+  EncodedStorageValue extends AnyResolvableA<string>,
 > extends Effect<{}, never, { value: unknown }, [StorageValueCodec<Beacon, StorageEntry>, EncodedStorageValue]> {
   constructor(
     readonly beacon: Beacon,
@@ -20,9 +20,9 @@ export class StorageValue<
 }
 
 export const storageValue = <
-  Beacon extends AnyEffect,
-  StorageEntry extends AnyEffectA<m.StorageEntry>,
-  EncodedStorageValue extends AnyEffectA<string>,
+  Beacon extends AnyResolvable,
+  StorageEntry extends AnyResolvableA<m.StorageEntry>,
+  EncodedStorageValue extends AnyResolvableA<string>,
 >(
   beacon: Beacon,
   storageEntry: StorageEntry,

@@ -1,16 +1,24 @@
-import { AnyEffect, AnyEffectA, Effect } from "/effect/Base.ts";
+import { AnyResolvable, AnyResolvableA, Effect } from "/effect/Base.ts";
 import * as m from "/frame_metadata/mod.ts";
 import { DeriveCodec, deriveCodec } from "./DeriveCodec.ts";
 
-export class StorageKey<R, D extends AnyEffect[]> extends Effect<R, never, string, D> {}
+export class StorageKey<R, D extends AnyResolvable[]> extends Effect<R, never, string, D> {}
 
 export namespace StorageKey {
   export const from = <
-    Beacon extends AnyEffectA<string>,
-    Pallet extends AnyEffectA<m.Pallet>,
-    StorageEntry extends AnyEffectA<m.StorageEntry>,
-    Keys extends [] | [AnyEffectA<unknown>] | [AnyEffectA<unknown>, AnyEffectA<unknown>],
-  >(beacon: Beacon, pallet: Pallet, storageEntry: StorageEntry, ...keys: Keys): StorageKey<
+    Beacon extends AnyResolvableA<string>,
+    Pallet extends AnyResolvableA<m.Pallet>,
+    StorageEntry extends AnyResolvableA<m.StorageEntry>,
+    Keys extends [
+      a?: AnyResolvableA<unknown>,
+      b?: AnyResolvableA<unknown>,
+    ],
+  >(
+    beacon: Beacon,
+    pallet: Pallet,
+    storageEntry: StorageEntry,
+    ...keys: Keys
+  ): StorageKey<
     { hashers: m.HasherLookup },
     [
       DeriveCodec<Beacon>,

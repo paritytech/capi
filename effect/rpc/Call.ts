@@ -1,15 +1,15 @@
-import { _A, AnyEffect, AnyEffectA, AsAnyEffectAList, Effect } from "/effect/Base.ts";
+import { _A, AnyResolvable, AnyResolvableA, Effect, Resolved, Unresolved } from "/effect/Base.ts";
 import { RpcClientFactoryRuntime, RpcClientFactoryRuntimeError } from "/effect/runtime/RpcClientPool.ts";
 import * as rpc from "/rpc/mod.ts";
 
 export class RpcCall<
-  Beacon extends AnyEffect,
-  Method extends AnyEffectA<rpc.Name>,
-  Params extends AsAnyEffectAList<rpc.Init<Method[_A]>["params"]>,
+  Beacon extends AnyResolvable,
+  Method extends AnyResolvableA<rpc.Name>,
+  Params extends Unresolved<rpc.Init<Resolved<Method>>["params"]>,
 > extends Effect<
-  RpcClientFactoryRuntime<Beacon[_A]>,
+  RpcClientFactoryRuntime<Resolved<Beacon>>,
   RpcClientFactoryRuntimeError,
-  rpc.OkRes<Method[_A]>,
+  rpc.OkRes<Resolved<Method>>,
   [Beacon, Method, ...Params]
 > {
   constructor(
@@ -28,9 +28,9 @@ export class RpcCall<
 }
 
 export const rpcCall = <
-  Beacon extends AnyEffect,
-  Method extends AnyEffectA<rpc.Name>,
-  Params extends AsAnyEffectAList<rpc.Init<Method[_A]>["params"]>,
+  Beacon extends AnyResolvable,
+  Method extends AnyResolvableA<rpc.Name>,
+  Params extends Unresolved<rpc.Init<Resolved<Method>>["params"]>,
 >(
   beacon: Beacon,
   method: Method,

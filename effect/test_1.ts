@@ -1,4 +1,4 @@
-import { _A, AnyEffect, AnyEffectA, Effect, exec, lift, then } from "./mod.ts";
+import { _A, AnyEffect, AnyResolvableA, Effect, exec, lift, then } from "./mod.ts";
 
 class RandE extends Error {
   readonly name = "rand_e";
@@ -29,7 +29,7 @@ export interface AddR {
   add(a: number, b: number): number;
 }
 
-export class Add<Values extends AnyEffectA<number>[]> extends Effect<AddR, AddE, number, Values> {
+export class Add<Values extends AnyResolvableA<number>[]> extends Effect<AddR, AddE, number, Values> {
   constructor(...values: Values) {
     super(values, async (runtime, ...values) => {
       return values.reduce<number>((acc, cur) => {
@@ -39,7 +39,7 @@ export class Add<Values extends AnyEffectA<number>[]> extends Effect<AddR, AddE,
   }
 }
 
-export const add = <Values extends AnyEffectA<number>[]>(...values: Values): Add<Values> => {
+export const add = <Values extends AnyResolvableA<number>[]>(...values: Values): Add<Values> => {
   return new Add(...values);
 };
 
@@ -53,7 +53,7 @@ interface DoubleR {
   double(n: number): number;
 }
 
-class Double<N extends AnyEffectA<number>> extends Effect<DoubleR, DoubleE, number, [N]> {
+class Double<N extends AnyResolvableA<number>> extends Effect<DoubleR, DoubleE, number, [N]> {
   constructor(value: N) {
     super([value], async (runtime, resolved) => {
       return runtime.double(resolved);
@@ -61,7 +61,7 @@ class Double<N extends AnyEffectA<number>> extends Effect<DoubleR, DoubleE, numb
   }
 }
 
-export const double = <N extends AnyEffectA<number>>(value: N): Double<N> => {
+export const double = <N extends AnyResolvableA<number>>(value: N): Double<N> => {
   return new Double(value);
 };
 
@@ -90,7 +90,7 @@ export const randomlyThrow = <E extends AnyEffect>(effect: E): RandomlyThrow<E> 
 
 const a = rand();
 const b = double(a);
-const c = add(a, b, lift(50));
+const c = add(a, b, 50);
 const d = then(c)((r) => {
   return r + 100;
 });

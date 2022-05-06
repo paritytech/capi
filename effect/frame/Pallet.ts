@@ -1,12 +1,12 @@
-import { AnyEffect, AnyEffectA, Effect } from "/effect/Base.ts";
+import { AnyResolvable, AnyResolvableA, Effect } from "/effect/Base.ts";
 import { MetadataLookup, metadataLookup } from "/effect/frame/MetadataLookup.ts";
 import * as m from "/frame_metadata/mod.ts";
 
 export class PalletError extends Error {}
 
 export class Pallet<
-  Beacon extends AnyEffect,
-  Name extends AnyEffectA<string>,
+  Beacon extends AnyResolvable,
+  Name extends AnyResolvableA<string>,
 > extends Effect<{}, PalletError, m.Pallet, [MetadataLookup<Beacon>, Name]> {
   constructor(
     readonly beacon: Beacon,
@@ -19,8 +19,8 @@ export class Pallet<
 }
 
 export const pallet = <
-  Beacon extends AnyEffect,
-  Name extends AnyEffectA<string>,
+  Beacon extends AnyResolvable,
+  Name extends AnyResolvableA<string>,
 >(
   beacon: Beacon,
   name: Name,

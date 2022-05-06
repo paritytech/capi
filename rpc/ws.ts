@@ -13,7 +13,7 @@ export class WsRpcClient implements RpcClient {
     this.#ws.addEventListener("message", this.#onMessage);
   }
 
-  opening = async (): Promise<void> => {
+  opening = (): Promise<void> => {
     if (this.#ws.readyState === WebSocket.CONNECTING) {
       const pending = a.deferred<void>();
       const onOpenError = () => {
@@ -32,6 +32,7 @@ export class WsRpcClient implements RpcClient {
       this.#ws.addEventListener("open", onOpen);
       return pending;
     }
+    return Promise.resolve();
   };
 
   close = async (): Promise<void> => {

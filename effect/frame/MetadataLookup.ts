@@ -1,10 +1,10 @@
-import { AnyEffect, Effect } from "/effect/Base.ts";
+import { AnyResolvable, Effect } from "/effect/Base.ts";
 import * as m from "/frame_metadata/mod.ts";
 import { Metadata, metadata } from "./Metadata.ts";
 
 export class MetadataLookupError extends Error {}
 
-export class MetadataLookup<Beacon extends AnyEffect>
+export class MetadataLookup<Beacon extends AnyResolvable>
   extends Effect<{}, MetadataLookupError, m.Lookup, [Metadata<Beacon>]>
 {
   constructor(readonly beacon: Beacon) {
@@ -14,6 +14,6 @@ export class MetadataLookup<Beacon extends AnyEffect>
   }
 }
 
-export const metadataLookup = <Beacon extends AnyEffect>(beacon: Beacon): MetadataLookup<Beacon> => {
+export const metadataLookup = <Beacon extends AnyResolvable>(beacon: Beacon): MetadataLookup<Beacon> => {
   return new MetadataLookup(beacon);
 };

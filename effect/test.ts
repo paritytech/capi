@@ -3,13 +3,15 @@ import { defaultHashers } from "/frame_metadata/mod.ts";
 import * as rpc from "/rpc/mod.ts";
 import * as z from "./mod.ts";
 
-const beacon = z.lift(POLKADOT_RPC_URL);
-const pallet = z.pallet(beacon, z.lift("Timestamp"));
-const entry = z.StorageEntry.fromPalletAndName(beacon, pallet, z.lift("Now"));
-const storageKey = z.StorageKey.from(beacon, pallet, entry);
-const storageValueRes = z.rpcCall(beacon, z.lift("state_getStorage" as const), storageKey);
+const pallet = z.pallet(POLKADOT_RPC_URL, "Timestamp");
+const entry = z.StorageEntryMeta.fromPalletAndName(POLKADOT_RPC_URL, pallet, "Now");
+
+const storageKey = z.StorageKey.from(POLKADOT_RPC_URL, pallet, entry);
+const storageValueRes = z.rpcCall(POLKADOT_RPC_URL, "state_getStorage", storageKey);
 const storageValueEncoded = z.then(storageValueRes)((e) => e.result);
-const storageValue = z.storageValue(beacon, entry, storageValueEncoded);
+const storageValue = z.storageValue(POLKADOT_RPC_URL, entry, storageValueEncoded);
+
+const m = z.metadata(POLKADOT_RPC_URL);
 
 const result = await z.exec(storageValue).run({
   hashers: defaultHashers,

@@ -1,12 +1,12 @@
-import { _A, AnyEffect, Effect, Id } from "../Base.ts";
+import { _A, AnyResolvable, CacheKey, Effect, Resolved } from "../Base.ts";
 
-type UseResolvedTarget<
-  Target extends AnyEffect,
+export type UseResolvedTarget<
+  Target extends AnyResolvable,
   Into,
-> = (resolvedTarget: Target[_A]) => Into;
+> = (resolvedTarget: Resolved<Target>) => Into;
 
 export class Then<
-  Target extends AnyEffect,
+  Target extends AnyResolvable,
   Into,
 > extends Effect<{}, never, Into, [Target]> {
   constructor(
@@ -19,11 +19,11 @@ export class Then<
   }
 
   get cacheKey(): string {
-    return `Then(${this.target.cacheKey},${Id(this.useResolvedTarget)})`;
+    return `Then(${CacheKey(this.target)},${CacheKey(this.useResolvedTarget)})`;
   }
 }
 
-export const then = <Target extends AnyEffect>(target: Target) => {
+export const then = <Target extends AnyResolvable>(target: Target) => {
   return <Into>(useResolvedTarget: UseResolvedTarget<Target, Into>) => {
     return new Then(target, useResolvedTarget);
   };

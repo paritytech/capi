@@ -7,6 +7,7 @@ export * from "./guards.ts";
 export * from "./hex.ts";
 export * from "./LruCache.ts";
 export * from "./mapped.ts";
+export * from "./memo.ts";
 export * from "./Result.ts";
 export * from "./runCmd.ts";
 export * from "./spread.ts";

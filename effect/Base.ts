@@ -13,17 +13,17 @@ export abstract class Effect<
   R,
   E extends Error,
   A,
-  D extends AnyEffect[],
+  D extends AnyResolvable[],
 > {
-  [_R]!: R & UnionToIntersection<D[number][_R]>;
-  [_E]!: E | D[number][_E];
+  [_R]!: R & UnionToIntersection<Extract<D[number], AnyEffect>[_R]>;
+  [_E]!: E | Extract<D[number], AnyEffect>[_E];
   [_A]!: A;
 
   constructor(
     readonly deps: D,
     readonly run: (
       runtime: R,
-      ...resolved: Resolved<D>
+      ...resolved: DepsResolved<D>
     ) => Promise<E | A>,
   ) {}
 
@@ -36,32 +36,29 @@ export abstract class Effect<
   }
 }
 
-export const IdFactory = () => {
+export const CacheKeyFactory = () => {
   let id = 0;
-  const cache = new Map<unknown, number>();
-  return (value: unknown): number => {
-    const existing = cache.get(value);
+  const nonEffectCacheKeys = new Map<unknown, string>();
+  return (value: unknown): string => {
+    if (value instanceof Effect) {
+      return value.cacheKey;
+    }
+    const existing = nonEffectCacheKeys.get(value);
     if (existing) {
       return existing;
     }
-    cache.set(value, id++);
-    return id;
+    const cacheKey = (id++).toString();
+    nonEffectCacheKeys.set(value, cacheKey);
+    return cacheKey;
   };
 };
+export const CacheKey = CacheKeyFactory();
 
-export const Id = IdFactory();
-
-export const NonIdempotent: unique symbol = Symbol();
-export type NonIdempotent = typeof NonIdempotent;
-
-export type AnyEffect = Effect<any, any, any, Effect<any, any, any, any>[]>;
 export type AnyEffectA<A> = Effect<any, any, A, any>;
-
-export type Resolved<D extends AnyEffect[]> = {
-  [K in keyof D]: Resolved._0<D[K]>;
-};
-namespace Resolved {
-  export type _0<T> = T extends AnyEffectA<infer A> ? A : T;
-}
-
-export type AsAnyEffectAList<D extends any[]> = any[] & { [I in keyof D]: AnyEffectA<D[I]> };
+export type AnyEffect = AnyEffectA<any>;
+export type AnyResolvableA<A> = A | AnyEffectA<A>;
+export type AnyResolvable = AnyResolvableA<any>;
+export type Resolved<T extends AnyResolvable> = T extends AnyResolvableA<infer A> ? A : T;
+export type DepsResolved<D extends any[]> = { [K in keyof D]: Resolved<D[K]> };
+// TODO: make as resolvable
+export type Unresolved<D extends any[]> = any[] & { [I in keyof D]: AnyEffectA<D[I]> };

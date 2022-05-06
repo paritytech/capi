@@ -1,4 +1,4 @@
-import { Effect, Id } from "../Base.ts";
+import { CacheKey, Effect } from "../Base.ts";
 
 export class Lift<A> extends Effect<{}, never, A, []> {
   constructor(readonly value: A) {
@@ -8,7 +8,7 @@ export class Lift<A> extends Effect<{}, never, A, []> {
   }
 
   get cacheKey(): string {
-    return `Lift(${Id(this.value).toString()})`;
+    return `Lift(${CacheKey(this.value).toString()})`;
   }
 }
 

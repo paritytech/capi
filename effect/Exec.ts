@@ -1,38 +1,35 @@
-import * as a from "std/async/mod.ts";
 import { _A, _E, _R, AnyEffect, Effect } from "./Base.ts";
 
 export class Exec<Root extends AnyEffect> {
-  cache = new Map<string, Promise<unknown>>();
+  #cache = new Map<string, Promise<unknown>>();
 
   constructor(readonly root: Root) {}
 
-  #runEffect = (
-    runtime: Root[_R],
-    effect: Effect<any, Error, any, AnyEffect[]>,
-  ): string => {
-    const cacheKey = effect.cacheKey;
-    if (!this.cache.has(cacheKey)) {
-      effect.deps.forEach((dep) => {
-        this.#runEffect(runtime, dep);
-      });
-      const pending = a.deferred();
-      this.cache.set(cacheKey, pending);
-      Promise.all(effect.deps.map((dep) => {
-        return this.cache.get(dep.cacheKey);
-      })).then((depsResolved) => {
-        effect.run(runtime, ...depsResolved).then((resolved) => {
-          pending.resolve(resolved);
-        });
-      }).catch((e) => {
-        pending.reject(e);
-      });
-    }
-    return cacheKey;
+  run = (runtime: Root[_R]): Promise<Root[_E] | Root[_A]> => {
+    return this.#runEffect(runtime, this.root);
   };
 
-  run = (runtime: Root[_R]): Promise<Root[_E] | Root[_A]> => {
-    const cacheKey = this.#runEffect(runtime, this.root);
-    return this.cache.get(cacheKey)!;
+  #runEffect = (
+    runtime: Root[_R],
+    effect: Effect<any, any, any, AnyEffect[]>,
+  ): Promise<unknown> => {
+    const deps = Promise.all(effect.deps.map((dep) => {
+      if (dep instanceof Effect) {
+        const cacheKey = dep.cacheKey;
+        const cached = this.#cache.get(cacheKey);
+        if (cached) {
+          return cached;
+        }
+        const pending = this.#runEffect(runtime, dep);
+        this.#cache.set(cacheKey, pending);
+        return pending;
+      }
+      return Promise.resolve(dep);
+    }));
+    return (async () => {
+      const depsResolved = await deps;
+      return effect.run(runtime, ...depsResolved);
+    })();
   };
 }
 

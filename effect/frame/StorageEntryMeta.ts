@@ -1,11 +1,11 @@
-import { AnyEffect, AnyEffectA, Effect } from "/effect/Base.ts";
+import { AnyResolvable, AnyResolvableA, Effect } from "/effect/Base.ts";
 import { MetadataLookup, metadataLookup } from "/effect/frame/MetadataLookup.ts";
 import * as m from "/frame_metadata/mod.ts";
 
-export class StorageEntry<
-  Beacon extends AnyEffect,
-  Pallet extends AnyEffectA<m.Pallet>,
-  StorageEntryName extends AnyEffectA<string>,
+export class StorageEntryMeta<
+  Beacon extends AnyResolvable,
+  Pallet extends AnyResolvableA<m.Pallet>,
+  StorageEntryName extends AnyResolvableA<string>,
 > extends Effect<{}, never, m.StorageEntry, [MetadataLookup<Beacon>, Pallet, StorageEntryName]> {
   constructor(
     readonly beacon: Beacon,
@@ -18,16 +18,16 @@ export class StorageEntry<
   }
 }
 
-export namespace StorageEntry {
+export namespace StorageEntryMeta {
   export const fromPalletAndName = <
-    Beacon extends AnyEffect,
-    Pallet extends AnyEffectA<m.Pallet>,
-    StorageEntryName extends AnyEffectA<string>,
+    Beacon extends AnyResolvable,
+    Pallet extends AnyResolvableA<m.Pallet>,
+    StorageEntryName extends AnyResolvableA<string>,
   >(
     beacon: Beacon,
     pallet: Pallet,
     storageEntryName: StorageEntryName,
-  ): StorageEntry<Beacon, Pallet, StorageEntryName> => {
-    return new StorageEntry(beacon, pallet, storageEntryName);
+  ): StorageEntryMeta<Beacon, Pallet, StorageEntryName> => {
+    return new StorageEntryMeta(beacon, pallet, storageEntryName);
   };
 }
