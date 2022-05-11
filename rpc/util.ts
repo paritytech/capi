@@ -1,4 +1,4 @@
-import * as u from "/_/util/mod.ts";
+import * as u from "/util/mod.ts";
 import * as a from "std/async/mod.ts";
 import { ListenerCb, RpcClient, StopListening } from "./Base.ts";
 import * as m from "./messages.ts";

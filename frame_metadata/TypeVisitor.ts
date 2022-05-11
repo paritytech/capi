@@ -1,5 +1,5 @@
+import * as u from "/util/mod.ts";
 import * as m from "./Metadata.ts";
-import { ValueOf } from "./util.ts";
 
 export type UnknownByTypeDefKind = { [Tag in m.TypeKind]: unknown };
 
@@ -13,4 +13,4 @@ export type TypeVisitor<
 
 export type TypeVisitors<Results extends UnknownByTypeDefKind> =
   & { [Tag in m.TypeKind]: TypeVisitor<Tag, Results> }
-  & { visit: (i: number) => ValueOf<Results> };
+  & { visit: (i: number) => u.ValueOf<Results> };

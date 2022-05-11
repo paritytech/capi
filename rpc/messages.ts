@@ -172,6 +172,7 @@ export type Lookup = EnsureMethodLookup<{
   transaction_unstable_unwatch(subscription: string): void;
 }>;
 
+// TODO: rename this
 export type Name = keyof Lookup;
 
 export type InitByName = { [N in Name]: InitBase<N, Parameters<Lookup[N]>> };
