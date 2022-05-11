@@ -43,3 +43,13 @@ export class Metadata<
     this.blockHash = blockHash;
   }
 }
+
+export const metadata = <
+  Beacon,
+  BlockHashRest extends [blockHash?: MaybeEffectLike<string>],
+>(
+  beacon: Beacon,
+  ...[blockHash]: BlockHashRest
+): Metadata<Beacon, BlockHashRest> => {
+  return new Metadata(beacon, blockHash);
+};

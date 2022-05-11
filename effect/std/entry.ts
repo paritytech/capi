@@ -6,8 +6,8 @@ export class Entry<
   Pallet extends AnyPallet,
   Name extends MaybeEffectLike<string>,
   Keys extends [
-    a?: MaybeEffectLike<string>,
-    b?: MaybeEffectLike<string>,
+    a?: unknown,
+    b?: unknown,
   ],
 > {
   keys;
@@ -28,7 +28,10 @@ export class Entry<
 export type AnyEntry = Entry<
   AnyPallet,
   MaybeEffectLike<string>,
-  [a?: MaybeEffectLike<string>, b?: MaybeEffectLike<string>]
+  [
+    a?: unknown,
+    b?: unknown,
+  ]
 >;
 
 export const entry = <
