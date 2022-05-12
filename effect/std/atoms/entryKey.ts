@@ -17,11 +17,16 @@ export const entryKey = <
   entryMetadata: EntryMetadata,
   ...keys: Keys
 ) => {
+  const args: [DeriveCodec, PalletMetadata, EntryMetadata, ...Keys] = [
+    deriveCodec,
+    palletMetadata,
+    entryMetadata,
+    ...keys,
+  ];
   return native(
-    [deriveCodec, palletMetadata, entryMetadata, ...keys],
+    args,
     (deriveCodec, palletMetadata, entryMetadata, ...keys) => {
       return async (env: HasherRuntime) => {
-        // @ts-ignore
         return m.encodeKey(deriveCodec, env.hashers, palletMetadata, entryMetadata, ...keys);
       };
     },

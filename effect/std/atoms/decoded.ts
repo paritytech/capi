@@ -1,6 +1,6 @@
 import { MaybeEffectLike } from "/effect/Base.ts";
 import { native } from "/effect/intrinsic/Native.ts";
-import * as m from "/frame_metadata/mod.ts";
+import { hexToU8a } from "/util/hex.ts";
 import * as S from "x/scale/mod.ts";
 
 // TODO: move into & get from `frame_metadata`
@@ -13,11 +13,10 @@ export const decoded = <
   codec: Codec,
   encoded: Encoded,
 ) => {
-  return native([codec, encoded], (codec, encoded) => {
+  const args: [Codec, Encoded] = [codec, encoded];
+  return native(args, (codec, encoded) => {
     return async () => {
-      // TODO
-      // @ts-ignore
-      return codec.decode(encoded);
+      return codec.decode(hexToU8a(encoded));
     };
   });
 };

@@ -9,10 +9,9 @@ export const codec = <
   deriveCodec: DeriveCodec,
   typeI: TypeI,
 ) => {
-  return native([deriveCodec, typeI], (deriveCodec, typeI) => {
-    return () => {
-      // TODO
-      // @ts-ignore
+  const args: [DeriveCodec, TypeI] = [deriveCodec, typeI];
+  return native(args, (deriveCodec, typeI) => {
+    return async () => {
       return deriveCodec(typeI);
     };
   });

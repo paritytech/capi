@@ -13,8 +13,8 @@ export class Pallet<
   entry<
     EntryName extends MaybeEffectLike<string>,
     Keys extends [
-      a?: MaybeEffectLike<string>,
-      b?: MaybeEffectLike<string>,
+      a?: unknown,
+      b?: unknown,
     ],
   >(
     name: EntryName,

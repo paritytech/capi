@@ -9,11 +9,10 @@ export const palletMetadata = <
   lookup: Lookup,
   palletName: PalletName,
 ) => {
-  return native([lookup, palletName], (lookup, palletName) => {
+  const args: [Lookup, PalletName] = [lookup, palletName];
+  return native(args, (lookup, palletName) => {
     return async () => {
-      // TODO
-      // @ts-ignore
-      lookup.getPalletByName(palletName);
+      return lookup.getPalletByName(palletName);
     };
   });
 };

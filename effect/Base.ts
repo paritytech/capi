@@ -15,11 +15,11 @@ export abstract class Effect<R, E extends Error, A> {
 
 export type AnyEffect<A = any> = Effect<any, Error, A>;
 
-export abstract class Container<A = any> {
-  abstract inner: AnyEffect<A>;
+export abstract class HOEffect<A = any> {
+  abstract root: AnyEffect<A>;
 }
 
-export type AnyEffectLike<A = any> = AnyEffect<A> | Container<A>;
+export type AnyEffectLike<A = any> = AnyEffect<A> | HOEffect<A>;
 export type MaybeEffectLike<A> = A | AnyEffectLike<A>;
 export type MaybeEffectLikeList<T extends unknown[]> = { [I in keyof T]: MaybeEffectLike<T[I]> };
 
@@ -27,4 +27,4 @@ export type Resolved<M> = M extends AnyEffectLike<infer A> ? A : M;
 export type ResolvedCollection<C> = { [I in keyof C]: Resolved<C[I]> };
 
 // TODO: handle nesting
-export type ExtractEffect<T> = Extract<T, AnyEffect> | Extract<T, Container>["inner"];
+export type ExtractEffect<T> = Extract<T, AnyEffect> | Extract<T, HOEffect>["root"];

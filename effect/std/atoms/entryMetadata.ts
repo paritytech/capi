@@ -11,11 +11,10 @@ export const entryMetadata = <
   palletMetadata: PalletMetadata,
   entryName: EntryName,
 ) => {
-  return native([lookup, palletMetadata, entryName], (lookup, palletMetadata, entryName) => {
+  const args: [Lookup, PalletMetadata, EntryName] = [lookup, palletMetadata, entryName];
+  return native(args, (lookup, palletMetadata, entryName) => {
     return async () => {
-      // TODO
-      // @ts-ignore
-      lookup.getStorageEntryByPalletAndName(palletMetadata, entryName);
+      return lookup.getStorageEntryByPalletAndName(palletMetadata, entryName);
     };
   });
 };

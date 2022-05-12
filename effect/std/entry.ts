@@ -38,8 +38,8 @@ export const entry = <
   Pallet extends AnyPallet,
   Name extends MaybeEffectLike<string>,
   Keys extends [
-    a?: MaybeEffectLike<string>,
-    b?: MaybeEffectLike<string>,
+    a?: unknown,
+    b?: unknown,
   ],
 >(
   pallet: Pallet,

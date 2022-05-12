@@ -1,37 +1,13 @@
-import { Container, MaybeEffectLike } from "/effect/Base.ts";
-import { native } from "/effect/intrinsic/Native.ts";
+import { HOEffect, MaybeEffectLike } from "/effect/Base.ts";
+import { select } from "/effect/intrinsic/Select.ts";
+import { metadataDecoded } from "/effect/std/atoms/metadataDecoded.ts";
 import { rpcCall } from "/effect/std/rpcCall.ts";
-import * as m from "/frame_metadata/mod.ts";
-
-// TODO: move into `frame_metadata`
-export class MetadataDecodeError extends Error {}
-
-// TODO: block hash param
-export const _metadata = <
-  Beacon,
-  BlockHashRest extends [blockHash?: MaybeEffectLike<string>],
->(
-  beacon: Beacon,
-  ...[blockHash]: BlockHashRest
-) => {
-  return native([rpcCall(beacon, "state_getMetadata", blockHash)], (result) => {
-    return async () => {
-      const raw = (result as any).result as string;
-      try {
-        return m.fromPrefixedHex(raw);
-      } catch (e) {
-        console.error(e);
-        return new MetadataDecodeError();
-      }
-    };
-  });
-};
 
 export class Metadata<
   Beacon,
   BlockHashRest extends [blockHash?: MaybeEffectLike<string>],
-> extends Container {
-  inner;
+> extends HOEffect {
+  root;
   blockHash;
 
   constructor(
@@ -39,7 +15,9 @@ export class Metadata<
     ...[blockHash]: BlockHashRest
   ) {
     super();
-    this.inner = _metadata(beacon, blockHash);
+    const rpcCall_ = rpcCall(beacon, "state_getMetadata", blockHash);
+    const result = select(rpcCall_, "result");
+    this.root = metadataDecoded(result);
     this.blockHash = blockHash;
   }
 }

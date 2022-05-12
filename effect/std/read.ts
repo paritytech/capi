@@ -1,4 +1,4 @@
-import { Container } from "/effect/Base.ts";
+import { HOEffect } from "/effect/Base.ts";
 import { select } from "/effect/intrinsic/Select.ts";
 import { codec } from "/effect/std/atoms/codec.ts";
 import { decoded } from "/effect/std/atoms/decoded.ts";
@@ -11,8 +11,8 @@ import { AnyEntry } from "/effect/std/entry.ts";
 import { metadata } from "/effect/std/metadata.ts";
 import { rpcCall } from "/effect/std/rpcCall.ts";
 
-export class Read<Entry extends AnyEntry> extends Container {
-  inner;
+export class Read<Entry extends AnyEntry> extends HOEffect {
+  root;
 
   constructor(readonly entry: Entry) {
     super();
@@ -20,19 +20,13 @@ export class Read<Entry extends AnyEntry> extends Container {
     const metadataLookup_ = metadataLookup(metadata_);
     const deriveCodec_ = deriveCodec(metadata_);
     const palletMetadata_ = palletMetadata(metadataLookup_, entry.pallet.name);
-    // TODO: fix the typing
-    const entryMetadata_ = entryMetadata(metadataLookup_, palletMetadata_ as any, entry.name);
-    // TODO: fix the typing
-    const key = entryKey(deriveCodec_, palletMetadata_ as any, entryMetadata_ as any, ...entry.keys);
+    const entryMetadata_ = entryMetadata(metadataLookup_, palletMetadata_, entry.name);
+    const key = entryKey(deriveCodec_, palletMetadata_, entryMetadata_, ...entry.keys);
     const rpcCall_ = rpcCall(entry.pallet.beacon, "state_getStorage", key);
     const encoded = select(rpcCall_, "result");
-    // TODO
-    const entryValueTypeI = select(entryMetadata_, "value" as never);
+    const entryValueTypeI = select(entryMetadata_, "value");
     const entryCodec_ = codec(deriveCodec_, entryValueTypeI);
-    // TODO
-    const decoded_ = decoded(encoded, entryCodec_ as any);
-    // const decoded =
-    this.inner = decoded_;
+    this.root = decoded(entryCodec_, encoded);
   }
 }
 
