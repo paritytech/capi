@@ -45,6 +45,7 @@ export const accountId32Bytes = hex.decode(
 export const accountId32 = {
   0: [...accountId32Bytes],
 };
+console.log(accountId32);
 
 export namespace State {
   export const getStorage = async (
