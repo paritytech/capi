@@ -1,5 +1,5 @@
-import { MaybeEffectLike } from "/effect/Base.ts";
-import { native } from "/effect/intrinsic/Native.ts";
+import { MaybeEffectLike } from "/effect/Effect.ts";
+import { step } from "/effect/intrinsic/Step.ts";
 import * as m from "/frame_metadata/mod.ts";
 import { HasherRuntime } from "/runtime/Hashers.ts";
 
@@ -23,7 +23,7 @@ export const entryKey = <
     entryMetadata,
     ...keys,
   ];
-  return native(
+  return step(
     args,
     (deriveCodec, palletMetadata, entryMetadata, ...keys) => {
       return async (env: HasherRuntime) => {

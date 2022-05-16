@@ -1,27 +1,29 @@
-import { HOEffect, MaybeEffectLike } from "/effect/Base.ts";
-import { native } from "/effect/intrinsic/Native.ts";
+import { HOEffect } from "/effect/Effect.ts";
+import { step } from "/effect/intrinsic/Step.ts";
+import { Ss58 } from "/effect/std/account/Ss58.ts";
+import * as crypto from "/target/wasm/crypto/mod.js";
+import * as hex from "std/encoding/hex.ts";
 
-export type AnyPubKey = PubKeyFromText;
-
-export class PubKeyFromText<Init extends MaybeEffectLike<string> = MaybeEffectLike<string>> extends HOEffect {
-  root;
-
+export abstract class PubKey<Init = any> extends HOEffect {
   constructor(readonly init: Init) {
     super();
-    this.root = native([init], (init) => {
+  }
+}
+
+export class PubKeyFromSs58<Init extends Ss58> extends PubKey<Init> {
+  root;
+
+  constructor(init: Init) {
+    super(init);
+    this.root = step([init], (init) => {
       return async () => {
-        return new TextEncoder().encode(init);
+        // TODO: decode byte representation instead
+        return hex.decode(crypto.decodeSs58Text(init));
       };
     });
   }
 }
 
-export const pubKeyFromText = <Init extends MaybeEffectLike<string>>(init: Init): PubKeyFromText<Init> => {
-  return new PubKeyFromText(init);
-};
-
-// export class PubKeyFromSs58<Init extends Ss58Address = Ss58Address> extends HOEffect {}
-
-// export const pubKeyFromSs58Text = <Init extends MaybeEffectLike<string>>(init: Init): PubKeyFromSs58<Init> => {
-//   return new PubKeyFromSs58(init);
-// };
+export function pubKeyFromSs58<Init extends Ss58>(init: Init): PubKeyFromSs58<Init> {
+  return new PubKeyFromSs58(init);
+}

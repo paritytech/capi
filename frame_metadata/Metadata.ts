@@ -1,3 +1,4 @@
+import { hexToU8a } from "/util/mod.ts";
 import * as hex from "https://deno.land/std@0.136.0/encoding/hex.ts";
 import * as s from "x/scale/mod.ts";
 import { ValidateCodecSignature } from "./test-util.ts";
@@ -365,6 +366,5 @@ export const metadata: s.Codec<Metadata> = s.record(
 type _MetadataV14Validity = ValidateCodecSignature<Metadata, typeof metadata, true>;
 
 export const fromPrefixedHex = (scaleEncoded: string): Metadata => {
-  const scaleBytes = hex.decode(new TextEncoder().encode(scaleEncoded.substring(10)));
-  return metadata.decode(scaleBytes);
+  return metadata.decode(hexToU8a(scaleEncoded, 8));
 };

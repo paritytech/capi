@@ -1,5 +1,5 @@
-import { HOEffect, MaybeEffectLike, MaybeEffectLikeList, Resolved } from "/effect/Base.ts";
-import { native } from "/effect/intrinsic/Native.ts";
+import { HOEffect, MaybeEffectLike, UnwrapA, WrapAll } from "/effect/Effect.ts";
+import { step } from "/effect/intrinsic/Step.ts";
 import { rpcClient } from "/effect/std/atoms/rpcClient.ts";
 import * as rpc from "/rpc/mod.ts";
 
@@ -10,7 +10,7 @@ export class RpcCall<
   Beacon,
   MethodName extends MaybeEffectLike<rpc.Name>,
   // TODO: fix the need for `any[]`
-  Params extends any[] & MaybeEffectLikeList<rpc.Init<Resolved<MethodName>>["params"]>,
+  Params extends any[] & WrapAll<rpc.Init<UnwrapA<MethodName>>["params"]>,
 > extends HOEffect {
   params;
   root;
@@ -23,9 +23,8 @@ export class RpcCall<
     super();
     this.params = params;
     const rpcClient_ = rpcClient(beacon);
-    const args: [typeof rpcClient_, MethodName, ...Params] = [rpcClient_, methodName, ...params];
-    this.root = native(
-      args,
+    this.root = step(
+      [rpcClient_, methodName, ...params],
       (client, methodName, ...params) => {
         return async () => {
           // TODO: fix param type resolution issue
@@ -44,7 +43,7 @@ export const rpcCall = <
   Beacon,
   MethodName extends MaybeEffectLike<rpc.Name>,
   // TODO: fix the need for `any[]`
-  Params extends any[] & MaybeEffectLikeList<rpc.Init<Resolved<MethodName>>["params"]>,
+  Params extends any[] & WrapAll<rpc.Init<UnwrapA<MethodName>>["params"]>,
 >(
   beacon: Beacon,
   methodName: MethodName,

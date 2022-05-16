@@ -1,5 +1,5 @@
-import { MaybeEffectLike } from "/effect/Base.ts";
-import { native } from "/effect/intrinsic/Native.ts";
+import { MaybeEffectLike } from "/effect/Effect.ts";
+import { step } from "/effect/intrinsic/Step.ts";
 import { hexToU8a } from "/util/hex.ts";
 import * as S from "x/scale/mod.ts";
 
@@ -14,7 +14,7 @@ export const decoded = <
   encoded: Encoded,
 ) => {
   const args: [Codec, Encoded] = [codec, encoded];
-  return native(args, (codec, encoded) => {
+  return step(args, (codec, encoded) => {
     return async () => {
       return codec.decode(hexToU8a(encoded));
     };

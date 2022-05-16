@@ -1,19 +1,18 @@
 import { POLKADOT_RPC_URL } from "/_/constants/chains/url.ts";
 import * as c from "/effect/mod.ts";
 import { wsRpcClient } from "/rpc/mod.ts";
-import { hashersRuntime } from "/runtime/Hashers.ts";
-import * as crypto from "/target/wasm/crypto/mod.js";
-import * as hex from "std/encoding/hex.ts";
+import { hashers } from "/runtime/Hashers.ts";
 
-const system = c.pallet(POLKADOT_RPC_URL, "System");
-const accountId32 = c.native(["13SceNt2ELz3ti4rnQbY1snpYH4XE4fLFsW8ph9rpwJd6HFC"], (init) => {
-  return async () => {
-    return { 0: [...hex.decode(crypto.decodeSs58(init))] };
-  };
+const ss58 = c.ss58FromText("13SceNt2ELz3ti4rnQbY1snpYH4XE4fLFsW8ph9rpwJd6HFC");
+const pubKey = c.pubKeyFromSs58(ss58);
+const accountId32 = c.accountId32FromPubKey(pubKey);
+const entry = c
+  .pallet(POLKADOT_RPC_URL, "System")
+  .entry("Account", accountId32)
+  .read();
+const run = c.runtime({
+  rpc: wsRpcClient,
+  hashers,
 });
-const entry = system.entry("Account", accountId32).read();
-const resolved = await c.runtime(entry).run({
-  rpcClientFactory: wsRpcClient,
-  ...hashersRuntime,
-});
-console.log(resolved);
+const result = await run(entry);
+console.log(result);

@@ -1,40 +1,57 @@
-import { _A, _E, _R, AnyEffect, ExtractEffect, HOEffect } from "/effect/Base.ts";
-import { Native } from "/effect/intrinsic/Native.ts";
-import { Select } from "/effect/intrinsic/Select.ts";
+import * as Z from "/effect/Effect.ts";
+import { NonIdempotent } from "/effect/intrinsic/NonIdempotent.ts";
+import { AnyStep, Step } from "/effect/intrinsic/Step.ts";
 
-export class Runtime<Root extends AnyEffect | HOEffect> {
-  constructor(readonly root: Root) {}
-
-  run = (env: ExtractEffect<Root>[_R]): Promise<ExtractEffect<Root>[_A | _E]> => {
-    return this.runNext(env, this.root);
-  };
-
-  runNext = <T>(
-    env: ExtractEffect<Root>[_R],
-    maybeEffect: unknown,
-  ): Promise<T> => {
-    if (maybeEffect instanceof Native) {
-      // TODO: why is this casting necessary?
-      const depsPending = Promise.all((maybeEffect.args as AnyEffect[]).map((dep) => {
-        const pending = this.runNext(env, dep);
-        return pending;
-      }));
-      return (async () => {
-        const deps = await depsPending;
-        return maybeEffect.run(...deps)(env);
-      })();
-    } else if (maybeEffect instanceof Select) {
-      return (async () => {
-        const result = await this.runNext(env, maybeEffect.target) as any;
-        return result[maybeEffect.key];
-      })();
-    } else if (maybeEffect instanceof HOEffect) {
-      return this.runNext(env, maybeEffect.root);
-    }
-    return Promise.resolve(maybeEffect as T);
-  };
+export interface Runtime<CommonR> {
+  <
+    Root extends Z.AnyEffectLike,
+    R extends Omit<Z.UnwrapR<Root>, keyof CommonR>,
+  >(
+    root: Root,
+    ...[env]: [{}] extends [R] ? [] : [R]
+  ): Promise<Z.UnwrapE<Root> | Z.UnwrapA<Root>>;
 }
 
-export const runtime = <Root extends AnyEffect | HOEffect>(root: Root): Runtime<Root> => {
-  return new Runtime(root);
-};
+export function runtime<CommonR>(sharedEnv: CommonR = ({} as any)): Runtime<CommonR> {
+  return (async (root, env) => {
+    const finalEnv = {
+      ...sharedEnv,
+      ...env || {},
+    };
+
+    const visitStep = async (
+      node: AnyStep,
+      argsPending: Promise<unknown[]>,
+    ): Promise<unknown> => {
+      const result = await node.resolve(...await argsPending)(finalEnv);
+      if (result instanceof Error) {
+        throw result;
+      }
+      return result;
+    };
+
+    const visit = (
+      node: unknown,
+      idempotent = true,
+    ): Promise<unknown> => {
+      if (node instanceof Z.HOEffect) {
+        return visit(node.root);
+      } else if (node instanceof Step) {
+        // TODO: why is `args` not inferred as `unknown[]`?
+        const argsPending = Promise.all((node as AnyStep).args.map((arg) => {
+          return visit(arg, idempotent);
+        }));
+        return visitStep(node, argsPending);
+      } else if (node instanceof NonIdempotent) {
+        return visit(node.root, false);
+      }
+      return Promise.resolve(node);
+    };
+
+    try {
+      return await visit(root);
+    } catch (e) {
+      return e;
+    }
+  }) as Runtime<CommonR>;
+}

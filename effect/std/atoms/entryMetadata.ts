@@ -1,5 +1,5 @@
-import { MaybeEffectLike } from "/effect/Base.ts";
-import { native } from "/effect/intrinsic/Native.ts";
+import { MaybeEffectLike } from "/effect/Effect.ts";
+import { step } from "/effect/intrinsic/Step.ts";
 import * as m from "/frame_metadata/mod.ts";
 
 export const entryMetadata = <
@@ -12,7 +12,7 @@ export const entryMetadata = <
   entryName: EntryName,
 ) => {
   const args: [Lookup, PalletMetadata, EntryName] = [lookup, palletMetadata, entryName];
-  return native(args, (lookup, palletMetadata, entryName) => {
+  return step(args, (lookup, palletMetadata, entryName) => {
     return async () => {
       return lookup.getStorageEntryByPalletAndName(palletMetadata, entryName);
     };

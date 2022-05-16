@@ -1,5 +1,5 @@
-import { MaybeEffectLike } from "/effect/Base.ts";
-import { native } from "/effect/intrinsic/Native.ts";
+import { MaybeEffectLike } from "/effect/Effect.ts";
+import { step } from "/effect/intrinsic/Step.ts";
 import * as m from "/frame_metadata/mod.ts";
 
 export const codec = <
@@ -10,7 +10,7 @@ export const codec = <
   typeI: TypeI,
 ) => {
   const args: [DeriveCodec, TypeI] = [deriveCodec, typeI];
-  return native(args, (deriveCodec, typeI) => {
+  return step(args, (deriveCodec, typeI) => {
     return async () => {
       return deriveCodec(typeI);
     };

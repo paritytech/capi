@@ -1,25 +1,26 @@
-import { Resolved } from "/effect/Base.ts";
-import { native } from "/effect/intrinsic/Native.ts";
+import { UnwrapA } from "/effect/Effect.ts";
+import { step } from "/effect/intrinsic/Step.ts";
 import * as rpc from "/rpc/mod.ts";
 
 export interface RpcClientR<Beacon> {
-  rpcClientFactory: rpc.RpcClientFactory<Beacon>;
+  rpc: rpc.RpcClientFactory<Beacon>;
 }
 
 export const rpcClient = <Beacon>(beacon: Beacon) => {
-  return native(
+  return step(
     [beacon],
     (beacon) => {
-      return async (env: RpcClientR<Resolved<Beacon>>) => {
-        return env.rpcClientFactory(beacon);
-      };
-    },
-    () => {
-      return () => {
-        return (client) => {
-          return client.close();
-        };
+      return async (env: RpcClientR<UnwrapA<Beacon>>) => {
+        return env.rpc(beacon);
       };
     },
   );
 };
+
+// () => {
+//   return () => {
+//     return (client) => {
+//       return client.close();
+//     };
+//   };
+// },
