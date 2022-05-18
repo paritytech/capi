@@ -10,23 +10,37 @@ export type E_ = typeof E_;
 export const A_: unique symbol = Symbol();
 export type A_ = typeof A_;
 
+export class EffectState {
+  id = 0;
+  cache = new Map<unknown, number>();
+
+  nextId = () => {
+    return this.id++;
+  };
+
+  idOf = (inQuestion: unknown): number => {
+    const prev = this.cache.get(inQuestion);
+    if (prev) {
+      return prev;
+    }
+    const id = this.nextId();
+    this.cache.set(inQuestion, id);
+    return id;
+  };
+}
+
 export abstract class Effect<
   R,
   E extends Error,
   A,
 > {
-  [R_]: R;
-  [E_]: E;
-  [A_]: A;
+  static state = new EffectState();
 
-  constructor() {
-    // @ts-ignore: The operand of a 'delete' operator must be optional.
-    delete this[R_];
-    // @ts-ignore: The operand of a 'delete' operator must be optional.
-    delete this[E_];
-    // @ts-ignore: The operand of a 'delete' operator must be optional.
-    delete this[A_];
-  }
+  declare [R_]: R;
+  declare [E_]: E;
+  declare [A_]: A;
+
+  abstract signature(): string;
 }
 
 export abstract class HOEffect<Root extends AnyEffectLike = AnyEffectLike> {

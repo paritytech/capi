@@ -4,10 +4,14 @@ export class NonIdempotent<Root> extends Z.Effect<Z.UnwrapR<Root>, Z.UnwrapE<Roo
   constructor(readonly root: Root) {
     super();
   }
+
+  signature(): string {
+    return `${this.constructor.name}(${Z.Effect.state.idOf(this.root)})`;
+  }
 }
 
 export type AnyNonIdempotent<A = any> = NonIdempotent<Z.MaybeEffectLike<A>>;
 
-export function nonIdempotent<Root>(root: Root): NonIdempotent<Root> {
+export const nonIdempotent = <Root>(root: Root): NonIdempotent<Root> => {
   return new NonIdempotent(root);
-}
+};

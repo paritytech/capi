@@ -15,7 +15,7 @@ export class PubKeyFromSs58<Init extends Ss58> extends PubKey<Init> {
 
   constructor(init: Init) {
     super(init);
-    this.root = step([init], (init) => {
+    this.root = step("PubKeyFromSs58", [init], (init) => {
       return async () => {
         // TODO: decode byte representation instead
         return hex.decode(crypto.decodeSs58Text(init));
@@ -24,6 +24,6 @@ export class PubKeyFromSs58<Init extends Ss58> extends PubKey<Init> {
   }
 }
 
-export function pubKeyFromSs58<Init extends Ss58>(init: Init): PubKeyFromSs58<Init> {
+export const pubKeyFromSs58 = <Init extends Ss58>(init: Init): PubKeyFromSs58<Init> => {
   return new PubKeyFromSs58(init);
-}
+};

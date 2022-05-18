@@ -13,8 +13,7 @@ export const decoded = <
   codec: Codec,
   encoded: Encoded,
 ) => {
-  const args: [Codec, Encoded] = [codec, encoded];
-  return step(args, (codec, encoded) => {
+  return step("Decoded", [codec, encoded], (codec, encoded) => {
     return async () => {
       return codec.decode(hexToU8a(encoded));
     };

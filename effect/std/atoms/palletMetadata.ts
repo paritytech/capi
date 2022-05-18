@@ -9,10 +9,13 @@ export const palletMetadata = <
   lookup: Lookup,
   palletName: PalletName,
 ) => {
-  const args: [Lookup, PalletName] = [lookup, palletName];
-  return step(args, (lookup, palletName) => {
-    return async () => {
-      return lookup.getPalletByName(palletName);
-    };
-  });
+  return step(
+    "PalletMetadata",
+    [lookup, palletName],
+    (lookup, palletName) => {
+      return async () => {
+        return lookup.getPalletByName(palletName);
+      };
+    },
+  );
 };

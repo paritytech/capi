@@ -1,6 +1,7 @@
 import { HOEffect, MaybeEffectLike } from "/effect/Effect.ts";
 import { step } from "/effect/intrinsic/Step.ts";
 import { metadataDecoded } from "/effect/std/atoms/metadataDecoded.ts";
+import { select } from "/effect/std/atoms/select.ts";
 import { rpcCall } from "/effect/std/RpcCall.ts";
 
 export class Metadata<
@@ -15,8 +16,8 @@ export class Metadata<
     ...[blockHash]: BlockHashRest
   ) {
     super();
-    const rpcCall_ = rpcCall(beacon, "state_getMetadata" as const, blockHash);
-    const result = step([rpcCall_], (rpcCall_) => async () => rpcCall_.result);
+    const rpcCall_ = rpcCall(beacon, "state_getMetadata", blockHash);
+    const result = select(rpcCall_, "result");
     this.root = metadataDecoded(result);
     this.blockHash = blockHash;
   }

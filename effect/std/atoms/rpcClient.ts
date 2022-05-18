@@ -8,6 +8,7 @@ export interface RpcClientR<Beacon> {
 
 export const rpcClient = <Beacon>(beacon: Beacon) => {
   return step(
+    "RpcClient",
     [beacon],
     (beacon) => {
       return async (env: RpcClientR<UnwrapA<Beacon>>) => {

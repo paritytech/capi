@@ -11,10 +11,13 @@ export const entryMetadata = <
   palletMetadata: PalletMetadata,
   entryName: EntryName,
 ) => {
-  const args: [Lookup, PalletMetadata, EntryName] = [lookup, palletMetadata, entryName];
-  return step(args, (lookup, palletMetadata, entryName) => {
-    return async () => {
-      return lookup.getStorageEntryByPalletAndName(palletMetadata, entryName);
-    };
-  });
+  return step(
+    "EntryMetadata",
+    [lookup, palletMetadata, entryName],
+    (lookup, palletMetadata, entryName) => {
+      return async () => {
+        return lookup.getStorageEntryByPalletAndName(palletMetadata, entryName);
+      };
+    },
+  );
 };

@@ -10,9 +10,14 @@ const entry = c
   .pallet(POLKADOT_RPC_URL, "System")
   .entry("Account", accountId32)
   .read();
+
 const run = c.runtime({
   rpc: wsRpcClient,
   hashers,
 });
+
 const result = await run(entry);
-console.log(result);
+// if (result instanceof Error) {}
+// else {
+//   console.log(result.getPalletByName("System"));
+// }

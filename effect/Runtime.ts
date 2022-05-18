@@ -13,6 +13,8 @@ export interface Runtime<CommonR> {
 }
 
 export function runtime<CommonR>(sharedEnv: CommonR = ({} as any)): Runtime<CommonR> {
+  const cache = new Map<string, Promise<unknown>>();
+
   return (async (root, env) => {
     const finalEnv = {
       ...sharedEnv,
@@ -32,15 +34,25 @@ export function runtime<CommonR>(sharedEnv: CommonR = ({} as any)): Runtime<Comm
 
     const visit = (
       node: unknown,
-      idempotent = true,
+      isIdempotent = true,
     ): Promise<unknown> => {
       if (node instanceof Z.HOEffect) {
-        return visit(node.root);
+        return visit(node.root, isIdempotent);
       } else if (node instanceof Step) {
         // TODO: why is `args` not inferred as `unknown[]`?
         const argsPending = Promise.all((node as AnyStep).args.map((arg) => {
-          return visit(arg, idempotent);
+          return visit(arg, isIdempotent);
         }));
+        if (isIdempotent) {
+          const key = node.signature();
+          const prev = cache.get(key);
+          if (prev) {
+            return prev;
+          }
+          const pending = visitStep(node, argsPending);
+          cache.set(key, pending);
+          return pending;
+        }
         return visitStep(node, argsPending);
       } else if (node instanceof NonIdempotent) {
         return visit(node.root, false);

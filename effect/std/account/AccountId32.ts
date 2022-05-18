@@ -15,7 +15,7 @@ export class AccountId32FromPubKey<Init extends PubKey> extends AccountId32<Init
 
   constructor(init: Init) {
     super(init);
-    this.root = step([init], (init) => {
+    this.root = step("AccountId32FromPubKey", [init], (init) => {
       return async () => {
         return { 0: [...init] };
       };
@@ -23,6 +23,6 @@ export class AccountId32FromPubKey<Init extends PubKey> extends AccountId32<Init
   }
 }
 
-export function accountId32FromPubKey<Init extends PubKey>(init: Init): AccountId32FromPubKey<Init> {
+export const accountId32FromPubKey = <Init extends PubKey>(init: Init): AccountId32FromPubKey<Init> => {
   return new AccountId32FromPubKey(init);
-}
+};

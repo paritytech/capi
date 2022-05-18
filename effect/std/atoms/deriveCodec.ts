@@ -6,7 +6,7 @@ import * as m from "/frame_metadata/mod.ts";
 export class DeriveCodecError extends Error {}
 
 export const deriveCodec = <Metadata extends MaybeEffectLike<m.Metadata>>(metadata: Metadata) => {
-  return step([metadata], (metadata) => {
+  return step("DeriveCodec", [metadata], (metadata) => {
     return async () => {
       return m.DeriveCodec(metadata);
     };

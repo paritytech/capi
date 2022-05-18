@@ -24,6 +24,7 @@ export class RpcCall<
     this.params = params;
     const rpcClient_ = rpcClient(beacon);
     this.root = step(
+      "RpcCall",
       [rpcClient_, methodName, ...params],
       (client, methodName, ...params) => {
         return async () => {

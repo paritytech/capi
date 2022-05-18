@@ -9,8 +9,7 @@ export const codec = <
   deriveCodec: DeriveCodec,
   typeI: TypeI,
 ) => {
-  const args: [DeriveCodec, TypeI] = [deriveCodec, typeI];
-  return step(args, (deriveCodec, typeI) => {
+  return step("Codec", [deriveCodec, typeI], (deriveCodec, typeI) => {
     return async () => {
       return deriveCodec(typeI);
     };

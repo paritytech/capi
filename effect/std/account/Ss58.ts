@@ -12,7 +12,7 @@ export class Ss58FromText<Init extends MaybeEffectLike<string>> extends Ss58<Ini
 
   constructor(init: Init) {
     super(init);
-    this.root = step([init], (init) => {
+    this.root = step("Ss58FromText", [init], (init) => {
       return async () => {
         // TODO: return byte representation instead
         return init;
@@ -21,6 +21,6 @@ export class Ss58FromText<Init extends MaybeEffectLike<string>> extends Ss58<Ini
   }
 }
 
-export function ss58FromText<Init extends MaybeEffectLike<string>>(init: Init): Ss58FromText<Init> {
+export const ss58FromText = <Init extends MaybeEffectLike<string>>(init: Init): Ss58FromText<Init> => {
   return new Ss58FromText(init);
-}
+};

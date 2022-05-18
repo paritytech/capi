@@ -6,7 +6,7 @@ import * as m from "/frame_metadata/mod.ts";
 export class MetadataDecodeError extends Error {}
 
 export const metadataDecoded = <Encoded extends MaybeEffectLike<string>>(encoded: Encoded) => {
-  return step([encoded], (encoded) => {
+  return step("MetadataDecoded", [encoded], (encoded) => {
     return async () => {
       try {
         return m.fromPrefixedHex(encoded);
