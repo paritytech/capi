@@ -1,6 +1,6 @@
 import { CHAIN_URL_LOOKUP } from "/_/constants/chains/url.ts";
+import { hashers } from "/env/mod.ts";
 import { call, wsRpcClient } from "/rpc/mod.ts";
-import { hashers } from "/runtime/mod.ts";
 import * as hex from "std/encoding/hex.ts";
 import * as path from "std/path/mod.ts";
 import { IsExact } from "x/conditional_type_checks/mod.ts";

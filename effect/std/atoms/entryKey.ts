@@ -1,7 +1,7 @@
 import { MaybeEffectLike } from "/effect/Effect.ts";
 import { step } from "/effect/intrinsic/Step.ts";
+import { HasherRuntime } from "/env/mod.ts";
 import * as m from "/frame_metadata/mod.ts";
-import { HasherRuntime } from "/runtime/Hashers.ts";
 
 export const entryKey = <
   DeriveCodec extends MaybeEffectLike<m.DeriveCodec>,

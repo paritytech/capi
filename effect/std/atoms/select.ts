@@ -13,6 +13,7 @@ export const select = <
     [target, key],
     (target, key) => {
       return async () => {
+        // TODO: fix this
         return (target as any)[key];
       };
     },

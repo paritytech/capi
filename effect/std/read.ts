@@ -7,6 +7,7 @@ import { entryMetadata } from "/effect/std/atoms/entryMetadata.ts";
 import { metadataLookup } from "/effect/std/atoms/metadataLookup.ts";
 import { palletMetadata } from "/effect/std/atoms/palletMetadata.ts";
 import { select } from "/effect/std/atoms/select.ts";
+import { wrap } from "/effect/std/atoms/wrap.ts";
 import { AnyEntry } from "/effect/std/Entry.ts";
 import { metadata } from "/effect/std/Metadata.ts";
 import { rpcCall } from "/effect/std/RpcCall.ts";
@@ -26,7 +27,8 @@ export class Read<Entry extends AnyEntry = AnyEntry> extends HOEffect {
     const encoded = select(rpcCall_, "result");
     const entryValueTypeI = select(entryMetadata_, "value");
     const entryCodec_ = codec(deriveCodec_, entryValueTypeI);
-    this.root = decoded(entryCodec_, encoded);
+    const decoded_ = decoded(entryCodec_, encoded);
+    this.root = wrap(decoded_, "value");
   }
 }
 
