@@ -1,5 +1,4 @@
 import { hexToU8a } from "/util/mod.ts";
-import * as hex from "https://deno.land/std@0.136.0/encoding/hex.ts";
 import * as s from "x/scale/mod.ts";
 import { ValidateCodecSignature } from "./test-util.ts";
 

@@ -12,6 +12,7 @@ export type A_ = typeof A_;
 
 export class EffectState {
   id = 0;
+  remainingVisits = new Map<string, number>();
   cache = new Map<unknown, number>();
 
   nextId = () => {
@@ -36,12 +37,14 @@ export abstract class Effect<
 > {
   static state = new EffectState();
 
+  abstract signature: string;
+
   declare [R_]: R;
   declare [E_]: E;
   declare [A_]: A;
-
-  abstract signature(): string;
 }
+
+export type AnyEffect = Effect<any, Error, any>;
 
 export abstract class HOEffect<Root extends AnyEffectLike = AnyEffectLike> {
   abstract root: Root;
@@ -63,3 +66,10 @@ export type UnwrapA<T> = T extends AnyEffectLike<infer A> ? A : T;
 
 export type WrapAll<T> = { [K in keyof T]: MaybeEffectLike<T[K]> };
 export type UnwrapAll<T> = { [K in keyof T]: UnwrapA<T[K]> };
+
+export const unwrapHOEffect = (e: AnyEffectLike): AnyEffect => {
+  if (e instanceof HOEffect) {
+    return unwrapHOEffect(e.root);
+  }
+  return e;
+};

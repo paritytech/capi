@@ -1,5 +1,4 @@
 import * as Z from "/effect/Effect.ts";
-import { NonIdempotent } from "/effect/intrinsic/NonIdempotent.ts";
 import { AnyStep, Step } from "/effect/intrinsic/Step.ts";
 
 export interface Runtime<CommonR> {
@@ -14,6 +13,7 @@ export interface Runtime<CommonR> {
 
 export function runtime<CommonR>(sharedEnv: CommonR = ({} as any)): Runtime<CommonR> {
   const cache = new Map<string, Promise<unknown>>();
+  const cleanup: (() => Promise<void>)[] = [];
 
   return (async (root, env) => {
     const finalEnv = {
@@ -29,39 +29,37 @@ export function runtime<CommonR>(sharedEnv: CommonR = ({} as any)): Runtime<Comm
       if (result instanceof Error) {
         throw result;
       }
+      const nodeCleanup = node.cleanup;
+      if (nodeCleanup) {
+        // Horrible... clean this up with effect system refactor
+        cleanup.push(async () => nodeCleanup(...await argsPending)(finalEnv)(result));
+      }
       return result;
     };
 
-    const visit = (
-      node: unknown,
-      isIdempotent = true,
-    ): Promise<unknown> => {
+    const visit = (node: unknown): Promise<unknown> => {
       if (node instanceof Z.HOEffect) {
-        return visit(node.root, isIdempotent);
+        return visit(node.root);
       } else if (node instanceof Step) {
         // TODO: why is `args` not inferred as `unknown[]`?
         const argsPending = Promise.all((node as AnyStep).args.map((arg) => {
-          return visit(arg, isIdempotent);
+          return visit(arg);
         }));
-        if (isIdempotent) {
-          const key = node.signature();
-          const prev = cache.get(key);
-          if (prev) {
-            return prev;
-          }
-          const pending = visitStep(node, argsPending);
-          cache.set(key, pending);
-          return pending;
+        const prev = cache.get(node.signature);
+        if (prev) {
+          return prev;
         }
-        return visitStep(node, argsPending);
-      } else if (node instanceof NonIdempotent) {
-        return visit(node.root, false);
+        const pending = visitStep(node, argsPending);
+        cache.set(node.signature, pending);
+        return pending;
       }
       return Promise.resolve(node);
     };
 
     try {
-      return await visit(root);
+      const result = await visit(root);
+      await Promise.all(cleanup.map((e) => e()));
+      return result;
     } catch (e) {
       return e;
     }

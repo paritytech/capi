@@ -1,3 +1,4 @@
+export * from "/effect/Effect.ts";
 export * from "/effect/intrinsic/Step.ts";
 export * from "/effect/Runtime.ts";
 export * from "/effect/std/account/AccountId32.ts";

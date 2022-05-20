@@ -15,13 +15,12 @@ export const rpcClient = <Beacon>(beacon: Beacon) => {
         return env.rpc(beacon);
       };
     },
+    () => {
+      return () => {
+        return (client) => {
+          return client.close();
+        };
+      };
+    },
   );
 };
-
-// () => {
-//   return () => {
-//     return (client) => {
-//       return client.close();
-//     };
-//   };
-// },

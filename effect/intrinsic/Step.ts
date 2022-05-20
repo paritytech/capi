@@ -7,6 +7,12 @@ export type Resolver<
   Result,
 > = (...args: Z.UnwrapAll<Args>) => (env: R) => Promise<Result>;
 
+export type Cleanup<
+  Args extends unknown[],
+  R,
+  Result,
+> = (...args: Z.UnwrapAll<Args>) => (env: R) => (result: Result) => Promise<void>;
+
 export class Step<
   Args extends unknown[],
   R,
@@ -16,16 +22,16 @@ export class Step<
   Z.UnwrapE<Args[number]> | Extract<Result, Error>,
   Exclude<Result, Error>
 > {
+  signature;
+
   constructor(
     readonly name: string,
     readonly args: Args,
     readonly resolve: Resolver<Args, R, Result>,
+    readonly cleanup?: Cleanup<Args, R, Result>,
   ) {
     super();
-  }
-
-  signature(): string {
-    return `${this.name}_${this.constructor.name}(${this.args.map(Z.Effect.state.idOf)})`;
+    this.signature = `${this.constructor.name}(${name}(${this.args.map(Z.Effect.state.idOf)}))`;
   }
 }
 
@@ -39,6 +45,7 @@ export const step = <
   name: string,
   args: [...Args],
   resolve: Resolver<Args, R, Result>,
+  cleanup?: Cleanup<Args, R, Result>,
 ): Step<Args, R, Result> => {
-  return new Step(name, args, resolve);
+  return new Step(name, args, resolve, cleanup);
 };
