@@ -11,8 +11,6 @@ path = "root.rs"
 [features]
 default = ["console_error_panic_hook"]
 crypto = []
-frame_metadata_fixtures = []
-scale_fixtures = []
 
 [dependencies]
 base58 = { version = "0.2.0" }

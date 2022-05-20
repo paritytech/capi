@@ -1,4 +1,4 @@
-import { runCmd } from "/_/util/runCmd.ts";
+import { runCmd } from "/util/runCmd.ts";
 import * as path from "std/path/mod.ts";
 
 const OutDir = (feature: string) => {
@@ -27,8 +27,6 @@ const buildWasm = async (feature: string): Promise<void> => {
 };
 
 // TODO: zip & inline! Perform gzip(base64(gzip(wasm))) like @tomaka does in Smoldot.
-await buildWasm("scale_fixtures");
-await buildWasm("frame_metadata_fixtures");
 await buildWasm("crypto");
 const outWasmPath = path.join(OutDir("crypto"), "mod_bg.wasm");
 await runCmd(["wasm-opt", "-g", "-Oz", outWasmPath, "-o", outWasmPath]);

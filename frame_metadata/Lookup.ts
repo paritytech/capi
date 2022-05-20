@@ -32,12 +32,12 @@ export class Lookup {
     return pallet;
   };
 
-  getStorageEntryByNameAndPalletName = (
-    palletName: string,
+  getStorageEntryByPalletAndName = (
+    pallet: m.Pallet,
     storageEntryName: string,
   ): m.StorageEntry => {
     this.ensureIndexed();
-    const palletStorageEntries = this.storageEntryByNameByPalletName[palletName];
+    const palletStorageEntries = this.storageEntryByNameByPalletName[pallet.name];
     if (!palletStorageEntries) {
       throw new PalletDne();
     }
@@ -46,6 +46,14 @@ export class Lookup {
       throw new StorageEntryDne();
     }
     return storageEntry;
+  };
+
+  getStorageEntryByPalletNameAndName = (
+    palletName: string,
+    storageEntryName: string,
+  ): m.StorageEntry => {
+    const pallet = this.getPalletByName(palletName);
+    return this.getStorageEntryByPalletAndName(pallet, storageEntryName);
   };
 }
 

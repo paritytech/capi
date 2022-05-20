@@ -1,4 +1,4 @@
-import { identity } from "/_/util/fn.ts";
+import { identity } from "/util/fn.ts";
 
 export const visitFixtures = (
   fixture: () => Map<Uint8Array, string>,
@@ -11,3 +11,5 @@ export const visitFixtures = (
     count += 1;
   }
 };
+
+export const assertTyTrue = <_T extends true>() => {};

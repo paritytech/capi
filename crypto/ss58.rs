@@ -13,9 +13,9 @@ pub fn base58Encode(data: &[u8]) -> Uint8Array {
 }
 
 #[wasm_bindgen] // TODO: with prefix
-pub fn decodeSs58(addr: &str) -> Uint8Array {
+pub fn decodeSs58Text(addr: &str) -> Uint8Array {
   console_error_panic_hook::set_once();
-  let address_bytes = addr.from_base58().expect("TODO");
+  let address_bytes = addr.from_base58().unwrap();
   let len = address_bytes.len();
   if len == 35 {
     let hex_public_key = &address_bytes[1..33];

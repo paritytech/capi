@@ -4,6 +4,8 @@ Capi (Chain API) is a TypeScript toolkit for crafting interactions with Substrat
 
 ⚠️ Capi is a work in progress. Many of its core features (such as the sending of extrinsics) are yet to be implemented. It is fraught with edge cases and `TODO` comments. [Here is a partial todo list](./_/assets/todo.md). If interested in working on Capi, please reach out to `@harrysolovay:matrix.parity.io`.
 
+⚠️ This readme may fall out of date during development.
+
 ## Overview
 
 At a birds-eye view, **there are two distinct versions of the Capi developer experience**:
