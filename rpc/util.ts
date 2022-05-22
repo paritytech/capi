@@ -36,12 +36,7 @@ export const call = async <Method extends m.Name>(
     jsonrpc: "2.0",
     id: client.uid(),
     method: method as any,
-    params: params.map((param) => {
-      if (param instanceof u.Branded) {
-        return param.raw;
-      }
-      return param;
-    }),
+    params,
   };
   const isCorrespondingRes = IsCorrespondingRes(init);
   const pending = a.deferred<m.OkResByName[Method]>();

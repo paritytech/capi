@@ -9,10 +9,5 @@
     }
   ],
   "dictionaries": ["project-words"],
-  "ignorePaths": [
-    "_/assets/lorem_ipsum.txt",
-    "Cargo.lock",
-    "deno.lock",
-    "target"
-  ]
+  "ignorePaths": ["Cargo.lock", "deno.lock", "target"]
 }

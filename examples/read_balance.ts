@@ -1,4 +1,4 @@
-import { POLKADOT_RPC_URL } from "/_/constants/chains/url.ts";
+import { POLKADOT_RPC_URL } from "/constants/chains/url.ts";
 import * as C from "/effect/mod.ts";
 
 import { hashers } from "/env/mod.ts";

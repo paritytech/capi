@@ -8,7 +8,6 @@ export class DeriveCodecError extends Error {}
 export const deriveCodec = <Metadata extends MaybeEffectLike<m.Metadata>>(metadata: Metadata) => {
   return step("DeriveCodec", [metadata], (metadata) => {
     return async () => {
-      console.log(metadata.types[16]);
       return m.DeriveCodec(metadata);
     };
   });
