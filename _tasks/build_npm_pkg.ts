@@ -36,13 +36,6 @@ await Promise.all([
     test: false,
     typeCheck: false,
   }),
-
-  (async (): Promise<void> => {
-    const [leading, trailing] = new TextDecoder().decode(await Deno.readFile("LICENSE"))
-      .split("[yyyy] [name of copyright owner]") as [string, string];
-    const licenseTxt = `${leading}${new Date().getFullYear()} Parity Technologies${trailing}`;
-    await Deno.writeFile(path.join(outDir, "LICENSE"), new TextEncoder().encode(licenseTxt));
-  })(),
+  fs.copy("LICENSE", path.join(outDir, "LICENSE")),
 ]);
-
-await fs.copy("target/wasm/crypto", "target/npm/crypto");
+await fs.copy("target/wasm/crypto", path.join(outDir, "crypto"));
