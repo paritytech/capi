@@ -1,5 +1,5 @@
 import { hexToU8a } from "/util/mod.ts";
-import * as s from "x/scale/mod.ts";
+import * as $ from "x/scale/mod.ts";
 import { ValidateCodecSignature } from "./test-util.ts";
 
 export interface Field {
@@ -8,11 +8,11 @@ export interface Field {
   typeName: string | undefined;
   docs: string[];
 }
-export const field = s.record(
-  ["name", s.option(s.str)],
-  ["type", s.nCompact],
-  ["typeName", s.option(s.str)],
-  ["docs", s.array(s.str)],
+export const field = $.object(
+  ["name", $.option($.str)],
+  ["type", $.nCompact],
+  ["typeName", $.option($.str)],
+  ["docs", $.array($.str)],
 );
 type _FieldValidity = ValidateCodecSignature<Field, typeof field, true>;
 
@@ -33,7 +33,7 @@ export enum PrimitiveKind {
   I128 = "i128",
   I256 = "i256",
 }
-const primitiveKind = s.keyLiteralUnion(
+const primitiveKind = $.keyLiteralUnion(
   PrimitiveKind.Bool,
   PrimitiveKind.Char,
   PrimitiveKind.Str,
@@ -111,36 +111,36 @@ export type TypeDef =
   | PrimitiveTypeDef
   | CompactTypeDef
   | BitSequenceTypeDef;
-export const typeDef = s.taggedUnion(
+export const typeDef = $.taggedUnion(
   "_tag",
   [
     TypeKind.Struct,
-    ["fields", s.array(field)],
+    ["fields", $.array(field)],
   ],
   [
     TypeKind.Union,
     [
       "members",
-      s.array(s.record(
-        ["name", s.str],
-        ["fields", s.array(field)],
-        ["i", s.u8],
-        ["docs", s.array(s.str)],
+      $.array($.object(
+        ["name", $.str],
+        ["fields", $.array(field)],
+        ["i", $.u8],
+        ["docs", $.array($.str)],
       )),
     ],
   ],
   [
     TypeKind.Sequence,
-    ["typeParam", s.nCompact],
+    ["typeParam", $.nCompact],
   ],
   [
     TypeKind.SizedArray,
-    ["len", s.u32],
-    ["typeParam", s.nCompact],
+    ["len", $.u32],
+    ["typeParam", $.nCompact],
   ],
   [
     TypeKind.Tuple,
-    ["fields", s.array(s.nCompact)],
+    ["fields", $.array($.nCompact)],
   ],
   [
     TypeKind.Primitive,
@@ -148,12 +148,12 @@ export const typeDef = s.taggedUnion(
   ],
   [
     TypeKind.Compact,
-    ["typeParam", s.nCompact],
+    ["typeParam", $.nCompact],
   ],
   [
     TypeKind.BitSequence,
-    ["bitOrderType", s.nCompact],
-    ["bitStoreType", s.nCompact],
+    ["bitOrderType", $.nCompact],
+    ["bitStoreType", $.nCompact],
   ],
 );
 type _TypeDefValidity = ValidateCodecSignature<TypeDef, typeof typeDef, true>;
@@ -162,9 +162,9 @@ export interface Param {
   name: string;
   type: number | undefined;
 }
-export const param = s.record(
-  ["name", s.str],
-  ["type", s.option(s.nCompact)],
+export const param = $.object(
+  ["name", $.str],
+  ["type", $.option($.nCompact)],
 );
 type _ParamValidity = ValidateCodecSignature<Param, typeof param, true>;
 
@@ -174,19 +174,23 @@ export type Type = {
   params: Param[];
   docs: string[];
 } & TypeDef;
-export const type_ = new s.Codec(undefined as any, undefined as any, (cursor) => {
-  const i = s.nCompact._d(cursor);
-  const path = s.array(s.str)._d(cursor);
-  const params = s.array(param)._d(cursor);
-  const def = typeDef._d(cursor);
-  const docs = s.array(s.str)._d(cursor);
-  return {
-    i,
-    path,
-    params,
-    ...def,
-    docs,
-  };
+export const type_ = $.createCodec({
+  _staticSize: 0,
+  _encode: undefined!,
+  _decode(buffer) {
+    const i = $.nCompact._decode(buffer);
+    const path = $.array($.str)._decode(buffer);
+    const params = $.array(param)._decode(buffer);
+    const def = typeDef._decode(buffer);
+    const docs = $.array($.str)._decode(buffer);
+    return {
+      i,
+      path,
+      params,
+      ...def,
+      docs,
+    };
+  },
 });
 type _TypeValidity = ValidateCodecSignature<Type, typeof type_, true>;
 
@@ -199,7 +203,7 @@ export enum HasherKind {
   Twox64Concat = "Twox64Concat",
   Identity = "Identity",
 }
-const hasherKind = s.keyLiteralUnion(
+const hasherKind = $.keyLiteralUnion(
   HasherKind.Blake2_128,
   HasherKind.Blake2_256,
   HasherKind.Blake2_128Concat,
@@ -214,7 +218,7 @@ export enum StorageEntryModifier {
   Optional,
   Default,
 }
-export const storageEntryModifier = s.orderedNumEnum(StorageEntryModifier);
+export const storageEntryModifier = $.u8 as $.Codec<StorageEntryModifier>;
 type _StorageEntryModifierValidity = ValidateCodecSignature<StorageEntryModifier, typeof storageEntryModifier, true>;
 
 export enum StorageEntryTypeKind {
@@ -236,14 +240,14 @@ export interface MapStorageEntryType {
 
 export type StorageEntryType = PlainStorageEntryType | MapStorageEntryType;
 
-export const storageEntryType = s.taggedUnion(
+export const storageEntryType = $.taggedUnion(
   "_tag",
-  [StorageEntryTypeKind.Plain, ["value", s.nCompact]],
+  [StorageEntryTypeKind.Plain, ["value", $.nCompact]],
   [
     StorageEntryTypeKind.Map,
-    ["hashers", s.array(hasherKind)],
-    ["key", s.nCompact],
-    ["value", s.nCompact],
+    ["hashers", $.array(hasherKind)],
+    ["key", $.nCompact],
+    ["value", $.nCompact],
   ],
 );
 type _StorageEntryTypeValidity = ValidateCodecSignature<StorageEntryType, typeof storageEntryType, true>;
@@ -254,15 +258,15 @@ export type StorageEntry = {
   default: number[];
   docs: string[];
 } & StorageEntryType;
-export const storageEntry = new s.Codec(
-  undefined as any,
-  undefined as any,
-  (cursor) => {
-    const name = s.str._d(cursor);
-    const modifier = storageEntryModifier._d(cursor);
-    const type = storageEntryType._d(cursor);
-    const default_ = s.array(s.u8)._d(cursor);
-    const docs = s.array(s.str)._d(cursor);
+export const storageEntry = $.createCodec({
+  _staticSize: 0,
+  _encode: undefined!,
+  _decode(buffer) {
+    const name = $.str._decode(buffer);
+    const modifier = storageEntryModifier._decode(buffer);
+    const type = storageEntryType._decode(buffer);
+    const default_ = $.array($.u8)._decode(buffer);
+    const docs = $.array($.str)._decode(buffer);
     return {
       name,
       modifier,
@@ -271,16 +275,16 @@ export const storageEntry = new s.Codec(
       docs,
     };
   },
-);
+});
 type _StorageEntryValidity = ValidateCodecSignature<StorageEntry, typeof storageEntry, true>;
 
 export interface Storage {
   prefix: string;
   entries: StorageEntry[];
 }
-export const storage = s.record(
-  ["prefix", s.str],
-  ["entries", s.array(storageEntry)],
+export const storage = $.object(
+  ["prefix", $.str],
+  ["entries", $.array(storageEntry)],
 );
 type _StorageValidity = ValidateCodecSignature<Storage, typeof storage, true>;
 
@@ -290,16 +294,16 @@ export interface Constant {
   value: number[];
   docs: string[];
 }
-export const constant = s.record(
-  ["name", s.str],
-  ["type", s.nCompact],
-  ["value", s.array(s.u8)],
-  ["docs", s.array(s.str)],
+export const constant = $.object(
+  ["name", $.str],
+  ["type", $.nCompact],
+  ["value", $.array($.u8)],
+  ["docs", $.array($.str)],
 );
 type _ConstantValidity = ValidateCodecSignature<Constant, typeof constant, true>;
 
 type OptionalTypeBearer = undefined | { type: number };
-const optionalTypeBearer = s.option(s.record(["type", s.nCompact]));
+const optionalTypeBearer = $.option($.object(["type", $.nCompact]));
 type _OptionalTypeBearerValidity = ValidateCodecSignature<OptionalTypeBearer, typeof optionalTypeBearer, true>;
 
 export interface Pallet {
@@ -311,14 +315,14 @@ export interface Pallet {
   error: OptionalTypeBearer;
   i: number;
 }
-export const pallet = s.record(
-  ["name", s.str],
-  ["storage", s.option(storage)],
+export const pallet = $.object(
+  ["name", $.str],
+  ["storage", $.option(storage)],
   ["calls", optionalTypeBearer],
   ["event", optionalTypeBearer],
-  ["constants", s.array(constant)],
+  ["constants", $.array(constant)],
   ["error", optionalTypeBearer],
-  ["i", s.u8],
+  ["i", $.u8],
 );
 type _PalletValidity = ValidateCodecSignature<Pallet, typeof pallet, true>;
 
@@ -327,10 +331,10 @@ export interface SignedExtensionMetadata {
   type: number;
   additionalSigned: number | bigint;
 }
-export const signedExtensionMetadata = s.record(
-  ["ident", s.str],
-  ["type", s.nCompact],
-  ["additionalSigned", s.compact],
+export const signedExtensionMetadata = $.object(
+  ["ident", $.str],
+  ["type", $.nCompact],
+  ["additionalSigned", $.compact],
 );
 type _SignedExtensionMetadataValidity = ValidateCodecSignature<
   SignedExtensionMetadata,
@@ -343,10 +347,10 @@ export interface Extrinsic {
   version: number;
   signedExtensions: SignedExtensionMetadata[];
 }
-export const extrinsic = s.record(
-  ["type", s.nCompact],
-  ["version", s.u8],
-  ["signedExtensions", s.array(signedExtensionMetadata)],
+export const extrinsic = $.object(
+  ["type", $.nCompact],
+  ["version", $.u8],
+  ["signedExtensions", $.array(signedExtensionMetadata)],
 );
 type _ExtrinsicValidity = ValidateCodecSignature<Extrinsic, typeof extrinsic, true>;
 
@@ -356,10 +360,10 @@ export interface Metadata {
   pallets: Pallet[];
   extrinsic: Extrinsic;
 }
-export const metadata: s.Codec<Metadata> = s.record(
-  ["version", s.u8 as s.Codec<14>],
-  ["types", s.array(type_)],
-  ["pallets", s.array(pallet)],
+export const metadata: $.Codec<Metadata> = $.object(
+  ["version", $.u8 as $.Codec<14>],
+  ["types", $.array(type_)],
+  ["pallets", $.array(pallet)],
   ["extrinsic", extrinsic],
 );
 type _MetadataV14Validity = ValidateCodecSignature<Metadata, typeof metadata, true>;
