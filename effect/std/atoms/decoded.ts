@@ -1,13 +1,13 @@
 import { MaybeEffectLike } from "/effect/Effect.ts";
 import { step } from "/effect/intrinsic/Step.ts";
 import { hexToU8a } from "/util/hex.ts";
-import * as S from "x/scale/mod.ts";
+import type * as $ from "x/scale/mod.ts";
 
 // TODO: move into & get from `frame_metadata`
 export class DecodedError extends Error {}
 
 export const decoded = <
-  Codec extends MaybeEffectLike<S.Codec<unknown>>,
+  Codec extends MaybeEffectLike<$.Codec<unknown>>,
   Encoded extends MaybeEffectLike<string>,
 >(
   codec: Codec,

@@ -1,60 +1,60 @@
-import * as s from "x/scale/mod.ts";
+import * as $ from "x/scale/mod.ts";
 import * as m from "./Metadata.ts";
 import { TypeVisitors } from "./TypeVisitor.ts";
 
-export type DeriveCodec = (typeI: number) => s.Codec<unknown>;
+export type DeriveCodec = (typeI: number) => $.Codec<unknown>;
 
 const primitiveCodecByDiscriminant = {
-  [m.PrimitiveKind.Bool]: s.bool,
-  [m.PrimitiveKind.Char]: s.str,
-  [m.PrimitiveKind.Str]: s.str,
-  [m.PrimitiveKind.U8]: s.u8,
-  [m.PrimitiveKind.I8]: s.i8,
-  [m.PrimitiveKind.U16]: s.u16,
-  [m.PrimitiveKind.I16]: s.i16,
-  [m.PrimitiveKind.U32]: s.u32,
-  [m.PrimitiveKind.I32]: s.i32,
-  [m.PrimitiveKind.U64]: s.u64,
-  [m.PrimitiveKind.I64]: s.i64,
-  [m.PrimitiveKind.U128]: s.u128,
-  [m.PrimitiveKind.I128]: s.i128,
+  [m.PrimitiveKind.Bool]: $.bool,
+  [m.PrimitiveKind.Char]: $.str,
+  [m.PrimitiveKind.Str]: $.str,
+  [m.PrimitiveKind.U8]: $.u8,
+  [m.PrimitiveKind.I8]: $.i8,
+  [m.PrimitiveKind.U16]: $.u16,
+  [m.PrimitiveKind.I16]: $.i16,
+  [m.PrimitiveKind.U32]: $.u32,
+  [m.PrimitiveKind.I32]: $.i32,
+  [m.PrimitiveKind.U64]: $.u64,
+  [m.PrimitiveKind.I64]: $.i64,
+  [m.PrimitiveKind.U128]: $.u128,
+  [m.PrimitiveKind.I128]: $.i128,
 
   // TODO
-  [m.PrimitiveKind.U256]: undefined,
-  [m.PrimitiveKind.I256]: undefined,
+  [m.PrimitiveKind.U256]: $.u256,
+  [m.PrimitiveKind.I256]: $.i256,
 };
 
 export const DeriveCodec = (metadata: m.Metadata): DeriveCodec => {
-  const Fields = (...fields: m.Field[]): s.Field[] => {
+  const Fields = (...fields: m.Field[]): $.Field[] => {
     return fields.map((field, i) => {
       return [field.name === undefined ? i : field.name, visitors.visit(field.type)];
     });
   };
 
-  const visitors: TypeVisitors<{ [_ in m.TypeKind]: s.Codec }> = {
+  const visitors: TypeVisitors<{ [_ in m.TypeKind]: $.Codec<any> }> = {
     [m.TypeKind.Struct]: (ty) => {
-      return s.record(...Fields(...ty.fields)) as unknown as s.Codec;
+      return $.object(...Fields(...ty.fields)) as unknown as $.Codec<unknown>;
     },
     [m.TypeKind.Union]: (ty) => {
       if (ty.path[0] === "Option") {
-        return s.option(visitors.visit(ty.params[0]?.type!));
+        return $.option(visitors.visit(ty.params[0]?.type!));
       }
-      return s.dummy(undefined);
+      return $.dummy(undefined);
     },
     [m.TypeKind.Sequence]: (ty) => {
-      return s.array(visitors.visit(ty.typeParam));
+      return $.array(visitors.visit(ty.typeParam));
     },
     [m.TypeKind.SizedArray]: (ty) => {
-      return s.sizedArray(visitors.visit(ty.typeParam), ty.len);
+      return $.sizedArray(visitors.visit(ty.typeParam), ty.len);
     },
     [m.TypeKind.Tuple]: (ty) => {
-      return s.tuple(...ty.fields.map(visitors.visit));
+      return $.tuple(...ty.fields.map(visitors.visit));
     },
     [m.TypeKind.Primitive]: (ty) => {
       return primitiveCodecByDiscriminant[ty.kind]!;
     },
     [m.TypeKind.Compact]: () => {
-      return s.compact;
+      return $.compact;
     },
     [m.TypeKind.BitSequence]: () => {
       throw new Error();

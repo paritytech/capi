@@ -4,7 +4,7 @@ import { call, wsRpcClient } from "/rpc/mod.ts";
 import * as hex from "std/encoding/hex.ts";
 import * as path from "std/path/mod.ts";
 import { IsExact } from "x/conditional_type_checks/mod.ts";
-import * as s from "x/scale/mod.ts";
+import * as $ from "x/scale/mod.ts";
 import { DeriveCodec } from "./Codec.ts";
 import { encodeKey } from "./Key.ts";
 import { Lookup } from "./Lookup.ts";
@@ -13,8 +13,8 @@ import * as m from "./Metadata.ts";
 export type AssertTrue<_InQuestion extends true> = never;
 export type ValidateCodecSignature<
   T,
-  C extends s.Codec,
-  _IsValid extends IsExact<T, s.Native<C>>,
+  C extends $.Codec<any>,
+  _IsValid extends IsExact<T, $.Native<C>>,
 > = never;
 
 export interface ChainInfo {
