@@ -9,7 +9,7 @@ await fs.emptyDir(outDir);
 await Promise.all([
   build({
     importMap: "import_map.json",
-    entryPoints: ["mod.ts"],
+    entryPoints: ["./mod.ts", "./crypto/mod.ts"],
     outDir,
     mappings: {
       "https://deno.land/x/scale@v0.1.1/mod.ts": {
@@ -38,4 +38,3 @@ await Promise.all([
   }),
   fs.copy("LICENSE", path.join(outDir, "LICENSE")),
 ]);
-await fs.copy("target/wasm/crypto", path.join(outDir, "crypto"));
