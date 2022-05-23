@@ -1,6 +1,6 @@
 import { MaybeEffectLike } from "/effect/Effect.ts";
 import { step } from "/effect/intrinsic/Step.ts";
-import { HasherRuntime } from "/env/mod.ts";
+import { HashersR } from "/env/mod.ts";
 import * as m from "/frame_metadata/mod.ts";
 
 export const entryKey = <
@@ -21,7 +21,7 @@ export const entryKey = <
     "EntryKey",
     [deriveCodec, palletMetadata, entryMetadata, ...keys],
     (deriveCodec, palletMetadata, entryMetadata, ...keys) => {
-      return async (env: HasherRuntime) => {
+      return async (env: HashersR) => {
         return m.encodeKey(deriveCodec, env.hashers, palletMetadata, entryMetadata, ...keys);
       };
     },

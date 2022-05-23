@@ -6,11 +6,16 @@ export type ListenerCb<IngressMessage_ extends IngressMessage = IngressMessage> 
 
 export type StopListening = () => void;
 
-export interface RpcClient {
-  uid: () => string;
-  send: (egressMessage: Init) => void;
-  listen: (listenerCb: ListenerCb) => StopListening;
-  close: () => Promise<void>;
+export abstract class RpcClient {
+  #nextId = 0;
+
+  uid = (): string => {
+    return (this.#nextId++).toString();
+  };
+
+  abstract send: (egressMessage: Init) => void;
+  abstract listen: (listenerCb: ListenerCb) => StopListening;
+  abstract close: () => Promise<void>;
 }
 
 export type RpcClientFactory<Beacon> = (beacon: Beacon) => Promise<RpcClient>;

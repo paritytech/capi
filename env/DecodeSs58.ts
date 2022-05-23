@@ -1,5 +1,3 @@
-export interface DecodeSs58Runtime {
-  decodeSs58: (ss58Text: string) => Uint8Array;
+export interface DecodeSs58R {
+  decodeSs58Text: (ss58Text: string) => Uint8Array;
 }
-
-export class DecodeSs58RuntimeError extends Error {}

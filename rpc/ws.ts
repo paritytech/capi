@@ -2,12 +2,12 @@ import * as a from "std/async/mod.ts";
 import { ListenerCb, RpcClient, RpcClientFactory, StopListening } from "./Base.ts";
 import { Init } from "./messages.ts";
 
-export class WsRpcClient implements RpcClient {
+export class WsRpcClient extends RpcClient {
   #ws;
-  #nextId = 0;
   #listeners = new Map<ListenerCb, boolean>();
 
   constructor(readonly url: string) {
+    super();
     this.#ws = new WebSocket(url);
     this.#ws.addEventListener("error", this.#onError);
     this.#ws.addEventListener("message", this.#onMessage);
@@ -46,10 +46,6 @@ export class WsRpcClient implements RpcClient {
     this.#ws.addEventListener("close", onClose);
     this.#ws.close();
     return pending;
-  };
-
-  uid = (): string => {
-    return (this.#nextId++).toString();
   };
 
   listen = (listener: ListenerCb): StopListening => {

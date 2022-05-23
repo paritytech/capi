@@ -1,7 +1,7 @@
 import { HOEffect } from "/effect/Effect.ts";
 import { step } from "/effect/intrinsic/Step.ts";
 import { Ss58 } from "/effect/std/account/Ss58.ts";
-import * as crypto from "/target/wasm/crypto/mod.js";
+import { DecodeSs58R } from "/env/mod.ts";
 import * as hex from "std/encoding/hex.ts";
 
 export abstract class PubKey<Init = any> extends HOEffect {
@@ -16,9 +16,9 @@ export class PubKeyFromSs58<Init extends Ss58> extends PubKey<Init> {
   constructor(init: Init) {
     super(init);
     this.root = step("PubKeyFromSs58", [init], (init) => {
-      return async () => {
+      return async (env: DecodeSs58R) => {
         // TODO: decode byte representation instead
-        return hex.decode(crypto.decodeSs58Text(init));
+        return hex.decode(env.decodeSs58Text(init));
       };
     });
   }
