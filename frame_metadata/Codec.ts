@@ -20,8 +20,8 @@ const primitiveCodecByDiscriminant = {
   [m.PrimitiveKind.I128]: $.i128,
 
   // TODO
-  [m.PrimitiveKind.U256]: undefined,
-  [m.PrimitiveKind.I256]: undefined,
+  [m.PrimitiveKind.U256]: $.u256,
+  [m.PrimitiveKind.I256]: $.i256,
 };
 
 export const DeriveCodec = (metadata: m.Metadata): DeriveCodec => {
