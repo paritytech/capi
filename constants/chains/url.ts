@@ -4,6 +4,7 @@ export const STATEMINT_RPC_URL = "wss://statemint-rpc.polkadot.io";
 export const MOONBEAM_RPC_URL = "wss://wss.api.moonbeam.network";
 export const ACALA_RPC_URL = "wss://acala-polkadot.api.onfinality.io/public-ws";
 export const SUBSOCIAL_RPC_URL = "wss://para.subsocial.network";
+export const WESTEND_RPC_URL = "wss://westend-rpc.polkadot.io";
 
 export const CHAIN_URL_LOOKUP = [
   ["polkadot", POLKADOT_RPC_URL],

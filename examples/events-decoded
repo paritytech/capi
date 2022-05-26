@@ -1,0 +1,98 @@
+[
+  {
+    phase: {
+      ApplyExtrinsic: 0
+    }
+    event: {
+      method: ExtrinsicSuccess
+      section: system
+      index: 0x0000
+      data: [
+        {
+          weight: 155,169,000
+          class: Mandatory
+          paysFee: Yes
+        }
+      ]
+    }
+    topics: []
+  }
+  {
+    phase: {
+      ApplyExtrinsic: 1
+    }
+    event: {
+      method: CandidateIncluded
+      section: paraInclusion
+      index: 0x2c01
+      data: [
+        {
+          descriptor: {
+            paraId: 1,000
+            relayParent: 0x5ea1926896d83e16dbe6007970c68473cd3854f6b26c6a385369e06b45688789
+            collator: 0x6a1037ef54e70bb513cb7f56650da35efeae1cbd897725dd6dae747b144afa3c
+            persistedValidationDataHash: 0xe8f8b836f2ab6af5805934127d4cc96db931e52c908492eeb0d0f4b2b2e51ed8
+            povHash: 0xf8b0f34e18529a81848aa3f18bebe50c1dcc215c7d7c8ad2e6f29a14c9c605f5
+            erasureRoot: 0x4845e3c470be0ec52de5855301a66756b60563e9c94990db62e4e9b400863d22
+            signature: 0x4c22169c205bf8c5efaa08326679266b2ea4f7238310cb1fa473582e8cff1b62c8c2d021f275dae209bd0098116aa2767658d2e91fe85b1114af73c0c4b0f18c
+            paraHead: 0xdee41198ece85a11eca24cd7e2b0e7f5185e004bdfbf354756d86befc6f1a5e1
+            validationCodeHash: 0x02de3be28dcefc0da15a6000873be8c57ec0fe0c6572a2e2cfc6f558e062e9b9
+          }
+          commitmentsHash: 0x98b5e1785b12c3073d4d7784870be62f83708746afacc62354f2ea753c38ef4d
+        }
+        0x54cb86aec926d13df608402cfb1735a14d442f5a2c587b1d6ff1722f4e2cdffdba2987009d3f1d7afa5dd68af7b48f5affc04448ce9e8b69dccef2cb3a4e8e9f2de73614e8147f0d64f5f1ce05fb562b6a7c6c97f14b6cbc7620dc50604242849ceb022608066175726120667e360800000000056175726101018c998dc7dcfc5dbb71d3dd8c75ad3d14f2fb0d548f85cff539bcc20dd738564c265fd1dd73e103899868d0b91f9fc565f60bb6a289d123687dafb50541189f81
+        0
+        1
+      ]
+    }
+    topics: []
+  }
+  {
+    phase: {
+      ApplyExtrinsic: 1
+    }
+    event: {
+      method: CandidateBacked
+      section: paraInclusion
+      index: 0x2c00
+      data: [
+        {
+          descriptor: {
+            paraId: 2,000
+            relayParent: 0x22958f7659d8a8d7373ca3a90222be54881391f636c165f5ab544f5cd7504555
+            collator: 0xcee65d0b62d33727decb4d6936f5d236cd58d689fdfce9fd92fb42a85ba25432
+            persistedValidationDataHash: 0x8b0116041fbbe52bdcf880ada9fda16b43841dde6e9998dfddcf8a6da20c0cc6
+            povHash: 0x9ab4385a34f580896b0668eb99919270b67a7c3095c15d09f977558eae0cbf59
+            erasureRoot: 0x79450e8bb380bc4466ff98a53cd12483a80893fdabb47ed8552f8c5b2a8fa40c
+            signature: 0xb26b1b091dc58dea978e0cf1a19e63ee9d8978fc8fc86afe52d9634a447edf57c9b748bedb6bee63e3bd19e2450ae2bea360dbd75672edb247e2c2a59f99c987
+            paraHead: 0xc2f9cacaa901feee5afb67a0640658df899df6982095ed575d92cf4c0392da00
+            validationCodeHash: 0xe8fa9290ef2bf346fc36d0f5cb2661d704ca7ba6479cd250e2e5de3236be887a
+          }
+          commitmentsHash: 0xff78e1268a2819a1c08c3350ae4c2a3c6f35ddb2d5d694d1831bdf8dfdee97c5
+        }
+        0x9a8dfad7fc27fe40b82798d2b1172b49d1d7cd7dc674140feda1377e1415428c86bb2a00cfe7bb7b08d4e1a422d9d8c336973a9cce8f1daac26cdb5136c54223d457d9f580a0650502b6e96933f6c54307fe7b56ea8a6536ab9944385607682554aa99ea08066175726120677e36080000000005617572610101c0deeaa7cd8642f4c61b5ca1850bc95b6770d51524c1bbdd7a474713a099c71715d2e346fd5507ab8ce397a33bb74e62b84d62590fe47e95285fd39e20c7c88b
+        2
+        0
+      ]
+    }
+    topics: []
+  }
+  {
+    phase: {
+      ApplyExtrinsic: 1
+    }
+    event: {
+      method: ExtrinsicSuccess
+      section: system
+      index: 0x0000
+      data: [
+        {
+          weight: 47,515,205,000
+          class: Mandatory
+          paysFee: Yes
+        }
+      ]
+    }
+    topics: []
+  }
+]

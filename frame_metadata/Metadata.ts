@@ -67,14 +67,15 @@ export interface StructTypeDef {
   _tag: TypeKind.Struct;
   fields: Field[];
 }
+export interface UnionTypeDefMember {
+  name: string;
+  fields: Field[];
+  i: number;
+  docs: string[];
+}
 export interface UnionTypeDef {
   _tag: TypeKind.Union;
-  members: {
-    name: string;
-    fields: Field[];
-    i: number;
-    docs: string[];
-  }[];
+  members: UnionTypeDefMember[];
 }
 export interface SequenceTypeDef {
   _tag: TypeKind.Sequence;

@@ -35,6 +35,8 @@
     "example:metadata": "deno run -A --no-check examples/metadata.ts",
     "example:read_balance": "deno run -A --no-check=remote examples/read_balance.ts",
     "example:playground": "deno run -A --no-check examples/playground.ts",
+    "example:transfer": "deno run -A --no-check examples/transfer.ts",
+    "example:events": "deno run -A --no-check examples/read_events.ts",
     "test": "deno test -A --no-check=remote -L=info",
     "update_snapshots": "deno test -A --no-check=remote -L=info -- --update"
   }
