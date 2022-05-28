@@ -1,14 +1,10 @@
-import { MaybeEffectLike } from "/effect/Effect.ts";
-import { step } from "/effect/intrinsic/Step.ts";
+import { effector } from "/effect/Effect.ts";
 import * as m from "/frame_metadata/mod.ts";
 
 // TODO: move into & get from `frame_metadata`
 export class DeriveCodecError extends Error {}
 
-export const deriveCodec = <Metadata extends MaybeEffectLike<m.Metadata>>(metadata: Metadata) => {
-  return step("DeriveCodec", [metadata], (metadata) => {
-    return async () => {
-      return m.DeriveCodec(metadata);
-    };
+export const deriveCodec = effector.sync("deriveCodec", () =>
+  (metadata: m.Metadata) => {
+    return m.DeriveCodec(metadata);
   });
-};

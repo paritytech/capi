@@ -1,20 +1,8 @@
-import { MaybeEffectLike } from "/effect/Effect.ts";
-import { step } from "/effect/intrinsic/Step.ts";
+import { effector, EffectorArgs } from "/effect/Effect.ts";
 
-export const wrap = <
-  T,
-  K extends MaybeEffectLike<PropertyKey>,
->(
-  target: T,
-  key: K,
-) => {
-  return step(
-    "Wrap",
-    [target, key],
-    (target, key) => {
-      return async () => {
-        return { [key]: target };
-      };
-    },
-  );
-};
+export const wrap = effector.sync.generic(
+  "wrap",
+  (effect) =>
+    <T, K extends PropertyKey, X extends unknown[]>(...args: EffectorArgs<X, [target: T, key: K]>) =>
+      effect(args, () => (target, key) => ({ [key]: target })),
+);
