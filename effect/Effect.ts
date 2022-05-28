@@ -21,6 +21,10 @@ export abstract class _EffectBase<K extends EffectKind, T, E extends Error> {
   declare [_E]: E;
 
   private constructor(readonly _node: _Node) {}
+
+  pipe<T>(fn: (effect: this) => T) {
+    return fn(this);
+  }
 }
 
 export class SyncEffect<T, E extends Error> extends // @ts-ignore private constructor
@@ -236,14 +240,14 @@ export function effector<K extends EffectKind, T, E extends Error, A extends unk
   _name: string,
   fn: (...args: EffectorItemCollection<A>) => InferEffectOfKind<K, T, E>,
 ) {
-  return fn as any as <X extends unknown[]>(...args: EffectArgs<X, A>) => _EffectorEffect<K, T, E, X>;
+  return fn as any as <X extends unknown[]>(...args: EffectorArgs<X, A>) => _EffectorEffect<K, T, E, X>;
 }
 
 effector.generic = <F>(
   _name: string,
   fn: (
     effect: <K extends EffectKind, T, E extends Error, X extends unknown[], A extends unknown[]>(
-      args: EffectArgs<X, A>,
+      args: EffectorArgs<X, A>,
       resolve: (
         ...args: EffectorItemCollection<A>
       ) => InferEffectOfKind<K, T, E>,
@@ -271,8 +275,8 @@ type EffectUpTo<K extends EffectKind, T, E extends Error> = [K] extends [never] 
   SyncEffect<T, E> | AsyncEffect<T, E> | T,
 ][K];
 
-export type EffectArgs<X extends unknown[], A extends unknown[]> = never extends X
-  ? { [K in keyof A]: EffectUpTo<_K<X[number]>, A[K], _E<X[number]>> }
+export type EffectorArgs<X extends unknown[], A extends unknown[]> = never extends X
+  ? { [K in keyof A]: EffectUpTo<{ [K in keyof X]: _K<X[K]> }[keyof X], A[K], { [K in keyof X]: _E<X[K]> }[keyof X]> }
   : X | { [K in keyof A]: A[K] | Effect<A[K], any> };
 
 function _effectorAtomicFn<K extends EffectKind>(baseKind: K) {
@@ -282,7 +286,7 @@ function _effectorAtomicFn<K extends EffectKind>(baseKind: K) {
   ) {
     return {
       [name]: function<X extends unknown[]>(
-        ...args: EffectArgs<X, A>
+        ...args: EffectorArgs<X, A>
       ): _EffectorEffect<K, Exclude<R, Error>, Extract<R, Error>, X> {
         return _effectorAtomic(baseKind, name, args, resolve);
       },
@@ -293,7 +297,7 @@ function _effectorAtomicFn<K extends EffectKind>(baseKind: K) {
     name: string,
     fn: (
       effect: <R, X extends unknown[], A extends unknown[]>(
-        args: EffectArgs<X, A>,
+        args: EffectorArgs<X, A>,
         resolve: () => (...args: A) => EffectKindReturn<K, R>,
       ) => _EffectorEffect<K, Exclude<R, Error>, Extract<R, Error>, X>,
     ) => F,
