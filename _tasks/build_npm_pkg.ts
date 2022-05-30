@@ -38,3 +38,40 @@ await Promise.all([
   }),
   fs.copy("LICENSE", path.join(outDir, "LICENSE")),
 ]);
+
+const importMap: Record<string, string> = JSON.parse(Deno.readTextFileSync("./import_map.json")).imports;
+delete importMap["./"];
+delete importMap["/"];
+
+function resolve(from: string, to: string) {
+  if (to.startsWith("/")) {
+    return "./" + path.relative(path.dirname("/" + from), to);
+  }
+  for (const frag in importMap) {
+    if (to.startsWith(frag)) {
+      return importMap[frag] + to.slice(frag.length);
+    }
+  }
+  return to;
+}
+
+const importRegex = /(from\s*|import\s*)(["'])(.+?)\2/g;
+
+function fixImports(from: string, file: string) {
+  return file.replace(importRegex, (_, lead, quote, path) => {
+    const newPath = resolve(from, path);
+    console.log(from, path, newPath);
+    return lead + quote + newPath + quote;
+  });
+}
+
+for await (
+  const { path: file } of fs.walk(".", {
+    match: [/^(?!.*\/(target|\.git|_tasks)\/).*\.[tj]s$/],
+    includeDirs: false,
+  })
+) {
+  const out = path.join(outDir, "deno", file);
+  Deno.mkdirSync(path.dirname(out), { recursive: true });
+  Deno.writeTextFileSync(out, fixImports(file, Deno.readTextFileSync(file)));
+}

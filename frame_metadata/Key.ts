@@ -33,6 +33,9 @@ export const encodeKey = (
   }
   const keyTypeCodec = deriveCodec(storageEntry.key);
   const keyBytes = new Uint8Array((keys as unknown[]).reduce<number[]>((acc, key, i) => {
+    if (key === undefined) {
+      return acc;
+    }
     const encoded = keyTypeCodec.encode(key);
     const hasherKind = storageEntry.hashers[i];
     if (!hasherKind) {
