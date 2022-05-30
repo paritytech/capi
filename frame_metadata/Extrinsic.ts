@@ -86,3 +86,15 @@ export function $SignatureToEncode(
     $extraCodec,
   );
 }
+
+export function encodeExtrinsic(
+  extrinsicVersion: number,
+  callData: Uint8Array,
+  signature?: Uint8Array,
+) {
+  const bytes = [
+    ...signature ? [extrinsicVersion | 128, ...signature] : [127],
+    ...callData,
+  ];
+  return new Uint8Array([...$.compact.encode(bytes.length), ...bytes]);
+}

@@ -3,6 +3,7 @@
 import * as M from "/frame_metadata/mod.ts";
 import * as C from "/mod.ts";
 import * as bindings from "/target/wasm/bindings/mod.js";
+import * as U from "/util/mod.ts";
 import "std/dotenv/load.ts";
 import * as hex from "std/encoding/hex.ts";
 import * as $ from "x/scale/mod.ts";
@@ -76,5 +77,9 @@ const signature = {
 };
 const $signatureToEncode = M.$SignatureToEncode($signature, $extra);
 const signatureToEncode = $signatureToEncode.encode([[...pair.pubKey] as any, signature, extra]);
+const final = new TextDecoder().decode(
+  hex.encode(M.encodeExtrinsic(metadata.extrinsic.version, callEncoded, signatureToEncode)),
+);
+console.log(final);
 
 await client.close();
