@@ -1,4 +1,4 @@
-import * as crypto from "/crypto/mod.ts";
+import * as bindings from "/bindings/mod.ts";
 import { Raw } from "/primitives/MultiAddress.ts";
 import * as hex from "https://deno.land/std@0.136.0/encoding/hex.ts";
 import * as $ from "x/scale/mod.ts";
@@ -71,7 +71,7 @@ export function encodeAdditional(
 
 export function ensureMaxLen(bytes: Uint8Array): Uint8Array {
   if (bytes.length > 256) {
-    return crypto.hashersR.hashers.Blake2_256(bytes);
+    return bindings.hashersR.hashers.Blake2_256(bytes);
   }
   return bytes;
 }

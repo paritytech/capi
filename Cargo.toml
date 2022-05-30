@@ -10,7 +10,7 @@ path = "root.rs"
 
 [features]
 default = ["console_error_panic_hook"]
-crypto = []
+bindings = []
 
 [dependencies]
 base58 = { version = "0.2.0" }

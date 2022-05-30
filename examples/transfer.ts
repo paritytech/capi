@@ -1,6 +1,6 @@
 // import { WESTEND_RPC_URL } from "/constants/chains/url.ts";
 // import * as C from "/mod.ts";
-import * as crypto from "/crypto/mod.ts";
+import * as bindings from "/bindings/mod.ts";
 import * as M from "/frame_metadata/mod.ts";
 import * as C from "/mod.ts";
 import "std/dotenv/load.ts";
