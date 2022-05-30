@@ -33,14 +33,7 @@ export function encodeExtrinsic(p: EncodeExtrinsicProps): string {
   if (uncheckedExtrinsicMetadata?._tag !== M.TypeKind.Struct) {
     throw new Error();
   }
-  const lookup = uncheckedExtrinsicMetadata.params.reduce<
-    Record<"Address" | "Call" | "Signature" | "Extra", number>
-  >((acc, cur) => {
-    if (!cur.type) {
-      throw new Error();
-    }
-    return { [cur.name]: cur.type, ...acc };
-  }, {} as any);
+  const lookup = Object.fromEntries(uncheckedExtrinsicMetadata.params.map((x) => [x.name, x.type]));
   if (
     lookup.Address === undefined
     || lookup.Call === undefined
