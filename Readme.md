@@ -29,6 +29,8 @@ Make sure you have the following installed on your machine (and please submit is
 - [Deno](https://deno.land/manual@v1.19.3/getting_started/installation)
 - [Docker](https://docs.docker.com/get-docker/)
 - [NodeJS](https://nodejs.org/) (only necessary if you're going to run [the build_npm task](./_/tasks/build_npm.ts))
+- [Wasm Bindgen](https://rustwasm.github.io/wasm-bindgen/reference/cli.html)
+- [Binaryen](https://github.com/WebAssembly/binaryen)
 
 ### Bootstrapping
 
