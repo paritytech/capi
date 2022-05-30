@@ -276,8 +276,9 @@ type EffectUpTo<K extends EffectKind, T, E extends Error> = [K] extends [never] 
 ][K];
 
 export type EffectorArgs<X extends unknown[], A extends unknown[]> = never extends X
-  ? { [K in keyof A]: EffectUpTo<{ [K in keyof X]: _K<X[K]> }[keyof X], A[K], { [K in keyof X]: _E<X[K]> }[keyof X]> }
-  : X | { [K in keyof A]: A[K] | Effect<A[K], any> };
+  ? { [K in keyof A]: EffectUpTo<{ [K in keyof X]: _K<X[K]> }[number], A[K], { [K in keyof X]: _E<X[K]> }[number]> }
+  : X extends A ? X | { [K in keyof A]: A[K] | Effect<A[K], any> }
+  : never;
 
 function _effectorAtomicFn<K extends EffectKind>(baseKind: K) {
   function step<R, A extends unknown[]>(
