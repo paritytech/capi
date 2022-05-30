@@ -1,9 +1,9 @@
-import * as bindings from "/bindings/mod.ts";
 import * as C from "/mod.ts";
 
-const $events = C.pallet(C.WESTEND_RPC_URL, "System").entry("Events").read();
-const result = await C.runtime({
-  ...bindings.hashersR,
-  rpc: C.wsRpcClient,
-})($events);
-console.log(result.value[0].event[0]);
+const rpc = await C.wsRpcClient(C.WESTEND_RPC_URL);
+const $pallet = C.pallet(rpc, "System");
+const $entry = C.entry($pallet, "Events");
+const $read = C.read($entry);
+const result = await $read.run();
+console.log(result);
+await rpc.close();

@@ -1,4 +1,4 @@
-import { hashers } from "/crypto/mod.ts";
+import { hashers } from "/bindings/mod.ts";
 import { effector } from "/effect/Effect.ts";
 import * as m from "/frame_metadata/mod.ts";
 

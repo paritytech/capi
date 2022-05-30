@@ -1,4 +1,4 @@
-import * as bindings from "/target/wasm/bindings/mod.js";
+import * as bindings from "/bindings/mod.ts";
 import * as hex from "https://deno.land/std@0.136.0/encoding/hex.ts";
 import * as $ from "x/scale/mod.ts";
 import { DeriveCodec } from "./Codec.ts";

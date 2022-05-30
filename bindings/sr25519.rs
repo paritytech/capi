@@ -1,9 +1,4 @@
-use {
-  js_sys::{JsString, Uint8Array},
-  schnorrkel as s,
-  sp_core::sr25519::Signature,
-  wasm_bindgen::prelude::*,
-};
+use {js_sys::Uint8Array, schnorrkel as s, sp_core::sr25519::Signature, wasm_bindgen::prelude::*};
 
 const SIGNING_CTX: &'static [u8] = b"capi";
 

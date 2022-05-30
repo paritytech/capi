@@ -1,3 +1,4 @@
+import { hashers } from "/bindings/mod.ts";
 import { CHAIN_URL_LOOKUP } from "/constants/chains/url.ts";
 import { call, wsRpcClient } from "/rpc/mod.ts";
 import * as hex from "std/encoding/hex.ts";

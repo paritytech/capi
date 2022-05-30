@@ -1,4 +1,4 @@
-import { decodeSs58Text } from "/crypto/mod.ts";
+import { decodeSs58Text } from "/bindings/mod.ts";
 import { effector } from "/effect/Effect.ts";
 import * as hex from "std/encoding/hex.ts";
 
