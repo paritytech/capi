@@ -1,5 +1,5 @@
-import * as bindings from "/bindings/mod.ts";
 import { Raw } from "/primitives/MultiAddress.ts";
+import * as bindings from "/target/wasm/bindings/mod.js";
 import * as hex from "https://deno.land/std@0.136.0/encoding/hex.ts";
 import * as $ from "x/scale/mod.ts";
 import { DeriveCodec } from "./Codec.ts";
@@ -71,7 +71,18 @@ export function encodeAdditional(
 
 export function ensureMaxLen(bytes: Uint8Array): Uint8Array {
   if (bytes.length > 256) {
-    return bindings.hashersR.hashers.Blake2_256(bytes);
+    return bindings.blake2_256(bytes);
   }
   return bytes;
+}
+
+export function $SignatureToEncode(
+  $signatureCodec: $.Codec<unknown>,
+  $extraCodec: $.Codec<unknown>,
+) {
+  return $.tuple(
+    $.sizedArray($.u8, 32),
+    $signatureCodec,
+    $extraCodec,
+  );
 }

@@ -9,7 +9,7 @@ await fs.emptyDir(outDir);
 await Promise.all([
   build({
     importMap: "import_map.json",
-    entryPoints: ["./mod.ts", "./crypto/mod.ts"],
+    entryPoints: ["./mod.ts", "./target/wasm/bindings/mod.js"],
     outDir,
     mappings: {
       "https://deno.land/x/scale@v0.1.1/mod.ts": {

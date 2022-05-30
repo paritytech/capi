@@ -6,14 +6,14 @@ use {
   wasm_bindgen::prelude::*,
 };
 
-#[wasm_bindgen]
-pub fn base58Encode(data: &[u8]) -> Uint8Array {
+#[wasm_bindgen(js_name = base58Encode)]
+pub fn base58_encode(data: &[u8]) -> Uint8Array {
   console_error_panic_hook::set_once();
   ToBase58::to_base58(&data[..]).as_bytes().into()
 }
 
-#[wasm_bindgen] // TODO: with prefix
-pub fn decodeSs58Text(addr: &str) -> Uint8Array {
+#[wasm_bindgen(js_name = decodeSs58Text)] // TODO: with prefix
+pub fn decode_Ss58Text(addr: &str) -> Uint8Array {
   console_error_panic_hook::set_once();
   let address_bytes = addr.from_base58().unwrap();
   let len = address_bytes.len();

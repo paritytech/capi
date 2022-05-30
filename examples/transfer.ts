@@ -1,17 +1,19 @@
 // import { WESTEND_RPC_URL } from "/constants/chains/url.ts";
 // import * as C from "/mod.ts";
-import * as bindings from "/bindings/mod.ts";
 import * as M from "/frame_metadata/mod.ts";
 import * as C from "/mod.ts";
+import * as bindings from "/target/wasm/bindings/mod.js";
 import "std/dotenv/load.ts";
 import * as hex from "std/encoding/hex.ts";
 import * as $ from "x/scale/mod.ts";
 
-M.fromPrefixedHex;
-
 // Make sure you have these in a project-root-level `.env`
 const PUB_KEY = Deno.env.get("PUB_KEY")!;
 const PRIV_KEY = Deno.env.get("PRIV_KEY")!;
+
+const pair = bindings.pairFromSecretSeed(
+  hex.decode(new TextEncoder().encode("2df317d6d3b060d9cef6999f592a4a4a3acfb7212a77172d8fcdf8a08f3bf120")),
+);
 
 const client = await C.wsRpcClient(C.WESTEND_RPC_URL);
 const metadataRaw = (await C.call(client, "state_getMetadata", []) as C.OkRes<"state_getMetadata">).result;
@@ -45,7 +47,8 @@ const callEncoded = M.encodeCall(balances.i, deriveCodec(balances.calls.type), "
   value: 12345n,
   dest,
 });
-const extraEncoded = M.encodeExtra(deriveCodec(656), [
+const $extra = deriveCodec(656);
+const extra = [
   {},
   {},
   {},
@@ -54,7 +57,8 @@ const extraEncoded = M.encodeExtra(deriveCodec(656), [
   { 0: 1000 },
   {},
   { 0: 500000000000000n },
-]);
+];
+const extraEncoded = M.encodeExtra($extra, extra);
 const hash = (hex.decode(new TextEncoder().encode("c5c2beaf81f8833d2ddcfe0c04b0612d16f0d08d67aa5032dde065ddf71b4ed1")));
 const additionalEncoded = M.encodeAdditional(100, 1, hash, hash);
 const fullUnsignedPayloadBytes = new Uint8Array([
@@ -63,6 +67,14 @@ const fullUnsignedPayloadBytes = new Uint8Array([
   ...additionalEncoded,
 ]);
 const normalized = M.ensureMaxLen(fullUnsignedPayloadBytes);
-console.log(normalized);
+const $signature = deriveCodec(464);
+const signature = {
+  _tag: "Sr25519",
+  0: {
+    0: bindings.sign(pair.pubKey, pair.secretKey, normalized),
+  },
+};
+const $signatureToEncode = M.$SignatureToEncode($signature, $extra);
+const signatureToEncode = $signatureToEncode.encode([[...pair.pubKey] as any, signature, extra]);
 
 await client.close();

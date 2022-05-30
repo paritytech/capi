@@ -68,3 +68,4 @@ unfollow
 multiaddr
 binaryen
 westend
+schnorrkel
