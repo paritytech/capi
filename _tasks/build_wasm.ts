@@ -60,7 +60,7 @@ export const _wasmBytes = wasmBytes;
 `;
 
 await Promise.all([
-  Deno.writeTextFile("./crypto/bindings.wasm.js", wasmJs),
-  Deno.writeTextFile("./crypto/bindings.js", bindingsJs),
-  Deno.copyFile("./target/wasm32-bindgen-deno-js/mod.d.ts", "./crypto/bindings.d.ts"),
+  Deno.writeTextFile("./bindings/bindings.wasm.js", wasmJs),
+  Deno.writeTextFile("./bindings/bindings.js", bindingsJs),
+  Deno.copyFile("./target/wasm32-bindgen-deno-js/mod.d.ts", "./bindings/bindings.d.ts"),
 ]);

@@ -1,4 +1,5 @@
 .DS_Store
+.env
 benches.json
 target
 examples/generated

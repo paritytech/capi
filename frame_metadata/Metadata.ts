@@ -67,14 +67,15 @@ export interface StructTypeDef {
   _tag: TypeKind.Struct;
   fields: Field[];
 }
+export interface UnionTypeDefMember {
+  name: string;
+  fields: Field[];
+  i: number;
+  docs: string[];
+}
 export interface UnionTypeDef {
   _tag: TypeKind.Union;
-  members: {
-    name: string;
-    fields: Field[];
-    i: number;
-    docs: string[];
-  }[];
+  members: UnionTypeDefMember[];
 }
 export interface SequenceTypeDef {
   _tag: TypeKind.Sequence;
@@ -368,6 +369,15 @@ export const metadata: $.Codec<Metadata> = $.object(
 );
 type _MetadataV14Validity = ValidateCodecSignature<Metadata, typeof metadata, true>;
 
+export const $prefixedMetadata = $.createCodec({
+  _staticSize: 0,
+  _encode: undefined!,
+  _decode(buffer) {
+    $.u32._decode(buffer);
+    return metadata._decode(buffer);
+  },
+});
+
 export const fromPrefixedHex = (scaleEncoded: string): Metadata => {
-  return metadata.decode(hexToU8a(scaleEncoded, 8));
+  return $prefixedMetadata.decode(hexToU8a(scaleEncoded));
 };

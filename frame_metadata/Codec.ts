@@ -1,94 +1,138 @@
 import * as $ from "x/scale/mod.ts";
-import * as m from "./Metadata.ts";
+import * as M from "./Metadata.ts";
 import { TypeVisitors } from "./TypeVisitor.ts";
 
 export type DeriveCodec = (typeI: number) => $.Codec<unknown>;
 
 const primitiveCodecByDiscriminant = {
-  [m.PrimitiveKind.Bool]: $.bool,
-  [m.PrimitiveKind.Char]: $.str,
-  [m.PrimitiveKind.Str]: $.str,
-  [m.PrimitiveKind.U8]: $.u8,
-  [m.PrimitiveKind.I8]: $.i8,
-  [m.PrimitiveKind.U16]: $.u16,
-  [m.PrimitiveKind.I16]: $.i16,
-  [m.PrimitiveKind.U32]: $.u32,
-  [m.PrimitiveKind.I32]: $.i32,
-  [m.PrimitiveKind.U64]: $.u64,
-  [m.PrimitiveKind.I64]: $.i64,
-  [m.PrimitiveKind.U128]: $.u128,
-  [m.PrimitiveKind.I128]: $.i128,
-
-  // TODO
-  [m.PrimitiveKind.U256]: $.u256,
-  [m.PrimitiveKind.I256]: $.i256,
+  [M.PrimitiveKind.Bool]: $.bool,
+  [M.PrimitiveKind.Char]: $.str,
+  [M.PrimitiveKind.Str]: $.str,
+  [M.PrimitiveKind.U8]: $.u8,
+  [M.PrimitiveKind.I8]: $.i8,
+  [M.PrimitiveKind.U16]: $.u16,
+  [M.PrimitiveKind.I16]: $.i16,
+  [M.PrimitiveKind.U32]: $.u32,
+  [M.PrimitiveKind.I32]: $.i32,
+  [M.PrimitiveKind.U64]: $.u64,
+  [M.PrimitiveKind.I64]: $.i64,
+  [M.PrimitiveKind.U128]: $.u128,
+  [M.PrimitiveKind.I128]: $.i128,
+  [M.PrimitiveKind.U256]: $.u256,
+  [M.PrimitiveKind.I256]: $.i256,
 };
 
-export const DeriveCodec = (metadata: m.Metadata): DeriveCodec => {
-  const Fields = (...fields: m.Field[]): $.Field[] => {
+export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
+  // TODO: don't leak memory!
+  const cache: Record<number, $.Codec<unknown>> = {};
+
+  const Fields = (fields: M.Field[]): $.Field[] => {
     return fields.map((field, i) => {
       return [field.name === undefined ? i : field.name, visitors.visit(field.type)];
     });
   };
 
-  const visitors: TypeVisitors<{ [_ in m.TypeKind]: $.Codec<any> }> = {
-    [m.TypeKind.Struct]: (ty) => {
-      return $.object(...Fields(...ty.fields)) as unknown as $.Codec<unknown>;
+  const visitors: TypeVisitors<{ [_ in M.TypeKind]: $.Codec<any> }, [isRoot?: boolean /* root */]> = {
+    [M.TypeKind.Struct]: (ty) => {
+      return $.object(...Fields(ty.fields)) as unknown as $.Codec<unknown>;
     },
-    [m.TypeKind.Union]: (ty) => {
+    [M.TypeKind.Union]: (ty) => {
+      // TODO: revisit this
       if (ty.path[0] === "Option") {
         return $.option(visitors.visit(ty.params[0]?.type!));
       }
-      return $.dummy(undefined);
+      const memberIByTag: Record<string, number> = {};
+      const memberIByDiscriminant: Record<number, number> = {};
+      const members = ty.members.map((member, i) => {
+        memberIByTag[member.name] = member.i;
+        memberIByDiscriminant[member.i] = i;
+        const memberFields = member.fields.map((field, i) => {
+          return [
+            field.name || i,
+            $.deferred(() => {
+              return visitors.visit(field.type, false);
+            }),
+          ] as [string, $.Codec<unknown>];
+        });
+        return $.object(["_tag", $.dummy(member.name)], ...memberFields);
+      });
+      return union(
+        (member) => {
+          const discriminant = memberIByTag[member._tag];
+          if (discriminant === undefined) {
+            throw new Error("TODO");
+          }
+          return discriminant;
+        },
+        (discriminant) => {
+          const i = memberIByDiscriminant[discriminant];
+          if (i === undefined) {
+            throw new Error("TODO");
+          }
+          return i;
+        },
+        ...members,
+      ) as unknown as $.Codec<any>;
     },
-    [m.TypeKind.Sequence]: (ty) => {
+    [M.TypeKind.Sequence]: (ty) => {
       return $.array(visitors.visit(ty.typeParam));
     },
-    [m.TypeKind.SizedArray]: (ty) => {
+    [M.TypeKind.SizedArray]: (ty) => {
       return $.sizedArray(visitors.visit(ty.typeParam), ty.len);
     },
-    [m.TypeKind.Tuple]: (ty) => {
-      return $.tuple(...ty.fields.map(visitors.visit));
+    [M.TypeKind.Tuple]: (ty) => {
+      return $.tuple(...ty.fields.map((field) => visitors.visit(field)));
     },
-    [m.TypeKind.Primitive]: (ty) => {
+    [M.TypeKind.Primitive]: (ty) => {
       return primitiveCodecByDiscriminant[ty.kind]!;
     },
-    [m.TypeKind.Compact]: () => {
+    [M.TypeKind.Compact]: () => {
       return $.compact;
     },
-    [m.TypeKind.BitSequence]: () => {
-      throw new Error();
+    [M.TypeKind.BitSequence]: () => {
+      return $.never as unknown as $.Codec<any>;
     },
-    visit: (i) => {
-      const type_ = metadata.types[i]!;
-      switch (type_._tag) {
-        case m.TypeKind.Struct: {
-          return visitors[m.TypeKind.Struct](type_);
-        }
-        case m.TypeKind.Union: {
-          return visitors[m.TypeKind.Union](type_);
-        }
-        case m.TypeKind.Sequence: {
-          return visitors[m.TypeKind.Sequence](type_);
-        }
-        case m.TypeKind.SizedArray: {
-          return visitors[m.TypeKind.SizedArray](type_);
-        }
-        case m.TypeKind.Tuple: {
-          return visitors[m.TypeKind.Tuple](type_);
-        }
-        case m.TypeKind.Primitive: {
-          return visitors[m.TypeKind.Primitive](type_);
-        }
-        case m.TypeKind.Compact: {
-          return visitors[m.TypeKind.Compact](type_);
-        }
-        case m.TypeKind.BitSequence: {
-          return visitors[m.TypeKind.BitSequence](type_);
-        }
+    visit: (i, isRoot = false) => {
+      if (cache[i]) {
+        return cache[i];
       }
+      if (!isRoot && i === 111) {
+        return $.dummy("TODO CIRCULARITY");
+      }
+      const type_ = metadata.types[i]!;
+      const $codec = (visitors[type_._tag] as any)(type_, false);
+      cache[i] = $codec;
+      return $codec;
     },
   };
 
-  return visitors.visit;
+  return (i: number) => visitors.visit(i, true);
 };
+
+type NativeUnion<MemberCodecs extends $.Codec<any>[]> = $.Native<MemberCodecs[number]>;
+
+// TODO: get rid of this upon fixing in SCALE impl
+function union<Members extends $.Codec<any>[]>(
+  discriminate: (value: NativeUnion<Members>) => number,
+  getIndexOfDiscriminant: (discriminant: number) => number,
+  ...members: [...Members]
+) {
+  return $.createCodec<NativeUnion<Members>>({
+    _staticSize: 1 + Math.max(...members.map((x) => x._staticSize)),
+    _encode(buffer, value) {
+      const discriminant = discriminate(value);
+      buffer.array[buffer.index++] = discriminant;
+      const $member = members[discriminant]!;
+      $member._encode(buffer, value);
+    },
+    _decode(buffer) {
+      const discriminant = buffer.array[buffer.index++]!;
+      const indexOfDiscriminant = getIndexOfDiscriminant(discriminant);
+      const $member = members[indexOfDiscriminant];
+      if (!$member) {
+        throw new Error(`No such member codec matching the discriminant \`${discriminant}\``);
+      }
+      return $member._decode(buffer);
+    },
+  });
+}

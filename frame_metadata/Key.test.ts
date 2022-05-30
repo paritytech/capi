@@ -1,4 +1,4 @@
-import { hashers } from "/crypto/mod.ts";
+import { hashers } from "/bindings/mod.ts";
 import * as asserts from "std/testing/asserts.ts";
 import { encodeKey } from "./Key.ts";
 import { accountId32, getLookupAndDeriveCodec } from "./test-util.ts";

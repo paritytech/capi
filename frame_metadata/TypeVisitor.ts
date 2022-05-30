@@ -1,16 +1,21 @@
-import * as u from "/util/mod.ts";
-import * as m from "./Metadata.ts";
+import * as U from "/util/mod.ts";
+import * as M from "./Metadata.ts";
 
-export type UnknownByTypeDefKind = { [Tag in m.TypeKind]: unknown };
+export type UnknownByTypeDefKind = { [Tag in M.TypeKind]: unknown };
 
 export type TypeVisitor<
-  Tag extends m.TypeKind,
+  Tag extends M.TypeKind,
+  Misc extends unknown[],
   Results extends UnknownByTypeDefKind,
 > = (
-  this: TypeVisitors<Results>,
-  typeDef: m.Type & { _tag: Tag },
+  this: TypeVisitors<Results, Misc>,
+  typeDef: M.Type & { _tag: Tag },
+  ...misc: Misc
 ) => Results[Tag];
 
-export type TypeVisitors<Results extends UnknownByTypeDefKind> =
-  & { [Tag in m.TypeKind]: TypeVisitor<Tag, Results> }
-  & { visit: (i: number) => u.ValueOf<Results> };
+export type TypeVisitors<
+  Results extends UnknownByTypeDefKind,
+  Misc extends unknown[] = [],
+> =
+  & { [Tag in M.TypeKind]: TypeVisitor<Tag, Misc, Results> }
+  & { visit: (i: number, ...misc: Misc) => U.ValueOf<Results> };

@@ -1035,6 +1035,7 @@ dependencies = [
  "js-sys",
  "parity-scale-codec 3.0.0",
  "paste",
+ "schnorrkel",
  "serde",
  "serde_json",
  "sha2 0.10.2",

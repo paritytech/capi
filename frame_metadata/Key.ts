@@ -1,9 +1,9 @@
 import * as hex from "https://deno.land/std@0.136.0/encoding/hex.ts";
 import { DeriveCodec } from "./Codec.ts";
-import * as m from "./Metadata.ts";
+import * as M from "./Metadata.ts";
 
 export type HasherLookup = {
-  [_ in m.HasherKind]: (input: Uint8Array) => Uint8Array;
+  [_ in M.HasherKind]: (input: Uint8Array) => Uint8Array;
 };
 
 const finalize = (
@@ -14,8 +14,8 @@ const finalize = (
 ): string => {
   return new TextDecoder().decode(hex.encode(
     new Uint8Array([
-      ...hashers[m.HasherKind.Twox128](new TextEncoder().encode(palletName)),
-      ...hashers[m.HasherKind.Twox128](new TextEncoder().encode(storageEntryName)),
+      ...hashers[M.HasherKind.Twox128](new TextEncoder().encode(palletName)),
+      ...hashers[M.HasherKind.Twox128](new TextEncoder().encode(storageEntryName)),
       ...keys,
     ]),
   ));
@@ -24,11 +24,11 @@ const finalize = (
 export const encodeKey = (
   deriveCodec: DeriveCodec,
   hashers: HasherLookup,
-  pallet: m.Pallet,
-  storageEntry: m.StorageEntry,
+  pallet: M.Pallet,
+  storageEntry: M.StorageEntry,
   ...keys: [a?: unknown, b?: unknown]
 ): string => {
-  if (storageEntry._tag === m.StorageEntryTypeKind.Plain) {
+  if (storageEntry._tag === M.StorageEntryTypeKind.Plain) {
     return finalize(hashers, pallet.name, storageEntry.name);
   }
   const keyTypeCodec = deriveCodec(storageEntry.key);

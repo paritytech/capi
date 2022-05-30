@@ -67,3 +67,5 @@ offchain
 unfollow
 multiaddr
 binaryen
+westend
+schnorrkel
