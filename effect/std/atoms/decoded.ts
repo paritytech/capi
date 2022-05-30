@@ -1,21 +1,15 @@
-import { MaybeEffectLike } from "/effect/Effect.ts";
-import { step } from "/effect/intrinsic/Step.ts";
+import { effector, EffectorArgs } from "/effect/Effect.ts";
 import { hexToU8a } from "/util/hex.ts";
 import type * as $ from "x/scale/mod.ts";
 
-// TODO: move into & get from `frame_metadata`
-export class DecodedError extends Error {}
+// TODO: DecodedError from `frame_metadata`?
 
-export const decoded = <
-  Codec extends MaybeEffectLike<$.Codec<unknown>>,
-  Encoded extends MaybeEffectLike<string>,
->(
-  codec: Codec,
-  encoded: Encoded,
-) => {
-  return step("Decoded", [codec, encoded], (codec, encoded) => {
-    return async () => {
-      return codec.decode(hexToU8a(encoded));
-    };
-  });
-};
+export const decoded = effector.sync.generic(
+  "decoded",
+  (effect) =>
+    <T, X extends unknown[]>(...args: EffectorArgs<X, [codec: $.Codec<T>, encoded: string]>) =>
+      effect(args, () =>
+        (codec, encoded) => {
+          return codec.decode(hexToU8a(encoded));
+        }),
+);

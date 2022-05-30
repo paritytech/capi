@@ -1,14 +1,9 @@
-import { MaybeEffectLike } from "/effect/Effect.ts";
-import { step } from "/effect/intrinsic/Step.ts";
+import { effector } from "/effect/Effect.ts";
 import * as m from "/frame_metadata/mod.ts";
 
-// TODO: move into & get from `frame_metadata`
-export class MetadataLookupError extends Error {}
+// TODO: MetadataLookupError from `frame_metadata`?
 
-export const metadataLookup = <Metadata extends MaybeEffectLike<m.Metadata>>(metadata: Metadata) => {
-  return step("MetadataLookup", [metadata], (metadata) => {
-    return async () => {
-      return new m.Lookup(metadata);
-    };
+export const metadataLookup = effector.sync("metadataLookup", () =>
+  (metadata: m.Metadata) => {
+    return new m.Lookup(metadata);
   });
-};
