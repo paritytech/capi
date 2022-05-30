@@ -1,5 +1,4 @@
 import * as $ from "x/scale/mod.ts";
-import { display } from "./Display.ts";
 import * as M from "./Metadata.ts";
 import { TypeVisitors } from "./TypeVisitor.ts";
 

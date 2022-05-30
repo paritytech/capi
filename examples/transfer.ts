@@ -20,16 +20,25 @@ const dest = {
     0: [...hex.decode(new TextEncoder().encode("8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48"))],
   },
 };
-const hash = (hex.decode(new TextEncoder().encode("c5c2beaf81f8833d2ddcfe0c04b0612d16f0d08d67aa5032dde065ddf71b4ed1")));
+const genesisHash =
+  (hex.decode(new TextEncoder().encode("c5c2beaf81f8833d2ddcfe0c04b0612d16f0d08d67aa5032dde065ddf71b4ed1")));
 
-const result = M.encodeExtrinsic(
-  pair.pubKey,
+const result = M.encodeExtrinsic({
+  pubKey: pair.pubKey,
   metadata,
   deriveCodec,
-  "Balances",
-  "transfer",
-  { value: 12345n, dest },
-  [
+  palletName: "Balances",
+  methodName: "transfer",
+  args: {
+    value: 12345n,
+    dest,
+  },
+  // TODO:
+  //   unfortunately, this is what the JS-native equivalent of the `Extras` type looks like.
+  //   This can differ between chains. While we could create a primitive out of it... it could
+  //   be invalid at times. We'll need to think through the right approach to abstracting over
+  //   producing this type.
+  extras: [
     {},
     {},
     {},
@@ -39,17 +48,15 @@ const result = M.encodeExtrinsic(
     {},
     { 0: 500000000000000n },
   ],
-  100,
-  1,
-  hash,
-  hash,
-  (message) => {
+  specVersion: 100,
+  transactionVersion: 1,
+  genesisHash,
+  checkpoint: genesisHash,
+  sign: (message) => {
     return bindings.sign(pair.pubKey, pair.secretKey, message);
   },
-);
+});
 
 console.log(result);
-// await C.call(client, "author_submitExtrinsic", [result]);
-// console.log(result);
 
 await client.close();

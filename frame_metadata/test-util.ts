@@ -8,7 +8,7 @@ import * as $ from "x/scale/mod.ts";
 import { DeriveCodec } from "./Codec.ts";
 import { encodeKey } from "./Key.ts";
 import { Lookup } from "./Lookup.ts";
-import * as m from "./Metadata.ts";
+import * as M from "./Metadata.ts";
 
 export type AssertTrue<_InQuestion extends true> = never;
 export type ValidateCodecSignature<
@@ -19,7 +19,7 @@ export type ValidateCodecSignature<
 
 export interface ChainInfo {
   deriveCodec: DeriveCodec;
-  metadata: m.Metadata;
+  metadata: M.Metadata;
   lookup: Lookup;
 }
 
@@ -29,7 +29,7 @@ export const getLookupAndDeriveCodec = async (
   const metadataEncoded = await Deno.readTextFile(
     path.join("target", "frame_metadata", `${networkName}.scale`),
   );
-  const metadata = m.fromPrefixedHex(metadataEncoded);
+  const metadata = M.fromPrefixedHex(metadataEncoded);
   const lookup = new Lookup(metadata);
   const deriveCodec = DeriveCodec(metadata);
   return {

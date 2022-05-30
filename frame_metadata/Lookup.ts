@@ -1,20 +1,20 @@
-import * as m from "./Metadata.ts";
+import * as M from "./Metadata.ts";
 
-type StorageEntryByNameByPalletName = Record<string, Record<string, m.StorageEntry>>;
+type StorageEntryByNameByPalletName = Record<string, Record<string, M.StorageEntry>>;
 
 export class Lookup {
   indexed = false;
-  palletByName: Record<string, m.Pallet> = {};
+  palletByName: Record<string, M.Pallet> = {};
   storageEntryByNameByPalletName: StorageEntryByNameByPalletName = {};
 
-  constructor(readonly metadata: m.Metadata) {}
+  constructor(readonly metadata: M.Metadata) {}
 
   ensureIndexed = (): void => {
     if (!this.indexed) {
       this.metadata.pallets.forEach((pallet) => {
         this.palletByName[pallet.name] = pallet;
 
-        const palletEntries: Record<string, m.StorageEntry> = {};
+        const palletEntries: Record<string, M.StorageEntry> = {};
         this.storageEntryByNameByPalletName[pallet.name] = palletEntries;
 
         pallet.storage?.entries.forEach((entry) => {
@@ -35,9 +35,9 @@ export class Lookup {
   };
 
   getStorageEntryByPalletAndName = (
-    pallet: m.Pallet,
+    pallet: M.Pallet,
     storageEntryName: string,
-  ): m.StorageEntry => {
+  ): M.StorageEntry => {
     this.ensureIndexed();
     const palletStorageEntries = this.storageEntryByNameByPalletName[pallet.name];
     if (!palletStorageEntries) {
@@ -53,7 +53,7 @@ export class Lookup {
   getStorageEntryByPalletNameAndName = (
     palletName: string,
     storageEntryName: string,
-  ): m.StorageEntry => {
+  ): M.StorageEntry => {
     const pallet = this.getPalletByName(palletName);
     return this.getStorageEntryByPalletAndName(pallet, storageEntryName);
   };

@@ -1,13 +1,13 @@
-import * as m from "./Metadata.ts";
+import * as M from "./Metadata.ts";
 import { TypeVisitors } from "./TypeVisitor.ts";
 
 export const display = (
-  metadata: m.Metadata,
+  metadata: M.Metadata,
   typeI: number,
 ) => {
   const cache: Record<number, unknown> = {};
 
-  const Fields = (...fields: m.Field[]) => {
+  const Fields = (...fields: M.Field[]) => {
     return fields.map((field) => {
       return {
         ...field,
@@ -16,14 +16,14 @@ export const display = (
     });
   };
 
-  const visitors: TypeVisitors<{ [_ in m.TypeKind]: unknown }> = {
-    [m.TypeKind.Struct]: (ty) => {
+  const visitors: TypeVisitors<{ [_ in M.TypeKind]: unknown }> = {
+    [M.TypeKind.Struct]: (ty) => {
       return {
         ...ty,
         fields: Fields(...ty.fields),
       };
     },
-    [m.TypeKind.Union]: (ty) => {
+    [M.TypeKind.Union]: (ty) => {
       return {
         ...ty,
         members: ty.members.map((member) => {
@@ -34,31 +34,31 @@ export const display = (
         }),
       };
     },
-    [m.TypeKind.Sequence]: (ty) => {
+    [M.TypeKind.Sequence]: (ty) => {
       return {
         ...ty,
         typeParam: visitors.visit(ty.typeParam),
       };
     },
-    [m.TypeKind.SizedArray]: (ty) => {
+    [M.TypeKind.SizedArray]: (ty) => {
       return {
         ...ty,
         typeParam: visitors.visit(ty.typeParam),
       };
     },
-    [m.TypeKind.Tuple]: (ty) => {
+    [M.TypeKind.Tuple]: (ty) => {
       return {
         ...ty,
         fields: ty.fields.map(visitors.visit),
       };
     },
-    [m.TypeKind.Primitive]: (ty) => {
+    [M.TypeKind.Primitive]: (ty) => {
       return ty;
     },
-    [m.TypeKind.Compact]: (ty) => {
+    [M.TypeKind.Compact]: (ty) => {
       return ty;
     },
-    [m.TypeKind.BitSequence]: (ty) => {
+    [M.TypeKind.BitSequence]: (ty) => {
       return ty;
     },
     visit: (i) => {
