@@ -90,7 +90,7 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
       return $.compact;
     },
     [M.TypeKind.BitSequence]: () => {
-      return $.dummy("TODO BIT SEQUENCE");
+      return $.never as unknown as $.Codec<any>;
     },
     visit: (i, isRoot = false) => {
       if (cache[i]) {
