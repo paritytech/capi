@@ -1,5 +1,5 @@
-import * as Z from "/effect/Effect.ts";
-import { AnyStep, Step } from "/effect/intrinsic/Step.ts";
+import * as Z from "../effect/Effect.ts";
+import { AnyStep, Step } from "../effect/intrinsic/Step.ts";
 
 export interface Runtime<CommonR> {
   <

@@ -1,16 +1,16 @@
-import { HOEffect } from "/effect/Effect.ts";
-import { codec } from "/effect/std/atoms/codec.ts";
-import { decoded } from "/effect/std/atoms/decoded.ts";
-import { deriveCodec } from "/effect/std/atoms/deriveCodec.ts";
-import { entryKey } from "/effect/std/atoms/entryKey.ts";
-import { entryMetadata } from "/effect/std/atoms/entryMetadata.ts";
-import { metadataLookup } from "/effect/std/atoms/metadataLookup.ts";
-import { palletMetadata } from "/effect/std/atoms/palletMetadata.ts";
-import { select } from "/effect/std/atoms/select.ts";
-import { wrap } from "/effect/std/atoms/wrap.ts";
-import { AnyEntry } from "/effect/std/Entry.ts";
-import { metadata } from "/effect/std/Metadata.ts";
-import { rpcCall } from "/effect/std/RpcCall.ts";
+import { HOEffect } from "../../effect/Effect.ts";
+import { codec } from "../../effect/std/atoms/codec.ts";
+import { decoded } from "../../effect/std/atoms/decoded.ts";
+import { deriveCodec } from "../../effect/std/atoms/deriveCodec.ts";
+import { entryKey } from "../../effect/std/atoms/entryKey.ts";
+import { entryMetadata } from "../../effect/std/atoms/entryMetadata.ts";
+import { metadataLookup } from "../../effect/std/atoms/metadataLookup.ts";
+import { palletMetadata } from "../../effect/std/atoms/palletMetadata.ts";
+import { select } from "../../effect/std/atoms/select.ts";
+import { wrap } from "../../effect/std/atoms/wrap.ts";
+import { AnyEntry } from "../../effect/std/Entry.ts";
+import { metadata } from "../../effect/std/Metadata.ts";
+import { rpcCall } from "../../effect/std/RpcCall.ts";
 
 export class Read<Entry extends AnyEntry = AnyEntry> extends HOEffect {
   root;

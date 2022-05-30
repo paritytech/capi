@@ -1,6 +1,6 @@
-import { MaybeEffectLike } from "/effect/Effect.ts";
-import { step } from "/effect/intrinsic/Step.ts";
-import * as m from "/frame_metadata/mod.ts";
+import { MaybeEffectLike } from "../../../effect/Effect.ts";
+import { step } from "../../../effect/intrinsic/Step.ts";
+import * as m from "../../../frame_metadata/mod.ts";
 
 // TODO: move into `frame_metadata`
 export class MetadataDecodeError extends Error {}

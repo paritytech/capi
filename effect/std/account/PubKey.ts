@@ -1,8 +1,8 @@
-import { HOEffect } from "/effect/Effect.ts";
-import { step } from "/effect/intrinsic/Step.ts";
-import { Ss58 } from "/effect/std/account/Ss58.ts";
-import { DecodeSs58R } from "/env/mod.ts";
-import * as hex from "std/encoding/hex.ts";
+import { hexDecode } from "../../../barrel.ts";
+import { HOEffect } from "../../../effect/Effect.ts";
+import { step } from "../../../effect/intrinsic/Step.ts";
+import { Ss58 } from "../../../effect/std/account/Ss58.ts";
+import { DecodeSs58R } from "../../../env/mod.ts";
 
 export abstract class PubKey<Init = any> extends HOEffect {
   constructor(readonly init: Init) {
@@ -18,7 +18,7 @@ export class PubKeyFromSs58<Init extends Ss58> extends PubKey<Init> {
     this.root = step("PubKeyFromSs58", [init], (init) => {
       return async (env: DecodeSs58R) => {
         // TODO: decode byte representation instead
-        return hex.decode(env.decodeSs58Text(init));
+        return hexDecode(env.decodeSs58Text(init));
       };
     });
   }

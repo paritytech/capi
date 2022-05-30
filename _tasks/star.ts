@@ -1,17 +1,16 @@
-import * as fs from "std/fs/mod.ts";
-import * as path from "std/path/mod.ts";
-import ts from "typescript";
+import { ts } from "../barrel.ts";
+import { fsWalk, globToRegExp, pathJoin } from "../barrel.ts";
 
 const f = ts.factory;
 
-const DEST = path.join("target", "star.ts");
-const tsPathRegex = path.globToRegExp("**/*.ts");
-const tsPathIter = fs.walk(".", {
+const DEST = pathJoin("target", "star.ts");
+const tsPathRegex = globToRegExp("**/*.ts");
+const tsPathIter = fsWalk(".", {
   match: [tsPathRegex],
   skip: [
     new RegExp(DEST),
-    path.globToRegExp("target/**/*.ts"),
-    path.globToRegExp("examples/generated/**/*.ts"),
+    globToRegExp("target/**/*.ts"),
+    globToRegExp("examples/generated/**/*.ts"),
   ],
 });
 const importDeclarations: ts.ImportDeclaration[] = [];
@@ -38,6 +37,6 @@ const generated = ts.createPrinter().printList(
   undefined as any,
 );
 
-const destAbs = path.join(Deno.cwd(), DEST);
+const destAbs = pathJoin(Deno.cwd(), DEST);
 console.log(`Writing "star" file to "${destAbs}".`);
 await Deno.writeFile(destAbs, new TextEncoder().encode(generated));

@@ -1,6 +1,6 @@
-import { AnyEffectLike, HOEffect } from "/effect/Effect.ts";
-import { step } from "/effect/intrinsic/Step.ts";
-import { PubKey } from "/effect/std/account/PubKey.ts";
+import { AnyEffectLike, HOEffect } from "../../../effect/Effect.ts";
+import { step } from "../../../effect/intrinsic/Step.ts";
+import { PubKey } from "../../../effect/std/account/PubKey.ts";
 
 export abstract class AccountId32<Init> extends HOEffect {
   abstract root: AnyEffectLike<{ 0: number[] }>;

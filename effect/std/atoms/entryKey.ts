@@ -1,7 +1,7 @@
-import { MaybeEffectLike } from "/effect/Effect.ts";
-import { step } from "/effect/intrinsic/Step.ts";
-import { HashersR } from "/env/mod.ts";
-import * as m from "/frame_metadata/mod.ts";
+import { MaybeEffectLike } from "../../../effect/Effect.ts";
+import { step } from "../../../effect/intrinsic/Step.ts";
+import { HashersR } from "../../../env/mod.ts";
+import * as m from "../../../frame_metadata/mod.ts";
 
 export const entryKey = <
   DeriveCodec extends MaybeEffectLike<m.DeriveCodec>,

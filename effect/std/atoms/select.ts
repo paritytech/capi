@@ -1,5 +1,5 @@
-import { MaybeEffectLike, UnwrapA } from "/effect/Effect.ts";
-import { step } from "/effect/intrinsic/Step.ts";
+import { MaybeEffectLike, UnwrapA } from "../../../effect/Effect.ts";
+import { step } from "../../../effect/intrinsic/Step.ts";
 
 export const select = <
   T,

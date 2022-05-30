@@ -22,7 +22,6 @@
       "tags": ["recommended"]
     }
   },
-  "importMap": "./import_map.json",
   "include": ["."],
   "tasks": {
     "download_frame_metadata": "deno run -A --no-check=remote _tasks/download_frame_metadata.ts",

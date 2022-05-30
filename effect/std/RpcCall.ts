@@ -1,7 +1,7 @@
-import { HOEffect, MaybeEffectLike, UnwrapA, WrapAll } from "/effect/Effect.ts";
-import { step } from "/effect/intrinsic/Step.ts";
-import { rpcClient } from "/effect/std/atoms/rpcClient.ts";
-import * as rpc from "/rpc/mod.ts";
+import { HOEffect, MaybeEffectLike, UnwrapA, WrapAll } from "../../effect/Effect.ts";
+import { step } from "../../effect/intrinsic/Step.ts";
+import { rpcClient } from "../../effect/std/atoms/rpcClient.ts";
+import * as rpc from "../../rpc/mod.ts";
 
 // TODO
 export class RpcError extends Error {}

@@ -1,13 +1,12 @@
-import * as fs from "std/fs/mod.ts";
-import * as path from "std/path/mod.ts";
-import { build } from "x/dnt/mod.ts";
+import { dntBuild } from "../barrel.ts";
+import { emptyDir, fsCopy, pathJoin } from "../barrel.ts";
 
-const outDir = path.join("target", "npm");
+const outDir = pathJoin("target", "npm");
 
-await fs.emptyDir(outDir);
+await emptyDir(outDir);
 
 await Promise.all([
-  build({
+  dntBuild({
     importMap: "import_map.json",
     entryPoints: ["./mod.ts", "./crypto/mod.ts"],
     outDir,
@@ -36,5 +35,5 @@ await Promise.all([
     test: false,
     typeCheck: false,
   }),
-  fs.copy("LICENSE", path.join(outDir, "LICENSE")),
+  fsCopy("LICENSE", pathJoin(outDir, "LICENSE")),
 ]);

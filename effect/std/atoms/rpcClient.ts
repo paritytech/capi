@@ -1,6 +1,6 @@
-import { UnwrapA } from "/effect/Effect.ts";
-import { step } from "/effect/intrinsic/Step.ts";
-import * as rpc from "/rpc/mod.ts";
+import { UnwrapA } from "../../../effect/Effect.ts";
+import { step } from "../../../effect/intrinsic/Step.ts";
+import * as rpc from "../../../rpc/mod.ts";
 
 export interface RpcClientR<Beacon> {
   rpc: rpc.RpcClientFactory<Beacon>;

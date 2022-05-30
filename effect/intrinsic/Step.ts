@@ -1,5 +1,5 @@
-import * as Z from "/effect/Effect.ts";
-import { UnionToIntersection } from "/util/mod.ts";
+import { UnionToIntersection } from "../../util/mod.ts";
+import * as Z from "../Effect.ts";
 
 export type Resolver<
   Args extends unknown[],

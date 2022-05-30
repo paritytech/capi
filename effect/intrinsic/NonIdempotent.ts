@@ -1,4 +1,4 @@
-import * as Z from "/effect/Effect.ts";
+import * as Z from "../../effect/Effect.ts";
 
 export class NonIdempotent<Root> extends Z.Effect<Z.UnwrapR<Root>, Z.UnwrapE<Root>, Z.UnwrapA<Root>> {
   signature;

@@ -1,8 +1,7 @@
-import { HOEffect, MaybeEffectLike } from "/effect/Effect.ts";
-import { step } from "/effect/intrinsic/Step.ts";
-import { metadataDecoded } from "/effect/std/atoms/metadataDecoded.ts";
-import { select } from "/effect/std/atoms/select.ts";
-import { rpcCall } from "/effect/std/RpcCall.ts";
+import { HOEffect, MaybeEffectLike } from "../../effect/Effect.ts";
+import { metadataDecoded } from "../../effect/std/atoms/metadataDecoded.ts";
+import { select } from "../../effect/std/atoms/select.ts";
+import { rpcCall } from "../../effect/std/RpcCall.ts";
 
 export class Metadata<
   Beacon,

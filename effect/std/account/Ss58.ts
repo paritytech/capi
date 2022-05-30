@@ -1,5 +1,5 @@
-import { HOEffect, MaybeEffectLike } from "/effect/Effect.ts";
-import { step } from "/effect/intrinsic/Step.ts";
+import { HOEffect, MaybeEffectLike } from "../../../effect/Effect.ts";
+import { step } from "../../../effect/intrinsic/Step.ts";
 
 export abstract class Ss58<Init = any> extends HOEffect {
   constructor(readonly init: Init) {

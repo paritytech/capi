@@ -1,7 +1,7 @@
-import { MaybeEffectLike } from "/effect/Effect.ts";
-import { step } from "/effect/intrinsic/Step.ts";
-import { hexToU8a } from "/util/hex.ts";
-import type * as $ from "x/scale/mod.ts";
+import { type $ } from "../../../barrel.ts";
+import { MaybeEffectLike } from "../../../effect/Effect.ts";
+import { step } from "../../../effect/intrinsic/Step.ts";
+import { hexToU8a } from "../../../util/hex.ts";
 
 // TODO: move into & get from `frame_metadata`
 export class DecodedError extends Error {}

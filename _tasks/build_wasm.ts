@@ -1,8 +1,8 @@
-import { runCmd } from "/util/runCmd.ts";
-import * as path from "std/path/mod.ts";
+import { pathJoin } from "../barrel.ts";
+import { runCmd } from "../util/runCmd.ts";
 
 const OutDir = (feature: string) => {
-  return path.join("target", "wasm", feature);
+  return pathJoin("target", "wasm", feature);
 };
 
 const buildWasm = async (feature: string): Promise<void> => {
@@ -17,7 +17,7 @@ const buildWasm = async (feature: string): Promise<void> => {
   ]);
   await runCmd([
     "wasm-bindgen",
-    path.join("target", "wasm32-unknown-unknown", "release", "mod.wasm"),
+    pathJoin("target", "wasm32-unknown-unknown", "release", "mod.wasm"),
     "--target",
     "deno",
     "--weak-refs",
@@ -28,5 +28,5 @@ const buildWasm = async (feature: string): Promise<void> => {
 
 // TODO: zip & inline! Perform gzip(base64(gzip(wasm))) like @tomaka does in Smoldot.
 await buildWasm("crypto");
-const outWasmPath = path.join(OutDir("crypto"), "mod_bg.wasm");
+const outWasmPath = pathJoin(OutDir("crypto"), "mod_bg.wasm");
 await runCmd(["wasm-opt", "-g", "-Oz", outWasmPath, "-o", outWasmPath]);

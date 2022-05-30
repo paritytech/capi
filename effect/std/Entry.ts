@@ -1,6 +1,6 @@
-import { MaybeEffectLike } from "/effect/Effect.ts";
-import { AnyPallet } from "/effect/std/Pallet.ts";
-import { Read, read } from "/effect/std/Read.ts";
+import { MaybeEffectLike } from "../../effect/Effect.ts";
+import { AnyPallet } from "../../effect/std/Pallet.ts";
+import { Read, read } from "../../effect/std/Read.ts";
 
 export class Entry<
   Pallet extends AnyPallet,

@@ -1,5 +1,5 @@
-import { MaybeEffectLike } from "/effect/Effect.ts";
-import { step } from "/effect/intrinsic/Step.ts";
+import { MaybeEffectLike } from "../../../effect/Effect.ts";
+import { step } from "../../../effect/intrinsic/Step.ts";
 
 export const wrap = <
   T,

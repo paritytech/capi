@@ -1,4 +1,4 @@
-import { identity } from "/util/fn.ts";
+import { identity } from "../util/fn.ts";
 
 export const visitFixtures = (
   fixture: () => Map<Uint8Array, string>,

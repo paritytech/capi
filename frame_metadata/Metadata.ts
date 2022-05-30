@@ -1,5 +1,5 @@
-import { hexToU8a } from "/util/mod.ts";
-import * as $ from "x/scale/mod.ts";
+import { $ } from "../barrel.ts";
+import { hexToU8a } from "../util/mod.ts";
 import { ValidateCodecSignature } from "./test-util.ts";
 
 export interface Field {

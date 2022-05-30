@@ -1,10 +1,7 @@
-import { CHAIN_URL_LOOKUP } from "/constants/chains/url.ts";
-import { hashersR } from "/crypto/mod.ts";
-import { call, wsRpcClient } from "/rpc/mod.ts";
-import * as hex from "std/encoding/hex.ts";
-import * as path from "std/path/mod.ts";
-import { IsExact } from "x/conditional_type_checks/mod.ts";
-import * as $ from "x/scale/mod.ts";
+import { $, hexDecode, IsExact, pathJoin } from "../barrel.ts";
+import { CHAIN_URL_LOOKUP } from "../constants/chains/url.ts";
+import { hashersR } from "../crypto/mod.ts";
+import { call, wsRpcClient } from "../rpc/mod.ts";
 import { DeriveCodec } from "./Codec.ts";
 import { encodeKey } from "./Key.ts";
 import { Lookup } from "./Lookup.ts";
@@ -27,7 +24,7 @@ export const getLookupAndDeriveCodec = async (
   networkName: typeof CHAIN_URL_LOOKUP[number][0],
 ): Promise<ChainInfo> => {
   const metadataEncoded = await Deno.readTextFile(
-    path.join("target", "frame_metadata", `${networkName}.scale`),
+    pathJoin("target", "frame_metadata", `${networkName}.scale`),
   );
   const metadata = m.fromPrefixedHex(metadataEncoded);
   const lookup = new Lookup(metadata);
@@ -39,7 +36,7 @@ export const getLookupAndDeriveCodec = async (
   };
 };
 
-export const accountId32Bytes = hex.decode(
+export const accountId32Bytes = hexDecode(
   new TextEncoder().encode("43fa61b298e82f9f207ddea327900cee26b554756c4a533f36cd875e3e7bcf06"),
 );
 export const accountId32 = {
@@ -65,7 +62,7 @@ export namespace State {
     if (resultScaleHex === undefined) {
       return;
     }
-    const resultScaleBytes = hex.decode(new TextEncoder().encode(resultScaleHex.substring(2)));
+    const resultScaleBytes = hexDecode(new TextEncoder().encode(resultScaleHex.substring(2)));
     const valueCodec = deriveCodec(storageEntry.value);
     const decoded = valueCodec.decode(resultScaleBytes);
     await client.close();

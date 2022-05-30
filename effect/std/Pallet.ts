@@ -1,5 +1,5 @@
-import { MaybeEffectLike } from "/effect/Effect.ts";
-import { Entry, entry } from "/effect/std/Entry.ts";
+import { MaybeEffectLike } from "../../effect/Effect.ts";
+import { Entry, entry } from "../../effect/std/Entry.ts";
 
 export class Pallet<
   Beacon,

@@ -1,4 +1,4 @@
-import { Flatten, ValueOf } from "/util/types.ts";
+import { Flatten, ValueOf } from "../util/types.ts";
 
 export type TaggedUnion<
   TagKey extends PropertyKey,

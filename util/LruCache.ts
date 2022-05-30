@@ -1,11 +1,11 @@
-import * as asserts from "std/testing/asserts.ts";
+import { assert } from "../barrel.ts";
 
 export class LruCache<Key extends PropertyKey, Value> extends Map<Key, Value> {
   constructor(
     readonly max: number,
     init?: Map<Key, Value>,
   ) {
-    asserts.assert(max > 0);
+    assert(max > 0);
     super(init || []);
   }
 
@@ -22,7 +22,7 @@ export class LruCache<Key extends PropertyKey, Value> extends Map<Key, Value> {
   set(key: Key, value: Value): this {
     if (this.size === this.max) {
       const keyToDelete = this.keys().next().value;
-      asserts.assert(keyToDelete);
+      assert(keyToDelete);
       this.delete(keyToDelete);
     }
     this.set(key, value);

@@ -1,6 +1,6 @@
-import * as V from "/env/mod.ts";
-import * as M from "/frame_metadata/mod.ts";
-import * as C from "/target/wasm/crypto/mod.js";
+import * as V from "../env/mod.ts";
+import * as M from "../frame_metadata/mod.ts";
+import * as C from "../target/wasm/crypto/mod.js";
 
 export const hashersR: V.HashersR = {
   hashers: {

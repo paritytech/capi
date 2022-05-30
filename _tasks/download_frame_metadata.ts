@@ -1,10 +1,9 @@
-import { CHAIN_URL_LOOKUP } from "/constants/chains/url.ts";
-import * as rpc from "/rpc/mod.ts";
-import * as fs from "std/fs/mod.ts";
-import * as path from "std/path/mod.ts";
+import { emptyDir, pathJoin } from "../barrel.ts";
+import { CHAIN_URL_LOOKUP } from "../constants/chains/url.ts";
+import * as rpc from "../rpc/mod.ts";
 
-const outDir = path.join(Deno.cwd(), "target", "frame_metadata");
-await fs.emptyDir(outDir);
+const outDir = pathJoin(Deno.cwd(), "target", "frame_metadata");
+await emptyDir(outDir);
 await Promise.all(
   CHAIN_URL_LOOKUP.map(async ([name, url]) => {
     const client = await rpc.wsRpcClient(url);
@@ -14,7 +13,7 @@ await Promise.all(
         console.log(metadata);
         throw new Error();
       }
-      const outPath = path.join(outDir, `${name}.scale`);
+      const outPath = pathJoin(outDir, `${name}.scale`);
       console.log(`Downloading ${name} metadata to "${outPath}".`);
       await Deno.writeTextFile(outPath, metadata.result);
     } catch (e) {

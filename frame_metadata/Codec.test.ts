@@ -1,4 +1,4 @@
-import * as asserts from "std/testing/asserts.ts";
+import { assertEquals } from "../barrel.ts";
 import { accountId32, accountId32Bytes, getLookupAndDeriveCodec, State } from "./test-util.ts";
 
 const { lookup, deriveCodec } = await getLookupAndDeriveCodec("polkadot");
@@ -6,8 +6,8 @@ const { lookup, deriveCodec } = await getLookupAndDeriveCodec("polkadot");
 Deno.test("Derive AccountId32 Codec", async () => {
   const codec = deriveCodec(0);
   const encoded = codec.encode(accountId32);
-  asserts.assertEquals(encoded, accountId32Bytes);
-  asserts.assertEquals(codec.decode(encoded), accountId32);
+  assertEquals(encoded, accountId32Bytes);
+  assertEquals(codec.decode(encoded), accountId32);
 });
 
 Deno.test("Derive AccountInfo Codec", async () => {
@@ -25,7 +25,7 @@ Deno.test("Derive AccountInfo Codec", async () => {
     },
   };
   const encoded = codec.encode(decoded);
-  asserts.assertEquals(codec.decode(encoded), decoded);
+  assertEquals(codec.decode(encoded), decoded);
 });
 
 Deno.test("Derive Auctions AuctionInfo Storage Entry Codec", async () => {
@@ -33,7 +33,7 @@ Deno.test("Derive Auctions AuctionInfo Storage Entry Codec", async () => {
   const codec = deriveCodec(auctionInfoStorageEntry.value);
   const decoded = [8, 9945400];
   const encoded = codec.encode(decoded);
-  asserts.assertEquals(codec.decode(encoded), decoded);
+  assertEquals(codec.decode(encoded), decoded);
 });
 
 Deno.test("Derive Auction Winning Storage Entry Codec", async () => {
@@ -45,7 +45,7 @@ Deno.test("Derive Auction Winning Storage Entry Codec", async () => {
     ...Array(28).fill(undefined),
   ];
   const encoded = codec.encode(decoded);
-  asserts.assertEquals(codec.decode(encoded), decoded);
+  assertEquals(codec.decode(encoded), decoded);
 });
 
 // TODO: revisit
@@ -67,7 +67,7 @@ Deno.test("Babe Authorities", { ignore: true }, async () => {
   // };
   // const encoded = babeAuthoritiesValueCodec.encode(decoded);
   // console.log(encoded);
-  // asserts.assertEquals(babeAuthoritiesValueCodec.decode(encoded), decoded);
+  // assertEquals(babeAuthoritiesValueCodec.decode(encoded), decoded);
 });
 
 Deno.test("Balances Locks", { ignore: true }, async () => {
@@ -88,5 +88,5 @@ Deno.test("Balances Locks", { ignore: true }, async () => {
   //   reasons: "Misc",
   // };
   // const encoded = codec.encode(decoded);
-  // asserts.assertEquals(codec.decode(encoded), decoded);
+  // assertEquals(codec.decode(encoded), decoded);
 });

@@ -1,5 +1,5 @@
-import * as u from "/util/mod.ts";
-import * as a from "std/async/mod.ts";
+import { deferred } from "../barrel.ts";
+import * as u from "../util/mod.ts";
 import { ListenerCb, RpcClient, StopListening } from "./Base.ts";
 import * as m from "./messages.ts";
 
@@ -39,7 +39,7 @@ export const call = async <Method extends m.Name>(
     params,
   };
   const isCorrespondingRes = IsCorrespondingRes(init);
-  const pending = a.deferred<m.OkResByName[Method]>();
+  const pending = deferred<m.OkResByName[Method]>();
   const stopListening = client.listen(async (res) => {
     if (isCorrespondingRes(res)) {
       pending.resolve(res as m.OkResByName[Method]);
