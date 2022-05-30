@@ -14,9 +14,12 @@ const metadataRaw = (await C.call(client, "state_getMetadata", []) as C.OkRes<"s
 const metadata = M.fromPrefixedHex(metadataRaw);
 const deriveCodec = M.DeriveCodec(metadata);
 
-const dest = new C.Id(
-  hex.decode(new TextEncoder().encode("8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48")),
-);
+const dest = {
+  _tag: "Id",
+  0: {
+    0: [...hex.decode(new TextEncoder().encode("8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48"))],
+  },
+};
 const hash = (hex.decode(new TextEncoder().encode("c5c2beaf81f8833d2ddcfe0c04b0612d16f0d08d67aa5032dde065ddf71b4ed1")));
 
 const result = M.encodeExtrinsic(
