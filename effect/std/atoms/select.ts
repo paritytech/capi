@@ -1,21 +1,8 @@
-import { MaybeEffectLike, UnwrapA } from "/effect/Effect.ts";
-import { step } from "/effect/intrinsic/Step.ts";
+import { effector, EffectorArgs } from "/effect/Effect.ts";
 
-export const select = <
-  T,
-  K extends MaybeEffectLike<keyof UnwrapA<T>>,
->(
-  target: T,
-  key: K,
-) => {
-  return step(
-    "Select",
-    [target, key],
-    (target, key) => {
-      return async () => {
-        // TODO: fix this
-        return (target as any)[key];
-      };
-    },
-  );
-};
+export const select = effector.sync.generic(
+  "select",
+  (effect) =>
+    <T, K extends keyof T, X extends unknown[]>(...args: EffectorArgs<X, [target: T, key: K]>) =>
+      effect(args, () => (target, key): T[K] => target[key]),
+);
