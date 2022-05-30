@@ -54,36 +54,6 @@ You may have noticed that the Capi repository looks somewhat different from a tr
 
 We no longer need to think about the separation of code for the sake of packaging. We can think about separation of code in terms of what best suits our development needs.
 
-For example, exports of [`_/util/types.ts`](./_/util/types.ts) can be imported directly into any other TypeScript file, without specifying the dependency in a package manifest. We are free to use `bearer.ts` in out-of-band processes, the CLI or even GitHub action scripts. From anywhere in the repository, we can import and use any code. No configuration overhead.
+For example, exports of [`/util/types.ts`](./util/types.ts) can be imported directly into any other TypeScript file, without specifying the dependency in a package manifest. We are free to use `bearer.ts` in out-of-band processes, the CLI or even GitHub action scripts. From anywhere in the repository, we can import and use any code. No configuration overhead.
 
-When it comes time to [build our code](./_/tasks/build_npm.ts) for NPM distribution, [DNT](https://github.com/denoland/dnt) takes care of transforming our dependency graph into something that NodeJS projects will understand.
-
-### Import Mapping
-
-In the Capi repository (and all Deno-first repositories) there is no package manifest. We do not specify imports in some central file. While we could certainly create a `deps.ts`/`barrel.ts`/`prelude.ts` at the root and re-export dependencies, that would not be Deno-idiomatic. Instead, we define an [import map (`import_map.json`)](./import_map.json) (import maps are a web standard), which maps leading text of import specifiers. In our case, we add mappings to enable root-relative references. For instance:
-
-Let's say we're inside of `frame/Metadata.ts` and we want to import `Resource` from `system/Resource.ts`.
-
-**Instead of writing this**...
-
-```ts
-import { Resource } from "../system/Resource.ts";
-```
-
-... **we write this**:
-
-```ts
-import { Resource } from "/system/Resource.ts";
-```
-
-Now, if we ever move our `Metadata.ts` elsewhere, its imports remain valid.
-
-### Why All the `_` Directories?
-
-In the world of NodeJS, we might expose specific functionality with a `package.json`'s `main`, `module` and/or `exports` fields. This is not the case in Deno projects. Deno users often (and in the case of Capi) consume libraries via published source code. Then, the user's own build processes are responsible for transforming that source code into the desired flavor or target. Users may bring Capi into their projects as follows.
-
-```ts
-import * as frame from "https://deno.land/x/capi@0.1.0/frame/mod.ts";
-```
-
-The `_` convention makes obvious a separation between the well-defined API surface and implementation details, which are not guaranteed to be consistent.
+When it comes time to [build our code](./_tasks/build_npm_pkg.ts) for NPM distribution, [DNT](https://github.com/denoland/dnt) takes care of transforming our dependency graph into something that NodeJS projects will understand.
