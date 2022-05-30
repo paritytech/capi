@@ -1,39 +1,40 @@
 import * as $ from "x/scale/mod.ts";
-import * as m from "./Metadata.ts";
+import { display } from "./Display.ts";
+import * as M from "./Metadata.ts";
 import { TypeVisitors } from "./TypeVisitor.ts";
 
 export type DeriveCodec = (typeI: number) => $.Codec<unknown>;
 
 const primitiveCodecByDiscriminant = {
-  [m.PrimitiveKind.Bool]: $.bool,
-  [m.PrimitiveKind.Char]: $.str,
-  [m.PrimitiveKind.Str]: $.str,
-  [m.PrimitiveKind.U8]: $.u8,
-  [m.PrimitiveKind.I8]: $.i8,
-  [m.PrimitiveKind.U16]: $.u16,
-  [m.PrimitiveKind.I16]: $.i16,
-  [m.PrimitiveKind.U32]: $.u32,
-  [m.PrimitiveKind.I32]: $.i32,
-  [m.PrimitiveKind.U64]: $.u64,
-  [m.PrimitiveKind.I64]: $.i64,
-  [m.PrimitiveKind.U128]: $.u128,
-  [m.PrimitiveKind.I128]: $.i128,
-  [m.PrimitiveKind.U256]: $.u256,
-  [m.PrimitiveKind.I256]: $.i256,
+  [M.PrimitiveKind.Bool]: $.bool,
+  [M.PrimitiveKind.Char]: $.str,
+  [M.PrimitiveKind.Str]: $.str,
+  [M.PrimitiveKind.U8]: $.u8,
+  [M.PrimitiveKind.I8]: $.i8,
+  [M.PrimitiveKind.U16]: $.u16,
+  [M.PrimitiveKind.I16]: $.i16,
+  [M.PrimitiveKind.U32]: $.u32,
+  [M.PrimitiveKind.I32]: $.i32,
+  [M.PrimitiveKind.U64]: $.u64,
+  [M.PrimitiveKind.I64]: $.i64,
+  [M.PrimitiveKind.U128]: $.u128,
+  [M.PrimitiveKind.I128]: $.i128,
+  [M.PrimitiveKind.U256]: $.u256,
+  [M.PrimitiveKind.I256]: $.i256,
 };
 
-export const DeriveCodec = (metadata: m.Metadata): DeriveCodec => {
-  const Fields = (...fields: m.Field[]): $.Field[] => {
+export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
+  const Fields = (...fields: M.Field[]): $.Field[] => {
     return fields.map((field, i) => {
       return [field.name === undefined ? i : field.name, visitors.visit(field.type)];
     });
   };
 
-  const visitors: TypeVisitors<{ [_ in m.TypeKind]: $.Codec<any> }, never> = {
-    [m.TypeKind.Struct]: (ty) => {
+  const visitors: TypeVisitors<{ [_ in M.TypeKind]: $.Codec<any> }, never> = {
+    [M.TypeKind.Struct]: (ty) => {
       return $.object(...Fields(...ty.fields)) as unknown as $.Codec<unknown>;
     },
-    [m.TypeKind.Union]: (ty) => {
+    [M.TypeKind.Union]: (ty) => {
       // TODO: revisit this
       if (ty.path[0] === "Option") {
         return $.option(visitors.visit(ty.params[0]?.type!));
@@ -43,7 +44,7 @@ export const DeriveCodec = (metadata: m.Metadata): DeriveCodec => {
       return union(
         (member) => {
           const discriminant = memberIByTag[member._tag];
-          if (!discriminant) {
+          if (discriminant === undefined) {
             throw new Error("TODO");
           }
           return discriminant;
@@ -58,32 +59,29 @@ export const DeriveCodec = (metadata: m.Metadata): DeriveCodec => {
         ...ty.members.map((member, i) => {
           memberIByTag[member.name] = member.i;
           memberIByDiscriminant[member.i] = i;
-          // if (ty.i === 17) {
-          //   console.log(member.name, member.i);
-          // }
           const memberFields = member.fields.map((field, i) => {
-            return [field.name || i.toString(), visitors.visit(field.type)] as [string, $.Codec<unknown>];
+            return [field.name || i, visitors.visit(field.type)] as [string, $.Codec<unknown>];
           });
           return $.object(["_tag", $.dummy(member.name)], ...memberFields);
         }),
       ) as unknown as $.Codec<any>;
     },
-    [m.TypeKind.Sequence]: (ty) => {
+    [M.TypeKind.Sequence]: (ty) => {
       return $.array(visitors.visit(ty.typeParam));
     },
-    [m.TypeKind.SizedArray]: (ty) => {
+    [M.TypeKind.SizedArray]: (ty) => {
       return $.sizedArray(visitors.visit(ty.typeParam), ty.len);
     },
-    [m.TypeKind.Tuple]: (ty) => {
+    [M.TypeKind.Tuple]: (ty) => {
       return $.tuple(...ty.fields.map(visitors.visit));
     },
-    [m.TypeKind.Primitive]: (ty) => {
+    [M.TypeKind.Primitive]: (ty) => {
       return primitiveCodecByDiscriminant[ty.kind]!;
     },
-    [m.TypeKind.Compact]: () => {
+    [M.TypeKind.Compact]: () => {
       return $.compact;
     },
-    [m.TypeKind.BitSequence]: () => {
+    [M.TypeKind.BitSequence]: () => {
       throw new Error();
     },
     visit: (i) => {
