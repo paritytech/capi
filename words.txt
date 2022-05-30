@@ -67,3 +67,6 @@ offchain
 unfollow
 multiaddr
 binaryen
+esbuild
+esbuild_deno_loader
+outfile

@@ -32,6 +32,7 @@
     "build_npm_pkg": "deno run -A --no-check=remote _tasks/build_npm_pkg.ts",
     "bootstrap": "deno task download_frame_metadata && deno task build_wasm && deno task star",
     "lock": "deno cache --lock=lock.json --lock-write --no-check=remote target/star.ts",
+    "example:metadata": "deno run -A --no-check examples/metadata.ts",
     "example:read_balance": "deno run -A --no-check=remote examples/read_balance.ts",
     "example:playground": "deno run -A --no-check examples/playground.ts",
     "test": "deno test -A --no-check=remote -L=info",

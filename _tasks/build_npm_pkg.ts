@@ -1,6 +1,8 @@
 import * as fs from "std/fs/mod.ts";
 import * as path from "std/path/mod.ts";
 import { build } from "x/dnt/mod.ts";
+import * as esbuild from "x/esbuild/mod.js";
+import { denoPlugin } from "x/esbuild_deno_loader/mod.ts";
 
 const outDir = path.join("target", "npm");
 
@@ -38,3 +40,15 @@ await Promise.all([
   }),
   fs.copy("LICENSE", path.join(outDir, "LICENSE")),
 ]);
+
+await esbuild.build({
+  plugins: [denoPlugin({
+    importMapURL: new URL("../import_map.json", import.meta.url),
+  })],
+  entryPoints: ["mod.ts"],
+  outfile: "./target/npm/bundle.js",
+  bundle: true,
+  format: "esm",
+  treeShaking: true,
+});
+esbuild.stop();
