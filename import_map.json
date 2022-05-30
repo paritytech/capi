@@ -8,8 +8,6 @@
     "x/deno_graph/": "https://deno.land/x/deno_graph@0.24.0/",
     "x/dnt/": "https://deno.land/x/dnt@0.22.0/",
     "x/scale/": "https://deno.land/x/scale@v0.1.1/",
-    "typescript": "https://esm.sh/typescript",
-    "x/esbuild/": "https://deno.land/x/esbuild@v0.14.39/",
-    "x/esbuild_deno_loader/": "https://deno.land/x/esbuild_deno_loader@0.5.0/"
+    "typescript": "https://esm.sh/typescript"
   }
 }
