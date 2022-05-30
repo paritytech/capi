@@ -1,53 +1,10 @@
-import { Raw } from "/primitives/MultiAddress.ts";
 import * as bindings from "/target/wasm/bindings/mod.js";
 import * as hex from "https://deno.land/std@0.136.0/encoding/hex.ts";
 import * as $ from "x/scale/mod.ts";
 import { DeriveCodec } from "./Codec.ts";
-import { display } from "./Display.ts";
 import * as M from "./Metadata.ts";
 
-// Call
-//   Pallet Index
-//   Call Index
-//   From Addr
-//   Call Args
-
-// Extra (and signed extension stuff?)
-//   Mortality
-//   Nonce
-//   Tip
-
-// Additional
-//   Runtime Spec Version
-//   Runtime TX version
-//   Genesis hash
-//   Checkpoint hash –– genesis if immortal. If mortal, should be the block hash provided in era information
-
-// Signature
-// If gt 256 bytes, blake2_256 it before signing, otherwise, just sign
-
-export function encodeCall(
-  palletI: number,
-  callCodec: $.Codec<unknown>,
-  methodName: string,
-  args: Record<string, unknown>,
-) {
-  return new Uint8Array([
-    ...$.u8.encode(palletI),
-    ...callCodec.encode({
-      _tag: methodName,
-      ...args,
-    }),
-  ]);
-}
-
-export function encodeExtra(
-  extraCodec: $.Codec<unknown>,
-  extras: unknown[],
-) {
-  return extraCodec.encode(extras);
-}
-
+// TODO: can this vary depending on chain?
 export const $additional = $.tuple(
   $.u32,
   $.u32,
@@ -55,46 +12,96 @@ export const $additional = $.tuple(
   $.sizedArray($.u8, 32),
 );
 
-export function encodeAdditional(
+// TODO: CLEAN THIS UP!
+export function encodeExtrinsic(
+  pubKey: Uint8Array,
+  metadata: M.Metadata,
+  deriveCodec: DeriveCodec,
+  palletName: string,
+  methodName: string,
+  args: Record<string, unknown>,
+  extras: unknown[],
   specVersion: number,
   transactionVersion: number,
   genesisHash: Uint8Array,
   checkpoint: Uint8Array,
-) {
-  return $additional.encode([
+  sign?: (message: Uint8Array) => Uint8Array,
+): string {
+  const uncheckedExtrinsicMetadata = metadata.types[metadata.extrinsic.type];
+  if (uncheckedExtrinsicMetadata?._tag !== M.TypeKind.Struct) {
+    throw new Error();
+  }
+  const lookup = uncheckedExtrinsicMetadata.params.reduce<
+    Record<"Address" | "Call" | "Signature" | "Extra", number>
+  >((acc, cur) => {
+    if (!cur.type) {
+      throw new Error();
+    }
+    return { [cur.name]: cur.type, ...acc };
+  }, {} as any);
+  if (
+    lookup.Address === undefined
+    || lookup.Call === undefined
+    || lookup.Signature === undefined
+    || lookup.Extra === undefined
+  ) {
+    throw new Error();
+  }
+  const $callCodec = deriveCodec(lookup.Call);
+  const callEncoded = $callCodec.encode({
+    _tag: palletName,
+    0: {
+      _tag: methodName,
+      ...args,
+    },
+  });
+  const $extraCodec = deriveCodec(lookup.Extra);
+  const extraEncoded = $extraCodec.encode(extras);
+  const additional = $additional.encode([
     specVersion,
     transactionVersion,
     [...genesisHash] as any,
     [...checkpoint] as any,
   ]);
-}
-
-export function ensureMaxLen(bytes: Uint8Array): Uint8Array {
-  if (bytes.length > 256) {
-    return bindings.blake2_256(bytes);
+  const fullUnsignedPayload = new Uint8Array([
+    ...callEncoded,
+    ...extraEncoded,
+    ...additional,
+  ]);
+  let bytes: number[] = [];
+  if (sign) {
+    const signature = {
+      _tag: "Sr25519",
+      0: {
+        0: sign(
+          fullUnsignedPayload.length > 256
+            ? bindings.blake2_256(fullUnsignedPayload)
+            : fullUnsignedPayload,
+        ),
+      },
+    };
+    const $signatureToEncode = $.tuple(
+      $.sizedArray($.u8, 32),
+      deriveCodec(lookup.Signature),
+      $extraCodec,
+    );
+    const finalSignature = $signatureToEncode.encode([
+      [...pubKey] as any,
+      signature,
+      extras,
+    ]);
+    bytes = [
+      metadata.extrinsic.version | 128,
+      ...finalSignature,
+      ...callEncoded,
+    ];
+  } else {
+    bytes = [127, ...callEncoded];
   }
-  return bytes;
-}
-
-export function $SignatureToEncode(
-  $signatureCodec: $.Codec<unknown>,
-  $extraCodec: $.Codec<unknown>,
-) {
-  return $.tuple(
-    $.sizedArray($.u8, 32),
-    $signatureCodec,
-    $extraCodec,
-  );
-}
-
-export function encodeExtrinsic(
-  extrinsicVersion: number,
-  callData: Uint8Array,
-  signature?: Uint8Array,
-) {
-  const bytes = [
-    ...signature ? [extrinsicVersion | 128, ...signature] : [127],
-    ...callData,
-  ];
-  return new Uint8Array([...$.compact.encode(bytes.length), ...bytes]);
+  return new TextDecoder().decode(hex.encode(
+    new Uint8Array([
+      ...$.compact.encode(bytes.length),
+      ...bytes,
+    ]),
+  ));
 }

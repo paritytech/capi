@@ -5,17 +5,17 @@ export type UnknownByTypeDefKind = { [Tag in m.TypeKind]: unknown };
 
 export type TypeVisitor<
   Tag extends m.TypeKind,
-  Misc,
+  Misc extends unknown[],
   Results extends UnknownByTypeDefKind,
 > = (
   this: TypeVisitors<Results, Misc>,
   typeDef: m.Type & { _tag: Tag },
-  misc?: unknown,
+  ...misc: Misc
 ) => Results[Tag];
 
 export type TypeVisitors<
   Results extends UnknownByTypeDefKind,
-  Misc,
+  Misc extends unknown[] = [],
 > =
   & { [Tag in m.TypeKind]: TypeVisitor<Tag, Misc, Results> }
-  & { visit: (i: number) => u.ValueOf<Results> };
+  & { visit: (i: number, ...misc: Misc) => u.ValueOf<Results> };

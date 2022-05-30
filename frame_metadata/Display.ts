@@ -5,6 +5,8 @@ export const display = (
   metadata: m.Metadata,
   typeI: number,
 ) => {
+  const cache: Record<number, unknown> = {};
+
   const Fields = (...fields: m.Field[]) => {
     return fields.map((field) => {
       return {
@@ -14,7 +16,7 @@ export const display = (
     });
   };
 
-  const visitors: TypeVisitors<{ [_ in m.TypeKind]: unknown }, Map<unknown, true>> = {
+  const visitors: TypeVisitors<{ [_ in m.TypeKind]: unknown }> = {
     [m.TypeKind.Struct]: (ty) => {
       return {
         ...ty,
@@ -60,11 +62,16 @@ export const display = (
       return ty;
     },
     visit: (i) => {
+      if (cache[i]) {
+        return cache[i];
+      }
       if (i === 103) {
         return "XMC STUFF TODO";
       }
       const type_ = metadata.types[i]!;
-      return (visitors[type_._tag] as any)(type_);
+      const result = (visitors[type_._tag] as any)(type_);
+      cache[i] = result;
+      return result;
     },
   };
 

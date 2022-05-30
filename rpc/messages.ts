@@ -55,6 +55,7 @@ export type Lookup = EnsureMethodLookup<{
   author_pendingExtrinsics(_: string): string;
   author_removeExtrinsics: TODO;
   author_rotateKeys(): string;
+  author_submitExtrinsic(transaction: string): string;
   author_submitAndWatchExtrinsic(tx: string): Subscription<unknown>;
   author_unwatchExtrinsic(subscription: string): unknown;
   babe_epochAuthorship(_: unknown): unknown;

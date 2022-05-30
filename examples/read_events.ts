@@ -6,4 +6,4 @@ const result = await C.runtime({
   ...bindings.hashersR,
   rpc: C.wsRpcClient,
 })($events);
-console.log(result);
+console.log(result.value[0].event[0]);
