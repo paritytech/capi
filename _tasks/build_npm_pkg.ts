@@ -9,12 +9,12 @@ await fs.emptyDir(outDir);
 await Promise.all([
   build({
     importMap: "import_map.json",
-    entryPoints: ["./mod.ts", "./target/wasm/bindings/mod.js"],
+    entryPoints: ["./mod.ts"],
     outDir,
     mappings: {
-      "https://deno.land/x/scale@v0.1.1/mod.ts": {
+      "https://deno.land/x/scale@v0.1.2/mod.ts": {
         name: "parity-scale-codec",
-        version: "^0.1.1",
+        version: "^0.1.2",
       },
     },
     package: {
@@ -30,9 +30,7 @@ await Promise.all([
       target: "ES2021",
     },
     scriptModule: false, // re-enable once top-level await removed from wasm bindings
-    shims: {
-      webSocket: true,
-    },
+    shims: {},
     test: false,
     typeCheck: false,
   }),
@@ -75,3 +73,7 @@ for await (
   Deno.mkdirSync(path.dirname(out), { recursive: true });
   Deno.writeTextFileSync(out, fixImports(file, Deno.readTextFileSync(file)));
 }
+
+await Promise.all(["deno", "esm", "src"].map((dir) => {
+  return fs.copy("./bindings/bindings.wasm", `target/npm/${dir}/bindings/bindings.wasm`);
+}));
