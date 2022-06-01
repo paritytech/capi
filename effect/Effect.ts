@@ -205,7 +205,7 @@ function _runAsyncNode(node: _Node) {
     let value: unknown;
     while (nodes.length) {
       const node = nodes.pop()!;
-      if (!node.deps.every((x) => x.resolved)) break;
+      if (!node.deps.every((x) => x.resolved)) return;
       if (node.kind === "syncFunc") {
         value = node.fn(...node.deps.map((x) => x.value));
         node.resolved = true;
