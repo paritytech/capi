@@ -1,24 +1,23 @@
+import { HashHexString, HexNum, HexString } from "./branded.ts";
+
 export interface Block {
-  extrinsics: string[];
-  header: {
-    digest: {
-      logs: string[];
-    };
-    extrinsicsRoot: string;
-    number: string;
-    parentHash: string;
-    stateRoot: string;
+  block: {
+    header: Header;
+    extrinsics: HexString[];
   };
+  justifications?: [number[], number[]][];
 }
 
-export interface Head {
-  digest: {
-    logs: string[];
-  };
-  extrinsicsRoot: string;
-  number: string;
-  parentHash: string;
-  stateRoot: string;
+export interface HeaderDigest {
+  logs: HexString[];
+}
+
+export interface Header {
+  digest: HeaderDigest;
+  extrinsicsRoot: HashHexString;
+  number: HexNum;
+  parentHash: HashHexString;
+  stateRoot: HashHexString;
 }
 
 export interface RuntimeVersion {
@@ -29,16 +28,12 @@ export interface RuntimeVersion {
   implVersion: number;
   transactionVersion?: number;
   stateVersion?: number;
-  apis: [string, number][];
+  apis: [HexString, number][];
 }
 
 export interface StorageChangeSet {
-  block: string;
-  changes: [string, string | undefined][];
-}
-
-export interface Cow {
-  id: string;
+  block: HashHexString;
+  changes: [HexString, HexString | undefined][];
 }
 
 export interface SystemHealth {
@@ -56,7 +51,7 @@ export const enum SystemPeerRole {
 export interface SystemPeer {
   peerId: string;
   roles: SystemPeerRole;
-  bestHash: string;
+  bestHash: HashHexString;
   bestNumber: number;
 }
 
@@ -64,4 +59,9 @@ export interface NetworkConfig {
   totalAttempts: number;
   maxParallel: number;
   timeoutMs: number;
+}
+
+export interface RpcMethods {
+  version: bigint;
+  methods: string[];
 }

@@ -1,6 +1,6 @@
 import { hashers } from "/bindings/mod.ts";
 import { CHAIN_URL_LOOKUP } from "/constants/chains/url.ts";
-import { call, wsRpcClient } from "/rpc/mod.ts";
+import { call, HexString, wsRpcClient } from "/rpc/mod.ts";
 import * as hex from "std/encoding/hex.ts";
 import * as path from "std/path/mod.ts";
 import { IsExact } from "x/conditional_type_checks/mod.ts";
@@ -60,7 +60,7 @@ export namespace State {
     const storageEntry = lookup.getStorageEntryByPalletAndName(pallet, storageEntryName);
     const key = encodeKey(deriveCodec, hashers, pallet, storageEntry, ...keys);
     const client = await wsRpcClient(url);
-    const message = await call(client, "state_getStorage", [key]);
+    const message = await call(client, "state_getStorage", [key as HexString]);
     const resultScaleHex = (message as any).result as string | undefined;
     if (resultScaleHex === undefined) {
       return;

@@ -1,6 +1,6 @@
 import * as A from "std/async/mod.ts";
 import { ListenerCb, RpcClient, RpcClientFactory, StopListening } from "./Base.ts";
-import { Init } from "./messages.ts";
+import { InitMessage } from "./messages.ts";
 
 export class WsRpcClient extends RpcClient {
   #ws;
@@ -58,7 +58,7 @@ export class WsRpcClient extends RpcClient {
     };
   };
 
-  send = (egressMessage: Init): void => {
+  send = (egressMessage: InitMessage): void => {
     this.#ws.send(JSON.stringify(egressMessage));
   };
 

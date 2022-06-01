@@ -1,4 +1,4 @@
-import { IngressMessage, Init } from "./messages.ts";
+import { IngressMessage, InitMessage } from "./messages.ts";
 
 export type ListenerCb<IngressMessage_ extends IngressMessage = IngressMessage> = (
   ingressMessage: IngressMessage_,
@@ -13,7 +13,7 @@ export abstract class RpcClient {
     return (this.#nextId++).toString();
   };
 
-  abstract send: (egressMessage: Init) => void;
+  abstract send: (egressMessage: InitMessage) => void;
   abstract listen: (listenerCb: ListenerCb) => StopListening;
   abstract close: () => Promise<void>;
 }
