@@ -115,7 +115,7 @@ const $parachainIds = C.entry($pallet, "Parachains");
 const $parachainHeads = C.map($pallet, "Heads");
 
 // 3. Create an effect for resolving each parachain head.
-const $parachainHeads = C.all($parachainIds, (id) => {
+const $parachainHeads = C.map($parachainIds, (id) => {
   return C.entry($parachainHeads, id);
 });
 
