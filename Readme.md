@@ -1,6 +1,6 @@
 # Capi
 
-<h4 align="center">
+<h4>
   <a href="">Guide</a> &nbsp;·&nbsp;
   <a href="">API Reference</a> &nbsp;·&nbsp;
   <a href="">Support</a> &nbsp;·&nbsp;
