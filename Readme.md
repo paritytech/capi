@@ -55,7 +55,7 @@ const $chain = C.chain(C.POLKADOT);
 const $pallet = C.pallet($chain, "System");
 
 // 2. Which item?
-const $accounts = C.map($pallet, "Account");
+const $accounts = C.storageMap($pallet, "Account");
 
 // 3. Which account (the key) within the map?
 const $accountId = C.ss58(MY_ADDR).toAccountId32();
@@ -112,7 +112,7 @@ const $pallet = C.pallet($chain, "Paras");
 const $parachainIds = C.entry($pallet, "Parachains");
 
 // 3. Get a reference to the heads map.
-const $parachainHeads = C.map($pallet, "Heads");
+const $parachainHeads = C.storageMap($pallet, "Heads");
 
 // 3. Create an effect for resolving each parachain head.
 const $parachainHeads = C.map($parachainIds, (id) => {
