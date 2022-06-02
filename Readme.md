@@ -114,12 +114,12 @@ const $parachainIds = C.entry($pallet, "Parachains");
 // 3. Get a reference to the heads map.
 const $parachainHeads = C.storageMap($pallet, "Heads");
 
-// 3. Create an effect for resolving each parachain head.
+// 4. Create an effect for resolving each parachain head.
 const $parachainHeads = C.map($parachainIds, (id) => {
   return C.entry($parachainHeads, id);
 });
 
-// 6. Execute the read.
+// 5. Execute the read.
 const result = await C.read($parachainHeads).run();
 ```
 
