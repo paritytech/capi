@@ -1,5 +1,5 @@
 import { effector } from "/effect/Effect.ts";
-import { Pallet } from "/effect/std/Pallet.ts";
+import { Pallet } from "/effect/std/pallet.ts";
 
 export interface Entry {
   pallet: Pallet;

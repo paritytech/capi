@@ -9,7 +9,7 @@ import { palletMetadata } from "/effect/std/atoms/palletMetadata.ts";
 import { select } from "/effect/std/atoms/select.ts";
 import { wrap } from "/effect/std/atoms/wrap.ts";
 import { Entry } from "/effect/std/Entry.ts";
-import { metadata } from "/effect/std/Metadata.ts";
+import { metadata } from "/effect/std/metadata.ts";
 import { rpcCall } from "/effect/std/rpcCall.ts";
 
 // TODO: flatten primitive?
