@@ -20,6 +20,6 @@ export const MultiAddressBrand: unique symbol = Symbol();
 export type MultiAddressBrand = typeof MultiAddressBrand;
 export type MultiAddress = U.Branded<string, MultiAddressBrand>;
 
-export const HexNumBrand: unique symbol = Symbol();
-export type HexNumBrand = typeof HexNumBrand;
-export type HexNum = U.Branded<string, HexNumBrand>;
+export const HexU64Brand: unique symbol = Symbol();
+export type HexNumBrand = typeof HexU64Brand;
+export type HexU64 = U.Branded<string, HexNumBrand>;

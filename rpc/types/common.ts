@@ -1,4 +1,4 @@
-import { HashHexString, HexNum, HexString } from "./branded.ts";
+import { HashHexString, HexString, HexU64 } from "./branded.ts";
 
 export interface Block {
   block: {
@@ -15,7 +15,7 @@ export interface HeaderDigest {
 export interface Header {
   digest: HeaderDigest;
   extrinsicsRoot: HashHexString;
-  number: HexNum;
+  number: HexU64;
   parentHash: HashHexString;
   stateRoot: HashHexString;
 }

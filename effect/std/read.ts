@@ -8,7 +8,7 @@ import { metadataLookup } from "/effect/std/atoms/metadataLookup.ts";
 import { palletMetadata } from "/effect/std/atoms/palletMetadata.ts";
 import { select } from "/effect/std/atoms/select.ts";
 import { wrap } from "/effect/std/atoms/wrap.ts";
-import { Entry } from "/effect/std/Entry.ts";
+import { Entry } from "/effect/std/entry.ts";
 import { metadata } from "/effect/std/metadata.ts";
 import { rpcCall } from "/effect/std/rpcCall.ts";
 
