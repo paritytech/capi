@@ -10,7 +10,7 @@ const pair = bindings.pairFromSecretSeed(
 );
 
 const client = await C.wsRpcClient(C.WESTEND_RPC_URL);
-const metadataRaw = (await C.call(client, "state_getMetadata", []) as C.OkRes<"state_getMetadata">).result;
+const metadataRaw = (await C.call(client, "state_getMetadata", []) as C.OkMessage<"state_getMetadata">).result;
 const metadata = M.fromPrefixedHex(metadataRaw);
 const deriveCodec = M.DeriveCodec(metadata);
 

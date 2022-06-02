@@ -1,119 +1,123 @@
 import { EnsureLookup } from "/util/mod.ts";
 import * as T from "./types/mod.ts";
 
-export type MethodName = keyof Lookup;
+export type MethodName = keyof MethodLookup;
 
-export type InitMessageByMethodName = { [N in MethodName]: InitMessageBase<N, Parameters<Lookup[N]>> };
+export type InitMessageByMethodName = { [N in MethodName]: InitMessageBase<N, Parameters<MethodLookup[N]>> };
 export type InitMessage<N extends MethodName = MethodName> = InitMessageByMethodName[N];
 
 export type OkMessageByMethodName = {
-  [N in MethodName]: OkResBase<ReturnType<Lookup[N]> extends Subscription ? string : ReturnType<Lookup[N]>>;
+  [N in MethodName]: OkResBase<ReturnType<MethodLookup[N]> extends Subscription ? string : ReturnType<MethodLookup[N]>>;
 };
 export type OkMessage<N extends MethodName = MethodName> = OkMessageByMethodName[N];
 
 export type NotifByMethodName = {
-  [N in MethodName as ReturnType<Lookup[N]> extends Subscription ? N : never]: NotifMessageBase<
+  [N in MethodName as ReturnType<MethodLookup[N]> extends Subscription ? N : never]: NotifMessageBase<
     N,
-    ReturnType<Lookup[N]> extends Subscription<infer R> ? R : never
+    ReturnType<MethodLookup[N]> extends Subscription<infer R> ? R : never
   >;
 };
 export type SubscriptionMethodName = keyof NotifByMethodName;
 export type NotifMessage<N extends SubscriptionMethodName = SubscriptionMethodName> = NotifByMethodName[N];
 
-// TODO: (possibly) narrow depending on method name
-export type ErrMessage<N extends MethodName = MethodName> = ErrMessageBase<ErrorDetails>;
+// TODO: error matching utility / requires generalized we think through generalized matching utility
+// TODO: investigate whether it's worthwhile to support somehow tacking on narrow method-specific types
+export type ErrName = keyof ErrDetailLookup;
+export type ErrMessageByName = { [N in ErrName]: ErrorMessageBase<ErrDetailLookup[N][0], ErrDetailLookup[N][1]> };
+export type ErrMessage<N extends ErrName = ErrName> = ErrMessageByName[N];
 
 export type IngressMessage = OkMessage | ErrMessage | NotifMessage;
 
+// TODO: attach type-level docs (draw from Substrate's source)
 /**
  * The following is modeled closely after the method definitions of Smoldot. This `Lookup` type serves as a source of
  * truth, from which we map to init, notification and ok response types. Error types are––unfortunately––not defined as
  * method-specific on the Rust side, although perhaps we could create represent them as such.
  * @see https://github.com/paritytech/smoldot/blob/82836f4f2af4dd1716c57c14a4f591c7b1043950/src/json_rpc/methods.rs#L338-L479
  */
-type Lookup = EnsureLookup<string, (...args: any[]) => any, {
+type MethodLookup = EnsureLookup<string, (...args: any[]) => any, {
   system_accountNextIndex(account: T.AccountId): number;
-  account_nextIndex: TODO;
-  system_dryRun: TODO;
-  system_dryRunAt: Lookup["system_dryRun"];
+  account_nextIndex: TODO_NARROW_METHOD_TYPE;
+  system_dryRun: TODO_NARROW_METHOD_TYPE;
+  system_dryRunAt: MethodLookup["system_dryRun"];
   author_submitExtrinsic(transaction: T.HexString): T.HashHexString;
-  author_insertKey: TODO;
+  author_insertKey: TODO_NARROW_METHOD_TYPE;
   author_rotateKeys(): T.HexString;
-  author_hasSessionKeys: TODO;
+  author_hasSessionKeys: TODO_NARROW_METHOD_TYPE;
   author_hasKey(pubKey: string, keyType: string): string;
   author_pendingExtrinsics(): T.HexString[];
-  author_removeExtrinsics: TODO;
+  author_removeExtrinsics: TODO_NARROW_METHOD_TYPE;
   author_submitAndWatchExtrinsic(tx: string): Subscription<unknown>;
   author_unwatchExtrinsic(subscriptionId: T.SubscriptionId): unknown;
   babe_epochAuthorship(_: unknown): unknown;
   chain_getBlock(hash?: T.HashHexString): T.Block;
   chain_getBlockHash(height?: number): T.HashHexString;
-  chain_getHead: Lookup["chain_getBlockHash"];
+  chain_getHead: MethodLookup["chain_getBlockHash"];
   chain_getFinalizedHead(): T.HashHexString;
-  chain_getFinalisedHead: Lookup["chain_getFinalizedHead"];
+  chain_getFinalisedHead: MethodLookup["chain_getFinalizedHead"];
   chain_getHeader(hash?: T.HashHexString): T.Header;
   chain_subscribeAllHeads(): Subscription<T.Header>;
   chain_subscribeFinalizedHeads(): Subscription<T.Header /* TODO: narrow to finalized? */>;
-  chain_subscribeFinalisedHeads: Lookup["chain_subscribeFinalizedHeads"];
+  chain_subscribeFinalisedHeads: MethodLookup["chain_subscribeFinalizedHeads"];
   chain_subscribeNewHeads(): Subscription<unknown>;
-  subscribe_newHead: Lookup["chain_subscribeNewHeads"];
-  chain_subscribeNewHead: Lookup["chain_subscribeNewHeads"];
+  subscribe_newHead: MethodLookup["chain_subscribeNewHeads"];
+  chain_subscribeNewHead: MethodLookup["chain_subscribeNewHeads"];
   chain_unsubscribeAllHeads(subscription: string): boolean;
   chain_unsubscribeFinalizedHeads(subscription: string): boolean;
-  chain_unsubscribeFinalisedHeads: Lookup["chain_unsubscribeFinalizedHeads"];
+  chain_unsubscribeFinalisedHeads: MethodLookup["chain_unsubscribeFinalizedHeads"];
   chain_unsubscribeNewHeads(subscription: string): boolean;
-  unsubscribe_newHead: Lookup["chain_unsubscribeNewHeads"];
-  chain_unsubscribeNewHead: Lookup["chain_unsubscribeNewHeads"];
+  unsubscribe_newHead: MethodLookup["chain_unsubscribeNewHeads"];
+  chain_unsubscribeNewHead: MethodLookup["chain_unsubscribeNewHeads"];
   chainHead_unstable_follow(runtimeUpdates: boolean): Subscription<T.ChainHeadUnstableFollowEvent>;
-  childstate_getKeys: TODO;
-  childstate_getStorage: TODO;
-  childstate_getStorageHash: TODO;
-  childstate_getStorageSize: TODO;
-  grandpa_roundState: TODO;
-  offchain_localStorageGet: TODO;
-  offchain_localStorageSet: TODO;
+  childstate_getKeys: TODO_NARROW_METHOD_TYPE;
+  childstate_getStorage: TODO_NARROW_METHOD_TYPE;
+  childstate_getStorageHash: TODO_NARROW_METHOD_TYPE;
+  childstate_getStorageSize: TODO_NARROW_METHOD_TYPE;
+  grandpa_roundState: TODO_NARROW_METHOD_TYPE;
+  offchain_localStorageGet: TODO_NARROW_METHOD_TYPE;
+  offchain_localStorageSet: TODO_NARROW_METHOD_TYPE;
   payment_queryInfo(extrinsic: T.HexString, hash?: T.HashHexString): T.RuntimeDispatchInfo;
   rpc_methods(): T.RpcMethods;
-  state_call: TODO;
-  state_callAt: Lookup["state_call"];
-  state_getKeys: TODO;
+  state_call: TODO_NARROW_METHOD_TYPE;
+  state_callAt: MethodLookup["state_call"];
+  state_getKeys: TODO_NARROW_METHOD_TYPE;
   state_getKeysPaged(
     prefix: string | undefined,
     count: number,
     startKey?: T.HexString,
     hash?: T.HashHexString,
   ): T.HexString[];
-  state_getKeysPagedAt: Lookup["state_getKeysPaged"];
+  state_getKeysPagedAt: MethodLookup["state_getKeysPaged"];
   state_getMetadata(hash?: T.HashHexString): string;
-  state_getPairs: TODO;
-  state_getReadProof: TODO;
+  state_getPairs: TODO_NARROW_METHOD_TYPE;
+  state_getReadProof: TODO_NARROW_METHOD_TYPE;
   state_getRuntimeVersion(at?: T.HashHexString): T.RuntimeVersion;
-  chain_getRuntimeVersion: Lookup["state_getRuntimeVersion"];
+  chain_getRuntimeVersion: MethodLookup["state_getRuntimeVersion"];
   state_getStorage(key: T.HexString, hash?: T.HashHexString): T.HexString;
-  state_getStorageHash: TODO;
-  state_getStorageHashAt: Lookup["state_getStorageHash"];
-  state_getStorageSize: TODO;
-  state_getStorageSizeAt: Lookup["state_getStorageSize"];
-  state_queryStorage: TODO;
+  state_getStorageHash: TODO_NARROW_METHOD_TYPE;
+  state_getStorageHashAt: MethodLookup["state_getStorageHash"];
+  state_getStorageSize: TODO_NARROW_METHOD_TYPE;
+  state_getStorageSizeAt: MethodLookup["state_getStorageSize"];
+  state_queryStorage: TODO_NARROW_METHOD_TYPE;
   state_queryStorageAt(keys: T.HexString[], at?: T.HashHexString): T.StorageChangeSet;
-  state_subscribeRuntimeVersion: TODO;
-  chain_subscribeRuntimeVersion: Lookup["state_subscribeRuntimeVersion"];
+  state_subscribeRuntimeVersion: TODO_NARROW_METHOD_TYPE;
+  chain_subscribeRuntimeVersion: MethodLookup["state_subscribeRuntimeVersion"];
   state_subscribeStorage(list: T.HexString[]): Subscription<"TODO">;
   state_unsubscribeRuntimeVersion(subscription: string): boolean;
-  chain_unsubscribeRuntimeVersion: Lookup["state_unsubscribeRuntimeVersion"];
+  chain_unsubscribeRuntimeVersion: MethodLookup["state_unsubscribeRuntimeVersion"];
   state_unsubscribeStorage(subscription: string): boolean;
-  system_addReservedPeer: TODO;
+  system_addReservedPeer: TODO_NARROW_METHOD_TYPE;
   system_chain(): string;
   system_chainType(): T.SystemChainTypeKind;
   system_health(): T.SystemHealth;
   system_localListenAddresses(): string[];
   system_localPeerId(): string;
   system_name(): string;
-  system_networkState: TODO;
-  system_nodeRoles: TODO;
+  system_networkState: TODO_NARROW_METHOD_TYPE;
+  system_nodeRoles: TODO_NARROW_METHOD_TYPE;
   system_peers(): T.SystemPeer[];
-  system_properties: TODO;
-  system_removeReservedPeer: TODO;
+  system_properties: TODO_NARROW_METHOD_TYPE;
+  system_removeReservedPeer: TODO_NARROW_METHOD_TYPE;
   system_version(): string;
   chainHead_unstable_body(followSubscription: T.HashHexString, networkConfig?: T.NetworkConfig): string;
   chainHead_unstable_call(
@@ -145,6 +149,41 @@ type Lookup = EnsureLookup<string, (...args: any[]) => any, {
   transaction_unstable_unwatch(subscription: T.SubscriptionId): void;
 }>;
 
+type ErrDetailLookup = EnsureLookup<string, [code: number, data?: any], {
+  /**
+   * Invalid JSON was received by the server.
+   */
+  ParseError: [-32700];
+  /**
+   * The JSON sent is not a valid Request object.
+   */
+  InvalidRequest: [-32600];
+  /**
+   * The method does not exist / is not available.
+   */
+  MethodNotFound: [-32601];
+  /**
+   * Invalid method parameter(s).
+   */
+  InvalidParams: [-32602];
+  /**
+   * Internal JSON-RPC error.
+   */
+  InternalError: [-32603];
+  /**
+   * Other internal server error.
+   * Contains a more precise error code and a custom message.
+   * Error code must be in the range -32000 to -32099 included.
+   */
+  ServerError: [number];
+  /**
+   * Method-specific error.
+   * Contains a more precise error code and a custom message.
+   * Error code must be outside of the range -32000 to -32700.
+   */
+  MethodError: [number];
+}>;
+
 interface JsonRpcVersionBearer {
   jsonrpc: "2.0";
 }
@@ -173,20 +212,23 @@ export interface NotifMessageBase<Method extends MethodName, Result> extends Jso
   error?: never;
 }
 
-// TODO: narrow
-export interface ErrorDetails {
-  code: number;
-  message: string;
-}
+const _N: unique symbol = Symbol();
+type Subscription<NotificationResult = any> = { [_N]: NotificationResult };
+type TODO_NARROW_METHOD_TYPE = (...args: unknown[]) => unknown;
 
-export interface ErrMessageBase<Details extends ErrorDetails> extends JsonRpcVersionBearer {
+interface ErrorMessageBase<
+  Code extends number,
+  Data = undefined,
+> extends JsonRpcVersionBearer {
   id: string;
-  error: Details;
+  error:
+    & {
+      code: Code;
+      message: string;
+    }
+    & (Data extends undefined ? {} : {
+      data: Data;
+    });
   params?: never;
   result?: never;
 }
-
-const _N: unique symbol = Symbol();
-type Subscription<NotificationResult = any> = { [_N]: NotificationResult };
-
-type TODO = (...args: unknown[]) => unknown;

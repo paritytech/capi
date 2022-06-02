@@ -2,6 +2,12 @@ import * as A from "std/async/mod.ts";
 import { ListenerCb, RpcClient, RpcClientFactory, StopListening } from "./Base.ts";
 import { InitMessage } from "./messages.ts";
 
+export const wsRpcClient: RpcClientFactory<string> = async (url) => {
+  const rpcClient = new WsRpcClient(url);
+  await rpcClient.opening();
+  return rpcClient;
+};
+
 export class WsRpcClient extends RpcClient {
   #ws;
   #listeners = new Map<ListenerCb, boolean>();
@@ -50,7 +56,7 @@ export class WsRpcClient extends RpcClient {
 
   listen = (listener: ListenerCb): StopListening => {
     if (this.#listeners.has(listener)) {
-      throw new Error();
+      throw new WsRpcClientRegisteredListenerTwiceError(listener);
     }
     this.#listeners.set(listener, true);
     return () => {
@@ -63,13 +69,12 @@ export class WsRpcClient extends RpcClient {
   };
 
   #onError = (e: Event) => {
-    console.error({ e });
-    throw new Error();
+    throw new WsRpcClientServerError(e);
   };
 
   #onMessage = (e: MessageEvent) => {
     if (typeof e.data !== "string") {
-      throw new Error();
+      throw new WsRpcClientNoDataError(e);
     }
     const parsed = JSON.parse(e.data);
     for (const listener of this.#listeners.keys()) {
@@ -78,8 +83,23 @@ export class WsRpcClient extends RpcClient {
   };
 }
 
-export const wsRpcClient: RpcClientFactory<string> = async (url) => {
-  const rpcClient = new WsRpcClient(url);
-  await rpcClient.opening();
-  return rpcClient;
-};
+export type WsRpcClientError =
+  | WsRpcClientServerError
+  | WsRpcClientRegisteredListenerTwiceError
+  | WsRpcClientNoDataError;
+
+export class WsRpcClientServerError extends Error {
+  constructor(readonly event: Event) {
+    super();
+  }
+}
+export class WsRpcClientRegisteredListenerTwiceError extends Error {
+  constructor(readonly listener: ListenerCb) {
+    super();
+  }
+}
+export class WsRpcClientNoDataError extends Error {
+  constructor(readonly event: Event) {
+    super();
+  }
+}

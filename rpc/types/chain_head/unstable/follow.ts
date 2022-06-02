@@ -1,3 +1,5 @@
+import { HashHexString } from "/rpc/types/branded.ts";
+
 export type ChainHeadUnstableFollowEvent =
   | ChainHeadUnstableFollowInitializedEvent
   | ChainHeadUnstableFollowNewBlockEvent
@@ -17,25 +19,44 @@ interface ChainHeadUnstableFollowEventBase<Kind extends ChainHeadUnstableFollowE
 }
 
 export interface ChainHeadUnstableFollowInitializedEvent extends ChainHeadUnstableFollowEventBase<"initialized"> {
-  finalizedBlockHash: string;
+  finalizedBlockHash: HashHexString;
   finalizedBlockRuntime: string;
 }
 
 export interface ChainHeadUnstableFollowNewBlockEvent extends ChainHeadUnstableFollowEventBase<"newBlock"> {
-  blockHash: string;
-  parentBlockHash: string;
+  blockHash: HashHexString;
+  parentBlockHash: HashHexString;
   newRuntime: null; // TODO
 }
 
 export interface ChainHeadUnstableFollowBestBlockChangedEvent
   extends ChainHeadUnstableFollowEventBase<"bestBlockChanged">
 {
-  bestBlockHash: string;
+  bestBlockHash: HashHexString;
 }
 
 export interface ChainHeadUnstableFollowFinalizedEvent extends ChainHeadUnstableFollowEventBase<"finalized"> {
-  finalizedBlocksHashes: string[];
-  prunedBlocksHashes: string[];
+  finalizedBlocksHashes: HashHexString[];
+  prunedBlocksHashes: HashHexString[];
 }
 
 export type ChainHeadUnstableFollowStopEvent = ChainHeadUnstableFollowEventBase<"stop">;
+
+export type MaybeRuntimeSpec = {
+  type: "valid";
+  spec: RuntimeSpec;
+} | {
+  type: "invalid";
+  error: string;
+};
+
+export interface RuntimeSpec {
+  specName: string;
+  implName: string;
+  authoringVersion: number;
+  specVersion: number;
+  implVersion: number;
+  transactionVersion?: number;
+  // TODO: type this as the Serde-serialized form of `hashbrown::HashMap`
+  apis: unknown;
+}
