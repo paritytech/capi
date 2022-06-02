@@ -6,5 +6,5 @@ const result = await $metadata.run();
 if (result instanceof Error) {
   throw result;
 }
-console.log(result.types[192]);
+console.log(result);
 await rpc.close();

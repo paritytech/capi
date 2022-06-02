@@ -11,7 +11,6 @@ import { wrap } from "/effect/std/atoms/wrap.ts";
 import { Entry } from "/effect/std/Entry.ts";
 import { metadata } from "/effect/std/Metadata.ts";
 import { rpcCall } from "/effect/std/rpcCall.ts";
-import { HexString } from "/rpc/mod.ts";
 
 // TODO: flatten primitive?
 export const read = effector.async("read", () =>
@@ -22,7 +21,7 @@ export const read = effector.async("read", () =>
     const palletMetadata_ = palletMetadata(metadataLookup_, entry.pallet.name);
     const entryMetadata_ = entryMetadata(metadataLookup_, palletMetadata_, entry.name);
     const key = entryKey(deriveCodec_, palletMetadata_, entryMetadata_, ...entry.keys);
-    const rpcCall_ = rpcCall(entry.pallet.rpc, "state_getStorage", key as unknown as HexString);
+    const rpcCall_ = rpcCall(entry.pallet.rpc, "state_getStorage", key);
     const encoded = select(rpcCall_, "result");
     const entryValueTypeI = select(entryMetadata_, "value");
     const entryCodec_ = codec(deriveCodec_, entryValueTypeI);
