@@ -38,6 +38,7 @@
     "example:transfer": "deno run -A --no-check examples/transfer.ts",
     "example:events": "deno run -A --no-check examples/events.ts",
     "test": "deno test -A --no-check=remote -L=info",
-    "update_snapshots": "deno test -A --no-check=remote -L=info -- --update"
+    "update_snapshots": "deno test -A --no-check=remote -L=info -- --update",
+    "watch_mdbook": "mdbook watch -o"
   }
 }

@@ -69,3 +69,4 @@ multiaddr
 binaryen
 westend
 schnorrkel
+mdbook
