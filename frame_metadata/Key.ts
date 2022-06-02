@@ -1,3 +1,4 @@
+import { HexString } from "/rpc/mod.ts";
 import * as hex from "https://deno.land/std@0.136.0/encoding/hex.ts";
 import { DeriveCodec } from "./Codec.ts";
 import * as M from "./Metadata.ts";
@@ -11,14 +12,14 @@ const finalize = (
   palletName: string,
   storageEntryName: string,
   keys: Iterable<number> = [],
-): string => {
+): HexString => {
   return new TextDecoder().decode(hex.encode(
     new Uint8Array([
       ...hashers[M.HasherKind.Twox128](new TextEncoder().encode(palletName)),
       ...hashers[M.HasherKind.Twox128](new TextEncoder().encode(storageEntryName)),
       ...keys,
     ]),
-  ));
+  )) as HexString;
 };
 
 export const encodeKey = (
@@ -27,7 +28,7 @@ export const encodeKey = (
   pallet: M.Pallet,
   storageEntry: M.StorageEntry,
   ...keys: [a?: unknown, b?: unknown]
-): string => {
+): HexString => {
   if (storageEntry._tag === M.StorageEntryTypeKind.Plain) {
     return finalize(hashers, pallet.name, storageEntry.name);
   }

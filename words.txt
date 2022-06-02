@@ -69,3 +69,5 @@ multiaddr
 binaryen
 westend
 schnorrkel
+hashbrown
+serde

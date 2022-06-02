@@ -10,7 +10,7 @@ await Promise.all(
     const client = await rpc.wsRpcClient(url);
     try {
       const metadata = await rpc.call(client, "state_getMetadata", []);
-      if (rpc.isErrRes(metadata)) {
+      if (metadata.error) {
         console.log(metadata);
         throw new Error();
       }

@@ -6,11 +6,11 @@ import { entryKey } from "/effect/std/atoms/entryKey.ts";
 import { entryMetadata } from "/effect/std/atoms/entryMetadata.ts";
 import { metadataLookup } from "/effect/std/atoms/metadataLookup.ts";
 import { palletMetadata } from "/effect/std/atoms/palletMetadata.ts";
-import { rpcCall } from "/effect/std/atoms/rpcCall.ts";
 import { select } from "/effect/std/atoms/select.ts";
 import { wrap } from "/effect/std/atoms/wrap.ts";
-import { Entry } from "/effect/std/Entry.ts";
-import { metadata } from "/effect/std/Metadata.ts";
+import { Entry } from "/effect/std/entry.ts";
+import { metadata } from "/effect/std/metadata.ts";
+import { rpcCall } from "/effect/std/rpcCall.ts";
 
 // TODO: flatten primitive?
 export const read = effector.async("read", () =>
