@@ -10,7 +10,7 @@
 
 Capi (Chain API) is a TypeScript toolkit for crafting interactions with Substrate-based chains.
 
-It offers both low-level utilities and a high-level functional effect system which abstract over a range of use cases. Using Capi's standard library of effects, you can easily and intuitively interact with any Substrate-based chain while also following best practices and achieving optimal performance.
+It offers low-level utilities and a high-level functional effect system to abstract over a range of use cases. Using Capi's standard library of effects, you can easily and intuitively interact with any Substrate-based chain while also following best practices and achieving optimal performance.
 
 ⚠️ Capi is a work in progress. It is fraught with edge cases and `TODO` comments. If joining the Capi / Apps Framework team interests you, please reach out to<!--INSERT EMAIL ADDR HERE-->.
 
