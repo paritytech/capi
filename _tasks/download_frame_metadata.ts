@@ -3,7 +3,7 @@ import * as rpc from "/rpc/mod.ts";
 import * as fs from "std/fs/mod.ts";
 import * as path from "std/path/mod.ts";
 
-const outDir = path.join(Deno.cwd(), "target", "frame_metadata");
+const outDir = path.join(Deno.cwd(), "frame_metadata", "_downloaded");
 await fs.emptyDir(outDir);
 await Promise.all(
   CHAIN_URL_LOOKUP.map(async ([name, url]) => {

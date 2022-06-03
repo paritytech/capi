@@ -12,7 +12,9 @@ await Promise.all(
     "subsocial",
   ].map(async (name) => {
     Deno.test(name, async (t) => {
-      const scaleEncoded = await Deno.readTextFile(path.join("target/frame_metadata/", `${name}.scale`));
+      const scaleEncoded = await Deno.readTextFile(
+        path.join("frame_metadata/_downloaded", `${name}.scale`),
+      );
       const decodedMetadata = M.fromPrefixedHex(scaleEncoded);
       await assertSnapshot(t, decodedMetadata);
     });
