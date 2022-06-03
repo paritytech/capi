@@ -24,7 +24,7 @@ const primitiveCodecByDiscriminant = {
 
 export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
   // TODO: don't leak memory!
-  const cache: Record<number, $.Codec<unknown>> = {};
+  const cache: Record<number, $.Codec<unknown> | null> = {};
 
   const Fields = (fields: M.Field[]): $.Field[] => {
     return fields.map((field, i) => {
@@ -32,7 +32,7 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
     });
   };
 
-  const visitors: TypeVisitors<{ [_ in M.TypeKind]: $.Codec<any> }, [isRoot?: boolean /* root */]> = {
+  const visitors: TypeVisitors<{ [_ in M.TypeKind]: $.Codec<any> }> = {
     [M.TypeKind.Struct]: (ty) => {
       return $.object(...Fields(ty.fields)) as unknown as $.Codec<unknown>;
     },
@@ -50,7 +50,7 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
           return [
             field.name || i,
             $.deferred(() => {
-              return visitors.visit(field.type, false);
+              return visitors.visit(field.type);
             }),
           ] as [string, $.Codec<unknown>];
         });
@@ -92,13 +92,14 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
     [M.TypeKind.BitSequence]: () => {
       return $.never as unknown as $.Codec<any>;
     },
-    visit: (i, isRoot = false) => {
+    visit: (i) => {
       if (cache[i]) {
         return cache[i];
       }
-      if (!isRoot && i === 111) {
-        return $.dummy("TODO CIRCULARITY");
+      if (cache[i] === null) {
+        return $.deferred(() => cache[i]!);
       }
+      cache[i] = null; // circularity detection
       const type_ = metadata.types[i]!;
       const $codec = (visitors[type_._tag] as any)(type_, false);
       cache[i] = $codec;
@@ -106,7 +107,7 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
     },
   };
 
-  return (i: number) => visitors.visit(i, true);
+  return (i: number) => visitors.visit(i);
 };
 
 type NativeUnion<MemberCodecs extends $.Codec<any>[]> = $.Native<MemberCodecs[number]>;

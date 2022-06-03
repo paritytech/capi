@@ -1,6 +1,6 @@
 import * as bindings from "/bindings/mod.ts";
 import * as P from "/primitives/mod.ts";
-import * as hex from "https://deno.land/std@0.136.0/encoding/hex.ts";
+import * as hex from "/util/hex.ts";
 import * as $ from "x/scale/mod.ts";
 import { DeriveCodec } from "./Codec.ts";
 import { Metadata, TypeKind } from "./Metadata.ts";
@@ -75,24 +75,6 @@ export function encodeExtrinsic(p: EncodeExtrinsicProps): string {
     bytes = [127, ...callEncoded];
   }
   return new TextDecoder().decode(hex.encode(new Uint8Array([...$.compact.encode(bytes.length), ...bytes])));
-}
-
-export class Extrinsic {
-  constructor(
-    readonly pubKey: Uint8Array,
-    readonly palletName: string,
-    readonly methodName: string,
-    readonly args: Record<string, unknown>,
-    readonly extras: P.Extras,
-    readonly genesisHash: string,
-    readonly checkpoint: string,
-    readonly signature: string,
-    readonly versions: {
-      extrinsic: number;
-      spec: number;
-      tx: number;
-    },
-  ) {}
 }
 
 // TODO: move encoding logic into this codec
