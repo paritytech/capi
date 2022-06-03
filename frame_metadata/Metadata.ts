@@ -1,4 +1,4 @@
-import { hexToU8a } from "/util/mod.ts";
+import * as hex from "/util/hex.ts";
 import * as $ from "x/scale/mod.ts";
 import { ValidateCodecSignature } from "./test-util.ts";
 
@@ -379,5 +379,5 @@ export const $prefixedMetadata = $.createCodec({
 });
 
 export const fromPrefixedHex = (scaleEncoded: string): Metadata => {
-  return $prefixedMetadata.decode(hexToU8a(scaleEncoded));
+  return $prefixedMetadata.decode(hex.decode(scaleEncoded));
 };

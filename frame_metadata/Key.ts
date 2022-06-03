@@ -1,5 +1,5 @@
 import { HexString } from "/rpc/mod.ts";
-import * as hex from "https://deno.land/std@0.136.0/encoding/hex.ts";
+import * as hex from "/util/hex.ts";
 import { DeriveCodec } from "./Codec.ts";
 import * as M from "./Metadata.ts";
 
@@ -13,13 +13,13 @@ const finalize = (
   storageEntryName: string,
   keys: Iterable<number> = [],
 ): HexString => {
-  return new TextDecoder().decode(hex.encode(
+  return hex.encode(
     new Uint8Array([
       ...hashers[M.HasherKind.Twox128](new TextEncoder().encode(palletName)),
       ...hashers[M.HasherKind.Twox128](new TextEncoder().encode(storageEntryName)),
       ...keys,
     ]),
-  )) as HexString;
+  ) as HexString;
 };
 
 export const encodeKey = (
