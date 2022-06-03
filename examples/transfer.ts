@@ -23,7 +23,7 @@ const dest = new C.MultiAddress(
   C.MultiAddressKind.Id,
   hex.decode("8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48"),
 );
-const genesisHash = (hex.decode("c5c2beaf81f8833d2ddcfe0c04b0612d16f0d08d67aa5032dde065ddf71b4ed1"));
+const genesisHash = hex.decode("c5c2beaf81f8833d2ddcfe0c04b0612d16f0d08d67aa5032dde065ddf71b4ed1");
 
 const encoded = M.encodeExtrinsic({
   ...M.getExtrinsicCodecs(metadata, deriveCodec),
