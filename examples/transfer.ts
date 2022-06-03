@@ -1,4 +1,3 @@
-// import * as C from "/mod.ts";
 import * as bindings from "/bindings/mod.ts";
 import * as M from "/frame_metadata/mod.ts";
 import * as C from "/mod.ts";
@@ -19,45 +18,20 @@ if (!metadataRaw) {
 const metadata = M.fromPrefixedHex(metadataRaw);
 const deriveCodec = M.DeriveCodec(metadata);
 
-const dest = {
-  _tag: "Id",
-  0: {
-    0: [
-      ...hex.decode(
-        "8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48",
-      ),
-    ],
-  },
-};
-const genesisHash = hex.decode(
-  "c5c2beaf81f8833d2ddcfe0c04b0612d16f0d08d67aa5032dde065ddf71b4ed1",
+const dest = new C.MultiAddress(
+  C.MultiAddressKind.Id,
+  hex.decode("8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48"),
 );
+const genesisHash = hex.decode("c5c2beaf81f8833d2ddcfe0c04b0612d16f0d08d67aa5032dde065ddf71b4ed1");
 
-const result = M.encodeExtrinsic({
+const encoded = M.encodeExtrinsic({
+  ...M.getExtrinsicCodecs(metadata, deriveCodec),
   pubKey: pair.pubKey,
-  metadata,
-  deriveCodec,
+  extrinsicVersion: metadata.extrinsic.version,
   palletName: "Balances",
   methodName: "transfer",
-  args: {
-    value: 12345n,
-    dest,
-  },
-  // TODO:
-  //   unfortunately, this is what the JS-native equivalent of the `Extras` type looks like.
-  //   This can differ between chains. While we could create a primitive out of it... it could
-  //   be invalid at times. We'll need to think through the right approach to abstracting over
-  //   producing this type.
-  extras: [
-    {},
-    {},
-    {},
-    {},
-    { 0: { _tag: "Immortal" } },
-    { 0: 1000 },
-    {},
-    { 0: 500000000000000n },
-  ],
+  args: { dest, value: 12345n },
+  extras: new C.Extras(C.immortalEra, 1000, new C.ChargeAssetTxPayment(500000000000000n)),
   specVersion: 100,
   transactionVersion: 1,
   genesisHash,
@@ -67,6 +41,7 @@ const result = M.encodeExtrinsic({
   },
 });
 
-console.log(result);
+console.log({ encoded });
+console.log({ decoded: M.decodeExtrinsic(metadata, deriveCodec, hex.decode(encoded)) });
 
 await client.close();
