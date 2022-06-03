@@ -3,23 +3,11 @@
 
 import { runCmd } from "/util/mod.ts";
 
-await runCmd([
-  "cargo",
-  "build",
-  "--release",
-  "--target",
-  "wasm32-unknown-unknown",
-]);
+const WASM_OUT_PATH = "./target/wasm32-unknown-unknown/release/mod.wasm";
 
-await runCmd([
-  "wasm-bindgen",
-  "./target/wasm32-unknown-unknown/release/mod.wasm",
-  "--target",
-  "deno",
-  "--weak-refs",
-  "--out-dir",
-  "./target/wasm",
-]);
+await runCmd(["cargo", "build", "--release", "--target", "wasm32-unknown-unknown"]);
+await runCmd(["wasm-opt", "-g", "-Oz", WASM_OUT_PATH, "-o", "./target/wasm32-unknown-unknown/release/mod.wasm"]);
+await runCmd(["wasm-bindgen", WASM_OUT_PATH, "--target", "deno", "--weak-refs", "--out-dir", "./target/wasm"]);
 
 await Promise.all([
   Deno.copyFile("./target/wasm/mod_bg.wasm", "./bindings/bindings.wasm"),
