@@ -6,7 +6,7 @@ import { runCmd } from "/util/mod.ts";
 const WASM_OUT_PATH = "./target/wasm32-unknown-unknown/release/mod.wasm";
 
 await runCmd(["cargo", "build", "--release", "--target", "wasm32-unknown-unknown"]);
-await runCmd(["wasm-opt", "-g", "-Oz", WASM_OUT_PATH, "-o", "./target/wasm32-unknown-unknown/release/mod.wasm"]);
+await runCmd(["wasm-opt", "-g", "-Oz", WASM_OUT_PATH, "-o", WASM_OUT_PATH]);
 await runCmd(["wasm-bindgen", WASM_OUT_PATH, "--target", "deno", "--weak-refs", "--out-dir", "./target/wasm"]);
 
 await Promise.all([
