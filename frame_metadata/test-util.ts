@@ -27,7 +27,7 @@ export const getLookupAndDeriveCodec = async (
   networkName: typeof CHAIN_URL_LOOKUP[number][0],
 ): Promise<ChainInfo> => {
   const metadataEncoded = await Deno.readTextFile(
-    path.join("target", "frame_metadata", `${networkName}.scale`),
+    path.join("frame_metadata", "_downloaded", `${networkName}.scale`),
   );
   const metadata = M.fromPrefixedHex(metadataEncoded);
   const lookup = new Lookup(metadata);
