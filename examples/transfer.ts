@@ -43,6 +43,6 @@ const result = M.encodeExtrinsic({
   },
 });
 
-M.decodeExtrinsic(metadata, deriveCodec, hex.decode(new TextEncoder().encode(result)));
+console.log({ result });
 
 await client.close();

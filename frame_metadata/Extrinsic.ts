@@ -41,12 +41,12 @@ export function getExtrinsicCodecs(metadata: Metadata, deriveCodec: DeriveCodec)
 }
 
 export interface EncodeExtrinsicProps {
-  pubKey: Uint8Array;
   $callCodec: $.Codec<unknown>;
   $extraCodec: $.Codec<unknown>;
   $signatureCodec: $.Codec<unknown>;
   $additional: $.Codec<unknown>;
   $signatureToEncode: $.Codec<unknown>;
+  pubKey: Uint8Array;
   palletName: string;
   methodName: string;
   args: Record<string, unknown>;
@@ -69,7 +69,7 @@ export function encodeExtrinsic(p: EncodeExtrinsicProps): string {
   if (p.sign) {
     const lenNormalized = unsigned.length > 256 ? bindings.blake2_256(unsigned) : unsigned;
     const signature = new P.Sr25519Signature(p.sign(lenNormalized));
-    const finalSignature = p.$signatureToEncode.encode([[...p.pubKey] as any, signature, p.extras]);
+    const finalSignature = p.$signatureToEncode.encode([[...p.pubKey], signature, p.extras]);
     bytes = [p.extrinsicVersion | 128, ...finalSignature, ...callEncoded];
   } else {
     bytes = [127, ...callEncoded];
@@ -77,13 +77,32 @@ export function encodeExtrinsic(p: EncodeExtrinsicProps): string {
   return new TextDecoder().decode(hex.encode(new Uint8Array([...$.compact.encode(bytes.length), ...bytes])));
 }
 
+export class Extrinsic {
+  constructor(
+    readonly pubKey: Uint8Array,
+    readonly palletName: string,
+    readonly methodName: string,
+    readonly args: Record<string, unknown>,
+    readonly extras: P.Extras,
+    readonly genesisHash: string,
+    readonly checkpoint: string,
+    readonly signature: string,
+    readonly versions: {
+      extrinsic: number;
+      spec: number;
+      tx: number;
+    },
+  ) {}
+}
+
+// TODO: move encoding logic into this codec
 function $Extrinsic(metadata: Metadata, deriveCodec: DeriveCodec) {
   const codecs = getExtrinsicCodecs(metadata, deriveCodec);
   return $.createCodec({
     _staticSize: 0,
     _encode: undefined!,
     _decode(buffer) {
-      const len = $.compact._decode(buffer);
+      const length = $.compact._decode(buffer);
       const prefix = $.u8._decode(buffer);
       const signed = {
         128: true,
@@ -92,14 +111,27 @@ function $Extrinsic(metadata: Metadata, deriveCodec: DeriveCodec) {
       if (signed === undefined) {
         throw new Error();
       }
+      // TODO: type this as well as possible
+      let signature: any;
       if (signed) {
-        const signatureToEncode = codecs.$signatureToEncode._decode(buffer);
-        console.log({ signatureToEncode });
+        signature = codecs.$signatureToEncode._decode(buffer);
       }
+      const call = codecs.$callCodec._decode(buffer);
+      // TODO: type this as well as possible
+      const decoded: any = {
+        length,
+        call,
+      };
+      if (signature) {
+        decoded.pubKey = signature[0];
+        decoded.signature = signature[1];
+        decoded.extras = signature[2];
+      }
+      return decoded;
     },
   });
 }
 
 export function decodeExtrinsic(metadata: Metadata, deriveCodec: DeriveCodec, bytes: Uint8Array) {
-  const result = $Extrinsic(metadata, deriveCodec).decode(bytes);
+  return $Extrinsic(metadata, deriveCodec).decode(bytes);
 }
