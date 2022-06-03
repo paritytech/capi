@@ -1,4 +1,5 @@
 import { EnsureLookup } from "/util/mod.ts";
+import * as U from "/util/mod.ts";
 import * as T from "./types/mod.ts";
 
 export type MethodName = keyof MethodLookup;
@@ -36,26 +37,26 @@ export type IngressMessage = OkMessage | ErrMessage | NotifMessage;
  * @see https://github.com/paritytech/smoldot/blob/82836f4f2af4dd1716c57c14a4f591c7b1043950/src/json_rpc/methods.rs#L338-L479
  */
 type MethodLookup = EnsureLookup<string, (...args: any[]) => any, {
-  system_accountNextIndex(account: T.AccountId): number;
+  system_accountNextIndex(account: U.AccountIdString): number;
   account_nextIndex: TODO_NARROW_METHOD_TYPE;
   system_dryRun: TODO_NARROW_METHOD_TYPE;
   system_dryRunAt: MethodLookup["system_dryRun"];
-  author_submitExtrinsic(transaction: T.HexString): T.HashHexString;
+  author_submitExtrinsic(transaction: U.HexString): U.HashHexString;
   author_insertKey: TODO_NARROW_METHOD_TYPE;
-  author_rotateKeys(): T.HexString;
+  author_rotateKeys(): U.HexString;
   author_hasSessionKeys: TODO_NARROW_METHOD_TYPE;
   author_hasKey(pubKey: string, keyType: string): string;
-  author_pendingExtrinsics(): T.HexString[];
+  author_pendingExtrinsics(): U.HexString[];
   author_removeExtrinsics: TODO_NARROW_METHOD_TYPE;
   author_submitAndWatchExtrinsic(tx: string): Subscription<unknown>;
-  author_unwatchExtrinsic(subscriptionId: T.SubscriptionId): unknown;
+  author_unwatchExtrinsic(subscriptionId: U.SubscriptionIdString): unknown;
   babe_epochAuthorship(_: unknown): unknown;
-  chain_getBlock(hash?: T.HashHexString): T.Block;
-  chain_getBlockHash(height?: number): T.HashHexString;
+  chain_getBlock(hash?: U.HashHexString): T.Block;
+  chain_getBlockHash(height?: number): U.HashHexString;
   chain_getHead: MethodLookup["chain_getBlockHash"];
-  chain_getFinalizedHead(): T.HashHexString;
+  chain_getFinalizedHead(): U.HashHexString;
   chain_getFinalisedHead: MethodLookup["chain_getFinalizedHead"];
-  chain_getHeader(hash?: T.HashHexString): T.Header;
+  chain_getHeader(hash?: U.HashHexString): T.Header;
   chain_subscribeAllHeads(): Subscription<T.Header>;
   chain_subscribeFinalizedHeads(): Subscription<T.Header /* TODO: narrow to finalized? */>;
   chain_subscribeFinalisedHeads: MethodLookup["chain_subscribeFinalizedHeads"];
@@ -76,7 +77,7 @@ type MethodLookup = EnsureLookup<string, (...args: any[]) => any, {
   grandpa_roundState: TODO_NARROW_METHOD_TYPE;
   offchain_localStorageGet: TODO_NARROW_METHOD_TYPE;
   offchain_localStorageSet: TODO_NARROW_METHOD_TYPE;
-  payment_queryInfo(extrinsic: T.HexString, hash?: T.HashHexString): T.RuntimeDispatchInfo;
+  payment_queryInfo(extrinsic: U.HexString, hash?: U.HashHexString): T.RuntimeDispatchInfo;
   rpc_methods(): T.RpcMethods;
   state_call: TODO_NARROW_METHOD_TYPE;
   state_callAt: MethodLookup["state_call"];
@@ -84,25 +85,25 @@ type MethodLookup = EnsureLookup<string, (...args: any[]) => any, {
   state_getKeysPaged(
     prefix: string | undefined,
     count: number,
-    startKey?: T.HexString,
-    hash?: T.HashHexString,
-  ): T.HexString[];
+    startKey?: U.HexString,
+    hash?: U.HashHexString,
+  ): U.HexString[];
   state_getKeysPagedAt: MethodLookup["state_getKeysPaged"];
-  state_getMetadata(hash?: T.HashHexString): string;
+  state_getMetadata(hash?: U.HashHexString): string;
   state_getPairs: TODO_NARROW_METHOD_TYPE;
   state_getReadProof: TODO_NARROW_METHOD_TYPE;
-  state_getRuntimeVersion(at?: T.HashHexString): T.RuntimeVersion;
+  state_getRuntimeVersion(at?: U.HashHexString): T.RuntimeVersion;
   chain_getRuntimeVersion: MethodLookup["state_getRuntimeVersion"];
-  state_getStorage(key: T.HexString, hash?: T.HashHexString): T.HexString;
+  state_getStorage(key: U.HexString, hash?: U.HashHexString): U.HexString;
   state_getStorageHash: TODO_NARROW_METHOD_TYPE;
   state_getStorageHashAt: MethodLookup["state_getStorageHash"];
   state_getStorageSize: TODO_NARROW_METHOD_TYPE;
   state_getStorageSizeAt: MethodLookup["state_getStorageSize"];
   state_queryStorage: TODO_NARROW_METHOD_TYPE;
-  state_queryStorageAt(keys: T.HexString[], at?: T.HashHexString): T.StorageChangeSet;
+  state_queryStorageAt(keys: U.HexString[], at?: U.HashHexString): T.StorageChangeSet;
   state_subscribeRuntimeVersion: TODO_NARROW_METHOD_TYPE;
   chain_subscribeRuntimeVersion: MethodLookup["state_subscribeRuntimeVersion"];
-  state_subscribeStorage(list: T.HexString[]): Subscription<"TODO">;
+  state_subscribeStorage(list: U.HexString[]): Subscription<"TODO">;
   state_unsubscribeRuntimeVersion(subscription: string): boolean;
   chain_unsubscribeRuntimeVersion: MethodLookup["state_unsubscribeRuntimeVersion"];
   state_unsubscribeStorage(subscription: string): boolean;
@@ -119,34 +120,34 @@ type MethodLookup = EnsureLookup<string, (...args: any[]) => any, {
   system_properties: TODO_NARROW_METHOD_TYPE;
   system_removeReservedPeer: TODO_NARROW_METHOD_TYPE;
   system_version(): string;
-  chainHead_unstable_body(followSubscription: T.HashHexString, networkConfig?: T.NetworkConfig): string;
+  chainHead_unstable_body(followSubscription: U.HashHexString, networkConfig?: T.NetworkConfig): string;
   chainHead_unstable_call(
-    hash: T.HashHexString | undefined,
+    hash: U.HashHexString | undefined,
     fn: string,
-    callParameters: T.HexString,
+    callParameters: U.HexString,
     networkConfig?: T.NetworkConfig,
   ): string;
-  chainHead_unstable_genesisHash(): T.HashHexString;
-  chainHead_unstable_header(followSubscription: string, hash: T.HashHexString): T.HexString | undefined;
+  chainHead_unstable_genesisHash(): U.HashHexString;
+  chainHead_unstable_header(followSubscription: string, hash: U.HashHexString): U.HexString | undefined;
   chainHead_unstable_stopBody(subscription: string): void;
   chainHead_unstable_stopCall(subscription: string): void;
   chainHead_unstable_stopStorage(subscription: string): void;
   chainHead_unstable_storage(
-    follow_subscription: T.SubscriptionId,
-    hash: T.HashHexString,
-    key: T.HexString,
-    childKey?: T.HexString,
+    follow_subscription: U.SubscriptionIdString,
+    hash: U.HashHexString,
+    key: U.HexString,
+    childKey?: U.HexString,
     networkConfig?: T.NetworkConfig,
   ): string;
-  chainHead_unstable_unfollow(followSubscription: T.SubscriptionId): void;
-  chainHead_unstable_unpin(followSubscription: T.SubscriptionId, hash: T.HashHexString): void;
+  chainHead_unstable_unfollow(followSubscription: U.SubscriptionIdString): void;
+  chainHead_unstable_unpin(followSubscription: U.SubscriptionIdString, hash: U.HashHexString): void;
   chainSpec_unstable_chainName(): string;
   chainSpec_unstable_genesisHash(): string;
   chainSpec_unstable_properties(): unknown;
-  sudo_unstable_p2pDiscover(multiaddr: T.MultiAddress): void;
+  sudo_unstable_p2pDiscover(multiaddr: U.MultiAddressString): void;
   sudo_unstable_version(): string;
-  transaction_unstable_submitAndWatch(transaction: T.HexString): T.SubscriptionId;
-  transaction_unstable_unwatch(subscription: T.SubscriptionId): void;
+  transaction_unstable_submitAndWatch(transaction: U.HexString): U.SubscriptionIdString;
+  transaction_unstable_unwatch(subscription: U.SubscriptionIdString): void;
 }>;
 
 type ErrDetailLookup = EnsureLookup<string, [code: number, data?: any], {
@@ -205,7 +206,7 @@ export interface NotifMessageBase<Method extends MethodName, Result> extends Jso
   method: Method;
   id?: never;
   params: {
-    subscription: T.SubscriptionId;
+    subscription: U.SubscriptionIdString;
     result: Result;
   };
   result?: never;
