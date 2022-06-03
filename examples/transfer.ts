@@ -1,4 +1,3 @@
-// import * as C from "/mod.ts";
 import * as bindings from "/bindings/mod.ts";
 import * as M from "/frame_metadata/mod.ts";
 import * as C from "/mod.ts";
