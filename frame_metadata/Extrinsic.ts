@@ -74,7 +74,7 @@ export function encodeExtrinsic(p: EncodeExtrinsicProps): string {
   } else {
     bytes = [127, ...callEncoded];
   }
-  return new TextDecoder().decode(hex.encode(new Uint8Array([...$.compact.encode(bytes.length), ...bytes])));
+  return hex.encode(new Uint8Array([...$.compact.encode(bytes.length), ...bytes]));
 }
 
 // TODO: move encoding logic into this codec
