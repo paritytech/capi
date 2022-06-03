@@ -90,3 +90,8 @@ Deno.test("Balances Locks", { ignore: true }, async () => {
   // const encoded = codec.encode(decoded);
   // asserts.assertEquals(codec.decode(encoded), decoded);
 });
+
+Deno.test("Westend circular", async () => {
+  const { deriveCodec } = await getLookupAndDeriveCodec("westend");
+  deriveCodec(283);
+});

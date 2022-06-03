@@ -14,4 +14,5 @@ export const CHAIN_URL_LOOKUP = [
   ["moonbeam", MOONBEAM_RPC_URL],
   ["acala", ACALA_RPC_URL],
   ["subsocial", SUBSOCIAL_RPC_URL],
+  ["westend", WESTEND_RPC_URL],
 ] as const;

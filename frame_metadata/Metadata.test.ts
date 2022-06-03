@@ -10,6 +10,7 @@ await Promise.all(
     "moonbeam",
     "acala",
     "subsocial",
+    "westend",
   ].map(async (name) => {
     Deno.test(name, async (t) => {
       const scaleEncoded = await Deno.readTextFile(
