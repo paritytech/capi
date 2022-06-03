@@ -17,12 +17,10 @@ if (!metadataRaw) {
 const metadata = M.fromPrefixedHex(metadataRaw);
 const deriveCodec = M.DeriveCodec(metadata);
 
-const dest = {
-  _tag: "Id",
-  0: {
-    0: [...hex.decode(new TextEncoder().encode("8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48"))],
-  },
-};
+const dest = new C.MultiAddress(
+  C.MultiAddressKind.Id,
+  hex.decode(new TextEncoder().encode("8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48")),
+);
 const genesisHash =
   (hex.decode(new TextEncoder().encode("c5c2beaf81f8833d2ddcfe0c04b0612d16f0d08d67aa5032dde065ddf71b4ed1")));
 

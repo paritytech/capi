@@ -31,10 +31,6 @@ export class ChargeAssetTxPayment {
   }
 }
 
-// TODO:
-//   Is the JS-native equivalent of the `Extras` type consistent across chains?
-//   Although we currently represent this primitive... might it be invalid at times.
-//   We'll need to think through the right approach to abstracting over producing this type.
 export class Extras {
   0 = {};
   1 = {};
