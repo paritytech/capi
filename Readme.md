@@ -52,6 +52,18 @@ Before we do anything, we must first attain a reference to a given chain. In the
 const $chain = C.chain(C.POLKADOT);
 ```
 
+**IMPORTANT**
+
+This is one of the rough edges during development. For now, utilize `C.wsRpcClient` (a raw RPC client) instead of `C.chain`.
+
+```ts
+const rpc = C.wsRpcClient(C.POLKADOT);
+
+// Your Capi usage here
+
+await rpc.close();
+```
+
 ### Read a Balance
 
 ```ts
