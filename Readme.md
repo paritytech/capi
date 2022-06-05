@@ -1,5 +1,6 @@
 # Capi
 
+<!--
 <h4>
   <a href="">Guide</a> &nbsp;·&nbsp;
   <a href="">API Reference</a> &nbsp;·&nbsp;
@@ -7,18 +8,21 @@
   <a href="">Roadmap</a> &nbsp;·&nbsp;
   <a href="">Contributing</a>
 </h4>
+-->
 
 Capi (Chain API) is a TypeScript toolkit for crafting interactions with Substrate-based chains.
 
-It offers low-level utilities and a high-level functional effect system to abstract over a range of use cases. Using Capi's standard library of effects, you can easily and intuitively interact with any Substrate-based chain while also following best practices and achieving optimal performance.
+Capi consists of utilities and a high-level functional effect system which abstract over a range of use cases. Using Capi's standard library of effects, you can interact with any Substrate-based chain while also following best practices and achieving optimal performance.
 
-⚠️ Capi is a work in progress. It is fraught with edge cases and `TODO` comments. If joining the Capi / Apps Framework team interests you, please reach out to<!--INSERT EMAIL ADDR HERE-->.
+⚠️ Capi is a work in progress. It is fraught with edge cases and `TODO` comments. If joining the Capi / Apps Framework team interests you, please reach out to TODO<!--INSERT EMAIL ADDR HERE-->.
 
 ## Quick Start
 
-> For a complete introduction, please refer to [the official Capi documentation](#).
+> For a complete introduction, please refer to [(TODO) Capi documentation](#).
 
 ### Setup
+
+> For now, follow the instructions in [the testing section](#testing).
 
 If you're using [Deno](https://deno.land/), simply import via the `denoland/x` specifier.
 
@@ -77,6 +81,8 @@ result.value;
 ```
 
 ### Transfer Some Dot
+
+> Note: this high-level API for transferring Dot is not yet functional. You can utilize `C.encodeExtrinsic` and an RPC client directly.
 
 ```ts
 // 1. Which pallet?
@@ -154,6 +160,20 @@ After running the bootstrap script, you should be able to run any of the example
 
 ```sh
 deno task example:balances
+```
+
+### Utilizing the Package in a NodeJS Project
+
+Build the NPM package and link it locally.
+
+```sh
+deno task build_npm_pkg && cd target/npm && npm link
+```
+
+From the project in which you wish to use Capi...
+
+```ts
+npm link capi-beta
 ```
 
 ## Code Structure

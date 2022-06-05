@@ -70,3 +70,4 @@ binaryen
 westend
 schnorrkel
 mdbook
+schickling
