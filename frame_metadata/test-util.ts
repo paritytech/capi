@@ -1,7 +1,7 @@
 import { hashers } from "/bindings/mod.ts";
 import { CHAIN_URL_LOOKUP } from "/constants/chains/url.ts";
 import { call, wsRpcClient } from "/rpc/mod.ts";
-import * as hex from "std/encoding/hex.ts";
+import * as hex from "/util/hex.ts";
 import * as path from "std/path/mod.ts";
 import { IsExact } from "x/conditional_type_checks/mod.ts";
 import * as $ from "x/scale/mod.ts";
@@ -27,7 +27,7 @@ export const getLookupAndDeriveCodec = async (
   networkName: typeof CHAIN_URL_LOOKUP[number][0],
 ): Promise<ChainInfo> => {
   const metadataEncoded = await Deno.readTextFile(
-    path.join("target", "frame_metadata", `${networkName}.scale`),
+    path.join("frame_metadata", "_downloaded", `${networkName}.scale`),
   );
   const metadata = M.fromPrefixedHex(metadataEncoded);
   const lookup = new Lookup(metadata);
@@ -40,7 +40,7 @@ export const getLookupAndDeriveCodec = async (
 };
 
 export const accountId32Bytes = hex.decode(
-  new TextEncoder().encode("43fa61b298e82f9f207ddea327900cee26b554756c4a533f36cd875e3e7bcf06"),
+  "43fa61b298e82f9f207ddea327900cee26b554756c4a533f36cd875e3e7bcf06",
 );
 export const accountId32 = {
   0: [...accountId32Bytes],
@@ -65,7 +65,7 @@ export namespace State {
     if (resultScaleHex === undefined) {
       return;
     }
-    const resultScaleBytes = hex.decode(new TextEncoder().encode(resultScaleHex.substring(2)));
+    const resultScaleBytes = hex.decode(resultScaleHex.substring(2));
     const valueCodec = deriveCodec(storageEntry.value);
     const decoded = valueCodec.decode(resultScaleBytes);
     await client.close();

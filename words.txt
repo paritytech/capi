@@ -70,4 +70,5 @@ binaryen
 westend
 schnorrkel
 mdbook
-schickling
+hashbrown
+serde

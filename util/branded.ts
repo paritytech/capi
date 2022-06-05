@@ -1,36 +1,25 @@
-export abstract class Branded<
-  Brand extends PropertyKey = PropertyKey,
-  Raw = any,
-> {
-  constructor(
-    readonly brand: Brand,
-    readonly raw: Raw,
-  ) {}
-}
-export const branded = <T>() => {
-  return <B extends PropertyKey>(brand: B) => {
-    return class extends Branded<B, T> {
-      constructor(raw: T) {
-        super(brand, raw);
-      }
-    };
-  };
-};
+type Branded<T, Brand extends PropertyKey> = T & { [_ in Brand]: undefined };
 
-type ValidateRestConstraint<T> = [validate?: (raw: T) => Error | void];
+export const HexStringBrand: unique symbol = Symbol();
+export type HexStringBrand = typeof HexStringBrand;
+export type HexString = Branded<string, HexStringBrand>;
 
-// TODO: simplify
-export const brandedFactory = <Ctor extends new(raw: any) => Branded>(ctor: Ctor) => {
-  return <VRest extends ValidateRestConstraint<ConstructorParameters<Ctor>[0]>>(
-    raw: ConstructorParameters<Ctor>[0],
-    ...[validate]: VRest
-  ): InstanceType<Ctor> | Extract<ReturnType<Exclude<VRest[0], undefined>>, Error> => {
-    if (validate) {
-      const error = validate(raw);
-      if (error) {
-        return error as any;
-      }
-    }
-    return new ctor(raw) as any;
-  };
-};
+export const HashHexStringBrand: unique symbol = Symbol();
+export type HashHexStringBrand = typeof HashHexStringBrand;
+export type HashHexString = Branded<HexString, HashHexStringBrand>;
+
+export const AccountIdStringBrand: unique symbol = Symbol();
+export type AccountIdStringBrand = typeof AccountIdStringBrand;
+export type AccountIdString = Branded<string, AccountIdStringBrand>;
+
+export const SubscriptionIdStringBrand: unique symbol = Symbol();
+export type SubscriptionIdStringBrand = typeof SubscriptionIdStringBrand;
+export type SubscriptionIdString = Branded<string, SubscriptionIdStringBrand>;
+
+export const MultiAddressStringBrand: unique symbol = Symbol();
+export type MultiAddressStringBrand = typeof MultiAddressStringBrand;
+export type MultiAddressString = Branded<string, MultiAddressStringBrand>;
+
+export const HexU64StringBrand: unique symbol = Symbol();
+export type HexU64StringBrand = typeof HexU64StringBrand;
+export type HexU64String = Branded<string, HexU64StringBrand>;
