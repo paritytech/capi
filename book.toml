@@ -1,0 +1,11 @@
+[book]
+title = "Capi Documentation"
+src = "_docs"
+
+[build]
+build-dir = "target/mdbook"
+create-missing = false
+
+[output.html]
+git-repository-url = "https://github.com/paritytech/chain-api-concept-docs"
+# edit-url-template = "https://github.com/paritytech/chain-api-concept-docs/edit/main/{path}"
