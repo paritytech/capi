@@ -79,7 +79,7 @@ const $accountId = C.ss58(MY_ADDR).toAccountId32();
 // 4. A representation of the data we wish to read.
 const entry = C.entry($accounts, $accountId);
 
-// 6. Execute the read.
+// 5. Execute the read.
 const result = await C.read(entry).run();
 ```
 
@@ -119,6 +119,8 @@ const result = await $transferSigned.run();
 ```
 
 ### Derived Queries / Composing Effects
+
+> Note: Effect-mapping utilities are yet to be implemented.
 
 Let's read the heads of Polkadot's parachains. This requires that we first obtain a list of parachain IDs, and then use these IDs to read their heads.
 
