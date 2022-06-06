@@ -16,6 +16,6 @@
   "editor.defaultFormatter": "dprint.dprint",
   "editor.formatOnSave": true,
   "editor.tabSize": 2,
-  "prettier.printWidth": 160,
+  "prettier.printWidth": 140,
   "rust-analyzer.diagnostics.disabled": ["incorrect-ident-case"]
 }
