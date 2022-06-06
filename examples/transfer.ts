@@ -4,10 +4,10 @@ import * as C from "/mod.ts";
 import * as hex from "/util/hex.ts";
 import "std/dotenv/load.ts";
 
+await C.init();
+
 const pair = bindings.pairFromSecretSeed(
-  hex.decode(
-    "2df317d6d3b060d9cef6999f592a4a4a3acfb7212a77172d8fcdf8a08f3bf120",
-  ),
+  hex.decode("2df317d6d3b060d9cef6999f592a4a4a3acfb7212a77172d8fcdf8a08f3bf120"),
 );
 
 const client = await C.wsRpcClient(C.WESTEND_RPC_URL);

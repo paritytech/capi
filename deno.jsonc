@@ -26,7 +26,7 @@
   "include": ["."],
   "tasks": {
     "download_frame_metadata": "deno run -A --no-check=remote _tasks/download_frame_metadata.ts",
-    "build_wasm": "deno run -A --no-check=remote _tasks/build_wasm.ts",
+    "build_wasm": "deno run --unstable -A https://deno.land/x/wasmbuild@0.4.0/main.ts -p bindings --out bindings",
     "star": "deno run -A --no-check=remote _tasks/star.ts && deno task cache_deps",
     "cache_deps": "deno cache --no-check=remote target/star.ts",
     "build_npm_pkg": "deno run -A --no-check=remote _tasks/build_npm_pkg.ts",

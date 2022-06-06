@@ -67,7 +67,7 @@ export function encodeExtrinsic(p: EncodeExtrinsicProps): string {
   const unsigned = new Uint8Array([...callEncoded, ...extraEncoded, ...additional]);
   let bytes: number[];
   if (p.sign) {
-    const lenNormalized = unsigned.length > 256 ? bindings.blake2_256(unsigned) : unsigned;
+    const lenNormalized = unsigned.length > 256 ? bindings.hashers.Blake2_256(unsigned) : unsigned;
     const signature = new P.Sr25519Signature(p.sign(lenNormalized));
     const finalSignature = p.$signatureToEncode.encode([[...p.pubKey], signature, p.extras]);
     bytes = [p.extrinsicVersion | 128, ...finalSignature, ...callEncoded];

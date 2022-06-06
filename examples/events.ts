@@ -1,5 +1,7 @@
 import * as C from "/mod.ts";
 
+await C.init();
+
 const rpc = await C.wsRpcClient(C.WESTEND_RPC_URL);
 const $pallet = C.pallet(rpc, "System");
 const $entry = C.entry($pallet, "Events");

@@ -29,9 +29,7 @@ export interface ChainHeadUnstableFollowNewBlockEvent extends ChainHeadUnstableF
   newRuntime: null; // TODO
 }
 
-export interface ChainHeadUnstableFollowBestBlockChangedEvent
-  extends ChainHeadUnstableFollowEventBase<"bestBlockChanged">
-{
+export interface ChainHeadUnstableFollowBestBlockChangedEvent extends ChainHeadUnstableFollowEventBase<"bestBlockChanged"> {
   bestBlockHash: U.HashHexString;
 }
 
