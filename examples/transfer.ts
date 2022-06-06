@@ -6,9 +6,7 @@ import "std/dotenv/load.ts";
 
 await C.init();
 
-const pair = bindings.pairFromSecretSeed(
-  hex.decode("2df317d6d3b060d9cef6999f592a4a4a3acfb7212a77172d8fcdf8a08f3bf120"),
-);
+const pair = bindings.pairFromSecretSeed(hex.decode("2df317d6d3b060d9cef6999f592a4a4a3acfb7212a77172d8fcdf8a08f3bf120"));
 
 const client = await C.wsRpcClient(C.WESTEND_RPC_URL);
 const metadataRaw = (await C.call(client, "state_getMetadata", [])).result;
@@ -18,10 +16,7 @@ if (!metadataRaw) {
 const metadata = M.fromPrefixedHex(metadataRaw);
 const deriveCodec = M.DeriveCodec(metadata);
 
-const dest = new C.MultiAddress(
-  C.MultiAddressKind.Id,
-  hex.decode("8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48"),
-);
+const dest = new C.MultiAddress(C.MultiAddressKind.Id, hex.decode("8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48"));
 const genesisHash = hex.decode("c5c2beaf81f8833d2ddcfe0c04b0612d16f0d08d67aa5032dde065ddf71b4ed1");
 
 const encoded = M.encodeExtrinsic({
