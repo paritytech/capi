@@ -1,4 +1,4 @@
-import { effector } from "/effect/Effect.ts";
+import { effector } from "/effect/mod.ts";
 import { Pallet } from "/effect/std/pallet.ts";
 
 export interface Entry {

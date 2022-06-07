@@ -1,4 +1,4 @@
-import { effector, EffectorArgs } from "/effect/Effect.ts";
+import { effector, EffectorArgs } from "/effect/mod.ts";
 
 export const select = effector.sync.generic(
   "select",

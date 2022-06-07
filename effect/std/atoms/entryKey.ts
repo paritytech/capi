@@ -1,5 +1,5 @@
 import { getHashers } from "/bindings/mod.ts";
-import { effector } from "/effect/Effect.ts";
+import { effector } from "/effect/mod.ts";
 import * as M from "/frame_metadata/mod.ts";
 
 export const entryKey = effector.async(

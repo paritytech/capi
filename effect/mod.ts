@@ -1,4 +1,4 @@
-export * from "/effect/Effect.ts";
+export * from "/effect/impl/mod.ts";
 export * from "/effect/std/account/AccountId32.ts";
 export * from "/effect/std/account/PubKey.ts";
 export * from "/effect/std/account/Ss58.ts";

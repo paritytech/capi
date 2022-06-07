@@ -1,4 +1,4 @@
-import { effector, EffectorArgs } from "/effect/Effect.ts";
+import { effector, EffectorArgs } from "/effect/mod.ts";
 import * as rpc from "/rpc/mod.ts";
 
 export interface RpcClientR<Beacon> {

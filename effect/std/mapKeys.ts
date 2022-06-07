@@ -1,4 +1,4 @@
-import { effector } from "/effect/Effect.ts";
+import { effector } from "/effect/mod.ts";
 import { deriveCodec } from "/effect/std/atoms/deriveCodec.ts";
 import { entryKey } from "/effect/std/atoms/entryKey.ts";
 import { entryMetadata } from "/effect/std/atoms/entryMetadata.ts";

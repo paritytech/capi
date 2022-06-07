@@ -1,4 +1,4 @@
-import { effector, EffectorArgs } from "/effect/Effect.ts";
+import { effector, EffectorArgs } from "/effect/mod.ts";
 
 export const wrap = effector.sync.generic(
   "wrap",
