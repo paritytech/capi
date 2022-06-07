@@ -1,4 +1,4 @@
-import { effector } from "/effect/mod.ts";
+import { effector } from "/effect/impl/mod.ts";
 import * as M from "/frame_metadata/mod.ts";
 
 export const entryMetadata = effector.sync(

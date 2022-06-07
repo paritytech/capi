@@ -1,4 +1,4 @@
-import { effector } from "/effect/mod.ts";
+import { effector } from "/effect/impl/mod.ts";
 import { Entry } from "/effect/std/entry.ts";
 import { Map } from "/effect/std/map.ts";
 

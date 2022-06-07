@@ -1,4 +1,4 @@
-import { effector, EffectorArgs } from "/effect/mod.ts";
+import { effector, EffectorArgs } from "/effect/impl/mod.ts";
 import * as hex from "/util/hex.ts";
 import type * as $ from "x/scale/mod.ts";
 

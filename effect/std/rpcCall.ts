@@ -1,4 +1,4 @@
-import { effector, EffectorArgs } from "/effect/mod.ts";
+import { effector, EffectorArgs } from "/effect/impl/mod.ts";
 import * as rpc from "/rpc/mod.ts";
 
 // TODO

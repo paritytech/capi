@@ -1,4 +1,4 @@
-import { effector } from "/effect/mod.ts";
+import { effector } from "/effect/impl/mod.ts";
 import { Pallet } from "/effect/std/pallet.ts";
 
 export interface Map {
