@@ -30,7 +30,11 @@ export function getExtrinsicCodecs(metadata: Metadata, deriveCodec: DeriveCodec)
     $.sizedArray($.u8, 32),
     $.sizedArray($.u8, 32),
   ) as $.Codec<unknown>;
-  const $signatureToEncode = $.tuple($.sizedArray($.u8, 32), $signatureCodec, $extraCodec) as $.Codec<unknown>;
+  const $signatureToEncode = $.tuple(
+    $.sizedArray($.u8, 32),
+    $signatureCodec,
+    $extraCodec,
+  ) as $.Codec<unknown>;
   return {
     $callCodec,
     $extraCodec,
@@ -60,14 +64,21 @@ export interface EncodeExtrinsicProps {
 }
 
 // TODO: CLEAN THIS UP!
-export function encodeExtrinsic(p: EncodeExtrinsicProps): string {
+export async function encodeExtrinsic(p: EncodeExtrinsicProps): Promise<string> {
   const callEncoded = p.$callCodec.encode(new P.Call(p.palletName, p.methodName, p.args));
   const extraEncoded = p.$extraCodec.encode(p.extras);
-  const additional = p.$additional.encode([p.specVersion, p.transactionVersion, [...p.genesisHash], [...p.checkpoint]]);
+  const additional = p.$additional.encode([
+    p.specVersion,
+    p.transactionVersion,
+    [...p.genesisHash],
+    [...p.checkpoint],
+  ]);
   const unsigned = new Uint8Array([...callEncoded, ...extraEncoded, ...additional]);
   let bytes: number[];
   if (p.sign) {
-    const lenNormalized = unsigned.length > 256 ? bindings.blake2_256(unsigned) : unsigned;
+    const lenNormalized = unsigned.length > 256
+      ? (await bindings.getHashers()).Blake2_256(unsigned)
+      : unsigned;
     const signature = new P.Sr25519Signature(p.sign(lenNormalized));
     const finalSignature = p.$signatureToEncode.encode([[...p.pubKey], signature, p.extras]);
     bytes = [p.extrinsicVersion | 128, ...finalSignature, ...callEncoded];

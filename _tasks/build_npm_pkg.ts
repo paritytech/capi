@@ -37,7 +37,8 @@ await Promise.all([
   fs.copy("LICENSE", path.join(outDir, "LICENSE")),
 ]);
 
-const importMap: Record<string, string> = JSON.parse(Deno.readTextFileSync("./import_map.json")).imports;
+const importMap: Record<string, string> =
+  JSON.parse(Deno.readTextFileSync("./import_map.json")).imports;
 delete importMap["./"];
 delete importMap["/"];
 
@@ -75,5 +76,5 @@ for await (
 }
 
 await Promise.all(["deno", "esm", "src"].map((dir) => {
-  return fs.copy("./bindings/bindings.wasm", `target/npm/${dir}/bindings/bindings.wasm`);
+  return fs.copy("./bindings/bindings_bg.wasm", `target/npm/${dir}/bindings/bindings_bg.wasm`);
 }));

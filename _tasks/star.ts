@@ -21,11 +21,7 @@ for await (const walkEntry of tsPathIter) {
   importDeclarations.push(f.createImportDeclaration(
     undefined,
     undefined,
-    f.createImportClause(
-      false,
-      undefined,
-      f.createNamespaceImport(f.createIdentifier(`_${i}`)),
-    ),
+    f.createImportClause(false, undefined, f.createNamespaceImport(f.createIdentifier(`_${i}`))),
     f.createStringLiteral(`../${walkEntry.path}`),
     undefined,
   ));

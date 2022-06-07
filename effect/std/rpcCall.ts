@@ -12,7 +12,10 @@ export const rpcCall = effector.async.generic(
   "rpcCall",
   (effect) =>
     <N extends rpc.MethodName, X extends unknown[]>(
-      ...args: EffectorArgs<X, [client: rpc.RpcClient, methodName: N, ...params: rpc.InitMessage<N>["params"]]>
+      ...args: EffectorArgs<
+        X,
+        [client: rpc.RpcClient, methodName: N, ...params: rpc.InitMessage<N>["params"]]
+      >
     ) =>
       effect(args, () =>
         async (client, methodName, ...params) => {

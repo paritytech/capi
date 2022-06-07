@@ -1,13 +1,13 @@
-import * as bindings from "/bindings/mod.ts";
+import { getBindings } from "/bindings/mod.ts";
 import * as M from "/frame_metadata/mod.ts";
 import * as C from "/mod.ts";
 import * as hex from "/util/hex.ts";
 import "std/dotenv/load.ts";
 
+const bindings = await getBindings();
+
 const pair = bindings.pairFromSecretSeed(
-  hex.decode(
-    "2df317d6d3b060d9cef6999f592a4a4a3acfb7212a77172d8fcdf8a08f3bf120",
-  ),
+  hex.decode("2df317d6d3b060d9cef6999f592a4a4a3acfb7212a77172d8fcdf8a08f3bf120"),
 );
 
 const client = await C.wsRpcClient(C.WESTEND_RPC_URL);
@@ -24,7 +24,7 @@ const dest = new C.MultiAddress(
 );
 const genesisHash = hex.decode("c5c2beaf81f8833d2ddcfe0c04b0612d16f0d08d67aa5032dde065ddf71b4ed1");
 
-const encoded = M.encodeExtrinsic({
+const encoded = await M.encodeExtrinsic({
   ...M.getExtrinsicCodecs(metadata, deriveCodec),
   pubKey: pair.pubKey,
   extrinsicVersion: metadata.extrinsic.version,

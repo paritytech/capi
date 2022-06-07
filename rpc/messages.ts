@@ -4,27 +4,35 @@ import * as T from "./types/mod.ts";
 
 export type MethodName = keyof MethodLookup;
 
-export type InitMessageByMethodName = { [N in MethodName]: InitMessageBase<N, Parameters<MethodLookup[N]>> };
+export type InitMessageByMethodName = {
+  [N in MethodName]: InitMessageBase<N, Parameters<MethodLookup[N]>>;
+};
 export type InitMessage<N extends MethodName = MethodName> = InitMessageByMethodName[N];
 
 export type OkMessageByMethodName = {
-  [N in MethodName]: OkResBase<ReturnType<MethodLookup[N]> extends Subscription ? string : ReturnType<MethodLookup[N]>>;
+  [N in MethodName]: OkResBase<
+    ReturnType<MethodLookup[N]> extends Subscription ? string : ReturnType<MethodLookup[N]>
+  >;
 };
 export type OkMessage<N extends MethodName = MethodName> = OkMessageByMethodName[N];
 
 export type NotifByMethodName = {
-  [N in MethodName as ReturnType<MethodLookup[N]> extends Subscription ? N : never]: NotifMessageBase<
-    N,
-    ReturnType<MethodLookup[N]> extends Subscription<infer R> ? R : never
-  >;
+  [N in MethodName as ReturnType<MethodLookup[N]> extends Subscription ? N : never]:
+    NotifMessageBase<
+      N,
+      ReturnType<MethodLookup[N]> extends Subscription<infer R> ? R : never
+    >;
 };
 export type SubscriptionMethodName = keyof NotifByMethodName;
-export type NotifMessage<N extends SubscriptionMethodName = SubscriptionMethodName> = NotifByMethodName[N];
+export type NotifMessage<N extends SubscriptionMethodName = SubscriptionMethodName> =
+  NotifByMethodName[N];
 
 // TODO: error matching utility / requires generalized we think through generalized matching utility
 // TODO: investigate whether it's worthwhile to support somehow tacking on narrow method-specific types
 export type ErrName = keyof ErrDetailLookup;
-export type ErrMessageByName = { [N in ErrName]: ErrorMessageBase<ErrDetailLookup[N][0], ErrDetailLookup[N][1]> };
+export type ErrMessageByName = {
+  [N in ErrName]: ErrorMessageBase<ErrDetailLookup[N][0], ErrDetailLookup[N][1]>;
+};
 export type ErrMessage<N extends ErrName = ErrName> = ErrMessageByName[N];
 
 export type IngressMessage = OkMessage | ErrMessage | NotifMessage;
@@ -120,7 +128,10 @@ type MethodLookup = EnsureLookup<string, (...args: any[]) => any, {
   system_properties: TODO_NARROW_METHOD_TYPE;
   system_removeReservedPeer: TODO_NARROW_METHOD_TYPE;
   system_version(): string;
-  chainHead_unstable_body(followSubscription: U.HashHexString, networkConfig?: T.NetworkConfig): string;
+  chainHead_unstable_body(
+    followSubscription: U.HashHexString,
+    networkConfig?: T.NetworkConfig,
+  ): string;
   chainHead_unstable_call(
     hash: U.HashHexString | undefined,
     fn: string,
@@ -128,7 +139,10 @@ type MethodLookup = EnsureLookup<string, (...args: any[]) => any, {
     networkConfig?: T.NetworkConfig,
   ): string;
   chainHead_unstable_genesisHash(): U.HashHexString;
-  chainHead_unstable_header(followSubscription: string, hash: U.HashHexString): U.HexString | undefined;
+  chainHead_unstable_header(
+    followSubscription: string,
+    hash: U.HashHexString,
+  ): U.HexString | undefined;
   chainHead_unstable_stopBody(subscription: string): void;
   chainHead_unstable_stopCall(subscription: string): void;
   chainHead_unstable_stopStorage(subscription: string): void;
@@ -189,7 +203,9 @@ interface JsonRpcVersionBearer {
   jsonrpc: "2.0";
 }
 
-export interface InitMessageBase<Method extends MethodName, Params extends unknown[]> extends JsonRpcVersionBearer {
+export interface InitMessageBase<Method extends MethodName, Params extends unknown[]>
+  extends JsonRpcVersionBearer
+{
   method: Method;
   id: string;
   params: Params;

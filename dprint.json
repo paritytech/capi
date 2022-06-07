@@ -1,7 +1,7 @@
 {
   "incremental": true,
   "indentWidth": 2,
-  "lineWidth": 120,
+  "lineWidth": 100,
   "typescript": {
     "quoteProps": "asNeeded",
     "arrowFunction.useParentheses": "force"

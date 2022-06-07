@@ -18,12 +18,16 @@ interface ChainHeadUnstableFollowEventBase<Kind extends ChainHeadUnstableFollowE
   event: Kind;
 }
 
-export interface ChainHeadUnstableFollowInitializedEvent extends ChainHeadUnstableFollowEventBase<"initialized"> {
+export interface ChainHeadUnstableFollowInitializedEvent
+  extends ChainHeadUnstableFollowEventBase<"initialized">
+{
   finalizedBlockHash: U.HashHexString;
   finalizedBlockRuntime: string;
 }
 
-export interface ChainHeadUnstableFollowNewBlockEvent extends ChainHeadUnstableFollowEventBase<"newBlock"> {
+export interface ChainHeadUnstableFollowNewBlockEvent
+  extends ChainHeadUnstableFollowEventBase<"newBlock">
+{
   blockHash: U.HashHexString;
   parentBlockHash: U.HashHexString;
   newRuntime: null; // TODO
@@ -35,7 +39,9 @@ export interface ChainHeadUnstableFollowBestBlockChangedEvent
   bestBlockHash: U.HashHexString;
 }
 
-export interface ChainHeadUnstableFollowFinalizedEvent extends ChainHeadUnstableFollowEventBase<"finalized"> {
+export interface ChainHeadUnstableFollowFinalizedEvent
+  extends ChainHeadUnstableFollowEventBase<"finalized">
+{
   finalizedBlocksHashes: U.HashHexString[];
   prunedBlocksHashes: U.HashHexString[];
 }

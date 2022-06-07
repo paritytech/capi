@@ -1,4 +1,4 @@
-import { hashers } from "/bindings/mod.ts";
+import { getHashers } from "/bindings/mod.ts";
 import { CHAIN_URL_LOOKUP } from "/constants/chains/url.ts";
 import { call, wsRpcClient } from "/rpc/mod.ts";
 import * as hex from "/util/hex.ts";
@@ -48,17 +48,17 @@ export const accountId32 = {
 console.log(accountId32);
 
 export namespace State {
-  export const getStorage = async (
+  export async function getStorage(
     url: typeof CHAIN_URL_LOOKUP[number][1],
     lookup: Lookup,
     deriveCodec: DeriveCodec,
     palletName: string,
     storageEntryName: string,
     ...keys: [] | [unknown] | [unknown, unknown]
-  ) => {
+  ) {
     const pallet = lookup.getPalletByName(palletName);
     const storageEntry = lookup.getStorageEntryByPalletAndName(pallet, storageEntryName);
-    const key = encodeKey(deriveCodec, hashers, pallet, storageEntry, ...keys);
+    const key = encodeKey(deriveCodec, await getHashers(), pallet, storageEntry, ...keys);
     const client = await wsRpcClient(url);
     const message = await call(client, "state_getStorage", [key]);
     const resultScaleHex = (message as any).result as string | undefined;
@@ -70,5 +70,5 @@ export namespace State {
     const decoded = valueCodec.decode(resultScaleBytes);
     await client.close();
     return decoded;
-  };
+  }
 }
