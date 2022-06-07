@@ -37,7 +37,8 @@ await Promise.all([
   fs.copy("LICENSE", path.join(outDir, "LICENSE")),
 ]);
 
-const importMap: Record<string, string> = JSON.parse(Deno.readTextFileSync("./import_map.json")).imports;
+const importMap: Record<string, string> =
+  JSON.parse(Deno.readTextFileSync("./import_map.json")).imports;
 delete importMap["./"];
 delete importMap["/"];
 

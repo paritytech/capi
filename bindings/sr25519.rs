@@ -49,6 +49,10 @@ pub fn sign(pub_key_bytes: &[u8], secret_key_bytes: &[u8], message: &[u8]) -> Ui
 pub fn verify(signature: &[u8], message: &[u8], pub_key: &[u8]) -> bool {
   s::PublicKey::from_bytes(pub_key)
     .unwrap()
-    .verify_simple(SIGNING_CTX, &message, &s::Signature::from_bytes(signature).unwrap())
+    .verify_simple(
+      SIGNING_CTX,
+      &message,
+      &s::Signature::from_bytes(signature).unwrap(),
+    )
     .is_ok()
 }

@@ -1,7 +1,13 @@
 import * as M from "/frame_metadata/mod.ts";
 import * as bindings from "./bindings.generated.js";
 
-export { base58Encode, decodeSs58Text, instantiate as init, pairFromSecretSeed, sign } from "./bindings.generated.js";
+export {
+  base58Encode,
+  decodeSs58Text,
+  instantiate as init,
+  pairFromSecretSeed,
+  sign,
+} from "./bindings.generated.js";
 
 export const hashers: M.HasherLookup = {
   [M.HasherKind.Blake2_128]: bindings.blake2_128,

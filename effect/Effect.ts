@@ -79,7 +79,8 @@ export type EffectOfKind<K extends EffectKind, T, E extends Error> = [
   StreamEffect<T, E>,
 ][K];
 
-export type InferEffectOfKind<K extends EffectKind, T, E extends Error> = never extends K ? EffectOfKind<K, T, E>
+export type InferEffectOfKind<K extends EffectKind, T, E extends Error> = never extends K
+  ? EffectOfKind<K, T, E>
   : _EffectBase<K, T, E>;
 
 export type EffectKindReturn<K extends EffectKind, R> = [
@@ -240,7 +241,9 @@ export function effector<K extends EffectKind, T, E extends Error, A extends unk
   _name: string,
   fn: (...args: EffectorItemCollection<A>) => InferEffectOfKind<K, T, E>,
 ) {
-  return fn as any as <X extends unknown[]>(...args: EffectorArgs<X, A>) => _EffectorEffect<K, T, E, X>;
+  return fn as any as <X extends unknown[]>(
+    ...args: EffectorArgs<X, A>
+  ) => _EffectorEffect<K, T, E, X>;
 }
 
 effector.generic = <F>(
@@ -275,8 +278,13 @@ type EffectUpTo<K extends EffectKind, T, E extends Error> = [K] extends [never] 
   SyncEffect<T, E> | AsyncEffect<T, E> | T,
 ][K];
 
-export type EffectorArgs<X extends unknown[], A extends unknown[]> = never extends X
-  ? { [K in keyof A]: EffectUpTo<{ [K in keyof X]: _K<X[K]> }[number], A[K], { [K in keyof X]: _E<X[K]> }[number]> }
+export type EffectorArgs<X extends unknown[], A extends unknown[]> = never extends X ? {
+  [K in keyof A]: EffectUpTo<
+    { [K in keyof X]: _K<X[K]> }[number],
+    A[K],
+    { [K in keyof X]: _E<X[K]> }[number]
+  >;
+}
   : X extends A ? X | { [K in keyof A]: A[K] | Effect<A[K], any> }
   : never;
 

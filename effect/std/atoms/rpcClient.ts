@@ -8,8 +8,9 @@ export interface RpcClientR<Beacon> {
 export const rpcClient = effector.async.generic(
   "rpcClient",
   (effect) =>
-    <Beacon, X extends unknown[]>(...args: EffectorArgs<X, [factory: rpc.RpcClientFactory<Beacon>, beacon: Beacon]>) =>
-      effect(args, () => (factory, beacon) => factory(beacon)),
+    <Beacon, X extends unknown[]>(
+      ...args: EffectorArgs<X, [factory: rpc.RpcClientFactory<Beacon>, beacon: Beacon]>
+    ) => effect(args, () => (factory, beacon) => factory(beacon)),
 );
 
 // TODO: cleanup

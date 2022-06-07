@@ -29,7 +29,10 @@ Deno.test("Derive AccountInfo Codec", async () => {
 });
 
 Deno.test("Derive Auctions AuctionInfo Storage Entry Codec", async () => {
-  const auctionInfoStorageEntry = lookup.getStorageEntryByPalletNameAndName("Auctions", "AuctionInfo");
+  const auctionInfoStorageEntry = lookup.getStorageEntryByPalletNameAndName(
+    "Auctions",
+    "AuctionInfo",
+  );
   const codec = deriveCodec(auctionInfoStorageEntry.value);
   const decoded = [8, 9945400];
   const encoded = codec.encode(decoded);
@@ -37,7 +40,10 @@ Deno.test("Derive Auctions AuctionInfo Storage Entry Codec", async () => {
 });
 
 Deno.test("Derive Auction Winning Storage Entry Codec", async () => {
-  const auctionWinningStorageEntry = lookup.getStorageEntryByPalletNameAndName("Auctions", "Winning");
+  const auctionWinningStorageEntry = lookup.getStorageEntryByPalletNameAndName(
+    "Auctions",
+    "Winning",
+  );
   const codec = deriveCodec(auctionWinningStorageEntry.value);
   const decoded = [
     ...Array(7).fill(undefined),
@@ -53,7 +59,13 @@ Deno.test("Babe Authorities", { ignore: true }, async () => {
   // const babe = lookup.getPalletByName("Babe");
   // const babeAuthorities = lookup.getStorageEntryByPalletAndName(babe, "Authorities");
 
-  const result = await State.getStorage("wss://kusama-rpc.polkadot.io", lookup, deriveCodec, "Babe", "Authorities");
+  const result = await State.getStorage(
+    "wss://kusama-rpc.polkadot.io",
+    lookup,
+    deriveCodec,
+    "Babe",
+    "Authorities",
+  );
   console.log(result);
   // const decoded = {
   //   0: [

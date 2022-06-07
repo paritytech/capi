@@ -220,7 +220,11 @@ export enum StorageEntryModifier {
   Default,
 }
 export const storageEntryModifier = $.u8 as $.Codec<StorageEntryModifier>;
-type _StorageEntryModifierValidity = ValidateCodecSignature<StorageEntryModifier, typeof storageEntryModifier, true>;
+type _StorageEntryModifierValidity = ValidateCodecSignature<
+  StorageEntryModifier,
+  typeof storageEntryModifier,
+  true
+>;
 
 export enum StorageEntryTypeKind {
   Plain,
@@ -251,7 +255,11 @@ export const storageEntryType = $.taggedUnion(
     ["value", $.nCompact],
   ],
 );
-type _StorageEntryTypeValidity = ValidateCodecSignature<StorageEntryType, typeof storageEntryType, true>;
+type _StorageEntryTypeValidity = ValidateCodecSignature<
+  StorageEntryType,
+  typeof storageEntryType,
+  true
+>;
 
 export type StorageEntry = {
   name: string;
@@ -305,7 +313,11 @@ type _ConstantValidity = ValidateCodecSignature<Constant, typeof constant, true>
 
 type OptionalTypeBearer = undefined | { type: number };
 const optionalTypeBearer = $.option($.object(["type", $.nCompact]));
-type _OptionalTypeBearerValidity = ValidateCodecSignature<OptionalTypeBearer, typeof optionalTypeBearer, true>;
+type _OptionalTypeBearerValidity = ValidateCodecSignature<
+  OptionalTypeBearer,
+  typeof optionalTypeBearer,
+  true
+>;
 
 export interface Pallet {
   name: string;
