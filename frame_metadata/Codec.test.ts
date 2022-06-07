@@ -95,7 +95,7 @@ Deno.test("Balances Locks", { ignore: true }, async () => {
   // const balancesLockStorageEntry = lookup.getStorageEntryByNameAndPalletName("Balances", "Locks");
   // const codec = deriveCodec(balancesLockStorageEntry.value);
   // const decoded = {
-  //   id: "democrac",
+  //   id: "democracy",
   //   amount: 50000000000,
   //   reasons: "Misc",
   // };

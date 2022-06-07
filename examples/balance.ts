@@ -1,7 +1,5 @@
 import * as C from "/mod.ts";
 
-await C.init();
-
 const ss58 = C.ss58FromText("13SceNt2ELz3ti4rnQbY1snpYH4XE4fLFsW8ph9rpwJd6HFC");
 const pubKey = C.pubKeyFromSs58(ss58);
 const accountId32 = C.accountId32FromPubKey(pubKey);

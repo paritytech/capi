@@ -1,9 +1,9 @@
-import { decodeSs58Text } from "/bindings/mod.ts";
+import { getBindings } from "/bindings/mod.ts";
 import { effector } from "/effect/Effect.ts";
 import * as hex from "/util/hex.ts";
 
-export const pubKeyFromSs58 = effector.sync("pubKeyFromSs58", () =>
-  (init: string) => {
+export const pubKeyFromSs58 = effector.async("pubKeyFromSs58", () =>
+  async (init: string) => {
     // TODO: decode byte representation instead
-    return hex.decodeBuf(decodeSs58Text(init));
+    return hex.decodeBuf((await getBindings()).decodeSs58Text(init));
   });
