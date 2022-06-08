@@ -7,7 +7,7 @@
     "x/conditional_type_checks/": "https://deno.land/x/conditional_type_checks@1.0.5/",
     "x/deno_graph/": "https://deno.land/x/deno_graph@0.24.0/",
     "x/dnt/": "https://deno.land/x/dnt@0.22.0/",
-    "x/scale/": "https://deno.land/x/scale@v0.1.2/",
+    "x/scale/": "https://deno.land/x/scale@v0.1.4/",
     "typescript": "https://esm.sh/typescript"
   }
 }
