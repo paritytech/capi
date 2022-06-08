@@ -1,4 +1,4 @@
-import { effector } from "/effect/Effect.ts";
+import { effector } from "/effect/impl/mod.ts";
 
 // TODO: ???
 interface AccountId32 {

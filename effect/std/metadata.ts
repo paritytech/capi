@@ -1,4 +1,4 @@
-import { effector, EffectorItem } from "/effect/Effect.ts";
+import { effector, EffectorItem } from "/effect/impl/mod.ts";
 import { metadataDecoded } from "/effect/std/atoms/metadataDecoded.ts";
 import { select } from "/effect/std/atoms/select.ts";
 import { rpcCall } from "/effect/std/rpcCall.ts";
