@@ -3,19 +3,12 @@ import { CHAIN_URL_LOOKUP } from "/constants/chains/url.ts";
 import { call, wsRpcClient } from "/rpc/mod.ts";
 import * as hex from "/util/hex.ts";
 import * as path from "std/path/mod.ts";
-import { IsExact } from "x/conditional_type_checks/mod.ts";
-import * as $ from "x/scale/mod.ts";
 import { DeriveCodec } from "./Codec.ts";
 import { encodeKey } from "./Key.ts";
 import { Lookup } from "./Lookup.ts";
 import * as M from "./Metadata.ts";
 
 export type AssertTrue<_InQuestion extends true> = never;
-export type ValidateCodecSignature<
-  T,
-  C extends $.Codec<any>,
-  _IsValid extends IsExact<T, $.Native<C>>,
-> = never;
 
 export interface ChainInfo {
   deriveCodec: DeriveCodec;
