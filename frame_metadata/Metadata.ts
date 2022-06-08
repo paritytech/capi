@@ -170,24 +170,19 @@ export type Type = {
   params: Param[];
   docs: string[];
 } & TypeDef;
-export const $type: $.Codec<Type> = $.createCodec({
-  _staticSize: 0,
-  _encode: undefined!,
-  _decode(buffer) {
-    const i = $.nCompact._decode(buffer);
-    const path = $.array($.str)._decode(buffer);
-    const params = $.array($param)._decode(buffer);
-    const def = $typeDef._decode(buffer);
-    const docs = $.array($.str)._decode(buffer);
-    return {
-      i,
-      path,
-      params,
-      ...def,
-      docs,
-    };
-  },
-});
+export const $type: $.Codec<Type> = $.spread(
+  $.spread(
+    $.object(
+      ["i", $.nCompact],
+      ["path", $.array($.str)],
+      ["params", $.array($param)],
+    ),
+    $typeDef,
+  ),
+  $.object(
+    ["docs", $.array($.str)],
+  ),
+);
 
 export enum HasherKind {
   Blake2_128 = "Blake2_128",
@@ -250,24 +245,20 @@ export type StorageEntry = {
   default: number[];
   docs: string[];
 } & StorageEntryType;
-export const $storageEntry: $.Codec<StorageEntry> = $.createCodec({
-  _staticSize: 0,
-  _encode: undefined!,
-  _decode(buffer) {
-    const name = $.str._decode(buffer);
-    const modifier = $storageEntryModifier._decode(buffer);
-    const type = $storageEntryType._decode(buffer);
-    const default_ = $.array($.u8)._decode(buffer);
-    const docs = $.array($.str)._decode(buffer);
-    return {
-      name,
-      modifier,
-      ...type,
-      default: default_,
-      docs,
-    };
-  },
-});
+
+export const $storageEntry: $.Codec<StorageEntry> = $.spread(
+  $.spread(
+    $.object(
+      ["name", $.str],
+      ["modifier", $storageEntryModifier],
+    ),
+    $storageEntryType,
+  ),
+  $.object(
+    ["default", $.array($.u8)],
+    ["docs", $.array($.str)],
+  ),
+);
 
 export interface Storage {
   prefix: string;
