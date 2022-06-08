@@ -7,7 +7,7 @@ export interface Field {
   typeName: string | undefined;
   docs: string[];
 }
-export const field: $.Codec<Field> = $.object(
+export const $field: $.Codec<Field> = $.object(
   ["name", $.option($.str)],
   ["type", $.nCompact],
   ["typeName", $.option($.str)],
@@ -31,7 +31,7 @@ export enum PrimitiveKind {
   I128 = "i128",
   I256 = "i256",
 }
-const primitiveKind: $.Codec<PrimitiveKind> = $.keyLiteralUnion(
+const $primitiveKind: $.Codec<PrimitiveKind> = $.keyLiteralUnion(
   PrimitiveKind.Bool,
   PrimitiveKind.Char,
   PrimitiveKind.Str,
@@ -109,11 +109,11 @@ export type TypeDef =
   | PrimitiveTypeDef
   | CompactTypeDef
   | BitSequenceTypeDef;
-export const typeDef: $.Codec<TypeDef> = $.taggedUnion(
+export const $typeDef: $.Codec<TypeDef> = $.taggedUnion(
   "_tag",
   [
     TypeKind.Struct,
-    ["fields", $.array(field)],
+    ["fields", $.array($field)],
   ],
   [
     TypeKind.Union,
@@ -121,7 +121,7 @@ export const typeDef: $.Codec<TypeDef> = $.taggedUnion(
       "members",
       $.array($.object(
         ["name", $.str],
-        ["fields", $.array(field)],
+        ["fields", $.array($field)],
         ["i", $.u8],
         ["docs", $.array($.str)],
       )),
@@ -142,7 +142,7 @@ export const typeDef: $.Codec<TypeDef> = $.taggedUnion(
   ],
   [
     TypeKind.Primitive,
-    ["kind", primitiveKind],
+    ["kind", $primitiveKind],
   ],
   [
     TypeKind.Compact,
@@ -159,7 +159,7 @@ export interface Param {
   name: string;
   type: number | undefined;
 }
-export const param: $.Codec<Param> = $.object(
+export const $param: $.Codec<Param> = $.object(
   ["name", $.str],
   ["type", $.option($.nCompact)],
 );
@@ -170,14 +170,14 @@ export type Type = {
   params: Param[];
   docs: string[];
 } & TypeDef;
-export const type_: $.Codec<Type> = $.createCodec({
+export const $type: $.Codec<Type> = $.createCodec({
   _staticSize: 0,
   _encode: undefined!,
   _decode(buffer) {
     const i = $.nCompact._decode(buffer);
     const path = $.array($.str)._decode(buffer);
-    const params = $.array(param)._decode(buffer);
-    const def = typeDef._decode(buffer);
+    const params = $.array($param)._decode(buffer);
+    const def = $typeDef._decode(buffer);
     const docs = $.array($.str)._decode(buffer);
     return {
       i,
@@ -198,7 +198,7 @@ export enum HasherKind {
   Twox64Concat = "Twox64Concat",
   Identity = "Identity",
 }
-const hasherKind: $.Codec<HasherKind> = $.keyLiteralUnion(
+const $hasherKind: $.Codec<HasherKind> = $.keyLiteralUnion(
   HasherKind.Blake2_128,
   HasherKind.Blake2_256,
   HasherKind.Blake2_128Concat,
@@ -212,7 +212,7 @@ export enum StorageEntryModifier {
   Optional,
   Default,
 }
-export const storageEntryModifier = $.u8 as $.Codec<StorageEntryModifier>;
+export const $storageEntryModifier = $.u8 as $.Codec<StorageEntryModifier>;
 
 export enum StorageEntryTypeKind {
   Plain,
@@ -233,12 +233,12 @@ export interface MapStorageEntryType {
 
 export type StorageEntryType = PlainStorageEntryType | MapStorageEntryType;
 
-export const storageEntryType: $.Codec<StorageEntryType> = $.taggedUnion(
+export const $storageEntryType: $.Codec<StorageEntryType> = $.taggedUnion(
   "_tag",
   [StorageEntryTypeKind.Plain, ["value", $.nCompact]],
   [
     StorageEntryTypeKind.Map,
-    ["hashers", $.array(hasherKind)],
+    ["hashers", $.array($hasherKind)],
     ["key", $.nCompact],
     ["value", $.nCompact],
   ],
@@ -250,13 +250,13 @@ export type StorageEntry = {
   default: number[];
   docs: string[];
 } & StorageEntryType;
-export const storageEntry: $.Codec<StorageEntry> = $.createCodec({
+export const $storageEntry: $.Codec<StorageEntry> = $.createCodec({
   _staticSize: 0,
   _encode: undefined!,
   _decode(buffer) {
     const name = $.str._decode(buffer);
-    const modifier = storageEntryModifier._decode(buffer);
-    const type = storageEntryType._decode(buffer);
+    const modifier = $storageEntryModifier._decode(buffer);
+    const type = $storageEntryType._decode(buffer);
     const default_ = $.array($.u8)._decode(buffer);
     const docs = $.array($.str)._decode(buffer);
     return {
@@ -273,9 +273,9 @@ export interface Storage {
   prefix: string;
   entries: StorageEntry[];
 }
-export const storage: $.Codec<Storage> = $.object(
+export const $storage: $.Codec<Storage> = $.object(
   ["prefix", $.str],
-  ["entries", $.array(storageEntry)],
+  ["entries", $.array($storageEntry)],
 );
 
 export interface Constant {
@@ -284,7 +284,7 @@ export interface Constant {
   value: number[];
   docs: string[];
 }
-export const constant: $.Codec<Constant> = $.object(
+export const $constant: $.Codec<Constant> = $.object(
   ["name", $.str],
   ["type", $.nCompact],
   ["value", $.array($.u8)],
@@ -303,12 +303,12 @@ export interface Pallet {
   error: OptionalTypeBearer;
   i: number;
 }
-export const pallet: $.Codec<Pallet> = $.object(
+export const $pallet: $.Codec<Pallet> = $.object(
   ["name", $.str],
-  ["storage", $.option(storage)],
+  ["storage", $.option($storage)],
   ["calls", optionalTypeBearer],
   ["event", optionalTypeBearer],
-  ["constants", $.array(constant)],
+  ["constants", $.array($constant)],
   ["error", optionalTypeBearer],
   ["i", $.u8],
 );
@@ -318,7 +318,7 @@ export interface SignedExtensionMetadata {
   type: number;
   additionalSigned: number | bigint;
 }
-export const signedExtensionMetadata: $.Codec<SignedExtensionMetadata> = $.object(
+export const $signedExtensionMetadata: $.Codec<SignedExtensionMetadata> = $.object(
   ["ident", $.str],
   ["type", $.nCompact],
   ["additionalSigned", $.compact],
@@ -329,10 +329,10 @@ export interface Extrinsic {
   version: number;
   signedExtensions: SignedExtensionMetadata[];
 }
-export const extrinsic: $.Codec<Extrinsic> = $.object(
+export const $extrinsic: $.Codec<Extrinsic> = $.object(
   ["type", $.nCompact],
   ["version", $.u8],
-  ["signedExtensions", $.array(signedExtensionMetadata)],
+  ["signedExtensions", $.array($signedExtensionMetadata)],
 );
 
 export interface Metadata {
@@ -341,11 +341,11 @@ export interface Metadata {
   pallets: Pallet[];
   extrinsic: Extrinsic;
 }
-export const metadata: $.Codec<Metadata> = $.object(
+export const $metadata: $.Codec<Metadata> = $.object(
   ["version", $.u8 as $.Codec<14>],
-  ["types", $.array(type_)],
-  ["pallets", $.array(pallet)],
-  ["extrinsic", extrinsic],
+  ["types", $.array($type)],
+  ["pallets", $.array($pallet)],
+  ["extrinsic", $extrinsic],
 );
 
 export const $prefixedMetadata = $.createCodec({
@@ -353,7 +353,7 @@ export const $prefixedMetadata = $.createCodec({
   _encode: undefined!,
   _decode(buffer) {
     $.u32._decode(buffer);
-    return metadata._decode(buffer);
+    return $metadata._decode(buffer);
   },
 });
 
