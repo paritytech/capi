@@ -281,13 +281,13 @@ export const $storage: $.Codec<Storage> = $.object(
 export interface Constant {
   name: string;
   type: number;
-  value: number[];
+  value: Uint8Array;
   docs: string[];
 }
 export const $constant: $.Codec<Constant> = $.object(
   ["name", $.str],
   ["type", $.nCompact],
-  ["value", $.array($.u8)],
+  ["value", $.uint8array],
   ["docs", $.array($.str)],
 );
 
