@@ -335,28 +335,24 @@ export const $extrinsic: $.Codec<Extrinsic> = $.object(
   ["signedExtensions", $.array($signedExtensionMetadata)],
 );
 
+// https://docs.substrate.io/v3/runtime/metadata/#encoded-metadata-format
+export const magicNumber = 1635018093;
+
 export interface Metadata {
+  magicNumber: typeof magicNumber;
   version: 14;
   types: Type[];
   pallets: Pallet[];
   extrinsic: Extrinsic;
 }
 export const $metadata: $.Codec<Metadata> = $.object(
-  ["version", $.u8 as $.Codec<14>],
+  ["magicNumber", $.constantPattern(magicNumber, $.u32)],
+  ["version", $.constantPattern(14, $.u8)],
   ["types", $.array($type)],
   ["pallets", $.array($pallet)],
   ["extrinsic", $extrinsic],
 );
 
-export const $prefixedMetadata = $.createCodec({
-  _staticSize: 0,
-  _encode: undefined!,
-  _decode(buffer) {
-    $.u32._decode(buffer);
-    return $metadata._decode(buffer);
-  },
-});
-
 export const fromPrefixedHex = (scaleEncoded: string): Metadata => {
-  return $prefixedMetadata.decode(hex.decode(scaleEncoded));
+  return $metadata.decode(hex.decode(scaleEncoded));
 };
