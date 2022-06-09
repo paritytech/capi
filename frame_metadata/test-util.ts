@@ -32,12 +32,9 @@ export const getLookupAndDeriveCodec = async (
   };
 };
 
-export const accountId32Bytes = hex.decode(
+export const accountId32 = hex.decode(
   "43fa61b298e82f9f207ddea327900cee26b554756c4a533f36cd875e3e7bcf06",
 );
-export const accountId32 = {
-  0: [...accountId32Bytes],
-};
 console.log(accountId32);
 
 export namespace State {

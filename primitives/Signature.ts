@@ -5,14 +5,10 @@ export const enum SignatureKind {
 }
 
 export abstract class SignatureBase {
-  0;
-
   constructor(
     readonly _tag: SignatureKind,
-    bytes: Uint8Array,
+    readonly value: Uint8Array,
   ) {
-    const asA = { 0: [...bytes] };
-    this[0] = asA;
   }
 }
 

@@ -22,19 +22,39 @@ const primitiveCodecByDiscriminant = {
   [M.PrimitiveKind.I256]: $.i256,
 };
 
+/**
+ * All derived codecs for ZSTs will use this exact codec,
+ * so `derivedCodec === $null` is true iff the type is a ZST.
+ */
+export const $null = $.dummy(null);
+
 export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
   // TODO: don't leak memory!
   const cache: Record<number, $.Codec<unknown> | null> = {};
 
-  const Fields = (fields: M.Field[]): $.Field[] => {
-    return fields.map((field, i) => {
-      return [field.name === undefined ? i : field.name, visitors.visit(field.type)];
-    });
-  };
+  function tuple(fields: number[]): $.Codec<any> {
+    if (fields.length === 0) {
+      return $null;
+    } else if (fields.length === 1) {
+      return visitors.visit(fields[0]!);
+    } else {
+      return $.tuple(...fields.map((field) => visitors.visit(field)));
+    }
+  }
 
   const visitors: TypeVisitors<{ [_ in M.TypeKind]: $.Codec<any> }> = {
     [M.TypeKind.Struct]: (ty) => {
-      return $.object(...Fields(ty.fields)) as unknown as $.Codec<unknown>;
+      if (ty.fields.length === 0) {
+        return $null;
+      } else if (ty.fields[0]!.name === undefined) {
+        // Tuple struct
+        return tuple(ty.fields.map((f) => f.type));
+      } else {
+        // Object struct
+        return $.object(
+          ...ty.fields.map((field): $.Field => [field.name!, visitors.visit(field.type)]),
+        );
+      }
     },
     [M.TypeKind.Union]: (ty) => {
       // TODO: revisit this
@@ -46,15 +66,28 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
       const members = ty.members.map((member, i) => {
         memberIByTag[member.name] = member.i;
         memberIByDiscriminant[member.i] = i;
-        const memberFields = member.fields.map((field, i) => {
-          return [
-            field.name || i,
-            $.deferred(() => {
-              return visitors.visit(field.type);
-            }),
-          ] as [string, $.Codec<unknown>];
-        });
-        return $.object(["_tag", $.dummy(member.name)], ...memberFields);
+        const { fields, name: _tag } = member;
+        if (fields.length === 0) return $.dummy({ _tag });
+        if (fields[0]!.name === undefined) {
+          // Tuple variant
+          const $value = tuple(fields.map((f) => f.type));
+          return $.transform(
+            $value,
+            ({ value }: { value: unknown }) => value,
+            (value) => ({ _tag, value }),
+          );
+        } else {
+          // Object variant
+          const memberFields = member.fields.map((field, i) => {
+            return [
+              field.name || i,
+              $.deferred(() => {
+                return visitors.visit(field.type);
+              }),
+            ] as [string, $.Codec<unknown>];
+          });
+          return $.object(["_tag", $.dummy(member.name)], ...memberFields);
+        }
       });
       return union(
         (member) => {
@@ -75,13 +108,23 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
       ) as unknown as $.Codec<any>;
     },
     [M.TypeKind.Sequence]: (ty) => {
-      return $.array(visitors.visit(ty.typeParam));
+      const $el = visitors.visit(ty.typeParam);
+      if ($el === $.u8) {
+        return $.uint8array;
+      } else {
+        return $.array($el);
+      }
     },
     [M.TypeKind.SizedArray]: (ty) => {
-      return $.sizedArray(visitors.visit(ty.typeParam), ty.len);
+      const $el = visitors.visit(ty.typeParam);
+      if ($el === $.u8) {
+        return $.sizedUint8array(ty.len);
+      } else {
+        return $.sizedArray($el, ty.len);
+      }
     },
     [M.TypeKind.Tuple]: (ty) => {
-      return $.tuple(...ty.fields.map((field) => visitors.visit(field)));
+      return tuple(ty.fields);
     },
     [M.TypeKind.Primitive]: (ty) => {
       return primitiveCodecByDiscriminant[ty.kind]!;

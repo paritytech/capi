@@ -6,12 +6,10 @@ export abstract class EraBase {
   constructor(readonly _tag: EraKind) {}
 }
 export class MortalEra extends EraBase {
-  0;
-  1;
+  value;
   constructor(period: bigint, phase: bigint) {
     super(EraKind.Mortal);
-    this[0] = period;
-    this[1] = phase;
+    this.value = [period, phase];
   }
 }
 export class ImmortalEra extends EraBase {
@@ -45,10 +43,10 @@ export class Extras {
   constructor(
     era: Era,
     nonce: number,
-    chargeAssetTxPayment: ChargeAssetTxPayment,
+    tip: bigint,
   ) {
-    this[4] = { 0: era };
-    this[5] = { 0: nonce };
-    this[7] = chargeAssetTxPayment;
+    this[4] = era;
+    this[5] = nonce;
+    this[7] = tip;
   }
 }
