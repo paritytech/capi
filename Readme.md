@@ -1,5 +1,9 @@
 # Capi
 
+Capi is a WIP TypeScript toolkit for crafting interactions with Substrate-based chains.
+
+Capi consists of [FRAME](https://docs.substrate.io/v3/runtime/frame/)-oriented utilities and [a high-level functional effect system](_docs/Effects.md) which facilitate multistep, multichain interactions without compromising on performance nor security.
+
 <!--
 <h4>
   <a href="">Guide</a> &nbsp;·&nbsp;
@@ -10,29 +14,41 @@
 </h4>
 -->
 
-Capi (Chain API) is a TypeScript toolkit for crafting interactions with Substrate-based chains.
+## ⚠ This Is a Work in Progress
 
-Capi consists of utilities and [a high-level functional effect system](_docs/Effects.md) which abstract over a range of use cases. Using Capi's standard library of effects, you can interact with any Substrate-based chain while also following best practices and achieving optimal performance.
+️Please share feedback or even join us in Capi's development; issues and PRs are very welcome!
 
-⚠️ Capi is a work in progress. It is fraught with edge cases and `TODO` comments. If joining the Capi / Apps Framework team interests you, please reach out to TODO<!--INSERT EMAIL ADDR HERE-->.
+#### In Good Shape
 
-## Quick Start
+- [x] RPC `call` and `subscribe` utils
+- [x] Metadata types and SCALE codecs
+- [x] Metadata-based codec derivation
+- [x] Storage key encoding
+- [x] Storage value decoding
 
-> For a complete introduction, please refer to [(TODO) Capi documentation](#).
+#### Needs Love
+
+- [ ] Creating / extracting from extrinsics
+- [ ] High-level "Effect" System
+- [ ] Std lib of effects
+
+#### TODO
+
+- [ ] RPC Client Error Handing
+- [ ] Get async iterable from RPC subscription
+- [ ] ... TODO, the remainder of this TODO section (we primarily use [this repo's issues](https://github.com/paritytech/capi/tree/harry-pre_beta_docs))
 
 ### Setup
 
-> For now, follow the instructions in [the testing section](#testing).
-
-If you're using [Deno](https://deno.land/), simply import via the `denoland/x` specifier.
+If you're using [Deno](https://deno.land/), import via the `denoland/x` specifier.
 
 ```ts
-import * as $ from "https://deno.land/x/capi/mod.ts";
+import * as C from "https://deno.land/x/capi/mod.ts";
 ```
 
 > Note: you may want to pin the version in your import specifier (`https://deno.land/x/capi@x.x.x/mod.ts`).
 
-If you're using [Node](https://nodejs.org/), install as follows.
+If you're using [Node](https://nodejs.org/), install Capi from NPM.
 
 ```
 npm install capi
@@ -44,108 +60,144 @@ Then import as follows.
 import * as C from "capi";
 ```
 
-### Get a Reference to a Chain
+### WIP DX vs. North Star
 
-Before we do anything, we must first attain a reference to a given chain. In the following example, we create a reference to the Polkadot relay chain via `C.POLKADOT`, a Capi-exposed constant, which is an array of known RPC proxy URLs. This array of URLs serves as a "beacon."
-
-```ts
-const $chain = C.chain(C.POLKADOT);
-```
-
-**IMPORTANT**
-
-This is one of the rough edges during development. For now, utilize `C.wsRpcClient` (a raw RPC client) instead of `C.chain`.
+For now, we will manually instantiate an RPC client (in this case, with a proxy WebSocket URL).
 
 ```ts
-const rpc = C.wsRpcClient(C.POLKADOT);
+const rpc = C.wsRpcClient(C.POLKADOT_PROXY_WS_URL);
 
-// Your Capi usage here
+// Use the client here
 
 await rpc.close();
 ```
 
+Our north star is a version of Capi which manages the connection lifecycle on your behalf.
+
+```ts
+const chain = C.chain(C.POLKADOT_PROXY_WS_URL);
+```
+
+Additionally, our north star is fluent. Instead of writing a pallet reference as follows.
+
+```ts
+const systemPallet = C.pallet(C.chain(C.POLKADOT_CHAIN_SPEC), "System");
+```
+
+One will write it like so:
+
+```ts
+const systemPallet = C.chain(C.POLKADOT_CHAIN_SPEC).pallet("System");
+```
+
+The following examples detail the north star experience, not the in-development experience. For examples of the current API's usage, look in the `examples` folder (all of which can be run with `deno task example:<example-name>`).
+
 ### Read a Balance
 
 ```ts
-// 1. Which pallet?
-const $pallet = C.pallet($chain, "System");
+// 1. Which chain?
+const chain = C.chain(C.POLKADOT_CHAIN_SPEC);
 
-// 2. Which item?
-const $accounts = C.storageMap($pallet, "Account");
+// 2. Which key within the balances storage map?
+const accountId = chain.ss58(MY_ADDR).toAccountId32();
 
-// 3. Which account (the key) within the map?
-const $accountId = C.ss58(MY_ADDR).toAccountId32();
-
-// 4. A representation of the data we wish to read.
-const entry = C.entry($accounts, $accountId);
-
-// 5. Execute the read.
-const result = await C.read(entry).run();
+// 3. Which value within the storage map?
+const value = await chain
+  .pallet("System")
+  .storageMap("Account")
+  .get(accountId)
+  .read(); // ... as opposed to `subscribe`
 ```
 
-The signature `result` is a union of `Read<unknown>` and all possible error types. We can utilize an `instanceof` check to narrow the `result` before accessing the read value.
+### Note About Typings
+
+#### Signatures
+
+The signature `value` is a union of `Read<unknown>` and all possible error types.
+
+```ts
+assertTypeEquals<
+  typeof value,
+  C.Read<unknown> | C.WsRpcError | C.StorageEntryDneError | C.StorageValueDecodeError
+>();
+```
+
+#### Narrow Error Handling
+
+We can utilize an `instanceof` check to narrow the `result` before accessing the read value.
 
 ```ts
 if (result instanceof Error) {
-  throw result;
+  // Handle narrow error types here
+} else {
+  // Handle `C.Read<unknown>` here
 }
-result.value;
+```
+
+#### Assertion of Type
+
+The on-chain world is evolving rapidly. This creates uncertainty regarding types. To mitigate this uncertainty, you can (optionally) utilize Capi's virtual type system to assert a given shape.
+
+```diff
+const value = await chain
+  .pallet("System")
+  .storageMap("Account")
+  .get(accountId)
++ .as(C.$.sizedUint8Array(32))
+  .read();
+```
+
+There are three main reason to utilize `as`:
+
+1. We can confirm that a given interaction's type-level expectations align with the metadata before dispatch.
+2. Legibility: the `as` call makes obvious the value encapsulated by the `Read`.
+3. We can produce a narrow signature.
+
+```diff
+- C.Read<unknown> | C.WsRpcError | C.StorageEntryDneError | C.StorageValueDecodeError
++ C.Read<Uint8Array> | C.WsRpcError | C.StorageEntryDneError | C.StorageValueDecodeError
 ```
 
 ### Transfer Some Dot
 
-> Note: this high-level API for transferring Dot is not yet functional. You can utilize `C.encodeExtrinsic` and an RPC client directly.
-
 ```ts
-// 1. Which pallet?
-const $pallet = C.pallet($chain, "Balances");
+// 1. Which chain?
+const chain = C.chain(C.POLKADOT_CHAIN_SPEC);
 
-// 2. Which callable?
-const $Transfer = C.txFactory($pallet, "transfer");
+// 2. Where to send the funds?
+const dest = chain.ss58(ALICE_ADDR).toMultiAddress();
 
-// 3. Where to send the funds?
-const $dest = C.ss58(ALICE_ADDR).toMultiAddress();
-
-// 4. Utilize the factory
-const $transfer = $Transfer($dest, 42);
-
-// 5. In the case of `Balances::transfer`, we must perform signing.
-//    The signing process will vary depending on your environment, wallet, misc.
-//    For now we'll assume that a valid secret seed is in scope, defined as `seed`.
-const sign = Sign(C.pair.fromSeed(seed));
-const $transferSigned = C.signTx(sign, $transfer);
-
-const result = await $transferSigned.run();
+// 3. Craft and submit the transaction.
+await C
+  .pallet("Balances")
+  .txFactory("transfer")
+  .call(dest, 42);
+  .sign(signingFn)
+  .submit()
 ```
+
+> Note: it is up to the developer to supply `sign` with a signing function, which will vary depending on your environment, wallet, misc.
 
 ### Derived Queries / Composing Effects
 
-> Note: Effect-mapping utilities are yet to be implemented.
-
-Let's read the heads of Polkadot's parachains. This requires that we first obtain a list of parachain IDs, and then use these IDs to read their heads.
+Let's read the heads of Polkadot's parachains. This requires that we first obtain a list of parachain IDs, and then use those IDs to read their heads.
 
 ```ts
 // 1. Which pallet?
-const $pallet = C.pallet($chain, "Paras");
+const pallet = C.chain(C.POLKADOT_CHAIN_SPEC).pallet("Paras");
 
-// 2. Get list of parachain IDs.
-const $parachainIds = C.entry($pallet, "Parachains");
+// 2. What is the first step in the derived query? In this case, reading the heads.
+const parachainHeads = pallet.storageMap("Heads");
 
-// 3. Get a reference to the heads map.
-const $parachainHeads = C.storageMap($pallet, "Heads");
-
-// 4. Create an effect for resolving each parachain head.
-const $parachainHeads = C.map($parachainIds, (id) => {
-  return C.entry($parachainHeads, id);
-});
-
-// 5. Execute the read.
-const result = await C.read($parachainHeads).run();
+// 3. Map from the to-be-evaluated result.
+const parachainIds = await pallet
+  .entry("Parachains")
+  .as(C.$.array($.u32))
+  .map(parachainHeads.get)
+  .read();
 ```
 
 ## Testing
-
-We have yet to publish Capi to [deno.land/x](https://deno.land/x) nor [NPM](https://www.npmjs.com/). For now, clone [`paritytech/capi`](https://github.com/paritytech/capi).
 
 > In the future, Gitpod and dev containers will simplify spinning up a Capi development environments. The [Dockerfile](./Dockerfile), [Gitpod configuration](./.gitpod.yml) and [Dev Containers / Codespaces configuration](./.devcontainer/devcontainer.json) are in need some finessing.
 
@@ -187,7 +239,7 @@ deno task build_npm_pkg && cd target/npm && npm link
 From the project in which you wish to use Capi...
 
 ```ts
-npm link capi-beta
+npm link capi
 ```
 
 ## Code Structure
@@ -217,7 +269,7 @@ import { hexToU8a } from "../util/mod.ts";
 ... **we write this**:
 
 ```ts
-import { Resource } from "/util/mod.ts";
+import { hexToU8a } from "/util/mod.ts";
 ```
 
 Now, if we ever move our `Metadata.ts` file elsewhere, its import of `hexToU8a` remain valid.

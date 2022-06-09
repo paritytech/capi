@@ -32,7 +32,7 @@ match getRand() {
 }
 
 // Propagate to parent for handling.
-fn getRandOrErr() -> Result<GtPoint5Error, u32> {
+fn getRandOrErr() -> Result<u32, GtPoint5Error> {
   getRand()?
 }
 ```
@@ -41,7 +41,7 @@ In TypeScript, we don't have this feature as a primitive of the language. So how
 
 ```diff
 - const getRand = (): number => {
-+ const getRand = (): Result<GtPoint5, number> => {
++ const getRand = (): Result<number, GtPoint5> => {
     const rand = Math.random();
     if (rand > .5) {
 -     throw new GtPoint5(rand);
@@ -55,7 +55,7 @@ In TypeScript, we don't have this feature as a primitive of the language. So how
 However, this introduces the complexity of propagating error types as we compose our program. Let's say we want to represent the addition of two numeric result types. We parameterize the constraints of `a` and `b` and produce a result type, derived from the error types extracted from those constraints. This does the trick, but introduces much boilerplate.
 
 ```ts
-const add = <A extends Result<Error, number>, B extends Result<Error, number>>(
+const add = <A extends Result<number, Error>, B extends Result<number, Error>>(
   a: A,
   b: B,
 ): Result<Extract<A, Error> | Extract<B, Error>> => {
@@ -68,7 +68,7 @@ const add = <A extends Result<Error, number>, B extends Result<Error, number>>(
 };
 ```
 
-Because the error types of `A` and `B` are generic, we can never truly handle them within `add`. So, why do we even try? Ideally, the errors of `add`'s dependencies bubble to the `add` caller's root, where the error types are accessible for type-safe handling. More on this later.
+Because the error types of `A` and `B` are generic, we can never truly handle them within `add`. So, why do we even try? Ideally, the errors of `add`'s dependencies bubble to the `add` caller's root, where the applied arguments' error types are accessible for type-safe handling. More on this later.
 
 ## Optimized Execution
 
@@ -106,7 +106,7 @@ The list of such situations goes on. The point is this: in an ideal world, the a
 
 ## Capi Effects
 
-<!-- TODO -->
+TODO: description
 
 ### Final Note about Effects
 

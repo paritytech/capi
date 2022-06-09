@@ -72,3 +72,7 @@ schnorrkel
 mdbook
 hashbrown
 serde
+multichain
+multistep
+deps
+combinators
