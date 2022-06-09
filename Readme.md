@@ -8,23 +8,24 @@ Capi consists of FRAME-oriented utilities and [a high-level functional effect sy
 
 ️Please share feedback or even join us in Capi's development; issues and PRs are very welcome!
 
-### In Good Shape
+#### In Good Shape
 
-- RPC `call` and `subscribe` utils
-- Metadata Types and SCALE Codecs
-- Metadata-based Codec Derivation
-- Storage Key Encoding
-- Storage Value Decoding
+- [x] RPC `call` and `subscribe` utils
+- [x] Metadata types and SCALE codecs
+- [x] Metadata-based codec derivation
+- [x] Storage key encoding
+- [x] Storage value decoding
 
-### Needs Love
+#### Needs Love
 
-- Creating / Extracting from Extrinsics
-- High-level "Effect" API
+- [-] Creating / extracting from extrinsics
+- [-] High-level "Effect" System
+- [-] Std lib of effects
 
-### TODO
+#### TODO
 
-- RPC Client Error Handing
-- Storage Key Decoding
+- [] RPC Client Error Handing
+- [] Get async iterable from RPC subscription
 
 <!--
 <h4>
