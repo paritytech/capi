@@ -143,7 +143,7 @@ const value = await chain
   .pallet("System")
   .storageMap("Account")
   .get(accountId)
-+ .as(C.$.sizedArray(C.$.u8, 32))
++ .as(C.$.sizedUint8Array(32))
   .read();
 ```
 
@@ -269,7 +269,7 @@ import { hexToU8a } from "../util/mod.ts";
 ... **we write this**:
 
 ```ts
-import { Resource } from "/util/mod.ts";
+import { hexToU8a } from "/util/mod.ts";
 ```
 
 Now, if we ever move our `Metadata.ts` file elsewhere, its import of `hexToU8a` remain valid.
