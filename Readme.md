@@ -136,7 +136,7 @@ if (result instanceof Error) {
 
 #### Assertion of Type
 
-The on-chain world is evolving rapidly. This creates uncertainty regarding types. To mitigate this uncertainty, you can (optional) utilize Capi's virtual type system to assert a given shape.
+The on-chain world is evolving rapidly. This creates uncertainty regarding types. To mitigate this uncertainty, you can (optionally) utilize Capi's virtual type system to assert a given shape.
 
 ```diff
 const value = await chain
