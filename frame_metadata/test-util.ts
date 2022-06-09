@@ -1,6 +1,6 @@
 import { getHashers } from "/bindings/mod.ts";
 import { CHAIN_URL_LOOKUP } from "/constants/chains/url.ts";
-import { call, wsRpcClient } from "/rpc/mod.ts";
+import { wsRpcClient } from "/rpc/mod.ts";
 import * as hex from "/util/hex.ts";
 import * as path from "std/path/mod.ts";
 import { DeriveCodec } from "./Codec.ts";
@@ -53,7 +53,7 @@ export namespace State {
     const storageEntry = lookup.getStorageEntryByPalletAndName(pallet, storageEntryName);
     const key = encodeKey(deriveCodec, await getHashers(), pallet, storageEntry, ...keys);
     const client = await wsRpcClient(url);
-    const message = await call(client, "state_getStorage", [key]);
+    const message = await client.call("state_getStorage", [key]);
     const resultScaleHex = (message as any).result as string | undefined;
     if (resultScaleHex === undefined) {
       return;

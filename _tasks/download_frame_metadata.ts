@@ -9,10 +9,9 @@ await Promise.all(
   CHAIN_URL_LOOKUP.map(async ([name, url]) => {
     const client = await rpc.wsRpcClient(url);
     try {
-      const metadata = await rpc.call(client, "state_getMetadata", []);
-      if (metadata.error) {
-        console.log(metadata);
-        throw new Error();
+      const metadata = await client.call("state_getMetadata", []);
+      if (metadata instanceof Error) {
+        throw metadata;
       }
       const outPath = path.join(outDir, `${name}.scale`);
       console.log(`Downloading ${name} metadata to "${outPath}".`);

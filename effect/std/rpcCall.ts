@@ -1,13 +1,6 @@
 import { effector, EffectorArgs } from "/effect/impl/mod.ts";
 import * as rpc from "/rpc/mod.ts";
 
-// TODO
-export class RpcError extends Error {
-  constructor(readonly inner: rpc.ErrMessage) {
-    super();
-  }
-}
-
 export const rpcCall = effector.async.generic(
   "rpcCall",
   (effect) =>
@@ -19,10 +12,6 @@ export const rpcCall = effector.async.generic(
     ) =>
       effect(args, () =>
         async (client, methodName, ...params) => {
-          const res = await rpc.call(client, methodName, params);
-          if (res?.error) {
-            return new RpcError(res);
-          }
-          return res;
+          return await client.call(methodName, params);
         }),
 );

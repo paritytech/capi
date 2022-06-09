@@ -1,8 +1,6 @@
 import { ListenerCb, RpcClient, RpcClientFactory, StopListening } from "./Base.ts";
 import { InitMessage } from "./messages.ts";
 
-// TODO: error handling
-
 // TODO: get this directly from smoldot
 interface SmoldotClient {
   addChain(options: AddChainOptions): Promise<SmoldotChain>;
