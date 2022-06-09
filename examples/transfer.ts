@@ -11,11 +11,11 @@ const pair = bindings.pairFromSecretSeed(
 );
 
 const client = await C.wsRpcClient(C.WESTEND_RPC_URL);
-const metadataRaw = (await C.call(client, "state_getMetadata", [])).result;
-if (!metadataRaw) {
-  throw new Error();
+const metadataRaw = await client.call("state_getMetadata", []);
+if (metadataRaw instanceof Error) {
+  throw metadataRaw;
 }
-const metadata = M.fromPrefixedHex(metadataRaw);
+const metadata = M.fromPrefixedHex(metadataRaw.result);
 const deriveCodec = M.DeriveCodec(metadata);
 
 const dest = new C.MultiAddress(
