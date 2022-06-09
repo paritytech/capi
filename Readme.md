@@ -150,10 +150,13 @@ await C
 Let's read the heads of Polkadot's parachains. This requires that we first obtain a list of parachain IDs, and then use those IDs to read their heads.
 
 ```ts
+// 1. Which pallet?
 const pallet = C.chain(C.POLKADOT_CHAIN_SPEC).pallet("Paras");
 
+// 2. What is the first step in the derived query? In this case, reading the heads.
 const parachainHeads = pallet.storageMap("Heads");
 
+// 3. Map from the to-be-evaluated result.
 const parachainIds = await pallet
   .entry("Parachains")
   .as(C.$.array($.u32))
