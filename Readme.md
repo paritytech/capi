@@ -60,13 +60,12 @@ Then import as follows.
 import * as C from "capi";
 ```
 
-### Current DX vs. North Star
+### WIP DX vs. North Star
 
-For now, we will manually instantiate an `RpcClient` (in this case, with a proxy WebSocket URL).
+For now, we will manually instantiate an RPC client (in this case, with a proxy WebSocket URL).
 
 ```ts
-const rpc1 = C.wsRpcClient(C.POLKADOT_PROXY_WS_URL);
-const rpc2 = C.wsRpcClient(C.POLKADOT_CHAIN_SPEC);
+const rpc = C.wsRpcClient(C.POLKADOT_PROXY_WS_URL);
 
 // Use the client here
 
@@ -76,27 +75,19 @@ await rpc.close();
 Our north star is a version of Capi which manages the connection lifecycle on your behalf.
 
 ```ts
-const chain1 = C.chain(C.POLKADOT_PROXY_WS_URL);
-const chain2 = C.chain(C.POLKADOT_CHAIN_SPEC);
+const chain = C.chain(C.POLKADOT_PROXY_WS_URL);
 ```
 
-Additionally, the API will be fluent.
-
-Instead of writing a pallet reference as follows.
+Additionally, our north star is fluent. Instead of writing a pallet reference as follows.
 
 ```ts
-const systemPallet = C.pallet(
-  C.chain(C.POLKADOT_CHAIN_SPEC),
-  "System",
-);
+const systemPallet = C.pallet(C.chain(C.POLKADOT_CHAIN_SPEC), "System");
 ```
 
 One will write it like so:
 
 ```ts
-const systemPallet = C
-  .chain(C.POLKADOT_CHAIN_SPEC)
-  .pallet("System");
+const systemPallet = C.chain(C.POLKADOT_CHAIN_SPEC).pallet("System");
 ```
 
 The following examples detail the north star experience, not the in-development experience. For examples of the current API's usage, look in the `examples` folder (all of which can be run with `deno task example:<example-name>`).
@@ -118,13 +109,53 @@ const value = await chain
   .read(); // ... as opposed to `subscribe`
 ```
 
-The signature `value` is a union of `Read<unknown>` and all possible error types. We can utilize an `instanceof` check to narrow the `result` before accessing the read value.
+### Note About Typings
+
+#### Signatures
+
+The signature `value` is a union of `Read<unknown>` and all possible error types.
+
+```ts
+assertTypeEquals<
+  typeof value,
+  C.Read<unknown> | C.WsRpcError | C.StorageEntryDneError | C.StorageValueDecodeError
+>();
+```
+
+#### Narrow Error Handling
+
+We can utilize an `instanceof` check to narrow the `result` before accessing the read value.
 
 ```ts
 if (result instanceof Error) {
-  throw result;
+  // Handle narrow error types here
+} else {
+  // Handle `C.Read<unknown>` here
 }
-result.value;
+```
+
+#### Assertion of Type
+
+The on-chain world is evolving rapidly. This creates uncertainty regarding types. To mitigate this uncertainty, you can (optional) utilize Capi's virtual type system to assert a given shape.
+
+```diff
+const value = await chain
+  .pallet("System")
+  .storageMap("Account")
+  .get(accountId)
++ .as(C.$.sizedArray(C.$.u8, 32))
+  .read();
+```
+
+There are three main reason to utilize `as`:
+
+1. We can confirm that a given interaction's type-level expectations align with the metadata before dispatch.
+2. Legibility: the `as` call makes obvious the value encapsulated by the `Read`.
+3. We can produce a narrow signature.
+
+```diff
+- C.Read<unknown> | C.WsRpcError | C.StorageEntryDneError | C.StorageValueDecodeError
++ C.Read<Uint8Array> | C.WsRpcError | C.StorageEntryDneError | C.StorageValueDecodeError
 ```
 
 ### Transfer Some Dot
