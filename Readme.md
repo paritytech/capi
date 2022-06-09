@@ -4,6 +4,16 @@ Capi (Chain API) is a WIP TypeScript toolkit for crafting interactions with Subs
 
 Capi consists of FRAME-oriented utilities and [a high-level functional effect system](_docs/Effects.md) which facilitate multichain interactions without compromising on performance nor security.
 
+<!--
+<h4>
+  <a href="">Guide</a> &nbsp;·&nbsp;
+  <a href="">API Reference</a> &nbsp;·&nbsp;
+  <a href="">Support</a> &nbsp;·&nbsp;
+  <a href="">Roadmap</a> &nbsp;·&nbsp;
+  <a href="">Contributing</a>
+</h4>
+-->
+
 ## ⚠ This Is a Work in Progress
 
 ️Please share feedback or even join us in Capi's development; issues and PRs are very welcome!
@@ -18,28 +28,19 @@ Capi consists of FRAME-oriented utilities and [a high-level functional effect sy
 
 #### Needs Love
 
-- [-] Creating / extracting from extrinsics
-- [-] High-level "Effect" System
-- [-] Std lib of effects
+- [ ] Creating / extracting from extrinsics
+- [ ] High-level "Effect" System
+- [ ] Std lib of effects
 
 #### TODO
 
-- [] RPC Client Error Handing
-- [] Get async iterable from RPC subscription
-
-<!--
-<h4>
-  <a href="">Guide</a> &nbsp;·&nbsp;
-  <a href="">API Reference</a> &nbsp;·&nbsp;
-  <a href="">Support</a> &nbsp;·&nbsp;
-  <a href="">Roadmap</a> &nbsp;·&nbsp;
-  <a href="">Contributing</a>
-</h4>
--->
+- [ ] RPC Client Error Handing
+- [ ] Get async iterable from RPC subscription
+- [ ] ... TODO, the remainder of this TODO section (we primarily use [this repo's issues](https://github.com/paritytech/capi/tree/harry-pre_beta_docs))
 
 ### Setup
 
-If you're using [Deno](https://deno.land/), simply import via the `denoland/x` specifier.
+If you're using [Deno](https://deno.land/), import via the `denoland/x` specifier.
 
 ```ts
 import * as C from "https://deno.land/x/capi/mod.ts";
