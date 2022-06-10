@@ -1,5 +1,5 @@
-import * as hex from "/util/hex.ts";
-import * as $ from "x/scale/mod.ts";
+import * as $ from "../_deps/scale.ts";
+import * as hex from "../util/hex.ts";
 
 export interface Field {
   name: string | undefined;

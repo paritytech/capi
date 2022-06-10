@@ -1,4 +1,4 @@
-import * as A from "std/async/mod.ts";
+import { deferred } from "../_deps/async.ts";
 import { ListenerCb, RpcClient, RpcClientFactory, StopListening } from "./Base.ts";
 import { InitMessage } from "./messages.ts";
 
@@ -21,7 +21,7 @@ export class WsRpcClient extends RpcClient {
 
   opening = (): Promise<void> => {
     if (this.#ws.readyState === WebSocket.CONNECTING) {
-      const pending = A.deferred<void>();
+      const pending = deferred<void>();
       const onOpenError = () => {
         clearListeners();
         pending.reject();
@@ -42,7 +42,7 @@ export class WsRpcClient extends RpcClient {
   };
 
   close = async (): Promise<void> => {
-    const pending = A.deferred<void>();
+    const pending = deferred<void>();
     const onClose = () => {
       this.#ws.removeEventListener("error", this.#onError);
       this.#ws.removeEventListener("message", this.#onMessage);

@@ -1,16 +1,16 @@
-import { effector } from "/effect/impl/mod.ts";
-import { codec } from "/effect/std/atoms/codec.ts";
-import { decoded } from "/effect/std/atoms/decoded.ts";
-import { deriveCodec } from "/effect/std/atoms/deriveCodec.ts";
-import { entryKey } from "/effect/std/atoms/entryKey.ts";
-import { entryMetadata } from "/effect/std/atoms/entryMetadata.ts";
-import { metadataLookup } from "/effect/std/atoms/metadataLookup.ts";
-import { palletMetadata } from "/effect/std/atoms/palletMetadata.ts";
-import { select } from "/effect/std/atoms/select.ts";
-import { wrap } from "/effect/std/atoms/wrap.ts";
-import { Entry } from "/effect/std/entry.ts";
-import { metadata } from "/effect/std/metadata.ts";
-import { rpcCall } from "/effect/std/rpcCall.ts";
+import { effector } from "../../effect/impl/mod.ts";
+import { codec } from "../../effect/std/atoms/codec.ts";
+import { decoded } from "../../effect/std/atoms/decoded.ts";
+import { deriveCodec } from "../../effect/std/atoms/deriveCodec.ts";
+import { entryKey } from "../../effect/std/atoms/entryKey.ts";
+import { entryMetadata } from "../../effect/std/atoms/entryMetadata.ts";
+import { metadataLookup } from "../../effect/std/atoms/metadataLookup.ts";
+import { palletMetadata } from "../../effect/std/atoms/palletMetadata.ts";
+import { select } from "../../effect/std/atoms/select.ts";
+import { wrap } from "../../effect/std/atoms/wrap.ts";
+import { Entry } from "../../effect/std/entry.ts";
+import { metadata } from "../../effect/std/metadata.ts";
+import { rpcCall } from "../../effect/std/rpcCall.ts";
 
 // TODO: flatten primitive?
 export const read = effector.async("read", () =>

@@ -1,15 +1,15 @@
-import { effector } from "/effect/impl/mod.ts";
-import { deriveCodec } from "/effect/std/atoms/deriveCodec.ts";
-import { entryKey } from "/effect/std/atoms/entryKey.ts";
-import { entryMetadata } from "/effect/std/atoms/entryMetadata.ts";
-import { metadataLookup } from "/effect/std/atoms/metadataLookup.ts";
-import { palletMetadata } from "/effect/std/atoms/palletMetadata.ts";
-import { select } from "/effect/std/atoms/select.ts";
-import { wrap } from "/effect/std/atoms/wrap.ts";
-import { Map } from "/effect/std/map.ts";
-import { metadata } from "/effect/std/metadata.ts";
-import { rpcCall } from "/effect/std/rpcCall.ts";
-import * as U from "/util/mod.ts";
+import { effector } from "../../effect/impl/mod.ts";
+import { deriveCodec } from "../../effect/std/atoms/deriveCodec.ts";
+import { entryKey } from "../../effect/std/atoms/entryKey.ts";
+import { entryMetadata } from "../../effect/std/atoms/entryMetadata.ts";
+import { metadataLookup } from "../../effect/std/atoms/metadataLookup.ts";
+import { palletMetadata } from "../../effect/std/atoms/palletMetadata.ts";
+import { select } from "../../effect/std/atoms/select.ts";
+import { wrap } from "../../effect/std/atoms/wrap.ts";
+import { Map } from "../../effect/std/map.ts";
+import { metadata } from "../../effect/std/metadata.ts";
+import { rpcCall } from "../../effect/std/rpcCall.ts";
+import * as U from "../../util/mod.ts";
 
 // TODO: flatten primitive?
 export const mapKeys = effector.async(

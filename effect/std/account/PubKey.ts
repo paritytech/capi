@@ -1,6 +1,6 @@
-import { getBindings } from "/bindings/mod.ts";
-import { effector } from "/effect/impl/mod.ts";
-import * as hex from "/util/hex.ts";
+import { getBindings } from "../../../bindings/mod.ts";
+import { effector } from "../../../effect/impl/mod.ts";
+import * as hex from "../../../util/hex.ts";
 
 export const pubKeyFromSs58 = effector.async("pubKeyFromSs58", () =>
   async (init: string) => {

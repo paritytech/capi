@@ -1,7 +1,7 @@
-import { CHAIN_URL_LOOKUP } from "/constants/chains/url.ts";
-import * as rpc from "/rpc/mod.ts";
-import * as fs from "std/fs/mod.ts";
-import * as path from "std/path/mod.ts";
+import * as fs from "../_deps/fs.ts";
+import * as path from "../_deps/path.ts";
+import { CHAIN_URL_LOOKUP } from "../constants/chains/url.ts";
+import * as rpc from "../rpc/mod.ts";
 
 const outDir = path.join(Deno.cwd(), "frame_metadata", "_downloaded");
 await fs.emptyDir(outDir);

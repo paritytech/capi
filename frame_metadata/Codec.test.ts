@@ -1,4 +1,4 @@
-import * as asserts from "std/testing/asserts.ts";
+import * as asserts from "../_deps/asserts.ts";
 import { accountId32, getLookupAndDeriveCodec, State } from "./test-util.ts";
 
 const { lookup, deriveCodec, metadata } = await getLookupAndDeriveCodec("polkadot");

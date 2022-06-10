@@ -1,4 +1,4 @@
-import * as U from "/util/mod.ts";
+import * as U from "../../../../util/mod.ts";
 
 export type ChainHeadUnstableFollowEvent =
   | ChainHeadUnstableFollowInitializedEvent

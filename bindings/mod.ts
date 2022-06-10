@@ -1,4 +1,4 @@
-import * as M from "/frame_metadata/mod.ts";
+import * as M from "../frame_metadata/mod.ts";
 import * as generated from "./bindings.generated.js";
 
 export { instantiate as getBindings } from "./bindings.generated.js";

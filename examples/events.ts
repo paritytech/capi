@@ -1,4 +1,4 @@
-import * as C from "/mod.ts";
+import * as C from "../mod.ts";
 
 const rpc = await C.wsRpcClient(C.WESTEND_RPC_URL);
 const $pallet = C.pallet(rpc, "System");

@@ -1,4 +1,4 @@
-import { deferred } from "std/async/mod.ts";
+import { deferred } from "../_deps/async.ts";
 import * as M from "./messages.ts";
 import { IsCorrespondingRes } from "./util.ts";
 

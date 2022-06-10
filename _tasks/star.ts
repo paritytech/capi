@@ -1,5 +1,5 @@
-import * as fs from "std/fs/mod.ts";
-import * as path from "std/path/mod.ts";
+import * as fs from "../_deps/fs.ts";
+import * as path from "../_deps/path.ts";
 
 let generated = "";
 for await (

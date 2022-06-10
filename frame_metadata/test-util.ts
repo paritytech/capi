@@ -1,8 +1,8 @@
-import { getHashers } from "/bindings/mod.ts";
-import { CHAIN_URL_LOOKUP } from "/constants/chains/url.ts";
-import { wsRpcClient } from "/rpc/mod.ts";
-import * as hex from "/util/hex.ts";
-import * as path from "std/path/mod.ts";
+import * as path from "../_deps/path.ts";
+import { getHashers } from "../bindings/mod.ts";
+import { CHAIN_URL_LOOKUP } from "../constants/chains/url.ts";
+import { wsRpcClient } from "../rpc/mod.ts";
+import * as hex from "../util/hex.ts";
 import { DeriveCodec } from "./Codec.ts";
 import { encodeKey } from "./Key.ts";
 import { Lookup } from "./Lookup.ts";

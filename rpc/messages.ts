@@ -1,5 +1,5 @@
-import { EnsureLookup } from "/util/mod.ts";
-import * as U from "/util/mod.ts";
+import { EnsureLookup } from "../util/mod.ts";
+import * as U from "../util/mod.ts";
 import * as T from "./types/mod.ts";
 
 export type MethodName = keyof MethodLookup;
