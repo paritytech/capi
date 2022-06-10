@@ -1,7 +1,13 @@
 import * as asserts from "std/testing/asserts.ts";
 import { accountId32, getLookupAndDeriveCodec, State } from "./test-util.ts";
 
-const { lookup, deriveCodec } = await getLookupAndDeriveCodec("polkadot");
+const { lookup, deriveCodec, metadata } = await getLookupAndDeriveCodec("polkadot");
+
+Deno.test("Derive all", () => {
+  for (const ty of metadata.types) {
+    deriveCodec(ty.i);
+  }
+});
 
 Deno.test("Derive AccountId32 Codec", async () => {
   const codec = deriveCodec(0);
@@ -106,4 +112,12 @@ Deno.test("Balances Locks", { ignore: true }, async () => {
 Deno.test("Westend circular", async () => {
   const { deriveCodec } = await getLookupAndDeriveCodec("westend");
   deriveCodec(283);
+});
+
+Deno.test("Derive pallet_xcm::pallet::Error codec", async () => {
+  const ty = metadata.types.find((x) => x.path.join("::") === "pallet_xcm::pallet::Error")!;
+  const codec = deriveCodec(ty.i);
+  const encoded = codec.encode("Unreachable");
+  asserts.assertEquals(encoded, new Uint8Array([0]));
+  asserts.assertEquals(codec.decode(encoded), "Unreachable");
 });

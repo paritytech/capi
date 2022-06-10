@@ -61,13 +61,21 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
       if (ty.path[0] === "Option") {
         return $.option(visitors.visit(ty.params[0]?.type!));
       }
+      if (ty.members.length === 0) return $.never as any;
+      const allEmpty = ty.members.every((x) => !x.fields.length);
       const memberIByTag: Record<string, number> = {};
       const memberIByDiscriminant: Record<number, number> = {};
       const members = ty.members.map((member, i) => {
         memberIByTag[member.name] = member.i;
         memberIByDiscriminant[member.i] = i;
         const { fields, name: _tag } = member;
-        if (fields.length === 0) return $.dummy({ _tag });
+        if (fields.length === 0) {
+          if (allEmpty) {
+            return $.dummy(_tag);
+          } else {
+            return $.dummy({ _tag });
+          }
+        }
         if (fields[0]!.name === undefined) {
           // Tuple variant
           const $value = tuple(fields.map((f) => f.type));
@@ -91,16 +99,16 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
       });
       return union(
         (member) => {
-          const discriminant = memberIByTag[member._tag];
+          const discriminant = memberIByTag[typeof member === "string" ? member : member._tag];
           if (discriminant === undefined) {
-            throw new Error("TODO");
+            throw new Error("Invalid tag");
           }
           return discriminant;
         },
         (discriminant) => {
           const i = memberIByDiscriminant[discriminant];
           if (i === undefined) {
-            throw new Error("TODO");
+            throw new Error("Invalid discriminant");
           }
           return i;
         },
