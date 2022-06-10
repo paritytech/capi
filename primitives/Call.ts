@@ -1,6 +1,6 @@
 export class Call {
   _tag;
-  0;
+  value;
 
   constructor(
     palletName: string,
@@ -8,10 +8,9 @@ export class Call {
     args: Record<string, unknown>,
   ) {
     this._tag = palletName;
-    const e0 = {
+    this.value = {
       _tag: methodName,
       ...args,
     };
-    this[0] = e0;
   }
 }

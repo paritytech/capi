@@ -1,12 +1,18 @@
 import * as asserts from "std/testing/asserts.ts";
-import { accountId32, accountId32Bytes, getLookupAndDeriveCodec, State } from "./test-util.ts";
+import { accountId32, getLookupAndDeriveCodec, State } from "./test-util.ts";
 
-const { lookup, deriveCodec } = await getLookupAndDeriveCodec("polkadot");
+const { lookup, deriveCodec, metadata } = await getLookupAndDeriveCodec("polkadot");
+
+Deno.test("Derive all", () => {
+  for (const ty of metadata.types) {
+    deriveCodec(ty.i);
+  }
+});
 
 Deno.test("Derive AccountId32 Codec", async () => {
   const codec = deriveCodec(0);
   const encoded = codec.encode(accountId32);
-  asserts.assertEquals(encoded, accountId32Bytes);
+  asserts.assertEquals(encoded, accountId32);
   asserts.assertEquals(codec.decode(encoded), accountId32);
 });
 
@@ -47,7 +53,7 @@ Deno.test("Derive Auction Winning Storage Entry Codec", async () => {
   const codec = deriveCodec(auctionWinningStorageEntry.value);
   const decoded = [
     ...Array(7).fill(undefined),
-    [accountId32, { 0: 2013 }, 8672334557167609n],
+    [accountId32, 2013, 8672334557167609n],
     ...Array(28).fill(undefined),
   ];
   const encoded = codec.encode(decoded);
@@ -106,4 +112,12 @@ Deno.test("Balances Locks", { ignore: true }, async () => {
 Deno.test("Westend circular", async () => {
   const { deriveCodec } = await getLookupAndDeriveCodec("westend");
   deriveCodec(283);
+});
+
+Deno.test("Derive pallet_xcm::pallet::Error codec", async () => {
+  const ty = metadata.types.find((x) => x.path.join("::") === "pallet_xcm::pallet::Error")!;
+  const codec = deriveCodec(ty.i);
+  const encoded = codec.encode("Unreachable");
+  asserts.assertEquals(encoded, new Uint8Array([0]));
+  asserts.assertEquals(codec.decode(encoded), "Unreachable");
 });
