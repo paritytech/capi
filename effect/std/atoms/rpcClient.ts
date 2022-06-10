@@ -1,5 +1,5 @@
-import { effector } from "../../impl/mod.ts";
 import * as rpc from "../../../rpc/mod.ts";
+import { effector, EffectorArgs } from "../../impl/mod.ts";
 
 export interface RpcClientR<Beacon> {
   rpc: rpc.RpcClientFactory<Beacon>;

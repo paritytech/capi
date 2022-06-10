@@ -1,4 +1,5 @@
-import { effector } from "..//impl/mod.ts";
+import * as U from "../../util/mod.ts";
+import { effector } from "../impl/mod.ts";
 import { deriveCodec } from "./atoms/deriveCodec.ts";
 import { entryKey } from "./atoms/entryKey.ts";
 import { entryMetadata } from "./atoms/entryMetadata.ts";
@@ -9,7 +10,6 @@ import { wrap } from "./atoms/wrap.ts";
 import { Map } from "./map.ts";
 import { metadata } from "./metadata.ts";
 import { rpcCall } from "./rpcCall.ts";
-import * as U from "../../util/mod.ts";
 
 // TODO: flatten primitive?
 export const mapKeys = effector.async(
