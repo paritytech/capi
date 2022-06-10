@@ -324,7 +324,7 @@ let lastLoadPromise;
  * loaded it will always return a reference to the same object.
  * @returns {Promise<{
  *   instance: WebAssembly.Instance;
- *   exports: { pairFromSecretSeed: typeof pairFromSecretSeed; sign: typeof sign; verify: typeof verify }
+ *   exports: { pairFromSecretSeed: typeof pairFromSecretSeed; sign: typeof sign; verify: typeof verify; Pair : typeof Pair  }
  * }>}
  */
 export function instantiateWithInstance() {
@@ -340,7 +340,7 @@ export function instantiateWithInstance() {
         cachedUint8Memory0 = new Uint8Array(wasm.memory.buffer);
         instanceWithExports = {
           instance,
-          exports: { pairFromSecretSeed, sign, verify },
+          exports: { pairFromSecretSeed, sign, verify, Pair },
         };
         return instanceWithExports;
       } finally {
@@ -388,3 +388,5 @@ async function instantiateModule() {
       throw new Error(`Unsupported protocol: ${wasm_url.protocol}`);
   }
 }
+
+let cachedInt32Memory0;

@@ -25,7 +25,7 @@
   "include": ["."],
   "tasks": {
     "download_frame_metadata": "deno run -A --no-check=remote _tasks/download_frame_metadata.ts",
-    "build_wasm": "deno run --unstable -A https://deno.land/x/wasmbuild@0.4.0/main.ts --out",
+    "build_wasm": "deno run --unstable -A _tasks/build_wasm.ts --out",
     "build_hashers_wasm": "deno task build_wasm bindings/hashers --features hashers",
     "build_sr25519_wasm": "deno task build_wasm bindings/sr25519 --features sr25519",
     "build_ss58_wasm": "deno task build_wasm bindings/ss58 --features ss58",
