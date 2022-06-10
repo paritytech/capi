@@ -36,7 +36,7 @@ Capi consists of [FRAME](https://docs.substrate.io/v3/runtime/frame/)-oriented u
 
 - [ ] RPC Client Error Handing
 - [ ] Get async iterable from RPC subscription
-- [ ] ... TODO, the remainder of this TODO section (we primarily use [this repo's issues](https://github.com/paritytech/capi/tree/harry-pre_beta_docs))
+- [ ] ... TODO, the remainder of this TODO section (we primarily use [this repo's issues](https://github.com/paritytech/capi/issues))
 
 ### Setup
 

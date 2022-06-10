@@ -59,7 +59,13 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
     [M.TypeKind.Union]: (ty) => {
       // TODO: revisit this
       if (ty.path[0] === "Option") {
-        return $.option(visitors.visit(ty.params[0]?.type!));
+        return $.option(visitors.visit(ty.params[0]!.type!));
+      }
+      if (ty.path[0] === "Result") {
+        return $.result(
+          visitors.visit(ty.params[0]!.type!),
+          $.instance(ChainError, ["value", visitors.visit(ty.params[1]!.type!)]),
+        );
       }
       if (ty.members.length === 0) return $.never as any;
       const allEmpty = ty.members.every((x) => !x.fields.length);
@@ -196,4 +202,10 @@ function union<Members extends $.Codec<any>[]>(
       return $member._decode(buffer);
     },
   });
+}
+
+export class ChainError extends Error {
+  constructor(readonly value: unknown) {
+    super();
+  }
 }
