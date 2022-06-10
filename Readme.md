@@ -25,10 +25,10 @@ Capi consists of [FRAME](https://docs.substrate.io/v3/runtime/frame/)-oriented u
 - [x] Metadata-based codec derivation
 - [x] Storage key encoding
 - [x] Storage value decoding
+- [x] Creating and decoding extrinsics
 
 #### Needs Love
 
-- [ ] Creating / extracting from extrinsics
 - [ ] High-level "Effect" System
 - [ ] Std lib of effects
 
@@ -39,6 +39,8 @@ Capi consists of [FRAME](https://docs.substrate.io/v3/runtime/frame/)-oriented u
 - [ ] ... TODO, the remainder of this TODO section (we primarily use [this repo's issues](https://github.com/paritytech/capi/issues))
 
 ### Setup
+
+> Note: we have yet to publish a beta of Capi. Expect the first publish to occur in the next few days (written on June 10th, 2022).
 
 If you're using [Deno](https://deno.land/), import via the `denoland/x` specifier.
 
