@@ -1,8 +1,8 @@
 import * as $ from "../_deps/scale.ts";
+import { MultiAddress, Signature } from "../primitives/mod.ts";
 import { $null, DeriveCodec } from "./Codec.ts";
 import { HasherLookup } from "./Key.ts";
 import { Metadata } from "./Metadata.ts";
-import { MultiAddress, Signature } from "../primitives/mod.ts";
 
 export interface Extrinsic {
   protocolVersion: number;
@@ -27,16 +27,16 @@ interface ExtrinsicCodecArgs {
   sign: (value: Uint8Array) => Signature;
 }
 
-export function $extrinsic(
-  { metadata, sign, deriveCodec, hashers: { Blake2_256 } }: ExtrinsicCodecArgs,
-) {
+export function $extrinsic(args: ExtrinsicCodecArgs): $.Codec<Extrinsic> {
+  const { metadata, sign, deriveCodec, hashers: { Blake2_256 } } = args;
   const { signedExtensions } = metadata.extrinsic;
   const $sig = deriveCodec(findExtrinsicTypeParam("Signature")!);
   const $address = deriveCodec(findExtrinsicTypeParam("Address")!);
   const $call = deriveCodec(findExtrinsicTypeParam("Call")!);
   const $extra = getExtrasCodec(signedExtensions.map((x) => x.type));
   const $additional = getExtrasCodec(signedExtensions.map((x) => x.additionalSigned));
-  const $baseExtrinsic = $.createCodec<Extrinsic>({
+  const $baseExtrinsic: $.Codec<Extrinsic> = $.createCodec({
+    _metadata: null,
     _staticSize: 1 + $.tuple($address, $sig, $extra, $call)._staticSize,
     _encode(buffer, extrinsic) {
       const firstByte = (+!!extrinsic.signature << 7) | extrinsic.protocolVersion;
@@ -99,7 +99,8 @@ export function $extrinsic(
     },
   });
 
-  const $extrinsic = $.createCodec<Extrinsic>({
+  return $.createCodec({
+    _metadata: [$extrinsic, args],
     _staticSize: $.nCompact._staticSize,
     _encode(buffer, extrinsic) {
       const encoded = $baseExtrinsic.encode(extrinsic);
@@ -111,8 +112,6 @@ export function $extrinsic(
       return $baseExtrinsic.decode(buffer.array.subarray(buffer.index, buffer.index += length));
     },
   });
-
-  return $extrinsic;
 
   function getExtrasCodec(is: number[]) {
     return $.tuple(...is.map((i) => deriveCodec(i)).filter((x) => x !== $null));
