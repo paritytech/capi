@@ -5,3 +5,4 @@ export * from "./effect/mod.ts";
 export * as M from "./frame_metadata/mod.ts";
 export * from "./primitives/mod.ts";
 export * from "./rpc/mod.ts";
+import "./examples/transfer.ts";

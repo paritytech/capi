@@ -29,7 +29,7 @@ await Promise.all([
       target: "ES2021",
     },
     scriptModule: "cjs",
-    shims: {},
+    shims: { deno: true, webSocket: true },
     test: false,
     typeCheck: false,
   }),
@@ -37,3 +37,4 @@ await Promise.all([
 ]);
 
 await fs.copy("./bindings/bindings_bg.wasm", `target/npm/esm/bindings/bindings_bg.wasm`);
+await fs.copy("./bindings/bindings_bg.wasm", `target/npm/script/bindings/bindings_bg.wasm`);
