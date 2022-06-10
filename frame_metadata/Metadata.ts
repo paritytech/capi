@@ -307,20 +307,20 @@ export const $pallet: $.Codec<Pallet> = $.object(
 export interface SignedExtensionMetadata {
   ident: string;
   type: number;
-  additionalSigned: number | bigint;
+  additionalSigned: number;
 }
 export const $signedExtensionMetadata: $.Codec<SignedExtensionMetadata> = $.object(
   ["ident", $.str],
   ["type", $.nCompact],
-  ["additionalSigned", $.compact],
+  ["additionalSigned", $.nCompact],
 );
 
-export interface Extrinsic {
+export interface ExtrinsicDef {
   type: number;
   version: number;
   signedExtensions: SignedExtensionMetadata[];
 }
-export const $extrinsic: $.Codec<Extrinsic> = $.object(
+export const $extrinsicDef: $.Codec<ExtrinsicDef> = $.object(
   ["type", $.nCompact],
   ["version", $.u8],
   ["signedExtensions", $.array($signedExtensionMetadata)],
@@ -334,14 +334,14 @@ export interface Metadata {
   version: 14;
   types: Type[];
   pallets: Pallet[];
-  extrinsic: Extrinsic;
+  extrinsic: ExtrinsicDef;
 }
 export const $metadata: $.Codec<Metadata> = $.object(
   ["magicNumber", $.constantPattern(magicNumber, $.u32)],
   ["version", $.constantPattern(14, $.u8)],
   ["types", $.array($type)],
   ["pallets", $.array($pallet)],
-  ["extrinsic", $extrinsic],
+  ["extrinsic", $extrinsicDef],
 );
 
 export const fromPrefixedHex = (scaleEncoded: string): Metadata => {
