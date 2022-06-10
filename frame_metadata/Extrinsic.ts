@@ -1,7 +1,7 @@
 import { $null, DeriveCodec } from "/frame_metadata/Codec.ts";
 import { HasherLookup } from "/frame_metadata/Key.ts";
 import { Metadata } from "/frame_metadata/Metadata.ts";
-import { MultiAddress } from "/primitives/mod.ts";
+import { MultiAddress, Signature } from "/primitives/mod.ts";
 import * as $ from "x/scale/mod.ts";
 
 export interface Extrinsic {
@@ -24,7 +24,7 @@ interface ExtrinsicCodecArgs {
   metadata: Metadata;
   deriveCodec: DeriveCodec;
   hashers: HasherLookup;
-  sign: (value: Uint8Array) => unknown;
+  sign: (value: Uint8Array) => Signature;
 }
 
 export function createExtrinsicCodec(

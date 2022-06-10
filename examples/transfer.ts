@@ -29,10 +29,7 @@ const $extrinsic = M.createExtrinsicCodec({
   metadata,
   deriveCodec,
   hashers,
-  sign: (message) => ({
-    _tag: "Sr25519",
-    value: bindings.sign(pair.pubKey, pair.secretKey, message),
-  }),
+  sign: (message) => new C.Sr25519Signature(bindings.sign(pair.pubKey, pair.secretKey, message)),
 });
 
 const extrinsic: M.Extrinsic = {
