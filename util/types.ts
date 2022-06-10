@@ -1,6 +1,7 @@
 export type ValueOf<T> = T[keyof T];
 
-export type U2I<T> = (T extends any ? (x: T) => any : never) extends (x: infer R) => any ? R
+export type U2I<T> = (T extends any ? (x: T) => any : never) extends
+  (x: infer R) => any ? R
   : never;
 
 // Sometimes, the checker isn't wise enough, and we must summon dark forces.
@@ -18,5 +19,8 @@ export type Flatten<T> = T extends Function ? T : { [K in keyof T]: T[K] };
 
 export type Narrow<T> =
   | (T extends infer U ? U : never)
-  | (T extends number | string | boolean | bigint | symbol | null | undefined | [] ? T
-    : { [K in keyof T]: Narrow<T[K]> });
+  | Extract<
+    T,
+    number | string | boolean | bigint | symbol | null | undefined | []
+  >
+  | ([T] extends [[]] ? [] : { [K in keyof T]: Narrow<T[K]> });
