@@ -1,4 +1,5 @@
 import * as asserts from "std/testing/asserts.ts";
+import { ChainError } from "./Codec.ts";
 import { accountId32, getLookupAndDeriveCodec, State } from "./test-util.ts";
 
 const { lookup, deriveCodec, metadata } = await getLookupAndDeriveCodec("polkadot");
@@ -120,4 +121,20 @@ Deno.test("Derive pallet_xcm::pallet::Error codec", async () => {
   const encoded = codec.encode("Unreachable");
   asserts.assertEquals(encoded, new Uint8Array([0]));
   asserts.assertEquals(codec.decode(encoded), "Unreachable");
+});
+
+Deno.test("Derive Result codec", async () => {
+  const ty = metadata.types.find((x) =>
+    x.path[0] === "Result"
+    && metadata.types[x.params[1]!.type!]!.path.join("::") === "sp_runtime::DispatchError"
+  )!;
+  const codec = deriveCodec(ty.i);
+  const ok = null;
+  const okEncoded = codec.encode(ok);
+  asserts.assertEquals(okEncoded, new Uint8Array([0]));
+  asserts.assertEquals(codec.decode(okEncoded), ok);
+  const err = new ChainError({ _tag: "Other" });
+  const errEncoded = codec.encode(err);
+  asserts.assertEquals(errEncoded, new Uint8Array([1, 0]));
+  asserts.assertEquals(codec.decode(errEncoded), err);
 });
