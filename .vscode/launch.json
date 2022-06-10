@@ -14,7 +14,6 @@
         "deno.jsonc",
         "-A",
         "--no-check=remote",
-        "--import-map=import_map.json",
         "${file}"
       ],
       "attachSimplePort": 9229

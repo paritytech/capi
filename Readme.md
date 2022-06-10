@@ -253,23 +253,3 @@ We no longer need to think about the separation of code for the sake of packagin
 For example, exports of [`util/types.ts`](./util/types.ts) can be imported directly into any other TypeScript file, without specifying the dependency in a package manifest. We are free to use (for example) `U2I`, the union to intersection utility, in out-of-band processes, the effect system or even GitHub workflow scripts. From anywhere in the repository, we can import and use any code with configuration overhead.
 
 When it comes time to [build our code](./tasks/build_npm_pkg.ts) for NPM distribution, [DNT](https://github.com/denoland/dnt) takes care of transforming our dependency graph into something that NodeJS and web browsers will understand.
-
-### Import Mapping
-
-In the Capi repository (and all Deno-first repositories) there is no package manifest. We do not specify imports in some central file. While we could certainly create a `deps.ts`/`barrel.ts`/`prelude.ts` at the root and re-export dependencies, that would not be Deno-idiomatic. Instead, we define an [import map (`import_map.json`)](./import_map.json) ([import maps are a web standard](https://wicg.github.io/import-maps/)), which maps leading text of import specifiers. In our case, we add mappings to enable root-relative references. For instance:
-
-Let's say we're inside `frame_metadata/Metadata.ts`, and we want to import `hexToU8a` from `util/mod.ts`.
-
-**Instead of writing this**...
-
-```ts
-import { hexToU8a } from "../util/mod.ts";
-```
-
-... **we write this**:
-
-```ts
-import { hexToU8a } from "/util/mod.ts";
-```
-
-Now, if we ever move our `Metadata.ts` file elsewhere, its import of `hexToU8a` remain valid.

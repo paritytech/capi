@@ -1,8 +1,7 @@
-import { getBindings, getHashers } from "/bindings/mod.ts";
-import * as M from "/frame_metadata/mod.ts";
-import * as C from "/mod.ts";
-import * as hex from "/util/hex.ts";
-import "std/dotenv/load.ts";
+import "../_deps/load_dotenv.ts";
+import { getBindings, getHashers } from "../bindings/mod.ts";
+import * as C from "../mod.ts";
+import * as hex from "../util/hex.ts";
 
 const bindings = await getBindings();
 const hashers = await getHashers();
@@ -16,8 +15,8 @@ const metadataRaw = await client.call("state_getMetadata", []);
 if (metadataRaw instanceof Error) {
   throw metadataRaw;
 }
-const metadata = M.fromPrefixedHex(metadataRaw.result);
-const deriveCodec = M.DeriveCodec(metadata);
+const metadata = C.M.fromPrefixedHex(metadataRaw.result);
+const deriveCodec = C.M.DeriveCodec(metadata);
 
 const dest = new C.MultiAddress(
   C.MultiAddressKind.Id,
@@ -25,14 +24,14 @@ const dest = new C.MultiAddress(
 );
 const genesisHash = hex.decode("c5c2beaf81f8833d2ddcfe0c04b0612d16f0d08d67aa5032dde065ddf71b4ed1");
 
-const $extrinsic = M.$extrinsic({
+const $extrinsic = C.M.$extrinsic({
   metadata,
   deriveCodec,
   hashers,
   sign: (message) => new C.Sr25519Signature(bindings.sign(pair.pubKey, pair.secretKey, message)),
 });
 
-const extrinsic: M.Extrinsic = {
+const extrinsic: C.M.Extrinsic = {
   protocolVersion: 4,
   signature: {
     address: new C.MultiAddress(C.MultiAddressKind.Address32, pair.pubKey),

@@ -1,4 +1,4 @@
-import * as U from "/util/mod.ts";
+import * as U from "../util/mod.ts";
 import * as M from "./Metadata.ts";
 
 export type UnknownByTypeDefKind = { [Tag in M.TypeKind]: unknown };

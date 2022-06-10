@@ -1,1 +1,1 @@
-import * as C from "/mod.ts";
+import * as C from "../mod.ts";

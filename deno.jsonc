@@ -22,16 +22,14 @@
       "tags": ["recommended"]
     }
   },
-  "importMap": "./import_map.json",
   "include": ["."],
   "tasks": {
     "download_frame_metadata": "deno run -A --no-check=remote _tasks/download_frame_metadata.ts",
     "build_wasm": "deno run --unstable -A https://deno.land/x/wasmbuild@0.4.0/main.ts -p bindings --out bindings",
-    "star": "deno run -A --no-check=remote _tasks/star.ts && deno task cache_deps",
-    "cache_deps": "deno cache --no-check=remote target/star.ts",
+    "star": "deno run -A --no-check=remote _tasks/star.ts && deno cache --no-check=remote target/star.ts",
     "build_npm_pkg": "deno run -A --no-check=remote _tasks/build_npm_pkg.ts",
     "bootstrap": "deno task build_wasm && deno task star",
-    "lock": "deno cache --lock=lock.json --lock-write --no-check=remote target/star.ts",
+    "lock": "deno task star --lock=lock.json --lock-write",
     "example:metadata": "deno run -A --no-check examples/metadata.ts",
     "example:balance": "deno run -A --no-check=remote examples/balance.ts",
     "example:playground": "deno run -A --no-check examples/playground.ts",

@@ -1,5 +1,5 @@
-import * as hex from "/util/hex.ts";
-import * as U from "/util/mod.ts";
+import * as hex from "../util/hex.ts";
+import * as U from "../util/mod.ts";
 import { DeriveCodec } from "./Codec.ts";
 import * as M from "./Metadata.ts";
 

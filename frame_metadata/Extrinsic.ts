@@ -1,8 +1,8 @@
-import { $null, DeriveCodec } from "/frame_metadata/Codec.ts";
-import { HasherLookup } from "/frame_metadata/Key.ts";
-import { Metadata } from "/frame_metadata/Metadata.ts";
-import { MultiAddress, Signature } from "/primitives/mod.ts";
-import * as $ from "x/scale/mod.ts";
+import * as $ from "../_deps/scale.ts";
+import { $null, DeriveCodec } from "./Codec.ts";
+import { HasherLookup } from "./Key.ts";
+import { Metadata } from "./Metadata.ts";
+import { MultiAddress, Signature } from "../primitives/mod.ts";
 
 export interface Extrinsic {
   protocolVersion: number;

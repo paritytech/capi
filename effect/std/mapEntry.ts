@@ -1,6 +1,6 @@
-import { effector } from "/effect/impl/mod.ts";
-import { Entry } from "/effect/std/entry.ts";
-import { Map } from "/effect/std/map.ts";
+import { effector } from "../impl/mod.ts";
+import { Entry } from "./entry.ts";
+import { Map } from "./map.ts";
 
 export const mapEntry = effector.sync(
   "map",

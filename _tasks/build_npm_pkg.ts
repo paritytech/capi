@@ -1,6 +1,6 @@
-import * as fs from "std/fs/mod.ts";
-import * as path from "std/path/mod.ts";
-import { build } from "x/dnt/mod.ts";
+import { build } from "https://deno.land/x/dnt@0.22.0/mod.ts";
+import * as fs from "../_deps/fs.ts";
+import * as path from "../_deps/path.ts";
 
 const outDir = path.join("target", "npm");
 
@@ -8,13 +8,12 @@ await fs.emptyDir(outDir);
 
 await Promise.all([
   build({
-    importMap: "import_map.json",
     entryPoints: ["./mod.ts"],
     outDir,
     mappings: {
-      "https://deno.land/x/scale@v0.1.4/mod.ts": {
+      "https://deno.land/x/scale@v0.2.0/mod.ts": {
         name: "parity-scale-codec",
-        version: "^0.1.4",
+        version: "^0.2.0",
       },
     },
     package: {
@@ -37,44 +36,4 @@ await Promise.all([
   fs.copy("LICENSE", path.join(outDir, "LICENSE")),
 ]);
 
-const importMap: Record<string, string> =
-  JSON.parse(Deno.readTextFileSync("./import_map.json")).imports;
-delete importMap["./"];
-delete importMap["/"];
-
-function resolve(from: string, to: string) {
-  if (to.startsWith("/")) {
-    return "./" + path.relative(path.dirname("/" + from), to);
-  }
-  for (const frag in importMap) {
-    if (to.startsWith(frag)) {
-      return importMap[frag] + to.slice(frag.length);
-    }
-  }
-  return to;
-}
-
-const importRegex = /(from\s*|import\s*)(["'])(.+?)\2/g;
-
-function fixImports(from: string, file: string) {
-  return file.replace(importRegex, (_, lead, quote, path) => {
-    const newPath = resolve(from, path);
-    console.log(from, path, newPath);
-    return lead + quote + newPath + quote;
-  });
-}
-
-for await (
-  const { path: file } of fs.walk(".", {
-    match: [/^(?!.*\/(target|\.git|_tasks)\/).*\.[tj]s$/],
-    includeDirs: false,
-  })
-) {
-  const out = path.join(outDir, "deno", file);
-  Deno.mkdirSync(path.dirname(out), { recursive: true });
-  Deno.writeTextFileSync(out, fixImports(file, Deno.readTextFileSync(file)));
-}
-
-await Promise.all(["deno", "esm", "src"].map((dir) => {
-  return fs.copy("./bindings/bindings_bg.wasm", `target/npm/${dir}/bindings/bindings_bg.wasm`);
-}));
+await fs.copy("./bindings/bindings_bg.wasm", `target/npm/esm/bindings/bindings_bg.wasm`);

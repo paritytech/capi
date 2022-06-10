@@ -1,5 +1,5 @@
-import { getHashers } from "/bindings/mod.ts";
-import * as asserts from "std/testing/asserts.ts";
+import * as asserts from "../_deps/asserts.ts";
+import { getHashers } from "../bindings/mod.ts";
 import { encodeKey } from "./Key.ts";
 import { accountId32, getLookupAndDeriveCodec } from "./test-util.ts";
 

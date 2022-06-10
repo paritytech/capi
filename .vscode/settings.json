@@ -11,7 +11,6 @@
   "deno.codeLens.testArgs": ["--no-check=remote", "-A", "-L=info"],
   "deno.config": "./deno.jsonc",
   "deno.enable": true,
-  "deno.importMap": "./import_map.json",
   "deno.lint": true,
   "editor.defaultFormatter": "dprint.dprint",
   "editor.formatOnSave": true,

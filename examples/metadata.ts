@@ -1,4 +1,4 @@
-import * as C from "/mod.ts";
+import * as C from "../mod.ts";
 
 const rpc = await C.wsRpcClient(C.POLKADOT_RPC_URL);
 const $metadata = C.metadata(rpc);

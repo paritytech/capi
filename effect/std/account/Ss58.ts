@@ -1,4 +1,4 @@
-import { effector } from "/effect/impl/mod.ts";
+import { effector } from "../../impl/mod.ts";
 
 export const ss58FromText = effector.sync("ss58FromText", () =>
   (init: string) => {
