@@ -36,4 +36,11 @@ await Promise.all([
   fs.copy("LICENSE", path.join(outDir, "LICENSE")),
 ]);
 
-await fs.copy("./bindings/bindings_bg.wasm", `target/npm/esm/bindings/bindings_bg.wasm`);
+["esm"].map((kind) => {
+  return ["hashers", "sr25519", "ss58"].map((feature) => {
+    return fs.copy(
+      `./bindings/${feature}/mod_bg.wasm`,
+      `target/npm/${kind}/${feature}/mod_bg.wasm`,
+    );
+  });
+});

@@ -1,12 +1,11 @@
 import "../_deps/load_dotenv.ts";
-import { getBindings, getHashers } from "../bindings/mod.ts";
+import { getHashers, getSr25519 } from "../bindings/mod.ts";
 import * as C from "../mod.ts";
 import * as hex from "../util/hex.ts";
 
-const bindings = await getBindings();
-const hashers = await getHashers();
+const sr25519 = await getSr25519();
 
-const pair = bindings.pairFromSecretSeed(
+const pair = sr25519.pairFromSecretSeed(
   hex.decode("2df317d6d3b060d9cef6999f592a4a4a3acfb7212a77172d8fcdf8a08f3bf120"),
 );
 
@@ -27,8 +26,8 @@ const genesisHash = hex.decode("c5c2beaf81f8833d2ddcfe0c04b0612d16f0d08d67aa5032
 const $extrinsic = C.M.$extrinsic({
   metadata,
   deriveCodec,
-  hashers,
-  sign: (message) => new C.Sr25519Signature(bindings.sign(pair.pubKey, pair.secretKey, message)),
+  hashers: await getHashers(),
+  sign: (message) => new C.Sr25519Signature(sr25519.sign(pair.pubKey, pair.secretKey, message)),
 });
 
 const extrinsic: C.M.Extrinsic = {

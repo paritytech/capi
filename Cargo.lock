@@ -140,24 +140,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6107fe1be6682a68940da878d9e9f5e90ca5745b3dec9fd1bb393c8777d4f581"
 
 [[package]]
-name = "bindings"
-version = "0.1.0"
-dependencies = [
- "base58 0.2.0",
- "console_error_panic_hook",
- "frame-support",
- "getrandom 0.2.5",
- "hex",
- "js-sys",
- "paste",
- "schnorrkel 0.10.2",
- "sp-core",
- "sp-core-hashing",
- "wasm-bindgen",
- "wee_alloc",
-]
-
-[[package]]
 name = "bitflags"
 version = "1.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -982,6 +964,24 @@ checksum = "a92518e98c078586bc6c934028adcca4c92a53d6a958196de835170a01d84e4b"
 dependencies = [
  "adler",
  "autocfg",
+]
+
+[[package]]
+name = "mod"
+version = "0.1.0"
+dependencies = [
+ "base58 0.2.0",
+ "console_error_panic_hook",
+ "frame-support",
+ "getrandom 0.2.5",
+ "hex",
+ "js-sys",
+ "paste",
+ "schnorrkel 0.10.2",
+ "sp-core",
+ "sp-core-hashing",
+ "wasm-bindgen",
+ "wee_alloc",
 ]
 
 [[package]]

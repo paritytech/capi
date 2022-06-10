@@ -19,5 +19,6 @@
   "editor.formatOnSave": true,
   "editor.tabSize": 2,
   "prettier.printWidth": 100,
-  "rust-analyzer.diagnostics.disabled": ["incorrect-ident-case"]
+  "rust-analyzer.diagnostics.disabled": ["incorrect-ident-case"],
+  "rust-analyzer.cargo.features": ["all"]
 }
