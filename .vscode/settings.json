@@ -8,6 +8,9 @@
   "[yaml]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "[typescript]": {
+    "editor.defaultFormatter": "dprint.dprint"
+  },
   "deno.codeLens.testArgs": ["--no-check=remote", "-A", "-L=info"],
   "deno.config": "./deno.jsonc",
   "deno.enable": true,
