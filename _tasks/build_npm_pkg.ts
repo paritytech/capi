@@ -11,9 +11,9 @@ await Promise.all([
     entryPoints: ["./mod.ts"],
     outDir,
     mappings: {
-      "https://deno.land/x/scale@v0.1.4/mod.ts": {
+      "https://deno.land/x/scale@v0.2.0/mod.ts": {
         name: "parity-scale-codec",
-        version: "^0.1.4",
+        version: "^0.2.0",
       },
     },
     package: {
