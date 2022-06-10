@@ -99,16 +99,25 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
       });
       return union(
         (member) => {
-          const discriminant = memberIByTag[typeof member === "string" ? member : member._tag];
+          const tag = typeof member === "string" ? member : member._tag;
+          const discriminant = memberIByTag[tag];
           if (discriminant === undefined) {
-            throw new Error("Invalid tag");
+            throw new Error(
+              `Invalid tag ${JSON.stringify(tag)}, expected one of ${
+                JSON.stringify(Object.keys(memberIByTag))
+              }`,
+            );
           }
           return discriminant;
         },
         (discriminant) => {
           const i = memberIByDiscriminant[discriminant];
           if (i === undefined) {
-            throw new Error("Invalid discriminant");
+            throw new Error(
+              `Invalid discriminant ${discriminant}, expected one of ${
+                JSON.stringify(Object.keys(memberIByDiscriminant))
+              }`,
+            );
           }
           return i;
         },

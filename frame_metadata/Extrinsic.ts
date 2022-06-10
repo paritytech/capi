@@ -1,130 +1,123 @@
-import * as bindings from "/bindings/mod.ts";
-import * as P from "/primitives/mod.ts";
-import * as hex from "/util/hex.ts";
+import { $null, DeriveCodec } from "/frame_metadata/Codec.ts";
+import { HasherLookup } from "/frame_metadata/Key.ts";
+import { Metadata } from "/frame_metadata/Metadata.ts";
+import { MultiAddress } from "/primitives/mod.ts";
 import * as $ from "x/scale/mod.ts";
-import { DeriveCodec } from "./Codec.ts";
-import { Metadata, TypeKind } from "./Metadata.ts";
 
-// TODO: clean this up
-export function getExtrinsicCodecs(metadata: Metadata, deriveCodec: DeriveCodec) {
-  const uncheckedExtrinsicMetadata = metadata.types[metadata.extrinsic.type];
-  if (uncheckedExtrinsicMetadata?._tag !== TypeKind.Struct) {
-    throw new Error();
-  }
-  const lookup = Object.fromEntries(uncheckedExtrinsicMetadata.params.map((x) => [x.name, x.type]));
-  if (
-    lookup.Address === undefined
-    || lookup.Call === undefined
-    || lookup.Signature === undefined
-    || lookup.Extra === undefined
-  ) {
-    throw new Error();
-  }
-  const $callCodec = deriveCodec(lookup.Call);
-  const $extraCodec = deriveCodec(lookup.Extra);
-  const $signatureCodec = deriveCodec(lookup.Signature);
-  // TODO: can this vary depending on chain?
-  const $additional = $.tuple(
-    $.u32,
-    $.u32,
-    $.sizedArray($.u8, 32),
-    $.sizedArray($.u8, 32),
-  ) as $.Codec<unknown>;
-  const $signatureToEncode = $.tuple(
-    $.sizedArray($.u8, 32),
-    $signatureCodec,
-    $extraCodec,
-  ) as $.Codec<unknown>;
-  return {
-    $callCodec,
-    $extraCodec,
-    $signatureCodec,
-    $additional,
-    $signatureToEncode,
+export interface Extrinsic {
+  protocolVersion: number;
+  signature?: {
+    address: MultiAddress;
+    extra: unknown[];
+    additional: unknown[];
+  } | {
+    address: MultiAddress;
+    sig: unknown;
+    extra: unknown[];
   };
-}
-
-export interface EncodeExtrinsicProps {
-  $callCodec: $.Codec<unknown>;
-  $extraCodec: $.Codec<unknown>;
-  $signatureCodec: $.Codec<unknown>;
-  $additional: $.Codec<unknown>;
-  $signatureToEncode: $.Codec<unknown>;
-  pubKey: Uint8Array;
   palletName: string;
   methodName: string;
   args: Record<string, unknown>;
-  extrinsicVersion: number;
-  extras: P.Extras;
-  specVersion: number;
-  transactionVersion: number;
-  genesisHash: Uint8Array;
-  checkpoint: Uint8Array;
-  sign?: (message: Uint8Array) => Uint8Array;
 }
 
-// TODO: CLEAN THIS UP!
-export async function encodeExtrinsic(p: EncodeExtrinsicProps): Promise<string> {
-  const callEncoded = p.$callCodec.encode(new P.Call(p.palletName, p.methodName, p.args));
-  const extraEncoded = p.$extraCodec.encode(p.extras);
-  const additional = p.$additional.encode([
-    p.specVersion,
-    p.transactionVersion,
-    [...p.genesisHash],
-    [...p.checkpoint],
-  ]);
-  const unsigned = new Uint8Array([...callEncoded, ...extraEncoded, ...additional]);
-  let bytes: number[];
-  if (p.sign) {
-    const lenNormalized = unsigned.length > 256
-      ? (await bindings.getHashers()).Blake2_256(unsigned)
-      : unsigned;
-    const signature = new P.Sr25519Signature(p.sign(lenNormalized));
-    const finalSignature = p.$signatureToEncode.encode([[...p.pubKey], signature, p.extras]);
-    bytes = [p.extrinsicVersion | 128, ...finalSignature, ...callEncoded];
-  } else {
-    bytes = [127, ...callEncoded];
-  }
-  return hex.encode(new Uint8Array([...$.compact.encode(bytes.length), ...bytes]));
+interface ExtrinsicCodecArgs {
+  metadata: Metadata;
+  deriveCodec: DeriveCodec;
+  hashers: HasherLookup;
+  sign: (value: Uint8Array) => unknown;
 }
 
-// TODO: move encoding logic into this codec
-function $Extrinsic(metadata: Metadata, deriveCodec: DeriveCodec) {
-  const codecs = getExtrinsicCodecs(metadata, deriveCodec);
-  return $.createCodec({
-    _staticSize: 0,
-    _encode: undefined!,
-    _decode(buffer) {
-      const length = $.compact._decode(buffer);
-      const prefix = $.u8._decode(buffer);
-      const signed = {
-        128: true,
-        127: false,
-      }[metadata.extrinsic.version ^ prefix];
-      if (signed === undefined) {
-        throw new Error();
-      }
-      // TODO: type this as well as possible
-      let signature: any;
-      if (signed) {
-        signature = codecs.$signatureToEncode._decode(buffer);
-      }
-      const call = codecs.$callCodec._decode(buffer);
-      // TODO: type this as well as possible
-      const decoded: any = {
-        length,
-        call,
+export function createExtrinsicCodec(
+  { metadata, sign, deriveCodec, hashers: { Blake2_256 } }: ExtrinsicCodecArgs,
+) {
+  const { signedExtensions } = metadata.extrinsic;
+  const $sig = deriveCodec(findExtrinsicTypeParam("Signature")!);
+  const $address = deriveCodec(findExtrinsicTypeParam("Address")!);
+  const $call = deriveCodec(findExtrinsicTypeParam("Call")!);
+  const $extra = getExtrasCodec(signedExtensions.map((x) => x.type));
+  const $additional = getExtrasCodec(signedExtensions.map((x) => x.additionalSigned));
+  const $baseExtrinsic = $.createCodec<Extrinsic>({
+    _staticSize: 1 + $.tuple($address, $sig, $extra, $call)._staticSize,
+    _encode(buffer, extrinsic) {
+      const firstByte = (+!!extrinsic.signature << 7) | extrinsic.protocolVersion;
+      buffer.array[buffer.index++] = firstByte;
+      const call = {
+        _tag: extrinsic.palletName,
+        value: {
+          _tag: extrinsic.methodName,
+          ...extrinsic.args,
+        },
       };
+      const { signature } = extrinsic;
       if (signature) {
-        decoded.pubKey = signature[0];
-        decoded.signature = signature[1];
-        decoded.extras = signature[2];
+        if ("additional" in signature) {
+          $address._encode(buffer, signature.address);
+          const toSignBuffer = new $.EncodeBuffer($.tuple($sig, $extra, $additional)._staticSize);
+          $call._encode(toSignBuffer, call);
+          const callEnd = toSignBuffer.finishedSize + toSignBuffer.index;
+          $extra._encode(toSignBuffer, signature.extra);
+          const extraEnd = toSignBuffer.finishedSize + toSignBuffer.index;
+          $additional._encode(toSignBuffer, signature.additional);
+          const toSignEncoded = toSignBuffer.finish();
+          const callEncoded = toSignEncoded.subarray(0, callEnd);
+          const extraEncoded = toSignEncoded.subarray(callEnd, extraEnd);
+          const toSign = toSignEncoded.length > 256 ? Blake2_256(toSignEncoded) : toSignEncoded;
+          const sig = sign(toSign);
+          $sig._encode(buffer, sig);
+          buffer.insertArray(extraEncoded);
+          buffer.insertArray(callEncoded);
+        } else {
+          $address._encode(buffer, signature.address);
+          $sig._encode(buffer, signature.sig);
+          $extra._encode(buffer, signature.extra);
+          $call._encode(buffer, call);
+        }
+      } else {
+        $call._encode(buffer, call);
       }
-      return decoded;
+    },
+    _decode(buffer) {
+      const firstByte = buffer.array[buffer.index++]!;
+      const hasSignature = firstByte & (1 << 7);
+      const protocolVersion = firstByte & ~(1 << 7);
+      let signature: Extrinsic["signature"];
+      if (hasSignature) {
+        const address = $address._decode(buffer) as MultiAddress;
+        const sig = $sig._decode(buffer);
+        const extra = $extra._decode(buffer);
+        signature = { address, sig, extra };
+      }
+      const call = $call._decode(buffer) as any;
+      const { _tag: palletName, value: { _tag: methodName, ...args } } = call;
+      return {
+        protocolVersion,
+        signature,
+        palletName,
+        methodName,
+        args,
+      };
     },
   });
-}
 
-export function decodeExtrinsic(metadata: Metadata, deriveCodec: DeriveCodec, bytes: Uint8Array) {
-  return $Extrinsic(metadata, deriveCodec).decode(bytes);
+  const $extrinsic = $.createCodec<Extrinsic>({
+    _staticSize: $.nCompact._staticSize,
+    _encode(buffer, extrinsic) {
+      const encoded = $baseExtrinsic.encode(extrinsic);
+      $.nCompact._encode(buffer, encoded.length);
+      buffer.insertArray(encoded);
+    },
+    _decode(buffer) {
+      const length = $.nCompact._decode(buffer);
+      return $baseExtrinsic.decode(buffer.array.subarray(buffer.index, buffer.index += length));
+    },
+  });
+
+  return $extrinsic;
+
+  function getExtrasCodec(is: number[]) {
+    return $.tuple(...is.map((i) => deriveCodec(i)).filter((x) => x !== $null));
+  }
+  function findExtrinsicTypeParam(name: string) {
+    return metadata.types[metadata.extrinsic.type]?.params.find((x) => x.name === name)?.type;
+  }
 }
