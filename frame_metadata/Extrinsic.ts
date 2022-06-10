@@ -27,7 +27,7 @@ interface ExtrinsicCodecArgs {
   sign: (value: Uint8Array) => Signature;
 }
 
-export function createExtrinsicCodec(
+export function $extrinsic(
   { metadata, sign, deriveCodec, hashers: { Blake2_256 } }: ExtrinsicCodecArgs,
 ) {
   const { signedExtensions } = metadata.extrinsic;

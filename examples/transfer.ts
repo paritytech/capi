@@ -25,7 +25,7 @@ const dest = new C.MultiAddress(
 );
 const genesisHash = hex.decode("c5c2beaf81f8833d2ddcfe0c04b0612d16f0d08d67aa5032dde065ddf71b4ed1");
 
-const $extrinsic = M.createExtrinsicCodec({
+const $extrinsic = M.$extrinsic({
   metadata,
   deriveCodec,
   hashers,
