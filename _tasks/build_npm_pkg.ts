@@ -17,8 +17,8 @@ await Promise.all([
       },
     },
     package: {
-      name: "capi-beta",
-      version: "0.1.0-beta.1", // Deno.args[0]!,
+      name: "capi",
+      version: Deno.args[0]!,
       description: "A TypeScript toolkit for crafting interactions with Substrate-based chains",
       license: "Apache-2.0",
       repository: "github:paritytech/capi",
@@ -28,7 +28,7 @@ await Promise.all([
       sourceMap: true,
       target: "ES2021",
     },
-    scriptModule: false, // re-enable once top-level await removed from wasm bindings
+    scriptModule: "cjs",
     shims: {},
     test: false,
     typeCheck: false,
