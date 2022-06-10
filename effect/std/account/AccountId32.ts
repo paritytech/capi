@@ -1,4 +1,4 @@
-import { effector } from "../../../effect/impl/mod.ts";
+import { effector } from "../../impl/mod.ts";
 
 type AccountId32 = Uint8Array;
 

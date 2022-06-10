@@ -1,4 +1,4 @@
-import { effector } from "../../../effect/impl/mod.ts";
+import { effector } from "../../impl/mod.ts";
 import * as M from "../../../frame_metadata/mod.ts";
 
 // TODO: move into & get from `frame_metadata`

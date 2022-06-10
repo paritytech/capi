@@ -1,4 +1,4 @@
-import { effector } from "../../effect/impl/mod.ts";
+import { effector } from "../impl/mod.ts";
 import { RpcClient } from "../../rpc/mod.ts";
 
 export interface Pallet {
