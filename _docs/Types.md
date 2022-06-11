@@ -181,18 +181,79 @@ namespace pallet_balances {
 
 > Note: we can ignore the `params` field of the `AccountData` metadata, as the type param is already applied to the field metadata.
 
-## TypeScript <-> Rust
-
-TODO
+## Rust ⬌ TypeScript
 
 <!-- https://github.com/paritytech/capi/pull/73 -->
 
-| TypeScript | Rust     |
-| ---------- | -------- |
-| `null`     | `()`     |
-| `A`        | `(A)`    |
-| `[A, B]`   | `(A, B)` |
-| `T[]`      | `Vec<T>` |
+<table>
+<tr>
+<td><b>Rust</b></td><td><b>TypeScript</b></td>
+</tr>
+<tr>
+<td>
+    
+```rs
+type T0 = ();
+type T1 = (A,);
+type T2 = (A, B);
+type T3 = Vec<u8>;
+type T4 = [u8; n];
+type T5 = Vec<A>;
+type T6 = [A; n];
+
+struct S0;
+struct S1(A);
+struct S2(A, B);
+struct S3 { a: A };
+                                                
+enum E0 {
+  A,
+  B,
+  C,
+};
+  
+enum E1 {
+  A,
+  B(C),
+  D(E, F),
+  G { h: H },
+};
+```
+
+</td>
+<td>
+
+```ts
+type T0 = null;
+type T1 = A;
+type T2 = [A, B];
+type T3 = Uint8Array;
+type T4 = Uint8Array & { length: n };
+type T5 = A[];
+type T6 = A[] & { length: n };
+
+type S0 = null;
+type S1 = A;
+type S2 = [A, B];
+type S3 = { a: A };
+                                                
+type E0 = (
+  | "A"
+  | "B"
+  | "C"
+);
+
+type E1 = (
+  | { _tag: "A" }
+  | { _tag: "B", value: C }
+  | { _tag: "D", value: [E, F] }
+  | { _tag: "G", h: H }
+);
+```
+
+</td>
+</tr>
+</table>
 
 ## Runtime Validation
 
