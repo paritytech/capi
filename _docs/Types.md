@@ -117,7 +117,7 @@ namespace sp_core {
 }
 ```
 
-We can put instantiate this as we would any other JS-land instance.
+We can instantiate this as we would any other JS-land instance.
 
 ```ts
 const accountId32 = new Uint8Array(...RAW_ADDR_BYTES);
