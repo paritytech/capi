@@ -13,7 +13,10 @@ jobs:
           deno-version: 1.22.3
       - name: Update dependencies
         run: |
-          deno run -A https://deno.land/x/udd/main.ts deps.ts && deno task lock
+          deno run -A https://deno.land/x/udd/main.ts mod.ts
+      - name: Regenerated Lockfile
+        run: |
+          deno task lock
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
         id: pr
