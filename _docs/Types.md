@@ -200,6 +200,8 @@ type T3 = Vec<u8>;
 type T4 = [u8; n];
 type T5 = Vec<A>;
 type T6 = [A; n];
+type T7 = Option<A>;
+type T8 = Result<O, E>;
 
 struct S0;
 struct S1(A);
@@ -231,6 +233,8 @@ type T3 = Uint8Array;
 type T4 = Uint8Array & { length: n };
 type T5 = A[];
 type T6 = A[] & { length: n };
+type T7 = A | undefined;
+type T8 = O | ChainError<E>;
 
 type S0 = null;
 type S1 = A;
