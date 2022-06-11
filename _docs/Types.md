@@ -140,7 +140,7 @@ const key = accounts.key(accountId32);
 const account = await accounts.get(key).read();
 ```
 
-If we take a look at `Read` member of the signature of `account`, we see its inner type is `unknown`. We cannot reliably know the narrow type (at least not without [codegen](./Codegen.md)). So how might we deduce the type of successfully-retrieved values.
+What value does this retrieve? How can we deduce this from the FRAME metadata?
 
 We can do the same as before, but this time index into `metadata.types` with the `accountsStorage.value`.
 
