@@ -13,6 +13,7 @@ default = ["console_error_panic_hook"]
 hashers = []
 sr25519 = []
 ss58 = []
+all = ["hashers", "sr25519", "ss58"]
 
 [dependencies]
 base58 = { version = "0.2.0" }
