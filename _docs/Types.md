@@ -83,9 +83,9 @@ On most chains, `accountsStorage` will look similar to the following.
 }
 ````
 
-- The `_tag` tells us that this storage is that of a map, not a plain entry (standalone value).
-- The `key` tells us what structure we need in order to index into the map.
-- The `value` tells us what we can expect to retrieve from the map.
+- `_tag` tells us that this storage is that of a map, not a plain entry (standalone value).
+- `key` tells us what type of value we need to use as the key for indexing into the map.
+- `value` tells us what we can expect to retrieve from the map.
 
 Let's index into `metadata.types` with the specified key (`0`).
 
