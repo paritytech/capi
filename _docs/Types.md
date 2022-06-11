@@ -26,7 +26,7 @@ Now let's fetch the metadata.
 const metadata = await C.chain(CHAIN_PROXY_WS_URL).metadata.read();
 ```
 
-If we index into `metadata.pallets`, we'll see a list of all pallet metadata. Each contains a complete description of the given pallet's storage entries, as well as constants, callables (for creating extrinsics), errors and events. Some fields––such as a pallet's `call` field––point to an index in `metadata.types`, which contains a complete description of the chain's type-level context.
+If we index into `metadata.pallets`, we'll see a list of all pallet metadata. Each element of this list contains a complete description of the given pallet's storage entries, as well as constants, callables (for creating extrinsics), errors and events. Some fields––such as a pallet's `call` field––point to an index in `metadata.types`, which contains a complete description of the chain's type-level context.
 
 Let's say we want to learn about the types associated with the `Balances` pallet's `Account` storage.
 
