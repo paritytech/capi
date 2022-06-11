@@ -1,5 +1,5 @@
 [package]
-name = "bindings"
+name = "mod"
 version = "0.1.0"
 edition = "2021"
 description = "Awesome Wasm Possum"
@@ -10,7 +10,9 @@ path = "bindings/mod.rs"
 
 [features]
 default = ["console_error_panic_hook"]
-bindings = []
+hashers = []
+sr25519 = []
+ss58 = []
 
 [dependencies]
 base58 = { version = "0.2.0" }

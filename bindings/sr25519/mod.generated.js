@@ -106,148 +106,6 @@ export function verify(signature, message, pub_key) {
   return ret !== 0;
 }
 
-/**
- * @param {Uint8Array} data
- * @returns {Uint8Array}
- */
-export function base58Encode(data) {
-  const ptr0 = passArray8ToWasm0(data, wasm.__wbindgen_malloc);
-  const len0 = WASM_VECTOR_LEN;
-  const ret = wasm.base58Encode(ptr0, len0);
-  return takeObject(ret);
-}
-
-const cachedTextEncoder = new TextEncoder("utf-8");
-
-const encodeString = function (arg, view) {
-  return cachedTextEncoder.encodeInto(arg, view);
-};
-
-function passStringToWasm0(arg, malloc, realloc) {
-  if (realloc === undefined) {
-    const buf = cachedTextEncoder.encode(arg);
-    const ptr = malloc(buf.length);
-    getUint8Memory0().subarray(ptr, ptr + buf.length).set(buf);
-    WASM_VECTOR_LEN = buf.length;
-    return ptr;
-  }
-
-  let len = arg.length;
-  let ptr = malloc(len);
-
-  const mem = getUint8Memory0();
-
-  let offset = 0;
-
-  for (; offset < len; offset++) {
-    const code = arg.charCodeAt(offset);
-    if (code > 0x7F) break;
-    mem[ptr + offset] = code;
-  }
-
-  if (offset !== len) {
-    if (offset !== 0) {
-      arg = arg.slice(offset);
-    }
-    ptr = realloc(ptr, len, len = offset + arg.length * 3);
-    const view = getUint8Memory0().subarray(ptr + offset, ptr + len);
-    const ret = encodeString(arg, view);
-
-    offset += ret.written;
-  }
-
-  WASM_VECTOR_LEN = offset;
-  return ptr;
-}
-/**
- * @param {string} addr
- * @returns {Uint8Array}
- */
-export function decodeSs58Text(addr) {
-  const ptr0 = passStringToWasm0(
-    addr,
-    wasm.__wbindgen_malloc,
-    wasm.__wbindgen_realloc,
-  );
-  const len0 = WASM_VECTOR_LEN;
-  const ret = wasm.decodeSs58Text(ptr0, len0);
-  return takeObject(ret);
-}
-
-/**
- * @param {Uint8Array} data
- * @returns {Uint8Array}
- */
-export function blake2_128(data) {
-  const ptr0 = passArray8ToWasm0(data, wasm.__wbindgen_malloc);
-  const len0 = WASM_VECTOR_LEN;
-  const ret = wasm.blake2_128(ptr0, len0);
-  return takeObject(ret);
-}
-
-/**
- * @param {Uint8Array} data
- * @returns {Uint8Array}
- */
-export function blake2_256(data) {
-  const ptr0 = passArray8ToWasm0(data, wasm.__wbindgen_malloc);
-  const len0 = WASM_VECTOR_LEN;
-  const ret = wasm.blake2_256(ptr0, len0);
-  return takeObject(ret);
-}
-
-/**
- * @param {Uint8Array} data
- * @returns {Uint8Array}
- */
-export function blake2_128Concat(data) {
-  const ptr0 = passArray8ToWasm0(data, wasm.__wbindgen_malloc);
-  const len0 = WASM_VECTOR_LEN;
-  const ret = wasm.blake2_128Concat(ptr0, len0);
-  return takeObject(ret);
-}
-
-/**
- * @param {Uint8Array} data
- * @returns {Uint8Array}
- */
-export function twox128(data) {
-  const ptr0 = passArray8ToWasm0(data, wasm.__wbindgen_malloc);
-  const len0 = WASM_VECTOR_LEN;
-  const ret = wasm.twox128(ptr0, len0);
-  return takeObject(ret);
-}
-
-/**
- * @param {Uint8Array} data
- * @returns {Uint8Array}
- */
-export function twox256(data) {
-  const ptr0 = passArray8ToWasm0(data, wasm.__wbindgen_malloc);
-  const len0 = WASM_VECTOR_LEN;
-  const ret = wasm.twox256(ptr0, len0);
-  return takeObject(ret);
-}
-
-/**
- * @param {Uint8Array} data
- * @returns {Uint8Array}
- */
-export function twox64Concat(data) {
-  const ptr0 = passArray8ToWasm0(data, wasm.__wbindgen_malloc);
-  const len0 = WASM_VECTOR_LEN;
-  const ret = wasm.twox64Concat(ptr0, len0);
-  return takeObject(ret);
-}
-
-let cachedInt32Memory0;
-function getInt32Memory0() {
-  if (cachedInt32Memory0.byteLength === 0) {
-    cachedInt32Memory0 = new Int32Array(wasm.memory.buffer);
-  }
-  return cachedInt32Memory0;
-}
-
 function handleError(f, args) {
   try {
     return f.apply(this, args);
@@ -315,28 +173,6 @@ const imports = {
   __wbindgen_placeholder__: {
     __wbindgen_object_drop_ref: function (arg0) {
       takeObject(arg0);
-    },
-    __wbg_new_693216e109162396: function () {
-      const ret = new Error();
-      return addHeapObject(ret);
-    },
-    __wbg_stack_0ddaca5d1abfb52f: function (arg0, arg1) {
-      const ret = getObject(arg1).stack;
-      const ptr0 = passStringToWasm0(
-        ret,
-        wasm.__wbindgen_malloc,
-        wasm.__wbindgen_realloc,
-      );
-      const len0 = WASM_VECTOR_LEN;
-      getInt32Memory0()[arg0 / 4 + 1] = len0;
-      getInt32Memory0()[arg0 / 4 + 0] = ptr0;
-    },
-    __wbg_error_09919627ac0992f5: function (arg0, arg1) {
-      try {
-        console.error(getStringFromWasm0(arg0, arg1));
-      } finally {
-        wasm.__wbindgen_free(arg0, arg1);
-      }
     },
     __wbindgen_is_undefined: function (arg0) {
       const ret = getObject(arg0) === undefined;
@@ -470,7 +306,7 @@ const imports = {
   },
 };
 
-const wasm_url = new URL("bindings_bg.wasm", import.meta.url);
+const wasm_url = new URL("mod_bg.wasm", import.meta.url);
 
 /** Instantiates an instance of the Wasm module returning its functions.
  * @remarks It is safe to call this multiple times and once successfully
@@ -488,7 +324,7 @@ let lastLoadPromise;
  * loaded it will always return a reference to the same object.
  * @returns {Promise<{
  *   instance: WebAssembly.Instance;
- *   exports: { pairFromSecretSeed: typeof pairFromSecretSeed; sign: typeof sign; verify: typeof verify; base58Encode: typeof base58Encode; decodeSs58Text: typeof decodeSs58Text; blake2_128: typeof blake2_128; blake2_256: typeof blake2_256; blake2_128Concat: typeof blake2_128Concat; twox128: typeof twox128; twox256: typeof twox256; twox64Concat: typeof twox64Concat }
+ *   exports: { pairFromSecretSeed: typeof pairFromSecretSeed; sign: typeof sign; verify: typeof verify; Pair : typeof Pair  }
  * }>}
  */
 export function instantiateWithInstance() {
@@ -504,19 +340,7 @@ export function instantiateWithInstance() {
         cachedUint8Memory0 = new Uint8Array(wasm.memory.buffer);
         instanceWithExports = {
           instance,
-          exports: {
-            pairFromSecretSeed,
-            sign,
-            verify,
-            base58Encode,
-            decodeSs58Text,
-            blake2_128,
-            blake2_256,
-            blake2_128Concat,
-            twox128,
-            twox256,
-            twox64Concat,
-          },
+          exports: { pairFromSecretSeed, sign, verify, Pair },
         };
         return instanceWithExports;
       } finally {
@@ -564,3 +388,5 @@ async function instantiateModule() {
       throw new Error(`Unsupported protocol: ${wasm_url.protocol}`);
   }
 }
+
+let cachedInt32Memory0;

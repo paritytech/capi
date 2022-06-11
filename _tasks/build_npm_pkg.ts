@@ -36,12 +36,16 @@ await Promise.all([
   fs.copy("LICENSE", path.join(outDir, "LICENSE")),
 ]);
 
-await fs.copy("./bindings/bindings_bg.wasm", `target/npm/esm/bindings/bindings_bg.wasm`);
-await fs.copy("./bindings/bindings_bg.wasm", `target/npm/script/bindings/bindings_bg.wasm`);
-
-await Deno.writeTextFile(
-  "target/npm/esm/bindings/bindings.generated.js",
-  `
+await Promise.all(["script", "esm"].map((kind) => {
+  return Promise.all(["hashers", "sr25519", "ss58"].map(async (feature) => {
+    await fs.copy(
+      `./bindings/${feature}/mod_bg.wasm`,
+      `target/npm/${kind}/${feature}/mod_bg.wasm`,
+    );
+    if (kind === "esm") {
+      await Deno.writeTextFile(
+        "target/npm/esm/bindings/bindings.generated.js",
+        `
 // workaround for https://github.com/rust-random/getrandom/issues/256
 import * as crypto from "crypto"
 const module = {
@@ -51,5 +55,8 @@ const module = {
     }
 }
 `,
-  { append: true },
-);
+        { append: true },
+      );
+    }
+  }));
+}));
