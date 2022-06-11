@@ -112,7 +112,7 @@ If we index again into `metadata.types` with `1` (as specified in the first fiel
 namespace sp_core {
   export namespace crypto {
     // Note: `Uint8Array` lengths are untyped in TypeScript
-    export type AccountId32 = [Uint8Array];
+    export type AccountId32 = Uint8Array;
   }
 }
 ```
@@ -120,7 +120,7 @@ namespace sp_core {
 We can put instantiate this as we would any other JS-land instance.
 
 ```ts
-const accountId32 = [new Uint8Array(...RAW_ADDR_BYTES)];
+const accountId32 = new Uint8Array(...RAW_ADDR_BYTES);
 ```
 
 We'll cover the TypeScript <-> Rust conversions more in depth [in a later section](#typescript---rust).
