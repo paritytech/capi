@@ -34,6 +34,7 @@ await Promise.all([
     typeCheck: false,
   }),
   fs.copy("LICENSE", path.join(outDir, "LICENSE")),
+  fs.copy("Readme.md", path.join(outDir, "Readme.md")),
 ]);
 
 await Promise.all(["script", "esm"].map((kind) => {
