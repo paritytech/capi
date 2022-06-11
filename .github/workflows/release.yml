@@ -26,4 +26,4 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: cd target/npm_pkg && npm publish
+        run: cd target/npm && npm publish
