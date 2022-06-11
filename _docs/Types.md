@@ -134,7 +134,7 @@ Let's now utilize our `accountId32` definition to read a balance.
 const accounts = C.pallet("Balances").storageMap("Account");
 
 // Which key?
-const key = accounts.key(C.AccountId32.fromRaw(BYTES));
+const key = accounts.key(accountId32);
 
 // Read the value.
 const account = await accounts.get(key).read();
