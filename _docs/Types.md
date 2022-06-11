@@ -106,7 +106,7 @@ const keyType = metadata.types[accountsStorage.key];
 };
 ```
 
-If index again into `metadata.types` with `1` (as specified in the first field), we'll see the inner types (in this case a 32-element tuple of `u8`s). From these descriptions, we can roughly deduce the JS equivalent.
+If we index again into `metadata.types` with `1` (as specified in the first field), we'll see the inner types (in this case a 32-element tuple of `u8`s). From these descriptions, we can roughly deduce the JS equivalent.
 
 ```ts
 namespace sp_core {
