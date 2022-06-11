@@ -38,3 +38,18 @@ await Promise.all([
 
 await fs.copy("./bindings/bindings_bg.wasm", `target/npm/esm/bindings/bindings_bg.wasm`);
 await fs.copy("./bindings/bindings_bg.wasm", `target/npm/script/bindings/bindings_bg.wasm`);
+
+await Deno.writeTextFile(
+  "target/npm/esm/bindings/bindings.generated.js",
+  `
+// workaround for https://github.com/rust-random/getrandom/issues/256
+import * as crypto from "crypto"
+const module = {
+    require: (string) => {
+        if(string !== "crypto") throw new Error("Unexpected require " + string)
+        return crypto
+    }
+}
+`,
+  { append: true },
+);
