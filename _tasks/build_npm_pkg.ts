@@ -40,11 +40,11 @@ await Promise.all(["script", "esm"].map((kind) => {
   return Promise.all(["hashers", "sr25519", "ss58"].map(async (feature) => {
     await fs.copy(
       `./bindings/${feature}/mod_bg.wasm`,
-      `target/npm/${kind}/${feature}/mod_bg.wasm`,
+      `target/npm/${kind}/bindings/${feature}/mod_bg.wasm`,
     );
     if (kind === "esm") {
       await Deno.writeTextFile(
-        "target/npm/esm/bindings/bindings.generated.js",
+        `target/npm/${kind}/bindings/${feature}/mod.generated.js`,
         `
 // workaround for https://github.com/rust-random/getrandom/issues/256
 import * as crypto from "crypto"
