@@ -1,6 +1,6 @@
 import { type Codec } from "../../../_deps/scale.ts";
-import { effector, EffectorArgs } from "../../impl/mod.ts";
 import * as hex from "../../../util/hex.ts";
+import { effector, EffectorArgs } from "../../impl/mod.ts";
 
 // TODO: DecodedError from `frame_metadata`?
 
