@@ -3,13 +3,13 @@ import * as hex from "../util/hex.ts";
 
 export interface Field {
   name: string | undefined;
-  type: number;
+  ty: number;
   typeName: string | undefined;
   docs: string[];
 }
 export const $field: $.Codec<Field> = $.object(
   ["name", $.option($.str)],
-  ["type", $.nCompact],
+  ["ty", $.nCompact],
   ["typeName", $.option($.str)],
   ["docs", $.array($.str)],
 );
@@ -157,20 +157,20 @@ export const $typeDef: $.Codec<TypeDef> = $.taggedUnion(
 
 export interface Param {
   name: string;
-  type: number | undefined;
+  ty: number | undefined;
 }
 export const $param: $.Codec<Param> = $.object(
   ["name", $.str],
-  ["type", $.option($.nCompact)],
+  ["ty", $.option($.nCompact)],
 );
 
-export type Type = {
+export type Ty = {
   i: number;
   path: string[];
   params: Param[];
   docs: string[];
 } & TypeDef;
-export const $type: $.Codec<Type> = $.spread(
+export const $ty: $.Codec<Ty> = $.spread(
   $.spread(
     $.object(
       ["i", $.nCompact],
@@ -274,19 +274,19 @@ export const $storage: $.Codec<Storage> = $.object(
 
 export interface Constant {
   name: string;
-  type: number;
+  ty: number;
   value: Uint8Array;
   docs: string[];
 }
 export const $constant: $.Codec<Constant> = $.object(
   ["name", $.str],
-  ["type", $.nCompact],
+  ["ty", $.nCompact],
   ["value", $.uint8array],
   ["docs", $.array($.str)],
 );
 
 type OptionalTypeBearer = $.Native<typeof optionalTypeBearer>;
-const optionalTypeBearer = $.option($.object(["type", $.nCompact]));
+const optionalTypeBearer = $.option($.object(["ty", $.nCompact]));
 
 export interface Pallet {
   name: string;
@@ -309,22 +309,22 @@ export const $pallet: $.Codec<Pallet> = $.object(
 
 export interface SignedExtensionMetadata {
   ident: string;
-  type: number;
+  ty: number;
   additionalSigned: number;
 }
 export const $signedExtensionMetadata: $.Codec<SignedExtensionMetadata> = $.object(
   ["ident", $.str],
-  ["type", $.nCompact],
+  ["ty", $.nCompact],
   ["additionalSigned", $.nCompact],
 );
 
 export interface ExtrinsicDef {
-  type: number;
+  ty: number;
   version: number;
   signedExtensions: SignedExtensionMetadata[];
 }
 export const $extrinsicDef: $.Codec<ExtrinsicDef> = $.object(
-  ["type", $.nCompact],
+  ["ty", $.nCompact],
   ["version", $.u8],
   ["signedExtensions", $.array($signedExtensionMetadata)],
 );
@@ -335,14 +335,14 @@ export const magicNumber = 1635018093;
 export interface Metadata {
   magicNumber: typeof magicNumber;
   version: 14;
-  types: Type[];
+  tys: Ty[];
   pallets: Pallet[];
   extrinsic: ExtrinsicDef;
 }
 export const $metadata: $.Codec<Metadata> = $.object(
   ["magicNumber", $.constantPattern(magicNumber, $.u32)],
   ["version", $.constantPattern(14, $.u8)],
-  ["types", $.array($type)],
+  ["tys", $.array($ty)],
   ["pallets", $.array($pallet)],
   ["extrinsic", $extrinsicDef],
 );

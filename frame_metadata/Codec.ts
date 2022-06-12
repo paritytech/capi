@@ -48,23 +48,23 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
         return $null;
       } else if (ty.fields[0]!.name === undefined) {
         // Tuple struct
-        return tuple(ty.fields.map((f) => f.type));
+        return tuple(ty.fields.map((f) => f.ty));
       } else {
         // Object struct
         return $.object(
-          ...ty.fields.map((field): $.Field => [field.name!, visitors.visit(field.type)]),
+          ...ty.fields.map((field): $.Field => [field.name!, visitors.visit(field.ty)]),
         );
       }
     },
     [M.TypeKind.Union]: (ty) => {
       // TODO: revisit this
       if (ty.path[0] === "Option") {
-        return $.option(visitors.visit(ty.params[0]!.type!));
+        return $.option(visitors.visit(ty.params[0]!.ty!));
       }
       if (ty.path[0] === "Result") {
         return $.result(
-          visitors.visit(ty.params[0]!.type!),
-          $.instance(ChainError, ["value", visitors.visit(ty.params[1]!.type!)]),
+          visitors.visit(ty.params[0]!.ty!),
+          $.instance(ChainError, ["value", visitors.visit(ty.params[1]!.ty!)]),
         );
       }
       if (ty.members.length === 0) return $.never as any;
@@ -84,7 +84,7 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
         }
         if (fields[0]!.name === undefined) {
           // Tuple variant
-          const $value = tuple(fields.map((f) => f.type));
+          const $value = tuple(fields.map((f) => f.ty));
           return $.transform(
             $value,
             ({ value }: { value: unknown }) => value,
@@ -96,7 +96,7 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
             return [
               field.name || i,
               $.deferred(() => {
-                return visitors.visit(field.type);
+                return visitors.visit(field.ty);
               }),
             ] as [string, $.Codec<unknown>];
           });
@@ -166,8 +166,8 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
         return $.deferred(() => cache[i]!);
       }
       cache[i] = null; // circularity detection
-      const type_ = metadata.types[i]!;
-      const $codec = (visitors[type_._tag] as any)(type_, false);
+      const ty = metadata.tys[i]!;
+      const $codec = (visitors[ty._tag] as any)(ty, false);
       cache[i] = $codec;
       return $codec;
     },

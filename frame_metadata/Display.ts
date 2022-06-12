@@ -11,7 +11,7 @@ export const display = (
     return fields.map((field) => {
       return {
         ...field,
-        type: visitors.visit(field.type),
+        ty: visitors.visit(field.ty),
       };
     });
   };
@@ -68,8 +68,8 @@ export const display = (
       if (i === 103) {
         return "XMC STUFF TODO";
       }
-      const type_ = metadata.types[i]!;
-      const result = (visitors[type_._tag] as any)(type_);
+      const ty = metadata.tys[i]!;
+      const result = (visitors[ty._tag] as any)(ty);
       cache[i] = result;
       return result;
     },

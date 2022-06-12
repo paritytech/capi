@@ -33,7 +33,7 @@ export function $extrinsic(args: ExtrinsicCodecArgs): $.Codec<Extrinsic> {
   const $sig = deriveCodec(findExtrinsicTypeParam("Signature")!);
   const $address = deriveCodec(findExtrinsicTypeParam("Address")!);
   const $call = deriveCodec(findExtrinsicTypeParam("Call")!);
-  const $extra = getExtrasCodec(signedExtensions.map((x) => x.type));
+  const $extra = getExtrasCodec(signedExtensions.map((x) => x.ty));
   const $additional = getExtrasCodec(signedExtensions.map((x) => x.additionalSigned));
   const $baseExtrinsic: $.Codec<Extrinsic> = $.createCodec({
     _metadata: null,
@@ -117,6 +117,6 @@ export function $extrinsic(args: ExtrinsicCodecArgs): $.Codec<Extrinsic> {
     return $.tuple(...is.map((i) => deriveCodec(i)).filter((x) => x !== $null));
   }
   function findExtrinsicTypeParam(name: string) {
-    return metadata.types[metadata.extrinsic.type]?.params.find((x) => x.name === name)?.type;
+    return metadata.tys[metadata.extrinsic.ty]?.params.find((x) => x.name === name)?.ty;
   }
 }
