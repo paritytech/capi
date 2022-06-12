@@ -10,24 +10,15 @@ export const entryKey = effector.async(
       deriveCodec: M.DeriveCodec,
       palletMetadata: M.Pallet,
       entryMetadata: M.StorageEntry,
-      keyA?: unknown,
-      keyB?: unknown,
+      key?: unknown,
     ) => {
-      const common = {
-        hashers: await getHashers(),
-        pallet: palletMetadata,
-      };
       return U.hex.encode(
-        keyA === undefined
-          ? M.encodeStoragePath({
-            ...common,
-            storageEntry: entryMetadata as M.StorageEntry & M.PlainStorageEntryType,
-          })
-          : M.$storageMapKeys({
-            ...common,
-            deriveCodec,
-            storageEntry: entryMetadata as M.StorageEntry & M.MapStorageEntryType,
-          }).encode({ keyA, keyB }),
+        M.$storageMapKey({
+          hashers: await getHashers(),
+          pallet: palletMetadata,
+          deriveCodec,
+          storageEntry: entryMetadata,
+        }).encode(key),
       ) as U.HexString;
     },
 );

@@ -4,82 +4,72 @@ import * as M from "./Metadata.ts";
 
 export type HasherLookup = { [_ in M.HasherKind]: (input: Uint8Array) => Uint8Array };
 
-export interface StoragePathProps {
+export interface StorageMapKeyProps {
+  deriveCodec: DeriveCodec;
   hashers: HasherLookup;
   pallet: M.Pallet;
   storageEntry: M.StorageEntry;
 }
 
-export interface StoragePath {
-  palletName: string;
-  storageEntryName: string;
-}
-export function encodeStoragePath(props: StoragePathProps): Uint8Array {
-  return new Uint8Array([
-    ...props.hashers[M.HasherKind.Twox128](new TextEncoder().encode(props.pallet.name)),
-    ...props.hashers[M.HasherKind.Twox128](new TextEncoder().encode(props.storageEntry.name)),
-  ]);
-}
-
-export interface StorageMapKeyProps extends StoragePathProps {
-  deriveCodec: DeriveCodec;
-  storageEntry: M.StorageEntry & M.MapStorageEntryType;
-}
-
-export interface StorageMapKeys {
-  keyA: unknown;
-  keyB?: unknown;
-}
-
-export function $storageMapKeys(props: StorageMapKeyProps): $.Codec<StorageMapKeys> {
-  const keyCodec = props.deriveCodec(props.storageEntry.key);
+const textEncoder = new TextEncoder();
+export function $storageMapKey(props: StorageMapKeyProps): $.Codec<unknown> {
+  const keyCodec = props.storageEntry._tag === M.StorageEntryTypeKind.Map
+    ? props.deriveCodec(props.storageEntry.key)
+    : null;
+  const hashTwox128 = props.hashers[M.HasherKind.Twox128];
   return $.createCodec({
-    _metadata: null,
+    _metadata: [$storageMapKey, props],
     _staticSize: 0,
-    _encode(buffer, storageMapKeys) {
-      $.sizedUint8array(32)._encode(buffer, encodeStoragePath(props));
-      buffer.insertArray(encodeKey(storageMapKeys.keyA));
-      if (storageMapKeys.keyB !== undefined) {
-        buffer.insertArray(encodeKey(storageMapKeys.keyB, true));
+    _encode(buffer, key) {
+      buffer.insertArray(hashTwox128(textEncoder.encode(props.pallet.name)));
+      buffer.insertArray(hashTwox128(textEncoder.encode(props.storageEntry.name)));
+      if (props.storageEntry._tag === M.StorageEntryTypeKind.Map) {
+        const { hashers } = props.storageEntry;
+        if (hashers.length === 1) {
+          buffer.insertArray(props.hashers[hashers[0]!](keyCodec!.encode(key)));
+        } else {
+          if (!(key instanceof Array) || key.length !== hashers.length) {
+            throw new Error(`Expected key to be an array of length ${hashers.length}`);
+          }
+          for (let i = 0; i < hashers.length; i++) {
+            buffer.insertArray(props.hashers[hashers[i]!](keyCodec!.encode(key[i])));
+          }
+        }
+      } else {
+        if (key != null) {
+          throw new Error("Expected nullish key");
+        }
       }
     },
     _decode(buffer) {
-      // Throw away
-      $.sizedUint8array(32)._decode(buffer);
-      const [keyAHasherKind, keyBHasherKind] = props.storageEntry.hashers;
-      if (!keyAHasherKind) {
-        throw new StorageEntryMissingHasher();
-      }
-      const keyA = decodeKey(keyAHasherKind);
-      if (keyBHasherKind) {
-        const keyB = decodeKey(keyBHasherKind);
-        return { keyA, keyB };
-      }
-      return { keyA };
+      // Ignore initial hashes
+      buffer.index += 32;
 
-      function decodeKey(hasherKind: M.HasherKind): unknown {
-        const leading = (<{ [K in M.HasherKind]?: $.Codec<any> }> {
-          [M.HasherKind.Blake2_128Concat]: $.sizedUint8array(16),
-          [M.HasherKind.Twox64Concat]: $.sizedUint8array(8),
+      if (props.storageEntry._tag === M.StorageEntryTypeKind.Plain) {
+        return null;
+      }
+
+      const { hashers } = props.storageEntry;
+      if (hashers.length === 1) {
+        return decodeHasher(hashers[0]!);
+      } else {
+        return hashers.map(decodeHasher);
+      }
+
+      function decodeHasher(hasherKind: M.HasherKind): unknown {
+        const leading = (<{ [K in M.HasherKind]?: number }> {
+          [M.HasherKind.Identity]: 0,
+          [M.HasherKind.Blake2_128Concat]: 16,
+          [M.HasherKind.Twox64Concat]: 8,
         })[hasherKind];
         if (!leading) {
           throw new DecodeNonTransparentKeyError();
         }
-        leading._decode(buffer);
-        return keyCodec._decode(buffer);
+        buffer.index += leading;
+        return keyCodec!._decode(buffer);
       }
     },
   });
-
-  function encodeKey(key: unknown, isSecond = false) {
-    const encoded = keyCodec.encode(key);
-    const hasherKind = props.storageEntry.hashers[isSecond ? 1 : 0];
-    if (!hasherKind) {
-      throw new StorageEntryMissingHasher();
-    }
-    const hasher = props.hashers[hasherKind];
-    return hasher(encoded);
-  }
 }
 
 export class StorageEntryMissingHasher extends Error {}
