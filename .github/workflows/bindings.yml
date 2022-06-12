@@ -9,9 +9,22 @@ jobs:
       - uses: denoland/setup-deno@v1
         with:
           deno-version: v1.x
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+          target: wasm32-unknown-unknown
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - run: cargo install wasm-bindgen-cli || true
       - run: deno task build_all_wasm
-      - uses: UnicornGlobal/has-changes-action@v1.0.11
-        id: changes
       - name: Error if changes present
-        if: steps.changes.outputs.changed == 1
-        run: exit 1
+        run: "[[ -z `git status --porcelain` ]]"
