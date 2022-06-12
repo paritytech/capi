@@ -272,6 +272,3 @@ async function instantiateModule() {
       throw new Error(`Unsupported protocol: ${wasm_url.protocol}`);
   }
 }
-
-
-// just testing the workflow
