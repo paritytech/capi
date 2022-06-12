@@ -1,6 +1,6 @@
 import * as $ from "../_deps/scale.ts";
 import * as M from "./Metadata.ts";
-import { TypeVisitors } from "./TypeVisitor.ts";
+import { TyVisitors } from "./TyVisitor.ts";
 
 export type DeriveCodec = (typeI: number) => $.Codec<unknown>;
 
@@ -24,7 +24,7 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
     }
   }
 
-  const visitors: TypeVisitors<{ [_ in M.TyType]: $.Codec<any> }> = {
+  const visitors: TyVisitors<{ [_ in M.TyType]: $.Codec<any> }> = {
     Struct: (ty) => {
       if (ty.fields.length === 0) {
         return $null;

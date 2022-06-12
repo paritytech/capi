@@ -1,5 +1,5 @@
 import * as M from "./Metadata.ts";
-import { TypeVisitors } from "./TypeVisitor.ts";
+import { TyVisitors } from "./TyVisitor.ts";
 
 export const display = (
   metadata: M.Metadata,
@@ -16,7 +16,7 @@ export const display = (
     });
   };
 
-  const visitors: TypeVisitors<{ [_ in M.TyType]: unknown }> = {
+  const visitors: TyVisitors<{ [_ in M.TyType]: unknown }> = {
     Struct: (ty) => {
       return {
         ...ty,
