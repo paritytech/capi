@@ -23,7 +23,7 @@ Capi consists of [FRAME](https://docs.substrate.io/v3/runtime/frame/)-oriented u
 - [x] RPC `call` and `subscribe` utils
 - [x] Metadata types and SCALE codecs
 - [x] Metadata-based codec derivation
-- [x] Storage key encoding
+- [x] Storage key encoding and (`blake2_128_concat`/`twox_64_concat`-hashed key) decoding
 - [x] Storage value decoding
 - [x] Creating and decoding extrinsics
 
