@@ -204,14 +204,17 @@ const $hasherKind: $.Codec<HasherKind> = $.keyLiteralUnion(
 );
 
 export enum StorageEntryModifier {
-  Optional,
-  Default,
+  Optional = "Optional",
+  Default = "Default",
 }
-export const $storageEntryModifier = $.u8 as $.Codec<StorageEntryModifier>;
+export const $storageEntryModifier = $.keyLiteralUnion(
+  StorageEntryModifier.Optional,
+  StorageEntryModifier.Default,
+);
 
 export enum StorageEntryTypeKind {
-  Plain,
-  Map,
+  Plain = "Plain",
+  Map = "Map",
 }
 
 export interface PlainStorageEntryType {
