@@ -4,24 +4,6 @@ import { TypeVisitors } from "./TypeVisitor.ts";
 
 export type DeriveCodec = (typeI: number) => $.Codec<unknown>;
 
-const primitiveCodecByDiscriminant = {
-  [M.PrimitiveKind.Bool]: $.bool,
-  [M.PrimitiveKind.Char]: $.str,
-  [M.PrimitiveKind.Str]: $.str,
-  [M.PrimitiveKind.U8]: $.u8,
-  [M.PrimitiveKind.I8]: $.i8,
-  [M.PrimitiveKind.U16]: $.u16,
-  [M.PrimitiveKind.I16]: $.i16,
-  [M.PrimitiveKind.U32]: $.u32,
-  [M.PrimitiveKind.I32]: $.i32,
-  [M.PrimitiveKind.U64]: $.u64,
-  [M.PrimitiveKind.I64]: $.i64,
-  [M.PrimitiveKind.U128]: $.u128,
-  [M.PrimitiveKind.I128]: $.i128,
-  [M.PrimitiveKind.U256]: $.u256,
-  [M.PrimitiveKind.I256]: $.i256,
-};
-
 /**
  * All derived codecs for ZSTs will use this exact codec,
  * so `derivedCodec === $null` is true iff the type is a ZST.
@@ -42,8 +24,8 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
     }
   }
 
-  const visitors: TypeVisitors<{ [_ in M.TypeKind]: $.Codec<any> }> = {
-    [M.TypeKind.Struct]: (ty) => {
+  const visitors: TypeVisitors<{ [_ in M.TyType]: $.Codec<any> }> = {
+    Struct: (ty) => {
       if (ty.fields.length === 0) {
         return $null;
       } else if (ty.fields[0]!.name === undefined) {
@@ -56,7 +38,7 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
         );
       }
     },
-    [M.TypeKind.Union]: (ty) => {
+    Union: (ty) => {
       // TODO: revisit this
       if (ty.path[0] === "Option") {
         return $.option(visitors.visit(ty.params[0]!.ty!));
@@ -130,7 +112,7 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
         ...members,
       ) as unknown as $.Codec<any>;
     },
-    [M.TypeKind.Sequence]: (ty) => {
+    Sequence: (ty) => {
       const $el = visitors.visit(ty.typeParam);
       if ($el === $.u8) {
         return $.uint8array;
@@ -138,7 +120,7 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
         return $.array($el);
       }
     },
-    [M.TypeKind.SizedArray]: (ty) => {
+    SizedArray: (ty) => {
       const $el = visitors.visit(ty.typeParam);
       if ($el === $.u8) {
         return $.sizedUint8array(ty.len);
@@ -146,16 +128,17 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
         return $.sizedArray($el, ty.len);
       }
     },
-    [M.TypeKind.Tuple]: (ty) => {
+    Tuple: (ty) => {
       return tuple(ty.fields);
     },
-    [M.TypeKind.Primitive]: (ty) => {
-      return primitiveCodecByDiscriminant[ty.kind]!;
+    Primitive: (ty) => {
+      if (ty.kind === "char") return $.str;
+      return $[ty.kind];
     },
-    [M.TypeKind.Compact]: () => {
+    Compact: () => {
       return $.compact;
     },
-    [M.TypeKind.BitSequence]: () => {
+    BitSequence: () => {
       return $.never as unknown as $.Codec<any>;
     },
     visit: (i) => {

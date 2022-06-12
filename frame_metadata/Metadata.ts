@@ -14,109 +14,83 @@ export const $field: $.Codec<Field> = $.object(
   ["docs", $.array($.str)],
 );
 
-export enum PrimitiveKind {
-  Bool = "bool",
-  Char = "char",
-  Str = "str",
-  U8 = "u8",
-  U16 = "u16",
-  U32 = "u32",
-  U64 = "u64",
-  U128 = "u128",
-  U256 = "u256",
-  I8 = "i8",
-  I16 = "i16",
-  I32 = "i32",
-  I64 = "i64",
-  I128 = "i128",
-  I256 = "i256",
-}
-const $primitiveKind: $.Codec<PrimitiveKind> = $.keyLiteralUnion(
-  PrimitiveKind.Bool,
-  PrimitiveKind.Char,
-  PrimitiveKind.Str,
-  PrimitiveKind.U8,
-  PrimitiveKind.U16,
-  PrimitiveKind.U32,
-  PrimitiveKind.U64,
-  PrimitiveKind.U128,
-  PrimitiveKind.U256,
-  PrimitiveKind.I8,
-  PrimitiveKind.I16,
-  PrimitiveKind.I32,
-  PrimitiveKind.I64,
-  PrimitiveKind.I128,
-  PrimitiveKind.I256,
+export type PrimitiveKind = $.Native<typeof $primitiveKind>;
+const $primitiveKind = $.keyLiteralUnion(
+  "bool",
+  "char",
+  "str",
+  "u8",
+  "u16",
+  "u32",
+  "u64",
+  "u128",
+  "u256",
+  "i8",
+  "i16",
+  "i32",
+  "i64",
+  "i128",
+  "i256",
 );
 
-export enum TypeKind {
-  Struct = "Struct",
-  Union = "Union",
-  Sequence = "Sequence",
-  SizedArray = "SizedArray",
-  Tuple = "Tuple",
-  Primitive = "Primitive",
-  Compact = "Compact",
-  BitSequence = "BitSequence",
-}
-
-export interface StructTypeDef {
-  type: TypeKind.Struct;
+export type TyType = TyDef["type"];
+export interface StructTyDef {
+  type: "Struct";
   fields: Field[];
 }
-export interface UnionTypeDefMember {
+export interface UnionTyDefMember {
   name: string;
   fields: Field[];
   i: number;
   docs: string[];
 }
-export interface UnionTypeDef {
-  type: TypeKind.Union;
-  members: UnionTypeDefMember[];
+export interface UnionTyDef {
+  type: "Union";
+  members: UnionTyDefMember[];
 }
-export interface SequenceTypeDef {
-  type: TypeKind.Sequence;
+export interface SequenceTyDef {
+  type: "Sequence";
   typeParam: number;
 }
-export interface SizedArrayTypeDef {
-  type: TypeKind.SizedArray;
+export interface SizedArrayTyDef {
+  type: "SizedArray";
   len: number;
   typeParam: number;
 }
-export interface TupleTypeDef {
-  type: TypeKind.Tuple;
+export interface TupleTyDef {
+  type: "Tuple";
   fields: number[];
 }
-export interface PrimitiveTypeDef {
-  type: TypeKind.Primitive;
+export interface PrimitiveTyDef {
+  type: "Primitive";
   kind: PrimitiveKind;
 }
-export interface CompactTypeDef {
-  type: TypeKind.Compact;
+export interface CompactTyDef {
+  type: "Compact";
   typeParam: number;
 }
-export interface BitSequenceTypeDef {
-  type: TypeKind.BitSequence;
+export interface BitSequenceTyDef {
+  type: "BitSequence";
   bitOrderType: number;
   bitStoreType: number;
 }
-export type TypeDef =
-  | StructTypeDef
-  | UnionTypeDef
-  | SequenceTypeDef
-  | SizedArrayTypeDef
-  | TupleTypeDef
-  | PrimitiveTypeDef
-  | CompactTypeDef
-  | BitSequenceTypeDef;
-export const $typeDef: $.Codec<TypeDef> = $.taggedUnion(
+export type TyDef =
+  | StructTyDef
+  | UnionTyDef
+  | SequenceTyDef
+  | SizedArrayTyDef
+  | TupleTyDef
+  | PrimitiveTyDef
+  | CompactTyDef
+  | BitSequenceTyDef;
+export const $tyDef: $.Codec<TyDef> = $.taggedUnion(
   "type",
   [
-    TypeKind.Struct,
+    "Struct",
     ["fields", $.array($field)],
   ],
   [
-    TypeKind.Union,
+    "Union",
     [
       "members",
       $.array($.object(
@@ -128,28 +102,28 @@ export const $typeDef: $.Codec<TypeDef> = $.taggedUnion(
     ],
   ],
   [
-    TypeKind.Sequence,
+    "Sequence",
     ["typeParam", $.nCompact],
   ],
   [
-    TypeKind.SizedArray,
+    "SizedArray",
     ["len", $.u32],
     ["typeParam", $.nCompact],
   ],
   [
-    TypeKind.Tuple,
+    "Tuple",
     ["fields", $.array($.nCompact)],
   ],
   [
-    TypeKind.Primitive,
+    "Primitive",
     ["kind", $primitiveKind],
   ],
   [
-    TypeKind.Compact,
+    "Compact",
     ["typeParam", $.nCompact],
   ],
   [
-    TypeKind.BitSequence,
+    "BitSequence",
     ["bitOrderType", $.nCompact],
     ["bitStoreType", $.nCompact],
   ],
@@ -169,7 +143,7 @@ export type Ty = {
   path: string[];
   params: Param[];
   docs: string[];
-} & TypeDef;
+} & TyDef;
 export const $ty: $.Codec<Ty> = $.spread(
   $.spread(
     $.object(
@@ -177,53 +151,37 @@ export const $ty: $.Codec<Ty> = $.spread(
       ["path", $.array($.str)],
       ["params", $.array($param)],
     ),
-    $typeDef,
+    $tyDef,
   ),
   $.object(
     ["docs", $.array($.str)],
   ),
 );
 
-export enum HasherKind {
-  Blake2_128 = "Blake2_128",
-  Blake2_256 = "Blake2_256",
-  Blake2_128Concat = "Blake2_128Concat",
-  Twox128 = "Twox128",
-  Twox256 = "Twox256",
-  Twox64Concat = "Twox64Concat",
-  Identity = "Identity",
-}
-const $hasherKind: $.Codec<HasherKind> = $.keyLiteralUnion(
-  HasherKind.Blake2_128,
-  HasherKind.Blake2_256,
-  HasherKind.Blake2_128Concat,
-  HasherKind.Twox128,
-  HasherKind.Twox256,
-  HasherKind.Twox64Concat,
-  HasherKind.Identity,
+export type HasherKind = $.Native<typeof $hasherKind>;
+const $hasherKind = $.keyLiteralUnion(
+  "Blake2_128",
+  "Blake2_256",
+  "Blake2_128Concat",
+  "Twox128",
+  "Twox256",
+  "Twox64Concat",
+  "Identity",
 );
 
-export enum StorageEntryModifier {
-  Optional = "Optional",
-  Default = "Default",
-}
+export type StorageEntryModifier = $.Native<typeof $storageEntryModifier>;
 export const $storageEntryModifier = $.keyLiteralUnion(
-  StorageEntryModifier.Optional,
-  StorageEntryModifier.Default,
+  "Optional",
+  "Default",
 );
-
-export enum StorageEntryTypeKind {
-  Plain = "Plain",
-  Map = "Map",
-}
 
 export interface PlainStorageEntryType {
-  type: StorageEntryTypeKind.Plain;
+  type: "Plain";
   value: number;
 }
 
 export interface MapStorageEntryType {
-  type: StorageEntryTypeKind.Map;
+  type: "Map";
   hashers: HasherKind[];
   key: number;
   value: number;
@@ -233,9 +191,9 @@ export type StorageEntryType = PlainStorageEntryType | MapStorageEntryType;
 
 export const $storageEntryType: $.Codec<StorageEntryType> = $.taggedUnion(
   "type",
-  [StorageEntryTypeKind.Plain, ["value", $.nCompact]],
+  ["Plain", ["value", $.nCompact]],
   [
-    StorageEntryTypeKind.Map,
+    "Map",
     ["hashers", $.array($hasherKind)],
     ["key", $.nCompact],
     ["value", $.nCompact],
