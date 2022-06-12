@@ -20,7 +20,7 @@ export const read = effector.async("read", () =>
     const deriveCodec_ = deriveCodec(metadata_);
     const palletMetadata_ = palletMetadata(metadataLookup_, entry.pallet.name);
     const entryMetadata_ = entryMetadata(metadataLookup_, palletMetadata_, entry.name);
-    const key = entryKey(deriveCodec_, palletMetadata_, entryMetadata_, ...entry.keys);
+    const key = entryKey(deriveCodec_, palletMetadata_, entryMetadata_, entry.key);
     const rpcCall_ = rpcCall(entry.pallet.rpc, "state_getStorage", key);
     const encoded = select(rpcCall_, "result");
     const entryValueTypeI = select(entryMetadata_, "value");
