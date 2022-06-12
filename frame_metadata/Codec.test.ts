@@ -1,6 +1,6 @@
 import * as asserts from "../_deps/asserts.ts";
 import { ChainError } from "./Codec.ts";
-import { accountId32, getLookupAndDeriveCodec, State } from "./test-util.ts";
+import { accountId32, getLookupAndDeriveCodec } from "./test-util.ts";
 
 const { lookup, deriveCodec, metadata } = await getLookupAndDeriveCodec("polkadot");
 
@@ -59,55 +59,6 @@ Deno.test("Derive Auction Winning Storage Entry Codec", async () => {
   ];
   const encoded = codec.encode(decoded);
   asserts.assertEquals(codec.decode(encoded), decoded);
-});
-
-// TODO: revisit
-Deno.test("Babe Authorities", { ignore: true }, async () => {
-  // const babe = lookup.getPalletByName("Babe");
-  // const babeAuthorities = lookup.getStorageEntryByPalletAndName(babe, "Authorities");
-
-  const result = await State.getStorage(
-    "wss://kusama-rpc.polkadot.io",
-    lookup,
-    deriveCodec,
-    "Babe",
-    "Authorities",
-  );
-  console.log(result);
-  // const decoded = {
-  //   0: [
-  //     [{ 0: { 0: accountId32 } }, 1n],
-  //     [{ 0: { 0: accountId32 } }, 1n],
-  //     [{ 0: { 0: accountId32 } }, 1n],
-  //     [{ 0: { 0: accountId32 } }, 1n],
-  //     [{ 0: { 0: accountId32 } }, 1n],
-  //     [{ 0: { 0: accountId32 } }, 1n],
-  //   ],
-  // };
-  // const encoded = babeAuthoritiesValueCodec.encode(decoded);
-  // console.log(encoded);
-  // asserts.assertEquals(babeAuthoritiesValueCodec.decode(encoded), decoded);
-});
-
-Deno.test("Balances Locks", { ignore: true }, async () => {
-  const result = await State.getStorage(
-    "wss://kusama-rpc.polkadot.io",
-    lookup,
-    deriveCodec,
-    "System",
-    "Account",
-    accountId32,
-  );
-  console.log(result);
-  // const balancesLockStorageEntry = lookup.getStorageEntryByNameAndPalletName("Balances", "Locks");
-  // const codec = deriveCodec(balancesLockStorageEntry.value);
-  // const decoded = {
-  //   id: "democracy",
-  //   amount: 50000000000,
-  //   reasons: "Misc",
-  // };
-  // const encoded = codec.encode(decoded);
-  // asserts.assertEquals(codec.decode(encoded), decoded);
 });
 
 Deno.test("Westend circular", async () => {
