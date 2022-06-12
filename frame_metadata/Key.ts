@@ -13,7 +13,7 @@ export interface StorageMapKeyProps {
 
 const textEncoder = new TextEncoder();
 export function $storageMapKey(props: StorageMapKeyProps): $.Codec<unknown> {
-  const keyCodec = props.storageEntry._tag === M.StorageEntryTypeKind.Map
+  const keyCodec = props.storageEntry.type === M.StorageEntryTypeKind.Map
     ? props.deriveCodec(props.storageEntry.key)
     : null;
   const hashTwox128 = props.hashers[M.HasherKind.Twox128];
@@ -23,7 +23,7 @@ export function $storageMapKey(props: StorageMapKeyProps): $.Codec<unknown> {
     _encode(buffer, key) {
       buffer.insertArray(hashTwox128(textEncoder.encode(props.pallet.name)));
       buffer.insertArray(hashTwox128(textEncoder.encode(props.storageEntry.name)));
-      if (props.storageEntry._tag === M.StorageEntryTypeKind.Map) {
+      if (props.storageEntry.type === M.StorageEntryTypeKind.Map) {
         const { hashers } = props.storageEntry;
         if (hashers.length === 1) {
           buffer.insertArray(props.hashers[hashers[0]!](keyCodec!.encode(key)));
@@ -45,7 +45,7 @@ export function $storageMapKey(props: StorageMapKeyProps): $.Codec<unknown> {
       // Ignore initial hashes
       buffer.index += 32;
 
-      if (props.storageEntry._tag === M.StorageEntryTypeKind.Plain) {
+      if (props.storageEntry.type === M.StorageEntryTypeKind.Plain) {
         return null;
       }
 

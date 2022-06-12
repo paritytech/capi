@@ -74,12 +74,12 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
       const members = ty.members.map((member, i) => {
         memberIByTag[member.name] = member.i;
         memberIByDiscriminant[member.i] = i;
-        const { fields, name: _tag } = member;
+        const { fields, name: type } = member;
         if (fields.length === 0) {
           if (allEmpty) {
-            return $.dummy(_tag);
+            return $.dummy(type);
           } else {
-            return $.dummy({ _tag });
+            return $.dummy({ type });
           }
         }
         if (fields[0]!.name === undefined) {
@@ -88,7 +88,7 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
           return $.transform(
             $value,
             ({ value }: { value: unknown }) => value,
-            (value) => ({ _tag, value }),
+            (value) => ({ type, value }),
           );
         } else {
           // Object variant
@@ -100,12 +100,12 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
               }),
             ] as [string, $.Codec<unknown>];
           });
-          return $.object(["_tag", $.dummy(member.name)], ...memberFields);
+          return $.object(["type", $.dummy(member.name)], ...memberFields);
         }
       });
       return union(
         (member) => {
-          const tag = typeof member === "string" ? member : member._tag;
+          const tag = typeof member === "string" ? member : member.type;
           const discriminant = memberIByTag[tag];
           if (discriminant === undefined) {
             throw new Error(
@@ -167,7 +167,7 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
       }
       cache[i] = null; // circularity detection
       const ty = metadata.tys[i]!;
-      const $codec = (visitors[ty._tag] as any)(ty, false);
+      const $codec = (visitors[ty.type] as any)(ty, false);
       cache[i] = $codec;
       return $codec;
     },

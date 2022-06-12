@@ -6,7 +6,7 @@ export const enum SignatureKind {
 
 export abstract class SignatureBase {
   constructor(
-    readonly _tag: SignatureKind,
+    readonly type: SignatureKind,
     readonly value: Uint8Array,
   ) {
   }

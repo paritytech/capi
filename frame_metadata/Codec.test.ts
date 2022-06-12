@@ -84,7 +84,7 @@ Deno.test("Derive Result codec", async () => {
   const okEncoded = codec.encode(ok);
   asserts.assertEquals(okEncoded, new Uint8Array([0]));
   asserts.assertEquals(codec.decode(okEncoded), ok);
-  const err = new ChainError({ _tag: "Other" });
+  const err = new ChainError({ type: "Other" });
   const errEncoded = codec.encode(err);
   asserts.assertEquals(errEncoded, new Uint8Array([1, 0]));
   asserts.assertEquals(codec.decode(errEncoded), err);

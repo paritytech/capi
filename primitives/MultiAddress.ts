@@ -8,7 +8,7 @@ export const enum MultiAddressKind {
 
 export class MultiAddress {
   constructor(
-    readonly _tag: MultiAddressKind,
+    readonly type: MultiAddressKind,
     readonly value: Uint8Array,
   ) {}
 }

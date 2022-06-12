@@ -69,7 +69,7 @@ export const display = (
         return "XMC STUFF TODO";
       }
       const ty = metadata.tys[i]!;
-      const result = (visitors[ty._tag] as any)(ty);
+      const result = (visitors[ty.type] as any)(ty);
       cache[i] = result;
       return result;
     },

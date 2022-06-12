@@ -3,7 +3,7 @@ export const enum EraKind {
   Immortal = "Immortal",
 }
 export abstract class EraBase {
-  constructor(readonly _tag: EraKind) {}
+  constructor(readonly type: EraKind) {}
 }
 export class MortalEra extends EraBase {
   value;

@@ -9,7 +9,7 @@ export type TypeVisitor<
   Results extends UnknownByTypeDefKind,
 > = (
   this: TypeVisitors<Results, Misc>,
-  typeDef: M.Ty & { _tag: Tag },
+  typeDef: M.Ty & { type: Tag },
   ...misc: Misc
 ) => Results[Tag];
 

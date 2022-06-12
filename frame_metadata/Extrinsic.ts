@@ -42,9 +42,9 @@ export function $extrinsic(args: ExtrinsicCodecArgs): $.Codec<Extrinsic> {
       const firstByte = (+!!extrinsic.signature << 7) | extrinsic.protocolVersion;
       buffer.array[buffer.index++] = firstByte;
       const call = {
-        _tag: extrinsic.palletName,
+        type: extrinsic.palletName,
         value: {
-          _tag: extrinsic.methodName,
+          type: extrinsic.methodName,
           ...extrinsic.args,
         },
       };
@@ -88,7 +88,7 @@ export function $extrinsic(args: ExtrinsicCodecArgs): $.Codec<Extrinsic> {
         signature = { address, sig, extra };
       }
       const call = $call._decode(buffer) as any;
-      const { _tag: palletName, value: { _tag: methodName, ...args } } = call;
+      const { type: palletName, value: { type: methodName, ...args } } = call;
       return {
         protocolVersion,
         signature,

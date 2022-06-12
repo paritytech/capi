@@ -61,7 +61,7 @@ export enum TypeKind {
 }
 
 export interface StructTypeDef {
-  _tag: TypeKind.Struct;
+  type: TypeKind.Struct;
   fields: Field[];
 }
 export interface UnionTypeDefMember {
@@ -71,32 +71,32 @@ export interface UnionTypeDefMember {
   docs: string[];
 }
 export interface UnionTypeDef {
-  _tag: TypeKind.Union;
+  type: TypeKind.Union;
   members: UnionTypeDefMember[];
 }
 export interface SequenceTypeDef {
-  _tag: TypeKind.Sequence;
+  type: TypeKind.Sequence;
   typeParam: number;
 }
 export interface SizedArrayTypeDef {
-  _tag: TypeKind.SizedArray;
+  type: TypeKind.SizedArray;
   len: number;
   typeParam: number;
 }
 export interface TupleTypeDef {
-  _tag: TypeKind.Tuple;
+  type: TypeKind.Tuple;
   fields: number[];
 }
 export interface PrimitiveTypeDef {
-  _tag: TypeKind.Primitive;
+  type: TypeKind.Primitive;
   kind: PrimitiveKind;
 }
 export interface CompactTypeDef {
-  _tag: TypeKind.Compact;
+  type: TypeKind.Compact;
   typeParam: number;
 }
 export interface BitSequenceTypeDef {
-  _tag: TypeKind.BitSequence;
+  type: TypeKind.BitSequence;
   bitOrderType: number;
   bitStoreType: number;
 }
@@ -110,7 +110,7 @@ export type TypeDef =
   | CompactTypeDef
   | BitSequenceTypeDef;
 export const $typeDef: $.Codec<TypeDef> = $.taggedUnion(
-  "_tag",
+  "type",
   [
     TypeKind.Struct,
     ["fields", $.array($field)],
@@ -218,12 +218,12 @@ export enum StorageEntryTypeKind {
 }
 
 export interface PlainStorageEntryType {
-  _tag: StorageEntryTypeKind.Plain;
+  type: StorageEntryTypeKind.Plain;
   value: number;
 }
 
 export interface MapStorageEntryType {
-  _tag: StorageEntryTypeKind.Map;
+  type: StorageEntryTypeKind.Map;
   hashers: HasherKind[];
   key: number;
   value: number;
@@ -232,7 +232,7 @@ export interface MapStorageEntryType {
 export type StorageEntryType = PlainStorageEntryType | MapStorageEntryType;
 
 export const $storageEntryType: $.Codec<StorageEntryType> = $.taggedUnion(
-  "_tag",
+  "type",
   [StorageEntryTypeKind.Plain, ["value", $.nCompact]],
   [
     StorageEntryTypeKind.Map,
