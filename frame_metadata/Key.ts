@@ -62,7 +62,7 @@ export function $storageMapKey(props: StorageMapKeyProps): $.Codec<unknown> {
           [M.HasherKind.Blake2_128Concat]: 16,
           [M.HasherKind.Twox64Concat]: 8,
         })[hasherKind];
-        if (!leading) {
+        if (leading === undefined) {
           throw new DecodeNonTransparentKeyError();
         }
         buffer.index += leading;
