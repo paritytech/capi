@@ -74,7 +74,7 @@ export function base58Encode(data) {
 
 const cachedTextEncoder = new TextEncoder("utf-8");
 
-const encodeString = function (arg, view) {
+const encodeString = function(arg, view) {
   return cachedTextEncoder.encodeInto(arg, view);
 };
 
@@ -139,14 +139,14 @@ function getInt32Memory0() {
 
 const imports = {
   __wbindgen_placeholder__: {
-    __wbindgen_object_drop_ref: function (arg0) {
+    __wbindgen_object_drop_ref: function(arg0) {
       takeObject(arg0);
     },
-    __wbg_new_693216e109162396: function () {
+    __wbg_new_693216e109162396: function() {
       const ret = new Error();
       return addHeapObject(ret);
     },
-    __wbg_stack_0ddaca5d1abfb52f: function (arg0, arg1) {
+    __wbg_stack_0ddaca5d1abfb52f: function(arg0, arg1) {
       const ret = getObject(arg1).stack;
       const ptr0 = passStringToWasm0(
         ret,
@@ -157,18 +157,18 @@ const imports = {
       getInt32Memory0()[arg0 / 4 + 1] = len0;
       getInt32Memory0()[arg0 / 4 + 0] = ptr0;
     },
-    __wbg_error_09919627ac0992f5: function (arg0, arg1) {
+    __wbg_error_09919627ac0992f5: function(arg0, arg1) {
       try {
         console.error(getStringFromWasm0(arg0, arg1));
       } finally {
         wasm.__wbindgen_free(arg0, arg1);
       }
     },
-    __wbg_buffer_5e74a88a1424a2e0: function (arg0) {
+    __wbg_buffer_5e74a88a1424a2e0: function(arg0) {
       const ret = getObject(arg0).buffer;
       return addHeapObject(ret);
     },
-    __wbg_newwithbyteoffsetandlength_278ec7532799393a: function (
+    __wbg_newwithbyteoffsetandlength_278ec7532799393a: function(
       arg0,
       arg1,
       arg2,
@@ -176,14 +176,14 @@ const imports = {
       const ret = new Uint8Array(getObject(arg0), arg1 >>> 0, arg2 >>> 0);
       return addHeapObject(ret);
     },
-    __wbg_new_e3b800e570795b3c: function (arg0) {
+    __wbg_new_e3b800e570795b3c: function(arg0) {
       const ret = new Uint8Array(getObject(arg0));
       return addHeapObject(ret);
     },
-    __wbindgen_throw: function (arg0, arg1) {
+    __wbindgen_throw: function(arg0, arg1) {
       throw new Error(getStringFromWasm0(arg0, arg1));
     },
-    __wbindgen_memory: function () {
+    __wbindgen_memory: function() {
       const ret = wasm.memory;
       return addHeapObject(ret);
     },

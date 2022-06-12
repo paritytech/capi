@@ -12,3 +12,5 @@ for (const bufName of ["cachedInt32Memory0", "cachedUint8Memory0"]) {
   }
 }
 await Deno.writeTextFile(path, content);
+
+await Deno.run({ cmd: ["dprint", "fmt", "bindings/*/mod.generated.js"] }).status();

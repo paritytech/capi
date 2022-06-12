@@ -24,7 +24,7 @@ jobs:
             ~/.cargo/git/db/
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-      - run: cargo install wasm-bindgen-cli || true
+      - run: cargo install wasm-bindgen-cli dprint || true
       - run: deno task build_all_wasm
       - name: Error if changes present
         run: "git status && git diff && [[ -z `git status --porcelain` ]]"
