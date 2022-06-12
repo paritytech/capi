@@ -1,20 +1,17 @@
-export const enum EraKind {
-  Mortal = "Mortal",
-  Immortal = "Immortal",
-}
+export type EraKind = "Mortal" | "Immortal";
 export abstract class EraBase {
-  constructor(readonly _tag: EraKind) {}
+  constructor(readonly type: EraKind) {}
 }
 export class MortalEra extends EraBase {
   value;
   constructor(period: bigint, phase: bigint) {
-    super(EraKind.Mortal);
+    super("Mortal");
     this.value = [period, phase];
   }
 }
 export class ImmortalEra extends EraBase {
   constructor() {
-    super(EraKind.Immortal);
+    super("Immortal");
   }
 }
 export const immortalEra = new ImmortalEra();

@@ -1,5 +1,5 @@
 import * as M from "./Metadata.ts";
-import { TypeVisitors } from "./TypeVisitor.ts";
+import { TyVisitors } from "./TyVisitor.ts";
 
 export const display = (
   metadata: M.Metadata,
@@ -11,19 +11,19 @@ export const display = (
     return fields.map((field) => {
       return {
         ...field,
-        type: visitors.visit(field.type),
+        ty: visitors.visit(field.ty),
       };
     });
   };
 
-  const visitors: TypeVisitors<{ [_ in M.TypeKind]: unknown }> = {
-    [M.TypeKind.Struct]: (ty) => {
+  const visitors: TyVisitors<{ [_ in M.TyType]: unknown }> = {
+    Struct: (ty) => {
       return {
         ...ty,
         fields: Fields(...ty.fields),
       };
     },
-    [M.TypeKind.Union]: (ty) => {
+    Union: (ty) => {
       return {
         ...ty,
         members: ty.members.map((member) => {
@@ -34,31 +34,31 @@ export const display = (
         }),
       };
     },
-    [M.TypeKind.Sequence]: (ty) => {
+    Sequence: (ty) => {
       return {
         ...ty,
         typeParam: visitors.visit(ty.typeParam),
       };
     },
-    [M.TypeKind.SizedArray]: (ty) => {
+    SizedArray: (ty) => {
       return {
         ...ty,
         typeParam: visitors.visit(ty.typeParam),
       };
     },
-    [M.TypeKind.Tuple]: (ty) => {
+    Tuple: (ty) => {
       return {
         ...ty,
         fields: ty.fields.map(visitors.visit),
       };
     },
-    [M.TypeKind.Primitive]: (ty) => {
+    Primitive: (ty) => {
       return ty;
     },
-    [M.TypeKind.Compact]: (ty) => {
+    Compact: (ty) => {
       return ty;
     },
-    [M.TypeKind.BitSequence]: (ty) => {
+    BitSequence: (ty) => {
       return ty;
     },
     visit: (i) => {
@@ -68,8 +68,8 @@ export const display = (
       if (i === 103) {
         return "XMC STUFF TODO";
       }
-      const type_ = metadata.types[i]!;
-      const result = (visitors[type_._tag] as any)(type_);
+      const ty = metadata.tys[i]!;
+      const result = (visitors[ty.type] as any)(ty);
       cache[i] = result;
       return result;
     },

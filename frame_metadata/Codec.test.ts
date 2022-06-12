@@ -5,7 +5,7 @@ import { accountId32, getLookupAndDeriveCodec } from "./test-util.ts";
 const { lookup, deriveCodec, metadata } = await getLookupAndDeriveCodec("polkadot");
 
 Deno.test("Derive all", () => {
-  for (const ty of metadata.types) {
+  for (const ty of metadata.tys) {
     deriveCodec(ty.i);
   }
 });
@@ -67,7 +67,7 @@ Deno.test("Westend circular", async () => {
 });
 
 Deno.test("Derive pallet_xcm::pallet::Error codec", async () => {
-  const ty = metadata.types.find((x) => x.path.join("::") === "pallet_xcm::pallet::Error")!;
+  const ty = metadata.tys.find((x) => x.path.join("::") === "pallet_xcm::pallet::Error")!;
   const codec = deriveCodec(ty.i);
   const encoded = codec.encode("Unreachable");
   asserts.assertEquals(encoded, new Uint8Array([0]));
@@ -75,16 +75,16 @@ Deno.test("Derive pallet_xcm::pallet::Error codec", async () => {
 });
 
 Deno.test("Derive Result codec", async () => {
-  const ty = metadata.types.find((x) =>
+  const ty = metadata.tys.find((x) =>
     x.path[0] === "Result"
-    && metadata.types[x.params[1]!.type!]!.path.join("::") === "sp_runtime::DispatchError"
+    && metadata.tys[x.params[1]!.ty!]!.path.join("::") === "sp_runtime::DispatchError"
   )!;
   const codec = deriveCodec(ty.i);
   const ok = null;
   const okEncoded = codec.encode(ok);
   asserts.assertEquals(okEncoded, new Uint8Array([0]));
   asserts.assertEquals(codec.decode(okEncoded), ok);
-  const err = new ChainError({ _tag: "Other" });
+  const err = new ChainError({ type: "Other" });
   const errEncoded = codec.encode(err);
   asserts.assertEquals(errEncoded, new Uint8Array([1, 0]));
   asserts.assertEquals(codec.decode(errEncoded), err);

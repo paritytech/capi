@@ -1,26 +1,8 @@
 import * as $ from "../_deps/scale.ts";
 import * as M from "./Metadata.ts";
-import { TypeVisitors } from "./TypeVisitor.ts";
+import { TyVisitors } from "./TyVisitor.ts";
 
 export type DeriveCodec = (typeI: number) => $.Codec<unknown>;
-
-const primitiveCodecByDiscriminant = {
-  [M.PrimitiveKind.Bool]: $.bool,
-  [M.PrimitiveKind.Char]: $.str,
-  [M.PrimitiveKind.Str]: $.str,
-  [M.PrimitiveKind.U8]: $.u8,
-  [M.PrimitiveKind.I8]: $.i8,
-  [M.PrimitiveKind.U16]: $.u16,
-  [M.PrimitiveKind.I16]: $.i16,
-  [M.PrimitiveKind.U32]: $.u32,
-  [M.PrimitiveKind.I32]: $.i32,
-  [M.PrimitiveKind.U64]: $.u64,
-  [M.PrimitiveKind.I64]: $.i64,
-  [M.PrimitiveKind.U128]: $.u128,
-  [M.PrimitiveKind.I128]: $.i128,
-  [M.PrimitiveKind.U256]: $.u256,
-  [M.PrimitiveKind.I256]: $.i256,
-};
 
 /**
  * All derived codecs for ZSTs will use this exact codec,
@@ -42,29 +24,29 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
     }
   }
 
-  const visitors: TypeVisitors<{ [_ in M.TypeKind]: $.Codec<any> }> = {
-    [M.TypeKind.Struct]: (ty) => {
+  const visitors: TyVisitors<{ [_ in M.TyType]: $.Codec<any> }> = {
+    Struct: (ty) => {
       if (ty.fields.length === 0) {
         return $null;
       } else if (ty.fields[0]!.name === undefined) {
         // Tuple struct
-        return tuple(ty.fields.map((f) => f.type));
+        return tuple(ty.fields.map((f) => f.ty));
       } else {
         // Object struct
         return $.object(
-          ...ty.fields.map((field): $.Field => [field.name!, visitors.visit(field.type)]),
+          ...ty.fields.map((field): $.Field => [field.name!, visitors.visit(field.ty)]),
         );
       }
     },
-    [M.TypeKind.Union]: (ty) => {
+    Union: (ty) => {
       // TODO: revisit this
       if (ty.path[0] === "Option") {
-        return $.option(visitors.visit(ty.params[0]!.type!));
+        return $.option(visitors.visit(ty.params[0]!.ty!));
       }
       if (ty.path[0] === "Result") {
         return $.result(
-          visitors.visit(ty.params[0]!.type!),
-          $.instance(ChainError, ["value", visitors.visit(ty.params[1]!.type!)]),
+          visitors.visit(ty.params[0]!.ty!),
+          $.instance(ChainError, ["value", visitors.visit(ty.params[1]!.ty!)]),
         );
       }
       if (ty.members.length === 0) return $.never as any;
@@ -74,21 +56,21 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
       const members = ty.members.map((member, i) => {
         memberIByTag[member.name] = member.i;
         memberIByDiscriminant[member.i] = i;
-        const { fields, name: _tag } = member;
+        const { fields, name: type } = member;
         if (fields.length === 0) {
           if (allEmpty) {
-            return $.dummy(_tag);
+            return $.dummy(type);
           } else {
-            return $.dummy({ _tag });
+            return $.dummy({ type });
           }
         }
         if (fields[0]!.name === undefined) {
           // Tuple variant
-          const $value = tuple(fields.map((f) => f.type));
+          const $value = tuple(fields.map((f) => f.ty));
           return $.transform(
             $value,
             ({ value }: { value: unknown }) => value,
-            (value) => ({ _tag, value }),
+            (value) => ({ type, value }),
           );
         } else {
           // Object variant
@@ -96,16 +78,16 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
             return [
               field.name || i,
               $.deferred(() => {
-                return visitors.visit(field.type);
+                return visitors.visit(field.ty);
               }),
             ] as [string, $.Codec<unknown>];
           });
-          return $.object(["_tag", $.dummy(member.name)], ...memberFields);
+          return $.object(["type", $.dummy(member.name)], ...memberFields);
         }
       });
       return union(
         (member) => {
-          const tag = typeof member === "string" ? member : member._tag;
+          const tag = typeof member === "string" ? member : member.type;
           const discriminant = memberIByTag[tag];
           if (discriminant === undefined) {
             throw new Error(
@@ -130,7 +112,7 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
         ...members,
       ) as unknown as $.Codec<any>;
     },
-    [M.TypeKind.Sequence]: (ty) => {
+    Sequence: (ty) => {
       const $el = visitors.visit(ty.typeParam);
       if ($el === $.u8) {
         return $.uint8array;
@@ -138,7 +120,7 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
         return $.array($el);
       }
     },
-    [M.TypeKind.SizedArray]: (ty) => {
+    SizedArray: (ty) => {
       const $el = visitors.visit(ty.typeParam);
       if ($el === $.u8) {
         return $.sizedUint8array(ty.len);
@@ -146,16 +128,17 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
         return $.sizedArray($el, ty.len);
       }
     },
-    [M.TypeKind.Tuple]: (ty) => {
+    Tuple: (ty) => {
       return tuple(ty.fields);
     },
-    [M.TypeKind.Primitive]: (ty) => {
-      return primitiveCodecByDiscriminant[ty.kind]!;
+    Primitive: (ty) => {
+      if (ty.kind === "char") return $.str;
+      return $[ty.kind];
     },
-    [M.TypeKind.Compact]: () => {
+    Compact: () => {
       return $.compact;
     },
-    [M.TypeKind.BitSequence]: () => {
+    BitSequence: () => {
       return $.never as unknown as $.Codec<any>;
     },
     visit: (i) => {
@@ -166,8 +149,8 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
         return $.deferred(() => cache[i]!);
       }
       cache[i] = null; // circularity detection
-      const type_ = metadata.types[i]!;
-      const $codec = (visitors[type_._tag] as any)(type_, false);
+      const ty = metadata.tys[i]!;
+      const $codec = (visitors[ty.type] as any)(ty, false);
       cache[i] = $codec;
       return $codec;
     },

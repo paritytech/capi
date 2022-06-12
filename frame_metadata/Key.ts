@@ -13,17 +13,17 @@ export interface StorageMapKeyProps {
 
 const textEncoder = new TextEncoder();
 export function $storageMapKey(props: StorageMapKeyProps): $.Codec<unknown> {
-  const keyCodec = props.storageEntry._tag === M.StorageEntryTypeKind.Map
+  const keyCodec = props.storageEntry.type === "Map"
     ? props.deriveCodec(props.storageEntry.key)
     : null;
-  const hashTwox128 = props.hashers[M.HasherKind.Twox128];
+  const hashTwox128 = props.hashers.Twox128;
   return $.createCodec({
     _metadata: [$storageMapKey, props],
     _staticSize: 0,
     _encode(buffer, key) {
       buffer.insertArray(hashTwox128(textEncoder.encode(props.pallet.name)));
       buffer.insertArray(hashTwox128(textEncoder.encode(props.storageEntry.name)));
-      if (props.storageEntry._tag === M.StorageEntryTypeKind.Map) {
+      if (props.storageEntry.type === "Map") {
         const { hashers } = props.storageEntry;
         if (hashers.length === 1) {
           buffer.insertArray(props.hashers[hashers[0]!](keyCodec!.encode(key)));
@@ -45,7 +45,7 @@ export function $storageMapKey(props: StorageMapKeyProps): $.Codec<unknown> {
       // Ignore initial hashes
       buffer.index += 32;
 
-      if (props.storageEntry._tag === M.StorageEntryTypeKind.Plain) {
+      if (props.storageEntry.type === "Plain") {
         return null;
       }
 
@@ -58,9 +58,9 @@ export function $storageMapKey(props: StorageMapKeyProps): $.Codec<unknown> {
 
       function decodeHasher(hasherKind: M.HasherKind): unknown {
         const leading = (<{ [K in M.HasherKind]?: number }> {
-          [M.HasherKind.Identity]: 0,
-          [M.HasherKind.Blake2_128Concat]: 16,
-          [M.HasherKind.Twox64Concat]: 8,
+          Identity: 0,
+          Blake2_128Concat: 16,
+          Twox64Concat: 8,
         })[hasherKind];
         if (leading === undefined) {
           throw new DecodeNonTransparentKeyError();

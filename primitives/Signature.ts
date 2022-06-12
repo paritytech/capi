@@ -1,12 +1,10 @@
 export type Signature = Sr25519Signature;
 
-export const enum SignatureKind {
-  Sr25519 = "Sr25519",
-}
+export type SignatureKind = "Sr25519";
 
 export abstract class SignatureBase {
   constructor(
-    readonly _tag: SignatureKind,
+    readonly type: SignatureKind,
     readonly value: Uint8Array,
   ) {
   }
@@ -14,6 +12,6 @@ export abstract class SignatureBase {
 
 export class Sr25519Signature extends SignatureBase {
   constructor(bytes: Uint8Array) {
-    super(SignatureKind.Sr25519, bytes);
+    super("Sr25519", bytes);
   }
 }

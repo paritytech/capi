@@ -42,11 +42,10 @@ export interface SystemHealth {
   shouldHavePeers: boolean;
 }
 
-export const enum SystemPeerRole {
-  Authority = "AUTHORITY",
-  FULL = "FULL",
-  LIGHT = "LIGHT",
-}
+export type SystemPeerRole =
+  | "AUTHORITY"
+  | "FULL"
+  | "LIGHT";
 
 export interface SystemPeer {
   peerId: string;

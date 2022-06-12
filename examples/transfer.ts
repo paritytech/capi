@@ -18,7 +18,7 @@ const metadata = C.M.fromPrefixedHex(metadataRaw.result);
 const deriveCodec = C.M.DeriveCodec(metadata);
 
 const dest = new C.MultiAddress(
-  C.MultiAddressKind.Id,
+  "Id",
   hex.decode("8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48"),
 );
 const genesisHash = hex.decode("c5c2beaf81f8833d2ddcfe0c04b0612d16f0d08d67aa5032dde065ddf71b4ed1");
@@ -33,7 +33,7 @@ const $extrinsic = C.M.$extrinsic({
 const extrinsic: C.M.Extrinsic = {
   protocolVersion: 4,
   signature: {
-    address: new C.MultiAddress(C.MultiAddressKind.Address32, pair.pubKey),
+    address: new C.MultiAddress("Address32", pair.pubKey),
     extra: [
       /* era */ C.immortalEra,
       /* nonce */ 1000,

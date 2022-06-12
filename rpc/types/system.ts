@@ -1,8 +1,7 @@
-export const enum DispatchClassKind {
-  Normal = "normal",
-  Operational = "operational",
-  Mandatory = "mandatory",
-}
+export type DispatchClassKind =
+  | "normal"
+  | "operational"
+  | "mandatory";
 
 export interface RuntimeDispatchInfo {
   weight: number;
@@ -10,9 +9,8 @@ export interface RuntimeDispatchInfo {
   partial_fee: number;
 }
 
-export const enum SystemChainTypeKind {
-  Development = "Development",
-  Local = "Local",
-  Live = "Live",
-  Custom = "Custom",
-}
+export type SystemChainTypeKind =
+  | "Development"
+  | "Local"
+  | "Live"
+  | "Custom";

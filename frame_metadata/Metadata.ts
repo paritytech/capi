@@ -3,120 +3,94 @@ import * as hex from "../util/hex.ts";
 
 export interface Field {
   name: string | undefined;
-  type: number;
+  ty: number;
   typeName: string | undefined;
   docs: string[];
 }
 export const $field: $.Codec<Field> = $.object(
   ["name", $.option($.str)],
-  ["type", $.nCompact],
+  ["ty", $.nCompact],
   ["typeName", $.option($.str)],
   ["docs", $.array($.str)],
 );
 
-export enum PrimitiveKind {
-  Bool = "bool",
-  Char = "char",
-  Str = "str",
-  U8 = "u8",
-  U16 = "u16",
-  U32 = "u32",
-  U64 = "u64",
-  U128 = "u128",
-  U256 = "u256",
-  I8 = "i8",
-  I16 = "i16",
-  I32 = "i32",
-  I64 = "i64",
-  I128 = "i128",
-  I256 = "i256",
-}
-const $primitiveKind: $.Codec<PrimitiveKind> = $.keyLiteralUnion(
-  PrimitiveKind.Bool,
-  PrimitiveKind.Char,
-  PrimitiveKind.Str,
-  PrimitiveKind.U8,
-  PrimitiveKind.U16,
-  PrimitiveKind.U32,
-  PrimitiveKind.U64,
-  PrimitiveKind.U128,
-  PrimitiveKind.U256,
-  PrimitiveKind.I8,
-  PrimitiveKind.I16,
-  PrimitiveKind.I32,
-  PrimitiveKind.I64,
-  PrimitiveKind.I128,
-  PrimitiveKind.I256,
+export type PrimitiveKind = $.Native<typeof $primitiveKind>;
+const $primitiveKind = $.keyLiteralUnion(
+  "bool",
+  "char",
+  "str",
+  "u8",
+  "u16",
+  "u32",
+  "u64",
+  "u128",
+  "u256",
+  "i8",
+  "i16",
+  "i32",
+  "i64",
+  "i128",
+  "i256",
 );
 
-export enum TypeKind {
-  Struct = "Struct",
-  Union = "Union",
-  Sequence = "Sequence",
-  SizedArray = "SizedArray",
-  Tuple = "Tuple",
-  Primitive = "Primitive",
-  Compact = "Compact",
-  BitSequence = "BitSequence",
-}
-
-export interface StructTypeDef {
-  _tag: TypeKind.Struct;
+export type TyType = TyDef["type"];
+export interface StructTyDef {
+  type: "Struct";
   fields: Field[];
 }
-export interface UnionTypeDefMember {
+export interface UnionTyDefMember {
   name: string;
   fields: Field[];
   i: number;
   docs: string[];
 }
-export interface UnionTypeDef {
-  _tag: TypeKind.Union;
-  members: UnionTypeDefMember[];
+export interface UnionTyDef {
+  type: "Union";
+  members: UnionTyDefMember[];
 }
-export interface SequenceTypeDef {
-  _tag: TypeKind.Sequence;
+export interface SequenceTyDef {
+  type: "Sequence";
   typeParam: number;
 }
-export interface SizedArrayTypeDef {
-  _tag: TypeKind.SizedArray;
+export interface SizedArrayTyDef {
+  type: "SizedArray";
   len: number;
   typeParam: number;
 }
-export interface TupleTypeDef {
-  _tag: TypeKind.Tuple;
+export interface TupleTyDef {
+  type: "Tuple";
   fields: number[];
 }
-export interface PrimitiveTypeDef {
-  _tag: TypeKind.Primitive;
+export interface PrimitiveTyDef {
+  type: "Primitive";
   kind: PrimitiveKind;
 }
-export interface CompactTypeDef {
-  _tag: TypeKind.Compact;
+export interface CompactTyDef {
+  type: "Compact";
   typeParam: number;
 }
-export interface BitSequenceTypeDef {
-  _tag: TypeKind.BitSequence;
+export interface BitSequenceTyDef {
+  type: "BitSequence";
   bitOrderType: number;
   bitStoreType: number;
 }
-export type TypeDef =
-  | StructTypeDef
-  | UnionTypeDef
-  | SequenceTypeDef
-  | SizedArrayTypeDef
-  | TupleTypeDef
-  | PrimitiveTypeDef
-  | CompactTypeDef
-  | BitSequenceTypeDef;
-export const $typeDef: $.Codec<TypeDef> = $.taggedUnion(
-  "_tag",
+export type TyDef =
+  | StructTyDef
+  | UnionTyDef
+  | SequenceTyDef
+  | SizedArrayTyDef
+  | TupleTyDef
+  | PrimitiveTyDef
+  | CompactTyDef
+  | BitSequenceTyDef;
+export const $tyDef: $.Codec<TyDef> = $.taggedUnion(
+  "type",
   [
-    TypeKind.Struct,
+    "Struct",
     ["fields", $.array($field)],
   ],
   [
-    TypeKind.Union,
+    "Union",
     [
       "members",
       $.array($.object(
@@ -128,28 +102,28 @@ export const $typeDef: $.Codec<TypeDef> = $.taggedUnion(
     ],
   ],
   [
-    TypeKind.Sequence,
+    "Sequence",
     ["typeParam", $.nCompact],
   ],
   [
-    TypeKind.SizedArray,
+    "SizedArray",
     ["len", $.u32],
     ["typeParam", $.nCompact],
   ],
   [
-    TypeKind.Tuple,
+    "Tuple",
     ["fields", $.array($.nCompact)],
   ],
   [
-    TypeKind.Primitive,
+    "Primitive",
     ["kind", $primitiveKind],
   ],
   [
-    TypeKind.Compact,
+    "Compact",
     ["typeParam", $.nCompact],
   ],
   [
-    TypeKind.BitSequence,
+    "BitSequence",
     ["bitOrderType", $.nCompact],
     ["bitStoreType", $.nCompact],
   ],
@@ -157,73 +131,57 @@ export const $typeDef: $.Codec<TypeDef> = $.taggedUnion(
 
 export interface Param {
   name: string;
-  type: number | undefined;
+  ty: number | undefined;
 }
 export const $param: $.Codec<Param> = $.object(
   ["name", $.str],
-  ["type", $.option($.nCompact)],
+  ["ty", $.option($.nCompact)],
 );
 
-export type Type = {
+export type Ty = {
   i: number;
   path: string[];
   params: Param[];
   docs: string[];
-} & TypeDef;
-export const $type: $.Codec<Type> = $.spread(
+} & TyDef;
+export const $ty: $.Codec<Ty> = $.spread(
   $.spread(
     $.object(
       ["i", $.nCompact],
       ["path", $.array($.str)],
       ["params", $.array($param)],
     ),
-    $typeDef,
+    $tyDef,
   ),
   $.object(
     ["docs", $.array($.str)],
   ),
 );
 
-export enum HasherKind {
-  Blake2_128 = "Blake2_128",
-  Blake2_256 = "Blake2_256",
-  Blake2_128Concat = "Blake2_128Concat",
-  Twox128 = "Twox128",
-  Twox256 = "Twox256",
-  Twox64Concat = "Twox64Concat",
-  Identity = "Identity",
-}
-const $hasherKind: $.Codec<HasherKind> = $.keyLiteralUnion(
-  HasherKind.Blake2_128,
-  HasherKind.Blake2_256,
-  HasherKind.Blake2_128Concat,
-  HasherKind.Twox128,
-  HasherKind.Twox256,
-  HasherKind.Twox64Concat,
-  HasherKind.Identity,
+export type HasherKind = $.Native<typeof $hasherKind>;
+const $hasherKind = $.keyLiteralUnion(
+  "Blake2_128",
+  "Blake2_256",
+  "Blake2_128Concat",
+  "Twox128",
+  "Twox256",
+  "Twox64Concat",
+  "Identity",
 );
 
-export enum StorageEntryModifier {
-  Optional = "Optional",
-  Default = "Default",
-}
+export type StorageEntryModifier = $.Native<typeof $storageEntryModifier>;
 export const $storageEntryModifier = $.keyLiteralUnion(
-  StorageEntryModifier.Optional,
-  StorageEntryModifier.Default,
+  "Optional",
+  "Default",
 );
-
-export enum StorageEntryTypeKind {
-  Plain = "Plain",
-  Map = "Map",
-}
 
 export interface PlainStorageEntryType {
-  _tag: StorageEntryTypeKind.Plain;
+  type: "Plain";
   value: number;
 }
 
 export interface MapStorageEntryType {
-  _tag: StorageEntryTypeKind.Map;
+  type: "Map";
   hashers: HasherKind[];
   key: number;
   value: number;
@@ -232,10 +190,10 @@ export interface MapStorageEntryType {
 export type StorageEntryType = PlainStorageEntryType | MapStorageEntryType;
 
 export const $storageEntryType: $.Codec<StorageEntryType> = $.taggedUnion(
-  "_tag",
-  [StorageEntryTypeKind.Plain, ["value", $.nCompact]],
+  "type",
+  ["Plain", ["value", $.nCompact]],
   [
-    StorageEntryTypeKind.Map,
+    "Map",
     ["hashers", $.array($hasherKind)],
     ["key", $.nCompact],
     ["value", $.nCompact],
@@ -274,19 +232,19 @@ export const $storage: $.Codec<Storage> = $.object(
 
 export interface Constant {
   name: string;
-  type: number;
+  ty: number;
   value: Uint8Array;
   docs: string[];
 }
 export const $constant: $.Codec<Constant> = $.object(
   ["name", $.str],
-  ["type", $.nCompact],
+  ["ty", $.nCompact],
   ["value", $.uint8array],
   ["docs", $.array($.str)],
 );
 
 type OptionalTypeBearer = $.Native<typeof optionalTypeBearer>;
-const optionalTypeBearer = $.option($.object(["type", $.nCompact]));
+const optionalTypeBearer = $.option($.object(["ty", $.nCompact]));
 
 export interface Pallet {
   name: string;
@@ -309,22 +267,22 @@ export const $pallet: $.Codec<Pallet> = $.object(
 
 export interface SignedExtensionMetadata {
   ident: string;
-  type: number;
+  ty: number;
   additionalSigned: number;
 }
 export const $signedExtensionMetadata: $.Codec<SignedExtensionMetadata> = $.object(
   ["ident", $.str],
-  ["type", $.nCompact],
+  ["ty", $.nCompact],
   ["additionalSigned", $.nCompact],
 );
 
 export interface ExtrinsicDef {
-  type: number;
+  ty: number;
   version: number;
   signedExtensions: SignedExtensionMetadata[];
 }
 export const $extrinsicDef: $.Codec<ExtrinsicDef> = $.object(
-  ["type", $.nCompact],
+  ["ty", $.nCompact],
   ["version", $.u8],
   ["signedExtensions", $.array($signedExtensionMetadata)],
 );
@@ -335,14 +293,14 @@ export const magicNumber = 1635018093;
 export interface Metadata {
   magicNumber: typeof magicNumber;
   version: 14;
-  types: Type[];
+  tys: Ty[];
   pallets: Pallet[];
   extrinsic: ExtrinsicDef;
 }
 export const $metadata: $.Codec<Metadata> = $.object(
   ["magicNumber", $.constantPattern(magicNumber, $.u32)],
   ["version", $.constantPattern(14, $.u8)],
-  ["types", $.array($type)],
+  ["tys", $.array($ty)],
   ["pallets", $.array($pallet)],
   ["extrinsic", $extrinsicDef],
 );
