@@ -26,7 +26,7 @@ Now let's fetch the metadata.
 const metadata = await C.chain(CHAIN_PROXY_WS_URL).metadata.read();
 ```
 
-If we index into `metadata.pallets`, we'll see a list of all pallet metadata. Each element of this list contains a complete description of the given pallet's storage entries, as well as constants, callables (for creating extrinsics), errors and events. Some fields––such as a pallet's `call` field––point to an index in `metadata.types`, which contains a complete description of the chain's type-level context.
+If we index into `metadata.pallets`, we'll see a list of all pallet metadata. Each element of this list contains a complete description of the given pallet's storage entries, as well as constants, callables (for creating extrinsics), errors and events. Some fields––such as a pallet's `call` field––point to an index in `metadata.tys`, which contains a complete description of the chain's type-level context.
 
 Let's say we want to learn about the types associated with the `Balances` pallet's `Account` storage.
 
@@ -42,8 +42,8 @@ On most chains, `accountsStorage` will look similar to the following.
 ````ts
 {
   name: "Account",
-  modifier: 1,
-  _tag: 1,
+  modifier: "Default",
+  type: "Map",
   hashers: [ "Blake2_128Concat" ],
   key: 0,
   value: 5,
@@ -83,14 +83,14 @@ On most chains, `accountsStorage` will look similar to the following.
 }
 ````
 
-- `_tag` tells us that this storage is that of a map, not a plain entry (standalone value).
+- `type` tells us that this storage is that of a map, not a plain entry (standalone value).
 - `key` tells us what type of value we need to use as the key for indexing into the map.
 - `value` tells us what we can expect to retrieve from the map.
 
-Let's index into `metadata.types` with the specified key (`0`).
+Let's index into `metadata.tys` with the specified key (`0`).
 
 ```ts
-const keyType = metadata.types[accountsStorage.key];
+const keyType = metadata.tys[accountsStorage.key];
 ```
 
 `keyType` should evaluate to something along the lines of:
@@ -100,13 +100,13 @@ const keyType = metadata.types[accountsStorage.key];
   i: 0,
   path: ["sp_core", "crypto", "AccountId32"],
   params: [],
-  _tag: "Struct",
-  fields: [{ name: undefined, type: 1, typeName: "[u8; 32]", docs: [] }],
+  type: "Struct",
+  fields: [{ name: undefined, ty: 1, typeName: "[u8; 32]", docs: [] }],
   docs: [],
 };
 ```
 
-If we index again into `metadata.types` with `1` (as specified in the first field), we'll see the inner types (in this case a 32-element tuple of `u8`s). From these descriptions, we can roughly deduce the JS equivalent.
+If we index again into `metadata.tys` with `1` (as specified in the first field), we'll see the inner types (in this case a 32-element tuple of `u8`s). From these descriptions, we can roughly deduce the JS equivalent.
 
 ```ts
 namespace sp_core {
@@ -142,10 +142,10 @@ const account = await accounts.get(key).read();
 
 What value does this retrieve? How can we deduce this from the FRAME metadata?
 
-We can do the same as before, but this time index into `metadata.types` with the `accountsStorage.value`.
+We can do the same as before, but this time index into `metadata.tys` with the `accountsStorage.value`.
 
 ```ts
-const valueType = metadata.types[accountsStorage.value];
+const valueType = metadata.tys[accountsStorage.value];
 ```
 
 This should give us something along the following lines:
@@ -154,19 +154,19 @@ This should give us something along the following lines:
 {
   i: 5,
   path: ["pallet_balances", "AccountData"],
-  params: [{ name: "Balance", type: 6 }],
-  _tag: "Struct",
+  params: [{ name: "Balance", ty: 6 }],
+  type: "Struct",
   fields: [
-    { name: "free", type: 6, typeName: "Balance", docs: [] },
-    { name: "reserved", type: 6, typeName: "Balance", docs: [] },
-    { name: "misc_frozen", type: 6, typeName: "Balance", docs: [] },
-    { name: "fee_frozen", type: 6, typeName: "Balance", docs: [] },
+    { name: "free", ty: 6, typeName: "Balance", docs: [] },
+    { name: "reserved", ty: 6, typeName: "Balance", docs: [] },
+    { name: "misc_frozen", ty: 6, typeName: "Balance", docs: [] },
+    { name: "fee_frozen", ty: 6, typeName: "Balance", docs: [] },
   ],
   docs: [],
 };
 ```
 
-When we follow type `6` (metadata.types[6]), we see that it represents a `u128`. In TypeScript, this translates to a `bigint`. Therefore, the complete JS-land structure looks as follows.
+When we follow type `6` (metadata.tys[6]), we see that it represents a `u128`. In TypeScript, this translates to a `bigint`. Therefore, the complete JS-land structure looks as follows.
 
 ```ts
 namespace pallet_balances {
@@ -191,7 +191,7 @@ namespace pallet_balances {
 </tr>
 <tr>
 <td>
-    
+
 ```rs
 type T0 = ();
 type T1 = (A,);
@@ -240,7 +240,7 @@ type S0 = null;
 type S1 = A;
 type S2 = [A, B];
 type S3 = { a: A };
-                                                
+
 type E0 = (
   | "A"
   | "B"
@@ -248,10 +248,10 @@ type E0 = (
 );
 
 type E1 = (
-  | { _tag: "A" }
-  | { _tag: "B", value: C }
-  | { _tag: "D", value: [E, F] }
-  | { _tag: "G", h: H }
+  | { type: "A" }
+  | { type: "B"; value: C }
+  | { type: "D"; value: [E, F] }
+  | { type: "G"; h: H }
 );
 ```
 
