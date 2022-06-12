@@ -1,1 +1,2 @@
 {"rule":"EN_A_VS_AN","sentence":"^\\QWe can utilize an \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q check to narrow the \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q before accessing the read value.\\E$"}
+{"rule":"UPPERCASE_SENTENCE_START","sentence":"^\\Qcapi.dev\\E$"}
