@@ -1,0 +1,9 @@
+name: Formatting
+on: push
+jobs:
+  check:
+    name: Check Formatting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dprint/check@v2.0
