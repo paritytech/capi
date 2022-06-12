@@ -1,5 +1,5 @@
-import { effector } from "../../impl/mod.ts";
 import * as M from "../../../frame_metadata/mod.ts";
+import { effector } from "../../impl/mod.ts";
 
 // TODO: move into `frame_metadata`
 export class MetadataDecodeError extends Error {}

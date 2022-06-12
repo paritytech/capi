@@ -1,7 +1,6 @@
 export type ValueOf<T> = T[keyof T];
 
-export type U2I<T> = (T extends any ? (x: T) => any : never) extends
-  (x: infer R) => any ? R
+export type U2I<T> = (T extends any ? (x: T) => any : never) extends (x: infer R) => any ? R
   : never;
 
 // Sometimes, the checker isn't wise enough, and we must summon dark forces.

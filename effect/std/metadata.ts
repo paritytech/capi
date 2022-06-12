@@ -1,9 +1,9 @@
+import { RpcClient } from "../../rpc/Base.ts";
+import * as U from "../../util/mod.ts";
 import { effector, EffectorItem } from "../impl/mod.ts";
 import { metadataDecoded } from "./atoms/metadataDecoded.ts";
 import { select } from "./atoms/select.ts";
 import { rpcCall } from "./rpcCall.ts";
-import { RpcClient } from "../../rpc/Base.ts";
-import * as U from "../../util/mod.ts";
 
 export const metadata = effector(
   "metadata",
