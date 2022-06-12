@@ -40,7 +40,6 @@
     "example:events": "deno run -A --no-check examples/events.ts",
     "example:rpc_call": "deno run -A --no-check examples/rpc_call.ts",
     "example:first_ten_keys": "deno run -A --no-check examples/first_ten_keys.ts",
-    "example:key_codec": "deno run -A --no-check examples/key_codec.ts",
     "test": "deno test -A --no-check=remote -L=info",
     "update_snapshots": "deno test -A --no-check=remote -L=info -- --update",
     "watch_mdbook": "mdbook watch -o"
