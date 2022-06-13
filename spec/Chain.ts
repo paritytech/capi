@@ -1,4 +1,3 @@
-import * as $ from "../_deps/scale.ts";
 import * as B from "../branded.ts";
 import { Block } from "./Block.ts";
 import { Metadata } from "./Metadata.ts";
@@ -16,6 +15,10 @@ export class Chain extends NodeBase {
 
   metadata(block?: Block): Metadata {
     return new Metadata(this, block);
+  }
+
+  block(hash?: B.HashHexString): Block {
+    return new Block(this, hash);
   }
 
   pallet(name: string): Pallet {

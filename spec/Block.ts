@@ -8,7 +8,7 @@ export class Block extends NodeBase {
 
   constructor(
     readonly chain: Chain,
-    readonly hash: HashHexString,
+    readonly hash?: HashHexString,
   ) {
     super();
   }
