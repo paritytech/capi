@@ -214,20 +214,16 @@ Make sure you have the following installed on your machine (and please submit is
 - [Wasm Bindgen](https://rustwasm.github.io/wasm-bindgen/reference/cli.html)
 - [Binaryen](https://github.com/WebAssembly/binaryen)
 
-### Bootstrapping
-
-After cloning the repository, CD into it and execute the following.
-
-```sh
-deno task bootstrap
-```
-
 ### Running an Example
 
-After running the bootstrap script, you should be able to run any of the examples.
+```sh
+deno task run <path-to-example>
+```
+
+### Building Wasm & Its Corresponding JS Bindings
 
 ```sh
-deno task example:balances
+deno task build:wasm
 ```
 
 ### Utilizing the Package in a NodeJS Project
@@ -235,10 +231,10 @@ deno task example:balances
 Build the NPM package and link it locally.
 
 ```sh
-deno task build_npm_pkg && cd target/npm && npm link
+deno task build:npm_pkg && cd target/npm && npm link
 ```
 
-From the project in which you wish to use Capi...
+Then link to Capi from your NodeJS project.
 
 ```ts
 npm link capi
