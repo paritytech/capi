@@ -1,10 +1,10 @@
-import * as B from "../branded.ts";
+import * as U from "../util/mod.ts";
 import { Block } from "./Block.ts";
 import { Metadata } from "./Metadata.ts";
 import { NodeBase, NodeKind } from "./Node.ts";
 import { Pallet } from "./Pallet.ts";
 
-export type Beacon = B.WsUrlString | B.ChainSpecString;
+export type Beacon = U.WsUrlString | U.ChainSpecString;
 
 export class Chain extends NodeBase {
   readonly kind = NodeKind.Chain;
@@ -17,7 +17,7 @@ export class Chain extends NodeBase {
     return new Metadata(this, block);
   }
 
-  block(hash?: B.HashHexString): Block {
+  block(hash?: U.HashHexString): Block {
     return new Block(this, hash);
   }
 

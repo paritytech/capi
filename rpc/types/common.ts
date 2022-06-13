@@ -1,23 +1,23 @@
-import * as B from "../../branded.ts";
+import * as U from "../../util/mod.ts";
 
 export interface Block {
   block: {
     header: Header;
-    extrinsics: B.HexString[];
+    extrinsics: U.HexString[];
   };
   justifications?: [number[], number[]][];
 }
 
 export interface HeaderDigest {
-  logs: B.HexString[];
+  logs: U.HexString[];
 }
 
 export interface Header {
   digest: HeaderDigest;
-  extrinsicsRoot: B.HashHexString;
-  number: B.HexU64String;
-  parentHash: B.HashHexString;
-  stateRoot: B.HashHexString;
+  extrinsicsRoot: U.HashHexString;
+  number: U.HexU64String;
+  parentHash: U.HashHexString;
+  stateRoot: U.HashHexString;
 }
 
 export interface RuntimeVersion {
@@ -28,12 +28,12 @@ export interface RuntimeVersion {
   implVersion: number;
   transactionVersion?: number;
   stateVersion?: number;
-  apis: [B.HexString, number][];
+  apis: [U.HexString, number][];
 }
 
 export interface StorageChangeSet {
-  block: B.HashHexString;
-  changes: [B.HexString, B.HexString | undefined][];
+  block: U.HashHexString;
+  changes: [U.HexString, U.HexString | undefined][];
 }
 
 export interface SystemHealth {
@@ -50,7 +50,7 @@ export type SystemPeerRole =
 export interface SystemPeer {
   peerId: string;
   roles: SystemPeerRole;
-  bestHash: B.HashHexString;
+  bestHash: U.HashHexString;
   bestNumber: number;
 }
 

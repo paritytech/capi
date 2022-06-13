@@ -1,4 +1,4 @@
-import { HashHexString } from "../branded.ts";
+import { HashHexString } from "../util/mod.ts";
 import { Chain } from "./Chain.ts";
 import { NodeBase, NodeKind } from "./Node.ts";
 import { Read } from "./Read.ts";

@@ -1,4 +1,4 @@
-import * as B from "../../branded.ts";
+import * as U from "../../util/mod.ts";
 import { effector } from "../impl/mod.ts";
 import { deriveCodec } from "./atoms/deriveCodec.ts";
 import { entryKey } from "./atoms/entryKey.ts";
@@ -15,7 +15,7 @@ import { rpcCall } from "./rpcCall.ts";
 export const mapKeys = effector.async(
   "mapKeys",
   () =>
-    (map: Map, count?: number, startKey?: B.HashHexString) => {
+    (map: Map, count?: number, startKey?: U.HashHexString) => {
       const metadata_ = metadata(map.pallet.rpc);
       const metadataLookup_ = metadataLookup(metadata_);
       const deriveCodec_ = deriveCodec(metadata_);
