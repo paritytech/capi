@@ -9,30 +9,35 @@ import { StorageMap } from "./StorageMap.ts";
 
 export * from "./Block.ts";
 export * from "./Chain.ts";
+export * from "./Extrinsic.ts";
+export * from "./ExtrinsicFactory.ts";
 export * from "./Metadata.ts";
 export * from "./Pallet.ts";
 export * from "./StorageItem.ts";
 export * from "./StorageMap.ts";
+export * from "./StorageMapKeysPage.ts";
 
 class _TODO extends NodeBase {
   readonly kind = undefined!;
 }
 
 type NodeLookup = EnsureLookup<NodeKind, NodeBase, {
-  Chain: Chain;
   Access: _TODO;
-  Metadata: Metadata;
   Block: Block;
+  Chain: Chain;
   Event: _TODO;
+  Extrinsic: _TODO;
+  ExtrinsicFactory: _TODO;
+  Metadata: Metadata;
   Pallet: Pallet;
   Read: _TODO;
+  SignedExtrinsic: _TODO;
   StorageItem: StorageItem;
   StorageMap: StorageMap;
-  StorageMapKey: _TODO;
+  StorageMapKeysPage: _TODO;
   StorageMapValue: _TODO;
   StoragePath: _TODO;
   Subscribe: _TODO;
-  Transaction: _TODO;
 }>;
 
 export type Node<Kind extends NodeKind = NodeKind> = NodeLookup[Kind];

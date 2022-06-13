@@ -1,3 +1,4 @@
+import * as $ from "../_deps/scale.ts";
 import * as B from "../branded.ts";
 import { Block } from "./Block.ts";
 import { Metadata } from "./Metadata.ts";
