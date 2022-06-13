@@ -223,7 +223,7 @@ deno task run <path-to-example>
 ### Building Wasm & Its Corresponding JS Bindings
 
 ```sh
-deno task build_wasm
+deno task build:wasm
 ```
 
 ### Utilizing the Package in a NodeJS Project
