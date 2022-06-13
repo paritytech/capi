@@ -1,4 +1,4 @@
-import * as U from "../../../../util/mod.ts";
+import * as B from "../../../../branded.ts";
 
 export type ChainHeadUnstableFollowEvent =
   | ChainHeadUnstableFollowInitializedEvent
@@ -21,29 +21,29 @@ interface ChainHeadUnstableFollowEventBase<Kind extends ChainHeadUnstableFollowE
 export interface ChainHeadUnstableFollowInitializedEvent
   extends ChainHeadUnstableFollowEventBase<"initialized">
 {
-  finalizedBlockHash: U.HashHexString;
+  finalizedBlockHash: B.HashHexString;
   finalizedBlockRuntime: string;
 }
 
 export interface ChainHeadUnstableFollowNewBlockEvent
   extends ChainHeadUnstableFollowEventBase<"newBlock">
 {
-  blockHash: U.HashHexString;
-  parentBlockHash: U.HashHexString;
+  blockHash: B.HashHexString;
+  parentBlockHash: B.HashHexString;
   newRuntime: null; // TODO
 }
 
 export interface ChainHeadUnstableFollowBestBlockChangedEvent
   extends ChainHeadUnstableFollowEventBase<"bestBlockChanged">
 {
-  bestBlockHash: U.HashHexString;
+  bestBlockHash: B.HashHexString;
 }
 
 export interface ChainHeadUnstableFollowFinalizedEvent
   extends ChainHeadUnstableFollowEventBase<"finalized">
 {
-  finalizedBlocksHashes: U.HashHexString[];
-  prunedBlocksHashes: U.HashHexString[];
+  finalizedBlocksHashes: B.HashHexString[];
+  prunedBlocksHashes: B.HashHexString[];
 }
 
 export type ChainHeadUnstableFollowStopEvent = ChainHeadUnstableFollowEventBase<"stop">;

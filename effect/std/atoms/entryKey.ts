@@ -1,4 +1,5 @@
 import { getHashers } from "../../../bindings/mod.ts";
+import * as B from "../../../branded.ts";
 import * as M from "../../../frame_metadata/mod.ts";
 import * as U from "../../../util/mod.ts";
 import { effector } from "../../impl/mod.ts";
@@ -19,6 +20,6 @@ export const entryKey = effector.async(
           deriveCodec,
           storageEntry: entryMetadata,
         }).encode(key),
-      ) as U.HexString;
+      ) as B.HexString;
     },
 );
