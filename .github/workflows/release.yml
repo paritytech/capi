@@ -21,7 +21,7 @@ jobs:
           node-version: "16.x"
           registry-url: "https://registry.npmjs.org"
       - name: Build NPM Package
-        run: deno run -A --no-check=remote ./_tasks/build_npm_pkg.ts ${{steps.get_tag_version.outputs.TAG_VERSION}}
+        run: deno task build:npm_pkg ${{steps.get_tag_version.outputs.TAG_VERSION}}
       - name: Publish NPM Package
         if: startsWith(github.ref, 'refs/tags/')
         env:

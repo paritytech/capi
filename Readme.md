@@ -231,7 +231,7 @@ deno task build:wasm
 Build the NPM package and link it locally.
 
 ```sh
-deno task build_npm_pkg && cd target/npm && npm link
+deno task build:npm_pkg && cd target/npm && npm link
 ```
 
 Then link to Capi from your NodeJS project.

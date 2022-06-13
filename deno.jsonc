@@ -25,18 +25,17 @@
   "include": ["."],
   "tasks": {
     "run": "deno run -A --no-check=remote",
-    "download_frame_metadata": "deno task run _tasks/download_frame_metadata.ts",
+    "download:frame_metadata": "deno task run _tasks/download_frame_metadata.ts",
     "build:_wasm": "deno task run --unstable _tasks/build_wasm.ts --out",
-    "build:hashers_wasm": "deno task build:_wasm bindings/hashers --features hashers",
-    "build:sr25519_wasm": "deno task build:_wasm bindings/sr25519 --features sr25519",
-    "build:ss58_wasm": "deno task build:_wasm bindings/ss58 --features ss58",
-    "build:wasm": "deno task build:hashers_wasm && deno task build:sr25519_wasm && deno task build:ss58_wasm",
+    "build:wasm:hashers": "deno task build:_wasm bindings/hashers --features hashers",
+    "build:wasm:sr25519": "deno task build:_wasm bindings/sr25519 --features sr25519",
+    "build:wasm:ss58": "deno task build:_wasm bindings/ss58 --features ss58",
+    "build:wasm": "deno task build:wasm:hashers && deno task build:wasm:sr25519 && deno task build:wasm:ss58",
+    "build:npm_pkg": "deno task run _tasks/build_npm_pkg.ts",
     "star": "deno task run _tasks/star.ts && deno cache --no-check=remote _star.ts",
-    "build_npm_pkg": "deno task run _tasks/build_npm_pkg.ts",
     "lock": "deno task star --lock=lock.json --lock-write",
-    "test": "deno test -A --no-check=remote -L=info",
-    "test_update": "deno task test -- -- --update",
-    "update_snapshots": "deno test -A --no-check=remote -L=info -- --update",
+    "test": "deno test -A --no-check=remote -L=info --ignore=target",
+    "test:update": "deno task test -- -- --update",
     "watch_mdbook": "mdbook watch -o"
   }
 }
