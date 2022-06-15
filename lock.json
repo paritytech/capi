@@ -197,5 +197,9 @@
   "https://deno.land/x/ts_morph@14.0.0/common/typescript.js": "d6b532a181b94359894da7559663d7430396c8b4a5d8ed436601dc46ba542ee9",
   "https://deno.land/x/wasmbuild@0.5.0/lib/wasmbuild.generated.js": "4eafff10cd9d5124709d814dd7f56ee5128be45cef9ca1c181433451ef350784",
   "https://deno.land/x/wasmbuild@0.5.0/main.ts": "e6ed86b16c15dd6e02ad393df0a97dd94f07aaaebf73d30ae6467fd1d6a3bcd8",
-  "https://deno.land/x/wasmbuild@0.5.0/manifest.ts": "9e4c0bcee41104c5cec3e8bd16f928e853f66a0f095316a2a2d9c8d06bf51186"
+  "https://deno.land/x/wasmbuild@0.5.0/manifest.ts": "9e4c0bcee41104c5cec3e8bd16f928e853f66a0f095316a2a2d9c8d06bf51186",
+  "https://esm.sh/@substrate/smoldot-light@0.6.19": "4bc3ce81642a0c6024f77965904a7f1184c69e6367aa1ec0c1fb148bf3dd7eb5",
+  "https://esm.sh/v86/@substrate/smoldot-light@0.6.19/deno/smoldot-light.js": "87d22a7a3cc4b804aa7cf7996fe61ecaf15f30bda619033a77f28f2f73f94e93",
+  "https://esm.sh/v86/@substrate/smoldot-light@0.6.19/dist/client.d.ts": "4e99d2a67444b585551feaa8956b39deeaeff0344015e44758e005299540174c",
+  "https://esm.sh/v86/@substrate/smoldot-light@0.6.19/dist/index.d.ts": "9785b85de9701f060c646ef6c6fd970e9b489dd184de8eb880951999cc0eade9"
 }
