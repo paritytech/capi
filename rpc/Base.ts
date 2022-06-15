@@ -72,7 +72,7 @@ export abstract class RpcClient<RpcError extends E.RpcError> {
   call = async <Method extends M.MethodName>(
     method: Method,
     params: M.InitMessageByMethodName[Method]["params"],
-  ): Promise<M.OkMessage<Method> | M.ErrMessage> => {
+  ): Promise<M.OkMessage<Method> | E.RpcServerError> => {
     const init = <M.InitMessage<Method>> {
       jsonrpc: "2.0",
       id: this.uid(),
@@ -80,10 +80,14 @@ export abstract class RpcClient<RpcError extends E.RpcError> {
       params,
     };
     const isCorrespondingRes = IsCorrespondingRes(init);
-    const pending = deferred<M.OkMessage<Method> | M.ErrMessage>();
+    const pending = deferred<M.OkMessage<Method> | E.RpcServerError>();
     const stopListening = this.listen((res) => {
       if (isCorrespondingRes(res)) {
-        pending.resolve(res);
+        if (res.error) {
+          pending.resolve(new E.RpcServerError(res));
+        } else {
+          pending.resolve(res);
+        }
       }
     });
     this.send(init);
@@ -104,7 +108,7 @@ export abstract class RpcClient<RpcError extends E.RpcError> {
     listenerCb: ListenerCb<M.NotifMessage<Method>>,
   ): Promise<StopListening> => {
     const initRes = await this.call(method, params);
-    if (initRes.error) {
+    if (initRes instanceof E.RpcServerError) {
       throw initRes;
     }
     const stopListening = this.listen((res) => {
