@@ -15,6 +15,12 @@ await Promise.all([
         name: "parity-scale-codec",
         version: "^0.2.1",
       },
+      "https://esm.sh/@substrate/smoldot-light@0.6.19": {
+        name: "@substrate/smoldot-light",
+        version: "^0.6.19",
+        // TODO: enable this flag upon resolution of https://github.com/denoland/dnt/issues/137
+        // peerDependency: true,
+      },
     },
     package: {
       name: "capi",
