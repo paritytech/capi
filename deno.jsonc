@@ -3,8 +3,10 @@
     "checkJs": false,
     "experimentalDecorators": false,
     "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
     "noImplicitReturns": true,
-    "noUncheckedIndexedAccess": true
+    "noUncheckedIndexedAccess": true,
+    "useUnknownInCatchVariables": true
   },
   "lint": {
     "files": {
