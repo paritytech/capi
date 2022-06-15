@@ -1,27 +1,21 @@
 import { deferred } from "../_deps/async.ts";
-import { ListenerCb, RpcClient, RpcClientFactory, StopListening } from "./Base.ts";
-import { InitMessage } from "./messages.ts";
+import { RpcClient, RpcClientFactory } from "./Base.ts";
+import { RpcClientError } from "./Error.ts";
+import { IngressMessage, InitMessage } from "./messages.ts";
 
-export const wsRpcClient: RpcClientFactory<string> = async (url) => {
-  const rpcClient = new WsRpcClient(url);
-  await rpcClient.opening();
-  return rpcClient;
-};
-
-export class WsRpcClient extends RpcClient {
+export class WsRpcClient extends RpcClient<WsRpcClientError> {
   #ws;
-  #listeners = new Map<ListenerCb, boolean>();
 
   constructor(readonly url: string) {
     super();
     this.#ws = new WebSocket(url);
-    this.#ws.addEventListener("error", this.#onError);
-    this.#ws.addEventListener("message", this.#onMessage);
+    this.#ws.addEventListener("error", this.onError);
+    this.#ws.addEventListener("message", this.onMessage);
   }
 
   opening = (): Promise<void> => {
+    const pending = deferred<void>();
     if (this.#ws.readyState === WebSocket.CONNECTING) {
-      const pending = deferred<void>();
       const onOpenError = () => {
         clearListeners();
         pending.reject();
@@ -36,16 +30,17 @@ export class WsRpcClient extends RpcClient {
       };
       this.#ws.addEventListener("error", onOpenError);
       this.#ws.addEventListener("open", onOpen);
-      return pending;
+    } else {
+      pending.resolve();
     }
-    return Promise.resolve();
+    return pending;
   };
 
   close = async (): Promise<void> => {
     const pending = deferred<void>();
     const onClose = () => {
-      this.#ws.removeEventListener("error", this.#onError);
-      this.#ws.removeEventListener("message", this.#onMessage);
+      this.#ws.removeEventListener("error", this.onError);
+      this.#ws.removeEventListener("message", this.onMessage);
       this.#ws.removeEventListener("close", onClose);
       pending.resolve();
     };
@@ -54,52 +49,39 @@ export class WsRpcClient extends RpcClient {
     return pending;
   };
 
-  listen = (listener: ListenerCb): StopListening => {
-    if (this.#listeners.has(listener)) {
-      throw new WsRpcClientRegisteredListenerTwiceError(listener);
-    }
-    this.#listeners.set(listener, true);
-    return () => {
-      this.#listeners.delete(listener);
-    };
-  };
-
   send = (egressMessage: InitMessage): void => {
     this.#ws.send(JSON.stringify(egressMessage));
   };
 
-  #onError = (e: Event) => {
-    throw new WsRpcClientServerError(e);
+  parseMessage = (e: unknown): IngressMessage => {
+    if (
+      typeof e !== "object"
+      || e === null
+      || !("data" in e)
+      || typeof (e as { data?: string }).data !== "string"
+    ) {
+      throw new WsRpcClientError.FailedToParse();
+    }
+    return JSON.parse((e as { data: string }).data);
   };
 
-  #onMessage = (e: MessageEvent) => {
-    if (typeof e.data !== "string") {
-      throw new WsRpcClientNoDataError(e);
-    }
-    const parsed = JSON.parse(e.data);
-    for (const listener of this.#listeners.keys()) {
-      listener(parsed);
-    }
+  // TODO: provide insight into error via `_e`
+  parseError = (_e: Event): WsRpcClientError => {
+    return new WsRpcClientError.WsError();
   };
 }
 
 export type WsRpcClientError =
-  | WsRpcClientServerError
-  | WsRpcClientRegisteredListenerTwiceError
-  | WsRpcClientNoDataError;
+  | WsRpcClientError.FailedToInitialize
+  | WsRpcClientError.FailedToParse;
+export namespace WsRpcClientError {
+  export class FailedToInitialize extends RpcClientError {}
+  export class FailedToParse extends RpcClientError {}
+  export class WsError extends RpcClientError {}
+}
 
-export class WsRpcClientServerError extends Error {
-  constructor(readonly event: Event) {
-    super();
-  }
-}
-export class WsRpcClientRegisteredListenerTwiceError extends Error {
-  constructor(readonly listener: ListenerCb) {
-    super();
-  }
-}
-export class WsRpcClientNoDataError extends Error {
-  constructor(readonly event: Event) {
-    super();
-  }
-}
+export const wsRpcClient: RpcClientFactory<string, WsRpcClientError> = async (url) => {
+  const rpcClient = new WsRpcClient(url);
+  await rpcClient.opening();
+  return rpcClient;
+};
