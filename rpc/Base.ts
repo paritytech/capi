@@ -14,7 +14,7 @@ export abstract class RpcClient<RpcError extends E.RpcError> {
   listeners = new Map<ListenerCb, boolean>();
   #errors: RpcError[] = [];
 
-  /** Send a message to the RPC server without
+  /** Send a message to the RPC server
    * @param egressMessage the message you wish to send to the RPC server */
   abstract send: (egressMessage: M.InitMessage) => void;
 
