@@ -18,6 +18,9 @@ export type Hash<T = unknown, K extends HasherKind = HasherKind> = Branded<
 export type HexEncoded<T> = Hex<Encoded<T>>;
 export type HexHash<T = unknown, K extends HasherKind = HasherKind> = Hex<Hash<T, K>>;
 
+declare const _u64: unique symbol;
+export type U64 = Branded<number, typeof _u64>;
+
 // export const HexStringBrand: unique symbol = Symbol();
 // export type HexStringBrand = typeof HexStringBrand;
 // export type HexString = Branded<string, HexStringBrand>;

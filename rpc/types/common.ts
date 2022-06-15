@@ -15,7 +15,7 @@ export interface HeaderDigest {
 export interface Header {
   digest: HeaderDigest;
   extrinsicsRoot: U.HexHash;
-  number: U.HexEncoded<number>;
+  number: U.U64;
   parentHash: U.HexHash;
   stateRoot: U.HexHash;
 }
