@@ -17,6 +17,7 @@ all = ["hashers", "sr25519", "ss58"]
 
 [dependencies]
 base58 = { version = "0.2.0" }
+blake2 = "0.10.4"
 console_error_panic_hook = { version = "0.1.7", optional = true }
 frame-support = { version = "3.0.0" }
 getrandom = { version = "0.2.5", features = ["js"] }
@@ -26,6 +27,7 @@ paste = { version = "1.0.6" }
 schnorrkel = { version = "0.10.2" }
 sp-core = { version = "*" } # TODO: why `*`?
 sp-core-hashing = { version = "4.0.0" }
+
 wasm-bindgen = { version = "0.2.80" }
 wee_alloc = { version = "0.4.5" }
 
