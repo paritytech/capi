@@ -18,7 +18,7 @@ for (let i = 0; i < ss58Registry.length; i++) {
   website: "${current.website}";
 }`;
 }
-
+generated += ";";
 const dest = path.join(Deno.cwd(), "bindings/ss58/registry.ts");
 console.log(`Writing "registry" file to "${dest}".`);
 await Deno.writeTextFile(dest, generated);

@@ -799,4 +799,4 @@ export type Ss58Registry = {
   decimals: [12];
   standardAccount: "*25519";
   website: "https://nftmart.io";
-}
+};
