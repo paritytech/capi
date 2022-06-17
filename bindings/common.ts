@@ -1,6 +1,6 @@
 /** A simple wrapper around wasm-bindgen-produced functions, which captures thrown values
  * (the `E`s (string literals) of `Result<T, E>`s) and instantiates an error type with them.
- * This helpers also enables us to narrow the fn types without `as`ing it. Use wisely!
+ * This helper also enables us to narrow the fn types without `as`ing it. Use wisely!
  * @param fn the initialized binding
  * @param errorCtor a constructor that accepts a string (reason for the binding call's failure)
  * and produces an error instance. If not supplied, the `WasmError` constructor will be used. */

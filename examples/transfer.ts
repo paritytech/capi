@@ -58,15 +58,3 @@ console.log({ encoded });
 console.log({ decoded: $extrinsic.decode(encoded) });
 
 await client.close();
-
-//
-
-// const e = await C
-//   .polkadot()
-//   .pallet("Balances")
-//   .extrinsic("transfer")
-//   .call({ dest, value: 42 })
-//   .signed(from, signingFn)
-//   .send();
-// await e.cancelation().send();
-// `ExtrinsicCancelation<Sent<Signed<Extrinsic>>>`
