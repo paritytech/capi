@@ -12,7 +12,7 @@ for (let i = 0; i < ss58Registry.length; i++) {
   prefix: ${current.prefix};
   network: "${current.network}";
   displayName: "${current.displayName}";
-  symbols: [${current.symbols.map((s) => `"${s}"`)}];
+  symbols: [${current.symbols.map((s) => `"${s}"`).join(", ")}];
   decimals: [${current.decimals.join(", ")}];
   standardAccount: "${current.standardAccount}";
   website: "${current.website}";

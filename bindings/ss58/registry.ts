@@ -147,7 +147,7 @@ export type Ss58Registry = {
   prefix: 18;
   network: "darwinia";
   displayName: "Darwinia Network";
-  symbols: ["RING","KTON"];
+  symbols: ["RING", "KTON"];
   decimals: [9, 9];
   standardAccount: "*25519";
   website: "https://darwinia.network/";
@@ -219,7 +219,7 @@ export type Ss58Registry = {
   prefix: 29;
   network: "cord";
   displayName: "CORD Network";
-  symbols: ["DHI","WAY"];
+  symbols: ["DHI", "WAY"];
   decimals: [12, 12];
   standardAccount: "*25519";
   website: "https://cord.network/";
@@ -347,7 +347,7 @@ export type Ss58Registry = {
   prefix: 45;
   network: "uniarts";
   displayName: "UniArts Network";
-  symbols: ["UART","UINK"];
+  symbols: ["UART", "UINK"];
   decimals: [12, 12];
   standardAccount: "*25519";
   website: "https://uniarts.me";
@@ -459,7 +459,7 @@ export type Ss58Registry = {
   prefix: 67;
   network: "genshiro";
   displayName: "Genshiro Network";
-  symbols: ["GENS","EQD","LPT0"];
+  symbols: ["GENS", "EQD", "LPT0"];
   decimals: [9, 9, 9];
   standardAccount: "*25519";
   website: "https://genshiro.equilibrium.io";
