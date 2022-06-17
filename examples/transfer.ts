@@ -1,40 +1,48 @@
-import "../_deps/load_dotenv.ts";
+import * as asserts from "../_deps/asserts.ts";
 import { Hashers, Sr25519 } from "../bindings/mod.ts";
 import * as C from "../mod.ts";
-import * as hex from "../util/hex.ts";
+import * as U from "../util/mod.ts";
 
-const sr25519 = await Sr25519();
+const env = U.loadEnv({
+  FROM_PUBLIC_KEY: U.hex.decode,
+  FROM_SECRET_KEY: U.hex.decode,
+  TO_PUBLIC_KEY: U.hex.decode,
+});
 
-// For a local dev chain
-// TODO: swap out with Deno.env usage
-const SECRET_SEED_TEXT = "2df317d6d3b060d9cef6999f592a4a4a3acfb7212a77172d8fcdf8a08f3bf120";
-const pair = sr25519.Pair.fromSecretSeed(hex.decode(SECRET_SEED_TEXT));
+const [client, sr25519, hashers] = await Promise.all([
+  C.wsRpcClient(C.WESTEND_RPC_URL),
+  Sr25519(),
+  Hashers(),
+]);
 
-const client = await C.wsRpcClient(C.WESTEND_RPC_URL);
 const metadataRaw = await client.call("state_getMetadata", []);
-if (metadataRaw instanceof Error) {
-  throw metadataRaw;
-}
+asserts.assert(!(metadataRaw instanceof Error));
 const metadata = C.M.fromPrefixedHex(metadataRaw.result);
 const deriveCodec = C.M.DeriveCodec(metadata);
 
-const dest = new C.MultiAddress(
-  "Id",
-  hex.decode("8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48"),
-);
-const genesisHash = hex.decode("c5c2beaf81f8833d2ddcfe0c04b0612d16f0d08d67aa5032dde065ddf71b4ed1");
+const signer = sr25519
+  .PublicKey.from(env.FROM_PUBLIC_KEY)
+  .signer(env.FROM_SECRET_KEY);
 
 const $extrinsic = C.M.$extrinsic({
   metadata,
   deriveCodec,
-  hashers: await Hashers(),
-  sign: (message) => new C.Sr25519Signature(pair.sign(message)),
+  hashers,
+  sign: (message) => new C.Sr25519Signature(signer.sign(message)),
 });
+
+const from = new C.MultiAddress("Id", env.FROM_PUBLIC_KEY);
+const dest = new C.MultiAddress("Id", env.TO_PUBLIC_KEY);
+
+// TODO: get this from the RPC node
+const genesisHash = U.hex.decode(
+  "c5c2beaf81f8833d2ddcfe0c04b0612d16f0d08d67aa5032dde065ddf71b4ed1",
+);
 
 const extrinsic: C.M.Extrinsic = {
   protocolVersion: 4,
   signature: {
-    address: new C.MultiAddress("Address32", pair.pubKey),
+    address: from,
     extra: [
       /* era */ C.immortalEra,
       /* nonce */ 1000,

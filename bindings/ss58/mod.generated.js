@@ -25,15 +25,6 @@ function takeObject(idx) {
   return ret;
 }
 
-function addHeapObject(obj) {
-  if (heap_next === heap.length) heap.push(heap.length + 1);
-  const idx = heap_next;
-  heap_next = heap[idx];
-
-  heap[idx] = obj;
-  return idx;
-}
-
 const cachedTextDecoder = new TextDecoder("utf-8", {
   ignoreBOM: true,
   fatal: true,
@@ -51,6 +42,15 @@ function getUint8Memory0() {
 
 function getStringFromWasm0(ptr, len) {
   return cachedTextDecoder.decode(getUint8Memory0().subarray(ptr, ptr + len));
+}
+
+function addHeapObject(obj) {
+  if (heap_next === heap.length) heap.push(heap.length + 1);
+  const idx = heap_next;
+  heap_next = heap[idx];
+
+  heap[idx] = obj;
+  return idx;
 }
 
 let WASM_VECTOR_LEN = 0;
@@ -168,6 +168,10 @@ const imports = {
   __wbindgen_placeholder__: {
     __wbindgen_object_drop_ref: function (arg0) {
       takeObject(arg0);
+    },
+    __wbindgen_error_new: function (arg0, arg1) {
+      const ret = new Error(getStringFromWasm0(arg0, arg1));
+      return addHeapObject(ret);
     },
     __wbindgen_number_new: function (arg0) {
       const ret = arg0;

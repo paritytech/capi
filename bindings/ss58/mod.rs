@@ -11,20 +11,20 @@ const INVALID_LEN: &'static str = "InvalidLen";
 const INVALID_CHECKSUM: &'static str = "InvalidChecksum";
 
 #[wasm_bindgen]
-pub fn decode(text: &str) -> Result<Array, String> {
+pub fn decode(text: &str) -> Result<Array, JsError> {
   console_error_panic_hook::set_once();
   match text.from_base58() {
     Ok(addr) => {
       let len = addr.len();
       if !(35..=36).contains(&len) {
-        Err(INVALID_LEN.to_string())
+        Err(JsError::new(INVALID_LEN))
       } else {
         let checksum = &addr[len - 2..len];
         let mut hasher = Blake2b512::new();
         hasher.update(b"SS58PRE");
         hasher.update(&addr[0..len - 2]);
         if checksum != &hasher.finalize()[0..2] {
-          return Err(INVALID_CHECKSUM.to_string());
+          return Err(JsError::new(INVALID_CHECKSUM));
         }
         let key = hex::encode(&addr[len - 34..len - 2]);
         let prefix_buf = &addr[0..len - 34];
@@ -41,7 +41,7 @@ pub fn decode(text: &str) -> Result<Array, String> {
         Ok(result)
       }
     }
-    Err(_) => Err(BASE58_DECODING_FAILED.to_string()),
+    Err(_) => Err(JsError::new(BASE58_DECODING_FAILED)),
   }
 }
 
@@ -49,12 +49,12 @@ const HEX_DECODING_FAILED: &'static str = "HexDecodingFailed";
 const INVALID_PUB_KEY_LEN: &'static str = "InvalidPubKeyLen";
 
 #[wasm_bindgen]
-pub fn encode(prefix: u16, pub_key: &str) -> Result<String, String> {
+pub fn encode(prefix: u16, pub_key: &str) -> Result<String, JsError> {
   match hex::decode(pub_key) {
-    Err(_) => Err(HEX_DECODING_FAILED.to_string()),
+    Err(_) => Err(JsError::new(HEX_DECODING_FAILED)),
     Ok(mut raw_key) => {
       if raw_key.len() != 32 {
-        Err(INVALID_PUB_KEY_LEN.to_string())
+        Err(JsError::new(INVALID_PUB_KEY_LEN))
       } else {
         let mut hasher = Blake2b512::new();
         hasher.update(b"SS58PRE");
