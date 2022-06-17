@@ -1,8 +1,6 @@
 import * as M from "../../../frame_metadata/mod.ts";
 import { effector } from "../../impl/mod.ts";
 
-// TODO: MetadataLookupError from `frame_metadata`?
-
 export const metadataLookup = effector.sync("metadataLookup", () =>
   (metadata: M.Metadata) => {
     return new M.Lookup(metadata);

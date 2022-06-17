@@ -1,4 +1,4 @@
-// Much of the following is adapted from `https://github.com/shamilsan/ss58.org` (thank you!)
+// Much of the following is adapted from `https://github.com/shamilsan/ss58.org`
 use {
   base58::{FromBase58, ToBase58},
   blake2::{Blake2b512, Digest},
@@ -6,21 +6,17 @@ use {
   wasm_bindgen::prelude::*,
 };
 
-const SS58_MIN_LEN: usize = 35;
-const SS58_MAX_LEN: usize = 36;
-
 const BASE58_DECODING_FAILED: &'static str = "Base58DecodingFailed";
 const INVALID_LEN: &'static str = "InvalidLen";
 const INVALID_CHECKSUM: &'static str = "InvalidChecksum";
 
-#[wasm_bindgen(js_name = decodeSs58Text)]
-pub fn decode_ss58_text(text: &str) -> Result<Array, String> {
+#[wasm_bindgen]
+pub fn decode(text: &str) -> Result<Array, String> {
   console_error_panic_hook::set_once();
   match text.from_base58() {
     Ok(addr) => {
       let len = addr.len();
-      // TODO: is this correct?
-      if !(SS58_MIN_LEN..=SS58_MAX_LEN).contains(&len) {
+      if !(35..=36).contains(&len) {
         Err(INVALID_LEN.to_string())
       } else {
         let checksum = &addr[len - 2..len];
@@ -52,8 +48,8 @@ pub fn decode_ss58_text(text: &str) -> Result<Array, String> {
 const HEX_DECODING_FAILED: &'static str = "HexDecodingFailed";
 const INVALID_PUB_KEY_LEN: &'static str = "InvalidPubKeyLen";
 
-#[wasm_bindgen(js_name = encodeSs58Text)]
-pub fn encode_ss58_text(prefix: u16, pub_key: &str) -> Result<String, String> {
+#[wasm_bindgen]
+pub fn encode(prefix: u16, pub_key: &str) -> Result<String, String> {
   match hex::decode(pub_key) {
     Err(_) => Err(HEX_DECODING_FAILED.to_string()),
     Ok(mut raw_key) => {

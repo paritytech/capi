@@ -62,34 +62,6 @@ function passArray8ToWasm0(arg, malloc) {
   return ptr;
 }
 /**
- * @param {Uint8Array} bytes
- * @returns {Pair}
- */
-export function pairFromSecretSeed(bytes) {
-  const ptr0 = passArray8ToWasm0(bytes, wasm.__wbindgen_malloc);
-  const len0 = WASM_VECTOR_LEN;
-  const ret = wasm.pairFromSecretSeed(ptr0, len0);
-  return Pair.__wrap(ret);
-}
-
-/**
- * @param {Uint8Array} pub_key_bytes
- * @param {Uint8Array} secret_key_bytes
- * @param {Uint8Array} message
- * @returns {Uint8Array}
- */
-export function sign(pub_key_bytes, secret_key_bytes, message) {
-  const ptr0 = passArray8ToWasm0(pub_key_bytes, wasm.__wbindgen_malloc);
-  const len0 = WASM_VECTOR_LEN;
-  const ptr1 = passArray8ToWasm0(secret_key_bytes, wasm.__wbindgen_malloc);
-  const len1 = WASM_VECTOR_LEN;
-  const ptr2 = passArray8ToWasm0(message, wasm.__wbindgen_malloc);
-  const len2 = WASM_VECTOR_LEN;
-  const ret = wasm.sign(ptr0, len0, ptr1, len1, ptr2, len2);
-  return takeObject(ret);
-}
-
-/**
  * @param {Uint8Array} signature
  * @param {Uint8Array} message
  * @param {Uint8Array} pub_key
@@ -143,12 +115,12 @@ export class Pair {
   }
   /**
    * @param {Uint8Array} pub_key_bytes
-   * @param {Uint8Array} priv_key_bytes
+   * @param {Uint8Array} secret_key_bytes
    */
-  constructor(pub_key_bytes, priv_key_bytes) {
+  constructor(pub_key_bytes, secret_key_bytes) {
     const ptr0 = passArray8ToWasm0(pub_key_bytes, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passArray8ToWasm0(priv_key_bytes, wasm.__wbindgen_malloc);
+    const ptr1 = passArray8ToWasm0(secret_key_bytes, wasm.__wbindgen_malloc);
     const len1 = WASM_VECTOR_LEN;
     const ret = wasm.pair_new(ptr0, len0, ptr1, len1);
     return Pair.__wrap(ret);
@@ -165,6 +137,26 @@ export class Pair {
    */
   get secretKey() {
     const ret = wasm.pair_secretKey(this.ptr);
+    return takeObject(ret);
+  }
+  /**
+   * @param {Uint8Array} bytes
+   * @returns {Pair}
+   */
+  static fromSecretSeed(bytes) {
+    const ptr0 = passArray8ToWasm0(bytes, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.pair_fromSecretSeed(ptr0, len0);
+    return Pair.__wrap(ret);
+  }
+  /**
+   * @param {Uint8Array} message
+   * @returns {Uint8Array}
+   */
+  sign(message) {
+    const ptr0 = passArray8ToWasm0(message, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.pair_sign(this.ptr, ptr0, len0);
     return takeObject(ret);
   }
 }
@@ -324,7 +316,7 @@ let lastLoadPromise;
  * loaded it will always return a reference to the same object.
  * @returns {Promise<{
  *   instance: WebAssembly.Instance;
- *   exports: { pairFromSecretSeed: typeof pairFromSecretSeed; sign: typeof sign; verify: typeof verify; Pair : typeof Pair  }
+ *   exports: { verify: typeof verify; Pair : typeof Pair  }
  * }>}
  */
 export function instantiateWithInstance() {
@@ -340,7 +332,7 @@ export function instantiateWithInstance() {
         cachedUint8Memory0 = new Uint8Array(wasm.memory.buffer);
         instanceWithExports = {
           instance,
-          exports: { pairFromSecretSeed, sign, verify, Pair },
+          exports: { verify, Pair },
         };
         return instanceWithExports;
       } finally {

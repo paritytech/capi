@@ -15,5 +15,3 @@ export const rpcClient = effector.async.generic(
       >
     ) => effect(args, () => (factory, beacon) => factory(beacon)),
 );
-
-// TODO: cleanup

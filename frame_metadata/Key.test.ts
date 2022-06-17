@@ -1,12 +1,12 @@
 import * as asserts from "../_deps/asserts.ts";
-import { getHashers } from "../bindings/mod.ts";
+import { Hashers } from "../bindings/mod.ts";
 import * as U from "../util/mod.ts";
 import { $storageMapKey } from "./Key.ts";
 import * as M from "./Metadata.ts";
 import { accountId32, getLookupAndDeriveCodec } from "./test-util.ts";
 
 const { lookup, deriveCodec } = await getLookupAndDeriveCodec("polkadot");
-const hashers = await getHashers();
+const hashers = await Hashers();
 
 Deno.test("System Accounts Key", async () => {
   const pallet = lookup.getPalletByName("System");

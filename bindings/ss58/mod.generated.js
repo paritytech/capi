@@ -106,19 +106,19 @@ function getInt32Memory0() {
   return cachedInt32Memory0;
 }
 /**
- * @param {string} address
+ * @param {string} text
  * @returns {Array<any>}
  */
-export function decodeSs58Text(address) {
+export function decode(text) {
   try {
     const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
     const ptr0 = passStringToWasm0(
-      address,
+      text,
       wasm.__wbindgen_malloc,
       wasm.__wbindgen_realloc,
     );
     const len0 = WASM_VECTOR_LEN;
-    wasm.decodeSs58Text(retptr, ptr0, len0);
+    wasm.decode(retptr, ptr0, len0);
     var r0 = getInt32Memory0()[retptr / 4 + 0];
     var r1 = getInt32Memory0()[retptr / 4 + 1];
     var r2 = getInt32Memory0()[retptr / 4 + 2];
@@ -133,19 +133,19 @@ export function decodeSs58Text(address) {
 
 /**
  * @param {number} prefix
- * @param {string} key
+ * @param {string} pub_key
  * @returns {string}
  */
-export function encodeSs58Text(prefix, key) {
+export function encode(prefix, pub_key) {
   try {
     const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
     const ptr0 = passStringToWasm0(
-      key,
+      pub_key,
       wasm.__wbindgen_malloc,
       wasm.__wbindgen_realloc,
     );
     const len0 = WASM_VECTOR_LEN;
-    wasm.encodeSs58Text(retptr, prefix, ptr0, len0);
+    wasm.encode(retptr, prefix, ptr0, len0);
     var r0 = getInt32Memory0()[retptr / 4 + 0];
     var r1 = getInt32Memory0()[retptr / 4 + 1];
     var r2 = getInt32Memory0()[retptr / 4 + 2];
@@ -231,7 +231,7 @@ let lastLoadPromise;
  * loaded it will always return a reference to the same object.
  * @returns {Promise<{
  *   instance: WebAssembly.Instance;
- *   exports: { decodeSs58Text: typeof decodeSs58Text; encodeSs58Text: typeof encodeSs58Text }
+ *   exports: { decode: typeof decode; encode: typeof encode }
  * }>}
  */
 export function instantiateWithInstance() {
@@ -247,7 +247,7 @@ export function instantiateWithInstance() {
         cachedUint8Memory0 = new Uint8Array(wasm.memory.buffer);
         instanceWithExports = {
           instance,
-          exports: { decodeSs58Text, encodeSs58Text },
+          exports: { decode, encode },
         };
         return instanceWithExports;
       } finally {
