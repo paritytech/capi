@@ -1,4 +1,4 @@
-import { getHashers } from "../../../bindings/mod.ts";
+import { Hashers } from "../../../bindings/mod.ts";
 import * as M from "../../../frame_metadata/mod.ts";
 import * as U from "../../../util/mod.ts";
 import { effector } from "../../impl/mod.ts";
@@ -14,7 +14,7 @@ export const entryKey = effector.async(
     ) => {
       return U.hex.encode(
         M.$storageMapKey({
-          hashers: await getHashers(),
+          hashers: await Hashers(),
           pallet: palletMetadata,
           deriveCodec,
           storageEntry: entryMetadata,

@@ -8,8 +8,7 @@ export const metadataDecoded = effector.sync("metadataDecoded", () =>
   (encoded: string) => {
     try {
       return M.fromPrefixedHex(encoded);
-    } catch (e) {
-      console.error(e);
+    } catch (_e) {
       return new MetadataDecodeError();
     }
   });

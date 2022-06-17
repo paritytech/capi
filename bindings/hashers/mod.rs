@@ -18,6 +18,7 @@ macro_rules! make_hasher_binding {
   };
 }
 
+// TODO: in what cases can these error out?
 make_hasher_binding!(blake2_128, _blake2_128);
 make_hasher_binding!(blake2_256, _blake2_256);
 make_hasher_binding!(blake2_128Concat, <Blake2_128Concat as StorageHasher>::hash);

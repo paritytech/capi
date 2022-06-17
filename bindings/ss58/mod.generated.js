@@ -55,23 +55,6 @@ function addHeapObject(obj) {
 
 let WASM_VECTOR_LEN = 0;
 
-function passArray8ToWasm0(arg, malloc) {
-  const ptr = malloc(arg.length * 1);
-  getUint8Memory0().set(arg, ptr / 1);
-  WASM_VECTOR_LEN = arg.length;
-  return ptr;
-}
-/**
- * @param {Uint8Array} data
- * @returns {Uint8Array}
- */
-export function base58Encode(data) {
-  const ptr0 = passArray8ToWasm0(data, wasm.__wbindgen_malloc);
-  const len0 = WASM_VECTOR_LEN;
-  const ret = wasm.base58Encode(ptr0, len0);
-  return takeObject(ret);
-}
-
 const cachedTextEncoder = new TextEncoder("utf-8");
 
 const encodeString = function (arg, view) {
@@ -114,20 +97,6 @@ function passStringToWasm0(arg, malloc, realloc) {
   WASM_VECTOR_LEN = offset;
   return ptr;
 }
-/**
- * @param {string} addr
- * @returns {Uint8Array}
- */
-export function decodeSs58Text(addr) {
-  const ptr0 = passStringToWasm0(
-    addr,
-    wasm.__wbindgen_malloc,
-    wasm.__wbindgen_realloc,
-  );
-  const len0 = WASM_VECTOR_LEN;
-  const ret = wasm.decodeSs58Text(ptr0, len0);
-  return takeObject(ret);
-}
 
 let cachedInt32Memory0;
 function getInt32Memory0() {
@@ -136,11 +105,81 @@ function getInt32Memory0() {
   }
   return cachedInt32Memory0;
 }
+/**
+ * @param {string} text
+ * @returns {Array<any>}
+ */
+export function decode(text) {
+  try {
+    const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+    const ptr0 = passStringToWasm0(
+      text,
+      wasm.__wbindgen_malloc,
+      wasm.__wbindgen_realloc,
+    );
+    const len0 = WASM_VECTOR_LEN;
+    wasm.decode(retptr, ptr0, len0);
+    var r0 = getInt32Memory0()[retptr / 4 + 0];
+    var r1 = getInt32Memory0()[retptr / 4 + 1];
+    var r2 = getInt32Memory0()[retptr / 4 + 2];
+    if (r2) {
+      throw takeObject(r1);
+    }
+    return takeObject(r0);
+  } finally {
+    wasm.__wbindgen_add_to_stack_pointer(16);
+  }
+}
+
+/**
+ * @param {number} prefix
+ * @param {string} pub_key
+ * @returns {string}
+ */
+export function encode(prefix, pub_key) {
+  try {
+    const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+    const ptr0 = passStringToWasm0(
+      pub_key,
+      wasm.__wbindgen_malloc,
+      wasm.__wbindgen_realloc,
+    );
+    const len0 = WASM_VECTOR_LEN;
+    wasm.encode(retptr, prefix, ptr0, len0);
+    var r0 = getInt32Memory0()[retptr / 4 + 0];
+    var r1 = getInt32Memory0()[retptr / 4 + 1];
+    var r2 = getInt32Memory0()[retptr / 4 + 2];
+    var r3 = getInt32Memory0()[retptr / 4 + 3];
+    var ptr1 = r0;
+    var len1 = r1;
+    if (r3) {
+      ptr1 = 0;
+      len1 = 0;
+      throw takeObject(r2);
+    }
+    return getStringFromWasm0(ptr1, len1);
+  } finally {
+    wasm.__wbindgen_add_to_stack_pointer(16);
+    wasm.__wbindgen_free(ptr1, len1);
+  }
+}
 
 const imports = {
   __wbindgen_placeholder__: {
     __wbindgen_object_drop_ref: function (arg0) {
       takeObject(arg0);
+    },
+    __wbindgen_error_new: function (arg0, arg1) {
+      const ret = new Error(getStringFromWasm0(arg0, arg1));
+      return addHeapObject(ret);
+    },
+    __wbindgen_number_new: function (arg0) {
+      const ret = arg0;
+      return addHeapObject(ret);
+    },
+    __wbindgen_string_new: function (arg0, arg1) {
+      const ret = getStringFromWasm0(arg0, arg1);
+      return addHeapObject(ret);
     },
     __wbg_new_693216e109162396: function () {
       const ret = new Error();
@@ -164,28 +203,16 @@ const imports = {
         wasm.__wbindgen_free(arg0, arg1);
       }
     },
-    __wbg_buffer_5e74a88a1424a2e0: function (arg0) {
-      const ret = getObject(arg0).buffer;
+    __wbg_new_16f24b0728c5e67b: function () {
+      const ret = new Array();
       return addHeapObject(ret);
     },
-    __wbg_newwithbyteoffsetandlength_278ec7532799393a: function (
-      arg0,
-      arg1,
-      arg2,
-    ) {
-      const ret = new Uint8Array(getObject(arg0), arg1 >>> 0, arg2 >>> 0);
-      return addHeapObject(ret);
-    },
-    __wbg_new_e3b800e570795b3c: function (arg0) {
-      const ret = new Uint8Array(getObject(arg0));
-      return addHeapObject(ret);
+    __wbg_push_a72df856079e6930: function (arg0, arg1) {
+      const ret = getObject(arg0).push(getObject(arg1));
+      return ret;
     },
     __wbindgen_throw: function (arg0, arg1) {
       throw new Error(getStringFromWasm0(arg0, arg1));
-    },
-    __wbindgen_memory: function () {
-      const ret = wasm.memory;
-      return addHeapObject(ret);
     },
   },
 };
@@ -208,7 +235,7 @@ let lastLoadPromise;
  * loaded it will always return a reference to the same object.
  * @returns {Promise<{
  *   instance: WebAssembly.Instance;
- *   exports: { base58Encode: typeof base58Encode; decodeSs58Text: typeof decodeSs58Text }
+ *   exports: { decode: typeof decode; encode: typeof encode }
  * }>}
  */
 export function instantiateWithInstance() {
@@ -224,7 +251,7 @@ export function instantiateWithInstance() {
         cachedUint8Memory0 = new Uint8Array(wasm.memory.buffer);
         instanceWithExports = {
           instance,
-          exports: { base58Encode, decodeSs58Text },
+          exports: { decode, encode },
         };
         return instanceWithExports;
       } finally {
