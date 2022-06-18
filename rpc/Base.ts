@@ -14,23 +14,35 @@ export abstract class RpcClient<RpcError extends E.RpcError> {
   listeners = new Map<ListenerCb, boolean>();
   #errors: RpcError[] = [];
 
-  /** Send a message to the RPC server
-   * @param egressMessage the message you wish to send to the RPC server */
+  /**
+   * Send a message to the RPC server
+   *
+   * @param egressMessage the message you wish to send to the RPC server
+   */
   abstract send: (egressMessage: M.InitMessage) => void;
 
-  /** Parse messages returned from the RPC server (this includes RPC server errors)
+  /**
+   * Parse messages returned from the RPC server (this includes RPC server errors)
+   *
    * @param rawIngressMessage the raw response from the given provider, likely in need of some sanitization
-   * @returns the sanitized ingress message, common to all providers */
+   * @returns the sanitized ingress message, common to all providers
+   */
   abstract parseMessage: (rawIngressMessage: unknown) => M.IngressMessage;
 
-  /** Parse errors of the given client, such as an error `Event` in the case of `WebSocket`s
+  /**
+   * Parse errors of the given client, such as an error `Event` in the case of `WebSocket`s
+   *
    * @param rawError the raw error from the given provider
-   * @returns an instance of `RpcError`, typed via the client's sole generic type param */
+   * @returns an instance of `RpcError`, typed via the client's sole generic type param
+   */
   abstract parseError: (rawError: any) => RpcError;
 
   // TODO: introduce `FailedToClose` error in the return type (union with `undefined`)
-  /** Close the connection and free up resources
-   * @returns a promise, which resolved to `undefined` upon successful cancelation */
+  /**
+   * Close the connection and free up resources
+   *
+   * @returns a promise, which resolved to `undefined` upon successful cancelation
+   */
   abstract close: () => Promise<void>;
 
   /** @returns a new ID, unique to the client instance */
@@ -38,9 +50,12 @@ export abstract class RpcClient<RpcError extends E.RpcError> {
     return (this.#nextId++).toString();
   };
 
-  /** Attach a listener to handle ingress messages
+  /**
+   * Attach a listener to handle ingress messages
+   *
    * @param listener the callback to be triggered upon arrival of ingress messages
-   * @returns a function to detach the listener */
+   * @returns a function to detach the listener
+   */
   listen = (listener: ListenerCb): StopListening => {
     if (this.listeners.has(listener)) {
       throw new Error();
@@ -65,14 +80,17 @@ export abstract class RpcClient<RpcError extends E.RpcError> {
     this.#errors.push(this.parseError(error));
   };
 
-  /** Call an RPC method and return a promise resolving to an ingress message with an ID that matches the egress message
+  /**
+   * Call an RPC method and return a promise resolving to an ingress message with an ID that matches the egress message
+   *
    * @param method the name of the method you wish to call
    * @param params the params with which to call the method
-   * @returns an ingress message corresponding to the given method (or a message-agnostic error) */
+   * @returns an ingress message corresponding to the given method (or a message-agnostic error)
+   */
   call = async <Method extends M.MethodName>(
     method: Method,
     params: M.InitMessageByMethodName[Method]["params"],
-  ): Promise<M.OkMessage<Method> | E.RpcServerError> => {
+  ): Promise<M.OkMessage<Method> | M.ErrMessage> => {
     const init = <M.InitMessage<Method>> {
       jsonrpc: "2.0",
       id: this.uid(),
@@ -80,14 +98,10 @@ export abstract class RpcClient<RpcError extends E.RpcError> {
       params,
     };
     const isCorrespondingRes = IsCorrespondingRes(init);
-    const pending = deferred<M.OkMessage<Method> | E.RpcServerError>();
+    const pending = deferred<M.OkMessage<Method> | M.ErrMessage>();
     const stopListening = this.listen((res) => {
       if (isCorrespondingRes(res)) {
-        if (res.error) {
-          pending.resolve(new E.RpcServerError(res));
-        } else {
-          pending.resolve(res);
-        }
+        pending.resolve(res);
       }
     });
     this.send(init);
@@ -96,7 +110,9 @@ export abstract class RpcClient<RpcError extends E.RpcError> {
     return result;
   };
 
-  /** Initialize an RPC subscription
+  /**
+   * Initialize an RPC subscription
+   *
    * @param method the method name of the subscription you wish to init
    * @param params the params with which to init the subscription
    * @param listenerCb the callback to which notifications should be supplied
