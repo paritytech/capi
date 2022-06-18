@@ -42,6 +42,7 @@ export type IngressMessage = OkMessage | ErrMessage | NotifMessage;
  * The following is modeled closely after the method definitions of Smoldot. This `Lookup` type serves as a source of
  * truth, from which we map to init, notification and ok response types. Error types are––unfortunately––not defined as
  * method-specific on the Rust side, although perhaps we could create represent them as such.
+ *
  * @see https://github.com/paritytech/smoldot/blob/82836f4f2af4dd1716c57c14a4f591c7b1043950/src/json_rpc/methods.rs#L338-L479
  */
 type MethodLookup = EnsureLookup<string, (...args: any[]) => any, {

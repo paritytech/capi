@@ -16,6 +16,10 @@ export const rpcCall = effector.async.generic(
     ) =>
       effect(args, () =>
         async (client, methodName, ...params) => {
-          return await client.call(methodName, params);
+          const result = await client.call(methodName, params);
+          if (result.error) {
+            return new rpc.RpcServerError(result);
+          }
+          return result;
         }),
 );

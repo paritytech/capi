@@ -6,7 +6,7 @@ export type DeriveCodec = (typeI: number) => $.Codec<unknown>;
 
 /**
  * All derived codecs for ZSTs will use this exact codec,
- * so `derivedCodec === $null` is true iff the type is a ZST.
+ * so `derivedCodec === $null` is true if the type is a ZST.
  */
 export const $null = $.dummy(null);
 

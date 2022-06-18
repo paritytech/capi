@@ -16,7 +16,7 @@ const [client, sr25519, hashers] = await Promise.all([
 ]);
 
 const metadataRaw = await client.call("state_getMetadata", []);
-asserts.assert(!(metadataRaw instanceof Error));
+asserts.assert(metadataRaw.result);
 const metadata = C.M.fromPrefixedHex(metadataRaw.result);
 const deriveCodec = C.M.DeriveCodec(metadata);
 
