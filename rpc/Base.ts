@@ -1,7 +1,6 @@
 import { deferred } from "../_deps/async.ts";
 import * as E from "./Error.ts";
 import * as M from "./messages.ts";
-import { IsCorrespondingRes } from "./util.ts";
 
 export type ListenerCb<IngressMessage_ extends M.IngressMessage = M.IngressMessage> = (
   ingressMessage: IngressMessage_,
@@ -134,5 +133,16 @@ export abstract class RpcClient<RpcError extends E.RpcError> {
       }
     });
     return stopListening;
+  };
+}
+
+export function IsCorrespondingRes<Init_ extends M.InitMessage>(init: Init_) {
+  return <InQuestion extends M.IngressMessage>(
+    inQuestion: InQuestion,
+  ): inQuestion is Extract<InQuestion, M.OkMessageByMethodName[Init_["method"]] | M.ErrMessage> => {
+    if (inQuestion.error || inQuestion.result) {
+      inQuestion;
+    }
+    return inQuestion?.id === init.id;
   };
 }
