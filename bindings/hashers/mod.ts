@@ -1,5 +1,5 @@
 import * as M from "../../frame_metadata/mod.ts";
-import { instantiate } from "./mod.generated.js";
+import { instantiate } from "./mod.generated.mjs";
 
 export async function Hashers(): Promise<M.HasherLookup> {
   const instance = await instantiate();
