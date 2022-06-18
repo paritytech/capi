@@ -11,9 +11,9 @@ export interface ChainInfo {
   lookup: Lookup;
 }
 
-export const getLookupAndDeriveCodec = async (
+export async function getLookupAndDeriveCodec(
   networkName: typeof CHAIN_URL_LOOKUP[number][0],
-): Promise<ChainInfo> => {
+): Promise<ChainInfo> {
   const metadataEncoded = await Deno.readTextFile(
     path.join("frame_metadata", "_downloaded", `${networkName}.scale`),
   );
@@ -25,7 +25,7 @@ export const getLookupAndDeriveCodec = async (
     metadata,
     lookup,
   };
-};
+}
 
 export const accountId32 = hex.decode(
   "43fa61b298e82f9f207ddea327900cee26b554756c4a533f36cd875e3e7bcf06",

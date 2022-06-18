@@ -136,9 +136,3 @@ export abstract class RpcClient<RpcError extends E.RpcError> {
     return stopListening;
   };
 }
-
-// TODO: type the failed-to-init case as part of the promise result
-/** A function which accepts a chain beacon and returns a promise resolving to an RPC client instance */
-export type RpcClientFactory<Beacon, Err extends E.RpcError> = (
-  beacon: Beacon,
-) => Promise<RpcClient<Err>>;
