@@ -15,7 +15,7 @@ import { rpcCall } from "./rpcCall.ts";
 export const mapKeys = effector.async(
   "mapKeys",
   () =>
-    (map: Map, count?: number, startKey?: U.HashHexString) => {
+    (map: Map, count?: number, startKey?: U.HexHash) => {
       const metadata_ = metadata(map.pallet.rpc);
       const metadataLookup_ = metadataLookup(metadata_);
       const deriveCodec_ = deriveCodec(metadata_);

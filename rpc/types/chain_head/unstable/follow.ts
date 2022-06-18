@@ -21,29 +21,29 @@ interface ChainHeadUnstableFollowEventBase<Kind extends ChainHeadUnstableFollowE
 export interface ChainHeadUnstableFollowInitializedEvent
   extends ChainHeadUnstableFollowEventBase<"initialized">
 {
-  finalizedBlockHash: U.HashHexString;
+  finalizedBlockHash: U.HexHash;
   finalizedBlockRuntime: string;
 }
 
 export interface ChainHeadUnstableFollowNewBlockEvent
   extends ChainHeadUnstableFollowEventBase<"newBlock">
 {
-  blockHash: U.HashHexString;
-  parentBlockHash: U.HashHexString;
+  blockHash: U.HexHash;
+  parentBlockHash: U.HexHash;
   newRuntime: null; // TODO
 }
 
 export interface ChainHeadUnstableFollowBestBlockChangedEvent
   extends ChainHeadUnstableFollowEventBase<"bestBlockChanged">
 {
-  bestBlockHash: U.HashHexString;
+  bestBlockHash: U.HexHash;
 }
 
 export interface ChainHeadUnstableFollowFinalizedEvent
   extends ChainHeadUnstableFollowEventBase<"finalized">
 {
-  finalizedBlocksHashes: U.HashHexString[];
-  prunedBlocksHashes: U.HashHexString[];
+  finalizedBlocksHashes: U.HexHash[];
+  prunedBlocksHashes: U.HexHash[];
 }
 
 export type ChainHeadUnstableFollowStopEvent = ChainHeadUnstableFollowEventBase<"stop">;

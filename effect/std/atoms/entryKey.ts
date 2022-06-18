@@ -19,6 +19,6 @@ export const entryKey = effector.async(
           deriveCodec,
           storageEntry: entryMetadata,
         }).encode(key),
-      ) as U.HexString;
+      ) as U.Hex;
     },
 );
