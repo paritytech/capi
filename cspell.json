@@ -9,5 +9,10 @@
     }
   ],
   "dictionaries": ["project-words"],
-  "ignorePaths": ["Cargo.lock", "deno.lock", "target"]
+  "ignorePaths": [
+    "bindings/*/*.generated.mjs",
+    "Cargo.lock",
+    "deno.lock",
+    "target"
+  ]
 }
