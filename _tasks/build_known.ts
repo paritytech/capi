@@ -2,7 +2,7 @@ import * as path from "../_deps/path.ts";
 import ss58Registry from "../_deps/ss58_registry.ts";
 
 let generated = "// @generated file from build script, do not edit";
-generated += "\nexport type Ss58Registry = ";
+generated += "\nexport type Ss58Lookup = ";
 for (let i = 0; i < ss58Registry.length; i++) {
   const current = ss58Registry[i]!;
   if (i !== 0) {
@@ -19,6 +19,6 @@ for (let i = 0; i < ss58Registry.length; i++) {
 }`;
 }
 generated += ";\n";
-const dest = path.join(Deno.cwd(), "bindings/ss58/registry.ts");
-console.log(`Writing "registry" file to "${dest}".`);
+const dest = path.join(Deno.cwd(), "known/generated.ts");
+console.log(`Writing "${dest}".`);
 await Deno.writeTextFile(dest, generated);

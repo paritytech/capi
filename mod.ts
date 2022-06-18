@@ -1,4 +1,3 @@
 export * as $ from "./_deps/scale.ts";
-export * from "./constants/mod.ts";
 export * from "./effect/mod.ts";
 export * from "./primitives/mod.ts";

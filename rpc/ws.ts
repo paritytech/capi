@@ -79,9 +79,3 @@ export namespace WsRpcClientError {
   export class FailedToParse extends RpcClientError {}
   export class WsError extends RpcClientError {}
 }
-
-export async function wsRpcClient(url: string) {
-  const rpcClient = new WsRpcClient(url);
-  await rpcClient.opening();
-  return rpcClient;
-}

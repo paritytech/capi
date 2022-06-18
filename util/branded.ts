@@ -1,4 +1,4 @@
-type Branded<T, Brand extends PropertyKey> = T & { [_ in Brand]: undefined };
+export type Branded<T, Brand extends PropertyKey> = T & { [_ in Brand]: undefined };
 
 export const HexStringBrand: unique symbol = Symbol();
 export type HexStringBrand = typeof HexStringBrand;

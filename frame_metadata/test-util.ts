@@ -1,5 +1,4 @@
 import * as path from "../_deps/path.ts";
-import { CHAIN_URL_LOOKUP } from "../constants/chains/url.ts";
 import * as hex from "../util/hex.ts";
 import { DeriveCodec } from "./Codec.ts";
 import { Lookup } from "./Lookup.ts";
@@ -11,9 +10,7 @@ export interface ChainInfo {
   lookup: Lookup;
 }
 
-export async function getLookupAndDeriveCodec(
-  networkName: typeof CHAIN_URL_LOOKUP[number][0],
-): Promise<ChainInfo> {
+export async function getLookupAndDeriveCodec(networkName: string): Promise<ChainInfo> {
   const metadataEncoded = await Deno.readTextFile(
     path.join("frame_metadata", "_downloaded", `${networkName}.scale`),
   );

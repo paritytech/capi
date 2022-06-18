@@ -79,6 +79,8 @@ export abstract class RpcClient<RpcError extends E.RpcError> {
     this.#errors.push(this.parseError(error));
   };
 
+  abstract opening(): Promise<void>;
+
   /**
    * Call an RPC method and return a promise resolving to an ingress message with an ID that matches the egress message
    *

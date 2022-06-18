@@ -24,6 +24,10 @@ export class SmoldotRpcClient extends RpcClient<SmoldotRpcClientError> {
       });
   }
 
+  async opening(): Promise<void> {
+    await this.openPending;
+  }
+
   close = async (): Promise<void> => {
     this.#chain.remove();
   };
