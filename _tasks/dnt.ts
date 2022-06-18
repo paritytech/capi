@@ -1,4 +1,4 @@
-import { build } from "https://deno.land/x/dnt@0.22.0/mod.ts";
+import { build } from "https://deno.land/x/dnt@0.26.0/mod.ts";
 import * as fs from "../_deps/fs.ts";
 import * as path from "../_deps/path.ts";
 
@@ -8,18 +8,26 @@ await fs.emptyDir(outDir);
 
 await Promise.all([
   build({
-    entryPoints: ["./mod.ts"],
+    entryPoints: ["mod.ts", {
+      name: "bindings",
+      path: "bindings/mod.ts",
+    }, {
+      name: "frame_metadata",
+      path: "frame_metadata/mod.ts",
+    }, {
+      name: "rpc",
+      path: "rpc/mod.ts",
+    }],
     outDir,
     mappings: {
       "https://deno.land/x/scale@v0.2.1/mod.ts": {
         name: "parity-scale-codec",
         version: "^0.2.1",
       },
-      "https://esm.sh/@substrate/smoldot-light@0.6.19": {
+      "_deps/smoldot_phantom.ts": {
         name: "@substrate/smoldot-light",
-        version: "^0.6.19",
-        // TODO: enable this flag upon resolution of https://github.com/denoland/dnt/issues/137
-        // peerDependency: true,
+        version: "0.6.19",
+        peerDependency: true,
       },
     },
     package: {
@@ -35,9 +43,12 @@ await Promise.all([
       target: "ES2021",
     },
     scriptModule: "cjs",
-    shims: { deno: true, webSocket: true },
+    shims: {
+      deno: true,
+      webSocket: true,
+    },
     test: false,
-    typeCheck: false,
+    typeCheck: false, // TODO: reenable?
   }),
   fs.copy("LICENSE", path.join(outDir, "LICENSE")),
   fs.copy("Readme.md", path.join(outDir, "Readme.md")),
@@ -45,25 +56,8 @@ await Promise.all([
 
 await Promise.all(["script", "esm"].map((kind) => {
   return Promise.all(["hashers", "sr25519", "ss58"].map(async (feature) => {
-    await fs.copy(
-      `./bindings/${feature}/mod_bg.wasm`,
-      `target/npm/${kind}/bindings/${feature}/mod_bg.wasm`,
-    );
-    if (kind === "esm") {
-      await Deno.writeTextFile(
-        `target/npm/${kind}/bindings/${feature}/mod.generated.js`,
-        `
-// workaround for https://github.com/rust-random/getrandom/issues/256
-import * as crypto from "crypto"
-const module = {
-    require: (string) => {
-        if(string !== "crypto") throw new Error("Unexpected require " + string)
-        return crypto
-    }
-}
-`,
-        { append: true },
-      );
-    }
+    const from = `./bindings/${feature}/mod_bg.wasm`;
+    const to = `target/npm/${kind}/bindings/${feature}/mod_bg.wasm`;
+    await fs.copy(from, to);
   }));
 }));

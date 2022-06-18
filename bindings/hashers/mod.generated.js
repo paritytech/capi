@@ -1,6 +1,7 @@
 // Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
 // @generated file from build script, do not edit
 // deno-lint-ignore-file
+// source-hash: b3704ddca6847341deba7c45c64b5df2609b5592
 let wasm;
 
 const heap = new Array(32).fill(undefined);
@@ -205,11 +206,11 @@ const imports = {
         wasm.__wbindgen_free(arg0, arg1);
       }
     },
-    __wbg_buffer_5e74a88a1424a2e0: function (arg0) {
+    __wbg_buffer_de1150f91b23aa89: function (arg0) {
       const ret = getObject(arg0).buffer;
       return addHeapObject(ret);
     },
-    __wbg_newwithbyteoffsetandlength_278ec7532799393a: function (
+    __wbg_newwithbyteoffsetandlength_9ca61320599a2c84: function (
       arg0,
       arg1,
       arg2,
@@ -217,7 +218,7 @@ const imports = {
       const ret = new Uint8Array(getObject(arg0), arg1 >>> 0, arg2 >>> 0);
       return addHeapObject(ret);
     },
-    __wbg_new_e3b800e570795b3c: function (arg0) {
+    __wbg_new_97cf52648830a70d: function (arg0) {
       const ret = new Uint8Array(getObject(arg0));
       return addHeapObject(ret);
     },
@@ -291,6 +292,10 @@ export function isInstantiated() {
 async function instantiateModule() {
   switch (wasm_url.protocol) {
     case "file:": {
+      if (typeof Deno !== "object") {
+        throw new Error("file urls are not supported in this environment");
+      }
+
       if ("permissions" in Deno) {
         Deno.permissions.request({ name: "read", path: wasm_url });
       }
@@ -299,7 +304,7 @@ async function instantiateModule() {
     }
     case "https:":
     case "http:": {
-      if ("permissions" in Deno) {
+      if (typeof Deno === "object" && "permissions" in Deno) {
         Deno.permissions.request({ name: "net", host: wasm_url.host });
       }
       const wasmResponse = await fetch(wasm_url);

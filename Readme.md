@@ -231,7 +231,7 @@ deno task build:wasm
 Build the NPM package and link it locally.
 
 ```sh
-deno task build:npm_pkg && cd target/npm && npm link
+deno task dnt && cd target/npm && npm link
 ```
 
 Then link to Capi from your NodeJS project.
@@ -250,4 +250,4 @@ We no longer need to think about the separation of code for the sake of packagin
 
 For example, exports of [`util/types.ts`](./util/types.ts) can be imported directly into any other TypeScript file, without specifying the dependency in a package manifest. We are free to use (for example) `U2I`, the union to intersection utility, in out-of-band processes, the effect system or even GitHub workflow scripts. From anywhere in the repository, we can import and use any code with configuration overhead.
 
-When it comes time to [build our code](./tasks/build_npm_pkg.ts) for NPM distribution, [DNT](https://github.com/denoland/dnt) takes care of transforming our dependency graph into something that NodeJS and web browsers will understand.
+When it comes time to [build our code](./tasks/dnt.ts) for NPM distribution, [DNT](https://github.com/denoland/dnt) takes care of transforming our dependency graph into something that NodeJS and web browsers will understand.

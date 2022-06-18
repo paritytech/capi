@@ -1,4 +1,4 @@
-import { Smoldot } from "../_deps/smoldot.ts";
+import type * as smoldot from "../_deps/smoldot.ts";
 import { RpcClient, RpcClientFactory } from "./Base.ts";
 import { RpcClientError } from "./Error.ts";
 import { InitMessage } from "./messages.ts";
@@ -6,9 +6,9 @@ import { InitMessage } from "./messages.ts";
 /** Be careful to only utilize methods once `openPending` is resolved */
 export class SmoldotRpcClient extends RpcClient<SmoldotRpcClientError> {
   openPending;
-  #chain!: Chain;
+  #chain!: smoldot.Chain;
 
-  constructor(readonly smoldotClient: SmoldotClient, readonly chainSpec: string) {
+  constructor(readonly smoldotClient: smoldot.Client, readonly chainSpec: string) {
     super();
     this.openPending = smoldotClient
       .addChain({
@@ -46,14 +46,12 @@ export class SmoldotRpcClient extends RpcClient<SmoldotRpcClientError> {
 }
 
 // Extract relevant types from `@substrate/smoldot-light`
-type SmoldotClient = ReturnType<Smoldot["start"]>;
-type Chain = Awaited<ReturnType<SmoldotClient["addChain"]>>;
 
 export const smoldotRpcClientFactory = (() => {
-  let smoldotClient: SmoldotClient;
+  let smoldotClient: smoldot.Client;
 
   return (
-    smoldotClientFactory: () => SmoldotClient,
+    smoldotClientFactory: () => smoldot.Client,
   ): RpcClientFactory<string, SmoldotRpcClientError> => {
     if (!smoldotClient) {
       smoldotClient = smoldotClientFactory();

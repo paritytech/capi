@@ -20,12 +20,12 @@ export interface Signer {
 export type SignerCtor = new() => Signer;
 
 export interface Keypair {
-  publicKey: string;
-  secretKey: string;
+  publicKey: PublicKey;
+  secretKey: Uint8Array;
 }
 export type KeypairCtor =
   & (new() => Keypair)
-  & { fromSecretSeed(bytes: Uint8Array): Keypair };
+  & { rand(): Keypair };
 
 export interface Sr25519 {
   PublicKey: PublicKeyCtor;

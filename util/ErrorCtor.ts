@@ -11,9 +11,8 @@ export function ReasonBearingErrorCtor<Name extends string>(name: Name) {
       constructor(
         readonly reason: Reason,
         message?: string,
-        options?: ErrorOptions,
       ) {
-        super(message, options);
+        super(message);
       }
     };
   };

@@ -13,3 +13,6 @@ pub mod sr25519;
 
 #[cfg(feature = "ss58")]
 pub mod ss58;
+
+#[cfg(feature = "bip39")]
+pub mod bip39;
