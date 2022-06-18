@@ -1,0 +1,15 @@
+name: "Check Spelling and Grammar"
+on: push
+jobs:
+  spellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: streetsidesoftware/cspell-action@v2
+  check_grammar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: xu-cheng/latex-action@v2
+        with:
+          root_file: "**.md"
+          glob_root_file: true
