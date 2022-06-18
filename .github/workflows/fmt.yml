@@ -1,4 +1,4 @@
-name: Formatting
+name: Check Formatting
 on: push
 jobs:
   check:

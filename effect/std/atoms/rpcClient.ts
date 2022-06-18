@@ -2,7 +2,7 @@ import * as rpc from "../../../rpc/mod.ts";
 import { effector, EffectorArgs } from "../../impl/mod.ts";
 
 export interface RpcClientR<Beacon> {
-  rpc: rpc.RpcClientFactory<Beacon, rpc.RpcError>;
+  rpc: (beacon: Beacon) => rpc.RpcClient<rpc.RpcError>;
 }
 
 export const rpcClient = effector.async.generic(
@@ -11,9 +11,13 @@ export const rpcClient = effector.async.generic(
     <Beacon, X extends unknown[]>(
       ...args: EffectorArgs<
         X,
-        [factory: rpc.RpcClientFactory<Beacon, rpc.RpcError>, beacon: Beacon]
+        [factory: (beacon: Beacon) => rpc.RpcClient<rpc.RpcError>, beacon: Beacon]
       >
-    ) => effect(args, () => (factory, beacon) => factory(beacon)),
+    ) =>
+      effect(args, () =>
+        async (factory, beacon) => {
+          return factory(beacon);
+        }),
 );
 
 // TODO: cleanup

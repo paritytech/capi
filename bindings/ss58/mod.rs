@@ -50,6 +50,7 @@ const INVALID_PUB_KEY_LEN: &'static str = "InvalidPubKeyLen";
 
 #[wasm_bindgen]
 pub fn encode(prefix: u16, pub_key: &str) -> Result<String, JsError> {
+  console_error_panic_hook::set_once();
   match hex::decode(pub_key) {
     Err(_) => Err(JsError::new(HEX_DECODING_FAILED)),
     Ok(mut raw_key) => {

@@ -1,5 +1,5 @@
 import { deferred } from "../_deps/async.ts";
-import { RpcClient, RpcClientFactory } from "./Base.ts";
+import { RpcClient } from "./Base.ts";
 import { RpcClientError } from "./Error.ts";
 import { IngressMessage, InitMessage } from "./messages.ts";
 
@@ -80,8 +80,8 @@ export namespace WsRpcClientError {
   export class WsError extends RpcClientError {}
 }
 
-export const wsRpcClient: RpcClientFactory<string, WsRpcClientError> = async (url) => {
+export async function wsRpcClient(url: string) {
   const rpcClient = new WsRpcClient(url);
   await rpcClient.opening();
   return rpcClient;
-};
+}

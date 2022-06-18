@@ -10,7 +10,7 @@ export type DeriveCodec = (typeI: number) => $.Codec<unknown>;
  */
 export const $null = $.dummy(null);
 
-export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
+export function DeriveCodec(metadata: M.Metadata): DeriveCodec {
   // TODO: don't leak memory!
   const cache: Record<number, $.Codec<unknown> | null> = {};
 
@@ -157,7 +157,7 @@ export const DeriveCodec = (metadata: M.Metadata): DeriveCodec => {
   };
 
   return (i: number) => visitors.visit(i);
-};
+}
 
 type NativeUnion<MemberCodecs extends $.Codec<any>[]> = $.Native<MemberCodecs[number]>;
 

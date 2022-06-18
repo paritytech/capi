@@ -1,6 +1,7 @@
 // Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
 // @generated file from build script, do not edit
 // deno-lint-ignore-file
+// source-hash: 90916c40031c0afff31bec1979768367b5b1c17e
 let wasm;
 
 const heap = new Array(32).fill(undefined);
@@ -203,11 +204,11 @@ const imports = {
         wasm.__wbindgen_free(arg0, arg1);
       }
     },
-    __wbg_new_16f24b0728c5e67b: function () {
+    __wbg_new_2ab697f1555e0dbc: function () {
       const ret = new Array();
       return addHeapObject(ret);
     },
-    __wbg_push_a72df856079e6930: function (arg0, arg1) {
+    __wbg_push_811c8b08bf4ff9d5: function (arg0, arg1) {
       const ret = getObject(arg0).push(getObject(arg1));
       return ret;
     },
@@ -270,6 +271,10 @@ export function isInstantiated() {
 async function instantiateModule() {
   switch (wasm_url.protocol) {
     case "file:": {
+      if (typeof Deno !== "object") {
+        throw new Error("file urls are not supported in this environment");
+      }
+
       if ("permissions" in Deno) {
         Deno.permissions.request({ name: "read", path: wasm_url });
       }
@@ -278,7 +283,7 @@ async function instantiateModule() {
     }
     case "https:":
     case "http:": {
-      if ("permissions" in Deno) {
+      if (typeof Deno === "object" && "permissions" in Deno) {
         Deno.permissions.request({ name: "net", host: wasm_url.host });
       }
       const wasmResponse = await fetch(wasm_url);

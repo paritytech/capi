@@ -1,4 +1,4 @@
-name: Configure
+name: Configure Labels
 on:
   push:
     paths:

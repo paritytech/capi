@@ -305,6 +305,6 @@ export const $metadata: $.Codec<Metadata> = $.object(
   ["extrinsic", $extrinsicDef],
 );
 
-export const fromPrefixedHex = (scaleEncoded: string): Metadata => {
+export function fromPrefixedHex(scaleEncoded: string): Metadata {
   return $metadata.decode(hex.decode(scaleEncoded));
-};
+}

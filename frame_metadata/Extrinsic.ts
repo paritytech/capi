@@ -20,14 +20,14 @@ export interface Extrinsic {
   args: Record<string, unknown>;
 }
 
-interface ExtrinsicCodecArgs {
+interface ExtrinsicCodecProps {
   metadata: Metadata;
   deriveCodec: DeriveCodec;
   hashers: HasherLookup;
   sign: (value: Uint8Array) => Signature;
 }
 
-export function $extrinsic(args: ExtrinsicCodecArgs): $.Codec<Extrinsic> {
+export function $extrinsic(args: ExtrinsicCodecProps): $.Codec<Extrinsic> {
   const { metadata, sign, deriveCodec, hashers: { Blake2_256 } } = args;
   const { signedExtensions } = metadata.extrinsic;
   const $sig = deriveCodec(findExtrinsicTypeParam("Signature")!);

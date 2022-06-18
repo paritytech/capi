@@ -1,4 +1,4 @@
-name: udd-update-dependencies
+name: Update Dependencies
 on:
   workflow_dispatch:
   schedule:
@@ -17,6 +17,11 @@ jobs:
       - name: Regenerated Lockfile
         run: |
           deno task lock
+      - name: Basic tests
+        id: test
+        continue-on-error: true
+        run: |
+          deno task test
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
         id: pr
@@ -39,11 +44,6 @@ jobs:
           context: "Basic tests"
           state: "pending"
           sha: ${{ steps.commit.outputs.sha }}
-      - name: Basic tests
-        id: test
-        continue-on-error: true
-        run: |
-          deno test --allow-read --allow-write
       - name: Set commit status with outcome
         uses: Sibz/github-status-action@v1
         with:

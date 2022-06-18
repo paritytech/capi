@@ -1,3 +1,3 @@
-// We use a `typeof` on the dyn import to safeguard against user-provided version mismatch. Ultimately,
-// we'd like to treat Smoldot as a peer dependency, which means we should never utilize its runtime.
-export type Smoldot = typeof import("https://esm.sh/@substrate/smoldot-light@0.6.19");
+// Smoldot is a peer dependency; we only utilize its types, never its runtime.
+// @deno-types="https://esm.sh/@substrate/smoldot-light@0.6.19/dist/index.d.ts"
+export * from "./smoldot_phantom.ts";
