@@ -55,9 +55,9 @@ export const smoldotRpcClientFactory = (() => {
     if (!smoldotClient) smoldotClient = start();
     // TODO: accept branded type
     return async (chainSpec: string) => {
-      const rpcClient = new SmoldotRpcClient(smoldotClient, chainSpec);
-      await rpcClient.openPending;
-      return rpcClient;
+      const client = new SmoldotRpcClient(smoldotClient, chainSpec);
+      await client.openPending;
+      return client;
     };
   };
 })();

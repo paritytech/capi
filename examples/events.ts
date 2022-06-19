@@ -2,10 +2,10 @@ import { westendBeacon } from "../known/mod.ts";
 import * as C from "../mod.ts";
 import { rpcClient } from "../rpc/mod.ts";
 
-const rpc = await rpcClient(westendBeacon);
-const $pallet = C.pallet(rpc, "System");
+const client = await rpcClient(westendBeacon);
+const $pallet = C.pallet(client, "System");
 const $entry = C.entry($pallet, "Events");
 const $read = C.read($entry);
 const result = await $read.run();
 console.log(result);
-await rpc.close();
+await client.close();
