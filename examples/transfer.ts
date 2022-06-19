@@ -3,11 +3,11 @@ import { Hashers, Sr25519 } from "../bindings/mod.ts";
 import * as M from "../frame_metadata/mod.ts";
 import { westendBeacon } from "../known/mod.ts";
 import * as C from "../mod.ts";
-import { rpcClient } from "../rpc/mod.ts";
+import * as rpc from "../rpc/mod.ts";
 import * as U from "../util/mod.ts";
 
 const [client, sr25519, hashers] = await Promise.all([
-  rpcClient(...westendBeacon),
+  rpc.client(rpc.beacon(westendBeacon)),
   Sr25519(),
   Hashers(),
 ]);
