@@ -1,23 +1,24 @@
-import * as asserts from "../_deps/asserts.ts";
+import { assert } from "../_deps/asserts.ts";
 import { Hashers, Sr25519 } from "../bindings/mod.ts";
 import * as M from "../frame_metadata/mod.ts";
+import { westendBeacon } from "../known/mod.ts";
 import * as C from "../mod.ts";
-import { wsRpcClient } from "../rpc/mod.ts";
+import { rpcClient } from "../rpc/mod.ts";
 import * as U from "../util/mod.ts";
 
 const [client, sr25519, hashers] = await Promise.all([
-  wsRpcClient(C.WESTEND_RPC_URL),
+  rpcClient(...westendBeacon),
   Sr25519(),
   Hashers(),
 ]);
-
+assert(!(client instanceof Error));
 const metadataRes = await client.call("state_getMetadata", []);
-asserts.assert(metadataRes.result);
+assert(metadataRes.result);
 const metadata = M.fromPrefixedHex(metadataRes.result);
 const deriveCodec = M.DeriveCodec(metadata);
 
 const genesisHashRes = await client.call("chain_getBlockHash", []);
-asserts.assert(genesisHashRes.result);
+assert(genesisHashRes.result);
 const genesisHash = U.hex.decode(genesisHashRes.result);
 
 const pair = sr25519.Keypair.rand();

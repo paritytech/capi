@@ -1,11 +1,14 @@
+import { assert } from "../_deps/asserts.ts";
+import { polkadotBeacon } from "../known/mod.ts";
 import * as C from "../mod.ts";
-import { wsRpcClient } from "../rpc/mod.ts";
+import { rpcClient } from "../rpc/mod.ts";
 
-const rpc = await wsRpcClient(C.POLKADOT_RPC_URL);
-const pallet = C.pallet(rpc, "System");
+const client = await rpcClient(...polkadotBeacon);
+assert(!(client instanceof Error));
+const pallet = C.pallet(client, "System");
 const map = C.map(pallet, "Account");
 const result = await C.mapKeys(map, 10).run();
 
 console.log({ result });
 
-rpc.close();
+client.close();

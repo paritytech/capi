@@ -12,5 +12,5 @@ for await (
 }
 
 const dest = path.join(Deno.cwd(), "_star.ts");
-console.log(`Writing "star" file to "${dest}".`);
+console.log(`Writing "${dest}".`);
 await Deno.writeTextFile(dest, generated);

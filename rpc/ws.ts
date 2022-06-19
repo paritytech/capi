@@ -1,87 +1,84 @@
 import { deferred } from "../_deps/async.ts";
-import { RpcClient } from "./Base.ts";
-import { RpcClientError } from "./Error.ts";
+import { deadline } from "../_deps/async.ts";
+import { ErrorCtor } from "../util/mod.ts";
+import * as B from "./Base.ts";
 import { IngressMessage, InitMessage } from "./messages.ts";
 
-export class WsRpcClient extends RpcClient<WsRpcClientError> {
-  #ws;
+export class FailedToOpenConnectionError extends ErrorCtor("FailedToOpenConnection") {}
+export class WebSocketInternalError extends ErrorCtor("WebSocketInternal") {}
+export class FailedToDisconnectError extends ErrorCtor("FailedToDisconnect") {}
 
-  constructor(readonly url: string) {
-    super();
-    this.#ws = new WebSocket(url);
-    this.#ws.addEventListener("error", this.onError);
-    this.#ws.addEventListener("message", this.onMessage);
-  }
+export class ProxyWsUrlClient
+  extends B.Client<string, MessageEvent, Event, WebSocketInternalError>
+{
+  #ws?: WebSocket;
 
-  opening = (): Promise<void> => {
-    const pending = deferred<void>();
-    if (this.#ws.readyState === WebSocket.CONNECTING) {
+  static open = async (
+    props: B.ClientProps<string, WebSocketInternalError>,
+  ): Promise<ProxyWsUrlClient | FailedToOpenConnectionError> => {
+    const client = new ProxyWsUrlClient(props);
+    const ws = new WebSocket(props.beacon);
+    client.#ws = ws;
+    ws.addEventListener("error", client.onError);
+    ws.addEventListener("message", client.onMessage);
+    const pending = deferred<ProxyWsUrlClient | FailedToOpenConnectionError>();
+    if (ws.readyState === WebSocket.CONNECTING) {
       const onOpenError = () => {
         clearListeners();
-        pending.reject();
+        pending.resolve(new FailedToOpenConnectionError());
       };
       const onOpen = () => {
         clearListeners();
-        pending.resolve();
+        pending.resolve(client);
       };
       const clearListeners = () => {
-        this.#ws.removeEventListener("error", onOpenError);
-        this.#ws.removeEventListener("open", onOpen);
+        ws.removeEventListener("error", onOpenError);
+        ws.removeEventListener("open", onOpen);
       };
-      this.#ws.addEventListener("error", onOpenError);
-      this.#ws.addEventListener("open", onOpen);
+      ws.addEventListener("error", onOpenError);
+      ws.addEventListener("open", onOpen);
     } else {
-      pending.resolve();
+      pending.resolve(client);
     }
     return pending;
   };
 
-  close = async (): Promise<void> => {
-    const pending = deferred<void>();
+  close = async (): Promise<undefined | FailedToDisconnectError> => {
+    const pending = deferred<undefined | FailedToDisconnectError>();
     const onClose = () => {
-      this.#ws.removeEventListener("error", this.onError);
-      this.#ws.removeEventListener("message", this.onMessage);
-      this.#ws.removeEventListener("close", onClose);
+      this.#ws?.removeEventListener("error", this.onError);
+      this.#ws?.removeEventListener("message", this.onMessage);
+      this.#ws?.removeEventListener("close", onClose);
       pending.resolve();
     };
-    this.#ws.addEventListener("close", onClose);
-    this.#ws.close();
+    this.#ws?.addEventListener("close", onClose);
+    this.#ws?.close();
+    try {
+      await deadline(pending, 250);
+    } catch (_e) {
+      pending.resolve(new FailedToDisconnectError());
+    }
     return pending;
   };
 
   send = (egressMessage: InitMessage): void => {
-    this.#ws.send(JSON.stringify(egressMessage));
+    this.#ws?.send(JSON.stringify(egressMessage));
   };
 
-  parseMessage = (e: unknown): IngressMessage => {
+  parseIngressMessage = (e: unknown): IngressMessage | B.ParseRawIngressMessageError => {
     if (
       typeof e !== "object"
       || e === null
       || !("data" in e)
       || typeof (e as { data?: string }).data !== "string"
     ) {
-      throw new WsRpcClientError.FailedToParse();
+      return new B.ParseRawIngressMessageError();
     }
     return JSON.parse((e as { data: string }).data);
   };
 
   // TODO: provide insight into error via `_e`
-  parseError = (_e: Event): WsRpcClientError => {
-    return new WsRpcClientError.WsError();
+  parseError = (_e: Event): WebSocketInternalError => {
+    return new WebSocketInternalError();
   };
-}
-
-export type WsRpcClientError =
-  | WsRpcClientError.FailedToInitialize
-  | WsRpcClientError.FailedToParse;
-export namespace WsRpcClientError {
-  export class FailedToInitialize extends RpcClientError {}
-  export class FailedToParse extends RpcClientError {}
-  export class WsError extends RpcClientError {}
-}
-
-export async function wsRpcClient(url: string) {
-  const rpcClient = new WsRpcClient(url);
-  await rpcClient.opening();
-  return rpcClient;
 }

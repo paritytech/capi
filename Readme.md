@@ -67,11 +67,11 @@ import * as C from "capi";
 For now, we will manually instantiate an RPC client (in this case, with a proxy WebSocket URL).
 
 ```ts
-const rpc = C.wsRpcClient(C.POLKADOT_PROXY_WS_URL);
+const client = C.wsRpcClient(C.POLKADOT_PROXY_WS_URL);
 
 // Use the client here
 
-await rpc.close();
+await client.close();
 ```
 
 Our north star is a version of Capi which manages the connection lifecycle on your behalf.

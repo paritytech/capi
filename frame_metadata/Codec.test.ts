@@ -1,4 +1,4 @@
-import * as asserts from "../_deps/asserts.ts";
+import { assertEquals } from "../_deps/asserts.ts";
 import { ChainError } from "./Codec.ts";
 import { accountId32, getLookupAndDeriveCodec } from "./test-util.ts";
 
@@ -13,8 +13,8 @@ Deno.test("Derive all", () => {
 Deno.test("Derive AccountId32 Codec", async () => {
   const codec = deriveCodec(0);
   const encoded = codec.encode(accountId32);
-  asserts.assertEquals(encoded, accountId32);
-  asserts.assertEquals(codec.decode(encoded), accountId32);
+  assertEquals(encoded, accountId32);
+  assertEquals(codec.decode(encoded), accountId32);
 });
 
 Deno.test("Derive AccountInfo Codec", async () => {
@@ -32,7 +32,7 @@ Deno.test("Derive AccountInfo Codec", async () => {
     },
   };
   const encoded = codec.encode(decoded);
-  asserts.assertEquals(codec.decode(encoded), decoded);
+  assertEquals(codec.decode(encoded), decoded);
 });
 
 Deno.test("Derive Auctions AuctionInfo Storage Entry Codec", async () => {
@@ -43,7 +43,7 @@ Deno.test("Derive Auctions AuctionInfo Storage Entry Codec", async () => {
   const codec = deriveCodec(auctionInfoStorageEntry.value);
   const decoded = [8, 9945400];
   const encoded = codec.encode(decoded);
-  asserts.assertEquals(codec.decode(encoded), decoded);
+  assertEquals(codec.decode(encoded), decoded);
 });
 
 Deno.test("Derive Auction Winning Storage Entry Codec", async () => {
@@ -58,7 +58,7 @@ Deno.test("Derive Auction Winning Storage Entry Codec", async () => {
     ...Array(28).fill(undefined),
   ];
   const encoded = codec.encode(decoded);
-  asserts.assertEquals(codec.decode(encoded), decoded);
+  assertEquals(codec.decode(encoded), decoded);
 });
 
 Deno.test("Westend circular", async () => {
@@ -70,8 +70,8 @@ Deno.test("Derive pallet_xcm::pallet::Error codec", async () => {
   const ty = metadata.tys.find((x) => x.path.join("::") === "pallet_xcm::pallet::Error")!;
   const codec = deriveCodec(ty.i);
   const encoded = codec.encode("Unreachable");
-  asserts.assertEquals(encoded, new Uint8Array([0]));
-  asserts.assertEquals(codec.decode(encoded), "Unreachable");
+  assertEquals(encoded, new Uint8Array([0]));
+  assertEquals(codec.decode(encoded), "Unreachable");
 });
 
 Deno.test("Derive Result codec", async () => {
@@ -82,10 +82,10 @@ Deno.test("Derive Result codec", async () => {
   const codec = deriveCodec(ty.i);
   const ok = null;
   const okEncoded = codec.encode(ok);
-  asserts.assertEquals(okEncoded, new Uint8Array([0]));
-  asserts.assertEquals(codec.decode(okEncoded), ok);
+  assertEquals(okEncoded, new Uint8Array([0]));
+  assertEquals(codec.decode(okEncoded), ok);
   const err = new ChainError({ type: "Other" });
   const errEncoded = codec.encode(err);
-  asserts.assertEquals(errEncoded, new Uint8Array([1, 0]));
-  asserts.assertEquals(codec.decode(errEncoded), err);
+  assertEquals(errEncoded, new Uint8Array([1, 0]));
+  assertEquals(codec.decode(errEncoded), err);
 });

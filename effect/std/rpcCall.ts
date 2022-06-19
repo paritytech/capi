@@ -1,5 +1,12 @@
 import * as rpc from "../../rpc/mod.ts";
+import { ErrorCtor } from "../../util/mod.ts";
 import { effector, EffectorArgs } from "../impl/mod.ts";
+
+export class RpcServerInternalError extends ErrorCtor("RpcServerInternal") {
+  constructor(readonly inner: rpc.ErrMessage) {
+    super();
+  }
+}
 
 export const rpcCall = effector.async.generic(
   "rpcCall",
@@ -8,7 +15,7 @@ export const rpcCall = effector.async.generic(
       ...args: EffectorArgs<
         X,
         [
-          client: rpc.RpcClient<rpc.RpcError>,
+          client: rpc.AnyClient,
           methodName: N,
           ...params: rpc.InitMessage<N>["params"],
         ]
@@ -18,7 +25,7 @@ export const rpcCall = effector.async.generic(
         async (client, methodName, ...params) => {
           const result = await client.call(methodName, params);
           if (result.error) {
-            return new rpc.RpcServerError(result);
+            return new RpcServerInternalError(result);
           }
           return result;
         }),

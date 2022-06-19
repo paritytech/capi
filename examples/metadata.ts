@@ -1,11 +1,14 @@
+import { assert } from "../_deps/asserts.ts";
+import { polkadotBeacon } from "../known/mod.ts";
 import * as C from "../mod.ts";
-import { wsRpcClient } from "../rpc/mod.ts";
+import { rpcClient } from "../rpc/mod.ts";
 
-const rpc = await wsRpcClient(C.POLKADOT_RPC_URL);
-const $metadata = C.metadata(rpc);
+const client = await rpcClient(...polkadotBeacon);
+assert(!(client instanceof Error));
+const $metadata = C.metadata(client);
 const result = await $metadata.run();
 if (result instanceof Error) {
   throw result;
 }
 console.log(result);
-await rpc.close();
+await client.close();

@@ -1,69 +1,78 @@
 import type * as smoldot from "../_deps/smoldot.ts";
-import { RpcClient } from "./Base.ts";
-import { RpcClientError } from "./Error.ts";
-import { InitMessage } from "./messages.ts";
+import { ErrorCtor } from "../util/mod.ts";
+import * as B from "./Base.ts";
+import * as M from "./messages.ts";
 
-/** Be careful to only utilize methods once `openPending` is resolved */
-export class SmoldotRpcClient extends RpcClient<SmoldotRpcClientError> {
-  openPending;
-  #chain!: smoldot.Chain;
+export class SmoldotClient extends B.Client<string, string, unknown, SmoldotInternalError> {
+  static #innerClient?: smoldot.Client;
+  #chain?: smoldot.Chain;
 
-  constructor(readonly smoldotClient: smoldot.Client, readonly chainSpec: string) {
-    super();
-    this.openPending = smoldotClient
-      .addChain({
-        chainSpec,
-        jsonRpcCallback: this.onMessage,
-      })
-      .then((chain) => {
-        this.#chain = chain;
-      })
-      .catch(() => {
-        // TODO: parameterize error / supply better message
-        this.onError(new SmoldotRpcClientError.FailedToInitialize());
+  static #ensureInstance = async (): Promise<smoldot.Client | FailedToStartSmoldotError> => {
+    if (!SmoldotClient.#innerClient) {
+      try {
+        const smoldot = await import("../_deps/smoldot.ts");
+        SmoldotClient.#innerClient = smoldot.start();
+      } catch (_e) {
+        return new FailedToStartSmoldotError();
+      }
+    }
+    return SmoldotClient.#innerClient;
+  };
+
+  static async open(
+    props: B.ClientProps<string, SmoldotInternalError>,
+  ): Promise<SmoldotClient | FailedToStartSmoldotError | FailedToAddChainError> {
+    const inner = await SmoldotClient.#ensureInstance();
+    if (inner instanceof Error) {
+      return inner;
+    }
+    try {
+      const client = new SmoldotClient(props);
+      // TODO: wire up `onError`
+      client.#chain = await inner.addChain({
+        chainSpec: props.beacon,
+        jsonRpcCallback: client.onMessage,
       });
+      return client;
+    } catch (_e) {
+      return new FailedToAddChainError();
+    }
   }
 
-  close = async (): Promise<void> => {
-    this.#chain.remove();
-  };
-
-  send = (egressMessage: InitMessage): void => {
-    this.#chain.sendJsonRpc(JSON.stringify(egressMessage));
-  };
-
-  parseMessage = (m: unknown) => {
-    if (typeof m !== "string") {
-      this.onError(new SmoldotRpcClientError.FailedToParse());
+  close = async (): Promise<undefined | FailedToRemoveChainError> => {
+    try {
+      this.#chain?.remove();
       return;
+    } catch (e) {
+      if (e instanceof Error) {
+        // TODO: handle the following in a special manner?
+        // - `AlreadyDestroyedError`
+        // - `CrashError`
+      }
+      return new FailedToRemoveChainError();
     }
-    return JSON.parse(m);
   };
 
-  parseError = (_e: unknown) => {
-    return new SmoldotRpcClientError.Internal();
+  send = (egressMessage: M.InitMessage): void => {
+    this.#chain?.sendJsonRpc(JSON.stringify(egressMessage));
+  };
+
+  parseIngressMessage = (
+    rawIngressMessage: string,
+  ): M.IngressMessage | B.ParseRawIngressMessageError => {
+    try {
+      return JSON.parse(rawIngressMessage);
+    } catch (_e) {
+      return new B.ParseRawIngressMessageError();
+    }
+  };
+
+  parseError = (_e: unknown): SmoldotInternalError => {
+    return new SmoldotInternalError();
   };
 }
 
-export const smoldotRpcClientFactory = (() => {
-  let smoldotClient: smoldot.Client;
-  return (start: () => smoldot.Client) => {
-    if (!smoldotClient) smoldotClient = start();
-    // TODO: accept branded type
-    return async (chainSpec: string) => {
-      const rpcClient = new SmoldotRpcClient(smoldotClient, chainSpec);
-      await rpcClient.openPending;
-      return rpcClient;
-    };
-  };
-})();
-
-export type SmoldotRpcClientError =
-  | SmoldotRpcClientError.FailedToInitialize
-  | SmoldotRpcClientError.FailedToParse
-  | SmoldotRpcClientError.Internal;
-export namespace SmoldotRpcClientError {
-  export class FailedToInitialize extends RpcClientError {}
-  export class FailedToParse extends RpcClientError {}
-  export class Internal extends RpcClientError {}
-}
+export class FailedToStartSmoldotError extends ErrorCtor("FailedToStartSmoldot") {}
+export class FailedToAddChainError extends ErrorCtor("FailedToAddChain") {}
+export class SmoldotInternalError extends ErrorCtor("SmoldotInternal") {}
+export class FailedToRemoveChainError extends ErrorCtor("FailedToRemoveChain") {}
