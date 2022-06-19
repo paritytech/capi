@@ -10,11 +10,5 @@ export type ChainSpec = Branded<string, typeof _proxyWsUrl>;
 
 export type Beacon = ProxyWsUrl | ChainSpec;
 
-export * from "./acala.ts";
-export { type Ss58Lookup } from "./generated.ts";
-export * from "./kusama.ts";
-export * from "./moonbeam.ts";
-export * from "./polkadot.ts";
-export * from "./statemint.ts";
-export * from "./subsocial.ts";
-export * from "./westend.ts";
+export * from "./beacons.ts";
+export * from "./generated.ts";

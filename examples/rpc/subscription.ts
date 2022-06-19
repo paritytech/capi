@@ -1,6 +1,4 @@
-#!/usr/bin/env -S deno run -A --no-check=remote
-
-import { polkadotBeacon } from "../../known/polkadot.ts";
+import { polkadotBeacon } from "../../known/mod.ts";
 import { rpcClient } from "../../rpc/mod.ts";
 
 const client = await rpcClient(polkadotBeacon);

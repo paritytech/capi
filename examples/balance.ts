@@ -1,4 +1,4 @@
-import { polkadotBeacon } from "../known/polkadot.ts";
+import { polkadotBeacon } from "../known/mod.ts";
 import * as C from "../mod.ts";
 import { rpcClient } from "../rpc/mod.ts";
 
