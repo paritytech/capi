@@ -1,15 +1,15 @@
-import { Client, RpcError } from "../../rpc/mod.ts";
+import { AnyClient } from "../../rpc/mod.ts";
 import { effector } from "../impl/mod.ts";
 
 export interface Pallet {
-  rpc: Client<RpcError>;
+  rpc: AnyClient;
   name: string;
 }
 
 export const pallet = effector.sync(
   "pallet",
   () =>
-    (rpc: Client<RpcError>, name: string): Pallet => ({
+    (rpc: AnyClient, name: string): Pallet => ({
       rpc,
       name,
     }),

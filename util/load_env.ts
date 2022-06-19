@@ -1,4 +1,4 @@
-import * as asserts from "../_deps/asserts.ts";
+import { assert } from "../_deps/asserts.ts";
 import "../_deps/load_dotenv.ts";
 
 export function loadEnv<T extends Record<string, unknown>>(
@@ -7,7 +7,7 @@ export function loadEnv<T extends Record<string, unknown>>(
   const result: Partial<T> = {};
   for (const key in transformers) {
     const value = Deno.env.get(key);
-    asserts.assert(value);
+    assert(value);
     result[key] = transformers[key](value);
   }
   return result as T;

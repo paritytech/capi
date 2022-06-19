@@ -3,31 +3,31 @@ import { ErrorCtor } from "../util/mod.ts";
 import * as B from "./Base.ts";
 import * as M from "./messages.ts";
 
-export class SmoldotRpcClient extends B.Client<string, string, unknown, SmoldotInternalError> {
+export class SmoldotClient extends B.Client<string, string, unknown, SmoldotInternalError> {
   static #innerClient?: smoldot.Client;
   #chain?: smoldot.Chain;
 
   static #ensureInstance = async (): Promise<smoldot.Client | FailedToStartSmoldotError> => {
-    if (!SmoldotRpcClient.#innerClient) {
+    if (!SmoldotClient.#innerClient) {
       try {
         const smoldot = await import("../_deps/smoldot.ts");
-        SmoldotRpcClient.#innerClient = smoldot.start();
+        SmoldotClient.#innerClient = smoldot.start();
       } catch (_e) {
         return new FailedToStartSmoldotError();
       }
     }
-    return SmoldotRpcClient.#innerClient;
+    return SmoldotClient.#innerClient;
   };
 
   static async open(
     props: B.ClientProps<string, SmoldotInternalError>,
-  ): Promise<SmoldotRpcClient | FailedToStartSmoldotError | FailedToAddChainError> {
-    const inner = await SmoldotRpcClient.#ensureInstance();
+  ): Promise<SmoldotClient | FailedToStartSmoldotError | FailedToAddChainError> {
+    const inner = await SmoldotClient.#ensureInstance();
     if (inner instanceof Error) {
       return inner;
     }
     try {
-      const client = new SmoldotRpcClient(props);
+      const client = new SmoldotClient(props);
       // TODO: wire up `onError`
       client.#chain = await inner.addChain({
         chainSpec: props.beacon,
@@ -67,7 +67,7 @@ export class SmoldotRpcClient extends B.Client<string, string, unknown, SmoldotI
     }
   };
 
-  parseError = (_e: unknown) => {
+  parseError = (_e: unknown): SmoldotInternalError => {
     return new SmoldotInternalError();
   };
 }

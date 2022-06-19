@@ -1,4 +1,4 @@
-import * as asserts from "../_deps/asserts.ts";
+import { assert } from "../_deps/asserts.ts";
 import * as fs from "../_deps/fs.ts";
 import * as path from "../_deps/path.ts";
 import * as known from "../known/mod.ts";
@@ -17,9 +17,10 @@ await Promise.all(
     westend: known.WESTEND_PROXY_WS_URL,
   }).map(async ([name, url]) => {
     const client = await rpc.rpcClient(url);
+    assert(!(client instanceof Error));
     try {
       const metadata = await client.call("state_getMetadata", []);
-      asserts.assert(metadata.result);
+      assert(metadata.result);
       const outPath = path.join(outDir, `${name}.scale`);
       console.log(`Downloading ${name} metadata to "${outPath}".`);
       await Deno.writeTextFile(outPath, metadata.result);
