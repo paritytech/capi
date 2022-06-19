@@ -24,11 +24,11 @@ for (let i = 0; i < ss58Registry.length; i++) {
       if (span) {
         const finalId = `${name}_${id}`;
         generated += `export const ${finalId} = ${span};\n`;
-        summation += `\t${id}: ${finalId},\n`;
+        summation += `  ${id}: ${finalId},\n`;
       }
     });
-    generated += `${summation}} as const;\ntype ${name} = typeof ${name};\n\n`;
-    lookup += `\t${networkNameSnakeCase}: ${name},\n`;
+    generated += `${summation}} as const;\nexport type ${name} = typeof ${name};\n\n`;
+    lookup += `  ${networkNameSnakeCase}: ${name},\n`;
   }
 }
 const final =
