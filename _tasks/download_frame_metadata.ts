@@ -16,7 +16,7 @@ await Promise.all(
     subsocial: known.SUBSOCIAL_PROXY_WS_URL,
     westend: known.WESTEND_PROXY_WS_URL,
   }).map(async ([name, url]) => {
-    const client = await rpc.rpcClient(url);
+    const client = await rpc.client(rpc.beacon([url]));
     assert(!(client instanceof Error));
     try {
       const metadata = await client.call("state_getMetadata", []);

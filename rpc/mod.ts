@@ -1,7 +1,8 @@
+import { MethodName } from "./messages.ts";
 import { SmoldotClient } from "./smoldot.ts";
 import { ProxyWsUrlClient } from "./ws.ts";
 
-export type AnyClient = ProxyWsUrlClient | SmoldotClient;
+export type AnyClient = ProxyWsUrlClient<MethodName> | SmoldotClient<MethodName>;
 
 export * from "./auto.ts";
 export * from "./Base.ts";

@@ -3,7 +3,9 @@ import { ErrorCtor } from "../util/mod.ts";
 import * as B from "./Base.ts";
 import * as M from "./messages.ts";
 
-export class SmoldotClient extends B.Client<string, string, unknown, SmoldotInternalError> {
+export class SmoldotClient<Supported extends M.MethodName>
+  extends B.Client<Supported, string, string, unknown, SmoldotInternalError>
+{
   static #innerClient?: smoldot.Client;
   #chain?: smoldot.Chain;
 
@@ -19,9 +21,9 @@ export class SmoldotClient extends B.Client<string, string, unknown, SmoldotInte
     return SmoldotClient.#innerClient;
   };
 
-  static async open(
-    props: B.ClientProps<string, SmoldotInternalError>,
-  ): Promise<SmoldotClient | FailedToStartSmoldotError | FailedToAddChainError> {
+  static async open<Supported extends M.MethodName>(
+    props: B.ClientProps<Supported, string, SmoldotInternalError>,
+  ): Promise<SmoldotClient<Supported> | FailedToStartSmoldotError | FailedToAddChainError> {
     const inner = await SmoldotClient.#ensureInstance();
     if (inner instanceof Error) {
       return inner;
@@ -59,7 +61,7 @@ export class SmoldotClient extends B.Client<string, string, unknown, SmoldotInte
 
   parseIngressMessage = (
     rawIngressMessage: string,
-  ): M.IngressMessage | B.ParseRawIngressMessageError => {
+  ): M.IngressMessage<Supported> | B.ParseRawIngressMessageError => {
     try {
       return JSON.parse(rawIngressMessage);
     } catch (_e) {

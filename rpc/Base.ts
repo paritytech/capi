@@ -1,16 +1,21 @@
 import { deferred } from "../_deps/async.ts";
 import * as M from "./messages.ts";
 
-export interface ClientProps<Beacon, ParsedError extends Error> {
+export interface ClientProps<
+  Supported extends M.MethodName,
+  Beacon,
+  ParsedError extends Error,
+> {
   beacon: Beacon;
   hooks?: {
     send?: (message: M.InitMessage) => void;
-    receive?: (message: M.IngressMessage) => void;
+    receive?: (message: M.IngressMessage<Supported>) => void;
     error?: (error: ParsedError | ParseRawErrorError) => void;
   };
 }
 
 export abstract class Client<
+  Supported extends M.MethodName,
   Beacon,
   RawIngressMessage,
   RawError,
@@ -24,14 +29,14 @@ export abstract class Client<
    *
    * @param props the beacon, error handling and message hooks with which you'd like the instance to operate
    */
-  constructor(readonly props: ClientProps<Beacon, ParsedError>) {}
+  constructor(readonly props: ClientProps<Supported, Beacon, ParsedError>) {}
 
   /**
    * Send a message to the RPC server
    *
    * @param egressMessage the message you wish to send to the RPC server
    */
-  abstract send: (egressMessage: M.InitMessage) => void;
+  abstract send: (egressMessage: M.InitMessage<Supported>) => void;
 
   /**
    * Parse messages returned from the RPC server (this includes RPC server errors)
@@ -41,7 +46,7 @@ export abstract class Client<
    */
   abstract parseIngressMessage: (
     rawIngressMessage: RawIngressMessage,
-  ) => M.IngressMessage | ParseRawIngressMessageError;
+  ) => M.IngressMessage<Supported> | ParseRawIngressMessageError;
 
   /**
    * Parse errors of the given client, such as an error `Event` in the case of `WebSocket`s
@@ -107,7 +112,7 @@ export abstract class Client<
    * @param params the params with which to call the method
    * @returns an ingress message corresponding to the given method (or a message-agnostic error)
    */
-  call = async <Method extends M.MethodName>(
+  call = async <Method extends Supported>(
     method: Method,
     params: M.InitMessageByMethodName[Method]["params"],
   ): Promise<M.OkMessage<Method> | M.ErrMessage> => {
@@ -138,7 +143,7 @@ export abstract class Client<
    * @param listenerCb the callback to which notifications should be supplied
    * @returns a function with which to stop listening for notifications
    */
-  subscribe = async <Method extends M.SubscriptionMethodName>(
+  subscribe = async <Method extends Extract<Supported, M.SubscriptionMethodName>>(
     method: Method,
     params: M.InitMessage<Method>["params"],
     listenerCb: ListenerCb<M.NotifMessage<Method>>,
