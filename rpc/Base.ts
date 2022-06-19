@@ -55,7 +55,7 @@ export abstract class Client<
   /**
    * Close the connection and free up resources
    *
-   * @returns a promise, which resolved to `undefined` upon successful cancelation
+   * @returns a promise, which resolved to `undefined` upon successful cancellation
    */
   abstract close: () => Promise<undefined | CloseError>;
 
