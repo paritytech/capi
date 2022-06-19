@@ -1,21 +1,26 @@
 import { deferred } from "../_deps/async.ts";
-import { RpcClient } from "./Base.ts";
-import { RpcClientError } from "./Error.ts";
+import { ErrorCtor } from "../util/mod.ts";
+import * as B from "./Base.ts";
 import { IngressMessage, InitMessage } from "./messages.ts";
 
-export class WsRpcClient extends RpcClient<WsRpcClientError> {
-  #ws;
+export class FailedToStartSmoldotError extends ErrorCtor("FailedToStartSmoldot") {}
+export class FailedToInitializeChainError extends ErrorCtor("FailedToInitializeChain") {}
+export class FailedToParseIngressMessageError extends ErrorCtor("FailedToParseIngressMessage") {}
+export class SmoldotInternalError extends ErrorCtor("SmoldotInternal") {}
 
-  constructor(readonly url: string) {
-    super();
-    this.#ws = new WebSocket(url);
-    this.#ws.addEventListener("error", this.onError);
-    this.#ws.addEventListener("message", this.onMessage);
-  }
+export class ProxyWsUrlRpcClient extends B.Client<string, ProxyWsUrlRpcClientError> {
+  #ws?: WebSocket;
 
-  opening = (): Promise<void> => {
+  static open = async (
+    props: B.ClientProps<WsProxyUrl, ProxyWsUrlRpcClientError>,
+  ): Promise<void> => {
+    const client = new ProxyWsUrlRpcClient(props);
+    const ws = new WebSocket(props.beacon);
+    client.#ws = ws;
+    ws.addEventListener("error", client.onError);
+    ws.addEventListener("message", client.onMessage);
     const pending = deferred<void>();
-    if (this.#ws.readyState === WebSocket.CONNECTING) {
+    if (ws.readyState === WebSocket.CONNECTING) {
       const onOpenError = () => {
         clearListeners();
         pending.reject();
@@ -25,11 +30,11 @@ export class WsRpcClient extends RpcClient<WsRpcClientError> {
         pending.resolve();
       };
       const clearListeners = () => {
-        this.#ws.removeEventListener("error", onOpenError);
-        this.#ws.removeEventListener("open", onOpen);
+        ws.removeEventListener("error", onOpenError);
+        ws.removeEventListener("open", onOpen);
       };
-      this.#ws.addEventListener("error", onOpenError);
-      this.#ws.addEventListener("open", onOpen);
+      ws.addEventListener("error", onOpenError);
+      ws.addEventListener("open", onOpen);
     } else {
       pending.resolve();
     }
@@ -39,18 +44,18 @@ export class WsRpcClient extends RpcClient<WsRpcClientError> {
   close = async (): Promise<void> => {
     const pending = deferred<void>();
     const onClose = () => {
-      this.#ws.removeEventListener("error", this.onError);
-      this.#ws.removeEventListener("message", this.onMessage);
-      this.#ws.removeEventListener("close", onClose);
+      this.#ws?.removeEventListener("error", this.onError);
+      this.#ws?.removeEventListener("message", this.onMessage);
+      this.#ws?.removeEventListener("close", onClose);
       pending.resolve();
     };
-    this.#ws.addEventListener("close", onClose);
-    this.#ws.close();
+    this.#ws?.addEventListener("close", onClose);
+    this.#ws?.close();
     return pending;
   };
 
   send = (egressMessage: InitMessage): void => {
-    this.#ws.send(JSON.stringify(egressMessage));
+    this.#ws?.send(JSON.stringify(egressMessage));
   };
 
   parseMessage = (e: unknown): IngressMessage => {
@@ -69,13 +74,4 @@ export class WsRpcClient extends RpcClient<WsRpcClientError> {
   parseError = (_e: Event): WsRpcClientError => {
     return new WsRpcClientError.WsError();
   };
-}
-
-export type WsRpcClientError =
-  | WsRpcClientError.FailedToInitialize
-  | WsRpcClientError.FailedToParse;
-export namespace WsRpcClientError {
-  export class FailedToInitialize extends RpcClientError {}
-  export class FailedToParse extends RpcClientError {}
-  export class WsError extends RpcClientError {}
 }

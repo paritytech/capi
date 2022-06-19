@@ -8,7 +8,7 @@ export const rpcCall = effector.async.generic(
       ...args: EffectorArgs<
         X,
         [
-          client: rpc.RpcClient<rpc.RpcError>,
+          client: rpc.Client<rpc.RpcError>,
           methodName: N,
           ...params: rpc.InitMessage<N>["params"],
         ]

@@ -1,17 +1,30 @@
 import { deferred } from "../_deps/async.ts";
-import * as E from "./Error.ts";
 import * as M from "./messages.ts";
 
-export type ListenerCb<IngressMessage_ extends M.IngressMessage = M.IngressMessage> = (
-  ingressMessage: IngressMessage_,
-) => void;
+export interface ClientProps<Beacon, ParsedError extends Error> {
+  beacon: Beacon;
+  hooks?: {
+    send?: (message: M.InitMessage) => void;
+    receive?: (message: M.IngressMessage) => void;
+    error?: (error: ParsedError | ParseRawErrorError) => void;
+  };
+}
 
-export type StopListening = () => void;
-
-export abstract class RpcClient<RpcError extends E.RpcError> {
+export abstract class Client<
+  Beacon,
+  RawIngressMessage,
+  RawError,
+  ParsedError extends Error,
+> {
   #nextId = 0;
   listeners = new Map<ListenerCb, boolean>();
-  #errors: RpcError[] = [];
+
+  /**
+   * Construct a new RPC client
+   *
+   * @param props the beacon, error handling and message hooks with which you'd like the instance to operate
+   */
+  constructor(readonly props: ClientProps<Beacon, ParsedError>) {}
 
   /**
    * Send a message to the RPC server
@@ -26,7 +39,9 @@ export abstract class RpcClient<RpcError extends E.RpcError> {
    * @param rawIngressMessage the raw response from the given provider, likely in need of some sanitization
    * @returns the sanitized ingress message, common to all providers
    */
-  abstract parseMessage: (rawIngressMessage: unknown) => M.IngressMessage;
+  abstract parseIngressMessage: (
+    rawIngressMessage: RawIngressMessage,
+  ) => M.IngressMessage | ParseRawIngressMessageError;
 
   /**
    * Parse errors of the given client, such as an error `Event` in the case of `WebSocket`s
@@ -34,7 +49,7 @@ export abstract class RpcClient<RpcError extends E.RpcError> {
    * @param rawError the raw error from the given provider
    * @returns an instance of `RpcError`, typed via the client's sole generic type param
    */
-  abstract parseError: (rawError: any) => RpcError;
+  abstract parseError: (rawError: RawError) => ParsedError | ParseRawErrorError;
 
   // TODO: introduce `FailedToClose` error in the return type (union with `undefined`)
   /**
@@ -42,7 +57,7 @@ export abstract class RpcClient<RpcError extends E.RpcError> {
    *
    * @returns a promise, which resolved to `undefined` upon successful cancelation
    */
-  abstract close: () => Promise<void>;
+  abstract close: () => Promise<undefined | CloseError>;
 
   /** @returns a new ID, unique to the client instance */
   uid = (): string => {
@@ -56,10 +71,10 @@ export abstract class RpcClient<RpcError extends E.RpcError> {
    * @returns a function to detach the listener
    */
   listen = (listener: ListenerCb): StopListening => {
-    if (this.listeners.has(listener)) {
-      throw new Error();
+    // TODO: do we care about repeat registration?
+    if (!this.listeners.has(listener)) {
+      this.listeners.set(listener, true);
     }
-    this.listeners.set(listener, true);
     return () => {
       this.listeners.delete(listener);
     };
@@ -67,19 +82,23 @@ export abstract class RpcClient<RpcError extends E.RpcError> {
 
   // TODO: do we want to parameterize `RpcClient` with a `RawMessage` type?
   /** @internal */
-  onMessage = (message: unknown) => {
-    const parsed = this.parseMessage(message);
-    for (const listener of this.listeners.keys()) {
-      listener(parsed);
+  onMessage = (message: RawIngressMessage) => {
+    const parsed = this.parseIngressMessage(message);
+    if (parsed instanceof Error) {
+      this.props.hooks?.error?.(parsed);
+    } else {
+      this.props.hooks?.receive?.(parsed);
+      for (const listener of this.listeners.keys()) {
+        listener(parsed);
+      }
     }
   };
 
   /** @internal */
-  onError = (error: unknown): void => {
-    this.#errors.push(this.parseError(error));
+  onError = (error: RawError): void => {
+    const parsedError = this.parseError(error);
+    this.props.hooks?.error?.(parsedError);
   };
-
-  abstract opening(): Promise<void>;
 
   /**
    * Call an RPC method and return a promise resolving to an ingress message with an ID that matches the egress message
@@ -123,10 +142,10 @@ export abstract class RpcClient<RpcError extends E.RpcError> {
     method: Method,
     params: M.InitMessage<Method>["params"],
     listenerCb: ListenerCb<M.NotifMessage<Method>>,
-  ): Promise<StopListening> => {
+  ): Promise<StopListening | M.ErrMessage> => {
     const initRes = await this.call(method, params);
-    if (initRes instanceof E.RpcServerError) {
-      throw initRes;
+    if (initRes.error) {
+      return initRes;
     }
     const stopListening = this.listen((res) => {
       // TODO: handle subscription errors
@@ -137,6 +156,16 @@ export abstract class RpcClient<RpcError extends E.RpcError> {
     return stopListening;
   };
 }
+
+export class ParseRawIngressMessageError extends Error {}
+export class ParseRawErrorError extends Error {}
+export class CloseError extends Error {}
+
+export type ListenerCb<IngressMessage_ extends M.IngressMessage = M.IngressMessage> = (
+  ingressMessage: IngressMessage_,
+) => void;
+
+export type StopListening = () => void;
 
 export function IsCorrespondingRes<Init_ extends M.InitMessage>(init: Init_) {
   return <InQuestion extends M.IngressMessage>(
