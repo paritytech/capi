@@ -6,15 +6,10 @@ const _N: unique symbol = Symbol();
 export type Subscription<NotificationResult = any> = { [_N]: NotificationResult };
 type TODO_NARROW_METHOD_TYPE = (...args: unknown[]) => unknown;
 
+export type AnyMethods = Record<string, U.AnyFn>;
+
 // TODO: attach type-level docs (draw from Substrate's source)
-/**
- * The following is modeled closely after the method definitions of Smoldot. This `Lookup` type serves as a source of
- * truth, from which we map to init, notification and ok response types. Error types are––unfortunately––not defined as
- * method-specific on the Rust side, although perhaps we could create represent them as such.
- *
- * @see https://github.com/paritytech/smoldot/blob/82836f4f2af4dd1716c57c14a4f591c7b1043950/src/json_rpc/methods.rs#L338-L479
- */
-export type Methods = Lookup<{
+export type KnownMethods = EnsureKnownMethods<{
   account: {
     nextIndex: TODO_NARROW_METHOD_TYPE;
   };
@@ -35,25 +30,25 @@ export type Methods = Lookup<{
   chain: {
     getBlock(hash?: U.HashHexString): T.Block;
     getBlockHash(height?: number): U.HashHexString;
-    getFinalisedHead: Methods["chain_getFinalizedHead"];
+    getFinalisedHead: KnownMethods["chain_getFinalizedHead"];
     getFinalizedHead(): U.HashHexString;
-    getHead: Methods["chain_getBlockHash"];
+    getHead: KnownMethods["chain_getBlockHash"];
     getHeader(hash?: U.HashHexString): T.Header;
-    getRuntimeVersion: Methods["state_getRuntimeVersion"];
+    getRuntimeVersion: KnownMethods["state_getRuntimeVersion"];
     subscribeAllHeads(): Subscription<T.Header>;
-    subscribeFinalisedHeads: Methods["chain_subscribeFinalizedHeads"];
+    subscribeFinalisedHeads: KnownMethods["chain_subscribeFinalizedHeads"];
     subscribeFinalizedHeads(): Subscription<T.Header /* TODO: narrow to finalized? */>;
-    subscribeNewHead: Methods["chain_subscribeNewHeads"];
+    subscribeNewHead: KnownMethods["chain_subscribeNewHeads"];
     subscribeNewHeads(): Subscription<unknown>;
-    subscribeRuntimeVersion: Methods["state_subscribeRuntimeVersion"];
-    subscribe_newHead: Methods["chain_subscribeNewHeads"];
+    subscribeRuntimeVersion: KnownMethods["state_subscribeRuntimeVersion"];
+    subscribe_newHead: KnownMethods["chain_subscribeNewHeads"];
     unsubscribeAllHeads(subscription: string): boolean;
-    unsubscribeFinalisedHeads: Methods["chain_unsubscribeFinalizedHeads"];
+    unsubscribeFinalisedHeads: KnownMethods["chain_unsubscribeFinalizedHeads"];
     unsubscribeFinalizedHeads(subscription: string): boolean;
-    unsubscribeNewHead: Methods["chain_unsubscribeNewHeads"];
+    unsubscribeNewHead: KnownMethods["chain_unsubscribeNewHeads"];
     unsubscribeNewHeads(subscription: string): boolean;
-    unsubscribeRuntimeVersion: Methods["state_unsubscribeRuntimeVersion"];
-    unsubscribe_newHead: Methods["chain_unsubscribeNewHeads"];
+    unsubscribeRuntimeVersion: KnownMethods["state_unsubscribeRuntimeVersion"];
+    unsubscribe_newHead: KnownMethods["chain_unsubscribeNewHeads"];
   };
   chainHead: {
     unstable_body(followSubscription: U.HashHexString, networkConfig?: T.NetworkConfig): string;
@@ -105,18 +100,18 @@ export type Methods = Lookup<{
   };
   state: {
     call: TODO_NARROW_METHOD_TYPE;
-    callAt: Methods["state_call"];
+    callAt: KnownMethods["state_call"];
     getKeys: TODO_NARROW_METHOD_TYPE;
-    getKeysPagedAt: Methods["state_getKeysPaged"];
+    getKeysPagedAt: KnownMethods["state_getKeysPaged"];
     getMetadata(hash?: U.HashHexString): string;
     getPairs: TODO_NARROW_METHOD_TYPE;
     getReadProof: TODO_NARROW_METHOD_TYPE;
     getRuntimeVersion(at?: U.HashHexString): T.RuntimeVersion;
     getStorage(key: U.HexString, hash?: U.HashHexString): U.HexString;
     getStorageHash: TODO_NARROW_METHOD_TYPE;
-    getStorageHashAt: Methods["state_getStorageHash"];
+    getStorageHashAt: KnownMethods["state_getStorageHash"];
     getStorageSize: TODO_NARROW_METHOD_TYPE;
-    getStorageSizeAt: Methods["state_getStorageSize"];
+    getStorageSizeAt: KnownMethods["state_getStorageSize"];
     queryStorage: TODO_NARROW_METHOD_TYPE;
     queryStorageAt(keys: U.HexString[], at?: U.HashHexString): T.StorageChangeSet;
     subscribeRuntimeVersion: TODO_NARROW_METHOD_TYPE;
@@ -140,7 +135,7 @@ export type Methods = Lookup<{
     chain(): string;
     chainType(): T.SystemChainTypeKind;
     dryRun: TODO_NARROW_METHOD_TYPE;
-    dryRunAt: Methods["system_dryRun"];
+    dryRunAt: KnownMethods["system_dryRun"];
     health(): T.SystemHealth;
     localListenAddresses(): string[];
     localPeerId(): string;
@@ -158,7 +153,7 @@ export type Methods = Lookup<{
   };
 }>;
 
-type Lookup<Lookup extends Record<string, Record<string, (...args: any[]) => any>>> = U.U2I<
+type EnsureKnownMethods<Lookup extends Record<string, AnyMethods>> = U.U2I<
   {
     [Prefix in keyof Lookup]: {
       [M in keyof Lookup[Prefix] as `${Extract<Prefix, string>}_${Extract<M, string>}`]:

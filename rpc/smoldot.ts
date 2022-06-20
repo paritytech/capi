@@ -2,8 +2,9 @@ import type * as smoldot from "../_deps/smoldot.ts";
 import { ErrorCtor } from "../util/mod.ts";
 import * as B from "./Base.ts";
 import * as M from "./messages.ts";
+import { AnyMethods } from "./methods.ts";
 
-export class SmoldotClient<Supported extends M.MethodName>
+export class SmoldotClient<Supported extends AnyMethods>
   extends B.Client<Supported, string, string, unknown, SmoldotInternalError>
 {
   static #innerClient?: smoldot.Client;
@@ -21,7 +22,7 @@ export class SmoldotClient<Supported extends M.MethodName>
     return SmoldotClient.#innerClient;
   };
 
-  static async open<Supported extends M.MethodName>(
+  static async open<Supported extends AnyMethods>(
     props: B.ClientProps<Supported, string, SmoldotInternalError>,
   ): Promise<SmoldotClient<Supported> | FailedToStartSmoldotError | FailedToAddChainError> {
     const inner = await SmoldotClient.#ensureInstance();
@@ -55,7 +56,7 @@ export class SmoldotClient<Supported extends M.MethodName>
     }
   };
 
-  send = (egressMessage: M.InitMessage): void => {
+  send = (egressMessage: M.InitMessage<Supported>): void => {
     this.#chain?.sendJsonRpc(JSON.stringify(egressMessage));
   };
 

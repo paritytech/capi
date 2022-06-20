@@ -1,19 +1,19 @@
-import { deferred } from "../_deps/async.ts";
-import { deadline } from "../_deps/async.ts";
+import { deadline, deferred } from "../_deps/async.ts";
 import { ErrorCtor } from "../util/mod.ts";
 import * as B from "./Base.ts";
 import * as M from "./messages.ts";
+import { AnyMethods } from "./methods.ts";
 
 export class FailedToOpenConnectionError extends ErrorCtor("FailedToOpenConnection") {}
 export class WebSocketInternalError extends ErrorCtor("WebSocketInternal") {}
 export class FailedToDisconnectError extends ErrorCtor("FailedToDisconnect") {}
 
-export class ProxyWsUrlClient<Supported extends M.MethodName>
+export class ProxyWsUrlClient<Supported extends AnyMethods>
   extends B.Client<Supported, string, MessageEvent, Event, WebSocketInternalError>
 {
   #ws?: WebSocket;
 
-  static open = async <Supported extends M.MethodName>(
+  static open = async <Supported extends AnyMethods>(
     props: B.ClientProps<Supported, string, WebSocketInternalError>,
   ): Promise<ProxyWsUrlClient<Supported> | FailedToOpenConnectionError> => {
     const client = new ProxyWsUrlClient(props);

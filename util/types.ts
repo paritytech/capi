@@ -22,3 +22,5 @@ export type Narrow<T> =
     number | string | boolean | bigint | symbol | null | undefined | []
   >
   | ([T] extends [[]] ? [] : { [K in keyof T]: Narrow<T[K]> });
+
+export type AnyFn = (...args: any[]) => any;
