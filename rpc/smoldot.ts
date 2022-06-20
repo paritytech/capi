@@ -32,7 +32,7 @@ export class SmoldotClient<M extends B.AnyMethods>
       const client = new SmoldotClient(props);
       // TODO: wire up `onError`
       client.#chain = await inner.addChain({
-        chainSpec: props.beacon,
+        chainSpec: props.discoveryValue,
         jsonRpcCallback: client.onMessage,
       });
       return client;

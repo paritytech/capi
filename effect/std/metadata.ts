@@ -7,7 +7,7 @@ import { rpcCall } from "./rpcCall.ts";
 
 export const metadata = effector(
   "metadata",
-  (rpc: EffectorItem<rpc.AnyClient>, blockHash?: EffectorItem<U.HashHexString>) => {
+  (rpc: EffectorItem<any>, blockHash?: EffectorItem<U.HashHexString>) => {
     const rpcCall_ = rpcCall(rpc, "state_getMetadata", blockHash);
     const result = select(rpcCall_, "result");
     return metadataDecoded(result);

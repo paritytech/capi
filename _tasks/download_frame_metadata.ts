@@ -8,15 +8,15 @@ const outDir = path.join(Deno.cwd(), "frame_metadata", "_downloaded");
 await fs.emptyDir(outDir);
 await Promise.all(
   Object.entries({
-    acala: known.ACALA_PROXY_WS_URL,
-    kusama: known.KUSAMA_PROXY_WS_URL,
-    moonbeam: known.MOONBEAM_PROXY_WS_URL,
-    polkadot: known.POLKADOT_PROXY_WS_URL,
-    statemint: known.STATEMINT_PROXY_WS_URL,
-    subsocial: known.SUBSOCIAL_PROXY_WS_URL,
-    westend: known.WESTEND_PROXY_WS_URL,
-  }).map(async ([name, url]) => {
-    const client = await rpc.client(rpc.beacon([url]));
+    acala: known.acalaBeacon,
+    kusama: known.kusamaBeacon,
+    moonbeam: known.moonbeamBeacon,
+    polkadot: known.polkadotBeacon,
+    statemint: known.statemintBeacon,
+    subsocial: known.subsocialBeacon,
+    westend: known.westendBeacon,
+  }).map(async ([name, beacon]) => {
+    const client = await rpc.client(beacon);
     assert(!(client instanceof Error));
     try {
       const metadata = await client.call("state_getMetadata", []);

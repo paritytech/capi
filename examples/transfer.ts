@@ -7,7 +7,7 @@ import * as rpc from "../rpc/mod.ts";
 import * as U from "../util/mod.ts";
 
 const [client, sr25519, hashers] = await Promise.all([
-  rpc.client(rpc.beacon(westendBeacon)),
+  rpc.client(westendBeacon),
   Sr25519(),
   Hashers(),
 ]);

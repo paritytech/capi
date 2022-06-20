@@ -18,10 +18,10 @@ export type Subscription<NotificationResult = any> = { [_N]: NotificationResult 
 
 export interface ClientProps<
   M extends AnyMethods,
-  Beacon,
+  DiscoveryValue,
   ParsedError extends Error,
 > {
-  beacon: Beacon;
+  discoveryValue: DiscoveryValue;
   hooks?: {
     send?: (message: InitMessage<M>) => void;
     receive?: (message: IngressMessage<M>) => void;

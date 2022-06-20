@@ -16,7 +16,7 @@ export class ProxyWsUrlClient<M extends B.AnyMethods>
     props: B.ClientProps<M, string, WebSocketInternalError>,
   ): Promise<ProxyWsUrlClient<M> | FailedToOpenConnectionError> => {
     const client = new ProxyWsUrlClient(props);
-    const ws = new WebSocket(props.beacon);
+    const ws = new WebSocket(props.discoveryValue);
     client.#ws = ws;
     ws.addEventListener("error", client.onError);
     ws.addEventListener("message", client.onMessage);

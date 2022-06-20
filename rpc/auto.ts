@@ -1,22 +1,17 @@
 import { ErrorCtor } from "../util/mod.ts";
 import { AnyMethods } from "./Base.ts";
+import { Beacon } from "./Beacon.ts";
 import { FailedToAddChainError, FailedToStartSmoldotError, SmoldotClient } from "./smoldot.ts";
 import { FailedToOpenConnectionError, ProxyWsUrlClient } from "./ws.ts";
-
-type DiscoveryValues = readonly [string, ...string[]];
-// TODO: replace with better branded types
-type Beacon<M extends AnyMethods> = DiscoveryValues & { _beacon: { supported: M } };
-export function beacon<Supported extends AnyMethods>(
-  discoveryValues: DiscoveryValues,
-): Beacon<Supported> {
-  return discoveryValues as Beacon<Supported>;
-}
 
 // TODO: use branded beacon types instead of string
 // TODO: dyn import smoldot and provider if chain spec is provided
 // TODO: handle retry
 // TODO: narrow to `[string, ...string[]]`
-export async function client<M extends AnyMethods>(beacon: Beacon<M>): Promise<
+export async function client<M extends AnyMethods>(
+  beacon: Beacon<M>,
+  currentDiscoveryValueI = 0,
+): Promise<
   | SmoldotClient<M>
   | ProxyWsUrlClient<M>
   | FailedToOpenConnectionError
@@ -24,22 +19,21 @@ export async function client<M extends AnyMethods>(beacon: Beacon<M>): Promise<
   | FailedToAddChainError
   | AllBeaconsErroredError
 > {
-  const [e0, ...rest] = beacon;
-  const result = await (async () => {
-    if (isWsUrl(e0)) {
-      return ProxyWsUrlClient.open({ beacon: e0 });
-    } else {
-      return SmoldotClient.open({ beacon: e0 });
+  const currentDiscoveryValue = beacon.discoveryValues[currentDiscoveryValueI];
+  if (currentDiscoveryValue) {
+    const result = await (async () => {
+      if (isWsUrl(currentDiscoveryValue)) {
+        return ProxyWsUrlClient.open<M>({ discoveryValue: currentDiscoveryValue });
+      } else {
+        return SmoldotClient.open<M>({ discoveryValue: currentDiscoveryValue });
+      }
+    })();
+    if (result instanceof Error) {
+      return await client(beacon, currentDiscoveryValueI + 1);
     }
-  })();
-  if (result instanceof Error) {
-    if (rest.length > 0) {
-      return await client(rest as unknown as Beacon<M>);
-    }
-    return new AllBeaconsErroredError();
+    return result;
   }
-  // TODO: fix
-  return result as any;
+  return new AllBeaconsErroredError();
 }
 
 // TODO: validate chain spec as well
