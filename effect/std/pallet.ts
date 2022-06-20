@@ -9,7 +9,7 @@ export interface Pallet {
 export const pallet = effector.sync(
   "pallet",
   () =>
-    (rpc: AnyClient, name: string): Pallet => ({
+    (rpc: any, name: string): Pallet => ({
       rpc,
       name,
     }),

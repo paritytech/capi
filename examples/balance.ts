@@ -3,7 +3,7 @@ import { polkadotBeacon } from "../known/mod.ts";
 import * as C from "../mod.ts";
 import * as rpc from "../rpc/mod.ts";
 
-const client = await rpc.client(rpc.beacon(polkadotBeacon));
+const client = await rpc.client(polkadotBeacon);
 assert(!(client instanceof Error));
 const ss58 = C.ss58FromText("13SceNt2ELz3ti4rnQbY1snpYH4XE4fLFsW8ph9rpwJd6HFC");
 const pubKey = C.pubKeyFromSs58(ss58);

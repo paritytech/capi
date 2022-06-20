@@ -6,6 +6,7 @@ export type AnyClient = ProxyWsUrlClient<AnyMethods> | SmoldotClient<AnyMethods>
 
 export * from "./auto.ts";
 export * from "./Base.ts";
+export * from "./Beacon.ts";
 export * from "./messages.ts";
 export * from "./smoldot.ts";
 export * from "./ws.ts";
