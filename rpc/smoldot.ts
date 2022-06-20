@@ -1,7 +1,7 @@
 import type * as smoldot from "../_deps/smoldot.ts";
 import { ErrorCtor } from "../util/mod.ts";
 import * as B from "./Base.ts";
-import * as M from "./messages.ts";
+import { IngressMessage, InitMessage } from "./messages.ts";
 import { AnyMethods } from "./methods.ts";
 
 export class SmoldotClient<Supported extends AnyMethods>
@@ -56,13 +56,13 @@ export class SmoldotClient<Supported extends AnyMethods>
     }
   };
 
-  send = (egressMessage: M.InitMessage<Supported>): void => {
+  send = (egressMessage: InitMessage<Supported>): void => {
     this.#chain?.sendJsonRpc(JSON.stringify(egressMessage));
   };
 
   parseIngressMessage = (
     rawIngressMessage: string,
-  ): M.IngressMessage<Supported> | B.ParseRawIngressMessageError => {
+  ): IngressMessage<Supported> | B.ParseRawIngressMessageError => {
     try {
       return JSON.parse(rawIngressMessage);
     } catch (_e) {

@@ -1,5 +1,14 @@
 import { deferred } from "../_deps/async.ts";
-import * as M from "./messages.ts";
+import {
+  ErrMessage,
+  IngressMessage,
+  InitMessage,
+  InitMessageByMethodName,
+  NotifMessage,
+  OkMessage,
+  OkMessageByMethodName,
+  SubscriptionMethodName,
+} from "./messages.ts";
 import { AnyMethods } from "./methods.ts";
 
 export interface ClientProps<
@@ -9,8 +18,8 @@ export interface ClientProps<
 > {
   beacon: Beacon;
   hooks?: {
-    send?: (message: M.InitMessage<M>) => void;
-    receive?: (message: M.IngressMessage<M>) => void;
+    send?: (message: InitMessage<M>) => void;
+    receive?: (message: IngressMessage<M>) => void;
     error?: (error: ParsedError | ParseRawErrorError) => void;
   };
 }
@@ -23,7 +32,7 @@ export abstract class Client<
   ParsedError extends Error,
 > {
   #nextId = 0;
-  listeners = new Map<ListenerCb<M.IngressMessage<M>>, boolean>();
+  listeners = new Map<ListenerCb<IngressMessage<M>>, boolean>();
 
   /**
    * Construct a new RPC client
@@ -37,7 +46,7 @@ export abstract class Client<
    *
    * @param egressMessage the message you wish to send to the RPC server
    */
-  abstract send: (egressMessage: M.InitMessage<M>) => void;
+  abstract send: (egressMessage: InitMessage<M>) => void;
 
   /**
    * Parse messages returned from the RPC server (this includes RPC server errors)
@@ -47,7 +56,7 @@ export abstract class Client<
    */
   abstract parseIngressMessage: (
     rawIngressMessage: RawIngressMessage,
-  ) => M.IngressMessage<M> | ParseRawIngressMessageError;
+  ) => IngressMessage<M> | ParseRawIngressMessageError;
 
   /**
    * Parse errors of the given client, such as an error `Event` in the case of `WebSocket`s
@@ -76,7 +85,7 @@ export abstract class Client<
    * @param listener the callback to be triggered upon arrival of ingress messages
    * @returns a function to detach the listener
    */
-  listen = (listener: ListenerCb<M.IngressMessage<M>>): StopListening => {
+  listen = (listener: ListenerCb<IngressMessage<M>>): StopListening => {
     // TODO: do we care about repeat registration?
     if (!this.listeners.has(listener)) {
       this.listeners.set(listener, true);
@@ -115,16 +124,16 @@ export abstract class Client<
    */
   call = async <Method extends keyof M>(
     method: Method,
-    params: M.InitMessageByMethodName<M>[Method]["params"],
-  ): Promise<M.OkMessage<M, Method> | M.ErrMessage> => {
-    const init = <M.InitMessage<M, Method>> {
+    params: InitMessageByMethodName<M>[Method]["params"],
+  ): Promise<OkMessage<M, Method> | ErrMessage> => {
+    const init = <InitMessage<M, Method>> {
       jsonrpc: "2.0",
       id: this.uid(),
       method,
       params,
     };
     const isCorrespondingRes = IsCorrespondingRes<M, typeof init>(init);
-    const pending = deferred<M.OkMessage<M, Method> | M.ErrMessage>();
+    const pending = deferred<OkMessage<M, Method> | ErrMessage>();
     const stopListening = this.listen((res) => {
       if (isCorrespondingRes(res)) {
         pending.resolve(res);
@@ -144,11 +153,11 @@ export abstract class Client<
    * @param listenerCb the callback to which notifications should be supplied
    * @returns a function with which to stop listening for notifications
    */
-  subscribe = async <Method extends Extract<M.SubscriptionMethodName<M>, keyof M>>(
+  subscribe = async <Method extends Extract<SubscriptionMethodName<M>, keyof M>>(
     method: Method,
-    params: M.InitMessage<M, Method>["params"],
-    listenerCb: ListenerCb<M.NotifMessage<M, Method>>,
-  ): Promise<StopListening | M.ErrMessage> => {
+    params: InitMessage<M, Method>["params"],
+    listenerCb: ListenerCb<NotifMessage<M, Method>>,
+  ): Promise<StopListening | ErrMessage> => {
     const initRes = await this.call(method, params);
     if (initRes.error) {
       return initRes;
@@ -174,13 +183,13 @@ export type StopListening = () => void;
 
 export function IsCorrespondingRes<
   M extends AnyMethods,
-  Init_ extends M.InitMessage<M>,
+  Init_ extends InitMessage<M>,
 >(init: Init_) {
-  return <InQuestion extends M.IngressMessage<M>>(
+  return <InQuestion extends IngressMessage<M>>(
     inQuestion: InQuestion,
   ): inQuestion is Extract<
     InQuestion,
-    M.OkMessageByMethodName<M>[Init_["method"]] | M.ErrMessage
+    OkMessageByMethodName<M>[Init_["method"]] | ErrMessage
   > => {
     if (inQuestion.error || inQuestion.result) {
       inQuestion;
