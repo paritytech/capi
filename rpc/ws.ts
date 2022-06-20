@@ -60,7 +60,7 @@ export class ProxyWsUrlClient<M extends B.AnyMethods>
     return pending;
   };
 
-  send = (egressMessage: InitMessage<M>): void => {
+  _send = (egressMessage: InitMessage<M>): void => {
     this.#ws?.send(JSON.stringify(egressMessage));
   };
 

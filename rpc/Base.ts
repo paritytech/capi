@@ -51,7 +51,17 @@ export abstract class Client<
    *
    * @param egressMessage the message you wish to send to the RPC server
    */
-  abstract send: (egressMessage: InitMessage<M>) => void;
+  send = (egressMessage: InitMessage<M>): void => {
+    this.props.hooks?.send?.(egressMessage);
+    this._send(egressMessage);
+  };
+
+  /**
+   * The provider-specific send implementation
+   *
+   * @param egressMessage the message you wish to send to the RPC server
+   */
+  abstract _send: (egressMessage: InitMessage<M>) => void;
 
   /**
    * Parse messages returned from the RPC server (this includes RPC server errors)

@@ -55,7 +55,7 @@ export class SmoldotClient<M extends B.AnyMethods>
     }
   };
 
-  send = (egressMessage: InitMessage<M>): void => {
+  _send = (egressMessage: InitMessage<M>): void => {
     this.#chain?.sendJsonRpc(JSON.stringify(egressMessage));
   };
 
