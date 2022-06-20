@@ -1,14 +1,11 @@
 import { ErrorCtor } from "../util/mod.ts";
-import * as M from "./messages.ts";
-import { AnyMethods } from "./methods.ts";
+import { AnyMethods } from "./Base.ts";
 import { FailedToAddChainError, FailedToStartSmoldotError, SmoldotClient } from "./smoldot.ts";
 import { FailedToOpenConnectionError, ProxyWsUrlClient } from "./ws.ts";
 
 type DiscoveryValues = readonly [string, ...string[]];
 // TODO: replace with better branded types
-type Beacon<Supported extends AnyMethods> = DiscoveryValues & {
-  _beacon: { supported: Supported };
-};
+type Beacon<M extends AnyMethods> = DiscoveryValues & { _beacon: { supported: M } };
 export function beacon<Supported extends AnyMethods>(
   discoveryValues: DiscoveryValues,
 ): Beacon<Supported> {
@@ -19,9 +16,9 @@ export function beacon<Supported extends AnyMethods>(
 // TODO: dyn import smoldot and provider if chain spec is provided
 // TODO: handle retry
 // TODO: narrow to `[string, ...string[]]`
-export async function client<Supported extends AnyMethods>(beacon: Beacon<Supported>): Promise<
-  | SmoldotClient<Supported>
-  | ProxyWsUrlClient<Supported>
+export async function client<M extends AnyMethods>(beacon: Beacon<M>): Promise<
+  | SmoldotClient<M>
+  | ProxyWsUrlClient<M>
   | FailedToOpenConnectionError
   | FailedToStartSmoldotError
   | FailedToAddChainError
@@ -37,7 +34,7 @@ export async function client<Supported extends AnyMethods>(beacon: Beacon<Suppor
   })();
   if (result instanceof Error) {
     if (rest.length > 0) {
-      return await client(rest as unknown as Beacon<Supported>);
+      return await client(rest as unknown as Beacon<M>);
     }
     return new AllBeaconsErroredError();
   }

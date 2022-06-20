@@ -2,10 +2,9 @@ import type * as smoldot from "../_deps/smoldot.ts";
 import { ErrorCtor } from "../util/mod.ts";
 import * as B from "./Base.ts";
 import { IngressMessage, InitMessage } from "./messages.ts";
-import { AnyMethods } from "./methods.ts";
 
-export class SmoldotClient<Supported extends AnyMethods>
-  extends B.Client<Supported, string, string, unknown, SmoldotInternalError>
+export class SmoldotClient<M extends B.AnyMethods>
+  extends B.Client<M, string, string, unknown, SmoldotInternalError>
 {
   static #innerClient?: smoldot.Client;
   #chain?: smoldot.Chain;
@@ -22,9 +21,9 @@ export class SmoldotClient<Supported extends AnyMethods>
     return SmoldotClient.#innerClient;
   };
 
-  static async open<Supported extends AnyMethods>(
-    props: B.ClientProps<Supported, string, SmoldotInternalError>,
-  ): Promise<SmoldotClient<Supported> | FailedToStartSmoldotError | FailedToAddChainError> {
+  static async open<M extends B.AnyMethods>(
+    props: B.ClientProps<M, string, SmoldotInternalError>,
+  ): Promise<SmoldotClient<M> | FailedToStartSmoldotError | FailedToAddChainError> {
     const inner = await SmoldotClient.#ensureInstance();
     if (inner instanceof Error) {
       return inner;
@@ -56,13 +55,13 @@ export class SmoldotClient<Supported extends AnyMethods>
     }
   };
 
-  send = (egressMessage: InitMessage<Supported>): void => {
+  send = (egressMessage: InitMessage<M>): void => {
     this.#chain?.sendJsonRpc(JSON.stringify(egressMessage));
   };
 
   parseIngressMessage = (
     rawIngressMessage: string,
-  ): IngressMessage<Supported> | B.ParseRawIngressMessageError => {
+  ): IngressMessage<M> | B.ParseRawIngressMessageError => {
     try {
       return JSON.parse(rawIngressMessage);
     } catch (_e) {

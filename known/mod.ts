@@ -12,3 +12,4 @@ export type Beacon = ProxyWsUrl | ChainSpec;
 
 export * from "./beacons.ts";
 export * from "./generated.ts";
+export * from "./methods.ts";

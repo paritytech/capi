@@ -9,7 +9,12 @@ import {
   OkMessageByMethodName,
   SubscriptionMethodName,
 } from "./messages.ts";
-import { AnyMethods } from "./methods.ts";
+
+export type AnyMethods = Record<string, (...args: any[]) => any>;
+
+// Swap with branded type
+const _N: unique symbol = Symbol();
+export type Subscription<NotificationResult = any> = { [_N]: NotificationResult };
 
 export interface ClientProps<
   M extends AnyMethods,
