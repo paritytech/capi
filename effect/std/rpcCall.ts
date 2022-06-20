@@ -11,12 +11,12 @@ export class RpcServerInternalError extends ErrorCtor("RpcServerInternal") {
 export const rpcCall = effector.async.generic(
   "rpcCall",
   (effect) =>
-    <N extends rpc.MethodName, X extends unknown[]>(
+    <N extends rpc.AnyMethods, X extends unknown[]>(
       ...args: EffectorArgs<
         X,
         [
           client: rpc.AnyClient,
-          methodName: N,
+          methodName: Extract<keyof N, string>,
           ...params: rpc.InitMessage<N>["params"],
         ]
       >
