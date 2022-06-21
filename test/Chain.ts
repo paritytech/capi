@@ -1,16 +1,10 @@
 import { Beacon, beacon } from "../Beacon.ts";
-import { Chain } from "../core/Chain.ts";
-import { AnyMethods } from "../util/mod.ts";
-import { TestAddresses } from "./Addresses.ts";
+import { Chain as Chain_ } from "../core/Chain.ts";
+import { KnownRpcMethods } from "../known/mod.ts";
+import { Addresses } from "./Addresses.ts";
 
-export class TestChain<M extends AnyMethods = AnyMethods> extends Chain<Beacon<M>> {
-  constructor(readonly host?: string) {
-    super(beacon(host || "wss://localhost:127.0.0.1:9933"));
-  }
-
-  addresses: TestAddresses<this> = new TestAddresses(this);
+export class Chain extends Chain_<Beacon<string, KnownRpcMethods>> {
+  addresses: Addresses<this> = new Addresses(this);
 }
 
-export function testChain<M extends AnyMethods = AnyMethods>(host?: string): TestChain<M> {
-  return new TestChain(host);
-}
+export const templateChain = new Chain(beacon("wss://localhost:127.0.0.1:9933"));

@@ -1,8 +1,8 @@
-import { Addresses } from "../core/Addresses.ts";
-import { TestAddress } from "./Address.ts";
-import { TestChain } from "./Chain.ts";
+import { Addresses as Addresses_ } from "../core/Addresses.ts";
+import { Address } from "./Address.ts";
+import { Chain } from "./Chain.ts";
 
-export class TestAddresses<C extends TestChain = TestChain> extends Addresses<C> {
-  alice: TestAddress<this> = new TestAddress(this, "Alice");
-  bob: TestAddress<this> = new TestAddress(this, "Bob");
+export class Addresses<C extends Chain = Chain> extends Addresses_<C> {
+  alice: Address<this> = new Address(this, "Alice");
+  bob: Address<this> = new Address(this, "Bob");
 }
