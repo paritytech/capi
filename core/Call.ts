@@ -9,12 +9,16 @@ import { Signed } from "./Signed.ts";
 export class Call<
   E extends Extrinsic = Extrinsic,
   Props extends Record<string, unknown> = Record<string, unknown>,
+  Extra extends unknown[] = any[],
+  Additional extends unknown = any,
 > extends Base<"Call"> {
   chain;
 
   constructor(
     readonly extrinsic: E,
     readonly props: Props,
+    readonly extra?: Extra,
+    readonly additional?: Additional,
   ) {
     super("Call");
     this.chain = extrinsic.chain;

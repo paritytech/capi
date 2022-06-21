@@ -18,7 +18,15 @@ export class Extrinsic<
   }
 
   // TODO: constraint
-  call<Props extends Record<string, unknown>>(props: Props): Call<this, Props> {
-    return new Call(this, props);
+  call<
+    Props extends Record<string, unknown>,
+    Extra extends unknown[],
+    Additional extends unknown,
+  >(
+    props: Props,
+    extra?: Extra,
+    additional?: Additional,
+  ): Call<this, Props> {
+    return new Call(this, props, extra, additional);
   }
 }
