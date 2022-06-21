@@ -6,7 +6,7 @@ const multi = C.polkadot.address
 
 const result = await C.polkadot
   .pallet("System")
-  .entry("Account", [multi])
+  .entry("Account", multi)
   .read();
 
 console.log({ result });
