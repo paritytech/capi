@@ -1,4 +1,5 @@
 import { deferred } from "../_deps/async.ts";
+import { AnyMethods } from "../util/mod.ts";
 import {
   ErrMessage,
   IngressMessage,
@@ -9,8 +10,6 @@ import {
   OkMessageByMethodName,
   SubscriptionMethodName,
 } from "./messages.ts";
-
-export type AnyMethods = Record<string, (...args: any[]) => any>;
 
 // Swap with branded type
 const _N: unique symbol = Symbol();

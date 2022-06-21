@@ -1,16 +1,10 @@
-import { assert } from "../_deps/asserts.ts";
-import { polkadotBeacon } from "../known/mod.ts";
 import * as C from "../mod.ts";
-import * as rpc from "../rpc/mod.ts";
 
-const client = await rpc.client(polkadotBeacon);
-assert(!(client instanceof Error));
-const ss58 = C.ss58FromText("13SceNt2ELz3ti4rnQbY1snpYH4XE4fLFsW8ph9rpwJd6HFC");
-const pubKey = C.pubKeyFromSs58(ss58);
-const accountId32 = C.accountId32FromPubKey(pubKey);
-const pallet = C.pallet(client, "System");
-const map = C.map(pallet, "Account");
-const entry = C.mapEntry(map, accountId32);
-const result = await C.read(entry).run();
+const ss58 = C.polkadot.address.fromSs58Text("13SceNt2ELz3ti4rnQbY1snpYH4XE4fLFsW8ph9rpwJd6HFC");
+
+const result = await C.polkadot
+  .pallet("System")
+  .entry("Account", [ss58])
+  .read();
+
 console.log({ result });
-client.close();

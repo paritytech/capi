@@ -1,6 +1,6 @@
-import { EnsureLookup } from "../util/mod.ts";
+import { AnyMethods, EnsureLookup } from "../util/mod.ts";
 import { SubscriptionIdString } from "../util/mod.ts";
-import { AnyMethods, Subscription } from "./Base.ts";
+import { Subscription } from "./Base.ts";
 
 export type InitMessageByMethodName<M extends AnyMethods> = {
   [N in keyof M]: InitMessageBase<M, N, Parameters<M[N]>>;

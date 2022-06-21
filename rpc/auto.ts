@@ -1,6 +1,6 @@
+import { Beacon } from "../Beacon.ts";
 import { ErrorCtor, isWsUrl } from "../util/mod.ts";
-import { AnyMethods } from "./Base.ts";
-import { Beacon } from "./Beacon.ts";
+import { AnyMethods } from "../util/mod.ts";
 import { FailedToAddChainError, FailedToStartSmoldotError, SmoldotClient } from "./smoldot.ts";
 import { FailedToOpenConnectionError, ProxyWsUrlClient } from "./ws.ts";
 

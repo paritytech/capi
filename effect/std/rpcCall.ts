@@ -1,5 +1,6 @@
 import * as rpc from "../../rpc/mod.ts";
 import { ErrorCtor } from "../../util/mod.ts";
+import { AnyMethods } from "../../util/mod.ts";
 import { effector, EffectorArgs } from "../impl/mod.ts";
 
 export class RpcServerInternalError extends ErrorCtor("RpcServerInternal") {
@@ -11,7 +12,7 @@ export class RpcServerInternalError extends ErrorCtor("RpcServerInternal") {
 export const rpcCall = effector.async.generic(
   "rpcCall",
   (effect) =>
-    <N extends rpc.AnyMethods, X extends unknown[]>(
+    <N extends AnyMethods, X extends unknown[]>(
       ...args: EffectorArgs<
         X,
         [

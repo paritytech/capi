@@ -1,9 +1,9 @@
 import type * as smoldot from "../_deps/smoldot.ts";
-import { ErrorCtor } from "../util/mod.ts";
+import { AnyMethods, ErrorCtor } from "../util/mod.ts";
 import * as B from "./Base.ts";
 import { IngressMessage, InitMessage } from "./messages.ts";
 
-export class SmoldotClient<M extends B.AnyMethods>
+export class SmoldotClient<M extends AnyMethods>
   extends B.Client<M, string, string, unknown, SmoldotInternalError>
 {
   static #innerClient?: smoldot.Client;
@@ -21,7 +21,7 @@ export class SmoldotClient<M extends B.AnyMethods>
     return SmoldotClient.#innerClient;
   };
 
-  static async open<M extends B.AnyMethods>(
+  static async open<M extends AnyMethods>(
     props: B.ClientProps<M, string, SmoldotInternalError>,
   ): Promise<SmoldotClient<M> | FailedToStartSmoldotError | FailedToAddChainError> {
     const inner = await SmoldotClient.#ensureInstance();
