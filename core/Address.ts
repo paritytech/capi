@@ -39,5 +39,7 @@ export class Address<
   declare asSs58Bytes: () => Uint8Array;
   declare asSs58Text: () => string;
 
+  declare asAccountId32: () => Uint8Array;
+
   declare asMultiAddress: () => MultiAddress;
 }
