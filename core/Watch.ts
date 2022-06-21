@@ -11,9 +11,12 @@ export class Watch<Target extends WatchTarget = WatchTarget>
   constructor(readonly target: Target) {}
 
   // TODO
-  next = undefined!;
+  next = undefined as any;
 
   [Symbol.asyncIterator]() {
     return this;
   }
+
+  // TODO
+  declare stop: () => void;
 }

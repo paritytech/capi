@@ -1,3 +1,4 @@
+import { MultiAddress } from "../primitives/MultiAddress.ts";
 import { EnsureLookup } from "../util/mod.ts";
 import { Addresses } from "./Addresses.ts";
 import { Base } from "./Base.ts";
@@ -8,6 +9,7 @@ export type AddressSourceKind =
   | "PublicKeyBytes"
   | "PublicKeyText"
   | "Test";
+
 export type AddressRawBySourceKind = EnsureLookup<AddressSourceKind, unknown, {
   Ss58Bytes: Uint8Array;
   Ss58Text: string;
@@ -30,4 +32,12 @@ export class Address<
     super("Address");
     this.chain = addresses.chain;
   }
+
+  declare asPublicKeyBytes: () => Uint8Array;
+  declare asPublicKeyText: () => string;
+
+  declare asSs58Bytes: () => Uint8Array;
+  declare asSs58Text: () => string;
+
+  declare asMultiAddress: () => MultiAddress;
 }

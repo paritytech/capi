@@ -2,6 +2,7 @@ import { Base } from "./Base.ts";
 import { Block } from "./Block.ts";
 import { Entry } from "./Entry.ts";
 import { Read } from "./Read.ts";
+import { Watch } from "./Watch.ts";
 
 // TODO: constrain to map entry / key types
 export class KeyPage<E extends Entry = Entry> extends Base<"KeyPage"> {
@@ -18,5 +19,9 @@ export class KeyPage<E extends Entry = Entry> extends Base<"KeyPage"> {
 
   read(block?: Block): Read<this> {
     return new Read(this, block);
+  }
+
+  watch(): Watch<this> {
+    return new Watch(this);
   }
 }
