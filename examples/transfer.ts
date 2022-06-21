@@ -1,6 +1,6 @@
 import * as C from "../mod.ts";
 
-const chain = C.test.testChain();
+const { templateChain: chain } = C.test;
 
 const transferPending = chain
   .pallet("Balances")

@@ -1,11 +1,15 @@
 import { Beacon } from "../Beacon.ts";
 import { ErrorCtor, isWsUrl } from "../util/mod.ts";
 import { AnyMethods } from "../util/mod.ts";
-import { FailedToAddChainError, FailedToStartSmoldotError, SmoldotClient } from "./smoldot.ts";
-import { FailedToOpenConnectionError, ProxyWsUrlClient } from "./ws.ts";
+import {
+  FailedToAddChainError,
+  FailedToStartSmoldotError,
+  SmoldotClient,
+} from "./providers/smoldot.ts";
+import { FailedToOpenConnectionError, ProxyWsUrlClient } from "./providers/ws.ts";
 
 export async function client<M extends AnyMethods>(
-  beacon: Beacon<M>,
+  beacon: Beacon<string, M>,
   currentDiscoveryValueI = 0,
 ): Promise<
   | SmoldotClient<M>

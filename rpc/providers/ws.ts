@@ -1,11 +1,7 @@
-import { deadline, deferred } from "../_deps/async.ts";
-import { AnyMethods, ErrorCtor } from "../util/mod.ts";
-import * as B from "./Base.ts";
-import { IngressMessage, InitMessage } from "./messages.ts";
-
-export class FailedToOpenConnectionError extends ErrorCtor("FailedToOpenConnection") {}
-export class WebSocketInternalError extends ErrorCtor("WebSocketInternal") {}
-export class FailedToDisconnectError extends ErrorCtor("FailedToDisconnect") {}
+import { deadline, deferred } from "../../_deps/async.ts";
+import { AnyMethods, ErrorCtor } from "../../util/mod.ts";
+import * as B from "../Base.ts";
+import { IngressMessage, InitMessage } from "../messages.ts";
 
 export class ProxyWsUrlClient<M extends AnyMethods>
   extends B.Client<M, string, MessageEvent, Event, WebSocketInternalError>
@@ -81,3 +77,7 @@ export class ProxyWsUrlClient<M extends AnyMethods>
     return new WebSocketInternalError();
   };
 }
+
+export class FailedToOpenConnectionError extends ErrorCtor("FailedToOpenConnection") {}
+export class WebSocketInternalError extends ErrorCtor("WebSocketInternal") {}
+export class FailedToDisconnectError extends ErrorCtor("FailedToDisconnect") {}
