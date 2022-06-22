@@ -1,7 +1,7 @@
 // Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
 // @generated file from build script, do not edit
 // deno-lint-ignore-file
-// source-hash: de559acfb3ececd7dc6b63c31e5b941f7026d069
+// source-hash: 3812747ba738f2a60e22e488ad308a6fe000a17c
 let wasm;
 
 const cachedTextDecoder = new TextDecoder("utf-8", {
@@ -70,22 +70,6 @@ function getInt32Memory0() {
   }
   return cachedInt32Memory0;
 }
-/**
- * @param {Uint8Array} pub_key_bytes
- * @param {Uint8Array} secret_key_bytes
- * @param {Uint8Array} message
- * @returns {Uint8Array}
- */
-export function sign(pub_key_bytes, secret_key_bytes, message) {
-  const ptr0 = passArray8ToWasm0(pub_key_bytes, wasm.__wbindgen_malloc);
-  const len0 = WASM_VECTOR_LEN;
-  const ptr1 = passArray8ToWasm0(secret_key_bytes, wasm.__wbindgen_malloc);
-  const len1 = WASM_VECTOR_LEN;
-  const ptr2 = passArray8ToWasm0(message, wasm.__wbindgen_malloc);
-  const len2 = WASM_VECTOR_LEN;
-  const ret = wasm.sign(ptr0, len0, ptr1, len1, ptr2, len2);
-  return takeObject(ret);
-}
 
 const cachedTextEncoder = new TextEncoder("utf-8");
 
@@ -140,52 +124,6 @@ function handleError(f, args) {
 
 function getArrayU8FromWasm0(ptr, len) {
   return getUint8Memory0().subarray(ptr / 1, ptr / 1 + len);
-}
-
-const KeypairFinalization = new FinalizationRegistry((ptr) =>
-  wasm.__wbg_keypair_free(ptr)
-);
-/** */
-export class Keypair {
-  static __wrap(ptr) {
-    const obj = Object.create(Keypair.prototype);
-    obj.ptr = ptr;
-    KeypairFinalization.register(obj, obj.ptr, obj);
-    return obj;
-  }
-
-  __destroy_into_raw() {
-    const ptr = this.ptr;
-    this.ptr = 0;
-    KeypairFinalization.unregister(this);
-    return ptr;
-  }
-
-  free() {
-    const ptr = this.__destroy_into_raw();
-    wasm.__wbg_keypair_free(ptr);
-  }
-  /**
-   * @returns {Keypair}
-   */
-  static rand() {
-    const ret = wasm.keypair_rand();
-    return Keypair.__wrap(ret);
-  }
-  /**
-   * @returns {PublicKey}
-   */
-  get publicKey() {
-    const ret = wasm.keypair_publicKey(this.ptr);
-    return PublicKey.__wrap(ret);
-  }
-  /**
-   * @returns {Uint8Array}
-   */
-  get secretKey() {
-    const ret = wasm.keypair_secretKey(this.ptr);
-    return takeObject(ret);
-  }
 }
 
 const PublicKeyFinalization = new FinalizationRegistry((ptr) =>
@@ -310,6 +248,73 @@ export class Signer {
   }
 }
 
+const TestUserFinalization = new FinalizationRegistry((ptr) =>
+  wasm.__wbg_testuser_free(ptr)
+);
+/** */
+export class TestUser {
+  static __wrap(ptr) {
+    const obj = Object.create(TestUser.prototype);
+    obj.ptr = ptr;
+    TestUserFinalization.register(obj, obj.ptr, obj);
+    return obj;
+  }
+
+  __destroy_into_raw() {
+    const ptr = this.ptr;
+    this.ptr = 0;
+    TestUserFinalization.unregister(this);
+    return ptr;
+  }
+
+  free() {
+    const ptr = this.__destroy_into_raw();
+    wasm.__wbg_testuser_free(ptr);
+  }
+  /**
+   * @param {string} name
+   * @returns {TestUser}
+   */
+  static fromName(name) {
+    try {
+      const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+      const ptr0 = passStringToWasm0(
+        name,
+        wasm.__wbindgen_malloc,
+        wasm.__wbindgen_realloc,
+      );
+      const len0 = WASM_VECTOR_LEN;
+      wasm.testuser_fromName(retptr, ptr0, len0);
+      var r0 = getInt32Memory0()[retptr / 4 + 0];
+      var r1 = getInt32Memory0()[retptr / 4 + 1];
+      var r2 = getInt32Memory0()[retptr / 4 + 2];
+      if (r2) {
+        throw takeObject(r1);
+      }
+      return TestUser.__wrap(r0);
+    } finally {
+      wasm.__wbindgen_add_to_stack_pointer(16);
+    }
+  }
+  /**
+   * @param {Uint8Array} message
+   * @returns {Uint8Array}
+   */
+  sign(message) {
+    const ptr0 = passArray8ToWasm0(message, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.testuser_sign(this.ptr, ptr0, len0);
+    return takeObject(ret);
+  }
+  /**
+   * @returns {Uint8Array}
+   */
+  get publicKey() {
+    const ret = wasm.testuser_publicKey(this.ptr);
+    return takeObject(ret);
+  }
+}
+
 const imports = {
   __wbindgen_placeholder__: {
     __wbindgen_error_new: function (arg0, arg1) {
@@ -340,6 +345,42 @@ const imports = {
       } finally {
         wasm.__wbindgen_free(arg0, arg1);
       }
+    },
+    __wbindgen_is_undefined: function (arg0) {
+      const ret = getObject(arg0) === undefined;
+      return ret;
+    },
+    __wbg_static_accessor_MODULE_452b4680e8614c81: function () {
+      const ret = module;
+      return addHeapObject(ret);
+    },
+    __wbg_self_86b4b13392c7af56: function () {
+      return handleError(function () {
+        const ret = self.self;
+        return addHeapObject(ret);
+      }, arguments);
+    },
+    __wbg_crypto_b8c92eaac23d0d80: function (arg0) {
+      const ret = getObject(arg0).crypto;
+      return addHeapObject(ret);
+    },
+    __wbg_msCrypto_9ad6677321a08dd8: function (arg0) {
+      const ret = getObject(arg0).msCrypto;
+      return addHeapObject(ret);
+    },
+    __wbg_require_f5521a5b85ad2542: function (arg0, arg1, arg2) {
+      const ret = getObject(arg0).require(getStringFromWasm0(arg1, arg2));
+      return addHeapObject(ret);
+    },
+    __wbg_getRandomValues_dd27e6b0652b3236: function (arg0) {
+      const ret = getObject(arg0).getRandomValues;
+      return addHeapObject(ret);
+    },
+    __wbg_randomFillSync_d2ba53160aec6aba: function (arg0, arg1, arg2) {
+      getObject(arg0).randomFillSync(getArrayU8FromWasm0(arg1, arg2));
+    },
+    __wbg_getRandomValues_e57c9b75ddead065: function (arg0, arg1) {
+      getObject(arg0).getRandomValues(getObject(arg1));
     },
     __wbindgen_is_object: function (arg0) {
       const val = getObject(arg0);
@@ -432,10 +473,6 @@ const imports = {
         return addHeapObject(ret);
       }, arguments);
     },
-    __wbindgen_is_undefined: function (arg0) {
-      const ret = getObject(arg0) === undefined;
-      return ret;
-    },
     __wbg_newwithbyteoffsetandlength_9ca61320599a2c84: function (
       arg0,
       arg1,
@@ -491,7 +528,7 @@ let lastLoadPromise;
  * loaded it will always return a reference to the same object.
  * @returns {Promise<{
  *   instance: WebAssembly.Instance;
- *   exports: { sign: typeof sign; Keypair : typeof Keypair ; PublicKey : typeof PublicKey ; Signer : typeof Signer  }
+ *   exports: { PublicKey : typeof PublicKey ; Signer : typeof Signer ; TestUser : typeof TestUser  }
  * }>}
  */
 export function instantiateWithInstance() {
@@ -507,7 +544,7 @@ export function instantiateWithInstance() {
         cachedUint8Memory0 = new Uint8Array(wasm.memory.buffer);
         instanceWithExports = {
           instance,
-          exports: { sign, Keypair, PublicKey, Signer },
+          exports: { PublicKey, Signer, TestUser },
         };
         return instanceWithExports;
       } finally {

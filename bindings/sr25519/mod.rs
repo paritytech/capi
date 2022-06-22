@@ -1,4 +1,7 @@
-use {js_sys::Uint8Array, schnorrkel as s, sp_core::sr25519::Signature, wasm_bindgen::prelude::*};
+use {
+  js_sys::Uint8Array, schnorrkel as s, sp_core::sr25519::Signature, sp_keyring::Sr25519Keyring,
+  std::str::FromStr, wasm_bindgen::prelude::*,
+};
 
 const SIGNING_CTX: &'static [u8] = b"capi";
 
@@ -71,39 +74,25 @@ impl Signer {
   }
 }
 
-// // TODO: delete this
 #[wasm_bindgen]
-pub struct Keypair(s::Keypair);
+pub struct TestUser(Sr25519Keyring);
 #[wasm_bindgen]
-impl Keypair {
+impl TestUser {
+  #[wasm_bindgen(js_name = fromName)]
+  pub fn from_name(name: &str) -> Result<TestUser, JsError> {
+    match Sr25519Keyring::from_str(name) {
+      Ok(inner) => Ok(TestUser(inner)),
+      Err(_) => Err(JsError::new("")),
+    }
+  }
+
   #[wasm_bindgen]
-  pub fn rand() -> Keypair {
-    Keypair(s::MiniSecretKey::generate().expand_to_keypair(s::ExpansionMode::Uniform))
+  pub fn sign(&self, message: &[u8]) -> Uint8Array {
+    self.0.sign(message).0[..].into()
   }
 
   #[wasm_bindgen(js_name = publicKey, getter)]
-  pub fn get_public_key(&self) -> PublicKey {
-    console_error_panic_hook::set_once();
-    PublicKey(self.0.public)
+  pub fn public_key(&self) -> Uint8Array {
+    self.0.public().0.to_vec()[..].into()
   }
-
-  #[wasm_bindgen(js_name = secretKey, getter)]
-  pub fn get_secret_key(&self) -> Uint8Array {
-    console_error_panic_hook::set_once();
-    Uint8Array::from(&self.0.secret.to_bytes()[..])
-  }
-}
-
-#[wasm_bindgen]
-pub fn sign(pub_key_bytes: &[u8], secret_key_bytes: &[u8], message: &[u8]) -> Uint8Array {
-  console_error_panic_hook::set_once();
-  let pub_key = s::PublicKey::from_bytes(pub_key_bytes).unwrap();
-  let secret_key = s::SecretKey::from_bytes(secret_key_bytes).unwrap();
-  let data = secret_key
-    .sign_simple(SIGNING_CTX, message, &pub_key)
-    .to_bytes()
-    .to_vec();
-  let mut inner = [0u8; 64];
-  inner.copy_from_slice(&data);
-  Signature(inner).0[..].into()
 }

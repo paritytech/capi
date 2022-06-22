@@ -10,32 +10,34 @@ export interface PublicKey {
     message: Uint8Array,
   ): boolean;
 }
-export type PublicKeyCtor =
-  & { from(bytes: Uint8Array): PublicKey }
-  & (new() => PublicKey);
+export interface PublicKeyCtor {
+  from(bytes: Uint8Array): PublicKey;
+}
+
+export type Sign = (message: Uint8Array) => Uint8Array;
 
 export interface Signer {
-  sign(message: Uint8Array): Uint8Array;
+  sign: Sign;
 }
-export type SignerCtor = new() => Signer;
 
-export interface Keypair {
-  publicKey: PublicKey;
-  secretKey: Uint8Array;
+export interface TestUserCtor {
+  fromName(name: "alice" | "bob" | "TODO"): TestUser;
 }
-export type KeypairCtor =
-  & (new() => Keypair)
-  & { rand(): Keypair };
+
+export interface TestUser {
+  sign: Sign;
+  publicKey: Uint8Array;
+}
 
 export interface Sr25519 {
   PublicKey: PublicKeyCtor;
-  Keypair: KeypairCtor;
+  TestUser: TestUserCtor;
 }
 
 export async function Sr25519(): Promise<Sr25519> {
   const instance = await instantiate();
   return {
     PublicKey: instance.PublicKey,
-    Keypair: instance.Keypair,
+    TestUser: instance.TestUser,
   };
 }

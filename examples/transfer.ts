@@ -1,12 +1,13 @@
 import * as C from "../mod.ts";
 
-const { templateChain: chain } = C.test;
+const chain = C.test.chain;
+const { alice, bob } = chain.addresses;
 
 const transferPending = chain
   .pallet("Balances")
   .extrinsic("transfer")
-  .call({ dest: chain.addresses.alice, value: 12345n })
-  .signed(chain.addresses.bob, chain.addresses.bob.sign)
+  .call({ dest: alice, value: 12345n })
+  .signed(bob, bob.sign)
   .send();
 
 const cancellationPending = transferPending

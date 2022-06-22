@@ -2,5 +2,5 @@
 // TODO: better ws validation
 
 export function isWsUrl(inQuestion: string): boolean {
-  return inQuestion.startsWith("wss://");
+  return inQuestion.startsWith("ws");
 }

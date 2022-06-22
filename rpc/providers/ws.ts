@@ -18,7 +18,8 @@ export class ProxyWsUrlClient<M extends AnyMethods>
     ws.addEventListener("message", client.onMessage);
     const pending = deferred<ProxyWsUrlClient<M> | FailedToOpenConnectionError>();
     if (ws.readyState === WebSocket.CONNECTING) {
-      const onOpenError = () => {
+      const onOpenError = (e: any) => {
+        console.log({ log: e });
         clearListeners();
         pending.resolve(new FailedToOpenConnectionError());
       };

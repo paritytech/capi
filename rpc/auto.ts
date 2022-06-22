@@ -2,11 +2,11 @@ import { Beacon } from "../Beacon.ts";
 import { ErrorCtor, isWsUrl } from "../util/mod.ts";
 import { AnyMethods } from "../util/mod.ts";
 import {
-  FailedToAddChainError,
-  FailedToStartSmoldotError,
-  SmoldotClient,
+  type FailedToAddChainError,
+  type FailedToStartSmoldotError,
+  type SmoldotClient,
 } from "./providers/smoldot.ts";
-import { FailedToOpenConnectionError, ProxyWsUrlClient } from "./providers/ws.ts";
+import { type FailedToOpenConnectionError, type ProxyWsUrlClient } from "./providers/ws.ts";
 
 export async function client<M extends AnyMethods>(
   beacon: Beacon<string, M>,
@@ -23,9 +23,13 @@ export async function client<M extends AnyMethods>(
   if (currentDiscoveryValue) {
     const result = await (async () => {
       if (isWsUrl(currentDiscoveryValue)) {
-        return ProxyWsUrlClient.open<M>({ discoveryValue: currentDiscoveryValue });
+        return (
+          await import("./providers/ws.ts")
+        ).ProxyWsUrlClient.open<M>({ discoveryValue: currentDiscoveryValue });
       } else {
-        return SmoldotClient.open<M>({ discoveryValue: currentDiscoveryValue });
+        return (
+          await import("./providers/smoldot.ts")
+        ).SmoldotClient.open<M>({ discoveryValue: currentDiscoveryValue });
       }
     })();
     if (result instanceof Error) {

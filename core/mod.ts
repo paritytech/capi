@@ -12,4 +12,5 @@ export * from "./Pallet.ts";
 export * from "./Read.ts";
 export * from "./Send.ts";
 export * from "./Signed.ts";
+export * as test from "./test/mod.ts";
 export * from "./Watch.ts";

@@ -1,7 +1,7 @@
-import { Address as Address_, AddressRawBySourceKind } from "../core/Address.ts";
-import { Addresses } from "./Addresses.ts";
+import { Address, AddressRawBySourceKind } from "../Address.ts";
+import { TestAddresses } from "./Addresses.ts";
 
-export class Address<A extends Addresses = Addresses> extends Address_<A, "Test"> {
+export class TestAddress<A extends TestAddresses = TestAddresses> extends Address<A, "Test"> {
   constructor(
     addresses: A,
     testUser: AddressRawBySourceKind["Test"],
