@@ -38,24 +38,6 @@ export class ProxyWsUrlClient<M extends AnyMethods>
     return pending;
   };
 
-  close = async (): Promise<undefined | FailedToDisconnectError> => {
-    const pending = deferred<undefined | FailedToDisconnectError>();
-    const onClose = () => {
-      this.#ws?.removeEventListener("error", this.onError);
-      this.#ws?.removeEventListener("message", this.onMessage);
-      this.#ws?.removeEventListener("close", onClose);
-      pending.resolve();
-    };
-    this.#ws?.addEventListener("close", onClose);
-    this.#ws?.close();
-    try {
-      await deadline(pending, 250);
-    } catch (_e) {
-      pending.resolve(new FailedToDisconnectError());
-    }
-    return pending;
-  };
-
   _send = (egressMessage: InitMessage<M>): void => {
     this.#ws?.send(JSON.stringify(egressMessage));
   };
@@ -75,6 +57,24 @@ export class ProxyWsUrlClient<M extends AnyMethods>
   // TODO: provide insight into error via `_e`
   parseError = (_e: Event): WebSocketInternalError => {
     return new WebSocketInternalError();
+  };
+
+  _close = async (): Promise<undefined | FailedToDisconnectError> => {
+    const pending = deferred<undefined | FailedToDisconnectError>();
+    const onClose = () => {
+      this.#ws?.removeEventListener("error", this.onError);
+      this.#ws?.removeEventListener("message", this.onMessage);
+      this.#ws?.removeEventListener("close", onClose);
+      pending.resolve();
+    };
+    this.#ws?.addEventListener("close", onClose);
+    this.#ws?.close();
+    try {
+      await deadline(pending, 250);
+    } catch (_e) {
+      pending.resolve(new FailedToDisconnectError());
+    }
+    return pending;
   };
 }
 

@@ -15,17 +15,23 @@ import {
 const _N: unique symbol = Symbol();
 export type Subscription<NotificationResult = any> = { [_N]: NotificationResult };
 
+export interface ClientHooks<
+  M extends AnyMethods,
+  ParsedError extends Error,
+> {
+  send?: (message: InitMessage<M>) => void;
+  receive?: (message: IngressMessage<M>) => void;
+  error?: (error: ParsedError | ParseRawErrorError) => void;
+  close?: () => void;
+}
+
 export interface ClientProps<
   M extends AnyMethods,
   DiscoveryValue,
   ParsedError extends Error,
 > {
   discoveryValue: DiscoveryValue;
-  hooks?: {
-    send?: (message: InitMessage<M>) => void;
-    receive?: (message: IngressMessage<M>) => void;
-    error?: (error: ParsedError | ParseRawErrorError) => void;
-  };
+  hooks?: ClientHooks<M, ParsedError>;
 }
 
 export abstract class Client<
@@ -86,7 +92,12 @@ export abstract class Client<
    *
    * @returns a promise, which resolved to `undefined` upon successful cancellation
    */
-  abstract close: () => Promise<undefined | CloseError>;
+  abstract _close: () => Promise<undefined | CloseError>;
+
+  close = (): Promise<undefined | CloseError> => {
+    this.props.hooks?.close?.();
+    return this._close();
+  };
 
   /** @returns a new ID, unique to the client instance */
   uid = (): string => {

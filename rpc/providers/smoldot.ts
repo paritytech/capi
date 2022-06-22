@@ -41,20 +41,6 @@ export class SmoldotClient<M extends AnyMethods>
     }
   }
 
-  close = async (): Promise<undefined | FailedToRemoveChainError> => {
-    try {
-      this.#chain?.remove();
-      return;
-    } catch (e) {
-      if (e instanceof Error) {
-        // TODO: handle the following in a special manner?
-        // - `AlreadyDestroyedError`
-        // - `CrashError`
-      }
-      return new FailedToRemoveChainError();
-    }
-  };
-
   _send = (egressMessage: InitMessage<M>): void => {
     this.#chain?.sendJsonRpc(JSON.stringify(egressMessage));
   };
@@ -71,6 +57,20 @@ export class SmoldotClient<M extends AnyMethods>
 
   parseError = (_e: unknown): SmoldotInternalError => {
     return new SmoldotInternalError();
+  };
+
+  _close = async (): Promise<undefined | FailedToRemoveChainError> => {
+    try {
+      this.#chain?.remove();
+      return;
+    } catch (e) {
+      if (e instanceof Error) {
+        // TODO: handle the following in a special manner?
+        // - `AlreadyDestroyedError`
+        // - `CrashError`
+      }
+      return new FailedToRemoveChainError();
+    }
   };
 }
 
