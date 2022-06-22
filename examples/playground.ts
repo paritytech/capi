@@ -5,7 +5,7 @@ import { KnownRpcMethods } from "../known/mod.ts";
 import * as rpc from "../rpc/mod.ts";
 import * as U from "../util/mod.ts";
 const client = await rpc.localClient<KnownRpcMethods>({
-  path: "../substrate-dev-hub/substrate-node-template",
+  path: "./examples/node-template",
   dev: true,
 });
 assert(!(client instanceof Error));
