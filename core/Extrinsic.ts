@@ -1,12 +1,12 @@
-import { Base } from "./Base.ts";
 import { Call } from "./Call.ts";
+import { NodeBase } from "./common.ts";
 import { Pallet } from "./Pallet.ts";
 
 // TODO: narrow extrinsic according to beacon
 export class Extrinsic<
   P extends Pallet = Pallet,
   Name extends string = string,
-> extends Base<"Extrinsic"> {
+> extends NodeBase<"Extrinsic"> {
   chain;
 
   constructor(

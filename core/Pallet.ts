@@ -1,5 +1,5 @@
-import { Base } from "./Base.ts";
 import { Chain } from "./Chain.ts";
+import { NodeBase } from "./common.ts";
 import { Entry } from "./Entry.ts";
 import { Extrinsic } from "./Extrinsic.ts";
 
@@ -7,7 +7,7 @@ import { Extrinsic } from "./Extrinsic.ts";
 export class Pallet<
   C extends Chain = Chain,
   Name extends string = string,
-> extends Base<"Pallet"> {
+> extends NodeBase<"Pallet"> {
   constructor(
     readonly chain: C,
     readonly name: Name,

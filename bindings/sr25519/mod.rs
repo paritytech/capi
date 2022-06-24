@@ -1,5 +1,5 @@
 use {
-  js_sys::Uint8Array, schnorrkel as s, sp_core::sr25519::Signature, sp_keyring::Sr25519Keyring,
+  js_sys::Uint8Array, schnorrkel as s, sp_core::sr25519, sp_keyring::Sr25519Keyring,
   std::str::FromStr, wasm_bindgen::prelude::*,
 };
 
@@ -70,7 +70,7 @@ impl Signer {
       .to_vec();
     let mut inner = [0u8; 64];
     inner.copy_from_slice(&data);
-    Signature(inner).0[..].into()
+    sr25519::Signature(inner).0[..].into()
   }
 }
 
@@ -87,8 +87,8 @@ impl TestUser {
   }
 
   #[wasm_bindgen]
-  pub fn sign(&self, message: &[u8]) -> Uint8Array {
-    self.0.sign(message).0[..].into()
+  pub fn sign(&self, message: &[u8]) -> Vec<u8> {
+    self.0.sign(message).0.to_vec()
   }
 
   #[wasm_bindgen(js_name = publicKey, getter)]

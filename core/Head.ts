@@ -1,19 +1,19 @@
-import { Base } from "./Base.ts";
+import * as R from "../runtime/mod.ts";
 import { Block } from "./Block.ts";
 import { Chain } from "./Chain.ts";
-import { Read } from "./Read.ts";
-import { Watch } from "./Watch.ts";
+import { NodeBase } from "./common.ts";
 
-export class Head<C extends Chain = Chain> extends Base<"Head"> {
+export class Head<C extends Chain = Chain> extends NodeBase<"Head"> {
   constructor(readonly chain: C) {
     super("Head");
   }
 
-  read(block?: Block<C>): Read<this> {
-    return new Read(this, block);
+  // TODO
+  read(block?: Block<C>): Promise<unknown> {
+    return R.read(this, block);
   }
 
-  watch(): Watch<this> {
-    return new Watch(this);
+  watch() {
+    return R.watch(this);
   }
 }

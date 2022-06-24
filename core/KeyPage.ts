@@ -1,11 +1,10 @@
-import { Base } from "./Base.ts";
+import * as R from "../runtime/mod.ts";
 import { Block } from "./Block.ts";
+import { NodeBase } from "./common.ts";
 import { Entry } from "./Entry.ts";
-import { Read } from "./Read.ts";
-import { Watch } from "./Watch.ts";
 
 // TODO: constrain to map entry / key types
-export class KeyPage<E extends Entry = Entry> extends Base<"KeyPage"> {
+export class KeyPage<E extends Entry = Entry> extends NodeBase<"KeyPage"> {
   chain;
 
   constructor(
@@ -17,11 +16,11 @@ export class KeyPage<E extends Entry = Entry> extends Base<"KeyPage"> {
     this.chain = entry.chain;
   }
 
-  read(block?: Block): Read<this> {
-    return new Read(this, block);
+  read(block?: Block): Promise<unknown> {
+    return R.read(this, block);
   }
 
-  watch(): Watch<this> {
-    return new Watch(this);
+  watch() {
+    return R.watch(this);
   }
 }

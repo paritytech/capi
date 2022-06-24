@@ -1,15 +1,14 @@
-import { Base } from "./Base.ts";
+import * as R from "../runtime/mod.ts";
 import { Block } from "./Block.ts";
+import { NodeBase } from "./common.ts";
 import { KeyPage } from "./KeyPage.ts";
 import { Pallet } from "./Pallet.ts";
-import { Read } from "./Read.ts";
-import { Watch } from "./Watch.ts";
 
 export class Entry<
   P extends Pallet = Pallet,
   Name extends string = string,
   Keys extends unknown[] = unknown[], // TODO: constrain
-> extends Base<"Entry"> {
+> extends NodeBase<"Entry"> {
   chain;
   keys;
 
@@ -27,11 +26,11 @@ export class Entry<
     return new KeyPage(this, count, offset);
   }
 
-  read(block?: Block<P["chain"]>): Read<this> {
-    return new Read(this, block);
+  read(block?: Block<P["chain"]>) {
+    return R.read(this, block);
   }
 
-  watch(): Watch<this> {
-    return new Watch(this);
+  watch() {
+    return R.watch(this);
   }
 }

@@ -1,14 +1,14 @@
-import { Base } from "./Base.ts";
+import { read } from "../runtime/mod.ts";
 import { Block } from "./Block.ts";
 import { Chain } from "./Chain.ts";
-import { Read } from "./Read.ts";
+import { NodeBase } from "./common.ts";
 
-export class Metadata<C extends Chain = Chain> extends Base<"Metadata"> {
+export class Metadata<C extends Chain = Chain> extends NodeBase<"Metadata"> {
   constructor(readonly chain: C) {
     super("Metadata");
   }
 
-  read(block?: Block<C>): Read<this> {
-    return new Read(this, block);
+  read(block?: Block<C>): Promise<unknown> {
+    return read(this, block);
   }
 }
