@@ -25,21 +25,11 @@ export interface ClientHooks<
   close?: () => void;
 }
 
-export interface ClientProps<
-  M extends AnyMethods,
-  DiscoveryValue,
-  ParsedError extends Error,
-> {
-  discoveryValue: DiscoveryValue;
-  hooks?: ClientHooks<M, ParsedError>;
-}
-
 export abstract class Client<
   M extends AnyMethods,
-  Beacon,
+  ParsedError extends Error,
   RawIngressMessage,
   RawError,
-  ParsedError extends Error,
 > {
   #nextId = 0;
   listeners = new Map<ListenerCb<IngressMessage<M>>, boolean>();
@@ -47,9 +37,9 @@ export abstract class Client<
   /**
    * Construct a new RPC client
    *
-   * @param props the beacon, error handling and message hooks with which you'd like the instance to operate
+   * @param hooks the error handling and message hooks with which you'd like the instance to operate
    */
-  constructor(readonly props: ClientProps<M, Beacon, ParsedError>) {}
+  constructor(readonly hooks?: ClientHooks<M, ParsedError>) {}
 
   /**
    * Send a message to the RPC server
@@ -57,7 +47,7 @@ export abstract class Client<
    * @param egressMessage the message you wish to send to the RPC server
    */
   send = (egressMessage: InitMessage<M>): void => {
-    this.props.hooks?.send?.(egressMessage);
+    this.hooks?.send?.(egressMessage);
     this._send(egressMessage);
   };
 
@@ -95,7 +85,7 @@ export abstract class Client<
   abstract _close: () => Promise<undefined | CloseError>;
 
   close = (): Promise<undefined | CloseError> => {
-    this.props.hooks?.close?.();
+    this.hooks?.close?.();
     return this._close();
   };
 
@@ -125,9 +115,9 @@ export abstract class Client<
   onMessage = (message: RawIngressMessage) => {
     const parsed = this.parseIngressMessage(message);
     if (parsed instanceof Error) {
-      this.props.hooks?.error?.(parsed);
+      this.hooks?.error?.(parsed);
     } else {
-      this.props.hooks?.receive?.(parsed);
+      this.hooks?.receive?.(parsed);
       for (const listener of this.listeners.keys()) {
         listener(parsed);
       }
@@ -137,7 +127,7 @@ export abstract class Client<
   /** @internal */
   onError = (error: RawError): void => {
     const parsedError = this.parseError(error);
-    this.props.hooks?.error?.(parsedError);
+    this.hooks?.error?.(parsedError);
   };
 
   /**
@@ -198,6 +188,9 @@ export abstract class Client<
   };
 }
 
+export type AnyClient<M extends AnyMethods = AnyMethods, ParsedError extends Error = Error> =
+  Client<M, ParsedError, any, any>;
+
 export class ParseRawIngressMessageError extends Error {}
 export class ParseRawErrorError extends Error {}
 export class CloseError extends Error {}
@@ -216,9 +209,6 @@ export function IsCorrespondingRes<
     InQuestion,
     OkMessageByMethodName<M>[Init_["method"]] | ErrMessage
   > => {
-    if (inQuestion.error || inQuestion.result) {
-      inQuestion;
-    }
     return inQuestion?.id === init.id;
   };
 }

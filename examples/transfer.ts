@@ -1,8 +1,10 @@
 import * as C from "../mod.ts";
 
-const { alice, bob } = C.test.addresses;
+const chain = C.test.chain();
 
-const result = C.test
+const { alice, bob } = chain.addresses;
+
+const result = chain
   .pallet("Balances")
   .extrinsic("transfer")
   .call({

@@ -1,4 +1,7 @@
+import { unimplemented } from "../_deps/asserts.ts";
+import { Ss58 } from "../bindings/mod.ts";
 import { MultiAddress } from "../primitives/MultiAddress.ts";
+import * as U from "../util/mod.ts";
 import { Addresses } from "./Addresses.ts";
 import { NodeBase } from "./common.ts";
 
@@ -35,7 +38,20 @@ export class Address<
     this.chain = addresses.chain;
   }
 
-  declare asPublicKeyBytes: () => Uint8Array;
+  asPublicKeyBytes = async (): Promise<Uint8Array> => {
+    switch (this.source.type) {
+      case "Ss58Text": {
+        return U.hex.decode((await Ss58()).decode(this.source.raw)[1]);
+      }
+      case "PublicKeyText": {
+        return U.hex.decode(this.source.raw);
+      }
+      default: {
+        unimplemented();
+      }
+    }
+  };
+
   declare asPublicKeyText: () => string;
   declare asSs58Bytes: () => Uint8Array;
   declare asSs58Text: () => string;

@@ -1,16 +1,15 @@
 import { assert } from "../_deps/asserts.ts";
 import { Hashers, Sr25519 } from "../bindings/mod.ts";
 import * as M from "../frame_metadata/mod.ts";
-import { KnownRpcMethods } from "../known/mod.ts";
-import * as rpc from "../rpc/mod.ts";
+import * as C from "../mod.ts";
 import * as U from "../util/mod.ts";
-const client = await rpc.localClient<KnownRpcMethods>({
-  path: "./examples/node-template",
-  dev: true,
-});
+
+const client = await C.test.rpcClient();
 assert(!(client instanceof Error));
+
 const metadataRaw = await client.call("state_getMetadata", []);
 assert(metadataRaw.result);
+
 const metadata = M.fromPrefixedHex(metadataRaw.result);
 const lookup = new M.Lookup(metadata);
 const pallet = lookup.getPalletByName("System");

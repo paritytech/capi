@@ -26,7 +26,7 @@ export class Entry<
     return new KeyPage(this, count, offset);
   }
 
-  read(block?: Block<P["chain"]>) {
+  read(block?: Block<P["chain"]>): Promise<unknown> {
     return R.read(this, block);
   }
 

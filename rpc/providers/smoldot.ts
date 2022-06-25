@@ -4,41 +4,19 @@ import * as B from "../Base.ts";
 import { IngressMessage, InitMessage } from "../messages.ts";
 
 export class SmoldotClient<M extends AnyMethods>
-  extends B.Client<M, string, string, unknown, SmoldotInternalError>
+  extends B.Client<M, SmoldotInternalError, string, unknown>
 {
-  static #innerClient?: smoldot.Client;
   #chain?: smoldot.Chain;
 
-  static #ensureInstance = async (): Promise<smoldot.Client | FailedToStartSmoldotError> => {
-    if (!SmoldotClient.#innerClient) {
-      try {
-        const smoldot = await import("../../_deps/smoldot.ts");
-        SmoldotClient.#innerClient = smoldot.start();
-      } catch (_e) {
-        return new FailedToStartSmoldotError();
-      }
-    }
-    return SmoldotClient.#innerClient;
-  };
-
-  static async open<M extends AnyMethods>(
-    props: B.ClientProps<M, string, SmoldotInternalError>,
-  ): Promise<SmoldotClient<M> | FailedToStartSmoldotError | FailedToAddChainError> {
-    const inner = await SmoldotClient.#ensureInstance();
-    if (inner instanceof Error) {
-      return inner;
-    }
-    try {
-      const client = new SmoldotClient(props);
-      // TODO: wire up `onError`
-      client.#chain = await inner.addChain({
-        chainSpec: props.discoveryValue,
-        jsonRpcCallback: client.onMessage,
-      });
-      return client;
-    } catch (_e) {
-      return new FailedToAddChainError();
-    }
+  constructor(
+    onMessageContainer: {
+      onMessage?: B.Client<M, SmoldotInternalError, string, unknown>["onMessage"];
+    },
+    readonly remove: () => void,
+    hooks?: B.ClientHooks<M, SmoldotInternalError>,
+  ) {
+    super(hooks);
+    onMessageContainer.onMessage = this.onMessage;
   }
 
   _send = (egressMessage: InitMessage<M>): void => {
@@ -61,7 +39,7 @@ export class SmoldotClient<M extends AnyMethods>
 
   _close = async (): Promise<undefined | FailedToRemoveChainError> => {
     try {
-      this.#chain?.remove();
+      this.remove();
       return;
     } catch (e) {
       if (e instanceof Error) {
@@ -72,6 +50,43 @@ export class SmoldotClient<M extends AnyMethods>
       return new FailedToRemoveChainError();
     }
   };
+}
+
+const _state: { smoldotInstance?: smoldot.Client } = {};
+
+async function ensureInstance(): Promise<smoldot.Client | FailedToStartSmoldotError> {
+  if (!_state.smoldotInstance) {
+    try {
+      const smoldot = await import("../../_deps/smoldot.ts");
+      _state.smoldotInstance = smoldot.start();
+    } catch (_e) {
+      return new FailedToStartSmoldotError();
+    }
+  }
+  return _state.smoldotInstance;
+}
+
+export async function createSmoldotClient<M extends AnyMethods>(
+  chainSpec: string,
+  hooks: B.ClientHooks<M, SmoldotInternalError>,
+): Promise<SmoldotClient<M> | FailedToStartSmoldotError | FailedToAddChainError> {
+  const smoldotInstance = await ensureInstance();
+  if (smoldotInstance instanceof Error) {
+    return smoldotInstance;
+  }
+  const onMessageContainer: { onMessage?: (message: unknown) => void } = {};
+  try {
+    // TODO: wire up `onError`
+    const chain = await smoldotInstance.addChain({
+      chainSpec,
+      jsonRpcCallback: (response) => {
+        onMessageContainer.onMessage?.(response);
+      },
+    });
+    return new SmoldotClient(onMessageContainer, chain.remove, hooks);
+  } catch (_e) {
+    return new FailedToAddChainError();
+  }
 }
 
 export class FailedToStartSmoldotError extends ErrorCtor("FailedToStartSmoldot") {}

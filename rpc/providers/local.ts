@@ -3,25 +3,25 @@ import { blue } from "../../_deps/colors.ts";
 import * as path from "../../_deps/path.ts";
 import { AnyMethods, ErrorCtor } from "../../util/mod.ts";
 import { ClientHooks } from "../Base.ts";
-import { FailedToOpenConnectionError, ProxyWsUrlClient, WebSocketInternalError } from "./ws.ts";
+import {
+  createWsClient,
+  FailedToOpenConnectionError,
+  ProxyWsUrlClient,
+  WebSocketInternalError,
+} from "./ws.ts";
 
-export type LocalClientProps<
-  M extends AnyMethods,
-  ParsedError extends Error,
-> = {
+export interface LocalClientProps<M extends AnyMethods> {
   cwd?: string;
   port?: number;
-  hooks?: ClientHooks<M, ParsedError> & {
+  hooks?: ClientHooks<M, WebSocketInternalError> & {
     useProcess?: (process: Deno.Process) => void;
   };
   dev?: true;
   path: string;
   timeout?: number;
-};
+}
 
-export async function localClient<M extends AnyMethods>(
-  props: LocalClientProps<M, WebSocketInternalError>,
-): Promise<
+export async function localClient<M extends AnyMethods>(props: LocalClientProps<M>): Promise<
   ProxyWsUrlClient<M> | FailedToOpenConnectionError | FailedToExeError | Deno.errors.NotFound
 > {
   let cwd: string;
@@ -67,19 +67,17 @@ export async function localClient<M extends AnyMethods>(
     } catch (_e) {
       return new FailedToExeError();
     }
-    const client = ProxyWsUrlClient.open({
-      discoveryValue: `ws://127.0.0.1:${props.port || 9944}`,
-      hooks: {
-        ...props.hooks || {},
-        close() {
-          props.hooks?.close?.();
-          process.close();
-        },
+    const client = await createWsClient(`ws://127.0.0.1:${props.port || 9944}`, {
+      ...props.hooks || {},
+      close() {
+        props.hooks?.close?.();
+        process.close();
       },
     });
-    if (!(client instanceof Error)) {
-      console.log(blue("Client connection established"));
+    if (client instanceof Error) {
+      return client;
     }
+    console.log(blue("Client connection established"));
     return client;
   } catch (e) {
     if (e instanceof Deno.errors.NotFound) {

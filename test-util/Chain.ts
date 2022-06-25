@@ -1,10 +1,17 @@
 import { Beacon, beacon } from "../Beacon.ts";
 import { Chain } from "../core/Chain.ts";
 import { KnownRpcMethods } from "../known/mod.ts";
+import { LocalClientProps } from "../rpc/mod.ts";
 import { TestAddresses } from "./Addresses.ts";
 
-export class TestChain extends Chain<Beacon<string, KnownRpcMethods>> {
+export class TestChain extends Chain<Beacon<LocalClientProps<KnownRpcMethods>, KnownRpcMethods>> {
   addresses: TestAddresses<this> = new TestAddresses(this);
 }
 
-export const test = new TestChain(beacon("wss://localhost:127.0.0.1:9933"));
+export function chain() {
+  return new TestChain(beacon<LocalClientProps<KnownRpcMethods>, KnownRpcMethods>({
+    path: "./node-template",
+    cwd: new URL(".", import.meta.url).pathname,
+    dev: true,
+  }));
+}

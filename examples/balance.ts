@@ -1,10 +1,10 @@
 import * as C from "../mod.ts";
 
-const address = C.polkadot.address.fromSs58Text("13SceNt2ELz3ti4rnQbY1snpYH4XE4fLFsW8ph9rpwJd6HFC");
-
-const result = await C.polkadot
+const chain = C.test.chain();
+const alice = await chain.addresses.alice.asPublicKeyBytes();
+const result = await chain
   .pallet("System")
-  .entry("Account", address)
+  .entry("Account", alice)
   .read();
 
 console.log({ result });

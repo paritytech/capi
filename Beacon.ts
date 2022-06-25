@@ -1,21 +1,22 @@
 import { AnyMethods } from "./util/mod.ts";
 
-export type DiscoveryValues<DiscoveryValue> = [DiscoveryValue, ...DiscoveryValue[]];
+export declare const M_: unique symbol;
+export type M_<B extends Beacon> = B extends Beacon<infer M> ? M : never;
 
-declare const _RpcMethods: unique symbol;
+export declare const D_: unique symbol;
+export type D_<B extends Beacon> = B extends Beacon<AnyMethods, infer D> ? D : never;
 
-// TODO: parameterize address kind & misc.
-export class Beacon<D = any, M extends AnyMethods = AnyMethods> {
-  declare [_RpcMethods]: M;
+export class Beacon<
+  M extends AnyMethods = AnyMethods,
+  DiscoveryValue = any,
+> {
+  declare [M_]: M;
 
-  discoveryValues;
-
-  constructor(...discoveryValues: DiscoveryValues<D>) {
-    this.discoveryValues = discoveryValues;
-  }
+  constructor(readonly discoveryValue: DiscoveryValue) {}
 }
-export function beacon<D, M extends AnyMethods>(
-  ...discoveryValues: DiscoveryValues<D>
-): Beacon<D, M> {
-  return new Beacon(...discoveryValues);
+export function beacon<
+  M extends AnyMethods,
+  DiscoveryValue,
+>(discoveryValue: DiscoveryValue): Beacon<M, DiscoveryValue> {
+  return new Beacon(discoveryValue);
 }

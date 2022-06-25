@@ -4,43 +4,17 @@ import * as B from "../Base.ts";
 import { IngressMessage, InitMessage } from "../messages.ts";
 
 export class ProxyWsUrlClient<M extends AnyMethods>
-  extends B.Client<M, string, MessageEvent, Event, WebSocketInternalError>
+  extends B.Client<M, WebSocketInternalError, MessageEvent, Event>
 {
-  #ws?: WebSocket;
-
-  static open = async <M extends AnyMethods>(
-    props: B.ClientProps<M, string, WebSocketInternalError>,
-  ): Promise<ProxyWsUrlClient<M> | FailedToOpenConnectionError> => {
-    const client = new ProxyWsUrlClient(props);
-    const ws = new WebSocket(props.discoveryValue);
-    client.#ws = ws;
-    ws.addEventListener("error", client.onError);
-    ws.addEventListener("message", client.onMessage);
-    const pending = deferred<ProxyWsUrlClient<M> | FailedToOpenConnectionError>();
-    if (ws.readyState === WebSocket.CONNECTING) {
-      const onOpenError = (e: any) => {
-        console.log({ log: e });
-        clearListeners();
-        pending.resolve(new FailedToOpenConnectionError());
-      };
-      const onOpen = () => {
-        clearListeners();
-        pending.resolve(client);
-      };
-      const clearListeners = () => {
-        ws.removeEventListener("error", onOpenError);
-        ws.removeEventListener("open", onOpen);
-      };
-      ws.addEventListener("error", onOpenError);
-      ws.addEventListener("open", onOpen);
-    } else {
-      pending.resolve(client);
-    }
-    return pending;
-  };
+  constructor(
+    private ws: WebSocket,
+    hooks: B.ClientHooks<M, WebSocketInternalError>,
+  ) {
+    super(hooks);
+  }
 
   _send = (egressMessage: InitMessage<M>): void => {
-    this.#ws?.send(JSON.stringify(egressMessage));
+    this.ws?.send(JSON.stringify(egressMessage));
   };
 
   parseIngressMessage = (e: unknown): IngressMessage<M> | B.ParseRawIngressMessageError => {
@@ -63,13 +37,13 @@ export class ProxyWsUrlClient<M extends AnyMethods>
   _close = async (): Promise<undefined | FailedToDisconnectError> => {
     const pending = deferred<undefined | FailedToDisconnectError>();
     const onClose = () => {
-      this.#ws?.removeEventListener("error", this.onError);
-      this.#ws?.removeEventListener("message", this.onMessage);
-      this.#ws?.removeEventListener("close", onClose);
+      this.ws?.removeEventListener("error", this.onError);
+      this.ws?.removeEventListener("message", this.onMessage);
+      this.ws?.removeEventListener("close", onClose);
       pending.resolve();
     };
-    this.#ws?.addEventListener("close", onClose);
-    this.#ws?.close();
+    this.ws?.addEventListener("close", onClose);
+    this.ws?.close();
     try {
       await deadline(pending, 250);
     } catch (_e) {
@@ -77,6 +51,37 @@ export class ProxyWsUrlClient<M extends AnyMethods>
     }
     return pending;
   };
+}
+
+export async function createWsClient<M extends AnyMethods>(
+  url: string,
+  hooks: B.ClientHooks<M, WebSocketInternalError>,
+): Promise<ProxyWsUrlClient<M> | FailedToOpenConnectionError> {
+  const ws = new WebSocket(url);
+  const client = new ProxyWsUrlClient(ws, hooks);
+  ws.addEventListener("error", client.onError);
+  ws.addEventListener("message", client.onMessage);
+  const pending = deferred<ProxyWsUrlClient<M> | FailedToOpenConnectionError>();
+  if (ws.readyState === WebSocket.CONNECTING) {
+    const onOpenError = (e: any) => {
+      console.log({ log: e });
+      clearListeners();
+      pending.resolve(new FailedToOpenConnectionError());
+    };
+    const onOpen = () => {
+      clearListeners();
+      pending.resolve(client);
+    };
+    const clearListeners = () => {
+      ws.removeEventListener("error", onOpenError);
+      ws.removeEventListener("open", onOpen);
+    };
+    ws.addEventListener("error", onOpenError);
+    ws.addEventListener("open", onOpen);
+  } else {
+    pending.resolve(client);
+  }
+  return pending;
 }
 
 export class FailedToOpenConnectionError extends ErrorCtor("FailedToOpenConnection") {}
