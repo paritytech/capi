@@ -26,7 +26,7 @@ await Promise.all([
       },
       "_deps/smoldot_phantom.ts": {
         name: "@substrate/smoldot-light",
-        version: "0.6.19",
+        version: "0.6.20",
         peerDependency: true,
       },
     },
