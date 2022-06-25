@@ -207,9 +207,9 @@
   "https://deno.land/x/ts_morph@15.1.0/common/ts_morph_common.js": "e43476019b9c74ca9116eb82b97a14e6bc2d1bba55b0575d933d98069c0c0c37",
   "https://deno.land/x/ts_morph@15.1.0/common/typescript.d.ts": "3fa86a2c33804b6a4221dda3714a6a2f8a2f26983ea6c63d2bf6f2839fbb778a",
   "https://deno.land/x/ts_morph@15.1.0/common/typescript.js": "4d7a5d2090a2ba739c02207bd8c49a60c9475dea7725a9cabfaf0f26cbf85f53",
-  "https://esm.sh/@substrate/smoldot-light@0.6.19/dist/client.js": "df1665c8bac20842acd4af447069cbc9d0b0091b14f6553fb81438a2b5868223",
-  "https://esm.sh/@substrate/smoldot-light@0.6.19/dist/index.d.ts": "e8f76c98d4ad1e080155c93ff29eb75d80515bcf991a27153f283ddd4c288476",
+  "https://esm.sh/@substrate/smoldot-light@0.6.20/dist/client.js": "1a69eab047a0a4947726681e17c08c4d699693d500b2a8ed2309b565a9d09ce0",
+  "https://esm.sh/@substrate/smoldot-light@0.6.20/dist/index.d.ts": "e8f76c98d4ad1e080155c93ff29eb75d80515bcf991a27153f283ddd4c288476",
   "https://esm.sh/v85/@substrate/ss58-registry@1.22.0/es2022/ss58-registry.js": "9ea45c8cc2942d30479f96ff7f3ae807da80ecaacb7989570efc914521ab4bd8",
-  "https://esm.sh/v86/@substrate/smoldot-light@0.6.19/deno/dist/client.js": "589c7b5eb8499027497ef63030ef759b60f3602d6774d3f9056146d6adc19dc5",
-  "https://esm.sh/v86/@substrate/smoldot-light@0.6.19/dist/client.d.ts": "4e99d2a67444b585551feaa8956b39deeaeff0344015e44758e005299540174c"
+  "https://esm.sh/v86/@substrate/smoldot-light@0.6.20/deno/dist/client.js": "d46cfd1ab647370381fe21ce4556004aa65904e5e9f13251dc3e8a5f961f7244",
+  "https://esm.sh/v86/@substrate/smoldot-light@0.6.20/dist/client.d.ts": "4e99d2a67444b585551feaa8956b39deeaeff0344015e44758e005299540174c"
 }
