@@ -1,25 +1,27 @@
-import { Beacon } from "../Beacon.ts";
 import * as M from "../frame_metadata/mod.ts";
+import { KnownRpcMethods } from "../known/mod.ts";
+import { detectClient, StdBeacon, StdClient } from "../rpc/mod.ts";
 import * as U from "../util/mod.ts";
 
-export class Runtime<
-  DiscoveryValue,
-  M extends U.AnyMethods,
-> {
-  #chains = new Map<Beacon<DiscoveryValue, M>, ChainContext>();
+export class GlobalContext {
+  chains = new Map<StdBeacon<KnownRpcMethods>, ChainContext>();
 
-  register = async (beacon: Beacon<DiscoveryValue, M>): Promise<ChainContext> => {
-    const existingChain = this.#chains.get(beacon);
+  register = async (beacon: StdBeacon<KnownRpcMethods>) => {
+    const existingChain = this.chains.get(beacon);
     if (existingChain) {
       return existingChain;
     }
-    const chain = new ChainContext(this, beacon);
-    this.#chains.set(beacon, chain);
+    const rpcClient = await detectClient(beacon);
+    if (rpcClient instanceof Error) {
+      return rpcClient;
+    }
+    const chain = new ChainContext(this, beacon, rpcClient);
+    this.chains.set(beacon, chain);
     return chain;
   };
 }
 
-export const globalContext = new Runtime();
+export const globalContext = new GlobalContext();
 
 export interface RuntimeGroup {
   metadata: M.Metadata;
@@ -32,7 +34,9 @@ export class ChainContext {
   groups: Record<U.HashHexString, RuntimeGroup> = {};
 
   constructor(
-    readonly beacon: Beacon,
+    readonly globalContext: GlobalContext,
+    readonly beacon: StdBeacon<KnownRpcMethods>,
+    readonly rpcClient: StdClient<KnownRpcMethods>,
   ) {}
 
   load = async (blockHash?: U.HashHexString): Promise<RuntimeGroup> => {
@@ -52,14 +56,23 @@ export class ChainContext {
     const raw = await this.rpcClient.call("state_getMetadata", [blockHash]);
     if (raw.result) {
       const metadata = M.fromPrefixedHex(raw.result);
-      const roup: RuntimeGroup = {
+      const group: RuntimeGroup = {
         metadata,
         lookup: new M.Lookup(metadata),
         deriveCodec: M.DeriveCodec(metadata),
       };
-      this.groups[blockHashEnsured] = roup;
-      return roup;
+      this.groups[blockHashEnsured] = group;
+      return group;
     }
     throw new Error(); // TODO
+  };
+
+  release = async () => {
+    if (this.users === 1) {
+      this.globalContext.chains.delete(this.beacon);
+      await this.rpcClient.close();
+    } else {
+      this.users -= 1;
+    }
   };
 }

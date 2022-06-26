@@ -9,8 +9,11 @@ export type ReadTarget = C.Entry | C.KeyPage | C.Metadata | C.Head;
 export async function read<Target extends ReadTarget = ReadTarget>(
   target: Target,
   block?: C.Block<Target["chain"]>,
-): Promise<unknown> {
+) {
   const chain = await globalContext.register(target.chain.beacon as any);
+  if (chain instanceof Error) {
+    return chain;
+  }
   const group = await chain.load(block?.hash);
   switch (target.kind) {
     case "Entry": {
