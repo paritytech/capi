@@ -5,7 +5,7 @@ import { LocalBeacon, LocalClientProps } from "../rpc/mod.ts";
 import { TestAddresses } from "./Addresses.ts";
 
 export class TestChain extends Chain<Beacon<LocalClientProps, KnownRpcMethods>> {
-  addresses: TestAddresses<this> = new TestAddresses(this);
+  override address: TestAddresses<this> = new TestAddresses(this);
 }
 
 export function chain() {
