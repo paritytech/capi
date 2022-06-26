@@ -23,6 +23,9 @@ export function $storageMapKey(props: StorageMapKeyProps): $.Codec<unknown> {
     _encode(buffer, key) {
       buffer.insertArray(hashTwox128(textEncoder.encode(props.pallet.name)));
       buffer.insertArray(hashTwox128(textEncoder.encode(props.storageEntry.name)));
+      if (key instanceof Array && key.length === 0) {
+        return;
+      }
       if (props.storageEntry.type === "Map") {
         const { hashers } = props.storageEntry;
         if (hashers.length === 1) {

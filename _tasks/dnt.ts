@@ -15,6 +15,9 @@ await Promise.all([
       name: "frame_metadata",
       path: "frame_metadata/mod.ts",
     }, {
+      name: "known",
+      path: "known/mod.ts",
+    }, {
       name: "rpc",
       path: "rpc/mod.ts",
     }],

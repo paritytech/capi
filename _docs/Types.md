@@ -241,18 +241,16 @@ type S1 = A;
 type S2 = [A, B];
 type S3 = { a: A };
 
-type E0 = (
+type E0 =
   | "A"
   | "B"
-  | "C"
-);
+  | "C";
 
-type E1 = (
+type E1 =
   | { type: "A" }
   | { type: "B"; value: C }
   | { type: "D"; value: [E, F] }
-  | { type: "G"; h: H }
-);
+  | { type: "G"; h: H };
 ```
 
 </td>

@@ -6,15 +6,12 @@ import { Metadata } from "./Metadata.ts";
 
 export interface Extrinsic {
   protocolVersion: number;
-  signature?: {
-    address: MultiAddress;
-    extra: unknown[];
-    additional: unknown[];
-  } | {
-    address: MultiAddress;
-    sig: unknown;
-    extra: unknown[];
-  };
+  signature?:
+    & {
+      address: MultiAddress;
+      extra: unknown[];
+    }
+    & ({ additional: unknown[] } | { sig: unknown });
   palletName: string;
   methodName: string;
   args: Record<string, unknown>;

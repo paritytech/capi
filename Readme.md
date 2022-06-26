@@ -2,7 +2,7 @@
 
 Capi is a WIP TypeScript toolkit for crafting interactions with Substrate-based chains.
 
-Capi consists of [FRAME](https://docs.substrate.io/v3/runtime/frame/)-oriented utilities and [a high-level functional effect system](_docs/Effects.md) which facilitate multistep, multichain interactions without compromising on performance or safety.
+Capi consists of [FRAME](https://docs.substrate.io/v3/runtime/frame/)-oriented utilities and (soon) [a high-level functional effect system](_docs/Effects.md) which facilitate multistep, multichain interactions without compromising on performance or safety.
 
 <!--
 <h4>
@@ -18,7 +18,7 @@ Capi consists of [FRAME](https://docs.substrate.io/v3/runtime/frame/)-oriented u
 
 ️Please share feedback or even join us in Capi's development; issues and PRs are very welcome!
 
-#### In Good Shape
+### In Good Shape
 
 - [x] RPC `call` and `subscribe` utils
 - [x] Metadata types and SCALE codecs
@@ -26,21 +26,13 @@ Capi consists of [FRAME](https://docs.substrate.io/v3/runtime/frame/)-oriented u
 - [x] Storage key encoding and (when transparent) decoding
 - [x] Storage value decoding
 - [x] Creating and decoding extrinsics
+- [x] RPC Client hooks / error handing
 
-#### Needs Love
+### TODO
 
-- [ ] High-level "Effect" System
-- [ ] Std lib of effects
-
-#### TODO
-
-- [ ] RPC Client Error Handing
-- [ ] Get async iterable from RPC subscription
-- [ ] ... TODO, the remainder of this TODO section (we primarily use [this repo's issues](https://github.com/paritytech/capi/issues))
+- [ ] Take a look at [this repo's issues](https://github.com/paritytech/capi/issues)
 
 ### Setup
-
-> Note: we have yet to publish a beta of Capi. Expect the first publish to occur in the next few days (written on June 10th, 2022).
 
 If you're using [Deno](https://deno.land/), import via the `denoland/x` specifier.
 
@@ -52,7 +44,7 @@ import * as C from "https://deno.land/x/capi/mod.ts";
 
 If you're using [Node](https://nodejs.org/), install Capi from NPM.
 
-```
+```sh
 npm install capi
 ```
 
@@ -62,53 +54,99 @@ Then import as follows.
 import * as C from "capi";
 ```
 
-### WIP DX vs. North Star
+## Beacons
 
-For now, we will manually instantiate an RPC client (in this case, with a proxy WebSocket URL).
+### Introduction
 
-```ts
-const client = C.wsRpcClient(C.POLKADOT_PROXY_WS_URL);
+Before interacting with a given chain, we must have a means of finding nodes of that chain. We refer to this as a "beacon."
 
-// Use the client here
-
-await client.close();
-```
-
-Our north star is a version of Capi which manages the connection lifecycle on your behalf.
+A Polkadot-specific beacon is accessible from `capi/known`.
 
 ```ts
-const chain = C.chain(C.POLKADOT_PROXY_WS_URL);
+// Deno
+import { polkadotBeacon } from "https://deno.land/x/capi/known/mod.ts";
+// Node
+import { polkadotBeacon } from "capi/known";
 ```
 
-Additionally, our north star is fluent. Instead of writing a pallet reference as follows.
+The beacon's type is encoded with all RPC server methods and FRAME metadata. This enables a narrowly-typed experience to flow through all usage of Capi.
 
 ```ts
-const systemPallet = C.pallet(C.chain(C.POLKADOT_CHAIN_SPEC), "System");
+ProxyBeacon<PolkadotRpcMethods, PolkadotFrameMetadata>;
 ```
 
-One will write it like so:
+We can use the beacon value to instantiate a `Chain` (in this case, a binding to the Polkadot relay chain).
 
 ```ts
-const systemPallet = C.chain(C.POLKADOT_CHAIN_SPEC).pallet("System");
+const polkadot = C.chain(polkadotBeacon);
 ```
 
-The following examples detail the north star experience, not the in-development experience. For examples of the current API's usage, look in the `examples` folder (all of which can be run with `deno task example:<example-name>`).
+Better yet, let's import `polkadot` directly from `capi/known`.
+
+```ts
+import { polkadot } from "capi/known";
+```
+
+### Custom
+
+If you wish to connect to an unknown chain, you must define its beacon. Let's create a beacon for a proxy WebSocket URL.
+
+```ts
+import { ProxyBeacon } from "capi/rpc";
+import { MyFrameMetadata } from "./generated.ts";
+
+interface Methods {
+  some_customRpcMethod(): string;
+}
+
+const myBeacon = new ProxyBeacon<Methods, MyFrameMetadata>("wss://...");
+
+const myChain = C.chain(myBeacon);
+```
+
+### Testing
+
+During development, connecting to a live network can slow down the feedback loop. It also may be infeasible, in the case that you are without an internet connection. In these situations, you can utilize Capi's test utilities.
+
+```diff
+- const chain = C.chain(myBeacon);
++ const chain = C.test.chain();
+```
+
+Under the hood, Capi will spin up a tiny, temporary chain. You can even access accounts (and their corresponding signers).
+
+```ts
+const chain = C.test.chain();
+
+const { alice } = chain.address;
+```
+
+For convenience, we'll be utilizing the test chain and addresses.
 
 ### Read a Balance
 
 ```ts
-// 1. Which chain?
-const chain = C.chain(C.POLKADOT_CHAIN_SPEC);
+const chain = C.test.chain();
 
-// 2. Which key within the balances storage map?
-const accountId = chain.ss58(MY_ADDR).toAccountId32();
+const alicePublicKey = chain.address.alice.asPublicKeyBytes();
 
-// 3. Which value within the storage map?
 const value = await chain
   .pallet("System")
-  .storageMap("Account")
-  .get(accountId)
-  .read(); // ... as opposed to `subscribe`
+  .entry("Account", alicePublicKey)
+  .read();
+```
+
+#### Read at Specific Block Hash
+
+```ts
+const block = chain.block(BLOCK_HASH);
+
+// ...
+
+const value = await chain
+  .pallet("System")
+  .entry("Account", alicePublicKey)
+  .read(block);
 ```
 
 ### Note About Typings
@@ -136,70 +174,33 @@ if (result instanceof Error) {
 }
 ```
 
-#### Assertion of Type
-
-The on-chain world is evolving rapidly. This creates uncertainty regarding types. To mitigate this uncertainty, you can (optionally) utilize Capi's virtual type system to assert a given shape.
-
-```diff
-const value = await chain
-  .pallet("System")
-  .storageMap("Account")
-  .get(accountId)
-+ .as(C.$.sizedUint8Array(32))
-  .read();
-```
-
-There are three main reason to utilize `as`:
-
-1. We can confirm that a given interaction's type-level expectations align with the metadata before dispatch.
-2. Legibility: the `as` call makes obvious the value encapsulated by the `Read`.
-3. We can produce a narrow signature.
-
-```diff
-- C.Read<unknown> | C.WsRpcError | C.StorageEntryDneError | C.StorageValueDecodeError
-+ C.Read<Uint8Array> | C.WsRpcError | C.StorageEntryDneError | C.StorageValueDecodeError
-```
-
 ### Transfer Some Dot
 
 ```ts
-// 1. Which chain?
-const chain = C.chain(C.POLKADOT_CHAIN_SPEC);
+import * as C from "../mod.ts";
 
-// 2. Where to send the funds?
-const dest = chain.ss58(ALICE_ADDR).toMultiAddress();
+const chain = C.test.chain();
 
-// 3. Craft and submit the transaction.
-await C
+const { alice, bob } = chain.address;
+
+const result = chain
   .pallet("Balances")
-  .txFactory("transfer")
-  .call(dest, 42);
-  .sign(signingFn)
-  .submit()
+  .extrinsic("transfer")
+  .call({
+    dest: alice.asPublicKeyBytes(),
+    value: 12345n,
+  })
+  .signed(bob, bob.sign)
+  .send();
+
+for await (const event of result) {
+  console.log({ event });
+}
 ```
 
 > Note: it is up to the developer to supply `sign` with a signing function, which will vary depending on your environment, wallet, misc.
 
-### Derived Queries / Composing Effects
-
-Let's read the heads of Polkadot's parachains. This requires that we first obtain a list of parachain IDs, and then use those IDs to read their heads.
-
-```ts
-// 1. Which pallet?
-const pallet = C.chain(C.POLKADOT_CHAIN_SPEC).pallet("Paras");
-
-// 2. What is the first step in the derived query? In this case, reading the heads.
-const parachainHeads = pallet.storageMap("Heads");
-
-// 3. Map from the to-be-evaluated result.
-const parachainIds = await pallet
-  .entry("Parachains")
-  .as(C.$.array($.u32))
-  .map(parachainHeads.get)
-  .read();
-```
-
-## Testing
+## Contributing
 
 > In the future, Gitpod and dev containers will simplify spinning up a Capi development environments. The [Dockerfile](./Dockerfile), [Gitpod configuration](./.gitpod.yml) and [Dev Containers / Codespaces configuration](./.devcontainer/devcontainer.json) are in need some finessing.
 

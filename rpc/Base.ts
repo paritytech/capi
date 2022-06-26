@@ -1,4 +1,5 @@
 import { deferred } from "../_deps/async.ts";
+import { AnyMethods } from "../util/mod.ts";
 import {
   ErrMessage,
   IngressMessage,
@@ -10,31 +11,11 @@ import {
   SubscriptionMethodName,
 } from "./messages.ts";
 
-export type AnyMethods = Record<string, (...args: any[]) => any>;
-
-// Swap with branded type
-const _N: unique symbol = Symbol();
-export type Subscription<NotificationResult = any> = { [_N]: NotificationResult };
-
-export interface ClientProps<
-  M extends AnyMethods,
-  DiscoveryValue,
-  ParsedError extends Error,
-> {
-  discoveryValue: DiscoveryValue;
-  hooks?: {
-    send?: (message: InitMessage<M>) => void;
-    receive?: (message: IngressMessage<M>) => void;
-    error?: (error: ParsedError | ParseRawErrorError) => void;
-  };
-}
-
 export abstract class Client<
   M extends AnyMethods,
-  Beacon,
+  ParsedError extends Error,
   RawIngressMessage,
   RawError,
-  ParsedError extends Error,
 > {
   #nextId = 0;
   listeners = new Map<ListenerCb<IngressMessage<M>>, boolean>();
@@ -42,9 +23,9 @@ export abstract class Client<
   /**
    * Construct a new RPC client
    *
-   * @param props the beacon, error handling and message hooks with which you'd like the instance to operate
+   * @param hooks the error handling and message hooks with which you'd like the instance to operate
    */
-  constructor(readonly props: ClientProps<M, Beacon, ParsedError>) {}
+  constructor(readonly hooks?: ClientHooks<M, ParsedError>) {}
 
   /**
    * Send a message to the RPC server
@@ -52,7 +33,7 @@ export abstract class Client<
    * @param egressMessage the message you wish to send to the RPC server
    */
   send = (egressMessage: InitMessage<M>): void => {
-    this.props.hooks?.send?.(egressMessage);
+    this.hooks?.send?.(egressMessage);
     this._send(egressMessage);
   };
 
@@ -87,7 +68,12 @@ export abstract class Client<
    *
    * @returns a promise, which resolved to `undefined` upon successful cancellation
    */
-  abstract close: () => Promise<undefined | CloseError>;
+  abstract _close: () => Promise<undefined | CloseError>;
+
+  close = (): Promise<undefined | CloseError> => {
+    this.hooks?.close?.();
+    return this._close();
+  };
 
   /** @returns a new ID, unique to the client instance */
   uid = (): string => {
@@ -115,9 +101,9 @@ export abstract class Client<
   onMessage = (message: RawIngressMessage) => {
     const parsed = this.parseIngressMessage(message);
     if (parsed instanceof Error) {
-      this.props.hooks?.error?.(parsed);
+      this.hooks?.error?.(parsed);
     } else {
-      this.props.hooks?.receive?.(parsed);
+      this.hooks?.receive?.(parsed);
       for (const listener of this.listeners.keys()) {
         listener(parsed);
       }
@@ -127,7 +113,7 @@ export abstract class Client<
   /** @internal */
   onError = (error: RawError): void => {
     const parsedError = this.parseError(error);
-    this.props.hooks?.error?.(parsedError);
+    this.hooks?.error?.(parsedError);
   };
 
   /**
@@ -188,6 +174,23 @@ export abstract class Client<
   };
 }
 
+// Swap with branded type
+const _N: unique symbol = Symbol();
+export type Subscription<NotificationResult = any> = { [_N]: NotificationResult };
+
+export interface ClientHooks<
+  M extends AnyMethods,
+  ParsedError extends Error,
+> {
+  send?: (message: InitMessage<M>) => void;
+  receive?: (message: IngressMessage<M>) => void;
+  error?: (error: ParsedError | ParseRawErrorError) => void;
+  close?: () => void;
+}
+
+export type AnyClient<M extends AnyMethods = AnyMethods, ParsedError extends Error = Error> =
+  Client<M, ParsedError, any, any>;
+
 export class ParseRawIngressMessageError extends Error {}
 export class ParseRawErrorError extends Error {}
 export class CloseError extends Error {}
@@ -206,9 +209,6 @@ export function IsCorrespondingRes<
     InQuestion,
     OkMessageByMethodName<M>[Init_["method"]] | ErrMessage
   > => {
-    if (inQuestion.error || inQuestion.result) {
-      inQuestion;
-    }
     return inQuestion?.id === init.id;
   };
 }

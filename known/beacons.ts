@@ -1,13 +1,29 @@
-import { beacon } from "../rpc/mod.ts";
+// TODO: swap out `KnownRpcMethods` with narrowed lookups
+// @see https://github.com/paritytech/capi/issues/127
+
+import { chain } from "../core/mod.ts";
+import { ProxyBeacon } from "../rpc/mod.ts";
 import { KnownRpcMethods } from "./methods.ts";
 
-// TODO: swap out `KnownRpcMethods` with narrowed lookups
-export const acalaBeacon = beacon<KnownRpcMethods>(
-  "wss://acala-polkadot.api.onfinality.io/public-ws",
-);
-export const kusamaBeacon = beacon<KnownRpcMethods>("wss://kusama-rpc.polkadot.io");
-export const moonbeamBeacon = beacon<KnownRpcMethods>("wss://wss.api.moonbeam.network");
-export const polkadotBeacon = beacon<KnownRpcMethods>("wss://rpc.polkadot.io");
-export const statemintBeacon = beacon<KnownRpcMethods>("wss://statemint-rpc.polkadot.io");
-export const subsocialBeacon = beacon<KnownRpcMethods>("wss://para.subsocial.network");
-export const westendBeacon = beacon<KnownRpcMethods>("wss://westend-rpc.polkadot.io");
+const Beacon_ = ProxyBeacon<KnownRpcMethods>;
+
+export const polkadotBeacon = new Beacon_("wss://rpc.polkadot.io");
+export const polkadot = chain(polkadotBeacon);
+
+export const kusamaBeacon = new Beacon_("wss://kusama-rpc.polkadot.io");
+export const kusama = chain(kusamaBeacon);
+
+export const acalaBeacon = new Beacon_("wss://acala-polkadot.api.onfinality.io/public-ws");
+export const acala = chain(acalaBeacon);
+
+export const moonbeamBeacon = new Beacon_("wss://wss.api.moonbeam.network");
+export const moonbeam = chain(moonbeamBeacon);
+
+export const statemintBeacon = new Beacon_("wss://statemint-rpc.polkadot.io");
+export const statemint = chain(statemintBeacon);
+
+export const subsocialBeacon = new Beacon_("wss://para.subsocial.network");
+export const subsocial = chain(subsocialBeacon);
+
+export const westendBeacon = new Beacon_("wss://westend-rpc.polkadot.io");
+export const westend = chain(westendBeacon);

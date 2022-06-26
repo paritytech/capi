@@ -24,3 +24,4 @@ export type Narrow<T> =
   | ([T] extends [[]] ? [] : { [K in keyof T]: Narrow<T[K]> });
 
 export type AnyFn = (...args: any[]) => any;
+export type AnyMethods = Record<string, (...args: any[]) => any>;

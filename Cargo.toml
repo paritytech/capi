@@ -27,10 +27,11 @@ paste = { version = "1.0.6" }
 schnorrkel = { version = "0.10.2" }
 sp-core = { version = "*" } # TODO: why `*`?
 sp-core-hashing = { version = "4.0.0" }
+sp-keyring = { version = "*" }
 wasm-bindgen = { version = "0.2.80" }
 wee_alloc = { version = "0.4.5" }
 
 [profile.release]
 codegen-units = 1
 lto = true
-opt-level = 'z'
+opt-level = 's'

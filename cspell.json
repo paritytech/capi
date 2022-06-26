@@ -13,6 +13,7 @@
     "bindings/*/*.generated.mjs",
     "Cargo.lock",
     "deno.lock",
+    "examples/node-template",
     "target"
   ]
 }
