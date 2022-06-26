@@ -1,14 +1,49 @@
 import { deadline, deferred } from "../../_deps/async.ts";
+import { Beacon } from "../../Beacon.ts";
 import { AnyMethods, ErrorCtor } from "../../util/mod.ts";
 import * as B from "../Base.ts";
 import { IngressMessage, InitMessage } from "../messages.ts";
 
-export class ProxyWsUrlClient<M extends AnyMethods>
+export class ProxyBeacon<M extends AnyMethods> extends Beacon<string, M> {}
+export type ProxyClientHooks<M extends AnyMethods> = B.ClientHooks<M, WebSocketInternalError>;
+
+export async function proxyClient<M extends AnyMethods>(
+  beacon: ProxyBeacon<M>,
+  hooks?: ProxyClientHooks<M>,
+): Promise<ProxyClient<M> | FailedToOpenConnectionError> {
+  const ws = new WebSocket(beacon.discoveryValue);
+  const client = new ProxyClient(ws, hooks);
+  ws.addEventListener("error", client.onError);
+  ws.addEventListener("message", client.onMessage);
+  const pending = deferred<ProxyClient<M> | FailedToOpenConnectionError>();
+  if (ws.readyState === WebSocket.CONNECTING) {
+    const onOpenError = (e: any) => {
+      console.log({ log: e });
+      clearListeners();
+      pending.resolve(new FailedToOpenConnectionError());
+    };
+    const onOpen = () => {
+      clearListeners();
+      pending.resolve(client);
+    };
+    const clearListeners = () => {
+      ws.removeEventListener("error", onOpenError);
+      ws.removeEventListener("open", onOpen);
+    };
+    ws.addEventListener("error", onOpenError);
+    ws.addEventListener("open", onOpen);
+  } else {
+    pending.resolve(client);
+  }
+  return pending;
+}
+
+export class ProxyClient<M extends AnyMethods>
   extends B.Client<M, WebSocketInternalError, MessageEvent, Event>
 {
   constructor(
     private ws: WebSocket,
-    hooks: B.ClientHooks<M, WebSocketInternalError>,
+    hooks?: ProxyClientHooks<M>,
   ) {
     super(hooks);
   }
@@ -51,37 +86,6 @@ export class ProxyWsUrlClient<M extends AnyMethods>
     }
     return pending;
   };
-}
-
-export async function createWsClient<M extends AnyMethods>(
-  url: string,
-  hooks: B.ClientHooks<M, WebSocketInternalError>,
-): Promise<ProxyWsUrlClient<M> | FailedToOpenConnectionError> {
-  const ws = new WebSocket(url);
-  const client = new ProxyWsUrlClient(ws, hooks);
-  ws.addEventListener("error", client.onError);
-  ws.addEventListener("message", client.onMessage);
-  const pending = deferred<ProxyWsUrlClient<M> | FailedToOpenConnectionError>();
-  if (ws.readyState === WebSocket.CONNECTING) {
-    const onOpenError = (e: any) => {
-      console.log({ log: e });
-      clearListeners();
-      pending.resolve(new FailedToOpenConnectionError());
-    };
-    const onOpen = () => {
-      clearListeners();
-      pending.resolve(client);
-    };
-    const clearListeners = () => {
-      ws.removeEventListener("error", onOpenError);
-      ws.removeEventListener("open", onOpen);
-    };
-    ws.addEventListener("error", onOpenError);
-    ws.addEventListener("open", onOpen);
-  } else {
-    pending.resolve(client);
-  }
-  return pending;
 }
 
 export class FailedToOpenConnectionError extends ErrorCtor("FailedToOpenConnection") {}

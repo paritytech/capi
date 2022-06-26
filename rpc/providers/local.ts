@@ -1,46 +1,60 @@
 import { deadline } from "../../_deps/async.ts";
 import { blue } from "../../_deps/colors.ts";
 import * as path from "../../_deps/path.ts";
+import { Beacon } from "../../Beacon.ts";
 import { AnyMethods, ErrorCtor } from "../../util/mod.ts";
 import { ClientHooks } from "../Base.ts";
 import {
-  createWsClient,
   FailedToOpenConnectionError,
-  ProxyWsUrlClient,
+  ProxyBeacon,
+  ProxyClient,
+  proxyClient,
   WebSocketInternalError,
-} from "./ws.ts";
+} from "./proxy.ts";
 
-export interface LocalClientProps<M extends AnyMethods> {
+export interface LocalClientProps {
   cwd?: string;
   port?: number;
-  hooks?: ClientHooks<M, WebSocketInternalError> & {
-    useProcess?: (process: Deno.Process) => void;
-  };
   dev?: true;
   path: string;
   timeout?: number;
 }
 
-export async function localClient<M extends AnyMethods>(props: LocalClientProps<M>): Promise<
-  ProxyWsUrlClient<M> | FailedToOpenConnectionError | FailedToExeError | Deno.errors.NotFound
+export class LocalBeacon<M extends AnyMethods> extends Beacon<LocalClientProps, M> {}
+
+export interface LocalClientHooks<M extends AnyMethods>
+  extends ClientHooks<M, WebSocketInternalError>
+{
+  process?: (process: Deno.Process) => void;
+}
+
+export async function localClient<M extends AnyMethods>(
+  beacon: LocalBeacon<M>,
+  hooks?: LocalClientHooks<M>,
+): Promise<
+  | ProxyClient<M>
+  | FailedToOpenConnectionError
+  | FailedToExeError
+  | Deno.errors.NotFound
 > {
   let cwd: string;
   const cmd: string[] = [];
-  const pathAbs = path.join(props.cwd || Deno.cwd(), props.path);
+  const config = beacon.discoveryValue;
+  const pathAbs = path.join(config.cwd || Deno.cwd(), config.path);
   try {
     const stat = await Deno.stat(pathAbs);
     if (stat.isDirectory) {
       cwd = pathAbs;
       cmd.push("cargo", "run", "--");
     } else {
-      cwd = props.cwd || Deno.cwd();
-      cmd.push(props.path);
+      cwd = config.cwd || Deno.cwd();
+      cmd.push(config.path);
     }
-    if (props.dev) {
+    if (config.dev) {
       cmd.push("--dev");
     }
-    if (props.port) {
-      cmd.push("--ws-port", props.port.toString());
+    if (config.port) {
+      cmd.push("--ws-port", config.port.toString());
     }
     const process = Deno.run({
       cmd,
@@ -48,7 +62,7 @@ export async function localClient<M extends AnyMethods>(props: LocalClientProps<
       stderr: "piped",
       stdout: "piped",
     });
-    props.hooks?.useProcess?.(process);
+    hooks?.process?.(process);
     // For some reason, logs come in through `stderr`
     const logs = process.stderr.readable;
     const spawning = (async () => {
@@ -63,14 +77,15 @@ export async function localClient<M extends AnyMethods>(props: LocalClientProps<
       }
     })();
     try {
-      await (props.timeout ? deadline(spawning, props.timeout) : spawning);
+      await (config.timeout ? deadline(spawning, config.timeout) : spawning);
     } catch (_e) {
       return new FailedToExeError();
     }
-    const client = await createWsClient(`ws://127.0.0.1:${props.port || 9944}`, {
-      ...props.hooks || {},
+    const beacon = new ProxyBeacon<M>(`ws://127.0.0.1:${config.port || 9944}`);
+    const client = await proxyClient(beacon, {
+      ...hooks || {},
       close() {
-        props.hooks?.close?.();
+        hooks?.close?.();
         process.close();
       },
     });

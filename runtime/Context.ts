@@ -1,30 +1,25 @@
 import { Beacon } from "../Beacon.ts";
 import * as M from "../frame_metadata/mod.ts";
-import { KnownRpcMethods } from "../known/mod.ts";
-import * as rpc from "../rpc/mod.ts";
 import * as U from "../util/mod.ts";
 
-export class GlobalContext {
-  chains = new Map<Beacon, ChainContext>();
+export class Runtime<
+  DiscoveryValue,
+  M extends U.AnyMethods,
+> {
+  #chains = new Map<Beacon<DiscoveryValue, M>, ChainContext>();
 
-  register = async (beacon: Beacon<string, KnownRpcMethods>): Promise<ChainContext> => {
-    const existingChain = this.chains.get(beacon);
+  register = async (beacon: Beacon<DiscoveryValue, M>): Promise<ChainContext> => {
+    const existingChain = this.#chains.get(beacon);
     if (existingChain) {
-      existingChain.users += 1;
       return existingChain;
     }
-    const rpcClient = await rpc.client(beacon) as any; // TODO
-    if (rpcClient instanceof Error) {
-      // TODO
-      throw rpcClient;
-    }
-    const chain = new ChainContext(this, beacon, rpcClient);
-    this.chains.set(beacon, chain);
+    const chain = new ChainContext(this, beacon);
+    this.#chains.set(beacon, chain);
     return chain;
   };
 }
 
-export const globalContext = new GlobalContext();
+export const globalContext = new Runtime();
 
 export interface RuntimeGroup {
   metadata: M.Metadata;
@@ -37,9 +32,7 @@ export class ChainContext {
   groups: Record<U.HashHexString, RuntimeGroup> = {};
 
   constructor(
-    readonly global: GlobalContext,
     readonly beacon: Beacon,
-    readonly rpcClient: rpc.Client<KnownRpcMethods, any, any, any, any>, // TODO
   ) {}
 
   load = async (blockHash?: U.HashHexString): Promise<RuntimeGroup> => {
@@ -68,13 +61,5 @@ export class ChainContext {
       return roup;
     }
     throw new Error(); // TODO
-  };
-
-  release = async () => {
-    if (this.users === 1) {
-      await this.rpcClient.close();
-      this.global.chains.delete(this.beacon);
-    }
-    this.users -= 1;
   };
 }

@@ -11,20 +11,6 @@ import {
   SubscriptionMethodName,
 } from "./messages.ts";
 
-// Swap with branded type
-const _N: unique symbol = Symbol();
-export type Subscription<NotificationResult = any> = { [_N]: NotificationResult };
-
-export interface ClientHooks<
-  M extends AnyMethods,
-  ParsedError extends Error,
-> {
-  send?: (message: InitMessage<M>) => void;
-  receive?: (message: IngressMessage<M>) => void;
-  error?: (error: ParsedError | ParseRawErrorError) => void;
-  close?: () => void;
-}
-
 export abstract class Client<
   M extends AnyMethods,
   ParsedError extends Error,
@@ -186,6 +172,20 @@ export abstract class Client<
     });
     return stopListening;
   };
+}
+
+// Swap with branded type
+const _N: unique symbol = Symbol();
+export type Subscription<NotificationResult = any> = { [_N]: NotificationResult };
+
+export interface ClientHooks<
+  M extends AnyMethods,
+  ParsedError extends Error,
+> {
+  send?: (message: InitMessage<M>) => void;
+  receive?: (message: IngressMessage<M>) => void;
+  error?: (error: ParsedError | ParseRawErrorError) => void;
+  close?: () => void;
 }
 
 export type AnyClient<M extends AnyMethods = AnyMethods, ParsedError extends Error = Error> =

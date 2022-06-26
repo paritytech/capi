@@ -7,7 +7,9 @@ import { Head } from "./Head.ts";
 import { Metadata } from "./Metadata.ts";
 import { Pallet } from "./Pallet.ts";
 
-export class Chain<B extends Beacon = Beacon> extends NodeBase<"Chain"> {
+export class Chain<
+  B extends Beacon = Beacon,
+> extends NodeBase<"Chain"> {
   constructor(readonly beacon: B) {
     super("Chain");
   }
