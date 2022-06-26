@@ -28,18 +28,21 @@ export async function read<Target extends ReadTarget = ReadTarget>(
       const key = $key.encode(target.keys.length === 1 ? target.keys[0]! : target.keys);
       const keyEncoded = U.hex.encode(key) as U.HexString;
       const raw = await chain.rpcClient.call("state_getStorage", [keyEncoded, block?.hash]);
-      await chain.release();
       if (raw.result) {
-        const $value = group.deriveCodec(storageEntry.value);
-        return $value.decode(U.hex.decode(raw.result));
+        await chain.release();
+        return group
+          .deriveCodec(storageEntry.value)
+          .decode(U.hex.decode(raw.result));
       }
       throw new Error(); // TODO
     }
     case "Metadata": {
+      await chain.release();
       return group.metadata;
     }
     case "Header": {
       const raw = await chain.rpcClient.call("chain_getHeader", [block?.hash]);
+      await chain.release();
       if (raw.result) {
         // TODO: parse this
         return raw.result;
@@ -65,8 +68,13 @@ export async function read<Target extends ReadTarget = ReadTarget>(
         startKey,
         block?.hash,
       ]);
+      await chain.release();
       if (raw.result) {
-        return raw.result.map((key) => $key.decode(U.hex.decode(key)));
+        return raw.result.map((key) => {
+          const trimmed = key.substring(2);
+          const bytes = U.hex.decode(trimmed);
+          return $key.decode(bytes);
+        });
       }
       throw new Error(); // TODO
     }
