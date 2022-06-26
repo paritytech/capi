@@ -6,7 +6,7 @@ export type NodeKind =
   | "Chain"
   | "Entry"
   | "Extrinsic"
-  | "Head"
+  | "Header"
   | "KeyPage"
   | "Metadata"
   | "Pallet"

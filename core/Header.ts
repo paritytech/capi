@@ -3,9 +3,9 @@ import { Block } from "./Block.ts";
 import { Chain } from "./Chain.ts";
 import { NodeBase } from "./common.ts";
 
-export class Head<C extends Chain = Chain> extends NodeBase<"Head"> {
+export class Header<C extends Chain = Chain> extends NodeBase<"Header"> {
   constructor(readonly chain: C) {
-    super("Head");
+    super("Header");
   }
 
   // TODO

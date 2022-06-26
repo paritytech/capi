@@ -22,8 +22,8 @@ export class Entry<
     this.keys = keys;
   }
 
-  keyPage(count: number, offset?: number): KeyPage<this> {
-    return new KeyPage(this, count, offset);
+  keyPage(count: number, ...start: unknown[]): KeyPage<this> {
+    return new KeyPage(this, count, ...start);
   }
 
   read(block?: Block<P["chain"]>): Promise<unknown> {

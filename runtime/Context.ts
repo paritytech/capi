@@ -42,6 +42,10 @@ export class ChainContext {
   load = async (blockHash?: U.HashHexString): Promise<RuntimeGroup> => {
     let blockHashEnsured: U.HashHexString = blockHash as U.HashHexString;
     if (blockHash === undefined) {
+      const header = await this.rpcClient.call("chain_getHeader", []);
+      if (header.result) {
+        console.log(header.result.digest);
+      }
       const currentBlockHashRaw = await this.rpcClient.call("chain_getHead", []);
       if (currentBlockHashRaw.result) {
         blockHashEnsured = currentBlockHashRaw.result;

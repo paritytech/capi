@@ -6,14 +6,16 @@ import { Entry } from "./Entry.ts";
 // TODO: constrain to map entry / key types
 export class KeyPage<E extends Entry = Entry> extends NodeBase<"KeyPage"> {
   chain;
+  start;
 
   constructor(
     readonly entry: E,
     readonly count: number,
-    readonly offset?: number,
+    ...start: unknown[]
   ) {
     super("KeyPage");
     this.chain = entry.chain;
+    this.start = start;
   }
 
   read(block?: Block): Promise<unknown> {

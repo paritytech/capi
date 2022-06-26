@@ -3,7 +3,7 @@ import { HashHexString } from "../util/mod.ts";
 import { Addresses } from "./Addresses.ts";
 import { Block } from "./Block.ts";
 import { NodeBase } from "./common.ts";
-import { Head } from "./Head.ts";
+import { Header } from "./Header.ts";
 import { Metadata } from "./Metadata.ts";
 import { Pallet } from "./Pallet.ts";
 
@@ -28,8 +28,8 @@ export class Chain<
 
   address: Addresses<this> = new Addresses(this);
 
-  head(): Head<this> {
-    return new Head(this);
+  head(): Header<this> {
+    return new Header(this);
   }
 }
 export const chain = <B extends Beacon>(beacon: B): Chain<B> => {

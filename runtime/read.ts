@@ -4,7 +4,7 @@ import * as M from "../frame_metadata/mod.ts";
 import * as U from "../util/mod.ts";
 import { globalContext } from "./Context.ts";
 
-export type ReadTarget = C.Entry | C.KeyPage | C.Metadata | C.Head;
+export type ReadTarget = C.Entry | C.KeyPage | C.Metadata | C.Header;
 
 export async function read<Target extends ReadTarget = ReadTarget>(
   target: Target,
@@ -35,8 +35,40 @@ export async function read<Target extends ReadTarget = ReadTarget>(
       }
       throw new Error(); // TODO
     }
-    default: {
-      return Promise.resolve("UNIMPLEMENTED");
+    case "Metadata": {
+      return group.metadata;
+    }
+    case "Header": {
+      const raw = await chain.rpcClient.call("chain_getHeader", [block?.hash]);
+      if (raw.result) {
+        // TODO: parse this
+        return raw.result;
+      }
+      throw new Error();
+    }
+    case "KeyPage": {
+      const pallet = group.lookup.getPalletByName(target.entry.pallet.name);
+      const storageEntry = group.lookup.getStorageEntryByPalletAndName(pallet, target.entry.name);
+      const $key = M.$storageMapKey({
+        deriveCodec: group.deriveCodec,
+        hashers: await Hashers(),
+        pallet,
+        storageEntry,
+      });
+      const key = U.hex.encode($key.encode([])) as U.HashHexString;
+      const startKey = target.start.length > 0
+        ? (U.hex.encode($key.encode(target.start)) as U.HashHexString)
+        : undefined;
+      const raw = await chain.rpcClient.call("state_getKeysPaged", [
+        key,
+        target.count,
+        startKey,
+        block?.hash,
+      ]);
+      if (raw.result) {
+        return raw.result.map((key) => $key.decode(U.hex.decode(key)));
+      }
+      throw new Error(); // TODO
     }
   }
 }
