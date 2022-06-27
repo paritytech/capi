@@ -139,7 +139,7 @@ export function DeriveCodec(metadata: M.Metadata): DeriveCodec {
       return $.compact;
     },
     BitSequence: () => {
-      return $.never as unknown as $.Codec<any>;
+      return $.bitSequence;
     },
     visit: (i) => {
       if (cache[i]) {
