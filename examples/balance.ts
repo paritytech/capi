@@ -1,10 +1,11 @@
 import * as C from "../mod.ts";
 
-const chain = C.test.chain();
+const node = await C.test.node();
+const chain = C.test.chain(node);
 const alice = await chain.address.alice.asPublicKeyBytes();
 const result = await chain
   .pallet("System")
   .entry("Account", alice)
   .read();
-
 console.log({ result });
+node.close();
