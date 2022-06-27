@@ -1,7 +1,10 @@
 export * from "./branded.ts";
+export * from "./config.ts";
 export * from "./discovery_value_validation.ts";
 export * from "./env.ts";
 export * from "./ErrorCtor.ts";
+export * from "./fs.ts";
 export * as hex from "./hex.ts";
-export * from "./substrateProcess.ts";
+export * from "./repo.ts";
+export * from "./substrateNode.ts";
 export * from "./types.ts";

@@ -3,5 +3,5 @@
 _star.ts
 benches.json
 target
-examples/generated
+examples/substrate-template-node
 bindings/**/snippets
