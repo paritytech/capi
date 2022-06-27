@@ -1,2 +1,2 @@
 export * from "./Chain.ts";
-export * from "./rpcClient.ts";
+export * from "./node.ts";

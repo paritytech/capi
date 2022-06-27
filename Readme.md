@@ -109,15 +109,19 @@ const myChain = C.chain(myBeacon);
 During development, connecting to a live network can slow down the feedback loop. It also may be infeasible, in the case that you are without an internet connection. In these situations, you can utilize Capi's test utilities.
 
 ```diff
++ const node = await C.test.node();
++
 - const chain = C.chain(myBeacon);
-+ const chain = C.test.chain();
++ const chain = C.test.chain(node);
+
+//
+
++ node.close()
 ```
 
-Under the hood, Capi will spin up a tiny, temporary chain. You can even access accounts (and their corresponding signers).
+Here, we've spun up a tiny, temporary chain. You can even access accounts (and their corresponding signers).
 
 ```ts
-const chain = C.test.chain();
-
 const { alice } = chain.address;
 ```
 
@@ -126,8 +130,6 @@ For convenience, we'll be utilizing the test chain and addresses.
 ### Read a Balance
 
 ```ts
-const chain = C.test.chain();
-
 const alicePublicKey = chain.address.alice.asPublicKeyBytes();
 
 const value = await chain
@@ -179,7 +181,7 @@ if (result instanceof Error) {
 ```ts
 import * as C from "../mod.ts";
 
-const chain = C.test.chain();
+// ...
 
 const { alice, bob } = chain.address;
 

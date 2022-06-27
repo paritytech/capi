@@ -1,6 +1,7 @@
 import * as C from "../mod.ts";
 
-const chain = C.test.chain();
+const node = await C.test.node();
+const chain = C.test.chain(node);
 
 const { alice, bob } = chain.address;
 
@@ -17,3 +18,5 @@ const result = chain
 for await (const event of result) {
   console.log({ event });
 }
+
+node.close();
