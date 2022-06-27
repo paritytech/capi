@@ -17,8 +17,7 @@ export async function proxyClient<M extends AnyMethods>(
   ws.addEventListener("message", client.onMessage);
   const pending = deferred<ProxyClient<M> | FailedToOpenConnectionError>();
   if (ws.readyState === WebSocket.CONNECTING) {
-    const onOpenError = (e: any) => {
-      console.log({ log: e });
+    const onOpenError = (_e: any) => {
       clearListeners();
       pending.resolve(new FailedToOpenConnectionError());
     };
