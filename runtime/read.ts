@@ -4,7 +4,7 @@ import * as M from "../frame_metadata/mod.ts";
 import * as U from "../util/mod.ts";
 import { globalContext } from "./Context.ts";
 
-export type ReadTarget = C.Entry | C.KeyPage | C.Metadata | C.Header;
+export type ReadTarget = C.Entry | C.KeyPage | C.Metadata | C.Header | C.Block;
 
 export async function read<Target extends ReadTarget = ReadTarget>(
   target: Target,
@@ -77,6 +77,32 @@ export async function read<Target extends ReadTarget = ReadTarget>(
         });
       }
       throw new Error(); // TODO
+    }
+    case "Block": {
+      const raw = await chain.rpcClient.call("chain_getBlock", [target.hash]);
+      if (raw.result) {
+        const { block, justifications } = raw.result;
+        const { extrinsics, header } = block;
+        const $extrinsic = M.$extrinsic({
+          deriveCodec: group.deriveCodec,
+          hashers: await Hashers(),
+          metadata: group.metadata,
+          sign: undefined!,
+        });
+        await chain.release();
+        return {
+          justifications,
+          block: {
+            header,
+            extrinsics: extrinsics.map((extrinsic) => {
+              const trimmed = extrinsic.substring(2);
+              const bytes = U.hex.decode(trimmed);
+              return $extrinsic.decode(bytes);
+            }),
+          },
+        };
+      }
+      throw new Error();
     }
   }
 }

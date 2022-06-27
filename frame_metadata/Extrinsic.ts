@@ -24,8 +24,8 @@ interface ExtrinsicCodecProps {
   sign: (value: Uint8Array) => Signature;
 }
 
-export function $extrinsic(args: ExtrinsicCodecProps): $.Codec<Extrinsic> {
-  const { metadata, sign, deriveCodec, hashers: { Blake2_256 } } = args;
+export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
+  const { metadata, sign, deriveCodec, hashers: { Blake2_256 } } = props;
   const { signedExtensions } = metadata.extrinsic;
   const $sig = deriveCodec(findExtrinsicTypeParam("Signature")!);
   const $address = deriveCodec(findExtrinsicTypeParam("Address")!);
@@ -97,7 +97,7 @@ export function $extrinsic(args: ExtrinsicCodecProps): $.Codec<Extrinsic> {
   });
 
   return $.createCodec({
-    _metadata: [$extrinsic, args],
+    _metadata: [$extrinsic, props],
     _staticSize: $.nCompact._staticSize,
     _encode(buffer, extrinsic) {
       const encoded = $baseExtrinsic.encode(extrinsic);
