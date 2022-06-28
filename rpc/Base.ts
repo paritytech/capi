@@ -164,7 +164,6 @@ export abstract class Client<
     const stopListening = this.listen((res) => {
       // TODO: handle subscription errors
       if (res.params?.subscription && res.params.subscription === initRes.result) {
-        // TODO
         listenerCb(res as any);
       }
     });
@@ -181,7 +180,6 @@ export abstract class Client<
     const existing = this.subscriptions.get(key);
     const Close = (group: Subscription<M>) => {
       return () => {
-        // TODO
         group.listeners.delete(listenerCb as any);
         if (!group.listeners.size) {
           group.close();
