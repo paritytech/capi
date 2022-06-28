@@ -1,16 +1,14 @@
 import { assert } from "../../_deps/asserts.ts";
 import { deferred } from "../../_deps/async.ts";
-import { KnownRpcMethods } from "../../known/mod.ts";
-import { node } from "../../test-util/node.ts";
+import { KnownRpcMethods, polkadotBeacon } from "../../known/mod.ts";
 import * as msg from "../messages.ts";
-import { ProxyBeacon, proxyClient } from "./proxy.ts";
+import { proxyClient } from "./proxy.ts";
 
 Deno.test({
   name: "Proxy RPC Client",
   sanitizeResources: false,
   async fn(t) {
-    const n = await node();
-    const client = await proxyClient(new ProxyBeacon<KnownRpcMethods>(n.url));
+    const client = await proxyClient(polkadotBeacon);
     assert(!(client instanceof Error));
 
     await t.step("call", async () => {
