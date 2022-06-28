@@ -2,7 +2,6 @@ import { deferred } from "../_deps/async.ts";
 import { AnyMethods } from "../util/mod.ts";
 import * as msg from "./messages.ts";
 
-// TODO: rename
 interface Subscription<M extends AnyMethods> {
   listeners: Map<ListenerCb<msg.NotifMessage<M>>, true>;
   close: () => void;
@@ -208,8 +207,9 @@ export abstract class Client<
   };
 }
 
-// Swap with branded type
 const _N: unique symbol = Symbol();
+// TODO: Swap with branded type
+// TODO: rename
 export type SubscriptionBrand<NotificationResult = any> = { [_N]: NotificationResult };
 
 export interface ClientHooks<
