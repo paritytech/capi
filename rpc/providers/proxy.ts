@@ -2,7 +2,7 @@ import { deadline, deferred } from "../../_deps/async.ts";
 import { Beacon } from "../../Beacon.ts";
 import { AnyMethods, ErrorCtor } from "../../util/mod.ts";
 import * as B from "../Base.ts";
-import { IngressMessage, InitMessage } from "../messages.ts";
+import * as msg from "../messages.ts";
 
 export class ProxyBeacon<M extends AnyMethods> extends Beacon<string, M> {}
 export type ProxyClientHooks<M extends AnyMethods> = B.ClientHooks<M, WebSocketInternalError>;
@@ -48,11 +48,11 @@ export class ProxyClient<M extends AnyMethods>
     super(hooks);
   }
 
-  _send = (egressMessage: InitMessage<M>): void => {
+  _send = (egressMessage: msg.InitMessage<M>): void => {
     this.ws?.send(JSON.stringify(egressMessage));
   };
 
-  parseIngressMessage = (e: unknown): IngressMessage<M> | B.ParseRawIngressMessageError => {
+  parseIngressMessage = (e: unknown): msg.IngressMessage<M> | B.ParseRawIngressMessageError => {
     if (
       typeof e !== "object"
       || e === null

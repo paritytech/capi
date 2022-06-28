@@ -4,25 +4,24 @@ import * as M from "./Metadata.ts";
 
 export type HasherLookup = { [_ in M.HasherKind]: (input: Uint8Array) => Uint8Array };
 
-export interface StorageMapKeyProps {
+export interface StorageKeyProps {
   deriveCodec: DeriveCodec;
   hashers: HasherLookup;
   pallet: M.Pallet;
   storageEntry: M.StorageEntry;
 }
 
-const textEncoder = new TextEncoder();
-export function $storageMapKey(props: StorageMapKeyProps): $.Codec<unknown> {
+export function $storageKey(props: StorageKeyProps): $.Codec<unknown> {
   const keyCodec = props.storageEntry.type === "Map"
     ? props.deriveCodec(props.storageEntry.key)
     : null;
   const hashTwox128 = props.hashers.Twox128;
   return $.createCodec({
-    _metadata: [$storageMapKey, props],
+    _metadata: [$storageKey, props],
     _staticSize: 0,
     _encode(buffer, key) {
-      buffer.insertArray(hashTwox128(textEncoder.encode(props.pallet.name)));
-      buffer.insertArray(hashTwox128(textEncoder.encode(props.storageEntry.name)));
+      buffer.insertArray(hashTwox128(new TextEncoder().encode(props.pallet.name)));
+      buffer.insertArray(hashTwox128(new TextEncoder().encode(props.storageEntry.name)));
       if (key instanceof Array && key.length === 0) {
         return;
       }

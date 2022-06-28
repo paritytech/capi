@@ -19,7 +19,7 @@ export async function read<Target extends ReadTarget = ReadTarget>(
     case "Entry": {
       const pallet = group.lookup.getPalletByName(target.pallet.name);
       const storageEntry = group.lookup.getStorageEntryByPalletAndName(pallet, target.name);
-      const $key = M.$storageMapKey({
+      const $key = M.$storageKey({
         deriveCodec: group.deriveCodec,
         hashers: await Hashers(),
         pallet,
@@ -52,7 +52,7 @@ export async function read<Target extends ReadTarget = ReadTarget>(
     case "KeyPage": {
       const pallet = group.lookup.getPalletByName(target.entry.pallet.name);
       const storageEntry = group.lookup.getStorageEntryByPalletAndName(pallet, target.entry.name);
-      const $key = M.$storageMapKey({
+      const $key = M.$storageKey({
         deriveCodec: group.deriveCodec,
         hashers: await Hashers(),
         pallet,

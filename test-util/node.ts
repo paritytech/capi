@@ -1,8 +1,8 @@
 import { assert } from "../_deps/asserts.ts";
-import { SubstrateProcess, substrateProcess } from "../util/mod.ts";
+import { SubstrateNode, substrateNode } from "../util/mod.ts";
 
-export async function node(): Promise<SubstrateProcess> {
-  const process = await substrateProcess({
+export async function node(): Promise<SubstrateNode> {
+  const process = await substrateNode({
     path: "./node-template",
     cwd: new URL(".", import.meta.url).pathname,
     dev: true,

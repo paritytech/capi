@@ -1,9 +1,8 @@
-import * as path from "https://deno.land/std@0.136.0/path/mod.ts";
-import { assertSnapshot } from "https://deno.land/std@0.136.0/testing/snapshot.ts";
-import * as M from "./Metadata.ts";
+import { assertSnapshot } from "../_deps/snapshot.ts";
+import { Metadata } from "./test-common.ts";
 
 await Promise.all(
-  [
+  ([
     "polkadot",
     "kusama",
     "statemint",
@@ -11,13 +10,9 @@ await Promise.all(
     "acala",
     "subsocial",
     "westend",
-  ].map(async (name) => {
+  ] as const).map(async (name) => {
     Deno.test(name, async (t) => {
-      const scaleEncoded = await Deno.readTextFile(
-        path.join("frame_metadata/_downloaded", `${name}.scale`),
-      );
-      const decodedMetadata = M.fromPrefixedHex(scaleEncoded);
-      await assertSnapshot(t, decodedMetadata);
+      await assertSnapshot(t, await Metadata(name));
     });
   }),
 );
