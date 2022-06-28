@@ -2,6 +2,11 @@ import { deferred } from "../_deps/async.ts";
 import { AnyMethods } from "../util/mod.ts";
 import * as msg from "./messages.ts";
 
+interface Subscription<M extends AnyMethods> {
+  listeners: Map<ListenerCb<msg.NotifMessage<M>>, true>;
+  close: () => void;
+}
+
 export abstract class Client<
   M extends AnyMethods,
   ParsedError extends Error,
@@ -9,7 +14,8 @@ export abstract class Client<
   RawError,
 > {
   #nextId = 0;
-  listeners = new Map<ListenerCb<msg.IngressMessage<M>>, boolean>();
+  listeners = new Map<ListenerCb<msg.IngressMessage<M>>, true>();
+  subscriptions = new Map<string, Subscription<M>>();
 
   /**
    * Construct a new RPC client
@@ -145,7 +151,7 @@ export abstract class Client<
    * @param listenerCb the callback to which notifications should be supplied
    * @returns a function with which to stop listening for notifications
    */
-  subscribe = async <Method extends Extract<msg.SubscriptionMethodName<M>, keyof M>>(
+  #subscribeUnsafe = async <Method extends Extract<msg.SubscriptionMethodName<M>, keyof M>>(
     method: Method,
     params: msg.InitMessage<M, Method>["params"],
     listenerCb: ListenerCb<msg.NotifMessage<M, Method>>,
@@ -157,17 +163,54 @@ export abstract class Client<
     const stopListening = this.listen((res) => {
       // TODO: handle subscription errors
       if (res.params?.subscription && res.params.subscription === initRes.result) {
-        // TODO
         listenerCb(res as any);
       }
     });
     return stopListening;
   };
+
+  subscribe = async <Method extends Extract<msg.SubscriptionMethodName<M>, keyof M>>(
+    method: Method,
+    params: msg.InitMessage<M, Method>["params"],
+    listenerCb: ListenerCb<msg.NotifMessage<M, Method>>,
+  ): Promise<StopListening | msg.ErrMessage> => {
+    // TODO: why is `keyof M` being inferred with sym as a member?
+    const key = `${method as string}(${JSON.stringify(params)})`;
+    const existing = this.subscriptions.get(key);
+    const Close = (group: Subscription<M>) => {
+      return () => {
+        group.listeners.delete(listenerCb as any);
+        if (!group.listeners.size) {
+          group.close();
+          this.subscriptions.delete(key);
+        }
+      };
+    };
+    if (existing) {
+      existing.listeners.set(listenerCb as any, true);
+      return Close(existing);
+    } else {
+      const group: Subscription<M> = {
+        listeners: new Map([[listenerCb as any, true]]),
+        close: undefined!,
+      };
+      const subscribeResult = await this.#subscribeUnsafe(method, params, (message) => {
+        for (const listener of group.listeners.keys()) {
+          listener(message);
+        }
+      });
+      if (typeof subscribeResult === "function") {
+        group.close = subscribeResult;
+      }
+      return Close(group);
+    }
+  };
 }
 
-// Swap with branded type
 const _N: unique symbol = Symbol();
-export type Subscription<NotificationResult = any> = { [_N]: NotificationResult };
+// TODO: Swap with branded type
+// TODO: rename
+export type SubscriptionBrand<NotificationResult = any> = { [_N]: NotificationResult };
 
 export interface ClientHooks<
   M extends AnyMethods,

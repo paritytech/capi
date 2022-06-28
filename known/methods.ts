@@ -17,7 +17,7 @@ export interface KnownRpcMethods extends
       pendingExtrinsics(): U.HexString[];
       removeExtrinsics: TODO_NARROW_METHOD_TYPE;
       rotateKeys(): U.HexString;
-      submitAndWatchExtrinsic(tx: string): rpc.Subscription<unknown>;
+      submitAndWatchExtrinsic(tx: string): rpc.SubscriptionBrand<unknown>;
       submitExtrinsic(transaction: U.HexString): U.HashHexString;
       unwatchExtrinsic(subscriptionId: U.SubscriptionIdString): unknown;
     };
@@ -32,11 +32,11 @@ export interface KnownRpcMethods extends
       getHead: KnownRpcMethods["chain_getBlockHash"];
       getHeader(hash?: U.HashHexString): T.Header;
       getRuntimeVersion: KnownRpcMethods["state_getRuntimeVersion"];
-      subscribeAllHeads(): rpc.Subscription<T.Header>;
+      subscribeAllHeads(): rpc.SubscriptionBrand<T.Header>;
       subscribeFinalisedHeads: KnownRpcMethods["chain_subscribeFinalizedHeads"];
-      subscribeFinalizedHeads(): rpc.Subscription<T.Header /* TODO: narrow to finalized? */>;
+      subscribeFinalizedHeads(): rpc.SubscriptionBrand<T.Header /* TODO: narrow to finalized? */>;
       subscribeNewHead: KnownRpcMethods["chain_subscribeNewHeads"];
-      subscribeNewHeads(): rpc.Subscription<unknown>;
+      subscribeNewHeads(): rpc.SubscriptionBrand<unknown>;
       subscribeRuntimeVersion: KnownRpcMethods["state_subscribeRuntimeVersion"];
       subscribe_newHead: KnownRpcMethods["chain_subscribeNewHeads"];
       unsubscribeAllHeads(subscription: string): boolean;
@@ -55,7 +55,9 @@ export interface KnownRpcMethods extends
         callParameters: U.HexString,
         networkConfig?: T.NetworkConfig,
       ): string;
-      unstable_follow(runtimeUpdates: boolean): rpc.Subscription<T.ChainHeadUnstableFollowEvent>;
+      unstable_follow(
+        runtimeUpdates: boolean,
+      ): rpc.SubscriptionBrand<T.ChainHeadUnstableFollowEvent>;
       unstable_genesisHash(): U.HashHexString;
       unstable_header(followSubscription: string, hash: U.HashHexString): U.HexString | undefined;
       unstable_stopBody(subscription: string): void;
@@ -112,7 +114,7 @@ export interface KnownRpcMethods extends
       queryStorage: TODO_NARROW_METHOD_TYPE;
       queryStorageAt(keys: U.HexString[], at?: U.HashHexString): T.StorageChangeSet;
       subscribeRuntimeVersion: TODO_NARROW_METHOD_TYPE;
-      subscribeStorage(list: U.HexString[]): rpc.Subscription<"TODO">;
+      subscribeStorage(list: U.HexString[]): rpc.SubscriptionBrand<"TODO">;
       unsubscribeRuntimeVersion(subscription: string): boolean;
       unsubscribeStorage(subscription: string): boolean;
       getKeysPaged(

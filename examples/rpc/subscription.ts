@@ -4,11 +4,13 @@ import * as rpc from "../../rpc/mod.ts";
 
 const client = await rpc.proxyClient(polkadotBeacon);
 assert(!(client instanceof Error));
-const stop = await client.subscribe("chain_subscribeAllHeads", [], (message) => {
-  console.log(message.params.result);
+
+let i = 1;
+const stop = await client.subscribe("chain_subscribeAllHeads", [], async (message) => {
+  console.log({ [i++]: message.params.result });
+  if (i > 5) {
+    assert(typeof stop === "function");
+    stop();
+    await client.close();
+  }
 });
-assert(typeof stop === "function");
-setTimeout(async () => {
-  stop();
-  await client.close();
-}, 100000);
