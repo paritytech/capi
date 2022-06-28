@@ -69,11 +69,7 @@ Deno.test("Derive Auction Winning Storage Entry Codec", async () => {
 });
 
 Deno.test("Westend circular", async () => {
-  const metadata = fromPrefixedHex(
-    await Deno.readTextFile(
-      path.join("frame_metadata", "_downloaded", "westend.scale"),
-    ),
-  );
+  const metadata = await Metadata("westend");
   const deriveCodec = DeriveCodec(metadata);
   deriveCodec(283);
 });
