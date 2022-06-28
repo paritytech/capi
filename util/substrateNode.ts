@@ -3,7 +3,7 @@ import { blue } from "../_deps/colors.ts";
 import * as path from "../_deps/path.ts";
 import { ErrorCtor } from "./ErrorCtor.ts";
 
-export interface SubstrateProcessConfig {
+export interface SubstrateNodeConfig {
   cwd?: string;
   port?: number;
   dev?: true;
@@ -11,15 +11,15 @@ export interface SubstrateProcessConfig {
   timeout?: number;
 }
 
-export interface SubstrateProcess {
-  config: SubstrateProcessConfig;
+export interface SubstrateNode {
+  config: SubstrateNodeConfig;
   inner: Deno.Process;
   close(): void;
   url: string;
 }
 
-export async function substrateProcess(config: SubstrateProcessConfig): Promise<
-  SubstrateProcess | Deno.errors.NotFound | FailedToExeError
+export async function substrateNode(config: SubstrateNodeConfig): Promise<
+  SubstrateNode | Deno.errors.NotFound | FailedToExeError
 > {
   let cwd: string;
   const cmd: string[] = [];

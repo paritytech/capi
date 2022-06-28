@@ -7,5 +7,5 @@ build-dir = "target/mdbook"
 create-missing = false
 
 [output.html]
-git-repository-url = "https://github.com/paritytech/chain-api-concept-docs"
-# edit-url-template = "https://github.com/paritytech/chain-api-concept-docs/edit/main/{path}"
+git-repository-url = "https://github.com/paritytech/capi"
+# edit-url-template = "https://github.com/paritytech/capi/edit/main/{path}"
