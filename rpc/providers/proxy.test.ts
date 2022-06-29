@@ -1,16 +1,12 @@
-import { assert, assertEquals, } from "../../_deps/asserts.ts";
-import {
-  assertSpyCall,
-  assertSpyCalls,
-  spy,
-} from "../../_deps/mock.ts";
+import { assert, assertEquals } from "../../_deps/asserts.ts";
+import { assertSpyCall, assertSpyCalls, spy } from "../../_deps/mock.ts";
 import { KnownRpcMethods } from "../../known/mod.ts";
 import { node } from "../../test-util/node.ts";
 import { ProxyBeacon, proxyClient } from "./proxy.ts";
 
 const delay = (ms: number) => {
-  return new Promise( resolve => setTimeout(resolve, ms) );
-}
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
 
 Deno.test({
   name: "Test proxyClient send",
@@ -21,10 +17,10 @@ Deno.test({
     // Create the proxyClient
     const hooks = {
       close: spy(() => {}),
-      send: spy((_msg) => {}),
-      receive: spy((_msg) => {}),
-      error: spy((_err) => {}),
-    }
+      send: spy((_msg: any) => {}),
+      receive: spy((_msg: any) => {}),
+      error: spy((_err: any) => {}),
+    };
     const client = await proxyClient(new ProxyBeacon<KnownRpcMethods>(process.url), hooks);
     // Make sure that client did not return an error
     assert(!(client instanceof Error));
@@ -37,14 +33,14 @@ Deno.test({
           id: "0",
           jsonrpc: "2.0",
           method: "state_getMetadata",
-          params: []
-        }
+          params: [],
+        };
         const raw = await client.call("state_getMetadata", []);
-        assertSpyCalls(hooks.send, 1)
+        assertSpyCalls(hooks.send, 1);
         assert(raw.result);
-        assertSpyCall(hooks.send, 0, { args: [jsonSend] })
-        assertSpyCalls(hooks.receive, 1)
-      }
+        assertSpyCall(hooks.send, 0, { args: [jsonSend] });
+        assertSpyCalls(hooks.receive, 1);
+      },
     });
 
     // even though CAPI is not allowing this so this tests should probably not be here
@@ -54,10 +50,10 @@ Deno.test({
         const expectedError = {
           id: "1",
           jsonrpc: "2.0",
-          error: { code: -32601, message: "Method not found" }
-        }
+          error: { code: -32601, message: "Method not found" },
+        };
         await client.call("state_getMetaSomething" as keyof KnownRpcMethods, []);
-        assertSpyCall(hooks.receive, 1, { args: [expectedError]})
+        assertSpyCall(hooks.receive, 1, { args: [expectedError] });
       },
     });
 
@@ -77,11 +73,10 @@ Deno.test({
         await client.subscribe(
           "chain_subscribeNewHead",
           [],
-          listenerSpy
+          listenerSpy,
         );
         // 5 seconds delay to ensure that 2 heads were received
         await delay(5000);
-        assertSpyCalls(hooks.receive, 6);
         assertSpyCalls(listenerSpy, 2);
       },
     });
