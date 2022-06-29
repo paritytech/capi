@@ -95,9 +95,9 @@ export async function read<Target extends ReadTarget = ReadTarget>(
           block: {
             header,
             extrinsics: extrinsics.map((extrinsic) => {
-              const trimmed = extrinsicore.substring(2);
+              const trimmed = extrinsic.substring(2);
               const bytes = U.hex.decode(trimmed);
-              return $extrinsicore.decode(bytes);
+              return $extrinsic.decode(bytes);
             }),
           },
         };
