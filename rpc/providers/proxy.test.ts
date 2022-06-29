@@ -1,16 +1,55 @@
 import { assert, assertEquals } from "../../_deps/asserts.ts";
+import { deferred } from "../../_deps/async.ts";
 import { assertSpyCall, assertSpyCalls, spy } from "../../_deps/mock.ts";
-import { KnownRpcMethods } from "../../known/mod.ts";
-import { node } from "../../test-util/node.ts";
+import { KnownRpcMethods, polkadotBeacon } from "../../known/mod.ts";
+import * as msg from "../messages.ts";
 import { ProxyBeacon, proxyClient } from "./proxy.ts";
+
+import { node } from "../../test-util/node.ts";
 
 const delay = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
 Deno.test({
-  name: "Test proxyClient send",
-  fn: async (s: Deno.TestContext) => {
+  name: "Proxy RPC Client",
+  sanitizeResources: false,
+  async fn(t) {
+    const client = await proxyClient(polkadotBeacon);
+    assert(!(client instanceof Error));
+
+    await t.step("call", async () => {
+      const raw = await client.call("state_getMetadata", []);
+      assert(typeof raw.result === "string");
+    });
+
+    await t.step("subscribe", async () => {
+      const result: msg.NotifMessage<KnownRpcMethods, "chain_subscribeAllHeads">[] = [];
+      const pending = deferred();
+      let i = 1;
+      const stop = await client.subscribe("chain_subscribeAllHeads", [], async (message) => {
+        result.push(message);
+        i++;
+        if (i > 2) {
+          assert(typeof stop === "function");
+          stop();
+          pending.resolve();
+        }
+      });
+      await pending;
+      assert(result.every((message) => {
+        return message.params.result;
+      }));
+    });
+
+    await client.close();
+  },
+});
+
+Deno.test({
+  name: "Tests RPC client",
+  sanitizeResources: false,
+  async fn(t) {
     // Initialize local node
     const process = await node();
 
@@ -26,7 +65,7 @@ Deno.test({
     assert(!(client instanceof Error));
 
     // start running tests
-    await s.step({
+    await t.step({
       name: "Tests send",
       fn: async () => {
         const jsonSend = {
@@ -44,7 +83,7 @@ Deno.test({
     });
 
     // even though CAPI is not allowing this so this tests should probably not be here
-    await s.step({
+    await t.step({
       name: "Tests error when a call is made with wrong method",
       fn: async () => {
         const expectedError = {
@@ -57,7 +96,7 @@ Deno.test({
       },
     });
 
-    await s.step({
+    await t.step({
       name: "Tests that id increments correctly",
       fn: async () => {
         const raw = await client.call("state_getMetadata", []);
@@ -65,8 +104,8 @@ Deno.test({
       },
     });
 
-    await s.step({
-      name: "Tests proxyClient subscribe",
+    await t.step({
+      name: "Tests proxyClient's subscribe",
       fn: async () => {
         const listenerSpy = spy((): void => {});
 
@@ -85,5 +124,4 @@ Deno.test({
     assertSpyCalls(hooks.close, 1);
     process.close();
   },
-  sanitizeResources: false,
 });

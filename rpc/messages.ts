@@ -1,6 +1,6 @@
 import { AnyMethods, EnsureLookup } from "../util/mod.ts";
 import { SubscriptionIdString } from "../util/mod.ts";
-import { Subscription } from "./Base.ts";
+import { SubscriptionBrand } from "./Base.ts";
 
 export type InitMessageByMethodName<M extends AnyMethods> = {
   [N in keyof M]: InitMessageBase<M, N, Parameters<M[N]>>;
@@ -11,7 +11,7 @@ export type InitMessage<
 > = InitMessageByMethodName<M>[N];
 
 export type OkMessageByMethodName<M extends AnyMethods> = {
-  [N in keyof M]: OkResBase<ReturnType<M[N]> extends Subscription ? string : ReturnType<M[N]>>;
+  [N in keyof M]: OkResBase<ReturnType<M[N]> extends SubscriptionBrand ? string : ReturnType<M[N]>>;
 };
 export type OkMessage<
   M extends AnyMethods,
@@ -19,10 +19,10 @@ export type OkMessage<
 > = OkMessageByMethodName<M>[N];
 
 export type NotifByMethodName<M extends AnyMethods> = {
-  [N in keyof M as ReturnType<M[N]> extends Subscription ? N : never]: NotifMessageBase<
+  [N in keyof M as ReturnType<M[N]> extends SubscriptionBrand ? N : never]: NotifMessageBase<
     M,
     N,
-    ReturnType<M[N]> extends Subscription<infer R> ? R : never
+    ReturnType<M[N]> extends SubscriptionBrand<infer R> ? R : never
   >;
 };
 export type SubscriptionMethodName<M extends AnyMethods> = keyof NotifByMethodName<M>;

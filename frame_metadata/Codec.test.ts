@@ -1,8 +1,15 @@
 import { assertEquals } from "../_deps/asserts.ts";
+import * as path from "../_deps/path.ts";
+import { testPairs } from "../known/mod.ts";
+import { DeriveCodec } from "./Codec.ts";
 import { ChainError } from "./Codec.ts";
-import { accountId32, getLookupAndDeriveCodec } from "./test-util.ts";
+import { Lookup } from "./Lookup.ts";
+import { fromPrefixedHex } from "./Metadata.ts";
+import { Metadata } from "./test-common.ts";
 
-const { lookup, deriveCodec, metadata } = await getLookupAndDeriveCodec("polkadot");
+const metadata = await Metadata("polkadot");
+const lookup = new Lookup(metadata);
+const deriveCodec = DeriveCodec(metadata);
 
 Deno.test("Derive all", () => {
   for (const ty of metadata.tys) {
@@ -12,9 +19,9 @@ Deno.test("Derive all", () => {
 
 Deno.test("Derive AccountId32 Codec", async () => {
   const codec = deriveCodec(0);
-  const encoded = codec.encode(accountId32);
-  assertEquals(encoded, accountId32);
-  assertEquals(codec.decode(encoded), accountId32);
+  const encoded = codec.encode(testPairs.alice.public);
+  assertEquals(encoded, testPairs.alice.public);
+  assertEquals(codec.decode(encoded), testPairs.alice.public);
 });
 
 Deno.test("Derive AccountInfo Codec", async () => {
@@ -54,7 +61,7 @@ Deno.test("Derive Auction Winning Storage Entry Codec", async () => {
   const codec = deriveCodec(auctionWinningStorageEntry.value);
   const decoded = [
     ...Array(7).fill(undefined),
-    [accountId32, 2013, 8672334557167609n],
+    [testPairs.alice.public, 2013, 8672334557167609n],
     ...Array(28).fill(undefined),
   ];
   const encoded = codec.encode(decoded);
@@ -62,7 +69,8 @@ Deno.test("Derive Auction Winning Storage Entry Codec", async () => {
 });
 
 Deno.test("Westend circular", async () => {
-  const { deriveCodec } = await getLookupAndDeriveCodec("westend");
+  const metadata = await Metadata("westend");
+  const deriveCodec = DeriveCodec(metadata);
   deriveCodec(283);
 });
 
