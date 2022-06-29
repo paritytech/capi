@@ -1,6 +1,6 @@
-import * as C from "../core/mod.ts";
+import * as core from "../core/mod.ts";
 
-export type WatchTarget = C.Entry | C.KeyPage | C.Metadata | C.Header;
+export type WatchTarget = core.Entry | core.KeyPage | core.Metadata | core.Header | core.Block;
 
 export declare function watch<Target extends WatchTarget>(
   target: Target,

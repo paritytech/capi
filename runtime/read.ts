@@ -1,14 +1,14 @@
 import { Hashers } from "../bindings/mod.ts";
-import * as C from "../core/mod.ts";
+import * as core from "../core/mod.ts";
 import * as M from "../frame_metadata/mod.ts";
 import * as U from "../util/mod.ts";
 import { globalContext } from "./Context.ts";
 
-export type ReadTarget = C.Entry | C.KeyPage | C.Metadata | C.Header | C.Block;
+export type ReadTarget = core.Entry | core.KeyPage | core.Metadata | core.Header | core.Block;
 
 export async function read<Target extends ReadTarget = ReadTarget>(
   target: Target,
-  block?: C.Block<Target["chain"]>,
+  block?: core.Block<Target["chain"]>,
 ) {
   const chain = await globalContext.register(target.chain.beacon as any);
   if (chain instanceof Error) {
