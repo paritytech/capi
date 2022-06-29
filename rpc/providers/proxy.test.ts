@@ -5,8 +5,6 @@ import { KnownRpcMethods, polkadotBeacon } from "../../known/mod.ts";
 import * as msg from "../messages.ts";
 import { ProxyBeacon, proxyClient } from "./proxy.ts";
 
-import { node } from "../../test-util/node.ts";
-
 const delay = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
@@ -50,9 +48,6 @@ Deno.test({
   name: "Tests RPC client",
   sanitizeResources: false,
   async fn(t) {
-    // Initialize local node
-    const process = await node();
-
     // Create the proxyClient
     const hooks = {
       close: spy(() => {}),
@@ -60,7 +55,7 @@ Deno.test({
       receive: spy((_msg: any) => {}),
       error: spy((_err: any) => {}),
     };
-    const client = await proxyClient(new ProxyBeacon<KnownRpcMethods>(process.url), hooks);
+    const client = await proxyClient(polkadotBeacon, hooks);
     // Make sure that client did not return an error
     assert(!(client instanceof Error));
 
@@ -122,6 +117,5 @@ Deno.test({
 
     await client.close();
     assertSpyCalls(hooks.close, 1);
-    process.close();
   },
 });
