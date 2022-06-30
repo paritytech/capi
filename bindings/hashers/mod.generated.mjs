@@ -1,7 +1,7 @@
-// Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
-// @generated file from build script, do not edit
+// @generated file from wasmbuild -- do not edit
 // deno-lint-ignore-file
-// source-hash: 1843d28d775dc4941c9f53705dfb80d6e7b59eda
+// deno-fmt-ignore-file
+// source-hash: 159285ce075cb9f0a0b1d5d306e765b19d3ebb81
 let wasm;
 
 const heap = new Array(32).fill(undefined);
@@ -234,12 +234,21 @@ const imports = {
 
 const wasm_url = new URL("mod_bg.wasm", import.meta.url);
 
+/**
+ * Decompression callback
+ *
+ * @callback decompressCallback
+ * @param {Uint8Array} compressed
+ * @return {Uint8Array} decompressed
+ */
+
 /** Instantiates an instance of the Wasm module returning its functions.
  * @remarks It is safe to call this multiple times and once successfully
  * loaded it will always return a reference to the same object.
+ * @param {decompressCallback=} transform
  */
-export async function instantiate() {
-  return (await instantiateWithInstance()).exports;
+export async function instantiate(transform) {
+  return (await instantiateWithInstance(transform)).exports;
 }
 
 let instanceWithExports;
@@ -248,32 +257,26 @@ let lastLoadPromise;
 /** Instantiates an instance of the Wasm module along with its exports.
  * @remarks It is safe to call this multiple times and once successfully
  * loaded it will always return a reference to the same object.
+ * @param {decompressCallback=} transform
  * @returns {Promise<{
  *   instance: WebAssembly.Instance;
  *   exports: { blake2_128: typeof blake2_128; blake2_256: typeof blake2_256; blake2_128Concat: typeof blake2_128Concat; twox128: typeof twox128; twox256: typeof twox256; twox64Concat: typeof twox64Concat }
  * }>}
  */
-export function instantiateWithInstance() {
+export function instantiateWithInstance(transform) {
   if (instanceWithExports != null) {
     return Promise.resolve(instanceWithExports);
   }
   if (lastLoadPromise == null) {
     lastLoadPromise = (async () => {
       try {
-        const instance = (await instantiateModule()).instance;
+        const instance = (await instantiateModule(transform)).instance;
         wasm = instance.exports;
         cachedInt32Memory0 = new Int32Array(wasm.memory.buffer);
         cachedUint8Memory0 = new Uint8Array(wasm.memory.buffer);
         instanceWithExports = {
           instance,
-          exports: {
-            blake2_128,
-            blake2_256,
-            blake2_128Concat,
-            twox128,
-            twox256,
-            twox64Concat,
-          },
+          exports: getWasmInstanceExports(),
         };
         return instanceWithExports;
       } finally {
@@ -284,12 +287,23 @@ export function instantiateWithInstance() {
   return lastLoadPromise;
 }
 
+function getWasmInstanceExports() {
+  return {
+    blake2_128,
+    blake2_256,
+    blake2_128Concat,
+    twox128,
+    twox256,
+    twox64Concat,
+  };
+}
+
 /** Gets if the Wasm module has been instantiated. */
 export function isInstantiated() {
   return instanceWithExports != null;
 }
 
-async function instantiateModule() {
+async function instantiateModule(transform) {
   switch (wasm_url.protocol) {
     case "file:": {
       if (typeof Deno !== "object") {
@@ -300,7 +314,10 @@ async function instantiateModule() {
         Deno.permissions.request({ name: "read", path: wasm_url });
       }
       const wasmCode = await Deno.readFile(wasm_url);
-      return WebAssembly.instantiate(wasmCode, imports);
+      return WebAssembly.instantiate(
+        !transform ? wasmCode : transform(wasmCode),
+        imports,
+      );
     }
     case "https:":
     case "http:": {
@@ -308,6 +325,10 @@ async function instantiateModule() {
         Deno.permissions.request({ name: "net", host: wasm_url.host });
       }
       const wasmResponse = await fetch(wasm_url);
+      if (transform) {
+        const wasmCode = new Uint8Array(await wasmResponse.arrayBuffer());
+        return WebAssembly.instantiate(transform(wasmCode), imports);
+      }
       if (
         wasmResponse.headers.get("content-type")?.toLowerCase().startsWith(
           "application/wasm",
