@@ -1,8 +1,9 @@
+import { decompress } from "../../_deps/lz4.ts";
 import * as M from "../../frame_metadata/mod.ts";
 import { instantiate } from "./mod.generated.mjs";
 
 export async function Hashers(): Promise<M.HasherLookup> {
-  const instance = await instantiate();
+  const instance = await instantiate(decompress);
   return {
     Blake2_128: instance.blake2_128,
     Blake2_128Concat: instance.blake2_128Concat,

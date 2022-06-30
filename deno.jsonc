@@ -29,11 +29,7 @@
   "tasks": {
     "run": "deno run -A --no-check=remote",
     "download:frame_metadata": "deno task run _tasks/download_frame_metadata.ts",
-    "wasmbuild": "deno task run --unstable https://deno.land/x/wasmbuild@0.7.1/main.ts --js-ext mjs --out",
-    "build:wasm:hashers": "deno task wasmbuild bindings/hashers --features hashers",
-    "build:wasm:sr25519": "deno task wasmbuild bindings/sr25519 --features sr25519",
-    "build:wasm:ss58": "deno task wasmbuild bindings/ss58 --features ss58",
-    "build:wasm": "deno task build:wasm:hashers && deno task build:wasm:sr25519 && deno task build:wasm:ss58",
+    "build:wasm": "deno task run _tasks/build_wasm.ts",
     "build:known": "deno task run _tasks/build_known.ts",
     "udd": "deno task star && deno task run https://deno.land/x/udd@0.5.0/main.ts _star.ts",
     "dnt": "deno task run _tasks/dnt.ts",
