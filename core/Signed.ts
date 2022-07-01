@@ -19,7 +19,7 @@ export class Signed<
     this.chain = call.chain;
   }
 
-  send = async (callback?: (notif: unknown) => void) => {
+  send = async () => {
     return send(this);
   };
 }
