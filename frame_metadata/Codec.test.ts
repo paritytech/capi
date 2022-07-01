@@ -1,10 +1,8 @@
 import { assertEquals } from "../_deps/asserts.ts";
-import * as path from "../_deps/path.ts";
 import { testPairs } from "../known/mod.ts";
 import { DeriveCodec } from "./Codec.ts";
 import { ChainError } from "./Codec.ts";
 import { Lookup } from "./Lookup.ts";
-import { fromPrefixedHex } from "./Metadata.ts";
 import { Metadata } from "./test-common.ts";
 
 const metadata = await Metadata("polkadot");

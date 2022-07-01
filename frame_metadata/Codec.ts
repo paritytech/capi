@@ -10,6 +10,7 @@ export type DeriveCodec = (typeI: number) => $.Codec<unknown>;
  */
 export const $null = $.dummy(null);
 
+// TODO: tuple/array element skip optimization
 export function DeriveCodec(metadata: M.Metadata): DeriveCodec {
   // TODO: don't leak memory!
   const cache: Record<number, $.Codec<unknown> | null> = {};
@@ -150,7 +151,7 @@ export function DeriveCodec(metadata: M.Metadata): DeriveCodec {
       }
       cache[i] = null; // circularity detection
       const ty = metadata.tys[i]!;
-      const $codec = (visitors[ty.type] as any)(ty, false);
+      const $codec = (visitors[ty.type] as any)(ty);
       cache[i] = $codec;
       return $codec;
     },

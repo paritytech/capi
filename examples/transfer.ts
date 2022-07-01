@@ -5,7 +5,7 @@ const chain = C.test.chain(node);
 
 const { alice, bob } = chain.address;
 
-const result = chain
+await chain
   .pallet("Balances")
   .extrinsic("transfer")
   .call({
@@ -14,9 +14,5 @@ const result = chain
   })
   .signed(bob, bob.sign)
   .send();
-
-for await (const event of result) {
-  console.log({ event });
-}
 
 node.close();
