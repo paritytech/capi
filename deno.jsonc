@@ -28,6 +28,7 @@
   "include": ["."],
   "tasks": {
     "run": "deno run -A --no-check=remote",
+    "debug": "deno task run --inspect-brk",
     "download:frame_metadata": "deno task run _tasks/download_frame_metadata.ts",
     "wasmbuild": "deno task run --unstable https://deno.land/x/wasmbuild@0.7.1/main.ts --js-ext mjs --out",
     "build:wasm:hashers": "deno task wasmbuild bindings/hashers --features hashers",

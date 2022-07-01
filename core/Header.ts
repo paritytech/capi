@@ -13,7 +13,7 @@ export class Header<C extends Chain = Chain> extends NodeBase<"Header"> {
     return R.read(this, block);
   }
 
-  watch() {
-    return R.watch(this);
+  watch(cb: (message: unknown) => void): any /* TODO */ {
+    return R.watch(this, cb);
   }
 }

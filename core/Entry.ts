@@ -30,7 +30,7 @@ export class Entry<
     return R.read(this, block);
   }
 
-  watch() {
-    return R.watch(this);
+  watch(cb: (message: unknown) => void): any /* TODO */ {
+    return R.watch(this, cb);
   }
 }
