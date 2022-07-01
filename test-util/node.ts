@@ -1,6 +1,6 @@
 import { fail } from "../_deps/asserts.ts";
 import { blue } from "../_deps/colors.ts";
-import { ErrorCtor, isPortAvailable } from "../util/mod.ts";
+import { isPortAvailable } from "../util/mod.ts";
 
 export interface TestNodeConfig {
   cwd?: string;
@@ -60,5 +60,3 @@ export async function node(config?: TestNodeConfig): Promise<TestNode> {
     fail();
   }
 }
-
-export class FailedToExeError extends ErrorCtor("FailedToExe") {}
