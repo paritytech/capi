@@ -1,8 +1,24 @@
 import * as $ from "../_deps/scale.ts";
-import { MultiAddress, Signature } from "../primitives/mod.ts";
 import { $null, DeriveCodec } from "./Codec.ts";
 import { HasherLookup } from "./Key.ts";
 import { Metadata } from "./Metadata.ts";
+
+export type Era = {
+  type: "Mortal";
+  value: [period: bigint, phase: bigint];
+} | {
+  type: "Immortal";
+};
+
+export interface MultiAddress {
+  type: "Id" | "Index" | "Raw" | "Address20" | "Address32";
+  value: Uint8Array;
+}
+
+interface Signature {
+  type: "Sr25519";
+  value: Uint8Array;
+}
 
 export interface Extrinsic {
   protocolVersion: number;
@@ -79,7 +95,10 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
       const protocolVersion = firstByte & ~(1 << 7);
       let signature: Extrinsic["signature"];
       if (hasSignature) {
-        const address = $address._decode(buffer) as MultiAddress;
+        const address = $address._decode(buffer) as Exclude<
+          Extrinsic["signature"],
+          undefined
+        >["address"];
         const sig = $sig._decode(buffer);
         const extra = $extra._decode(buffer);
         signature = { address, sig, extra };
