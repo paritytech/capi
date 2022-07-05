@@ -95,10 +95,7 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
       const protocolVersion = firstByte & ~(1 << 7);
       let signature: Extrinsic["signature"];
       if (hasSignature) {
-        const address = $address._decode(buffer) as Exclude<
-          Extrinsic["signature"],
-          undefined
-        >["address"];
+        const address = $address._decode(buffer) as MultiAddress;
         const sig = $sig._decode(buffer);
         const extra = $extra._decode(buffer);
         signature = { address, sig, extra };

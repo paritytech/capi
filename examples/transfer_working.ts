@@ -2,7 +2,6 @@ import { assert } from "../_deps/asserts.ts";
 import { Hashers, Sr25519 } from "../bindings/mod.ts";
 import * as M from "../frame_metadata/mod.ts";
 import { westendBeacon } from "../known/mod.ts";
-import * as C from "../mod.ts";
 import * as rpc from "../rpc/mod.ts";
 import * as U from "../util/mod.ts";
 
