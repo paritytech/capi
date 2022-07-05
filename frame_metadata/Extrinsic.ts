@@ -1,8 +1,24 @@
 import * as $ from "../_deps/scale.ts";
-import { MultiAddress, Signature } from "../primitives/mod.ts";
 import { $null, DeriveCodec } from "./Codec.ts";
 import { HasherLookup } from "./Key.ts";
 import { Metadata } from "./Metadata.ts";
+
+export type Era = {
+  type: "Mortal";
+  value: [period: bigint, phase: bigint];
+} | {
+  type: "Immortal";
+};
+
+export interface MultiAddress {
+  type: "Id" | "Index" | "Raw" | "Address20" | "Address32";
+  value: Uint8Array;
+}
+
+interface Signature {
+  type: "Sr25519";
+  value: Uint8Array;
+}
 
 export interface Extrinsic {
   protocolVersion: number;

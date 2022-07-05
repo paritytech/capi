@@ -2,7 +2,6 @@ import { assert } from "../_deps/asserts.ts";
 import { Hashers, Sr25519 } from "../bindings/mod.ts";
 import * as M from "../frame_metadata/mod.ts";
 import { westendBeacon } from "../known/mod.ts";
-import * as C from "../mod.ts";
 import * as rpc from "../rpc/mod.ts";
 import * as U from "../util/mod.ts";
 
@@ -27,19 +26,21 @@ const $extrinsic = M.$extrinsic({
   metadata,
   deriveCodec,
   hashers,
-  sign: (message) => new C.Sr25519Signature(alice.sign(message)),
+  sign: (message) => ({
+    type: "Sr25519",
+    value: alice.sign(message),
+  }),
 });
-
-const from = new C.MultiAddress("Id", alice.publicKey);
-const DEST_PUBLIC_KEY = "8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48";
-const dest = new C.MultiAddress("Id", U.hex.decode(DEST_PUBLIC_KEY));
 
 const extrinsic: M.Extrinsic = {
   protocolVersion: 4,
   signature: {
-    address: from,
+    address: {
+      type: "Id",
+      value: alice.publicKey,
+    },
     extra: [
-      /* era */ C.immortalEra,
+      /* era */ { type: "Immortal" },
       /* nonce */ 1000,
       /* tip */ 500,
     ],
@@ -52,7 +53,13 @@ const extrinsic: M.Extrinsic = {
   },
   palletName: "Balances",
   methodName: "transfer",
-  args: { dest, value: 12345n },
+  args: {
+    dest: {
+      type: "Id",
+      value: U.hex.decode("8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48"),
+    },
+    value: 12345n,
+  },
 };
 
 const encoded = $extrinsic.encode(extrinsic);

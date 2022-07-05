@@ -1,6 +1,5 @@
 import { unimplemented } from "../_deps/asserts.ts";
 import { Ss58 } from "../bindings/mod.ts";
-import { MultiAddress } from "../primitives/MultiAddress.ts";
 import * as U from "../util/mod.ts";
 import { Addresses } from "./Addresses.ts";
 import { NodeBase } from "./common.ts";
@@ -55,5 +54,4 @@ export class Address<
   declare asPublicKeyText: () => string;
   declare asSs58Bytes: () => Uint8Array;
   declare asSs58Text: () => string;
-  declare asMulti: () => MultiAddress;
 }
