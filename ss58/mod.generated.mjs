@@ -1,30 +1,8 @@
 // @generated file from wasmbuild -- do not edit
 // deno-lint-ignore-file
 // deno-fmt-ignore-file
-// source-hash: 159285ce075cb9f0a0b1d5d306e765b19d3ebb81
+// source-hash: a2319fe2e124b47dda29e7a809b31f9f8dc89320
 let wasm;
-
-const heap = new Array(32).fill(undefined);
-
-heap.push(undefined, null, true, false);
-
-function getObject(idx) {
-  return heap[idx];
-}
-
-let heap_next = heap.length;
-
-function dropObject(idx) {
-  if (idx < 36) return;
-  heap[idx] = heap_next;
-  heap_next = idx;
-}
-
-function takeObject(idx) {
-  const ret = getObject(idx);
-  dropObject(idx);
-  return ret;
-}
 
 const cachedTextDecoder = new TextDecoder("utf-8", {
   ignoreBOM: true,
@@ -45,6 +23,12 @@ function getStringFromWasm0(ptr, len) {
   return cachedTextDecoder.decode(getUint8Memory0().subarray(ptr, ptr + len));
 }
 
+const heap = new Array(32).fill(undefined);
+
+heap.push(undefined, null, true, false);
+
+let heap_next = heap.length;
+
 function addHeapObject(obj) {
   if (heap_next === heap.length) heap.push(heap.length + 1);
   const idx = heap_next;
@@ -54,79 +38,23 @@ function addHeapObject(obj) {
   return idx;
 }
 
+function getObject(idx) {
+  return heap[idx];
+}
+
+function dropObject(idx) {
+  if (idx < 36) return;
+  heap[idx] = heap_next;
+  heap_next = idx;
+}
+
+function takeObject(idx) {
+  const ret = getObject(idx);
+  dropObject(idx);
+  return ret;
+}
+
 let WASM_VECTOR_LEN = 0;
-
-function passArray8ToWasm0(arg, malloc) {
-  const ptr = malloc(arg.length * 1);
-  getUint8Memory0().set(arg, ptr / 1);
-  WASM_VECTOR_LEN = arg.length;
-  return ptr;
-}
-/**
- * @param {Uint8Array} data
- * @returns {Uint8Array}
- */
-export function blake2_128(data) {
-  const ptr0 = passArray8ToWasm0(data, wasm.__wbindgen_malloc);
-  const len0 = WASM_VECTOR_LEN;
-  const ret = wasm.blake2_128(ptr0, len0);
-  return takeObject(ret);
-}
-
-/**
- * @param {Uint8Array} data
- * @returns {Uint8Array}
- */
-export function blake2_256(data) {
-  const ptr0 = passArray8ToWasm0(data, wasm.__wbindgen_malloc);
-  const len0 = WASM_VECTOR_LEN;
-  const ret = wasm.blake2_256(ptr0, len0);
-  return takeObject(ret);
-}
-
-/**
- * @param {Uint8Array} data
- * @returns {Uint8Array}
- */
-export function blake2_128Concat(data) {
-  const ptr0 = passArray8ToWasm0(data, wasm.__wbindgen_malloc);
-  const len0 = WASM_VECTOR_LEN;
-  const ret = wasm.blake2_128Concat(ptr0, len0);
-  return takeObject(ret);
-}
-
-/**
- * @param {Uint8Array} data
- * @returns {Uint8Array}
- */
-export function twox128(data) {
-  const ptr0 = passArray8ToWasm0(data, wasm.__wbindgen_malloc);
-  const len0 = WASM_VECTOR_LEN;
-  const ret = wasm.twox128(ptr0, len0);
-  return takeObject(ret);
-}
-
-/**
- * @param {Uint8Array} data
- * @returns {Uint8Array}
- */
-export function twox256(data) {
-  const ptr0 = passArray8ToWasm0(data, wasm.__wbindgen_malloc);
-  const len0 = WASM_VECTOR_LEN;
-  const ret = wasm.twox256(ptr0, len0);
-  return takeObject(ret);
-}
-
-/**
- * @param {Uint8Array} data
- * @returns {Uint8Array}
- */
-export function twox64Concat(data) {
-  const ptr0 = passArray8ToWasm0(data, wasm.__wbindgen_malloc);
-  const len0 = WASM_VECTOR_LEN;
-  const ret = wasm.twox64Concat(ptr0, len0);
-  return takeObject(ret);
-}
 
 const cachedTextEncoder = new TextEncoder("utf-8");
 
@@ -178,11 +106,81 @@ function getInt32Memory0() {
   }
   return cachedInt32Memory0;
 }
+/**
+ * @param {string} text
+ * @returns {Array<any>}
+ */
+export function decode(text) {
+  try {
+    const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+    const ptr0 = passStringToWasm0(
+      text,
+      wasm.__wbindgen_malloc,
+      wasm.__wbindgen_realloc,
+    );
+    const len0 = WASM_VECTOR_LEN;
+    wasm.decode(retptr, ptr0, len0);
+    var r0 = getInt32Memory0()[retptr / 4 + 0];
+    var r1 = getInt32Memory0()[retptr / 4 + 1];
+    var r2 = getInt32Memory0()[retptr / 4 + 2];
+    if (r2) {
+      throw takeObject(r1);
+    }
+    return takeObject(r0);
+  } finally {
+    wasm.__wbindgen_add_to_stack_pointer(16);
+  }
+}
+
+/**
+ * @param {number} prefix
+ * @param {string} pub_key
+ * @returns {string}
+ */
+export function encode(prefix, pub_key) {
+  try {
+    const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+    const ptr0 = passStringToWasm0(
+      pub_key,
+      wasm.__wbindgen_malloc,
+      wasm.__wbindgen_realloc,
+    );
+    const len0 = WASM_VECTOR_LEN;
+    wasm.encode(retptr, prefix, ptr0, len0);
+    var r0 = getInt32Memory0()[retptr / 4 + 0];
+    var r1 = getInt32Memory0()[retptr / 4 + 1];
+    var r2 = getInt32Memory0()[retptr / 4 + 2];
+    var r3 = getInt32Memory0()[retptr / 4 + 3];
+    var ptr1 = r0;
+    var len1 = r1;
+    if (r3) {
+      ptr1 = 0;
+      len1 = 0;
+      throw takeObject(r2);
+    }
+    return getStringFromWasm0(ptr1, len1);
+  } finally {
+    wasm.__wbindgen_add_to_stack_pointer(16);
+    wasm.__wbindgen_free(ptr1, len1);
+  }
+}
 
 const imports = {
   __wbindgen_placeholder__: {
+    __wbindgen_error_new: function (arg0, arg1) {
+      const ret = new Error(getStringFromWasm0(arg0, arg1));
+      return addHeapObject(ret);
+    },
+    __wbindgen_number_new: function (arg0) {
+      const ret = arg0;
+      return addHeapObject(ret);
+    },
     __wbindgen_object_drop_ref: function (arg0) {
       takeObject(arg0);
+    },
+    __wbindgen_string_new: function (arg0, arg1) {
+      const ret = getStringFromWasm0(arg0, arg1);
+      return addHeapObject(ret);
     },
     __wbg_new_693216e109162396: function () {
       const ret = new Error();
@@ -206,28 +204,16 @@ const imports = {
         wasm.__wbindgen_free(arg0, arg1);
       }
     },
-    __wbg_buffer_de1150f91b23aa89: function (arg0) {
-      const ret = getObject(arg0).buffer;
+    __wbg_new_2ab697f1555e0dbc: function () {
+      const ret = new Array();
       return addHeapObject(ret);
     },
-    __wbg_newwithbyteoffsetandlength_9ca61320599a2c84: function (
-      arg0,
-      arg1,
-      arg2,
-    ) {
-      const ret = new Uint8Array(getObject(arg0), arg1 >>> 0, arg2 >>> 0);
-      return addHeapObject(ret);
-    },
-    __wbg_new_97cf52648830a70d: function (arg0) {
-      const ret = new Uint8Array(getObject(arg0));
-      return addHeapObject(ret);
+    __wbg_push_811c8b08bf4ff9d5: function (arg0, arg1) {
+      const ret = getObject(arg0).push(getObject(arg1));
+      return ret;
     },
     __wbindgen_throw: function (arg0, arg1) {
       throw new Error(getStringFromWasm0(arg0, arg1));
-    },
-    __wbindgen_memory: function () {
-      const ret = wasm.memory;
-      return addHeapObject(ret);
     },
   },
 };
@@ -260,7 +246,7 @@ let lastLoadPromise;
  * @param {decompressCallback=} transform
  * @returns {Promise<{
  *   instance: WebAssembly.Instance;
- *   exports: { blake2_128: typeof blake2_128; blake2_256: typeof blake2_256; blake2_128Concat: typeof blake2_128Concat; twox128: typeof twox128; twox256: typeof twox256; twox64Concat: typeof twox64Concat }
+ *   exports: { decode: typeof decode; encode: typeof encode }
  * }>}
  */
 export function instantiateWithInstance(transform) {
@@ -288,14 +274,7 @@ export function instantiateWithInstance(transform) {
 }
 
 function getWasmInstanceExports() {
-  return {
-    blake2_128,
-    blake2_256,
-    blake2_128Concat,
-    twox128,
-    twox256,
-    twox64Concat,
-  };
+  return { decode, encode };
 }
 
 /** Gets if the Wasm module has been instantiated. */
