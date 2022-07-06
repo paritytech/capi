@@ -12,7 +12,7 @@ async function build(
       "deno",
       "task",
       "run",
-      "https://deno.land/x/wasmbuild@0.8.2/main.ts",
+      "https://deno.land/x/wasmbuild@0.8.3/main.ts",
       "--js-ext",
       "mjs",
       "--out",

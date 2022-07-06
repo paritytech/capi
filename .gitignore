@@ -3,5 +3,3 @@
 _star.ts
 benches.json
 target
-examples/generated
-bindings/**/snippets

@@ -10,10 +10,10 @@
   ],
   "dictionaries": ["project-words"],
   "ignorePaths": [
-    "bindings/*/*.generated.mjs",
+    "**/mod.generated.mjs",
+    "**/mod_bg.wasm",
     "Cargo.lock",
     "deno.lock",
-    "examples/node-template",
     "target"
   ]
 }
