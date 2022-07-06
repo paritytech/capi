@@ -1,5 +1,5 @@
 import { unimplemented } from "../_deps/asserts.ts";
-import { Ss58 } from "../bindings/mod.ts";
+import { Ss58 } from "../ss58/mod.ts";
 import * as U from "../util/mod.ts";
 import { Addresses } from "./Addresses.ts";
 import { NodeBase } from "./common.ts";

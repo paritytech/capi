@@ -1,22 +1,24 @@
-import { assert, fail } from "../_deps/asserts.ts";
+import { assert } from "../_deps/asserts.ts";
 import { compress } from "../_deps/lz4.ts";
 import * as path from "../_deps/path.ts";
 
-await ["hashers", "sr25519", "ss58"].reduce(async (acc, cur) => {
-  await acc;
-  const destDir = path.join("bindings", cur);
+async function build(
+  featureName: string,
+  destDir?: string,
+) {
+  destDir = destDir || featureName;
   const buildProcess = Deno.run({
     cmd: [
       "deno",
       "task",
       "run",
-      "https://deno.land/x/wasmbuild@0.8.2/main.ts",
+      "https://deno.land/x/wasmbuild@0.8.3/main.ts",
       "--js-ext",
       "mjs",
       "--out",
       destDir,
       "--features",
-      cur,
+      featureName,
     ],
   });
   const status = await buildProcess.status();
@@ -25,4 +27,13 @@ await ["hashers", "sr25519", "ss58"].reduce(async (acc, cur) => {
   const wasmBytes = await Deno.readFile(wasmPath);
   const wasmCompressed = compress(wasmBytes);
   Deno.writeFile(wasmPath, wasmCompressed);
+}
+
+await ([
+  ["hashers"],
+  ["sr25519", "test-util/sr25519"],
+  ["ss58"],
+] as const).reduce(async (acc, [featureName, destDir]) => {
+  await acc;
+  await build(featureName, destDir);
 }, Promise.resolve());

@@ -1,5 +1,5 @@
 import { assertEquals } from "../_deps/asserts.ts";
-import { Hashers } from "../bindings/mod.ts";
+import { Hashers } from "../hashers/mod.ts";
 import { testPairs } from "../known/mod.ts";
 import * as U from "../util/mod.ts";
 import { DeriveCodec } from "./Codec.ts";

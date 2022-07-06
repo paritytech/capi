@@ -1,6 +1,6 @@
 // TODO: brands
 // TODO: narrow error typings
-import { decompress } from "../../_deps/lz4.ts";
+import { decompress } from "../_deps/lz4.ts";
 import { instantiate } from "./mod.generated.mjs";
 
 // TODO: `encodeBuf` and `decodeBuf`, if useful.

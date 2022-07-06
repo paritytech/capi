@@ -1,6 +1,6 @@
-import { Hashers } from "../bindings/mod.ts";
 import * as core from "../core/mod.ts";
 import * as M from "../frame_metadata/mod.ts";
+import { Hashers } from "../hashers/mod.ts";
 import * as U from "../util/mod.ts";
 import { globalContext } from "./Context.ts";
 
