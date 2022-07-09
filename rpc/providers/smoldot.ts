@@ -1,14 +1,13 @@
 import type * as smoldot from "../../_deps/smoldot.ts";
-import { Beacon } from "../../Beacon.ts";
+import { Config } from "../../Config.ts";
 import { AnyMethods, ErrorCtor } from "../../util/mod.ts";
 import * as B from "../Base.ts";
 import { IngressMessage, InitMessage } from "../messages.ts";
 
-export class SmoldotBeacon<M extends AnyMethods> extends Beacon<string, M> {}
 export type SmoldotClientHooks<M extends AnyMethods> = B.ClientHooks<M, SmoldotInternalError>;
 
 export async function smoldotClient<M extends AnyMethods>(
-  beacon: SmoldotBeacon<M>,
+  config: Config<string, M>,
   hooks?: SmoldotClientHooks<M>,
 ): Promise<SmoldotClient<M> | FailedToStartSmoldotError | FailedToAddChainError> {
   const smoldotInstance = await ensureInstance();
@@ -19,7 +18,7 @@ export async function smoldotClient<M extends AnyMethods>(
   try {
     // TODO: wire up `onError`
     const chain = await smoldotInstance.addChain({
-      chainSpec: beacon.discoveryValue,
+      chainSpec: config.discoveryValue,
       jsonRpcCallback: (response) => {
         onMessageContainer.onMessage?.(response);
       },

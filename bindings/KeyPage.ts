@@ -13,7 +13,7 @@ export class KeyPage<E extends Entry = Entry> extends NodeBase<"KeyPage"> {
     readonly count: number,
     ...start: unknown[]
   ) {
-    super("KeyPage");
+    super();
     this.chain = entry.chain;
     this.start = start;
   }

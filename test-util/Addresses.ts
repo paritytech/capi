@@ -1,4 +1,4 @@
-import { Addresses } from "../core/Addresses.ts";
+import { Addresses } from "../bindings/Addresses.ts";
 import { TestAddress } from "./Address.ts";
 import { TestChain } from "./Chain.ts";
 

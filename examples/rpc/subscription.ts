@@ -1,8 +1,8 @@
 import { assert } from "../../_deps/asserts.ts";
-import { polkadotBeacon } from "../../known/mod.ts";
+import { polkadot } from "../../known/mod.ts";
 import * as rpc from "../../rpc/mod.ts";
 
-const client = await rpc.proxyClient(polkadotBeacon);
+const client = await rpc.proxyClient(polkadot);
 assert(!(client instanceof Error));
 
 let i = 1;

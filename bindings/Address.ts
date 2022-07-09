@@ -33,7 +33,7 @@ export class Address<
     readonly addresses: A,
     readonly source: AddressRawBySourceKind[SourceKind],
   ) {
-    super("Address");
+    super();
     this.chain = addresses.chain;
   }
 

@@ -5,7 +5,7 @@ import { NodeBase } from "./common.ts";
 
 export class Metadata<C extends Chain = Chain> extends NodeBase<"Metadata"> {
   constructor(readonly chain: C) {
-    super("Metadata");
+    super();
   }
 
   read(block?: Block<C>): Promise<unknown> {

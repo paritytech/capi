@@ -1,17 +1,19 @@
-import { unreachable } from "../../_deps/asserts.ts";
-import { AnyMethods } from "../../util/mod.ts";
-import { ProxyBeacon, ProxyClient, proxyClient } from "./proxy.ts";
-import { SmoldotBeacon, SmoldotClient, smoldotClient } from "./smoldot.ts";
+import { unimplemented } from "../../_deps/asserts.ts";
+import { Config } from "../../Config.ts";
+import { AnyMethods, isWsUrl } from "../../util/mod.ts";
+import { ProxyClient, proxyClient } from "./proxy.ts";
+import { SmoldotClient, smoldotClient } from "./smoldot.ts";
 
-export type StdBeacon<M extends AnyMethods> = ProxyBeacon<M> | SmoldotBeacon<M>;
 export type StdClient<M extends AnyMethods> = ProxyClient<M> | SmoldotClient<M>;
 
-export function detectClient<M extends AnyMethods>(beacon: ProxyBeacon<M> | SmoldotBeacon<M>) {
-  if (beacon instanceof ProxyBeacon) {
-    return proxyClient(beacon);
-  } else if (beacon instanceof SmoldotBeacon) {
-    return smoldotClient(beacon);
-  } else {
-    unreachable();
+// TODO: get rid of / supply as `V` in effect run
+export function detectClient<M extends AnyMethods>(config: Config<string, M>) {
+  if (typeof config === "string") {
+    if (isWsUrl(config)) {
+      return proxyClient<M>(config);
+    } else {
+      return smoldotClient<M>(config);
+    }
   }
+  unimplemented();
 }

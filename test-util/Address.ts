@@ -1,4 +1,4 @@
-import { Address } from "../core/Address.ts";
+import { Address } from "../bindings/Address.ts";
 import { testPairs } from "../known/mod.ts";
 import { TestAddresses } from "./Addresses.ts";
 

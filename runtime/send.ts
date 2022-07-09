@@ -1,5 +1,5 @@
 import { unimplemented } from "../_deps/asserts.ts";
-import * as core from "../core/mod.ts";
+import * as core from "../bindings/mod.ts";
 
 export type SendTarget = core.Signed | core.Call;
 

@@ -1,17 +1,16 @@
 import { deadline, deferred } from "../../_deps/async.ts";
-import { Beacon } from "../../Beacon.ts";
+import { Config } from "../../Config.ts";
 import { AnyMethods, ErrorCtor } from "../../util/mod.ts";
 import * as B from "../Base.ts";
 import * as msg from "../messages.ts";
 
-export class ProxyBeacon<M extends AnyMethods> extends Beacon<string, M> {}
 export type ProxyClientHooks<M extends AnyMethods> = B.ClientHooks<M, WebSocketInternalError>;
 
 export async function proxyClient<M extends AnyMethods>(
-  beacon: ProxyBeacon<M>,
+  config: Config<string, M>,
   hooks?: ProxyClientHooks<M>,
 ): Promise<ProxyClient<M> | FailedToOpenConnectionError> {
-  const ws = new WebSocket(beacon.discoveryValue);
+  const ws = new WebSocket(config.discoveryValue);
   const client = new ProxyClient(ws, hooks);
   ws.addEventListener("error", client.onError);
   ws.addEventListener("message", client.onMessage);
