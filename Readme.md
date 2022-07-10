@@ -88,7 +88,7 @@ During development, connecting to a live network can slow down the feedback loop
 ```diff
 + const node = await C.test.node();
 +
-- const chain = C.chain(myBeacon);
+- const chain = C.chain(myConfig);
 + const chain = C.test.chain(node);
 
 //
