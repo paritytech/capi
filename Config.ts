@@ -3,7 +3,7 @@ import { AnyMethods } from "./util/mod.ts";
 export class Config<
   D = any,
   M extends AnyMethods = AnyMethods,
-  F extends AnyMeta = AnyMeta,
+  F extends Meta = Meta,
 > {
   declare rpc: M;
   declare frame: F;
@@ -12,7 +12,7 @@ export class Config<
 }
 
 export namespace Config {
-  export type F_<B extends Config> = B extends Config<any, AnyMethods, infer F extends AnyMeta> ? F
+  export type F_<B extends Config> = B extends Config<any, AnyMethods, infer F extends Meta> ? F
     : never;
 
   export type Pallets<B extends Config> = F_<B>["pallets"];
@@ -40,7 +40,7 @@ export namespace Config {
 
 export function config<
   M extends AnyMethods,
-  F extends AnyMeta,
+  F extends Meta,
 >() {
   return <D>(discoveryValue: D) => {
     return class extends Config<D, M, F> {
@@ -53,9 +53,8 @@ export function config<
 
 //
 
-export type Meta<T extends AnyMeta> = T;
-
-export interface AnyMeta {
+export type Meta<T extends Meta = AnyMeta> = T;
+interface AnyMeta {
   pallets: Record<string, PalletMeta>;
 }
 
