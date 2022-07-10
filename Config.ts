@@ -1,5 +1,6 @@
 import { AnyMethods } from "./util/mod.ts";
 
+/** We represent as a class, not a branded type, because we want to extend into a pretty signature. */
 export class Config<
   D = any,
   M extends AnyMethods = AnyMethods,
@@ -11,6 +12,7 @@ export class Config<
   constructor(readonly discoveryValue: D) {}
 }
 
+// TODO: simplify these extraction utils
 export namespace Config {
   export type F_<B extends Config> = B extends Config<any, AnyMethods, infer F extends Meta> ? F
     : never;
