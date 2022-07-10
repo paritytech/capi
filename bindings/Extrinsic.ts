@@ -2,7 +2,7 @@ import { Call } from "./Call.ts";
 import { NodeBase } from "./common.ts";
 import { Pallet } from "./Pallet.ts";
 
-// TODO: narrow extrinsic according to beacon
+// TODO: narrow extrinsic according to config
 export class Extrinsic<
   P extends Pallet = Pallet,
   Name extends string = string,
@@ -13,7 +13,7 @@ export class Extrinsic<
     readonly pallet: P,
     readonly name: Name,
   ) {
-    super("Extrinsic");
+    super();
     this.chain = pallet.chain;
   }
 

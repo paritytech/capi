@@ -54,54 +54,31 @@ Then import as follows.
 import * as C from "capi";
 ```
 
-## Beacons
+## Configs
 
 ### Introduction
 
-Before interacting with a given chain, we must have a means of finding nodes of that chain. We refer to this as a "beacon."
+Before interacting with a given chain, we must have a means of finding nodes of that chain (a config).
 
-A Polkadot-specific beacon is accessible from `capi/known`.
+A Polkadot-specific config is accessible from `capi/known`.
 
 ```ts
 // Deno
-import { polkadotBeacon } from "https://deno.land/x/capi/known/mod.ts";
+import { polkadot } from "https://deno.land/x/capi/known/mod.ts";
 // Node
-import { polkadotBeacon } from "capi/known";
+import { polkadot } from "capi/known";
 ```
 
-The beacon's type is encoded with all RPC server methods and FRAME metadata. This enables a narrowly-typed experience to flow through all usage of Capi.
+The static type of any config can describe accessible RPC server methods and FRAME metadata. This enables a narrowly-typed experience to flow through all usage of Capi.
 
 ```ts
-ProxyBeacon<PolkadotRpcMethods, PolkadotFrameMetadata>;
-```
-
-We can use the beacon value to instantiate a `Chain` (in this case, a binding to the Polkadot relay chain).
-
-```ts
-const polkadot = C.chain(polkadotBeacon);
+const polkadot = C.chain(polkadot);
 ```
 
 Better yet, let's import `polkadot` directly from `capi/known`.
 
 ```ts
 import { polkadot } from "capi/known";
-```
-
-### Custom
-
-If you wish to connect to an unknown chain, you must define its beacon. Let's create a beacon for a proxy WebSocket URL.
-
-```ts
-import { ProxyBeacon } from "capi/rpc";
-import { MyFrameMetadata } from "./generated.ts";
-
-interface Methods {
-  some_customRpcMethod(): string;
-}
-
-const myBeacon = new ProxyBeacon<Methods, MyFrameMetadata>("wss://...");
-
-const myChain = C.chain(myBeacon);
 ```
 
 ### Testing
@@ -111,7 +88,7 @@ During development, connecting to a live network can slow down the feedback loop
 ```diff
 + const node = await C.test.node();
 +
-- const chain = C.chain(myBeacon);
+- const chain = C.chain(myConfig);
 + const chain = C.test.chain(node);
 
 //

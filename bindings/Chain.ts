@@ -1,4 +1,4 @@
-import { Beacon } from "../Beacon.ts";
+import { Config } from "../Config.ts";
 import { HashHexString } from "../util/mod.ts";
 import { Addresses } from "./Addresses.ts";
 import { Block } from "./Block.ts";
@@ -7,11 +7,12 @@ import { Header } from "./Header.ts";
 import { Metadata } from "./Metadata.ts";
 import { Pallet } from "./Pallet.ts";
 
-export class Chain<
-  B extends Beacon = Beacon,
-> extends NodeBase<"Chain"> {
-  constructor(readonly beacon: B) {
-    super("Chain");
+export class Chain<B extends Config = Config> extends NodeBase<"Chain"> {
+  chain;
+
+  constructor(readonly config: B) {
+    super();
+    this.chain = this;
   }
 
   block(hash?: HashHexString): Block<this> {
@@ -32,6 +33,6 @@ export class Chain<
     return new Header(this);
   }
 }
-export const chain = <B extends Beacon>(beacon: B): Chain<B> => {
-  return new Chain(beacon);
+export const chain = <B extends Config>(config: B): Chain<B> => {
+  return new Chain(config);
 };

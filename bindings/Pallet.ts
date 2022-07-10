@@ -12,7 +12,7 @@ export class Pallet<
     readonly chain: C,
     readonly name: Name,
   ) {
-    super("Pallet");
+    super();
   }
 
   // TODO: constrain

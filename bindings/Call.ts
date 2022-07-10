@@ -20,7 +20,7 @@ export class Call<
     readonly extra?: Extra,
     readonly additional?: Additional,
   ) {
-    super("Call");
+    super();
     this.chain = extrinsic.chain;
   }
 

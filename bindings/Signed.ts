@@ -15,7 +15,7 @@ export class Signed<
     readonly from: From,
     readonly sign: (message: Uint8Array) => Promise<Uint8Array>,
   ) {
-    super("Signed");
+    super();
     this.chain = call.chain;
   }
 

@@ -4,11 +4,7 @@ import { NodeBase } from "./common.ts";
 
 export class Addresses<C extends Chain = Chain> extends NodeBase<"Addresses"> {
   constructor(readonly chain: C) {
-    super("Addresses");
-  }
-
-  signature(): string {
-    return "Addresses";
+    super();
   }
 
   // TODO: constrain `text` with brand

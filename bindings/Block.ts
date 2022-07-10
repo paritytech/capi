@@ -8,7 +8,7 @@ export class Block<C extends Chain = Chain> extends NodeBase<"Block"> {
     readonly chain: C,
     readonly hash?: HashHexString,
   ) {
-    super("Block");
+    super();
   }
 
   read(): Promise<unknown> {

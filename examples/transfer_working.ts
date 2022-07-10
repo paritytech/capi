@@ -1,13 +1,13 @@
 import { assert } from "../_deps/asserts.ts";
 import * as M from "../frame_metadata/mod.ts";
 import { Hashers } from "../hashers/mod.ts";
-import { westendBeacon } from "../known/mod.ts";
+import { westend } from "../known/mod.ts";
 import * as rpc from "../rpc/mod.ts";
 import { Sr25519 } from "../test-util/mod.ts";
 import * as U from "../util/mod.ts";
 
 const [client, sr25519, hashers] = await Promise.all([
-  rpc.proxyClient(westendBeacon),
+  rpc.proxyClient(westend),
   Sr25519(),
   Hashers(),
 ]);

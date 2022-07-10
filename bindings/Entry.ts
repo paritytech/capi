@@ -17,7 +17,7 @@ export class Entry<
     readonly name: Name,
     ...keys: Keys
   ) {
-    super("Entry");
+    super();
     this.chain = pallet.chain;
     this.keys = keys;
   }
