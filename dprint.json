@@ -7,7 +7,7 @@
     "arrowFunction.useParentheses": "force"
   },
   "includes": ["**.{dockerfile,json,md,toml,ts}"],
-  "excludes": ["target"],
+  "excludes": ["frame_metadata/raw_erc20_metadata.json", "target"],
   "plugins": [
     "https://plugins.dprint.dev/dockerfile-0.2.3.wasm",
     "https://plugins.dprint.dev/json-0.15.3.wasm",
