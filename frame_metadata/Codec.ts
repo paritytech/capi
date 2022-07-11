@@ -1,5 +1,5 @@
 import * as $ from "../_deps/scale.ts";
-import * as M from "./Metadata.ts";
+import type * as M from "./mod.ts";
 import { TyVisitors } from "./TyVisitor.ts";
 
 export type DeriveCodec = (typeI: number) => $.Codec<unknown>;
@@ -11,7 +11,7 @@ export type DeriveCodec = (typeI: number) => $.Codec<unknown>;
 export const $null = $.dummy(null);
 
 // TODO: tuple/array element skip optimization
-export function DeriveCodec(metadata: M.Metadata): DeriveCodec {
+export function DeriveCodec(tys: M.Ty[]): DeriveCodec {
   // TODO: don't leak memory!
   const cache: Record<number, $.Codec<unknown> | null> = {};
 
@@ -55,8 +55,8 @@ export function DeriveCodec(metadata: M.Metadata): DeriveCodec {
       const memberIByTag: Record<string, number> = {};
       const memberIByDiscriminant: Record<number, number> = {};
       const members = ty.members.map((member, i) => {
-        memberIByTag[member.name] = member.i;
-        memberIByDiscriminant[member.i] = i;
+        memberIByTag[member.name] = member.index;
+        memberIByDiscriminant[member.index] = i;
         const { fields, name: type } = member;
         if (fields.length === 0) {
           if (allEmpty) {
@@ -150,7 +150,7 @@ export function DeriveCodec(metadata: M.Metadata): DeriveCodec {
         return $.deferred(() => cache[i]!);
       }
       cache[i] = null; // circularity detection
-      const ty = metadata.tys[i]!;
+      const ty = tys[i]!;
       const $codec = (visitors[ty.type] as any)(ty);
       cache[i] = $codec;
       return $codec;

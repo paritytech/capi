@@ -15,7 +15,7 @@ assert(!(client instanceof Error));
 const metadataRes = await client.call("state_getMetadata", []);
 assert(metadataRes.result);
 const metadata = M.fromPrefixedHex(metadataRes.result);
-const deriveCodec = M.DeriveCodec(metadata);
+const deriveCodec = M.DeriveCodec(metadata.tys);
 
 const genesisHashRes = await client.call("chain_getBlockHash", []);
 assert(genesisHashRes.result);
