@@ -1,17 +1,17 @@
 import { assertEquals } from "../_deps/asserts.ts";
 import { testPairs } from "../known/mod.ts";
-import { DeriveCodec } from "./Codec.ts";
-import { ChainError } from "./Codec.ts";
+import { ChainError, DeriveCodec } from "./Codec.ts";
+import { normalize } from "./Contract.ts";
 import { Lookup } from "./Lookup.ts";
 import { Metadata } from "./test-common.ts";
 
 const metadata = await Metadata("polkadot");
 const lookup = new Lookup(metadata);
-const deriveCodec = DeriveCodec(metadata);
+const deriveCodec = DeriveCodec(metadata.tys);
 
 Deno.test("Derive all", () => {
   for (const ty of metadata.tys) {
-    deriveCodec(ty.i);
+    deriveCodec(ty.id);
   }
 });
 
@@ -68,13 +68,13 @@ Deno.test("Derive Auction Winning Storage Entry Codec", async () => {
 
 Deno.test("Westend circular", async () => {
   const metadata = await Metadata("westend");
-  const deriveCodec = DeriveCodec(metadata);
+  const deriveCodec = DeriveCodec(metadata.tys);
   deriveCodec(283);
 });
 
 Deno.test("Derive pallet_xcm::pallet::Error codec", async () => {
   const ty = metadata.tys.find((x) => x.path.join("::") === "pallet_xcm::pallet::Error")!;
-  const codec = deriveCodec(ty.i);
+  const codec = deriveCodec(ty.id);
   const encoded = codec.encode("Unreachable");
   assertEquals(encoded, new Uint8Array([0]));
   assertEquals(codec.decode(encoded), "Unreachable");
@@ -85,7 +85,7 @@ Deno.test("Derive Result codec", async () => {
     x.path[0] === "Result"
     && metadata.tys[x.params[1]!.ty!]!.path.join("::") === "sp_runtime::DispatchError"
   )!;
-  const codec = deriveCodec(ty.i);
+  const codec = deriveCodec(ty.id);
   const ok = null;
   const okEncoded = codec.encode(ok);
   assertEquals(okEncoded, new Uint8Array([0]));
@@ -94,4 +94,12 @@ Deno.test("Derive Result codec", async () => {
   const errEncoded = codec.encode(err);
   assertEquals(errEncoded, new Uint8Array([1, 0]));
   assertEquals(codec.decode(errEncoded), err);
+});
+
+Deno.test("Smart Contract codecs", async () => {
+  const raw = await Deno.readTextFile("frame_metadata/raw_erc20_metadata.json");
+  const normalized = normalize(JSON.parse(raw));
+  for (const ty of normalized.V3.types) {
+    deriveCodec(ty.id);
+  }
 });

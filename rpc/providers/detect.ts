@@ -8,8 +8,8 @@ export type StdClient<M extends AnyMethods> = ProxyClient<M> | SmoldotClient<M>;
 
 // TODO: get rid of / supply as `V` in effect run
 export function detectClient<M extends AnyMethods>(config: Config<string, M>) {
-  if (typeof config === "string") {
-    if (isWsUrl(config)) {
+  if (typeof config.discoveryValue === "string") {
+    if (isWsUrl(config.discoveryValue)) {
       return proxyClient<M>(config);
     } else {
       return smoldotClient<M>(config);

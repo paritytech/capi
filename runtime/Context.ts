@@ -60,7 +60,7 @@ export class ChainContext {
       const group: RuntimeGroup = {
         metadata,
         lookup: new M.Lookup(metadata),
-        deriveCodec: M.DeriveCodec(metadata),
+        deriveCodec: M.DeriveCodec(metadata.tys),
       };
       this.groups[blockHashEnsured] = group;
       return group;

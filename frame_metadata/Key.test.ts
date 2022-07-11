@@ -9,7 +9,7 @@ import { Metadata } from "./test-common.ts";
 
 const metadata = await Metadata("polkadot");
 const lookup = new Lookup(metadata);
-const deriveCodec = DeriveCodec(metadata);
+const deriveCodec = DeriveCodec(metadata.tys);
 const hashers = await Hashers();
 
 Deno.test("System Accounts Key", async () => {
