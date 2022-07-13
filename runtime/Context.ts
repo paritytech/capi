@@ -1,7 +1,7 @@
 import { Config } from "../Config.ts";
 import * as M from "../frame_metadata/mod.ts";
 import { KnownRpcMethods } from "../known/mod.ts";
-import { detectClient, ProxyClient, SmoldotClient } from "../rpc/mod.ts";
+import * as rpc from "../rpc/mod.ts";
 import * as U from "../util/mod.ts";
 
 export class GlobalContext {
@@ -12,7 +12,7 @@ export class GlobalContext {
     if (existingChain) {
       return existingChain;
     }
-    const rpcClient = await detectClient<KnownRpcMethods>(config);
+    const rpcClient = await rpc.fromConfig<KnownRpcMethods>(config);
     if (rpcClient instanceof Error) {
       return rpcClient;
     }
@@ -37,7 +37,7 @@ export class ChainContext {
   constructor(
     readonly globalContext: GlobalContext,
     readonly config: Config<any, KnownRpcMethods>,
-    readonly rpcClient: ProxyClient<KnownRpcMethods> | SmoldotClient<KnownRpcMethods>,
+    readonly rpcClient: rpc.StdClient<KnownRpcMethods>,
   ) {}
 
   load = async (blockHash?: U.HashHexString): Promise<RuntimeGroup> => {

@@ -1,13 +1,12 @@
 import type * as smoldot from "../../_deps/smoldot.ts";
-import { Config } from "../../Config.ts";
 import { AnyMethods, ErrorCtor } from "../../util/mod.ts";
 import * as B from "../Base.ts";
-import { IngressMessage, InitMessage } from "../messages.ts";
+import { ClientHooks, ParseRawIngressMessageError } from "./common.ts";
 
-export type SmoldotClientHooks<M extends AnyMethods> = B.ClientHooks<M, SmoldotInternalError>;
+export type SmoldotClientHooks<M extends AnyMethods> = ClientHooks<M, SmoldotInternalError>;
 
 export async function smoldotClient<M extends AnyMethods>(
-  config: Config<string, M>,
+  chainSpec: string,
   hooks?: SmoldotClientHooks<M>,
 ): Promise<SmoldotClient<M> | FailedToStartSmoldotError | FailedToAddChainError> {
   const smoldotInstance = await ensureInstance();
@@ -18,7 +17,7 @@ export async function smoldotClient<M extends AnyMethods>(
   try {
     // TODO: wire up `onError`
     const chain = await smoldotInstance.addChain({
-      chainSpec: config.discoveryValue,
+      chainSpec,
       jsonRpcCallback: (response) => {
         onMessageContainer.onMessage?.(response);
       },
@@ -30,52 +29,58 @@ export async function smoldotClient<M extends AnyMethods>(
 }
 
 export class SmoldotClient<M extends AnyMethods>
-  extends B.Client<M, SmoldotInternalError, string, unknown>
+  extends B.Client<M, SmoldotInternalError, string, unknown, FailedToRemoveChainError>
 {
   #chain?: smoldot.Chain;
 
   constructor(
     onMessageContainer: {
-      onMessage?: B.Client<M, SmoldotInternalError, string, unknown>["onMessage"];
+      onMessage?: B.Client<
+        M,
+        SmoldotInternalError,
+        string,
+        unknown,
+        FailedToRemoveChainError
+      >["onMessage"];
     },
     readonly remove: () => void,
     hooks?: SmoldotClientHooks<M>,
   ) {
-    super(hooks);
+    super(
+      {
+        parse: {
+          ingressMessage: (rawIngressMessage) => {
+            try {
+              return JSON.parse(rawIngressMessage);
+            } catch (_e) {
+              return new ParseRawIngressMessageError();
+            }
+          },
+          error: (_e) => {
+            return new SmoldotInternalError();
+          },
+        },
+        send: (egressMessage) => {
+          this.#chain?.sendJsonRpc(JSON.stringify(egressMessage));
+        },
+        close: async () => {
+          try {
+            this.remove();
+            return;
+          } catch (e) {
+            if (e instanceof Error) {
+              // TODO: handle the following in a special manner?
+              // - `AlreadyDestroyedError`
+              // - `CrashError`
+            }
+            return new FailedToRemoveChainError();
+          }
+        },
+      },
+      hooks,
+    );
     onMessageContainer.onMessage = this.onMessage;
   }
-
-  _send = (egressMessage: InitMessage<M>): void => {
-    this.#chain?.sendJsonRpc(JSON.stringify(egressMessage));
-  };
-
-  parseIngressMessage = (
-    rawIngressMessage: string,
-  ): IngressMessage<M> | B.ParseRawIngressMessageError => {
-    try {
-      return JSON.parse(rawIngressMessage);
-    } catch (_e) {
-      return new B.ParseRawIngressMessageError();
-    }
-  };
-
-  parseError = (_e: unknown): SmoldotInternalError => {
-    return new SmoldotInternalError();
-  };
-
-  _close = async (): Promise<undefined | FailedToRemoveChainError> => {
-    try {
-      this.remove();
-      return;
-    } catch (e) {
-      if (e instanceof Error) {
-        // TODO: handle the following in a special manner?
-        // - `AlreadyDestroyedError`
-        // - `CrashError`
-      }
-      return new FailedToRemoveChainError();
-    }
-  };
 }
 
 const _state: { smoldotInstance?: smoldot.Client } = {};
