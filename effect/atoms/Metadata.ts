@@ -4,6 +4,7 @@ import * as U from "../../util/mod.ts";
 import { atom } from "../sys/Atom.ts";
 import { Val } from "../sys/Effect.ts";
 
+export type metadata = typeof metadata;
 export function metadata<
   // Unfortunately, we need to `any`-ify to prevent contravariant incompatibility
   C extends Val<rpc.StdClient<any>>,
