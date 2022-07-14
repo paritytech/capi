@@ -8,4 +8,4 @@ const result = await run(metadata_);
 if (result instanceof Error) {
   throw result;
 }
-console.log(result);
+// console.log(result);

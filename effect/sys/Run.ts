@@ -2,6 +2,7 @@ import { AnyAtom, Atom } from "./Atom.ts";
 import { E_, T_ } from "./Effect.ts";
 
 export function Run<Atom extends AnyAtom>(transform: (root: Atom) => Atom) {
+  // TODO: set max size / use LRU
   const cache = new Map<string, unknown>();
 
   return async <Root extends Atom>(root: Root): Promise<T_<Root> | E_<Root>> => {
