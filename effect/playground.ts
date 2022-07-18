@@ -6,4 +6,5 @@ const node = await t.node();
 const config = t.config(node);
 const metadata_ = metadata(config);
 const result = await run(metadata_);
+node.close();
 console.log(result);

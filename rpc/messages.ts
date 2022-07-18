@@ -9,6 +9,8 @@ export type InitMessage<
   N extends keyof M = keyof M,
 > = InitMessageByMethodName<M>[N];
 
+export type Params<M extends ProviderMethods, N extends keyof M> = M[N][0];
+
 export type OkMessageByMethodName<M extends ProviderMethods> = {
   [N in keyof M]: OkMessageBase<M[N][1] extends Subscription ? string : M[N][1]>;
 };

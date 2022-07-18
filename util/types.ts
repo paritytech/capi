@@ -11,20 +11,4 @@ export type EnsureLookup<
   },
 > = Lookup;
 
-export type Flatten<T> = T extends (infer E)[] ? Flatten<E>[]
-  : T extends object ? { [K in keyof T]: Flatten<T[K]> }
-  : T;
-
-export type Narrow<T> =
-  | (T extends infer U ? U : never)
-  | Extract<
-    T,
-    number | string | boolean | bigint | symbol | null | undefined | []
-  >
-  | ([T] extends [[]] ? [] : { [K in keyof T]: Narrow<T[K]> });
-
-export type AnyFn = (...args: any[]) => any;
-export type AnyMethods = Record<string, (...args: any[]) => any>;
-
-// TODO: confirm this behavior is desirable where used
-export type AssertT<T, As> = [T] extends [As] ? T : never;
+export type AssertT<T, As> = T extends As ? T : never;
