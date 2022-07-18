@@ -1,9 +1,9 @@
-import { AnyMethods } from "./util/mod.ts";
+import { ProviderMethods } from "./rpc/mod.ts";
 
 /** We represent as a class, not a branded type, because we want to extend into a pretty signature. */
 export class Config<
   D = any,
-  M extends AnyMethods = AnyMethods,
+  M extends ProviderMethods = ProviderMethods,
   F extends Meta = Meta,
 > {
   declare rpc: M;
@@ -14,7 +14,8 @@ export class Config<
 
 // TODO: simplify these extraction utils
 export namespace Config {
-  export type F_<B extends Config> = B extends Config<any, AnyMethods, infer F extends Meta> ? F
+  export type F_<B extends Config> = B extends Config<any, ProviderMethods, infer F extends Meta>
+    ? F
     : never;
 
   export type Pallets<B extends Config> = F_<B>["pallets"];
@@ -36,14 +37,11 @@ export namespace Config {
   > = Entries<B, PalletName_>[EntryName_];
 
   export type D_<B extends Config> = B extends Config<infer D> ? D : never;
-  export type M_<B extends Config> = B extends Config<any, infer M extends AnyMethods> ? M
+  export type M_<B extends Config> = B extends Config<any, infer M extends ProviderMethods> ? M
     : never;
 }
 
-export function config<
-  M extends AnyMethods,
-  F extends Meta,
->() {
+export function config<M extends ProviderMethods, F extends Meta>() {
   return <D>(discoveryValue: D) => {
     return class extends Config<D, M, F> {
       constructor() {

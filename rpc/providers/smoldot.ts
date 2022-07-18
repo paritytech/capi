@@ -1,11 +1,11 @@
 import type * as smoldot from "../../_deps/smoldot.ts";
-import { AnyMethods, ErrorCtor } from "../../util/mod.ts";
+import { ErrorCtor } from "../../util/mod.ts";
 import * as B from "../Base.ts";
-import { ClientHooks, ParseRawIngressMessageError } from "./common.ts";
+import { ClientHooks, ParseRawIngressMessageError, ProviderMethods } from "../common.ts";
 
-export type SmoldotClientHooks<M extends AnyMethods> = ClientHooks<M, SmoldotInternalError>;
+export type SmoldotClientHooks<M extends ProviderMethods> = ClientHooks<M, SmoldotInternalError>;
 
-export async function smoldotClient<M extends AnyMethods>(
+export async function smoldotClient<M extends ProviderMethods>(
   chainSpec: string,
   hooks?: SmoldotClientHooks<M>,
 ): Promise<SmoldotClient<M> | FailedToStartSmoldotError | FailedToAddChainError> {
@@ -28,7 +28,7 @@ export async function smoldotClient<M extends AnyMethods>(
   }
 }
 
-export class SmoldotClient<M extends AnyMethods>
+export class SmoldotClient<M extends ProviderMethods>
   extends B.Client<M, SmoldotInternalError, string, unknown, FailedToRemoveChainError>
 {
   #chain?: smoldot.Chain;

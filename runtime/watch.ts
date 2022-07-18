@@ -10,7 +10,7 @@ export type WatchTarget = core.Entry | core.KeyPage | core.Metadata | core.Heade
 
 export async function watch<Target extends WatchTarget>(
   target: Target,
-  listener: (notification: rpc.NotifMessage<U.AnyMethods>) => void,
+  listener: (notification: rpc.NotifMessage<rpc.ProviderMethods>) => void,
 ): Promise<(() => void) | Error> {
   const chain = await globalContext.register(target.chain.config as any);
   if (chain instanceof Error) {
@@ -35,7 +35,7 @@ export async function watch<Target extends WatchTarget>(
     const key = $key.encode(target.keys.length === 1 ? target.keys[0]! : target.keys);
     const keyEncoded = U.hex.encode(key) as U.HexString;
     const $value = group.deriveCodec(storageEntry.value);
-    const outerListener = (message: rpc.NotifMessage<U.AnyMethods>) => {
+    const outerListener = (message: rpc.NotifMessage<rpc.ProviderMethods>) => {
       const { result } = message.params;
       const changes = (result as any).changes;
       const changesDecoded = changes.map(([key, value]: [any, any]) => {

@@ -1,8 +1,16 @@
-import { AnyMethods, ErrorCtor } from "../../util/mod.ts";
-import * as msg from "../messages.ts";
+import { ErrorCtor } from "../util/mod.ts";
+import * as msg from "./messages.ts";
+
+export type ProviderMethods = Record<string, ProviderMethod<any[], any>>;
+export type ProviderMethod<
+  Params extends unknown[],
+  Result extends unknown,
+> = [params: Params, result: Result];
+declare const subscription_: unique symbol;
+export type Subscription<Notification = any> = { [subscription_]: Notification };
 
 export interface Provider<
-  M extends AnyMethods,
+  M extends ProviderMethods,
   ParsedError extends Error,
   RawIngressMessage,
   RawError,
@@ -42,7 +50,7 @@ export interface Provider<
 }
 
 export interface ClientHooks<
-  M extends AnyMethods,
+  M extends ProviderMethods,
   ParsedError extends Error,
 > {
   send?: (message: msg.InitMessage<M>) => void;

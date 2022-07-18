@@ -1,33 +1,31 @@
-import { AnyMethods, EnsureLookup } from "../util/mod.ts";
-import { SubscriptionIdString } from "../util/mod.ts";
-import { SubscriptionBrand } from "./Base.ts";
+import * as U from "../util/mod.ts";
+import { ProviderMethods, Subscription } from "./common.ts";
 
-export type InitMessageByMethodName<M extends AnyMethods> = {
-  [N in keyof M]: InitMessageBase<M, N, Parameters<M[N]>>;
+export type InitMessageByMethodName<M extends ProviderMethods> = {
+  [N in keyof M]: InitMessageBase<U.AssertT<N, string>, M[N][0]>;
 };
 export type InitMessage<
-  M extends AnyMethods,
+  M extends ProviderMethods,
   N extends keyof M = keyof M,
 > = InitMessageByMethodName<M>[N];
 
-export type OkMessageByMethodName<M extends AnyMethods> = {
-  [N in keyof M]: OkResBase<ReturnType<M[N]> extends SubscriptionBrand ? string : ReturnType<M[N]>>;
+export type OkMessageByMethodName<M extends ProviderMethods> = {
+  [N in keyof M]: OkMessageBase<M[N][1] extends Subscription ? string : M[N][1]>;
 };
 export type OkMessage<
-  M extends AnyMethods,
+  M extends ProviderMethods,
   N extends keyof M = keyof M,
 > = OkMessageByMethodName<M>[N];
 
-export type NotifByMethodName<M extends AnyMethods> = {
-  [N in keyof M as ReturnType<M[N]> extends SubscriptionBrand ? N : never]: NotifMessageBase<
-    M,
-    N,
-    ReturnType<M[N]> extends SubscriptionBrand<infer R> ? R : never
+export type NotifByMethodName<M extends ProviderMethods> = {
+  [N in keyof M as M[N][1] extends Subscription ? N : never]: NotifMessageBase<
+    U.AssertT<N, string>,
+    M[N][1] extends Subscription<infer R> ? R : never
   >;
 };
-export type SubscriptionMethodName<M extends AnyMethods> = keyof NotifByMethodName<M>;
+export type SubscriptionMethodName<M extends ProviderMethods> = keyof NotifByMethodName<M>;
 export type NotifMessage<
-  M extends AnyMethods,
+  M extends ProviderMethods,
   N extends SubscriptionMethodName<M> = SubscriptionMethodName<M>,
 > = NotifByMethodName<M>[N];
 
@@ -39,14 +37,14 @@ export type ErrMessageByName = {
 export type ErrMessage<N extends ErrName = ErrName> = ErrMessageByName[N];
 
 export type IngressMessage<
-  M extends AnyMethods,
+  M extends ProviderMethods,
   N extends keyof M = keyof M,
 > =
   | OkMessage<M, N>
   | ErrMessage
   | (N extends SubscriptionMethodName<M> ? NotifMessage<M, N> : never);
 
-type ErrDetailLookup = EnsureLookup<string, [code: number, data?: any], {
+type ErrDetailLookup = U.EnsureLookup<string, [code: number, data?: any], {
   /**
    * Invalid JSON was received by the server.
    */
@@ -85,32 +83,26 @@ interface JsonRpcVersionBearer {
   jsonrpc: "2.0";
 }
 
-export interface InitMessageBase<
-  M extends AnyMethods,
-  Method extends keyof M,
-  Params extends unknown[],
-> extends JsonRpcVersionBearer {
+export interface InitMessageBase<Method extends string, Params extends unknown[]>
+  extends JsonRpcVersionBearer
+{
   method: Method;
   id: string;
   params: Params;
 }
 
-export interface OkResBase<Result> extends JsonRpcVersionBearer {
+export interface OkMessageBase<Result> extends JsonRpcVersionBearer {
   id: string;
   result: Result;
   params?: never;
   error?: never;
 }
 
-export interface NotifMessageBase<
-  M extends AnyMethods,
-  Method extends keyof M,
-  Result,
-> extends JsonRpcVersionBearer {
+export interface NotifMessageBase<Method extends string, Result> extends JsonRpcVersionBearer {
   method: Method;
   id?: never;
   params: {
-    subscription: SubscriptionIdString;
+    subscription: U.SubscriptionIdString;
     result: Result;
   };
   result?: never;
