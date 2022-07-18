@@ -18,8 +18,14 @@ export async function watch<Target extends WatchTarget>(
   }
   const group = await chain.load();
   if (target instanceof core.Entry) {
-    const pallet = group.lookup.getPalletByName(target.pallet.name);
-    const storageEntry = group.lookup.getStorageEntryByPalletAndName(pallet, target.name);
+    const pallet = M.getPallet(group.metadata, target.pallet.name);
+    if (pallet instanceof Error) {
+      return pallet;
+    }
+    const storageEntry = M.getEntry(pallet, target.name);
+    if (storageEntry instanceof Error) {
+      return storageEntry;
+    }
     const $key = M.$storageKey({
       deriveCodec: group.deriveCodec,
       hashers: await Hashers(),

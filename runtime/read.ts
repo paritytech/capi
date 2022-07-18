@@ -16,8 +16,14 @@ export async function read<Target extends ReadTarget = ReadTarget>(
   }
   const group = await chain.load(block?.hash);
   if (target instanceof core.Entry) {
-    const pallet = group.lookup.getPalletByName(target.pallet.name);
-    const storageEntry = group.lookup.getStorageEntryByPalletAndName(pallet, target.name);
+    const pallet = M.getPallet(group.metadata, target.pallet.name);
+    if (pallet instanceof Error) {
+      return pallet;
+    }
+    const storageEntry = M.getEntry(pallet, target.name);
+    if (storageEntry instanceof Error) {
+      return storageEntry;
+    }
     const $key = M.$storageKey({
       deriveCodec: group.deriveCodec,
       hashers: await Hashers(),
@@ -46,8 +52,14 @@ export async function read<Target extends ReadTarget = ReadTarget>(
     }
     throw new Error();
   } else if (target instanceof core.KeyPage) {
-    const pallet = group.lookup.getPalletByName(target.entry.pallet.name);
-    const storageEntry = group.lookup.getStorageEntryByPalletAndName(pallet, target.entry.name);
+    const pallet = M.getPallet(group.metadata, target.entry.pallet.name);
+    if (pallet instanceof Error) {
+      return pallet;
+    }
+    const storageEntry = M.getEntry(pallet, target.entry.name);
+    if (storageEntry instanceof Error) {
+      return storageEntry;
+    }
     const $key = M.$storageKey({
       deriveCodec: group.deriveCodec,
       hashers: await Hashers(),

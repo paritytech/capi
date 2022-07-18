@@ -48,4 +48,4 @@ export const two = new Pair(
   "711baefcb129e031885532a8f1e634bbd28f4c60490a7dd29636567472af513d",
 );
 
-export const testPairs = { alice, bob, charlie, dave, eve, ferdie, one, two };
+export const pairs = { alice, bob, charlie, dave, eve, ferdie, one, two };

@@ -1,18 +1,18 @@
 import { Address } from "../bindings/Address.ts";
-import { testPairs } from "../known/mod.ts";
 import { TestAddresses } from "./Addresses.ts";
+import { pairs } from "./pairs.ts";
 
 export class TestAddress<A extends TestAddresses = TestAddresses>
   extends Address<A, "PublicKeyText">
 {
   constructor(
     addresses: A,
-    name: keyof typeof testPairs,
+    name: keyof typeof pairs,
   ) {
     // TODO:
     super(addresses, {
       type: "PublicKeyText",
-      raw: testPairs[name]["publicText"],
+      raw: pairs[name]["publicText"],
     });
   }
 

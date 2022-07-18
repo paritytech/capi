@@ -14,5 +14,6 @@ export type T_<U> = U extends AnyEffect<infer T> ? T : U;
 export type E_<U> = U extends Effect<string, any, infer E> ? E : never;
 
 export type Val<T> = T | AnyEffect<T>;
+export type ValCollection<U> = { [K in keyof U]: Val<U[K]> };
 
 export type Resolved<C extends unknown[]> = { [I in keyof C]: T_<C[I]> };

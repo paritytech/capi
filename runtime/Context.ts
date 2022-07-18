@@ -26,7 +26,6 @@ export const globalContext = new GlobalContext();
 
 export interface RuntimeGroup {
   metadata: M.Metadata;
-  lookup: M.Lookup;
   deriveCodec: M.DeriveCodec;
 }
 
@@ -59,7 +58,6 @@ export class ChainContext {
       const metadata = M.fromPrefixedHex(raw.result);
       const group: RuntimeGroup = {
         metadata,
-        lookup: new M.Lookup(metadata),
         deriveCodec: M.DeriveCodec(metadata.tys),
       };
       this.groups[blockHashEnsured] = group;

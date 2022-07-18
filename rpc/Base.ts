@@ -94,7 +94,7 @@ export abstract class Client<
    */
   call = async <Method extends keyof M>(
     method: Method,
-    params: msg.InitMessageByMethodName<M>[Method]["params"],
+    params: msg.InitMessage<M, Method>["params"],
   ): Promise<msg.OkMessage<M, Method> | msg.ErrMessage> => {
     const init = <msg.InitMessage<M, Method>> {
       jsonrpc: "2.0",
