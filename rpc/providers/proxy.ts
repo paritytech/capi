@@ -1,11 +1,11 @@
 import { deadline, deferred } from "../../_deps/async.ts";
-import { AnyMethods, ErrorCtor } from "../../util/mod.ts";
+import { ErrorCtor } from "../../util/mod.ts";
 import * as B from "../Base.ts";
-import { ClientHooks, ParseRawIngressMessageError } from "./common.ts";
+import { ClientHooks, ParseRawIngressMessageError, ProviderMethods } from "../common.ts";
 
-export type ProxyClientHooks<M extends AnyMethods> = ClientHooks<M, WebSocketInternalError>;
+export type ProxyClientHooks<M extends ProviderMethods> = ClientHooks<M, WebSocketInternalError>;
 
-export async function proxyClient<M extends AnyMethods>(
+export async function proxyClient<M extends ProviderMethods>(
   proxyWsUrl: string,
   hooks?: ProxyClientHooks<M>,
 ): Promise<ProxyClient<M> | FailedToOpenConnectionError> {
@@ -36,7 +36,7 @@ export async function proxyClient<M extends AnyMethods>(
   return pending;
 }
 
-export class ProxyClient<M extends AnyMethods>
+export class ProxyClient<M extends ProviderMethods>
   extends B.Client<M, WebSocketInternalError, MessageEvent, Event, FailedToDisconnectError>
 {
   constructor(

@@ -1,9 +1,12 @@
-import { polkadot } from "../known/mod.ts";
 import * as C from "../mod.ts";
 
-const result = await C
-  .chain(polkadot)
+const node = await C.test.node();
+
+const result = await C.test
+  .chain(node)
   .block()
   .read();
+
+node.close();
 
 console.log({ result });

@@ -1,15 +1,14 @@
 import { deferred } from "../_deps/async.ts";
-import { AnyMethods } from "../util/mod.ts";
+import { ClientHooks, Provider, ProviderMethods } from "./common.ts";
 import * as msg from "./messages.ts";
-import { ClientHooks, Provider } from "./providers/common.ts";
 
-interface Subscription<M extends AnyMethods> {
+interface Subscription<M extends ProviderMethods> {
   listeners: Map<ListenerCb<msg.NotifMessage<M>>, true>;
   close: () => void;
 }
 
 export abstract class Client<
-  M extends AnyMethods,
+  M extends ProviderMethods,
   ParsedError extends Error,
   RawIngressMessage,
   RawError,
@@ -180,17 +179,12 @@ export abstract class Client<
   };
 }
 
-const _N: unique symbol = Symbol();
-// TODO: Swap with branded type
-// TODO: rename
-export type SubscriptionBrand<NotificationResult = any> = { [_N]: NotificationResult };
-
 export type ListenerCb<IngressMessage> = (ingressMessage: IngressMessage) => void;
 
 export type StopListening = () => void;
 
 export function IsCorrespondingRes<
-  M extends AnyMethods,
+  M extends ProviderMethods,
   Init_ extends msg.InitMessage<M>,
 >(init: Init_) {
   return <InQuestion extends msg.IngressMessage<M>>(

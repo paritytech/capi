@@ -25,3 +25,6 @@ export type Narrow<T> =
 
 export type AnyFn = (...args: any[]) => any;
 export type AnyMethods = Record<string, (...args: any[]) => any>;
+
+// TODO: confirm this behavior is desirable where used
+export type AssertT<T, As> = [T] extends [As] ? T : never;
