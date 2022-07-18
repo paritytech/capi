@@ -1,6 +1,7 @@
+import { Config } from "../../Config.ts";
 import * as M from "../../frame_metadata/mod.ts";
 import { Hashers } from "../../hashers/mod.ts";
-import * as rpc from "../../rpc/mod.ts";
+import { KnownRpcMethods } from "../../known/mod.ts";
 import * as U from "../../util/mod.ts";
 import { atom } from "../sys/Atom.ts";
 import { Val } from "../sys/Effect.ts";
@@ -9,20 +10,19 @@ import { metadata } from "./Metadata.ts";
 
 export type storageKey = typeof storageKey;
 export function storageKey<
-  // Unfortunately, we need to `any`-ify to prevent contravariant incompatibility
-  C extends Val<rpc.StdClient<any>>,
+  C extends Config<string, Pick<KnownRpcMethods, "state_getMetadata">>,
   PalletName extends Val<string>,
   EntryName extends Val<string>,
   Keys extends Val<unknown>[],
   BlockHashRest extends [blockHash?: Val<U.HashHexString>],
 >(
-  client: C,
+  config: C,
   palletName: PalletName,
   entryName: EntryName,
   keys: Keys,
   ...[blockHash]: BlockHashRest
 ) {
-  const metadata_ = metadata(client, blockHash);
+  const metadata_ = metadata(config, blockHash);
   const deriveCodec_ = deriveCodec(metadata_);
   return atom(
     "StorageKey",
