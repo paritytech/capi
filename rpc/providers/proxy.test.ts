@@ -8,7 +8,7 @@ Deno.test({
   name: "Proxy RPC Client",
   sanitizeResources: false,
   async fn(t) {
-    const client = await proxyClient(polkadot);
+    const client = await proxyClient<KnownRpcMethods>(polkadot.discoveryValue);
     assert(!(client instanceof Error));
 
     await t.step("call", async () => {

@@ -1,6 +1,7 @@
 import { deferred } from "../_deps/async.ts";
 import { AnyMethods } from "../util/mod.ts";
 import * as msg from "./messages.ts";
+import { ClientHooks, Provider } from "./providers/common.ts";
 
 interface Subscription<M extends AnyMethods> {
   listeners: Map<ListenerCb<msg.NotifMessage<M>>, true>;
@@ -12,6 +13,7 @@ export abstract class Client<
   ParsedError extends Error,
   RawIngressMessage,
   RawError,
+  CloseError extends Error,
 > {
   #nextId = 0;
   listeners = new Map<ListenerCb<msg.IngressMessage<M>>, true>();
@@ -22,7 +24,10 @@ export abstract class Client<
    *
    * @param hooks the error handling and message hooks with which you'd like the instance to operate
    */
-  constructor(readonly hooks?: ClientHooks<M, ParsedError>) {}
+  constructor(
+    readonly provider: Provider<M, ParsedError, RawIngressMessage, RawError, CloseError>,
+    readonly hooks?: ClientHooks<M, ParsedError>,
+  ) {}
 
   /**
    * Send a message to the RPC server
@@ -31,45 +36,12 @@ export abstract class Client<
    */
   send = (egressMessage: msg.InitMessage<M>): void => {
     this.hooks?.send?.(egressMessage);
-    this._send(egressMessage);
+    this.provider.send(egressMessage);
   };
-
-  /**
-   * The provider-specific send implementation
-   *
-   * @param egressMessage the message you wish to send to the RPC server
-   */
-  abstract _send: (egressMessage: msg.InitMessage<M>) => void;
-
-  /**
-   * Parse messages returned from the RPC server (this includes RPC server errors)
-   *
-   * @param rawIngressMessage the raw response from the given provider, likely in need of some sanitization
-   * @returns the sanitized ingress message, common to all providers
-   */
-  abstract parseIngressMessage: (
-    rawIngressMessage: RawIngressMessage,
-  ) => msg.IngressMessage<M> | ParseRawIngressMessageError;
-
-  /**
-   * Parse errors of the given client, such as an error `Event` in the case of `WebSocket`s
-   *
-   * @param rawError the raw error from the given provider
-   * @returns an instance of `RpcError`, typed via the client's sole generic type param
-   */
-  abstract parseError: (rawError: RawError) => ParsedError | ParseRawErrorError;
-
-  // TODO: introduce `FailedToClose` error in the return type (union with `undefined`)
-  /**
-   * Close the connection and free up resources
-   *
-   * @returns a promise, which resolved to `undefined` upon successful cancellation
-   */
-  abstract _close: () => Promise<undefined | CloseError>;
 
   close = (): Promise<undefined | CloseError> => {
     this.hooks?.close?.();
-    return this._close();
+    return this.provider.close();
   };
 
   /** @returns a new ID, unique to the client instance */
@@ -96,7 +68,7 @@ export abstract class Client<
   // TODO: do we want to parameterize `RpcClient` with a `RawMessage` type?
   /** @internal */
   onMessage = (message: RawIngressMessage) => {
-    const parsed = this.parseIngressMessage(message);
+    const parsed = this.provider.parse.ingressMessage(message);
     if (parsed instanceof Error) {
       this.hooks?.error?.(parsed);
     } else {
@@ -109,7 +81,7 @@ export abstract class Client<
 
   /** @internal */
   onError = (error: RawError): void => {
-    const parsedError = this.parseError(error);
+    const parsedError = this.provider.parse.error(error);
     this.hooks?.error?.(parsedError);
   };
 
@@ -122,7 +94,7 @@ export abstract class Client<
    */
   call = async <Method extends keyof M>(
     method: Method,
-    params: msg.InitMessageByMethodName<M>[Method]["params"],
+    params: msg.InitMessage<M, Method>["params"],
   ): Promise<msg.OkMessage<M, Method> | msg.ErrMessage> => {
     const init = <msg.InitMessage<M, Method>> {
       jsonrpc: "2.0",
@@ -143,14 +115,7 @@ export abstract class Client<
     return result;
   };
 
-  /**
-   * Initialize an RPC subscription
-   *
-   * @param method the method name of the subscription you wish to init
-   * @param params the params with which to init the subscription
-   * @param listenerCb the callback to which notifications should be supplied
-   * @returns a function with which to stop listening for notifications
-   */
+  /** @internal */
   #subscribeUnsafe = async <Method extends Extract<msg.SubscriptionMethodName<M>, keyof M>>(
     method: Method,
     params: msg.InitMessage<M, Method>["params"],
@@ -169,6 +134,14 @@ export abstract class Client<
     return stopListening;
   };
 
+  /**
+   * Initialize an RPC subscription
+   *
+   * @param method the method name of the subscription you wish to init
+   * @param params the params with which to init the subscription
+   * @param listenerCb the callback to which notifications should be supplied
+   * @returns a function with which to stop listening for notifications
+   */
   subscribe = async <Method extends Extract<msg.SubscriptionMethodName<M>, keyof M>>(
     method: Method,
     params: msg.InitMessage<M, Method>["params"],
@@ -211,23 +184,6 @@ const _N: unique symbol = Symbol();
 // TODO: Swap with branded type
 // TODO: rename
 export type SubscriptionBrand<NotificationResult = any> = { [_N]: NotificationResult };
-
-export interface ClientHooks<
-  M extends AnyMethods,
-  ParsedError extends Error,
-> {
-  send?: (message: msg.InitMessage<M>) => void;
-  receive?: (message: msg.IngressMessage<M>) => void;
-  error?: (error: ParsedError | ParseRawErrorError) => void;
-  close?: () => void;
-}
-
-export type AnyClient<M extends AnyMethods = AnyMethods, ParsedError extends Error = Error> =
-  Client<M, ParsedError, any, any>;
-
-export class ParseRawIngressMessageError extends Error {}
-export class ParseRawErrorError extends Error {}
-export class CloseError extends Error {}
 
 export type ListenerCb<IngressMessage> = (ingressMessage: IngressMessage) => void;
 

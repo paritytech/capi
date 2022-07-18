@@ -7,7 +7,7 @@ import { Sr25519 } from "../test-util/mod.ts";
 import * as U from "../util/mod.ts";
 
 const [client, sr25519, hashers] = await Promise.all([
-  rpc.proxyClient(westend),
+  rpc.fromConfig(westend),
   Sr25519(),
   Hashers(),
 ]);

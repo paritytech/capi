@@ -1,5 +1,4 @@
 import { unimplemented } from "../_deps/asserts.ts";
-import { DeriveCodec } from "./Codec.ts";
 import { Ty, TyDef } from "./scale_info.ts";
 
 export interface ContractMetadata<Ty_ = Ty> {

@@ -1,5 +1,5 @@
 import * as $ from "../_deps/scale.ts";
-import * as hex from "../util/hex.ts";
+import * as U from "../util/mod.ts";
 import { $ty, Ty } from "./scale_info.ts";
 
 export type HasherKind = $.Native<typeof $hasherKind>;
@@ -150,5 +150,31 @@ export const $metadata: $.Codec<Metadata> = $.object(
 );
 
 export function fromPrefixedHex(scaleEncoded: string): Metadata {
-  return $metadata.decode(hex.decode(scaleEncoded));
+  return $metadata.decode(U.hex.decode(scaleEncoded));
+}
+
+export function getPallet(metadata: Metadata, name: string): Pallet | PalletNotFoundError {
+  return metadata.pallets.find((pallet) => pallet.name === name) || new PalletNotFoundError();
+}
+export class PalletNotFoundError extends U.ErrorCtor("PalletNotFound") {}
+
+export function getEntry(pallet: Pallet, name: string): StorageEntry | EntryNotFoundError {
+  return pallet.storage?.entries.find((entry) => entry.name === name) || new EntryNotFoundError();
+}
+export class EntryNotFoundError extends U.ErrorCtor("EntryNotFound") {}
+
+export function getPalletAndEntry(
+  metadata: Metadata,
+  palletName: string,
+  entryName: string,
+): [Pallet, StorageEntry] | PalletNotFoundError | EntryNotFoundError {
+  const pallet = getPallet(metadata, palletName);
+  if (pallet instanceof Error) {
+    return pallet;
+  }
+  const entry = getEntry(pallet, entryName);
+  if (entry instanceof Error) {
+    return entry;
+  }
+  return [pallet, entry];
 }

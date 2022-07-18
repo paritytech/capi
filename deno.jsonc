@@ -15,6 +15,7 @@
     },
     "rules": {
       "exclude": [
+        "ban-ts-comment",
         "ban-types",
         "no-empty",
         "no-empty-interface",

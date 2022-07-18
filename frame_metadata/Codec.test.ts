@@ -1,12 +1,12 @@
 import { assertEquals } from "../_deps/asserts.ts";
-import { testPairs } from "../known/mod.ts";
+import * as t from "../test-util/mod.ts";
+import * as U from "../util/mod.ts";
 import { ChainError, DeriveCodec } from "./Codec.ts";
 import { normalize } from "./Contract.ts";
-import { Lookup } from "./Lookup.ts";
+import { getPalletAndEntry } from "./Metadata.ts";
 import { Metadata } from "./test-common.ts";
 
 const metadata = await Metadata("polkadot");
-const lookup = new Lookup(metadata);
 const deriveCodec = DeriveCodec(metadata.tys);
 
 Deno.test("Derive all", () => {
@@ -17,9 +17,9 @@ Deno.test("Derive all", () => {
 
 Deno.test("Derive AccountId32 Codec", async () => {
   const codec = deriveCodec(0);
-  const encoded = codec.encode(testPairs.alice.public);
-  assertEquals(encoded, testPairs.alice.public);
-  assertEquals(codec.decode(encoded), testPairs.alice.public);
+  const encoded = codec.encode(t.pairs.alice.public);
+  assertEquals(encoded, t.pairs.alice.public);
+  assertEquals(codec.decode(encoded), t.pairs.alice.public);
 });
 
 Deno.test("Derive AccountInfo Codec", async () => {
@@ -41,10 +41,9 @@ Deno.test("Derive AccountInfo Codec", async () => {
 });
 
 Deno.test("Derive Auctions AuctionInfo Storage Entry Codec", async () => {
-  const auctionInfoStorageEntry = lookup.getStorageEntryByPalletNameAndName(
-    "Auctions",
-    "AuctionInfo",
-  );
+  const auctionInfoStorageEntry = U.throwIfError(
+    getPalletAndEntry(metadata, "Auctions", "AuctionInfo"),
+  )[1];
   const codec = deriveCodec(auctionInfoStorageEntry.value);
   const decoded = [8, 9945400];
   const encoded = codec.encode(decoded);
@@ -52,14 +51,12 @@ Deno.test("Derive Auctions AuctionInfo Storage Entry Codec", async () => {
 });
 
 Deno.test("Derive Auction Winning Storage Entry Codec", async () => {
-  const auctionWinningStorageEntry = lookup.getStorageEntryByPalletNameAndName(
-    "Auctions",
-    "Winning",
-  );
+  const auctionWinningStorageEntry =
+    U.throwIfError(getPalletAndEntry(metadata, "Auctions", "Winning"))[1];
   const codec = deriveCodec(auctionWinningStorageEntry.value);
   const decoded = [
     ...Array(7).fill(undefined),
-    [testPairs.alice.public, 2013, 8672334557167609n],
+    [t.pairs.alice.public, 2013, 8672334557167609n],
     ...Array(28).fill(undefined),
   ];
   const encoded = codec.encode(decoded);
