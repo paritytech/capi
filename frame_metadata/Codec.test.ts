@@ -1,8 +1,9 @@
 import { assertEquals } from "../_deps/asserts.ts";
 import * as t from "../test-util/mod.ts";
+import * as U from "../util/mod.ts";
 import { ChainError, DeriveCodec } from "./Codec.ts";
 import { normalize } from "./Contract.ts";
-import { getEntryUnsafe } from "./Metadata.ts";
+import { getPalletAndEntry } from "./Metadata.ts";
 import { Metadata } from "./test-common.ts";
 
 const metadata = await Metadata("polkadot");
@@ -40,7 +41,9 @@ Deno.test("Derive AccountInfo Codec", async () => {
 });
 
 Deno.test("Derive Auctions AuctionInfo Storage Entry Codec", async () => {
-  const auctionInfoStorageEntry = getEntryUnsafe(metadata, "Auctions", "AuctionInfo");
+  const auctionInfoStorageEntry = U.throwIfError(
+    getPalletAndEntry(metadata, "Auctions", "AuctionInfo"),
+  )[1];
   const codec = deriveCodec(auctionInfoStorageEntry.value);
   const decoded = [8, 9945400];
   const encoded = codec.encode(decoded);
@@ -48,7 +51,8 @@ Deno.test("Derive Auctions AuctionInfo Storage Entry Codec", async () => {
 });
 
 Deno.test("Derive Auction Winning Storage Entry Codec", async () => {
-  const auctionWinningStorageEntry = getEntryUnsafe(metadata, "Auctions", "Winning");
+  const auctionWinningStorageEntry =
+    U.throwIfError(getPalletAndEntry(metadata, "Auctions", "Winning"))[1];
   const codec = deriveCodec(auctionWinningStorageEntry.value);
   const decoded = [
     ...Array(7).fill(undefined),

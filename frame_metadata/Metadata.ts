@@ -163,15 +163,18 @@ export function getEntry(pallet: Pallet, name: string): StorageEntry | EntryNotF
 }
 export class EntryNotFoundError extends U.ErrorCtor("EntryNotFound") {}
 
-// TODO: rename / move to internal test-specific utils
-export function getEntryUnsafe(
+export function getPalletAndEntry(
   metadata: Metadata,
   palletName: string,
   entryName: string,
-): StorageEntry {
+): [Pallet, StorageEntry] | PalletNotFoundError | EntryNotFoundError {
   const pallet = getPallet(metadata, palletName);
-  U.assertNotError(pallet);
+  if (pallet instanceof Error) {
+    return pallet;
+  }
   const entry = getEntry(pallet, entryName);
-  U.assertNotError(entry);
-  return entry;
+  if (entry instanceof Error) {
+    return entry;
+  }
+  return [pallet, entry];
 }
