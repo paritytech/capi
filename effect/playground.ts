@@ -7,4 +7,8 @@ const config = t.config(node);
 const read_ = read(config, "System", "Account", [t.pairs.alice.public]);
 const result = await run(read_);
 node.close();
-console.log(result);
+if (result instanceof Error) {
+  throw result;
+} else {
+  console.log(result.value);
+}

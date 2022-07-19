@@ -5,6 +5,7 @@ import { RpcCall } from "./RpcCall.ts";
 import { RpcClient } from "./RpcClient.ts";
 import { Select } from "./Select.ts";
 import { StorageKey } from "./StorageKey.ts";
+import { Wrap } from "./Wrap.ts";
 
 export type CapiAtom =
   | Metadata
@@ -15,7 +16,8 @@ export type CapiAtom =
   | StorageKey
   | RpcCall
   | Select
-  | Decoded;
+  | Decoded
+  | Wrap;
 
 export * from "./Decoded.ts";
 export * from "./DeriveCodec.ts";
@@ -24,3 +26,4 @@ export * from "./RpcCall.ts";
 export * from "./RpcClient.ts";
 export * from "./Select.ts";
 export * from "./StorageKey.ts";
+export * from "./Wrap.ts";

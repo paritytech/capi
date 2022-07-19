@@ -5,6 +5,7 @@ import { codec } from "../atoms/Codec.ts";
 import { decoded } from "../atoms/Decoded.ts";
 import { deriveCodec } from "../atoms/DeriveCodec.ts";
 import { entryMetadata, metadata, palletMetadata } from "../atoms/Metadata.ts";
+import * as a from "../atoms/mod.ts";
 import { rpcCall } from "../atoms/RpcCall.ts";
 import { select } from "../atoms/Select.ts";
 import { storageKey } from "../atoms/StorageKey.ts";
@@ -32,5 +33,5 @@ export function read<
   const entryValueTypeI = select(entryMetadata_, "value");
   const entryCodec = codec(deriveCodec_, entryValueTypeI);
   const resultHex = select(storageCall, "result");
-  return decoded(entryCodec, resultHex);
+  return decoded(entryCodec, resultHex, "value");
 }
