@@ -1,3 +1,4 @@
+import { Codec } from "./Codec.ts";
 import { Decoded } from "./Decoded.ts";
 import { DeriveCodec } from "./DeriveCodec.ts";
 import { EntryMetadata, Metadata, PalletMetadata } from "./Metadata.ts";
@@ -15,10 +16,12 @@ export type CapiAtom =
   | DeriveCodec
   | StorageKey
   | RpcCall
+  | Codec
   | Select
   | Decoded
   | Wrap;
 
+export * from "./Codec.ts";
 export * from "./Decoded.ts";
 export * from "./DeriveCodec.ts";
 export * from "./Metadata.ts";

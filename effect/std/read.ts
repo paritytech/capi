@@ -1,14 +1,7 @@
 import { Config } from "../../Config.ts";
 import { KnownRpcMethods } from "../../known/mod.ts";
 import * as U from "../../util/mod.ts";
-import { codec } from "../atoms/Codec.ts";
-import { decoded } from "../atoms/Decoded.ts";
-import { deriveCodec } from "../atoms/DeriveCodec.ts";
-import { entryMetadata, metadata, palletMetadata } from "../atoms/Metadata.ts";
 import * as a from "../atoms/mod.ts";
-import { rpcCall } from "../atoms/RpcCall.ts";
-import { select } from "../atoms/Select.ts";
-import { storageKey } from "../atoms/StorageKey.ts";
 import * as sys from "../sys/mod.ts";
 
 export function read<
@@ -24,14 +17,14 @@ export function read<
   keys: Keys,
   ...[blockHash]: BlockHashRest
 ) {
-  const metadata_ = metadata(config, blockHash);
-  const deriveCodec_ = deriveCodec(metadata_);
-  const palletMetadata_ = palletMetadata(metadata_, palletName);
-  const entryMetadata_ = entryMetadata(palletMetadata_, entryName);
-  const storageKey_ = storageKey(deriveCodec_, palletMetadata_, entryMetadata_, keys);
-  const storageCall = rpcCall(config, "state_getStorage", storageKey_, blockHash);
-  const entryValueTypeI = select(entryMetadata_, "value");
-  const entryCodec = codec(deriveCodec_, entryValueTypeI);
-  const resultHex = select(storageCall, "result");
-  return decoded(entryCodec, resultHex, "value");
+  const metadata_ = a.metadata(config, blockHash);
+  const deriveCodec_ = a.deriveCodec(metadata_);
+  const palletMetadata_ = a.palletMetadata(metadata_, palletName);
+  const entryMetadata_ = a.entryMetadata(palletMetadata_, entryName);
+  const storageKey_ = a.storageKey(deriveCodec_, palletMetadata_, entryMetadata_, keys);
+  const storageCall = a.rpcCall(config, "state_getStorage", storageKey_, blockHash);
+  const entryValueTypeI = a.select(entryMetadata_, "value");
+  const entryCodec = a.codec(deriveCodec_, entryValueTypeI);
+  const resultHex = a.select(storageCall, "result");
+  return a.decoded(entryCodec, resultHex, "value");
 }
