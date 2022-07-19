@@ -5,7 +5,7 @@ import { atom } from "../sys/Atom.ts";
 import { T_, Val, ValCollection } from "../sys/Effect.ts";
 import { rpcClient } from "./RpcClient.ts";
 
-export type rpcCall = typeof rpcCall;
+export type RpcCall = ReturnType<typeof rpcCall>;
 export function rpcCall<
   Methods extends rpc.ProviderMethods,
   MethodName extends Val<U.AssertT<keyof Methods, string>>,
@@ -18,8 +18,14 @@ export function rpcCall<
   return atom(
     "RpcCall",
     [rpcClient(config), methodName, ...params],
-    (client, methodName, ...params) => {
-      return client.call(methodName, params);
+    async (client, methodName, ...params) => {
+      const result = await client.call(methodName, params);
+      if (result.error) {
+        return new RpcError();
+      }
+      return result;
     },
   );
 }
+
+class RpcError extends U.ErrorCtor("Rpc") {}

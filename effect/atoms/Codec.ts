@@ -2,7 +2,7 @@ import * as M from "../../frame_metadata/mod.ts";
 import { atom } from "../sys/Atom.ts";
 import { Val } from "../sys/Effect.ts";
 
-export type codec = typeof codec;
+export type Codec = ReturnType<typeof codec>;
 export function codec<
   DeriveCodec extends Val<M.DeriveCodec>,
   TypeI extends Val<number>,
