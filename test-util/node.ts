@@ -7,7 +7,7 @@ export interface TestNodeConfig {
   altRuntime?: "kusama" | "rococo" | "westend";
 }
 
-export interface TestNode {
+export interface Node {
   config?: TestNodeConfig;
   inner: Deno.Process;
   close(): void;
@@ -15,7 +15,7 @@ export interface TestNode {
 }
 
 let port = 9944;
-export async function node(config?: TestNodeConfig): Promise<TestNode> {
+export async function node(config?: TestNodeConfig): Promise<Node> {
   while (!isPortAvailable(port)) {
     port++;
   }

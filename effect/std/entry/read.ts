@@ -1,10 +1,10 @@
-import { Config } from "../../Config.ts";
-import { KnownRpcMethods } from "../../known/mod.ts";
-import * as U from "../../util/mod.ts";
-import * as a from "../atoms/mod.ts";
-import * as sys from "../sys/mod.ts";
+import { Config } from "../../../Config.ts";
+import { KnownRpcMethods } from "../../../known/mod.ts";
+import * as U from "../../../util/mod.ts";
+import * as a from "../../atoms/mod.ts";
+import * as sys from "../../sys/mod.ts";
 
-export function read<
+export function readEntry<
   C extends Config<string, Pick<KnownRpcMethods, "state_getMetadata" | "state_getStorage">>,
   PalletName extends sys.Val<string>,
   EntryName extends sys.Val<string>,

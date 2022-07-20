@@ -9,16 +9,16 @@ export function storageKey<
   DeriveCodec extends Val<M.DeriveCodec>,
   PalletMetadata extends Val<M.Pallet>,
   EntryMetadata extends Val<M.StorageEntry>,
-  Keys extends Val<unknown>[],
+  KeysRest extends [keys?: Val<unknown>[] | undefined],
 >(
   deriveCodec: DeriveCodec,
   palletMetadata: PalletMetadata,
   entryMetadata: EntryMetadata,
-  keys: Keys,
+  ...[keys]: KeysRest
 ) {
   return atom(
     "StorageKey",
-    [deriveCodec, palletMetadata, entryMetadata, ...keys],
+    [deriveCodec, palletMetadata, entryMetadata, ...keys ? keys : []],
     async (deriveCodec, pallet, storageEntry, ...keys) => {
       const keyCodec = M.$storageKey({
         deriveCodec,
