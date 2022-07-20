@@ -39,10 +39,13 @@ export function Run<Atom extends AnyAtom>(transform: (root: Atom) => Atom) {
     if (val instanceof Atom) {
       return (async () => {
         const args: any[] = val.args;
-        const argsResolved = await Promise.all((args as any[]).map((arg) => {
+        const argsPending = Promise.all((args as any[]).map((arg) => {
           return visit(arg, dependents, cleanup);
         }));
-        const pending = val.impl(...argsResolved);
+        const pending = argsPending.then((argsResolved) => {
+          return val.impl(...argsResolved);
+        });
+        cache.set(k, pending);
         args.forEach((arg) => {
           if (arg instanceof Atom) {
             let e = dependents.get(arg as Atom);
