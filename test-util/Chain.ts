@@ -1,4 +1,4 @@
-import { Chain } from "../bindings/Chain.ts";
+import { Chain } from "../fluent/Chain.ts";
 import { TestAddresses } from "./Addresses.ts";
 import { config } from "./Config.ts";
 import { Node } from "./node.ts";

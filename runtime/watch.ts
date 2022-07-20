@@ -1,5 +1,5 @@
 import { unimplemented } from "../_deps/asserts.ts";
-import * as core from "../bindings/mod.ts";
+import * as core from "../fluent/mod.ts";
 import * as M from "../frame_metadata/mod.ts";
 import { Hashers } from "../hashers/mod.ts";
 import * as rpc from "../rpc/mod.ts";

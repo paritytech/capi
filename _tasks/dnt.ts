@@ -9,8 +9,8 @@ await fs.emptyDir(outDir);
 await Promise.all([
   build({
     entryPoints: ["mod.ts", {
-      name: "bindings",
-      path: "bindings/mod.ts",
+      name: "fluent",
+      path: "fluent/mod.ts",
     }, {
       name: "frame_metadata",
       path: "frame_metadata/mod.ts",
@@ -59,9 +59,9 @@ await Promise.all([
 ]);
 
 await Promise.all(["script", "esm"].map((kind) => {
-  return Promise.all(["hashers", "sr25519", "ss58"].map(async (feature) => {
-    const from = `./bindings/${feature}/mod_bg.wasm`;
-    const to = `target/npm/${kind}/bindings/${feature}/mod_bg.wasm`;
+  return Promise.all(["hashers", "test-util/sr25519", "ss58"].map(async (dir) => {
+    const from = `./${dir}/mod_bg.wasm`;
+    const to = `target/npm/${kind}/${dir}/mod_bg.wasm`;
     await fs.copy(from, to);
   }));
 }));
