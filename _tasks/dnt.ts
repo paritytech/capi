@@ -15,6 +15,9 @@ await Promise.all([
       name: "frame_metadata",
       path: "frame_metadata/mod.ts",
     }, {
+      name: "config",
+      path: "config/mod.ts",
+    }, {
       name: "known",
       path: "known/mod.ts",
     }, {
@@ -23,9 +26,9 @@ await Promise.all([
     }],
     outDir,
     mappings: {
-      "https://deno.land/x/scale@v0.2.1/mod.ts": {
+      "https://deno.land/x/scale@v0.3.0/mod.ts": {
         name: "parity-scale-codec",
-        version: "^0.2.1",
+        version: "^0.3.0",
       },
       "_deps/smoldot_phantom.ts": {
         name: "@substrate/smoldot-light",
@@ -46,7 +49,8 @@ await Promise.all([
       sourceMap: true,
       target: "ES2021",
     },
-    scriptModule: "cjs",
+    // TODO: re-enable as "cjs"
+    scriptModule: false,
     shims: {
       deno: true,
       webSocket: true,
@@ -58,7 +62,7 @@ await Promise.all([
   fs.copy("Readme.md", path.join(outDir, "Readme.md")),
 ]);
 
-await Promise.all(["script", "esm"].map((kind) => {
+await Promise.all([/* "script" */, "esm"].map((kind) => {
   return Promise.all(["hashers", "test-util/sr25519", "ss58"].map(async (dir) => {
     const from = `./${dir}/mod_bg.wasm`;
     const to = `target/npm/${kind}/${dir}/mod_bg.wasm`;

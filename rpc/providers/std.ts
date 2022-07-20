@@ -1,5 +1,5 @@
 import { unimplemented } from "../../_deps/asserts.ts";
-import { Config } from "../../Config.ts";
+import { Config } from "../../config/mod.ts";
 import { isWsUrl } from "../../util/mod.ts";
 import { ProviderMethods } from "../common.ts";
 import { FailedToOpenConnectionError, ProxyClient, proxyClient } from "./proxy.ts";

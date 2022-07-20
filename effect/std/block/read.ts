@@ -1,4 +1,4 @@
-import { Config } from "../../../Config.ts";
+import { Config } from "../../../config/mod.ts";
 import { KnownRpcMethods } from "../../../known/mod.ts";
 import * as U from "../../../util/mod.ts";
 import * as a from "../../atoms/mod.ts";

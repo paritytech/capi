@@ -1,4 +1,4 @@
-import { Config } from "../Config.ts";
+import { Config } from "../config/mod.ts";
 import { HashHexString } from "../util/mod.ts";
 import { Addresses } from "./Addresses.ts";
 import { Block } from "./Block.ts";

@@ -1,4 +1,4 @@
-import { ProviderMethods } from "./rpc/mod.ts";
+import { ProviderMethods } from "../rpc/mod.ts";
 
 /** We represent as a class, not a branded type, because we want to extend into a pretty signature. */
 export class Config<
@@ -54,7 +54,7 @@ export function config<M extends ProviderMethods, F extends Meta>() {
 //
 
 export type Meta<T extends Meta = AnyMeta> = T;
-interface AnyMeta {
+export interface AnyMeta {
   pallets: Record<string, PalletMeta>;
 }
 

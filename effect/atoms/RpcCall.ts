@@ -1,4 +1,4 @@
-import { Config } from "../../Config.ts";
+import { Config } from "../../config/mod.ts";
 import * as rpc from "../../rpc/mod.ts";
 import * as U from "../../util/mod.ts";
 import { atom } from "../sys/Atom.ts";
