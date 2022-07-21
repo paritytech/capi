@@ -66,7 +66,7 @@ await Promise.all([
   fs.copy("Readme.md", path.join(outDir, "Readme.md")),
 ]);
 
-await Promise.all([/* "script" */, "esm"].map((kind) => {
+await Promise.all(["script", "esm"].map((kind) => {
   return Promise.all(["hashers", "test-util/sr25519", "ss58"].map(async (dir) => {
     const from = `./${dir}/mod_bg.wasm`;
     const to = `target/npm/${kind}/${dir}/mod_bg.wasm`;
