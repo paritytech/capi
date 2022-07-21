@@ -1,5 +1,6 @@
 import { AnyAtom, Atom } from "./Atom.ts";
 import { AnyEffect, E_, T_ } from "./Effect.ts";
+import { key } from "./key.ts";
 
 // Eventually, we'll refactor this to contain any `V` / atom-specified runtime requirements
 export interface RunContext {
@@ -82,21 +83,4 @@ export function Run(transform?: (root: AnyAtom) => AnyEffect): Run {
     }
     return val as T;
   }
-}
-
-let i = 0; // TODO: make fqn optional
-const refKeys = new Map<unknown, string>();
-export function key(val: unknown): string {
-  let refKey = refKeys.get(val);
-  if (refKey) {
-    return refKey;
-  }
-  if (val instanceof Atom) {
-    refKey = `${val.fqn}(${(val.args as any[]).map(key)})`;
-    refKeys.set(val, refKey);
-    return refKey;
-  }
-  refKey = `_${i++}`;
-  refKeys.set(val, refKey);
-  return refKey;
 }
