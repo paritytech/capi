@@ -13,7 +13,7 @@ export function storageKeyCodec<
   entryMetadata: EntryMetadata,
 ) {
   return atom(
-    "StorageKey",
+    "StorageKeyCodec",
     [deriveCodec, palletMetadata, entryMetadata],
     async (deriveCodec, pallet, storageEntry) => {
       return M.$storageKey({
