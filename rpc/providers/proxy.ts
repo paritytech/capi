@@ -5,7 +5,7 @@ import { ClientHooks, ParseRawIngressMessageError, ProviderMethods } from "../co
 
 export type ProxyClientHooks<M extends ProviderMethods> = ClientHooks<M, WebSocketInternalError>;
 
-export async function proxyClient<M extends ProviderMethods>(
+export function proxyClient<M extends ProviderMethods>(
   proxyWsUrl: string,
   hooks?: ProxyClientHooks<M>,
 ): Promise<ProxyClient<M> | FailedToOpenConnectionError> {

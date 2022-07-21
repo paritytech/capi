@@ -1,8 +1,12 @@
 import { config } from "./config.ts";
-import { node } from "./node.ts";
+import { node, NodeConfig } from "./node.ts";
 
-export async function ctx(use: (config_: ReturnType<typeof config>) => Promise<void>) {
-  const node_ = await node();
+// TODO: generic over config
+export async function ctx(
+  use: (config_: ReturnType<typeof config>) => Promise<void>,
+  nodeConfig?: NodeConfig,
+) {
+  const node_ = await node(nodeConfig);
   await use(config(node_));
   node_.close();
 }
