@@ -1,4 +1,5 @@
 import { E_, Effect, Resolved } from "./Effect.ts";
+import { RunContext } from "./Run.ts";
 
 export function atom<N extends string, A extends unknown[], R>(
   fqn: N,
@@ -24,7 +25,10 @@ export class Atom<N extends string, A extends unknown[], R>
 
 export type AnyAtom = Atom<string, any[], any>;
 
-export type Impl<A extends unknown[], R> = (...args: Resolved<A>) => R | Promise<R>;
+export type Impl<A extends unknown[], R> = (
+  this: RunContext,
+  ...args: Resolved<A>
+) => R | Promise<R>;
 
 // TODO: type the possibility of exit errors
 export type Exit<R> = (resolved: Exclude<R, Error>) => void | Promise<void>;

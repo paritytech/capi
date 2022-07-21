@@ -1,7 +1,6 @@
 import * as U from "../../util/mod.ts";
 import * as sys from "../sys/mod.ts";
 
-export type Select = ReturnType<typeof select>;
 export function select<T, Field extends sys.Val<keyof sys.T_<T>>>(val: T, field: Field) {
   return sys.atom(
     "Select",

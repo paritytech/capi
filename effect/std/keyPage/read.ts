@@ -4,7 +4,7 @@ import * as U from "../../../util/mod.ts";
 import * as a from "../../atoms/mod.ts";
 import * as sys from "../../sys/mod.ts";
 
-export function readKeys<
+export function readKeyPage<
   C extends Config<string, Pick<KnownRpcMethods, "state_getMetadata" | "state_getKeysPaged">>,
   PalletName extends sys.Val<string>,
   EntryName extends sys.Val<string>,
@@ -34,16 +34,17 @@ export function readKeys<
     blockHash,
   );
   const keysEncoded = a.select(storageCall, "result");
-  const mapEntryMetadata = sys.atom("Anonymous", [entryMetadata_], (entryMetadata) => {
-    if (entryMetadata.type === "Map") {
-      return entryMetadata;
-    }
-    return new ReadingKeysOfNonMapError();
-  });
-  const entryKeyTypeI = a.select(mapEntryMetadata, "key");
-  const entryKeyCodec = a.codec(deriveCodec_, entryKeyTypeI);
-  // TODO: flat map one effect into another
-  return a.wrap(keysEncoded, "keys");
+  const $key = a.keyCodec(deriveCodec_, palletMetadata_, entryMetadata_);
+  const decoded = sys.atom(
+    "Anonymous",
+    [$key, keysEncoded],
+    (keyCodec, keysEncoded) => {
+      return keysEncoded.map((keyEncoded) => {
+        return keyCodec.decode(U.hex.decode(keyEncoded));
+      });
+    },
+  );
+  return a.wrap(decoded, "keys");
 }
 
 export class ReadingKeysOfNonMapError extends U.ErrorCtor("ReadingKeysOfNonMap") {}

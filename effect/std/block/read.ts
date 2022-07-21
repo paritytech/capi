@@ -11,10 +11,25 @@ export function readBlock<
   config: C,
   ...[blockHash]: Rest
 ) {
-  // const metadata_ = a.metadata(config, blockHash);
-  // const deriveCodec_ = a.deriveCodec(metadata_);
+  const metadata_ = a.metadata(config, blockHash);
+  const deriveCodec_ = a.deriveCodec(metadata_);
   const rpcCall_ = a.rpcCall(config, "chain_getBlock", blockHash);
-  const result = a.select(rpcCall_, "result");
-  // TODO: flat map one effect into another
-  return a.wrap(result, "block");
+  const $extrinsic = a.extrinsicCodec(deriveCodec_, metadata_);
+  const withDecodedExtrinsics = sys.atom(
+    "WithDecodedExtrinsics",
+    [rpcCall_, $extrinsic],
+    (rpcCall_, $extrinsic) => {
+      const { block: { extrinsics, header }, justifications } = rpcCall_.result;
+      return {
+        justifications,
+        block: {
+          header,
+          extrinsics: extrinsics.map((extrinsic) => {
+            return $extrinsic.decode(U.hex.decode(extrinsic));
+          }),
+        },
+      };
+    },
+  );
+  return a.wrap(withDecodedExtrinsics, "block");
 }

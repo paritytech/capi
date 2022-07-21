@@ -4,7 +4,6 @@ import * as U from "../../util/mod.ts";
 import { atom } from "../sys/Atom.ts";
 import { Val } from "../sys/Effect.ts";
 
-export type StorageKey = ReturnType<typeof storageKey>;
 export function storageKey<
   DeriveCodec extends Val<M.DeriveCodec>,
   PalletMetadata extends Val<M.Pallet>,
