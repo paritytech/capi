@@ -1,30 +1,10 @@
-// TODO: swap out `KnownRpcMethods` with narrowed lookups
-// @see https://github.com/paritytech/capi/issues/127
-
 import { Config } from "../config/mod.ts";
+import { TmpMetadata } from "./metadata.ts";
 import { KnownRpcMethods } from "./methods.ts";
 
-// TODO
-type KnownFrameLookup = {
-  pallets: {
-    balances: {
-      entries: {
-        Something: {
-          keys: [];
-          value: "SUP";
-        };
-        Account: {
-          keys: [accountId: Uint8Array];
-          value: "TODO";
-        };
-      };
-    };
-  };
-};
-
-// TODO: swap out chain-specifics
-
-const Config_ = Config.from<KnownRpcMethods, KnownFrameLookup>();
+// TODO: swap out chain-specific rpc and metadata types
+// @see https://github.com/paritytech/capi/issues/127
+const Config_ = Config.from<KnownRpcMethods, TmpMetadata>();
 
 export class Polkadot extends Config_("wss://rpc.polkadot.io") {}
 export const polkadot = new Polkadot();
