@@ -1,6 +1,7 @@
 import { AnyAtom, Atom } from "./Atom.ts";
 import { AnyEffect, E_, T_ } from "./Effect.ts";
 
+// Eventually, we'll refactor this to contain any `V` / atom-specified runtime requirements
 export interface RunContext {
   run: Run;
 }
@@ -8,7 +9,7 @@ export interface RunContext {
 export type Run = <Root extends AnyAtom>(root: Root) => Promise<T_<Root> | E_<Root>>;
 
 export function Run(transform?: (root: AnyAtom) => AnyEffect): Run {
-  const cache = new Map<string, unknown>(); // TODO: set max size / use LRU
+  const cache = new Map<string, Promise<unknown>>(); // TODO: set max size / use LRU
   const ctx: RunContext = { run };
   return run;
 
@@ -38,14 +39,14 @@ export function Run(transform?: (root: AnyAtom) => AnyEffect): Run {
     }
   }
 
-  async function visit<T>(
+  function visit<T>(
     val: unknown,
     dependents: Map<AnyAtom, Promise<unknown>[]>,
     cleanup: Map<AnyAtom, () => void | Promise<void>>,
-  ): Promise<T> {
+  ): T | Promise<T> {
     const k = key(val);
     if (cache.has(k)) {
-      return cache.get(k) as T;
+      return cache.get(k) as Promise<T>;
     }
     if (val instanceof Atom) {
       return (async () => {
@@ -83,8 +84,7 @@ export function Run(transform?: (root: AnyAtom) => AnyEffect): Run {
   }
 }
 
-// TODO: make fqn optional
-let i = 0;
+let i = 0; // TODO: make fqn optional
 const refKeys = new Map<unknown, string>();
 export function key(val: unknown): string {
   let refKey = refKeys.get(val);

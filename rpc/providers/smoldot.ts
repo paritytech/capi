@@ -63,15 +63,17 @@ export class SmoldotClient<M extends ProviderMethods>
         send: (egressMessage) => {
           this.#chain?.sendJsonRpc(JSON.stringify(egressMessage));
         },
-        close: async () => {
-          try {
-            this.remove();
-            return;
-          } catch (_e) {
-            // TODO: differentiate between `AlreadyDestroyedError` & `CrashError`
-            // if (e instanceof Error) {}
-            return new FailedToRemoveChainError();
-          }
+        close: () => {
+          return Promise.resolve((() => {
+            try {
+              this.remove();
+              return;
+            } catch (_e) {
+              // TODO: differentiate between `AlreadyDestroyedError` & `CrashError`
+              // if (e instanceof Error) {}
+              return new FailedToRemoveChainError();
+            }
+          })());
         },
       },
       hooks,

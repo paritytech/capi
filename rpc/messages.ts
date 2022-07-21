@@ -119,7 +119,7 @@ interface ErrorMessageBase<
       code: Code;
       message: string;
     }
-    & (Data extends undefined ? {} : {
+    & (Data extends undefined ? Record<never, never> : {
       data: Data;
     });
   params?: never;

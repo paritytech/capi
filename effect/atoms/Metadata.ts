@@ -11,7 +11,7 @@ export function metadata<
   Rest extends [blockHash?: Val<U.HashHexString | undefined>],
 >(config: C, ...[blockHash]: Rest) {
   const call = rpcCall(config, "state_getMetadata", blockHash);
-  return atom("Metadata", [call], async (call) => {
+  return atom("Metadata", [call], (call) => {
     if (call.error) {
       return new MetadataRetrievalError();
     }

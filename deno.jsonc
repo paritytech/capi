@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "checkJs": false,
-    "experimentalDecorators": false,
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
     "noImplicitReturns": true,
@@ -14,15 +13,7 @@
       "include": ["."]
     },
     "rules": {
-      "exclude": [
-        "ban-ts-comment",
-        "ban-types",
-        "no-empty",
-        "no-empty-interface",
-        "no-explicit-any",
-        "no-namespace",
-        "require-await"
-      ],
+      "exclude": ["no-empty-interface", "no-explicit-any", "no-namespace"],
       "tags": ["recommended"]
     }
   },

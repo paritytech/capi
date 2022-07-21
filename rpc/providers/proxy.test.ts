@@ -21,7 +21,7 @@ Deno.test({
       const result: msg.NotifMessage<KnownRpcMethods, "chain_subscribeAllHeads">[] = [];
       const pending = deferred();
       let i = 1;
-      const stop = await client.subscribe("chain_subscribeAllHeads", [], async (message) => {
+      const stop = await client.subscribe("chain_subscribeAllHeads", [], (message) => {
         result.push(message);
         i++;
         if (i > 2) {

@@ -4,6 +4,7 @@ import { fail } from "../deps/std/testing/asserts.ts";
 export interface TestNodeConfig {
   cwd?: string;
   altRuntime?: "kusama" | "rococo" | "westend";
+  port?: number;
 }
 
 export interface Node {
@@ -13,10 +14,17 @@ export interface Node {
   url: string;
 }
 
-let port = 9944;
 export async function node(config?: TestNodeConfig): Promise<Node> {
-  while (!isPortAvailable(port)) {
-    port++;
+  let port = 9944;
+  if (config?.port) {
+    if (!isPortAvailable(config.port)) {
+      fail(`Port ${config.port} is unavailable`);
+    }
+    port = config.port;
+  } else {
+    while (!isPortAvailable(port)) {
+      port++;
+    }
   }
   try {
     const process = Deno.run({
@@ -32,18 +40,15 @@ export async function node(config?: TestNodeConfig): Promise<Node> {
       stdout: "piped",
     });
     // For some reason, logs come in through `stderr`
-    const logs = process.stderr.readable;
-    await (async () => {
-      console.log(blue(`Piping node logs:`));
-      for await (const log of logs) {
-        Deno.stdout.write(log);
-        if (new TextDecoder().decode(log).includes(" Running JSON-RPC WS server")) {
-          console.log(blue("Chain and RPC server initialized"));
-          console.log(blue(`Suspending node logs`));
-          return;
-        }
+    console.log(blue(`Piping node logs:`));
+    for await (const log of process.stderr.readable) {
+      await Deno.stdout.write(log);
+      if (new TextDecoder().decode(log).includes(" Running JSON-RPC WS server")) {
+        console.log(blue("Chain and RPC server initialized"));
+        console.log(blue(`Suspending node logs`));
+        break;
       }
-    })();
+    }
     return {
       config,
       inner: process,
@@ -56,7 +61,7 @@ export async function node(config?: TestNodeConfig): Promise<Node> {
     if (e instanceof Deno.errors.NotFound) {
       fail("Must have Polkadot installed locally. Visit https://github.com/paritytech/polkadot.");
     }
-    fail();
+    throw e; // TODO: don't go nuclear without proper messaging
   }
 }
 

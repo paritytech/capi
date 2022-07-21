@@ -17,7 +17,5 @@ export class TestAddress<A extends TestAddresses = TestAddresses>
   }
 
   // TODO
-  sign = async (message: Uint8Array): Promise<Uint8Array> => {
-    return new Uint8Array();
-  };
+  declare sign: (_message: Uint8Array) => Promise<Uint8Array>;
 }
