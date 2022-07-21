@@ -10,7 +10,7 @@
   ],
   "dictionaries": ["project-words"],
   "ignorePaths": [
-    "**/mod.generated.mjs",
+    "**/mod.generated.js",
     "**/mod_bg.wasm",
     "Cargo.lock",
     "deno.lock",

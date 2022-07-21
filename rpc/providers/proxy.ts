@@ -1,4 +1,4 @@
-import { deadline, deferred } from "../../_deps/async.ts";
+import { deadline, deferred } from "../../_deps/std/async.ts";
 import { ErrorCtor } from "../../util/mod.ts";
 import * as B from "../Base.ts";
 import { ClientHooks, ParseRawIngressMessageError, ProviderMethods } from "../common.ts";

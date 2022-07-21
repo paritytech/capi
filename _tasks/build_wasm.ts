@@ -1,6 +1,4 @@
-import { assert } from "../_deps/asserts.ts";
-import { compress } from "../_deps/lz4.ts";
-import * as path from "../_deps/path.ts";
+import { assert } from "../_deps/std/testing/asserts.ts";
 
 async function build(
   featureName: string,
@@ -12,9 +10,7 @@ async function build(
       "deno",
       "task",
       "run",
-      "https://deno.land/x/wasmbuild@0.8.3/main.ts",
-      "--js-ext",
-      "mjs",
+      "https://deno.land/x/wasmbuild@0.8.4/main.ts",
       "--out",
       destDir,
       "--features",
@@ -23,10 +19,6 @@ async function build(
   });
   const status = await buildProcess.status();
   assert(status.success);
-  const wasmPath = path.join(destDir, `mod_bg.wasm`);
-  const wasmBytes = await Deno.readFile(wasmPath);
-  const wasmCompressed = compress(wasmBytes);
-  Deno.writeFile(wasmPath, wasmCompressed);
 }
 
 await ([

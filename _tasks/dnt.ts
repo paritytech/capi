@@ -1,6 +1,6 @@
 import { build } from "https://deno.land/x/dnt@0.26.0/mod.ts";
-import * as fs from "../_deps/fs.ts";
-import * as path from "../_deps/path.ts";
+import * as fs from "../_deps/std/fs.ts";
+import * as path from "../_deps/std/path.ts";
 
 const outDir = path.join("target", "npm");
 
@@ -9,23 +9,29 @@ await fs.emptyDir(outDir);
 await Promise.all([
   build({
     entryPoints: ["mod.ts", {
-      name: "bindings",
-      path: "bindings/mod.ts",
+      name: "./fluent",
+      path: "fluent/mod.ts",
     }, {
-      name: "frame_metadata",
+      name: "./test-util",
+      path: "test-util/mod.ts",
+    }, {
+      name: "./frame_metadata",
       path: "frame_metadata/mod.ts",
     }, {
-      name: "known",
+      name: "./config",
+      path: "config/mod.ts",
+    }, {
+      name: "./known",
       path: "known/mod.ts",
     }, {
-      name: "rpc",
+      name: "./rpc",
       path: "rpc/mod.ts",
     }],
     outDir,
     mappings: {
-      "https://deno.land/x/scale@v0.2.1/mod.ts": {
+      "https://deno.land/x/scale@v0.3.0/mod.ts": {
         name: "parity-scale-codec",
-        version: "^0.2.1",
+        version: "^0.3.0",
       },
       "_deps/smoldot_phantom.ts": {
         name: "@substrate/smoldot-light",
@@ -48,20 +54,22 @@ await Promise.all([
     },
     scriptModule: "cjs",
     shims: {
-      deno: true,
+      deno: {
+        test: true,
+      },
       webSocket: true,
     },
     test: false,
-    typeCheck: false, // TODO: reenable?
+    typeCheck: false,
   }),
   fs.copy("LICENSE", path.join(outDir, "LICENSE")),
   fs.copy("Readme.md", path.join(outDir, "Readme.md")),
 ]);
 
 await Promise.all(["script", "esm"].map((kind) => {
-  return Promise.all(["hashers", "sr25519", "ss58"].map(async (feature) => {
-    const from = `./bindings/${feature}/mod_bg.wasm`;
-    const to = `target/npm/${kind}/bindings/${feature}/mod_bg.wasm`;
+  return Promise.all(["hashers", "test-util/sr25519", "ss58"].map(async (dir) => {
+    const from = `./${dir}/mod_bg.wasm`;
+    const to = `target/npm/${kind}/${dir}/mod_bg.wasm`;
     await fs.copy(from, to);
   }));
 }));

@@ -1,4 +1,4 @@
-import { Config } from "../Config.ts";
+import { Config } from "../config/mod.ts";
 import * as M from "../frame_metadata/mod.ts";
 import { KnownRpcMethods } from "../known/mod.ts";
 import * as rpc from "../rpc/mod.ts";

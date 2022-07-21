@@ -1,7 +1,7 @@
 // TODO: swap out `KnownRpcMethods` with narrowed lookups
 // @see https://github.com/paritytech/capi/issues/127
 
-import { config, Meta } from "../Config.ts";
+import { config, Meta } from "../config/mod.ts";
 import { KnownRpcMethods } from "./methods.ts";
 
 // TODO

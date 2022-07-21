@@ -1,8 +1,14 @@
-import { config as config_, Meta } from "../Config.ts";
+import { config as config_ } from "../config/mod.ts";
 import { KnownRpcMethods } from "../known/mod.ts";
-import { TestNode } from "./node.ts";
+import { Node } from "./node.ts";
 
-export function config(node: TestNode) {
-  class TestConfig extends config_<KnownRpcMethods, Meta>()(node.url) {}
-  return new TestConfig();
+export type Config = ReturnType<typeof config>;
+export function config(node: Node) {
+  return new class TestConfig extends config_<KnownRpcMethods, {
+    pallets: {
+      Balances: {
+        entries: {};
+      };
+    };
+  }>()(node.url) {}();
 }

@@ -1,4 +1,4 @@
-import { deferred } from "../_deps/async.ts";
+import { deferred } from "../_deps/std/async.ts";
 
 export class Iter<T> implements AsyncIterableIterator<T> {
   #queue: T[] = [];

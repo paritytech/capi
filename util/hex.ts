@@ -1,4 +1,4 @@
-export { decode as decodeBuf, encode as encodeBuf } from "../_deps/hex.ts";
+export { decode as decodeBuf, encode as encodeBuf } from "../_deps/std/encoding/hex.ts";
 
 export function decode(hex: string) {
   if (hex.startsWith("0x")) hex = hex.slice(2);

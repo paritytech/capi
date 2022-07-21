@@ -1,4 +1,4 @@
-import { assert } from "../_deps/asserts.ts";
+import { assert } from "../_deps/std/testing/asserts.ts";
 import * as M from "../frame_metadata/mod.ts";
 import { Hashers } from "../hashers/mod.ts";
 import { westend } from "../known/mod.ts";

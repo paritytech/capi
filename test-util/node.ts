@@ -1,13 +1,12 @@
-import { fail } from "../_deps/asserts.ts";
-import { blue } from "../_deps/colors.ts";
-import { isPortAvailable } from "../util/mod.ts";
+import { blue } from "../_deps/std/fmt/colors.ts";
+import { fail } from "../_deps/std/testing/asserts.ts";
 
 export interface TestNodeConfig {
   cwd?: string;
   altRuntime?: "kusama" | "rococo" | "westend";
 }
 
-export interface TestNode {
+export interface Node {
   config?: TestNodeConfig;
   inner: Deno.Process;
   close(): void;
@@ -15,7 +14,7 @@ export interface TestNode {
 }
 
 let port = 9944;
-export async function node(config?: TestNodeConfig): Promise<TestNode> {
+export async function node(config?: TestNodeConfig): Promise<Node> {
   while (!isPortAvailable(port)) {
     port++;
   }
@@ -58,5 +57,22 @@ export async function node(config?: TestNodeConfig): Promise<TestNode> {
       fail("Must have Polkadot installed locally. Visit https://github.com/paritytech/polkadot.");
     }
     fail();
+  }
+}
+
+function isPortAvailable(port: number): boolean {
+  try {
+    const listener = Deno.listen({
+      transport: "tcp",
+      hostname: "127.0.0.1",
+      port,
+    });
+    listener.close();
+    return true;
+  } catch (error) {
+    if (error instanceof Deno.errors.AddrInUse) {
+      return false;
+    }
+    throw error;
   }
 }

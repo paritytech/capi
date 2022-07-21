@@ -1,4 +1,4 @@
-import { assert } from "../../_deps/asserts.ts";
+import { assert } from "../../_deps/std/testing/asserts.ts";
 import { polkadot } from "../../known/mod.ts";
 import * as rpc from "../../rpc/mod.ts";
 

@@ -1,4 +1,4 @@
-import { Address } from "../bindings/Address.ts";
+import { Address } from "../fluent/Address.ts";
 import { TestAddresses } from "./Addresses.ts";
 import { pairs } from "./pairs.ts";
 

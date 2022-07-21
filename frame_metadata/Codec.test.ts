@@ -1,21 +1,20 @@
-import { assertEquals } from "../_deps/asserts.ts";
+import { assertEquals } from "../_deps/std/testing/asserts.ts";
 import * as t from "../test-util/mod.ts";
 import * as U from "../util/mod.ts";
-import { ChainError, DeriveCodec } from "./Codec.ts";
+import { ChainError } from "./Codec.ts";
 import { normalize } from "./Contract.ts";
 import { getPalletAndEntry } from "./Metadata.ts";
-import { Metadata } from "./test-common.ts";
+import { setup } from "./test-common.ts";
 
-const metadata = await Metadata("polkadot");
-const deriveCodec = DeriveCodec(metadata.tys);
-
-Deno.test("Derive all", () => {
+Deno.test("Derive all", async () => {
+  const [metadata, deriveCodec] = await setup("polkadot");
   for (const ty of metadata.tys) {
     deriveCodec(ty.id);
   }
 });
 
 Deno.test("Derive AccountId32 Codec", async () => {
+  const [_, deriveCodec] = await setup("polkadot");
   const codec = deriveCodec(0);
   const encoded = codec.encode(t.pairs.alice.public);
   assertEquals(encoded, t.pairs.alice.public);
@@ -23,6 +22,7 @@ Deno.test("Derive AccountId32 Codec", async () => {
 });
 
 Deno.test("Derive AccountInfo Codec", async () => {
+  const [_, deriveCodec] = await setup("polkadot");
   const codec = deriveCodec(3);
   const decoded = {
     nonce: 4,
@@ -41,6 +41,7 @@ Deno.test("Derive AccountInfo Codec", async () => {
 });
 
 Deno.test("Derive Auctions AuctionInfo Storage Entry Codec", async () => {
+  const [metadata, deriveCodec] = await setup("polkadot");
   const auctionInfoStorageEntry = U.throwIfError(
     getPalletAndEntry(metadata, "Auctions", "AuctionInfo"),
   )[1];
@@ -51,6 +52,7 @@ Deno.test("Derive Auctions AuctionInfo Storage Entry Codec", async () => {
 });
 
 Deno.test("Derive Auction Winning Storage Entry Codec", async () => {
+  const [metadata, deriveCodec] = await setup("polkadot");
   const auctionWinningStorageEntry =
     U.throwIfError(getPalletAndEntry(metadata, "Auctions", "Winning"))[1];
   const codec = deriveCodec(auctionWinningStorageEntry.value);
@@ -64,12 +66,13 @@ Deno.test("Derive Auction Winning Storage Entry Codec", async () => {
 });
 
 Deno.test("Westend circular", async () => {
-  const metadata = await Metadata("westend");
-  const deriveCodec = DeriveCodec(metadata.tys);
+  const [_, deriveCodec] = await setup("westend");
+  // TODO: safeguard against runtime upgrade resulting in future testing of the wrong type
   deriveCodec(283);
 });
 
 Deno.test("Derive pallet_xcm::pallet::Error codec", async () => {
+  const [metadata, deriveCodec] = await setup("polkadot");
   const ty = metadata.tys.find((x) => x.path.join("::") === "pallet_xcm::pallet::Error")!;
   const codec = deriveCodec(ty.id);
   const encoded = codec.encode("Unreachable");
@@ -78,6 +81,7 @@ Deno.test("Derive pallet_xcm::pallet::Error codec", async () => {
 });
 
 Deno.test("Derive Result codec", async () => {
+  const [metadata, deriveCodec] = await setup("polkadot");
   const ty = metadata.tys.find((x) =>
     x.path[0] === "Result"
     && metadata.tys[x.params[1]!.ty!]!.path.join("::") === "sp_runtime::DispatchError"
@@ -94,6 +98,7 @@ Deno.test("Derive Result codec", async () => {
 });
 
 Deno.test("Smart Contract codecs", async () => {
+  const [_, deriveCodec] = await setup("polkadot");
   const raw = await Deno.readTextFile("frame_metadata/raw_erc20_metadata.json");
   const normalized = normalize(JSON.parse(raw));
   for (const ty of normalized.V3.types) {

@@ -1,7 +1,6 @@
 // TODO: brands
 // TODO: narrow error typings
-import { decompress } from "../_deps/lz4.ts";
-import { instantiate } from "./mod.generated.mjs";
+import { instantiate } from "./mod.generated.js";
 
 // TODO: `encodeBuf` and `decodeBuf`, if useful.
 export interface Ss58 {
@@ -10,7 +9,7 @@ export interface Ss58 {
 }
 
 export async function Ss58(): Promise<Ss58> {
-  const instance = await instantiate(decompress);
+  const instance = await instantiate();
   return {
     encode: instance.encode,
     decode: instance.decode as Ss58["decode"],
