@@ -1,4 +1,5 @@
-import * as R from "../runtime/mod.ts";
+import { run } from "../effect/run.ts";
+import { readKeyPage } from "../effect/std/keyPage/read.ts";
 import { Block } from "./Block.ts";
 import { NodeBase } from "./common.ts";
 import { Entry } from "./Entry.ts";
@@ -18,11 +19,18 @@ export class KeyPage<E extends Entry = Entry> extends NodeBase<"KeyPage"> {
     this.start = start;
   }
 
-  read(block?: Block): Promise<unknown> {
-    return R.read(this, block);
+  read(block?: Block) {
+    return run(
+      readKeyPage(
+        this.chain.config as any,
+        this.entry.pallet.name,
+        this.entry.name,
+        this.count,
+        this.start,
+        block?.hash,
+      ),
+    );
   }
 
-  watch(cb: (message: unknown) => void): any /* TODO */ {
-    return R.watch(this, cb);
-  }
+  declare watch: (cb: (message: unknown) => void) => any;
 }
