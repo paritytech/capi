@@ -1,6 +1,5 @@
 import { blue } from "../_deps/std/fmt/colors.ts";
 import { fail } from "../_deps/std/testing/asserts.ts";
-import { isPortAvailable } from "../util/isPortAvailable.ts";
 
 export interface TestNodeConfig {
   cwd?: string;
@@ -58,5 +57,22 @@ export async function node(config?: TestNodeConfig): Promise<Node> {
       fail("Must have Polkadot installed locally. Visit https://github.com/paritytech/polkadot.");
     }
     fail();
+  }
+}
+
+function isPortAvailable(port: number): boolean {
+  try {
+    const listener = Deno.listen({
+      transport: "tcp",
+      hostname: "127.0.0.1",
+      port,
+    });
+    listener.close();
+    return true;
+  } catch (error) {
+    if (error instanceof Deno.errors.AddrInUse) {
+      return false;
+    }
+    throw error;
   }
 }

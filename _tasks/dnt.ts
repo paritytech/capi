@@ -47,7 +47,7 @@ await Promise.all([
       repository: "github:paritytech/capi",
     },
     compilerOptions: {
-      lib: ["dom", "es2021"],
+      lib: ["dom"],
       importHelpers: true,
       sourceMap: true,
       target: "ES2021",

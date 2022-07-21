@@ -46,7 +46,7 @@ export class Address<
         return U.hex.decode(this.source.raw);
       }
       default: {
-        return unimplemented();
+        unimplemented();
       }
     }
   };

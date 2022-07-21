@@ -9,8 +9,8 @@ import { rpcCall } from "./RpcCall.ts";
 export type Metadata = ReturnType<typeof metadata>;
 export function metadata<
   C extends Config<string, Pick<KnownRpcMethods, "state_getMetadata">>,
-  BlockHashRest extends [blockHash?: Val<U.HashHexString | undefined>],
->(config: C, ...[blockHash]: BlockHashRest) {
+  Rest extends [blockHash?: Val<U.HashHexString | undefined>],
+>(config: C, ...[blockHash]: Rest) {
   const call = rpcCall(config, "state_getMetadata", blockHash);
   return atom("Metadata", [call], async (call) => {
     if (call.error) {

@@ -9,13 +9,13 @@ export function readEntry<
   PalletName extends sys.Val<string>,
   EntryName extends sys.Val<string>,
   Keys extends unknown[],
-  BlockHashRest extends [blockHash?: sys.Val<U.HashHexString | undefined>],
+  Rest extends [blockHash?: sys.Val<U.HashHexString | undefined>],
 >(
   config: C,
   palletName: PalletName,
   entryName: EntryName,
   keys: Keys,
-  ...[blockHash]: BlockHashRest
+  ...[blockHash]: Rest
 ) {
   const metadata_ = a.metadata(config, blockHash);
   const deriveCodec_ = a.deriveCodec(metadata_);
