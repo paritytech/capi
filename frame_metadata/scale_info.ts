@@ -1,4 +1,4 @@
-import * as $ from "../_deps/scale.ts";
+import * as $ from "../deps/scale.ts";
 
 export interface Field {
   name: string | undefined;

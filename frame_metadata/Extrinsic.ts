@@ -1,4 +1,4 @@
-import * as $ from "../_deps/scale.ts";
+import * as $ from "../deps/scale.ts";
 import { $null, DeriveCodec } from "./Codec.ts";
 import { HasherLookup } from "./Key.ts";
 import { Metadata } from "./Metadata.ts";

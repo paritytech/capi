@@ -1,5 +1,5 @@
-import { deferred } from "../../_deps/std/async.ts";
-import { assert } from "../../_deps/std/testing/asserts.ts";
+import { deferred } from "../../deps/std/async.ts";
+import { assert } from "../../deps/std/testing/asserts.ts";
 import { KnownRpcMethods, polkadot } from "../../known/mod.ts";
 import * as msg from "../messages.ts";
 import { proxyClient } from "./proxy.ts";

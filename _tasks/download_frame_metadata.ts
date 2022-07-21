@@ -1,6 +1,6 @@
-import * as fs from "../_deps/std/fs.ts";
-import * as path from "../_deps/std/path.ts";
-import { assert } from "../_deps/std/testing/asserts.ts";
+import * as fs from "../deps/std/fs.ts";
+import * as path from "../deps/std/path.ts";
+import { assert } from "../deps/std/testing/asserts.ts";
 import { acala, kusama, moonbeam, polkadot, statemint, subsocial, westend } from "../known/mod.ts";
 import * as rpc from "../rpc/mod.ts";
 

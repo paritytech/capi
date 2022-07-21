@@ -1,4 +1,4 @@
-import { assert } from "../_deps/std/testing/asserts.ts";
+import { assert } from "../deps/std/testing/asserts.ts";
 
 async function build(
   featureName: string,

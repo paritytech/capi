@@ -1,4 +1,4 @@
-import { assertEquals } from "../_deps/std/testing/asserts.ts";
+import { assertEquals } from "../deps/std/testing/asserts.ts";
 import { Ss58 } from "./mod.ts";
 
 Deno.test("Decode Ss58 Text", async () => {
