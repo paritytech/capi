@@ -2,21 +2,19 @@ import { assertEquals } from "../_deps/std/testing/asserts.ts";
 import { Hashers } from "../hashers/mod.ts";
 import * as t from "../test-util/mod.ts";
 import * as U from "../util/mod.ts";
-import { DeriveCodec } from "./Codec.ts";
 import { $storageKey } from "./Key.ts";
-import { getEntry, getPallet } from "./Metadata.ts";
-import { Metadata } from "./test-common.ts";
-
-const metadata = await Metadata("polkadot");
-const deriveCodec = DeriveCodec(metadata.tys);
-const hashers = await Hashers();
+import { getPalletAndEntry } from "./Metadata.ts";
+import { setup } from "./test-common.ts";
 
 Deno.test("System Accounts Key", async () => {
-  const pallet = getPallet(metadata, "System");
-  U.assertNotError(pallet);
-  const storageEntry = getEntry(pallet, "Account");
-  U.assertNotError(storageEntry);
-  const $key = $storageKey({ deriveCodec, hashers, pallet, storageEntry });
+  const [metadata, deriveCodec] = await setup("polkadot");
+  const [pallet, storageEntry] = U.throwIfError(getPalletAndEntry(metadata, "System", "Account"));
+  const $key = $storageKey({
+    deriveCodec,
+    hashers: await Hashers(),
+    pallet,
+    storageEntry,
+  });
   const keyEncoded = $key.encode(t.pairs.alice.public);
   const encoded = U.hex.encode(keyEncoded);
   assertEquals(
@@ -28,11 +26,14 @@ Deno.test("System Accounts Key", async () => {
 });
 
 Deno.test("Auction Winning Key", async () => {
-  const pallet = getPallet(metadata, "Auctions");
-  U.assertNotError(pallet);
-  const storageEntry = getEntry(pallet, "Winning");
-  U.assertNotError(storageEntry);
-  const $key = $storageKey({ deriveCodec, hashers, pallet, storageEntry });
+  const [metadata, deriveCodec] = await setup("polkadot");
+  const [pallet, storageEntry] = U.throwIfError(getPalletAndEntry(metadata, "Auctions", "Winning"));
+  const $key = $storageKey({
+    deriveCodec,
+    hashers: await Hashers(),
+    pallet,
+    storageEntry,
+  });
   const key = 5;
   const encoded = $key.encode(key);
   assertEquals(

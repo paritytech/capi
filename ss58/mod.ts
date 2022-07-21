@@ -1,6 +1,6 @@
 // TODO: brands
 // TODO: narrow error typings
-import { instantiate } from "./mod.generated.mjs";
+import { instantiate } from "./mod.generated.js";
 
 // TODO: `encodeBuf` and `decodeBuf`, if useful.
 export interface Ss58 {

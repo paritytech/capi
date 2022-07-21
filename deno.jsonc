@@ -10,7 +10,7 @@
   },
   "lint": {
     "files": {
-      "exclude": ["**/mod.generated.mjs", "target"],
+      "exclude": ["**/mod.generated.js", "target"],
       "include": ["."]
     },
     "rules": {

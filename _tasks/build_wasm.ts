@@ -11,8 +11,6 @@ async function build(
       "task",
       "run",
       "https://deno.land/x/wasmbuild@0.8.4/main.ts",
-      "--js-ext",
-      "mjs",
       "--out",
       destDir,
       "--features",

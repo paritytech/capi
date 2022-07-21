@@ -1,6 +1,6 @@
 // TODO: brands
 // TODO: narrow error types
-import { instantiate } from "./mod.generated.mjs";
+import { instantiate } from "./mod.generated.js";
 
 export interface PublicKey {
   bytes: Uint8Array;
