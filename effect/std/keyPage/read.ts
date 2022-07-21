@@ -4,7 +4,7 @@ import * as U from "../../../util/mod.ts";
 import * as a from "../../atoms/mod.ts";
 import * as sys from "../../sys/mod.ts";
 
-export function readKeys<
+export function readKeyPage<
   C extends Config<string, Pick<KnownRpcMethods, "state_getMetadata" | "state_getKeysPaged">>,
   PalletName extends sys.Val<string>,
   EntryName extends sys.Val<string>,
