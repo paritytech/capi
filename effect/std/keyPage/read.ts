@@ -21,14 +21,12 @@ export function readKeyPage<
   const deriveCodec_ = a.deriveCodec(metadata_);
   const palletMetadata_ = a.palletMetadata(metadata_, palletName);
   const entryMetadata_ = a.entryMetadata(palletMetadata_, entryName);
-  const storageKey_ = a.storageKey(deriveCodec_, palletMetadata_, entryMetadata_);
-  const startKey = start
-    ? a.storageKey(deriveCodec_, palletMetadata_, entryMetadata_, start)
-    : undefined;
+  const storageKeyCodec_ = a.storageKeyCodec(deriveCodec_, palletMetadata_, entryMetadata_);
+  const startKey = start ? a.storageKey(storageKeyCodec_, start) : undefined;
   const storageCall = a.rpcCall(
     config,
     "state_getKeysPaged",
-    storageKey_,
+    a.storageKey(storageKeyCodec_),
     count,
     startKey,
     blockHash,

@@ -1,4 +1,3 @@
-import { send } from "../runtime/mod.ts";
 import { Address } from "./Address.ts";
 import { Addresses } from "./Addresses.ts";
 import { Call } from "./Call.ts";
@@ -19,7 +18,5 @@ export class Signed<
     this.chain = call.chain;
   }
 
-  send = () => {
-    return send(this);
-  };
+  declare send: () => any;
 }

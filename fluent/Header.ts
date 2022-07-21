@@ -1,4 +1,5 @@
-import * as R from "../runtime/mod.ts";
+import { rpcCall } from "../effect/atoms/RpcCall.ts";
+import { run } from "../effect/run.ts";
 import { Block } from "./Block.ts";
 import { Chain } from "./Chain.ts";
 import { NodeBase } from "./common.ts";
@@ -8,12 +9,9 @@ export class Header<C extends Chain = Chain> extends NodeBase<"Header"> {
     super();
   }
 
-  // TODO
-  read(block?: Block<C>): Promise<unknown> {
-    return R.read(this, block);
+  read(block?: Block<C>) {
+    return run(rpcCall(this.chain.config as any, "chain_getHeader", block?.hash));
   }
 
-  watch(cb: (message: unknown) => void): any /* TODO */ {
-    return R.watch(this, cb);
-  }
+  declare watch: (cb: (message: unknown) => void) => any;
 }

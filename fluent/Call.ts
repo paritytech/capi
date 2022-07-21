@@ -1,4 +1,3 @@
-import { send } from "../runtime/mod.ts";
 import { Address } from "./Address.ts";
 import { Addresses } from "./Addresses.ts";
 import { NodeBase } from "./common.ts";
@@ -31,7 +30,5 @@ export class Call<
     return new Signed(this, from, sign);
   }
 
-  send() {
-    return send(this);
-  }
+  declare send: () => any;
 }
