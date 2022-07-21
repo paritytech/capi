@@ -1,4 +1,4 @@
-import * as path from "../_deps/std/path.ts";
+import * as path from "../deps/std/path.ts";
 import * as M from "../frame_metadata/mod.ts";
 
 const downloadedDir = new URL("../frame_metadata/_downloaded", import.meta.url).pathname;

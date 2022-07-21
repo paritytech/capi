@@ -1,4 +1,4 @@
-import { IsExact } from "../../_deps/conditional_type_checks.ts";
+import { IsExact } from "../../deps/conditional_type_checks.ts";
 import { ErrorCtor } from "../../util/mod.ts";
 import { AnyAtom, atom } from "./Atom.ts";
 import { E_, T_, Val } from "./Effect.ts";

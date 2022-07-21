@@ -1,5 +1,5 @@
-import { blue } from "../_deps/std/fmt/colors.ts";
-import { fail } from "../_deps/std/testing/asserts.ts";
+import { blue } from "../deps/std/fmt/colors.ts";
+import { fail } from "../deps/std/testing/asserts.ts";
 
 export interface TestNodeConfig {
   cwd?: string;

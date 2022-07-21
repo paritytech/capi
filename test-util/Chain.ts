@@ -1,6 +1,6 @@
 import { Chain } from "../fluent/Chain.ts";
 import { TestAddresses } from "./Addresses.ts";
-import { config } from "./Config.ts";
+import { config } from "./config.ts";
 import { Node } from "./node.ts";
 
 export class TestChain extends Chain<ReturnType<typeof config>> {

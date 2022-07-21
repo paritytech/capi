@@ -1,4 +1,4 @@
-import { assertSnapshot } from "../_deps/std/testing/snapshot.ts";
+import { assertSnapshot } from "../deps/std/testing/snapshot.ts";
 import { setup } from "./test-common.ts";
 
 ([

@@ -5,7 +5,7 @@ import { atom } from "../sys/Atom.ts";
 export type RpcClient = ReturnType<typeof rpcClient>;
 export function rpcClient<C extends Config<string>>(config: C) {
   return atom("RpcClient", [config], (config) => {
-    return rpc.stdClient<Config.M_<C>>(config.discoveryValue);
+    return rpc.stdClient<Config.GetRpcProviderMethods<C>>(config.discoveryValue);
   }, async (client) => {
     await client.close();
   });

@@ -1,6 +1,6 @@
-import { snakeCase, upperCase } from "../_deps/case.ts";
-import ss58Registry from "../_deps/ss58_registry.ts";
-import * as path from "../_deps/std/path.ts";
+import { snakeCase, upperCase } from "../deps/case.ts";
+import ss58Registry from "../deps/ss58_registry.ts";
+import * as path from "../deps/std/path.ts";
 
 let generated = "";
 let lookup = "export const LOOKUP = {\n";

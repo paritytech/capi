@@ -1,4 +1,4 @@
-import { unimplemented } from "../_deps/std/testing/asserts.ts";
+import { unimplemented } from "../deps/std/testing/asserts.ts";
 import { Ty, TyDef } from "./scale_info.ts";
 
 export interface ContractMetadata<Ty_ = Ty> {

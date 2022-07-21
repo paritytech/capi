@@ -1,4 +1,4 @@
-import * as $ from "../_deps/scale.ts";
+import * as $ from "../deps/scale.ts";
 import * as U from "../util/mod.ts";
 import { $ty, Ty } from "./scale_info.ts";
 

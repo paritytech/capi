@@ -1,6 +1,6 @@
 import { build } from "https://deno.land/x/dnt@0.26.0/mod.ts";
-import * as fs from "../_deps/std/fs.ts";
-import * as path from "../_deps/std/path.ts";
+import * as fs from "../deps/std/fs.ts";
+import * as path from "../deps/std/path.ts";
 
 const outDir = path.join("target", "npm");
 

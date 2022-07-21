@@ -1,6 +1,6 @@
-import type * as smoldot from "../../_deps/smoldot.ts";
+import type * as smoldot from "../../deps/smoldot.ts";
 import { ErrorCtor } from "../../util/mod.ts";
-import * as B from "../Base.ts";
+import { Client } from "../Base.ts";
 import { ClientHooks, ParseRawIngressMessageError, ProviderMethods } from "../common.ts";
 
 export type SmoldotClientHooks<M extends ProviderMethods> = ClientHooks<M, SmoldotInternalError>;
@@ -29,13 +29,13 @@ export async function smoldotClient<M extends ProviderMethods>(
 }
 
 export class SmoldotClient<M extends ProviderMethods>
-  extends B.Client<M, SmoldotInternalError, string, unknown, FailedToRemoveChainError>
+  extends Client<M, SmoldotInternalError, string, unknown, FailedToRemoveChainError>
 {
   #chain?: smoldot.Chain;
 
   constructor(
     onMessageContainer: {
-      onMessage?: B.Client<
+      onMessage?: Client<
         M,
         SmoldotInternalError,
         string,
@@ -67,12 +67,9 @@ export class SmoldotClient<M extends ProviderMethods>
           try {
             this.remove();
             return;
-          } catch (e) {
-            if (e instanceof Error) {
-              // TODO: handle the following in a special manner?
-              // - `AlreadyDestroyedError`
-              // - `CrashError`
-            }
+          } catch (_e) {
+            // TODO: differentiate between `AlreadyDestroyedError` & `CrashError`
+            // if (e instanceof Error) {}
             return new FailedToRemoveChainError();
           }
         },
@@ -88,7 +85,7 @@ const _state: { smoldotInstance?: smoldot.Client } = {};
 async function ensureInstance(): Promise<smoldot.Client | FailedToStartSmoldotError> {
   if (!_state.smoldotInstance) {
     try {
-      const smoldot = await import("../../_deps/smoldot.ts");
+      const smoldot = await import("../../deps/smoldot.ts");
       _state.smoldotInstance = smoldot.start();
     } catch (_e) {
       return new FailedToStartSmoldotError();
