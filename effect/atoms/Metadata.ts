@@ -6,7 +6,6 @@ import { atom } from "../sys/Atom.ts";
 import { Val } from "../sys/Effect.ts";
 import { rpcCall } from "./RpcCall.ts";
 
-export type Metadata = ReturnType<typeof metadata>;
 export function metadata<
   C extends Config<string, Pick<KnownRpcMethods, "state_getMetadata">>,
   Rest extends [blockHash?: Val<U.HashHexString | undefined>],
@@ -27,7 +26,6 @@ export function metadata<
 export class MetadataRetrievalError extends U.ErrorCtor("MetadataRetrieval") {}
 export class MetadataDecodeError extends U.ErrorCtor("MetadataDecode") {}
 
-export type PalletMetadata = ReturnType<typeof palletMetadata>;
 export function palletMetadata<
   Metadata extends Val<M.Metadata>,
   PalletName extends Val<string>,
@@ -38,7 +36,6 @@ export function palletMetadata<
   return atom("PalletMetadata", [metadata, palletName], M.getPallet);
 }
 
-export type EntryMetadata = ReturnType<typeof entryMetadata>;
 export function entryMetadata<
   PalletMetadata extends Val<M.Pallet>,
   EntryName extends Val<string>,

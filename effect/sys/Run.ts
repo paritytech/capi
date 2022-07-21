@@ -1,16 +1,27 @@
 import { AnyAtom, Atom } from "./Atom.ts";
-import { E_, T_ } from "./Effect.ts";
+import { AnyEffect, E_, T_ } from "./Effect.ts";
 
-export function Run<Atom extends AnyAtom>(transform: (root: Atom) => Atom) {
-  // TODO: set max size / use LRU
-  const cache = new Map<string, unknown>();
+export interface RunContext {
+  run: Run;
+}
 
-  return async <Root extends Atom>(root: Root): Promise<T_<Root> | E_<Root>> => {
+export type Run = <Root extends AnyAtom>(root: Root) => Promise<T_<Root> | E_<Root>>;
+
+export function Run(transform?: (root: AnyAtom) => AnyEffect): Run {
+  const cache = new Map<string, unknown>(); // TODO: set max size / use LRU
+  const ctx: RunContext = { run };
+  return run;
+
+  async function run<Root extends AnyAtom>(root: Root) {
     try {
-      const dependents = new Map<Atom, Promise<unknown>[]>();
-      const cleanup = new Map<Atom, () => void | Promise<void>>();
+      const dependents = new Map<AnyAtom, Promise<unknown>[]>();
+      const cleanup = new Map<AnyAtom, () => void | Promise<void>>();
       const cleanupPending: (void | Promise<void>)[] = [];
-      const rootResult = await visit<T_<Root>>(transform(root), dependents, cleanup);
+      const rootResult = await visit<T_<Root>>(
+        transform ? transform(root) : root,
+        dependents,
+        cleanup,
+      );
       for (const [k, v] of dependents) {
         const c = cleanup.get(k);
         if (c) {
@@ -25,12 +36,12 @@ export function Run<Atom extends AnyAtom>(transform: (root: Atom) => Atom) {
     } catch (e) {
       return e as E_<Root>;
     }
-  };
+  }
 
   async function visit<T>(
     val: unknown,
-    dependents: Map<Atom, Promise<unknown>[]>,
-    cleanup: Map<Atom, () => void | Promise<void>>,
+    dependents: Map<AnyAtom, Promise<unknown>[]>,
+    cleanup: Map<AnyAtom, () => void | Promise<void>>,
   ): Promise<T> {
     const k = key(val);
     if (cache.has(k)) {
@@ -43,17 +54,17 @@ export function Run<Atom extends AnyAtom>(transform: (root: Atom) => Atom) {
           return visit(arg, dependents, cleanup);
         }));
         const pending = argsPending.then((argsResolved) => {
-          return val.impl(...argsResolved);
+          return val.impl.bind(ctx)(...argsResolved);
         });
         cache.set(k, pending);
         args.forEach((arg) => {
           if (arg instanceof Atom) {
-            let e = dependents.get(arg as Atom);
+            let e = dependents.get(arg);
             if (e) {
               e.push(pending);
             } else {
               e = [pending];
-              dependents.set(arg as Atom, e);
+              dependents.set(arg, e);
             }
           }
         });
@@ -63,7 +74,7 @@ export function Run<Atom extends AnyAtom>(transform: (root: Atom) => Atom) {
         }
         if (val.exit) {
           const applied = () => val.exit!(resolved);
-          cleanup.set(val as Atom, applied);
+          cleanup.set(val, applied);
         }
         return resolved;
       })();

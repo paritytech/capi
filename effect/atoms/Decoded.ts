@@ -3,7 +3,6 @@ import * as U from "../../util/mod.ts";
 import { atom } from "../sys/Atom.ts";
 import { T_, Val } from "../sys/Effect.ts";
 
-export type Decoded = ReturnType<typeof decoded>;
 export function decoded<
   Codec extends Val<$.Codec<any>>,
   Encoded extends Val<U.HexString>,

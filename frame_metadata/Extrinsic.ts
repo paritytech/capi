@@ -20,6 +20,8 @@ interface Signature {
   value: Uint8Array;
 }
 
+export type SignExtrinsic = (value: Uint8Array) => Signature;
+
 export interface Extrinsic {
   protocolVersion: number;
   signature?:
@@ -37,7 +39,7 @@ interface ExtrinsicCodecProps {
   metadata: Metadata;
   deriveCodec: DeriveCodec;
   hashers: HasherLookup;
-  sign: (value: Uint8Array) => Signature;
+  sign: SignExtrinsic;
 }
 
 export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
