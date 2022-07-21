@@ -1,11 +1,11 @@
 // TODO: swap out `KnownRpcMethods` with narrowed lookups
 // @see https://github.com/paritytech/capi/issues/127
 
-import { config, Meta } from "../config/mod.ts";
+import { Config } from "../config/mod.ts";
 import { KnownRpcMethods } from "./methods.ts";
 
 // TODO
-type KnownFrameLookup = Meta<{
+type KnownFrameLookup = {
   pallets: {
     balances: {
       entries: {
@@ -20,11 +20,11 @@ type KnownFrameLookup = Meta<{
       };
     };
   };
-}>;
+};
 
 // TODO: swap out chain-specifics
 
-const Config_ = config<KnownRpcMethods, KnownFrameLookup>();
+const Config_ = Config.from<KnownRpcMethods, KnownFrameLookup>();
 
 export class Polkadot extends Config_("wss://rpc.polkadot.io") {}
 export const polkadot = new Polkadot();
