@@ -1,6 +1,6 @@
 import { build } from "https://deno.land/x/dnt@0.26.0/mod.ts";
-import * as fs from "../_deps/fs.ts";
-import * as path from "../_deps/path.ts";
+import * as fs from "../_deps/std/fs.ts";
+import * as path from "../_deps/std/path.ts";
 
 const outDir = path.join("target", "npm");
 
@@ -9,19 +9,22 @@ await fs.emptyDir(outDir);
 await Promise.all([
   build({
     entryPoints: ["mod.ts", {
-      name: "fluent",
+      name: "./fluent",
       path: "fluent/mod.ts",
     }, {
-      name: "frame_metadata",
+      name: "./test-util",
+      path: "test-util/mod.ts",
+    }, {
+      name: "./frame_metadata",
       path: "frame_metadata/mod.ts",
     }, {
-      name: "config",
+      name: "./config",
       path: "config/mod.ts",
     }, {
-      name: "known",
+      name: "./known",
       path: "known/mod.ts",
     }, {
-      name: "rpc",
+      name: "./rpc",
       path: "rpc/mod.ts",
     }],
     outDir,
@@ -44,19 +47,20 @@ await Promise.all([
       repository: "github:paritytech/capi",
     },
     compilerOptions: {
-      lib: ["dom"],
+      lib: ["dom", "es2021"],
       importHelpers: true,
       sourceMap: true,
       target: "ES2021",
     },
-    // TODO: re-enable as "cjs"
-    scriptModule: false,
+    scriptModule: "cjs",
     shims: {
-      deno: true,
+      deno: {
+        test: true,
+      },
       webSocket: true,
     },
     test: false,
-    typeCheck: false, // TODO: reenable?
+    typeCheck: false,
   }),
   fs.copy("LICENSE", path.join(outDir, "LICENSE")),
   fs.copy("Readme.md", path.join(outDir, "Readme.md")),

@@ -1,4 +1,4 @@
-import { unimplemented } from "../_deps/asserts.ts";
+import { unimplemented } from "../_deps/std/testing/asserts.ts";
 import { Ss58 } from "../ss58/mod.ts";
 import * as U from "../util/mod.ts";
 import { Addresses } from "./Addresses.ts";

@@ -1,6 +1,6 @@
-import { fail } from "../_deps/asserts.ts";
-import { blue } from "../_deps/colors.ts";
-import { isPortAvailable } from "../util/mod.ts";
+import { blue } from "../_deps/std/fmt/colors.ts";
+import { fail } from "../_deps/std/testing/asserts.ts";
+import { isPortAvailable } from "../util/isPortAvailable.ts";
 
 export interface TestNodeConfig {
   cwd?: string;

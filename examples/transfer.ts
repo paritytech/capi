@@ -1,7 +1,7 @@
-import * as C from "../mod.ts";
+import * as test from "../test-util/mod.ts";
 
-const node = await C.test.node();
-const chain = C.test.chain(node);
+const node = await test.node();
+const chain = test.chain(node);
 
 const { alice, bob } = chain.address;
 

@@ -1,4 +1,4 @@
-import { deferred } from "../_deps/async.ts";
+import { deferred } from "../_deps/std/async.ts";
 import { ClientHooks, Provider, ProviderMethods } from "./common.ts";
 import * as msg from "./messages.ts";
 

@@ -1,4 +1,4 @@
-import { assert } from "../_deps/asserts.ts";
+import { assert } from "../_deps/std/testing/asserts.ts";
 
 export function assertNotError<InQuestion>(
   inQuestion: InQuestion,

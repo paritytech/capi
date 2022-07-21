@@ -1,8 +1,7 @@
-import * as C from "../mod.ts";
+import * as test from "../test-util/mod.ts";
 
-const node = await C.test.node();
-
-const result = await C.test
+const node = await test.node();
+const result = await test
   .chain(node)
   .block()
   .read();

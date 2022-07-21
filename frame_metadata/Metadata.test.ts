@@ -1,4 +1,4 @@
-import { assertSnapshot } from "../_deps/snapshot.ts";
+import { assertSnapshot } from "../_deps/std/testing/snapshot.ts";
 import { Metadata } from "./test-common.ts";
 
 await Promise.all(

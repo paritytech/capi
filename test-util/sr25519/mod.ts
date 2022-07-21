@@ -1,6 +1,5 @@
 // TODO: brands
 // TODO: narrow error types
-import { decompress } from "../../_deps/lz4.ts";
 import { instantiate } from "./mod.generated.mjs";
 
 export interface PublicKey {
@@ -36,7 +35,7 @@ export interface Sr25519 {
 }
 
 export async function Sr25519(): Promise<Sr25519> {
-  const instance = await instantiate(decompress);
+  const instance = await instantiate();
   return {
     PublicKey: instance.PublicKey,
     TestUser: instance.TestUser,

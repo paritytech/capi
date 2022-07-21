@@ -1,4 +1,4 @@
-import { unimplemented } from "../../_deps/asserts.ts";
+import { unimplemented } from "../../_deps/std/testing/asserts.ts";
 import { Config } from "../../config/mod.ts";
 import { isWsUrl } from "../../util/mod.ts";
 import { ProviderMethods } from "../common.ts";

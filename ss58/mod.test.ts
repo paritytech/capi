@@ -1,4 +1,4 @@
-import { assertEquals } from "../_deps/asserts.ts";
+import { assertEquals } from "../_deps/std/testing/asserts.ts";
 import { Ss58 } from "./mod.ts";
 
 const ss58 = await Ss58();

@@ -14,6 +14,7 @@ export class Config<
 
 // TODO: simplify these extraction utils
 export namespace Config {
+  // If you experience a parse error stemming from the following line, update Deno.
   export type F_<B extends Config> = B extends Config<any, ProviderMethods, infer F extends Meta>
     ? F
     : never;
@@ -50,8 +51,6 @@ export function config<M extends ProviderMethods, F extends Meta>() {
     };
   };
 }
-
-//
 
 export type Meta<T extends Meta = AnyMeta> = T;
 export interface AnyMeta {

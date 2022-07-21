@@ -1,4 +1,4 @@
-import { assertEquals } from "../_deps/asserts.ts";
+import { assertEquals } from "../_deps/std/testing/asserts.ts";
 import * as t from "../test-util/mod.ts";
 import * as U from "../util/mod.ts";
 import { ChainError, DeriveCodec } from "./Codec.ts";
