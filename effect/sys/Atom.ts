@@ -1,4 +1,5 @@
-import { E_, Effect, Resolved } from "./Effect.ts";
+import { E_, Effect, Resolved, T_ } from "./Effect.ts";
+import { key } from "./key.ts";
 import { RunContext } from "./Run.ts";
 
 export function atom<N extends string, A extends unknown[], R>(
@@ -32,3 +33,30 @@ export type Impl<A extends unknown[], R> = (
 
 // TODO: type the possibility of exit errors
 export type Exit<R> = (resolved: Exclude<R, Error>) => void | Promise<void>;
+
+export function anon<A extends unknown[], R>(
+  args: [...A],
+  impl: Impl<A, R>,
+  exit?: Exit<R>,
+): Atom<string, A, R> {
+  return new Atom(key(impl), args, impl, exit);
+}
+
+export function into<A extends unknown[], R extends AnyAtom | Error>(
+  args: [...A],
+  into: Impl<A, R>,
+): Atom<string, A, Extract<R, Error> | E_<Extract<R, AnyAtom>> | T_<Extract<R, AnyAtom>>> {
+  return new Atom("Map", args, async function(...args) {
+    const next = await into.bind(this)(...args);
+    if (next instanceof Error) {
+      return next;
+    }
+    return await this.run(next);
+  });
+}
+
+export function all<A extends unknown[]>(...effects: A): Atom<"All", A, Resolved<A>> {
+  return new Atom("All", effects, (...resolved) => {
+    return resolved;
+  });
+}
