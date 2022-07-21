@@ -9,7 +9,7 @@ await t.ctx(async (config) => {
     return (m) => {
       i++;
       if (i > 5) {
-        close?.();
+        close();
       }
       console.log(m);
     };
