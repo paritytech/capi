@@ -9,7 +9,7 @@ export type RpcCall = ReturnType<typeof rpcCall>;
 export function rpcCall<
   Methods extends rpc.ProviderMethods,
   MethodName extends Val<U.AssertT<keyof Methods, string>>,
-  Params extends ValCollection<rpc.Params<Methods, T_<MethodName>>>,
+  Params extends ValCollection<Parameters<Methods[T_<MethodName>]>>,
 >(
   config: Config<string, Methods>,
   methodName: MethodName,
@@ -19,7 +19,7 @@ export function rpcCall<
     "RpcCall",
     [rpcClient(config), methodName, ...params],
     async (client, methodName, ...params) => {
-      const result = await client.call(methodName, params);
+      const result = await client.call(methodName, params as Parameters<Methods[T_<MethodName>]>);
       if (result.error) {
         return new RpcError();
       }

@@ -2,17 +2,15 @@ import * as U from "../util/mod.ts";
 import { ProviderMethods, Subscription } from "./common.ts";
 
 export type InitMessageByMethodName<M extends ProviderMethods> = {
-  [N in keyof M]: InitMessageBase<U.AssertT<N, string>, M[N][0]>;
+  [N in keyof M]: InitMessageBase<U.AssertT<N, string>, Parameters<M[N]>>;
 };
 export type InitMessage<
   M extends ProviderMethods,
   N extends keyof M = keyof M,
 > = InitMessageByMethodName<M>[N];
 
-export type Params<M extends ProviderMethods, N extends keyof M> = M[N][0];
-
 export type OkMessageByMethodName<M extends ProviderMethods> = {
-  [N in keyof M]: OkMessageBase<M[N][1] extends Subscription ? string : M[N][1]>;
+  [N in keyof M]: OkMessageBase<ReturnType<M[N]> extends Subscription ? string : ReturnType<M[N]>>;
 };
 export type OkMessage<
   M extends ProviderMethods,
@@ -20,9 +18,9 @@ export type OkMessage<
 > = OkMessageByMethodName<M>[N];
 
 export type NotifByMethodName<M extends ProviderMethods> = {
-  [N in keyof M as M[N][1] extends Subscription ? N : never]: NotifMessageBase<
+  [N in keyof M as ReturnType<M[N]> extends Subscription ? N : never]: NotifMessageBase<
     U.AssertT<N, string>,
-    M[N][1] extends Subscription<infer R> ? R : never
+    ReturnType<M[N]> extends Subscription<infer R> ? R : never
   >;
 };
 export type SubscriptionMethodName<M extends ProviderMethods> = keyof NotifByMethodName<M>;

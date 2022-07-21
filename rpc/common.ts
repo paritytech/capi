@@ -1,11 +1,8 @@
 import { ErrorCtor } from "../util/mod.ts";
 import * as msg from "./messages.ts";
 
-export type ProviderMethods = Record<string, ProviderMethod<any[], any>>;
-export type ProviderMethod<
-  Params extends unknown[],
-  Result extends unknown,
-> = [params: Params, result: Result];
+export type ProviderMethods = Record<string, (...args: any[]) => any>;
+
 declare const subscription_: unique symbol;
 export type Subscription<Notification = any> = { [subscription_]: Notification };
 
