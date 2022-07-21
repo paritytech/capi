@@ -9,4 +9,5 @@ export * from "./RpcClient.ts";
 export * from "./RpcSubscription.ts";
 export * from "./Select.ts";
 export * from "./StorageKey.ts";
+export * from "./StorageKeyCodec.ts";
 export * from "./Wrap.ts";

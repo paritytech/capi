@@ -21,7 +21,8 @@ export function readEntry<
   const deriveCodec_ = a.deriveCodec(metadata_);
   const palletMetadata_ = a.palletMetadata(metadata_, palletName);
   const entryMetadata_ = a.entryMetadata(palletMetadata_, entryName);
-  const storageKey_ = a.storageKey(deriveCodec_, palletMetadata_, entryMetadata_, keys);
+  const storageKeyCodec_ = a.storageKeyCodec(deriveCodec_, palletMetadata_, entryMetadata_);
+  const storageKey_ = a.storageKey(storageKeyCodec_, keys);
   const storageCall = a.rpcCall(config, "state_getStorage", storageKey_, blockHash);
   const entryValueTypeI = a.select(entryMetadata_, "value");
   const entryCodec = a.codec(deriveCodec_, entryValueTypeI);

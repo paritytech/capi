@@ -112,7 +112,11 @@ export interface KnownRpcMethods extends
       queryStorage: TODO_NARROW_METHOD_TYPE;
       queryStorageAt(keys: U.HexString[], at?: U.HashHexString): T.StorageChangeSet;
       subscribeRuntimeVersion: TODO_NARROW_METHOD_TYPE;
-      subscribeStorage(list: U.HexString[]): rpc.Subscription<"TODO">;
+      subscribeStorage(list: U.HexString[]): rpc.Subscription<{
+        // TODO: clean this up
+        block: U.HashHexString;
+        changes: [U.HexString, U.HexString][];
+      }>;
       unsubscribeRuntimeVersion(subscription: string): boolean;
       unsubscribeStorage(subscription: string): boolean;
       getKeysPaged(
