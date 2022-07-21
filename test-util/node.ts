@@ -1,20 +1,20 @@
 import { blue } from "../deps/std/fmt/colors.ts";
 import { fail } from "../deps/std/testing/asserts.ts";
 
-export interface TestNodeConfig {
+export interface NodeConfig {
   cwd?: string;
   altRuntime?: "kusama" | "rococo" | "westend";
   port?: number;
 }
 
 export interface Node {
-  config?: TestNodeConfig;
+  config?: NodeConfig;
   inner: Deno.Process;
   close(): void;
   url: string;
 }
 
-export async function node(config?: TestNodeConfig): Promise<Node> {
+export async function node(config?: NodeConfig): Promise<Node> {
   let port = 9944;
   if (config?.port) {
     if (!isPortAvailable(config.port)) {
