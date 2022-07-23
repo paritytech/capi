@@ -5,17 +5,14 @@ import {
   PalletMetadata as PalletMetadata_,
 } from "./metadata.ts";
 
-declare const rpc_provider_methods_: unique symbol;
-declare const metadata_: unique symbol;
-
+export declare const config_: unique symbol;
 /** We represent as a class, not a branded type, because we want to extend into a pretty signature. */
 export class Config<
   D = any,
   M extends ProviderMethods = ProviderMethods,
   F extends Metadata_ = Metadata_,
 > {
-  declare [rpc_provider_methods_]: M;
-  declare [metadata_]: F;
+  #$!: [M, F];
 
   constructor(readonly discoveryValue: D) {}
 }

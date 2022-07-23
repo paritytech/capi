@@ -9,17 +9,11 @@ await fs.emptyDir(outDir);
 await Promise.all([
   build({
     entryPoints: ["mod.ts", {
-      name: "./fluent",
-      path: "fluent/mod.ts",
-    }, {
       name: "./test-util",
       path: "test-util/mod.ts",
     }, {
       name: "./frame_metadata",
       path: "frame_metadata/mod.ts",
-    }, {
-      name: "./config",
-      path: "config/mod.ts",
     }, {
       name: "./known",
       path: "known/mod.ts",
@@ -29,11 +23,11 @@ await Promise.all([
     }],
     outDir,
     mappings: {
-      "https://deno.land/x/scale@v0.3.0/mod.ts": {
+      "https://deno.land/x/scale@v0.3.2/mod.ts": {
         name: "parity-scale-codec",
-        version: "^0.3.0",
+        version: "^0.3.2",
       },
-      "_deps/smoldot_phantom.ts": {
+      "deps/smoldot_phantom.ts": {
         name: "@substrate/smoldot-light",
         version: "0.6.20",
         peerDependency: true,
@@ -57,7 +51,6 @@ await Promise.all([
       deno: {
         test: true,
       },
-      webSocket: true,
     },
     test: false,
     typeCheck: false,
