@@ -12,7 +12,7 @@ export class Config<
   M extends ProviderMethods = ProviderMethods,
   F extends Metadata_ = Metadata_,
 > {
-  #$!: [M, F];
+  _!: [M, F];
 
   constructor(readonly discoveryValue: D) {}
 }
