@@ -20,11 +20,11 @@ export function rpcCall<
     async function(client, methodName, ...params) {
       const result = await client.call(methodName, params as Parameters<Methods[T_<MethodName>]>);
       if (result.error) {
-        return new RpcError();
+        return new RpcCallError();
       }
       return result;
     },
   );
 }
 
-class RpcError extends U.ErrorCtor("Rpc") {}
+export class RpcCallError extends U.ErrorCtor("Rpc") {}
