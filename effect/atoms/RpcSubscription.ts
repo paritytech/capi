@@ -25,27 +25,27 @@ export function rpcSubscription<
     "RpcSubscription",
     [clientA, methodName, ...params],
     async function(client, methodName, ...params) {
-      const ref = this.pin(clientA);
-      const closeContainer: { close?: () => void } = {};
-      const result = await client.subscribe(
-        methodName as Extract<keyof rpc.NotifByMethodName<Methods>, keyof Methods>,
-        params as Parameters<Methods[Extract<keyof rpc.NotifByMethodName<Methods>, keyof Methods>]>,
-        createListener(() => {
-          closeContainer.close?.();
-        }) as rpc.ListenerCb<
-          rpc.NotifMessage<Methods, Extract<keyof rpc.NotifByMethodName<Methods>, keyof Methods>>
-        >,
-      );
-      if (typeof result !== "function") {
-        return new RpcError();
-      }
-      closeContainer.close = () => {
-        result();
-        ref.unpin();
-      };
-      return;
+      // const ref = this.pin(clientA);
+      // const closeContainer: { close?: () => void } = {};
+      // await client.subscribe(
+      //   methodName as Extract<keyof rpc.NotifByMethodName<Methods>, keyof Methods>,
+      //   params as Parameters<Methods[Extract<keyof rpc.NotifByMethodName<Methods>, keyof Methods>]>,
+      //   createListener(() => {
+      //     closeContainer.close?.();
+      //   }) as rpc.ListenerCb<
+      //     rpc.NotifMessage<Methods, Extract<keyof rpc.NotifByMethodName<Methods>, keyof Methods>>
+      //   >,
+      // );
+      // if (typeof result !== "function") {
+      //   return new RpcError();
+      // }
+      // closeContainer.close = () => {
+      //   result();
+      //   ref.unpin();
+      // };
+      // return;
     },
   );
 }
 
-class RpcError extends U.ErrorCtor("Rpc") {}
+export class RpcSubscriptionError extends U.ErrorCtor("Rpc") {}
