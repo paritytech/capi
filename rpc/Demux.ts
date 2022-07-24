@@ -11,6 +11,7 @@ class DemuxGroup<M extends ProviderMethods> {
   constructor(readonly stop: StopListening) {}
 }
 
+// TODO: decide whether this is even beneficial
 export class Demux<
   M extends ProviderMethods,
   ParsedError extends Error,
