@@ -1,11 +1,8 @@
 import { deferred } from "../deps/std/async.ts";
+import * as U from "../util/mod.ts";
 import { ClientHooks, Provider, ProviderMethods } from "./common.ts";
 import * as msg from "./messages.ts";
-
-interface Subscription<M extends ProviderMethods> {
-  listeners: Map<ListenerCb<msg.NotifMessage<M>>, true>;
-  close: () => void;
-}
+import { IsCorrespondingRes } from "./util.ts";
 
 export abstract class Client<
   M extends ProviderMethods,
@@ -15,8 +12,7 @@ export abstract class Client<
   CloseError extends Error,
 > {
   #nextId = 0;
-  listeners = new Map<ListenerCb<msg.IngressMessage<M>>, true>();
-  subscriptions = new Map<string, Subscription<M>>();
+  #listenerCbs = new Map<ListenerCb<msg.IngressMessage<M>>, true>();
 
   /**
    * Construct a new RPC client
@@ -51,17 +47,14 @@ export abstract class Client<
   /**
    * Attach a listener to handle ingress messages
    *
-   * @param listener the callback to be triggered upon arrival of ingress messages
-   * @returns a function to detach the listener
+   * @param createListenerCb the factory for the callback to be triggered upon arrival of ingress messages
    */
-  listen = (listener: ListenerCb<msg.IngressMessage<M>>): StopListening => {
-    // TODO: do we care about repeat registration?
-    if (!this.listeners.has(listener)) {
-      this.listeners.set(listener, true);
-    }
-    return () => {
-      this.listeners.delete(listener);
+  listen = (createListenerCb: CreateListenerCb<msg.IngressMessage<M>>) => {
+    const stopListening = () => {
+      this.#listenerCbs.delete(listenerCb);
     };
+    const listenerCb = createListenerCb(stopListening);
+    this.#listenerCbs.set(listenerCb, true);
   };
 
   // TODO: do we want to parameterize `RpcClient` with a `RawMessage` type?
@@ -72,7 +65,7 @@ export abstract class Client<
       this.hooks?.error?.(parsed);
     } else {
       this.hooks?.receive?.(parsed);
-      for (const listener of this.listeners.keys()) {
+      for (const listener of this.#listenerCbs.keys()) {
         listener(parsed);
       }
     }
@@ -91,7 +84,7 @@ export abstract class Client<
    * @param params the params with which to call the method
    * @returns an ingress message corresponding to the given method (or a message-agnostic error)
    */
-  call = async <Method extends keyof M>(
+  call = <Method extends keyof M>(
     method: Method,
     params: msg.InitMessage<M, Method>["params"],
   ): Promise<msg.OkMessage<M, Method> | msg.ErrMessage> => {
@@ -101,36 +94,18 @@ export abstract class Client<
       method,
       params,
     };
-    const isCorrespondingRes = IsCorrespondingRes<M, typeof init>(init);
+    const isCorrespondingRes = IsCorrespondingRes(init);
     const pending = deferred<msg.OkMessage<M, Method> | msg.ErrMessage>();
-    const stopListening = this.listen((res) => {
-      if (isCorrespondingRes(res)) {
-        pending.resolve(res);
-      }
+    this.listen((stopListening) => {
+      return (res) => {
+        if (isCorrespondingRes(res)) {
+          stopListening();
+          pending.resolve(res);
+        } else { /* TODO: handle */ }
+      };
     });
     this.send(init);
-    const result = await pending;
-    stopListening();
-    return result;
-  };
-
-  /** @internal */
-  #subscribeUnsafe = async <Method extends Extract<msg.SubscriptionMethodName<M>, keyof M>>(
-    method: Method,
-    params: msg.InitMessage<M, Method>["params"],
-    listenerCb: ListenerCb<msg.NotifMessage<M, Method>>,
-  ): Promise<StopListening | msg.ErrMessage> => {
-    const initRes = await this.call(method, params);
-    if (initRes.error) {
-      return initRes;
-    }
-    const stopListening = this.listen((res) => {
-      // TODO: handle subscription errors
-      if (res.params?.subscription && res.params.subscription === initRes.result) {
-        listenerCb(res as any);
-      }
-    });
-    return stopListening;
+    return pending;
   };
 
   /**
@@ -138,61 +113,30 @@ export abstract class Client<
    *
    * @param method the method name of the subscription you wish to init
    * @param params the params with which to init the subscription
-   * @param listenerCb the callback to which notifications should be supplied
-   * @returns a function with which to stop listening for notifications
+   * @param createListenerCb the factory of the callback to which notifications should be supplied
    */
   subscribe = async <Method extends Extract<msg.SubscriptionMethodName<M>, keyof M>>(
     method: Method,
     params: msg.InitMessage<M, Method>["params"],
-    listenerCb: ListenerCb<msg.NotifMessage<M, Method>>,
-  ): Promise<StopListening | msg.ErrMessage> => {
-    // TODO: why is `keyof M` being inferred with sym as a member?
-    const key = `${method as string}(${JSON.stringify(params)})`;
-    const existing = this.subscriptions.get(key);
-    const Close = (group: Subscription<M>) => {
-      return () => {
-        group.listeners.delete(listenerCb as any);
-        if (!group.listeners.size) {
-          group.close();
-          this.subscriptions.delete(key);
-        }
-      };
-    };
-    if (existing) {
-      existing.listeners.set(listenerCb as any, true);
-      return Close(existing);
-    } else {
-      const group: Subscription<M> = {
-        listeners: new Map([[listenerCb as any, true]]),
-        close: undefined!,
-      };
-      const subscribeResult = await this.#subscribeUnsafe(method, params, (message) => {
-        for (const listener of group.listeners.keys()) {
-          listener(message);
-        }
-      });
-      if (typeof subscribeResult === "function") {
-        group.close = subscribeResult;
-      }
-      return Close(group);
+    createListenerCb: CreateListenerCb<msg.NotifMessage<M, Method>>,
+  ): Promise<undefined | msg.ErrMessage> => {
+    const initRes = await this.call(method, params);
+    if (initRes.error) {
+      return initRes;
     }
+    const status = deferred<undefined | msg.ErrMessage>();
+    this.listen((stop) => {
+      const listenerCb = createListenerCb(U.resolveOnCall(status, stop));
+      return (res) => {
+        if (res.params?.subscription && res.params.subscription === initRes.result) {
+          listenerCb(res as any);
+        } else { /* TODO: error */ }
+      };
+    });
+    return await status;
   };
 }
 
-export type ListenerCb<IngressMessage> = (ingressMessage: IngressMessage) => void;
-
+export type CreateListenerCb<IngressMessage> = (stop: StopListening) => ListenerCb<IngressMessage>;
 export type StopListening = () => void;
-
-export function IsCorrespondingRes<
-  M extends ProviderMethods,
-  Init_ extends msg.InitMessage<M>,
->(init: Init_) {
-  return <InQuestion extends msg.IngressMessage<M>>(
-    inQuestion: InQuestion,
-  ): inQuestion is Extract<
-    InQuestion,
-    msg.OkMessageByMethodName<M>[Init_["method"]] | msg.ErrMessage
-  > => {
-    return inQuestion?.id === init.id;
-  };
-}
+export type ListenerCb<IngressMessage> = (ingressMessage: IngressMessage) => void;

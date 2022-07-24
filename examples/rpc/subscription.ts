@@ -6,11 +6,12 @@ const client = await rpc.fromConfig(polkadot);
 assert(!(client instanceof Error));
 
 let i = 1;
-const stop = await client.subscribe("chain_subscribeAllHeads", [], async (message) => {
-  console.log({ [i++]: message.params.result });
-  if (i > 5) {
-    assert(typeof stop === "function");
-    stop();
-    await client.close();
-  }
+await client.subscribe("chain_subscribeAllHeads", [], (stop) => {
+  return async (message) => {
+    console.log({ [i++]: message.params.result });
+    if (i > 5) {
+      stop();
+      await client.close();
+    }
+  };
 });
