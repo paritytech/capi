@@ -30,6 +30,7 @@
     "lock": "deno task star --lock=lock.json --lock-write",
     "test": "deno test -A --no-check=remote -L=info --ignore=target",
     "test:update": "deno task test -- -- --update",
-    "mdbook:watch": "mdbook watch -o"
+    "mdbook:watch": "mdbook watch -o",
+    "bench": "deno bench -A --no-check=remote --unstable"
   }
 }

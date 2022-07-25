@@ -1,5 +1,4 @@
-import { run } from "../effect/run.ts";
-import { readKeyPage } from "../effect/std/keyPage/read.ts";
+import * as Z from "../effect/mod.ts";
 import { Block } from "./Block.ts";
 import { NodeBase } from "./common.ts";
 import { Entry } from "./Entry.ts";
@@ -20,8 +19,8 @@ export class KeyPage<E extends Entry = Entry> extends NodeBase<"KeyPage"> {
   }
 
   read(block?: Block) {
-    return run(
-      readKeyPage(
+    return Z.run(
+      Z.readKeyPage(
         this.chain.config as any,
         this.entry.pallet.name,
         this.entry.name,

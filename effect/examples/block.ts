@@ -1,8 +1,7 @@
 import * as C from "../../known/mod.ts";
 import * as U from "../../util/mod.ts";
-import { run } from "../run.ts";
-import { readBlock } from "../std/block/read.ts";
+import * as Z from "../mod.ts";
 
-const read_ = readBlock(C.polkadot);
-const result = U.throwIfError(await run(read_));
+const read_ = Z.readBlock(C.polkadot);
+const result = U.throwIfError(await Z.run(read_));
 console.log(result.block);

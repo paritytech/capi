@@ -1,8 +1,8 @@
-import { Config } from "../../../config/mod.ts";
-import { KnownRpcMethods } from "../../../known/mod.ts";
-import * as U from "../../../util/mod.ts";
-import * as a from "../../atoms/mod.ts";
-import * as sys from "../../sys/mod.ts";
+import { Config } from "../../config/mod.ts";
+import { KnownRpcMethods } from "../../known/mod.ts";
+import * as U from "../../util/mod.ts";
+import * as a from "../atoms/mod.ts";
+import * as sys from "../sys/mod.ts";
 
 export function readBlock<
   C extends Config<string, Pick<KnownRpcMethods, "state_getMetadata" | "chain_getBlock">>,
@@ -14,7 +14,7 @@ export function readBlock<
   const metadata_ = a.metadata(config, blockHash);
   const deriveCodec_ = a.deriveCodec(metadata_);
   const rpcCall_ = a.rpcCall(config, "chain_getBlock", blockHash);
-  const $extrinsic = a.extrinsicCodec(deriveCodec_, metadata_);
+  const $extrinsic = a.$extrinsic(deriveCodec_, metadata_);
   const withDecodedExtrinsics = sys.atom(
     "WithDecodedExtrinsics",
     [rpcCall_, $extrinsic],

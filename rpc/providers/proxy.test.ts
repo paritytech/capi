@@ -1,4 +1,3 @@
-import { deferred } from "../../deps/std/async.ts";
 import { assert } from "../../deps/std/testing/asserts.ts";
 import { KnownRpcMethods, polkadot } from "../../known/mod.ts";
 import * as msg from "../messages.ts";
@@ -19,18 +18,16 @@ Deno.test({
 
     await t.step("subscribe", async () => {
       const result: msg.NotifMessage<KnownRpcMethods, "chain_subscribeAllHeads">[] = [];
-      const pending = deferred();
       let i = 1;
-      const stop = await client.subscribe("chain_subscribeAllHeads", [], (message) => {
-        result.push(message);
-        i++;
-        if (i > 2) {
-          assert(typeof stop === "function");
-          stop();
-          pending.resolve();
-        }
+      await client.subscribe("chain_subscribeAllHeads", [], (stop) => {
+        return (message) => {
+          result.push(message);
+          i++;
+          if (i > 2) {
+            stop();
+          }
+        };
       });
-      await pending;
       assert(result.every((message) => {
         return message.params.result;
       }));

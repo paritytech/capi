@@ -1,11 +1,10 @@
 import { polkadot } from "../../known/mod.ts";
 import * as U from "../../util/mod.ts";
-import { run } from "../run.ts";
-import { watchEntry } from "../std/entry/watch.ts";
+import * as Z from "../mod.ts";
 
-const subscription = watchEntry(polkadot, "Timestamp", "Now", [], () => {
+const subscription = Z.watchEntry(polkadot, "Timestamp", "Now", [], () => {
   return (m) => {
     console.log(m);
   };
 });
-U.throwIfError(await run(subscription));
+U.throwIfError(await Z.run(subscription));
