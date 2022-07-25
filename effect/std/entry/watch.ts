@@ -1,5 +1,6 @@
 import { Config } from "../../../config/mod.ts";
 import { KnownRpcMethods } from "../../../known/mod.ts";
+import * as rpc from "../../../rpc/mod.ts";
 import * as U from "../../../util/mod.ts";
 import * as a from "../../atoms/mod.ts";
 import * as sys from "../../sys/mod.ts";
@@ -14,9 +15,8 @@ export function watchEntry<
   palletName: PalletName,
   entryName: EntryName,
   keys: Keys,
-  createListener: (close: () => void) => (change: any) => void,
+  createListenerCb: rpc.CreateListenerCb<any /* TODO */>,
 ) {
-  // TODO: something in the runtime is misbehaving –– subscription is closed after first ping
   const metadata_ = a.metadata(config);
   const deriveCodec_ = a.deriveCodec(metadata_);
   const palletMetadata_ = a.palletMetadata(metadata_, palletName);
@@ -26,15 +26,18 @@ export function watchEntry<
   const entryCodec = a.codec(deriveCodec_, entryValueTypeI);
   const storageKeys = sys.anon([a.storageKey(storageKeyCodec_, keys)], (v) => [v]);
   return sys.into([entryCodec], ($entryCodec) => {
-    return a.rpcSubscription(config, "state_subscribeStorage", [storageKeys], (close) => {
-      const inner = createListener(close);
-      return (message) => {
-        if (message.params) {
-          inner(message.params.result.changes.map(([key, val]) => {
+    return a.rpcSubscription(
+      config,
+      "state_subscribeStorage",
+      [storageKeys],
+      rpc.mapNotifications(createListenerCb, (notif) => {
+        if (notif.params) {
+          return notif.params.result.changes.map(([key, val]) => {
             return [key, val ? $entryCodec.decode(U.hex.decode(val)) : undefined];
-          }));
+          });
         }
-      };
-    });
+        return;
+      }),
+    );
   });
 }
