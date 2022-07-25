@@ -10,5 +10,3 @@ export type EnsureLookup<
     [_ in K]: ValueConstraint;
   },
 > = Lookup;
-
-export type AssertT<T, As> = T extends As ? T : never;

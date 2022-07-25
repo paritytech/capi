@@ -1,83 +1,82 @@
+import { Config } from "../config/mod.ts";
 import * as U from "../util/mod.ts";
-import { ProviderMethods, Subscription } from "./common.ts";
+import { ProviderMethods } from "./common.ts";
 
-export type InitMessageByMethodName<M extends ProviderMethods> = {
-  [N in keyof M]: InitMessageBase<U.AssertT<N, string>, Parameters<M[N]>>;
-};
-export type InitMessage<
-  M extends ProviderMethods,
-  N extends keyof M = keyof M,
-> = InitMessageByMethodName<M>[N];
+/** Ensure valid declaration of RPC method lookup (for both calls and subscriptions) */
+export type EnsureMethods<Lookup extends Record<string, ProviderMethods>> = U.U2I<
+  {
+    [Prefix in keyof Lookup]: {
+      [M in Extract<keyof Lookup[Prefix], string> as `${Extract<Prefix, string>}_${M}`]:
+        Lookup[Prefix][M];
+    };
+  }[keyof Lookup]
+>;
 
-export type OkMessageByMethodName<M extends ProviderMethods> = {
-  [N in keyof M]: OkMessageBase<ReturnType<M[N]> extends Subscription ? string : ReturnType<M[N]>>;
-};
-export type OkMessage<
-  M extends ProviderMethods,
-  N extends keyof M = keyof M,
-> = OkMessageByMethodName<M>[N];
+/** Ensure valid declaration of an RPC error detail lookup */
+export type EnsureErrorDetails<Lookup extends Record<string, [code: number, data?: any]>> = Lookup;
 
-export type NotifByMethodName<M extends ProviderMethods> = {
-  [N in keyof M as ReturnType<M[N]> extends Subscription ? N : never]: NotifMessageBase<
-    U.AssertT<N, string>,
-    ReturnType<M[N]> extends Subscription<infer R> ? R : never
+/** Get a mapping from method name to init message */
+export type InitMessageByMethodName<Config_ extends Config> = {
+  [N in Extract<keyof Config_["RpcMethods"], string>]: InitMessageBase<
+    N,
+    Parameters<Config_["RpcMethods"][N]>
   >;
 };
-export type SubscriptionMethodName<M extends ProviderMethods> = keyof NotifByMethodName<M>;
+
+/** Get a union of init messages or––if `N` is supplied––a specific init message */
+export type InitMessage<
+  Config_ extends Config,
+  N extends Extract<keyof Config_["RpcMethods"], string> = Extract<
+    keyof Config_["RpcMethods"],
+    string
+  >,
+> = InitMessageByMethodName<Config_>[N];
+
+/** Get a mapping from method name to ok ingress message */
+export type OkMessageByMethodName<Config_ extends Config> =
+  & {
+    [N in Extract<keyof Config_["RpcMethods"], string>]: OkMessageBase<
+      ReturnType<Config["RpcMethods"][N]>
+    >;
+  }
+  & { [N in keyof Config_["RpcSubscriptionMethods"]]: OkMessageBase<string> };
+
+/** Get a ok ingress messages or––if `N` is supplied––a specific ok ingress message */
+export type OkMessage<
+  Config_ extends Config,
+  N extends keyof OkMessageByMethodName<Config_> = keyof OkMessageByMethodName<Config_>,
+> = OkMessageByMethodName<Config_>[N];
+
+/** Get a mapping from method name to "notification" ingress message */
+export type NotifByMethodName<Config_ extends Config> = {
+  [N in Extract<keyof Config_["RpcSubscriptionMethods"], string>]: NotifMessageBase<
+    N,
+    ReturnType<Config_["RpcSubscriptionMethods"][N]>
+  >;
+};
+
+/** Get a union of notification messages or––if `N` is supplied––a specific notification message */
 export type NotifMessage<
-  M extends ProviderMethods,
-  N extends SubscriptionMethodName<M> = SubscriptionMethodName<M>,
-> = NotifByMethodName<M>[N];
+  Config_ extends Config,
+  N extends keyof NotifByMethodName<Config_> = keyof NotifByMethodName<Config_>,
+> = NotifByMethodName<Config_>[N];
 
 // TODO: investigate whether it's worthwhile to support somehow tacking on narrow method-specific types
-export type ErrName = keyof ErrDetailLookup;
-export type ErrMessageByName = {
-  [N in ErrName]: ErrorMessageBase<ErrDetailLookup[N][0], ErrDetailLookup[N][1]>;
+/** Get a mapping from error name to error ingress message */
+export type ErrMessageByName<Config_ extends Config> = {
+  [N in keyof Config_["RpcErrorDetails"]]: ErrorMessageBase<
+    Config_["RpcErrorDetails"][N][0],
+    Config_["RpcErrorDetails"][N][1]
+  >;
 };
-export type ErrMessage<N extends ErrName = ErrName> = ErrMessageByName[N];
 
-export type IngressMessage<
-  M extends ProviderMethods,
-  N extends keyof M = keyof M,
-> =
-  | OkMessage<M, N>
-  | ErrMessage
-  | (N extends SubscriptionMethodName<M> ? NotifMessage<M, N> : never);
+/** Get a union of error messages */
+export type ErrMessage<Config_ extends Config> = U.ValueOf<ErrMessageByName<Config_>>;
 
-type ErrDetailLookup = U.EnsureLookup<string, [code: number, data?: any], {
-  /**
-   * Invalid JSON was received by the server.
-   */
-  ParseError: [-32700];
-  /**
-   * The JSON sent is not a valid Request object.
-   */
-  InvalidRequest: [-32600];
-  /**
-   * The method does not exist / is not available.
-   */
-  MethodNotFound: [-32601];
-  /**
-   * Invalid method parameter(s).
-   */
-  InvalidParams: [-32602];
-  /**
-   * Internal JSON-RPC error.
-   */
-  InternalError: [-32603];
-  /**
-   * Other internal server error.
-   * Contains a more precise error code and a custom message.
-   * Error code must be in the range -32000 to -32099 included.
-   */
-  ServerError: [number];
-  /**
-   * Method-specific error.
-   * Contains a more precise error code and a custom message.
-   * Error code must be outside of the range -32000 to -32700.
-   */
-  MethodError: [number];
-}>;
+export type IngressMessage<Config_ extends Config> =
+  | OkMessage<Config_>
+  | U.ValueOf<ErrMessageByName<Config_>> // ... for now
+  | NotifMessage<Config_>;
 
 interface JsonRpcVersionBearer {
   jsonrpc: "2.0";

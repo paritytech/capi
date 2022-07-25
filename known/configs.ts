@@ -1,10 +1,15 @@
 import { Config } from "../config/mod.ts";
 import { TmpMetadata } from "./metadata.ts";
-import { KnownRpcMethods } from "./methods.ts";
+import * as knownRpc from "./rpc.ts";
 
 // TODO: swap out chain-specific rpc and metadata types
 // @see https://github.com/paritytech/capi/issues/127
-const Config_ = Config.from<KnownRpcMethods, TmpMetadata>();
+const Config_ = Config.from<
+  knownRpc.CallMethods,
+  knownRpc.SubscriptionMethods,
+  knownRpc.ErrorDetails,
+  TmpMetadata
+>();
 
 export class Polkadot extends Config_("wss://rpc.polkadot.io") {}
 export const polkadot = new Polkadot();

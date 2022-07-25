@@ -1,11 +1,11 @@
 import { Config } from "../../config/mod.ts";
-import { KnownRpcMethods } from "../../known/mod.ts";
+import { rpc as knownRpc } from "../../known/mod.ts";
 import * as U from "../../util/mod.ts";
 import * as a from "../atoms/mod.ts";
 import * as sys from "../sys/mod.ts";
 
 export function readEntry<
-  C extends Config<string, Pick<KnownRpcMethods, "state_getMetadata" | "state_getStorage">>,
+  C extends Config<string, Pick<knownRpc.Methods, "state_getMetadata" | "state_getStorage">>,
   PalletName extends sys.Val<string>,
   EntryName extends sys.Val<string>,
   Keys extends unknown[],
@@ -23,7 +23,7 @@ export function readEntry<
   const entryMetadata_ = a.entryMetadata(palletMetadata_, entryName);
   const $storageKey = a.$storageKey(deriveCodec_, palletMetadata_, entryMetadata_);
   const storageKey = a.storageKey($storageKey, keys);
-  const storageCall = a.rpcCall(config, "state_getStorage", storageKey, blockHash);
+  const storageCall = a.rpcCall(config, "state_getStorage", [storageKey, blockHash]);
   const entryValueTypeI = a.select(entryMetadata_, "value");
   const $entry = a.codec(deriveCodec_, entryValueTypeI);
   const resultHex = a.select(storageCall, "result");

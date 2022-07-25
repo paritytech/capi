@@ -1,22 +1,28 @@
 import { Config } from "../../config/mod.ts";
 import * as M from "../../frame_metadata/mod.ts";
-import { KnownRpcMethods } from "../../known/mod.ts";
+import { rpc as knownRpc } from "../../known/mod.ts";
 import * as rpc from "../../rpc/mod.ts";
 import * as U from "../../util/mod.ts";
 import { atomFactory } from "../sys/Atom.ts";
 import { Val } from "../sys/mod.ts";
 import { rpcCall } from "./RpcCall.ts";
 
-export function metadata<
-  C extends Config<string, Pick<KnownRpcMethods, "state_getMetadata">>,
-  Rest extends [blockHash?: Val<U.HashHexString | undefined>],
->(config: C, ...[blockHash]: Rest) {
-  return parseMetadata(rpcCall(config, "state_getMetadata", blockHash));
+export function metadata<Rest extends [blockHash?: Val<U.HashHexString | undefined>]>(
+  config: Config<string, Pick<knownRpc.Methods, "state_getMetadata">>,
+  ...[blockHash]: Rest
+) {
+  const call = rpcCall(config, "state_getMetadata", [blockHash]);
+  return parseMetadata(call);
 }
 
 export const parseMetadata = atomFactory(
   "Metadata",
-  (call: rpc.OkMessage<KnownRpcMethods, "state_getMetadata">) => {
+  (
+    call: rpc.OkMessage<
+      Config<string, Pick<knownRpc.Methods, "state_getMetadata">>,
+      "state_getMetadata"
+    >,
+  ) => {
     try {
       return M.fromPrefixedHex(call.result);
     } catch (_e) {

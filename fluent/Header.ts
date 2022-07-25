@@ -9,7 +9,7 @@ export class Header<C extends Chain = Chain> extends NodeBase<"Header"> {
   }
 
   read(block?: Block<C>) {
-    return Z.run(Z.rpcCall(this.chain.config as any, "chain_getHeader", block?.hash));
+    return Z.run(Z.rpcCall(this.chain.config, "chain_getHeader", [block?.hash]));
   }
 
   declare watch: (cb: (message: unknown) => void) => any;

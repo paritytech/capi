@@ -1,29 +1,16 @@
-import { CreateListenerCb } from "./Base.ts";
-import { ProviderMethods } from "./common.ts";
+import { Config } from "../config/mod.ts";
 import * as msg from "./messages.ts";
 
 export function IsCorrespondingRes<
-  M extends ProviderMethods,
-  Init_ extends msg.InitMessage<M>,
+  Config_ extends Config,
+  Init_ extends msg.InitMessage<Config_>,
 >(init: Init_) {
-  return <InQuestion extends msg.IngressMessage<M>>(
+  return <InQuestion extends msg.IngressMessage<Config_>>(
     inQuestion: InQuestion,
   ): inQuestion is Extract<
     InQuestion,
-    msg.OkMessageByMethodName<M>[Init_["method"]] | msg.ErrMessage
+    msg.OkMessage<Config_, Init_["method"]> | msg.ErrMessage<Config_>
   > => {
     return inQuestion?.id === init.id;
-  };
-}
-
-export function mapNotifications<T, U>(
-  createListenerCb: CreateListenerCb<U>,
-  map: (message: T) => U,
-): CreateListenerCb<T> {
-  return (close) => {
-    const inner = createListenerCb(close);
-    return (message) => {
-      inner(map(message));
-    };
   };
 }
