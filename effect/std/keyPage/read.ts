@@ -24,25 +24,14 @@ export function readKeyPage<
   const $storageKey = a.$storageKey(deriveCodec_, palletMetadata_, entryMetadata_);
   const startKey = start ? a.storageKey($storageKey, start) : undefined;
   const storageKey = a.storageKey($storageKey, []);
-  const storageCall = a.rpcCall(
-    config,
-    "state_getKeysPaged",
-    storageKey,
-    count,
-    startKey,
-    blockHash,
-  );
-  const keysEncoded = a.select(storageCall, "result");
+  const call = a.rpcCall(config, "state_getKeysPaged", storageKey, count, startKey, blockHash);
+  const keysEncoded = a.select(call, "result");
   const $key = a.$key(deriveCodec_, palletMetadata_, entryMetadata_);
-  const decoded = sys.atom(
-    "Anonymous",
-    [$key, keysEncoded],
-    (keyCodec, keysEncoded) => {
-      return keysEncoded.map((keyEncoded) => {
-        return keyCodec.decode(U.hex.decode(keyEncoded));
-      });
-    },
-  );
+  const decoded = sys.atom("Anonymous", [$key, keysEncoded], (keyCodec, keysEncoded) => {
+    return keysEncoded.map((keyEncoded) => {
+      return keyCodec.decode(U.hex.decode(keyEncoded));
+    });
+  });
   return a.wrap(decoded, "keys");
 }
 

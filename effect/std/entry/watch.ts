@@ -21,11 +21,11 @@ export function watchEntry<
   const deriveCodec_ = a.deriveCodec(metadata_);
   const palletMetadata_ = a.palletMetadata(metadata_, palletName);
   const entryMetadata_ = a.entryMetadata(palletMetadata_, entryName);
-  const storageKeyCodec_ = a.$storageKey(deriveCodec_, palletMetadata_, entryMetadata_);
+  const $storageKey = a.$storageKey(deriveCodec_, palletMetadata_, entryMetadata_);
   const entryValueTypeI = a.select(entryMetadata_, "value");
-  const entryCodec = a.codec(deriveCodec_, entryValueTypeI);
-  const storageKeys = sys.anon([a.storageKey(storageKeyCodec_, keys)], (v) => [v]);
-  return sys.into([entryCodec], ($entryCodec) => {
+  const $entry = a.codec(deriveCodec_, entryValueTypeI);
+  const storageKeys = sys.anon([a.storageKey($storageKey, keys)], (v) => [v]);
+  return sys.into([$entry], ($entryCodec) => {
     return a.rpcSubscription(
       config,
       "state_subscribeStorage",
