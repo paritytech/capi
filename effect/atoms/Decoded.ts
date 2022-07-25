@@ -4,7 +4,7 @@ import { atom } from "../sys/Atom.ts";
 import { T_, Val } from "../sys/Effect.ts";
 
 export function decoded<
-  Codec extends Val<$.Codec<any>>,
+  Codec extends Val<$.Codec<unknown>>,
   Encoded extends Val<U.HexString>,
   Key extends Val<string>,
 >(

@@ -21,18 +21,19 @@ export function readKeyPage<
   const deriveCodec_ = a.deriveCodec(metadata_);
   const palletMetadata_ = a.palletMetadata(metadata_, palletName);
   const entryMetadata_ = a.entryMetadata(palletMetadata_, entryName);
-  const storageKeyCodec_ = a.storageKeyCodec(deriveCodec_, palletMetadata_, entryMetadata_);
-  const startKey = start ? a.storageKey(storageKeyCodec_, start) : undefined;
+  const $storageKey = a.$storageKey(deriveCodec_, palletMetadata_, entryMetadata_);
+  const startKey = start ? a.storageKey($storageKey, start) : undefined;
+  const storageKey = a.storageKey($storageKey, []);
   const storageCall = a.rpcCall(
     config,
     "state_getKeysPaged",
-    a.storageKey(storageKeyCodec_),
+    storageKey,
     count,
     startKey,
     blockHash,
   );
   const keysEncoded = a.select(storageCall, "result");
-  const $key = a.keyCodec(deriveCodec_, palletMetadata_, entryMetadata_);
+  const $key = a.$key(deriveCodec_, palletMetadata_, entryMetadata_);
   const decoded = sys.atom(
     "Anonymous",
     [$key, keysEncoded],

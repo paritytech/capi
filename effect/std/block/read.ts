@@ -14,7 +14,7 @@ export function readBlock<
   const metadata_ = a.metadata(config, blockHash);
   const deriveCodec_ = a.deriveCodec(metadata_);
   const rpcCall_ = a.rpcCall(config, "chain_getBlock", blockHash);
-  const $extrinsic = a.extrinsicCodec(deriveCodec_, metadata_);
+  const $extrinsic = a.$extrinsic(deriveCodec_, metadata_);
   const withDecodedExtrinsics = sys.atom(
     "WithDecodedExtrinsics",
     [rpcCall_, $extrinsic],

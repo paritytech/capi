@@ -1,5 +1,4 @@
-import { run } from "../effect/run.ts";
-import { readEntry } from "../effect/std/entry/read.ts";
+import * as Z from "../effect/mod.ts";
 import { Block } from "./Block.ts";
 import { NodeBase } from "./common.ts";
 import { KeyPage } from "./KeyPage.ts";
@@ -28,8 +27,8 @@ export class Entry<
   }
 
   read(block?: Block<P["chain"]>) {
-    return run(
-      readEntry(
+    return Z.run(
+      Z.readEntry(
         // TODO: better typings on `chain.config`
         this.pallet.chain.config as any,
         this.pallet.name,

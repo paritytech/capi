@@ -1,10 +1,9 @@
 import * as t from "../../test-util/mod.ts";
 import * as U from "../../util/mod.ts";
-import { metadata } from "../atoms/Metadata.ts";
-import { run } from "../run.ts";
+import * as Z from "../mod.ts";
 
 await t.ctx(async (config) => {
-  const read_ = metadata(config);
-  const result = U.throwIfError(await run(read_));
+  const read_ = Z.metadata(config);
+  const result = U.throwIfError(await Z.run(read_));
   console.log(result);
 });

@@ -1,19 +1,9 @@
 import * as M from "../../frame_metadata/mod.ts";
-import { atom } from "../sys/Atom.ts";
-import { Val } from "../sys/Effect.ts";
+import { atomFactory } from "../sys/Atom.ts";
 
-export function codec<
-  DeriveCodec extends Val<M.DeriveCodec>,
-  TypeI extends Val<number>,
->(
-  deriveCodec: DeriveCodec,
-  typeI: TypeI,
-) {
-  return atom(
-    "Codec",
-    [deriveCodec, typeI],
-    (deriveCodec, typeI) => {
-      return deriveCodec(typeI);
-    },
-  );
-}
+export const codec = atomFactory("Codec", (
+  deriveCodec: M.DeriveCodec,
+  typeI: number,
+) => {
+  return deriveCodec(typeI);
+});

@@ -1,13 +1,6 @@
 import * as M from "../../frame_metadata/mod.ts";
-import { atom } from "../sys/Atom.ts";
-import { Val } from "../sys/Effect.ts";
+import { atomFactory } from "../sys/Atom.ts";
 
-export function deriveCodec<Metadata extends Val<M.Metadata>>(metadata: Metadata) {
-  return atom(
-    "DeriveCodec",
-    [metadata],
-    (metadata) => {
-      return M.DeriveCodec(metadata.tys);
-    },
-  );
-}
+export const deriveCodec = atomFactory("DeriveCodec", (metadata: M.Metadata) => {
+  return M.DeriveCodec(metadata.tys);
+});

@@ -1,5 +1,4 @@
-import { rpcCall } from "../effect/atoms/RpcCall.ts";
-import { run } from "../effect/run.ts";
+import * as Z from "../effect/mod.ts";
 import { Block } from "./Block.ts";
 import { Chain } from "./Chain.ts";
 import { NodeBase } from "./common.ts";
@@ -10,7 +9,7 @@ export class Header<C extends Chain = Chain> extends NodeBase<"Header"> {
   }
 
   read(block?: Block<C>) {
-    return run(rpcCall(this.chain.config as any, "chain_getHeader", block?.hash));
+    return Z.run(Z.rpcCall(this.chain.config as any, "chain_getHeader", block?.hash));
   }
 
   declare watch: (cb: (message: unknown) => void) => any;

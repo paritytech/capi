@@ -1,11 +1,10 @@
 import * as t from "../../test-util/mod.ts";
 import * as U from "../../util/mod.ts";
-import { rpcSubscription } from "../atoms/RpcSubscription.ts";
-import { run } from "../run.ts";
+import * as Z from "../mod.ts";
 
 await t.ctx(async (config) => {
   let i = 0;
-  const subscription = rpcSubscription(config, "chain_subscribeNewHead", [], (close) => {
+  const subscription = Z.rpcSubscription(config, "chain_subscribeNewHead", [], (close) => {
     return (m) => {
       i++;
       if (i > 5) {
@@ -14,5 +13,5 @@ await t.ctx(async (config) => {
       console.log(m);
     };
   });
-  U.throwIfError(await run(subscription));
+  U.throwIfError(await Z.run(subscription));
 });

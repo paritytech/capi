@@ -1,8 +1,7 @@
 import { polkadot } from "../../known/mod.ts";
 import * as U from "../../util/mod.ts";
-import { run } from "../run.ts";
 import { readEntry } from "../std/entry/read.ts";
-import { all, into } from "../sys/mod.ts";
+import { all, into, run } from "../sys/mod.ts";
 
 const parachainIds = readEntry(polkadot, "Paras", "Parachains", []);
 const parachainHeads = into([parachainIds], ({ value }) => {
