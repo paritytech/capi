@@ -4,11 +4,11 @@ import * as Z from "../mod.ts";
 
 await t.ctx(async (config) => {
   let i = 0;
-  const subscription = Z.rpcSubscription(config, "chain_subscribeNewHead", [], (close) => {
+  const subscription = Z.rpcSubscription(config, "chain_subscribeNewHead", [], (stop) => {
     return (m) => {
       i++;
       if (i > 5) {
-        close();
+        stop();
       }
       console.log(m);
     };

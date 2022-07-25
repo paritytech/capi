@@ -52,10 +52,9 @@ export type AtomArgs<X extends unknown[], A extends unknown[]> =
     // This mapped type is the real type of the arguments
     ? { [K in keyof A]: AtomArg<A[K], E_<X[number]>> }
     // This latter branch only affects type inference
-    : X extends A // Infer `X` based on a constraint of `A`
-      ?
-        | X // Infer `X` based on all of the arguments to the function
-        | { [K in keyof A]: A[K] | Effect<string, A[K], any> } // Infer generics within `A[K]` from arguments
+    : X extends A ? // Infer `X` based on a constraint of `A`
+      | X // Infer `X` based on all of the arguments to the function
+      | { [K in keyof A]: A[K] | Effect<string, A[K], any> } // Infer generics within `A[K]` from arguments
     : never;
 
 export function anon<A extends unknown[], R>(
