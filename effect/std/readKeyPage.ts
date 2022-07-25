@@ -1,8 +1,8 @@
-import { Config } from "../../../config/mod.ts";
-import { KnownRpcMethods } from "../../../known/mod.ts";
-import * as U from "../../../util/mod.ts";
-import * as a from "../../atoms/mod.ts";
-import * as sys from "../../sys/mod.ts";
+import { Config } from "../../config/mod.ts";
+import { KnownRpcMethods } from "../../known/mod.ts";
+import * as U from "../../util/mod.ts";
+import * as a from "../atoms/mod.ts";
+import * as sys from "../sys/mod.ts";
 
 export function readKeyPage<
   C extends Config<string, Pick<KnownRpcMethods, "state_getMetadata" | "state_getKeysPaged">>,

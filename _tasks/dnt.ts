@@ -15,6 +15,9 @@ await Promise.all([
       name: "./frame_metadata",
       path: "frame_metadata/mod.ts",
     }, {
+      name: "./effect",
+      path: "effect/mod.ts",
+    }, {
       name: "./known",
       path: "known/mod.ts",
     }, {
