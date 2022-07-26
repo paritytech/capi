@@ -1,5 +1,5 @@
 import { assert } from "../../deps/std/testing/asserts.ts";
-import { KnownRpcMethods, polkadot } from "../../known/mod.ts";
+import { polkadot } from "../../known/mod.ts";
 import * as msg from "../messages.ts";
 import { proxyClient } from "./proxy.ts";
 
@@ -8,7 +8,7 @@ Deno.test({
   sanitizeResources: false,
   sanitizeOps: false,
   async fn(t) {
-    const client = await proxyClient<KnownRpcMethods>(polkadot.discoveryValue);
+    const client = await proxyClient(polkadot);
     assert(!(client instanceof Error));
 
     await t.step("call", async () => {
@@ -17,7 +17,7 @@ Deno.test({
     });
 
     await t.step("subscribe", async () => {
-      const result: msg.NotifMessage<KnownRpcMethods, "chain_subscribeAllHeads">[] = [];
+      const result: msg.NotifMessage<typeof polkadot, "chain_subscribeAllHeads">[] = [];
       let i = 1;
       await client.subscribe("chain_subscribeAllHeads", [], (stop) => {
         return (message) => {

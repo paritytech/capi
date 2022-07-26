@@ -1,7 +1,6 @@
 import { Config } from "../../config/mod.ts";
 import { unimplemented } from "../../deps/std/testing/asserts.ts";
 import { isWsUrl } from "../../util/mod.ts";
-import { ProviderMethods } from "../common.ts";
 import { FailedToOpenConnectionError, ProxyClient, proxyClient } from "./proxy.ts";
 import {
   FailedToAddChainError,
@@ -10,26 +9,24 @@ import {
   smoldotClient,
 } from "./smoldot.ts";
 
-export type StdClient<M extends ProviderMethods> = ProxyClient<M> | SmoldotClient<M>;
+export type StdClient<Config_ extends Config<string>> =
+  | ProxyClient<Config_>
+  | SmoldotClient<Config_>;
 
 export type StdClientInitError =
   | FailedToOpenConnectionError
   | FailedToStartSmoldotError
   | FailedToAddChainError;
 
-export function stdClient<M extends ProviderMethods>(
-  discoveryValue: string,
-): Promise<StdClient<M> | StdClientInitError> {
-  if (typeof discoveryValue === "string") {
-    if (isWsUrl(discoveryValue)) {
-      return proxyClient<M>(discoveryValue);
+export function stdClient<Config_ extends Config<string>>(
+  config: Config_,
+): Promise<StdClient<Config_> | StdClientInitError> {
+  if (typeof config.discoveryValue === "string") {
+    if (isWsUrl(config.discoveryValue)) {
+      return proxyClient(config);
     } else {
-      return smoldotClient<M>(discoveryValue);
+      return smoldotClient(config);
     }
   }
-  unimplemented();
-}
-
-export function fromConfig<M extends ProviderMethods>(config: Config<string, M>) {
-  return stdClient<M>(config.discoveryValue);
+  return unimplemented();
 }

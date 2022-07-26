@@ -1,18 +1,20 @@
+import { Config } from "../config/mod.ts";
 import { deferred } from "../deps/std/async.ts";
 import * as U from "../util/mod.ts";
-import { ClientHooks, Provider, ProviderMethods } from "./common.ts";
+import { ClientHooks, Provider } from "./common.ts";
 import * as msg from "./messages.ts";
 import { IsCorrespondingRes } from "./util.ts";
 
+export type OnMessage<Message> = (message: Message) => void;
+
 export abstract class Client<
-  M extends ProviderMethods,
-  ParsedError extends Error,
+  Config_ extends Config,
   RawIngressMessage,
-  RawError,
+  InternalError,
   CloseError extends Error,
 > {
   #nextId = 0;
-  #listenerCbs = new Map<ListenerCb<msg.IngressMessage<M>>, true>();
+  #listenerCbs = new Map<U.WatchHandler<msg.IngressMessage<Config_>>, true>();
 
   /**
    * Construct a new RPC client
@@ -20,8 +22,8 @@ export abstract class Client<
    * @param hooks the error handling and message hooks with which you'd like the instance to operate
    */
   constructor(
-    readonly provider: Provider<M, ParsedError, RawIngressMessage, RawError, CloseError>,
-    readonly hooks?: ClientHooks<M, ParsedError>,
+    readonly provider: Provider<Config_, RawIngressMessage, CloseError>,
+    readonly hooks?: ClientHooks<Config_, InternalError>,
   ) {}
 
   /**
@@ -29,7 +31,7 @@ export abstract class Client<
    *
    * @param egressMessage the message you wish to send to the RPC server
    */
-  send = (egressMessage: msg.InitMessage<M>): void => {
+  send = (egressMessage: msg.InitMessage<Config_>): void => {
     this.hooks?.send?.(egressMessage);
     this.provider.send(egressMessage);
   };
@@ -49,7 +51,7 @@ export abstract class Client<
    *
    * @param createListenerCb the factory for the callback to be triggered upon arrival of ingress messages
    */
-  listen = (createListenerCb: CreateListenerCb<msg.IngressMessage<M>>) => {
+  listen = (createListenerCb: U.CreateWatchHandler<msg.IngressMessage<Config_>>): void => {
     const stopListening = () => {
       this.#listenerCbs.delete(listenerCb);
     };
@@ -59,8 +61,8 @@ export abstract class Client<
 
   // TODO: do we want to parameterize `RpcClient` with a `RawMessage` type?
   /** @internal */
-  onMessage = (message: RawIngressMessage) => {
-    const parsed = this.provider.parse.ingressMessage(message);
+  onMessage: OnMessage<RawIngressMessage> = (message) => {
+    const parsed = this.provider.parseIngressMessage(message);
     if (parsed instanceof Error) {
       this.hooks?.error?.(parsed);
     } else {
@@ -72,71 +74,74 @@ export abstract class Client<
   };
 
   /** @internal */
-  onError = (error: RawError): void => {
-    const parsedError = this.provider.parse.error(error);
-    this.hooks?.error?.(parsedError);
+  onError = (error: InternalError): void => {
+    this.hooks?.error?.(error);
   };
 
   /**
    * Call an RPC method and return a promise resolving to an ingress message with an ID that matches the egress message
    *
-   * @param method the name of the method you wish to call
+   * @param methodName the name of the method you wish to call
    * @param params the params with which to call the method
    * @returns an ingress message corresponding to the given method (or a message-agnostic error)
    */
-  call = <Method extends keyof M>(
-    method: Method,
-    params: msg.InitMessage<M, Method>["params"],
-  ): Promise<msg.OkMessage<M, Method> | msg.ErrMessage> => {
-    const init = <msg.InitMessage<M, Method>> {
+  call = <
+    MethodName extends Extract<keyof Config_["RpcMethods"], string>,
+    IngressMessage extends msg.OkMessage<Config_, MethodName> | msg.ErrMessage<Config_>,
+  >(
+    methodName: MethodName,
+    params: Parameters<Config_["RpcMethods"][MethodName]>,
+  ): Promise<IngressMessage> => {
+    const init = <msg.InitMessage<Config_, MethodName>> {
       jsonrpc: "2.0",
       id: this.uid(),
-      method,
+      method: methodName,
       params,
     };
     const isCorrespondingRes = IsCorrespondingRes(init);
-    const pending = deferred<msg.OkMessage<M, Method> | msg.ErrMessage>();
+    const ingressMessagePending = deferred<IngressMessage>();
     this.listen((stopListening) => {
       return (res) => {
         if (isCorrespondingRes(res)) {
           stopListening();
-          pending.resolve(res);
-        } else { /* TODO: handle */ }
+          ingressMessagePending.resolve(res as IngressMessage);
+        }
       };
     });
     this.send(init);
-    return pending;
+    return ingressMessagePending;
   };
 
   /**
    * Initialize an RPC subscription
    *
-   * @param method the method name of the subscription you wish to init
+   * @param methodName the method name of the subscription you wish to init
    * @param params the params with which to init the subscription
    * @param createListenerCb the factory of the callback to which notifications should be supplied
    */
-  subscribe = async <Method extends Extract<msg.SubscriptionMethodName<M>, keyof M>>(
-    method: Method,
-    params: msg.InitMessage<M, Method>["params"],
-    createListenerCb: CreateListenerCb<msg.NotifMessage<M, Method>>,
-  ): Promise<undefined | msg.ErrMessage> => {
-    const initRes = await this.call(method, params);
+  subscribe = async <MethodName extends Extract<keyof Config_["RpcSubscriptionMethods"], string>>(
+    methodName: MethodName,
+    params: Parameters<Config_["RpcSubscriptionMethods"][MethodName]>,
+    createListenerCb: U.CreateWatchHandler<msg.NotifMessage<Config_, MethodName>>,
+  ): Promise<undefined | msg.ErrMessage<Config_>> => {
+    const initRes = await this.call(methodName, params);
     if (initRes.error) {
-      return initRes;
+      // TODO: fix typings
+      return initRes as msg.ErrMessage<Config_>;
     }
-    const status = deferred<undefined | msg.ErrMessage>();
+    const terminalPending = deferred<undefined | msg.ErrMessage<Config_>>();
     this.listen((stop) => {
-      const listenerCb = createListenerCb(U.resolveOnCall(status, stop));
+      const listenerCb = createListenerCb(
+        U.resolveOnCall(terminalPending, stop),
+      );
       return (res) => {
         if (res.params?.subscription && res.params.subscription === initRes.result) {
-          listenerCb(res as any);
-        } else { /* TODO: error */ }
+          listenerCb(res as msg.NotifMessage<Config_, MethodName>);
+        } else {
+          // TODO: associate errors with subscriptions & exit
+        }
       };
     });
-    return await status;
+    return await terminalPending;
   };
 }
-
-export type CreateListenerCb<IngressMessage> = (stop: StopListening) => ListenerCb<IngressMessage>;
-export type StopListening = () => void;
-export type ListenerCb<IngressMessage> = (ingressMessage: IngressMessage) => void;

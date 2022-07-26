@@ -6,31 +6,31 @@ import { T_, Val, ValCollection } from "../sys/Effect.ts";
 import { rpcClient } from "./RpcClient.ts";
 
 export function rpcSubscription<
-  Methods extends rpc.ProviderMethods,
-  MethodName extends Val<keyof rpc.NotifByMethodName<Methods>>,
-  Params extends ValCollection<Parameters<Methods[U.AssertT<T_<MethodName>, keyof Methods>]>>,
+  Config_ extends Config,
+  MethodName extends Extract<keyof Config_["RpcSubscriptionMethods"], string>,
+  MethodName_ extends Val<MethodName>,
+  Params extends Parameters<Config_["RpcSubscriptionMethods"][T_<MethodName_>]>,
+  Params_ extends ValCollection<Params>,
 >(
-  config: Config<string, Methods>,
-  methodName: MethodName,
-  params: Params,
-  // TODO: decide whether to adapt the inner RPC subscription's api to this design
-  createListener: rpc.CreateListenerCb<
-    rpc.IngressMessage<Methods, U.AssertT<T_<MethodName>, keyof Methods>>
-  >,
+  config: Config_,
+  methodName: MethodName_,
+  params: Params_,
+  createListener: U.CreateWatchHandler<rpc.NotifMessage<Config_, MethodName>>,
 ) {
-  const clientA = rpcClient(config);
   return atom(
     "RpcSubscription",
-    [clientA, methodName, ...params],
+    [rpcClient(config), methodName, ...params],
     (client, methodName, ...params) => {
       // TODO: cleanup typings
+      // TODO: include server err
       return client.subscribe(
-        methodName as any,
-        params as any,
+        methodName as MethodName,
+        params as Parameters<T_<Config_>["RpcSubscriptionMethods"][MethodName]>,
         createListener as any,
       );
     },
   );
 }
 
-export class RpcSubscriptionError extends U.ErrorCtor("Rpc") {}
+// TODO: use this
+export class RpcSubscriptionError extends U.ErrorCtor("RpcSubscription") {}

@@ -9,7 +9,7 @@ await fs.emptyDir(outDir);
 await Promise.all(
   Object.entries({ acala, kusama, moonbeam, polkadot, statemint, subsocial, westend }).map(
     async ([name, config]) => {
-      const client = await rpc.fromConfig(config);
+      const client = await rpc.stdClient(config);
       assert(!(client instanceof Error));
       try {
         const metadata = await client.call("state_getMetadata", []);

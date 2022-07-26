@@ -1,14 +1,18 @@
+import { Config } from "../../config/mod.ts";
 import type * as smoldot from "../../deps/smoldot.ts";
 import { ErrorCtor } from "../../util/mod.ts";
-import { Client } from "../Base.ts";
-import { ClientHooks, ParseRawIngressMessageError, ProviderMethods } from "../common.ts";
+import { Client, OnMessage } from "../Base.ts";
+import { ClientHooks, ParseRawIngressMessageError } from "../common.ts";
 
-export type SmoldotClientHooks<M extends ProviderMethods> = ClientHooks<M, SmoldotInternalError>;
+export type SmoldotClientHooks<Config_ extends Config<string>> = ClientHooks<
+  Config_,
+  SmoldotInternalError
+>;
 
-export async function smoldotClient<M extends ProviderMethods>(
-  chainSpec: string,
-  hooks?: SmoldotClientHooks<M>,
-): Promise<SmoldotClient<M> | FailedToStartSmoldotError | FailedToAddChainError> {
+export async function smoldotClient<Config_ extends Config<string>>(
+  config: Config_,
+  hooks?: SmoldotClientHooks<Config_>,
+): Promise<SmoldotClient<Config_> | FailedToStartSmoldotError | FailedToAddChainError> {
   const smoldotInstance = await ensureInstance();
   if (smoldotInstance instanceof Error) {
     return smoldotInstance;
@@ -17,48 +21,35 @@ export async function smoldotClient<M extends ProviderMethods>(
   try {
     // TODO: wire up `onError`
     const chain = await smoldotInstance.addChain({
-      chainSpec,
+      chainSpec: config.discoveryValue,
       jsonRpcCallback: (response) => {
         onMessageContainer.onMessage?.(response);
       },
     });
     return new SmoldotClient(onMessageContainer, chain.remove, hooks);
-  } catch (_e) {
-    return new FailedToAddChainError();
+  } catch (e) {
+    return new FailedToAddChainError(e);
   }
 }
 
-export class SmoldotClient<M extends ProviderMethods>
-  extends Client<M, SmoldotInternalError, string, unknown, FailedToRemoveChainError>
+export class SmoldotClient<Config_ extends Config<string>>
+  extends Client<Config_, string, SmoldotInternalError, FailedToRemoveChainError>
 {
   #chain?: smoldot.Chain;
 
   constructor(
-    onMessageContainer: {
-      onMessage?: Client<
-        M,
-        SmoldotInternalError,
-        string,
-        unknown,
-        FailedToRemoveChainError
-      >["onMessage"];
-    },
+    onMessageContainer: { onMessage?: OnMessage<string> },
     readonly remove: () => void,
-    hooks?: SmoldotClientHooks<M>,
+    hooks?: SmoldotClientHooks<Config_>,
   ) {
     super(
       {
-        parse: {
-          ingressMessage: (rawIngressMessage) => {
-            try {
-              return JSON.parse(rawIngressMessage);
-            } catch (_e) {
-              return new ParseRawIngressMessageError();
-            }
-          },
-          error: (_e) => {
-            return new SmoldotInternalError();
-          },
+        parseIngressMessage: (rawIngressMessage) => {
+          try {
+            return JSON.parse(rawIngressMessage);
+          } catch (_e) {
+            return new ParseRawIngressMessageError();
+          }
         },
         send: (egressMessage) => {
           this.#chain?.sendJsonRpc(JSON.stringify(egressMessage));
@@ -68,10 +59,8 @@ export class SmoldotClient<M extends ProviderMethods>
             try {
               this.remove();
               return;
-            } catch (_e) {
-              // TODO: differentiate between `AlreadyDestroyedError` & `CrashError`
-              // if (e instanceof Error) {}
-              return new FailedToRemoveChainError();
+            } catch (e) {
+              return new FailedToRemoveChainError(e);
             }
           })());
         },
@@ -97,6 +86,15 @@ async function ensureInstance(): Promise<smoldot.Client | FailedToStartSmoldotEr
 }
 
 export class FailedToStartSmoldotError extends ErrorCtor("FailedToStartSmoldot") {}
-export class FailedToAddChainError extends ErrorCtor("FailedToAddChain") {}
+export class FailedToAddChainError extends ErrorCtor("FailedToAddChain") {
+  constructor(readonly inner: unknown) {
+    super();
+  }
+}
 export class SmoldotInternalError extends ErrorCtor("SmoldotInternal") {}
-export class FailedToRemoveChainError extends ErrorCtor("FailedToRemoveChain") {}
+// TODO: specify narrow `AlreadyDestroyedError` & `CrashError` from Smoldot
+export class FailedToRemoveChainError extends ErrorCtor("FailedToRemoveChain") {
+  constructor(readonly inner: unknown) {
+    super();
+  }
+}

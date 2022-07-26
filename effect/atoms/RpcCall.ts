@@ -7,24 +7,32 @@ import { rpcClient } from "./RpcClient.ts";
 
 export function rpcCall<
   Methods extends rpc.ProviderMethods,
-  MethodName extends Val<U.AssertT<keyof Methods, string>>,
+  MethodName extends Val<Extract<keyof Methods, string>>,
   Params extends ValCollection<Parameters<Methods[T_<MethodName>]>>,
 >(
   config: Config<string, Methods>,
   methodName: MethodName,
-  ...params: Params
+  params: Params,
 ) {
   return atom(
     "RpcCall",
     [rpcClient(config), methodName, ...params],
-    async function(client, methodName, ...params) {
-      const result = await client.call(methodName, params as Parameters<Methods[T_<MethodName>]>);
+    async (client, methodName, ...params) => {
+      // TODO: clean up typings
+      const result = await client.call(
+        methodName,
+        params as Parameters<(Methods & rpc.ProviderMethods)[T_<MethodName>]>,
+      );
       if (result.error) {
-        return new RpcCallError();
+        return new RpcCallError<typeof config>(result);
       }
       return result;
     },
   );
 }
 
-export class RpcCallError extends U.ErrorCtor("Rpc") {}
+export class RpcCallError<Config_ extends Config> extends U.ErrorCtor("RpcCall") {
+  constructor(readonly error: rpc.ErrMessage<Config_>) {
+    super();
+  }
+}
