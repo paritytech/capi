@@ -32,4 +32,4 @@ export function rpcCall<
   );
 }
 
-export class RpcCallError extends U.ErrorCtor("RpcCallError") {}
+export class RpcCallError extends U.ErrorCtor("RpcCall") {}

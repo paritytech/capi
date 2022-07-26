@@ -17,10 +17,9 @@ export function rpcSubscription<
   params: Params_,
   createListener: U.CreateListenerCb<rpc.NotifMessage<Config_, MethodName>>,
 ) {
-  const clientA = rpcClient(config);
   return atom(
     "RpcSubscription",
-    [clientA, methodName, ...params],
+    [rpcClient(config), methodName, ...params],
     (client, methodName, ...params) => {
       // TODO: cleanup typings
       // TODO: include server err
@@ -33,4 +32,5 @@ export function rpcSubscription<
   );
 }
 
-export class RpcSubscriptionError extends U.ErrorCtor("RpcSubscriptionError") {}
+// TODO: use this
+export class RpcSubscriptionError extends U.ErrorCtor("RpcSubscription") {}

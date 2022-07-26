@@ -1,6 +1,17 @@
+import { Config as Config_ } from "../config/mod.ts";
 import * as rpc from "../rpc/mod.ts";
 import * as U from "../util/mod.ts";
 import * as T from "./types/mod.ts";
+
+export type Config<
+  DiscoveryValue,
+  CallMethodName extends keyof CallMethods,
+  SubscriptionMethodName extends keyof SubscriptionMethods = never,
+> = Config_<
+  DiscoveryValue,
+  Pick<CallMethods, CallMethodName>,
+  Pick<SubscriptionMethods, SubscriptionMethodName>
+>;
 
 export type TODO_NARROW_METHOD_TYPE = (...args: any[]) => any;
 

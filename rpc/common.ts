@@ -41,4 +41,4 @@ export interface ClientHooks<Config_ extends Config, InternalError> {
   close?: () => void;
 }
 
-export class ParseRawIngressMessageError extends ErrorCtor("ParseRawIngressMessageError") {}
+export class ParseRawIngressMessageError extends ErrorCtor("ParseRawIngressMessage") {}
