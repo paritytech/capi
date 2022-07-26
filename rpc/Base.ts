@@ -5,8 +5,7 @@ import { ClientHooks, Provider } from "./common.ts";
 import * as msg from "./messages.ts";
 import { IsCorrespondingRes } from "./util.ts";
 
-// TODO: extra all base methods into standalone
-export type OnMessage<RawIngressMessage> = (message: RawIngressMessage) => void;
+export type OnMessage<Message> = (message: Message) => void;
 
 export abstract class Client<
   Config_ extends Config,
@@ -52,7 +51,7 @@ export abstract class Client<
    *
    * @param createListenerCb the factory for the callback to be triggered upon arrival of ingress messages
    */
-  listen = (createListenerCb: U.CreateWatchHandler<msg.IngressMessage<Config_>>) => {
+  listen = (createListenerCb: U.CreateWatchHandler<msg.IngressMessage<Config_>>): void => {
     const stopListening = () => {
       this.#listenerCbs.delete(listenerCb);
     };
@@ -86,10 +85,13 @@ export abstract class Client<
    * @param params the params with which to call the method
    * @returns an ingress message corresponding to the given method (or a message-agnostic error)
    */
-  call = <MethodName extends Extract<keyof Config_["RpcMethods"], string>>(
+  call = <
+    MethodName extends Extract<keyof Config_["RpcMethods"], string>,
+    IngressMessage extends msg.OkMessage<Config_, MethodName> | msg.ErrMessage<Config_>,
+  >(
     methodName: MethodName,
     params: Parameters<Config_["RpcMethods"][MethodName]>,
-  ): Promise<msg.OkMessage<Config_, MethodName> | msg.ErrMessage<Config_>> => {
+  ): Promise<IngressMessage> => {
     const init = <msg.InitMessage<Config_, MethodName>> {
       jsonrpc: "2.0",
       id: this.uid(),
@@ -97,18 +99,17 @@ export abstract class Client<
       params,
     };
     const isCorrespondingRes = IsCorrespondingRes(init);
-    const pending = deferred<msg.OkMessage<Config_, MethodName> | msg.ErrMessage<Config_>>();
+    const ingressMessagePending = deferred<IngressMessage>();
     this.listen((stopListening) => {
       return (res) => {
         if (isCorrespondingRes(res)) {
           stopListening();
-          // TODO: fix these typings
-          pending.resolve(res as any);
-        } else { /* TODO: handle */ }
+          ingressMessagePending.resolve(res as IngressMessage);
+        }
       };
     });
     this.send(init);
-    return pending;
+    return ingressMessagePending;
   };
 
   /**
@@ -128,15 +129,19 @@ export abstract class Client<
       // TODO: fix typings
       return initRes as msg.ErrMessage<Config_>;
     }
-    const status = deferred<undefined | msg.ErrMessage<Config_>>();
+    const terminalPending = deferred<undefined | msg.ErrMessage<Config_>>();
     this.listen((stop) => {
-      const listenerCb = createListenerCb(U.resolveOnCall(status, stop));
+      const listenerCb = createListenerCb(
+        U.resolveOnCall(terminalPending, stop),
+      );
       return (res) => {
         if (res.params?.subscription && res.params.subscription === initRes.result) {
-          listenerCb(res as any);
-        } else { /* TODO: error */ }
+          listenerCb(res as msg.NotifMessage<Config_, MethodName>);
+        } else {
+          // TODO: associate errors with subscriptions & exit
+        }
       };
     });
-    return await status;
+    return await terminalPending;
   };
 }

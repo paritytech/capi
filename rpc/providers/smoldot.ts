@@ -27,8 +27,8 @@ export async function smoldotClient<Config_ extends Config<string>>(
       },
     });
     return new SmoldotClient(onMessageContainer, chain.remove, hooks);
-  } catch (_e) {
-    return new FailedToAddChainError();
+  } catch (e) {
+    return new FailedToAddChainError(e);
   }
 }
 
@@ -59,10 +59,8 @@ export class SmoldotClient<Config_ extends Config<string>>
             try {
               this.remove();
               return;
-            } catch (_e) {
-              // TODO: differentiate between `AlreadyDestroyedError` & `CrashError`
-              // if (e instanceof Error) {}
-              return new FailedToRemoveChainError();
+            } catch (e) {
+              return new FailedToRemoveChainError(e);
             }
           })());
         },
@@ -88,6 +86,15 @@ async function ensureInstance(): Promise<smoldot.Client | FailedToStartSmoldotEr
 }
 
 export class FailedToStartSmoldotError extends ErrorCtor("FailedToStartSmoldot") {}
-export class FailedToAddChainError extends ErrorCtor("FailedToAddChain") {}
+export class FailedToAddChainError extends ErrorCtor("FailedToAddChain") {
+  constructor(readonly inner: unknown) {
+    super();
+  }
+}
 export class SmoldotInternalError extends ErrorCtor("SmoldotInternal") {}
-export class FailedToRemoveChainError extends ErrorCtor("FailedToRemoveChain") {}
+// TODO: specify narrow `AlreadyDestroyedError` & `CrashError` from Smoldot
+export class FailedToRemoveChainError extends ErrorCtor("FailedToRemoveChain") {
+  constructor(readonly inner: unknown) {
+    super();
+  }
+}
