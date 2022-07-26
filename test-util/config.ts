@@ -4,7 +4,7 @@ import { Node } from "./node.ts";
 
 export function config(node: Node) {
   return new class TestConfig extends Config.from<
-    rpc.Methods,
+    rpc.CallMethods,
     rpc.SubscriptionMethods,
     rpc.ErrorDetails,
     TmpMetadata

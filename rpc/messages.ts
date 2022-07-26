@@ -35,8 +35,8 @@ export type InitMessage<
 /** Get a mapping from method name to ok ingress message */
 export type OkMessageByMethodName<Config_ extends Config> =
   & {
-    [N in Extract<keyof Config_["RpcMethods"], string>]: OkMessageBase<
-      ReturnType<Config["RpcMethods"][N]>
+    [N in Extract<keyof Config_["RpcCallMethods"], string>]: OkMessageBase<
+      ReturnType<Config_["RpcCallMethods"][N]>
     >;
   }
   & { [N in keyof Config_["RpcSubscriptionMethods"]]: OkMessageBase<string> };

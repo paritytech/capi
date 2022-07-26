@@ -7,12 +7,11 @@ import { rpcClient } from "./RpcClient.ts";
 
 export function rpcCall<
   Methods extends rpc.ProviderMethods,
-  MethodName extends Extract<keyof Methods, string>,
-  MethodName_ extends Val<MethodName>,
+  MethodName extends Val<Extract<keyof Methods, string>>,
   Params extends ValCollection<Parameters<Methods[T_<MethodName>]>>,
 >(
   config: Config<string, Methods>,
-  methodName: MethodName_,
+  methodName: MethodName,
   params: Params,
 ) {
   return atom(
@@ -21,8 +20,8 @@ export function rpcCall<
     async (client, methodName, ...params) => {
       // TODO: clean up typings
       const result = await client.call(
-        methodName as MethodName,
-        params as Parameters<Methods[MethodName]>,
+        methodName,
+        params as Parameters<(Methods & rpc.ProviderMethods)[T_<MethodName>]>,
       );
       if (result.error) {
         // TODO: include server err

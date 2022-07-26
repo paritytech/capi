@@ -86,7 +86,7 @@ export abstract class Client<
    * @param params the params with which to call the method
    * @returns an ingress message corresponding to the given method (or a message-agnostic error)
    */
-  call = <MethodName extends Extract<keyof Config_["RpcCallMethods"], string>>(
+  call = <MethodName extends Extract<keyof Config_["RpcMethods"], string>>(
     methodName: MethodName,
     params: Parameters<Config_["RpcMethods"][MethodName]>,
   ): Promise<msg.OkMessage<Config_, MethodName> | msg.ErrMessage<Config_>> => {

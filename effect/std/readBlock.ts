@@ -21,7 +21,6 @@ export function readBlock<Rest extends [blockHash?: sys.Val<U.HashHexString | un
           justifications,
           block: {
             header,
-            // @ts-ignore
             extrinsics: extrinsics.map((extrinsic) => {
               return $extrinsic.decode(U.hex.decode(extrinsic));
             }),

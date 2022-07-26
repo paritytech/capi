@@ -28,7 +28,6 @@ export function readKeyPage<
   const keysEncoded = a.select(call, "result");
   const $key = a.$key(deriveCodec_, palletMetadata_, entryMetadata_);
   const decoded = sys.atom("Anonymous", [$key, keysEncoded], (keyCodec, keysEncoded) => {
-    // @ts-ignore
     return keysEncoded.map((keyEncoded) => {
       return keyCodec.decode(U.hex.decode(keyEncoded));
     });
