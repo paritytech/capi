@@ -24,12 +24,15 @@ export function rpcCall<
         params as Parameters<(Methods & rpc.ProviderMethods)[T_<MethodName>]>,
       );
       if (result.error) {
-        // TODO: include server err
-        return new RpcCallError();
+        return new RpcCallError<typeof config>(result);
       }
       return result;
     },
   );
 }
 
-export class RpcCallError extends U.ErrorCtor("RpcCall") {}
+export class RpcCallError<Config_ extends Config> extends U.ErrorCtor("RpcCall") {
+  constructor(readonly error: rpc.ErrMessage<Config_>) {
+    super();
+  }
+}
