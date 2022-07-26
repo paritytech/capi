@@ -15,7 +15,7 @@ export function watchEntry<
   palletName: PalletName,
   entryName: EntryName,
   keys: Keys,
-  createListenerCb: U.CreateListenerCb<WatchEntryEvent[]>,
+  createWatchHandler: U.CreateWatchHandler<WatchEntryEvent[]>,
 ) {
   const metadata_ = a.metadata(config);
   const deriveCodec_ = a.deriveCodec(metadata_);
@@ -26,8 +26,8 @@ export function watchEntry<
   const $entry = a.codec(deriveCodec_, entryValueTypeI);
   const storageKeys = sys.anon([a.storageKey($storageKey, keys)], (v) => [v]);
   return sys.into([$entry], ($entryCodec) => {
-    const watchInit = U.mapCreateListenerCb(
-      createListenerCb,
+    const watchInit = U.mapCreateWatchHandler(
+      createWatchHandler,
       (message: rpc.NotifMessage<typeof config, "state_subscribeStorage">) => {
         return message.params.result.changes.map(([key, val]) => {
           return <WatchEntryEvent> [key, val ? $entryCodec.decode(U.hex.decode(val)) : undefined];

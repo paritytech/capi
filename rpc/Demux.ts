@@ -6,9 +6,9 @@ import { Client } from "./Base.ts";
 import * as msg from "./messages.ts";
 
 class DemuxGroup<Config_ extends Config> {
-  members = new Map<U.ListenerCb<msg.NotifMessage<Config_>>, true>();
+  members = new Map<U.WatchHandler<msg.NotifMessage<Config_>>, true>();
 
-  constructor(readonly stop: U.DestroyListener) {}
+  constructor(readonly stop: () => void) {}
 }
 
 // TODO: decide whether this is even beneficial
@@ -25,7 +25,7 @@ export class Demux<
   subscribe = async <MethodName extends Extract<keyof Config_["RpcSubscriptionMethods"], string>>(
     methodName: MethodName,
     params: Parameters<Config_["RpcSubscriptionMethods"][MethodName]>,
-    createListenerCb: U.CreateListenerCb<msg.NotifMessage<Config_, MethodName>>,
+    createWatchHandler: U.CreateWatchHandler<msg.NotifMessage<Config_, MethodName>>,
   ): Promise<undefined | msg.ErrMessage<Config_>> => {
     const key = `${methodName}(${JSON.stringify(params)})`;
     let group = this.#groups.get(key);
@@ -38,8 +38,8 @@ export class Demux<
         this.#groups.set(key, group);
         return (message) => {
           assert(group);
-          for (const listenerCb of group.members.keys()) {
-            listenerCb(message);
+          for (const watchWatchCb of group.members.keys()) {
+            watchWatchCb(message);
           }
         };
       }).then(status.resolve);
@@ -47,15 +47,15 @@ export class Demux<
     }
     const stopWrapped = () => {
       assert(group);
-      group.members.delete(listenerCb as any);
+      group.members.delete(watchWatchCb as any);
       if (group.members.size === 0) {
         group.stop();
         this.#groups.delete(key);
       }
     };
-    const listenerCb = createListenerCb(U.resolveOnCall(status, stopWrapped));
+    const watchWatchCb = createWatchHandler(U.resolveOnCall(status, stopWrapped));
     assert(group);
-    group.members.set(listenerCb as any, true);
+    group.members.set(watchWatchCb as any, true);
     return status;
   };
 }

@@ -15,7 +15,7 @@ export abstract class Client<
   CloseError extends Error,
 > {
   #nextId = 0;
-  #listenerCbs = new Map<U.ListenerCb<msg.IngressMessage<Config_>>, true>();
+  #listenerCbs = new Map<U.WatchHandler<msg.IngressMessage<Config_>>, true>();
 
   /**
    * Construct a new RPC client
@@ -52,7 +52,7 @@ export abstract class Client<
    *
    * @param createListenerCb the factory for the callback to be triggered upon arrival of ingress messages
    */
-  listen = (createListenerCb: U.CreateListenerCb<msg.IngressMessage<Config_>>) => {
+  listen = (createListenerCb: U.CreateWatchHandler<msg.IngressMessage<Config_>>) => {
     const stopListening = () => {
       this.#listenerCbs.delete(listenerCb);
     };
@@ -121,7 +121,7 @@ export abstract class Client<
   subscribe = async <MethodName extends Extract<keyof Config_["RpcSubscriptionMethods"], string>>(
     methodName: MethodName,
     params: Parameters<Config_["RpcSubscriptionMethods"][MethodName]>,
-    createListenerCb: U.CreateListenerCb<msg.NotifMessage<Config_, MethodName>>,
+    createListenerCb: U.CreateWatchHandler<msg.NotifMessage<Config_, MethodName>>,
   ): Promise<undefined | msg.ErrMessage<Config_>> => {
     const initRes = await this.call(methodName, params);
     if (initRes.error) {

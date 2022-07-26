@@ -15,7 +15,7 @@ export function rpcSubscription<
   config: Config_,
   methodName: MethodName_,
   params: Params_,
-  createListener: U.CreateListenerCb<rpc.NotifMessage<Config_, MethodName>>,
+  createListener: U.CreateWatchHandler<rpc.NotifMessage<Config_, MethodName>>,
 ) {
   return atom(
     "RpcSubscription",
