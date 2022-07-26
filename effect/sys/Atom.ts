@@ -34,7 +34,7 @@ export function atomFactory<N extends string, AR extends unknown[], R>(
   };
 }
 
-export type AnyAtom = Atom<string, any, any>;
+export type AnyAtom = Atom<string, any[], any>;
 
 export type Impl<A extends unknown[], R> = (
   this: RunContext,

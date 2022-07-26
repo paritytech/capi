@@ -19,7 +19,7 @@ export function readBlock<Rest extends [blockHash?: sys.Val<U.HashHexString | un
   return a.wrap(decoded, "block");
 }
 
-export function processChainGetBlock(
+function processChainGetBlock(
   $extrinsic: Codec<Extrinsic>,
   raw: rpc.OkMessage<ConfigConstraint, "chain_getBlock">,
 ) {

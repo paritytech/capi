@@ -3,8 +3,10 @@ import * as U from "../../util/mod.ts";
 import * as a from "../atoms/mod.ts";
 import * as sys from "../sys/mod.ts";
 
+type ConfigConstraint = knownRpc.Config<string, "state_getMetadata" | "state_getStorage">;
+
 export function readEntry<
-  C extends knownRpc.Config<string, "state_getMetadata" | "state_getStorage">,
+  C extends ConfigConstraint,
   PalletName extends sys.Val<string>,
   EntryName extends sys.Val<string>,
   Keys extends unknown[],
