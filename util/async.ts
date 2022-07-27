@@ -10,3 +10,9 @@ export function resolveOnCall<F extends (...args: any[]) => any, T>(
     return fn(...args);
   }) as F;
 }
+
+export function sleep(ms: number) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}

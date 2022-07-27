@@ -152,7 +152,7 @@ export type CallMethods = rpc.EnsureMethods<{
 
 export type SubscriptionMethods = rpc.EnsureMethods<{
   author: {
-    submitAndWatchExtrinsic(tx: string): unknown;
+    submitAndWatchExtrinsic(tx: U.HexString): T.TransactionStatus;
   };
   chain: {
     subscribeAllHeads(): T.Header;
@@ -168,11 +168,7 @@ export type SubscriptionMethods = rpc.EnsureMethods<{
   };
   state: {
     subscribeRuntimeVersion: TODO_NARROW_METHOD_TYPE;
-    subscribeStorage(list: U.HexString[]): {
-      // TODO: clean this up
-      block: U.HashHexString;
-      changes: [U.HexString, U.HexString][];
-    };
+    subscribeStorage(list: U.HexString[]): T.StorageNotification;
   };
   transaction: {
     unstable_submitAndWatch(transaction: U.HexString): unknown;

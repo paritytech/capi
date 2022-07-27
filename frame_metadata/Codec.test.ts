@@ -16,9 +16,9 @@ Deno.test("Derive all", async () => {
 Deno.test("Derive AccountId32 Codec", async () => {
   const [_, deriveCodec] = await setup("polkadot");
   const codec = deriveCodec(0);
-  const encoded = codec.encode(t.pairs.alice.public);
-  assertEquals(encoded, t.pairs.alice.public);
-  assertEquals(codec.decode(encoded), t.pairs.alice.public);
+  const encoded = codec.encode(t.p.alice.publicKey);
+  assertEquals(encoded, t.p.alice.publicKey);
+  assertEquals(codec.decode(encoded), t.p.alice.publicKey);
 });
 
 Deno.test("Derive AccountInfo Codec", async () => {
@@ -58,7 +58,7 @@ Deno.test("Derive Auction Winning Storage Entry Codec", async () => {
   const codec = deriveCodec(auctionWinningStorageEntry.value);
   const decoded = [
     ...Array(7).fill(undefined),
-    [t.pairs.alice.public, 2013, 8672334557167609n],
+    [t.p.alice.publicKey, 2013, 8672334557167609n],
     ...Array(28).fill(undefined),
   ];
   const encoded = codec.encode(decoded);

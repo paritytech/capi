@@ -15,14 +15,14 @@ Deno.test("System Accounts Key", async () => {
     pallet,
     storageEntry,
   });
-  const keyEncoded = $key.encode(t.pairs.alice.public);
+  const keyEncoded = $key.encode(t.p.alice.publicKey);
   const encoded = U.hex.encode(keyEncoded);
   assertEquals(
     encoded,
     "26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da9de1e86a9a8c739864cf3cc5ec2bea59fd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d",
   );
   const decoded = $key.decode(keyEncoded);
-  assertEquals(decoded, t.pairs.alice.public);
+  assertEquals(decoded, t.p.alice.publicKey);
 });
 
 Deno.test("Auction Winning Key", async () => {

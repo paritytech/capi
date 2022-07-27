@@ -1,12 +1,10 @@
-import * as test from "../test-util/mod.ts";
+import * as C from "../mod.ts";
+import * as t from "../test-util/mod.ts";
 
-const node = await test.node();
-
-const result = await test
-  .chain(node)
-  .metadata()
-  .read();
-
-node.close();
-
-console.log({ result });
+await t.ctx(async (config) => {
+  const result = await C
+    .chain(config)
+    .metadata()
+    .read();
+  console.log(result);
+});

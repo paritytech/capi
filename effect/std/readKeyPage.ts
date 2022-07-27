@@ -3,7 +3,7 @@ import * as U from "../../util/mod.ts";
 import * as a from "../atoms/mod.ts";
 import * as sys from "../sys/mod.ts";
 
-type ConfigConstraint = knownRpc.Config<string, "state_getMetadata" | "state_getKeysPaged">;
+type Config = knownRpc.Config<string, "state_getMetadata" | "state_getKeysPaged">;
 
 export function readKeyPage<
   PalletName extends sys.Val<string>,
@@ -11,7 +11,7 @@ export function readKeyPage<
   Count extends sys.Val<number>,
   Rest extends [start?: unknown[] | undefined, blockHash?: sys.Val<U.HashHexString | undefined>],
 >(
-  config: ConfigConstraint,
+  config: Config,
   palletName: PalletName,
   entryName: EntryName,
   count: Count,

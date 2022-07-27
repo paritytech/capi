@@ -1,10 +1,6 @@
 import { assert } from "../deps/std/testing/asserts.ts";
 
-async function build(
-  featureName: string,
-  destDir?: string,
-) {
-  destDir = destDir || featureName;
+async function build(featureName: string) {
   const buildProcess = Deno.run({
     cmd: [
       "deno",
@@ -12,7 +8,7 @@ async function build(
       "run",
       "https://deno.land/x/wasmbuild@0.8.4/main.ts",
       "--out",
-      destDir,
+      featureName,
       "--features",
       featureName,
     ],
@@ -21,11 +17,7 @@ async function build(
   assert(status.success);
 }
 
-await ([
-  ["hashers"],
-  ["sr25519", "test-util/sr25519"],
-  ["ss58"],
-] as const).reduce(async (acc, [featureName, destDir]) => {
+await (["hashers", "ss58"] as const).reduce(async (acc, featureName) => {
   await acc;
-  await build(featureName, destDir);
+  await build(featureName);
 }, Promise.resolve());
