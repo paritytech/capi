@@ -1,4 +1,5 @@
 import { Config } from "../../config/mod.ts";
+import { unreachable } from "../../deps/std/testing/asserts.ts";
 import * as rpc from "../../rpc/mod.ts";
 import * as U from "../../util/mod.ts";
 import { atom } from "../sys/Atom.ts";
@@ -21,8 +22,6 @@ export function rpcSubscription<
     "RpcSubscription",
     [rpcClient(config), methodName, ...params],
     async (client, methodName, ...params) => {
-      // TODO: cleanup typings
-      // TODO: include server err
       const result = await client.subscribe(
         methodName as MethodName,
         params as Parameters<T_<Config_>["RpcSubscriptionMethods"][MethodName]>,
@@ -31,7 +30,7 @@ export function rpcSubscription<
       if (result?.error) {
         return new RpcSubscriptionError(result);
       }
-      return result; // TODO: should be unreachable –– an assertion perhaps?
+      return unreachable();
     },
   );
 }

@@ -7,18 +7,6 @@ import * as U from "../../util/mod.ts";
 import * as a from "../atoms/mod.ts";
 import * as sys from "../sys/mod.ts";
 
-// TODO:
-// export class PolkadotExtra extends Array {
-//   constructor(
-//     nonce?: number,
-//     era?: { type: "Immortal" },
-//     tip?: number,
-//   ) {
-//     super();
-//     this.push(era || { type: "Immortal" }, nonce, tip || 0);
-//   }
-// }
-
 type Config = knownRpc.Config<
   string,
   | "state_getMetadata"
@@ -32,7 +20,7 @@ type Config = knownRpc.Config<
 export function sendAndWatchExtrinsic<
   PalletName extends sys.Val<string>,
   MethodName extends sys.Val<string>,
-  Args extends Record<string, unknown>, // TODO: enable effect values
+  Args extends Record<string, unknown>,
 >(
   config: Config,
   sender: sys.Val<M.MultiAddress>,
@@ -50,7 +38,8 @@ export function sendAndWatchExtrinsic<
   const runtimeVersion = a.rpcCall(config, "state_getRuntimeVersion", []);
   const senderSs58 = sys.anon([sender], async (sender) => {
     const ss58 = await Ss58();
-    if (sender.type !== "Id") { // TODO: other types
+    // TODO: other types
+    if (sender.type !== "Id") {
       return unimplemented();
     }
     return ss58.encode(0, /* TODO */ U.hex.encode(sender.value)) as U.AccountIdString;

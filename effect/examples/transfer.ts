@@ -11,13 +11,6 @@ const testPairs = createTestPairs({
 const { alice, bob } = testPairs;
 assert(alice && bob);
 
-console.log({
-  alice: alice.address,
-  bob: bob.address,
-});
-
-// TODO: multiaddress type
-
 await t.ctx(async (config) => {
   const tx = Z.sendAndWatchExtrinsic(
     config,

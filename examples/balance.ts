@@ -5,7 +5,7 @@ await t.ctx(async (config) => {
   const result = await C
     .chain(config)
     .pallet("System")
-    .entry("Account", t.anyPairs.alice.publicKey)
+    .entry("Account", t.p.alice.publicKey)
     .read();
   console.log(result);
 });
