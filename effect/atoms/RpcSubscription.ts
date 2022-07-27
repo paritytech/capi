@@ -20,17 +20,24 @@ export function rpcSubscription<
   return atom(
     "RpcSubscription",
     [rpcClient(config), methodName, ...params],
-    (client, methodName, ...params) => {
+    async (client, methodName, ...params) => {
       // TODO: cleanup typings
       // TODO: include server err
-      return client.subscribe(
+      const result = await client.subscribe(
         methodName as MethodName,
         params as Parameters<T_<Config_>["RpcSubscriptionMethods"][MethodName]>,
         createListener as any,
       );
+      if (result?.error) {
+        return new RpcSubscriptionError(result);
+      }
+      return result; // TODO: should be unreachable –– an assertion perhaps?
     },
   );
 }
 
-// TODO: use this
-export class RpcSubscriptionError extends U.ErrorCtor("RpcSubscription") {}
+export class RpcSubscriptionError<Config_ extends Config> extends U.ErrorCtor("RpcSubscription") {
+  constructor(readonly error: rpc.ErrMessage<Config_>) {
+    super();
+  }
+}

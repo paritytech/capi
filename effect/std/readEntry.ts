@@ -3,16 +3,15 @@ import * as U from "../../util/mod.ts";
 import * as a from "../atoms/mod.ts";
 import * as sys from "../sys/mod.ts";
 
-type ConfigConstraint = knownRpc.Config<string, "state_getMetadata" | "state_getStorage">;
+type Config = knownRpc.Config<string, "state_getMetadata" | "state_getStorage">;
 
 export function readEntry<
-  C extends ConfigConstraint,
   PalletName extends sys.Val<string>,
   EntryName extends sys.Val<string>,
   Keys extends unknown[],
   Rest extends [blockHash?: sys.Val<U.HashHexString | undefined>],
 >(
-  config: C,
+  config: Config,
   palletName: PalletName,
   entryName: EntryName,
   keys: Keys,

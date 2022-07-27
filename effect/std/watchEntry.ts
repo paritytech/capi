@@ -6,14 +6,14 @@ import * as sys from "../sys/mod.ts";
 
 export type WatchEntryEvent = [key?: U.HexString, value?: unknown];
 
-type ConfigConstraint = knownRpc.Config<string, "state_getMetadata", "state_subscribeStorage">;
+type Config = knownRpc.Config<string, "state_getMetadata", "state_subscribeStorage">;
 
 export function watchEntry<
   PalletName extends sys.Val<string>,
   EntryName extends sys.Val<string>,
   Keys extends unknown[],
 >(
-  config: ConfigConstraint,
+  config: Config,
   palletName: PalletName,
   entryName: EntryName,
   keys: Keys,
@@ -30,7 +30,7 @@ export function watchEntry<
   return sys.into([$entry], ($entryCodec) => {
     const watchInit = U.mapCreateWatchHandler(
       createWatchHandler,
-      (message: rpc.NotifMessage<ConfigConstraint, "state_subscribeStorage">) => {
+      (message: rpc.NotifMessage<Config, "state_subscribeStorage">) => {
         return message.params.result.changes.map(([key, val]) => {
           return <WatchEntryEvent> [key, val ? $entryCodec.decode(U.hex.decode(val)) : undefined];
         });

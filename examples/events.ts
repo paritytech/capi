@@ -1,10 +1,9 @@
-import { westend } from "../known/mod.ts";
+import { polkadot } from "../known/mod.ts";
 import * as C from "../mod.ts";
 
 const result = await C
-  .chain(westend)
+  .chain(polkadot)
   .pallet("System")
   .entry("Events")
   .read();
-
-console.log({ result });
+console.log(result);

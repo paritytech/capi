@@ -6,10 +6,10 @@ import * as U from "../../util/mod.ts";
 import * as a from "../atoms/mod.ts";
 import * as sys from "../sys/mod.ts";
 
-type ConfigConstraint = knownRpc.Config<string, "state_getMetadata" | "chain_getBlock">;
+type Config = knownRpc.Config<string, "state_getMetadata" | "chain_getBlock">;
 
 export function readBlock<Rest extends [blockHash?: sys.Val<U.HashHexString | undefined>]>(
-  config: ConfigConstraint,
+  config: Config,
   ...[blockHash]: Rest
 ) {
   const metadata_ = a.metadata(config, blockHash);
@@ -21,7 +21,7 @@ export function readBlock<Rest extends [blockHash?: sys.Val<U.HashHexString | un
 
 function processChainGetBlock(
   $extrinsic: Codec<Extrinsic>,
-  raw: rpc.OkMessage<ConfigConstraint, "chain_getBlock">,
+  raw: rpc.OkMessage<Config, "chain_getBlock">,
 ) {
   const { block: { extrinsics, header }, justifications } = raw.result;
   return {

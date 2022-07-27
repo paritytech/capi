@@ -1,4 +1,6 @@
 import * as $ from "../deps/scale.ts";
+import { assert } from "../deps/std/testing/asserts.ts";
+import * as U from "../util/mod.ts";
 import { $null, DeriveCodec } from "./Codec.ts";
 import { HasherLookup } from "./Key.ts";
 import { Metadata } from "./Metadata.ts";
@@ -15,12 +17,12 @@ export interface MultiAddress {
   value: Uint8Array;
 }
 
-interface Signature {
+export interface Signature {
   type: "Sr25519";
   value: Uint8Array;
 }
 
-export type SignExtrinsic = (value: Uint8Array) => Signature;
+export type SignExtrinsic = (message: Uint8Array) => Signature;
 
 export interface Extrinsic {
   protocolVersion: number;
@@ -47,7 +49,10 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
   const { signedExtensions } = metadata.extrinsic;
   const $sig = deriveCodec(findExtrinsicTypeParam("Signature")!);
   const $address = deriveCodec(findExtrinsicTypeParam("Address")!);
-  const $call = deriveCodec(findExtrinsicTypeParam("Call")!);
+  const callTyI = findExtrinsicTypeParam("Call")!;
+  const callTy = props.metadata.tys[callTyI];
+  assert(callTy?.type === "Union");
+  const $call = deriveCodec(callTyI);
   const $extra = getExtrasCodec(signedExtensions.map((x) => x.ty));
   const $additional = getExtrasCodec(signedExtensions.map((x) => x.additionalSigned));
   const $baseExtrinsic: $.Codec<Extrinsic> = $.createCodec({
@@ -68,7 +73,24 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
         if ("additional" in signature) {
           $address._encode(buffer, signature.address);
           const toSignBuffer = new $.EncodeBuffer($.tuple($sig, $extra, $additional)._staticSize);
-          $call._encode(toSignBuffer, call);
+          const palletMember = callTy.members.find((member) => {
+            return member.name === extrinsic.palletName;
+          });
+          assert(palletMember);
+          $.u8._encode(toSignBuffer, palletMember.index);
+          const methodsTyI = palletMember.fields[0]?.ty;
+          assert(methodsTyI);
+          const methodsTy = metadata.tys[methodsTyI];
+          assert(methodsTy?.type === "Union");
+          const method = methodsTy.members.find((member) => {
+            return member.name === extrinsic.methodName;
+          });
+          assert(method);
+          $.u8._encode(toSignBuffer, method.index);
+          method.fields.forEach((field) => {
+            assert(field.name); // TODO: clean this up
+            deriveCodec(field.ty)._encode(toSignBuffer, extrinsic.args[field.name]);
+          });
           const callEnd = toSignBuffer.finishedSize + toSignBuffer.index;
           $extra._encode(toSignBuffer, signature.extra);
           const extraEnd = toSignBuffer.finishedSize + toSignBuffer.index;
@@ -104,13 +126,7 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
       }
       const call = $call._decode(buffer) as any;
       const { type: palletName, value: { type: methodName, ...args } } = call;
-      return {
-        protocolVersion,
-        signature,
-        palletName,
-        methodName,
-        args,
-      };
+      return { protocolVersion, signature, palletName, methodName, args };
     },
   });
 
