@@ -1,9 +1,9 @@
 import * as $ from "../deps/scale.ts";
 import { assert } from "../deps/std/testing/asserts.ts";
-import * as U from "../util/mod.ts";
 import { $null, DeriveCodec } from "./Codec.ts";
 import { HasherLookup } from "./Key.ts";
 import { Metadata } from "./Metadata.ts";
+import { UnionTyDef } from "./scale_info.ts";
 
 export type Era = {
   type: "Mortal";
@@ -44,6 +44,29 @@ interface ExtrinsicCodecProps {
   sign: SignExtrinsic;
 }
 
+function encodeCall(
+  toSignBuffer: $.EncodeBuffer,
+  callTy: UnionTyDef,
+  extrinsic: Extrinsic,
+  metadata: Metadata,
+  deriveCodec: DeriveCodec,
+) {
+  const palletUnionMember = callTy.members.find((member) => {
+    return member.name === extrinsic.palletName;
+  })!;
+  $.u8._encode(toSignBuffer, palletUnionMember.index);
+  const methodsUnionTyI = palletUnionMember.fields[0]?.ty!;
+  const methodsUnionTy = metadata.tys[methodsUnionTyI]!;
+  assert(methodsUnionTy.type === "Union");
+  const methodsUnionMember = methodsUnionTy.members.find((member) => {
+    return member.name === extrinsic.methodName;
+  })!;
+  $.u8._encode(toSignBuffer, methodsUnionMember.index);
+  methodsUnionMember.fields.forEach((field) => {
+    deriveCodec(field.ty)._encode(toSignBuffer, extrinsic.args[field.name!]);
+  });
+}
+
 export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
   const { metadata, sign, deriveCodec, hashers: { Blake2_256 } } = props;
   const { signedExtensions } = metadata.extrinsic;
@@ -73,24 +96,8 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
         if ("additional" in signature) {
           $address._encode(buffer, signature.address);
           const toSignBuffer = new $.EncodeBuffer($.tuple($sig, $extra, $additional)._staticSize);
-          const palletMember = callTy.members.find((member) => {
-            return member.name === extrinsic.palletName;
-          });
-          assert(palletMember);
-          $.u8._encode(toSignBuffer, palletMember.index);
-          const methodsTyI = palletMember.fields[0]?.ty;
-          assert(methodsTyI);
-          const methodsTy = metadata.tys[methodsTyI];
-          assert(methodsTy?.type === "Union");
-          const method = methodsTy.members.find((member) => {
-            return member.name === extrinsic.methodName;
-          });
-          assert(method);
-          $.u8._encode(toSignBuffer, method.index);
-          method.fields.forEach((field) => {
-            assert(field.name); // TODO: clean this up
-            deriveCodec(field.ty)._encode(toSignBuffer, extrinsic.args[field.name]);
-          });
+          // TODO: swap out with use of `$call._encode` upon fixing https://github.com/paritytech/parity-scale-codec-ts/issues/53
+          encodeCall(toSignBuffer, callTy, extrinsic, metadata, deriveCodec);
           const callEnd = toSignBuffer.finishedSize + toSignBuffer.index;
           $extra._encode(toSignBuffer, signature.extra);
           const extraEnd = toSignBuffer.finishedSize + toSignBuffer.index;
