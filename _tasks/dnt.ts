@@ -9,9 +9,6 @@ await fs.emptyDir(outDir);
 await Promise.all([
   build({
     entryPoints: ["mod.ts", {
-      name: "./test-util",
-      path: "test-util/mod.ts",
-    }, {
       name: "./frame_metadata",
       path: "frame_metadata/mod.ts",
     }, {
@@ -56,7 +53,9 @@ await Promise.all([
     },
     scriptModule: "cjs",
     shims: {
-      deno: true,
+      deno: {
+        test: true,
+      },
       timers: true,
       custom: [{
         package: { name: "stream/web" },
