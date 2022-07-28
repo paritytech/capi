@@ -42,28 +42,36 @@ await Promise.all([
       description: "A TypeScript toolkit for crafting interactions with Substrate-based chains",
       license: "Apache-2.0",
       repository: "github:paritytech/capi",
+      devDependencies: {
+        "@types/bn.js": "^5.1.0",
+        "@types/ed2curve": "^0.2.2",
+      },
     },
+
     compilerOptions: {
-      lib: ["dom"],
+      lib: ["dom", "esnext"],
       importHelpers: true,
       sourceMap: true,
       target: "ES2021",
     },
     scriptModule: "cjs",
     shims: {
-      deno: {
-        test: true,
-      },
+      deno: true,
+      timers: true,
+      custom: [{
+        package: { name: "stream/web" },
+        globalNames: ["TransformStream"],
+      }],
     },
     test: false,
-    typeCheck: false,
+    typeCheck: true,
   }),
   fs.copy("LICENSE", path.join(outDir, "LICENSE")),
   fs.copy("Readme.md", path.join(outDir, "Readme.md")),
 ]);
 
 await Promise.all(["script", "esm"].map((kind) => {
-  return Promise.all(["hashers", "test-util/sr25519", "ss58"].map(async (dir) => {
+  return Promise.all(["hashers", "ss58"].map(async (dir) => {
     const from = `./${dir}/mod_bg.wasm`;
     const to = `target/npm/${kind}/${dir}/mod_bg.wasm`;
     await fs.copy(from, to);
