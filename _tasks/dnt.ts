@@ -9,9 +9,6 @@ await fs.emptyDir(outDir);
 await Promise.all([
   build({
     entryPoints: ["mod.ts", {
-      name: "./test-util",
-      path: "test-util/mod.ts",
-    }, {
       name: "./frame_metadata",
       path: "frame_metadata/mod.ts",
     }, {
@@ -43,8 +40,9 @@ await Promise.all([
       license: "Apache-2.0",
       repository: "github:paritytech/capi",
     },
+
     compilerOptions: {
-      lib: ["dom"],
+      lib: ["dom", "esnext"],
       importHelpers: true,
       sourceMap: true,
       target: "ES2021",
@@ -63,7 +61,7 @@ await Promise.all([
 ]);
 
 await Promise.all(["script", "esm"].map((kind) => {
-  return Promise.all(["hashers", "test-util/sr25519", "ss58"].map(async (dir) => {
+  return Promise.all(["hashers", "ss58"].map(async (dir) => {
     const from = `./${dir}/mod_bg.wasm`;
     const to = `target/npm/${kind}/${dir}/mod_bg.wasm`;
     await fs.copy(from, to);
