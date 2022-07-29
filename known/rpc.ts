@@ -74,6 +74,17 @@ export type CallMethods = rpc.EnsureMethods<{
     unstable_unfollow(followSubscription: U.SubscriptionIdString): void;
     unstable_unpin(followSubscription: U.SubscriptionIdString, hash: U.HashHexString): void;
   };
+  contracts: {
+    getStorage(
+      accountId: string, /* TODO: Ss58 requirement */
+      key: U.HexString,
+      hash?: U.HashHexString,
+    ): unknown;
+    // TODO
+    call(...args: any[]): unknown;
+    instantiate(...args: any[]): unknown;
+    upload_code(...args: any[]): unknown;
+  };
   childState: {
     getKeys: TODO_NARROW_METHOD_TYPE;
     getStorage: TODO_NARROW_METHOD_TYPE;
