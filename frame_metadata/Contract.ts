@@ -97,10 +97,9 @@ export namespace ContractMetadata {
   }
 
   // TODO: stricter typings? Not the most necessary atm.
-  export function fromRawTy(rawTy: any): Ty {
-    const { def, params, path } = rawTy.type;
+  export function fromRawTy({ type: { def, params, path }, id }: any): Ty {
     return {
-      id: rawTy.id,
+      id,
       path,
       params: params ? normalizeFields(params) : [],
       // TODO: grab this from appropriate loc
@@ -167,9 +166,9 @@ export namespace ContractMetadata {
     });
   }
 
-  export function normalize(contractMetadata: ContractMetadata): ContractMetadata<Ty> {
-    const { V3, ...topLevelRest } = contractMetadata;
-    const { types, ...v3Rest } = V3;
+  export function normalize(
+    { V3: { types, ...v3Rest }, ...topLevelRest }: ContractMetadata,
+  ): ContractMetadata<Ty> {
     return {
       ...topLevelRest,
       V3: {
