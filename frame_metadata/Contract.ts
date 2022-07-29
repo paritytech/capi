@@ -1,4 +1,4 @@
-import { unimplemented, unreachable } from "../deps/std/testing/asserts.ts";
+import { unreachable } from "../deps/std/testing/asserts.ts";
 import { Ty, TyDef, UnionTyDefMember } from "./scale_info.ts";
 
 export interface ContractMetadata<Ty_ = Ty> {
@@ -145,13 +145,16 @@ export namespace ContractMetadata {
             typeParam: def.sequence.type,
           };
         } else if (def.compact) {
-          // TODO
-          console.log({ Compact: def });
-          unimplemented();
+          return {
+            type: "Compact",
+            typeParam: def.compact.typeParam,
+          };
         } else if (def.bitSequence) {
-          // TODO
-          console.log({ BitSequence: def });
-          unimplemented();
+          return {
+            type: "BitSequence",
+            bitOrderType: def.bitSequence.bitOrderType,
+            bitStoreType: def.bitSequence.bitStoreType,
+          };
         }
         unreachable();
       })(),

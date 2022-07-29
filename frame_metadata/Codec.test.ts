@@ -2,7 +2,7 @@ import { assertEquals } from "../deps/std/testing/asserts.ts";
 import * as t from "../test-util/mod.ts";
 import * as U from "../util/mod.ts";
 import { ChainError } from "./Codec.ts";
-import { normalize } from "./Contract.ts";
+import { ContractMetadata } from "./Contract.ts";
 import { getPalletAndEntry } from "./Metadata.ts";
 import { setup } from "./test-common.ts";
 
@@ -100,7 +100,7 @@ Deno.test("Derive Result codec", async () => {
 Deno.test("Smart Contract codecs", async () => {
   const [_, deriveCodec] = await setup("polkadot");
   const raw = await Deno.readTextFile("frame_metadata/raw_erc20_metadata.json");
-  const normalized = normalize(JSON.parse(raw));
+  const normalized = ContractMetadata.normalize(JSON.parse(raw));
   for (const ty of normalized.V3.types) {
     deriveCodec(ty.id);
   }
