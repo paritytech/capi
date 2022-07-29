@@ -39,10 +39,6 @@ await Promise.all([
       description: "A TypeScript toolkit for crafting interactions with Substrate-based chains",
       license: "Apache-2.0",
       repository: "github:paritytech/capi",
-      devDependencies: {
-        "@types/bn.js": "^5.1.0",
-        "@types/ed2curve": "^0.2.2",
-      },
     },
 
     compilerOptions: {
@@ -57,13 +53,9 @@ await Promise.all([
         test: true,
       },
       timers: true,
-      custom: [{
-        package: { name: "stream/web" },
-        globalNames: ["TransformStream"],
-      }],
     },
     test: false,
-    typeCheck: true,
+    typeCheck: false,
   }),
   fs.copy("LICENSE", path.join(outDir, "LICENSE")),
   fs.copy("Readme.md", path.join(outDir, "Readme.md")),
