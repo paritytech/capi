@@ -13,7 +13,8 @@ type Config = knownRpc.Config<
   | "state_getRuntimeVersion"
   | "chain_getBlockHash"
   | "system_accountNextIndex"
-  | "system_chain",
+  | "system_chain"
+  | "author_unwatchExtrinsic",
   "author_submitAndWatchExtrinsic"
 >;
 
@@ -84,5 +85,8 @@ export function sendAndWatchExtrinsic<
     "author_submitAndWatchExtrinsic",
     [extrinsicHex],
     createWatchHandler,
+    (ok) => {
+      return a.rpcCall(config, "author_unwatchExtrinsic", [ok.result]);
+    },
   );
 }

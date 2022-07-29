@@ -122,17 +122,23 @@ export abstract class Client<
   subscribe = async <MethodName extends Extract<keyof Config_["RpcSubscriptionMethods"], string>>(
     methodName: MethodName,
     params: Parameters<Config_["RpcSubscriptionMethods"][MethodName]>,
-    createListenerCb: U.CreateWatchHandler<msg.NotifMessage<Config_, MethodName>>,
+    createListenerCb: CreateListenerCb<Config_, MethodName>,
+    cleanup: SubscriptionCleanup<Config_, MethodName> = () => Promise.resolve(),
   ): Promise<undefined | msg.ErrMessage<Config_>> => {
     const initRes = await this.call(methodName, params);
     if (initRes.error) {
       // TODO: fix typings
       return initRes as msg.ErrMessage<Config_>;
     }
+    const cleanupApplied = () => cleanup(initRes as msg.OkMessage<Config_, MethodName>);
     const terminalPending = deferred<undefined | msg.ErrMessage<Config_>>();
     this.listen((stop) => {
       const listenerCb = createListenerCb(
-        U.resolveOnCall(terminalPending, stop),
+        async () => {
+          stop();
+          await cleanupApplied();
+          terminalPending.resolve();
+        },
       );
       return (res) => {
         if (res.params?.subscription && res.params.subscription === initRes.result) {
@@ -145,3 +151,13 @@ export abstract class Client<
     return await terminalPending;
   };
 }
+
+export type CreateListenerCb<
+  Config_ extends Config,
+  MethodName extends Extract<keyof Config_["RpcSubscriptionMethods"], string>,
+> = U.CreateWatchHandler<msg.NotifMessage<Config_, MethodName>>;
+
+export type SubscriptionCleanup<
+  Config_ extends Config,
+  MethodName extends keyof Config_["RpcMethods"],
+> = (initOk: msg.OkMessage<Config_, MethodName>) => Promise<void>;

@@ -39,7 +39,7 @@ export type OkMessageByMethodName<Config_ extends Config> =
       ReturnType<Config_["RpcCallMethods"][N]>
     >;
   }
-  & { [N in keyof Config_["RpcSubscriptionMethods"]]: OkMessageBase<string> };
+  & { [N in keyof Config_["RpcSubscriptionMethods"]]: OkMessageBase<U.SubscriptionIdString> };
 
 /** Get a ok ingress messages or––if `N` is supplied––a specific ok ingress message */
 export type OkMessage<

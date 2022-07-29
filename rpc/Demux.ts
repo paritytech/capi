@@ -53,7 +53,10 @@ export class Demux<
         this.#groups.delete(key);
       }
     };
-    const watchWatchCb = createWatchHandler(U.resolveOnCall(status, stopWrapped));
+    const watchWatchCb = createWatchHandler(() => {
+      stopWrapped();
+      status.resolve();
+    });
     assert(group);
     group.members.set(watchWatchCb as any, true);
     return status;
