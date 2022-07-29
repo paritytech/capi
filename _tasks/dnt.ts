@@ -52,7 +52,6 @@ await Promise.all([
       deno: {
         test: true,
       },
-      timers: true,
     },
     test: false,
     typeCheck: false,
