@@ -1,8 +1,7 @@
 import { Config } from "../../config/mod.ts";
-import { unreachable } from "../../deps/std/testing/asserts.ts";
 import * as rpc from "../../rpc/mod.ts";
 import * as U from "../../util/mod.ts";
-import { atom } from "../sys/Atom.ts";
+import { AnyAtom, atom } from "../sys/Atom.ts";
 import { T_, Val, ValCollection } from "../sys/Effect.ts";
 import { rpcClient } from "./RpcClient.ts";
 
@@ -17,20 +16,27 @@ export function rpcSubscription<
   methodName: MethodName_,
   params: Params_,
   createListener: U.CreateWatchHandler<rpc.NotifMessage<Config_, MethodName>>,
+  cleanup?: (initOk: rpc.OkMessage<Config_, MethodName>) => AnyAtom,
 ) {
   return atom(
     "RpcSubscription",
     [rpcClient(config), methodName, ...params],
-    async (client, methodName, ...params) => {
+    async function(client, methodName, ...params) {
       const result = await client.subscribe(
         methodName as MethodName,
         params as Parameters<T_<Config_>["RpcSubscriptionMethods"][MethodName]>,
-        createListener as any,
+        createListener,
+        cleanup
+          ? (x) => {
+            return this.run(cleanup(x.result));
+          }
+          : undefined,
       );
       if (result?.error) {
         return new RpcSubscriptionError(result);
       }
-      return unreachable();
+      // TODO: clean up typings –– should implicitly narrow to `undefined`
+      return result as undefined;
     },
   );
 }

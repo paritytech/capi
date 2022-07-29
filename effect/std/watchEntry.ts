@@ -6,7 +6,11 @@ import * as sys from "../sys/mod.ts";
 
 export type WatchEntryEvent = [key?: U.HexString, value?: unknown];
 
-type Config = knownRpc.Config<string, "state_getMetadata", "state_subscribeStorage">;
+type Config = knownRpc.Config<
+  string,
+  "state_getMetadata" | "state_unsubscribeStorage",
+  "state_subscribeStorage"
+>;
 
 export function watchEntry<
   PalletName extends sys.Val<string>,
@@ -36,6 +40,8 @@ export function watchEntry<
         });
       },
     );
-    return a.rpcSubscription(config, "state_subscribeStorage", [storageKeys], watchInit);
+    return a.rpcSubscription(config, "state_subscribeStorage", [storageKeys], watchInit, (ok) => {
+      return a.rpcCall(config, "state_unsubscribeStorage", [ok.result]);
+    });
   });
 }
