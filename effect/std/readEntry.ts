@@ -22,7 +22,7 @@ export function readEntry<
   const palletMetadata_ = a.palletMetadata(metadata_, palletName);
   const entryMetadata_ = a.entryMetadata(palletMetadata_, entryName);
   const $storageKey = a.$storageKey(deriveCodec_, palletMetadata_, entryMetadata_);
-  const storageKey = a.storageKey($storageKey, keys);
+  const storageKey = a.storageKey($storageKey, ...keys);
   const storageCall = a.rpcCall(config, "state_getStorage", [storageKey, blockHash]);
   const entryValueTypeI = a.select(entryMetadata_, "value");
   const $entry = a.codec(deriveCodec_, entryValueTypeI);
