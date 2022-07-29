@@ -24,8 +24,7 @@ export function rpcCall<
         params as Parameters<(Methods & rpc.ProviderMethods)[T_<MethodName>]>,
       );
       if (result.error) {
-        console.log(result.error);
-        return new RpcCallError<typeof config>(result);
+        return new RpcCallError(result);
       }
       return result;
     },
