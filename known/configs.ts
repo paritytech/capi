@@ -20,6 +20,9 @@ export const kusama = new Kusama();
 export class Acala extends Config_("wss://acala-polkadot.api.onfinality.io/public-ws") {}
 export const acala = new Acala();
 
+export class Rococo extends Config_("wss://rococo-contracts-rpc.polkadot.io") {}
+export const rococo = new Rococo();
+
 export class Moonbeam extends Config_("wss://wss.api.moonbeam.network") {}
 export const moonbeam = new Moonbeam();
 

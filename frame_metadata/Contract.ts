@@ -1,5 +1,5 @@
-import { unimplemented } from "../deps/std/testing/asserts.ts";
-import { Ty, TyDef } from "./scale_info.ts";
+import { unimplemented, unreachable } from "../deps/std/testing/asserts.ts";
+import { Ty, TyDef, UnionTyDefMember } from "./scale_info.ts";
 
 export interface ContractMetadata<Ty_ = Ty> {
   source: ContractMetadata.Source;
@@ -95,75 +95,88 @@ export namespace ContractMetadata {
       }[];
     };
   }
-}
 
-// TODO: stricter typings? Not the most necessary atm.
-export function fromRawTy(rawTy: any): Ty {
-  const { def, params, path } = rawTy.type;
-  return {
-    id: rawTy.id,
-    path,
-    params,
-    // TODO: grab this from appropriate loc
-    docs: [],
-    ...((): TyDef => {
-      if (def.primitive) {
-        return {
-          type: "Primitive",
-          kind: def.primitive,
-        };
-      } else if (def.composite) {
-        return {
-          type: "Struct",
-          fields: normalizeFields(def.composite.fields),
-        };
-      } else if (def.variant) {
-        return {
-          type: "Union",
-          members: def.variant.variants.map((variant: any) => {
-            const { fields, ...rest } = variant;
-            return {
-              fields: fields ? normalizeFields(fields) : [],
-              ...rest,
-            };
-          }),
-        };
-      } else if (def.tuple) {
-        return {
-          type: "Tuple",
-          fields: def.tuple,
-        };
-      } else if (def.array) {
-        return {
-          type: "SizedArray",
-          len: def.array.len,
-          typeParam: def.array.type,
-        };
-      } else {
-        // Sequence
-        // Compact
-        // BitSequence
-        unimplemented();
-      }
-    })(),
-  };
-}
+  // TODO: stricter typings? Not the most necessary atm.
+  export function fromRawTy(rawTy: any): Ty {
+    const { def, params, path } = rawTy.type;
+    return {
+      id: rawTy.id,
+      path,
+      params: params ? normalizeFields(params) : [],
+      // TODO: grab this from appropriate loc
+      docs: [],
+      ...((): TyDef => {
+        if (def.primitive) {
+          return {
+            type: "Primitive",
+            kind: def.primitive,
+          };
+        } else if (def.composite) {
+          return {
+            type: "Struct",
+            fields: normalizeFields(def.composite.fields),
+          };
+        } else if (def.variant) {
+          return {
+            type: "Union",
+            members: def.variant.variants.map((variant: any) => {
+              const { fields, ...rest } = variant;
+              const member: UnionTyDefMember = {
+                fields: fields ? normalizeFields(fields) : [],
+                ...rest,
+              };
+              return member;
+            }),
+          };
+        } else if (def.tuple) {
+          return {
+            type: "Tuple",
+            fields: def.tuple,
+          };
+        } else if (def.array) {
+          return {
+            type: "SizedArray",
+            len: def.array.len,
+            typeParam: def.array.type,
+          };
+        } else if (def.sequence) {
+          return {
+            type: "Sequence",
+            typeParam: def.sequence.type,
+          };
+        } else if (def.compact) {
+          // TODO
+          console.log({ Compact: def });
+          unimplemented();
+        } else if (def.bitSequence) {
+          // TODO
+          console.log({ BitSequence: def });
+          unimplemented();
+        }
+        unreachable();
+      })(),
+    };
+  }
 
-function normalizeFields(fields: any[]) {
-  return fields.map((field: any) => {
-    const { type: ty, ...rest } = field;
-    return { ty, ...rest };
-  });
-}
+  function normalizeFields(fields: any[]) {
+    return fields.map(({ type: ty, ...rest }: any) => {
+      return { ty, ...rest };
+    });
+  }
 
-export function normalize(contractMetadata: ContractMetadata): ContractMetadata<Ty> {
-  const { V3, ...topLevelRest } = contractMetadata;
-  const { types, ...v3Rest } = V3;
-  return {
-    ...topLevelRest,
-    V3: {
-      ...v3Rest,
-      types: types.map(fromRawTy),
-    },
-  };
+  export function normalize(contractMetadata: ContractMetadata): ContractMetadata<Ty> {
+    const { V3, ...topLevelRest } = contractMetadata;
+    const { types, ...v3Rest } = V3;
+    return {
+      ...topLevelRest,
+      V3: {
+        ...v3Rest,
+        types: types.map(fromRawTy),
+      },
+    };
+  }
+
+  export function tys(contractMetadata: ContractMetadata): Ty[] {
+    return normalize(contractMetadata).V3.types;
+  }
 }
