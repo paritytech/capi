@@ -13,7 +13,12 @@
       "include": ["."]
     },
     "rules": {
-      "exclude": ["no-empty-interface", "no-explicit-any", "no-namespace"],
+      "exclude": [
+        "no-empty-interface",
+        "no-explicit-any",
+        "no-namespace",
+        "no-empty"
+      ],
       "tags": ["recommended"]
     }
   },

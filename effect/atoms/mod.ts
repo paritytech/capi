@@ -1,4 +1,5 @@
 export * from "./$Extrinsic.ts";
+export * from "./$ExtrinsicEncodeAsync.ts";
 export * from "./$Key.ts";
 export * from "./$StorageKey.ts";
 export * from "./Codec.ts";

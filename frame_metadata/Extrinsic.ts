@@ -22,7 +22,7 @@ export interface Signature {
   value: Uint8Array;
 }
 
-export type SignExtrinsic = (message: Uint8Array) => Signature;
+export type SignExtrinsic = (message: Uint8Array) => Signature | Promise<Signature>;
 
 export interface Extrinsic {
   protocolVersion: number;
@@ -67,8 +67,8 @@ function encodeCall(
   });
 }
 
-export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
-  const { metadata, sign, deriveCodec, hashers: { Blake2_256 } } = props;
+function setup(props: ExtrinsicCodecProps) {
+  const { metadata, deriveCodec } = props;
   const { signedExtensions } = metadata.extrinsic;
   const $sig = deriveCodec(findExtrinsicTypeParam("Signature")!);
   const $address = deriveCodec(findExtrinsicTypeParam("Address")!);
@@ -78,48 +78,23 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
   const $call = deriveCodec(callTyI);
   const $extra = getExtrasCodec(signedExtensions.map((x) => x.ty));
   const $additional = getExtrasCodec(signedExtensions.map((x) => x.additionalSigned));
+
+  return { $sig, $address, callTy, $call, $extra, $additional };
+
+  function findExtrinsicTypeParam(name: string) {
+    return metadata.tys[metadata.extrinsic.ty]?.params.find((x) => x.name === name)?.ty;
+  }
+  function getExtrasCodec(is: number[]) {
+    return $.tuple(...is.map((i) => deriveCodec(i)).filter((x) => x !== $null));
+  }
+}
+
+export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
+  const { $address, $call, $extra, $sig, callTy, $additional } = setup(props);
   const $baseExtrinsic: $.Codec<Extrinsic> = $.createCodec({
     _metadata: null,
     _staticSize: 1 + $.tuple($address, $sig, $extra, $call)._staticSize,
-    _encode(buffer, extrinsic) {
-      const firstByte = (+!!extrinsic.signature << 7) | extrinsic.protocolVersion;
-      buffer.array[buffer.index++] = firstByte;
-      const call = {
-        type: extrinsic.palletName,
-        value: {
-          type: extrinsic.methodName,
-          ...extrinsic.args,
-        },
-      };
-      const { signature } = extrinsic;
-      if (signature) {
-        if ("additional" in signature) {
-          $address._encode(buffer, signature.address);
-          const toSignBuffer = new $.EncodeBuffer($.tuple($sig, $extra, $additional)._staticSize);
-          // TODO: swap out with use of `$call._encode` upon fixing https://github.com/paritytech/parity-scale-codec-ts/issues/53
-          encodeCall(toSignBuffer, callTy, extrinsic, metadata, deriveCodec);
-          const callEnd = toSignBuffer.finishedSize + toSignBuffer.index;
-          $extra._encode(toSignBuffer, signature.extra);
-          const extraEnd = toSignBuffer.finishedSize + toSignBuffer.index;
-          $additional._encode(toSignBuffer, signature.additional);
-          const toSignEncoded = toSignBuffer.finish();
-          const callEncoded = toSignEncoded.subarray(0, callEnd);
-          const extraEncoded = toSignEncoded.subarray(callEnd, extraEnd);
-          const toSign = toSignEncoded.length > 256 ? Blake2_256(toSignEncoded) : toSignEncoded;
-          const sig = sign(toSign);
-          $sig._encode(buffer, sig);
-          buffer.insertArray(extraEncoded);
-          buffer.insertArray(callEncoded);
-        } else {
-          $address._encode(buffer, signature.address);
-          $sig._encode(buffer, signature.sig);
-          $extra._encode(buffer, signature.extra);
-          $call._encode(buffer, call);
-        }
-      } else {
-        $call._encode(buffer, call);
-      }
-    },
+    _encode: _Encode(props, $address, $call, $extra, $sig, $additional, callTy),
     _decode(buffer) {
       const firstByte = buffer.array[buffer.index++]!;
       const hasSignature = firstByte & (1 << 7);
@@ -150,11 +125,73 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
       return $baseExtrinsic.decode(buffer.array.subarray(buffer.index, buffer.index += length));
     },
   });
+}
 
-  function getExtrasCodec(is: number[]) {
-    return $.tuple(...is.map((i) => deriveCodec(i)).filter((x) => x !== $null));
-  }
-  function findExtrinsicTypeParam(name: string) {
-    return metadata.tys[metadata.extrinsic.ty]?.params.find((x) => x.name === name)?.ty;
-  }
+// TODO: clean this up upon introducing async support to SCALE
+export function $encodeAsync(props: ExtrinsicCodecProps) {
+  const { $address, $call, $extra, $sig, callTy, $additional } = setup(props);
+  const _encode = _Encode(props, $address, $call, $extra, $sig, $additional, callTy);
+  const baseStaticSize = 1 + $.tuple($address, $sig, $extra, $call)._staticSize;
+
+  return async (extrinsic: Extrinsic): Promise<Uint8Array> => {
+    const baseBuf = new $.EncodeBuffer(baseStaticSize);
+    await _encode(baseBuf, extrinsic);
+    const baseEncoded = baseBuf.finish();
+    const finalBuf = new $.EncodeBuffer($.nCompact._staticSize);
+    $.nCompact._encode(finalBuf, baseEncoded.length);
+    finalBuf.insertArray(baseEncoded);
+    return finalBuf.finish();
+  };
+}
+
+function _Encode(
+  props: ExtrinsicCodecProps,
+  $address: $.Codec<unknown>,
+  $call: $.Codec<unknown>,
+  $extra: $.Codec<unknown[]>,
+  $sig: $.Codec<unknown>,
+  $additional: $.Codec<unknown[]>,
+  callTy: UnionTyDef,
+) {
+  return async (buffer: $.EncodeBuffer, extrinsic: Extrinsic) => {
+    const firstByte = (+!!extrinsic.signature << 7) | extrinsic.protocolVersion;
+    buffer.array[buffer.index++] = firstByte;
+    const call = {
+      type: extrinsic.palletName,
+      value: {
+        type: extrinsic.methodName,
+        ...extrinsic.args,
+      },
+    };
+    const { signature } = extrinsic;
+    if (signature) {
+      if ("additional" in signature) {
+        $address._encode(buffer, signature.address);
+        const toSignBuffer = new $.EncodeBuffer($.tuple($sig, $extra, $additional)._staticSize);
+        // TODO: swap out with use of `$call._encode` upon fixing https://github.com/paritytech/parity-scale-codec-ts/issues/53
+        encodeCall(toSignBuffer, callTy, extrinsic, props.metadata, props.deriveCodec);
+        const callEnd = toSignBuffer.finishedSize + toSignBuffer.index;
+        $extra._encode(toSignBuffer, signature.extra);
+        const extraEnd = toSignBuffer.finishedSize + toSignBuffer.index;
+        $additional._encode(toSignBuffer, signature.additional);
+        const toSignEncoded = toSignBuffer.finish();
+        const callEncoded = toSignEncoded.subarray(0, callEnd);
+        const extraEncoded = toSignEncoded.subarray(callEnd, extraEnd);
+        const toSign = toSignEncoded.length > 256
+          ? props.hashers.Blake2_256(toSignEncoded)
+          : toSignEncoded;
+        const sig = await props.sign(toSign);
+        $sig._encode(buffer, sig);
+        buffer.insertArray(extraEncoded);
+        buffer.insertArray(callEncoded);
+      } else {
+        $address._encode(buffer, signature.address);
+        $sig._encode(buffer, signature.sig);
+        $extra._encode(buffer, signature.extra);
+        $call._encode(buffer, call);
+      }
+    } else {
+      $call._encode(buffer, call);
+    }
+  };
 }

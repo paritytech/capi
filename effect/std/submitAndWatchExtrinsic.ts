@@ -35,7 +35,7 @@ export function sendAndWatchExtrinsic<
 ) {
   const metadata = a.metadata(config);
   const deriveCodec = a.deriveCodec(metadata);
-  const $extrinsic = a.$extrinsic(deriveCodec, metadata, sign);
+  const $extrinsic = a.$extrinsicEncodeAsync(deriveCodec, metadata, sign);
   const runtimeVersion = a.rpcCall(config, "state_getRuntimeVersion", []);
   const senderSs58 = sys.anon([sender], async (sender) => {
     const ss58 = await Ss58();
@@ -55,7 +55,7 @@ export function sendAndWatchExtrinsic<
     runtimeVersion,
     accountNextIndex,
     genesisHash,
-  ], (
+  ], async (
     $extrinsic,
     sender,
     methodName,
@@ -65,7 +65,7 @@ export function sendAndWatchExtrinsic<
     { result: genesisHashHex },
   ) => {
     const genesisHash = U.hex.decode(genesisHashHex);
-    const extrinsicBytes = $extrinsic.encode({
+    const extrinsicBytes = await $extrinsic({
       protocolVersion: 4, // TODO: grab this from elsewhere
       palletName,
       methodName,
