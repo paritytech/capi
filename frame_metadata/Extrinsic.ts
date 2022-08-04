@@ -18,7 +18,7 @@ export interface MultiAddress {
 }
 
 export interface Signature {
-  type: "Sr25519" | "Ed25519" | "Ecdsa";
+  type: "Sr25519" | "Ed25519" | "Secp256k"; // TODO: `"Ecdsa"`?;
   value: Uint8Array;
 }
 

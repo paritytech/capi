@@ -17,5 +17,5 @@ export function config(node: Node) {
 const ALT_RUNTIME_ADDRESS_PREFIX = {
   kusama: 2,
   rococo: undefined!, /* TODO */
-  westend: 54,
+  westend: 0,
 };

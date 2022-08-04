@@ -1,8 +1,8 @@
 import { Config } from "../../config/mod.ts";
 import * as rpc from "../../rpc/mod.ts";
-import * as U from "../../util/mod.ts";
 import { atom } from "../sys/Atom.ts";
 import { T_, Val, ValCollection } from "../sys/Effect.ts";
+import { RpcError } from "./common.ts";
 import { rpcClient } from "./RpcClient.ts";
 
 export function rpcCall<
@@ -24,15 +24,9 @@ export function rpcCall<
         params as Parameters<(Methods & rpc.ProviderMethods)[T_<MethodName>]>,
       );
       if (result.error) {
-        return new RpcCallError(result);
+        return new RpcError(result.error);
       }
       return result;
     },
   );
-}
-
-export class RpcCallError<Config_ extends Config> extends U.ErrorCtor("RpcCall") {
-  constructor(readonly error: rpc.ErrMessage<Config_>) {
-    super();
-  }
 }

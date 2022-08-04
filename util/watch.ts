@@ -15,6 +15,7 @@ export function mapCreateWatchHandler<From, Into>(
   };
 }
 
+// TODO: rename
 export type Handle<T> = CreateWatchHandler<T> & { iter: Iter<T> };
 export function handle<T>(): Handle<T> {
   const inner = new Iter<T>();

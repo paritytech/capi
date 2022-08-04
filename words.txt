@@ -159,3 +159,6 @@ demux
 demuxing
 datetime
 multiaddress
+cdylib
+rlib
+alloc

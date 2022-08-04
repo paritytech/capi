@@ -3,6 +3,7 @@ import * as rpc from "../../rpc/mod.ts";
 import * as U from "../../util/mod.ts";
 import { AnyAtom, atom } from "../sys/Atom.ts";
 import { T_, Val, ValCollection } from "../sys/Effect.ts";
+import { RpcError } from "./common.ts";
 import { rpcClient } from "./RpcClient.ts";
 
 export function rpcSubscription<
@@ -33,7 +34,7 @@ export function rpcSubscription<
           : undefined,
       );
       if (result?.error) {
-        return new RpcSubscriptionError(result);
+        return new RpcError(result.error);
       }
       // TODO: clean up typings –– should implicitly narrow to `undefined`
       return result as undefined;
@@ -42,7 +43,7 @@ export function rpcSubscription<
 }
 
 export class RpcSubscriptionError<Config_ extends Config> extends U.ErrorCtor("RpcSubscription") {
-  constructor(readonly error: rpc.ErrMessage<Config_>) {
+  constructor(readonly error: rpc.ErrMessage<Config_>["error"]) {
     super();
   }
 }
