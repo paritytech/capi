@@ -24,7 +24,13 @@ export function rpcCall<
         params as Parameters<(Methods & rpc.ProviderMethods)[T_<MethodName>]>,
       );
       if (result.error) {
-        return new RpcError(result.error);
+        return new RpcError({
+          ...result.error,
+          attempt: {
+            methodName,
+            params,
+          },
+        });
       }
       return result;
     },

@@ -34,7 +34,13 @@ export function rpcSubscription<
           : undefined,
       );
       if (result?.error) {
-        return new RpcError(result.error);
+        return new RpcError({
+          ...result.error,
+          attempt: {
+            methodName,
+            params,
+          },
+        });
       }
       // TODO: clean up typings –– should implicitly narrow to `undefined`
       return result as undefined;
