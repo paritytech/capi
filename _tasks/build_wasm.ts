@@ -6,7 +6,7 @@ async function build(featureName: string) {
       "deno",
       "task",
       "run",
-      "https://deno.land/x/wasmbuild@0.8.4/main.ts",
+      "https://deno.land/x/wasmbuild@0.8.5/main.ts",
       "--out",
       featureName,
       "--features",

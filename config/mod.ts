@@ -15,7 +15,10 @@ export class Config<
   RpcErrorDetails!: RpcErrorDetails;
   Metadata!: Metadata;
 
-  constructor(readonly discoveryValue: DiscoveryValue) {}
+  constructor(
+    readonly discoveryValue: DiscoveryValue,
+    readonly addressPrefix: number,
+  ) {}
 }
 
 export namespace Config {
@@ -25,12 +28,15 @@ export namespace Config {
     RpcErrorDetails extends rpc.ErrorDetails,
     Metadata extends M.Metadata,
   >() {
-    return <D>(discoveryValue: D) => {
+    return <D>(
+      discoveryValue: D,
+      addressPrefix: number,
+    ) => {
       return class
         extends Config<D, RpcMethods, RpcSubscriptionMethods, RpcErrorDetails, Metadata>
       {
         constructor() {
-          super(discoveryValue);
+          super(discoveryValue, addressPrefix);
         }
       };
     };

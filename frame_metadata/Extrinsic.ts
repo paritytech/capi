@@ -18,7 +18,7 @@ export interface MultiAddress {
 }
 
 export interface Signature {
-  type: "Sr25519";
+  type: "Sr25519" | "Ed25519" | "Ecdsa";
   value: Uint8Array;
 }
 
@@ -26,6 +26,7 @@ export type SignExtrinsic = (message: Uint8Array) => Signature | Promise<Signatu
 
 export interface Extrinsic {
   protocolVersion: number;
+  // TODO: make generic over chain
   signature?:
     & {
       address: MultiAddress;

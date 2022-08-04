@@ -35,9 +35,18 @@ await t.ctx(async (config) => {
     },
     (stop) => {
       return (message) => {
-        console.log(message);
-        if (typeof message !== "string" && (message.params.result as any).finalized) {
-          stop();
+        if (typeof message.params.result === "string") {
+          console.log("Extrinsic", message.params.result);
+        } else {
+          if (message.params.result.inBlock) {
+            console.log("Extrinsic in block", message.params.result.inBlock);
+          } else if (message.params.result.finalized) {
+            console.log("Extrinsic finalized as of", message.params.result.finalized);
+            stop();
+          } else {
+            console.log("Misc", message.params.result);
+            stop();
+          }
         }
       };
     },

@@ -3,6 +3,7 @@ import { deferred } from "../deps/std/async.ts";
 export class Iter<T> implements AsyncIterableIterator<T> {
   #queue: T[] = [];
   #cbs: ((value: IteratorYieldResult<T>) => void)[] = [];
+  onDone?: () => void;
 
   push = (value: T): void => {
     const cb = this.#cbs.shift();
@@ -28,11 +29,15 @@ export class Iter<T> implements AsyncIterableIterator<T> {
     return await pending;
   }
 
+  return(): Promise<IteratorReturnResult<undefined>> {
+    this.onDone?.();
+    return Promise.resolve({
+      done: true as const,
+      value: undefined,
+    });
+  }
+
   [Symbol.asyncIterator]() {
     return this;
   }
-}
-
-export function iter<T>(): Iter<T> {
-  return new Iter();
 }

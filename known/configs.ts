@@ -11,26 +11,28 @@ const Config_ = Config.from<
   TmpMetadata
 >();
 
-export class Polkadot extends Config_("wss://rpc.polkadot.io") {}
+export class Polkadot extends Config_("wss://rpc.polkadot.io", 0) {}
 export const polkadot = new Polkadot();
 
-export class Kusama extends Config_("wss://kusama-rpc.polkadot.io") {}
+export class Kusama extends Config_("wss://kusama-rpc.polkadot.io", 2) {}
 export const kusama = new Kusama();
 
-export class Acala extends Config_("wss://acala-polkadot.api.onfinality.io/public-ws") {}
+export class Acala extends Config_("wss://acala-polkadot.api.onfinality.io/public-ws", 10) {}
 export const acala = new Acala();
 
-export class Rococo extends Config_("wss://rococo-contracts-rpc.polkadot.io") {}
+export class Rococo
+  extends Config_("wss://rococo-contracts-rpc.polkadot.io", undefined! /* TODO */)
+{}
 export const rococo = new Rococo();
 
-export class Moonbeam extends Config_("wss://wss.api.moonbeam.network") {}
+export class Moonbeam extends Config_("wss://wss.api.moonbeam.network", 1284) {}
 export const moonbeam = new Moonbeam();
 
-export class Statemint extends Config_("wss://statemint-rpc.polkadot.io") {}
+export class Statemint extends Config_("wss://statemint-rpc.polkadot.io", undefined! /* TODO */) {}
 export const statemint = new Statemint();
 
-export class Subsocial extends Config_("wss://para.subsocial.network") {}
+export class Subsocial extends Config_("wss://para.subsocial.network", 28) {}
 export const subsocial = new Subsocial();
 
-export class Westend extends Config_("wss://westend-rpc.polkadot.io") {}
+export class Westend extends Config_("wss://westend-rpc.polkadot.io", 54) {}
 export const westend = new Westend();

@@ -8,5 +8,14 @@ export function config(node: Node) {
     rpc.SubscriptionMethods,
     rpc.ErrorDetails,
     TmpMetadata
-  >()(node.url) {}();
+  >()(
+    node.url,
+    node.config?.altRuntime ? ALT_RUNTIME_ADDRESS_PREFIX[node.config.altRuntime] : 0,
+  ) {}();
 }
+
+const ALT_RUNTIME_ADDRESS_PREFIX = {
+  kusama: 2,
+  rococo: undefined!, /* TODO */
+  westend: 54,
+};

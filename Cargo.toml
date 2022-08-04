@@ -9,10 +9,9 @@ crate-type = ["cdylib", "rlib"]
 path = "wasm.rs"
 
 [features]
-all = ["hashers", "sr25519", "ss58"]
+all = ["hashers", "ss58"]
 default = ["console_error_panic_hook"]
 hashers = []
-sr25519 = []
 ss58 = []
 
 [dependencies]
