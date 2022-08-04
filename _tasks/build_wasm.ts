@@ -17,6 +17,7 @@ async function build(featureName: string) {
   assert(status.success);
 }
 
+// TODO: account for empty `wasm_url.protocol`
 await (["hashers", "ss58"] as const).reduce(async (acc, featureName) => {
   await acc;
   await build(featureName);
