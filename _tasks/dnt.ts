@@ -40,7 +40,6 @@ await Promise.all([
       license: "Apache-2.0",
       repository: "github:paritytech/capi",
     },
-
     compilerOptions: {
       lib: ["dom", "esnext"],
       importHelpers: true,

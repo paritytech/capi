@@ -1,7 +1,7 @@
 // @generated file from wasmbuild -- do not edit
 // deno-lint-ignore-file
 // deno-fmt-ignore-file
-// source-hash: 03396dbc62654de6e23aa312b7716c60b0b3ef0e
+// source-hash: 9e2447c43eb252922eda02052e4ee441dc439853
 let wasm;
 
 const heap = new Array(32).fill(undefined);
@@ -320,7 +320,8 @@ async function instantiateModule(transform) {
       );
     }
     case "https:":
-    case "http:": {
+    case "http:":
+    case "": {
       if (typeof Deno === "object" && "permissions" in Deno) {
         await Deno.permissions.request({ name: "net", host: wasm_url.host });
       }

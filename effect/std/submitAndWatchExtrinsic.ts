@@ -37,13 +37,18 @@ export function sendAndWatchExtrinsic<
   const deriveCodec = a.deriveCodec(metadata);
   const $extrinsic = a.$extrinsicEncodeAsync(deriveCodec, metadata, sign);
   const runtimeVersion = a.rpcCall(config, "state_getRuntimeVersion", []);
-  const senderSs58 = sys.anon([sender], async (sender) => {
-    const ss58 = await Ss58();
-    // TODO: other types
-    if (sender.type !== "Id") {
-      return unimplemented();
-    }
-    return ss58.encode(0, /* TODO */ U.hex.encode(sender.value)) as U.AccountIdString;
+  const senderSs58 = sys.anon([sender], (sender) => {
+    return (async (): Promise<string> => {
+      switch (sender.type) {
+        case "Id": {
+          return (await Ss58()).encode(config.addressPrefix, U.hex.encode(sender.value));
+        }
+        // TODO: other types
+        default: {
+          unimplemented();
+        }
+      }
+    })() as Promise<U.AccountIdString>;
   });
   const accountNextIndex = a.rpcCall(config, "system_accountNextIndex", [senderSs58]);
   const genesisHash = a.rpcCall(config, "chain_getBlockHash", [0]);
