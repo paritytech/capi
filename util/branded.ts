@@ -23,3 +23,7 @@ export type MultiAddressString = Branded<string, MultiAddressStringBrand>;
 export const HexU64StringBrand: unique symbol = Symbol();
 export type HexU64StringBrand = typeof HexU64StringBrand;
 export type HexU64String = Branded<string, HexU64StringBrand>;
+
+export const H256StringBrand: unique symbol = Symbol();
+export type H256StringBrand = typeof H256StringBrand;
+export type H256String = Branded<string, H256StringBrand>;
