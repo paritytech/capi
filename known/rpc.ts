@@ -115,7 +115,7 @@ export type CallMethods = rpc.EnsureMethods<{
   mmr: {
     generateBatchProof: TODO_NARROW_METHOD_TYPE;
     generateProof: TODO_NARROW_METHOD_TYPE;
-  }
+  };
   offchain: {
     localStorageGet: TODO_NARROW_METHOD_TYPE;
     localStorageSet: TODO_NARROW_METHOD_TYPE;
