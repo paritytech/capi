@@ -27,13 +27,16 @@ export type CallMethods = rpc.EnsureMethods<{
     hasSessionKeys: TODO_NARROW_METHOD_TYPE;
     insertKey: TODO_NARROW_METHOD_TYPE;
     pendingExtrinsics: TODO_NARROW_METHOD_TYPE;
-    removeExtrinsics: TODO_NARROW_METHOD_TYPE;
+    removeExtrinsic: TODO_NARROW_METHOD_TYPE;
     rotateKeys: TODO_NARROW_METHOD_TYPE;
     submitExtrinsic(transaction: U.HexString): U.HashHexString;
     unwatchExtrinsic(subscriptionId: U.SubscriptionIdString): unknown;
   };
   babe: {
     epochAuthorship: TODO_NARROW_METHOD_TYPE;
+  };
+  beefy: {
+    getFinalizedHead(): U.H256String;
   };
   chain: {
     getBlock(hash?: U.HashHexString): T.Block;
@@ -75,19 +78,21 @@ export type CallMethods = rpc.EnsureMethods<{
     unstable_unpin(followSubscription: U.SubscriptionIdString, hash: U.HashHexString): void;
   };
   contracts: {
+    call: TODO_NARROW_METHOD_TYPE;
     getStorage(
       accountId: string, /* TODO: Ss58 requirement */
       key: U.HexString,
       hash?: U.HashHexString,
     ): unknown;
-    // TODO
-    call(...args: any[]): unknown;
-    instantiate(...args: any[]): unknown;
-    upload_code(...args: any[]): unknown;
+    instantiate: TODO_NARROW_METHOD_TYPE
+    retProjection: TODO_NARROW_METHOD_TYPE;
+    upload_code: TODO_NARROW_METHOD_TYPE
   };
   childState: {
     getKeys: TODO_NARROW_METHOD_TYPE;
+    getKeysPaged: TODO_NARROW_METHOD_TYPE;
     getStorage: TODO_NARROW_METHOD_TYPE;
+    getStorageEntries: TODO_NARROW_METHOD_TYPE;
     getStorageHash: TODO_NARROW_METHOD_TYPE;
     getStorageSize: TODO_NARROW_METHOD_TYPE;
   };
@@ -96,14 +101,27 @@ export type CallMethods = rpc.EnsureMethods<{
     unstable_genesisHash(): string;
     unstable_properties(): unknown;
   };
+  dev: {
+    getBlockStats(at: U.HashHexString): T.BlockStats | undefined;
+  };
+  engine: {
+    createBlock: TODO_NARROW_METHOD_TYPE;
+    finalizeBlock: TODO_NARROW_METHOD_TYPE;
+  };
   grandpa: {
+    proveFinality: TODO_NARROW_METHOD_TYPE;
     roundState: TODO_NARROW_METHOD_TYPE;
   };
+  mmr: {
+    generateBatchProof: TODO_NARROW_METHOD_TYPE
+    generateProof: TODO_NARROW_METHOD_TYPE
+  }
   offchain: {
     localStorageGet: TODO_NARROW_METHOD_TYPE;
     localStorageSet: TODO_NARROW_METHOD_TYPE;
   };
   payment: {
+    queryFeeDetails: TODO_NARROW_METHOD_TYPE
     queryInfo(extrinsic: U.HexString, hash?: U.HashHexString): T.RuntimeDispatchInfo;
   };
   rpc: {
@@ -112,7 +130,18 @@ export type CallMethods = rpc.EnsureMethods<{
   state: {
     call: TODO_NARROW_METHOD_TYPE;
     callAt: CallMethods["state_call"];
+    getChildKeys: TODO_NARROW_METHOD_TYPE
+    getChildReadProof: TODO_NARROW_METHOD_TYPE
+    getChildStorage: TODO_NARROW_METHOD_TYPE
+    getChildStorageHash: TODO_NARROW_METHOD_TYPE
+    getChildStorageSize: TODO_NARROW_METHOD_TYPE
     getKeys: TODO_NARROW_METHOD_TYPE;
+    getKeysPaged(
+      prefix: string | undefined,
+      count: number,
+      startKey?: U.HexString,
+      hash?: U.HashHexString,
+    ): U.HexString[];
     getKeysPagedAt: CallMethods["state_getKeysPaged"];
     getMetadata(hash?: U.HashHexString): string;
     getPairs: TODO_NARROW_METHOD_TYPE;
@@ -125,21 +154,21 @@ export type CallMethods = rpc.EnsureMethods<{
     getStorageSizeAt: CallMethods["state_getStorageSize"];
     queryStorage: TODO_NARROW_METHOD_TYPE;
     queryStorageAt(keys: U.HexString[], at?: U.HashHexString): T.StorageChangeSet;
+    traceBlock: TODO_NARROW_METHOD_TYPE
+    trieMigrationStatus: TODO_NARROW_METHOD_TYPE
     unsubscribeRuntimeVersion(subscription: string): boolean;
     unsubscribeStorage(subscription: string): boolean;
-    getKeysPaged(
-      prefix: string | undefined,
-      count: number,
-      startKey?: U.HexString,
-      hash?: U.HashHexString,
-    ): U.HexString[];
   };
   sudo: {
     unstable_p2pDiscover(multiaddr: U.MultiAddressString): void;
     unstable_version(): string;
   };
+  syncstate: {
+    genSyncSpec: TODO_NARROW_METHOD_TYPE
+  }
   system: {
     accountNextIndex(account: U.AccountIdString): number;
+    addLogFilter: TODO_NARROW_METHOD_TYPE
     addReservedPeer: TODO_NARROW_METHOD_TYPE;
     chain(): string;
     chainType(): T.SystemChainTypeKind;
@@ -154,6 +183,9 @@ export type CallMethods = rpc.EnsureMethods<{
     peers(): T.SystemPeer[];
     properties: TODO_NARROW_METHOD_TYPE;
     removeReservedPeer: TODO_NARROW_METHOD_TYPE;
+    reservedPeers: TODO_NARROW_METHOD_TYPE
+    resetLogFilter: TODO_NARROW_METHOD_TYPE
+    syncState: TODO_NARROW_METHOD_TYPE
     version(): string;
   };
   transaction: {
@@ -164,6 +196,9 @@ export type CallMethods = rpc.EnsureMethods<{
 export type SubscriptionMethods = rpc.EnsureMethods<{
   author: {
     submitAndWatchExtrinsic(tx: U.HexString): T.TransactionStatus;
+  };
+  beefy: {
+    subscribeJustifications(): T.beefy.SignedCommitment;
   };
   chain: {
     subscribeAllHeads(): T.Header;
@@ -176,6 +211,9 @@ export type SubscriptionMethods = rpc.EnsureMethods<{
   };
   chainHead: {
     unstable_follow(runtimeUpdates: boolean): T.ChainHeadUnstableFollowEvent;
+  };
+  grandpa: {
+    subscribeJustifications: TODO_NARROW_METHOD_TYPE;
   };
   state: {
     subscribeRuntimeVersion: TODO_NARROW_METHOD_TYPE;
