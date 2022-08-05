@@ -84,9 +84,9 @@ export type CallMethods = rpc.EnsureMethods<{
       key: U.HexString,
       hash?: U.HashHexString,
     ): unknown;
-    instantiate: TODO_NARROW_METHOD_TYPE
+    instantiate: TODO_NARROW_METHOD_TYPE;
     retProjection: TODO_NARROW_METHOD_TYPE;
-    upload_code: TODO_NARROW_METHOD_TYPE
+    upload_code: TODO_NARROW_METHOD_TYPE;
   };
   childState: {
     getKeys: TODO_NARROW_METHOD_TYPE;
@@ -113,15 +113,15 @@ export type CallMethods = rpc.EnsureMethods<{
     roundState: TODO_NARROW_METHOD_TYPE;
   };
   mmr: {
-    generateBatchProof: TODO_NARROW_METHOD_TYPE
-    generateProof: TODO_NARROW_METHOD_TYPE
+    generateBatchProof: TODO_NARROW_METHOD_TYPE;
+    generateProof: TODO_NARROW_METHOD_TYPE;
   }
   offchain: {
     localStorageGet: TODO_NARROW_METHOD_TYPE;
     localStorageSet: TODO_NARROW_METHOD_TYPE;
   };
   payment: {
-    queryFeeDetails: TODO_NARROW_METHOD_TYPE
+    queryFeeDetails: TODO_NARROW_METHOD_TYPE;
     queryInfo(extrinsic: U.HexString, hash?: U.HashHexString): T.RuntimeDispatchInfo;
   };
   rpc: {
@@ -130,11 +130,11 @@ export type CallMethods = rpc.EnsureMethods<{
   state: {
     call: TODO_NARROW_METHOD_TYPE;
     callAt: CallMethods["state_call"];
-    getChildKeys: TODO_NARROW_METHOD_TYPE
-    getChildReadProof: TODO_NARROW_METHOD_TYPE
-    getChildStorage: TODO_NARROW_METHOD_TYPE
-    getChildStorageHash: TODO_NARROW_METHOD_TYPE
-    getChildStorageSize: TODO_NARROW_METHOD_TYPE
+    getChildKeys: TODO_NARROW_METHOD_TYPE;
+    getChildReadProof: TODO_NARROW_METHOD_TYPE;
+    getChildStorage: TODO_NARROW_METHOD_TYPE;
+    getChildStorageHash: TODO_NARROW_METHOD_TYPE;
+    getChildStorageSize: TODO_NARROW_METHOD_TYPE;
     getKeys: TODO_NARROW_METHOD_TYPE;
     getKeysPaged(
       prefix: string | undefined,
@@ -154,8 +154,8 @@ export type CallMethods = rpc.EnsureMethods<{
     getStorageSizeAt: CallMethods["state_getStorageSize"];
     queryStorage: TODO_NARROW_METHOD_TYPE;
     queryStorageAt(keys: U.HexString[], at?: U.HashHexString): T.StorageChangeSet;
-    traceBlock: TODO_NARROW_METHOD_TYPE
-    trieMigrationStatus: TODO_NARROW_METHOD_TYPE
+    traceBlock: TODO_NARROW_METHOD_TYPE;
+    trieMigrationStatus: TODO_NARROW_METHOD_TYPE;
     unsubscribeRuntimeVersion(subscription: string): boolean;
     unsubscribeStorage(subscription: string): boolean;
   };
@@ -164,11 +164,11 @@ export type CallMethods = rpc.EnsureMethods<{
     unstable_version(): string;
   };
   syncstate: {
-    genSyncSpec: TODO_NARROW_METHOD_TYPE
-  }
+    genSyncSpec: TODO_NARROW_METHOD_TYPE;
+  };
   system: {
     accountNextIndex(account: U.AccountIdString): number;
-    addLogFilter: TODO_NARROW_METHOD_TYPE
+    addLogFilter: TODO_NARROW_METHOD_TYPE;
     addReservedPeer: TODO_NARROW_METHOD_TYPE;
     chain(): string;
     chainType(): T.SystemChainTypeKind;
@@ -183,9 +183,9 @@ export type CallMethods = rpc.EnsureMethods<{
     peers(): T.SystemPeer[];
     properties: TODO_NARROW_METHOD_TYPE;
     removeReservedPeer: TODO_NARROW_METHOD_TYPE;
-    reservedPeers: TODO_NARROW_METHOD_TYPE
-    resetLogFilter: TODO_NARROW_METHOD_TYPE
-    syncState: TODO_NARROW_METHOD_TYPE
+    reservedPeers: TODO_NARROW_METHOD_TYPE;
+    resetLogFilter: TODO_NARROW_METHOD_TYPE;
+    syncState: TODO_NARROW_METHOD_TYPE;
     version(): string;
   };
   transaction: {
