@@ -1,11 +1,14 @@
 import * as C from "../mod.ts";
 import * as t from "../test-util/mod.ts";
+import * as U from "../util/mod.ts";
 
-await t.ctx(async (config) => {
-  const result = await C
-    .chain(config)
-    .pallet("System")
-    .entry("Account", t.p.alice.publicKey)
-    .read();
-  console.log(result);
-});
+const config = await t.config();
+
+const root = C
+  .chain(config)
+  .pallet("System")
+  .entry("Account", t.alice.publicKey)
+  .read();
+console.log(U.throwIfError(await root.run()));
+
+config.close();

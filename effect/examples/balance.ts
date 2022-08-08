@@ -2,8 +2,10 @@ import * as t from "../../test-util/mod.ts";
 import * as U from "../../util/mod.ts";
 import * as Z from "../mod.ts";
 
-await t.ctx(async (config) => {
-  const read_ = Z.readEntry(config, "System", "Account", [t.p.alice.publicKey]);
-  const result = U.throwIfError(await Z.run(read_));
-  console.log(result.value);
-});
+const config = await t.config();
+
+const read = Z.readEntry(config, "System", "Account", [t.alice.publicKey]);
+const result = U.throwIfError(await read.run());
+console.log(result.value);
+
+config.close();

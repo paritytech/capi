@@ -19,17 +19,15 @@ export class KeyPage<E extends Entry = Entry> extends NodeBase<"KeyPage"> {
   }
 
   read(block?: Block) {
-    return Z.run(
-      Z.readKeyPage(
-        this.chain.config as any,
-        this.entry.pallet.name,
-        this.entry.name,
-        this.count,
-        this.start,
-        block?.hash,
-      ),
+    return Z.readKeyPage(
+      this.chain.config as any,
+      this.entry.pallet.name,
+      this.entry.name,
+      this.count,
+      this.start,
+      block?.hash,
     );
   }
 
-  declare watch: (cb: (message: unknown) => void) => any;
+  // declare watch: (cb: (message: unknown) => void) => any;
 }
