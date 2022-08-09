@@ -1,4 +1,3 @@
-export * from "./Address.ts";
 export * from "./Block.ts";
 export * from "./Call.ts";
 export * from "./Chain.ts";

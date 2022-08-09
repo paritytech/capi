@@ -1,5 +1,4 @@
-import { Address } from "./Address.ts";
-import { Addresses } from "./Addresses.ts";
+import * as M from "../frame_metadata/mod.ts";
 import { NodeBase } from "./common.ts";
 import { Extrinsic } from "./Extrinsic.ts";
 import { Signed } from "./Signed.ts";
@@ -7,28 +6,32 @@ import { Signed } from "./Signed.ts";
 // TODO: constraint `Props` according to metadata
 export class Call<
   E extends Extrinsic = Extrinsic,
-  Props extends Record<string, unknown> = Record<string, unknown>,
-  Extra extends unknown[] = any[],
-  Additional extends unknown = any,
+  Args extends Record<string, unknown> = Record<string, any>,
 > extends NodeBase<"Call"> {
   chain;
 
   constructor(
     readonly extrinsic: E,
-    readonly props: Props,
-    readonly extra?: Extra,
-    readonly additional?: Additional,
+    readonly args: Args,
+    readonly options?: CallOptions,
   ) {
     super();
     this.chain = extrinsic.chain;
   }
 
-  signed<From extends Address<Addresses<this["chain"]>> = Address<Addresses<this["chain"]>>>(
-    from: From,
-    sign: (message: Uint8Array) => Promise<Uint8Array>,
+  signed(
+    from: M.MultiAddress,
+    sign: M.SignExtrinsic,
   ): Signed<this> {
     return new Signed(this, from, sign);
   }
 
   declare send: () => any;
+}
+
+export interface CallOptions {
+  checkpoint?: string;
+  mortality?: [period: bigint, phase: bigint];
+  tip?: bigint;
+  nonce?: number;
 }

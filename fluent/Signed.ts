@@ -1,22 +1,38 @@
-import { Address } from "./Address.ts";
-import { Addresses } from "./Addresses.ts";
+import {
+  sendAndWatchExtrinsic,
+  SendAndWatchExtrinsicConfig,
+} from "../effect/std/submitAndWatchExtrinsic.ts";
+import * as M from "../frame_metadata/mod.ts";
+import * as rpc from "../rpc/mod.ts";
+import * as U from "../util/mod.ts";
 import { Call } from "./Call.ts";
 import { NodeBase } from "./common.ts";
 
-export class Signed<
-  C extends Call = Call,
-  From extends Address<Addresses<C["chain"]>> = Address<Addresses<C["chain"]>>,
-> extends NodeBase<"Signed"> {
+export class Signed<C extends Call = Call> extends NodeBase<"Signed"> {
   chain;
 
   constructor(
     readonly call: C,
-    readonly from: From,
-    readonly sign: (message: Uint8Array) => Promise<Uint8Array>,
+    readonly from: M.MultiAddress,
+    readonly sign: M.SignExtrinsic,
   ) {
     super();
     this.chain = call.chain;
   }
 
-  declare send: () => any;
+  sendAndWatch(
+    createWatchHandler: U.CreateWatchHandler<
+      rpc.NotifMessage<SendAndWatchExtrinsicConfig, "author_submitAndWatchExtrinsic">
+    >,
+  ) {
+    return sendAndWatchExtrinsic({
+      config: this.chain.config as any,
+      palletName: this.call.extrinsic.pallet.name,
+      methodName: this.call.extrinsic.name,
+      args: this.call.args,
+      sender: this.from,
+      sign: this.sign,
+      createWatchHandler,
+    });
+  }
 }

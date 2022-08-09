@@ -7,6 +7,7 @@ import * as U from "../../util/mod.ts";
 import * as a from "../atoms/mod.ts";
 import * as sys from "../sys/mod.ts";
 
+export { type Config as SendAndWatchExtrinsicConfig };
 type Config = knownRpc.Config<
   string,
   | "state_getMetadata"
