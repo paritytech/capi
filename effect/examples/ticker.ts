@@ -8,8 +8,8 @@ const root = C.watchEntry(config, "Timestamp", "Now", [], () => {
   let i = 0;
 
   return (m) => {
-    i++;
     console.log({ [i]: m });
+    i++;
   };
 });
 
