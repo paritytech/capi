@@ -25,10 +25,9 @@ export interface SendAndWatchExtrinsicProps {
   methodName: sys.Val<string>;
   args: sys.Val<Record<string, unknown>>;
   checkpoint?: sys.Val<U.HashHexString>;
-  era?: sys.Val<U.HashHexString>;
+  mortality?: sys.Val<[period: bigint, phase: bigint]>;
   nonce?: sys.Val<string>;
-  tip?: sys.Val<U.HexString>;
-  extras?: sys.Val<unknown[]>[];
+  tip?: sys.Val<bigint>;
   sign: M.SignExtrinsic;
   createWatchHandler: U.CreateWatchHandler<
     rpc.NotifMessage<Config, "author_submitAndWatchExtrinsic">
@@ -54,7 +53,17 @@ export function sendAndWatchExtrinsic<Props extends SendAndWatchExtrinsicProps>(
     })() as Promise<U.AccountIdString>;
   });
   const accountNextIndex = a.rpcCall(props.config, "system_accountNextIndex", [senderSs58]);
-  const genesisHash = a.rpcCall(props.config, "chain_getBlockHash", [0]);
+  const genesisHash = sys.anon(
+    [a.rpcCall(props.config, "chain_getBlockHash", [0])],
+    ({ result }) => {
+      return U.hex.decode(result);
+    },
+  );
+  const checkpointHash = props.checkpoint
+    ? sys.anon([props.checkpoint], (v) => {
+      return U.hex.decode(v);
+    })
+    : genesisHash;
   const extrinsicHex = sys.anon([
     $extrinsic,
     props.sender,
@@ -64,17 +73,22 @@ export function sendAndWatchExtrinsic<Props extends SendAndWatchExtrinsicProps>(
     accountNextIndex,
     genesisHash,
     props.args,
+    checkpointHash,
+    props.tip,
+    props.mortality,
   ], async (
     $extrinsic,
     sender,
     methodName,
     palletName,
     { result: { specVersion, transactionVersion } },
-    { result: nextI },
-    { result: genesisHashHex },
+    { result: nonce },
+    genesisHash,
     args,
+    checkpoint,
+    tip,
+    mortality,
   ) => {
-    const genesisHash = U.hex.decode(genesisHashHex);
     const extrinsicBytes = await $extrinsic({
       protocolVersion: 4, // TODO: grab this from elsewhere
       palletName,
@@ -82,10 +96,17 @@ export function sendAndWatchExtrinsic<Props extends SendAndWatchExtrinsicProps>(
       args,
       signature: {
         address: sender,
-        // TODO: extract this out of the effect & make configurable
-        extra: [/* era */ { type: "Immortal" }, /* nonce */ nextI, /* tip */ 0],
-        // TODO: enable specificity of checkpoint
-        additional: [specVersion, transactionVersion, genesisHash, genesisHash],
+        extra: [
+          mortality
+            ? {
+              type: "Mortal",
+              value: mortality,
+            }
+            : { type: "Immortal" },
+          nonce,
+          tip || 0,
+        ],
+        additional: [specVersion, transactionVersion, checkpoint, genesisHash],
       },
     });
     return U.hex.encode(extrinsicBytes) as U.HexString;

@@ -32,6 +32,7 @@ export function rpcCall<
           },
         });
       }
+      // TODO: should this effect implicitly index into `result`?
       return result;
     },
   );
