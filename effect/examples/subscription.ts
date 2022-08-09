@@ -1,17 +1,21 @@
+import * as C from "../../mod.ts";
 import * as t from "../../test-util/mod.ts";
 import * as U from "../../util/mod.ts";
-import * as Z from "../mod.ts";
 
-await t.ctx(async (config) => {
+const config = await t.config();
+
+const root = C.rpcSubscription(config, "chain_subscribeNewHead", [], (stop) => {
   let i = 0;
-  const subscription = Z.rpcSubscription(config, "chain_subscribeNewHead", [], (stop) => {
-    return (m) => {
-      i++;
-      if (i > 5) {
-        stop();
-      }
-      console.log(m);
-    };
-  });
-  U.throwIfError(await Z.run(subscription));
+
+  return (m) => {
+    i++;
+    if (i > 5) {
+      stop();
+    }
+    console.log(m);
+  };
 });
+
+U.throwIfError(await root.run());
+
+config.close();

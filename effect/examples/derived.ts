@@ -1,13 +1,12 @@
-import { polkadot } from "../../known/mod.ts";
+import * as C from "../../mod.ts";
 import * as U from "../../util/mod.ts";
-import * as Z from "../mod.ts";
 
-const parachainIds = Z.readEntry(polkadot, "Paras", "Parachains", []);
-const parachainHeads = Z.into([parachainIds], ({ value }) => {
-  const atoms = value.map((id: number) => {
-    return Z.readEntry(polkadot, "Paras", "Heads", [id]);
+const ids = C.readEntry(C.polkadot, "Paras", "Parachains", []);
+const root = C.into([ids], ({ value }) => {
+  const heads = value.map((id: number) => {
+    return C.readEntry(C.polkadot, "Paras", "Heads", [id]);
   });
-  return Z.all(...atoms);
+  return C.all(...heads);
 });
-const result = U.throwIfError(await Z.run(parachainHeads));
-console.log(result);
+
+console.log(U.throwIfError(await root.run()));

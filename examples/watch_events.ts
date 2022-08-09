@@ -1,9 +1,19 @@
-import { westend } from "../known/mod.ts";
 import * as C from "../mod.ts";
+import * as U from "../util/mod.ts";
 
-// TODO: wire up with new subscription interface
-const result = await C
-  .chain(westend)
+const root = C
+  .chain(C.westend)
   .pallet("System")
   .entry("Events")
-  .watch(console.log);
+  .watch((stop) => {
+    let i = 0;
+    return (event) => {
+      i++;
+      console.log(event);
+      if (i === 5) {
+        stop();
+      }
+    };
+  });
+
+U.throwIfError(await root.run());

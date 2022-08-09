@@ -9,6 +9,6 @@ export class Metadata<C extends Chain = Chain> extends NodeBase<"Metadata"> {
   }
 
   read(block?: Block<C>) {
-    return Z.run(Z.metadata(this.chain.config as any, block?.hash));
+    return Z.metadata(this.chain.config as any, block?.hash);
   }
 }

@@ -1,4 +1,5 @@
 import * as Z from "../effect/mod.ts";
+import * as U from "../util/mod.ts";
 import { Block } from "./Block.ts";
 import { NodeBase } from "./common.ts";
 import { KeyPage } from "./KeyPage.ts";
@@ -22,22 +23,28 @@ export class Entry<
     this.keys = keys;
   }
 
-  keyPage(count: number, ...start: unknown[]): KeyPage<this> {
-    return new KeyPage(this, count, ...start);
+  keyPage(count: number, ...start: unknown[]) {
+    return new KeyPage(this as any, count, ...start);
   }
 
   read(block?: Block<P["chain"]>) {
-    return Z.run(
-      Z.readEntry(
-        // TODO: better typings on `chain.config`
-        this.pallet.chain.config as any,
-        this.pallet.name,
-        this.name,
-        this.keys,
-        block?.hash,
-      ),
+    return Z.readEntry(
+      // TODO: better typings on `chain.config`
+      this.pallet.chain.config as any,
+      this.pallet.name,
+      this.name,
+      this.keys,
+      block?.hash,
     );
   }
 
-  declare watch: (cb: (message: unknown) => void) => any;
+  watch(createWatchHandler: U.CreateWatchHandler<Z.WatchEntryEvent[]>) {
+    return Z.watchEntry(
+      this.chain.config as any,
+      this.pallet.name,
+      this.name,
+      this.keys,
+      createWatchHandler,
+    );
+  }
 }

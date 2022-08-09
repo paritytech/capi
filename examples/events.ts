@@ -1,9 +1,10 @@
-import { polkadot } from "../known/mod.ts";
 import * as C from "../mod.ts";
+import * as U from "../util/mod.ts";
 
-const result = await C
-  .chain(polkadot)
+const root = C
+  .chain(C.polkadot)
   .pallet("System")
   .entry("Events")
   .read();
-console.log(result);
+
+console.log(U.throwIfError(await root.run()));
