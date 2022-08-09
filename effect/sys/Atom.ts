@@ -1,7 +1,6 @@
 import { E_, Effect, Resolved, T_, ValCollection } from "./Effect.ts";
 import { key } from "./key.ts";
-import { RunContext } from "./run.ts";
-import { run } from "./run.ts";
+import { run, RunContext, RunResult } from "./run.ts";
 
 export function atom<N extends string, A extends unknown[], R>(
   fqn: N,
@@ -24,7 +23,7 @@ export class Atom<N extends string, A extends unknown[], R>
     super(fqn);
   }
 
-  run() {
+  run(): RunResult<this> {
     return run(this);
   }
 }
