@@ -6,8 +6,8 @@ import { key } from "./key.ts";
 export interface RunContext {
   run: Run;
 }
-
-export type Run = <Root extends AnyAtom>(root: Root) => Promise<T_<Root> | E_<Root>>;
+export type RunResult<Root extends AnyAtom> = Promise<T_<Root> | E_<Root>>;
+export type Run = <Root extends AnyAtom>(root: Root) => RunResult<Root>;
 
 export const { run } = (new class Runtime implements RunContext {
   #cache = new Map<string, Promise<unknown>>(); // TODO: set max size / use LRU
