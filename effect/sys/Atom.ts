@@ -1,4 +1,5 @@
-import { E_, Effect, Resolved, T_, ValCollection } from "./Effect.ts";
+import { select } from "../atoms/Select.ts";
+import { E_, Effect, Resolved, T_, Val, ValCollection } from "./Effect.ts";
 import { key } from "./key.ts";
 import { run, RunContext, RunResult } from "./run.ts";
 
@@ -21,6 +22,10 @@ export class Atom<N extends string, A extends unknown[], R>
     readonly exit?: Exit<R>,
   ) {
     super(fqn);
+  }
+
+  select(field: Val<keyof T_<this>>) {
+    return select(this, field);
   }
 
   run(): RunResult<this> {
