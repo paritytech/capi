@@ -1,12 +1,12 @@
 import * as M from "../../frame_metadata/mod.ts";
-import { rpc as knownRpc } from "../../known/mod.ts";
+import * as known from "../../known/mod.ts";
 import * as rpc from "../../rpc/mod.ts";
 import * as U from "../../util/mod.ts";
 import { atomFactory } from "../sys/Atom.ts";
 import { Val } from "../sys/mod.ts";
 import { rpcCall } from "./RpcCall.ts";
 
-type ConfigConstraint = knownRpc.Config<string, "state_getMetadata">;
+type ConfigConstraint = known.rpc.Config<string, "state_getMetadata">;
 
 export function metadata<Rest extends [blockHash?: Val<U.HashHexString | undefined>]>(
   config: ConfigConstraint,

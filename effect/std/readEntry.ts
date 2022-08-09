@@ -1,9 +1,9 @@
-import { rpc as knownRpc } from "../../known/mod.ts";
+import * as known from "../../known/mod.ts";
 import * as U from "../../util/mod.ts";
 import * as a from "../atoms/mod.ts";
 import * as sys from "../sys/mod.ts";
 
-type Config = knownRpc.Config<string, "state_getMetadata" | "state_getStorage">;
+type Config = known.rpc.Config<string, "state_getMetadata" | "state_getStorage">;
 
 export function readEntry<
   PalletName extends sys.Val<string>,

@@ -1,6 +1,6 @@
 import { unimplemented } from "../../deps/std/testing/asserts.ts";
 import * as M from "../../frame_metadata/mod.ts";
-import { rpc as knownRpc } from "../../known/mod.ts";
+import * as known from "../../known/mod.ts";
 import * as rpc from "../../rpc/mod.ts";
 import { Ss58 } from "../../ss58/mod.ts";
 import * as U from "../../util/mod.ts";
@@ -8,7 +8,7 @@ import * as a from "../atoms/mod.ts";
 import * as sys from "../sys/mod.ts";
 
 export { type Config as SendAndWatchExtrinsicConfig };
-type Config = knownRpc.Config<
+type Config = known.rpc.Config<
   string,
   | "state_getMetadata"
   | "state_getRuntimeVersion"
