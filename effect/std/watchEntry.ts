@@ -1,4 +1,4 @@
-import { type rpc as knownRpc } from "../../known/mod.ts";
+import * as known from "../../known/mod.ts";
 import * as rpc from "../../rpc/mod.ts";
 import * as U from "../../util/mod.ts";
 import * as a from "../atoms/mod.ts";
@@ -6,7 +6,7 @@ import * as sys from "../sys/mod.ts";
 
 export type WatchEntryEvent = [key?: U.HexString, value?: unknown];
 
-type Config = knownRpc.Config<
+type Config = known.rpc.Config<
   string,
   "state_getMetadata" | "state_unsubscribeStorage",
   "state_subscribeStorage"

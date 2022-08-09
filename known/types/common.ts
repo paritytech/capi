@@ -1,9 +1,9 @@
 import * as U from "../../util/mod.ts";
 
-export interface Block {
+export interface Block<Extrinsic> {
   block: {
     header: Header;
-    extrinsics: U.HexString[];
+    extrinsics: Extrinsic[];
   };
   justifications?: [number[], number[]][];
 }

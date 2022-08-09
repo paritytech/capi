@@ -39,8 +39,9 @@ export type CallMethods = rpc.EnsureMethods<{
     getFinalizedHead(): U.H256String;
   };
   chain: {
-    getBlock(hash?: U.HashHexString): T.Block;
-    getBlockHash(height?: number): U.HashHexString;
+    getBlock(hash?: U.HashHexString): T.Block<U.HexString>;
+    // TODO: confirm that the following params are accurate (seems to work both ways)
+    getBlockHash(height?: U.HexU64String | number): U.HashHexString;
     getFinalisedHead: CallMethods["chain_getFinalizedHead"];
     getFinalizedHead(): U.HashHexString;
     getHead: CallMethods["chain_getBlockHash"];
@@ -205,7 +206,7 @@ export type SubscriptionMethods = rpc.EnsureMethods<{
     subscribeFinalisedHeads: SubscriptionMethods["chain_subscribeFinalizedHeads"];
     subscribeFinalizedHeads(): T.Header; /* TODO: narrow to finalized? */
     subscribeNewHead: SubscriptionMethods["chain_subscribeNewHeads"];
-    subscribeNewHeads(): unknown;
+    subscribeNewHeads(): T.Header;
     subscribeRuntimeVersion: SubscriptionMethods["state_subscribeRuntimeVersion"];
     subscribe_newHead: SubscriptionMethods["chain_subscribeNewHeads"];
   };
