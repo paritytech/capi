@@ -6,7 +6,8 @@ const client = await rpc.stdClient(polkadot);
 assert(!(client instanceof Error));
 
 let i = 1;
-await client.subscribe("chain_subscribeAllHeads", [], (stop) => {
+
+const error = await client.subscribe("chain_subscribeAllHeads", [], (stop) => {
   return async (message) => {
     console.log({ [i++]: message.params.result });
     if (i > 5) {
@@ -15,3 +16,7 @@ await client.subscribe("chain_subscribeAllHeads", [], (stop) => {
     }
   };
 });
+
+if (error) {
+  console.log(error);
+}

@@ -24,7 +24,7 @@ export class Entry<
   }
 
   keyPage(count: number, ...start: unknown[]) {
-    return new KeyPage(this, count, ...start);
+    return new KeyPage(this as any, count, ...start);
   }
 
   read(block?: Block<P["chain"]>) {

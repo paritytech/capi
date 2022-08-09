@@ -9,6 +9,7 @@ const root = C
   .pallet("System")
   .entry("Account", t.alice.publicKey)
   .read();
+
 console.log(U.throwIfError(await root.run()));
 
 config.close();

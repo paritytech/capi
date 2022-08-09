@@ -1,19 +1,18 @@
+import * as C from "../../mod.ts";
 import * as t from "../../test-util/mod.ts";
 import * as U from "../../util/mod.ts";
-import * as Z from "../mod.ts";
 
 const config = await t.config();
 
-const subscription = Z.watchEntry(config, "Timestamp", "Now", [], (stop) => {
+const root = C.watchEntry(config, "Timestamp", "Now", [], () => {
   let i = 0;
+
   return (m) => {
     i++;
-    console.log(m);
-    if (i > 4) {
-      stop();
-    }
+    console.log({ [i]: m });
   };
 });
-U.throwIfError(await subscription.run());
+
+U.throwIfError(await root.run());
 
 config.close();

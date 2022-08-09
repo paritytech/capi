@@ -1,11 +1,12 @@
+import * as C from "../../mod.ts";
 import * as t from "../../test-util/mod.ts";
 import * as U from "../../util/mod.ts";
-import * as Z from "../mod.ts";
 
 const config = await t.config();
 
-let i = 0;
-const subscription = Z.rpcSubscription(config, "chain_subscribeNewHead", [], (stop) => {
+const root = C.rpcSubscription(config, "chain_subscribeNewHead", [], (stop) => {
+  let i = 0;
+
   return (m) => {
     i++;
     if (i > 5) {
@@ -14,6 +15,7 @@ const subscription = Z.rpcSubscription(config, "chain_subscribeNewHead", [], (st
     console.log(m);
   };
 });
-U.throwIfError(await Z.run(subscription));
+
+U.throwIfError(await root.run());
 
 config.close();

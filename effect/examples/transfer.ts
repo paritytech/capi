@@ -1,10 +1,10 @@
+import * as C from "../../mod.ts";
 import * as t from "../../test-util/mod.ts";
 import * as U from "../../util/mod.ts";
-import * as Z from "../mod.ts";
 
 const config = await t.config({ altRuntime: "westend" });
 
-const root = Z.sendAndWatchExtrinsic({
+const root = C.sendAndWatchExtrinsic({
   config,
   sender: {
     type: "Id",
@@ -43,6 +43,7 @@ const root = Z.sendAndWatchExtrinsic({
     };
   },
 });
-U.throwIfError(await Z.run(root));
+
+U.throwIfError(await root.run());
 
 config.close();

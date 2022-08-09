@@ -4,6 +4,7 @@ import * as rpc from "../../rpc/mod.ts";
 
 const client = await rpc.stdClient(polkadot);
 assert(!(client instanceof Error));
-const result = await client.call("state_getMetadata", []);
-console.log(result);
+
+console.log(await client.call("state_getMetadata", []));
+
 await client.close();

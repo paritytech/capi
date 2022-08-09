@@ -12,6 +12,6 @@ export class Block<C extends Chain = Chain> extends NodeBase<"Block"> {
   }
 
   read() {
-    return Z.run(Z.readBlock(this.chain.config as any, this.hash));
+    return Z.readBlock(this.chain.config as any, this.hash);
   }
 }

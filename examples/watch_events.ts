@@ -1,8 +1,8 @@
-import { westend } from "../known/mod.ts";
 import * as C from "../mod.ts";
+import * as U from "../util/mod.ts";
 
-await C
-  .chain(westend)
+const root = C
+  .chain(C.westend)
   .pallet("System")
   .entry("Events")
   .watch((stop) => {
@@ -15,3 +15,5 @@ await C
       }
     };
   });
+
+U.throwIfError(await root.run());
