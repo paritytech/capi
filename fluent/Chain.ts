@@ -1,6 +1,5 @@
 import { Config } from "../config/mod.ts";
 import { HashHexString } from "../util/mod.ts";
-import { Addresses } from "./Addresses.ts";
 import { Block } from "./Block.ts";
 import { NodeBase } from "./common.ts";
 import { Header } from "./Header.ts";
@@ -26,8 +25,6 @@ export class Chain<B extends Config = Config> extends NodeBase<"Chain"> {
   pallet<Name extends string = string>(name: Name): Pallet<this, Name> {
     return new Pallet(this, name);
   }
-
-  address: Addresses<this> = new Addresses(this);
 
   head(): Header<this> {
     return new Header(this);

@@ -1,4 +1,4 @@
-import { Call } from "./Call.ts";
+import { Call, CallOptions } from "./Call.ts";
 import { NodeBase } from "./common.ts";
 import { Pallet } from "./Pallet.ts";
 
@@ -17,16 +17,10 @@ export class Extrinsic<
     this.chain = pallet.chain;
   }
 
-  // TODO: constraint
-  call<
-    Props extends Record<string, unknown>,
-    Extra extends unknown[],
-    Additional extends unknown,
-  >(
-    props: Props,
-    extra?: Extra,
-    additional?: Additional,
-  ): Call<this, Props> {
-    return new Call(this, props, extra, additional);
+  call<Args extends Record<string, unknown>>(
+    args: Args,
+    callOptions?: CallOptions,
+  ): Call<this, Args> {
+    return new Call(this, args, callOptions);
   }
 }
