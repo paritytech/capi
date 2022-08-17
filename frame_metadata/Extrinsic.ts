@@ -3,7 +3,6 @@ import { assert } from "../deps/std/testing/asserts.ts";
 import { $null, DeriveCodec } from "./Codec.ts";
 import { HasherLookup } from "./Key.ts";
 import { Metadata } from "./Metadata.ts";
-import { UnionTyDef } from "./scale_info.ts";
 
 export type Era = {
   type: "Mortal";
