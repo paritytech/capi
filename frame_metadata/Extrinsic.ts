@@ -31,7 +31,7 @@ export interface Extrinsic {
       address: MultiAddress;
       extra: unknown[];
     }
-    & ({ additional: unknown[] } | { sig: unknown });
+    & ({ additional: unknown[] } | { sig: Signature });
   palletName: string;
   methodName: string;
   args: Record<string, unknown>;
@@ -47,7 +47,7 @@ interface ExtrinsicCodecProps {
 export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
   const { metadata, deriveCodec } = props;
   const { signedExtensions } = metadata.extrinsic;
-  const $sig = deriveCodec(findExtrinsicTypeParam("Signature")!);
+  const $sig = deriveCodec(findExtrinsicTypeParam("Signature")!) as $.Codec<Signature>;
   const $sigPromise = $.promise($sig);
   const $address = deriveCodec(findExtrinsicTypeParam("Address")!);
   const callTyI = findExtrinsicTypeParam("Call")!;
