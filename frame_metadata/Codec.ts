@@ -91,6 +91,9 @@ export function DeriveCodec(tys: M.Ty[]): DeriveCodec {
     bitSequence() {
       return $.bitSequence;
     },
+    map(_ty, key, val) {
+      return $.map(this.visit(key), this.visit(val));
+    },
     circular(ty) {
       return $.deferred(() => this.cache[ty.id]!);
     },

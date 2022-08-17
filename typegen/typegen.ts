@@ -4,7 +4,7 @@ import { setup } from "../frame_metadata/test-common.ts";
 const [metadata] = await setup("polkadot");
 
 function getName(ty: M.Ty) {
-  if (ty.path[0] === "Option" || ty.path[0] === "Result") return "";
+  if (["Option", "Result", "Cow", "BTreeMap"].includes(ty.path[0]!)) return "";
   return ty.path.join(".")
     + ty.params.filter((x) => x.ty !== undefined).map((x) => "_" + x.ty).join("");
 }
@@ -14,7 +14,6 @@ class TypegenVisitor extends M.TyVisitor<string> {
   override _visit(ty: M.Ty): string {
     const value = super._visit(ty);
     const name = getName(ty);
-    if (name === "Option" || name === "Result") return value;
     if (name) {
       this.types.push([name, value]);
     }
@@ -92,6 +91,9 @@ const visitor = new TypegenVisitor(metadata.tys, {
   },
   bitSequence() {
     return "BitSequence";
+  },
+  map(_ty, key, val) {
+    return `Map<${this.visit(key)}, ${this.visit(val)}>`;
   },
   circular(ty) {
     return getName(ty) || this._visit(ty);
