@@ -31,7 +31,9 @@ export interface TyVisitorMethods<T> {
   primitive(ty: Ty & PrimitiveTyDef): T;
   compact(ty: Ty & CompactTyDef): T;
   bitSequence(ty: Ty & BitSequenceTyDef): T;
+
   map(ty: Ty & StructTyDef, key: Ty, value: Ty): T;
+  set(ty: Ty & StructTyDef, value: Ty): T;
 
   circular(ty: Ty): T;
 }
@@ -68,6 +70,8 @@ export class TyVisitor<T> {
     if (ty.type === "Struct") {
       if (ty.path[0] === "BTreeMap") {
         return this.map(ty, this.tys[ty.params[0]!.ty!]!, this.tys[ty.params[1]!.ty!]!);
+      } else if (ty.path[0] === "BTreeSet") {
+        return this.set(ty, this.tys[ty.params[0]!.ty!]!);
       } else if (ty.fields.length === 0) {
         return this.unitStruct(ty);
       } else if (ty.fields[0]!.name === undefined) {
