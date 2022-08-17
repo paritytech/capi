@@ -56,9 +56,12 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
   const $extra = getExtrasCodec(signedExtensions.map((x) => x.ty));
   const $additional = getExtrasCodec(signedExtensions.map((x) => x.additionalSigned));
 
+  const toSignSize = $call._staticSize + $extra._staticSize + $additional._staticSize;
+  const totalSize = 1 + $address._staticSize + $sig._staticSize + toSignSize;
+
   const $baseExtrinsic: $.Codec<Extrinsic> = $.createCodec({
     _metadata: null,
-    _staticSize: 1 + $.tuple($address, $sig, $extra, $call)._staticSize,
+    _staticSize: totalSize,
     _encode(buffer, extrinsic) {
       const firstByte = (+!!extrinsic.signature << 7) | extrinsic.protocolVersion;
       buffer.array[buffer.index++] = firstByte;
@@ -73,7 +76,7 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
       if (signature) {
         if ("additional" in signature) {
           $address._encode(buffer, signature.address);
-          const toSignBuffer = new $.EncodeBuffer($.tuple($sig, $extra, $additional)._staticSize);
+          const toSignBuffer = new $.EncodeBuffer(buffer.stealAlloc(toSignSize));
           $call._encode(toSignBuffer, call);
           const callEnd = toSignBuffer.finishedSize + toSignBuffer.index;
           $extra._encode(toSignBuffer, signature.extra);
@@ -124,11 +127,17 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
 
   return $.createCodec({
     _metadata: [$extrinsic, props],
-    _staticSize: $.nCompact._staticSize,
+    _staticSize: $.nCompact._staticSize + $baseExtrinsic._staticSize,
     _encode(buffer, extrinsic) {
-      const encoded = $baseExtrinsic.encode(extrinsic);
-      $.nCompact._encode(buffer, encoded.length);
-      buffer.insertArray(encoded);
+      const lengthCursor = buffer.createCursor($.nCompact._staticSize);
+      const contentCursor = buffer.createCursor($baseExtrinsic._staticSize);
+      $baseExtrinsic._encode(contentCursor, extrinsic);
+      buffer.waitForBuffer(contentCursor, () => {
+        const length = contentCursor.finishedSize + contentCursor.index;
+        $.nCompact._encode(lengthCursor, length);
+        lengthCursor.close();
+        contentCursor.close();
+      });
     },
     _decode(buffer) {
       const length = $.nCompact._decode(buffer);
