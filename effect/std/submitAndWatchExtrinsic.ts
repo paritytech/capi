@@ -38,7 +38,7 @@ export interface SendAndWatchExtrinsicProps {
 export function sendAndWatchExtrinsic<Props extends SendAndWatchExtrinsicProps>(props: Props) {
   const metadata = a.metadata(props.config);
   const deriveCodec = a.deriveCodec(metadata);
-  const $extrinsic = a.$extrinsicEncodeAsync(deriveCodec, metadata, props.sign);
+  const $extrinsic = a.$extrinsic(deriveCodec, metadata, props.sign);
   const runtimeVersion = a.rpcCall(props.config, "state_getRuntimeVersion", []);
   const senderSs58 = sys.anon([props.sender], (sender) => {
     return (async (): Promise<string> => {
@@ -90,7 +90,7 @@ export function sendAndWatchExtrinsic<Props extends SendAndWatchExtrinsicProps>(
     tip,
     mortality,
   ) => {
-    const extrinsicBytes = await $extrinsic({
+    const extrinsicBytes = await $extrinsic.encodeAsync({
       protocolVersion: 4, // TODO: grab this from elsewhere
       palletName,
       methodName,
