@@ -48,6 +48,7 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
   const { metadata, deriveCodec } = props;
   const { signedExtensions } = metadata.extrinsic;
   const $sig = deriveCodec(findExtrinsicTypeParam("Signature")!);
+  const $sigPromise = $.promise($sig);
   const $address = deriveCodec(findExtrinsicTypeParam("Address")!);
   const callTyI = findExtrinsicTypeParam("Call")!;
   const callTy = props.metadata.tys[callTyI];
@@ -90,9 +91,7 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
             : toSignEncoded;
           const sig = props.sign(toSign);
           if (sig instanceof Promise) {
-            buffer.writeAsync($sig._staticSize, async (buffer) => {
-              $sig._encode(buffer, await sig);
-            });
+            $sigPromise._encode(buffer, sig);
           } else {
             $sig._encode(buffer, sig);
           }
