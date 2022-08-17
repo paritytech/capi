@@ -51,7 +51,7 @@ export class TyVisitor<T> {
       ty = this.tys[ty]!;
     }
     const i = ty.id;
-    if (this.cache[i]) {
+    if (this.cache[i] != null) {
       return this.cache[i]!;
     }
     if (this.cache[i] === null) {

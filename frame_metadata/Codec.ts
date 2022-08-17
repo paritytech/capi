@@ -26,10 +26,10 @@ export function DeriveCodec(tys: M.Ty[]): DeriveCodec {
       return $.object(...ty.fields.map((x): $.Field => [x.name!, this.visit(x.ty)]));
     },
     option(_ty, some) {
-      return $.option(this._visit(some));
+      return $.option(this.visit(some));
     },
     result(_ty, ok, err) {
-      return $.result(this._visit(ok), $.instance(ChainError, ["value", this._visit(err)]));
+      return $.result(this.visit(ok), $.instance(ChainError, ["value", this.visit(err)]));
     },
     never() {
       return $.never as any;
@@ -99,8 +99,8 @@ export function DeriveCodec(tys: M.Ty[]): DeriveCodec {
   return (i: number) => visitor.visit(i);
 }
 
-export class ChainError extends Error {
-  constructor(readonly value: unknown) {
+export class ChainError<T> extends Error {
+  constructor(readonly value: T) {
     super();
   }
 }
