@@ -1,4 +1,5 @@
 import * as $ from "../deps/scale.ts";
+import { taggedUnion } from "../deps/scale.ts";
 import type * as M from "./mod.ts";
 import { TyVisitors } from "./TyVisitor.ts";
 
@@ -6,7 +7,7 @@ export type DeriveCodec = (typeI: number) => $.Codec<unknown>;
 
 /**
  * All derived codecs for ZSTs will use this exact codec,
- * so `derivedCodec === $null` is true if the type is a ZST.
+ * so `derivedCodec === $null` is true iff the type is a ZST.
  */
 export const $null = $.dummy(null);
 
@@ -52,30 +53,25 @@ export function DeriveCodec(tys: M.Ty[]): DeriveCodec {
       }
       if (ty.members.length === 0) return $.never as any;
       const allEmpty = ty.members.every((x) => !x.fields.length);
-      const memberIByTag: Record<string, number> = {};
-      const memberIByDiscriminant: Record<number, number> = {};
-      const members = ty.members.map((member, i) => {
-        memberIByTag[member.name] = member.index;
-        memberIByDiscriminant[member.index] = i;
-        const { fields, name: type } = member;
-        if (fields.length === 0) {
-          if (allEmpty) {
-            return $.dummy(type);
-          } else {
-            return $.dummy({ type });
-          }
+      if (allEmpty) {
+        const members: Record<number, string> = {};
+        for (const { index, name } of ty.members) {
+          members[index] = name;
         }
-        if (fields[0]!.name === undefined) {
+        return $.stringUnion(members);
+      }
+      const members: Record<number, $.TaggedUnionMember> = {};
+      for (const { fields, name: type, index } of ty.members) {
+        let member: $.TaggedUnionMember;
+        if (fields.length === 0) {
+          member = [type];
+        } else if (fields[0]!.name === undefined) {
           // Tuple variant
           const $value = tuple(fields.map((f) => f.ty));
-          return $.transform(
-            $value,
-            ({ value }: { value: unknown }) => value,
-            (value) => ({ type, value }),
-          );
+          member = [type, ["value", $value]];
         } else {
           // Object variant
-          const memberFields = member.fields.map((field, i) => {
+          const memberFields = fields.map((field, i) => {
             return [
               field.name || i,
               $.deferred(() => {
@@ -83,35 +79,11 @@ export function DeriveCodec(tys: M.Ty[]): DeriveCodec {
               }),
             ] as [string, $.Codec<unknown>];
           });
-          return $.object(["type", $.dummy(member.name)], ...memberFields);
+          member = [type, ...memberFields];
         }
-      });
-      return union(
-        (member) => {
-          const tag = typeof member === "string" ? member : member.type;
-          const discriminant = memberIByTag[tag];
-          if (discriminant === undefined) {
-            throw new Error(
-              `Invalid tag ${JSON.stringify(tag)}, expected one of ${
-                JSON.stringify(Object.keys(memberIByTag))
-              }`,
-            );
-          }
-          return discriminant;
-        },
-        (discriminant) => {
-          const i = memberIByDiscriminant[discriminant];
-          if (i === undefined) {
-            throw new Error(
-              `Invalid discriminant ${discriminant}, expected one of ${
-                JSON.stringify(Object.keys(memberIByDiscriminant))
-              }`,
-            );
-          }
-          return i;
-        },
-        ...members,
-      ) as unknown as $.Codec<any>;
+        members[index] = member;
+      }
+      return taggedUnion("type", members);
     },
     Sequence: (ty) => {
       const $el = visitors.visit(ty.typeParam);
@@ -158,35 +130,6 @@ export function DeriveCodec(tys: M.Ty[]): DeriveCodec {
   };
 
   return (i: number) => visitors.visit(i);
-}
-
-type NativeUnion<MemberCodecs extends $.Codec<any>[]> = $.Native<MemberCodecs[number]>;
-
-// TODO: get rid of this upon fixing in SCALE impl
-function union<Members extends $.Codec<any>[]>(
-  discriminate: (value: NativeUnion<Members>) => number,
-  getIndexOfDiscriminant: (discriminant: number) => number,
-  ...members: [...Members]
-): $.Codec<NativeUnion<Members>> {
-  return $.createCodec({
-    _metadata: [union, discriminate, getIndexOfDiscriminant, ...members],
-    _staticSize: 1 + Math.max(...members.map((x) => x._staticSize)),
-    _encode(buffer, value) {
-      const discriminant = discriminate(value);
-      buffer.array[buffer.index++] = discriminant;
-      const $member = members[discriminant]!;
-      $member._encode(buffer, value);
-    },
-    _decode(buffer) {
-      const discriminant = buffer.array[buffer.index++]!;
-      const indexOfDiscriminant = getIndexOfDiscriminant(discriminant);
-      const $member = members[indexOfDiscriminant];
-      if (!$member) {
-        throw new Error(`No such member codec matching the discriminant \`${discriminant}\``);
-      }
-      return $member._decode(buffer);
-    },
-  });
 }
 
 export class ChainError extends Error {
