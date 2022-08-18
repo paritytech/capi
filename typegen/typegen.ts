@@ -24,7 +24,11 @@ function typegen(tys: M.Ty[]) {
     objectStruct(ty) {
       return addInterfaceDecl(
         ty,
-        `{ ${ty.fields.map((x) => `${x.name!}: ${this.visit(x.ty)}`).join(", ")} }`,
+        `{\n${
+          ty.fields.map(
+            (x) => `${makeDocComment(x.docs)}${x.name!}: ${this.visit(x.ty)}`,
+          ).join("\n")
+        }\n}`,
       );
     },
     option(_ty, some) {
@@ -44,8 +48,8 @@ function typegen(tys: M.Ty[]) {
       const ident = lastName(name);
       decls.push([
         name,
-        `export type ${ident} = ${
-          ty.members.map(({ fields, name: type }) => {
+        `${makeDocComment(ty.docs)}export type ${ident} = ${
+          ty.members.map(({ fields, name: type, docs }) => {
             let props: string[];
             if (fields.length === 0) {
               props = [];
@@ -57,13 +61,15 @@ function typegen(tys: M.Ty[]) {
               props = [`value: ${value}`];
             } else {
               // Object variant
-              props = fields.map((field, i) => `${field.name || i}: ${this.visit(field.ty)}`);
+              props = fields.map((field, i) =>
+                `${makeDocComment(field.docs)}${field.name || i}: ${this.visit(field.ty)}`
+              );
             }
             decls.push([
               name + "." + type,
-              `export interface ${type} { ${
-                [`type: ${JSON.stringify(type)}`, ...props].join(", ")
-              } }`,
+              `${makeDocComment(docs)}export interface ${type} {\n${
+                [`type: ${JSON.stringify(type)}`, ...props].join("\n")
+              }\n}`,
             ]);
             return name + "." + type;
           }).join(" | ")
@@ -138,7 +144,7 @@ function typegen(tys: M.Ty[]) {
   function addTypeDecl(ty: M.Ty, value: string) {
     const name = getName(ty);
     if (name && name !== value) {
-      decls.push([name, `export type ${lastName(name)} = ${value}`]);
+      decls.push([name, `${makeDocComment(ty.docs)}export type ${lastName(name)} = ${value}`]);
     }
     return name || value;
   }
@@ -146,7 +152,7 @@ function typegen(tys: M.Ty[]) {
   function addInterfaceDecl(ty: M.Ty, value: string) {
     const name = getName(ty);
     if (name && name !== value) {
-      decls.push([name, `export interface ${lastName(name)} ${value}`]);
+      decls.push([name, `${makeDocComment(ty.docs)}export interface ${lastName(name)} ${value}`]);
     }
     return name || value;
   }
@@ -166,12 +172,19 @@ function typegen(tys: M.Ty[]) {
     for (const ns in namespaces) {
       done.push([
         ns,
-        `export namespace ${ns} {\n  ${printDecls(namespaces[ns]!).split("\n").join("\n  ")}\n}`,
+        `export namespace ${ns} {\n${printDecls(namespaces[ns]!)}\n}`,
       ]);
     }
     // sort by name, then by content
     done.sort((a, b) => a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : a[1] < b[1] ? -1 : 1);
     return [...new Set(done.map((x) => x[1]))].join("\n");
+  }
+
+  function makeDocComment(docs: string[]) {
+    docs = docs.map((x) => x.replace(/^\s*\n\s*|\s*\n\s*$/, "").replace(/\s*\n\s*/g, " "));
+    if (!docs.length) return "";
+    if (docs.length === 1) return `/** ${docs[0]} */\n`;
+    return `/**\n  * ${docs.join("\n  * ")}\n  */\n`;
   }
 }
 
