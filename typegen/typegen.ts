@@ -7,8 +7,34 @@ function lastName(name: string) {
   return name.split(".").at(-1);
 }
 
-function typegen(tys: M.Ty[]) {
+function typegen(metadata: M.Metadata) {
   const decls: Decl[] = [];
+
+  const { tys, extrinsic, pallets } = metadata;
+
+  const isUnitVisitor = new M.TyVisitor<boolean>(tys, {
+    unitStruct: () => true,
+    wrapperStruct(_, inner) {
+      return this.visit(inner);
+    },
+    tupleStruct: () => false,
+    objectStruct: () => false,
+    option: () => false,
+    result: () => false,
+    never: () => false,
+    stringUnion: () => false,
+    taggedUnion: () => false,
+    uint8array: () => false,
+    array: () => false,
+    sizedUint8Array: () => false,
+    sizedArray: () => false,
+    primitive: () => false,
+    compact: () => false,
+    bitSequence: () => false,
+    map: () => false,
+    set: () => false,
+    circular: () => false,
+  });
 
   const visitor = new M.TyVisitor<string>(tys, {
     unitStruct(ty) {
@@ -115,6 +141,57 @@ function typegen(tys: M.Ty[]) {
 
   visitor.tys.map((x) => visitor.visit(x));
 
+  decls.push([
+    "Metadata",
+    [
+      "export type Metadata = {",
+      "extrinsic: {",
+      `version: ${extrinsic.version},`,
+      `extras: ${getExtrasType(extrinsic.signedExtensions.map((x) => [x.ident, x.ty]))},`,
+      `additional: ${
+        getExtrasType(extrinsic.signedExtensions.map((x) => [x.ident, x.additionalSigned]))
+      },`,
+      "},",
+      "pallets: {",
+      ...pallets.flatMap((pallet) => [
+        `${pallet.name}: {`,
+        `name: ${JSON.stringify(pallet.name)},`,
+        `i: ${pallet.i},`,
+        `calls: ${pallet.calls && visitor.visit(pallet.calls.ty)},`,
+        `error: ${pallet.error && visitor.visit(pallet.error.ty)},`,
+        `event: ${pallet.event && visitor.visit(pallet.event.ty)},`,
+        ...pallet.storage
+          ? [
+            "storage: {",
+            `prefix: ${JSON.stringify(pallet.storage.prefix)},`,
+            "entries: {",
+            ...pallet.storage.entries.flatMap((
+              entry,
+            ) => [
+              `${makeDocComment(entry.docs)}${entry.name}: {`,
+              `type: ${JSON.stringify(entry.type)},`,
+              `modifier: ${JSON.stringify(entry.modifier)},`,
+              `hashers: ${entry.type === "Map" ? JSON.stringify(entry.hashers) : "[]"},`,
+              `key: ${entry.type === "Map" ? visitor.visit(entry.key) : "null"},`,
+              `value: ${visitor.visit(entry.value)},`,
+              "},",
+            ]),
+            "}},",
+          ]
+          : ["storage: undefined,"],
+        "}",
+      ]),
+      "}};",
+    ].join("\n"),
+  ]);
+
+  function getExtrasType(xs: [string, number][]) {
+    return `[${
+      xs.filter((x) => !isUnitVisitor.visit(x[1])).map((x) => `${x[0]}: ${visitor.visit(x[1])}`)
+        .join(", ")
+    }]`;
+  }
+
   return printDecls(decls);
 
   function getName(ty: M.Ty): string | null {
@@ -200,7 +277,7 @@ for (
   ] as const
 ) {
   const [metadata] = await setup(network);
-  console.log(`export namespace ${network} {\n${typegen(metadata.tys)}\n}`);
+  console.log(`export namespace ${network} {\n${typegen(metadata)}\n}`);
 }
 
 console.log(`class ChainError<T> {}`);
