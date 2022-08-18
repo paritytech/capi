@@ -14,7 +14,7 @@ export const $field: $.Codec<Field> = $.object(
 );
 
 export type PrimitiveKind = $.Native<typeof $primitiveKind>;
-const $primitiveKind = $.keyLiteralUnion(
+const $primitiveKind = $.stringUnion([
   "bool",
   "char",
   "str",
@@ -30,7 +30,7 @@ const $primitiveKind = $.keyLiteralUnion(
   "i64",
   "i128",
   "i256",
-);
+]);
 
 export type TyType = TyDef["type"];
 export interface StructTyDef {
@@ -82,8 +82,7 @@ export type TyDef =
   | PrimitiveTyDef
   | CompactTyDef
   | BitSequenceTyDef;
-export const $tyDef: $.Codec<TyDef> = $.taggedUnion(
-  "type",
+export const $tyDef: $.Codec<TyDef> = $.taggedUnion("type", [
   [
     "Struct",
     ["fields", $.array($field)],
@@ -126,7 +125,7 @@ export const $tyDef: $.Codec<TyDef> = $.taggedUnion(
     ["bitOrderType", $.nCompact],
     ["bitStoreType", $.nCompact],
   ],
-);
+]);
 
 export interface Param {
   name: string;

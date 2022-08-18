@@ -3,7 +3,7 @@ import * as U from "../util/mod.ts";
 import { $ty, Ty } from "./scale_info.ts";
 
 export type HasherKind = $.Native<typeof $hasherKind>;
-const $hasherKind = $.keyLiteralUnion(
+const $hasherKind = $.stringUnion([
   "Blake2_128",
   "Blake2_256",
   "Blake2_128Concat",
@@ -11,13 +11,13 @@ const $hasherKind = $.keyLiteralUnion(
   "Twox256",
   "Twox64Concat",
   "Identity",
-);
+]);
 
 export type StorageEntryModifier = $.Native<typeof $storageEntryModifier>;
-export const $storageEntryModifier = $.keyLiteralUnion(
+export const $storageEntryModifier = $.stringUnion([
   "Optional",
   "Default",
-);
+]);
 
 export interface PlainStorageEntryType {
   type: "Plain";
@@ -33,8 +33,7 @@ export interface MapStorageEntryType {
 
 export type StorageEntryType = PlainStorageEntryType | MapStorageEntryType;
 
-export const $storageEntryType: $.Codec<StorageEntryType> = $.taggedUnion(
-  "type",
+export const $storageEntryType: $.Codec<StorageEntryType> = $.taggedUnion("type", [
   ["Plain", ["value", $.nCompact]],
   [
     "Map",
@@ -42,7 +41,7 @@ export const $storageEntryType: $.Codec<StorageEntryType> = $.taggedUnion(
     ["key", $.nCompact],
     ["value", $.nCompact],
   ],
-);
+]);
 
 export type StorageEntry = {
   name: string;
