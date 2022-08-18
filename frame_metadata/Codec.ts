@@ -1,4 +1,5 @@
 import * as $ from "../deps/scale.ts";
+import { $era } from "./Era.ts";
 import type * as M from "./mod.ts";
 import { TyVisitor } from "./TyVisitor.ts";
 
@@ -96,6 +97,9 @@ export function DeriveCodec(tys: M.Ty[]): DeriveCodec {
     },
     set(_ty, val) {
       return $.set(this.visit(val));
+    },
+    era() {
+      return $era;
     },
     circular(ty) {
       return $.deferred(() => this.cache[ty.id]!);

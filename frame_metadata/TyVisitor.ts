@@ -22,18 +22,20 @@ export interface TyVisitorMethods<T> {
   stringUnion(ty: Ty & UnionTyDef): T;
   taggedUnion(ty: Ty & UnionTyDef): T;
 
-  uint8array(ty: Ty & SequenceTyDef): T;
+  uint8array?(ty: Ty & SequenceTyDef): T;
   array(ty: Ty & SequenceTyDef): T;
 
-  sizedUint8Array(ty: Ty & SizedArrayTyDef): T;
+  sizedUint8Array?(ty: Ty & SizedArrayTyDef): T;
   sizedArray(ty: Ty & SizedArrayTyDef): T;
 
   primitive(ty: Ty & PrimitiveTyDef): T;
   compact(ty: Ty & CompactTyDef): T;
   bitSequence(ty: Ty & BitSequenceTyDef): T;
 
-  map(ty: Ty & StructTyDef, key: Ty, value: Ty): T;
-  set(ty: Ty & StructTyDef, value: Ty): T;
+  map?(ty: Ty & StructTyDef, key: Ty, value: Ty): T;
+  set?(ty: Ty & StructTyDef, value: Ty): T;
+
+  era?(ty: Ty & UnionTyDef): T;
 
   circular(ty: Ty): T;
 }
@@ -68,9 +70,9 @@ export class TyVisitor<T> {
 
   _visit(ty: Ty) {
     if (ty.type === "Struct") {
-      if (ty.path[0] === "BTreeMap") {
+      if (this.map && ty.path[0] === "BTreeMap") {
         return this.map(ty, this.tys[ty.params[0]!.ty!]!, this.tys[ty.params[1]!.ty!]!);
-      } else if (ty.path[0] === "BTreeSet") {
+      } else if (this.set && ty.path[0] === "BTreeSet") {
         return this.set(ty, this.tys[ty.params[0]!.ty!]!);
       } else if (ty.fields.length === 0) {
         return this.unitStruct(ty);
@@ -97,6 +99,8 @@ export class TyVisitor<T> {
         return this.option(ty, this.tys[ty.params[0]!.ty!]!);
       } else if (ty.path[0] === "Result") {
         return this.result(ty, this.tys[ty.params[0]!.ty!]!, this.tys[ty.params[1]!.ty!]!);
+      } else if (this.era && ty.path.at(-1) === "Era") {
+        return this.era(ty);
       } else if (ty.members.length === 0) {
         return this.never(ty);
       } else if (ty.members.every((x) => x.fields.length === 0)) {
@@ -105,13 +109,13 @@ export class TyVisitor<T> {
         return this.taggedUnion(ty);
       }
     } else if (ty.type === "Sequence") {
-      if (this._isU8(ty.typeParam)) {
+      if (this.uint8array && this._isU8(ty.typeParam)) {
         return this.uint8array(ty);
       } else {
         return this.array(ty);
       }
     } else if (ty.type === "SizedArray") {
-      if (this._isU8(ty.typeParam)) {
+      if (this.sizedUint8Array && this._isU8(ty.typeParam)) {
         return this.sizedUint8Array(ty);
       } else {
         return this.sizedArray(ty);

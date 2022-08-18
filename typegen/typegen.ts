@@ -24,15 +24,11 @@ function typegen(metadata: M.Metadata) {
     never: () => false,
     stringUnion: () => false,
     taggedUnion: () => false,
-    uint8array: () => false,
     array: () => false,
-    sizedUint8Array: () => false,
     sizedArray: () => false,
     primitive: () => false,
     compact: () => false,
     bitSequence: () => false,
-    map: () => false,
-    set: () => false,
     circular: () => false,
   });
 
@@ -134,6 +130,9 @@ function typegen(metadata: M.Metadata) {
     set(_ty, val) {
       return `Set<${this.visit(val)}>`;
     },
+    era() {
+      return `Era`;
+    },
     circular(ty) {
       return getName(ty) || this._visit(ty);
     },
@@ -205,6 +204,7 @@ function typegen(metadata: M.Metadata) {
       if (ty.type === "Compact") {
         return "compact";
       }
+      if (ty.path.at(-1) === "Era") return "Era";
       if (["Option", "Result", "Cow", "BTreeMap", "BTreeSet"].includes(ty.path[0]!)) return null;
       const baseName = ty.path.join(".");
       if (!baseName) return null;
@@ -280,5 +280,6 @@ for (
   console.log(`export namespace ${network} {\n${typegen(metadata)}\n}`);
 }
 
-console.log(`class ChainError<T> {}`);
-console.log(`class BitSequence {}`);
+console.log(`interface ChainError<T> {}`);
+console.log(`interface BitSequence {}`);
+console.log(`interface Era {}`);
