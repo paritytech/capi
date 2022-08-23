@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: denoland/setup-deno@v1
+      - uses: denoland/setup-deno@004814556e37c54a2f6e31384c9e18e983317366 # v1.1.0
         with:
           deno-version: 1.22.3
       - name: Update dependencies
@@ -23,7 +23,7 @@ jobs:
         run: |
           deno task test
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@18f90432bedd2afd6a825469ffd38aa24712a91d # v4.1.1
         id: pr
         with:
           commit-message: "update dependencies and regenerate lockfile"
@@ -38,14 +38,14 @@ jobs:
         run: |
           echo "::set-output name=sha::$(git rev-parse HEAD)"
       - name: Set commit status with pending
-        uses: Sibz/github-status-action@v1
+        uses: Sibz/github-status-action@650dd1a882a76dbbbc4576fb5974b8d22f29847f # v1.1.6
         with:
           authToken: ${{ secrets.GITHUB_TOKEN }}
           context: "Basic tests"
           state: "pending"
           sha: ${{ steps.commit.outputs.sha }}
       - name: Set commit status with outcome
-        uses: Sibz/github-status-action@v1
+        uses: Sibz/github-status-action@650dd1a882a76dbbbc4576fb5974b8d22f29847f # v1.1.6
         with:
           authToken: ${{ secrets.GITHUB_TOKEN }}
           context: "Basic tests"
