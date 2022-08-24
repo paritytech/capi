@@ -8,15 +8,15 @@ jobs:
     name: Build & Publish to NPM
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: denoland/setup-deno@v1
+      - uses: actions/checkout@v3
+      - uses: denoland/setup-deno@004814556e37c54a2f6e31384c9e18e983317366 # v1.1.0
         with:
           deno-version: v1.x
       - name: Retrieve Version
         if: startsWith(github.ref, 'refs/tags/')
         id: get_tag_version
         run: echo ::set-output name=TAG_VERSION::${GITHUB_REF/refs\/tags\//}
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
           node-version: "16.x"
           registry-url: "https://registry.npmjs.org"
