@@ -1,16 +1,30 @@
+import { tsFormatter } from "../deps/dprint.ts";
 import * as M from "../frame_metadata/mod.ts";
-import { setup } from "../frame_metadata/test-common.ts";
 
-type Decl = [name: string, stmt: string];
+const importSource = new URL("../mod.ts", import.meta.url).toString();
 
-function lastName(name: string) {
-  return name.split(".").at(-1);
+// TODO: better cli
+if (import.meta.main) {
+  // put console.log in STDERR
+  console.log = console.error;
+
+  const [metadataFile, outputFile] = Deno.args;
+  const metadata = M.fromPrefixedHex(await Deno.readTextFile(metadataFile!));
+  const output = tsFormatter.formatText("gen.ts", typegen(metadata));
+  await Deno.writeTextFile(outputFile!, output);
 }
 
-function typegen(metadata: M.Metadata) {
+export function typegen(metadata: M.Metadata) {
+  type Decl = [name: string, stmt: string];
+
   const decls: Decl[] = [];
 
   const { tys, extrinsic, pallets } = metadata;
+
+  decls.push([
+    "",
+    `import type { ChainError, BitSequence, Era } from ${JSON.stringify(importSource)}\n`,
+  ]);
 
   const isUnitVisitor = new M.TyVisitor<boolean>(tys, {
     unitStruct: () => true,
@@ -184,14 +198,14 @@ function typegen(metadata: M.Metadata) {
     ].join("\n"),
   ]);
 
+  return printDecls(decls);
+
   function getExtrasType(xs: [string, number][]) {
     return `[${
       xs.filter((x) => !isUnitVisitor.visit(x[1])).map((x) => `${x[0]}: ${visitor.visit(x[1])}`)
         .join(", ")
     }]`;
   }
-
-  return printDecls(decls);
 
   function getName(ty: M.Ty): string | null {
     if (ty.type === "Struct" && ty.fields.length === 1 && ty.params.length) return null;
@@ -263,23 +277,8 @@ function typegen(metadata: M.Metadata) {
     if (docs.length === 1) return `/** ${docs[0]} */\n`;
     return `/**\n  * ${docs.join("\n  * ")}\n  */\n`;
   }
-}
 
-for (
-  const network of [
-    "acala",
-    "kusama",
-    "moonbeam",
-    "polkadot",
-    "statemint",
-    "subsocial",
-    "westend",
-  ] as const
-) {
-  const [metadata] = await setup(network);
-  console.log(`export namespace ${network} {\n${typegen(metadata)}\n}`);
+  function lastName(name: string) {
+    return name.split(".").at(-1);
+  }
 }
-
-console.log(`interface ChainError<T> {}`);
-console.log(`interface BitSequence {}`);
-console.log(`interface Era {}`);
