@@ -17,7 +17,7 @@ const ALICE_PUBLIC_KEY = "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684
   {
     name: "ss58.encode should encode 16-bit prefix aventus address",
     args: [65, ALICE_PUBLIC_KEY],
-    expected: "cLxkfNUiCYsb57YLhTJdNVKxUTB1VTpeygYZNhYuFc83KrFy7",
+    expected: "cLxkfNUiCYsb57YLhTJdNVKxUTB1VTpeygYZNhYuFc83KrFy7", // cspell:disable-line
   },
 ].forEach(({ name, args, expected }) => {
   Deno.test({
@@ -69,7 +69,7 @@ const ALICE_PUBLIC_KEY = "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684
   },
   {
     name: "ss58.decode should decode 16-bit prefix aventus address",
-    args: ["cLxkfNUiCYsb57YLhTJdNVKxUTB1VTpeygYZNhYuFc83KrFy7"],
+    args: ["cLxkfNUiCYsb57YLhTJdNVKxUTB1VTpeygYZNhYuFc83KrFy7"], // cspell:disable-line
     expected: [65, ALICE_PUBLIC_KEY],
   },
 ].forEach(({ name, args, expected }) => {

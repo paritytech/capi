@@ -9,7 +9,7 @@ import {
   ALLOWED_PUBLIC_KEY_LENGTHS,
   CHECKSUM_LENGTH,
   SS58PRE,
-} from "./consts.ts";
+} from "./constants.ts";
 
 export const encode = (prefix: number, pubKey: string): string => {
   const pubKeyBytes = hex.decode(pubKey);
