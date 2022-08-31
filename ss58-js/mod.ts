@@ -1,4 +1,5 @@
 import { blake2b } from "../deps/hashes.ts";
+import * as U from "../util/mod.ts";
 
 // SS58PRE = Uint8Array.from("SS58PRE".split("").map((c) => c.charCodeAt(0)));
 const SS58PRE = Uint8Array.of(83, 83, 53, 56, 80, 82, 69);
@@ -17,6 +18,11 @@ const VALID_PUBLIC_KEY_LENGTHS: Record<number, boolean | undefined> = {
   33: true,
 };
 
+export class InvalidPublicKeyLengthError extends U.ErrorCtor("InvalidPublicKeyLengthError") {}
+export class InvalidNetworkPrefixError extends U.ErrorCtor("InvalidNetworkPrefixError") {}
+export class InvalidAddressLengthError extends U.ErrorCtor("InvalidAddressError") {}
+export class InvalidAddressChecksumError extends U.ErrorCtor("InvalidAddressChecksumError") {}
+
 export const encode = (
   prefix: number,
   pubKey: Uint8Array,
@@ -25,13 +31,13 @@ export const encode = (
   const isValidPublicKeyLength = !!VALID_PUBLIC_KEY_LENGTHS[pubKey.length];
 
   if (!isValidPublicKeyLength) {
-    throw new Error("Invalid public key length");
+    throw new InvalidPublicKeyLengthError();
   }
 
   const isValidNetworkPrefix = !validNetworkPrefixes || validNetworkPrefixes.includes(prefix);
 
   if (!isValidNetworkPrefix) {
-    throw new Error("Invalid network prefix");
+    throw new InvalidNetworkPrefixError();
   }
 
   const prefixBytes = prefix < 64
@@ -65,10 +71,10 @@ export const decode = (address: Uint8Array): [prefix: number, pubKey: Uint8Array
   const isValidAddressLength = !!VALID_ADDRESS_LENGTHS[address.length];
 
   if (!isValidAddressLength) {
-    throw new Error("Invalid address length");
+    throw new InvalidAddressLengthError();
   }
 
-  const prefixLength = (address[0] as number) & 0b0100_0000 ? 2 : 1;
+  const prefixLength = address[0]! & 0b0100_0000 ? 2 : 1;
 
   const prefix: number = prefixLength === 1
     ? address[0]!
@@ -86,7 +92,7 @@ export const decode = (address: Uint8Array): [prefix: number, pubKey: Uint8Array
   const checksum = address.subarray(address.length - CHECKSUM_LENGTH);
 
   if (digest[0] !== checksum[0] || digest[1] !== checksum[1]) {
-    throw new Error("Invalid address checksum");
+    throw new InvalidAddressChecksumError();
   }
 
   const pubKey = address.subarray(

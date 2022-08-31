@@ -2,111 +2,131 @@ import * as base58 from "../deps/std/encoding/base58.ts";
 import { assertEquals, assertThrows } from "../deps/std/testing/asserts.ts";
 import * as p from "../test-util/pairs.ts";
 
-import { decode, encode } from "./mod.ts";
+import {
+  decode,
+  encode,
+  InvalidAddressChecksumError,
+  InvalidAddressLengthError,
+  InvalidNetworkPrefixError,
+  InvalidPublicKeyLengthError,
+} from "./mod.ts";
 
-[
-  {
-    name: "ss58.encode should encode 8-bit prefix polkadot address",
-    args: [0, p.alice.publicKey],
-    expected: "15oF4uVJwmo4TdGW7VfQxNLavjCXviqxT9S1MgbjMNHr6Sp5",
-  },
-  {
-    name: "ss58.encode should encode 8-bit prefix substrate address",
-    args: [42, p.alice.publicKey],
-    expected: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
-  },
-  {
-    name: "ss58.encode should encode 16-bit prefix aventus address",
-    args: [65, p.alice.publicKey],
-    expected: "cLxkfNUiCYsb57YLhTJdNVKxUTB1VTpeygYZNhYuFc83KrFy7", // cspell:disable-line
-  },
-].forEach(({ name, args, expected }) => {
+(<[networkName: string, prefix: number, publicKey: Uint8Array, base58EncodedAddress: string][]> [
+  [
+    "Polkadot",
+    0,
+    p.alice.publicKey,
+    "15oF4uVJwmo4TdGW7VfQxNLavjCXviqxT9S1MgbjMNHr6Sp5",
+  ],
+  [
+    "Substrate",
+    42,
+    p.alice.publicKey,
+    "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+  ],
+  [
+    "Aventus",
+    65,
+    p.alice.publicKey,
+    "cLxkfNUiCYsb57YLhTJdNVKxUTB1VTpeygYZNhYuFc83KrFy7", // cspell:disable-line
+  ],
+])
+  .forEach(
+    ([networkName, prefix, publicKey, base58EncodedAddress]) => {
+      Deno.test({
+        name: `ss58.encode should encode a ${networkName} address with ${prefix} prefix`,
+        fn: () => {
+          const actual = encode(prefix, publicKey);
+
+          assertEquals(actual, base58.decode(base58EncodedAddress));
+        },
+      });
+    },
+  );
+
+(<[
+  testSpec: string,
+  prefix: number,
+  publicKey: Uint8Array,
+  validNetworkPrefixes: number[] | undefined,
+  ErrorClass: ErrorConstructor,
+][]> [
+  [
+    "should throw for an invalid public key length",
+    0,
+    p.alice.publicKey.slice(0, 30),
+    undefined,
+    InvalidPublicKeyLengthError,
+  ],
+  [
+    "should throw for an invalid network prefix",
+    46,
+    p.alice.publicKey,
+    [0],
+    InvalidNetworkPrefixError,
+  ],
+]).forEach(([testSpec, prefix, publicKey, validNetworkPrefixes, ErrorClass]) => {
   Deno.test({
-    name,
+    name: `ss58.encode ${testSpec}`,
     fn: () => {
-      // @ts-ignore
-      const actual = encode(...args);
-      assertEquals(base58.encode(actual), expected);
+      assertThrows(() => encode(prefix, publicKey, validNetworkPrefixes), ErrorClass);
     },
   });
 });
 
-[
-  {
-    name: "ss58.encode should throw for an invalid public key length",
-    args: [0, p.alice.publicKey.slice(0, 30)],
-    errorMessage: "Invalid public key length",
-  },
-  {
-    name: "ss58.encode should throw for a reserved network prefix",
-    args: [46, p.alice.publicKey],
-    errorMessage: "Invalid network prefix",
-  },
-  {
-    name: "ss58.encode should throw for an invalid network prefix",
-    args: [0b0000_1111_1111_1111, p.alice.publicKey],
-    errorMessage: "Invalid network prefix",
-  },
-].forEach(({ name, args, errorMessage }) => {
+(<[
+  networkName: string,
+  base58EncodedAddress: string,
+  decodedAddress: [prefix: number, publicKey: Uint8Array],
+][]> [
+  [
+    "Polkadot",
+    "15oF4uVJwmo4TdGW7VfQxNLavjCXviqxT9S1MgbjMNHr6Sp5",
+    [0, p.alice.publicKey],
+  ],
+  [
+    "Substrate",
+    "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+    [42, p.alice.publicKey],
+  ],
+  [
+    "Aventus",
+    "cLxkfNUiCYsb57YLhTJdNVKxUTB1VTpeygYZNhYuFc83KrFy7", // cspell:disable-line
+    [65, p.alice.publicKey],
+  ],
+]).forEach(([networkName, base58EncodedAddress, [prefix, publicKey]]) => {
   Deno.test({
-    name,
+    name: `ss58.decode should decode a ${networkName} address`,
     fn: () => {
-      // @ts-ignore
-      assertThrows(() => encode(...args), Error, errorMessage);
+      const actual = decode(base58.decode(base58EncodedAddress));
+
+      assertEquals(actual, [prefix, publicKey]);
     },
   });
 });
 
-[
-  {
-    name: "ss58.decode should decode 8-bit prefix polkadot address",
-    args: ["15oF4uVJwmo4TdGW7VfQxNLavjCXviqxT9S1MgbjMNHr6Sp5"],
-    expected: [0, p.alice.publicKey],
-  },
-  {
-    name: "ss58.decode should decode 8-bit prefix substrate address",
-    args: ["5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"],
-    expected: [42, p.alice.publicKey],
-  },
-  {
-    name: "ss58.decode should decode 16-bit prefix aventus address",
-    args: ["cLxkfNUiCYsb57YLhTJdNVKxUTB1VTpeygYZNhYuFc83KrFy7"], // cspell:disable-line
-    expected: [65, p.alice.publicKey],
-  },
-].forEach(({ name, args, expected }) => {
-  Deno.test({
-    name,
-    fn: () => {
-      // @ts-ignore
-      const actual = decode(base58.decode(args[0]));
-      assertEquals(actual, expected);
-    },
-  });
-});
-
-[
-  {
-    name: "ss58.decode should throw for a long address",
-    args: ["15oF4uVJwmo4TdGW7VfQxNLavjCXviqxT9S1MgbjMNHr6Sp5" + "11111111"],
-    errorMessage: "Invalid address length",
-  },
-  {
-    name: "ss58.decode should throw for a short address",
-    args: ["15oF4uVJwmo4TdGW7VfQxNLavjCXviqxT9S1MgbjMNHr6Sp5".slice(0, 40)],
-    errorMessage: "Invalid address length",
-  },
-  {
-    name: "ss58.decode should throw for an invalid checksum",
+(<[name: string, base58EncodedAddress: string, ErrorClass: ErrorConstructor][]> [
+  [
+    "should throw for a long address",
+    "15oF4uVJwmo4TdGW7VfQxNLavjCXviqxT9S1MgbjMNHr6Sp5" + "11111111",
+    InvalidAddressLengthError,
+  ],
+  [
+    "should throw for a short address",
+    "15oF4uVJwmo4TdGW7VfQxNLavjCXviqxT9S1MgbjMNHr6Sp5".slice(0, 40),
+    InvalidAddressLengthError,
+  ],
+  [
+    "should throw for an invalid checksum",
     // Alice public key with a 0xff 0xff checksum
-    args: ["15oF4uVJwmo4TdGW7VfQxNLavjCXviqxT9S1MgbjMNHr6ccE"],
-    errorMessage: "Invalid address checksum",
-  },
-].forEach(({ name, args, errorMessage }) => {
+    "15oF4uVJwmo4TdGW7VfQxNLavjCXviqxT9S1MgbjMNHr6ccE",
+    InvalidAddressChecksumError,
+  ],
+]).forEach(([testSpec, base58EncodedAddress, ErrorClass]) => {
   Deno.test({
-    name,
+    name: `ss58.decode ${testSpec}`,
     fn: () => {
-      // @ts-ignore
-      assertThrows(() => decode(...args), Error, errorMessage);
+      assertThrows(() => decode(base58.decode(base58EncodedAddress)), ErrorClass);
     },
   });
 });
