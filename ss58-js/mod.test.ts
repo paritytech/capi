@@ -1,22 +1,23 @@
+import * as base58 from "../deps/std/encoding/base58.ts";
 import { assertEquals, assertThrows } from "../deps/std/testing/asserts.ts";
-import { decode, encode } from "./mod.ts";
+import * as p from "../test-util/pairs.ts";
 
-const ALICE_PUBLIC_KEY = "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d";
+import { decode, encode } from "./mod.ts";
 
 [
   {
     name: "ss58.encode should encode 8-bit prefix polkadot address",
-    args: [0, ALICE_PUBLIC_KEY],
+    args: [0, p.alice.publicKey],
     expected: "15oF4uVJwmo4TdGW7VfQxNLavjCXviqxT9S1MgbjMNHr6Sp5",
   },
   {
     name: "ss58.encode should encode 8-bit prefix substrate address",
-    args: [42, ALICE_PUBLIC_KEY],
+    args: [42, p.alice.publicKey],
     expected: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
   },
   {
     name: "ss58.encode should encode 16-bit prefix aventus address",
-    args: [65, ALICE_PUBLIC_KEY],
+    args: [65, p.alice.publicKey],
     expected: "cLxkfNUiCYsb57YLhTJdNVKxUTB1VTpeygYZNhYuFc83KrFy7", // cspell:disable-line
   },
 ].forEach(({ name, args, expected }) => {
@@ -25,7 +26,7 @@ const ALICE_PUBLIC_KEY = "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684
     fn: () => {
       // @ts-ignore
       const actual = encode(...args);
-      assertEquals(actual, expected);
+      assertEquals(base58.encode(actual), expected);
     },
   });
 });
@@ -33,17 +34,17 @@ const ALICE_PUBLIC_KEY = "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684
 [
   {
     name: "ss58.encode should throw for an invalid public key length",
-    args: [0, ALICE_PUBLIC_KEY.slice(0, 30)],
+    args: [0, p.alice.publicKey.slice(0, 30)],
     errorMessage: "Invalid public key length",
   },
   {
     name: "ss58.encode should throw for a reserved network prefix",
-    args: [46, ALICE_PUBLIC_KEY],
+    args: [46, p.alice.publicKey],
     errorMessage: "Invalid network prefix",
   },
   {
     name: "ss58.encode should throw for an invalid network prefix",
-    args: [0b0000_1111_1111_1111, ALICE_PUBLIC_KEY],
+    args: [0b0000_1111_1111_1111, p.alice.publicKey],
     errorMessage: "Invalid network prefix",
   },
 ].forEach(({ name, args, errorMessage }) => {
@@ -60,24 +61,24 @@ const ALICE_PUBLIC_KEY = "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684
   {
     name: "ss58.decode should decode 8-bit prefix polkadot address",
     args: ["15oF4uVJwmo4TdGW7VfQxNLavjCXviqxT9S1MgbjMNHr6Sp5"],
-    expected: [0, ALICE_PUBLIC_KEY],
+    expected: [0, p.alice.publicKey],
   },
   {
     name: "ss58.decode should decode 8-bit prefix substrate address",
     args: ["5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"],
-    expected: [42, ALICE_PUBLIC_KEY],
+    expected: [42, p.alice.publicKey],
   },
   {
     name: "ss58.decode should decode 16-bit prefix aventus address",
     args: ["cLxkfNUiCYsb57YLhTJdNVKxUTB1VTpeygYZNhYuFc83KrFy7"], // cspell:disable-line
-    expected: [65, ALICE_PUBLIC_KEY],
+    expected: [65, p.alice.publicKey],
   },
 ].forEach(({ name, args, expected }) => {
   Deno.test({
     name,
     fn: () => {
       // @ts-ignore
-      const actual = decode(...args);
+      const actual = decode(base58.decode(args[0]));
       assertEquals(actual, expected);
     },
   });

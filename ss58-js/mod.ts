@@ -1,24 +1,36 @@
 import { blake2b } from "../deps/hashes.ts";
-import * as base58 from "../deps/std/encoding/base58.ts";
 
-import { hex } from "../util/mod.ts";
+// SS58PRE = Uint8Array.from("SS58PRE".split("").map((c) => c.charCodeAt(0)));
+const SS58PRE = Uint8Array.of(83, 83, 53, 56, 80, 82, 69);
 
-import {
-  ALLOWED_ADDRESS_LENGTHS,
-  ALLOWED_NETWORK_PREFIXES,
-  ALLOWED_PUBLIC_KEY_LENGTHS,
-  CHECKSUM_LENGTH,
-  SS58PRE,
-} from "./constants.ts";
+const CHECKSUM_LENGTH = 2;
 
-export const encode = (prefix: number, pubKey: string): string => {
-  const pubKeyBytes = hex.decode(pubKey);
+const VALID_ADDRESS_LENGTHS: Record<number, boolean | undefined> = {
+  35: true,
+  36: true,
+  37: true,
+  38: true,
+};
 
-  if (!ALLOWED_PUBLIC_KEY_LENGTHS.includes(pubKeyBytes.length)) {
+const VALID_PUBLIC_KEY_LENGTHS: Record<number, boolean | undefined> = {
+  32: true,
+  33: true,
+};
+
+export const encode = (
+  prefix: number,
+  pubKey: Uint8Array,
+  validNetworkPrefixes?: number[],
+): Uint8Array => {
+  const isValidPublicKeyLength = !!VALID_PUBLIC_KEY_LENGTHS[pubKey.length];
+
+  if (!isValidPublicKeyLength) {
     throw new Error("Invalid public key length");
   }
 
-  if (!ALLOWED_NETWORK_PREFIXES.includes(prefix)) {
+  const isValidNetworkPrefix = !validNetworkPrefixes || validNetworkPrefixes.includes(prefix);
+
+  if (!isValidNetworkPrefix) {
     throw new Error("Invalid network prefix");
   }
 
@@ -35,54 +47,52 @@ export const encode = (prefix: number, pubKey: string): string => {
 
   hasher.update(SS58PRE);
   hasher.update(prefixBytes);
-  hasher.update(pubKeyBytes);
+  hasher.update(pubKey);
 
   const digest = hasher.digest();
   const checksum = digest.subarray(0, CHECKSUM_LENGTH);
 
-  const addrBytes = new Uint8Array(prefixBytes.length + pubKeyBytes.length + CHECKSUM_LENGTH);
+  const address = new Uint8Array(prefixBytes.length + pubKey.length + CHECKSUM_LENGTH);
 
-  addrBytes.set(prefixBytes, 0);
-  addrBytes.set(pubKeyBytes, prefixBytes.length);
-  addrBytes.set(checksum, prefixBytes.length + pubKeyBytes.length);
+  address.set(prefixBytes, 0);
+  address.set(pubKey, prefixBytes.length);
+  address.set(checksum, prefixBytes.length + pubKey.length);
 
-  return base58.encode(addrBytes);
+  return address;
 };
 
 export const decode = (address: Uint8Array): [prefix: number, pubKey: Uint8Array] => {
-  const addrBytes = base58.decode(address);
+  const isValidAddressLength = !!VALID_ADDRESS_LENGTHS[address.length];
 
-  if (!ALLOWED_ADDRESS_LENGTHS.includes(addrBytes.length)) {
+  if (!isValidAddressLength) {
     throw new Error("Invalid address length");
   }
 
-  const prefixLength = (addrBytes[0] as number) & 0b0100_0000 ? 2 : 1;
+  const prefixLength = (address[0] as number) & 0b0100_0000 ? 2 : 1;
 
   const prefix: number = prefixLength === 1
-    ? addrBytes[0]!
-    : (((addrBytes[0]!) & 0b0011_1111) << 2) | ((addrBytes[1]!) >> 6)
-      | (((addrBytes[1]!) & 0b0011_1111) << 8);
+    ? address[0]!
+    : (((address[0]!) & 0b0011_1111) << 2) | ((address[1]!) >> 6)
+      | (((address[1]!) & 0b0011_1111) << 8);
 
   const hasher = blake2b.create({
     dkLen: 512 / 8,
   });
 
   hasher.update(SS58PRE);
-  hasher.update(addrBytes.subarray(0, addrBytes.length - CHECKSUM_LENGTH));
+  hasher.update(address.subarray(0, address.length - CHECKSUM_LENGTH));
 
   const digest = hasher.digest();
-  const checksum = addrBytes.subarray(addrBytes.length - CHECKSUM_LENGTH);
+  const checksum = address.subarray(address.length - CHECKSUM_LENGTH);
 
   if (digest[0] !== checksum[0] || digest[1] !== checksum[1]) {
     throw new Error("Invalid address checksum");
   }
 
-  const pubKeyBytes = addrBytes.subarray(
+  const pubKey = address.subarray(
     prefixLength,
-    addrBytes.length - CHECKSUM_LENGTH,
+    address.length - CHECKSUM_LENGTH,
   );
-
-  const pubKey = hex.encode(pubKeyBytes);
 
   return [prefix, pubKey];
 };
