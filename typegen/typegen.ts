@@ -185,7 +185,13 @@ export function typegen(metadata: M.Metadata) {
               `type: ${JSON.stringify(entry.type)},`,
               `modifier: ${JSON.stringify(entry.modifier)},`,
               `hashers: ${entry.type === "Map" ? JSON.stringify(entry.hashers) : "[]"},`,
-              `key: ${entry.type === "Map" ? visitor.visit(entry.key) : "null"},`,
+              `key: ${
+                entry.type === "Map"
+                  ? entry.hashers.length === 1
+                    ? `[${visitor.visit(entry.key)}]`
+                    : visitor.visit(entry.key)
+                  : "[]"
+              },`,
               `value: ${visitor.visit(entry.value)},`,
               "},",
             ]),
