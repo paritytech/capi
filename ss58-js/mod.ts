@@ -78,8 +78,8 @@ export const decode = (address: Uint8Array): [prefix: number, pubKey: Uint8Array
 
   const prefix: number = prefixLength === 1
     ? address[0]!
-    : (((address[0]!) & 0b0011_1111) << 2) | ((address[1]!) >> 6)
-      | (((address[1]!) & 0b0011_1111) << 8);
+    : ((address[0]! & 0b0011_1111) << 2) | (address[1]! >> 6)
+      | ((address[1]! & 0b0011_1111) << 8);
 
   const hasher = blake2b.create({
     dkLen: 512 / 8,
