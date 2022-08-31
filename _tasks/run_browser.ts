@@ -8,7 +8,7 @@ const dirname = path.dirname(path.fromFileUrl(import.meta.url));
 
 const port = +(Deno.env.get("PORT") ?? "8080");
 
-const transpiledDir = path.join(dirname, "_transpiled");
+const transpiledDir = path.join(dirname, "../target/transpiled");
 
 const getTranspiledLocation = (url: string) => path.join(transpiledDir, getTranspiledPath(url));
 const getTranspiledPath = (url: string) => {
