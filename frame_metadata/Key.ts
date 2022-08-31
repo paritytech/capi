@@ -11,67 +11,65 @@ export interface StorageKeyProps {
   storageEntry: M.StorageEntry;
 }
 
-export function $storageKey(props: StorageKeyProps): $.Codec<unknown> {
-  const keyCodec = props.storageEntry.type === "Map"
-    ? props.deriveCodec(props.storageEntry.key)
-    : null;
-  const hashTwox128 = props.hashers.Twox128;
+export function $storageKey(props: StorageKeyProps): $.Codec<unknown[]> {
+  let keyCodecs: $.Codec<any>[];
+  if (props.storageEntry.type === "Map") {
+    const codec = props.deriveCodec(props.storageEntry.key);
+    if (props.storageEntry.hashers.length === 1) {
+      keyCodecs = [codec];
+    } else {
+      if (codec._metadata?.[0] !== $.tuple) {
+        throw new Error("Expected key codec to be a tuple since there are multiple hashers");
+      }
+      keyCodecs = codec._metadata.slice(1) as any;
+    }
+  } else {
+    keyCodecs = [];
+  }
+  const palletHash = props.hashers.Twox128(new TextEncoder().encode(props.pallet.name));
+  const entryHash = props.hashers.Twox128(new TextEncoder().encode(props.storageEntry.name));
+  const $keys = $.tuple(
+    ...keyCodecs.map(($key, i) =>
+      hashCodec((props.storageEntry as M.MapStorageEntryType).hashers[i]!, $key)
+    ),
+  );
   return $.createCodec({
     _metadata: [$storageKey, props],
     _staticSize: 0,
     _encode(buffer, key) {
-      buffer.insertArray(hashTwox128(new TextEncoder().encode(props.pallet.name)));
-      buffer.insertArray(hashTwox128(new TextEncoder().encode(props.storageEntry.name)));
-      if (key instanceof Array && key.length === 0) {
-        return;
-      }
-      if (props.storageEntry.type === "Map") {
-        const { hashers } = props.storageEntry;
-        if (hashers.length === 1) {
-          buffer.insertArray(props.hashers[hashers[0]!](keyCodec!.encode(key)));
-        } else {
-          if (!(key instanceof Array) || key.length !== hashers.length) {
-            throw new Error(`Expected key to be an array of length ${hashers.length}`);
-          }
-          for (let i = 0; i < hashers.length; i++) {
-            buffer.insertArray(props.hashers[hashers[i]!](keyCodec!.encode(key[i])));
-          }
-        }
-      } else {
-        if (key != null) {
-          throw new Error("Expected nullish key");
-        }
-      }
+      buffer.insertArray(palletHash);
+      buffer.insertArray(entryHash);
+      $keys._encode(buffer, key);
     },
     _decode(buffer) {
       // Ignore initial hashes
       buffer.index += 32;
+      return $keys._decode(buffer);
+    },
+  });
 
-      if (props.storageEntry.type === "Plain") {
-        return null;
-      }
-
-      const { hashers } = props.storageEntry;
-      if (hashers.length === 1) {
-        return decodeHasher(hashers[0]!);
-      } else {
-        return hashers.map(decodeHasher);
-      }
-
-      function decodeHasher(hasherKind: M.HasherKind): unknown {
-        const leading = (<{ [K in M.HasherKind]?: number }> {
-          Identity: 0,
-          Blake2_128Concat: 16,
-          Twox64Concat: 8,
-        })[hasherKind];
+  function hashCodec<T>(hasherKind: M.HasherKind, $value: $.Codec<T>): $.Codec<T> {
+    const hasher = props.hashers[hasherKind];
+    const leading = (<{ [K in M.HasherKind]?: number }> {
+      Blake2_128Concat: 16,
+      Twox64Concat: 8,
+    })[hasherKind];
+    if (hasherKind === "Identity") return $value;
+    return $.createCodec({
+      _metadata: null,
+      _staticSize: 0,
+      _encode(buffer, value) {
+        buffer.insertArray(hasher($value.encode(value)));
+      },
+      _decode(buffer) {
         if (leading === undefined) {
           throw new DecodeNonTransparentKeyError();
         }
         buffer.index += leading;
-        return keyCodec!._decode(buffer);
-      }
-    },
-  });
+        return $value._decode(buffer);
+      },
+    });
+  }
 }
 
 export class StorageEntryMissingHasher extends Error {}
