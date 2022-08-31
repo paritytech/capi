@@ -25,6 +25,7 @@
   "include": ["."],
   "tasks": {
     "run": "deno run -A --no-check=remote",
+    "run:browser": "deno task run _tasks/run_browser.ts",
     "debug": "deno task run --inspect-brk",
     "download:frame_metadata": "deno task run _tasks/download_frame_metadata.ts",
     "build:wasm": "deno task run _tasks/build_wasm.ts",

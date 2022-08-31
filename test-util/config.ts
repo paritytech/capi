@@ -30,6 +30,7 @@ export class Config
 }
 
 export async function config(props?: NodeProps): Promise<Config> {
+  if ("_browserShim" in Deno) return new Config(9944, () => {});
   let port = 9944;
   if (props?.port) {
     if (!isPortAvailable(props.port)) {
