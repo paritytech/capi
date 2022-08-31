@@ -26,7 +26,7 @@ export class InvalidAddressChecksumError extends U.ErrorCtor("InvalidAddressChec
 export const encode = (
   prefix: number,
   pubKey: Uint8Array,
-  validNetworkPrefixes?: number[],
+  validNetworkPrefixes?: readonly number[],
 ): Uint8Array => {
   const isValidPublicKeyLength = !!VALID_PUBLIC_KEY_LENGTHS[pubKey.length];
 
