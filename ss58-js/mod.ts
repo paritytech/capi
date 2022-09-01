@@ -1,4 +1,5 @@
 import { blake2b } from "../deps/hashes.ts";
+import * as base58 from "../deps/std/encoding/base58.ts";
 import * as U from "../util/mod.ts";
 
 // SS58PRE = Uint8Array.from("SS58PRE".split("").map((c) => c.charCodeAt(0)));
@@ -24,6 +25,12 @@ export class InvalidAddressLengthError extends U.ErrorCtor("InvalidAddressError"
 export class InvalidAddressChecksumError extends U.ErrorCtor("InvalidAddressChecksumError") {}
 
 export const encode = (
+  prefix: number,
+  pubKey: Uint8Array,
+  validNetworkPrefixes?: readonly number[],
+) => base58.encode(encodeRaw(prefix, pubKey, validNetworkPrefixes));
+
+export const encodeRaw = (
   prefix: number,
   pubKey: Uint8Array,
   validNetworkPrefixes?: readonly number[],
@@ -67,7 +74,9 @@ export const encode = (
   return address;
 };
 
-export const decode = (address: Uint8Array): [prefix: number, pubKey: Uint8Array] => {
+export const decode = (address: string) => decodeRaw(base58.decode(address));
+
+export const decodeRaw = (address: Uint8Array): [prefix: number, pubKey: Uint8Array] => {
   const isValidAddressLength = !!VALID_ADDRESS_LENGTHS[address.length];
 
   if (!isValidAddressLength) {

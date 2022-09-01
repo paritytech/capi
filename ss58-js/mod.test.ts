@@ -1,9 +1,9 @@
-import * as base58 from "../deps/std/encoding/base58.ts";
 import { assertEquals, assertThrows } from "../deps/std/testing/asserts.ts";
 import * as p from "../test-util/pairs.ts";
 
 import {
   decode,
+  decodeRaw,
   encode,
   InvalidAddressChecksumError,
   InvalidAddressLengthError,
@@ -31,11 +31,11 @@ for (
   ] as const
 ) {
   Deno.test(`ss58.encode ${networkName}`, () => {
-    const actual = base58.encode(encode(prefix, publicKey));
+    const actual = encode(prefix, publicKey);
     assertEquals(actual, address);
   });
   Deno.test(`ss58.decode ${networkName}`, () => {
-    const actual = decode(base58.decode(address));
+    const actual = decode(address);
     assertEquals(actual, [prefix, publicKey]);
   });
 }
@@ -48,17 +48,17 @@ Deno.test("ss58.encode invalid network prefix", () => {
   assertThrows(() => encode(46, p.alice.publicKey, [0]), InvalidNetworkPrefixError);
 });
 
-Deno.test("ss58.decode long address", () => {
-  assertThrows(() => decode(new Uint8Array(40)), InvalidAddressLengthError);
+Deno.test("ss58.decodeRaw long address", () => {
+  assertThrows(() => decodeRaw(new Uint8Array(40)), InvalidAddressLengthError);
 });
 
-Deno.test("ss58.decode short address", () => {
-  assertThrows(() => decode(new Uint8Array(30)), InvalidAddressLengthError);
+Deno.test("ss58.decodeRaw short address", () => {
+  assertThrows(() => decodeRaw(new Uint8Array(30)), InvalidAddressLengthError);
 });
 
-Deno.test("ss58.decode invalid checksum", () => {
+Deno.test("ss58.decodeRaw invalid checksum", () => {
   assertThrows(
-    () => decode(Uint8Array.of(0, ...p.alice.publicKey, 255, 255)),
+    () => decodeRaw(Uint8Array.of(0, ...p.alice.publicKey, 255, 255)),
     InvalidAddressChecksumError,
   );
 });
