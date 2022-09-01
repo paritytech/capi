@@ -117,6 +117,7 @@ export class ChainError<T> extends Error {
 }
 
 const compactCodecVisitor = new $.CodecVisitor<$.Codec<any>>()
+  .add($null, () => $null)
   .add($.u8, () => $.compactU8)
   .add($.u16, () => $.compactU16)
   .add($.u32, () => $.compactU32)
