@@ -25,7 +25,7 @@ for (
     ],
     [
       "aventus",
-      "cLxkfNUiCYsb57YLhTJdNVKxUTB1VTpeygYZNhYuFc83KrFy7", // cspell:disable-line
+      "cLxkfNUiCYsb57YLhTJdNVKxUTB1VTpeygYZNhYuFc83KrFy7",
       [65, p.alice.publicKey],
     ],
   ] as const
