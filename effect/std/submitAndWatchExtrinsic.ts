@@ -2,7 +2,7 @@ import { unimplemented } from "../../deps/std/testing/asserts.ts";
 import * as M from "../../frame_metadata/mod.ts";
 import * as known from "../../known/mod.ts";
 import * as rpc from "../../rpc/mod.ts";
-import { Ss58 } from "../../ss58/mod.ts";
+import * as ss58 from "../../ss58/mod.ts";
 import * as U from "../../util/mod.ts";
 import * as a from "../atoms/mod.ts";
 import * as sys from "../sys/mod.ts";
@@ -41,17 +41,17 @@ export function sendAndWatchExtrinsic<Props extends SendAndWatchExtrinsicProps>(
   const $extrinsic = a.$extrinsic(deriveCodec, metadata, props.sign);
   const runtimeVersion = a.rpcCall(props.config, "state_getRuntimeVersion", []);
   const senderSs58 = sys.anon([props.sender], (sender) => {
-    return (async (): Promise<string> => {
+    return ((): string => {
       switch (sender.type) {
         case "Id": {
-          return (await Ss58()).encode(props.config.addressPrefix, U.hex.encode(sender.value));
+          return ss58.encode(props.config.addressPrefix, sender.value);
         }
         // TODO: other types
         default: {
           unimplemented();
         }
       }
-    })() as Promise<U.AccountIdString>;
+    })() as U.AccountIdString;
   });
   const accountNextIndex = a.rpcCall(props.config, "system_accountNextIndex", [senderSs58]);
   const genesisHash = sys.anon(

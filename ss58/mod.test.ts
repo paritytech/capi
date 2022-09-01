@@ -1,15 +1,64 @@
-import { assertEquals } from "../deps/std/testing/asserts.ts";
-import { Ss58 } from "./mod.ts";
+import { assertEquals, assertThrows } from "../deps/std/testing/asserts.ts";
+import * as p from "../test-util/pairs.ts";
 
-Deno.test("Decode Ss58 Text", async () => {
-  const decoded = (await Ss58()).decode("12Y8b4C9ar162cBgycxYgxxHG7cLVs8gre9Y5xeMjW3izqer");
-  assertEquals(decoded, [0, "43fa61b298e82f9f207ddea327900cee26b554756c4a533f36cd875e3e7bcf06"]);
+import {
+  decode,
+  decodeRaw,
+  encode,
+  InvalidAddressChecksumError,
+  InvalidAddressLengthError,
+  InvalidNetworkPrefixError,
+  InvalidPublicKeyLengthError,
+} from "./mod.ts";
+
+for (
+  const [networkName, address, [prefix, publicKey]] of [
+    [
+      "polkadot",
+      "15oF4uVJwmo4TdGW7VfQxNLavjCXviqxT9S1MgbjMNHr6Sp5",
+      [0, p.alice.publicKey],
+    ],
+    [
+      "substrate",
+      "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+      [42, p.alice.publicKey],
+    ],
+    [
+      "aventus",
+      "cLxkfNUiCYsb57YLhTJdNVKxUTB1VTpeygYZNhYuFc83KrFy7", // cspell:disable-line
+      [65, p.alice.publicKey],
+    ],
+  ] as const
+) {
+  Deno.test(`ss58.encode ${networkName}`, () => {
+    const actual = encode(prefix, publicKey);
+    assertEquals(actual, address);
+  });
+  Deno.test(`ss58.decode ${networkName}`, () => {
+    const actual = decode(address);
+    assertEquals(actual, [prefix, publicKey]);
+  });
+}
+
+Deno.test("ss58.encode invalid public key length", () => {
+  assertThrows(() => encode(0, p.alice.publicKey.slice(0, 30)), InvalidPublicKeyLengthError);
 });
 
-Deno.test("Encode Ss58 Text", async () => {
-  const encoded = (await Ss58()).encode(
-    0,
-    "43fa61b298e82f9f207ddea327900cee26b554756c4a533f36cd875e3e7bcf06",
+Deno.test("ss58.encode invalid network prefix", () => {
+  assertThrows(() => encode(46, p.alice.publicKey, [0]), InvalidNetworkPrefixError);
+});
+
+Deno.test("ss58.decodeRaw long address", () => {
+  assertThrows(() => decodeRaw(new Uint8Array(40)), InvalidAddressLengthError);
+});
+
+Deno.test("ss58.decodeRaw short address", () => {
+  assertThrows(() => decodeRaw(new Uint8Array(30)), InvalidAddressLengthError);
+});
+
+Deno.test("ss58.decodeRaw invalid checksum", () => {
+  assertThrows(
+    () => decodeRaw(Uint8Array.of(0, ...p.alice.publicKey, 255, 255)),
+    InvalidAddressChecksumError,
   );
-  assertEquals(encoded, "12Y8b4C9ar162cBgycxYgxxHG7cLVs8gre9Y5xeMjW3izqer");
 });
