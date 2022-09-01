@@ -1,5 +1,5 @@
 import { assertEquals, assertThrows } from "../deps/std/testing/asserts.ts";
-import * as p from "../test-util/pairs.ts";
+import * as t from "../test-util/mod.ts";
 
 import {
   decode,
@@ -16,17 +16,17 @@ for (
     [
       "polkadot",
       "15oF4uVJwmo4TdGW7VfQxNLavjCXviqxT9S1MgbjMNHr6Sp5",
-      [0, p.alice.publicKey],
+      [0, t.alice.publicKey],
     ],
     [
       "substrate",
       "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
-      [42, p.alice.publicKey],
+      [42, t.alice.publicKey],
     ],
     [
       "aventus",
       "cLxkfNUiCYsb57YLhTJdNVKxUTB1VTpeygYZNhYuFc83KrFy7",
-      [65, p.alice.publicKey],
+      [65, t.alice.publicKey],
     ],
   ] as const
 ) {
@@ -41,11 +41,11 @@ for (
 }
 
 Deno.test("ss58.encode invalid public key length", () => {
-  assertThrows(() => encode(0, p.alice.publicKey.slice(0, 30)), InvalidPublicKeyLengthError);
+  assertThrows(() => encode(0, t.alice.publicKey.slice(0, 30)), InvalidPublicKeyLengthError);
 });
 
 Deno.test("ss58.encode invalid network prefix", () => {
-  assertThrows(() => encode(46, p.alice.publicKey, [0]), InvalidNetworkPrefixError);
+  assertThrows(() => encode(46, t.alice.publicKey, [0]), InvalidNetworkPrefixError);
 });
 
 Deno.test("ss58.decodeRaw long address", () => {
@@ -58,7 +58,7 @@ Deno.test("ss58.decodeRaw short address", () => {
 
 Deno.test("ss58.decodeRaw invalid checksum", () => {
   assertThrows(
-    () => decodeRaw(Uint8Array.of(0, ...p.alice.publicKey, 255, 255)),
+    () => decodeRaw(Uint8Array.of(0, ...t.alice.publicKey, 255, 255)),
     InvalidAddressChecksumError,
   );
 });
