@@ -86,8 +86,9 @@ export function DeriveCodec(tys: M.Ty[]): DeriveCodec {
       if (ty.kind === "char") return $.str;
       return $[ty.kind];
     },
-    compact() {
-      return $.compact;
+    compact(ty) {
+      const inner = this.visit(ty.typeParam);
+      return compactCodecVisitor.visit(inner);
     },
     bitSequence() {
       return $.bitSequence;
@@ -114,3 +115,12 @@ export class ChainError<T> extends Error {
     super();
   }
 }
+
+const compactCodecVisitor = new $.CodecVisitor<$.Codec<any>>()
+  .add($null, () => $null)
+  .add($.u8, () => $.compactU8)
+  .add($.u16, () => $.compactU16)
+  .add($.u32, () => $.compactU32)
+  .add($.u64, () => $.compactU64)
+  .add($.u128, () => $.compactU128)
+  .add($.u256, () => $.compactU256);

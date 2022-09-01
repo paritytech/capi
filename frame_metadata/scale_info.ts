@@ -8,7 +8,7 @@ export interface Field {
 }
 export const $field: $.Codec<Field> = $.object(
   ["name", $.option($.str)],
-  ["ty", $.nCompact],
+  ["ty", $.compactU32],
   ["typeName", $.option($.str)],
   ["docs", $.array($.str)],
 );
@@ -101,16 +101,16 @@ export const $tyDef: $.Codec<TyDef> = $.taggedUnion("type", [
   ],
   [
     "Sequence",
-    ["typeParam", $.nCompact],
+    ["typeParam", $.compactU32],
   ],
   [
     "SizedArray",
     ["len", $.u32],
-    ["typeParam", $.nCompact],
+    ["typeParam", $.compactU32],
   ],
   [
     "Tuple",
-    ["fields", $.array($.nCompact)],
+    ["fields", $.array($.compactU32)],
   ],
   [
     "Primitive",
@@ -118,12 +118,12 @@ export const $tyDef: $.Codec<TyDef> = $.taggedUnion("type", [
   ],
   [
     "Compact",
-    ["typeParam", $.nCompact],
+    ["typeParam", $.compactU32],
   ],
   [
     "BitSequence",
-    ["bitOrderType", $.nCompact],
-    ["bitStoreType", $.nCompact],
+    ["bitOrderType", $.compactU32],
+    ["bitStoreType", $.compactU32],
   ],
 ]);
 
@@ -133,7 +133,7 @@ export interface Param {
 }
 export const $param: $.Codec<Param> = $.object(
   ["name", $.str],
-  ["ty", $.option($.nCompact)],
+  ["ty", $.option($.compactU32)],
 );
 
 export type Ty = {
@@ -145,7 +145,7 @@ export type Ty = {
 export const $ty: $.Codec<Ty> = $.spread(
   $.spread(
     $.object(
-      ["id", $.nCompact],
+      ["id", $.compactU32],
       ["path", $.array($.str)],
       ["params", $.array($param)],
     ),
