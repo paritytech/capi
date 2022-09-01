@@ -2,7 +2,7 @@ import { blake2b } from "../deps/hashes.ts";
 import * as base58 from "../deps/std/encoding/base58.ts";
 import * as U from "../util/mod.ts";
 
-// SS58PRE = Uint8Array.from("SS58PRE".split("").map((c) => c.charCodeAt(0)));
+// SS58PRE string (0x53533538505245 hex) encoded as Uint8Array
 const SS58PRE = Uint8Array.of(83, 83, 53, 56, 80, 82, 69);
 
 const CHECKSUM_LENGTH = 2;
