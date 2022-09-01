@@ -133,7 +133,8 @@ export function typegen(metadata: M.Metadata) {
       return addTypeDecl(ty, "bigint");
     },
     compact(ty) {
-      return addTypeDecl(ty, "number | bigint");
+      decls.push(["Compact", "export type Compact<T> = T"]);
+      return `Compact<${this.visit(ty.typeParam)}>`;
     },
     bitSequence(ty) {
       return addTypeDecl(ty, "BitSequence");
