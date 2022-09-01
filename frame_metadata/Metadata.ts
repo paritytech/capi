@@ -34,12 +34,12 @@ export interface MapStorageEntryType {
 export type StorageEntryType = PlainStorageEntryType | MapStorageEntryType;
 
 export const $storageEntryType: $.Codec<StorageEntryType> = $.taggedUnion("type", [
-  ["Plain", ["value", $.nCompact]],
+  ["Plain", ["value", $.compactU32]],
   [
     "Map",
     ["hashers", $.array($hasherKind)],
-    ["key", $.nCompact],
-    ["value", $.nCompact],
+    ["key", $.compactU32],
+    ["value", $.compactU32],
   ],
 ]);
 
@@ -81,13 +81,13 @@ export interface Constant {
 }
 export const $constant: $.Codec<Constant> = $.object(
   ["name", $.str],
-  ["ty", $.nCompact],
+  ["ty", $.compactU32],
   ["value", $.uint8array],
   ["docs", $.array($.str)],
 );
 
 type OptionalTypeBearer = $.Native<typeof optionalTypeBearer>;
-const optionalTypeBearer = $.option($.object(["ty", $.nCompact]));
+const optionalTypeBearer = $.option($.object(["ty", $.compactU32]));
 
 export interface Pallet {
   name: string;
@@ -115,8 +115,8 @@ export interface SignedExtensionMetadata {
 }
 export const $signedExtensionMetadata: $.Codec<SignedExtensionMetadata> = $.object(
   ["ident", $.str],
-  ["ty", $.nCompact],
-  ["additionalSigned", $.nCompact],
+  ["ty", $.compactU32],
+  ["additionalSigned", $.compactU32],
 );
 
 export interface ExtrinsicDef {
@@ -125,7 +125,7 @@ export interface ExtrinsicDef {
   signedExtensions: SignedExtensionMetadata[];
 }
 export const $extrinsicDef: $.Codec<ExtrinsicDef> = $.object(
-  ["ty", $.nCompact],
+  ["ty", $.compactU32],
   ["version", $.u8],
   ["signedExtensions", $.array($signedExtensionMetadata)],
 );

@@ -126,20 +126,20 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
 
   return $.createCodec({
     _metadata: [$extrinsic, props],
-    _staticSize: $.nCompact._staticSize + $baseExtrinsic._staticSize,
+    _staticSize: $.compactU32._staticSize + $baseExtrinsic._staticSize,
     _encode(buffer, extrinsic) {
-      const lengthCursor = buffer.createCursor($.nCompact._staticSize);
+      const lengthCursor = buffer.createCursor($.compactU32._staticSize);
       const contentCursor = buffer.createCursor($baseExtrinsic._staticSize);
       $baseExtrinsic._encode(contentCursor, extrinsic);
       buffer.waitForBuffer(contentCursor, () => {
         const length = contentCursor.finishedSize + contentCursor.index;
-        $.nCompact._encode(lengthCursor, length);
+        $.compactU32._encode(lengthCursor, length);
         lengthCursor.close();
         contentCursor.close();
       });
     },
     _decode(buffer) {
-      const length = $.nCompact._decode(buffer);
+      const length = $.compactU32._decode(buffer);
       return $baseExtrinsic.decode(buffer.array.subarray(buffer.index, buffer.index += length));
     },
   });
