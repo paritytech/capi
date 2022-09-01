@@ -1,4 +1,4 @@
-import { blake2b } from "../deps/black2b.ts";
+import { blake2b } from "../deps/blake2b.ts";
 import * as base58 from "../deps/std/encoding/base58.ts";
 import * as U from "../util/mod.ts";
 
