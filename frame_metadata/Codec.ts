@@ -1,7 +1,7 @@
 import * as $ from "../deps/scale.ts";
-import { taggedUnion } from "../deps/scale.ts";
+import { $era } from "./Era.ts";
 import type * as M from "./mod.ts";
-import { TyVisitors } from "./TyVisitor.ts";
+import { TyVisitor } from "./TyVisitor.ts";
 
 export type DeriveCodec = (typeI: number) => $.Codec<unknown>;
 
@@ -13,53 +13,36 @@ export const $null = $.dummy(null);
 
 // TODO: tuple/array element skip optimization
 export function DeriveCodec(tys: M.Ty[]): DeriveCodec {
-  // TODO: don't leak memory!
-  const cache: Record<number, $.Codec<unknown> | null> = {};
-
-  function tuple(fields: number[]): $.Codec<any> {
-    if (fields.length === 0) {
+  const visitor = new TyVisitor<$.Codec<any>>(tys, {
+    unitStruct() {
       return $null;
-    } else if (fields.length === 1) {
-      return visitors.visit(fields[0]!);
-    } else {
-      return $.tuple(...fields.map((field) => visitors.visit(field)));
-    }
-  }
-
-  const visitors: TyVisitors<{ [_ in M.TyType]: $.Codec<any> }> = {
-    Struct: (ty) => {
-      if (ty.fields.length === 0) {
-        return $null;
-      } else if (ty.fields[0]!.name === undefined) {
-        // Tuple struct
-        return tuple(ty.fields.map((f) => f.ty));
-      } else {
-        // Object struct
-        return $.object(
-          ...ty.fields.map((field): $.Field => [field.name!, visitors.visit(field.ty)]),
-        );
-      }
     },
-    Union: (ty) => {
-      // TODO: revisit this
-      if (ty.path[0] === "Option") {
-        return $.option(visitors.visit(ty.params[0]!.ty!));
+    wrapperStruct(_ty, inner) {
+      return this.visit(inner);
+    },
+    tupleStruct(_ty, members) {
+      return $.tuple(...members.map((x) => this.visit(x)));
+    },
+    objectStruct(ty) {
+      return $.object(...ty.fields.map((x): $.Field => [x.name!, this.visit(x.ty)]));
+    },
+    option(_ty, some) {
+      return $.option(this.visit(some));
+    },
+    result(_ty, ok, err) {
+      return $.result(this.visit(ok), $.instance(ChainError, ["value", this.visit(err)]));
+    },
+    never() {
+      return $.never as any;
+    },
+    stringUnion(ty) {
+      const members: Record<number, string> = {};
+      for (const { index, name } of ty.members) {
+        members[index] = name;
       }
-      if (ty.path[0] === "Result") {
-        return $.result(
-          visitors.visit(ty.params[0]!.ty!),
-          $.instance(ChainError, ["value", visitors.visit(ty.params[1]!.ty!)]),
-        );
-      }
-      if (ty.members.length === 0) return $.never as any;
-      const allEmpty = ty.members.every((x) => !x.fields.length);
-      if (allEmpty) {
-        const members: Record<number, string> = {};
-        for (const { index, name } of ty.members) {
-          members[index] = name;
-        }
-        return $.stringUnion(members);
-      }
+      return $.stringUnion(members);
+    },
+    taggedUnion(ty) {
       const members: Record<number, $.TaggedUnionMember> = {};
       for (const { fields, name: type, index } of ty.members) {
         let member: $.TaggedUnionMember;
@@ -67,7 +50,9 @@ export function DeriveCodec(tys: M.Ty[]): DeriveCodec {
           member = [type];
         } else if (fields[0]!.name === undefined) {
           // Tuple variant
-          const $value = tuple(fields.map((f) => f.ty));
+          const $value = fields.length === 1
+            ? this.visit(fields[0]!.ty)
+            : $.tuple(...fields.map((f) => this.visit(f.ty)));
           member = [type, ["value", $value]];
         } else {
           // Object variant
@@ -75,7 +60,7 @@ export function DeriveCodec(tys: M.Ty[]): DeriveCodec {
             return [
               field.name || i,
               $.deferred(() => {
-                return visitors.visit(field.ty);
+                return this.visit(field.ty);
               }),
             ] as [string, $.Codec<unknown>];
           });
@@ -83,57 +68,49 @@ export function DeriveCodec(tys: M.Ty[]): DeriveCodec {
         }
         members[index] = member;
       }
-      return taggedUnion("type", members);
+      return $.taggedUnion("type", members);
     },
-    Sequence: (ty) => {
-      const $el = visitors.visit(ty.typeParam);
-      if ($el === $.u8) {
-        return $.uint8array;
-      } else {
-        return $.array($el);
-      }
+    uint8array() {
+      return $.uint8array;
     },
-    SizedArray: (ty) => {
-      const $el = visitors.visit(ty.typeParam);
-      if ($el === $.u8) {
-        return $.sizedUint8array(ty.len);
-      } else {
-        return $.sizedArray($el, ty.len);
-      }
+    array(ty) {
+      return $.array(this.visit(ty.typeParam));
     },
-    Tuple: (ty) => {
-      return tuple(ty.fields);
+    sizedUint8Array(ty) {
+      return $.sizedUint8array(ty.len);
     },
-    Primitive: (ty) => {
+    sizedArray(ty) {
+      return $.sizedArray(this.visit(ty.typeParam), ty.len);
+    },
+    primitive(ty) {
       if (ty.kind === "char") return $.str;
       return $[ty.kind];
     },
-    Compact: () => {
+    compact() {
       return $.compact;
     },
-    BitSequence: () => {
+    bitSequence() {
       return $.bitSequence;
     },
-    visit: (i) => {
-      if (cache[i]) {
-        return cache[i];
-      }
-      if (cache[i] === null) {
-        return $.deferred(() => cache[i]!);
-      }
-      cache[i] = null; // circularity detection
-      const ty = tys[i]!;
-      const $codec = (visitors[ty.type] as any)(ty);
-      cache[i] = $codec;
-      return $codec;
+    map(_ty, key, val) {
+      return $.map(this.visit(key), this.visit(val));
     },
-  };
+    set(_ty, val) {
+      return $.set(this.visit(val));
+    },
+    era() {
+      return $era;
+    },
+    circular(ty) {
+      return $.deferred(() => this.cache[ty.id]!);
+    },
+  });
 
-  return (i: number) => visitors.visit(i);
+  return (i: number) => visitor.visit(i);
 }
 
-export class ChainError extends Error {
-  constructor(readonly value: unknown) {
+export class ChainError<T> extends Error {
+  constructor(readonly value: T) {
     super();
   }
 }

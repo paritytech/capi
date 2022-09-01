@@ -163,3 +163,4 @@ cdylib
 rlib
 alloc
 syncstate
+typegen
