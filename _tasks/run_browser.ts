@@ -61,16 +61,6 @@ app.use(async (ctx) => {
 
 await t.config({ port: 9944 });
 
-await Promise.all(["hashers/mod_bg.wasm", "ss58/mod_bg.wasm"].map(async (wasmPath) => {
-  const wasmUrl = new URL("../" + wasmPath, import.meta.url).toString();
-  const location = getTranspiledLocation(transformUrl(wasmUrl));
-  await Deno.mkdir(path.dirname(location), { recursive: true });
-  await Deno.writeFile(
-    location,
-    new Uint8Array(await (await fetch(wasmUrl)).arrayBuffer()),
-  );
-}));
-
 const rootFilePath = getTranspiledPath(transformUrl(rootFile));
 await Deno.writeTextFile(
   path.join(transpiledDir, "index.html"),
