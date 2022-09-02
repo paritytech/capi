@@ -164,3 +164,6 @@ rlib
 alloc
 syncstate
 typegen
+Lxkf
+Tpeyg
+getrandom
