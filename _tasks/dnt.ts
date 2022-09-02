@@ -58,11 +58,3 @@ await Promise.all([
   fs.copy("LICENSE", path.join(outDir, "LICENSE")),
   fs.copy("Readme.md", path.join(outDir, "Readme.md")),
 ]);
-
-await Promise.all(["script", "esm"].map((kind) => {
-  return Promise.all(["hashers", "ss58"].map(async (dir) => {
-    const from = `./${dir}/mod_bg.wasm`;
-    const to = `target/npm/${kind}/${dir}/mod_bg.wasm`;
-    await fs.copy(from, to);
-  }));
-}));

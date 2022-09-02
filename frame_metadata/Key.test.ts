@@ -1,5 +1,4 @@
 import { assertEquals } from "../deps/std/testing/asserts.ts";
-import { Hashers } from "../hashers/mod.ts";
 import * as t from "../test-util/mod.ts";
 import * as U from "../util/mod.ts";
 import { $storageKey } from "./Key.ts";
@@ -11,7 +10,6 @@ Deno.test("System Accounts Key", async () => {
   const [pallet, storageEntry] = U.throwIfError(getPalletAndEntry(metadata, "System", "Account"));
   const $key = $storageKey({
     deriveCodec,
-    hashers: await Hashers(),
     pallet,
     storageEntry,
   });
@@ -30,7 +28,6 @@ Deno.test("Auction Winning Key", async () => {
   const [pallet, storageEntry] = U.throwIfError(getPalletAndEntry(metadata, "Auctions", "Winning"));
   const $key = $storageKey({
     deriveCodec,
-    hashers: await Hashers(),
     pallet,
     storageEntry,
   });

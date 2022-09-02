@@ -1,4 +1,5 @@
 import * as $ from "../deps/scale.ts";
+import * as H from "../hashers/mod.ts";
 import { DeriveCodec } from "./Codec.ts";
 import * as M from "./Metadata.ts";
 
@@ -6,7 +7,6 @@ export type HasherLookup = { [_ in M.HasherKind]: (input: Uint8Array) => Uint8Ar
 
 export interface StorageKeyProps {
   deriveCodec: DeriveCodec;
-  hashers: HasherLookup;
   pallet: M.Pallet;
   storageEntry: M.StorageEntry;
 }
@@ -26,16 +26,16 @@ export function $storageKey(props: StorageKeyProps): $.Codec<unknown[]> {
   } else {
     keyCodecs = [];
   }
-  const palletHash = props.hashers.Twox128(new TextEncoder().encode(props.pallet.name));
-  const entryHash = props.hashers.Twox128(new TextEncoder().encode(props.storageEntry.name));
+  const palletHash = H.Twox128.hash(new TextEncoder().encode(props.pallet.name));
+  const entryHash = H.Twox128.hash(new TextEncoder().encode(props.storageEntry.name));
   const $keys = $.tuple(
     ...keyCodecs.map(($key, i) =>
-      hashCodec((props.storageEntry as M.MapStorageEntryType).hashers[i]!, $key)
+      H[(props.storageEntry as M.MapStorageEntryType).hashers[i]!].$hash($key)
     ),
   );
   return $.createCodec({
     _metadata: [$storageKey, props],
-    _staticSize: 0,
+    _staticSize: $keys._staticSize,
     _encode(buffer, key) {
       buffer.insertArray(palletHash);
       buffer.insertArray(entryHash);
@@ -47,29 +47,6 @@ export function $storageKey(props: StorageKeyProps): $.Codec<unknown[]> {
       return $keys._decode(buffer);
     },
   });
-
-  function hashCodec<T>(hasherKind: M.HasherKind, $value: $.Codec<T>): $.Codec<T> {
-    const hasher = props.hashers[hasherKind];
-    const leading = (<{ [K in M.HasherKind]?: number }> {
-      Blake2_128Concat: 16,
-      Twox64Concat: 8,
-    })[hasherKind];
-    if (hasherKind === "Identity") return $value;
-    return $.createCodec({
-      _metadata: null,
-      _staticSize: 0,
-      _encode(buffer, value) {
-        buffer.insertArray(hasher($value.encode(value)));
-      },
-      _decode(buffer) {
-        if (leading === undefined) {
-          throw new DecodeNonTransparentKeyError();
-        }
-        buffer.index += leading;
-        return $value._decode(buffer);
-      },
-    });
-  }
 }
 
 export class StorageEntryMissingHasher extends Error {}

@@ -1,7 +1,7 @@
 import * as $ from "../deps/scale.ts";
 import { assert } from "../deps/std/testing/asserts.ts";
+import * as H from "../hashers/mod.ts";
 import { $null, DeriveCodec } from "./Codec.ts";
-import { HasherLookup } from "./Key.ts";
 import { Metadata } from "./Metadata.ts";
 
 export type Era = {
@@ -40,7 +40,6 @@ export interface Extrinsic {
 interface ExtrinsicCodecProps {
   metadata: Metadata;
   deriveCodec: DeriveCodec;
-  hashers: HasherLookup;
   sign: SignExtrinsic;
 }
 
@@ -87,7 +86,7 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
           const callEncoded = toSignEncoded.subarray(0, callEnd);
           const extraEncoded = toSignEncoded.subarray(callEnd, extraEnd);
           const toSign = toSignEncoded.length > 256
-            ? props.hashers.Blake2_256(toSignEncoded)
+            ? H.Blake2_256.hash(toSignEncoded)
             : toSignEncoded;
           const sig = props.sign(toSign);
           if (sig instanceof Promise) {
