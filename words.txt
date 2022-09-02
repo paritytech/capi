@@ -167,3 +167,4 @@ typegen
 Lxkf
 Tpeyg
 getrandom
+Curto
