@@ -78,6 +78,10 @@ cspell "**/*"
 
 Declaring formal releases remains the prerogative of the project maintainer(s).
 
+## License
+
+By contributing to project, you agree that your contributions will be licensed under its [Apache license](LICENSE).
+
 ## Changes to this arrangement
 
 This is an experiment and feedback is welcome! This document may also be subject to pull-requests or changes by contributors where you believe you have something valuable to add or change.

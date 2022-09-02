@@ -179,7 +179,7 @@ for await (const event of result) {
 
 > Note: it is up to the developer to supply `sign` with a signing function, which will vary depending on your environment, wallet, misc.
 
-## Contributing
+## Environment setup
 
 > In the future, Gitpod and dev containers will simplify spinning up a Capi development environments. The [Dockerfile](./Dockerfile), [Gitpod configuration](./.gitpod.yml) and [Dev Containers / Codespaces configuration](./.devcontainer/devcontainer.json) are in need some finessing.
 
@@ -231,3 +231,13 @@ We no longer need to think about the separation of code for the sake of packagin
 For example, exports of [`util/types.ts`](./util/types.ts) can be imported directly into any other TypeScript file, without specifying the dependency in a package manifest. We are free to use (for example) `U2I`, the union to intersection utility, in out-of-band processes, the effect system or even GitHub workflow scripts. From anywhere in the repository, we can import and use any code with configuration overhead.
 
 When it comes time to [build our code](./tasks/dnt.ts) for NPM distribution, [DNT](https://github.com/denoland/dnt) takes care of transforming our dependency graph into something that NodeJS and web browsers will understand.
+
+## Contributing
+
+Contributions are welcome and appreciated! Check out the [contributing guide](CONTRIBUTING.md) before you dive in.
+
+Everyone interacting in the project is expected to follow the [code of conduct](CODE_OF_CONDUCT.md).
+
+## License
+
+Capi is [Apache licensed](LICENSE).
