@@ -14,7 +14,7 @@ There are a few basic ground-rules for contributors:
 2. **Non-master branches** ought to be used for ongoing work.
 3. **All modifications** must be made in a **pull-request** to solicit feedback from other contributors.
 4. A pull-request _must not be merged until CI_ has finished successfully.
-5. Contributors should attempt to adhere to the prevailing code-style.
+5. Contributors should attempt to adhere to the prevailing [code-style](#code-style).
 
 ## Pull requests
 
@@ -58,7 +58,21 @@ When reviewing a pull request, the end-goal is to suggest useful changes to the 
 
 ## Code style
 
-**TODO**
+We use the following tools to enforce linting rules, formatting and spell checking
+
+- [`deno lint`](https://deno.land/manual/tools/linter)
+- [`dprint`](https://dprint.dev/)
+- [`cspell`](https://cspell.org/)
+
+We encourage adding the [recommended](.vscode/extensions.json) (or similar) extensions to your IDE.
+
+To run a project wide check you can use:
+
+```bash
+deno lint
+dprint fmt # or dprint check
+cspell "**/*"
+```
 
 ## Releases
 
