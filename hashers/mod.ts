@@ -2,7 +2,6 @@ import { blake2b } from "../deps/blake2b.ts";
 import * as $ from "../deps/scale.ts";
 import { EncodeBuffer } from "../deps/scale.ts";
 import { DecodeNonTransparentKeyError } from "../frame_metadata/Key.ts";
-import { HasherKind } from "../frame_metadata/mod.ts";
 import { Xxhash } from "./xxhash.ts";
 
 export abstract class Hasher {
@@ -106,9 +105,6 @@ export const Identity = new IdentityHasher();
 export const Twox128 = new TwoxHasher(128, false);
 export const Twox256 = new TwoxHasher(256, false);
 export const Twox64Concat = new TwoxHasher(64, true);
-
-import type * as H from "./mod.ts";
-((_x: keyof typeof H) => {})(null! as HasherKind);
 
 function updateHashing(hashing: Hashing, data: EncodeBuffer) {
   for (const array of data.finishedArrays) {
