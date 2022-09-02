@@ -166,3 +166,4 @@ syncstate
 typegen
 Lxkf
 Tpeyg
+getrandom
