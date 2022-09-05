@@ -25,7 +25,7 @@ export interface SendAndWatchExtrinsicProps {
   palletName: sys.Val<string>;
   methodName: sys.Val<string>;
   args: sys.Val<Record<string, unknown>>;
-  checkpoint?: sys.Val<U.HashHexString>;
+  checkpoint?: sys.Val<U.HexHash>;
   mortality?: sys.Val<[period: bigint, phase: bigint]>;
   nonce?: sys.Val<string>;
   tip?: sys.Val<bigint>;
@@ -51,7 +51,7 @@ export function sendAndWatchExtrinsic<Props extends SendAndWatchExtrinsicProps>(
           unimplemented();
         }
       }
-    })() as U.AccountIdString;
+    })(); // todo: brand
   });
   const accountNextIndex = a.rpcCall(props.config, "system_accountNextIndex", [senderSs58]);
   const genesisHash = sys.anon(
@@ -110,7 +110,7 @@ export function sendAndWatchExtrinsic<Props extends SendAndWatchExtrinsicProps>(
         additional: [specVersion, transactionVersion, checkpoint, genesisHash],
       },
     });
-    return U.hex.encode(extrinsicBytes) as U.HexString;
+    return U.hex.encode(extrinsicBytes) as U.Hex;
   });
   return a.rpcSubscription(
     props.config,

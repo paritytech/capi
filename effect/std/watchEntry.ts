@@ -4,7 +4,7 @@ import * as U from "../../util/mod.ts";
 import * as a from "../atoms/mod.ts";
 import * as sys from "../sys/mod.ts";
 
-export type WatchEntryEvent = [key?: U.HexString, value?: unknown];
+export type WatchEntryEvent = [key?: U.Hex, value?: unknown];
 
 type Config = known.rpc.Config<
   string,

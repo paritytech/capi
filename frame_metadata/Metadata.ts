@@ -146,7 +146,7 @@ export const $metadata: $.Codec<Metadata> = $.object(
 );
 
 export function fromPrefixedHex(scaleEncoded: string): Metadata {
-  return $metadata.decode(U.hex.decode(scaleEncoded));
+  return $metadata.decode(U.hex.decode(scaleEncoded as U.Hex));
 }
 
 export function getPallet(metadata: Metadata, name: string): Pallet | PalletNotFoundError {
