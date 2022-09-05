@@ -3,7 +3,7 @@ import * as U from "../util/mod.ts";
 import { ProviderMethods } from "./common.ts";
 
 /** Ensure valid declaration of RPC method lookup (for both calls and subscriptions) */
-export type EnsureMethods<Lookup extends Record<string, ProviderMethods>> = U.U2I<
+export type EnsureMethods<Lookup> = U.U2I<
   {
     [Prefix in keyof Lookup]: {
       [M in Extract<keyof Lookup[Prefix], string> as `${Extract<Prefix, string>}_${M}`]:

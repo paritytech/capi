@@ -9,15 +9,15 @@ export interface Block<Extrinsic> {
 }
 
 export interface HeaderDigest {
-  logs: U.HexString[];
+  logs: U.Hex[];
 }
 
 export interface Header {
   digest: HeaderDigest;
-  extrinsicsRoot: U.HashHexString;
-  number: U.HexU64String;
-  parentHash: U.HashHexString;
-  stateRoot: U.HashHexString;
+  extrinsicsRoot: U.HexHash;
+  number: U.HexEncoded<bigint>;
+  parentHash: U.HexHash;
+  stateRoot: U.HexHash;
 }
 
 export interface RuntimeVersion {
@@ -28,12 +28,12 @@ export interface RuntimeVersion {
   implVersion: number;
   transactionVersion?: number;
   stateVersion?: number;
-  apis: [U.HexString, number][];
+  apis: [U.HexHash, number][];
 }
 
 export interface StorageChangeSet {
-  block: U.HashHexString;
-  changes: [U.HexString, U.HexString | undefined][];
+  block: U.HexHash;
+  changes: [U.HexHash, U.Hex | undefined][];
 }
 
 export interface SystemHealth {
@@ -50,7 +50,7 @@ export type SystemPeerRole =
 export interface SystemPeer {
   peerId: string;
   roles: SystemPeerRole;
-  bestHash: U.HashHexString;
+  bestHash: U.HexHash;
   bestNumber: number;
 }
 
