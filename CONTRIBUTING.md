@@ -1,6 +1,6 @@
 # Contributing
 
-👍🎉 &nbsp; First off, thanks for taking the time to contribute! &nbsp; 🎉👍
+First off, thanks for taking the time to contribute!
 
 When contributing to this repository, please check our open issues and whether there is already an issue related to your idea. Please first discuss the change you wish to make in a GitHub issue and wait for a reply from the maintainers of this repository before making a change.
 
@@ -10,11 +10,8 @@ We have a [code of conduct](CODE_OF_CONDUCT.md); please follow it in all your in
 
 There are a few basic ground-rules for contributors:
 
-1. **No `--force` pushes** or modifying the Git history in any way.
-2. **Non-master branches** ought to be used for ongoing work.
-3. **All modifications** must be made in a **pull-request** to solicit feedback from other contributors.
-4. A pull-request _must not be merged until CI_ has finished successfully.
-5. Contributors should attempt to adhere to the prevailing [code-style](#code-style).
+1. **All modifications** must be made in a **pull-request** to solicit feedback from other contributors.
+2. Contributors should attempt to adhere to the prevailing [code-style](#code-style).
 
 ## Pull requests
 
@@ -24,7 +21,7 @@ There are a few basic ground-rules for contributors:
 
 :white_check_mark: &nbsp; Have one approving review
 
-✅ &nbsp; Have the contributor(s) proud of their contribution
+:white_check_mark: &nbsp; Have the contributor(s) proud of their contribution
 
 **Ideally, a good pull request should:**
 
