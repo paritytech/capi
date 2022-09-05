@@ -2,9 +2,9 @@
 
 👍🎉 &nbsp; First off, thanks for taking the time to contribute! &nbsp; 🎉👍
 
-When contributing to this repository, please check our open issues and if there is already an issue related to your idea. Please first discuss the change you wish to make via creating a Github issue and wait for a reply from the maintainers of this repository before making a change.
+When contributing to this repository, please check our open issues and whether there is already an issue related to your idea. Please first discuss the change you wish to make in a GitHub issue and wait for a reply from the maintainers of this repository before making a change.
 
-We have a [code of conduct](CODE_OF_CONDUCT.md), please follow it in all your interactions with the project.
+We have a [code of conduct](CODE_OF_CONDUCT.md); please follow it in all your interactions relating to the project.
 
 ## Rules
 
@@ -24,7 +24,7 @@ There are a few basic ground-rules for contributors:
 
 :white_check_mark: &nbsp; Have one approving review
 
-:white_check_mark: &nbsp; Have the contributor(s) proud of hir contribution
+✅ &nbsp; Have the contributor(s) proud of their contribution
 
 **Ideally, a good pull request should:**
 
