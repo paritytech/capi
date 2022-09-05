@@ -168,3 +168,4 @@ Lxkf
 Tpeyg
 getrandom
 Curto
+devcontainers

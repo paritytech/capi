@@ -9,7 +9,28 @@
       "**/.git/subtree-cache/**": true,
       "target/**": true
     },
-    "dprint.path": "/home/vscode/.dprint/bin/dprint"
+    "[jsonc]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[rust]": {
+      "editor.defaultFormatter": "rust-lang.rust-analyzer"
+    },
+    "[yaml]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescript]": {
+      "editor.defaultFormatter": "dprint.dprint"
+    },
+    "deno.codeLens.testArgs": ["--no-check=remote", "-A", "-L=info"],
+    "deno.config": "./deno.jsonc",
+    "deno.enable": true,
+    "deno.lint": true,
+    "editor.defaultFormatter": "dprint.dprint",
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2,
+    "prettier.printWidth": 100,
+    "rust-analyzer.diagnostics.disabled": ["incorrect-ident-case"],
+    "rust-analyzer.cargo.features": ["all"]
   },
   "extensions": [
     "EditorConfig.EditorConfig",
@@ -23,6 +44,6 @@
     "streetsidesoftware.code-spell-checker",
     "vadimcn.vscode-lldb"
   ],
-  "postCreateCommand": "deno task bootstrap",
+  "postCreateCommand": "deno task star",
   "remoteUser": "vscode"
 }
