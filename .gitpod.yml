@@ -1,5 +1,7 @@
 image:
-  file: Dockerfile
+  file: .gitpod.Dockerfile
+tasks:
+  - init: deno task star
 vscode:
   extensions:
     - EditorConfig.EditorConfig
