@@ -37,6 +37,5 @@
     "streetsidesoftware.code-spell-checker",
     "vadimcn.vscode-lldb"
   ],
-  "postCreateCommand": "deno task star",
-  "remoteUser": "vscode"
+  "postCreateCommand": "deno task star"
 }

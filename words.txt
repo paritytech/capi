@@ -169,3 +169,5 @@ Tpeyg
 getrandom
 Curto
 devcontainers
+noninteractive
+autoremove
