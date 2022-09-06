@@ -8,8 +8,8 @@ We have a [code of conduct](CODE_OF_CONDUCT.md); please follow it in all your in
 
 There are a few basic ground-rules for contributors:
 
-1. **All modifications** must be made in a **pull-request** to solicit feedback from other contributors.
-2. Contributors should attempt to adhere to the prevailing [code-style](#code-style).
+1. **All modifications** must be made in a **pull-request** to solicit feedback from other contributors
+2. Contributors should attempt to adhere to the prevailing [code-style](#code-style)
 
 ## Pull requests
 
@@ -39,15 +39,15 @@ There are a few basic ground-rules for contributors:
 
 When reviewing a pull request, the end-goal is to suggest useful changes to the author. Reviews should finish with approval unless there are issues that would result in:
 
-:x: &nbsp; Buggy behavior.
+:x: &nbsp; Buggy behavior
 
-:x: &nbsp; Undue maintenance burden.
+:x: &nbsp; Undue maintenance burden
 
 :x: &nbsp; Measurable performance issues
 
-:x: &nbsp; Feature reduction (i.e. it removes some aspect of functionality that a significant minority of users rely on).
+:x: &nbsp; Feature reduction (i.e. it removes some aspect of functionality that a significant minority of users rely on)
 
-:x: &nbsp; Uselessness (i.e. it does not strictly add a feature or fix a known issue).
+:x: &nbsp; Uselessness (i.e. it does not strictly add a feature or fix a known issue)
 
 :x: &nbsp; Disabling a compiler feature to introduce code that wouldn't compile
 
