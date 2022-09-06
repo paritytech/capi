@@ -1,17 +1,12 @@
-<!--- Provide a general summary of your changes in the Title above -->
+<!--- Provide a general summary of your changes in the title above, following conventional commit -->
 
 **Description**
 
+<!--- Link to the open issue this addresses -->
+
+Fixes #
+
 <!--- Describe your changes in detail -->
-
-**Related Issue**
-
-<!--- Please link to the issue here -->
-
-**Motivation and Context**
-
-<!--- Why is this change required? What problem does it solve? -->
-<!--- If it fixes an open issue, please link to the issue here. -->
 
 **How Has This Been Tested?**
 
