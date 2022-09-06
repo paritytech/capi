@@ -12,9 +12,6 @@
     "[jsonc]": {
       "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
-    "[rust]": {
-      "editor.defaultFormatter": "rust-lang.rust-analyzer"
-    },
     "[yaml]": {
       "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
@@ -28,9 +25,7 @@
     "editor.defaultFormatter": "dprint.dprint",
     "editor.formatOnSave": true,
     "editor.tabSize": 2,
-    "prettier.printWidth": 100,
-    "rust-analyzer.diagnostics.disabled": ["incorrect-ident-case"],
-    "rust-analyzer.cargo.features": ["all"]
+    "prettier.printWidth": 100
   },
   "extensions": [
     "EditorConfig.EditorConfig",
@@ -38,9 +33,7 @@
     "denoland.vscode-deno",
     "dprint.dprint",
     "esbenp.prettier-vscode",
-    "rust-lang.rust-analyzer",
     "ms-azuretools.vscode-docker",
-    "serayuzgur.crates",
     "streetsidesoftware.code-spell-checker",
     "vadimcn.vscode-lldb"
   ],
