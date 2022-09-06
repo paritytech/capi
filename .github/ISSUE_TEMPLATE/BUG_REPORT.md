@@ -7,11 +7,7 @@ labels: bug
 
 ---
 
-<!--
-Thank you for reporting a bug that will help us to improve.
-
-Note: Please search to see if an issue already exists for the bug you encountered.
--->
+<!-- Please search to see if an issue already exists for the bug you encountered. -->
 
 **Current Behavior**
 
