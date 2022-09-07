@@ -1,4 +1,9 @@
 ARG DENO_VERSION=1.25.1
+ARG POLKADOT_VERSION=v0.9.25
+
+
+FROM parity/polkadot:${POLKADOT_VERSION} as polkadot
+
 
 FROM denoland/deno:${DENO_VERSION} as vscode
 
@@ -13,6 +18,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
   && apt-get clean -y \
   && rm -rf /var/lib/apt/lists/*
 
+COPY --from=polkadot /usr/bin/polkadot /usr/local/bin
 
 FROM vscode as gitpod
 
