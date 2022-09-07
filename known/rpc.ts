@@ -1,6 +1,5 @@
 import { Config as Config_ } from "../config/mod.ts";
-import { Call } from "../fluent/Call.ts";
-import { Extrinsic, MultiAddress } from "../frame_metadata/Extrinsic.ts";
+import { MultiAddress } from "../frame_metadata/Extrinsic.ts";
 import * as rpc from "../rpc/mod.ts";
 import * as U from "../util/mod.ts";
 import * as T from "./types/mod.ts";
