@@ -13,7 +13,4 @@ RUN export DEBIAN_FRONTEND=noninteractive \
   && apt-get clean -y \
   && rm -rf /var/lib/apt/lists/*
 
-# Unset DENO_DIR set by denoland/deno base image
-# so DENO_DIR defaults to the current user system cache
-# This is required for non-root users to cache deno remote imports
-ENV DENO_DIR=
+USER deno
