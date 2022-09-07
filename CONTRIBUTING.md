@@ -33,7 +33,7 @@ There are a few basic ground-rules for contributors:
 
 :dart: &nbsp; Handle renaming, moving files, linting and formatting separately (not alongside features or bug fixes)
 
-:test_tube: Add tests for new functionality
+:test_tube: &nbsp; Add tests for new functionality
 
 **Draft pull requests for early feedback are welcome and do not need to adhere to any guidelines.**
 
