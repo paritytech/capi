@@ -1,7 +1,8 @@
 {
   "name": "Capi",
   "build": {
-    "dockerfile": "../Dockerfile"
+    "dockerfile": "../Dockerfile",
+    "target": "vscode"
   },
   "settings": {
     "files.watcherExclude": {
