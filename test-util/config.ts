@@ -52,18 +52,21 @@ export async function config(props?: NodeProps): Promise<Config> {
         ...props?.altRuntime ? [`--force-${props.altRuntime}`] : [],
       ],
       stderr: "piped",
-      stdout: "piped",
     });
+
     // For some reason, logs come in through `stderr`
     console.log(blue(`Piping node logs:`));
+
+    const encoder = new TextDecoder();
     for await (const log of process.stderr.readable) {
       await Deno.stdout.write(log);
-      if (new TextDecoder().decode(log).includes(" Running JSON-RPC WS server")) {
+      if (encoder.decode(log).includes(" Running JSON-RPC WS server")) {
         console.log(blue("Chain and RPC server initialized"));
         console.log(blue(`Suspending node logs`));
         break;
       }
     }
+
     return new Config(port, process.close.bind(process), props?.altRuntime);
   } catch (e) {
     if (e instanceof Deno.errors.NotFound) {
