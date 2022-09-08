@@ -11,9 +11,8 @@ jobs:
           deno-version: v1.x
       - name: Download polkadot
         run: |
-          docker run -d --entrypoint /bin/sh --rm -it --name tmp parity/polkadot:latest
-          docker cp tmp:/usr/bin/polkadot /usr/local/bin
-          docker stop tmp
+          curl -L -o /usr/local/bin/polkadot https://github.com/paritytech/polkadot/releases/download/v0.9.28/polkadot
+          chmod +x /usr/local/bin/polkadot
       - run: deno task lint
       - run: deno task star
       - run: deno task test
