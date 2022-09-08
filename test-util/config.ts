@@ -57,10 +57,9 @@ export async function config(props?: NodeProps): Promise<Config> {
     // For some reason, logs come in through `stderr`
     console.log(blue(`Piping node logs:`));
 
-    const encoder = new TextDecoder();
     for await (const log of process.stderr.readable) {
       await Deno.stdout.write(log);
-      if (encoder.decode(log).includes(" Running JSON-RPC WS server")) {
+      if (new TextDecoder().decode(log).includes(" Running JSON-RPC WS server")) {
         console.log(blue("Chain and RPC server initialized"));
         console.log(blue(`Suspending node logs`));
         break;
