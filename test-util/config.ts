@@ -53,10 +53,8 @@ export async function config(props?: NodeProps): Promise<Config> {
       ],
       stderr: "piped",
     });
-
     // For some reason, logs come in through `stderr`
     console.log(blue(`Piping node logs:`));
-
     for await (const log of process.stderr.readable) {
       await Deno.stdout.write(log);
       if (new TextDecoder().decode(log).includes(" Running JSON-RPC WS server")) {
@@ -65,7 +63,6 @@ export async function config(props?: NodeProps): Promise<Config> {
         break;
       }
     }
-
     return new Config(port, process.close.bind(process), props?.altRuntime);
   } catch (e) {
     if (e instanceof Deno.errors.NotFound) {
