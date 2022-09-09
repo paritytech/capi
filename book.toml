@@ -1,6 +1,6 @@
 [book]
 title = "Capi Documentation"
-src = "_docs"
+src = "docs"
 
 [build]
 build-dir = "target/mdbook"

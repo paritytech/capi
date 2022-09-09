@@ -1,22 +1,18 @@
 # Capi
 
-Capi is a WIP TypeScript toolkit for crafting interactions with Substrate-based chains.
+Capi is a declarative, TypeScript-first toolkit for crafting interactions with Substrate-based chains. It consists of [FRAME](https://docs.substrate.io/v3/runtime/frame/)-oriented utilities and [a high-level functional effect system](docs/Effects.md) and standard library, which facilitate multistep, multichain interactions without compromising on performance or safety.
 
-Capi consists of [FRAME](https://docs.substrate.io/v3/runtime/frame/)-oriented utilities and (soon) [a high-level functional effect system](_docs/Effects.md) which facilitate multistep, multichain interactions without compromising on performance or safety.
+In a likely future of specialized, interoperable chains, developers will need to make use of on-chain programs to satisfy varying use cases; the expertise required to interact with on-chain programs is currently greater than that which _should_ be expected of app developers. Does this mean that app developers should forgo integrating with this blossoming infrastructure? We think not; **the open source community can use Capi and [its functional effect system](Effects.md) to abstract over the atomics of the on-chain world**. An interaction spanning several chains and dozens of methods can be described with a single effect. This paves the way for more developers to make use of Substrate-based infrastructure from their programs.
 
-<!--
-<h4>
-  <a href="">Guide</a> &nbsp;·&nbsp;
-  <a href="">API Reference</a> &nbsp;·&nbsp;
-  <a href="">Support</a> &nbsp;·&nbsp;
-  <a href="">Roadmap</a> &nbsp;·&nbsp;
-  <a href="">Contributing</a>
-</h4>
--->
+> As you read through this documentation, please consider what use cases you might like to abstract over; if you wish to add your use case to Capi's standard library, please [submit an issue](https://github.com/paritytech/capi/issues/new).
 
-## ⚠ This Is a Work in Progress
+- [Documentation &rarr;](./docs/Readme.md)<br />Materials for learning about Capi
+- [Examples &rarr;](./examples/Readme.md)<br />SHOW ME THE CODE
+- [API Reference &rarr;](https://deno.land/x/capi/mod.ts)<br />A generated API reference, based on type signatures and in-source comments.
 
-️Please share feedback or even join us in Capi's development; issues and PRs are very welcome!
+## [Code of Conduct](CODE_OF_CONDUCT.md)
+
+Everyone interacting in the project is expected to follow the [code of conduct](CODE_OF_CONDUCT.md).
 
 ### In Good Shape
 
@@ -233,11 +229,9 @@ For example, exports of [`util/types.ts`](./util/types.ts) can be imported direc
 
 When it comes time to [build our code](./tasks/dnt.ts) for NPM distribution, [DNT](https://github.com/denoland/dnt) takes care of transforming our dependency graph into something that NodeJS and web browsers will understand.
 
-## Contributing
+## [Contributing](CONTRIBUTING.md)
 
 Contributions are welcome and appreciated! Check out the [contributing guide](CONTRIBUTING.md) before you dive in.
-
-Everyone interacting in the project is expected to follow the [code of conduct](CODE_OF_CONDUCT.md).
 
 ## License
 
