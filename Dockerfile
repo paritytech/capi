@@ -1,15 +1,14 @@
-ARG DENO_VERSION=1.25.1
-ARG POLKADOT_VERSION=v0.9.25
-
-
-FROM parity/polkadot:${POLKADOT_VERSION} as polkadot
-
+ARG DENO_VERSION=1.25.2
 
 FROM denoland/deno:${DENO_VERSION} as vscode
+
+ARG POLKADOT_VERSION=v0.9.25
 
 RUN export DEBIAN_FRONTEND=noninteractive \
   && apt-get update \
   && apt-get install -y unzip curl git \
+  && curl -L -o /usr/local/bin/polkadot https://github.com/paritytech/polkadot/releases/download/${POLKADOT_VERSION}/polkadot \
+  && chmod +x /usr/local/bin/polkadot \
   && curl -fsSL https://dprint.dev/install.sh | DPRINT_INSTALL=/usr/local sh \
   && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
   && apt-get install -y nodejs \
@@ -18,7 +17,6 @@ RUN export DEBIAN_FRONTEND=noninteractive \
   && apt-get clean -y \
   && rm -rf /var/lib/apt/lists/*
 
-COPY --from=polkadot /usr/bin/polkadot /usr/local/bin
 
 FROM vscode as gitpod
 
