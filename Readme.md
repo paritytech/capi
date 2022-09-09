@@ -1,6 +1,6 @@
 # Capi
 
-Capi is a declarative, TypeScript-first toolkit for crafting interactions with Substrate-based chains. It consists of [FRAME](https://docs.substrate.io/v3/runtime/frame/)-oriented utilities and [a high-level functional effect system](docs/Effects.md) and standard library, which facilitate multistep, multichain interactions without compromising on performance or safety.
+Capi is a declarative, TypeScript-first toolkit for crafting interactions with Substrate-based chains. It consists of [FRAME](https://docs.substrate.io/v3/runtime/frame/)-oriented utilities and [a high-level functional effect system](docs/5.Effects.md) and standard library, which facilitate multistep, multichain interactions without compromising on performance or safety.
 
 - [Documentation &rarr;](./docs/Readme.md)<br />Materials for learning about Capi
 - [Examples &rarr;](./examples/Readme.md)<br />SHOW ME THE CODE
