@@ -6,7 +6,6 @@
     "dprint.dprint",
     "esbenp.prettier-vscode",
     "ms-azuretools.vscode-docker",
-    "serayuzgur.crates",
     "streetsidesoftware.code-spell-checker",
     "vadimcn.vscode-lldb"
   ]

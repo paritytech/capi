@@ -168,3 +168,6 @@ Lxkf
 Tpeyg
 getrandom
 Curto
+devcontainers
+noninteractive
+autoremove

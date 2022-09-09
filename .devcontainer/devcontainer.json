@@ -1,7 +1,8 @@
 {
   "name": "Capi",
   "build": {
-    "dockerfile": "../Dockerfile"
+    "dockerfile": "../Dockerfile",
+    "target": "vscode"
   },
   "settings": {
     "files.watcherExclude": {
@@ -9,7 +10,23 @@
       "**/.git/subtree-cache/**": true,
       "target/**": true
     },
-    "dprint.path": "/home/vscode/.dprint/bin/dprint"
+    "[jsonc]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[yaml]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescript]": {
+      "editor.defaultFormatter": "dprint.dprint"
+    },
+    "deno.codeLens.testArgs": ["--no-check=remote", "-A", "-L=info"],
+    "deno.config": "./deno.jsonc",
+    "deno.enable": true,
+    "deno.lint": true,
+    "editor.defaultFormatter": "dprint.dprint",
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2,
+    "prettier.printWidth": 100
   },
   "extensions": [
     "EditorConfig.EditorConfig",
@@ -17,12 +34,9 @@
     "denoland.vscode-deno",
     "dprint.dprint",
     "esbenp.prettier-vscode",
-    "rust-lang.rust-analyzer",
     "ms-azuretools.vscode-docker",
-    "serayuzgur.crates",
     "streetsidesoftware.code-spell-checker",
     "vadimcn.vscode-lldb"
   ],
-  "postCreateCommand": "deno task bootstrap",
-  "remoteUser": "vscode"
+  "postCreateCommand": "deno task star"
 }

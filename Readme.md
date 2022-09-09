@@ -181,15 +181,25 @@ for await (const event of result) {
 
 ## Environment setup
 
-> In the future, Gitpod and dev containers will simplify spinning up a Capi development environments. The [Dockerfile](./Dockerfile), [Gitpod configuration](./.gitpod.yml) and [Dev Containers / Codespaces configuration](./.devcontainer/devcontainer.json) are in need some finessing.
+### Container environment setup
 
-Make sure you have the following installed on your machine (and please submit issues if errors crop up).
+Develop in the cloud with
 
-### System Requirements
+[![Gitpod Open](https://img.shields.io/badge/Gitpod-Open-blue?logo=gitpod)](https://gitpod.io/#https://github.com/paritytech/capi)
 
-- [Deno](https://deno.land/manual@v1.19.3/getting_started/installation)
+Develop locally using the [VSCode Remote Container](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension and [Docker](https://docs.docker.com/get-docker/)
+
+[![Open in Remote - Containers](https://img.shields.io/badge/Remote_--_Container-Open-blue?logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/paritytech/capi)
+
+### Local environment setup
+
+Develop on your machine installing the following (and please submit issues if errors crop up)
+
+- [Deno](https://deno.land/manual/getting_started/installation)
 - [Docker](https://docs.docker.com/get-docker/)
-- [NodeJS](https://nodejs.org/) (only necessary if you're going to run [the build_npm task](./_/tasks/build_npm.ts))
+- [NodeJS](https://nodejs.org/)
+- [`dprint`](https://dprint.dev/)
+- [`cspell`](https://cspell.org/)
 
 ### Running an Example
 

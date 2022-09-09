@@ -1,14 +1,25 @@
-FROM mcr.microsoft.com/vscode/devcontainers/rust:0-1
+ARG DENO_VERSION=1.25.2
 
-RUN rustup target add wasm32-unknown-unknown
+FROM denoland/deno:${DENO_VERSION} as vscode
 
-ENV DENO_INSTALL=/usr/local
-# crates.io index update fails without this (https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=918854)
-ENV CARGO_NET_GIT_FETCH_WITH_CLI=true
+ARG POLKADOT_VERSION=v0.9.25
 
-RUN curl -fsSL https://deno.land/x/install/install.sh | sh
-RUN curl -fsSL https://dprint.dev/install.sh | sh
+RUN export DEBIAN_FRONTEND=noninteractive \
+  && apt-get update \
+  && apt-get install -y unzip curl git \
+  && curl -L -o /usr/local/bin/polkadot https://github.com/paritytech/polkadot/releases/download/${POLKADOT_VERSION}/polkadot \
+  && chmod +x /usr/local/bin/polkadot \
+  && curl -fsSL https://dprint.dev/install.sh | DPRINT_INSTALL=/usr/local sh \
+  && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+  && apt-get install -y nodejs \
+  && npm -g install cspell@latest \
+  && apt-get autoremove -y \
+  && apt-get clean -y \
+  && rm -rf /var/lib/apt/lists/*
 
-RUN export PATH=/usr/local/cargo/bin:$PATH
-RUN export DPRINT_INSTALL="/home/vscode/.dprint"
-RUN export PATH="$DPRINT_INSTALL/bin:$PATH"
+
+FROM vscode as gitpod
+
+# Gitpod creates a gitpod user to run without privileges
+# following https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#user
+ENV DENO_DIR=/home/gitpod/.cache/deno

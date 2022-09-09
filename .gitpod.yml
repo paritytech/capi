@@ -1,5 +1,7 @@
 image:
   file: Dockerfile
+tasks:
+  - init: deno task star
 vscode:
   extensions:
     - EditorConfig.EditorConfig
@@ -7,8 +9,6 @@ vscode:
     - denoland.vscode-deno
     - dprint.dprint
     - esbenp.prettier-vscode
-    - matklad.rust-analyzer
     - ms-azuretools.vscode-docker
-    - serayuzgur.crates
     - streetsidesoftware.code-spell-checker
     - vadimcn.vscode-lldb
