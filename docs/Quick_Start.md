@@ -56,22 +56,25 @@ import * as C from "capi";
 
 const url = prompt("Please enter the URL of a Substrate chain RPC node.");
 const prefix = prompt("Please enter the chain prefix.");
+
 const config = C.config({ url, prefix });
 ```
 
-While this works, the lack of static typing is a noteworthy drawback.
+### Reading the Latest Block
 
 ```ts
 const block = await C.block(config).read();
 ```
 
-A static config will enable a smoother experience, with type-checking and––depending on your IDE––auto-completion. For example, let's index into a block's extrinsics.
+#### Note on Typings
+
+A static config will enable a smoother experience, with type-checking and––depending on your IDE––auto-completion. Let's index into an extrinsic, the type of which will vary by chain.
 
 ```ts
-block.extrinsics[0]?.methodName;
+block.extrinsics[0]?.palletName;
 ```
 
-When using a static config, `methodName` will be typed as `ExtrinsicMethodName | undefined`, where `ExtrinsicMethodName` is a union of all method name literals. The dynamic equivalent will result in `methodName` typed as a widened `string`.
+When using a static config, `palletName` will be typed as `PalletName | undefined`, where `PalletName` is a union of all pallet name types (string literal types). The dynamic equivalent will display as a widened `string`.
 
 ## Using A Config
 
