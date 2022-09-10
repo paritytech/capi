@@ -40,7 +40,7 @@ We use "static" configs when we know the chain(s) with which our program interac
 import { config as polkadot } from "@capi/polkadot";
 ```
 
-> Deno users can reference this via `https://deno.land/x/capi-polkadot/mod.ts`
+> Deno users can reference this via `https://deno.land/x/capi-polkadot/mod.ts`<br />
 > Node users can install via `@capi/polkadot`
 
 This `config` encapsulates discovery values (RPC URLs and chain specs), flight-critical constants (Ss58 prefix, misc.) and static typing of the Polkadot relay chain.
