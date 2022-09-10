@@ -8,7 +8,7 @@ If you're using [Deno](https://deno.land/), import Capi via its [`denoland/x`](h
 import * as C from "https://deno.land/x/capi/mod.ts";
 ```
 
-> Note: you may want to pin the version in the import specifier (`https://deno.land/x/capi@x.x.x/mod.ts`).
+> Note: you may want to pin the version in the import specifier (`"https://deno.land/x/capi@x.x.x/mod.ts"`).
 
 If you're using [Node](https://nodejs.org/), install Capi from [NPM](https://www.npmjs.com/).
 
@@ -28,21 +28,24 @@ This documentation will prefer the Node-style import for the sake of brevity, al
 
 ## Configs
 
-To begin interacting with any chain, we must first have a [config](Configs.md). The attaining of a config will differ depending on whether we know the exact chain(s) with which we're going to interact.
+To begin interacting with any chain, we must first have a [config](Configs.md). The process of attaining a config differs depending on whether we know the exact chain(s) with which we're going to interact.
 
 ### Static
 
-Static configs are always preferable if you know the chains with which your program will interact; static configs are encoded with chain-specific type information so that invalid usage results in compile-time errors.
+We use "static" configs when we know the chain(s) with which our program interacts; **static configs are encoded with chain-specific type information so that invalid usage results in compile-time errors**.
 
-Chain maintainers may provide configs (among other utilities). One such example is that of Polkadot.
+3rd parties such as chain proprietors and communities may provide configs (among other [Effects](Effects.md) and utilities) external to Capi. One such example is that of Polkadot.
 
 ```ts
 import { config as polkadot } from "@capi/polkadot";
 ```
 
-This config encapsulates all of the discovery values (RPC URLs), flight-critical constants (Ss58 prefix, misc.) and static typing of the Polkadot relay chain.
+> Deno users can reference this via `https://deno.land/x/capi-polkadot/mod.ts`
+> Node users can install via `@capi/polkadot`
 
-In some cases––if there is no standard config––one can [generate a config](./Configs.md#custom-configs).
+This `config` encapsulates discovery values (RPC URLs and chain specs), flight-critical constants (Ss58 prefix, misc.) and static typing of the Polkadot relay chain.
+
+If there is no standard, community-provided config, one can [generate a config](./Configs.md#custom-configs).
 
 ### Dynamic
 
