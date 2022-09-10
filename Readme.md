@@ -6,15 +6,31 @@ Capi is a declarative, TypeScript-first toolkit for crafting interactions with S
 - [Examples &rarr;](./examples/Readme.md)<br />SHOW ME THE CODE
 - [API Reference &rarr;](https://deno.land/x/capi/mod.ts)<br />A generated API reference, based on type signatures and in-source comments.
 
+## At a Glance
+
+```ts
+import { config as polkadot } from "https://deno.land/x/capi-polkadot@0.1.0/mod.ts";
+import * as C from "https://deno.land/x/capi@0.1.0/mod.ts";
+
+// Get a reference to the accounts map
+const accounts = C.map(polkadot, "System", "Account");
+
+// Get a reference to the last inserted key of the map
+const key = accounts.keys().first();
+
+// Read the corresponding value
+const value = await accounts.get(key).read();
+```
+
 ## The Thesis
 
-In a likely future of specialized, interoperable chains, developers will need to make use of on-chain programs to satisfy varying use cases; the expertise required to interact with on-chain programs is currently greater than that which _should_ be expected of app developers. Does this mean that app developers must forgo integrating with this blossoming infrastructure? We think not; **the open source community can use Capi to abstract over the atomics of the on-chain world**. An interaction spanning several chains and dozens of methods can be described with a single effect.
+In a likely future of specialized, interoperable chains, developers will need to make use of on-chain programs to satisfy varying use cases; the expertise required to interact with these on-chain programs is currently greater than that which _should_ be expected of app developers. Does this mean that app developers must forgo integrating with this blossoming infrastructure? We think not; **the open source community can use Capi to abstract over the atomics of the on-chain world**. An interaction spanning several chains and dozens of methods can be described with a single effect.
 
 As you read through this documentation, please consider use cases over which you might like to abstract; if you wish to add your use case to Capi's standard library, please [submit an issue](https://github.com/paritytech/capi/issues/new).
 
 ## Code of Conduct
 
-Everyone interacting in the project is expected to follow the [code of conduct](CODE_OF_CONDUCT.md).
+Everyone interacting in this repo is expected to follow the [code of conduct](CODE_OF_CONDUCT.md).
 
 ### In Good Shape
 

@@ -8,7 +8,7 @@ If you're using [Deno](https://deno.land/), import Capi via its [`denoland/x`](h
 import * as C from "https://deno.land/x/capi/mod.ts";
 ```
 
-> Note: you may want to pin the version in the import specifier (https://deno.land/x/capi@x.x.x/mod.ts).
+> Note: you may want to pin the version in the import specifier (`https://deno.land/x/capi@x.x.x/mod.ts`).
 
 If you're using [Node](https://nodejs.org/), install Capi from [NPM](https://www.npmjs.com/).
 
@@ -32,9 +32,9 @@ To begin interacting with any chain, we must first have a [config](Configs.md). 
 
 ### Static
 
-The static path is always preferable if you know the chains with which your program will interact; static configs can be encoded with chain-specific type information such that invalid interaction produces compile-time errors.
+Static configs are always preferable if you know the chains with which your program will interact; static configs are encoded with chain-specific type information so that invalid usage results in compile-time errors.
 
-The proprietors of chains may maintain chain-specific configs (among other utilities). One such example is that of Polkadot.
+Chain maintainers may provide configs (among other utilities). One such example is that of Polkadot.
 
 ```ts
 import { config as polkadot } from "@capi/polkadot";
@@ -42,13 +42,13 @@ import { config as polkadot } from "@capi/polkadot";
 
 This config encapsulates all of the discovery values (RPC URLs), flight-critical constants (Ss58 prefix, misc.) and static typing of the Polkadot relay chain.
 
-In some cases––if there is no standard config––one can [generate a custom config](./Configs.md#custom-configs).
+In some cases––if there is no standard config––one can [generate a config](./Configs.md#custom-configs).
 
 ### Dynamic
 
 Not all configs can be known at the time of development.
 
-Let's say we're building a block explorer website, into which the visitor can specify a Substrate chain RPC node URL. In this case, we would need to construct the config at runtime.
+Let's say we're building a block explorer website, on which the visitor can specify a Substrate chain RPC node URL. In this case, we would need to construct the config at runtime.
 
 ```ts
 import * as C from "capi";
@@ -64,19 +64,17 @@ While this works, the lack of static typing is a noteworthy drawback.
 const block = await C.block(config).read();
 ```
 
-A static config will enable a smoother experience, with auto-completion (depending on your IDE) and type-checking. For example, let's index into a block's extrinsics.
+A static config will enable a smoother experience, with type-checking and––depending on your IDE––auto-completion. For example, let's index into a block's extrinsics.
 
 ```ts
 block.extrinsics[0]?.methodName;
 ```
 
-The static config will treat `methodName` as `ExtrinsicMethodName | undefined`, where `ExtrinsicMethodName` is a union of all method name literal. The dynamic config will treat `methodName` as a widened `string`.
+When using a static config, `methodName` will be typed as `ExtrinsicMethodName | undefined`, where `ExtrinsicMethodName` is a union of all method name literals. The dynamic equivalent will result in `methodName` typed as a widened `string`.
 
 ## Using A Config
 
-Once we have a config, we can use it alongside Capi's bindings to the on-chain world.
-
-Let's read some data from the on-chain world.
+Now that we've covered configs, let's use a config (that of Polkadot) to read from some on-chain storage.
 
 ```ts
 import { config as polkadot } from "https://deno.land/x/capi-polkadot@0.1.0/mod.ts";
@@ -89,7 +87,7 @@ const accounts = C.map(polkadot, "System", "Account");
 const key = accounts.keys().first();
 
 // Read the corresponding value
-const value = await accounts.get(lastInserted).read();
+const value = await accounts.get(key).read();
 ```
 
 ## Onward To Adventure
