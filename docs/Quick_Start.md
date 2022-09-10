@@ -43,7 +43,7 @@ import { config as polkadot } from "@capi/polkadot";
 > **Deno** import specifier: `https://deno.land/x/capi-polkadot/mod.ts`<br />
 > **Node** package name: `@capi/polkadot`
 
-This `config` encapsulates discovery values (RPC URLs and chain specs), flight-critical constants (Ss58 prefix, misc.) and static typing of the Polkadot relay chain.
+This `config` encapsulates discovery values (RPC URLs and chain specs), Ss58 prefix and static typing of the Polkadot relay chain.
 
 If there is no standard, community-provided config, one can [generate a config](./Configs.md#custom-configs).
 
