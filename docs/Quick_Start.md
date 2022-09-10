@@ -60,13 +60,13 @@ const prefix = prompt("Please enter the chain prefix.");
 const config = C.config({ url, prefix });
 ```
 
-### Reading the Latest Block
+## Reading the Latest Block
 
 ```ts
 const block = await C.block(config).read();
 ```
 
-#### Note on Typings
+### Note on Typings
 
 A static config will enable a smoother experience, with type-checking and––depending on your IDE––auto-completion. Let's index into an extrinsic, the type of which will vary by chain.
 
@@ -76,7 +76,7 @@ block.extrinsics[0]?.palletName;
 
 When using a static config, `palletName` will be typed as `PalletName | undefined`, where `PalletName` is a union of all pallet name types (string literal types). The dynamic equivalent will display as a widened `string`.
 
-## Using A Config
+## Reading From Storage
 
 Now that we've covered configs, let's use a config (that of Polkadot) to read from some on-chain storage.
 
