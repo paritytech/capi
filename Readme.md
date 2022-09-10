@@ -8,9 +8,11 @@ Capi is a declarative, TypeScript-first toolkit for crafting interactions with S
 
 ## At a Glance
 
+<!-- dprint-ignore -->
+
 ```ts
-import { config as polkadot } from "https://deno.land/x/capi-polkadot@0.1.0/mod.ts";
-import * as C from "https://deno.land/x/capi@0.1.0/mod.ts";
+import * as C from "capi";
+import { config as polkadot } from "@capi/polkadot";
 
 // Get a reference to the accounts map
 const accounts = C.map(polkadot, "System", "Account");
