@@ -41,3 +41,7 @@ All dependencies of an effect are known before its evaluation; this metadata can
 ## Application Evolution
 
 Forkless upgrades are a defining feature of Substrate-based chains. Yet, this feature is also a point of failure for dependents of those chains. Following an upgrade, an app may form newly-invalid transactions or attempt to access newly-nonexistent storage. Capi provides a means for developers to prepare for runtime upgrades and seamlessly transition their apps with as little downtime as possible.
+
+---
+
+We've now covered some core considerations behind Capi. Let's move onto [the next section](Testing.md), in which we'll spawn a local development node and use it to test Capi.
