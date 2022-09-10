@@ -22,10 +22,6 @@ const result = await C
   .run();
 ```
 
-## Static vs. Dynamic
-
-If we know the exact chain(s) with which we're going to interact, we can leverage type generation to output chain-specific types. While **typegen is the recommended approach for static use cases, this does not apply to cases in which chains are specified dynamically**.
-
 ## Type Safety
 
 The static type of any config can describe accessible RPC server methods and FRAME metadata. This enables a narrowly-typed experience to flow through all usage of Capi.

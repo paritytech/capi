@@ -1,6 +1,6 @@
-# Capi WIP Docs
+# Capi Docs (WIP)
 
-> Capi is under active development. We will write more documentation when development slows.
+> Capi is under active development. Comprehensive documentation will follow a stable release.
 
 - [Quick Start](./Quick_Start.md)
 - [Philosophy](./Philosophy.md)

@@ -1,16 +1,18 @@
 # Capi
 
-Capi is a declarative, TypeScript-first toolkit for crafting interactions with Substrate-based chains. It consists of [FRAME](https://docs.substrate.io/v3/runtime/frame/)-oriented utilities and [a high-level functional effect system](docs/5.Effects.md) and standard library, which facilitate multistep, multichain interactions without compromising on performance or safety.
+Capi is a declarative, TypeScript-first toolkit for crafting interactions with Substrate-based chains. It consists of [FRAME](https://docs.substrate.io/v3/runtime/frame/) utilities and [a high-level functional effect system](docs/Effects.md) and standard library, which facilitate multistep, multichain interactions without compromising either performance or safety.
 
 - [Documentation &rarr;](./docs/Readme.md)<br />Materials for learning about Capi
 - [Examples &rarr;](./examples/Readme.md)<br />SHOW ME THE CODE
 - [API Reference &rarr;](https://deno.land/x/capi/mod.ts)<br />A generated API reference, based on type signatures and in-source comments.
 
-In a likely future of specialized, interoperable chains, developers will need to make use of on-chain programs to satisfy varying use cases; the expertise required to interact with on-chain programs is currently greater than that which _should_ be expected of app developers. Does this mean that app developers should forgo integrating with this blossoming infrastructure? We think not; **the open source community can use Capi and [its functional effect system](Effects.md) to abstract over the atomics of the on-chain world**. An interaction spanning several chains and dozens of methods can be described with a single effect. This paves the way for more developers to make use of Substrate-based infrastructure from their programs.
+## The Thesis
 
-> As you read through this documentation, please consider what use cases you might like to abstract over; if you wish to add your use case to Capi's standard library, please [submit an issue](https://github.com/paritytech/capi/issues/new).
+In a likely future of specialized, interoperable chains, developers will need to make use of on-chain programs to satisfy varying use cases; the expertise required to interact with on-chain programs is currently greater than that which _should_ be expected of app developers. Does this mean that app developers must forgo integrating with this blossoming infrastructure? We think not; **the open source community can use Capi to abstract over the atomics of the on-chain world**. An interaction spanning several chains and dozens of methods can be described with a single effect.
 
-## [Code of Conduct](CODE_OF_CONDUCT.md)
+As you read through this documentation, please consider use cases over which you might like to abstract; if you wish to add your use case to Capi's standard library, please [submit an issue](https://github.com/paritytech/capi/issues/new).
+
+## Code of Conduct
 
 Everyone interacting in the project is expected to follow the [code of conduct](CODE_OF_CONDUCT.md).
 
