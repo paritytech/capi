@@ -3,7 +3,7 @@
 > Capi is under active development. Comprehensive documentation will follow a stable release.
 
 - [Quick Start](./Quick_Start.md)
-- [Philosophy](./Philosophy.md)
+- [Principles](./Principles.md)
 - [Testing](./Testing.md)
 - [Configs](./Configs.md)
 - [Effects](./Effects.md)

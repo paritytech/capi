@@ -1,4 +1,4 @@
-# Philosophy
+# Principles
 
 > The following sections do not cover practical usage of Capi, but rather give background on underlying ideas. By all means **[skip to the next section](Testing.md) if your goal is to dive into building**.
 

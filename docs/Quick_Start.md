@@ -98,4 +98,4 @@ const value = await accounts.get(key).read();
 
 ---
 
-At this point, we've brought Capi dependencies into scope, learned about Capi configs and read from some on-chain storage. Now let's cover the API step by step, starting with notes on [general philosophy](Philosophy.md), including context on design decisions and long-term goals.
+At this point, we've brought Capi dependencies into scope, learned about Capi configs and read from some on-chain storage. Now let's cover the API step by step, starting with notes on [principles](./Principles.md), including context on design decisions and long-term goals.
