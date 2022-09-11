@@ -100,9 +100,11 @@ const result = await accounts.get(key).read();
 
 In the following example, we create and sign an extrinsic that calls the Balance pallet's transfer method.
 
+<!-- dprint-ignore -->
+
 ```ts
-import { config as polkadot } from "@capi/polkadot";
 import * as C from "capi";
+import { config as polkadot } from "@capi/polkadot";
 
 declare const aliceSigner: C.Signer;
 
