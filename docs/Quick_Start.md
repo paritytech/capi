@@ -93,9 +93,42 @@ const accounts = C.map(polkadot, "System", "Account");
 const key = accounts.keys().first();
 
 // Read the corresponding value
-const value = await accounts.get(key).read();
+const result = await accounts.get(key).read();
+```
+
+## Transferring Some Funds
+
+In the following example, we create and sign an extrinsic that calls the Balance pallet's transfer method.
+
+```ts
+import { config as polkadot } from "@capi/polkadot";
+import * as C from "capi";
+
+declare const aliceSigner: C.Signer;
+
+const extrinsic = C
+  .extrinsic("Balances", "transfer", {
+    value: 12345n,
+    dest: C.MultiAddress.fromPublic(BOB_PUBLIC_KEY),
+  })
+  .signed(aliceSigner);
+
+const result = await extrinsic.send();
+```
+
+### Observe Transfer Events
+
+Let's modify the code above so that we can observe corresponding events as they are emitted.
+
+```diff
+- const result = await extrinsic.send();
++ const result = await extrinsic.send((stop) => {
++   return (event) => {
++     // ...
++   };
++ });
 ```
 
 ---
 
-At this point, we've brought Capi dependencies into scope, learned about Capi configs and read from some on-chain storage. Now let's cover the API step by step, starting with notes on [principles](./Principles.md), including context on design decisions and long-term goals.
+At this point, we've brought Capi dependencies into scope, learned about configs, read from some on-chain storage and created, submitted and watched a transfer. Now let's cover the API step by step, starting with notes on [principles](./Principles.md), including context on design decisions and long-term goals.

@@ -14,7 +14,7 @@ One of the core goals behind Substrate is to support a multichain future. As we 
 
 Capi reduces this friction; developers declare their requirements as [Effects](Effects.md) and allow an executor to determine the most efficient route to fulfillment. The management and optimization of connections, and communication across those connections, is abstracted away from the developer.
 
-### Access Patterns
+### Optimal Access Patterns
 
 Chain resources are intentionally-constrained by economic incentives; this limits a developer's ability to implement access patterns, which would otherwise benefit the end-user experience. Many such access patterns relate to data aggregation and preprocessing; doing this work on the client-side (in a browser, for example) consumes already-sparse resources. In other circumstances, the developer might move these tasks to less-constrained environments, such as that of a centralized server. Although Substrate developers can use centralized servers as chain proxies, this introduces points of failure. There is currently no obvious solution to avoiding trade-offs.
 
@@ -26,7 +26,7 @@ Capi provides a foundation on top of which higher-level solutions can be built.
 
 ### Effect System
 
-The basis of Capi is its effect system, with which developers describe chain interactions. This system is designed to make interactions optimally composable.
+The basis of Capi is its effect system, with which developers describe chain interactions. This system is designed to make interactions optimally composable as to support an open source ecosystem of effects, ranging in level of abstraction.
 
 ### Compatibility
 
@@ -36,7 +36,7 @@ Capi is compatible with modern JavaScript environments; its behavior is consiste
 
 ### Testing
 
-All dependencies of an effect are known before its evaluation; this metadata can be used within analysis and testing solutions.
+The experience of testing Capi usage must be as unobtrusive as possible. We aim to gradually integrate with tools such as [Zombienet](https://github.com/paritytech/zombienet) which provide simple means of confirming behavioral expectations. Regarding ease of testing Capi: all dependencies of an effect are known before its execution; this metadata can be used within analysis and testing solutions.
 
 ## Application Evolution
 
@@ -44,4 +44,4 @@ Forkless upgrades are a defining feature of Substrate-based chains. Yet, this fe
 
 ---
 
-We've now covered some core considerations behind Capi. Let's move onto [the next section](Testing.md), in which we'll spawn a local development node and use it to test Capi.
+These are just a few of the considerations that underlay Capi's design and development. Let's move onto [the next section](Testing.md), in which we'll spawn a local development node and use it to test Capi.
