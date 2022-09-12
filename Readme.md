@@ -15,7 +15,7 @@ Generate chain-specific bindings.
 ```sh
 deno run -A -r https://deno.land/x/capi/main.ts \
   --dir="polkadot" \
-  --discovery="wss://rpc.polkadot.io"
+  --src="wss://rpc.polkadot.io"
 ```
 
 Make use of the generated bindings.
