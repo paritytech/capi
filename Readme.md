@@ -16,7 +16,7 @@ Generate chain-specific bindings.
 capi gen --dir="polkadot" --discovery="wss://rpc.polkadot.io"
 ```
 
-> [CLI installation instructions here](./docs/Quick_Start.md).
+> CLI installation instructions can be found [here](./docs/Quick_Start.md).
 
 Make use of the generated bindings.
 
