@@ -63,7 +63,14 @@ export async function config(props?: NodeProps): Promise<Config> {
         break;
       }
     }
-    return new Config(port, process.close.bind(process), props?.altRuntime);
+    return new Config(
+      port,
+      () => {
+        process.kill("SIGKILL");
+        process.close();
+      },
+      props?.altRuntime,
+    );
   } catch (e) {
     if (e instanceof Deno.errors.NotFound) {
       fail("Must have Polkadot installed locally. Visit https://github.com/paritytech/polkadot.");
