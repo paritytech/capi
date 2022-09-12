@@ -10,7 +10,7 @@ Capi is a declarative, TypeScript-first toolkit for crafting interactions with S
 
 ## At a Glance
 
-Generate chain-Specific bindings.
+Generate chain-specific bindings.
 
 ```sh
 capi gen --dir="polkadot" --discovery="wss://rpc.polkadot.io"
