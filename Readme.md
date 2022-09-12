@@ -13,10 +13,10 @@ Capi is a declarative, TypeScript-first toolkit for crafting interactions with S
 Generate chain-specific bindings.
 
 ```sh
-capi gen --dir="polkadot" --discovery="wss://rpc.polkadot.io"
+deno run -A -r https://deno.land/x/capi/main.ts \
+  --dir="polkadot" \
+  --discovery="wss://rpc.polkadot.io"
 ```
-
-> CLI installation instructions can be found [here](./docs/Quick_Start.md).
 
 Make use of the generated bindings.
 
