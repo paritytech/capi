@@ -10,17 +10,22 @@ Capi is a declarative, TypeScript-first toolkit for crafting interactions with S
 
 ## At a Glance
 
-<!-- dprint-ignore -->
+Generate chain-Specific bindings.
+
+```sh
+capi gen --dir="polkadot" --discovery="wss://rpc.polkadot.io"
+```
+
+> [CLI installation instructions here](./docs/Quick_Start.md).
+
+Make use of the generated bindings.
 
 ```ts
-import * as C from "capi";
-import { config as polkadot } from "@capi/polkadot";
+// Namespace import from a pallet-corresponding path
+import * as system from "./polkadot/system";
 
-// Get a reference to the accounts map
-const accounts = C.map(polkadot, "System", "Account");
-
-// Get a reference to the last inserted key of the map
-const key = accounts.keys().first();
+// Bind to the last inserted key
+const key = system.account.keys().first();
 
 // Read the corresponding value
 const value = await accounts.get(key).read();
