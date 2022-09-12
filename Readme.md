@@ -28,7 +28,7 @@ import * as system from "./polkadot/system";
 const key = system.account.keys().first();
 
 // Read the corresponding value
-const value = await accounts.get(key).read();
+const value = await system.account.get(key).read();
 ```
 
 ## The Thesis
