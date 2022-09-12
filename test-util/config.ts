@@ -31,16 +31,14 @@ export class Config
 
 export async function config(props?: NodeProps): Promise<Config> {
   if ("_browserShim" in Deno) return new Config(9944, () => {});
-  let port = 9944;
+  let port;
   if (props?.port) {
     if (!isPortAvailable(props.port)) {
       fail(`Port ${props.port} is unavailable`);
     }
     port = props.port;
   } else {
-    while (!isPortAvailable(port)) {
-      port++;
-    }
+    port = getRandomPort();
   }
   try {
     const process = Deno.run({
@@ -94,4 +92,14 @@ function isPortAvailable(port: number): boolean {
     }
     throw error;
   }
+}
+
+function getRandomPort(min = 49152, max = 65534): number {
+  let randomPort;
+
+  do {
+    randomPort = Math.floor(Math.random() * (max - min + 1) + min);
+  } while (!isPortAvailable(randomPort));
+
+  return randomPort;
 }
