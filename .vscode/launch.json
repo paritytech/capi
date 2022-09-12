@@ -1,0 +1,28 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Attach debugger"
+    },
+    {
+      "type": "node",
+      "runtimeExecutable": "deno",
+      "request": "launch",
+      "name": "Debug current file",
+      "program": "${file}",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": ["task", "test", "--inspect-brk"],
+      "name": "Debug current test file",
+      "program": "${file}",
+      "cwd": "${workspaceFolder}",
+      "attachSimplePort": 9229
+    }
+  ]
+}
