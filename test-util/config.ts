@@ -1,5 +1,4 @@
 import { Config as Config_ } from "../config/mod.ts";
-import { blue } from "../deps/std/fmt/colors.ts";
 import { fail } from "../deps/std/testing/asserts.ts";
 import { rpc, TmpMetadata } from "../known/mod.ts";
 
@@ -49,18 +48,12 @@ export async function config(props?: NodeProps): Promise<Config> {
         port.toString(),
         ...props?.altRuntime ? [`--force-${props.altRuntime}`] : [],
       ],
-      stderr: "piped",
+      stdout: "null",
+      stderr: "null",
     });
-    // For some reason, logs come in through `stderr`
-    console.log(blue(`Piping node logs:`));
-    for await (const log of process.stderr.readable) {
-      await Deno.stdout.write(log);
-      if (new TextDecoder().decode(log).includes(" Running JSON-RPC WS server")) {
-        console.log(blue("Chain and RPC server initialized"));
-        console.log(blue(`Suspending node logs`));
-        break;
-      }
-    }
+
+    await waitForPort({ port });
+
     return new Config(
       port,
       () => {
@@ -102,4 +95,38 @@ function getRandomPort(min = 49152, max = 65534): number {
   } while (!isPortAvailable(randomPort));
 
   return randomPort;
+}
+
+interface WaitForPortOptions {
+  attempts: number;
+  delayBetweenAttempts: number;
+}
+
+async function waitForPort(
+  connectOptions: Deno.ConnectOptions,
+  options?: WaitForPortOptions,
+): Promise<void> {
+  let attempts = options?.attempts ?? 20;
+  const delayBetweenAttempts = options?.delayBetweenAttempts ?? 500;
+
+  while (attempts > 0) {
+    attempts--;
+
+    try {
+      const connection = await Deno.connect(connectOptions);
+      connection.close();
+
+      break;
+    } catch (error) {
+      if (
+        error instanceof Deno.errors.ConnectionRefused
+        && attempts > 0
+      ) {
+        await new Promise((resolve) => setTimeout(resolve, delayBetweenAttempts));
+        continue;
+      }
+
+      throw error;
+    }
+  }
 }
