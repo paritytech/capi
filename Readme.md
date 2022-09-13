@@ -29,7 +29,7 @@ import * as polkadot from "./polkadot.ts";
 const xKey = polkadot.system.account.keys().first();
 
 // read the corresponding value
-const value = await polkadot.system.account.get(key).read();
+const value = await polkadot.system.account.get(xKey).read();
 ```
 
 ## The Thesis
