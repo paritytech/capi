@@ -44,7 +44,7 @@ deno run -A -r https://deno.land/x/capi/codegen.ts \
 >
 > Note: we can run this in CI for ongoing validation that our usage aligns with the latest runtime.
 
-## Reading the Latest Block
+## Read the Latest Block
 
 ```ts
 import * as polkadot from "./polkadot.ts";
@@ -102,4 +102,4 @@ Let's modify the code above so that we can observe corresponding events as they 
 
 ---
 
-At this point, we've generated chain-specific bindings, read from some on-chain storage and created, submitted and watched a transfer extrinsic. Now let's cover the API step by step, starting with notes on [principles](./Principles.md), including context on design decisions and long-term goals.
+At this point, we've generated chain-specific bindings, read the latest block, read from some on-chain storage and created, submitted and watched a transfer extrinsic. Now let's cover the API step by step, starting with notes on [principles](./Principles.md), including context on design decisions and long-term goals.
