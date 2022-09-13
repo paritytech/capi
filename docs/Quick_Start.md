@@ -41,6 +41,7 @@ deno run -A -r https://deno.land/x/capi/codegen.ts \
 ```
 
 > Note: the `src` string can be a comma-separated list of proxy node URLs or even relative paths to chain specs on disk.
+>
 > Note: we can run this in CI for ongoing validation that our usage aligns with the latest runtime.
 
 ## Reading the Latest Block
