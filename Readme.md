@@ -18,7 +18,7 @@ deno run -A -r https://deno.land/x/capi/codegen.ts \
   --src="wss://rpc.polkadot.io"
 ```
 
-> ... or **the Node equivalent** `npx capi`, with the same arguments
+> ... or use **the Node equivalent**––`npx capi`--with the same arguments.
 
 Make use of those bindings.
 
