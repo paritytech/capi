@@ -20,7 +20,7 @@ deno run -A -r https://deno.land/x/capi/codegen.ts \
 
 > ... or **the Node equivalent** `npx capi`, with the same arguments
 
-Make use of the generated bindings.
+Make use of those bindings.
 
 ```ts
 import * as polkadot from "./polkadot.ts";
