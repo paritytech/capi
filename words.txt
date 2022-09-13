@@ -179,3 +179,5 @@ amannn
 multisigs
 curto
 zombienet
+ltex
+morfologik
