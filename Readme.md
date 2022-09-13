@@ -2,7 +2,7 @@
 
 > Capi is a work in progress. The documentation may not reflect the current implementation. **Expect a stable release and proper documentation in early 2023**.
 
-Capi is a declarative, TypeScript-first toolkit for crafting interactions with Substrate-based chains. It consists of [FRAME](https://docs.substrate.io/v3/runtime/frame/) utilities and [a high-level functional effect system](docs/Effects.md) and standard library, which facilitate multistep, multichain interactions without compromising either performance or safety.
+Capi is a declarative, TypeScript-first toolkit for crafting interactions with Substrate-based chains. It consists of [FRAME](https://docs.substrate.io/v3/runtime/frame/) utilities and [a high-level functional effect system](https://github.com/paritytech/zones) and [standard library](std), which facilitate multistep, multichain interactions without compromising either performance or safety.
 
 - [Documentation &rarr;](./docs/Readme.md)<br />Materials for learning about Capi
 - [Examples &rarr;](./examples/Readme.md)<br />SHOW ME THE CODE
@@ -13,29 +13,28 @@ Capi is a declarative, TypeScript-first toolkit for crafting interactions with S
 Generate chain-specific bindings.
 
 ```sh
-deno run -A -r https://deno.land/x/capi/main.ts \
-  --dir="polkadot" \
+deno run -A -r https://deno.land/x/capi/codegen.ts \
+  --out="polkadot" \
   --src="wss://rpc.polkadot.io"
 ```
 
 Make use of the generated bindings.
 
 ```ts
-// Namespace import from a pallet-corresponding path
-import * as system from "./polkadot/system";
+import * as polkadot from "./polkadot.ts";
 
-// Bind to the last inserted key
-const key = system.account.keys().first();
+// bind to the last inserted key (the `$` distinguishes effects from values)
+const $key = polkadot.system.account.keys().first();
 
-// Read the corresponding value
-const value = await system.account.get(key).read();
+// read the corresponding value
+const value = await polkadot.system.account.get(key).read();
 ```
 
 ## The Thesis
 
 In a likely future of specialized, interoperable chains, developers will need to make use of on-chain programs to satisfy varying use cases; the expertise required to interact with these on-chain programs is currently greater than that which _should_ be expected of app developers. Does this mean that app developers must forgo integrating with this blossoming infrastructure? We think not; **the open source community can use Capi to abstract over the atomics of the on-chain world**. An interaction spanning several chains and dozens of methods can be described with a single effect.
 
-As you read through this documentation, please consider use cases over which you might like to abstract; if you wish to add your use case to Capi's standard library, please [submit an issue](https://github.com/paritytech/capi/issues/new).
+As you read through this documentation, please consider use cases over which you might like to abstract; if you wish to add your use case to [Capi's standard library](std), please [submit an issue](https://github.com/paritytech/capi/issues/new).
 
 ## Code of Conduct
 

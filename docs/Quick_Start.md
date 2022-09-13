@@ -26,96 +26,63 @@ import * as C from "capi";
 
 This documentation will prefer the Node-style import for the sake of brevity, although Capi itself is a Deno-first toolkit.
 
-## Configs
+## Static vs. Dynamic
 
-To begin interacting with any chain, we must first have a [config](Configs.md). The process of attaining a config differs depending on whether we know the exact chain(s) with which we're going to interact.
+If we know the exact chain(s) with which we're going to interact, the static DX is preferable. This DX offers static types modeling specific runtimes. The benefits of this are far-reaching: compile-time validation, inference/autocomplete, tsdoc comments and more. The static DX is the recommended path and gets the majority of attention throughout the documentation. If you, however, do not have development-time knowledge of the target chain, [the dynamic experience](./Dynamic_Targets.md) is for you.
 
-### Static
+## Generate Chain-specific Bindings
 
-We use "static" configs when we know the chain(s) with which our program interacts; **static configs are encoded with chain-specific type information so that invalid usage results in compile-time errors**.
+We use Capi's code generator to output minimal bindings based on the latest runtime of a given chain.
 
-3rd parties such as chain proprietors and communities may provide configs (among other [Effects](Effects.md) and utilities) external to Capi. One such example is that of Polkadot.
-
-```ts
-import { config as polkadot } from "@capi/polkadot";
-//                                 "https://deno.land/x/capi-polkadot/mod.ts"
+```sh
+deno run -A -r https://deno.land/x/capi/codegen.ts \
+  --out="polkadot.ts" \
+  --src="wss://rpc.polkadot.io"
 ```
 
-This `config` encapsulates discovery values (RPC URLs and chain specs), Ss58 prefix and static typing of the Polkadot relay chain.
-
-If there is no standard, community-provided config, one can [generate a config](./Configs.md#custom-configs).
-
-### Dynamic
-
-Not all configs can be known at the time of development.
-
-Let's say we're building a block explorer website, on which the visitor can specify a Substrate chain RPC node URL. In this case, we would need to construct the config at runtime.
-
-```ts
-import * as C from "capi";
-
-const url = prompt("Please enter the URL of a Substrate chain RPC node.");
-const prefix = prompt("Please enter the chain prefix.");
-
-const config = C.config({ url, prefix });
-```
+> Note: we can run this in CI for ongoing validation that our usage aligns with the latest runtime.
 
 ## Reading the Latest Block
 
 ```ts
-const block = await C.block(config).read();
+import * as polkadot from "./polkadot.ts";
+
+const block = await polkadot.block().read();
 ```
-
-### Note on Typings
-
-A static config will enable a smoother experience, with type-checking and––depending on your IDE––auto-completion. Let's index into an extrinsic, the type of which will vary by chain.
-
-```ts
-block.extrinsics[0]?.palletName;
-```
-
-When using a static config, `palletName` will be typed as `PalletName | undefined`, where `PalletName` is a union of all pallet name types (string literal types). The dynamic equivalent will display as a widened `string`.
 
 ## Reading From Storage
 
-Now that we've covered configs, let's use a config (that of Polkadot) to read from some on-chain storage.
-
-<!-- dprint-ignore -->
+Let's read from on-chain storage.
 
 ```ts
-import * as C from "capi";
-import { config as polkadot } from "@capi/polkadot";
+import * as polkadot from "./polkadot.ts";
 
-// Get a reference to the accounts map
-const accounts = C.map(polkadot, "System", "Account");
+// bind to the last inserted key (the `x` prefix distinguishes effects from values)
+const xKey = polkadot.system.account.keys().first();
 
-// Get a reference to the last inserted key of the map
-const key = accounts.keys().first();
-
-// Read the corresponding value
-const result = await accounts.get(key).read();
+// read the corresponding value
+const value = await polkadot.system.account.get(key).read();
 ```
 
 ## Transferring Some Funds
 
 In the following example, we create and sign an extrinsic that calls the Balance pallet's transfer method.
 
-<!-- dprint-ignore -->
-
 ```ts
 import * as C from "capi";
-import { config as polkadot } from "@capi/polkadot";
+import * as polkadot from "./polkadot.ts";
 
 declare const aliceSigner: C.Signer;
 
-const extrinsic = C
-  .extrinsic("Balances", "transfer", {
-    value: 12345n,
-    dest: C.MultiAddress.fromPublic(BOB_PUBLIC_KEY),
-  })
+const xTransfer = polkadot.balances.transfer({
+  value: 12345n,
+  dest: C.MultiAddress.fromPublic(BOB_PUBLIC_KEY),
+})
+  .immortal()
+  .tip(10000)
   .signed(aliceSigner);
 
-const result = await extrinsic.send();
+const result = await xTransfer.send();
 ```
 
 ### Observe Transfer Events
@@ -123,8 +90,8 @@ const result = await extrinsic.send();
 Let's modify the code above so that we can observe corresponding events as they are emitted.
 
 ```diff
-- const result = await extrinsic.send();
-+ const result = await extrinsic.send((stop) => {
+- const result = await xTransfer.send();
++ const result = await xTransfer.send((stop) => {
 +   return (event) => {
 +     // ...
 +   };
@@ -133,4 +100,4 @@ Let's modify the code above so that we can observe corresponding events as they 
 
 ---
 
-At this point, we've brought Capi dependencies into scope, learned about configs, read from some on-chain storage and created, submitted and watched a transfer. Now let's cover the API step by step, starting with notes on [principles](./Principles.md), including context on design decisions and long-term goals.
+At this point, we've generated chain-specific bindings, read from some on-chain storage and created, submitted and watched a transfer extrinsic. Now let's cover the API step by step, starting with notes on [principles](./Principles.md), including context on design decisions and long-term goals.
