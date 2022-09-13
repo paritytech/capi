@@ -1,21 +1,33 @@
 # Reading
 
-## A Basic Example
+```ts
+import * as chain from "./generated.ts";
+```
 
-Let's read some data from the on-chain world.
-
-<!-- dprint-ignore -->
+## Items
 
 ```ts
-import * as C from "capi";
-import { config as polkadot } from "@capi/polkadot";
-
-// Get a reference to the accounts map
-const accounts = C.map(polkadot, "System", "Account");
-
-// Get a reference to the last inserted key of the map
-const key = accounts.keys().first();
-
-// Read the corresponding value
-const result = await accounts.get(key).read();
+const result = await chain.timestamp.now.read();
 ```
+
+## Maps
+
+```ts
+const result = await chain.system.account.get(PUBLIC_KEY).read();
+```
+
+## NMaps
+
+```ts
+const result = await chain.staking.nominatorSlashInEra.get(123, PUBLIC_KEY).read();
+```
+
+### Keys
+
+```ts
+const keyPage = await.chain.staking.nominatorSlashInEra.keys(5).read()
+```
+
+## Child Trie
+
+TODO

@@ -178,3 +178,4 @@ trufflehog
 amannn
 multisigs
 curto
+zombienet

@@ -26,7 +26,7 @@ Make use of those bindings.
 import * as polkadot from "./polkadot.ts";
 
 // bind to the last inserted key (the `x` prefix distinguishes effects from values)
-const xKey = polkadot.system.account.keys().first();
+const xKey = polkadot.system.account.keys.first;
 
 // read the corresponding value
 const value = await polkadot.system.account.get(xKey).read();
