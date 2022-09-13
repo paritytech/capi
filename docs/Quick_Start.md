@@ -22,13 +22,13 @@ Then import as follows.
 import * as C from "capi";
 ```
 
-> `capi`'s NPM package contains both ESM & CJS formats, alongside corresponding type definitions.
+> The `capi` NPM package contains both ESM & CJS formats, alongside corresponding type definitions.
 
 This documentation will prefer the Node-style import for the sake of brevity, although Capi itself is a Deno-first toolkit.
 
 ## Static vs. Dynamic
 
-If we know the exact chain(s) with which we're going to interact, the static DX is preferable. This DX offers static types modeling specific runtimes. The benefits of this are far-reaching: compile-time validation, inference/autocomplete, tsdoc comments and more. The static DX is the recommended path and gets the majority of attention throughout the documentation. If you, however, do not have development-time knowledge of the target chain, [the dynamic experience](./Dynamic_Targets.md) is for you.
+If we know the exact chain(s) with which we're going to interact, the "static" approach is preferable. This approach offers minimal and type-safe bindings to specific chains. The benefits of this are far-reaching: compile-time validation, inference/autocomplete, tsdoc comments, precompiled codecs and more. The static approach gets the majority of attention throughout this documentation. If you, however, do not have development-time knowledge of the target chain, [the dynamic experience](./Dynamic_Targets.md) is for you.
 
 ## Generate Chain-specific Bindings
 
