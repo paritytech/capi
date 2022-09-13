@@ -123,6 +123,12 @@ const xValue = polkadot.system.account.get(xKey);
 
 We can compose atomic effects such as these to create complex, multichain interactions that abstract over common use cases. Meanwhile, the underlying effect system appropriately determines the optimal path to execute effects.
 
+```ts
+const result = await xValue.read();
+```
+
+In this example `result` carries a type representing a union of all possible errors (such as `StorageDne`).
+
 ## Optimized Execution
 
 Let's go over one more pain point: optimizing execution.
