@@ -32,7 +32,7 @@ This documentation will prefer the Node-style import for the sake of brevity, al
 
 ## Generate Bindings
 
-We use Capi's code generator to output minimal bindings based on the latest runtime of a given chain.
+We use Capi's codegen CLI to generate bindings to a given chain.
 
 ```sh
 deno run -A -r https://deno.land/x/capi/codegen.ts \
@@ -40,6 +40,7 @@ deno run -A -r https://deno.land/x/capi/codegen.ts \
   --src="wss://rpc.polkadot.io"
 ```
 
+> Note: the `src` string can be a comma-separated list of proxy node URLs or even relative paths to chain specs on disk.
 > Note: we can run this in CI for ongoing validation that our usage aligns with the latest runtime.
 
 ## Reading the Latest Block
