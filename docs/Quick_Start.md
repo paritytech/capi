@@ -30,7 +30,7 @@ This documentation will prefer the Node-style import for the sake of brevity, al
 
 **If we know the exact chain(s) with which we're going to interact, the "static" approach is preferable**. This approach offers minimal and type-safe bindings to specific chains. The benefits of this are far-reaching: compile-time validation, inference and autocompletion, symbol-bound ([TSDoc](https://tsdoc.org/)) comments, precompiled codecs and more. Given these DX gains, the static approach gets the majority of attention throughout this documentation. If, however, you do not have development-time knowledge of the target chain, [the "dynamic" approach](./Dynamic_Targets.md) is for you.
 
-## Generate Chain-specific Bindings
+## Generate Bindings
 
 We use Capi's code generator to output minimal bindings based on the latest runtime of a given chain.
 
