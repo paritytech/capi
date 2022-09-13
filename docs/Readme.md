@@ -6,7 +6,6 @@
 - [Principles](./Principles.md)
 - [Testing](./Testing.md)
 - [Effects](./Effects.md)
-- [Types](./Types.md)
 - [Reading](./Reading.md)
 - [Subscribing](./Subscribing.md)
 - [Transacting](./Transacting.md)

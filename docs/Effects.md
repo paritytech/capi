@@ -168,3 +168,7 @@ The list of such situations goes on. The point is this: in an ideal world, the a
 Another advantage of this programming model is that developers can see performance improvements as we enhance the effect runtime. Today, a Capi effect may take 100ms to execute. Tomorrow, it may take 30ms. The day after, ...
 
 Onward to adventure.
+
+---
+
+Now that we've gone over the basics of Capi's effect system, let's take a look at [how we read from different kinds of on-chain storage](./Reading.md).
