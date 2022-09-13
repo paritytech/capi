@@ -10,7 +10,7 @@ Capi must adapt to future use cases and technical possibilities.
 
 ### Multichain
 
-One of the core goals behind Substrate is to support a multichain future. As we approach this future, there is increasing pressure on JavaScript clients to interact with multiple chains simultaneously. This is quite difficult in practice, as developers must manually instantiate and await connections, optimize disconnection and re-connection, and devise other means of preserving the limited resources of their JavaScript environments.
+One of the major goals which motivates the development of Substrate is to support a multichain future. As we approach this future, there is increasing pressure on JavaScript clients to interact with multiple chains simultaneously. This is quite difficult in practice, as developers must manually instantiate and await connections, optimize disconnection and re-connection, and devise other means of preserving the limited resources of their JavaScript environments.
 
 Capi reduces this friction; developers declare their requirements as [Effects](Effects.md) and allow an executor to determine the most efficient route to fulfillment. The management and optimization of connections, and communication across those connections, is abstracted away from the developer.
 
