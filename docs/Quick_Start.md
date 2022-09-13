@@ -28,7 +28,7 @@ This documentation will prefer the Node-style import for the sake of brevity, al
 
 ## Static vs. Dynamic
 
-**If we know the exact chain(s) with which we're going to interact, the "static" approach is preferable**. This approach offers minimal and type-safe bindings to specific chains. The benefits of this are far-reaching: compile-time validation, inference/autocomplete, tsdoc comments, precompiled codecs and more. The static approach gets the majority of attention throughout this documentation. If you, however, do not have development-time knowledge of the target chain, [the dynamic experience](./Dynamic_Targets.md) is for you.
+**If we know the exact chain(s) with which we're going to interact, the "static" approach is preferable**. This approach offers minimal and type-safe bindings to specific chains. The benefits of this are far-reaching: compile-time validation, inference/autocomplete, tsdoc comments, precompiled codecs and more. The static approach gets the majority of attention throughout this documentation. If you, however, do not have development-time knowledge of the target chain, [the "dynamic" approach](./Dynamic_Targets.md) is for you.
 
 ## Generate Chain-specific Bindings
 
