@@ -38,4 +38,4 @@ if (!(events instanceof Error)) {
 
 ---
 
-Now that we've covered spawning and interacting with a local test network, let's cover [the effect system](./Effects.md), which enables our lazily-evaluated descriptions of our interactions.
+Now that we've covered spawning and interacting with a local test network, let's cover [the effect system](./Effects.md), which enables us to model complex interactions spanning many chains and then optimally-execute those descriptions.
