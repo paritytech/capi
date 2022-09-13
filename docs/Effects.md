@@ -1,6 +1,6 @@
 # Effects
 
-"Effects" are a type-safe means by which we model and dispatch potentially-complex interactions that span many chains. To understand this programming model, let's discuss effects beyond the context of network resource management.
+"Effects" are a type-safe means by which we model and dispatch potentially-complex interactions that span many chains. To understand this programming model, let's discuss Effects beyond the context of blockchains and network resource management.
 
 Let's say we want to write a program that produces a random number. If the number is greater than `.5`, we want the program to fail (a strange little program, I'll admit).
 
@@ -11,18 +11,18 @@ class GtPoint5Error extends Error {
   }
 }
 
-const getRand = (): number => {
+function getRand(): number {
   const rand = Math.random();
   if (rand > .5) {
     throw new GtPoint5Error(rand);
   }
   return rand;
-};
+}
 ```
 
 ## Type-safe Errors
 
-How do we safeguard against `GtPoint5Error` causing trouble in other parts of our program? An unfortunate shortcoming of TypeScript is a lack of typed errors. In Rust, perhaps we could match error variants or propagate errors to the parent scope.
+How do we safeguard against `GtPoint5Error` causing trouble in other parts of our program? An unfortunate shortcoming of TypeScript is a lack of holistic error management (especially error types and their propagation through callers). In a language such as Rust, perhaps we could match error variants or trigger early escape.
 
 ```rs
 // Match and handle locally.
@@ -37,11 +37,11 @@ fn getRandOrErr() -> Result<u32, GtPoint5Error> {
 }
 ```
 
-In TypeScript, we don't have this feature as a primitive of the language. So how might we type our errors? One solution would be to introduce a `Result` type.
+In TypeScript, we don't have this luxury. So how might we tackle error handling? One solution would be to introduce a `Result` type.
 
 ```diff
-- const getRand = (): number => {
-+ const getRand = (): Result<number, GtPoint5> => {
+- function getRand(): number {
++ function getRand(): Result<number, GtPoint5Error> {
     const rand = Math.random();
     if (rand > .5) {
 -     throw new GtPoint5(rand);
@@ -52,27 +52,80 @@ In TypeScript, we don't have this feature as a primitive of the language. So how
 };
 ```
 
-However, this introduces the complexity of propagating error types as we compose our program. Let's say we want to represent the addition of two numeric result types. We parameterize the constraints of `a` and `b` and produce a result type, derived from the error types extracted from those constraints. This does the trick, but introduces much boilerplate.
+However, this introduces the complexity of propagating **all** error types as we compose our program.
+
+Let's say we want to represent the addition of two numeric result types. We parameterize the constraints of `a` and `b` and produce a result type, derived from the error types extracted from those constraints. This does the trick, but introduces much boilerplate.
 
 ```ts
-const add = <A extends Result<number, Error>, B extends Result<number, Error>>(
+function add<
+  A extends Result<number, Error>,
+  B extends Result<number, Error>,
+>(
   a: A,
   b: B,
-): Result<Extract<A, Error> | Extract<B, Error>> => {
+): Result<Extract<A, Error> | Extract<B, Error>> {
   if (a instanceof Error) {
     return a;
   } else if (b instanceof Error) {
     return b;
   }
   return ok(a.ok + b.ok);
-};
+}
 ```
 
-Because the error types of `A` and `B` are generic, we can never truly handle them within `add`. So, why do we even try? Ideally, the errors of `add`'s dependencies bubble to the `add` caller's root, where the applied arguments' error types are accessible for type-safe handling. More on this later.
+Because the error types of `A` and `B` are generic, we can never truly handle them within `add`. So, why do we even try? Ideally, the errors of `add`'s dependencies bubble up to the `add` caller's root, where the applied arguments' error types are accessible for type-safe handling. More on this later.
+
+This is precisely what Capi's effect system––[Zones](https://github.com/paritytech/zones)––enables.
+
+```ts
+import * as Z from "zones";
+
+const rand = Z.atomf(() => {
+  const rand = Math.random();
+  if (rand > .5) {
+    return new GtPoint5Error(rand);
+  }
+  return rand;
+});
+
+const add = Z.atomf((a: number, b: number) => {
+  return a + b;
+});
+
+const root = add(rand(), 1);
+
+const result = Z.runtime().run(root);
+```
+
+In this example `result` carried the type `number | GtPoint5Error`, which allows us to discriminate with ease.
+
+```ts
+if (result instanceof Error) {
+  // `result` is of type `GtPoint5Error`
+} else {
+  // `result` is of type `number`
+}
+```
+
+Although this may seem overly-complex for such a tiny amount of computation, it is dramatically-simple when composing interactions spanning many chains, each with their own types of errors.
+
+## Capi Effects
+
+In the context of Capi, Effects are used to represent on-chain constructs without actually performing any computation until necessary. As showcased within this project's readme, we can create an effect that represents a key in a map, and then use that effect to represent its corresponding value in the map. This all occurs without any network interaction whatsoever.
+
+```ts
+import * as polkadot from "./polkadot.ts";
+
+const xKey = polkadot.system.account.keys().first();
+
+const xValue = polkadot.system.account.get(xKey);
+```
+
+We can compose atomic effects such as these to create complex, multichain interactions that abstract over common use cases. Meanwhile, the underlying effect system appropriately determines the optimal path to execute effects.
 
 ## Optimized Execution
 
-Let's go over one final pain point: optimizing execution.
+Let's go over one more pain point: optimizing execution.
 
 We don't want to accidentally allocate all the JS thread's processing to a blocking operation. We don't want to accidentally send duplicate requests or keep connections alive for longer than they are needed. These are just a few of the considerations that go into smooth network interactions. In practice, these considerations pose great difficulty.
 
@@ -102,11 +155,7 @@ makeD(Math.random());
 
 If `Math.random()` miraculously returns `.25` twice, do we need to send the request a second time? If `requestD` is idempotent, then no.
 
-The list of such situations goes on. The point is this: in an ideal world, the aforementioned responsibilities are offloaded from the developer. Enter, Capi's effect system.
-
-## Capi Effects
-
-TODO: description
+The list of such situations goes on. The point is this: in an ideal world, the aforementioned considerations are offloaded from the developer. Enter, Capi's effect system.
 
 ### Final Note about Effects
 

@@ -5,7 +5,6 @@
 - [Quick Start](./Quick_Start.md)
 - [Principles](./Principles.md)
 - [Testing](./Testing.md)
-- [Configs](./Configs.md)
 - [Effects](./Effects.md)
 - [Types](./Types.md)
 - [Reading](./Reading.md)
