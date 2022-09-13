@@ -14,7 +14,7 @@ Generate chain-specific bindings.
 
 ```sh
 deno run -A -r https://deno.land/x/capi/codegen.ts \
-  --out="polkadot" \
+  --out="polkadot.ts" \
   --src="wss://rpc.polkadot.io"
 ```
 
