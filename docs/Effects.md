@@ -165,6 +165,6 @@ The list of such situations goes on. The point is this: in an ideal world, the a
 
 ### Final Note about Effects
 
-The beauty of this programming model is that developers can see performance improvements as we enhance the effect runtime. Today, a Capi effect may take 100ms to execute. Tomorrow, it may take 30ms. The day after, ...
+Another advantage of this programming model is that developers can see performance improvements as we enhance the effect runtime. Today, a Capi effect may take 100ms to execute. Tomorrow, it may take 30ms. The day after, ...
 
 Onward to adventure.
