@@ -40,7 +40,7 @@ deno run -A -r https://deno.land/x/capi/codegen.ts \
   --src="wss://rpc.polkadot.io"
 ```
 
-> Note: the `src` string can be a comma-separated list of proxy node URLs or even relative paths to chain specs on disk.
+> Note: the `src` string can be a comma-separated list of proxy node URLs or even a relative path to chain spec on disk.
 >
 > Note: we can run this in CI for ongoing validation that our usage aligns with the latest runtime.
 
