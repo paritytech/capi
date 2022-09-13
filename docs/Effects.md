@@ -97,7 +97,7 @@ const root = add(rand(), 1);
 const result = Z.runtime().run(root);
 ```
 
-In this example `result` carried the type `number | GtPoint5Error`, which allows us to discriminate with ease.
+In this example `result` carries the type `number | GtPoint5Error`, which allows us to discriminate with ease.
 
 ```ts
 if (result instanceof Error) {
