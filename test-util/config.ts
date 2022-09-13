@@ -106,7 +106,7 @@ async function waitForPort(
   connectOptions: Deno.ConnectOptions,
   options?: WaitForPortOptions,
 ): Promise<void> {
-  let attempts = options?.attempts ?? 20;
+  let attempts = options?.attempts ?? 60;
   const delayBetweenAttempts = options?.delayBetweenAttempts ?? 500;
 
   while (attempts > 0) {

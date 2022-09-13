@@ -31,14 +31,13 @@ Deno.test({
     });
 
     await ctx.step({
-      name: "account balance",
-      ignore: true,
+      name: "account balance updated",
       fn: async () => {
         const root = C.readEntry(config, "System", "Account", [t.bob.publicKey]);
 
         const state = U.throwIfError(await root.run());
 
-        assertObjectMatch(state, { value: { data: { free: 12345n } } });
+        assertObjectMatch(state, { value: { data: { free: 10000000000012345n } } });
       },
     });
 
