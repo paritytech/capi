@@ -30,7 +30,7 @@ export class Config
 
 export async function config(props?: NodeProps): Promise<Config> {
   if ("_browserShim" in Deno) return new Config(9944, () => {});
-  let port;
+  let port: number;
   if (props?.port) {
     if (!isPortAvailable(props.port)) {
       fail(`Port ${props.port} is unavailable`);
@@ -88,7 +88,7 @@ function isPortAvailable(port: number): boolean {
 }
 
 function getRandomPort(min = 49152, max = 65534): number {
-  let randomPort;
+  let randomPort: number;
 
   do {
     randomPort = Math.floor(Math.random() * (max - min + 1) + min);
