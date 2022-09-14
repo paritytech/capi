@@ -37,6 +37,11 @@ export async function config(props?: NodeProps): Promise<Config> {
     }
     port = props.port;
   } else {
+    // TODO: improve port allocation for parallel testing.
+    // This is a temporary solution for concurrent tests that need a fresh
+    // polkadot node.
+    // This might fail because another process could start to listen on the
+    // port before the polkadot process starts to listen on the configured port.
     port = getRandomPort();
   }
   try {
@@ -97,17 +102,11 @@ function getRandomPort(min = 49152, max = 65534): number {
   return randomPort;
 }
 
-interface WaitForPortOptions {
-  attempts: number;
-  delayBetweenAttempts: number;
-}
-
 async function waitForPort(
   connectOptions: Deno.ConnectOptions,
-  options?: WaitForPortOptions,
 ): Promise<void> {
-  let attempts = options?.attempts ?? 60;
-  const delayBetweenAttempts = options?.delayBetweenAttempts ?? 500;
+  let attempts = 60;
+  const delayBetweenAttempts = 500;
 
   while (attempts > 0) {
     attempts--;

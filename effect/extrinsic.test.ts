@@ -3,7 +3,6 @@ import { assertEquals, assertObjectMatch } from "../deps/std/testing/asserts.ts"
 import * as C from "../mod.ts";
 import * as t from "../test-util/mod.ts";
 import * as U from "../util/mod.ts";
-import { SendAndWatchExtrinsicProps } from "./mod.ts";
 
 Deno.test({
   name: "Balances.transfer",
@@ -104,7 +103,7 @@ Deno.test({
 
 async function collectExtrinsicEvents(
   { config, palletName, methodName, args }: Pick<
-    SendAndWatchExtrinsicProps,
+    C.SendAndWatchExtrinsicProps,
     "config" | "palletName" | "methodName" | "args"
   >,
   sender: KeyringPair,
@@ -144,7 +143,7 @@ async function collectExtrinsicEvents(
     },
   });
 
-  await U.throwIfError(await root.run());
+  await root.run();
 
   return extrinsicEvents;
 }
