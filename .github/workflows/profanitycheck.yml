@@ -1,7 +1,7 @@
 name: "Check for presence of Bad Words"
 on: push
 jobs:
-  abusecheck:
+  profanitycheck:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
