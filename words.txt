@@ -171,3 +171,4 @@ Curto
 devcontainers
 noninteractive
 autoremove
+trufflesecurity
