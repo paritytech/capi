@@ -90,7 +90,11 @@ export function printDecls(decls: Decl[]) {
   for (const ns in namespaces) {
     done.push({
       path: ns,
-      code: [["export namespace", ns, "{"], printDecls(namespaces[ns]!), "}"],
+      code: [
+        [ns.startsWith("_") ? "" : "export", "namespace", ns, "{"],
+        printDecls(namespaces[ns]!),
+        "}",
+      ],
     });
   }
   // sort by path
