@@ -1,5 +1,4 @@
 import { Config as Config_ } from "../config/mod.ts";
-import { blue } from "../deps/std/fmt/colors.ts";
 import { fail } from "../deps/std/testing/asserts.ts";
 import { rpc, TmpMetadata } from "../known/mod.ts";
 
@@ -31,16 +30,19 @@ export class Config
 
 export async function config(props?: NodeProps): Promise<Config> {
   if ("_browserShim" in Deno) return new Config(9944, () => {});
-  let port = 9944;
+  let port: number;
   if (props?.port) {
     if (!isPortAvailable(props.port)) {
       fail(`Port ${props.port} is unavailable`);
     }
     port = props.port;
   } else {
-    while (!isPortAvailable(port)) {
-      port++;
-    }
+    // TODO: improve port allocation for parallel testing.
+    // This is a temporary solution for concurrent tests that need a fresh
+    // polkadot node.
+    // This might fail because another process could start to listen on the
+    // port before the polkadot process starts to listen on the configured port.
+    port = getRandomPort();
   }
   try {
     const process = Deno.run({
@@ -51,20 +53,20 @@ export async function config(props?: NodeProps): Promise<Config> {
         port.toString(),
         ...props?.altRuntime ? [`--force-${props.altRuntime}`] : [],
       ],
-      stderr: "piped",
-      stdout: "piped",
+      stdout: "null",
+      stderr: "null",
     });
-    // For some reason, logs come in through `stderr`
-    console.log(blue(`Piping node logs:`));
-    for await (const log of process.stderr.readable) {
-      await Deno.stdout.write(log);
-      if (new TextDecoder().decode(log).includes(" Running JSON-RPC WS server")) {
-        console.log(blue("Chain and RPC server initialized"));
-        console.log(blue(`Suspending node logs`));
-        break;
-      }
-    }
-    return new Config(port, process.close.bind(process), props?.altRuntime);
+
+    await waitForPort({ port });
+
+    return new Config(
+      port,
+      () => {
+        process.kill("SIGKILL");
+        process.close();
+      },
+      props?.altRuntime,
+    );
   } catch (e) {
     if (e instanceof Deno.errors.NotFound) {
       fail("Must have Polkadot installed locally. Visit https://github.com/paritytech/polkadot.");
@@ -87,5 +89,43 @@ function isPortAvailable(port: number): boolean {
       return false;
     }
     throw error;
+  }
+}
+
+function getRandomPort(min = 49152, max = 65534): number {
+  let randomPort: number;
+
+  do {
+    randomPort = Math.floor(Math.random() * (max - min + 1) + min);
+  } while (!isPortAvailable(randomPort));
+
+  return randomPort;
+}
+
+async function waitForPort(
+  connectOptions: Deno.ConnectOptions,
+): Promise<void> {
+  let attempts = 60;
+  const delayBetweenAttempts = 500;
+
+  while (attempts > 0) {
+    attempts--;
+
+    try {
+      const connection = await Deno.connect(connectOptions);
+      connection.close();
+
+      break;
+    } catch (error) {
+      if (
+        error instanceof Deno.errors.ConnectionRefused
+        && attempts > 0
+      ) {
+        await new Promise((resolve) => setTimeout(resolve, delayBetweenAttempts));
+        continue;
+      }
+
+      throw error;
+    }
   }
 }
