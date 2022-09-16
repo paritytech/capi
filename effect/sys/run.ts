@@ -65,6 +65,7 @@ export const { run } = (new class Runtime implements RunContext {
         if (val.exit) {
           const applied = () => val.exit!(resolved);
           cleanup.set(val, applied);
+          this.#cache.delete(k);
         }
         return resolved;
       })();
