@@ -10,11 +10,11 @@ if (import.meta.main) {
 
   const [metadataFile, outputFile] = Deno.args;
   const metadata = M.fromPrefixedHex(await Deno.readTextFile(metadataFile!));
-  const output = tsFormatter.formatText("gen.ts", typegen(metadata));
+  const output = tsFormatter.formatText("gen.ts", codegen(metadata));
   await Deno.writeTextFile(outputFile!, output);
 }
 
-export function typegen(metadata: M.Metadata) {
+export function codegen(metadata: M.Metadata) {
   type Decl = [name: string, stmt: string];
 
   const decls: Decl[] = [];
