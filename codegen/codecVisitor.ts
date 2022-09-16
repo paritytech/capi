@@ -141,7 +141,7 @@ export function createCodecVisitor(tys: M.Ty[], decls: Decl[], typeVisitor: M.Ty
       return addCodecDecl(ty, "$era");
     },
     circular(ty) {
-      return getCodecPath(tys, ty);
+      return ["$.deferred(() =>", getRawCodecPath(ty), ")"];
     },
   });
 
@@ -170,6 +170,6 @@ export function createCodecVisitor(tys: M.Ty[], decls: Decl[], typeVisitor: M.Ty
         ],
       });
     }
-    return path;
+    return rawPath;
   }
 }

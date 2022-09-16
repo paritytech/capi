@@ -39,26 +39,6 @@ export function genMetadata(metadata: M.Metadata, decls: Decl[], codecVisitor: M
     ],
   });
   for (const pallet of pallets) {
-    decls.push({
-      path: `${pallet.name}.i`,
-      code: [`export const i =`, pallet.i],
-    });
-    for (const key of ["calls", "error", "event"] as const) {
-      decls.push({
-        path: `${pallet.name}.$${key}`,
-        code: [
-          `export const $${key} =`,
-          pallet[key] ? codecVisitor.visit(pallet[key]!.ty) : "undefined",
-        ],
-      });
-    }
-    decls.push({
-      path: `${pallet.name}.storagePrefix`,
-      code: [
-        `export const storagePrefix =`,
-        pallet.storage ? S.string(pallet.storage.prefix) : "undefined",
-      ],
-    });
     for (const entry of pallet.storage?.entries ?? []) {
       decls.push({
         path: `${pallet.name}.${entry.name}`,

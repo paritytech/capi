@@ -97,7 +97,15 @@ export function printDecls(decls: Decl[]) {
       ],
     });
   }
-  // sort by path
-  done.sort((a, b) => a.path < b.path ? -1 : a.path > b.path ? 1 : 0);
+  // sort by path, _s first
+  done.sort((a, b) =>
+    a.path.startsWith("_") !== b.path.startsWith("_")
+      ? a.path.startsWith("_") ? -1 : 1
+      : a.path < b.path
+      ? -1
+      : a.path > b.path
+      ? 1
+      : 0
+  );
   return [...new Set(done.map((x) => S.toString(x.code)))].join("\n");
 }

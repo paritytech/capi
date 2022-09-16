@@ -27,7 +27,7 @@ export function codegen(metadata: M.Metadata) {
   const { tys } = metadata;
 
   decls.push({
-    path: "",
+    path: "_",
     code: [
       "import { ChainError, BitSequence, Era, $, $null, $era } from",
       S.string(importSource),
