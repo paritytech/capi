@@ -1,8 +1,20 @@
 import { Config as Config_ } from "../config/mod.ts";
+import { Expand } from "../deps/scale.ts";
 import { MultiAddress } from "../frame_metadata/Extrinsic.ts";
 import * as rpc from "../rpc/mod.ts";
 import * as U from "../util/mod.ts";
+import { Hash, Hex } from "../util/mod.ts";
+import {
+  AccId,
+  ListOrValue,
+  NumberOrHex,
+  Result,
+  StorageKey,
+  SubId,
+  Subscription,
+} from "./rpc/utils.ts";
 import * as T from "./types/mod.ts";
+import { Header, RuntimeVersion, StorageChangeSet } from "./types/mod.ts";
 
 export type Config<
   DiscoveryValue,
@@ -18,26 +30,6 @@ export type TODO_NARROW_METHOD_TYPE = (...args: any[]) => any;
 
 export type Methods = CallMethods & SubscriptionMethods;
 
-type Hex = U.Hex;
-type Hash = U.HexHash;
-type SubId = string;
-type AccId = string;
-type StorageKey = Hex;
-
-/// Holds information about the `slot`'s that can be claimed by a given key.
-interface EpochAuthorship {
-  /// the array of primary slots that can be claimed
-  primary: number[];
-  /// the array of secondary slots that can be claimed
-  secondary: number[];
-  /// The array of secondary VRF slots that can be claimed.
-  secondary_vrf: number[];
-}
-
-type NumberOrHex = U.HexEncoded<bigint> | number;
-type ListOrValue<T> = T | T[];
-
-type Result<T> = T;
 type TodoRpc = {
   state_getChildKeys: TODO_NARROW_METHOD_TYPE;
   state_getChildReadProof: TODO_NARROW_METHOD_TYPE;
@@ -81,202 +73,6 @@ type TodoRpc = {
   transaction_unstable_submitAndWatch(transaction: U.Hex): unknown;
 };
 
-/** https://github.com/paritytech/substrate/blob/e0ccd00/client/rpc-api/src/author/mod.rs#L30 */
-type AuthorRpc = {
-  /** Submit hex-encoded extrinsic for inclusion in block. */
-  author_submitExtrinsic(extrinsic: Hex): Result<Hash>;
-  /** Insert a key into the keystore. */
-  author_insertKey(keyType: string, suri: string, publicKey: Hex): Result<null>;
-  /** Generate new session keys and returns the corresponding public keys. */
-  author_rotateKeys(): Result<Hex>;
-  /**
-   * Checks if the keystore has private keys for the given session public keys.
-   * `sessionKeys` is the SCALE encoded session keys object from the runtime.
-   * Returns `true` iff all private keys could be found.
-   */
-  author_hasSessionKeys(sessionsKeys: Hex): Result<boolean>;
-  /**
-   * Checks if the keystore has private keys for the given public key and key type.
-   * Returns `true` if a private key could be found.
-   */
-  author_hasKey(pubKey: Hex, keyType: string): Result<boolean>;
-  /** Returns all pending extrinsics, potentially grouped by sender.  */
-  author_pendingExtrinsics(): Result<Hex[]>;
-  /** Remove given extrinsic from the pool and temporarily ban it to prevent reimporting. */
-  author_removeExtrinsic(extrinsics: ExtrinsicOrHash[]): Result<Hex[]>; // todo
-  /// Submit an extrinsic to watch.
-  ///
-  /// See [`TransactionStatus`](sc_transaction_pool_api::TransactionStatus) for details on
-  /// transaction life cycle.
-  author_submitAndWatchExtrinsic(
-    extrinsic: Hex,
-  ): Result<Subscription<"author_submitAndWatchExtrinsic", TransactionStatus>>;
-  author_unwatchExtrinsic(
-    subscription: Subscription<"author_submitAndWatchExtrinsic", TransactionStatus>,
-  ): Result<void>;
-};
-/** https://github.com/paritytech/substrate/blob/9b01569/client/consensus/babe/rpc/src/lib.rs#L44 */
-type BabeRpc = {
-  /**
-   * Returns data about which slots (primary or secondary) can be claimed in
-   * the current epoch with the keys in the keystore.
-   */
-  babe_epochAuthorship(): Result<Record<AccId, EpochAuthorship>>;
-};
-/** https://github.com/paritytech/substrate/blob/317808a/client/beefy/rpc/src/lib.rs#L84 */
-type BeefyRpc = {
-  /// Returns the block most recently finalized by BEEFY, alongside side its justification.
-  beefy_subscribeJustifications(): Result<
-    Subscription<"beefy_subscribeJustifications", Notification>
-  >;
-  /// Returns hash of the latest BEEFY finalized block as seen by this client.
-  ///
-  /// The latest BEEFY block might not be available if the BEEFY gadget is not running
-  /// in the network or if the client is still initializing or syncing with the network.
-  /// In such case an error would be returned.
-  beefy_getFinalizedHead(): Result<Hash>;
-};
-/** https://github.com/paritytech/substrate/blob/934fbfd/client/rpc-api/src/chain/mod.rs#L27 */
-type ChainRpc = {
-  /** Get header. */
-  chain_getHeader(hash?: Hash): Result<T.Header | null>;
-  /** Get header and body of a relay chain block. */
-  chain_getBlock(hash?: Hash): Result<T.Block<U.Hex> | null>;
-  /// Get hash of the n-th block in the canon chain.
-  ///
-  /// By default returns latest block hash.
-  chain_getBlockHash(height?: ListOrValue<NumberOrHex>): Result<ListOrValue<Hash | null>>;
-  chain_getHead: ChainRpc["chain_getBlockHash"];
-  /// Get hash of the last finalized block in the canon chain.
-  chain_getFinalizedHead(): Result<U.HexHash>;
-  chain_getFinalisedHead: ChainRpc["chain_getFinalizedHead"];
-  /// All head subscription.
-  chain_subscribeAllHeads(): Result<Subscription<"chain_subscribeAllHeads", Header>>;
-  chain_unsubscribeAllHeads(
-    subscription: Subscription<"chain_subscribeAllHeads", Header>,
-  ): Result<void>;
-  /// All head subscription.
-  chain_subscribeNewHeads(): Result<Subscription<"chain_subscribeAllHeads", Header>>;
-  chain_unsubscribeNewHeads(
-    subscription: Subscription<"chain_subscribeAllHeads", Header>,
-  ): Result<void>;
-  /// All head subscription.
-  chain_subscribeFinalizedHeads(): Result<Subscription<"chain_subscribeAllHeads", Header>>;
-  chain_unsubscribeFinalizedHeads(
-    subscription: Subscription<"chain_subscribeAllHeads", Header>,
-  ): Result<void>;
-  chain_subscribeFinalisedHeads: ChainRpc["chain_subscribeFinalizedHeads"];
-  chain_unsubscribeFinalisedHeads: ChainRpc["chain_unsubscribeFinalizedHeads"];
-};
-/** https://github.com/paritytech/substrate/blob/0246883/frame/contracts/rpc/src/lib.rs#L127 */
-type X = {
-  /// Executes a call to a contract.
-  ///
-  /// This call is performed locally without submitting any transactions. Thus executing this
-  /// won't change any state. Nonetheless, the calling state-changing contracts is still possible.
-  ///
-  /// This method is useful for calling getter-like methods on contracts or to dry-run a
-  /// a contract call in order to determine the `gas_limit`.
-  contracts_call(
-    callRequest: CallRequest,
-    at?: BlockHash,
-  ): Result<ContractExecResult>;
-  /// Instantiate a new contract.
-  ///
-  /// This instantiate is performed locally without submitting any transactions. Thus the contract
-  /// is not actually created.
-  ///
-  /// This method is useful for UIs to dry-run contract instantiations.
-  contracts_instantiate(instantiateRequest: InstantiateRequest): Result<ContractInstantiateResult>;
-  /// Upload new code without instantiating a contract from it.
-  ///
-  /// This upload is performed locally without submitting any transactions. Thus executing this
-  /// won't change any state.
-  ///
-  /// This method is useful for UIs to dry-run code upload.
-  contracts_upload_code(
-    uploadRequest: CodeUploadRequest,
-    at?: BlockHash,
-  ): Result<CodeUploadRequest>;
-  /// Returns the value under a specified storage `key` in a contract given by `address` param,
-  /// or `None` if it is not set.
-  contracts_getStorage(
-    accountId: AccId,
-    key: Hex,
-    aat?: BlockHash,
-  ): Result<Hex | null>;
-};
-/** https://github.com/paritytech/substrate/blob/934fbfd/client/rpc-api/src/child_state/mod.rs#L29 */
-type ChildStateRpc = {
-  /**
-   * Returns the keys with prefix from a child storage, leave empty to get all the keys
-   * @deprecated [2.0.0] Please use `getKeysPaged` with proper paging support
-   */
-  childState_getKeys(
-    childStorageKey: PrefixedStorageKey,
-    prefix: StorageKey,
-    hash?: Hash,
-  ): Result<StorageKey[]>;
-  /// Returns the keys with prefix from a child storage with pagination support.
-  /// Up to `count` keys will be returned.
-  /// If `start_key` is passed, return next keys in storage in lexicographic order.
-  childState_getKeysPaged(
-    childStorageKey: PrefixedStorageKey,
-    prefix: StorageKey,
-    count: number,
-    startKey?: StorageKey,
-    hash?: Hash,
-  ): TODO_NARROW_METHOD_TYPE;
-  /// Returns a child storage entry at a specific block's state.
-  childState_getStorage(
-    childStorageKey: PrefixedStorageKey,
-    key: StorageKey,
-    hash?: Hash,
-  ): Result<StorageData | null>;
-  /// Returns child storage entries for multiple keys at a specific block's state.
-  childState_getStorageEntries(
-    childStorageKey: PrefixedStorageKey,
-    keys: StorageKey[],
-    hash?: Hash,
-  ): Result<(StorageData | null)[]>;
-  /// Returns the hash of a child storage entry at a block's state.
-  childState_getStorageHash(
-    childStorageKey: PrefixedStorageKey,
-    key: StorageKey,
-    hash?: Hash,
-  ): Result<Hash | null>;
-  /// Returns the size of a child storage entry at a block's state.
-  childState_getStorageSize(
-    childStorageKey: PrefixedStorageKey,
-    key: StorageKey,
-    hash?: Hash,
-  ): Result<number | null>;
-  /// Returns proof of storage for child key entries at a specific block's state.
-  state_getChildReadProof(
-    childStorageKey: PrefixedStorageKey,
-    keys: StorageKey[],
-    hash?: Hash,
-  ): Result<ReadProof<Hash>>;
-};
-
-/** https://github.com/paritytech/substrate/blob/9b01569/client/finality-grandpa/rpc/src/lib.rs#L48 */
-type GrandpaRpc = {
-  /// Returns the state of the current best round state as well as the
-  /// ongoing background rounds.
-  grandpa_roundState(): Result<ReportedRoundStates>;
-  /// Returns the block most recently finalized by Grandpa, alongside
-  /// side its justification.
-  grandpa_subscribeJustifications(): Result<
-    Subscription<"grandpa_subscribeJustifications", Notification>
-  >;
-  grandpa_unsubscribeJustifications(
-    subscription: Subscription<"grandpa_subscribeJustifications", Notification>,
-  ): void;
-  /// Prove finality for the given block number by returning the Justification for the last block
-  /// in the set and all the intermediary headers to link them together.
-  grandpa_proveFinality(block: number): Result<EncodedFinalityProof | null>;
-};
-
 /** https://github.com/paritytech/substrate/blob/eddf888/frame/merkle-mountain-range/rpc/src/lib.rs#L99 */
 type MMrRpc = {
   /// Generate MMR proof for given leaf index.
@@ -287,7 +83,7 @@ type MMrRpc = {
   ///
   /// Returns the (full) leaf itself and a proof for this leaf (compact encoding, i.e. hash of
   /// the leaf). Both parameters are SCALE-encoded.
-  mmr_generateProof(leafIndex: LeafIndex, at?: BlockHash): Result<LeafProof>;
+  mmr_generateProof(leafIndex: LeafIndex, at?: Hash): Result<LeafProof>;
   /// Generate MMR proof for the given leaf indices.
   ///
   /// This method calls into a runtime with MMR pallet included and attempts to generate
@@ -298,7 +94,7 @@ type MMrRpc = {
   /// the leaves). Both parameters are SCALE-encoded.
   /// The order of entries in the `leaves` field of the returned struct
   /// is the same as the order of the entries in `leaf_indices` supplied
-  mmr_generateBatchProof(leafIndices: LeafIndex[], at?: BlockHash): Result<LeafBatchProof>;
+  mmr_generateBatchProof(leafIndices: LeafIndex[], at?: Hash): Result<LeafBatchProof>;
 };
 /** https://github.com/paritytech/substrate/blob/7d233c2/client/rpc-api/src/offchain/mod.rs#L28 */
 type OffchainRpc = {
@@ -309,13 +105,13 @@ type OffchainRpc = {
 };
 /** https://github.com/paritytech/substrate/blob/eddf888/frame/transaction-payment/rpc/src/lib.rs#L41 */
 type TransactionPaymentApi = {
-  payment_queryInfo(extrinsic: Hex, at?: BlockHash): T.RuntimeDispatchInfo;
-  payment_queryFeeDetails(extrinsic: Hex, at?: BlockHash): FeeDetails<NumberOrHex>;
+  payment_queryInfo(extrinsic: Hex, at?: Hash): T.RuntimeDispatchInfo;
+  payment_queryFeeDetails(extrinsic: Hex, at?: Hash): FeeDetails<NumberOrHex>;
 };
 /** https://github.com/paritytech/substrate/blob/28ac0a8/client/rpc-api/src/state/mod.rs#L35 */
 type StateRpc = {
   /// Call a contract at a block's state.
-  state_call(name: string, bytes: Hex, at?: BlockHash): Result<Hex>;
+  state_call(name: string, bytes: Hex, at?: Hash): Result<Hex>;
   state_callAt: StateRpc["state_call"];
   /**
    * Returns the keys with prefix, leave empty to get all the keys.
