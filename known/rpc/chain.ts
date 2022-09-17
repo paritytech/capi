@@ -2,41 +2,41 @@ import { HexEncoded } from "../../util/branded.ts";
 import { Hash, Hex, ListOrValue, NumberOrHex, Result, Subscription } from "./utils.ts";
 
 // https://github.com/paritytech/substrate/blob/0ba251c/primitives/runtime/src/generic/digest.rs
-/// Generic header digest.
+/** Generic header digest. */
 export interface Digest {
-  /// A list of logs in the digest.
+  /** A list of logs in the digest. */
   logs: Hex[];
 }
 
 // https://github.com/paritytech/substrate/blob/01a3ad65/primitives/runtime/src/generic/header.rs#L39
-/// Abstraction over a block header for a substrate chain.
+/** Abstraction over a block header for a substrate chain. */
 export interface Header {
-  /// The parent hash.
+  /** The parent hash. */
   parentHash: Hash;
-  /// The block number.
+  /** The block number. */
   number: HexEncoded<bigint>;
-  /// The state trie merkle root
+  /** The state trie merkle root */
   stateRoot: Hash;
-  /// The merkle root of the extrinsics.
+  /** The merkle root of the extrinsics. */
   extrinsicsRoot: Hash;
-  /// A chain-specific digest of data useful for light clients or referencing auxiliary data.
+  /** A chain-specific digest of data useful for light clients or referencing auxiliary data. */
   digest: Digest;
 }
 
 // https://github.com/paritytech/substrate/blob/ded44948/primitives/runtime/src/generic/block.rs#L126
-/// Abstraction over a substrate block and justification.
+/** Abstraction over a substrate block and justification. */
 export interface SignedBlock {
-  /// Full block.
+  /** Full block. */
   block: Block;
-  /// Block justification.
+  /** Block justification. */
   justifications?: [number[], number[]][];
 }
 
 // https://github.com/paritytech/substrate/blob/ded44948/primitives/runtime/src/generic/block.rs#L88
 export interface Block {
-  /// The block header.
+  /** The block header. */
   header: Header;
-  /// The accompanying extrinsics.
+  /** The accompanying extrinsics. */
   extrinsics: Hex[];
 }
 
@@ -46,25 +46,27 @@ export type ChainRpc = {
   chain_getHeader(hash?: Hash): Result<Header | null>;
   /** Get header and body of a relay chain block. */
   chain_getBlock(hash?: Hash): Result<SignedBlock | null>;
-  /// Get hash of the n-th block in the canon chain.
-  ///
-  /// By default returns latest block hash.
+  /**
+   * Get hash of the n-th block in the canon chain.
+   *
+   * By default returns latest block hash.
+   */
   chain_getBlockHash(height?: ListOrValue<NumberOrHex>): Result<ListOrValue<Hash | null>>;
   chain_getHead: ChainRpc["chain_getBlockHash"];
-  /// Get hash of the last finalized block in the canon chain.
+  /** Get hash of the last finalized block in the canon chain. */
   chain_getFinalizedHead(): Result<Hash>;
   chain_getFinalisedHead: ChainRpc["chain_getFinalizedHead"];
-  /// All head subscription.
+  /** All head subscription. */
   chain_subscribeAllHeads(): Result<Subscription<"chain_subscribeAllHeads", Header>>;
   chain_unsubscribeAllHeads(
     subscription: Subscription<"chain_subscribeAllHeads", Header>,
   ): Result<void>;
-  /// New head subscription.
+  /** New head subscription. */
   chain_subscribeNewHeads(): Result<Subscription<"chain_subscribeAllHeads", Header>>;
   chain_unsubscribeNewHeads(
     subscription: Subscription<"chain_subscribeAllHeads", Header>,
   ): Result<void>;
-  /// Finalized head subscription.
+  /** Finalized head subscription. */
   chain_subscribeFinalizedHeads(): Result<Subscription<"chain_subscribeAllHeads", Header>>;
   chain_unsubscribeFinalizedHeads(
     subscription: Subscription<"chain_subscribeAllHeads", Header>,

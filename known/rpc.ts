@@ -1,25 +1,15 @@
 import * as rpc from "../rpc/mod.ts";
 
 export type ErrorDetails = rpc.EnsureErrorDetails<{
-  /**
-   * Invalid JSON was received by the server.
-   */
+  /** Invalid JSON was received by the server. */
   ParseError: [-32700];
-  /**
-   * The JSON sent is not a valid Request object.
-   */
+  /** The JSON sent is not a valid Request object. */
   InvalidRequest: [-32600];
-  /**
-   * The method does not exist / is not available.
-   */
+  /** The method does not exist / is not available. */
   MethodNotFound: [-32601];
-  /**
-   * Invalid method parameter(s).
-   */
+  /** Invalid method parameter(s). */
   InvalidParams: [-32602];
-  /**
-   * Internal JSON-RPC error.
-   */
+  /** Internal JSON-RPC error. */
   InternalError: [-32603];
   /**
    * Other internal server error.
