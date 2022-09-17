@@ -1,10 +1,10 @@
-import { AccId, Hash, Hex, NumberOrHex, Result, SerdeEnum, SerdeResult } from "./utils.ts";
+import { AccountId, Hash, Hex, NumberOrHex, Result, SerdeEnum, SerdeResult } from "./utils.ts";
 
 // https://github.com/paritytech/substrate/blob/0246883/frame/contracts/rpc/src/lib.rs#L92
 /// A struct that encodes RPC parameters required for a call to a smart-contract.
 export interface CallRequest {
-  origin: AccId;
-  dest: AccId;
+  origin: AccountId;
+  dest: AccountId;
   value: NumberOrHex;
   gasLimit: NumberOrHex;
   storageDepositLimit: NumberOrHex | undefined;
@@ -170,7 +170,7 @@ export type Code = SerdeEnum<{
 // https://github.com/paritytech/substrate/blob/0246883/frame/contracts/rpc/src/lib.rs#L105
 /// A struct that encodes RPC parameters required to instantiate a new smart-contract.
 export interface InstantiateRequest {
-  origin: AccId;
+  origin: AccountId;
   value: NumberOrHex;
   gasLimit: NumberOrHex;
   storageDepositLimit: NumberOrHex | undefined;
@@ -182,7 +182,7 @@ export interface InstantiateRequest {
 // https://github.com/paritytech/substrate/blob/0246883/frame/contracts/rpc/src/lib.rs#L119
 /// A struct that encodes RPC parameters required for a call to upload a new code.
 export interface CodeUploadRequest {
-  origin: AccId;
+  origin: AccountId;
   code: Hex;
   storageDepositLimit: NumberOrHex | undefined;
 }
@@ -202,7 +202,7 @@ export interface InstantiateReturnValue {
   /// The output of the called constructor.
   result: ExecReturnValue;
   /// The account id of the new contract.
-  account_id: AccId;
+  account_id: AccountId;
 }
 
 // https://github.com/paritytech/substrate/blob/0246883/frame/contracts/rpc/src/lib.rs#L127
@@ -240,7 +240,7 @@ export type ContractsRpc = {
   /// Returns the value under a specified storage `key` in a contract given by `address` param,
   /// or `None` if it is not set.
   contracts_getStorage(
-    accountId: AccId,
+    accountId: AccountId,
     key: Hex,
     aat?: Hash,
   ): Result<Hex | null>;

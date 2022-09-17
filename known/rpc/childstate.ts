@@ -1,4 +1,3 @@
-import { TODO_NARROW_METHOD_TYPE } from "../rpc.ts";
 import { Hash, Hex, Result } from "./utils.ts";
 
 // https://github.com/paritytech/substrate/blob/4d04aba/primitives/storage/src/lib.rs
@@ -34,7 +33,7 @@ export type ChildStateRpc = {
     count: number,
     startKey?: StorageKey,
     hash?: Hash,
-  ): TODO_NARROW_METHOD_TYPE;
+  ): Result<StorageKey[]>;
   /// Returns a child storage entry at a specific block's state.
   childState_getStorage(
     childStorageKey: PrefixedStorageKey,
