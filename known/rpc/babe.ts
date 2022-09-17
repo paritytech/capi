@@ -1,4 +1,4 @@
-import { AccId, Result } from "./utils.ts";
+import { AccountId, Result } from "./utils.ts";
 
 // https://github.com/paritytech/substrate/blob/9b01569/client/consensus/babe/rpc/src/lib.rs#L154
 /// Holds information about the `slot`'s that can be claimed by a given key.
@@ -17,5 +17,5 @@ export type BabeRpc = {
    * Returns data about which slots (primary or secondary) can be claimed in
    * the current epoch with the keys in the keystore.
    */
-  babe_epochAuthorship(): Result<Record<AccId, EpochAuthorship>>;
+  babe_epochAuthorship(): Result<Record<AccountId, EpochAuthorship>>;
 };
