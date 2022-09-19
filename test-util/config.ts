@@ -92,7 +92,7 @@ function isPortAvailable(port: number): boolean {
   }
 }
 
-function getRandomPort(min = 49152, max = 65534): number {
+export function getRandomPort(min = 49152, max = 65534): number {
   let randomPort: number;
 
   do {

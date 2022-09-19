@@ -3,44 +3,38 @@ import { deadline, deferred } from "../../deps/std/async.ts";
 import { ErrorCtor } from "../../util/mod.ts";
 import * as B from "../Base.ts";
 import { ClientHooks, ParseRawIngressMessageError } from "../common.ts";
+import { WebSocketProxy } from "./web-socket-proxy.ts";
 
 export type ProxyClientHooks<Config_ extends Config<string>> = ClientHooks<Config_, Event>;
 
-export function proxyClient<Config_ extends Config<string>>(
+export async function proxyClient<Config_ extends Config<string>>(
   config: Config_,
   hooks?: ProxyClientHooks<Config_>,
 ): Promise<ProxyClient<Config_> | FailedToOpenConnectionError> {
-  const ws = new WebSocket(config.discoveryValue);
-  const client = new ProxyClient(ws, hooks);
-  ws.addEventListener("error", client.onError);
-  ws.addEventListener("message", client.onMessage);
-  const pending = deferred<ProxyClient<Config_> | FailedToOpenConnectionError>();
-  if (ws.readyState === WebSocket.CONNECTING) {
-    const onOpenError = (e: any) => {
-      console.log({ log: e });
-      clearListeners();
-      pending.resolve(new FailedToOpenConnectionError());
-    };
-    const onOpen = () => {
-      clearListeners();
-      pending.resolve(client);
-    };
-    const clearListeners = () => {
-      ws.removeEventListener("error", onOpenError);
-      ws.removeEventListener("open", onOpen);
-    };
-    ws.addEventListener("error", onOpenError);
-    ws.addEventListener("open", onOpen);
-  } else {
-    pending.resolve(client);
+  const wsIsOpen = deferred();
+  const ws = new WebSocketProxy({
+    webSocketFactory: () => new WebSocket(config.discoveryValue),
+  });
+
+  ws.onopen = () => wsIsOpen.resolve();
+  ws.onerror = () => wsIsOpen.reject();
+
+  try {
+    await wsIsOpen;
+  } catch (_e) {
+    return new FailedToOpenConnectionError();
+  } finally {
+    ws.onopen = undefined;
+    ws.onerror = undefined;
   }
-  return pending;
+
+  return new ProxyClient(ws, hooks);
 }
 
 export class ProxyClient<Config_ extends Config>
   extends B.Client<Config_, MessageEvent, Event, FailedToDisconnectError>
 {
-  constructor(ws: WebSocket, hooks?: ProxyClientHooks<Config_>) {
+  constructor(ws: WebSocketProxy, hooks?: ProxyClientHooks<Config_>) {
     super(
       {
         parseIngressMessage: (e) => {
@@ -58,25 +52,29 @@ export class ProxyClient<Config_ extends Config>
           ws.send(JSON.stringify(egressMessage));
         },
         close: async () => {
-          const pending = deferred<undefined | FailedToDisconnectError>();
-          const onClose = () => {
-            ws.removeEventListener("error", this.onError);
-            ws.removeEventListener("message", this.onMessage);
-            ws.removeEventListener("close", onClose);
-            pending.resolve();
-          };
-          ws.addEventListener("close", onClose);
+          const isClosed = deferred<undefined | FailedToDisconnectError>();
+
+          ws.onclose = () => isClosed.resolve();
           ws.close();
+
           try {
-            await deadline(pending, 250);
+            await deadline(isClosed, 250);
           } catch (_e) {
-            pending.resolve(new FailedToDisconnectError());
+            isClosed.resolve(new FailedToDisconnectError());
+          } finally {
+            ws.onclose = undefined;
+            ws.onmessage = undefined;
+            ws.onerror = undefined;
           }
-          return pending;
+
+          return isClosed;
         },
       },
       hooks,
     );
+
+    ws.onmessage = this.onMessage;
+    ws.onerror = this.onError;
   }
 }
 
