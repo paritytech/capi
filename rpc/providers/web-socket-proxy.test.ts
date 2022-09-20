@@ -1,4 +1,6 @@
+import sinon from "../../deps/sinon.ts";
 import { deferred } from "../../deps/std/async.ts";
+import { assert } from "../../deps/std/testing/asserts.ts";
 import { polkadot } from "../../known/mod.ts";
 import { getRandomPort } from "../../test-util/mod.ts";
 import { WebSocketProxy } from "./web-socket-proxy.ts";
@@ -9,17 +11,7 @@ Deno.test({
     await t.step({
       name: "reconnect on client-side WebSocket close",
       async fn() {
-        let firstConnection: WebSocket;
-
-        const webSocketFactory = () => {
-          const ws = new WebSocket(polkadot.discoveryValue);
-
-          if (!firstConnection) {
-            firstConnection = ws;
-          }
-
-          return ws;
-        };
+        const webSocketFactory = sinon.spy(() => new WebSocket(polkadot.discoveryValue));
 
         const webSocketProxy = new WebSocketProxy({
           webSocketFactory,
@@ -39,7 +31,7 @@ Deno.test({
         const isClosed = deferred();
         webSocketProxy.onclose = () => isClosed.resolve();
 
-        firstConnection!.close();
+        webSocketFactory.lastCall.returnValue.close();
 
         await Promise.all([isClosed, isReopen]);
 
@@ -48,6 +40,8 @@ Deno.test({
         webSocketProxy.close();
 
         await isManuallyClosed;
+
+        assert(webSocketFactory.calledTwice);
       },
     });
 
@@ -58,10 +52,10 @@ Deno.test({
         const listener = Deno.listen({ port });
         startWebSocketServer(listener);
 
+        const webSocketFactory = sinon.spy(() => new WebSocket(`ws://localhost:${port}`));
+
         const webSocketProxy = new WebSocketProxy({
-          webSocketFactory() {
-            return new WebSocket(`ws://localhost:${port}`);
-          },
+          webSocketFactory,
         });
 
         const isOpen = deferred();
@@ -82,6 +76,8 @@ Deno.test({
 
         listener.close();
         webSocketProxy.close();
+
+        assert(webSocketFactory.calledTwice);
       },
     });
   },
@@ -91,24 +87,13 @@ Deno.test({
  * Starts a WebSocket server that closes the WebSocket connection on the first message
  */
 async function startWebSocketServer(listener: Deno.Listener) {
-  async function handleConn(conn: Deno.Conn) {
-    const httpConn = Deno.serveHttp(conn);
-    for await (const e of httpConn) {
-      e.respondWith(handle(e.request));
-    }
-  }
-
-  function handle(req: Request) {
-    const { socket, response } = Deno.upgradeWebSocket(req);
-
-    socket.onmessage = () => {
-      socket.close();
-    };
-
-    return response;
-  }
-
   for await (const conn of listener) {
-    handleConn(conn);
+    for await (const e of Deno.serveHttp(conn)) {
+      const { socket, response } = Deno.upgradeWebSocket(e.request);
+      socket.onmessage = () => {
+        socket.close();
+      };
+      e.respondWith(response);
+    }
   }
 }
