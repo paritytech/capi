@@ -9,7 +9,6 @@ export type ProxyClientHooks<Config_ extends Config<string>> = ClientHooks<Confi
 
 export async function proxyClient<Config_ extends Config<string>>(
   config: Config_,
-  hooks?: ProxyClientHooks<Config_>,
 ): Promise<ProxyClient<Config_> | FailedToOpenConnectionError> {
   const wsIsOpen = deferred();
   const ws = new WSContainer({
@@ -28,13 +27,13 @@ export async function proxyClient<Config_ extends Config<string>>(
     ws.onerror = undefined;
   }
 
-  return new ProxyClient(ws, hooks);
+  return new ProxyClient(ws);
 }
 
 export class ProxyClient<Config_ extends Config>
   extends B.Client<Config_, MessageEvent, Event, FailedToDisconnectError>
 {
-  constructor(ws: WSContainer, hooks?: ProxyClientHooks<Config_>) {
+  constructor(ws: WSContainer) {
     super(
       {
         parseIngressMessage: (e) => {
@@ -63,7 +62,6 @@ export class ProxyClient<Config_ extends Config>
           return isClosed;
         },
       },
-      hooks,
     );
 
     ws.onmessage = this.onMessage;
