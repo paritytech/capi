@@ -1,6 +1,7 @@
 import { Config as Config_ } from "../config/mod.ts";
 import { fail } from "../deps/std/testing/asserts.ts";
 import { rpc, TmpMetadata } from "../known/mod.ts";
+import { getRandomPort, isPortAvailable, waitForPort } from "./port.ts";
 
 export interface NodeProps {
   altRuntime?: "kusama" | "rococo" | "westend";
@@ -72,60 +73,5 @@ export async function config(props?: NodeProps): Promise<Config> {
       fail("Must have Polkadot installed locally. Visit https://github.com/paritytech/polkadot.");
     }
     throw e; // TODO: don't go nuclear without proper messaging
-  }
-}
-
-function isPortAvailable(port: number): boolean {
-  try {
-    const listener = Deno.listen({
-      transport: "tcp",
-      hostname: "127.0.0.1",
-      port,
-    });
-    listener.close();
-    return true;
-  } catch (error) {
-    if (error instanceof Deno.errors.AddrInUse) {
-      return false;
-    }
-    throw error;
-  }
-}
-
-export function getRandomPort(min = 49152, max = 65534): number {
-  let randomPort: number;
-
-  do {
-    randomPort = Math.floor(Math.random() * (max - min + 1) + min);
-  } while (!isPortAvailable(randomPort));
-
-  return randomPort;
-}
-
-async function waitForPort(
-  connectOptions: Deno.ConnectOptions,
-): Promise<void> {
-  let attempts = 60;
-  const delayBetweenAttempts = 500;
-
-  while (attempts > 0) {
-    attempts--;
-
-    try {
-      const connection = await Deno.connect(connectOptions);
-      connection.close();
-
-      break;
-    } catch (error) {
-      if (
-        error instanceof Deno.errors.ConnectionRefused
-        && attempts > 0
-      ) {
-        await new Promise((resolve) => setTimeout(resolve, delayBetweenAttempts));
-        continue;
-      }
-
-      throw error;
-    }
   }
 }
