@@ -3,7 +3,7 @@ import { deadline, deferred } from "../../deps/std/async.ts";
 import { ErrorCtor } from "../../util/mod.ts";
 import * as B from "../Base.ts";
 import { ClientHooks, ParseRawIngressMessageError } from "../common.ts";
-import { WebSocketProxy } from "./web-socket-proxy.ts";
+import { WSContainer } from "./ws_container.ts";
 
 export type ProxyClientHooks<Config_ extends Config<string>> = ClientHooks<Config_, Event>;
 
@@ -12,7 +12,7 @@ export async function proxyClient<Config_ extends Config<string>>(
   hooks?: ProxyClientHooks<Config_>,
 ): Promise<ProxyClient<Config_> | FailedToOpenConnectionError> {
   const wsIsOpen = deferred();
-  const ws = new WebSocketProxy({
+  const ws = new WSContainer({
     webSocketFactory: () => new WebSocket(config.discoveryValue),
   });
 
@@ -34,7 +34,7 @@ export async function proxyClient<Config_ extends Config<string>>(
 export class ProxyClient<Config_ extends Config>
   extends B.Client<Config_, MessageEvent, Event, FailedToDisconnectError>
 {
-  constructor(ws: WebSocketProxy, hooks?: ProxyClientHooks<Config_>) {
+  constructor(ws: WSContainer, hooks?: ProxyClientHooks<Config_>) {
     super(
       {
         parseIngressMessage: (e) => {
