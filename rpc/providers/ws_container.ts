@@ -68,10 +68,10 @@ export class WSContainer implements Pick<WebSocket, "send" | "close"> {
     this.#isReconnecting = false;
     this.#webSocket = this.options.webSocketFactory();
 
-    this.#webSocket.onopen = this.#onWSOpen;
-    this.#webSocket.onclose = this.#onWSClose;
-    this.#webSocket.onmessage = this.#onWSMessage;
-    this.#webSocket.onerror = this.#onWSError;
+    this.#webSocket.onopen = this.#onWsOpen;
+    this.#webSocket.onclose = this.#onWsClose;
+    this.#webSocket.onmessage = this.#onWsMessage;
+    this.#webSocket.onerror = this.#onWsError;
   }
 
   #reconnect() {
@@ -98,23 +98,23 @@ export class WSContainer implements Pick<WebSocket, "send" | "close"> {
     );
   }
 
-  #onWSOpen = (ev: WebSocketEventMap["open"]) => {
+  #onWsOpen = (ev: WebSocketEventMap["open"]) => {
     this.onopen?.(ev);
 
     this.#reconnectAttempts = 0;
   };
 
-  #onWSClose = (ev: WebSocketEventMap["close"]) => {
+  #onWsClose = (ev: WebSocketEventMap["close"]) => {
     this.#reconnect();
 
     this.onclose?.(ev);
   };
 
-  #onWSMessage = (ev: WebSocketEventMap["message"]) => {
+  #onWsMessage = (ev: WebSocketEventMap["message"]) => {
     this.onmessage?.(ev);
   };
 
-  #onWSError = (ev: WebSocketEventMap["error"]) => {
+  #onWsError = (ev: WebSocketEventMap["error"]) => {
     this.onerror?.(ev);
   };
 }
