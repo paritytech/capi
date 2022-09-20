@@ -3,17 +3,17 @@ import { deferred } from "../../deps/std/async.ts";
 import { assert } from "../../deps/std/testing/asserts.ts";
 import { polkadot } from "../../known/mod.ts";
 import { getRandomPort } from "../../test-util/mod.ts";
-import { WSContainer } from "./ws_container.ts";
+import { WsContainer } from "./ws_container.ts";
 
 Deno.test({
-  name: "WSContainer",
+  name: "WsContainer",
   async fn(t) {
     await t.step({
       name: "reconnect on client-side WebSocket close",
       async fn() {
         const webSocketFactory = sinon.spy(() => new WebSocket(polkadot.discoveryValue));
 
-        const webSocketProxy = new WSContainer({
+        const webSocketProxy = new WsContainer({
           webSocketFactory,
           reconnect: {
             delay: 0,
@@ -54,7 +54,7 @@ Deno.test({
 
         const webSocketFactory = sinon.spy(() => new WebSocket(`ws://localhost:${port}`));
 
-        const webSocketProxy = new WSContainer({
+        const webSocketProxy = new WsContainer({
           webSocketFactory,
         });
 

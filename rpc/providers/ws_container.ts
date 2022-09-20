@@ -9,7 +9,7 @@ type WebSocketClientOptions = {
   reconnect?: ReconnectOptions;
 };
 
-export class WSContainer implements Pick<WebSocket, "send" | "close"> {
+export class WsContainer implements Pick<WebSocket, "send" | "close"> {
   onopen?: (e: WebSocketEventMap["open"]) => void;
   onclose?: (e: WebSocketEventMap["close"]) => void;
   onmessage?: (e: WebSocketEventMap["message"]) => void;
