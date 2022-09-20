@@ -20,39 +20,31 @@ Deno.test({
         });
 
         await new Promise((resolve) => {
-          wsContainer.listen("open", (stop) =>
-            () => {
-              stop();
-              resolve(undefined);
-            });
+          wsContainer.once("open", () => {
+            resolve(undefined);
+          });
         });
 
         webSocketFactory.lastCall.returnValue.close();
 
         await new Promise((resolve) => {
-          wsContainer.listen("close", (stop) =>
-            () => {
-              stop();
-              resolve(undefined);
-            });
+          wsContainer.once("close", () => {
+            resolve(undefined);
+          });
         });
 
         await new Promise((resolve) => {
-          wsContainer.listen("open", (stop) =>
-            () => {
-              stop();
-              resolve(undefined);
-            });
+          wsContainer.once("open", () => {
+            resolve(undefined);
+          });
         });
 
         wsContainer.close();
 
         await new Promise((resolve) => {
-          wsContainer.listen("close", (stop) =>
-            () => {
-              stop();
-              resolve(undefined);
-            });
+          wsContainer.once("close", () => {
+            resolve(undefined);
+          });
         });
 
         assert(webSocketFactory.calledTwice);
@@ -76,29 +68,23 @@ Deno.test({
         });
 
         await new Promise((resolve) => {
-          wsContainer.listen("open", (stop) =>
-            () => {
-              stop();
-              resolve(undefined);
-            });
+          wsContainer.once("open", () => {
+            resolve(undefined);
+          });
         });
 
         wsContainer.send("a message!");
 
         await new Promise((resolve) => {
-          wsContainer.listen("close", (stop) =>
-            () => {
-              stop();
-              resolve(undefined);
-            });
+          wsContainer.once("close", () => {
+            resolve(undefined);
+          });
         });
 
         await new Promise((resolve) => {
-          wsContainer.listen("open", (stop) =>
-            () => {
-              stop();
-              resolve(undefined);
-            });
+          wsContainer.once("open", () => {
+            resolve(undefined);
+          });
         });
 
         wsContainer.send("a message!");

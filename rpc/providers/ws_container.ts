@@ -55,26 +55,29 @@ export class WsContainer {
 
     const webSocket = this.#webSocket;
 
-    webSocket.onopen = null;
-    webSocket.onclose = null;
-    webSocket.onmessage = null;
-    webSocket.onerror = null;
+    webSocket.removeEventListener("open", this.#onWsOpen);
+    webSocket.removeEventListener("close", this.#onWsClose);
+    webSocket.removeEventListener("message", this.#onWsMessage);
+    webSocket.removeEventListener("error", this.#onWsError);
 
     webSocket.close();
 
     if (this.#webSocket.readyState === WebSocket.CLOSED) {
-      this.#dispatch(new CloseEvent("close", { wasClean: true }));
+      this.#emit(new CloseEvent("close", { wasClean: true }));
       this.#removeAllListeners();
     } else {
-      webSocket.onclose = () => {
-        this.#dispatch(new CloseEvent("close", { wasClean: true }));
-        this.#removeAllListeners();
-        webSocket.onclose = null;
-      };
+      webSocket.addEventListener(
+        "close",
+        () => {
+          this.#emit(new CloseEvent("close", { wasClean: true }));
+          this.#removeAllListeners();
+        },
+        { once: true },
+      );
     }
   }
 
-  listen<K extends WebSocketEventTypes>(
+  addListener<K extends WebSocketEventTypes>(
     type: K,
     createListenerCb: U.CreateWatchHandler<WebSocketEventMap[K]>,
   ) {
@@ -85,7 +88,21 @@ export class WsContainer {
     this.#listeners[type].add(listenerCb);
   }
 
-  #dispatch<K extends WebSocketEventTypes>(event: WebSocketEventMap[K]) {
+  once<K extends WebSocketEventTypes>(
+    type: K,
+    watchHandler: U.WatchHandler<WebSocketEventMap[K]>,
+  ) {
+    this.addListener(
+      type,
+      (stop) =>
+        (e) => {
+          stop();
+          watchHandler(e);
+        },
+    );
+  }
+
+  #emit<K extends WebSocketEventTypes>(event: WebSocketEventMap[K]) {
     for (const listener of this.#listeners[event.type as K]) {
       listener(event);
     }
@@ -102,10 +119,10 @@ export class WsContainer {
     this.#isReconnecting = false;
     this.#webSocket = this.options.webSocketFactory();
 
-    this.#webSocket.onopen = this.#onWsOpen;
-    this.#webSocket.onclose = this.#onWsClose;
-    this.#webSocket.onmessage = this.#onWsMessage;
-    this.#webSocket.onerror = this.#onWsError;
+    this.#webSocket.addEventListener("open", this.#onWsOpen);
+    this.#webSocket.addEventListener("close", this.#onWsClose);
+    this.#webSocket.addEventListener("message", this.#onWsMessage);
+    this.#webSocket.addEventListener("error", this.#onWsError);
   }
 
   #reconnect() {
@@ -133,7 +150,7 @@ export class WsContainer {
   }
 
   #onWsOpen = (ev: WebSocketEventMap["open"]) => {
-    this.#dispatch(ev);
+    this.#emit(ev);
 
     this.#reconnectAttempts = 0;
   };
@@ -141,14 +158,14 @@ export class WsContainer {
   #onWsClose = (ev: WebSocketEventMap["close"]) => {
     this.#reconnect();
 
-    this.#dispatch(ev);
+    this.#emit(ev);
   };
 
   #onWsMessage = (ev: WebSocketEventMap["message"]) => {
-    this.#dispatch(ev);
+    this.#emit(ev);
   };
 
   #onWsError = (ev: WebSocketEventMap["error"]) => {
-    this.#dispatch(ev);
+    this.#emit(ev);
   };
 }

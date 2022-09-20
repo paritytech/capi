@@ -1,5 +1,5 @@
 import { Config } from "../../config/mod.ts";
-import { CreateWatchHandler, ErrorCtor } from "../../util/mod.ts";
+import { ErrorCtor } from "../../util/mod.ts";
 import * as B from "../Base.ts";
 import { ClientHooks, ParseRawIngressMessageError } from "../common.ts";
 import { WsContainer } from "./ws_container.ts";
@@ -14,18 +14,8 @@ export function proxyClient<Config_ extends Config<string>>(
   });
 
   return new Promise((resolve) => {
-    const createWatchHandler: CreateWatchHandler<Event> = (stop) =>
-      (e: Event) => {
-        stop();
-        if (e.type === "error") {
-          resolve(new FailedToOpenConnectionError());
-        } else {
-          resolve(new ProxyClient(ws));
-        }
-      };
-
-    ws.listen("open", createWatchHandler);
-    ws.listen("error", createWatchHandler);
+    ws.once("open", () => resolve(new ProxyClient(ws)));
+    ws.once("error", () => resolve(new FailedToOpenConnectionError()));
   });
 }
 
@@ -51,24 +41,14 @@ export class ProxyClient<Config_ extends Config>
         },
         close: () =>
           new Promise((resolve) => {
-            ws.listen("close", (stop) =>
-              () => {
-                stop();
-                resolve(undefined);
-              });
+            ws.once("close", () => resolve(undefined));
             ws.close();
           }),
       },
     );
 
-    ws.listen("message", () =>
-      (e) => {
-        this.onMessage(e);
-      });
-    ws.listen("error", () =>
-      (e) => {
-        this.onError(e);
-      });
+    ws.addListener("message", () => this.onMessage);
+    ws.addListener("error", () => this.onError);
   }
 }
 
