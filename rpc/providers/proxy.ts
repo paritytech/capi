@@ -1,33 +1,32 @@
 import { Config } from "../../config/mod.ts";
-import { deferred } from "../../deps/std/async.ts";
-import { ErrorCtor } from "../../util/mod.ts";
+import { CreateWatchHandler, ErrorCtor } from "../../util/mod.ts";
 import * as B from "../Base.ts";
 import { ClientHooks, ParseRawIngressMessageError } from "../common.ts";
 import { WsContainer } from "./ws_container.ts";
 
 export type ProxyClientHooks<Config_ extends Config<string>> = ClientHooks<Config_, Event>;
 
-export async function proxyClient<Config_ extends Config<string>>(
+export function proxyClient<Config_ extends Config<string>>(
   config: Config_,
 ): Promise<ProxyClient<Config_> | FailedToOpenConnectionError> {
-  const wsIsOpen = deferred();
   const ws = new WsContainer({
     webSocketFactory: () => new WebSocket(config.discoveryValue),
   });
 
-  ws.onopen = () => wsIsOpen.resolve();
-  ws.onerror = () => wsIsOpen.reject();
+  return new Promise((resolve) => {
+    const createWatchHandler: CreateWatchHandler<Event> = (stop) =>
+      (e: Event) => {
+        stop();
+        if (e.type === "error") {
+          resolve(new FailedToOpenConnectionError());
+        } else {
+          resolve(new ProxyClient(ws));
+        }
+      };
 
-  try {
-    await wsIsOpen;
-  } catch (_e) {
-    return new FailedToOpenConnectionError();
-  } finally {
-    ws.onopen = undefined;
-    ws.onerror = undefined;
-  }
-
-  return new ProxyClient(ws);
+    ws.listen("open", createWatchHandler);
+    ws.listen("error", createWatchHandler);
+  });
 }
 
 export class ProxyClient<Config_ extends Config>
@@ -50,22 +49,26 @@ export class ProxyClient<Config_ extends Config>
         send: (egressMessage) => {
           ws.send(JSON.stringify(egressMessage));
         },
-        close: () => {
-          const isClosed = deferred<undefined>();
-          ws.onclose = () => {
-            isClosed.resolve();
-            ws.onclose = undefined;
-            ws.onmessage = undefined;
-            ws.onerror = undefined;
-          };
-          ws.close();
-          return isClosed;
-        },
+        close: () =>
+          new Promise((resolve) => {
+            ws.listen("close", (stop) =>
+              () => {
+                stop();
+                resolve(undefined);
+              });
+            ws.close();
+          }),
       },
     );
 
-    ws.onmessage = this.onMessage;
-    ws.onerror = this.onError;
+    ws.listen("message", () =>
+      (e) => {
+        this.onMessage(e);
+      });
+    ws.listen("error", () =>
+      (e) => {
+        this.onError(e);
+      });
   }
 }
 

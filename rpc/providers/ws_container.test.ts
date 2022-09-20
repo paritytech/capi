@@ -1,5 +1,4 @@
 import sinon from "../../deps/sinon.ts";
-import { deferred } from "../../deps/std/async.ts";
 import { assert } from "../../deps/std/testing/asserts.ts";
 import { polkadot } from "../../known/mod.ts";
 import { getRandomPort } from "../../test-util/mod.ts";
@@ -13,33 +12,48 @@ Deno.test({
       async fn() {
         const webSocketFactory = sinon.spy(() => new WebSocket(polkadot.discoveryValue));
 
-        const webSocketProxy = new WsContainer({
+        const wsContainer = new WsContainer({
           webSocketFactory,
           reconnect: {
             delay: 0,
           },
         });
 
-        const isOpen = deferred();
-        webSocketProxy.onopen = () => isOpen.resolve();
-
-        await isOpen;
-
-        const isReopen = deferred();
-        webSocketProxy.onopen = () => isReopen.resolve();
-
-        const isClosed = deferred();
-        webSocketProxy.onclose = () => isClosed.resolve();
+        await new Promise((resolve) => {
+          wsContainer.listen("open", (stop) =>
+            () => {
+              stop();
+              resolve(undefined);
+            });
+        });
 
         webSocketFactory.lastCall.returnValue.close();
 
-        await Promise.all([isClosed, isReopen]);
+        await new Promise((resolve) => {
+          wsContainer.listen("close", (stop) =>
+            () => {
+              stop();
+              resolve(undefined);
+            });
+        });
 
-        const isManuallyClosed = deferred();
-        webSocketProxy.onclose = () => isManuallyClosed.resolve();
-        webSocketProxy.close();
+        await new Promise((resolve) => {
+          wsContainer.listen("open", (stop) =>
+            () => {
+              stop();
+              resolve(undefined);
+            });
+        });
 
-        await isManuallyClosed;
+        wsContainer.close();
+
+        await new Promise((resolve) => {
+          wsContainer.listen("close", (stop) =>
+            () => {
+              stop();
+              resolve(undefined);
+            });
+        });
 
         assert(webSocketFactory.calledTwice);
       },
@@ -54,28 +68,43 @@ Deno.test({
 
         const webSocketFactory = sinon.spy(() => new WebSocket(`ws://localhost:${port}`));
 
-        const webSocketProxy = new WsContainer({
+        const wsContainer = new WsContainer({
           webSocketFactory,
+          reconnect: {
+            delay: 0,
+          },
         });
 
-        const isOpen = deferred();
-        webSocketProxy.onopen = () => isOpen.resolve();
-        await isOpen;
+        await new Promise((resolve) => {
+          wsContainer.listen("open", (stop) =>
+            () => {
+              stop();
+              resolve(undefined);
+            });
+        });
 
-        webSocketProxy.send("a message!");
+        wsContainer.send("a message!");
 
-        const isClosed = deferred();
-        webSocketProxy.onclose = () => isClosed.resolve();
+        await new Promise((resolve) => {
+          wsContainer.listen("close", (stop) =>
+            () => {
+              stop();
+              resolve(undefined);
+            });
+        });
 
-        const isReopen = deferred();
-        webSocketProxy.onopen = () => isReopen.resolve();
+        await new Promise((resolve) => {
+          wsContainer.listen("open", (stop) =>
+            () => {
+              stop();
+              resolve(undefined);
+            });
+        });
 
-        await Promise.all([isClosed, isReopen]);
-
-        webSocketProxy.send("a message!");
+        wsContainer.send("a message!");
 
         listener.close();
-        webSocketProxy.close();
+        wsContainer.close();
 
         assert(webSocketFactory.calledTwice);
       },
