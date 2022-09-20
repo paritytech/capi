@@ -1,5 +1,5 @@
 import { Config } from "../../config/mod.ts";
-import { deadline, deferred } from "../../deps/std/async.ts";
+import { deferred } from "../../deps/std/async.ts";
 import { ErrorCtor } from "../../util/mod.ts";
 import * as B from "../Base.ts";
 import { ClientHooks, ParseRawIngressMessageError } from "../common.ts";
@@ -51,22 +51,15 @@ export class ProxyClient<Config_ extends Config>
         send: (egressMessage) => {
           ws.send(JSON.stringify(egressMessage));
         },
-        close: async () => {
-          const isClosed = deferred<undefined | FailedToDisconnectError>();
-
-          ws.onclose = () => isClosed.resolve();
-          ws.close();
-
-          try {
-            await deadline(isClosed, 250);
-          } catch (_e) {
-            isClosed.resolve(new FailedToDisconnectError());
-          } finally {
+        close: () => {
+          const isClosed = deferred<undefined>();
+          ws.onclose = () => {
+            isClosed.resolve();
             ws.onclose = undefined;
             ws.onmessage = undefined;
             ws.onerror = undefined;
-          }
-
+          };
+          ws.close();
           return isClosed;
         },
       },
