@@ -28,7 +28,6 @@ export class WsContainer {
   #webSocket!: WebSocket;
   #isClosed = false;
   #isReconnecting = false;
-
   #reconnectTimeoutId?: number;
   #reconnectAttempts = 0;
   #reconnectMaxAttempts: number;
@@ -37,7 +36,6 @@ export class WsContainer {
   constructor(private readonly options: WebSocketClientOptions) {
     this.#reconnectMaxAttempts = options.reconnect?.maxAttempts ?? 5;
     this.#reconnectDelay = options.reconnect?.delay ?? 1000;
-
     this.#connect();
   }
 
@@ -51,18 +49,13 @@ export class WsContainer {
 
   close(): void {
     clearTimeout(this.#reconnectTimeoutId);
-
     this.#isClosed = true;
-
     const webSocket = this.#webSocket;
-
     webSocket.removeEventListener("open", this.#onWsOpen);
     webSocket.removeEventListener("close", this.#onWsClose);
     webSocket.removeEventListener("message", this.#onWsMessage);
     webSocket.removeEventListener("error", this.#onWsError);
-
     webSocket.close();
-
     if (this.#webSocket.readyState === WebSocket.CLOSED) {
       this.#emit(new CloseEvent("close", { wasClean: true }));
     } else {
@@ -119,7 +112,6 @@ export class WsContainer {
     this.#isClosed = false;
     this.#isReconnecting = false;
     this.#webSocket = this.options.webSocketFactory();
-
     this.#webSocket.addEventListener("open", this.#onWsOpen);
     this.#webSocket.addEventListener("close", this.#onWsClose);
     this.#webSocket.addEventListener("message", this.#onWsMessage);
@@ -130,20 +122,16 @@ export class WsContainer {
     if (this.#isClosed) {
       return;
     }
-
     // TODO: extract reconnect logic in a class/util
     // it should be cancellable
     if (this.#isReconnecting) {
       return;
     }
-
     if (this.#reconnectAttempts === this.#reconnectMaxAttempts) {
       return;
     }
-
     this.#reconnectAttempts++;
     this.#isReconnecting = true;
-
     this.#reconnectTimeoutId = setTimeout(
       () => this.#connect(),
       this.#reconnectDelay,
@@ -152,13 +140,11 @@ export class WsContainer {
 
   #onWsOpen = (ev: WebSocketEventMap["open"]) => {
     this.#emit(ev);
-
     this.#reconnectAttempts = 0;
   };
 
   #onWsClose = (ev: WebSocketEventMap["close"]) => {
     this.#reconnect();
-
     this.#emit(ev);
   };
 

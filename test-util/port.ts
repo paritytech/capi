@@ -30,14 +30,11 @@ export async function waitForPort(
 ): Promise<void> {
   let attempts = 60;
   const delayBetweenAttempts = 500;
-
   while (attempts > 0) {
     attempts--;
-
     try {
       const connection = await Deno.connect(connectOptions);
       connection.close();
-
       break;
     } catch (error) {
       if (
@@ -47,7 +44,6 @@ export async function waitForPort(
         await new Promise((resolve) => setTimeout(resolve, delayBetweenAttempts));
         continue;
       }
-
       throw error;
     }
   }
