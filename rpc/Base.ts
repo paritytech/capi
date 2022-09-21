@@ -11,6 +11,7 @@ export abstract class Client<
   Config_ extends Config,
   RawIngressMessage,
   InternalError,
+  SendError extends Error,
   CloseError extends Error,
 > {
   #nextId = 0;
@@ -22,7 +23,7 @@ export abstract class Client<
    * @param hooks the error handling and message hooks with which you'd like the instance to operate
    */
   constructor(
-    readonly provider: Provider<Config_, RawIngressMessage, CloseError>,
+    readonly provider: Provider<Config_, RawIngressMessage, SendError, CloseError>,
     readonly hooks?: ClientHooks<Config_, InternalError>,
   ) {}
 
@@ -31,9 +32,9 @@ export abstract class Client<
    *
    * @param egressMessage the message you wish to send to the RPC server
    */
-  send = (egressMessage: msg.InitMessage<Config_>): void => {
+  send = (egressMessage: msg.InitMessage<Config_>): void | SendError => {
     this.hooks?.send?.(egressMessage);
-    this.provider.send(egressMessage);
+    return this.provider.send(egressMessage);
   };
 
   close = (): Promise<undefined | CloseError> => {
@@ -108,7 +109,11 @@ export abstract class Client<
         }
       };
     });
-    this.send(init);
+    const sendResult = this.send(init);
+    if (sendResult instanceof Error) {
+      // FIXME: ingressMessagePending should be resolved to a non-RPC Error
+      // and stopListening() should be invoked
+    }
     return ingressMessagePending;
   };
 

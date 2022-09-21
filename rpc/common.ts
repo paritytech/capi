@@ -8,6 +8,7 @@ export type ErrorDetails = Record<string, [code: number, data?: any]>;
 export interface Provider<
   Config_ extends Config,
   RawIngressMessage,
+  SendError extends Error,
   CloseError extends Error,
 > {
   /**
@@ -24,7 +25,7 @@ export interface Provider<
    *
    * @param egressMessage the message you wish to send to the RPC server
    */
-  send: (egressMessage: msg.InitMessage<Config_>) => void;
+  send: (egressMessage: msg.InitMessage<Config_>) => void | SendError;
   // TODO: introduce `FailedToClose` error in the return type (union with `undefined`)
   /**
    * Close the connection and free up resources
@@ -42,3 +43,9 @@ export interface ClientHooks<Config_ extends Config, InternalError> {
 }
 
 export class ParseRawIngressMessageError extends ErrorCtor("ParseRawIngressMessage") {}
+
+export class FailedToSendMessageError extends ErrorCtor("FailedToSendMessage") {
+  constructor(readonly inner: unknown) {
+    super();
+  }
+}

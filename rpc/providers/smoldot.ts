@@ -2,7 +2,7 @@ import { Config } from "../../config/mod.ts";
 import type * as smoldot from "../../deps/smoldot.ts";
 import { ErrorCtor } from "../../util/mod.ts";
 import { Client, OnMessage } from "../Base.ts";
-import { ClientHooks, ParseRawIngressMessageError } from "../common.ts";
+import { ClientHooks, FailedToSendMessageError, ParseRawIngressMessageError } from "../common.ts";
 
 export type SmoldotClientHooks<Config_ extends Config<string>> = ClientHooks<
   Config_,
@@ -32,9 +32,13 @@ export async function smoldotClient<Config_ extends Config<string>>(
   }
 }
 
-export class SmoldotClient<Config_ extends Config<string>>
-  extends Client<Config_, string, SmoldotInternalError, FailedToRemoveChainError>
-{
+export class SmoldotClient<Config_ extends Config<string>> extends Client<
+  Config_,
+  string,
+  SmoldotInternalError,
+  FailedToSendMessageError,
+  FailedToRemoveChainError
+> {
   #chain?: smoldot.Chain;
 
   constructor(
@@ -52,7 +56,11 @@ export class SmoldotClient<Config_ extends Config<string>>
           }
         },
         send: (egressMessage) => {
-          this.#chain?.sendJsonRpc(JSON.stringify(egressMessage));
+          try {
+            return this.#chain?.sendJsonRpc(JSON.stringify(egressMessage));
+          } catch (error) {
+            return new FailedToSendMessageError(error);
+          }
         },
         close: () => {
           return Promise.resolve((() => {
