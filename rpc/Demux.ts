@@ -16,11 +16,14 @@ export class Demux<
   Config_ extends Config,
   RawIngressMessage,
   InternalError,
+  SendError extends Error,
   CloseError extends Error,
 > {
   #groups = new Map<string, DemuxGroup<Config_>>();
 
-  constructor(readonly client: Client<Config_, RawIngressMessage, InternalError, CloseError>) {}
+  constructor(
+    readonly client: Client<Config_, RawIngressMessage, InternalError, SendError, CloseError>,
+  ) {}
 
   subscribe = async <MethodName extends Extract<keyof Config_["RpcSubscriptionMethods"], string>>(
     methodName: MethodName,
