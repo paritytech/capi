@@ -10,42 +10,21 @@ Deno.test({
     await t.step({
       name: "reconnect on client-side WebSocket close",
       async fn() {
-        const webSocketFactory = sinon.spy(() => new WebSocket(polkadot.discoveryValue));
-
+        const webSocketFactory = sinon.spy(
+          () => new WebSocket(polkadot.discoveryValue),
+        );
         const wsContainer = new WsContainer({
           webSocketFactory,
           reconnect: {
             delay: 0,
           },
         });
-
-        await new Promise((resolve) => {
-          wsContainer.once("open", () => {
-            resolve(undefined);
-          });
-        });
-
+        await wsContainer.once("open");
         webSocketFactory.lastCall.returnValue.close();
-
-        await new Promise((resolve) => {
-          wsContainer.once("close", () => {
-            resolve(undefined);
-          });
-        });
-
-        await new Promise((resolve) => {
-          wsContainer.once("open", () => {
-            resolve(undefined);
-          });
-        });
-
+        await wsContainer.once("close");
+        await wsContainer.once("open");
         wsContainer.close();
-
-        await new Promise((resolve) => {
-          wsContainer.once("close", () => {
-            resolve(undefined);
-          });
-        });
+        await wsContainer.once("close");
 
         assert(webSocketFactory.calledTwice);
       },
@@ -57,40 +36,23 @@ Deno.test({
         const port = getRandomPort();
         const listener = Deno.listen({ port });
         startWebSocketServer(listener);
-
-        const webSocketFactory = sinon.spy(() => new WebSocket(`ws://localhost:${port}`));
-
+        const webSocketFactory = sinon.spy(
+          () => new WebSocket(`ws://localhost:${port}`),
+        );
         const wsContainer = new WsContainer({
           webSocketFactory,
           reconnect: {
             delay: 0,
           },
         });
-
-        await new Promise((resolve) => {
-          wsContainer.once("open", () => {
-            resolve(undefined);
-          });
-        });
-
+        await wsContainer.once("open");
         wsContainer.send("a message!");
-
-        await new Promise((resolve) => {
-          wsContainer.once("close", () => {
-            resolve(undefined);
-          });
-        });
-
-        await new Promise((resolve) => {
-          wsContainer.once("open", () => {
-            resolve(undefined);
-          });
-        });
-
+        await wsContainer.once("close");
+        await wsContainer.once("open");
         wsContainer.send("a message!");
-
-        listener.close();
         wsContainer.close();
+        await wsContainer.once("close");
+        listener.close();
 
         assert(webSocketFactory.calledTwice);
       },

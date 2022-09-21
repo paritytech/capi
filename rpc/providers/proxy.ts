@@ -6,17 +6,17 @@ import { WsContainer } from "./ws_container.ts";
 
 export type ProxyClientHooks<Config_ extends Config<string>> = ClientHooks<Config_, Event>;
 
-export function proxyClient<Config_ extends Config<string>>(
+export async function proxyClient<Config_ extends Config<string>>(
   config: Config_,
 ): Promise<ProxyClient<Config_> | FailedToOpenConnectionError> {
   const ws = new WsContainer({
     webSocketFactory: () => new WebSocket(config.discoveryValue),
   });
-
-  return new Promise((resolve) => {
-    ws.once("open", () => resolve(new ProxyClient(ws)));
-    ws.once("error", () => resolve(new FailedToOpenConnectionError()));
-  });
+  const event = await ws.once(["open", "error"]);
+  if (event.type === "error") {
+    return new FailedToOpenConnectionError();
+  }
+  return new ProxyClient(ws);
 }
 
 export class ProxyClient<Config_ extends Config>
@@ -39,16 +39,17 @@ export class ProxyClient<Config_ extends Config>
         send: (egressMessage) => {
           ws.send(JSON.stringify(egressMessage));
         },
-        close: () =>
-          new Promise((resolve) => {
-            ws.once("close", () => resolve(undefined));
-            ws.close();
-          }),
+        close: async () => {
+          ws.removeListener("message", this.onMessage);
+          ws.removeListener("error", this.onError);
+          ws.close();
+          await ws.once("close");
+          return undefined;
+        },
       },
     );
-
-    ws.addListener("message", () => this.onMessage);
-    ws.addListener("error", () => this.onError);
+    ws.addListener("message", this.onMessage);
+    ws.addListener("error", this.onError);
   }
 }
 

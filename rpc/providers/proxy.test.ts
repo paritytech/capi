@@ -11,8 +11,6 @@ Deno.test({
 
     await t.step({
       name: "call",
-      sanitizeOps: false,
-      sanitizeResources: false,
       fn: async () => {
         const raw = await client.call("state_getMetadata", []);
         assert(typeof raw.result === "string");
@@ -21,8 +19,6 @@ Deno.test({
 
     await t.step({
       name: "subscribe",
-      sanitizeOps: false,
-      sanitizeResources: false,
       fn: async () => {
         const result: msg.NotifMessage<typeof polkadot, "chain_subscribeAllHeads">[] = [];
         let i = 1;

@@ -1,3 +1,4 @@
+import { deferred } from "../../deps/std/async.ts";
 import * as U from "../../util/mod.ts";
 
 type ReconnectOptions = {
@@ -64,14 +65,10 @@ export class WsContainer {
 
     if (this.#webSocket.readyState === WebSocket.CLOSED) {
       this.#emit(new CloseEvent("close", { wasClean: true }));
-      this.#removeAllListeners();
     } else {
       webSocket.addEventListener(
         "close",
-        () => {
-          this.#emit(new CloseEvent("close", { wasClean: true }));
-          this.#removeAllListeners();
-        },
+        () => this.#emit(new CloseEvent("close", { wasClean: true })),
         { once: true },
       );
     }
@@ -79,38 +76,42 @@ export class WsContainer {
 
   addListener<K extends WebSocketEventTypes>(
     type: K,
-    createListenerCb: U.CreateWatchHandler<WebSocketEventMap[K]>,
+    listener: U.WatchHandler<WebSocketEventMap[K]>,
   ) {
-    const stopListening = () => {
-      this.#listeners[type].delete(listenerCb);
-    };
-    const listenerCb = createListenerCb(stopListening);
-    this.#listeners[type].add(listenerCb);
+    this.#listeners[type].add(listener);
+  }
+
+  removeListener<K extends WebSocketEventTypes>(
+    type: K,
+    listener: U.WatchHandler<WebSocketEventMap[K]>,
+  ) {
+    this.#listeners[type].delete(listener);
   }
 
   once<K extends WebSocketEventTypes>(
-    type: K,
-    watchHandler: U.WatchHandler<WebSocketEventMap[K]>,
-  ) {
-    this.addListener(
-      type,
-      (stop) =>
-        (e) => {
-          stop();
-          watchHandler(e);
-        },
-    );
+    types: K | K[],
+  ): Promise<WebSocketEventMap[K]> {
+    const eventTypes = typeof types === "string"
+      ? [types]
+      : types;
+    const result = deferred<WebSocketEventMap[K]>();
+    const removeListeners = () =>
+      eventTypes
+        .forEach(
+          (t) => this.removeListener(t, listener),
+        );
+    const listener: U.WatchHandler<WebSocketEventMap[K]> = (e) => {
+      removeListeners();
+      result.resolve(e);
+    };
+    eventTypes
+      .forEach((type) => this.addListener(type, listener));
+    return result;
   }
 
   #emit<K extends WebSocketEventTypes>(event: WebSocketEventMap[K]) {
     for (const listener of this.#listeners[event.type as K]) {
       listener(event);
-    }
-  }
-
-  #removeAllListeners() {
-    for (const set of Object.values(this.#listeners)) {
-      set.clear();
     }
   }
 
