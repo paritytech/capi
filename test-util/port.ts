@@ -1,10 +1,8 @@
 export function getRandomPort(min = 49152, max = 65534): number {
   let randomPort: number;
-
   do {
     randomPort = Math.floor(Math.random() * (max - min + 1) + min);
   } while (!isPortAvailable(randomPort));
-
   return randomPort;
 }
 
