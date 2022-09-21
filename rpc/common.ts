@@ -35,13 +35,6 @@ export interface Provider<
   close: () => Promise<undefined | CloseError>;
 }
 
-export interface ClientHooks<Config_ extends Config, InternalError> {
-  send?: (message: msg.InitMessage<Config_>) => void;
-  receive?: (message: msg.IngressMessage<Config_>) => void;
-  error?: (error: ParseRawIngressMessageError | InternalError) => void;
-  close?: () => void;
-}
-
 export class ParseRawIngressMessageError extends ErrorCtor("ParseRawIngressMessage") {}
 
 export class FailedToSendMessageError extends ErrorCtor("FailedToSendMessage") {

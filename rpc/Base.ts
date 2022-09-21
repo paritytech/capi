@@ -1,7 +1,7 @@
 import { Config } from "../config/mod.ts";
 import { deferred } from "../deps/std/async.ts";
 import * as U from "../util/mod.ts";
-import { ClientHooks, Provider } from "./common.ts";
+import { Provider } from "./common.ts";
 import * as msg from "./messages.ts";
 import { IsCorrespondingRes } from "./util.ts";
 
@@ -19,12 +19,9 @@ export abstract class Client<
 
   /**
    * Construct a new RPC client
-   *
-   * @param hooks the error handling and message hooks with which you'd like the instance to operate
    */
   constructor(
     readonly provider: Provider<Config_, RawIngressMessage, SendError, CloseError>,
-    readonly hooks?: ClientHooks<Config_, InternalError>,
   ) {}
 
   /**
@@ -33,12 +30,10 @@ export abstract class Client<
    * @param egressMessage the message you wish to send to the RPC server
    */
   send = (egressMessage: msg.InitMessage<Config_>): void | SendError => {
-    this.hooks?.send?.(egressMessage);
     return this.provider.send(egressMessage);
   };
 
   close = (): Promise<undefined | CloseError> => {
-    this.hooks?.close?.();
     return this.provider.close();
   };
 
@@ -65,9 +60,8 @@ export abstract class Client<
   onMessage: OnMessage<RawIngressMessage> = (message) => {
     const parsed = this.provider.parseIngressMessage(message);
     if (parsed instanceof Error) {
-      this.hooks?.error?.(parsed);
+      // FIXME: define behavior for provider.parseIngressMessage errors
     } else {
-      this.hooks?.receive?.(parsed);
       for (const listener of this.#listenerCbs.keys()) {
         listener(parsed);
       }
@@ -75,8 +69,9 @@ export abstract class Client<
   };
 
   /** @internal */
-  onError = (error: InternalError): void => {
-    this.hooks?.error?.(error);
+  onError = (_error: InternalError): void => {
+    // FIXME: define behavior for provider errors
+    // inflight call/subscriptions might need to be rejected/cancelled
   };
 
   /**

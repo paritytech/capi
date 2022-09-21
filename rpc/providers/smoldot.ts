@@ -2,16 +2,10 @@ import { Config } from "../../config/mod.ts";
 import type * as smoldot from "../../deps/smoldot.ts";
 import { ErrorCtor } from "../../util/mod.ts";
 import { Client, OnMessage } from "../Base.ts";
-import { ClientHooks, FailedToSendMessageError, ParseRawIngressMessageError } from "../common.ts";
-
-export type SmoldotClientHooks<Config_ extends Config<string>> = ClientHooks<
-  Config_,
-  SmoldotInternalError
->;
+import { FailedToSendMessageError, ParseRawIngressMessageError } from "../common.ts";
 
 export async function smoldotClient<Config_ extends Config<string>>(
   config: Config_,
-  hooks?: SmoldotClientHooks<Config_>,
 ): Promise<SmoldotClient<Config_> | FailedToStartSmoldotError | FailedToAddChainError> {
   const smoldotInstance = await ensureInstance();
   if (smoldotInstance instanceof Error) {
@@ -26,7 +20,7 @@ export async function smoldotClient<Config_ extends Config<string>>(
         onMessageContainer.onMessage?.(response);
       },
     });
-    return new SmoldotClient(onMessageContainer, chain.remove, hooks);
+    return new SmoldotClient(onMessageContainer, chain.remove);
   } catch (e) {
     return new FailedToAddChainError(e);
   }
@@ -44,7 +38,6 @@ export class SmoldotClient<Config_ extends Config<string>> extends Client<
   constructor(
     onMessageContainer: { onMessage?: OnMessage<string> },
     readonly remove: () => void,
-    hooks?: SmoldotClientHooks<Config_>,
   ) {
     super(
       {
@@ -73,7 +66,6 @@ export class SmoldotClient<Config_ extends Config<string>> extends Client<
           })());
         },
       },
-      hooks,
     );
     onMessageContainer.onMessage = this.onMessage;
   }

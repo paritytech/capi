@@ -1,10 +1,8 @@
 import { Config } from "../../config/mod.ts";
 import { ErrorCtor } from "../../util/mod.ts";
 import * as B from "../Base.ts";
-import { ClientHooks, FailedToSendMessageError, ParseRawIngressMessageError } from "../common.ts";
+import { FailedToSendMessageError, ParseRawIngressMessageError } from "../common.ts";
 import { WsContainer } from "./ws_container.ts";
-
-export type ProxyClientHooks<Config_ extends Config<string>> = ClientHooks<Config_, Event>;
 
 export async function proxyClient<Config_ extends Config<string>>(
   config: Config_,
