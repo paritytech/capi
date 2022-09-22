@@ -7,8 +7,9 @@ type ReconnectOptions = {
   delay?: number;
 };
 
-type WebSocketClientOptions = {
-  webSocketFactory: () => WebSocket;
+type WebSocketClientOptions<DiscoveryValue> = {
+  discoveryValue: DiscoveryValue;
+  webSocketFactory: (discoveryValue: DiscoveryValue) => WebSocket;
   reconnect?: ReconnectOptions;
 };
 
@@ -18,7 +19,7 @@ type WebSocketListeners = {
   [P in WebSocketEventTypes]: Set<U.WatchHandler<WebSocketEventMap[P]>>;
 };
 
-export class WsContainer {
+export class WsContainer<DiscoveryValue = any> {
   #listeners: WebSocketListeners = {
     open: new Set(),
     close: new Set(),
@@ -33,7 +34,7 @@ export class WsContainer {
   #reconnectMaxAttempts: number;
   #reconnectDelay: number;
 
-  constructor(private readonly options: WebSocketClientOptions) {
+  constructor(private readonly options: WebSocketClientOptions<DiscoveryValue>) {
     this.#reconnectMaxAttempts = options.reconnect?.maxAttempts ?? 5;
     this.#reconnectDelay = options.reconnect?.delay ?? 1000;
     this.#connect();
@@ -111,7 +112,7 @@ export class WsContainer {
   #connect() {
     this.#isClosed = false;
     this.#isReconnecting = false;
-    this.#webSocket = this.options.webSocketFactory();
+    this.#webSocket = this.#createWebSocket();
     this.#webSocket.addEventListener("open", this.#onWsOpen);
     this.#webSocket.addEventListener("close", this.#onWsClose);
     this.#webSocket.addEventListener("message", this.#onWsMessage);
@@ -155,4 +156,6 @@ export class WsContainer {
   #onWsError = (ev: WebSocketEventMap["error"]) => {
     this.#emit(ev);
   };
+
+  #createWebSocket = (): WebSocket => this.options.webSocketFactory(this.options.discoveryValue);
 }

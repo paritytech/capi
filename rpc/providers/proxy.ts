@@ -4,11 +4,22 @@ import * as B from "../Base.ts";
 import { FailedToSendMessageError, ParseRawIngressMessageError } from "../common.ts";
 import { WsContainer } from "./ws_container.ts";
 
-export async function proxyClient<Config_ extends Config<string>>(
+export async function proxyClient<Config_ extends Config<string | string[]>>(
   config: Config_,
 ): Promise<ProxyClient<Config_> | FailedToOpenConnectionError> {
+  const createWebSocketFactory = () => {
+    let index = 0;
+    return (discoveryValue: Config_["discoveryValue"]) => {
+      if (typeof discoveryValue === "string") {
+        return new WebSocket(discoveryValue);
+      }
+      index %= discoveryValue.length;
+      return new WebSocket(discoveryValue[index++]!);
+    };
+  };
   const ws = new WsContainer({
-    webSocketFactory: () => new WebSocket(config.discoveryValue),
+    discoveryValue: config.discoveryValue,
+    webSocketFactory: createWebSocketFactory(),
   });
   const event = await ws.once(["open", "error"]);
   if (event.type === "error") {

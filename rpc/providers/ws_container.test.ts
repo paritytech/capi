@@ -11,9 +11,10 @@ Deno.test({
       name: "reconnect on client-side WebSocket close",
       async fn() {
         const webSocketFactory = sinon.spy(
-          () => new WebSocket(polkadot.discoveryValue),
+          (discoveryValue) => new WebSocket(discoveryValue),
         );
         const wsContainer = new WsContainer({
+          discoveryValue: polkadot.discoveryValue,
           webSocketFactory,
           reconnect: {
             delay: 0,
@@ -37,9 +38,10 @@ Deno.test({
         const listener = Deno.listen({ port });
         startWebSocketServer(listener);
         const webSocketFactory = sinon.spy(
-          () => new WebSocket(`ws://localhost:${port}`),
+          (discoveryValue) => new WebSocket(discoveryValue),
         );
         const wsContainer = new WsContainer({
+          discoveryValue: `ws://localhost:${port}`,
           webSocketFactory,
           reconnect: {
             delay: 0,
