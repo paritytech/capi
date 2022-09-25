@@ -1,4 +1,4 @@
-import { Hash, Hex, Result } from "./utils.ts";
+import { Hash, Hex, RpcResult } from "./utils.ts";
 
 // https://github.com/paritytech/substrate/blob/6c5ac31/primitives/merkle-mountain-range/src/lib.rs#L37
 /**
@@ -44,7 +44,7 @@ export type MmrRpc = {
    * Returns the (full) leaf itself and a proof for this leaf (compact encoding, i.e. hash of
    * the leaf). Both parameters are SCALE-encoded.
    */
-  mmr_generateProof(leafIndex: LeafIndex, at?: Hash): Result<LeafProof>;
+  mmr_generateProof(leafIndex: LeafIndex, at?: Hash): RpcResult<LeafProof>;
   /**
    * Generate MMR proof for the given leaf indices.
    *
@@ -57,5 +57,5 @@ export type MmrRpc = {
    * The order of entries in the `leaves` field of the returned struct
    * is the same as the order of the entries in `leaf_indices` supplied
    */
-  mmr_generateBatchProof(leafIndices: LeafIndex[], at?: Hash): Result<LeafBatchProof>;
+  mmr_generateBatchProof(leafIndices: LeafIndex[], at?: Hash): RpcResult<LeafBatchProof>;
 };

@@ -1,4 +1,4 @@
-import { Hash, Result } from "./utils.ts";
+import { Hash, RpcResult } from "./utils.ts";
 
 // https://github.com/paritytech/substrate/blob/00cc5f1/utils/frame/rpc/state-trie-migration-rpc/src/lib.rs#L106
 export interface MigrationStatusResult {
@@ -15,5 +15,5 @@ export type StateMigrationRpc = {
    * won't change any state. Nonetheless it is a VERY costy call that should be
    * only exposed to trusted peers.
    */
-  state_trieMigrationStatus(at?: Hash): Result<MigrationStatusResult>;
+  state_trieMigrationStatus(at?: Hash): RpcResult<MigrationStatusResult>;
 };

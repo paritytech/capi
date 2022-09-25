@@ -1,5 +1,5 @@
 import { HexEncoded } from "../../util/branded.ts";
-import { Hash, Hex, ListOrValue, NumberOrHex, Result, Subscription } from "./utils.ts";
+import { Hash, Hex, ListOrValue, NumberOrHex, RpcResult, Subscription } from "./utils.ts";
 
 // https://github.com/paritytech/substrate/blob/0ba251c/primitives/runtime/src/generic/digest.rs
 /** Generic header digest. */
@@ -43,34 +43,34 @@ export interface Block {
 // https://github.com/paritytech/substrate/blob/934fbfd/client/rpc-api/src/chain/mod.rs#L27
 export type ChainRpc = {
   /** Get header. */
-  chain_getHeader(hash?: Hash): Result<Header | null>;
+  chain_getHeader(hash?: Hash): RpcResult<Header | null>;
   /** Get header and body of a relay chain block. */
-  chain_getBlock(hash?: Hash): Result<SignedBlock | null>;
+  chain_getBlock(hash?: Hash): RpcResult<SignedBlock | null>;
   /**
    * Get hash of the n-th block in the canon chain.
    *
    * By default returns latest block hash.
    */
-  chain_getBlockHash(height?: ListOrValue<NumberOrHex>): Result<ListOrValue<Hash | null>>;
+  chain_getBlockHash(height?: ListOrValue<NumberOrHex>): RpcResult<ListOrValue<Hash | null>>;
   chain_getHead: ChainRpc["chain_getBlockHash"];
   /** Get hash of the last finalized block in the canon chain. */
-  chain_getFinalizedHead(): Result<Hash>;
+  chain_getFinalizedHead(): RpcResult<Hash>;
   chain_getFinalisedHead: ChainRpc["chain_getFinalizedHead"];
   /** All head subscription. */
-  chain_subscribeAllHeads(): Result<Subscription<"chain_subscribeAllHeads", Header>>;
+  chain_subscribeAllHeads(): RpcResult<Subscription<"chain_subscribeAllHeads", Header>>;
   chain_unsubscribeAllHeads(
     subscription: Subscription<"chain_subscribeAllHeads", Header>,
-  ): Result<void>;
+  ): RpcResult<void>;
   /** New head subscription. */
-  chain_subscribeNewHeads(): Result<Subscription<"chain_subscribeAllHeads", Header>>;
+  chain_subscribeNewHeads(): RpcResult<Subscription<"chain_subscribeAllHeads", Header>>;
   chain_unsubscribeNewHeads(
     subscription: Subscription<"chain_subscribeAllHeads", Header>,
-  ): Result<void>;
+  ): RpcResult<void>;
   /** Finalized head subscription. */
-  chain_subscribeFinalizedHeads(): Result<Subscription<"chain_subscribeAllHeads", Header>>;
+  chain_subscribeFinalizedHeads(): RpcResult<Subscription<"chain_subscribeAllHeads", Header>>;
   chain_unsubscribeFinalizedHeads(
     subscription: Subscription<"chain_subscribeAllHeads", Header>,
-  ): Result<void>;
+  ): RpcResult<void>;
   chain_subscribeFinalisedHeads: ChainRpc["chain_subscribeFinalizedHeads"];
   chain_unsubscribeFinalisedHeads: ChainRpc["chain_unsubscribeFinalizedHeads"];
 };

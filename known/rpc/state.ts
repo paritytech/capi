@@ -1,5 +1,5 @@
 import { ReadProof, StorageData, StorageKey } from "./childstate.ts";
-import { Hash, Hex, Result, SerdeEnum, Subscription } from "./utils.ts";
+import { Hash, Hex, RpcResult, SerdeEnum, Subscription } from "./utils.ts";
 
 // https://github.com/paritytech/substrate/blob/01a3ad65/primitives/version/src/lib.rs#L161
 /**
@@ -162,15 +162,15 @@ export interface Span {
 // https://github.com/paritytech/substrate/blob/28ac0a8/client/rpc-api/src/state/mod.rs#L35
 export type StateRpc = {
   /** Call a contract at a block's state. */
-  state_call(name: string, bytes: Hex, at?: Hash): Result<Hex>;
+  state_call(name: string, bytes: Hex, at?: Hash): RpcResult<Hex>;
   state_callAt: StateRpc["state_call"];
   /**
    * Returns the keys with prefix, leave empty to get all the keys.
    * @deprecated [2.0.0] Please use `getKeysPaged` with proper paging support
    */
-  state_getKeys(prefix: StorageKey, at?: Hash): Result<StorageKey[]>;
+  state_getKeys(prefix: StorageKey, at?: Hash): RpcResult<StorageKey[]>;
   /** Returns the keys with prefix, leave empty to get all the keys */
-  state_getPairs(prefix: StorageKey, at?: Hash): Result<[StorageKey, StorageData][]>;
+  state_getPairs(prefix: StorageKey, at?: Hash): RpcResult<[StorageKey, StorageData][]>;
   /**
    * Returns the keys with prefix with pagination support.
    * Up to `count` keys will be returned.
@@ -181,21 +181,21 @@ export type StateRpc = {
     count: number,
     startKey?: StorageKey,
     at?: Hash,
-  ): Result<StorageKey[]>;
+  ): RpcResult<StorageKey[]>;
   state_getKeysPagedAt: StateRpc["state_getKeysPaged"];
   /** Returns a storage entry at a specific block's state. */
-  state_getStorage(key: StorageKey, at?: Hash): Result<StorageData | null>;
+  state_getStorage(key: StorageKey, at?: Hash): RpcResult<StorageData | null>;
   state_getStorageAt: StateRpc["state_getStorage"];
   /** Returns the hash of a storage entry at a block's state. */
-  state_getStorageHash(key: StorageKey, at?: Hash): Result<Hash | null>;
+  state_getStorageHash(key: StorageKey, at?: Hash): RpcResult<Hash | null>;
   state_getStorageHashAt: StateRpc["state_getStorageHash"];
   /** Returns the size of a storage entry at a block's state. */
-  state_getStorageSize(key: StorageKey, at?: Hash): Result<number | null>;
+  state_getStorageSize(key: StorageKey, at?: Hash): RpcResult<number | null>;
   state_getStorageSizeAt: StateRpc["state_getStorageSize"];
   /** Returns the runtime metadata as an opaque blob. */
-  state_getMetadata(at?: Hash): Result<Hex | null>;
+  state_getMetadata(at?: Hash): RpcResult<Hex | null>;
   /** Get the runtime version. */
-  state_getRuntimeVersion(at?: Hash): Result<RuntimeVersion>;
+  state_getRuntimeVersion(at?: Hash): RpcResult<RuntimeVersion>;
   chain_getRuntimeVersion: StateRpc["state_getRuntimeVersion"];
   /**
    * Query historical storage entries (by key) starting from a block given as the second
@@ -204,32 +204,32 @@ export type StateRpc = {
    * NOTE This first returned result contains the initial state of storage for all keys.
    * Subsequent values in the vector represent changes to the previous state (diffs).
    */
-  state_queryStorage(keys: StorageKey[], block: Hash, at?: Hash): Result<StorageChangeSet[]>;
+  state_queryStorage(keys: StorageKey[], block: Hash, at?: Hash): RpcResult<StorageChangeSet[]>;
   /** Query storage entries (by key) starting at block hash given as the second parameter. */
-  state_queryStorageAt(keys: StorageKey[], at?: Hash): Result<StorageChangeSet[]>;
+  state_queryStorageAt(keys: StorageKey[], at?: Hash): RpcResult<StorageChangeSet[]>;
   /** Returns proof of storage entries at a specific block's state. */
-  state_getReadProof(keys: StorageKey[], at?: Hash): Result<ReadProof>;
+  state_getReadProof(keys: StorageKey[], at?: Hash): RpcResult<ReadProof>;
   /** New runtime version subscription */
-  state_subscribeRuntimeVersion(): Result<
+  state_subscribeRuntimeVersion(): RpcResult<
     Subscription<"state_subscribeRuntimeVersion", RuntimeVersion>
   >;
   state_unsubscribeRuntimeVersion(
     subscription: Subscription<"state_subscribeRuntimeVersion", RuntimeVersion>,
-  ): Result<void>;
+  ): RpcResult<void>;
   chain_subscribeRuntimeVersion: StateRpc["state_subscribeRuntimeVersion"];
   chain_unsubscribeRuntimeVersion: StateRpc["state_unsubscribeRuntimeVersion"];
   /** New storage subscription */
   state_subscribeStorage(
     keys: StorageKey[] | null,
-  ): Result<Subscription<"state_subscribeStorage", StorageChangeSet>>;
+  ): RpcResult<Subscription<"state_subscribeStorage", StorageChangeSet>>;
   state_unsubscribeStorage(
     subscription: Subscription<"state_subscribeStorage", StorageChangeSet>,
-  ): Result<void>;
+  ): RpcResult<void>;
   /** See https://paritytech.github.io/substrate/master/sc_rpc_api/state/trait.StateApiServer.html#tymethod.trace_block */
   state_traceBlock(
     block: Hash,
     targets?: string,
     storageKeys?: string,
     methods?: string,
-  ): Result<TraceBlockResponse>;
+  ): RpcResult<TraceBlockResponse>;
 };
