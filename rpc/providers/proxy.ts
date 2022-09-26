@@ -4,28 +4,10 @@ import * as B from "../Base.ts";
 import { FailedToSendMessageError, ParseRawIngressMessageError } from "../common.ts";
 import { WsContainer } from "./ws_container.ts";
 
-export async function proxyClient<Config_ extends Config<string | string[]>>(
+export function proxyClient<Config_ extends Config<string | string[]>>(
   config: Config_,
-): Promise<ProxyClient<Config_> | FailedToOpenConnectionError> {
-  const createWebSocketFactory = () => {
-    let index = 0;
-    return (discoveryValue: Config_["discoveryValue"]) => {
-      if (typeof discoveryValue === "string") {
-        return new WebSocket(discoveryValue);
-      }
-      index %= discoveryValue.length;
-      return new WebSocket(discoveryValue[index++]!);
-    };
-  };
-  const ws = new WsContainer({
-    discoveryValue: config.discoveryValue,
-    webSocketFactory: createWebSocketFactory(),
-  });
-  const event = await ws.once(["open", "error"]);
-  if (event.type === "error") {
-    return new FailedToOpenConnectionError();
-  }
-  return new ProxyClient(ws);
+): ProxyClient<Config_> {
+  return new ProxyClient(config);
 }
 
 export class ProxyClient<Config_ extends Config> extends B.Client<
@@ -35,7 +17,9 @@ export class ProxyClient<Config_ extends Config> extends B.Client<
   FailedToSendMessageError,
   FailedToDisconnectError
 > {
-  constructor(ws: WsContainer) {
+  #container!: WsContainer<Config_>;
+
+  constructor(readonly config: Config_) {
     super(
       {
         parseIngressMessage: (e) => {
@@ -49,24 +33,36 @@ export class ProxyClient<Config_ extends Config> extends B.Client<
           }
           return JSON.parse((e as { data: string }).data);
         },
-        send: (egressMessage) => {
+        send: async (egressMessage) => {
           try {
-            return ws.send(JSON.stringify(egressMessage));
+            const result = await this.#container.send(JSON.stringify(egressMessage));
+            if (result instanceof Error) {
+              return new FailedToSendMessageError(result);
+            }
+            return result;
           } catch (error) {
             return new FailedToSendMessageError(error);
           }
         },
         close: async () => {
-          ws.removeListener("message", this.onMessage);
-          ws.removeListener("error", this.onError);
-          ws.close();
-          await ws.once("close");
+          await this.#container.close();
           return undefined;
         },
       },
     );
-    ws.addListener("message", this.onMessage);
-    ws.addListener("error", this.onError);
+    this.#initContainer();
+  }
+
+  #initContainer() {
+    let index = 0;
+    const factory = ({ discoveryValue }: Config_) => {
+      if (typeof discoveryValue === "string") {
+        return new WebSocket(discoveryValue);
+      }
+      index %= discoveryValue.length;
+      return new WebSocket(discoveryValue[index++]!);
+    };
+    this.#container = new WsContainer({ client: this, factory });
   }
 }
 

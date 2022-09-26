@@ -25,7 +25,7 @@ export interface Provider<
    *
    * @param egressMessage the message you wish to send to the RPC server
    */
-  send: (egressMessage: msg.InitMessage<Config_>) => void | SendError;
+  send: (egressMessage: msg.InitMessage<Config_>) => Promise<void | SendError>;
   // TODO: introduce `FailedToClose` error in the return type (union with `undefined`)
   /**
    * Close the connection and free up resources

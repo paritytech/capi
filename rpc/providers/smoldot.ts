@@ -48,9 +48,9 @@ export class SmoldotClient<Config_ extends Config<string>> extends Client<
             return new ParseRawIngressMessageError();
           }
         },
-        send: (egressMessage) => {
+        send: async (egressMessage) => {
           try {
-            return this.#chain?.sendJsonRpc(JSON.stringify(egressMessage));
+            return await this.#chain?.sendJsonRpc(JSON.stringify(egressMessage));
           } catch (error) {
             return new FailedToSendMessageError(error);
           }

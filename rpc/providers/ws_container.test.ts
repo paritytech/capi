@@ -10,24 +10,24 @@ Deno.test({
     await t.step({
       name: "reconnect on client-side WebSocket close",
       async fn() {
-        const webSocketFactory = sinon.spy(
+        const wsFactory = sinon.spy(
           (discoveryValue) => new WebSocket(discoveryValue),
         );
         const wsContainer = new WsContainer({
           discoveryValue: polkadot.discoveryValue,
-          webSocketFactory,
+          factory,
           reconnect: {
             delay: 0,
           },
         });
         await wsContainer.once("open");
-        webSocketFactory.lastCall.returnValue.close();
+        wsFactory.lastCall.returnValue.close();
         await wsContainer.once("close");
         await wsContainer.once("open");
         wsContainer.close();
         await wsContainer.once("close");
 
-        assert(webSocketFactory.calledTwice);
+        assert(wsFactory.calledTwice);
       },
     });
 
@@ -37,12 +37,12 @@ Deno.test({
         const port = getRandomPort();
         const listener = Deno.listen({ port });
         startWebSocketServer(listener);
-        const webSocketFactory = sinon.spy(
+        const wsFactory = sinon.spy(
           (discoveryValue) => new WebSocket(discoveryValue),
         );
         const wsContainer = new WsContainer({
           discoveryValue: `ws://localhost:${port}`,
-          webSocketFactory,
+          factory,
           reconnect: {
             delay: 0,
           },
@@ -56,7 +56,7 @@ Deno.test({
         await wsContainer.once("close");
         listener.close();
 
-        assert(webSocketFactory.calledTwice);
+        assert(wsFactory.calledTwice);
       },
     });
   },

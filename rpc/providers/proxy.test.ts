@@ -5,8 +5,9 @@ import { proxyClient } from "./proxy.ts";
 
 Deno.test({
   name: "Proxy RPC Client",
+  sanitizeResources: false,
   async fn(t) {
-    const client = await proxyClient(polkadot);
+    const client = proxyClient(polkadot);
     assert(!(client instanceof Error));
 
     await t.step({

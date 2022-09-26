@@ -18,14 +18,14 @@ export type StdClientInitError =
   | FailedToStartSmoldotError
   | FailedToAddChainError;
 
-export function stdClient<Config_ extends Config<string>>(
+export async function stdClient<Config_ extends Config<string>>(
   config: Config_,
 ): Promise<StdClient<Config_> | StdClientInitError> {
   if (typeof config.discoveryValue === "string") {
     if (isWsUrl(config.discoveryValue)) {
       return proxyClient(config);
     } else {
-      return smoldotClient(config);
+      return await smoldotClient(config);
     }
   }
   return unimplemented();

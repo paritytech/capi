@@ -29,7 +29,7 @@ export abstract class Client<
    *
    * @param egressMessage the message you wish to send to the RPC server
    */
-  send = (egressMessage: msg.InitMessage<Config_>): void | SendError => {
+  send = (egressMessage: msg.InitMessage<Config_>): Promise<void | SendError> => {
     return this.provider.send(egressMessage);
   };
 

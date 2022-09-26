@@ -1,122 +1,77 @@
-import { deferred } from "../../deps/std/async.ts";
-import * as U from "../../util/mod.ts";
+import { Config } from "../../config/mod.ts";
+import { Deferred, deferred } from "../../deps/std/async.ts";
+import { FailedToOpenConnectionError, ProxyClient } from "./proxy.ts";
 
-type ReconnectOptions = {
-  attempts?: number;
-  maxAttempts?: number;
-  delay?: number;
-};
+interface WsContainerProps<Config_ extends Config> {
+  client: ProxyClient<Config_>;
+  factory: (discoveryValue: Config_) => WebSocket;
+}
 
-type WebSocketClientOptions<DiscoveryValue> = {
-  discoveryValue: DiscoveryValue;
-  webSocketFactory: (discoveryValue: DiscoveryValue) => WebSocket;
-  reconnect?: ReconnectOptions;
-};
-
-type WebSocketEventTypes = keyof WebSocketEventMap;
-
-type WebSocketListeners = {
-  [P in WebSocketEventTypes]: Set<U.WatchHandler<WebSocketEventMap[P]>>;
-};
-
-export class WsContainer<DiscoveryValue = any> {
-  #listeners: WebSocketListeners = {
-    open: new Set(),
-    close: new Set(),
-    message: new Set(),
-    error: new Set(),
-  };
-  #webSocket!: WebSocket;
+export class WsContainer<Config_ extends Config> {
+  #inner!: WebSocket;
   #isClosed = false;
   #isReconnecting = false;
-  #reconnectTimeoutId?: number;
+  #connectFinalized?: Deferred<void | FailedToOpenConnectionError>;
+  #reconnectTimeoutId: number | undefined;
   #reconnectAttempts = 0;
-  #reconnectMaxAttempts: number;
-  #reconnectDelay: number;
 
-  constructor(private readonly options: WebSocketClientOptions<DiscoveryValue>) {
-    this.#reconnectMaxAttempts = options.reconnect?.maxAttempts ?? 5;
-    this.#reconnectDelay = options.reconnect?.delay ?? 1000;
+  constructor(readonly props: WsContainerProps<Config_>) {
     this.#connect();
   }
 
-  get isOpen(): boolean {
-    return this.#webSocket.readyState === WebSocket.OPEN;
-  }
+  #connect = () => {
+    this.#isClosed = false;
+    this.#isReconnecting = false;
+    this.#inner = this.props.factory(this.props.client.config);
+    this.#connectFinalized = this.#connectFinalized ?? deferred();
+    this.#attachListeners();
+  };
 
-  send(data: string | ArrayBufferLike | Blob | ArrayBufferView): void {
-    this.#webSocket.send(data);
-  }
-
-  close(): void {
-    clearTimeout(this.#reconnectTimeoutId);
-    this.#isClosed = true;
-    const webSocket = this.#webSocket;
-    webSocket.removeEventListener("open", this.#onWsOpen);
-    webSocket.removeEventListener("close", this.#onWsClose);
-    webSocket.removeEventListener("message", this.#onWsMessage);
-    webSocket.removeEventListener("error", this.#onWsError);
-    webSocket.close();
-    if (this.#webSocket.readyState === WebSocket.CLOSED) {
-      this.#emit(new CloseEvent("close", { wasClean: true }));
-    } else {
-      webSocket.addEventListener(
-        "close",
-        () => this.#emit(new CloseEvent("close", { wasClean: true })),
-        { once: true },
-      );
-    }
-  }
-
-  addListener<K extends WebSocketEventTypes>(
-    type: K,
-    listener: U.WatchHandler<WebSocketEventMap[K]>,
-  ) {
-    this.#listeners[type].add(listener);
-  }
-
-  removeListener<K extends WebSocketEventTypes>(
-    type: K,
-    listener: U.WatchHandler<WebSocketEventMap[K]>,
-  ) {
-    this.#listeners[type].delete(listener);
-  }
-
-  once<K extends WebSocketEventTypes>(
-    types: K | K[],
-  ): Promise<WebSocketEventMap[K]> {
-    const eventTypes = typeof types === "string"
-      ? [types]
-      : types;
-    const result = deferred<WebSocketEventMap[K]>();
-    const removeListeners = () =>
-      eventTypes
-        .forEach(
-          (t) => this.removeListener(t, listener),
-        );
-    const listener: U.WatchHandler<WebSocketEventMap[K]> = (e) => {
-      removeListeners();
-      result.resolve(e);
+  #switchListener = (on: boolean) =>
+    () => {
+      const toggle = on
+        ? this.#inner.addEventListener.bind(this.#inner)
+        : this.#inner.removeEventListener.bind(this.#inner);
+      toggle("open", this.#onOpen);
+      toggle("close", this.#onClose);
+      toggle("message", this.props.client.onMessage);
+      toggle("error", this.props.client.onError);
     };
-    eventTypes
-      .forEach((type) => this.addListener(type, listener));
+  #attachListeners = this.#switchListener(true);
+  #detachListeners = this.#switchListener(false);
+
+  async #ensureConnected(): Promise<void | FailedToOpenConnectionError> {
+    const result = deferred<void | FailedToOpenConnectionError>();
+    if (this.#inner.readyState === WebSocket.OPEN) {
+      result.resolve();
+    } else if (this.#connectFinalized) {
+      result.resolve(await this.#connectFinalized);
+    } else {
+      result.resolve(new FailedToOpenConnectionError());
+    }
     return result;
   }
 
-  #emit<K extends WebSocketEventTypes>(event: WebSocketEventMap[K]) {
-    for (const listener of this.#listeners[event.type as K]) {
-      listener(event);
-    }
-  }
+  send = async (data: string): Promise<void | FailedToOpenConnectionError> => {
+    return (await this.#ensureConnected()) || this.#inner.send(data);
+  };
 
-  #connect() {
-    this.#isClosed = false;
-    this.#isReconnecting = false;
-    this.#webSocket = this.#createWebSocket();
-    this.#webSocket.addEventListener("open", this.#onWsOpen);
-    this.#webSocket.addEventListener("close", this.#onWsClose);
-    this.#webSocket.addEventListener("message", this.#onWsMessage);
-    this.#webSocket.addEventListener("error", this.#onWsError);
+  close(): Promise<void> {
+    clearTimeout(this.#reconnectTimeoutId);
+    this.#isClosed = true;
+    this.#detachListeners();
+    this.#inner.close();
+    const result = deferred<void>();
+    if (this.#inner.readyState === WebSocket.CLOSED) {
+      result.resolve();
+    } else {
+      this.#inner.addEventListener(
+        "close",
+        () => result.resolve(),
+        { once: true },
+      );
+    }
+    return result;
   }
 
   #reconnect() {
@@ -128,34 +83,23 @@ export class WsContainer<DiscoveryValue = any> {
     if (this.#isReconnecting) {
       return;
     }
-    if (this.#reconnectAttempts === this.#reconnectMaxAttempts) {
+    if (this.#reconnectAttempts === 4) {
+      this.#connectFinalized?.resolve(new FailedToOpenConnectionError());
       return;
     }
     this.#reconnectAttempts++;
     this.#isReconnecting = true;
-    this.#reconnectTimeoutId = setTimeout(
-      () => this.#connect(),
-      this.#reconnectDelay,
-    );
+    this.#connectFinalized = deferred();
+    this.#reconnectTimeoutId = setTimeout(this.#connect, 250);
   }
 
-  #onWsOpen = (ev: WebSocketEventMap["open"]) => {
-    this.#emit(ev);
+  #onOpen = () => {
     this.#reconnectAttempts = 0;
+    this.#connectFinalized?.resolve();
+    this.#connectFinalized = undefined;
   };
 
-  #onWsClose = (ev: WebSocketEventMap["close"]) => {
+  #onClose = () => {
     this.#reconnect();
-    this.#emit(ev);
   };
-
-  #onWsMessage = (ev: WebSocketEventMap["message"]) => {
-    this.#emit(ev);
-  };
-
-  #onWsError = (ev: WebSocketEventMap["error"]) => {
-    this.#emit(ev);
-  };
-
-  #createWebSocket = (): WebSocket => this.options.webSocketFactory(this.options.discoveryValue);
 }
