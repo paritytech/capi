@@ -5,13 +5,14 @@ import { proxyClient } from "./proxy.ts";
 
 Deno.test({
   name: "Proxy RPC Client",
-  sanitizeResources: false,
   async fn(t) {
     const client = proxyClient(polkadot);
     assert(!(client instanceof Error));
 
     await t.step({
       name: "call",
+      sanitizeResources: false,
+      sanitizeOps: false,
       fn: async () => {
         const raw = await client.call("state_getMetadata", []);
         assert(typeof raw.result === "string");

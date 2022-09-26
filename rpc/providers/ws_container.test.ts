@@ -20,6 +20,7 @@ Deno.test({
           client: createTestClient(server.url),
           factory,
         });
+        await wsContainer.send("a message!");
         factory.lastCall.returnValue.close();
         // schedule a .send call for the next loop
         await delay(1);
@@ -79,8 +80,6 @@ function createWebSocketServer(onMessage?: WebSocket["onmessage"]) {
       for await (const e of Deno.serveHttp(conn)) {
         const { socket, response } = Deno.upgradeWebSocket(e.request);
         socket.onmessage = onmessage;
-        // socket.onopen = () => console.log("client connected");
-        // socket.onclose = () => console.log("client disconnected");
         e.respondWith(response);
       }
     }

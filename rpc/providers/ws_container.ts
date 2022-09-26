@@ -8,16 +8,14 @@ interface WsContainerProps<Config_ extends Config> {
 }
 
 export class WsContainer<Config_ extends Config> {
-  #inner!: WebSocket;
+  #inner?: WebSocket;
   #isClosed = false;
   #isReconnecting = false;
   #connectFinalized?: Deferred<void | FailedToOpenConnectionError>;
   #reconnectTimeoutId: number | undefined;
   #reconnectAttempts = 0;
 
-  constructor(readonly props: WsContainerProps<Config_>) {
-    this.#connect();
-  }
+  constructor(readonly props: WsContainerProps<Config_>) {}
 
   #connect = () => {
     this.#isClosed = false;
@@ -29,6 +27,7 @@ export class WsContainer<Config_ extends Config> {
 
   #switchListener = (on: boolean) =>
     () => {
+      if (!this.#inner) return;
       const toggle = on
         ? this.#inner.addEventListener.bind(this.#inner)
         : this.#inner.removeEventListener.bind(this.#inner);
@@ -42,7 +41,10 @@ export class WsContainer<Config_ extends Config> {
 
   async #ensureConnected(): Promise<void | FailedToOpenConnectionError> {
     const result = deferred<void | FailedToOpenConnectionError>();
-    if (this.#inner.readyState === WebSocket.OPEN) {
+    if (!this.#inner) {
+      this.#connect();
+    }
+    if (this.#inner!.readyState === WebSocket.OPEN) {
       result.resolve();
     } else if (this.#connectFinalized) {
       result.resolve(await this.#connectFinalized);
@@ -53,14 +55,18 @@ export class WsContainer<Config_ extends Config> {
   }
 
   send = async (data: string): Promise<void | FailedToOpenConnectionError> =>
-    (await this.#ensureConnected()) || this.#inner.send(data);
+    (await this.#ensureConnected()) || this.#inner!.send(data);
 
   close(): Promise<void> {
     clearTimeout(this.#reconnectTimeoutId);
     this.#isClosed = true;
+    const result = deferred<void>();
+    if (!this.#inner) {
+      result.resolve();
+      return result;
+    }
     this.#detachListeners();
     this.#inner.close();
-    const result = deferred<void>();
     if (this.#inner.readyState === WebSocket.CLOSED) {
       result.resolve();
     } else {
