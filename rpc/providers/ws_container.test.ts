@@ -1,7 +1,9 @@
+import { Config } from "../../config/mod.ts";
 import sinon from "../../deps/sinon.ts";
+import { delay } from "../../deps/std/async.ts";
 import { assert } from "../../deps/std/testing/asserts.ts";
-import { polkadot } from "../../known/mod.ts";
 import { getRandomPort } from "../../test-util/mod.ts";
+import { ProxyClient } from "./proxy.ts";
 import { WsContainer } from "./ws_container.ts";
 
 Deno.test({
@@ -10,69 +12,83 @@ Deno.test({
     await t.step({
       name: "reconnect on client-side WebSocket close",
       async fn() {
-        const wsFactory = sinon.spy(
-          (discoveryValue) => new WebSocket(discoveryValue),
+        const server = createWebSocketServer();
+        const factory = sinon.spy(
+          ({ discoveryValue }) => new WebSocket(discoveryValue),
         );
         const wsContainer = new WsContainer({
-          discoveryValue: polkadot.discoveryValue,
+          client: createTestClient(server.url),
           factory,
-          reconnect: {
-            delay: 0,
-          },
         });
-        await wsContainer.once("open");
-        wsFactory.lastCall.returnValue.close();
-        await wsContainer.once("close");
-        await wsContainer.once("open");
-        wsContainer.close();
-        await wsContainer.once("close");
+        factory.lastCall.returnValue.close();
+        // schedule a .send call for the next loop
+        await delay(1);
+        await wsContainer.send("a message!");
+        await wsContainer.close();
+        server.close();
 
-        assert(wsFactory.calledTwice);
+        assert(factory.calledTwice);
       },
     });
 
     await t.step({
       name: "reconnect on server-side WebSocket close",
       async fn() {
-        const port = getRandomPort();
-        const listener = Deno.listen({ port });
-        startWebSocketServer(listener);
-        const wsFactory = sinon.spy(
-          (discoveryValue) => new WebSocket(discoveryValue),
+        const server = createWebSocketServer(
+          function() {
+            this.close();
+          },
+        );
+        const factory = sinon.spy(
+          ({ discoveryValue }) => new WebSocket(discoveryValue),
         );
         const wsContainer = new WsContainer({
-          discoveryValue: `ws://localhost:${port}`,
+          client: createTestClient(server.url),
           factory,
-          reconnect: {
-            delay: 0,
-          },
         });
-        await wsContainer.once("open");
-        wsContainer.send("a message!");
-        await wsContainer.once("close");
-        await wsContainer.once("open");
-        wsContainer.send("a message!");
-        wsContainer.close();
-        await wsContainer.once("close");
-        listener.close();
+        await wsContainer.send("a message!");
+        // schedule a .send call for the next loop
+        await delay(1);
+        await wsContainer.send("a message!");
+        await wsContainer.close();
+        server.close();
 
-        assert(wsFactory.calledTwice);
+        assert(factory.calledTwice);
       },
     });
   },
 });
 
-/**
- * Starts a WebSocket server that closes the WebSocket connection on the first message
- */
-async function startWebSocketServer(listener: Deno.Listener) {
-  for await (const conn of listener) {
-    for await (const e of Deno.serveHttp(conn)) {
-      const { socket, response } = Deno.upgradeWebSocket(e.request);
-      socket.onmessage = () => {
-        socket.close();
-      };
-      e.respondWith(response);
+function createTestClient(discoveryValue: string) {
+  return {
+    onMessage: sinon.stub(),
+    onError: sinon.stub(),
+    config: {
+      discoveryValue,
+    },
+  } as unknown as ProxyClient<Config<string>>;
+}
+
+function createWebSocketServer(onMessage?: WebSocket["onmessage"]) {
+  const onmessage: WebSocket["onmessage"] = onMessage
+    ?? (() => {});
+  const port = getRandomPort();
+  const listener = Deno.listen({ port });
+  const startServer = async () => {
+    for await (const conn of listener) {
+      for await (const e of Deno.serveHttp(conn)) {
+        const { socket, response } = Deno.upgradeWebSocket(e.request);
+        socket.onmessage = onmessage;
+        // socket.onopen = () => console.log("client connected");
+        // socket.onclose = () => console.log("client disconnected");
+        e.respondWith(response);
+      }
     }
-  }
+  };
+  const close = () => listener.close();
+  startServer();
+  return {
+    close,
+    url: `ws://localhost:${port}`,
+  };
 }

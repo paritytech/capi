@@ -52,9 +52,8 @@ export class WsContainer<Config_ extends Config> {
     return result;
   }
 
-  send = async (data: string): Promise<void | FailedToOpenConnectionError> => {
-    return (await this.#ensureConnected()) || this.#inner.send(data);
-  };
+  send = async (data: string): Promise<void | FailedToOpenConnectionError> =>
+    (await this.#ensureConnected()) || this.#inner.send(data);
 
   close(): Promise<void> {
     clearTimeout(this.#reconnectTimeoutId);
@@ -89,7 +88,7 @@ export class WsContainer<Config_ extends Config> {
     }
     this.#reconnectAttempts++;
     this.#isReconnecting = true;
-    this.#connectFinalized = deferred();
+    this.#connectFinalized = this.#connectFinalized ?? deferred();
     this.#reconnectTimeoutId = setTimeout(this.#connect, 250);
   }
 
