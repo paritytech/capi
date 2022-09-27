@@ -5,10 +5,12 @@ export const $extrinsic = atomFactory("ExtrinsicCodec", (
   deriveCodec: M.DeriveCodec,
   metadata: M.Metadata,
   sign?: M.SignExtrinsic,
+  prefix?: number,
 ) => {
   return M.$extrinsic({
     deriveCodec,
     metadata,
     sign: sign!,
+    prefix: prefix!,
   });
 });

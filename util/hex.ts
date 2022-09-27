@@ -17,3 +17,7 @@ export function encode(bytes: Uint8Array): string {
   }
   return str;
 }
+
+export function encodePrefixed(bytes: Uint8Array): string {
+  return "0x" + encode(bytes);
+}

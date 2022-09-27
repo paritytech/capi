@@ -34,5 +34,5 @@ export const statemint = new Statemint();
 export class Subsocial extends Config_("wss://para.subsocial.network", 28) {}
 export const subsocial = new Subsocial();
 
-export class Westend extends Config_("wss://westend-rpc.polkadot.io", 0) {}
+export class Westend extends Config_("wss://westend-rpc.polkadot.io", 42) {}
 export const westend = new Westend();
