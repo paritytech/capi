@@ -38,7 +38,7 @@ export interface SendAndWatchExtrinsicProps {
 export function sendAndWatchExtrinsic<Props extends SendAndWatchExtrinsicProps>(props: Props) {
   const metadata = a.metadata(props.config);
   const deriveCodec = a.deriveCodec(metadata);
-  const $extrinsic = a.$extrinsic(deriveCodec, metadata, props.sign);
+  const $extrinsic = a.$extrinsic(deriveCodec, metadata, props.sign, props.config.addressPrefix);
   const runtimeVersion = a.rpcCall(props.config, "state_getRuntimeVersion", []);
   const senderSs58 = sys.anon([props.sender], (sender) => {
     return ((): string => {
