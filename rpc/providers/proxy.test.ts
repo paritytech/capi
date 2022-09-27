@@ -14,7 +14,7 @@ Deno.test({
       sanitizeResources: false,
       sanitizeOps: false,
       fn: async () => {
-        const raw = await client.call("state_getMetadata", []);
+        const raw = await client.call("state_getMetadata", []) as msg.OkMessageBase<string>;
         assert(typeof raw.result === "string");
       },
     });
@@ -26,7 +26,7 @@ Deno.test({
         let i = 1;
         await client.subscribe("chain_subscribeAllHeads", [], (stop) => {
           return (message) => {
-            result.push(message);
+            result.push(message as msg.NotifMessage<typeof polkadot, "chain_subscribeAllHeads">);
             i++;
             if (i > 2) {
               stop();

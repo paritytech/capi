@@ -1,6 +1,6 @@
 import { Config } from "../../config/mod.ts";
 import { Deferred, deferred } from "../../deps/std/async.ts";
-import { FailedToOpenConnectionError, ProxyClient } from "./proxy.ts";
+import { ConnectionError, FailedToOpenConnectionError, ProxyClient } from "./proxy.ts";
 
 interface WsContainerProps<Config_ extends Config> {
   client: ProxyClient<Config_>;
@@ -34,8 +34,9 @@ export class WsContainer<Config_ extends Config> {
       toggle("open", this.#onOpen);
       toggle("close", this.#onClose);
       toggle("message", this.props.client.onMessage);
-      toggle("error", this.props.client.onError);
+      toggle("error", this.#onError);
     };
+
   #attachListeners = this.#switchListener(true);
   #detachListeners = this.#switchListener(false);
 
@@ -106,5 +107,9 @@ export class WsContainer<Config_ extends Config> {
 
   #onClose = () => {
     this.#reconnect();
+  };
+
+  #onError = () => {
+    this.props.client.onError(new ConnectionError());
   };
 }

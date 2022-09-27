@@ -13,7 +13,7 @@ export function proxyClient<Config_ extends Config<string | string[]>>(
 export class ProxyClient<Config_ extends Config> extends B.Client<
   Config_,
   MessageEvent,
-  Event,
+  ConnectionError,
   FailedToSendMessageError,
   FailedToDisconnectError
 > {
@@ -68,3 +68,4 @@ export class ProxyClient<Config_ extends Config> extends B.Client<
 
 export class FailedToOpenConnectionError extends ErrorCtor("FailedToOpenConnection") {}
 export class FailedToDisconnectError extends ErrorCtor("FailedToDisconnect") {}
+export class ConnectionError extends ErrorCtor("ConnectionError") {}

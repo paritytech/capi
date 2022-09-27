@@ -10,12 +10,12 @@ export type OnMessage<Message> = (message: Message) => void;
 export abstract class Client<
   Config_ extends Config,
   RawIngressMessage,
-  InternalError,
+  InternalError extends Error,
   SendError extends Error,
   CloseError extends Error,
 > {
   #nextId = 0;
-  #listenerCbs = new Map<U.WatchHandler<msg.IngressMessage<Config_>>, true>();
+  #listenerCbs = new Map<U.WatchHandler<msg.IngressMessage<Config_> | InternalError>, true>();
 
   /**
    * Construct a new RPC client
@@ -47,31 +47,33 @@ export abstract class Client<
    *
    * @param createListenerCb the factory for the callback to be triggered upon arrival of ingress messages
    */
-  listen = (createListenerCb: U.CreateWatchHandler<msg.IngressMessage<Config_>>): void => {
+  listen = (
+    createListenerCb: U.CreateWatchHandler<msg.IngressMessage<Config_> | InternalError>,
+  ): () => void => {
     const stopListening = () => {
       this.#listenerCbs.delete(listenerCb);
     };
     const listenerCb = createListenerCb(stopListening);
     this.#listenerCbs.set(listenerCb, true);
+    return stopListening;
   };
 
   // TODO: do we want to parameterize `RpcClient` with a `RawMessage` type?
   /** @internal */
   onMessage: OnMessage<RawIngressMessage> = (message) => {
     const parsed = this.provider.parseIngressMessage(message);
-    if (parsed instanceof Error) {
-      // FIXME: define behavior for provider.parseIngressMessage errors
-    } else {
-      for (const listener of this.#listenerCbs.keys()) {
-        listener(parsed);
-      }
+    // FIXME: type casting, Should ParseRawIngressMessageError extend from InternalError?
+    for (const listener of this.#listenerCbs.keys()) {
+      listener(parsed as msg.IngressMessage<Config_> | InternalError);
     }
   };
 
   /** @internal */
-  onError = (_error: InternalError): void => {
-    // FIXME: define behavior for provider errors
-    // inflight call/subscriptions might need to be rejected/cancelled
+  onError = (error: InternalError): void => {
+    for (const listener of this.#listenerCbs.keys()) {
+      listener(error);
+      this.#listenerCbs.delete(listener);
+    }
   };
 
   /**
@@ -83,11 +85,13 @@ export abstract class Client<
    */
   call = <
     MethodName extends Extract<keyof Config_["RpcMethods"], string>,
-    IngressMessage extends msg.OkMessage<Config_, MethodName> | msg.ErrMessage<Config_>,
+    IngressMessage extends
+      | msg.OkMessage<Config_, MethodName>
+      | msg.ErrMessage<Config_>,
   >(
     methodName: MethodName,
     params: Parameters<Config_["RpcMethods"][MethodName]>,
-  ): Promise<IngressMessage> => {
+  ): Promise<IngressMessage | SendError | InternalError> => {
     const init = <msg.InitMessage<Config_, MethodName>> {
       jsonrpc: "2.0",
       id: this.uid(),
@@ -95,21 +99,24 @@ export abstract class Client<
       params,
     };
     const isCorrespondingRes = IsCorrespondingRes(init);
-    const ingressMessagePending = deferred<IngressMessage>();
-    this.listen((stopListening) => {
-      return (res) => {
-        if (isCorrespondingRes(res)) {
+    const result = deferred<IngressMessage | InternalError | SendError>();
+    const stopListening = this.listen(
+      (stopListening) =>
+        (res) => {
+          if (isError<InternalError>(res) || isCorrespondingRes(res)) {
+            stopListening();
+            result.resolve(res as IngressMessage | InternalError);
+          }
+        },
+    );
+    this.send(init)
+      .then((sendResult) => {
+        if (sendResult instanceof Error) {
           stopListening();
-          ingressMessagePending.resolve(res as IngressMessage);
+          result.resolve(sendResult);
         }
-      };
-    });
-    const sendResult = this.send(init);
-    if (sendResult instanceof Error) {
-      // FIXME: ingressMessagePending should be resolved to a non-RPC Error
-      // and stopListening() should be invoked
-    }
-    return ingressMessagePending;
+      });
+    return result;
   };
 
   /**
@@ -122,29 +129,33 @@ export abstract class Client<
   subscribe = async <MethodName extends Extract<keyof Config_["RpcSubscriptionMethods"], string>>(
     methodName: MethodName,
     params: Parameters<Config_["RpcSubscriptionMethods"][MethodName]>,
-    createListenerCb: CreateListenerCb<Config_, MethodName>,
+    createListenerCb: CreateListenerCb<Config_, MethodName, InternalError>,
     cleanup: SubscriptionCleanup<Config_, MethodName> = () => Promise.resolve(),
-  ): Promise<undefined | msg.ErrMessage<Config_>> => {
+  ): Promise<undefined | msg.ErrMessage<Config_> | SendError | InternalError> => {
     const initRes = await this.call(methodName, params);
-    if (initRes.error) {
+    if (isError<InternalError | SendError>(initRes)) {
+      return initRes;
+    } else if (initRes.error) {
       // TODO: fix typings
       return initRes as msg.ErrMessage<Config_>;
     }
     const cleanupApplied = () => cleanup(initRes as msg.OkMessage<Config_, MethodName>);
     const terminalPending = deferred<undefined | msg.ErrMessage<Config_>>();
     this.listen((stop) => {
-      const listenerCb = createListenerCb(
-        async () => {
-          stop();
-          await cleanupApplied();
-          terminalPending.resolve();
-        },
-      );
+      const stopAndCleanup = async () => {
+        stop();
+        await cleanupApplied();
+        terminalPending.resolve();
+      };
+      const listenerCb = createListenerCb(stopAndCleanup);
       return (res) => {
-        if (res.params?.subscription && res.params.subscription === initRes.result) {
+        if (isError<InternalError | Error>(res)) {
+          stopAndCleanup();
+          listenerCb(res);
+        } else if (res.params?.subscription && res.params.subscription === initRes.result) {
           listenerCb(res as msg.NotifMessage<Config_, MethodName>);
         } else {
-          // TODO: associate errors with subscriptions & exit
+          // TODO: associate RPC errors with subscriptions & exit
         }
       };
     });
@@ -152,10 +163,15 @@ export abstract class Client<
   };
 }
 
+function isError<T>(error: any): error is T {
+  return error instanceof Error;
+}
+
 export type CreateListenerCb<
   Config_ extends Config,
   MethodName extends Extract<keyof Config_["RpcSubscriptionMethods"], string>,
-> = U.CreateWatchHandler<msg.NotifMessage<Config_, MethodName>>;
+  InternalError extends Error,
+> = U.CreateWatchHandler<msg.NotifMessage<Config_, MethodName> | InternalError>;
 
 export type SubscriptionCleanup<
   Config_ extends Config,
