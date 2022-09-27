@@ -24,7 +24,7 @@ export function DeriveCodec(tys: M.Ty[]): DeriveCodec {
       return $.tuple(...members.map((x) => this.visit(x)));
     },
     objectStruct(ty) {
-      return $.object(...ty.fields.map((x): $.Field => [x.name!, this.visit(x.ty)]));
+      return $.object(...ty.fields.map((x): $.AnyField => [x.name!, this.visit(x.ty)]));
     },
     option(_ty, some) {
       return $.option(this.visit(some));
@@ -43,9 +43,9 @@ export function DeriveCodec(tys: M.Ty[]): DeriveCodec {
       return $.stringUnion(members);
     },
     taggedUnion(ty) {
-      const members: Record<number, $.TaggedUnionMember> = {};
+      const members: Record<number, $.AnyTaggedUnionMember> = {};
       for (const { fields, name: type, index } of ty.members) {
-        let member: $.TaggedUnionMember;
+        let member: $.AnyTaggedUnionMember;
         if (fields.length === 0) {
           member = [type];
         } else if (fields[0]!.name === undefined) {
