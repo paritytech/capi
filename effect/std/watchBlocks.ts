@@ -24,7 +24,7 @@ export function watchBlocks(
       const block = await readBlock(config, blockHash as unknown as U.HashHexString).run(); // STOP THIS MADNESS
       if (block instanceof Error) {
         // TODO: subscription runtime error channel
-        throw new Error();
+        throw block;
       }
       watchHandler(block.block);
     };
