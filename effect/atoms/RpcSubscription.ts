@@ -35,7 +35,9 @@ export function rpcSubscription<
           }
           : undefined,
       );
-      if (result?.error) {
+      if (result instanceof Error) {
+        // FIXME: What would be the error for InternalError (non RPC response errors)?
+      } else if (result?.error) {
         return new RpcError({
           ...result.error,
           attempt: {

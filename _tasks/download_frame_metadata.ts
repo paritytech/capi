@@ -13,6 +13,9 @@ await Promise.all(
       assert(!(client instanceof Error));
       try {
         const metadata = await client.call("state_getMetadata", []);
+        if (metadata instanceof Error) {
+          throw metadata;
+        }
         assert(metadata.result);
         const outPath = path.join(outDir, `${name}.scale`);
         console.log(`Downloading ${name} metadata to "${outPath}".`);

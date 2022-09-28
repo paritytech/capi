@@ -23,7 +23,9 @@ export function rpcCall<
         methodName,
         params as Parameters<(Methods & rpc.ProviderMethods)[T_<MethodName>]>,
       );
-      if (result.error) {
+      if (result instanceof Error) {
+        // FIXME: What would be the error for InternalError (non RPC response errors)?
+      } else if (result.error) {
         return new RpcError({
           ...result.error,
           attempt: {
