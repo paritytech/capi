@@ -117,6 +117,7 @@ export function sendAndWatchExtrinsic<Props extends SendAndWatchExtrinsicProps>(
     "author_submitAndWatchExtrinsic",
     [extrinsicHex],
     props.createWatchHandler,
+    rpc.defaultCreateListenerCb,
     (ok) => {
       return a.rpcCall(props.config, "author_unwatchExtrinsic", [ok.result]);
     },

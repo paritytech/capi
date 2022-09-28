@@ -2,7 +2,7 @@ import { Config } from "../../config/mod.ts";
 import type * as smoldot from "../../deps/smoldot.ts";
 import { ErrorCtor } from "../../util/mod.ts";
 import { Client, OnMessage } from "../Base.ts";
-import { FailedToSendMessageError, ParseRawIngressMessageError } from "../common.ts";
+import { ParseRawIngressMessageError } from "../common.ts";
 
 export async function smoldotClient<Config_ extends Config<string>>(
   config: Config_,
@@ -30,7 +30,6 @@ export class SmoldotClient<Config_ extends Config<string>> extends Client<
   Config_,
   string,
   SmoldotInternalError,
-  FailedToSendMessageError,
   FailedToRemoveChainError
 > {
   #chain?: smoldot.Chain;
@@ -52,7 +51,7 @@ export class SmoldotClient<Config_ extends Config<string>> extends Client<
           try {
             return await this.#chain?.sendJsonRpc(JSON.stringify(egressMessage));
           } catch (error) {
-            return new FailedToSendMessageError(error);
+            return new SmoldotInternalError(error);
           }
         },
         close: () => {
@@ -91,7 +90,11 @@ export class FailedToAddChainError extends ErrorCtor("FailedToAddChain") {
     super();
   }
 }
-export class SmoldotInternalError extends ErrorCtor("SmoldotInternal") {}
+export class SmoldotInternalError extends ErrorCtor("SmoldotInternal") {
+  constructor(readonly inner: unknown) {
+    super();
+  }
+}
 // TODO: specify narrow `AlreadyDestroyedError` & `CrashError` from Smoldot
 export class FailedToRemoveChainError extends ErrorCtor("FailedToRemoveChain") {
   constructor(readonly inner: unknown) {

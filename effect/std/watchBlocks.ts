@@ -1,5 +1,6 @@
 import { Extrinsic } from "../../frame_metadata/mod.ts";
 import * as known from "../../known/mod.ts";
+import * as rpc from "../../rpc/mod.ts";
 import * as U from "../../util/mod.ts";
 import * as a from "../atoms/mod.ts";
 import { readBlock } from "./readBlock.ts";
@@ -14,21 +15,28 @@ export function watchBlocks(
   config: Config,
   createWatchHandler: U.CreateWatchHandler<known.types.Block<Extrinsic>>,
 ) {
-  return a.rpcSubscription(config, "chain_subscribeNewHeads", [], (stop) => {
-    const watchHandler = createWatchHandler(stop);
-    return async (result) => {
-      const blockNum = result.params.result.number;
-      const blockHash = a
-        .rpcCall(config, "chain_getBlockHash", [blockNum])
-        .select("result");
-      const block = await readBlock(config, blockHash as unknown as U.HashHexString).run(); // STOP THIS MADNESS
-      if (block instanceof Error) {
-        // TODO: subscription runtime error channel
-        throw new Error();
-      }
-      watchHandler(block.block);
-    };
-  }, (ok) => {
-    return a.rpcCall(config, "chain_unsubscribeNewHead", [ok.result]);
-  });
+  return a.rpcSubscription(
+    config,
+    "chain_subscribeNewHeads",
+    [],
+    (stop) => {
+      const watchHandler = createWatchHandler(stop);
+      return async (result) => {
+        const blockNum = result.params.result.number;
+        const blockHash = a
+          .rpcCall(config, "chain_getBlockHash", [blockNum])
+          .select("result");
+        const block = await readBlock(config, blockHash as unknown as U.HashHexString).run(); // STOP THIS MADNESS
+        if (block instanceof Error) {
+          // TODO: subscription runtime error channel
+          throw new Error();
+        }
+        watchHandler(block.block);
+      };
+    },
+    rpc.defaultCreateListenerCb,
+    (ok) => {
+      return a.rpcCall(config, "chain_unsubscribeNewHead", [ok.result]);
+    },
+  );
 }

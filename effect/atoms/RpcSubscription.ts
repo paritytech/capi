@@ -17,6 +17,7 @@ export function rpcSubscription<
   methodName: MethodName_,
   params: Params_,
   createListener: U.CreateWatchHandler<rpc.NotifMessage<Config_, MethodName>>,
+  createErrorListener?: U.CreateWatchHandler<rpc.ProxyInternalError | rpc.SmoldotInternalError>,
   cleanup?: (initOk: rpc.OkMessage<Config_, MethodName>) => AnyAtom,
 ) {
   return atom(
@@ -27,6 +28,7 @@ export function rpcSubscription<
         methodName as MethodName,
         params as Parameters<T_<Config_>["RpcSubscriptionMethods"][MethodName]>,
         createListener,
+        createErrorListener,
         cleanup
           ? (x) => {
             return this.run(cleanup(x.result));

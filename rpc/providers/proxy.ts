@@ -1,7 +1,7 @@
 import { Config } from "../../config/mod.ts";
 import { ErrorCtor } from "../../util/mod.ts";
 import * as B from "../Base.ts";
-import { FailedToSendMessageError, ParseRawIngressMessageError } from "../common.ts";
+import { ParseRawIngressMessageError } from "../common.ts";
 import { WsContainer } from "./ws_container.ts";
 
 export function proxyClient<Config_ extends Config<string | string[]>>(
@@ -13,8 +13,7 @@ export function proxyClient<Config_ extends Config<string | string[]>>(
 export class ProxyClient<Config_ extends Config> extends B.Client<
   Config_,
   MessageEvent,
-  ConnectionError,
-  FailedToSendMessageError,
+  ProxyInternalError,
   FailedToDisconnectError
 > {
   #container!: WsContainer<Config_>;
@@ -37,11 +36,11 @@ export class ProxyClient<Config_ extends Config> extends B.Client<
           try {
             const result = await this.#container.send(JSON.stringify(egressMessage));
             if (result instanceof Error) {
-              return new FailedToSendMessageError(result);
+              return new ProxyInternalError(result);
             }
             return result;
           } catch (error) {
-            return new FailedToSendMessageError(error);
+            return new ProxyInternalError(error);
           }
         },
         close: async () => {
@@ -68,4 +67,8 @@ export class ProxyClient<Config_ extends Config> extends B.Client<
 
 export class FailedToOpenConnectionError extends ErrorCtor("FailedToOpenConnection") {}
 export class FailedToDisconnectError extends ErrorCtor("FailedToDisconnect") {}
-export class ConnectionError extends ErrorCtor("ConnectionError") {}
+export class ProxyInternalError extends ErrorCtor("ProxyInternal") {
+  constructor(readonly inner: unknown) {
+    super();
+  }
+}

@@ -40,8 +40,15 @@ export function watchEntry<
         });
       },
     );
-    return a.rpcSubscription(config, "state_subscribeStorage", [storageKeys], watchInit, (ok) => {
-      return a.rpcCall(config, "state_unsubscribeStorage", [ok.result]);
-    });
+    return a.rpcSubscription(
+      config,
+      "state_subscribeStorage",
+      [storageKeys],
+      watchInit,
+      rpc.defaultCreateListenerCb,
+      (ok) => {
+        return a.rpcCall(config, "state_unsubscribeStorage", [ok.result]);
+      },
+    );
   });
 }
