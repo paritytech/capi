@@ -89,7 +89,7 @@ export abstract class Client<
    * @param params the params with which to call the method
    * @returns an ingress message corresponding to the given method (or a message-agnostic error)
    */
-  call = async <
+  call = <
     MethodName extends Extract<keyof Config_["RpcMethods"], string>,
     IngressMessage extends msg.OkMessage<Config_, MethodName> | msg.ErrMessage<Config_>,
   >(
@@ -121,11 +121,13 @@ export abstract class Client<
           ingressMessagePending.resolve(error);
         },
     );
-    const sendResult = await this.send(init);
-    if (sendResult instanceof Error) {
-      stopListening();
-      return sendResult;
-    }
+    this.send(init)
+      .then((sendResult) => {
+        if (sendResult instanceof Error) {
+          stopListening();
+          ingressMessagePending.resolve(sendResult);
+        }
+      });
     return ingressMessagePending;
   };
 
