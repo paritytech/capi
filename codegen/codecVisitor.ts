@@ -1,7 +1,29 @@
 import * as M from "../frame_metadata/mod.ts";
-import { Decl, getCodecPath, getName, getRawCodecPath, S } from "./utils.ts";
+import { Decl, Files, getCodecPath, getName, getRawCodecPath, importSource, S } from "./utils.ts";
 
-export function createCodecVisitor(tys: M.Ty[], decls: Decl[], typeVisitor: M.TyVisitor<S>) {
+export function createCodecVisitor(
+  tys: M.Ty[],
+  decls: Decl[],
+  typeVisitor: M.TyVisitor<S>,
+  files: Files,
+) {
+  ["import { $, $null, $era } from", S.string(importSource)];
+  const namespaceImports = new Set<string>();
+  const codecs: S[] = [];
+
+  files.set("codecs.ts", {
+    getContent: () => [
+      "\n",
+      ["import { ChainError, BitSequence, Era, $, $era, $null } from", S.string(importSource)],
+      [`import type * as t from "./mod.ts"`],
+      ...codecs,
+      [
+        "export const _all: $.AnyCodec[] =",
+        S.array(tys.map((ty) => getName(getRawCodecPath(ty)))),
+      ],
+    ],
+  });
+
   const compactCodecVisitor = new M.TyVisitor<string | null>(tys, {
     unitStruct: () => "$null",
     wrapperStruct(_, inner) {
@@ -59,7 +81,9 @@ export function createCodecVisitor(tys: M.Ty[], decls: Decl[], typeVisitor: M.Ty
     },
     result(ty, ok, err) {
       return addCodecDecl(ty, ["$.result(", this.visit(ok), ",", [
-        `$.instance(ChainError<${typeVisitor.visit(err)}>, ["value", `,
+        "$.instance(ChainError<",
+        fixType(typeVisitor.visit(err)),
+        `>, ["value", `,
         this.visit(err),
         "])",
       ], ")"]);
@@ -141,22 +165,22 @@ export function createCodecVisitor(tys: M.Ty[], decls: Decl[], typeVisitor: M.Ty
       return addCodecDecl(ty, "$era");
     },
     circular(ty) {
-      return ["$.deferred(() =>", getRawCodecPath(ty), ")"];
+      return ["$.deferred(() =>", getName(getRawCodecPath(ty)), ")"];
     },
   });
 
   function addCodecDecl(ty: M.Ty, value: S) {
     const rawPath = getRawCodecPath(ty);
-    decls.push({
-      path: "_codec.", // no sorting
-      code: [
-        ["export const", getName(rawPath)],
-        ": $.Codec<",
-        typeVisitor.visit(ty),
-        "> =",
-        value,
-      ],
-    });
+    if (ty.path.length > 1) {
+      namespaceImports.add(ty.path[0]!);
+    }
+    codecs.push([
+      ["export const", getName(rawPath)],
+      ": $.Codec<",
+      fixType(typeVisitor.visit(ty)),
+      "> =",
+      value,
+    ]);
     const path = getCodecPath(tys, ty);
     if (path !== rawPath && path !== value && !decls.some((x) => x.path === path)) {
       decls.push({
@@ -170,6 +194,13 @@ export function createCodecVisitor(tys: M.Ty[], decls: Decl[], typeVisitor: M.Ty
         ],
       });
     }
-    return rawPath;
+    return getName(rawPath);
+  }
+
+  function fixType(type: S) {
+    return S.toString(type).replace(
+      /\b([\w\$]+\.[\w\.$]+|u\d+|Compact)\b/g,
+      (x) => "t." + x,
+    );
   }
 }

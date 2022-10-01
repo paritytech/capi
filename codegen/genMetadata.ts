@@ -1,7 +1,7 @@
 import * as M from "../frame_metadata/mod.ts";
 import { Decl, getPath, getRawCodecPath, makeDocComment, S } from "./utils.ts";
 
-export function genMetadata(metadata: M.Metadata, decls: Decl[], codecVisitor: M.TyVisitor<S>) {
+export function genMetadata(metadata: M.Metadata, decls: Decl[]) {
   const { tys, extrinsic, pallets } = metadata;
 
   const isUnitVisitor = new M.TyVisitor<boolean>(tys, {
@@ -56,11 +56,11 @@ export function genMetadata(metadata: M.Metadata, decls: Decl[], codecVisitor: M
               "key",
               entry.type === "Map"
                 ? entry.hashers.length === 1
-                  ? ["$.tuple(", codecVisitor.visit(entry.key), ")"]
-                  : codecVisitor.visit(entry.key)
+                  ? ["$.tuple(", getRawCodecPath(tys[entry.key]!), ")"]
+                  : getRawCodecPath(tys[entry.key]!)
                 : "[]",
             ],
-            ["value", codecVisitor.visit(entry.value)],
+            ["value", getRawCodecPath(tys[entry.value]!)],
           ),
         ],
       });
@@ -96,15 +96,12 @@ export function genMetadata(metadata: M.Metadata, decls: Decl[], codecVisitor: M
 
   decls.push({
     path: "_metadata.types",
-    code: [
-      "export const types: $.AnyCodec[] =",
-      S.array(codecVisitor.tys.map((ty) => getRawCodecPath(ty))),
-    ],
+    code: "export const types = _codec._all",
   });
 
   function getExtrasCodec(xs: [string, number][]) {
     return S.array(
-      xs.filter((x) => !isUnitVisitor.visit(x[1])).map((x) => codecVisitor.visit(x[1])),
+      xs.filter((x) => !isUnitVisitor.visit(x[1])).map((x) => getRawCodecPath(tys[x[1]]!)),
     );
   }
 }
