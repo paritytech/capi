@@ -1,4 +1,5 @@
 import { tsFormatter } from "../deps/dprint.ts";
+import { parse } from "../deps/std/flags.ts";
 import * as M from "../frame_metadata/mod.ts";
 import { createCodecVisitor } from "./codecVisitor.ts";
 import { genMetadata } from "./genMetadata.ts";
@@ -7,9 +8,17 @@ import { Decl, printDecls, S } from "./utils.ts";
 
 const importSource = new URL("../mod.ts", import.meta.url).toString();
 
-// TODO: better cli
 if (import.meta.main) {
-  const [metadataFile, outputFile] = Deno.args;
+  const args = parse(Deno.args, {
+    string: ["metadata", "output"],
+  });
+  if (args.help || args["?"]) {
+    console.log("Usage: codegen --metadata <file> --output <file>");
+    Deno.exit(0);
+  }
+  if (!args.metadata) throw new Error("Must specify metadata file");
+  if (!args.output) throw new Error("Must specify output file");
+  const { metadata: metadataFile, output: outputFile } = args;
   const metadata = M.fromPrefixedHex(await Deno.readTextFile(metadataFile!));
   const output = codegen(metadata);
   try {
