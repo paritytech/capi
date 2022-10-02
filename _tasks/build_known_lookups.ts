@@ -64,7 +64,7 @@ function concatLookup<LookupKey extends keyof Lookups>(
   generated += `\nexport const ${constantCase(lookupKey)} = {`;
   const lookup = lookups[lookupKey];
   for (const networkKey in lookup) {
-    generated += `\n\t${networkKey}: ${printValue(lookup[networkKey])},`;
+    generated += `\n  ${networkKey}: ${printValue(lookup[networkKey])},`;
   }
   generated += "\n}\n";
 }
