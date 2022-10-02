@@ -44,7 +44,7 @@ export function createTypeVisitor(tys: M.Ty[], decls: Decl[]) {
           makeDocComment(ty.docs),
           ["export type", name, "="],
           ty.members.map(({ fields, name: type, docs }) => {
-            let props: [S, S, S][];
+            let props: [comment: S, name: S, type: S][];
             if (fields.length === 0) {
               props = [];
             } else if (fields[0]!.name === undefined) {
