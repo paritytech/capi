@@ -1,6 +1,6 @@
 import { TypeRegistry } from "../deps/polkadot/types.ts";
 import * as C from "../mod.ts";
-import * as t from "../test-util/mod.ts";
+import * as t from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
 
 const config = await t.config({ altRuntime: "westend" });

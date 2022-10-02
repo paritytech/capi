@@ -1,5 +1,5 @@
 import { assertEquals, assertThrows } from "../deps/std/testing/asserts.ts";
-import * as t from "../test-util/mod.ts";
+import * as t from "../test_util/mod.ts";
 
 import {
   decode,

@@ -1,5 +1,5 @@
 import { assertEquals } from "../deps/std/testing/asserts.ts";
-import * as t from "../test-util/mod.ts";
+import * as t from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
 import { $storageKey } from "./Key.ts";
 import { getPalletAndEntry } from "./Metadata.ts";
