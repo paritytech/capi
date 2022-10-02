@@ -1,6 +1,5 @@
 import { Config } from "../../config/mod.ts";
 import { unimplemented } from "../../deps/std/testing/asserts.ts";
-import { isWsUrl } from "../../util/mod.ts";
 import { FailedToOpenConnectionError, ProxyClient, proxyClient } from "./proxy.ts";
 import {
   FailedToAddChainError,
@@ -22,7 +21,8 @@ export function stdClient<Config_ extends Config<string>>(
   config: Config_,
 ): Promise<StdClient<Config_> | StdClientInitError> {
   if (typeof config.discoveryValue === "string") {
-    if (isWsUrl(config.discoveryValue)) {
+    // TODO: improve check / move selection elsewhere
+    if (config.discoveryValue.startsWith("ws")) {
       return proxyClient(config);
     } else {
       return smoldotClient(config);

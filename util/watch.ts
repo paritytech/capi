@@ -1,7 +1,7 @@
-import { Iter } from "./iter.ts";
+import { deferred } from "../deps/std/async.ts";
 
 export type WatchHandler<Event> = (event: Event) => void;
-export type CreateWatchHandler<IngressMessage> = (stop: () => void) => WatchHandler<IngressMessage>;
+export type CreateWatchHandler<Event> = (stop: () => void) => WatchHandler<Event>;
 
 export function mapCreateWatchHandler<From, Into>(
   createWatchHandler: CreateWatchHandler<Into>,
@@ -15,14 +15,48 @@ export function mapCreateWatchHandler<From, Into>(
   };
 }
 
-// TODO: rename
-export type Handle<T> = CreateWatchHandler<T> & { iter: Iter<T> };
-export function handle<T>(): Handle<T> {
-  const inner = new Iter<T>();
-  const createWatchHandler: Handle<T> = (stop) => {
-    inner.onDone = stop;
-    return inner.push;
+export type WatchIter<T> = CreateWatchHandler<T> & AsyncIterable<T>;
+
+export function watchIter<T>(): WatchIter<T> {
+  const queue: T[] = [];
+  const cbs: ((value: IteratorYieldResult<T>) => void)[] = [];
+  const onDoneContainer: { onDone?: () => void } = {};
+  const createWatchHandler: CreateWatchHandler<T> = (stop) => {
+    onDoneContainer.onDone = stop;
+    return (value) => {
+      const cb = cbs.shift();
+      if (cb) {
+        cb({
+          done: false,
+          value,
+        });
+      } else {
+        queue.push(value);
+      }
+    };
   };
-  createWatchHandler.iter = inner;
-  return createWatchHandler;
+  const iter: AsyncIterableIterator<T> = {
+    async next() {
+      if (queue.length) {
+        return {
+          done: false,
+          value: queue.shift()!,
+        };
+      }
+      const pending = deferred<IteratorYieldResult<T>>();
+      cbs.push(pending.resolve);
+      return await pending;
+    },
+    return() {
+      onDoneContainer?.onDone?.();
+      return Promise.resolve({
+        done: true as const,
+        value: undefined,
+      });
+    },
+    [Symbol.asyncIterator]() {
+      return this;
+    },
+  };
+  return Object.assign(createWatchHandler, iter);
 }
