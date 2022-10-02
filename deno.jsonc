@@ -38,6 +38,6 @@
     "test:update": "deno task test -- -- --update",
     "mdbook:watch": "mdbook watch -o",
     "bench": "deno bench -A --no-check=remote --unstable",
-    "typegen": "deno task run typegen/typegen.ts"
+    "codegen": "deno task run main.ts"
   }
 }

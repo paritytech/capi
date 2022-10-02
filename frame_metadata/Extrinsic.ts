@@ -6,13 +6,6 @@ import { hex } from "../util/mod.ts";
 import { $null, DeriveCodec } from "./Codec.ts";
 import { Metadata } from "./Metadata.ts";
 
-export type Era = {
-  type: "Mortal";
-  value: [period: bigint, phase: bigint];
-} | {
-  type: "Immortal";
-};
-
 export interface MultiAddress {
   type: "Id" | "Index" | "Raw" | "Address20" | "Address32";
   value: Uint8Array;
