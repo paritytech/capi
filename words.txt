@@ -171,4 +171,5 @@ Curto
 devcontainers
 noninteractive
 autoremove
+trufflesecurity
 tailaiw
