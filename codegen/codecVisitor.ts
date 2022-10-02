@@ -197,8 +197,10 @@ export function createCodecVisitor(
     return getName(rawPath);
   }
 
+  /** Prefix generated types with `t.` */
   function fixType(type: S) {
     return S.toString(type).replace(
+      // Matches paths (`a.b.c`) that either contain a `.`, or are a number type (either `u123` or `Compact`)
       /\b([\w\$]+\.[\w\.$]+|u\d+|Compact)\b/g,
       (x) => "t." + x,
     );

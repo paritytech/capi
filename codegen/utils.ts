@@ -86,9 +86,8 @@ export function printDecls(decls: Decl[]) {
   const done: Decl[] = [];
   for (const { path, code } of decls) {
     if (path.includes(".")) {
-      const ns = path.split(".")[0]!;
-      const rest = path.split(".").slice(1).join(".");
-      (namespaces[ns] ??= []).push({ path: rest, code });
+      const [ns, ...rest] = path.split(".");
+      (namespaces[ns!] ??= []).push({ path: rest.join("."), code });
     } else {
       done.push({ path, code });
     }

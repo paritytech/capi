@@ -53,8 +53,10 @@ export function codegen(metadata: M.Metadata): Files {
   const typeVisitor = createTypeVisitor(tys, decls);
   const codecVisitor = createCodecVisitor(tys, decls, typeVisitor, files);
 
-  typeVisitor.tys.map((x) => typeVisitor.visit(x));
-  codecVisitor.tys.map((x) => codecVisitor.visit(x));
+  for (const ty of metadata.tys) {
+    typeVisitor.visit(ty);
+    codecVisitor.visit(ty);
+  }
 
   genMetadata(metadata, decls);
 
