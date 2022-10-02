@@ -112,5 +112,6 @@ export function printDecls(decls: Decl[]) {
       ? 1
       : 0
   );
-  return [...(done.map((x) => S.toString(x.code)))].join("\n");
+  // Deduplicate -- metadata has redundant entries (e.g. pallet_collective::RawOrigin)
+  return [...new Set(done.map((x) => S.toString(x.code)))].join("\n");
 }
