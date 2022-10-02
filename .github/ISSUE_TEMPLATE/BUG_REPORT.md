@@ -7,7 +7,7 @@ labels: bug
 
 ## Bug Report
 
-<!-- Please search Capi's issues incase one already exists for this bug. -->
+<!-- Please search Capi's issues in case one already exists for this bug. -->
 
 ### Current Behavior
 
