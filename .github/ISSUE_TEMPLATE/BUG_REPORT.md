@@ -1,6 +1,6 @@
 ---
 name: Bug
-about: Help us identify faulty behavior
+about: Identify faulty behavior
 title: ""
 labels: bug
 ---
