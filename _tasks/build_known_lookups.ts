@@ -66,7 +66,7 @@ function concatLookup<LookupKey extends keyof Lookups>(
   for (const networkKey in lookup) {
     generated += `\n  ${networkKey}: ${printValue(lookup[networkKey])},`;
   }
-  generated += "\n}\n";
+  generated += "\n};\n";
 }
 
 function quote(value: string): string {
