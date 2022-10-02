@@ -1,16 +1,10 @@
-<!--- Provide a general summary of your changes in the title above, following conventional commit -->
+Resolves #
 
-**Description**
+- [ ] There is an associated issue (**required**)
+- [ ] The change is described in detail
+- [ ] There are no merge conflicts
+- [ ] All CI checks pass
+- [ ] There are new or updated tests validating the change
+- [ ] The title conforms to [the conventional commit standard](https://www.conventionalcommits.org/en/v1.0.0/)
 
-<!--- Link to the open issue this addresses -->
-
-Fixes #
-
-<!--- Describe your changes in detail -->
-
-**How Has This Been Tested?**
-
-<!--- Please describe in detail how you tested your changes. -->
-<!--- Include details of your testing environment, and the tests you ran to -->
-<!--- see how your change affects other areas of the code, etc. -->
-<!--- validate CI checks passed -->
+## Description
