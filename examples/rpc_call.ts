@@ -1,10 +1,6 @@
 import * as C from "../mod.ts";
 import * as U from "../util/mod.ts";
 
-const root = C
-  .chain(C.polkadot)
-  .pallet("System")
-  .entry("Events")
-  .read();
+const root = C.rpcCall(C.polkadot, "rpc_methods", []);
 
 console.log(U.throwIfError(await root.run()));

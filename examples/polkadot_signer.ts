@@ -1,39 +1,37 @@
-import { TypeRegistry } from "https://deno.land/x/polkadot@0.0.8/types/mod.ts";
+import { TypeRegistry } from "../deps/polkadot/types.ts";
 import * as C from "../mod.ts";
 import * as t from "../test-util/mod.ts";
 import * as U from "../util/mod.ts";
 
-const config = await t.config();
+const config = await t.config({ altRuntime: "westend" });
 
-const root = C
-  .chain(config)
-  .pallet("Balances")
-  .extrinsic("transfer")
-  .call({
+const root = C.sendAndWatchExtrinsic({
+  config,
+  sender: {
+    type: "Id",
+    value: t.alice.publicKey,
+  },
+  palletName: "Balances",
+  methodName: "transfer",
+  args: {
     value: 12345n,
     dest: {
       type: "Id",
       value: t.bob.publicKey,
     },
-  })
-  .signed(
-    {
-      type: "Id",
-      value: t.alice.publicKey,
+  },
+  sign: {
+    signPayload(payload) {
+      const tr = new TypeRegistry();
+      tr.setSignedExtensions(payload.signedExtensions);
+      return Promise.resolve(
+        tr
+          .createType("ExtrinsicPayload", payload, { version: payload.version })
+          .sign(t.alice),
+      );
     },
-    {
-      signPayload(payload: any) {
-        const tr = new TypeRegistry();
-        tr.setSignedExtensions(payload.signedExtensions);
-        return Promise.resolve(
-          tr
-            .createType("ExtrinsicPayload", payload, { version: payload.version })
-            .sign(t.alice),
-        );
-      },
-    },
-  )
-  .sendAndWatch((stop) => {
+  },
+  createWatchHandler(stop) {
     return (event) => {
       if (typeof event.params.result === "string") {
         console.log("Extrinsic", event.params.result);
@@ -45,9 +43,13 @@ const root = C
           stop();
         } else {
           console.log("Misc", event.params.result);
+          stop();
         }
       }
     };
-  });
+  },
+});
 
 U.throwIfError(await root.run());
+
+config.close();

@@ -4,13 +4,8 @@ import * as U from "../util/mod.ts";
 
 const config = await t.config();
 
-const root = C
-  .chain(config)
-  .pallet("System")
-  .entry("Account")
-  .keyPage(10)
-  .read();
+const root = C.readKeyPage(config, "System", "Account", 10);
 
-console.log(U.throwIfError(await root.run()));
+console.log(U.throwIfError(await root.run()).keys);
 
 config.close();

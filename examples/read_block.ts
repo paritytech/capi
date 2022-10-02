@@ -1,5 +1,5 @@
-import * as C from "../../mod.ts";
-import * as U from "../../util/mod.ts";
+import * as C from "../mod.ts";
+import * as U from "../util/mod.ts";
 
 const root = C.readBlock(C.polkadot);
 

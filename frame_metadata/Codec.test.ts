@@ -42,9 +42,8 @@ Deno.test("Derive AccountInfo Codec", async () => {
 
 Deno.test("Derive Auctions AuctionInfo Storage Entry Codec", async () => {
   const [metadata, deriveCodec] = await setup("polkadot");
-  const auctionInfoStorageEntry = U.throwIfError(
-    getPalletAndEntry(metadata, "Auctions", "AuctionInfo"),
-  )[1];
+  const auctionInfoStorageEntry =
+    U.throwIfError(getPalletAndEntry(metadata, "Auctions", "AuctionInfo"))[1];
   const codec = deriveCodec(auctionInfoStorageEntry.value);
   const decoded = [8, 9945400];
   const encoded = codec.encode(decoded);
