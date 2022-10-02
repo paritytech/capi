@@ -1,5 +1,4 @@
 import { tsFormatter } from "../deps/dprint.ts";
-import { parse } from "../deps/std/flags.ts";
 import * as path from "../deps/std/path.ts";
 import * as M from "../frame_metadata/mod.ts";
 import { createCodecVisitor } from "./codecVisitor.ts";
@@ -7,20 +6,17 @@ import { genMetadata } from "./genMetadata.ts";
 import { createTypeVisitor } from "./typeVisitor.ts";
 import { Decl, Files, importSource, printDecls, S } from "./utils.ts";
 
-if (import.meta.main) {
-  const args = parse(Deno.args, {
-    string: ["metadata", "output"],
-  });
-  if (args.help || args["?"]) {
-    console.log("Usage: codegen --metadata <file> --output <dir>");
-    Deno.exit(0);
-  }
-  if (!args.metadata) throw new Error("Must specify metadata file");
-  if (!args.output) throw new Error("Must specify output dir");
-  const { metadata: metadataFile, output: outputDir } = args;
+export async function run(metadataFile: string, outputDir: string) {
   const metadata = M.fromPrefixedHex(await Deno.readTextFile(metadataFile));
   const output = codegen(metadata);
   const errors = [];
+  try {
+    await Deno.remove(outputDir, { recursive: true });
+  } catch (e) {
+    if (!(e instanceof Deno.errors.NotFound)) {
+      throw e;
+    }
+  }
   await Deno.mkdir(outputDir, { recursive: true });
   for (const [relativePath, file] of output.entries()) {
     const outputPath = path.join(outputDir, relativePath);
@@ -34,8 +30,7 @@ if (import.meta.main) {
     }
   }
   if (errors.length) {
-    console.error(errors);
-    Deno.exit(1);
+    throw errors;
   }
 }
 
