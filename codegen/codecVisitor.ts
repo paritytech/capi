@@ -182,6 +182,7 @@ export function createCodecVisitor(
       value,
     ]);
     const path = getCodecPath(tys, ty);
+    // Deduplicate -- metadata has redundant entries (e.g. pallet_collective::RawOrigin)
     if (path !== rawPath && path !== value && !decls.some((x) => x.path === path)) {
       decls.push({
         path,
@@ -197,7 +198,10 @@ export function createCodecVisitor(
     return getName(rawPath);
   }
 
-  /** Prefix generated types with `t.` */
+  /**
+   * Prefix generated types with `t.`
+   * e.g. `[Compact<u8>, foo.Bar, Uint8Array]` -> `[t.Compact<t.u8>, t.foo.Bar, Uint8Array]`
+   */
   function fixType(type: S) {
     return S.toString(type).replace(
       // Matches paths (`a.b.c`) that either contain a `.`, or are a number type (either `u123` or `Compact`)
