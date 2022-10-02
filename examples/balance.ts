@@ -1,15 +1,15 @@
 import * as C from "../mod.ts";
 import * as t from "../test-util/mod.ts";
-import * as U from "../util/mod.ts";
 
 const config = await t.config();
 
-const root = C
-  .chain(config)
-  .pallet("System")
-  .entry("Account", t.alice.publicKey)
-  .read();
+const root = C.readEntry(config, "System", "Account", [t.alice.publicKey]);
 
-console.log(U.throwIfError(await root.run()));
+const result = await root.run();
+
+if (result instanceof Error) {
+  throw result;
+}
+console.log(result);
 
 config.close();

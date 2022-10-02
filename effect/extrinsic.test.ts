@@ -34,7 +34,7 @@ Deno.test({
       fn: async () => {
         const root = C.readEntry(config, "System", "Account", [t.bob.publicKey]);
 
-        const state = U.throwIfError(await root.run());
+        const state = await root.run();
 
         assertObjectMatch(state, { value: { data: { free: 10000000000012345n } } });
       },
