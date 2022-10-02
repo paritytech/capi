@@ -1,36 +1,37 @@
 ---
-
-name: Bug Report
-about: Create a report to help us improve
-title: <title>
+name: Bug
+about: Help us identify faulty behavior
+title: ""
 labels: bug
-
 ---
 
-<!-- Please search to see if an issue already exists for the bug you encountered. -->
+## Bug Report
 
-**Current Behavior**
+<!-- Please search Capi's issues incase one already exists for this bug. -->
 
-<!-- A concise description of what you're experiencing. -->
+### Current Behavior
 
-**Expected Behavior**
+<!-- TODO -->
 
-<!-- A concise description of what you expected to happen. -->
+### Expected Behavior**
 
-**Steps To Reproduce**
+<!-- TODO -->
 
-<!--
-Example: steps to reproduce the behavior:
-1. In this environment...
-2. With this config...
-3. Run '...'
-4. See error...
--->
-
-**Environment**
+### Steps To Reproduce**
 
 <!--
 Example:
+
+1. In this environment...
+2. ... with this code...
+3. ... run this command.
+-->
+
+### Environment
+
+<!--
+Example:
+
 - Deno: ... (deno --version)
 - Node: ... (node -v)
 - Browser: ...
@@ -38,8 +39,6 @@ Example:
 - Language: TypeScript vX.Y.Z (tsc --version) / JavaScript / ...
 -->
 
-**Anything else**
+### Additional Information
 
-<!--
-Links? References? Github repository? Anything that will give us more context about the issue that you are encountering!
--->
+<!-- Is there anything else that might help us tackle this bug (a public GitHub repo perhaps?) -->
