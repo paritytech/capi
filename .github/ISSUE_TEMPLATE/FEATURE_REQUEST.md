@@ -1,25 +1,22 @@
 ---
-
 name: Feature Request
-about: Suggest an idea for this project
-title: <title>
+about: Suggest an idea
+title: ""
 labels: feature
-
 ---
 
-<!--
-Thank you for suggesting an idea to make the project better.
+## Feature Request
 
-Please fill in as much of the template below as you're able.
+<!-- Please search Capi's issues incase one already exists for this idea. -->
 
-Note: Please search to see if the feature request already exists or has been discussed.
--->
+### Suggestion
 
-**Is your feature request related to a problem? Please describe.**
-Please describe the problem you are trying to solve.
+<!-- TODO -->
 
-**Describe the solution you'd like**
-Please describe the desired behavior.
+### Motivation
 
-**Describe alternatives you've considered**
-Please describe alternative solutions or features you have considered.
+<!-- TODO -->
+
+### Use Cases
+
+<!-- TODO -->
