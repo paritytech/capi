@@ -1,6 +1,6 @@
 import { Config as Config_ } from "../config/mod.ts";
 import { fail } from "../deps/std/testing/asserts.ts";
-import { rpc, TmpMetadata } from "../known/mod.ts";
+import { rpc } from "../known/mod.ts";
 
 export interface NodeProps {
   altRuntime?: "kusama" | "rococo" | "westend";
@@ -8,7 +8,7 @@ export interface NodeProps {
 }
 
 export class Config
-  extends Config_<string, rpc.CallMethods, rpc.SubscriptionMethods, rpc.ErrorDetails, TmpMetadata>
+  extends Config_<string, rpc.CallMethods, rpc.SubscriptionMethods, rpc.ErrorDetails>
 {
   constructor(
     port: number,
