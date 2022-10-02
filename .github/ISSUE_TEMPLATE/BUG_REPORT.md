@@ -41,4 +41,4 @@ Example:
 
 ### Additional Information
 
-<!-- Is there anything else that might help us tackle this bug (a public GitHub repo perhaps?) -->
+<!-- Is there anything else that might help us tackle this bug (a public GitHub repo perhaps)? -->
