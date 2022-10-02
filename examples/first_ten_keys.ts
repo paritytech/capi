@@ -1,15 +1,11 @@
 import * as C from "../mod.ts";
 import * as t from "../test-util/mod.ts";
+import * as U from "../util/mod.ts";
 
 const config = await t.config();
 
 const root = C.readKeyPage(config, "System", "Account", 10);
 
-const result = await root.run();
-
-if (result instanceof Error) {
-  throw result;
-}
-console.log(result.keys);
+console.log(U.throwIfError(await root.run()).keys);
 
 config.close();

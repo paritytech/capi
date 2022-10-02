@@ -1,4 +1,5 @@
 import * as C from "../mod.ts";
+import * as U from "../util/mod.ts";
 
 const root = C.watchBlocks(C.westend, (stop) => {
   let i = 0;
@@ -11,8 +12,4 @@ const root = C.watchBlocks(C.westend, (stop) => {
   };
 });
 
-const maybeError = await root.run();
-
-if (maybeError) {
-  throw maybeError;
-}
+U.throwIfError(await root.run());

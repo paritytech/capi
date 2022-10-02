@@ -1,10 +1,6 @@
 import * as C from "../mod.ts";
+import * as U from "../util/mod.ts";
 
 const root = C.readEntry(C.westend, "System", "Events", []);
 
-const result = await root.run();
-
-if (result instanceof Error) {
-  throw result;
-}
-console.log(result);
+console.log(U.throwIfError(await root.run()));

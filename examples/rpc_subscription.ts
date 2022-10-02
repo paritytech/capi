@@ -1,5 +1,6 @@
 import * as C from "../mod.ts";
 import * as t from "../test-util/mod.ts";
+import * as U from "../util/mod.ts";
 
 const config = await t.config();
 
@@ -14,10 +15,6 @@ const root = C.rpcSubscription(config, "chain_subscribeNewHead", [], (stop) => {
   };
 });
 
-const maybeError = await root.run();
-
-if (maybeError instanceof Error) {
-  throw maybeError;
-}
+U.throwIfError(await root.run());
 
 config.close();

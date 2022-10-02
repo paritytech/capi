@@ -1,4 +1,5 @@
 import * as C from "../mod.ts";
+import * as U from "../util/mod.ts";
 
 const ids = C.readEntry(C.polkadot, "Paras", "Parachains", []);
 
@@ -9,9 +10,4 @@ const root = C.into([ids], ({ value }) => {
   return C.all(...heads);
 });
 
-const result = await root.run();
-
-if (result instanceof Error) {
-  throw result;
-}
-console.log(result);
+console.log(U.throwIfError(await root.run()));

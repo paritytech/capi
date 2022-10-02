@@ -1,4 +1,5 @@
 import * as C from "../mod.ts";
+import * as U from "../util/mod.ts";
 
 const root = C.watchEntry(C.rococo, "System", "Events", [], (stop) => {
   let i = 0;
@@ -11,8 +12,4 @@ const root = C.watchEntry(C.rococo, "System", "Events", [], (stop) => {
   };
 });
 
-const maybeError = await root.run();
-
-if (maybeError instanceof Error) {
-  throw maybeError;
-}
+U.throwIfError(await root.run());

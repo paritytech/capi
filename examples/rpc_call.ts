@@ -1,10 +1,6 @@
 import * as C from "../mod.ts";
+import * as U from "../util/mod.ts";
 
 const root = C.rpcCall(C.polkadot, "rpc_methods", []);
 
-const result = await root.run();
-
-if (result instanceof Error) {
-  throw result;
-}
-console.log(result);
+console.log(U.throwIfError(await root.run()));

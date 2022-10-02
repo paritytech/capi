@@ -1,13 +1,9 @@
 import * as C from "../../mod.ts";
 import * as rpc from "../../rpc/mod.ts";
+import * as U from "../../util/mod.ts";
 
-const client = await rpc.stdClient(C.westend);
-if (client instanceof Error) {
-  throw client;
-}
+const client = U.throwIfError(await rpc.stdClient(C.westend));
 
-const result = await client.call("state_getMetadata", []);
-
-console.log(result);
+console.log(await client.call("state_getMetadata", []));
 
 await client.close();

@@ -1,4 +1,5 @@
 import * as C from "../../mod.ts";
+import * as U from "../../util/mod.ts";
 
 const idx = C.readEntry(C.polkadot, "Staking", "ActiveEra", [])
   .select("value")
@@ -6,9 +7,4 @@ const idx = C.readEntry(C.polkadot, "Staking", "ActiveEra", [])
 
 const eraRewardPoints = C.readEntry(C.polkadot, "Staking", "ErasRewardPoints", [idx]);
 
-const result = await eraRewardPoints.run();
-
-if (result instanceof Error) {
-  throw result;
-}
-console.log(result);
+console.log(U.throwIfError(await eraRewardPoints.run()));

@@ -27,9 +27,7 @@ Deno.test("System Accounts Key", async () => {
 
 Deno.test("Auction Winning Key", async () => {
   const [metadata, deriveCodec] = await setup("polkadot");
-  const auctionWinningPalletAndEntry = getPalletAndEntry(metadata, "Auctions", "Winning");
-  if (auctionWinningPalletAndEntry instanceof Error) throw auctionWinningPalletAndEntry;
-  const [pallet, storageEntry] = auctionWinningPalletAndEntry;
+  const [pallet, storageEntry] = U.throwIfError(getPalletAndEntry(metadata, "Auctions", "Winning"));
   const $key = $storageKey({
     deriveCodec,
     pallet,
