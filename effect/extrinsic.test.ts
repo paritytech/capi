@@ -1,7 +1,7 @@
 import type { KeyringPair } from "https://deno.land/x/polkadot@0.0.8/keyring/types.ts";
 import { assertEquals, assertObjectMatch } from "../deps/std/testing/asserts.ts";
 import * as C from "../mod.ts";
-import * as t from "../test-util/mod.ts";
+import * as t from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
 
 Deno.test({
