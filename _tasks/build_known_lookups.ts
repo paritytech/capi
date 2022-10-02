@@ -39,18 +39,18 @@ for (const e of ss58Registry) {
   }
 }
 let generated = "";
-concatLookup("displayName", quote);
-concatLookup("prefix", (value) => {
+concatLookup("displayName", "string", quote);
+concatLookup("prefix", "number", (value) => {
   return `${value}`;
 });
-concatLookup("symbols", (value) => {
+concatLookup("symbols", "string[]", (value) => {
   return `["${value.join(`", "`)}"]`;
 });
-concatLookup("decimals", (value) => {
+concatLookup("decimals", "number[]", (value) => {
   return `[${value.join(", ")}]`;
 });
-concatLookup("stdAccount", quote);
-concatLookup("website", quote);
+concatLookup("stdAccount", `"*25519" | "Sr25519" | "Ed25519" | "secp256k1"`, quote);
+concatLookup("website", "string", quote);
 
 const final = `// @generated file from build script, do not edit\n${generated}`;
 const dest = path.join(Deno.cwd(), `known/lookups.ts`);
@@ -59,9 +59,10 @@ await Deno.writeTextFile(dest, final);
 
 function concatLookup<LookupKey extends keyof Lookups>(
   lookupKey: LookupKey,
+  constraint: string,
   printValue: (value: Lookups[LookupKey][keyof Lookups[LookupKey]]) => string,
 ) {
-  generated += `\nexport const ${constantCase(lookupKey)} = {`;
+  generated += `\nexport const ${constantCase(lookupKey)}: Record<string, ${constraint}> = {`;
   const lookup = lookups[lookupKey];
   for (const networkKey in lookup) {
     generated += `\n  ${networkKey}: ${printValue(lookup[networkKey])},`;

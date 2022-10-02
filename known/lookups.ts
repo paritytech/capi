@@ -1,6 +1,6 @@
 // @generated file from build script, do not edit
 
-export const DISPLAY_NAME = {
+export const DISPLAY_NAME: Record<string, string> = {
   polkadot: "POLKADOT",
   bare_sr25519: "BARE_SR25519",
   kusama: "KUSAMA",
@@ -99,9 +99,9 @@ export const DISPLAY_NAME = {
   cess: "CESS",
   contextfree: "CONTEXTFREE",
   nftmart: "NFTMART",
-}
+};
 
-export const PREFIX = {
+export const PREFIX: Record<string, number> = {
   polkadot: 0,
   bare_sr25519: 1,
   kusama: 2,
@@ -200,9 +200,9 @@ export const PREFIX = {
   cess: 11331,
   contextfree: 11820,
   nftmart: 12191,
-}
+};
 
-export const SYMBOLS = {
+export const SYMBOLS: Record<string, string[]> = {
   polkadot: ["DOT"],
   kusama: ["KSM"],
   astar: ["ASTR"],
@@ -290,9 +290,9 @@ export const SYMBOLS = {
   cess: ["CESS"],
   contextfree: ["CTX"],
   nftmart: ["NMT"],
-}
+};
 
-export const DECIMALS = {
+export const DECIMALS: Record<string, number[]> = {
   polkadot: [10],
   kusama: [12],
   astar: [18],
@@ -380,9 +380,9 @@ export const DECIMALS = {
   cess: [12],
   contextfree: [18],
   nftmart: [12],
-}
+};
 
-export const STD_ACCOUNT = {
+export const STD_ACCOUNT: Record<string, "*25519" | "Sr25519" | "Ed25519" | "secp256k1"> = {
   polkadot: "*25519",
   bare_sr25519: "Sr25519",
   kusama: "*25519",
@@ -481,9 +481,9 @@ export const STD_ACCOUNT = {
   cess: "*25519",
   contextfree: "*25519",
   nftmart: "*25519",
-}
+};
 
-export const WEBSITE = {
+export const WEBSITE: Record<string, string> = {
   polkadot: "https://polkadot.network",
   kusama: "https://kusama.network",
   astar: "https://astar.network",
@@ -574,4 +574,4 @@ export const WEBSITE = {
   cess: "https://cess.cloud",
   contextfree: "https://ata.network",
   nftmart: "https://nftmart.io",
-}
+};
