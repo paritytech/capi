@@ -1,5 +1,5 @@
 import { assertEquals } from "../deps/std/testing/asserts.ts";
-import * as t from "../test-util/mod.ts";
+import * as t from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
 import { ChainError } from "./Codec.ts";
 import { ContractMetadata } from "./Contract.ts";

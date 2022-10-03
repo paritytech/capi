@@ -1,5 +1,5 @@
 import { assert } from "../deps/std/testing/asserts.ts";
-import * as t from "../test-util/mod.ts";
+import * as t from "../test_util/mod.ts";
 import * as msg from "./messages.ts";
 import { proxyClient } from "./providers/proxy.ts";
 
