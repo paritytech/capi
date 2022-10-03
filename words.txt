@@ -173,3 +173,4 @@ noninteractive
 autoremove
 trufflesecurity
 tailaiw
+trufflehog
