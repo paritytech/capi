@@ -69,17 +69,21 @@ export abstract class Client<
     if (parsed instanceof Error) {
       // FIXME: define behavior for provider.parseIngressMessage errors
     } else {
-      for (const listener of this.#listenerCbs.keys()) {
-        listener(parsed);
-      }
+      setTimeout(() => {
+        for (const listener of this.#listenerCbs.keys()) {
+          listener(parsed);
+        }
+      });
     }
   };
 
   /** @internal */
   onError = (error: InternalError): void => {
-    for (const listener of this.#errorListenerCbs.keys()) {
-      listener(error);
-    }
+    setTimeout(() => {
+      for (const listener of this.#errorListenerCbs.keys()) {
+        listener(error);
+      }
+    });
   };
 
   /**
@@ -89,7 +93,7 @@ export abstract class Client<
    * @param params the params with which to call the method
    * @returns an ingress message corresponding to the given method (or a message-agnostic error)
    */
-  call = <
+  call = async <
     MethodName extends Extract<keyof Config_["RpcMethods"], string>,
     IngressMessage extends msg.OkMessage<Config_, MethodName> | msg.ErrMessage<Config_>,
   >(
@@ -102,12 +106,14 @@ export abstract class Client<
       method: methodName,
       params,
     };
+    const sendResult = await this.send(init);
+    if (sendResult instanceof Error) {
+      return sendResult;
+    }
     const isCorrespondingRes = IsCorrespondingRes(init);
     const ingressMessagePending = deferred<IngressMessage | InternalError>();
-    let stopListening: () => void = () => {};
     this.listen(
       (stop) => {
-        stopListening = stop;
         return (res) => {
           if (isCorrespondingRes(res)) {
             stop();
@@ -121,13 +127,6 @@ export abstract class Client<
           ingressMessagePending.resolve(error);
         },
     );
-    this.send(init)
-      .then((sendResult) => {
-        if (sendResult instanceof Error) {
-          stopListening();
-          ingressMessagePending.resolve(sendResult);
-        }
-      });
     return ingressMessagePending;
   };
 
