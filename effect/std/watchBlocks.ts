@@ -21,11 +21,10 @@ export function watchBlocks(
       const blockHash = a
         .rpcCall(config, "chain_getBlockHash", [blockNum])
         .select("result");
-      const block = await readBlock(config, blockHash as unknown as U.HashHexString).run(); // STOP THIS MADNESS
-      if (block instanceof Error) {
-        // TODO: subscription runtime error channel
-        throw block;
-      }
+      const block = U.throwIfError(
+        // STOP THIS MADNESS
+        await readBlock(config, blockHash as unknown as U.HashHexString).run(),
+      );
       watchHandler(block.block);
     };
   }, (ok) => {
