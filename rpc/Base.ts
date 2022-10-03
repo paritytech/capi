@@ -115,9 +115,9 @@ export abstract class Client<
           }
         };
       },
-      (stopListening) =>
+      (stop) =>
         (error) => {
-          stopListening();
+          stop();
           ingressMessagePending.resolve(error);
         },
     );
