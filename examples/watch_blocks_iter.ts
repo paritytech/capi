@@ -7,7 +7,7 @@ import * as C from "../mod.ts";
 
 const watchIter = C.watchIter();
 
-C.watchBlocks(C.rococo, watchIter).run();
+new C.BlockWatch(C.rococo, watchIter).run();
 
 let i = 0;
 

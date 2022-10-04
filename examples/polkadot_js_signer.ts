@@ -3,7 +3,7 @@ import * as C from "../mod.ts";
 import * as T from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
 
-const root = C.sendAndWatchExtrinsic({
+const root = new C.ExtrinsicSentWatch({
   config: T.westend,
   sender: {
     type: "Id",
