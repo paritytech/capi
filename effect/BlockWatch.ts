@@ -1,14 +1,13 @@
-import * as Z from "../deps/zones.ts";
 import { Extrinsic } from "../frame_metadata/mod.ts";
 import * as known from "../known/mod.ts";
 import * as U from "../util/mod.ts";
 import { BlockRead } from "./BlockRead.ts";
-import { runtime } from "./core/runtime.ts";
+import { Name, runtime } from "./core/runtime.ts";
 import { RpcCall } from "./RpcCall.ts";
 import { RpcSubscription } from "./RpcSubscription.ts";
 import { select } from "./util/select.ts";
 
-export class BlockWatch extends Z.Name {
+export class BlockWatch extends Name {
   root;
 
   constructor(
@@ -35,6 +34,4 @@ export class BlockWatch extends Z.Name {
       return new RpcCall(config, "chain_unsubscribeNewHead", [ok.result]);
     });
   }
-
-  run = runtime(this);
 }

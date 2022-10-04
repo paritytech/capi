@@ -4,32 +4,33 @@ import * as rpc from "../rpc/mod.ts";
 import * as U from "../util/mod.ts";
 import { RpcError } from "./common.ts";
 import { rpcClient } from "./core/rpcClient.ts";
-import { runtime } from "./core/runtime.ts";
+import { Name, runtime } from "./core/runtime.ts";
 
 export class RpcSubscription<
   Config_ extends Config,
   MethodName extends Extract<keyof Config_["RpcSubscriptionMethods"], string>,
   MethodName_ extends Z.$<MethodName>,
   Params extends Parameters<Config_["RpcSubscriptionMethods"][Z.T<MethodName_>]>,
-  Params_ extends Z.Collection$<Params> & any[],
-> extends Z.Name {
+  Params_ extends Z.Collection$<Params>,
+  CreateListenerCb extends Z.$<U.CreateWatchHandler<rpc.NotifMessage<Config_, MethodName>>>,
+> extends Name {
   root;
 
   constructor(
     config: Config_,
     methodName: MethodName_,
     params: Params_,
-    createListener: U.CreateWatchHandler<rpc.NotifMessage<Config_, MethodName>>,
-    cleanup?: (initOk: rpc.OkMessage<Config_, MethodName>) => Z.AnyEffect,
+    createListenerCb: CreateListenerCb,
+    cleanup?: (initOk: rpc.OkMessage<Config_, MethodName>) => Z.EffectLike,
   ) {
     super();
     this.root = Z.atom(
-      [rpcClient(config), methodName, ...params],
-      async function(client, methodName, ...params) {
+      [rpcClient(config), methodName, createListenerCb, ...params],
+      async function(client, methodName, createListenerCb, ...params) {
         const result = await client.subscribe(
           methodName as MethodName,
           params as Parameters<Config_["RpcSubscriptionMethods"][MethodName]>,
-          createListener,
+          createListenerCb,
           cleanup
             ? (x) => {
               return runtime(cleanup(x.result))();
@@ -50,8 +51,6 @@ export class RpcSubscription<
       },
     );
   }
-
-  run = runtime(this);
 }
 
 // TODO: handle elsewhere
