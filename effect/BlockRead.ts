@@ -3,12 +3,11 @@ import * as known from "../known/mod.ts";
 import * as U from "../util/mod.ts";
 import { $extrinsic } from "./core/$extrinsic.ts";
 import { deriveCodec } from "./core/deriveCodec.ts";
-import { Name } from "./core/runtime.ts";
 import { Metadata } from "./Metadata.ts";
 import { RpcCall } from "./RpcCall.ts";
 import { wrap } from "./util/wrap.ts";
 
-export class BlockRead<Rest extends [blockHash?: Z.$<U.HashHexString | undefined>]> extends Name {
+export class BlockRead<Rest extends [blockHash?: Z.$<U.HashHexString | undefined>]> extends Z.Name {
   root;
 
   constructor(

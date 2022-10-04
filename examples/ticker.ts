@@ -10,4 +10,4 @@ const root = new C.EntryWatch(T.polkadot, "Timestamp", "Now", [], () => {
   };
 });
 
-U.throwIfError(await root.run());
+U.throwIfError(await C.run(root));

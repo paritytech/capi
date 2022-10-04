@@ -4,7 +4,6 @@ import * as U from "../util/mod.ts";
 import { $key } from "./core/$key.ts";
 import { $storageKey } from "./core/$storageKey.ts";
 import { deriveCodec } from "./core/deriveCodec.ts";
-import { Name } from "./core/runtime.ts";
 import { storageKey } from "./core/storageKey.ts";
 import { entryMetadata, Metadata, palletMetadata } from "./Metadata.ts";
 import { RpcCall } from "./RpcCall.ts";
@@ -16,7 +15,7 @@ export class KeyPageRead<
   EntryName extends Z.$<string>,
   Count extends Z.$<number>,
   Rest extends [start?: unknown[] | undefined, blockHash?: Z.$<U.HashHexString | undefined>],
-> extends Name {
+> extends Z.Name {
   root;
 
   constructor(

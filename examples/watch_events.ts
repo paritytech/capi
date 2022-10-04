@@ -12,4 +12,4 @@ const root = new C.EntryWatch(C.rococo, "System", "Events", [], (stop) => {
   };
 });
 
-U.throwIfError(await root.run());
+U.throwIfError(await C.run(root));

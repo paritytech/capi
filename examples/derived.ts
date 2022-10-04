@@ -10,4 +10,4 @@ const root = C.into([ids], ({ value }) => {
   return C.all(...heads);
 });
 
-console.log(U.throwIfError(await root.run()));
+console.log(U.throwIfError(await C.run(root)));

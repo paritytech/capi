@@ -1,13 +1,14 @@
+import * as Z from "../deps/zones.ts";
 import { Extrinsic } from "../frame_metadata/mod.ts";
 import * as known from "../known/mod.ts";
 import * as U from "../util/mod.ts";
 import { BlockRead } from "./BlockRead.ts";
-import { Name, runtime } from "./core/runtime.ts";
 import { RpcCall } from "./RpcCall.ts";
 import { RpcSubscription } from "./RpcSubscription.ts";
+import { run } from "./runtime.ts";
 import { select } from "./util/select.ts";
 
-export class BlockWatch extends Name {
+export class BlockWatch extends Z.Name {
   root;
 
   constructor(
@@ -26,7 +27,7 @@ export class BlockWatch extends Name {
         const blockHash = select(new RpcCall(config, "chain_getBlockHash", [blockNum]), "result");
         const block = U.throwIfError(
           // STOP THIS MADNESS
-          await runtime(new BlockRead(config, blockHash as unknown as U.HashHexString))(),
+          await run(new BlockRead(config, blockHash as unknown as U.HashHexString)),
         );
         watchHandler(block.block);
       };

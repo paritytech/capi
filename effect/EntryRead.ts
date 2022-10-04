@@ -5,7 +5,6 @@ import { $storageKey } from "./core/$storageKey.ts";
 import { codec } from "./core/codec.ts";
 import { decoded } from "./core/decoded.ts";
 import { deriveCodec } from "./core/deriveCodec.ts";
-import { Name } from "./core/runtime.ts";
 import { storageKey } from "./core/storageKey.ts";
 import { entryMetadata, Metadata, palletMetadata } from "./Metadata.ts";
 import { RpcCall } from "./RpcCall.ts";
@@ -16,7 +15,7 @@ export class EntryRead<
   EntryName extends Z.$<string>,
   Keys extends unknown[],
   Rest extends [blockHash?: Z.$<U.HashHexString | undefined>],
-> extends Name {
+> extends Z.Name {
   root;
 
   constructor(

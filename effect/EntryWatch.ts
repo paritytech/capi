@@ -5,7 +5,6 @@ import * as U from "../util/mod.ts";
 import { $storageKey } from "./core/$storageKey.ts";
 import { codec } from "./core/codec.ts";
 import { deriveCodec } from "./core/deriveCodec.ts";
-import { Name } from "./core/runtime.ts";
 import { storageKey } from "./core/storageKey.ts";
 import { entryMetadata, Metadata, palletMetadata } from "./Metadata.ts";
 import { RpcCall } from "./RpcCall.ts";
@@ -24,7 +23,7 @@ export class EntryWatch<
   PalletName extends Z.$<string>,
   EntryName extends Z.$<string>,
   Keys extends unknown[],
-> extends Name {
+> extends Z.Name {
   root;
 
   constructor(

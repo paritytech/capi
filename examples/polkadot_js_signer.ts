@@ -48,4 +48,4 @@ const root = new C.ExtrinsicSentWatch({
   },
 });
 
-U.throwIfError(await root.run());
+U.throwIfError(await C.run(root));

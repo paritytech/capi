@@ -2,15 +2,12 @@ import * as Z from "../deps/zones.ts";
 import * as M from "../frame_metadata/mod.ts";
 import * as known from "../known/mod.ts";
 import * as U from "../util/mod.ts";
-import { Name } from "./core/runtime.ts";
 import { RpcCall } from "./RpcCall.ts";
 
-type ConfigConstraint = known.rpc.Config<string, "state_getMetadata">;
-
-export class Metadata<Rest extends [blockHash?: Z.$<U.HashHexString | undefined>]> extends Name {
+export class Metadata<Rest extends [blockHash?: Z.$<U.HashHexString | undefined>]> extends Z.Name {
   root;
 
-  constructor(config: ConfigConstraint, ...[blockHash]: Rest) {
+  constructor(config: known.rpc.Config<string, "state_getMetadata">, ...[blockHash]: Rest) {
     super();
     this.root = Z.atom(
       [new RpcCall(config, "state_getMetadata", [blockHash])],

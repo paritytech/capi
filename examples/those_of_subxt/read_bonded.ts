@@ -6,4 +6,4 @@ const aliceStash = T.alice.derive("//stash");
 
 const aliceBonded = new C.EntryRead(T.polkadot, "Staking", "Bonded", [aliceStash.publicKey]);
 
-console.log(U.throwIfError(await aliceBonded.run()));
+console.log(U.throwIfError(await C.run(aliceBonded)));
