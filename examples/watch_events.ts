@@ -1,7 +1,7 @@
 import * as C from "../mod.ts";
 import * as U from "../util/mod.ts";
 
-const root = C.watchEntry(C.rococo, "System", "Events", [], (stop) => {
+const root = new C.EntryWatch(C.rococo, "System", "Events", [], (stop) => {
   let i = 0;
   return (event) => {
     i++;

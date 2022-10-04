@@ -1,7 +1,8 @@
-import { Config } from "../../config/mod.ts";
-import * as rpc from "../../rpc/mod.ts";
-import * as U from "../../util/mod.ts";
+import { Config } from "../config/mod.ts";
+import * as rpc from "../rpc/mod.ts";
+import * as U from "../util/mod.ts";
 
+// TODO: handle this elsewhere
 export class RpcError<
   Config_ extends Config,
   MethodName extends keyof Config_["RpcMethods"],

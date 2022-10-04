@@ -1,7 +1,7 @@
+import * as Z from "../../deps/zones.ts";
 import * as M from "../../frame_metadata/mod.ts";
-import { atomFactory } from "../sys/Atom.ts";
 
-export const codec = atomFactory("Codec", (
+export const codec = Z.atomf((
   deriveCodec: M.DeriveCodec,
   ty: number | M.Ty,
 ) => {

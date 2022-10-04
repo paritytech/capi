@@ -23,17 +23,14 @@ Deno.test({
         },
         T.alice,
       );
-
       assertEquals(extrinsicEvents, ["ready", "inBlock", "finalized"]);
     });
 
     await ctx.step({
       name: "account balance updated",
       fn: async () => {
-        const root = C.readEntry(T.westend, "System", "Account", [T.bob.publicKey]);
-
-        const state = await root.run();
-
+        const state = await new C.EntryRead(T.westend, "System", "Account", [T.bob.publicKey])
+          .run();
         assertObjectMatch(state, { value: { data: { free: 10000000000012345n } } });
       },
     });
@@ -83,7 +80,6 @@ Deno.test({
         },
         T.alice,
       );
-
       assertEquals(extrinsicEvents, ["ready", "inBlock", "finalized"]);
     });
   },
@@ -97,8 +93,7 @@ async function collectExtrinsicEvents(
   sender: KeyringPair,
 ): Promise<string[]> {
   const extrinsicEvents: string[] = [];
-
-  const root = C.sendAndWatchExtrinsic({
+  const root = new C.ExtrinsicSentWatch({
     config,
     sender: {
       type: "Id",
@@ -130,8 +125,6 @@ async function collectExtrinsicEvents(
       };
     },
   });
-
-  await root.run();
-
+  U.throwIfError(await root.run());
   return extrinsicEvents;
 }
