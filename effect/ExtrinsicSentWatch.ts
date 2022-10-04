@@ -7,7 +7,6 @@ import * as ss58 from "../ss58/mod.ts";
 import * as U from "../util/mod.ts";
 import { $extrinsic } from "./core/$extrinsic.ts";
 import { deriveCodec } from "./core/deriveCodec.ts";
-import { Name } from "./core/runtime.ts";
 import { Metadata } from "./Metadata.ts";
 import { RpcCall } from "./RpcCall.ts";
 import { RpcSubscription } from "./RpcSubscription.ts";
@@ -40,7 +39,7 @@ export interface SendAndWatchExtrinsicProps {
   >;
 }
 
-export class ExtrinsicSentWatch<Props extends SendAndWatchExtrinsicProps> extends Name {
+export class ExtrinsicSentWatch<Props extends SendAndWatchExtrinsicProps> extends Z.Name {
   root;
 
   constructor(props: Props) {

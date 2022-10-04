@@ -3,6 +3,7 @@ import { assertEquals, assertObjectMatch } from "../deps/std/testing/asserts.ts"
 import * as C from "../mod.ts";
 import * as T from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
+import { run } from "./runtime.ts";
 
 Deno.test({
   name: "Balances.transfer",
@@ -29,8 +30,7 @@ Deno.test({
     await ctx.step({
       name: "account balance updated",
       fn: async () => {
-        const state = await new C.EntryRead(T.westend, "System", "Account", [T.bob.publicKey])
-          .run();
+        const state = await run(new C.EntryRead(T.westend, "System", "Account", [T.bob.publicKey]));
         assertObjectMatch(state, { value: { data: { free: 10000000000012345n } } });
       },
     });
@@ -125,6 +125,6 @@ async function collectExtrinsicEvents(
       };
     },
   });
-  U.throwIfError(await root.run());
+  U.throwIfError(await run(root));
   return extrinsicEvents;
 }

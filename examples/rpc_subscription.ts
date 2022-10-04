@@ -13,4 +13,4 @@ const root = new C.RpcSubscription(T.polkadot, "chain_subscribeNewHead", [], (st
   };
 });
 
-U.throwIfError(await root.run());
+U.throwIfError(await C.run(root));

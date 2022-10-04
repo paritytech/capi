@@ -4,7 +4,7 @@ import * as rpc from "../rpc/mod.ts";
 import * as U from "../util/mod.ts";
 import { RpcError } from "./common.ts";
 import { rpcClient } from "./core/rpcClient.ts";
-import { Name, runtime } from "./core/runtime.ts";
+import { run } from "./runtime.ts";
 
 export class RpcSubscription<
   Config_ extends Config,
@@ -13,7 +13,7 @@ export class RpcSubscription<
   Params extends Parameters<Config_["RpcSubscriptionMethods"][Z.T<MethodName_>]>,
   Params_ extends Z.Collection$<Params>,
   CreateListenerCb extends Z.$<U.CreateWatchHandler<rpc.NotifMessage<Config_, MethodName>>>,
-> extends Name {
+> extends Z.Name {
   root;
 
   constructor(
@@ -33,7 +33,7 @@ export class RpcSubscription<
           createListenerCb,
           cleanup
             ? (x) => {
-              return runtime(cleanup(x.result))();
+              return run(cleanup(x.result));
             }
             : undefined,
         );

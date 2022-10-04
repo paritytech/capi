@@ -3,13 +3,12 @@ import * as Z from "../deps/zones.ts";
 import * as rpc from "../rpc/mod.ts";
 import { RpcError } from "./common.ts";
 import { rpcClient } from "./core/rpcClient.ts";
-import { Name } from "./core/runtime.ts";
 
 export class RpcCall<
   Methods extends rpc.ProviderMethods,
   MethodName extends Z.$<Extract<keyof Methods, string>>,
   Params extends Z.Collection$<Parameters<Methods[Z.T<MethodName>]>>,
-> extends Name {
+> extends Z.Name {
   root;
 
   constructor(

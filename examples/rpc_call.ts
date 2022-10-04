@@ -3,4 +3,4 @@ import * as U from "../util/mod.ts";
 
 const root = new C.RpcCall(C.polkadot, "rpc_methods", []);
 
-console.log(U.throwIfError(await root.run()));
+console.log(U.throwIfError(await C.run(root)));
