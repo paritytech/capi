@@ -5,7 +5,7 @@ import { $storageKey } from "./core/$storageKey.ts";
 import { codec } from "./core/codec.ts";
 import { decoded } from "./core/decoded.ts";
 import { deriveCodec } from "./core/deriveCodec.ts";
-import { runtime } from "./core/runtime.ts";
+import { Name } from "./core/runtime.ts";
 import { storageKey } from "./core/storageKey.ts";
 import { entryMetadata, Metadata, palletMetadata } from "./Metadata.ts";
 import { RpcCall } from "./RpcCall.ts";
@@ -16,7 +16,7 @@ export class EntryRead<
   EntryName extends Z.$<string>,
   Keys extends unknown[],
   Rest extends [blockHash?: Z.$<U.HashHexString | undefined>],
-> extends Z.Name {
+> extends Name {
   root;
 
   constructor(
@@ -39,6 +39,4 @@ export class EntryRead<
     const resultHex = select(storageCall, "result");
     this.root = decoded($entry, resultHex, "value");
   }
-
-  run = runtime(this);
 }

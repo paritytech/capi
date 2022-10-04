@@ -5,7 +5,7 @@ import * as U from "../util/mod.ts";
 import { $storageKey } from "./core/$storageKey.ts";
 import { codec } from "./core/codec.ts";
 import { deriveCodec } from "./core/deriveCodec.ts";
-import { runtime } from "./core/runtime.ts";
+import { Name } from "./core/runtime.ts";
 import { storageKey } from "./core/storageKey.ts";
 import { entryMetadata, Metadata, palletMetadata } from "./Metadata.ts";
 import { RpcCall } from "./RpcCall.ts";
@@ -24,7 +24,7 @@ export class EntryWatch<
   PalletName extends Z.$<string>,
   EntryName extends Z.$<string>,
   Keys extends unknown[],
-> extends Z.Name {
+> extends Name {
   root;
 
   constructor(
@@ -43,26 +43,24 @@ export class EntryWatch<
     const entryValueTypeI = select(entryMetadata_, "value");
     const $entry = codec(deriveCodec_, entryValueTypeI);
     const storageKeys = Z.atom([storageKey($storageKey_, keys)], (v) => [v]);
-    this.root = Z.into([$entry], ($entryCodec) => {
-      const watchInit = U.mapCreateWatchHandler(
+    const watchInit = Z.atom([$entry], ($entry) => {
+      return U.mapCreateWatchHandler(
         createWatchHandler,
         (message: rpc.NotifMessage<Config, "state_subscribeStorage">) => {
           return message.params.result.changes.map(([key, val]) => {
-            return <WatchEntryEvent> [key, val ? $entryCodec.decode(U.hex.decode(val)) : undefined];
+            return <WatchEntryEvent> [key, val ? $entry.decode(U.hex.decode(val)) : undefined];
           });
         },
       );
-      return new RpcSubscription(
-        config,
-        "state_subscribeStorage",
-        [storageKeys],
-        watchInit,
-        (ok) => {
-          return new RpcCall(config, "state_unsubscribeStorage", [ok.result]);
-        },
-      );
     });
+    this.root = new RpcSubscription(
+      config,
+      "state_subscribeStorage",
+      [storageKeys],
+      watchInit,
+      (ok) => {
+        return new RpcCall(config, "state_unsubscribeStorage", [ok.result]);
+      },
+    );
   }
-
-  run = runtime(this);
 }
