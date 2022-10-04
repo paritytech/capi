@@ -4,12 +4,18 @@ declare const PRIMARY: Uint8Array;
 declare const SECONDARY: Uint8Array[];
 declare const THRESHOLD: number;
 
-const multiSigAddress = await C.MultiSig.with(
+declare namespace MultiSig {
+  const create: (
+    primary: Uint8Array,
+    secondary: Uint8Array[],
+    threshold: number,
+  ) => Promise<Uint8Array>;
+}
+
+const multiSigAddress = await MultiSig.create(
   PRIMARY,
   SECONDARY,
   THRESHOLD,
-  proposalId,
-  signer
 );
 
 console.log(multiSigAddress);
