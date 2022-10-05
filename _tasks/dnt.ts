@@ -23,9 +23,9 @@ await Promise.all([
     }],
     outDir,
     mappings: {
-      "https://deno.land/x/scale@v0.5.3/mod.ts": {
+      "https://deno.land/x/scale@v0.6.0/mod.ts": {
         name: "parity-scale-codec",
-        version: "^0.5.3",
+        version: "^0.6.0",
       },
       "deps/smoldot_phantom.ts": {
         name: "@substrate/smoldot-light",
