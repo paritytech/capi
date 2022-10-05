@@ -40,7 +40,7 @@ export class KeyPageRead<
     );
     const $storageKey_ = $storageKey(deriveCodec_, palletMetadata_, entryMetadata_);
     const startKey = start ? storageKey($storageKey_, start) : undefined;
-    const storageKey_ = storageKey($storageKey_, []);
+    const storageKey_ = storageKey($storageKey_);
     const call = new RpcCall(config, "state_getKeysPaged", [
       storageKey_,
       count,

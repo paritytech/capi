@@ -5,7 +5,7 @@ import * as U from "../util/mod.ts";
 import { BlockRead } from "./BlockRead.ts";
 import { RpcCall } from "./RpcCall.ts";
 import { RpcSubscription } from "./RpcSubscription.ts";
-import { run } from "./runtime.ts";
+import { run } from "./run.ts";
 import { select } from "./util/select.ts";
 
 export class BlockWatch extends Z.Name {

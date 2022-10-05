@@ -3,6 +3,7 @@ import * as U from "../util/mod.ts";
 
 const ids = new C.EntryRead(C.polkadot, "Paras", "Parachains", []);
 
+// @ts-ignore
 const root = C.into([ids], ({ value }) => {
   const heads = value.map((id: number) => {
     return new C.EntryRead(C.polkadot, "Paras", "Heads", [id]);

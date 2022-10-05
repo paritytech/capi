@@ -7,7 +7,7 @@ import { rpcClient } from "./core/rpcClient.ts";
 export class RpcCall<
   Methods extends rpc.ProviderMethods,
   MethodName extends Z.$<Extract<keyof Methods, string>>,
-  Params extends Z.Collection$<Parameters<Methods[Z.T<MethodName>]>>,
+  Params extends Z.List$<Parameters<Methods[Z.T<MethodName>]>>,
 > extends Z.Name {
   root;
 
