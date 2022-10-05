@@ -4,14 +4,14 @@ import * as rpc from "../rpc/mod.ts";
 import * as U from "../util/mod.ts";
 import { RpcError } from "./common.ts";
 import { rpcClient } from "./core/rpcClient.ts";
-import { run } from "./runtime.ts";
+import { run } from "./run.ts";
 
 export class RpcSubscription<
   Config_ extends Config,
   MethodName extends Extract<keyof Config_["RpcSubscriptionMethods"], string>,
   MethodName_ extends Z.$<MethodName>,
   Params extends Parameters<Config_["RpcSubscriptionMethods"][Z.T<MethodName_>]>,
-  Params_ extends Z.Collection$<Params>,
+  Params_ extends Z.List$<Params>,
   CreateListenerCb extends Z.$<U.CreateWatchHandler<rpc.NotifMessage<Config_, MethodName>>>,
 > extends Z.Name {
   root;

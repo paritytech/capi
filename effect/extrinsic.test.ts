@@ -3,7 +3,7 @@ import { assertEquals, assertObjectMatch } from "../deps/std/testing/asserts.ts"
 import * as C from "../mod.ts";
 import * as T from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
-import { run } from "./runtime.ts";
+import { run } from "./run.ts";
 
 Deno.test({
   name: "Balances.transfer",
