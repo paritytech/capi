@@ -3,7 +3,7 @@ import { atomFactory } from "../sys/Atom.ts";
 
 export const codec = atomFactory("Codec", (
   deriveCodec: M.DeriveCodec,
-  typeI: number,
+  ty: number | M.Ty,
 ) => {
-  return deriveCodec(typeI);
+  return deriveCodec(ty);
 });

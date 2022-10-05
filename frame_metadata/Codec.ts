@@ -3,7 +3,7 @@ import { $era } from "./Era.ts";
 import type * as M from "./mod.ts";
 import { TyVisitor } from "./TyVisitor.ts";
 
-export type DeriveCodec = (typeI: number) => $.Codec<unknown>;
+export type DeriveCodec = (typeI: number | M.Ty) => $.Codec<unknown>;
 
 /**
  * All derived codecs for ZSTs will use this exact codec,
@@ -107,7 +107,7 @@ export function DeriveCodec(tys: M.Ty[]): DeriveCodec {
     },
   });
 
-  return (i: number) => visitor.visit(i);
+  return (ty) => visitor.visit(ty);
 }
 
 export class ChainError<T> extends Error {
