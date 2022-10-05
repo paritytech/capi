@@ -82,7 +82,7 @@ export interface Constant {
 export const $constant: $.Codec<Constant> = $.object(
   ["name", $.str],
   ["ty", $.compactU32],
-  ["value", $.uint8array],
+  ["value", $.uint8Array],
   ["docs", $.array($.str)],
 );
 

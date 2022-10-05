@@ -12,7 +12,7 @@ interface Foo {
 }
 
 const $foo: $.Codec<Foo> = $.object(
-  ["a", $.uint8array],
+  ["a", $.uint8Array],
   ["b", $.array($.bool)],
   ["c", $.promise($.str)],
   ["d", $.option($.deferred(() => $foo))],

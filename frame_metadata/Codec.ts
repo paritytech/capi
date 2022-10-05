@@ -70,14 +70,14 @@ export function DeriveCodec(tys: M.Ty[]): DeriveCodec {
       }
       return $.taggedUnion("type", members);
     },
-    uint8array() {
-      return $.uint8array;
+    uint8Array() {
+      return $.uint8Array;
     },
     array(ty) {
       return $.array(this.visit(ty.typeParam));
     },
     sizedUint8Array(ty) {
-      return $.sizedUint8array(ty.len);
+      return $.sizedUint8Array(ty.len);
     },
     sizedArray(ty) {
       return $.sizedArray(this.visit(ty.typeParam), ty.len);

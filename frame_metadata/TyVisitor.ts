@@ -22,7 +22,7 @@ export interface TyVisitorMethods<T> {
   stringUnion(ty: Ty & UnionTyDef): T;
   taggedUnion(ty: Ty & UnionTyDef): T;
 
-  uint8array?(ty: Ty & SequenceTyDef): T;
+  uint8Array?(ty: Ty & SequenceTyDef): T;
   array(ty: Ty & SequenceTyDef): T;
 
   sizedUint8Array?(ty: Ty & SizedArrayTyDef): T;
@@ -109,8 +109,8 @@ export class TyVisitor<T> {
         return this.taggedUnion(ty);
       }
     } else if (ty.type === "Sequence") {
-      if (this.uint8array && this._isU8(ty.typeParam)) {
-        return this.uint8array(ty);
+      if (this.uint8Array && this._isU8(ty.typeParam)) {
+        return this.uint8Array(ty);
       } else {
         return this.array(ty);
       }
