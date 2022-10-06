@@ -48,7 +48,7 @@ export function getPath(tys: M.Ty[], ty: M.Ty): string | null {
       if (tys.every((x) => x.path.join(".") !== baseName || x.params[i]!.ty === p.ty)) {
         return "";
       }
-      return ".$$" + (_getName(tys[p.ty!]!) ?? p.ty);
+      return ".$$" + (_getName(p.ty) ?? p.ty);
     }).join("");
   }
 }

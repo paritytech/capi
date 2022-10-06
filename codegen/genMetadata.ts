@@ -56,17 +56,17 @@ export function genMetadata(metadata: M.Metadata, decls: Decl[]) {
               "key",
               entry.type === "Map"
                 ? entry.hashers.length === 1
-                  ? ["$.tuple(", getRawCodecPath(tys[entry.key]!), ")"]
-                  : getRawCodecPath(tys[entry.key]!)
+                  ? ["$.tuple(", getRawCodecPath(entry.key), ")"]
+                  : getRawCodecPath(entry.key)
                 : "[]",
             ],
-            ["value", getRawCodecPath(tys[entry.value]!)],
+            ["value", getRawCodecPath(entry.value)],
           ),
         ],
       });
     }
     if (pallet.calls) {
-      const ty = tys[pallet.calls.ty]! as M.Ty & M.UnionTyDef;
+      const ty = pallet.calls as M.Ty & M.UnionTyDef;
       const isStringUnion = ty.members.every((x) => !x.fields.length);
       for (const call of ty.members) {
         const typeName = isStringUnion ? S.string(call.name) : getPath(tys, ty)! + "." + call.name;
@@ -99,9 +99,9 @@ export function genMetadata(metadata: M.Metadata, decls: Decl[]) {
     code: "export const types = _codec._all",
   });
 
-  function getExtrasCodec(xs: [string, number][]) {
+  function getExtrasCodec(xs: [string, M.Ty][]) {
     return S.array(
-      xs.filter((x) => !isUnitVisitor.visit(x[1])).map((x) => getRawCodecPath(tys[x[1]]!)),
+      xs.filter((x) => !isUnitVisitor.visit(x[1])).map((x) => getRawCodecPath(x[1])),
     );
   }
 }
