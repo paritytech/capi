@@ -1,6 +1,6 @@
 import * as $ from "../deps/scale.ts";
 import * as U from "../util/mod.ts";
-import { $ty, Ty } from "./scale_info.ts";
+import { $tyId, $tys, Ty } from "./scale_info.ts";
 
 export type HasherKind = $.Native<typeof $hasherKind>;
 const $hasherKind = $.stringUnion([
@@ -21,25 +21,25 @@ export const $storageEntryModifier = $.stringUnion([
 
 export interface PlainStorageEntryType {
   type: "Plain";
-  value: number;
+  value: Ty;
 }
 
 export interface MapStorageEntryType {
   type: "Map";
   hashers: HasherKind[];
-  key: number;
-  value: number;
+  key: Ty;
+  value: Ty;
 }
 
 export type StorageEntryType = PlainStorageEntryType | MapStorageEntryType;
 
 export const $storageEntryType: $.Codec<StorageEntryType> = $.taggedUnion("type", [
-  ["Plain", ["value", $.compactU32]],
+  ["Plain", ["value", $tyId]],
   [
     "Map",
     ["hashers", $.array($hasherKind)],
-    ["key", $.compactU32],
-    ["value", $.compactU32],
+    ["key", $tyId],
+    ["value", $tyId],
   ],
 ]);
 
@@ -75,57 +75,54 @@ export const $storage: $.Codec<Storage> = $.object(
 
 export interface Constant {
   name: string;
-  ty: number;
+  ty: Ty;
   value: Uint8Array;
   docs: string[];
 }
 export const $constant: $.Codec<Constant> = $.object(
   ["name", $.str],
-  ["ty", $.compactU32],
-  ["value", $.uint8array],
+  ["ty", $tyId],
+  ["value", $.uint8Array],
   ["docs", $.array($.str)],
 );
-
-type OptionalTypeBearer = $.Native<typeof optionalTypeBearer>;
-const optionalTypeBearer = $.option($.object(["ty", $.compactU32]));
 
 export interface Pallet {
   name: string;
   storage: Storage | undefined;
-  calls: OptionalTypeBearer;
-  event: OptionalTypeBearer;
+  calls: Ty | undefined;
+  event: Ty | undefined;
   constants: Constant[];
-  error: OptionalTypeBearer;
+  error: Ty | undefined;
   i: number;
 }
 export const $pallet: $.Codec<Pallet> = $.object(
   ["name", $.str],
   ["storage", $.option($storage)],
-  ["calls", optionalTypeBearer],
-  ["event", optionalTypeBearer],
+  ["calls", $.option($tyId)],
+  ["event", $.option($tyId)],
   ["constants", $.array($constant)],
-  ["error", optionalTypeBearer],
+  ["error", $.option($tyId)],
   ["i", $.u8],
 );
 
 export interface SignedExtensionMetadata {
   ident: string;
-  ty: number;
-  additionalSigned: number;
+  ty: Ty;
+  additionalSigned: Ty;
 }
 export const $signedExtensionMetadata: $.Codec<SignedExtensionMetadata> = $.object(
   ["ident", $.str],
-  ["ty", $.compactU32],
-  ["additionalSigned", $.compactU32],
+  ["ty", $tyId],
+  ["additionalSigned", $tyId],
 );
 
 export interface ExtrinsicDef {
-  ty: number;
+  ty: Ty;
   version: number;
   signedExtensions: SignedExtensionMetadata[];
 }
 export const $extrinsicDef: $.Codec<ExtrinsicDef> = $.object(
-  ["ty", $.compactU32],
+  ["ty", $tyId],
   ["version", $.u8],
   ["signedExtensions", $.array($signedExtensionMetadata)],
 );
@@ -143,7 +140,7 @@ export interface Metadata {
 export const $metadata: $.Codec<Metadata> = $.object(
   ["magicNumber", $.constantPattern(magicNumber, $.u32)],
   ["version", $.constantPattern(14, $.u8)],
-  ["tys", $.array($ty)],
+  ["tys", $tys],
   ["pallets", $.array($pallet)],
   ["extrinsic", $extrinsicDef],
 );

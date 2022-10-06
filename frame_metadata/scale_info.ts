@@ -1,14 +1,50 @@
 import * as $ from "../deps/scale.ts";
 
+export class TyDecodeCtx {
+  tys: Ty[] | null = null;
+}
+
+export const $tys: $.Codec<Ty[]> = $.createCodec({
+  name: "tys",
+  _metadata: null,
+  _staticSize: $.compactU32._staticSize,
+  _encode(buffer, value) {
+    $.array($ty)._encode(buffer, value);
+  },
+  _decode(buffer) {
+    const length = $.compactU32._decode(buffer);
+    const ctx = buffer.context.get(TyDecodeCtx);
+    const tys = ctx.tys = Array.from({ length }, (_, id) => ({ id } as Ty));
+    for (let i = 0; i < length; i++) {
+      Object.assign(tys[i]!, $ty._decode(buffer));
+    }
+    return tys;
+  },
+});
+
+export const $tyId: $.Codec<Ty> = $.createCodec({
+  name: "tyId",
+  _metadata: null,
+  _staticSize: $.compactU32._staticSize,
+  _encode(buffer, value) {
+    $.compactU32._encode(buffer, value.id);
+  },
+  _decode(buffer) {
+    const ctx = buffer.context.get(TyDecodeCtx);
+    const id = $.compactU32._decode(buffer);
+    return ctx.tys?.[id] ?? { id } as any;
+  },
+});
+
 export interface Field {
   name: string | undefined;
-  ty: number;
+  ty: Ty;
   typeName: string | undefined;
   docs: string[];
 }
 export const $field: $.Codec<Field> = $.object(
   ["name", $.option($.str)],
-  ["ty", $.compactU32],
+  ["ty", $tyId],
   ["typeName", $.option($.str)],
   ["docs", $.array($.str)],
 );
@@ -49,16 +85,16 @@ export interface UnionTyDef {
 }
 export interface SequenceTyDef {
   type: "Sequence";
-  typeParam: number;
+  typeParam: Ty;
 }
 export interface SizedArrayTyDef {
   type: "SizedArray";
   len: number;
-  typeParam: number;
+  typeParam: Ty;
 }
 export interface TupleTyDef {
   type: "Tuple";
-  fields: number[];
+  fields: Ty[];
 }
 export interface PrimitiveTyDef {
   type: "Primitive";
@@ -66,12 +102,12 @@ export interface PrimitiveTyDef {
 }
 export interface CompactTyDef {
   type: "Compact";
-  typeParam: number;
+  typeParam: Ty;
 }
 export interface BitSequenceTyDef {
   type: "BitSequence";
-  bitOrderType: number;
-  bitStoreType: number;
+  bitOrderType: Ty;
+  bitStoreType: Ty;
 }
 export type TyDef =
   | StructTyDef
@@ -101,16 +137,16 @@ export const $tyDef: $.Codec<TyDef> = $.taggedUnion("type", [
   ],
   [
     "Sequence",
-    ["typeParam", $.compactU32],
+    ["typeParam", $tyId],
   ],
   [
     "SizedArray",
     ["len", $.u32],
-    ["typeParam", $.compactU32],
+    ["typeParam", $tyId],
   ],
   [
     "Tuple",
-    ["fields", $.array($.compactU32)],
+    ["fields", $.array($tyId)],
   ],
   [
     "Primitive",
@@ -118,22 +154,22 @@ export const $tyDef: $.Codec<TyDef> = $.taggedUnion("type", [
   ],
   [
     "Compact",
-    ["typeParam", $.compactU32],
+    ["typeParam", $tyId],
   ],
   [
     "BitSequence",
-    ["bitOrderType", $.compactU32],
-    ["bitStoreType", $.compactU32],
+    ["bitOrderType", $tyId],
+    ["bitStoreType", $tyId],
   ],
 ]);
 
 export interface Param {
   name: string;
-  ty: number | undefined;
+  ty: Ty | undefined;
 }
 export const $param: $.Codec<Param> = $.object(
   ["name", $.str],
-  ["ty", $.option($.compactU32)],
+  ["ty", $.option($tyId)],
 );
 
 export type Ty = {

@@ -51,10 +51,9 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
   const $sig = deriveCodec(findExtrinsicTypeParam("Signature")!) as $.Codec<Signature>;
   const $sigPromise = $.promise($sig);
   const $address = deriveCodec(findExtrinsicTypeParam("Address")!);
-  const callTyI = findExtrinsicTypeParam("Call")!;
-  const callTy = props.metadata.tys[callTyI];
+  const callTy = findExtrinsicTypeParam("Call")!;
   assert(callTy?.type === "Union");
-  const $call = deriveCodec(callTyI);
+  const $call = deriveCodec(callTy);
   const [$extra, extraPjsInfo] = getExtensionInfo(pjsExtraKeyMap, "ty");
   const [$additional, additionalPjsInfo] = getExtensionInfo(
     pjsAdditionalKeyMap,
@@ -187,7 +186,7 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
   });
 
   function findExtrinsicTypeParam(name: string) {
-    return metadata.tys[metadata.extrinsic.ty]?.params.find((x) => x.name === name)?.ty;
+    return metadata.extrinsic.ty.params.find((x) => x.name === name)?.ty;
   }
   function getExtensionInfo(
     keyMap: Record<string, string | undefined>,

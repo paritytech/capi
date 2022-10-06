@@ -130,14 +130,14 @@ export function createCodecVisitor(
         ],
       );
     },
-    uint8array(ty) {
-      return addCodecDecl(ty, "$.uint8array");
+    uint8Array(ty) {
+      return addCodecDecl(ty, "$.uint8Array");
     },
     array(ty) {
       return addCodecDecl(ty, ["$.array(", this.visit(ty.typeParam), ")"]);
     },
     sizedUint8Array(ty) {
-      return addCodecDecl(ty, `$.sizedUint8array(${ty.len})`);
+      return addCodecDecl(ty, `$.sizedUint8Array(${ty.len})`);
     },
     sizedArray(ty) {
       return addCodecDecl(ty, ["$.sizedArray(", this.visit(ty.typeParam), ",", ty.len, ")"]);

@@ -22,7 +22,7 @@ export interface TyVisitorMethods<T> {
   stringUnion(ty: Ty & UnionTyDef): T;
   taggedUnion(ty: Ty & UnionTyDef): T;
 
-  uint8array?(ty: Ty & SequenceTyDef): T;
+  uint8Array?(ty: Ty & SequenceTyDef): T;
   array(ty: Ty & SequenceTyDef): T;
 
   sizedUint8Array?(ty: Ty & SizedArrayTyDef): T;
@@ -71,16 +71,16 @@ export class TyVisitor<T> {
   _visit(ty: Ty) {
     if (ty.type === "Struct") {
       if (this.map && ty.path[0] === "BTreeMap") {
-        return this.map(ty, this.tys[ty.params[0]!.ty!]!, this.tys[ty.params[1]!.ty!]!);
+        return this.map(ty, ty.params[0]!.ty!, ty.params[1]!.ty!);
       } else if (this.set && ty.path[0] === "BTreeSet") {
-        return this.set(ty, this.tys[ty.params[0]!.ty!]!);
+        return this.set(ty, ty.params[0]!.ty!);
       } else if (ty.fields.length === 0) {
         return this.unitStruct(ty);
       } else if (ty.fields[0]!.name === undefined) {
         if (ty.fields.length === 1) {
-          return this.wrapperStruct(ty, this.tys[ty.fields[0]!.ty]!);
+          return this.wrapperStruct(ty, ty.fields[0]!.ty);
         } else {
-          return this.tupleStruct(ty, ty.fields.map((x) => this.tys[x.ty]!));
+          return this.tupleStruct(ty, ty.fields.map((x) => x.ty));
         }
       } else {
         return this.objectStruct(ty);
@@ -89,16 +89,16 @@ export class TyVisitor<T> {
       if (ty.fields.length === 0) {
         return this.unitStruct(ty);
       } else if (ty.fields.length === 1) {
-        return this.wrapperStruct(ty, this.tys[ty.fields[0]!]!);
+        return this.wrapperStruct(ty, ty.fields[0]!);
       } else {
-        return this.tupleStruct(ty, ty.fields.map((i) => this.tys[i]!));
+        return this.tupleStruct(ty, ty.fields);
       }
     } else if (ty.type === "Union") {
       // TODO: revisit Option and Result
       if (ty.path[0] === "Option") {
-        return this.option(ty, this.tys[ty.params[0]!.ty!]!);
+        return this.option(ty, ty.params[0]!.ty!);
       } else if (ty.path[0] === "Result") {
-        return this.result(ty, this.tys[ty.params[0]!.ty!]!, this.tys[ty.params[1]!.ty!]!);
+        return this.result(ty, ty.params[0]!.ty!, ty.params[1]!.ty!);
       } else if (this.era && ty.path.at(-1) === "Era") {
         return this.era(ty);
       } else if (ty.members.length === 0) {
@@ -109,13 +109,13 @@ export class TyVisitor<T> {
         return this.taggedUnion(ty);
       }
     } else if (ty.type === "Sequence") {
-      if (this.uint8array && this._isU8(ty.typeParam)) {
-        return this.uint8array(ty);
+      if (this.uint8Array && _isU8(ty.typeParam)) {
+        return this.uint8Array(ty);
       } else {
         return this.array(ty);
       }
     } else if (ty.type === "SizedArray") {
-      if (this.sizedUint8Array && this._isU8(ty.typeParam)) {
+      if (this.sizedUint8Array && _isU8(ty.typeParam)) {
         return this.sizedUint8Array(ty);
       } else {
         return this.sizedArray(ty);
@@ -130,9 +130,8 @@ export class TyVisitor<T> {
       throw new Error("unreachable");
     }
   }
+}
 
-  private _isU8(i: number) {
-    const ty = this.tys[i]!;
-    return ty.type === "Primitive" && ty.kind === "u8";
-  }
+function _isU8(ty: Ty) {
+  return ty.type === "Primitive" && ty.kind === "u8";
 }

@@ -78,7 +78,7 @@ export function createTypeVisitor(tys: M.Ty[], decls: Decl[]) {
       });
       return path;
     },
-    uint8array(ty) {
+    uint8Array(ty) {
       return addTypeDecl(ty, "Uint8Array");
     },
     array(ty) {

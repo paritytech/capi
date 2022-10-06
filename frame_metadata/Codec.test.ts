@@ -83,7 +83,7 @@ Deno.test("Derive Result codec", async () => {
   const [metadata, deriveCodec] = await setup("polkadot");
   const ty = metadata.tys.find((x) =>
     x.path[0] === "Result"
-    && metadata.tys[x.params[1]!.ty!]!.path.join("::") === "sp_runtime::DispatchError"
+    && x.params[1]!.ty!.path.join("::") === "sp_runtime::DispatchError"
   )!;
   const codec = deriveCodec(ty.id);
   const ok = null;
