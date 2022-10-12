@@ -37,6 +37,8 @@ export interface TyVisitorMethods<T> {
 
   era?(ty: Ty & UnionTyDef): T;
 
+  lenPrefixedWrapper(ty: Ty & StructTyDef, inner: Ty): T;
+
   circular(ty: Ty): T;
 }
 
@@ -74,6 +76,8 @@ export class TyVisitor<T> {
         return this.map(ty, ty.params[0]!.ty!, ty.params[1]!.ty!);
       } else if (this.set && ty.path[0] === "BTreeSet") {
         return this.set(ty, ty.params[0]!.ty!);
+      } else if (ty.path.at(-1) === "WrapperOpaque" || ty.path.at(-1) === "WrapperKeepOpaque") {
+        return this.lenPrefixedWrapper(ty, ty.params[0]!.ty!);
       } else if (ty.fields.length === 0) {
         return this.unitStruct(ty);
       } else if (ty.fields[0]!.name === undefined) {
