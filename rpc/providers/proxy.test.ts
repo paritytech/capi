@@ -8,6 +8,7 @@ Deno.test({
   name: "Proxy RPC Client",
   sanitizeResources: false,
   sanitizeOps: false,
+  ignore: true,
   async fn(t) {
     const client = U.throwIfError(await proxyClient(polkadot));
 
