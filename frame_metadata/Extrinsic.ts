@@ -2,7 +2,6 @@ import * as $ from "../deps/scale.ts";
 import { assert } from "../deps/std/testing/asserts.ts";
 import * as H from "../hashers/mod.ts";
 import * as ss58 from "../ss58/mod.ts";
-import { $lenPrefixed } from "../util/$lenPrefixed.ts";
 import { hex } from "../util/mod.ts";
 import { $null, DeriveCodec } from "./Codec.ts";
 import { Metadata } from "./Metadata.ts";
@@ -166,7 +165,7 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
     },
   });
 
-  return $lenPrefixed($baseExtrinsic);
+  return $.lenPrefixed($baseExtrinsic);
 
   function findExtrinsicTypeParam(name: string) {
     return metadata.extrinsic.ty.params.find((x) => x.name === name)?.ty;

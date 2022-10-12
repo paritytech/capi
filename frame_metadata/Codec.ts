@@ -1,5 +1,4 @@
 import * as $ from "../deps/scale.ts";
-import { $lenPrefixed } from "../util/$lenPrefixed.ts";
 import { $era } from "./Era.ts";
 import type * as M from "./mod.ts";
 import { TyVisitor } from "./TyVisitor.ts";
@@ -104,7 +103,7 @@ export function DeriveCodec(tys: M.Ty[]): DeriveCodec {
       return $era;
     },
     lenPrefixedWrapper(_ty, inner) {
-      return $lenPrefixed(this.visit(inner));
+      return $.lenPrefixed(this.visit(inner));
     },
     circular(ty) {
       return $.deferred(() => this.cache[ty.id]!);
