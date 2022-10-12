@@ -1,4 +1,3 @@
-export * from "./$lenPrefixed.ts";
 export * from "./branded.ts";
 export * from "./error.ts";
 export * as hex from "./hex.ts";

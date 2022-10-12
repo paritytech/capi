@@ -15,7 +15,7 @@ export function createCodecVisitor(
     getContent: () => [
       "\n",
       [
-        "import { ChainError, BitSequence, Era, $, $era, $null, $lenPrefixed } from",
+        "import { ChainError, BitSequence, Era, $, $era, $null } from",
         S.string(importSource),
       ],
       [`import type * as t from "./mod.ts"`],
@@ -169,7 +169,7 @@ export function createCodecVisitor(
       return addCodecDecl(ty, "$era");
     },
     lenPrefixedWrapper(ty, inner) {
-      return addCodecDecl(ty, ["$lenPrefixed(", this.visit(inner), ")"]);
+      return addCodecDecl(ty, ["$.lenPrefixed(", this.visit(inner), ")"]);
     },
     circular(ty) {
       return ["$.deferred(() =>", getName(getRawCodecPath(ty)), ")"];
