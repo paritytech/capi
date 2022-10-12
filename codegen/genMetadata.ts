@@ -21,6 +21,7 @@ export function genMetadata(metadata: M.Metadata, decls: Decl[]) {
     primitive: () => false,
     compact: () => false,
     bitSequence: () => false,
+    lenPrefixedWrapper: () => false,
     circular: () => false,
   });
 

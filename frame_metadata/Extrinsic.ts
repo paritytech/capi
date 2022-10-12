@@ -2,6 +2,7 @@ import * as $ from "../deps/scale.ts";
 import { assert } from "../deps/std/testing/asserts.ts";
 import * as H from "../hashers/mod.ts";
 import * as ss58 from "../ss58/mod.ts";
+import { $lenPrefixed } from "../util/$lenPrefixed.ts";
 import { hex } from "../util/mod.ts";
 import { $null, DeriveCodec } from "./Codec.ts";
 import { Metadata } from "./Metadata.ts";
@@ -165,25 +166,7 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
     },
   });
 
-  return $.createCodec({
-    _metadata: [$extrinsic, props],
-    _staticSize: $.compactU32._staticSize + $baseExtrinsic._staticSize,
-    _encode(buffer, extrinsic) {
-      const lengthCursor = buffer.createCursor($.compactU32._staticSize);
-      const contentCursor = buffer.createCursor($baseExtrinsic._staticSize);
-      $baseExtrinsic._encode(contentCursor, extrinsic);
-      buffer.waitForBuffer(contentCursor, () => {
-        const length = contentCursor.finishedSize + contentCursor.index;
-        $.compactU32._encode(lengthCursor, length);
-        lengthCursor.close();
-        contentCursor.close();
-      });
-    },
-    _decode(buffer) {
-      const length = $.compactU32._decode(buffer);
-      return $baseExtrinsic.decode(buffer.array.subarray(buffer.index, buffer.index += length));
-    },
-  });
+  return $lenPrefixed($baseExtrinsic);
 
   function findExtrinsicTypeParam(name: string) {
     return metadata.extrinsic.ty.params.find((x) => x.name === name)?.ty;

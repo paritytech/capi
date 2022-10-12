@@ -113,6 +113,9 @@ export function createTypeVisitor(tys: M.Ty[], decls: Decl[]) {
     era() {
       return "Era";
     },
+    lenPrefixedWrapper(_ty, inner) {
+      return this.visit(inner);
+    },
     circular(ty) {
       return getPath(tys, ty) || this._visit(ty);
     },
