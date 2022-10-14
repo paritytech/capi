@@ -23,8 +23,10 @@ const cmdProcess = Deno.run({
     TEST_CTX_PORT: listener.addr.port.toString(),
   },
 });
-await cmdProcess.status();
+const status = await cmdProcess.status();
 cleanup();
+
+Deno.exit(status.code);
 
 async function useListener(listener: Deno.Listener, lookup: DevNets) {
   for await (const conn of listener) {
