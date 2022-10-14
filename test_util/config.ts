@@ -39,8 +39,9 @@ class TestConfig extends Config<string, CallMethods, SubscriptionMethods, ErrorD
 function requiresSetupError(): never {
   throw new Error([
     "You are using a config that depends on the `test_ctx` util.",
-    "You may want to try re-running the same command, but prefixed with `deno task test_ctx `.",
-    "For instance, `deno task run examples/metadata.ts` would become `deno task test_ctx deno task run examples/metadata.ts`",
+    "You may want to try re-running the same command, but prefixed with the run command for `test_ctx`.",
+    "For instance, `deno task run examples/metadata.ts` would (in this repository)",
+    "become `deno task test_ctx deno task run examples/metadata.ts`.",
   ].join(" "));
 }
 
