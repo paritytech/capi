@@ -1,5 +1,5 @@
 import { assertEquals } from "../deps/std/testing/asserts.ts";
-import * as t from "../test_util/mod.ts";
+import * as T from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
 import { ChainError } from "./Codec.ts";
 import { ContractMetadata } from "./Contract.ts";
@@ -16,9 +16,9 @@ Deno.test("Derive all", async () => {
 Deno.test("Derive AccountId32 Codec", async () => {
   const [_, deriveCodec] = await setup("polkadot");
   const codec = deriveCodec(0);
-  const encoded = codec.encode(t.alice.publicKey);
-  assertEquals(encoded, t.alice.publicKey);
-  assertEquals(codec.decode(encoded), t.alice.publicKey);
+  const encoded = codec.encode(T.alice.publicKey);
+  assertEquals(encoded, T.alice.publicKey);
+  assertEquals(codec.decode(encoded), T.alice.publicKey);
 });
 
 Deno.test("Derive AccountInfo Codec", async () => {
@@ -57,7 +57,7 @@ Deno.test("Derive Auction Winning Storage Entry Codec", async () => {
   const codec = deriveCodec(auctionWinningStorageEntry.value);
   const decoded = [
     ...Array(7).fill(undefined),
-    [t.alice.publicKey, 2013, 8672334557167609n],
+    [T.alice.publicKey, 2013, 8672334557167609n],
     ...Array(28).fill(undefined),
   ];
   const encoded = codec.encode(decoded);

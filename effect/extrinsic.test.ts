@@ -1,29 +1,27 @@
 import type { KeyringPair } from "https://deno.land/x/polkadot@0.0.8/keyring/types.ts";
 import { assertEquals, assertObjectMatch } from "../deps/std/testing/asserts.ts";
 import * as C from "../mod.ts";
-import * as t from "../test_util/mod.ts";
+import * as T from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
 
 Deno.test({
   name: "Balances.transfer",
   fn: async (ctx) => {
-    const config = await t.config({ altRuntime: "westend" });
-
     await ctx.step("extrinsic events", async () => {
       const extrinsicEvents: string[] = await collectExtrinsicEvents(
         {
-          config,
+          config: T.westend,
           palletName: "Balances",
           methodName: "transfer",
           args: {
             value: 12345n,
             dest: {
               type: "Id",
-              value: t.bob.publicKey,
+              value: T.bob.publicKey,
             },
           },
         },
-        t.alice,
+        T.alice,
       );
 
       assertEquals(extrinsicEvents, ["ready", "inBlock", "finalized"]);
@@ -32,56 +30,48 @@ Deno.test({
     await ctx.step({
       name: "account balance updated",
       fn: async () => {
-        const root = C.readEntry(config, "System", "Account", [t.bob.publicKey]);
+        const root = C.readEntry(T.westend, "System", "Account", [T.bob.publicKey]);
 
         const state = await root.run();
 
         assertObjectMatch(state, { value: { data: { free: 10000000000012345n } } });
       },
     });
-
-    config.close();
   },
 });
 
 Deno.test({
   name: "Treasury.propose_spend",
   fn: async (ctx) => {
-    const config = await t.config({ altRuntime: "westend" });
-
     await ctx.step("extrinsic events", async () => {
       const extrinsicEvents: string[] = await collectExtrinsicEvents(
         {
-          config,
+          config: T.westend,
           palletName: "Treasury",
           methodName: "propose_spend",
           args: {
             value: 200n,
             beneficiary: {
               type: "Id",
-              value: t.bob.publicKey,
+              value: T.bob.publicKey,
             },
           },
         },
-        t.alice,
+        T.alice,
       );
 
       assertEquals(extrinsicEvents, ["ready", "inBlock", "finalized"]);
     });
-
-    config.close();
   },
 });
 
 Deno.test({
   name: "Democracy.propose",
   fn: async (ctx) => {
-    const config = await t.config({ altRuntime: "westend" });
-
     await ctx.step("extrinsic events", async () => {
       const extrinsicEvents: string[] = await collectExtrinsicEvents(
         {
-          config,
+          config: T.westend,
           palletName: "Democracy",
           methodName: "propose",
           args: {
@@ -91,13 +81,11 @@ Deno.test({
             value: 2000000000000n,
           },
         },
-        t.alice,
+        T.alice,
       );
 
       assertEquals(extrinsicEvents, ["ready", "inBlock", "finalized"]);
     });
-
-    config.close();
   },
 });
 

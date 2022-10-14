@@ -1,131 +1,73 @@
-import { Config as Config_ } from "../config/mod.ts";
-import { fail } from "../deps/std/testing/asserts.ts";
-import { rpc } from "../known/mod.ts";
+import { Config } from "../config/mod.ts";
+import { CallMethods, ErrorDetails, SubscriptionMethods } from "../known/rpc.ts";
 
-export interface NodeProps {
-  altRuntime?: "kusama" | "rococo" | "westend";
-  port?: number;
-}
-
-export class Config
-  extends Config_<string, rpc.CallMethods, rpc.SubscriptionMethods, rpc.ErrorDetails>
-{
-  constructor(
-    port: number,
-    readonly close: () => void,
-    altRuntime?: NodeProps["altRuntime"],
-  ) {
+class TestConfig extends Config<string, CallMethods, SubscriptionMethods, ErrorDetails> {
+  constructor(readonly runtimeName: TestConfigRuntime.Name) {
     super(
-      `ws://127.0.0.1:${port}`,
-      altRuntime
-        ? {
-          kusama: 2,
-          rococo: undefined!, /* TODO */
-          westend: 0,
-        }[altRuntime]
-        : 0,
-    );
-  }
-}
-
-export async function config(props?: NodeProps): Promise<Config> {
-  if ("_browserShim" in Deno) return new Config(9944, () => {});
-  let port: number;
-  if (props?.port) {
-    if (!isPortAvailable(props.port)) {
-      fail(`Port ${props.port} is unavailable`);
-    }
-    port = props.port;
-  } else {
-    // TODO: improve port allocation for parallel testing.
-    // This is a temporary solution for concurrent tests that need a fresh
-    // polkadot node.
-    // This might fail because another process could start to listen on the
-    // port before the polkadot process starts to listen on the configured port.
-    port = getRandomPort();
-  }
-  try {
-    const process = Deno.run({
-      cmd: [
-        "polkadot",
-        "--dev",
-        "--ws-port",
-        port.toString(),
-        ...props?.altRuntime ? [`--force-${props.altRuntime}`] : [],
-      ],
-      stdout: "null",
-      stderr: "null",
-    });
-
-    await waitForPort({ port });
-
-    return new Config(
-      port,
-      () => {
-        process.kill("SIGKILL");
-        process.close();
+      async () => {
+        const hostname = Deno.env.get("TEST_CTX_HOSTNAME");
+        const portRaw = Deno.env.get("TEST_CTX_PORT");
+        if (!hostname || !portRaw) requiresSetupError();
+        let conn: Deno.TcpConn;
+        try {
+          conn = await Deno.connect({
+            hostname,
+            port: parseInt(portRaw),
+          });
+        } catch (_e) {
+          requiresSetupError();
+        }
+        conn.write(new Uint8Array([TestConfigRuntime.CODES[runtimeName]]));
+        const port = await (async () => {
+          for await (const x of conn.readable) {
+            return new DataView(x.buffer).getUint16(0);
+          }
+          return undefined!;
+        })();
+        return `ws://127.0.0.1:${port}`;
       },
-      props?.altRuntime,
+      {
+        kusama: 2,
+        rococo: undefined!, // TODO
+        westend: 0,
+        polkadot: 0,
+      }[runtimeName],
     );
-  } catch (e) {
-    if (e instanceof Deno.errors.NotFound) {
-      fail("Must have Polkadot installed locally. Visit https://github.com/paritytech/polkadot.");
-    }
-    throw e; // TODO: don't go nuclear without proper messaging
   }
 }
 
-function isPortAvailable(port: number): boolean {
-  try {
-    const listener = Deno.listen({
-      transport: "tcp",
-      hostname: "127.0.0.1",
-      port,
-    });
-    listener.close();
-    return true;
-  } catch (error) {
-    if (error instanceof Deno.errors.AddrInUse) {
-      return false;
-    }
-    throw error;
-  }
+function requiresSetupError(): never {
+  throw new Error([
+    "You are using a config that depends on the `test_ctx` util.",
+    "You may want to try re-running the same command, but prefixed with the run command for `test_ctx`.",
+    "For instance, `deno task run examples/metadata.ts` would (in this repository)",
+    "become `deno task test_ctx deno task run examples/metadata.ts`.",
+  ].join(" "));
 }
 
-function getRandomPort(min = 49152, max = 65534): number {
-  let randomPort: number;
+export const polkadot = new TestConfig("polkadot");
+export type polkadot = typeof polkadot;
+export const kusama = new TestConfig("kusama");
+export type kusama = typeof kusama;
+export const westend = new TestConfig("westend");
+export type westend = typeof westend;
+export const rococo = new TestConfig("rococo");
+export type rococo = typeof rococo;
 
-  do {
-    randomPort = Math.floor(Math.random() * (max - min + 1) + min);
-  } while (!isPortAvailable(randomPort));
-
-  return randomPort;
-}
-
-async function waitForPort(
-  connectOptions: Deno.ConnectOptions,
-): Promise<void> {
-  let attempts = 60;
-  const delayBetweenAttempts = 500;
-
-  while (attempts > 0) {
-    attempts--;
-
-    try {
-      const connection = await Deno.connect(connectOptions);
-      connection.close();
-
-      break;
-    } catch (error) {
-      if (
-        error instanceof Deno.errors.ConnectionRefused
-        && attempts > 0
-      ) {
-        await new Promise((resolve) => setTimeout(resolve, delayBetweenAttempts));
-        continue;
-      }
-
-      throw error;
-    }
-  }
+export namespace TestConfigRuntime {
+  export type CODES = typeof CODES;
+  export const CODES = {
+    polkadot: 0,
+    kusama: 1,
+    westend: 2,
+    rococo: 3,
+  } as const;
+  export type Name = keyof CODES;
+  export type NAMES = { [N in Name as CODES[N]]: N };
+  export const NAMES: NAMES = {
+    0: "polkadot",
+    1: "kusama",
+    2: "westend",
+    3: "rococo",
+  };
 }

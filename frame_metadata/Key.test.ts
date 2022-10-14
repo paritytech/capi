@@ -1,5 +1,5 @@
 import { assertEquals } from "../deps/std/testing/asserts.ts";
-import * as t from "../test_util/mod.ts";
+import * as T from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
 import { $storageKey } from "./Key.ts";
 import { getPalletAndEntry } from "./Metadata.ts";
@@ -15,7 +15,7 @@ Deno.test("System Accounts Key", async () => {
     pallet,
     storageEntry,
   });
-  const key = [t.alice.publicKey];
+  const key = [T.alice.publicKey];
   const encoded = $key.encode(key);
   assertEquals(
     U.hex.encode(encoded),

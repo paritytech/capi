@@ -1,5 +1,5 @@
 import { assert } from "../deps/std/testing/asserts.ts";
-import * as t from "../test_util/mod.ts";
+import * as T from "../test_util/mod.ts";
 import * as msg from "./messages.ts";
 import { proxyClient } from "./providers/proxy.ts";
 
@@ -9,11 +9,10 @@ Deno.test({
   sanitizeOps: false,
   ignore: true,
   async fn() {
-    const config = await t.config();
-    const client = await proxyClient(config);
+    const client = await proxyClient(T.polkadot);
     assert(!(client instanceof Error));
     const groups = await Promise.all(
-      (<msg.NotifMessage<typeof config, "chain_subscribeAllHeads">[][]> [[], [], []]).map(
+      (<msg.NotifMessage<T.polkadot, "chain_subscribeAllHeads">[][]> [[], [], []]).map(
         async (messages) => {
           let i = 1;
           await client.subscribe("chain_subscribeAllHeads", [], (stop) => {
@@ -35,6 +34,5 @@ Deno.test({
         return message.params.result;
       });
     }));
-    config.close();
   },
 });
