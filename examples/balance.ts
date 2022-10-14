@@ -1,11 +1,7 @@
 import * as C from "../mod.ts";
-import * as t from "../test_util/mod.ts";
+import * as T from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
 
-const config = await t.config();
-
-const root = C.readEntry(config, "System", "Account", [t.alice.publicKey]);
+const root = C.readEntry(T.polkadot, "System", "Account", [T.alice.publicKey]);
 
 console.log(U.throwIfError(await root.run()));
-
-config.close();

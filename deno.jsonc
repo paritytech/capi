@@ -33,10 +33,10 @@
     "star": "deno task run _tasks/star.ts && deno cache --no-check=remote _star.ts",
     "lock": "deno task star --lock=lock.json --lock-write",
     "lint": "deno lint",
-    "test": "deno test -A --no-check=remote -L=info --ignore=target",
+    "test": "deno task test_ctx deno test -A --no-check=remote -L=info --ignore=target --parallel",
     "test:update": "deno task test -- -- --update",
     "mdbook:watch": "mdbook watch -o",
     "bench": "deno bench -A --no-check=remote --unstable",
-    "codegen": "deno task run main.ts"
+    "test_ctx": "deno task run test_ctx.ts"
   }
 }

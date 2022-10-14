@@ -1,14 +1,12 @@
 import * as C from "../mod.ts";
-import * as t from "../test_util/mod.ts";
+import * as T from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
 
-const config = await t.config({ altRuntime: "westend" });
-
 const root = C.sendAndWatchExtrinsic({
-  config,
+  config: T.westend,
   sender: {
     type: "Id",
-    value: t.alice.publicKey,
+    value: T.alice.publicKey,
   },
   palletName: "Balances",
   methodName: "transfer",
@@ -16,13 +14,13 @@ const root = C.sendAndWatchExtrinsic({
     value: 12345n,
     dest: {
       type: "Id",
-      value: t.bob.publicKey,
+      value: T.bob.publicKey,
     },
   },
   sign(message) {
     return {
       type: "Sr25519",
-      value: t.alice.sign(message),
+      value: T.alice.sign(message),
     };
   },
   createWatchHandler(stop) {
@@ -45,5 +43,3 @@ const root = C.sendAndWatchExtrinsic({
 });
 
 U.throwIfError(await root.run());
-
-config.close();

@@ -21,7 +21,7 @@ export async function smoldotClient<Config_ extends Config<string>>(
   try {
     // TODO: wire up `onError`
     const chain = await smoldotInstance.addChain({
-      chainSpec: config.discoveryValue,
+      chainSpec: await config.discoveryValue,
       jsonRpcCallback: (response) => {
         onMessageContainer.onMessage?.(response);
       },

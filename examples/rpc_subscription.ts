@@ -1,10 +1,8 @@
 import * as C from "../mod.ts";
-import * as t from "../test_util/mod.ts";
+import * as T from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
 
-const config = await t.config();
-
-const root = C.rpcSubscription(config, "chain_subscribeNewHead", [], (stop) => {
+const root = C.rpcSubscription(T.polkadot, "chain_subscribeNewHead", [], (stop) => {
   let i = 0;
   return (m) => {
     i++;
@@ -16,5 +14,3 @@ const root = C.rpcSubscription(config, "chain_subscribeNewHead", [], (stop) => {
 });
 
 U.throwIfError(await root.run());
-
-config.close();

@@ -6,11 +6,11 @@ import { ClientHooks, ParseRawIngressMessageError } from "../common.ts";
 
 export type ProxyClientHooks<Config_ extends Config<string>> = ClientHooks<Config_, Event>;
 
-export function proxyClient<Config_ extends Config<string>>(
+export async function proxyClient<Config_ extends Config<string>>(
   config: Config_,
   hooks?: ProxyClientHooks<Config_>,
 ): Promise<ProxyClient<Config_> | FailedToOpenConnectionError> {
-  const ws = new WebSocket(config.discoveryValue);
+  const ws = new WebSocket(await config.discoveryValue);
   const client = new ProxyClient(ws, hooks);
   ws.addEventListener("error", client.onError);
   ws.addEventListener("message", client.onMessage);
@@ -34,7 +34,7 @@ export function proxyClient<Config_ extends Config<string>>(
   } else {
     pending.resolve(client);
   }
-  return pending;
+  return await pending;
 }
 
 export class ProxyClient<Config_ extends Config>
