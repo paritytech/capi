@@ -24,6 +24,7 @@ class TestConfig extends Config<string, CallMethods, SubscriptionMethods, ErrorD
           }
           return undefined!;
         })();
+        conn.close();
         return `ws://127.0.0.1:${port}`;
       },
       {
