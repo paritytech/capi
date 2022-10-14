@@ -28,23 +28,30 @@ export function $storageKey(props: StorageKeyProps): $.Codec<unknown[]> {
   }
   const palletHash = H.Twox128.hash(new TextEncoder().encode(props.pallet.name));
   const entryHash = H.Twox128.hash(new TextEncoder().encode(props.storageEntry.name));
-  const $keys = $.tuple(
-    ...keyCodecs.map(($key, i) =>
-      H[(props.storageEntry as M.MapStorageEntryType).hashers[i]!].$hash($key)
-    ),
+  const $keys = [...Array(keyCodecs.length + 1).keys()].reduce(
+    (keys, i) => {
+      keys[i] = $.tuple(
+        ...keyCodecs.slice(0, i).map(($key, i) =>
+          H[(props.storageEntry as M.MapStorageEntryType).hashers[i]!].$hash($key)
+        ),
+      );
+      return keys;
+    },
+    {} as Record<number, $.Codec<any[]>>,
   );
   return $.createCodec({
     _metadata: [$storageKey, props],
-    _staticSize: $keys._staticSize,
+    _staticSize: $keys[Object.values($keys).length - 1]!._staticSize,
     _encode(buffer, key) {
       buffer.insertArray(palletHash);
       buffer.insertArray(entryHash);
-      $keys._encode(buffer, key);
+      if (key.length === 0) return;
+      $keys[key.length]!._encode(buffer, key);
     },
     _decode(buffer) {
       // Ignore initial hashes
       buffer.index += 32;
-      return $keys._decode(buffer);
+      return $keys[Object.values($keys).length - 1]!._decode(buffer);
     },
   });
 }
