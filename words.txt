@@ -175,3 +175,4 @@ trufflesecurity
 tailaiw
 trufflehog
 amannn
+multisigs

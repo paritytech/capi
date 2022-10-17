@@ -15,6 +15,11 @@ Deno.test("System Accounts Key", async () => {
     pallet,
     storageEntry,
   });
+  const partialKey: unknown[] = [];
+  assertEquals(
+    U.hex.encode($key.encode(partialKey)),
+    "26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da9",
+  );
   const key = [T.alice.publicKey];
   const encoded = $key.encode(key);
   assertEquals(
@@ -41,4 +46,22 @@ Deno.test("Auction Winning Key", async () => {
   );
   const decoded = $key.decode(encoded);
   assertEquals(key, decoded);
+});
+
+Deno.test("Multisig Multisigs partial storage Key", async () => {
+  const [metadata, deriveCodec] = await setup("polkadot");
+  const [pallet, storageEntry] = U.throwIfError(
+    getPalletAndEntry(metadata, "Multisig", "Multisigs"),
+  );
+  const $key = $storageKey({
+    deriveCodec,
+    pallet,
+    storageEntry,
+  });
+  const key = [T.alice.publicKey];
+  const encoded = $key.encode(key);
+  assertEquals(
+    U.hex.encode(encoded),
+    "7474449cca95dc5d0c00e71735a6d17d3cd15a3fd6e04e47bee3922dbfa92c8d518366b5b1bc7c99d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d",
+  );
 });
