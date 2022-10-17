@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        example_path: ${{ fromJSON(github.event.inputs.example_paths) }}
+        example_path: ${{ fromJSON(inputs.example_paths) }}
     steps:
       - uses: actions/checkout@v3
       - uses: denoland/setup-deno@004814556e37c54a2f6e31384c9e18e983317366 # v1.1.0
