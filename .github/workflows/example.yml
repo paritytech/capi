@@ -1,0 +1,21 @@
+name: Run example
+on:
+  workflow_dispatch:
+    inputs:
+      example_path:
+        type: text
+        required: true
+jobs:
+  run_example:
+    name: Run example
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: denoland/setup-deno@004814556e37c54a2f6e31384c9e18e983317366 # v1.1.0
+        with:
+          deno-version: v1.x
+      - name: Download polkadot
+        run: |
+          curl -L -o /usr/local/bin/polkadot https://github.com/paritytech/polkadot/releases/download/v0.9.28/polkadot
+          chmod +x /usr/local/bin/polkadot
+      - run: deno task run test_ctx.ts deno task run ${{ github.event.inputs.example_path }}
