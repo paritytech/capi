@@ -1,0 +1,20 @@
+name: Spawn examples
+on:
+  workflow_dispatch:
+  push:
+jobs:
+  spawn_examples:
+    name: Spawn examples
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      # - run: |
+      #     find ./examples -type f -print0 \
+      #     | xargs -0 -n1 -P 0 -t -I {} gh workflow run --ref feat/examples-gh-action example.yml -f example_path={}
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  call_example_workflow:
+    uses: ./.github/workflows/example.yml
+    with:
+      example_paths: '["./examples/metadata.ts","./examples/balance.ts"]'
