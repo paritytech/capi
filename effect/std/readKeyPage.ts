@@ -28,7 +28,7 @@ export function readKeyPage<
   });
   const $storageKey = a.$storageKey(deriveCodec, palletMetadata, entryMetadata);
   const startKey = start ? a.storageKey($storageKey, start) : undefined;
-  const storageKey = a.storageKey($storageKey, []);
+  const storageKey = a.storageKey($storageKey);
   const call = a.rpcCall(config, "state_getKeysPaged", [storageKey, count, startKey, blockHash]);
   const $key = a.$key(deriveCodec, palletMetadata, entryMetadata);
   const keysEncoded = a.select(call, "result");
