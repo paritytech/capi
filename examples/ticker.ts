@@ -1,10 +1,8 @@
 import * as C from "../mod.ts";
-import * as t from "../test_util/mod.ts";
+import * as T from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
 
-const config = await t.config();
-
-const root = C.watchEntry(config, "Timestamp", "Now", [], () => {
+const root = C.watchEntry(T.polkadot, "Timestamp", "Now", [], () => {
   let i = 0;
   return (m) => {
     console.log({ [i]: m });
@@ -13,5 +11,3 @@ const root = C.watchEntry(config, "Timestamp", "Now", [], () => {
 });
 
 U.throwIfError(await root.run());
-
-config.close();

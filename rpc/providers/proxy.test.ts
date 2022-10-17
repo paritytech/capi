@@ -1,5 +1,5 @@
 import { assert } from "../../deps/std/testing/asserts.ts";
-import { config as testConfig } from "../../test_util/mod.ts";
+import * as T from "../../test_util/mod.ts";
 import * as U from "../../util/mod.ts";
 import * as msg from "../messages.ts";
 import { proxyClient } from "./proxy.ts";
@@ -9,8 +9,7 @@ Deno.test({
   sanitizeResources: false,
   sanitizeOps: false,
   async fn(t) {
-    const config = await testConfig();
-    const client = U.throwIfError(await proxyClient(config));
+    const client = U.throwIfError(await proxyClient(T.polkadot));
 
     await t.step("call", async () => {
       const raw = await client.call("state_getMetadata", []);
@@ -18,7 +17,7 @@ Deno.test({
     });
 
     await t.step("subscribe", async () => {
-      const result: msg.NotifMessage<typeof config, "chain_subscribeAllHeads">[] = [];
+      const result: msg.NotifMessage<T.polkadot, "chain_subscribeAllHeads">[] = [];
       let i = 1;
       await client.subscribe("chain_subscribeAllHeads", [], (stop) => {
         return (message) => {
@@ -35,6 +34,5 @@ Deno.test({
     });
 
     await client.close();
-    config.close();
   },
 });

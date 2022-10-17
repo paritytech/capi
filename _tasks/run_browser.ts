@@ -2,7 +2,6 @@ import { contentType } from "https://deno.land/x/media_types@v2.11.1/mod.ts";
 import { Application, send } from "https://deno.land/x/oak@v10.1.0/mod.ts";
 import { babel, babelPresetTypeScript } from "https://escad.dev/deps/babel.ts";
 import * as path from "../deps/std/path.ts";
-import * as t from "../test_util/mod.ts";
 
 const dirname = path.dirname(path.fromFileUrl(import.meta.url));
 
@@ -58,8 +57,6 @@ app.use(async (ctx) => {
     }),
   });
 });
-
-await t.config({ port: 9944 });
 
 const rootFilePath = getTranspiledPath(transformUrl(rootFile));
 await Deno.writeTextFile(
