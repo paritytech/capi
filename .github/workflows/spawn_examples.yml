@@ -10,14 +10,11 @@ jobs:
       example_paths: ${{ steps.generate_examples.outputs.example_paths }}
     steps:
       - uses: actions/checkout@v3
-      # - run: |
-      #     find ./examples -type f -print0 \
-      #     | xargs -0 -n1 -P 0 -t -I {} gh workflow run --ref feat/examples-gh-action example.yml -f example_path={}
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - id: generate_examples
         run: |
-          echo 'example_paths=["./examples/metadata.ts","./examples/balance.ts"]' >> $GITHUB_OUTPUT
+          find ./examples -type f -print0 | jq -Rnc '(input | split("\u0000"))' > example_paths.json
+          example_paths=`cat example_paths.json`
+          echo "example_paths=$example_paths" >> $GITHUB_OUTPUT
 
   call_example_workflow:
     needs: spawn_examples
