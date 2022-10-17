@@ -6,6 +6,8 @@ jobs:
   spawn_examples:
     name: Spawn examples
     runs-on: ubuntu-latest
+    outputs:
+      example_paths: ${{ steps.generate_examples.outputs.example_paths }}
     steps:
       - uses: actions/checkout@v3
       # - run: |
@@ -13,8 +15,12 @@ jobs:
       #     | xargs -0 -n1 -P 0 -t -I {} gh workflow run --ref feat/examples-gh-action example.yml -f example_path={}
       #   env:
       #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - id: generate_examples
+        run: |
+          echo 'example_paths=["./examples/metadata.ts","./examples/balance.ts"]' >> $GITHUB_OUTPUT
 
   call_example_workflow:
+    needs: spawn_examples
     uses: ./.github/workflows/example.yml
     with:
-      example_paths: '["./examples/metadata.ts","./examples/balance.ts"]'
+      example_paths: ${{ needs.spawn_examples.outputs.example_paths }}

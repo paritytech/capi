@@ -10,7 +10,6 @@ on:
       example_paths:
         type: string
         required: true
-  push:
 jobs:
   run_example:
     name: Run example
