@@ -26,8 +26,9 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
+            ~/.deno
             ~/.cache/deno
-          key: ${{ runner.os }}-build-${{ hashFiles('lock.json', 'deps/**/*.ts') }}
+          key: ${{ runner.os }}-deno-${{ hashFiles('lock.json', 'deps/**/*.ts') }}
       - name: Setup Polkadot
         uses: ./.github/actions/setup-polkadot
       - run: deno task run test_ctx.ts deno task run ${{ matrix.example_path }}
