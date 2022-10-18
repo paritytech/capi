@@ -22,6 +22,12 @@ jobs:
       - uses: denoland/setup-deno@004814556e37c54a2f6e31384c9e18e983317366 # v1.1.0
         with:
           deno-version: v1.x
+      - name: Cache Deno dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/deno
+          key: ${{ runner.os }}-build-${{ hashFiles('lock.json', 'deps/**/*.ts') }}
       - name: Download polkadot
         run: |
           curl -L -o /usr/local/bin/polkadot https://github.com/paritytech/polkadot/releases/download/v0.9.28/polkadot
