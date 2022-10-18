@@ -28,8 +28,6 @@ jobs:
           path: |
             ~/.cache/deno
           key: ${{ runner.os }}-build-${{ hashFiles('lock.json', 'deps/**/*.ts') }}
-      - name: Download polkadot
-        run: |
-          curl -L -o /usr/local/bin/polkadot https://github.com/paritytech/polkadot/releases/download/v0.9.28/polkadot
-          chmod +x /usr/local/bin/polkadot
+      - name: Setup Polkadot
+        uses: ./.github/actions/setup-polkadot
       - run: deno task run test_ctx.ts deno task run ${{ matrix.example_path }}
