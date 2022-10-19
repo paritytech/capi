@@ -6,7 +6,6 @@ import { BlockRead } from "./BlockRead.ts";
 import { RpcCall } from "./RpcCall.ts";
 import { RpcSubscription } from "./RpcSubscription.ts";
 import { run } from "./run.ts";
-import { select } from "./util/select.ts";
 
 export class BlockWatch extends Z.Name {
   root;
@@ -24,7 +23,7 @@ export class BlockWatch extends Z.Name {
       const watchHandler = createWatchHandler(stop);
       return async (result) => {
         const blockNum = result.params.result.number;
-        const blockHash = select(new RpcCall(config, "chain_getBlockHash", [blockNum]), "result");
+        const blockHash = Z.sel(new RpcCall(config, "chain_getBlockHash", [blockNum]), "result");
         const block = U.throwIfError(
           // STOP THIS MADNESS
           await run(new BlockRead(config, blockHash as unknown as U.HashHexString)),

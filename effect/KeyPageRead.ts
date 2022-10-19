@@ -7,8 +7,6 @@ import { deriveCodec } from "./core/deriveCodec.ts";
 import { storageKey } from "./core/storageKey.ts";
 import { entryMetadata, Metadata, palletMetadata } from "./Metadata.ts";
 import { RpcCall } from "./RpcCall.ts";
-import { select } from "./util/select.ts";
-import { wrap } from "./util/wrap.ts";
 
 export class KeyPageRead<
   PalletName extends Z.$<string>,
@@ -45,13 +43,13 @@ export class KeyPageRead<
       blockHash as Rest[1],
     ]);
     const $key_ = $key(deriveCodec_, palletMetadata_, entryMetadata_);
-    const keysEncoded = select(call, "result");
+    const keysEncoded = Z.sel(call, "result");
     const keysDecoded = Z.call(Z.ls($key_, keysEncoded), ([$key, keysEncoded]) => {
       return keysEncoded.map((keyEncoded) => {
         return $key.decode(U.hex.decode(keyEncoded));
       });
     });
-    this.root = wrap(keysDecoded, "keys");
+    this.root = Z.wrap(keysDecoded, "keys");
   }
 }
 
