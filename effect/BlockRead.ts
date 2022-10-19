@@ -16,7 +16,7 @@ export class BlockRead<Rest extends [blockHash?: Z.$<U.HashHexString | undefined
   ) {
     super();
     const metadata_ = new Metadata(config, blockHash);
-    const $extrinsic_ = $extrinsic(deriveCodec(metadata_), metadata_);
+    const $extrinsic_ = $extrinsic(deriveCodec(metadata_), metadata_, undefined!);
     const call = new RpcCall(config, "chain_getBlock", [blockHash]);
     const decoded = Z.call(Z.ls($extrinsic_, call), ([$extrinsic_, call]) => {
       const { block: { extrinsics, header }, justifications } = call.result;
