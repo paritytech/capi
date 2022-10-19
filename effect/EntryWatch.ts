@@ -9,7 +9,6 @@ import { storageKey } from "./core/storageKey.ts";
 import { entryMetadata, Metadata, palletMetadata } from "./Metadata.ts";
 import { RpcCall } from "./RpcCall.ts";
 import { RpcSubscription } from "./RpcSubscription.ts";
-import { select } from "./util/select.ts";
 
 export type WatchEntryEvent = [key?: U.HexString, value?: unknown];
 
@@ -39,7 +38,7 @@ export class EntryWatch<
     const palletMetadata_ = palletMetadata(metadata_, palletName);
     const entryMetadata_ = entryMetadata(palletMetadata_, entryName);
     const $storageKey_ = $storageKey(deriveCodec_, palletMetadata_, entryMetadata_);
-    const entryValueTypeI = select(entryMetadata_, "value");
+    const entryValueTypeI = Z.sel(entryMetadata_, "value");
     const $entry = codec(deriveCodec_, entryValueTypeI);
     const storageKeys = Z.call(storageKey($storageKey_, keys), (v) => [v]);
     const watchInit = Z.call($entry, ($entry) => {

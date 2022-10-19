@@ -5,7 +5,6 @@ import { $extrinsic } from "./core/$extrinsic.ts";
 import { deriveCodec } from "./core/deriveCodec.ts";
 import { Metadata } from "./Metadata.ts";
 import { RpcCall } from "./RpcCall.ts";
-import { wrap } from "./util/wrap.ts";
 
 export class BlockRead<Rest extends [blockHash?: Z.$<U.HashHexString | undefined>]> extends Z.Name {
   root;
@@ -30,6 +29,6 @@ export class BlockRead<Rest extends [blockHash?: Z.$<U.HashHexString | undefined
         },
       };
     });
-    this.root = wrap(decoded, "block");
+    this.root = Z.wrap(decoded, "block");
   }
 }
