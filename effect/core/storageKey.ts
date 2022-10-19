@@ -2,7 +2,7 @@ import * as $ from "../../deps/scale.ts";
 import * as Z from "../../deps/zones.ts";
 import * as U from "../../util/mod.ts";
 
-export const storageKey = Z.atomf((
+export const storageKey = Z.call.fac((
   $storageKey: $.Codec<unknown[]>,
   ...keys: unknown[]
 ) => {

@@ -10,8 +10,8 @@ Deno.test({
   fn: async (ctx) => {
     await ctx.step("extrinsic events", async () => {
       const extrinsicEvents: string[] = await collectExtrinsicEvents(
+        T.westend,
         {
-          config: T.westend,
           palletName: "Balances",
           methodName: "transfer",
           args: {
@@ -42,8 +42,8 @@ Deno.test({
   fn: async (ctx) => {
     await ctx.step("extrinsic events", async () => {
       const extrinsicEvents: string[] = await collectExtrinsicEvents(
+        T.westend,
         {
-          config: T.westend,
           palletName: "Treasury",
           methodName: "propose_spend",
           args: {
@@ -67,8 +67,8 @@ Deno.test({
   fn: async (ctx) => {
     await ctx.step("extrinsic events", async () => {
       const extrinsicEvents: string[] = await collectExtrinsicEvents(
+        T.westend,
         {
-          config: T.westend,
           palletName: "Democracy",
           methodName: "propose",
           args: {
@@ -86,15 +86,16 @@ Deno.test({
 });
 
 async function collectExtrinsicEvents(
-  { config, palletName, methodName, args }: Pick<
+  config: C.Config,
+  { palletName, methodName, args }: Pick<
     C.SendAndWatchExtrinsicProps,
-    "config" | "palletName" | "methodName" | "args"
+    "palletName" | "methodName" | "args"
   >,
   sender: KeyringPair,
 ): Promise<string[]> {
   const extrinsicEvents: string[] = [];
-  const root = new C.ExtrinsicSentWatch({
-    config,
+  // TODO: get rid of this `any`
+  const root = new C.ExtrinsicSentWatch(config as any, {
     sender: {
       type: "Id",
       value: sender.publicKey,

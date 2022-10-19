@@ -41,8 +41,8 @@ export class EntryWatch<
     const $storageKey_ = $storageKey(deriveCodec_, palletMetadata_, entryMetadata_);
     const entryValueTypeI = select(entryMetadata_, "value");
     const $entry = codec(deriveCodec_, entryValueTypeI);
-    const storageKeys = Z.atom([storageKey($storageKey_, keys)], (v) => [v]);
-    const watchInit = Z.atom([$entry], ($entry) => {
+    const storageKeys = Z.call(storageKey($storageKey_, keys), (v) => [v]);
+    const watchInit = Z.call($entry, ($entry) => {
       return U.mapCreateWatchHandler(
         createWatchHandler,
         (message: rpc.NotifMessage<Config, "state_subscribeStorage">) => {
