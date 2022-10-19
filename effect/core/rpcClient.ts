@@ -3,9 +3,14 @@ import * as Z from "../../deps/zones.ts";
 import * as rpc from "../../rpc/mod.ts";
 
 export function rpcClient<C extends Config<string>>(config: C) {
-  return Z.atom([config], (config) => {
+  return Z.call(config, (config) => {
     return rpc.stdClient(config);
-  }, (client) => {
-    return client instanceof Error ? undefined : client.close();
   });
 }
+
+// TODO:
+/**
+(client) => {
+  return client instanceof Error ? undefined : client.close();
+}
+*/

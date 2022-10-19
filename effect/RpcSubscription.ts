@@ -11,7 +11,7 @@ export class RpcSubscription<
   MethodName extends Extract<keyof Config_["RpcSubscriptionMethods"], string>,
   MethodName_ extends Z.$<MethodName>,
   Params extends Parameters<Config_["RpcSubscriptionMethods"][Z.T<MethodName_>]>,
-  Params_ extends Z.List$<Params>,
+  Params_ extends Z.Ls$<Params>,
   CreateListenerCb extends Z.$<U.CreateWatchHandler<rpc.NotifMessage<Config_, MethodName>>>,
 > extends Z.Name {
   root;
@@ -19,23 +19,19 @@ export class RpcSubscription<
   constructor(
     config: Config_,
     methodName: MethodName_,
-    params: Params_,
+    params: [...Params_],
     createListenerCb: CreateListenerCb,
     cleanup?: (initOk: rpc.OkMessage<Config_, MethodName>) => Z.EffectLike,
   ) {
     super();
-    this.root = Z.atom(
-      [rpcClient(config), methodName, createListenerCb, ...params],
-      async function(client, methodName, createListenerCb, ...params) {
+    this.root = Z.call(
+      Z.ls(rpcClient(config), methodName, createListenerCb, ...params),
+      async function([client, methodName, createListenerCb, ...params]) {
         const result = await client.subscribe(
           methodName as MethodName,
           params as Parameters<Config_["RpcSubscriptionMethods"][MethodName]>,
           createListenerCb,
-          cleanup
-            ? (x) => {
-              return run(cleanup(x.result));
-            }
-            : undefined,
+          cleanup ? (x) => run(cleanup(x.result), undefined!) : undefined,
         );
         if (result?.error) {
           return new RpcError({

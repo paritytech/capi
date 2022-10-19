@@ -1,7 +1,7 @@
 export * from "./config/mod.ts";
 export * as $ from "./deps/scale.ts";
 export { BitSequence } from "./deps/scale.ts";
-export { all, atom, atomf, UnexpectedThrow } from "./deps/zones.ts";
+export { call, each, Effect, ls, sel } from "./deps/zones.ts";
 export * from "./effect/mod.ts";
 export * as M from "./frame_metadata/mod.ts";
 export { $era, $null, ChainError, type Era } from "./frame_metadata/mod.ts";

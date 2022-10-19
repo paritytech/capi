@@ -12,13 +12,13 @@ export class BlockRead<Rest extends [blockHash?: Z.$<U.HashHexString | undefined
 
   constructor(
     config: known.rpc.Config<string, "state_getMetadata" | "chain_getBlock">,
-    ...[blockHash]: Rest
+    ...[blockHash]: [...Rest]
   ) {
     super();
     const metadata_ = new Metadata(config, blockHash);
     const $extrinsic_ = $extrinsic(deriveCodec(metadata_), metadata_);
     const call = new RpcCall(config, "chain_getBlock", [blockHash]);
-    const decoded = Z.atom([$extrinsic_, call], ($extrinsic_, call) => {
+    const decoded = Z.call(Z.ls($extrinsic_, call), ([$extrinsic_, call]) => {
       const { block: { extrinsics, header }, justifications } = call.result;
       return {
         justifications,

@@ -23,21 +23,18 @@ export class KeyPageRead<
     palletName: PalletName,
     entryName: EntryName,
     count: Count,
-    ...[start, blockHash]: Rest
+    ...[start, blockHash]: [...Rest]
   ) {
     super();
-    const metadata_ = new Metadata(config, blockHash);
+    const metadata_ = new Metadata(config, blockHash as Rest[1]);
     const deriveCodec_ = deriveCodec(metadata_);
     const palletMetadata_ = palletMetadata(metadata_, palletName);
-    const entryMetadata_ = Z.atom(
-      [entryMetadata(palletMetadata_, entryName)],
-      (entryMetadata) => {
-        if (entryMetadata.type !== "Map") {
-          return new ReadingKeysOfNonMapError();
-        }
-        return entryMetadata;
-      },
-    );
+    const entryMetadata_ = Z.call(entryMetadata(palletMetadata_, entryName), (entryMetadata) => {
+      if (entryMetadata.type !== "Map") {
+        return new ReadingKeysOfNonMapError();
+      }
+      return entryMetadata;
+    });
     const $storageKey_ = $storageKey(deriveCodec_, palletMetadata_, entryMetadata_);
     const startKey = start ? storageKey($storageKey_, start) : undefined;
     const storageKey_ = storageKey($storageKey_);
@@ -45,11 +42,11 @@ export class KeyPageRead<
       storageKey_,
       count,
       startKey,
-      blockHash,
+      blockHash as Rest[1],
     ]);
     const $key_ = $key(deriveCodec_, palletMetadata_, entryMetadata_);
     const keysEncoded = select(call, "result");
-    const keysDecoded = Z.atom([$key_, keysEncoded], ($key, keysEncoded) => {
+    const keysDecoded = Z.call(Z.ls($key_, keysEncoded), ([$key, keysEncoded]) => {
       return keysEncoded.map((keyEncoded) => {
         return $key.decode(U.hex.decode(keyEncoded));
       });
