@@ -46,6 +46,6 @@ Everyone interacting in this repo is expected to follow the [code of conduct](CO
 
 Contributions are welcome and appreciated! Check out the [contributing guide](CONTRIBUTING.md) before you dive in.
 
-## License
+## [License](LICENSE)
 
 Capi is [Apache licensed](LICENSE).
