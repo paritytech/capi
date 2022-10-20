@@ -17,10 +17,11 @@ export class RpcCall<
     params: [...Params],
   ) {
     super();
+    const client = rpcClient(config);
+    const deps = Z.ls(client, methodName, ...params);
     this.root = Z.call(
-      Z.ls(rpcClient(config), methodName, ...params),
-      async ([client, methodName, ...params]) => {
-        // TODO: clean up typings
+      Z.ls(deps, Z.rc(client, deps)),
+      async ([[client, methodName, ...params], rc]) => {
         const result = await client.call(
           methodName,
           params as Parameters<(Methods & rpc.ProviderMethods)[Z.T<MethodName>]>,
@@ -33,6 +34,10 @@ export class RpcCall<
               params,
             },
           });
+        }
+        if (rc() == 1) {
+          const close = await client.close();
+          if (close instanceof Error) return close;
         }
         // TODO: should this effect implicitly index into `result`?
         return result;

@@ -2,15 +2,10 @@ import { Config } from "../../config/mod.ts";
 import * as Z from "../../deps/zones.ts";
 import * as rpc from "../../rpc/mod.ts";
 
-export function rpcClient<C extends Config<string>>(config: C) {
-  return Z.call(config, (config) => {
-    return rpc.stdClient(config);
-  });
+export function rpcClient<C extends Config>(config: C) {
+  return Z.call(config, impl);
 }
 
-// TODO:
-/**
-(client) => {
-  return client instanceof Error ? undefined : client.close();
+function impl<C extends Config>(config: C) {
+  return rpc.stdClient(config);
 }
-*/

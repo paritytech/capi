@@ -40,7 +40,7 @@ export class EntryWatch<
     const $storageKey_ = $storageKey(deriveCodec_, palletMetadata_, entryMetadata_);
     const entryValueTypeI = Z.sel(entryMetadata_, "value");
     const $entry = codec(deriveCodec_, entryValueTypeI);
-    const storageKeys = Z.call(storageKey($storageKey_, keys), (v) => [v]);
+    const storageKey_ = Z.call(storageKey($storageKey_, ...keys), (x) => [x]);
     const watchInit = Z.call($entry, ($entry) => {
       return U.mapCreateWatchHandler(
         createWatchHandler,
@@ -54,7 +54,7 @@ export class EntryWatch<
     this.root = new RpcSubscription(
       config,
       "state_subscribeStorage",
-      [storageKeys],
+      [storageKey_],
       watchInit,
       (ok) => {
         return new RpcCall(config, "state_unsubscribeStorage", [ok.result]);

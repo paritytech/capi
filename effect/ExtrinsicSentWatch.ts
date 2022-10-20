@@ -43,19 +43,15 @@ export class ExtrinsicSentWatch<Props extends Z.Rec$<SendAndWatchExtrinsicProps>
 
   constructor(
     readonly config: Config,
-    readonly props: Props,
+    readonly props_: Props,
   ) {
     super();
+    const props = props_ as Z.Rec$Access<Props>;
     const metadata_ = new Metadata(config);
     const deriveCodec_ = deriveCodec(metadata_);
-    const $extrinsic_ = $extrinsic(
-      deriveCodec_,
-      metadata_,
-      props.sign as Props["sign"],
-      config.addressPrefix,
-    );
+    const $extrinsic_ = $extrinsic(deriveCodec_, metadata_, props.sign, config.addressPrefix);
     const runtimeVersion = new RpcCall(config, "state_getRuntimeVersion", []);
-    const senderSs58 = Z.call(props.sender as Props["sender"], (sender) => {
+    const senderSs58 = Z.call(props.sender, (sender) => {
       return ((): string => {
         switch (sender.type) {
           case "Id": {
@@ -76,21 +72,21 @@ export class ExtrinsicSentWatch<Props extends Z.Rec$<SendAndWatchExtrinsicProps>
       },
     );
     const checkpointHash = props.checkpoint
-      ? Z.call(props.checkpoint as Props["checkpoint"], (v) => v ? U.hex.decode(v) : v)
+      ? Z.call(props.checkpoint, (v) => v ? U.hex.decode(v) : v)
       : genesisHash;
     const extrinsicHex = Z.call(
       Z.ls(
         $extrinsic_,
-        props.sender as Props["sender"],
-        props.methodName as Props["methodName"],
-        props.palletName as Props["palletName"],
+        props.sender,
+        props.methodName,
+        props.palletName,
         runtimeVersion,
         accountNextIndex,
         genesisHash,
-        props.args as Props["args"],
+        props.args,
         checkpointHash,
-        props.tip as Props["tip"],
-        props.mortality as Props["mortality"],
+        props.tip,
+        props.mortality,
       ),
       async ([
         $extrinsic,
@@ -132,7 +128,7 @@ export class ExtrinsicSentWatch<Props extends Z.Rec$<SendAndWatchExtrinsicProps>
       config,
       "author_submitAndWatchExtrinsic",
       [extrinsicHex],
-      props.createWatchHandler as Props["createWatchHandler"],
+      props.createWatchHandler,
       // TODO: use effect system for cbs such as this
       (ok) => new RpcCall(config, "author_unwatchExtrinsic", [ok.result]),
     );
