@@ -38,14 +38,14 @@ In a likely future of specialized, interoperable chains, developers will need to
 
 As you read through this documentation, please consider use cases over which you might like to abstract; if you wish to add your use case to [Capi's standard library](std), please [submit an issue](https://github.com/paritytech/capi/issues/new).
 
-## [Code of Conduct](CODE_OF_CONDUCT.md)
+## Code of Conduct
 
 Everyone interacting in this repo is expected to follow the [code of conduct](CODE_OF_CONDUCT.md).
 
-## [Contributing](CONTRIBUTING.md)
+## Contributing
 
 Contributions are welcome and appreciated! Check out the [contributing guide](CONTRIBUTING.md) before you dive in.
 
-## [License](LICENSE)
+## License
 
 Capi is [Apache licensed](LICENSE).
