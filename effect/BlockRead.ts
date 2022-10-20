@@ -1,8 +1,5 @@
-import * as $ from "../deps/scale.ts";
 import * as Z from "../deps/zones.ts";
-import * as M from "../frame_metadata/mod.ts";
 import * as known from "../known/mod.ts";
-import * as rpc from "../rpc/mod.ts";
 import * as U from "../util/mod.ts";
 import { $extrinsic } from "./core/$extrinsic.ts";
 import { deriveCodec } from "./core/deriveCodec.ts";
