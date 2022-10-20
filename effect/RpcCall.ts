@@ -21,7 +21,7 @@ export class RpcCall<
     const deps = Z.ls(client, methodName, ...params);
     this.root = Z.call(
       Z.ls(deps, Z.rc(client, deps)),
-      async ([[client, methodName, ...params], rc]) => {
+      async function rpcCallImpl([[client, methodName, ...params], rc]) {
         const result = await client.call(
           methodName,
           params as Parameters<(Methods & rpc.ProviderMethods)[Z.T<MethodName>]>,

@@ -19,19 +19,21 @@ export class BlockWatch extends Z.Name {
     createWatchHandler: U.CreateWatchHandler<known.types.Block<Extrinsic>>,
   ) {
     super();
-    this.root = new RpcSubscription(config, "chain_subscribeNewHeads", [], (stop) => {
-      const watchHandler = createWatchHandler(stop);
-      return async (result) => {
-        const blockNum = result.params.result.number;
-        const blockHash = Z.sel(new RpcCall(config, "chain_getBlockHash", [blockNum]), "result");
-        const block = U.throwIfError(
-          // STOP THIS MADNESS
-          await run(new BlockRead(config, blockHash as unknown as U.HashHexString)),
-        );
-        watchHandler(block.block);
-      };
-    }, (ok) => {
-      return new RpcCall(config, "chain_unsubscribeNewHead", [ok.result]);
-    });
+    this.root = new RpcSubscription(
+      config,
+      "chain_subscribeNewHeads",
+      [],
+      function subscribeNewHeadsHandler(stop) {
+        const watchHandler = createWatchHandler(stop);
+        return async (result) => {
+          const blockNum = result.params.result.number;
+          const blockHash = Z.sel(new RpcCall(config, "chain_getBlockHash", [blockNum]), "result");
+          // TODO: use derived util from Zones
+          const block = U.throwIfError(await run(new BlockRead(config, blockHash)));
+          watchHandler(block.block);
+        };
+      },
+      (ok) => new RpcCall(config, "chain_unsubscribeNewHead", [ok.result]),
+    );
   }
 }

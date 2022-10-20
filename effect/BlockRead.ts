@@ -20,22 +20,18 @@ export class BlockRead<Rest extends [blockHash?: Z.$<U.HashHexString | undefined
     const metadata_ = new Metadata(config, blockHash);
     const $extrinsic_ = $extrinsic(deriveCodec(metadata_), metadata_, undefined!);
     const call = new RpcCall(config, "chain_getBlock", [blockHash]);
-    const decoded = Z.call(Z.ls($extrinsic_, call), mapExtrinsicCall);
+    const decoded = Z.call(Z.ls($extrinsic_, call), function mapExtrinsicCall([$extrinsic_, call]) {
+      const { block: { extrinsics, header }, justifications } = call.result;
+      return {
+        justifications,
+        block: {
+          header,
+          extrinsics: extrinsics.map((extrinsic) => {
+            return $extrinsic_.decode(U.hex.decode(extrinsic));
+          }),
+        },
+      };
+    });
     this.root = Z.wrap(decoded, "block");
   }
-}
-
-function mapExtrinsicCall(
-  [$extrinsic_, call]: [$.Codec<M.Extrinsic>, rpc.OkMessageBase<known.types.Block<U.HexString>>],
-) {
-  const { block: { extrinsics, header }, justifications } = call.result;
-  return {
-    justifications,
-    block: {
-      header,
-      extrinsics: extrinsics.map((extrinsic) => {
-        return $extrinsic_.decode(U.hex.decode(extrinsic));
-      }),
-    },
-  };
 }
