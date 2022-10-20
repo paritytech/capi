@@ -11,12 +11,11 @@ export function decoded<
   encoded: Encoded,
   key: Key,
 ) {
-  return Z.call(
-    Z.ls(codec, encoded, key),
-    // TODO: create `Wrap` util –– this is currently necessary as the decoded value is `unknown`,
-    // which––left top-level––unifies with error types.
-    ([codec, encoded, key]): Record<Z.T<Key>, any> => {
-      return { [key]: codec.decode(U.hex.decode(encoded)) } as any;
-    },
-  );
+  return Z.call(Z.ls(codec, encoded, key), impl);
+}
+
+function impl<Key extends string>(
+  [codec, encoded, key]: [$.Codec<unknown>, U.HexString, Key],
+): Record<Z.T<Key>, any> {
+  return { [key]: codec.decode(U.hex.decode(encoded)) } as any;
 }

@@ -24,13 +24,15 @@ export class RpcSubscription<
     cleanup?: (initOk: rpc.OkMessage<Config_, MethodName>) => Z.EffectLike,
   ) {
     super();
+    const client = rpcClient(config);
+    const deps = Z.ls(client, methodName, createListenerCb, ...params);
     this.root = Z.call(
-      Z.ls(rpcClient(config), methodName, createListenerCb, ...params),
-      async function([client, methodName, createListenerCb, ...params]) {
+      Z.ls(deps, Z.rc(client, deps)),
+      async function([[client, methodName, createListenerCb, ...params], rc]) {
         const result = await client.subscribe(
           methodName as MethodName,
           params as Parameters<Config_["RpcSubscriptionMethods"][MethodName]>,
-          createListenerCb,
+          createListenerCb as any,
           cleanup ? (x) => run(cleanup(x.result), undefined!) : undefined,
         );
         if (result?.error) {
@@ -41,6 +43,10 @@ export class RpcSubscription<
               params,
             },
           });
+        }
+        if (rc() == 1) {
+          const close = await client.close();
+          if (close instanceof Error) return close;
         }
         // TODO: clean up typings –– should implicitly narrow to `undefined`
         return result as undefined;
