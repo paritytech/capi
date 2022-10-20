@@ -27,12 +27,15 @@ export class KeyPageRead<
     const metadata_ = new Metadata(config, blockHash as Rest[1]);
     const deriveCodec_ = deriveCodec(metadata_);
     const palletMetadata_ = palletMetadata(metadata_, palletName);
-    const entryMetadata_ = Z.call(entryMetadata(palletMetadata_, entryName), (entryMetadata) => {
-      if (entryMetadata.type !== "Map") {
-        return new ReadingKeysOfNonMapError();
-      }
-      return entryMetadata;
-    });
+    const entryMetadata_ = Z.call(
+      entryMetadata(palletMetadata_, entryName),
+      function assertIsMap(entryMetadata) {
+        if (entryMetadata.type !== "Map") {
+          return new ReadingKeysOfNonMapError();
+        }
+        return entryMetadata;
+      },
+    );
     const $storageKey_ = $storageKey(deriveCodec_, palletMetadata_, entryMetadata_);
     const startKey = start ? storageKey($storageKey_, start) : undefined;
     const storageKey_ = storageKey($storageKey_);
@@ -44,11 +47,14 @@ export class KeyPageRead<
     ]);
     const $key_ = $key(deriveCodec_, palletMetadata_, entryMetadata_);
     const keysEncoded = Z.sel(call, "result");
-    const keysDecoded = Z.call(Z.ls($key_, keysEncoded), ([$key, keysEncoded]) => {
-      return keysEncoded.map((keyEncoded) => {
-        return $key.decode(U.hex.decode(keyEncoded));
-      });
-    });
+    const keysDecoded = Z.call(
+      Z.ls($key_, keysEncoded),
+      function keysDecodedImpl([$key, keysEncoded]) {
+        return keysEncoded.map((keyEncoded) => {
+          return $key.decode(U.hex.decode(keyEncoded));
+        });
+      },
+    );
     this.root = Z.wrap(keysDecoded, "keys");
   }
 }

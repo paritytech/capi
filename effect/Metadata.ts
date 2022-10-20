@@ -9,13 +9,16 @@ export class Metadata<Rest extends [blockHash?: Z.$<U.HashHexString | undefined>
 
   constructor(config: known.rpc.Config<string, "state_getMetadata">, ...[blockHash]: [...Rest]) {
     super();
-    this.root = Z.call(new RpcCall(config, "state_getMetadata", [blockHash]), (call) => {
-      try {
-        return M.fromPrefixedHex(call.result);
-      } catch (e) {
-        return new MetadataDecodeError(e);
-      }
-    });
+    this.root = Z.call(
+      new RpcCall(config, "state_getMetadata", [blockHash]),
+      function metadataImpl(call) {
+        try {
+          return M.fromPrefixedHex(call.result);
+        } catch (e) {
+          return new MetadataDecodeError(e);
+        }
+      },
+    );
   }
 }
 

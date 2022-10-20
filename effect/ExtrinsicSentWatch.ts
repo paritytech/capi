@@ -7,6 +7,7 @@ import * as ss58 from "../ss58/mod.ts";
 import * as U from "../util/mod.ts";
 import { $extrinsic } from "./core/$extrinsic.ts";
 import { deriveCodec } from "./core/deriveCodec.ts";
+import { hexDecode } from "./core/hex.ts";
 import { Metadata } from "./Metadata.ts";
 import { RpcCall } from "./RpcCall.ts";
 import { RpcSubscription } from "./RpcSubscription.ts";
@@ -51,7 +52,7 @@ export class ExtrinsicSentWatch<Props extends Z.Rec$<SendAndWatchExtrinsicProps>
     const deriveCodec_ = deriveCodec(metadata_);
     const $extrinsic_ = $extrinsic(deriveCodec_, metadata_, props.sign, config.addressPrefix);
     const runtimeVersion = new RpcCall(config, "state_getRuntimeVersion", []);
-    const senderSs58 = Z.call(props.sender, (sender) => {
+    const senderSs58 = Z.call(props.sender, function senderSs58(sender) {
       return ((): string => {
         switch (sender.type) {
           case "Id": {
@@ -65,14 +66,11 @@ export class ExtrinsicSentWatch<Props extends Z.Rec$<SendAndWatchExtrinsicProps>
       })() as U.AccountIdString;
     });
     const accountNextIndex = new RpcCall(config, "system_accountNextIndex", [senderSs58]);
-    const genesisHash = Z.call(
-      new RpcCall(config, "chain_getBlockHash", [0]),
-      ({ result }) => {
-        return U.hex.decode(result);
-      },
-    );
+    const genesisHash = hexDecode(Z.sel(new RpcCall(config, "chain_getBlockHash", [0]), "result"));
     const checkpointHash = props.checkpoint
-      ? Z.call(props.checkpoint, (v) => v ? U.hex.decode(v) : v)
+      ? Z.call(props.checkpoint, function checkpointOrUndef(v) {
+        return v ? U.hex.decode(v) : v;
+      })
       : genesisHash;
     const extrinsicHex = Z.call(
       Z.ls(
@@ -88,7 +86,7 @@ export class ExtrinsicSentWatch<Props extends Z.Rec$<SendAndWatchExtrinsicProps>
         props.tip,
         props.mortality,
       ),
-      async ([
+      async function formExtrinsicHex([
         $extrinsic,
         sender,
         methodName,
@@ -100,7 +98,7 @@ export class ExtrinsicSentWatch<Props extends Z.Rec$<SendAndWatchExtrinsicProps>
         checkpoint,
         tip,
         mortality,
-      ]) => {
+      ]) {
         const extrinsicBytes = await $extrinsic.encodeAsync({
           protocolVersion: 4, // TODO: grab this from elsewhere
           palletName,

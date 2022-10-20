@@ -28,7 +28,7 @@ export class RpcSubscription<
     const deps = Z.ls(client, methodName, createListenerCb, ...params);
     this.root = Z.call(
       Z.ls(deps, Z.rc(client, deps)),
-      async function([[client, methodName, createListenerCb, ...params], rc]) {
+      async function rpcSubscriptionImpl([[client, methodName, createListenerCb, ...params], rc]) {
         const result = await client.subscribe(
           methodName as MethodName,
           params as Parameters<Config_["RpcSubscriptionMethods"][MethodName]>,
