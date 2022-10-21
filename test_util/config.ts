@@ -36,8 +36,8 @@ async function testCtx(): Promise<never> {
   const p = Deno.run({
     cmd: ["deno", "task", "run", testCtxPath, "deno", "task", "run", Deno.mainModule],
   });
-  await p.status();
-  Deno.exit(1);
+  const { code } = await p.status();
+  Deno.exit(code);
 }
 
 export const polkadot = new TestConfig("polkadot");
