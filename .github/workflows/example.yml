@@ -1,0 +1,34 @@
+name: Run example
+on:
+  workflow_dispatch:
+    inputs:
+      example_paths:
+        type: string
+        required: true
+  workflow_call:
+    inputs:
+      example_paths:
+        type: string
+        required: true
+jobs:
+  run_example:
+    name: Run example
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        example_path: ${{ fromJSON(inputs.example_paths) }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: denoland/setup-deno@9db7f66e8e16b5699a514448ce994936c63f0d54 # v1.1.0
+        with:
+          deno-version: v1.x
+      - name: Cache Deno dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.deno
+            ~/.cache/deno
+          key: ${{ runner.os }}-deno-${{ hashFiles('lock.json', 'deps/**/*.ts') }}
+      - name: Setup Polkadot
+        uses: ./.github/actions/setup-polkadot
+      - run: deno task run ${{ matrix.example_path }}

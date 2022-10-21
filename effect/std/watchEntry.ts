@@ -30,7 +30,9 @@ export function watchEntry<
   const $storageKey = a.$storageKey(deriveCodec_, palletMetadata_, entryMetadata_);
   const entryValueTypeI = a.select(entryMetadata_, "value");
   const $entry = a.codec(deriveCodec_, entryValueTypeI);
-  const storageKeys = sys.anon([a.storageKey($storageKey, keys)], (v) => [v]);
+  const storageKeys = keys.length === 0
+    ? sys.anon([a.storageKey($storageKey)], (v) => [v])
+    : sys.anon([a.storageKey($storageKey, keys)], (v) => [v]);
   return sys.into([$entry], ($entryCodec) => {
     const watchInit = U.mapCreateWatchHandler(
       createWatchHandler,

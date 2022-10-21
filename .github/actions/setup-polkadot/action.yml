@@ -1,0 +1,23 @@
+name: "Setup Polkadot"
+description: "Setup Polkadot"
+inputs:
+  polkadot-version:
+    description: "Polkadot version"
+    required: true
+    default: v0.9.28
+runs:
+  using: "composite"
+  steps:
+    - name: Cache Polkadot
+      uses: actions/cache@v3
+      id: cache-polkadot
+      with:
+        path: |
+          /usr/local/bin/polkadot
+        key: polkadot-${{ inputs.polkadot-version }}
+    - if: ${{ steps.cache-polkadot.outputs.cache-hit != 'true' }}
+      name: Download Polkadot
+      run: |
+        curl -L -o /usr/local/bin/polkadot https://github.com/paritytech/polkadot/releases/download/${{ inputs.polkadot-version }}/polkadot
+        chmod +x /usr/local/bin/polkadot
+      shell: bash

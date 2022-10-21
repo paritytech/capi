@@ -182,3 +182,4 @@ zombienet
 ltex
 morfologik
 neovim
+tostring
