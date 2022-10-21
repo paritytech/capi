@@ -80,7 +80,7 @@ This is precisely what Capi's effect system––[Zones](https://github.com/pari
 ```ts
 import * as Z from "zones";
 
-const rand = Z.atomf(() => {
+const rand = Z.call.fac(() => {
   const rand = Math.random();
   if (rand > .5) {
     return new GtPoint5Error(rand);
@@ -88,7 +88,7 @@ const rand = Z.atomf(() => {
   return rand;
 });
 
-const add = Z.atomf((a: number, b: number) => {
+const add = Z.call.fac((a: number, b: number) => {
   return a + b;
 });
 
@@ -114,17 +114,18 @@ Although this may seem overly-complex for such a tiny amount of computation, it 
 In the context of Capi, Effects are used to represent on-chain constructs without actually performing any computation until necessary. As showcased within this project's readme, we can create an effect that represents a key in a map, and then use that effect to represent its corresponding value in the map. This all occurs without any network interaction whatsoever.
 
 ```ts
-import * as polkadot from "./polkadot.ts";
+import * as C from "capi";
+import { system } from "./polkadot/frame.ts";
 
-const xKey = polkadot.system.account.keys().first();
+const key = system.account.keys.first;
 
-const xValue = polkadot.system.account.get(xKey);
+const value = system.account.get(key);
 ```
 
 We can compose atomic effects such as these to create complex, multichain interactions that abstract over common use cases. Meanwhile, the underlying effect system appropriately determines the optimal path to execute effects.
 
 ```ts
-const result = await xValue.read();
+const result = await C.run(value);
 ```
 
 In this example `result` carries a type representing a union of all possible errors (such as `StorageDne`).
