@@ -6,6 +6,7 @@ dprint
 esbenp
 matklad
 polkadot
+atomf
 serayuzgur
 typebox
 vadimcn
@@ -176,4 +177,9 @@ tailaiw
 trufflehog
 amannn
 multisigs
+curto
+zombienet
+ltex
+morfologik
+neovim
 tostring

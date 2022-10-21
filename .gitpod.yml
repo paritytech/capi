@@ -5,7 +5,6 @@ tasks:
 vscode:
   extensions:
     - EditorConfig.EditorConfig
-    - bungcip.better-toml
     - denoland.vscode-deno
     - dprint.dprint
     - esbenp.prettier-vscode
