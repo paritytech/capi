@@ -1,7 +1,7 @@
 import * as C from "../mod.ts";
 import * as U from "../util/mod.ts";
 
-const root = C.watchBlocks(C.westend, (stop) => {
+const root = new C.BlockWatch(C.polkadot, (stop) => {
   let i = 0;
   return ({ block }) => {
     console.log(block.header);
@@ -12,4 +12,4 @@ const root = C.watchBlocks(C.westend, (stop) => {
   };
 });
 
-U.throwIfError(await root.run());
+U.throwIfError(await C.run(root));

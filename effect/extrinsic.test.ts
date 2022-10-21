@@ -3,14 +3,15 @@ import { assertEquals, assertObjectMatch } from "../deps/std/testing/asserts.ts"
 import * as C from "../mod.ts";
 import * as T from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
+import { run } from "./run.ts";
 
 Deno.test({
   name: "Balances.transfer",
   fn: async (ctx) => {
     await ctx.step("extrinsic events", async () => {
       const extrinsicEvents: string[] = await collectExtrinsicEvents(
+        T.westend,
         {
-          config: T.westend,
           palletName: "Balances",
           methodName: "transfer",
           args: {
@@ -23,17 +24,13 @@ Deno.test({
         },
         T.alice,
       );
-
       assertEquals(extrinsicEvents, ["ready", "inBlock", "finalized"]);
     });
 
     await ctx.step({
       name: "account balance updated",
       fn: async () => {
-        const root = C.readEntry(T.westend, "System", "Account", [T.bob.publicKey]);
-
-        const state = await root.run();
-
+        const state = await run(new C.EntryRead(T.westend, "System", "Account", [T.bob.publicKey]));
         assertObjectMatch(state, { value: { data: { free: 10000000000012345n } } });
       },
     });
@@ -45,8 +42,8 @@ Deno.test({
   fn: async (ctx) => {
     await ctx.step("extrinsic events", async () => {
       const extrinsicEvents: string[] = await collectExtrinsicEvents(
+        T.westend,
         {
-          config: T.westend,
           palletName: "Treasury",
           methodName: "propose_spend",
           args: {
@@ -70,8 +67,8 @@ Deno.test({
   fn: async (ctx) => {
     await ctx.step("extrinsic events", async () => {
       const extrinsicEvents: string[] = await collectExtrinsicEvents(
+        T.westend,
         {
-          config: T.westend,
           palletName: "Democracy",
           methodName: "propose",
           args: {
@@ -83,23 +80,22 @@ Deno.test({
         },
         T.alice,
       );
-
       assertEquals(extrinsicEvents, ["ready", "inBlock", "finalized"]);
     });
   },
 });
 
 async function collectExtrinsicEvents(
-  { config, palletName, methodName, args }: Pick<
+  config: C.Config,
+  { palletName, methodName, args }: Pick<
     C.SendAndWatchExtrinsicProps,
-    "config" | "palletName" | "methodName" | "args"
+    "palletName" | "methodName" | "args"
   >,
   sender: KeyringPair,
 ): Promise<string[]> {
   const extrinsicEvents: string[] = [];
-
-  const root = C.sendAndWatchExtrinsic({
-    config,
+  // TODO: get rid of this `any`
+  const root = new C.ExtrinsicSentWatch(config as any, {
     sender: {
       type: "Id",
       value: sender.publicKey,
@@ -130,8 +126,6 @@ async function collectExtrinsicEvents(
       };
     },
   });
-
-  await root.run();
-
+  U.throwIfError(await run(root));
   return extrinsicEvents;
 }

@@ -4,6 +4,6 @@ import * as U from "../../util/mod.ts";
 
 const aliceStash = T.alice.derive("//stash");
 
-const aliceBonded = C.readEntry(T.polkadot, "Staking", "Bonded", [aliceStash.publicKey]);
+const aliceBonded = new C.EntryRead(T.polkadot, "Staking", "Bonded", [aliceStash.publicKey]);
 
-console.log(U.throwIfError(await aliceBonded.run()));
+console.log(U.throwIfError(await C.run(aliceBonded)));

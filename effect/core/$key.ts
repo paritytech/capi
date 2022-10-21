@@ -1,7 +1,7 @@
+import * as Z from "../../deps/zones.ts";
 import * as M from "../../frame_metadata/mod.ts";
-import { atomFactory } from "../sys/Atom.ts";
 
-export const $key = atomFactory("KeyCodec", (
+export const $key = Z.call.fac((
   deriveCodec: M.DeriveCodec,
   pallet: M.Pallet,
   storageEntry: M.StorageEntry,
