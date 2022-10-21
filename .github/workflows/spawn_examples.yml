@@ -10,11 +10,11 @@ jobs:
       example_paths: ${{ steps.generate_example_paths.outputs.example_paths }}
     steps:
       - uses: actions/checkout@v3
+      - name: Setup fd-find
+        uses: ./.github/actions/setup-fd-find
       - id: generate_example_paths
-        # FIXME: cache fd-find binary installation
         run: |
-          cargo install fd-find
-          ~/.cargo/bin/fd --print0 --glob "*.ts" ./examples | jq -Rnc '(input | split("\u0000"))' > example_paths.json
+          fd --print0 --glob "*.ts" ./examples | jq -Rnc '(input | split("\u0000"))' > example_paths.json
           example_paths=`cat example_paths.json`
           echo "example_paths=$example_paths" >> $GITHUB_OUTPUT
   run_example_workflow:
