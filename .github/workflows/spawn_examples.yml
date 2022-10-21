@@ -11,8 +11,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - id: generate_example_paths
+        # FIXME: cache fd-find binary installation
         run: |
-          find ./examples -type f -name "*.ts" -print0 | jq -Rnc '(input | split("\u0000"))' > example_paths.json
+          cargo install fd-find
+          ~/.cargo/bin/fd --print0 --glob "*.ts" ./examples | jq -Rnc '(input | split("\u0000"))' > example_paths.json
           example_paths=`cat example_paths.json`
           echo "example_paths=$example_paths" >> $GITHUB_OUTPUT
   run_example_workflow:
