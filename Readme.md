@@ -2,7 +2,7 @@
 
 > Capi is a work in progress. The documentation may not reflect the current implementation. **Expect a stable release and proper documentation in early 2023**.
 
-Capi is a declarative, TypeScript-first toolkit for crafting interactions with Substrate-based chains. It consists of [FRAME](https://docs.substrate.io/v3/runtime/frame/) utilities and [a high-level functional effect system](https://github.com/paritytech/zones) and [standard library](std), which facilitate multistep, multichain interactions without compromising either performance or safety.
+Capi is a declarative, TypeScript-first toolkit for crafting interactions with Substrate-based chains. It consists of [FRAME](https://docs.substrate.io/v3/runtime/frame/) utilities and [a high-level functional effect system](https://github.com/paritytech/zones) and [standard library](effects), which facilitate multistep, multichain interactions without compromising either performance or safety.
 
 - [Documentation &rarr;](./docs/Readme.md)<br />Materials for learning about Capi
 - [Examples &rarr;](./examples/Readme.md)<br />SHOW ME THE CODE
@@ -14,8 +14,8 @@ Generate chain-specific bindings.
 
 ```sh
 deno run -A -r https://deno.land/x/capi/codegen.ts \
-  --out="polkadot.ts" \
-  --src="wss://rpc.polkadot.io"
+  --src="wss://rpc.polkadot.io" \
+  --out="polkadot"
 ```
 
 > ... or use **the Node equivalent**––`npx capi`--with the same arguments.
@@ -23,13 +23,14 @@ deno run -A -r https://deno.land/x/capi/codegen.ts \
 Make use of those bindings.
 
 ```ts
-import * as polkadot from "./polkadot.ts";
+import * as C from "capi";
+import { system } from "./polkadot/frame.ts";
 
 // bind to the last inserted key
-const key = polkadot.system.account.keys.first;
+const key = system.account.keys.first;
 
-// read the corresponding value
-const value = await polkadot.system.account.get(key).read();
+// bind to the corresponding value
+const value = C.run(system.account.get(key));
 ```
 
 ## The Thesis

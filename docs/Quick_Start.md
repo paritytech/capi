@@ -36,8 +36,8 @@ We use Capi's codegen CLI to generate bindings to a given chain.
 
 ```sh
 deno run -A -r https://deno.land/x/capi/codegen.ts \
-  --out="polkadot.ts" \
-  --src="wss://rpc.polkadot.io"
+  --src="wss://rpc.polkadot.io" \
+  --out="polkadot"
 ```
 
 > Note: the `src` string can be a comma-separated list of proxy node URLs or even a relative path to chain spec on disk.
@@ -47,9 +47,10 @@ deno run -A -r https://deno.land/x/capi/codegen.ts \
 ## Read the Latest Block
 
 ```ts
-import * as polkadot from "./polkadot.ts";
+import * as C from "capi";
+import { block } from "./polkadot/core.ts";
 
-const block = await polkadot.block().read();
+const block = await C.run(block.latest);
 ```
 
 ## Reading From Storage
@@ -57,13 +58,14 @@ const block = await polkadot.block().read();
 Let's read from on-chain storage.
 
 ```ts
-import * as polkadot from "./polkadot.ts";
+import * as C from "capi";
+import { system } from "./polkadot/frame.ts";
 
-// bind to the last inserted key (the `x` prefix distinguishes effects from values)
-const xKey = polkadot.system.account.keys().first();
+// bind to the last inserted key
+const key = system.account.keys.first;
 
-// read the corresponding value
-const value = await polkadot.system.account.get(xKey).read();
+// bind to the corresponding value
+const value = C.run(system.account.get(key));
 ```
 
 ## Transferring Some Funds
@@ -72,19 +74,19 @@ In the following example, we create and sign an extrinsic that calls the Balance
 
 ```ts
 import * as C from "capi";
-import * as polkadot from "./polkadot.ts";
+import { balances } from "./polkadot/frame.ts";
 
 declare const aliceSigner: C.Signer;
 
-const xTransfer = polkadot.balances.transfer({
+const tx = balances.transfer({
   value: 12345n,
   dest: C.MultiAddress.fromPublic(BOB_PUBLIC_KEY),
 })
-  .immortal()
-  .tip(10000)
-  .signed(aliceSigner);
+  .signed(aliceSigner)
+  .sent
+  .finalized;
 
-const result = await xTransfer.send();
+const result = await C.run(tx);
 ```
 
 ### Observe Transfer Events
@@ -92,12 +94,18 @@ const result = await xTransfer.send();
 Let's modify the code above so that we can observe corresponding events as they are emitted.
 
 ```diff
-- const result = await xTransfer.send();
-+ const result = await xTransfer.send((stop) => {
-+   return (event) => {
-+     // ...
-+   };
+const tx = balances.transfer({
+  value: 12345n,
+  dest: C.MultiAddress.fromPublic(BOB_PUBLIC_KEY),
+})
+  .signed(aliceSigner)
+- .sent
++ .watched((stop) => {
++   return (message) => {
++     // use `message`
++   }
 + });
+- .finalized;
 ```
 
 ---

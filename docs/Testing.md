@@ -8,33 +8,39 @@ Before interacting with a live network, you may find it worthwhile to spawn a lo
 
 > Note: the following makes use of [Polkadot](https://github.com/paritytech/polkadot), the installation instructions of which can be found [here](https://github.com/paritytech/polkadot#installation).
 
-```sh
-polkadot --dev --ws-port=ws://127.0.0.1:9944
-```
+## Map to Test Config
 
-## Specify Local `src`
+Under the hood, a given "config" encapsulates the value(s) utilized to discover a given chain (RPC proxy URLs and chain specs). To utilize a test config, we can utilize an import map.
 
-Let's update our codegen task with the local test chain's WebSocket URL.
+Let's say you have the following usage.
 
-```diff
-deno run -A -r https://deno.land/x/capi/codegen.ts \
-- --out="polkadot.ts" \
-+ --out="polkadot-dev.ts" \
-- --src="wss://rpc.polkadot.io"
-+ --src="ws://127.0.0.1:9944"
-```
-
-## Use as You Would Normally
+`example.ts`
 
 ```ts
-import * as polkadot from "./polkadot-dev.ts";
+import * as C from "capi";
+import { system } from "./polkadot/frame.ts";
 
-const events = await polkadot.system.events().read();
+const result = await C.run(system.events);
+```
 
-if (!(events instanceof Error)) {
-  events.length; // will be `0`, unless you trigger some events within preceding test code!
+Create an import map.
+
+`test_import_map.json`
+
+```json
+{
+  "./polkadot/config.ts": "capi/test_util/configs/polkadot.ts"
 }
 ```
+
+Specify the import map when you run your code.
+
+```diff
+- deno run -A example.ts
++ deno run -A example.ts --import-map="test_import_map.json"
+```
+
+Under the hood, this usage will spawn a local dev chain and re-route to a corresponding config.
 
 ---
 
