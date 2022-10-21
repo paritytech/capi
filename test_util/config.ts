@@ -7,16 +7,11 @@ class TestConfig extends Config<string, CallMethods, SubscriptionMethods, ErrorD
       async () => {
         const hostname = Deno.env.get("TEST_CTX_HOSTNAME");
         const portRaw = Deno.env.get("TEST_CTX_PORT");
-        if (!hostname || !portRaw) requiresSetupError();
-        let conn: Deno.TcpConn;
-        try {
-          conn = await Deno.connect({
-            hostname,
-            port: parseInt(portRaw),
-          });
-        } catch (_e) {
-          requiresSetupError();
-        }
+        if (!hostname || !portRaw) await testCtx();
+        const conn = await Deno.connect({
+          hostname,
+          port: parseInt(portRaw!),
+        });
         conn.write(new Uint8Array([TestConfigRuntime.CODES[runtimeName]]));
         const port = await (async () => {
           for await (const x of conn.readable) {
@@ -36,13 +31,13 @@ class TestConfig extends Config<string, CallMethods, SubscriptionMethods, ErrorD
   }
 }
 
-function requiresSetupError(): never {
-  throw new Error([
-    "You are using a config that depends on the `test_ctx` util.",
-    "You may want to try re-running the same command, but prefixed with the run command for `test_ctx`.",
-    "For instance, `deno task run examples/metadata.ts` would (in this repository)",
-    "become `deno task test_ctx deno task run examples/metadata.ts`.",
-  ].join(" "));
+async function testCtx(): Promise<never> {
+  const testCtxPath = new URL("../test_ctx.ts", import.meta.url).pathname;
+  const p = Deno.run({
+    cmd: ["deno", "task", "run", testCtxPath, "deno", "task", "run", Deno.mainModule],
+  });
+  const { code } = await p.status();
+  Deno.exit(code);
 }
 
 export const polkadot = new TestConfig("polkadot");
