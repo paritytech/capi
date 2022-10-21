@@ -29,6 +29,7 @@ jobs:
           name: package
           path: "./target/npm/*.tgz"
       - uses: octokit/request-action@v2.x
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           route: POST /repos/paritytech/npm_publish_automation/actions/workflows/publish.yml/dispatches
           ref: main
