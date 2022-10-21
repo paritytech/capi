@@ -181,3 +181,4 @@ curto
 zombienet
 ltex
 morfologik
+neovim
