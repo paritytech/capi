@@ -11,4 +11,5 @@
 - [Transacting](./Transacting.md)
 - [Events](./Events.md)
 - [Derivations](./Derivations.md)
+- [Patterns](./Patterns.md)
 - [Future Direction](./Future_Direction.md)
