@@ -36,14 +36,14 @@ jobs:
       - name: Retrieve commit sha
         id: commit
         run: |
-          echo "::set-output name=sha::$(git rev-parse HEAD)"
+          echo "sha=$(git rev-parse HEAD)" >> $GITHUB_ENV
       - name: Set commit status with pending
         uses: Sibz/github-status-action@650dd1a882a76dbbbc4576fb5974b8d22f29847f # v1.1.6
         with:
           authToken: ${{ secrets.GITHUB_TOKEN }}
           context: "Basic tests"
           state: "pending"
-          sha: ${{ steps.commit.outputs.sha }}
+          sha: ${{ env.sha }}
       - name: Set commit status with outcome
         uses: Sibz/github-status-action@650dd1a882a76dbbbc4576fb5974b8d22f29847f # v1.1.6
         with:
@@ -51,4 +51,4 @@ jobs:
           context: "Basic tests"
           description: "To run other CI actions close/reopen this PR"
           state: ${{ steps.test.outcome }}
-          sha: ${{ steps.commit.outputs.sha }}
+          sha: ${{ env.sha }}
