@@ -1,0 +1,23 @@
+name: Spawn examples
+on:
+  workflow_dispatch:
+  push:
+jobs:
+  generate_example_paths:
+    name: Generate example paths
+    runs-on: ubuntu-latest
+    outputs:
+      example_paths: ${{ steps.generate_example_paths.outputs.example_paths }}
+    steps:
+      - uses: actions/checkout@v3
+      - id: generate_example_paths
+        run: |
+          find ./examples -type f -print0 | jq -Rnc '(input | split("\u0000"))' > example_paths.json
+          example_paths=`cat example_paths.json`
+          echo "example_paths=$example_paths" >> $GITHUB_OUTPUT
+  run_example_workflow:
+    needs: generate_example_paths
+    name: Run examples
+    uses: ./.github/workflows/example.yml
+    with:
+      example_paths: ${{ needs.generate_example_paths.outputs.example_paths }}
