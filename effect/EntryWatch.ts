@@ -41,7 +41,7 @@ export class EntryWatch<
     const entryValueTypeI = Z.sel(entryMetadata_, "value");
     const $entry = codec(deriveCodec_, entryValueTypeI);
     const storageKeys = Z.call(
-      keys.length === 0 ? storageKey($storageKey_) : storageKey($storageKey_, keys),
+      storageKey($storageKey_, ...keys.length ? [keys] : []),
       function wrapWithList(v) {
         return [v];
       },
