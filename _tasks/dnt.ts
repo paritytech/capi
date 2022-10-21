@@ -27,9 +27,9 @@ await Promise.all([
         name: "parity-scale-codec",
         version: "^0.6.1",
       },
-      "https://deno.land/x/zones@v0.1.0-beta.5/mod.ts": {
+      "https://deno.land/x/zones@v0.1.0-beta.6/mod.ts": {
         name: "zones",
-        version: "0.1.0-beta.5",
+        version: "0.1.0-beta.6",
       },
       "deps/smoldot_phantom.ts": {
         name: "@substrate/smoldot-light",
