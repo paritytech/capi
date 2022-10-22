@@ -30,7 +30,7 @@ Deno.test({
     await ctx.step({
       name: "account balance updated",
       fn: async () => {
-        const state = await run(new C.EntryRead(T.westend, "System", "Account", [T.bob.publicKey]));
+        const state = await run(C.Entry.read(T.westend, "System", "Account", [T.bob.publicKey]));
         assertObjectMatch(state, { value: { data: { free: 10000000000012345n } } });
       },
     });
