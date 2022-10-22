@@ -131,6 +131,10 @@ export class SignedExtrinsic<
   >(watchHandler: WatchHandler): SignedExtrinsicWatch<this, WatchHandler> {
     return new SignedExtrinsicWatch(this.config, this, watchHandler);
   }
+
+  get sent(): SignedExtrinsicSent<this> {
+    return new SignedExtrinsicSent(this.config, this);
+  }
 }
 
 // TODO: is this really required? Why not use the RPC call effect directly?
@@ -154,5 +158,17 @@ export class SignedExtrinsicWatch<
       // TODO: use effect system for cbs such as this
       (ok) => new RpcCall(config, "author_unwatchExtrinsic", [ok.result]),
     );
+  }
+}
+
+export class SignedExtrinsicSent<SignedExtrinsic extends Z.$<U.Hex>> extends Z.Name {
+  root;
+
+  constructor(
+    readonly config: Config,
+    readonly signedExtrinsic: SignedExtrinsic,
+  ) {
+    super();
+    this.root = new RpcCall(config, "author_submitExtrinsic", [signedExtrinsic]);
   }
 }
