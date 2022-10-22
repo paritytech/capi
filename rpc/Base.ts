@@ -85,19 +85,19 @@ export abstract class Client<
   call = (
     methodName: string,
     params: unknown[],
-  ): Promise<msg.IngressMessage> => {
+  ): Promise<msg.OkMessage | msg.ErrMessage> => {
     const init = <msg.InitMessage> {
       jsonrpc: "2.0",
       id: this.uid(),
       method: methodName,
       params,
     };
-    const ingressMessagePending = deferred<msg.IngressMessage>();
+    const ingressMessagePending = deferred<msg.OkMessage | msg.ErrMessage>();
     this.listen((stopListening) => {
       return (res) => {
         if (res.id === init.id) {
           stopListening();
-          ingressMessagePending.resolve(res as msg.IngressMessage);
+          ingressMessagePending.resolve(res);
         }
       };
     });

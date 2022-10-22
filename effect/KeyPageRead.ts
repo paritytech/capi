@@ -5,7 +5,7 @@ import { $key } from "./core/$key.ts";
 import { $storageKey } from "./core/$storageKey.ts";
 import { deriveCodec } from "./core/deriveCodec.ts";
 import { storageKey } from "./core/storageKey.ts";
-import { entryMetadata, Metadata, palletMetadata } from "./Metadata.ts";
+import { Metadata } from "./Metadata.ts";
 import { RpcCall } from "./RpcCall.ts";
 
 export class KeyPageRead<
@@ -26,9 +26,9 @@ export class KeyPageRead<
     super();
     const metadata_ = new Metadata(config, blockHash as Rest[1]);
     const deriveCodec_ = deriveCodec(metadata_);
-    const palletMetadata_ = palletMetadata(metadata_, palletName);
+    const palletMetadata_ = metadata_.pallet(palletName);
     const entryMetadata_ = Z.call(
-      entryMetadata(palletMetadata_, entryName),
+      palletMetadata_.entry(entryName),
       function assertIsMap(entryMetadata) {
         if (entryMetadata.type !== "Map") {
           return new ReadingKeysOfNonMapError();

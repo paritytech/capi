@@ -3,7 +3,7 @@ import * as C from "../mod.ts";
 import * as T from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
 
-const root = new C.ExtrinsicSentWatch(T.westend, {
+const root = new C.Extrinsic(T.westend, {
   sender: {
     type: "Id",
     value: T.alice.publicKey,
@@ -17,7 +17,8 @@ const root = new C.ExtrinsicSentWatch(T.westend, {
       value: T.bob.publicKey,
     },
   },
-  sign: {
+})
+  .signed({
     signPayload(payload) {
       const tr = new TypeRegistry();
       tr.setSignedExtensions(payload.signedExtensions);
@@ -27,8 +28,8 @@ const root = new C.ExtrinsicSentWatch(T.westend, {
           .sign(T.alice),
       );
     },
-  },
-  createWatchHandler(stop) {
+  })
+  .watch((stop) => {
     return (event) => {
       if (typeof event.params.result === "string") {
         console.log("Extrinsic", event.params.result);
@@ -44,7 +45,6 @@ const root = new C.ExtrinsicSentWatch(T.westend, {
         }
       }
     };
-  },
-});
+  });
 
 U.throwIfError(await C.run(root));

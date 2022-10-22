@@ -1,8 +1,9 @@
 import { unimplemented } from "../deps/std/testing/asserts.ts";
 import * as Z from "../deps/zones.ts";
 import * as M from "../frame_metadata/mod.ts";
+import * as author from "../known/rpc/author.ts";
 import { Config } from "../mod.ts";
-import * as rpc from "../rpc/mod.ts";
+import { NotifMessage } from "../rpc/mod.ts";
 import * as ss58 from "../ss58/mod.ts";
 import * as U from "../util/mod.ts";
 import { $extrinsic } from "./core/$extrinsic.ts";
@@ -12,7 +13,7 @@ import { Metadata } from "./Metadata.ts";
 import { RpcCall } from "./RpcCall.ts";
 import { RpcSubscription } from "./RpcSubscription.ts";
 
-export interface SendAndWatchExtrinsicProps {
+export interface ExtrinsicProps {
   sender: M.MultiAddress;
   palletName: string;
   methodName: string;
@@ -21,22 +22,35 @@ export interface SendAndWatchExtrinsicProps {
   mortality?: [period: bigint, phase: bigint];
   nonce?: string;
   tip?: bigint;
-  sign: M.SignExtrinsic;
-  createWatchHandler: U.CreateWatchHandler<rpc.NotifMessage>;
 }
 
-export class ExtrinsicSentWatch<Props extends Z.Rec$<SendAndWatchExtrinsicProps>> extends Z.Name {
+export class Extrinsic<Props extends Z.Rec$<ExtrinsicProps>> {
+  constructor(
+    readonly config: Config,
+    readonly props: Props,
+  ) {}
+
+  signed<Sign extends Z.$<M.SignExtrinsic>>(sign: Sign): SignedExtrinsic<Props, Sign> {
+    return new SignedExtrinsic(this.config, this.props, sign);
+  }
+}
+
+export class SignedExtrinsic<
+  Props extends Z.Rec$<ExtrinsicProps>,
+  Sign extends Z.$<M.SignExtrinsic>,
+> extends Z.Name {
   root;
 
   constructor(
     readonly config: Config,
     readonly props_: Props,
+    readonly sign: Sign,
   ) {
     super();
     const props = props_ as Z.Rec$Access<Props>;
     const metadata_ = new Metadata(config);
     const deriveCodec_ = deriveCodec(metadata_);
-    const $extrinsic_ = $extrinsic(deriveCodec_, metadata_, props.sign, config.addressPrefix);
+    const $extrinsic_ = $extrinsic(deriveCodec_, metadata_, this.sign, config.addressPrefix);
     const runtimeVersion = new RpcCall(config, "state_getRuntimeVersion", []);
     const senderSs58 = Z.call(props.sender, function senderSs58(sender) {
       return ((): string => {
@@ -52,13 +66,15 @@ export class ExtrinsicSentWatch<Props extends Z.Rec$<SendAndWatchExtrinsicProps>
       })();
     });
     const accountNextIndex = new RpcCall(config, "system_accountNextIndex", [senderSs58]);
-    const genesisHash = hexDecode(Z.sel(new RpcCall(config, "chain_getBlockHash", [0]), "result"));
+    const genesisHash = hexDecode(
+      Z.sel(new RpcCall(config, "chain_getBlockHash", [0]), "result"),
+    );
     const checkpointHash = props.checkpoint
       ? Z.call(props.checkpoint, function checkpointOrUndef(v) {
         return v ? U.hex.decode(v) : v;
       })
       : genesisHash;
-    const extrinsicHex = Z.call(
+    this.root = Z.call(
       Z.ls(
         $extrinsic_,
         props.sender,
@@ -108,13 +124,51 @@ export class ExtrinsicSentWatch<Props extends Z.Rec$<SendAndWatchExtrinsicProps>
         return U.hex.encode(extrinsicBytes);
       },
     );
+  }
+
+  watch<
+    WatchHandler extends U.CreateWatchHandler<NotifMessage<author.TransactionStatus>>,
+  >(watchHandler: WatchHandler): SignedExtrinsicWatch<this, WatchHandler> {
+    return new SignedExtrinsicWatch(this.config, this, watchHandler);
+  }
+
+  get sent(): SignedExtrinsicSent<this> {
+    return new SignedExtrinsicSent(this.config, this);
+  }
+}
+
+// TODO: is this really required? Why not use the RPC call effect directly?
+export class SignedExtrinsicWatch<
+  SignedExtrinsic extends Z.$<U.Hex>,
+  WatchHandler extends U.CreateWatchHandler<NotifMessage<author.TransactionStatus>>,
+> extends Z.Name {
+  root;
+
+  constructor(
+    readonly config: Config,
+    readonly signedExtrinsic: SignedExtrinsic,
+    readonly watchHandler: WatchHandler,
+  ) {
+    super();
     this.root = new RpcSubscription(
       config,
       "author_submitAndWatchExtrinsic",
-      [extrinsicHex],
-      props.createWatchHandler,
+      [signedExtrinsic],
+      watchHandler,
       // TODO: use effect system for cbs such as this
       (ok) => new RpcCall(config, "author_unwatchExtrinsic", [ok.result]),
     );
+  }
+}
+
+export class SignedExtrinsicSent<SignedExtrinsic extends Z.$<U.Hex>> extends Z.Name {
+  root;
+
+  constructor(
+    readonly config: Config,
+    readonly signedExtrinsic: SignedExtrinsic,
+  ) {
+    super();
+    this.root = new RpcCall(config, "author_submitExtrinsic", [signedExtrinsic]);
   }
 }
