@@ -1,21 +1,16 @@
-import { Config } from "../config/mod.ts";
 import * as rpc from "../rpc/mod.ts";
 import * as U from "../util/mod.ts";
 
 // TODO: handle this elsewhere
-export class RpcError<
-  Config_ extends Config,
-  MethodName extends keyof Config_["RpcMethods"],
-  Params extends Parameters<Config_["RpcMethods"][MethodName]>,
-> extends U.ErrorCtor("RpcCall") {
+export class RpcError extends U.ErrorCtor("RpcCall") {
   code;
   attempt;
 
   constructor(
-    { code, message, attempt }: rpc.ErrMessage<Config_>["error"] & {
+    { code, message, attempt }: rpc.ErrMessage["error"] & {
       attempt: {
-        methodName: MethodName;
-        params: Params;
+        methodName: string;
+        params: unknown[];
       };
     },
   ) {

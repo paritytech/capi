@@ -1,4 +1,3 @@
-import { Config } from "../config/mod.ts";
 import { deferred } from "../deps/std/async.ts";
 import { assert } from "../deps/std/testing/asserts.ts";
 import * as U from "../util/mod.ts";
@@ -13,14 +12,13 @@ class DemuxGroup {
 
 // TODO: decide whether this is even beneficial
 export class Demux<
-  Config_ extends Config,
   RawIngressMessage,
   InternalError,
   CloseError extends Error,
 > {
   #groups = new Map<string, DemuxGroup>();
 
-  constructor(readonly client: Client<Config_, RawIngressMessage, InternalError, CloseError>) {}
+  constructor(readonly client: Client<RawIngressMessage, InternalError, CloseError>) {}
 
   subscribe = async (
     methodName: string,

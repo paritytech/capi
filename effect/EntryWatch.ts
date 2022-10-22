@@ -1,5 +1,5 @@
+import { Config } from "../config/mod.ts";
 import * as Z from "../deps/zones.ts";
-import * as known from "../known/mod.ts";
 import * as rpc from "../rpc/mod.ts";
 import * as U from "../util/mod.ts";
 import { $storageKey } from "./core/$storageKey.ts";
@@ -10,13 +10,7 @@ import { entryMetadata, Metadata, palletMetadata } from "./Metadata.ts";
 import { RpcCall } from "./RpcCall.ts";
 import { RpcSubscription } from "./RpcSubscription.ts";
 
-export type WatchEntryEvent = [key?: U.HexString, value?: unknown];
-
-type Config = known.rpc.Config<
-  string,
-  "state_getMetadata" | "state_unsubscribeStorage",
-  "state_subscribeStorage"
->;
+export type WatchEntryEvent = [key?: U.Hex, value?: unknown];
 
 export class EntryWatch<
   PalletName extends Z.$<string>,
@@ -49,8 +43,8 @@ export class EntryWatch<
     const watchInit = Z.call($entry, function entryWatchInit($entry) {
       return U.mapCreateWatchHandler(
         createWatchHandler,
-        (message: rpc.NotifMessage<Config, "state_subscribeStorage">) => {
-          return message.params.result.changes.map(([key, val]) => {
+        (message: rpc.NotifMessage) => {
+          return message.params.result.changes.map(([key, val]: any) => {
             return <WatchEntryEvent> [key, val ? $entry.decode(U.hex.decode(val)) : undefined];
           });
         },

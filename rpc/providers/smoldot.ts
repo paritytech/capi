@@ -4,15 +4,12 @@ import { ErrorCtor } from "../../util/mod.ts";
 import { Client, OnMessage } from "../Base.ts";
 import { ClientHooks, ParseRawIngressMessageError } from "../common.ts";
 
-export type SmoldotClientHooks<Config_ extends Config<string>> = ClientHooks<
-  Config_,
-  SmoldotInternalError
->;
+export type SmoldotClientHooks = ClientHooks<SmoldotInternalError>;
 
-export async function smoldotClient<Config_ extends Config<string>>(
-  config: Config_,
-  hooks?: SmoldotClientHooks<Config_>,
-): Promise<SmoldotClient<Config_> | FailedToStartSmoldotError | FailedToAddChainError> {
+export async function smoldotClient(
+  config: Config,
+  hooks?: SmoldotClientHooks,
+): Promise<SmoldotClient | FailedToStartSmoldotError | FailedToAddChainError> {
   const smoldotInstance = await ensureInstance();
   if (smoldotInstance instanceof Error) {
     return smoldotInstance;
@@ -32,15 +29,13 @@ export async function smoldotClient<Config_ extends Config<string>>(
   }
 }
 
-export class SmoldotClient<Config_ extends Config<string>>
-  extends Client<Config_, string, SmoldotInternalError, FailedToRemoveChainError>
-{
+export class SmoldotClient extends Client<string, SmoldotInternalError, FailedToRemoveChainError> {
   #chain?: smoldot.Chain;
 
   constructor(
     onMessageContainer: { onMessage?: OnMessage<string> },
     readonly remove: () => void,
-    hooks?: SmoldotClientHooks<Config_>,
+    hooks?: SmoldotClientHooks,
   ) {
     super(
       {

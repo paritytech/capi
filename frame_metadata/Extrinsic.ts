@@ -2,7 +2,7 @@ import * as $ from "../deps/scale.ts";
 import { assert } from "../deps/std/testing/asserts.ts";
 import * as H from "../hashers/mod.ts";
 import * as ss58 from "../ss58/mod.ts";
-import { hex } from "../util/mod.ts";
+import { Hex, hex } from "../util/mod.ts";
 import { $null, DeriveCodec } from "./Codec.ts";
 import { Metadata } from "./Metadata.ts";
 
@@ -116,7 +116,7 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
             const signer = props.sign;
             buffer.writeAsync(0, async (buffer) => {
               const { signature } = await signer.signPayload(payload);
-              buffer.insertArray(hex.decode(signature));
+              buffer.insertArray(hex.decode(signature as Hex));
             });
             buffer.insertArray(extraEncoded);
             buffer.insertArray(callEncoded);

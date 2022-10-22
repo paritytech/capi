@@ -15,7 +15,8 @@ export interface InitMessage extends JsonRpcVersionBearer {
 
 export interface OkMessage extends JsonRpcVersionBearer {
   id: string;
-  result: unknown;
+  // TODO
+  result: any;
   params?: never;
   error?: never;
 }
@@ -25,7 +26,8 @@ export interface NotifMessage extends JsonRpcVersionBearer {
   id?: never;
   params: {
     subscription: string;
-    result: unknown;
+    // TODO
+    result: any;
   };
   result?: never;
   error?: never;
@@ -36,7 +38,8 @@ export interface ErrMessage extends JsonRpcVersionBearer {
   error: {
     code: number;
     message: string;
-    data?: unknown;
+    // TODO
+    data?: any;
   };
   params?: never;
   result?: never;

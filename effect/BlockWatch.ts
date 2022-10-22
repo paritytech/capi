@@ -1,5 +1,5 @@
+import { Config } from "../config/mod.ts";
 import * as Z from "../deps/zones.ts";
-import { Extrinsic } from "../frame_metadata/mod.ts";
 import * as known from "../known/mod.ts";
 import * as U from "../util/mod.ts";
 import { BlockRead } from "./BlockRead.ts";
@@ -11,12 +11,8 @@ export class BlockWatch extends Z.Name {
   root;
 
   constructor(
-    config: known.rpc.Config<
-      string,
-      "state_getMetadata" | "chain_getBlockHash" | "chain_getBlock" | "chain_unsubscribeNewHead",
-      "chain_subscribeNewHeads"
-    >,
-    createWatchHandler: U.CreateWatchHandler<known.types.Block<Extrinsic>>,
+    config: Config,
+    createWatchHandler: U.CreateWatchHandler<known.SignedBlock>,
   ) {
     super();
     this.root = new RpcSubscription(
@@ -26,7 +22,7 @@ export class BlockWatch extends Z.Name {
       function subscribeNewHeadsHandler(stop) {
         const watchHandler = createWatchHandler(stop);
         return async (result) => {
-          const blockNum = result.params.result.number;
+          const blockNum: number = result.params.result.number;
           const blockHash = Z.sel(new RpcCall(config, "chain_getBlockHash", [blockNum]), "result");
           // TODO: use derived util from Zones
           const block = U.throwIfError(await run(new BlockRead(config, blockHash)));

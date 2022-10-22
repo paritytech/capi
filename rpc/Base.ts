@@ -1,4 +1,3 @@
-import { Config } from "../config/mod.ts";
 import { deferred } from "../deps/std/async.ts";
 import * as U from "../util/mod.ts";
 import { ClientHooks, Provider } from "./common.ts";
@@ -7,7 +6,6 @@ import * as msg from "./messages.ts";
 export type OnMessage<Message> = (message: Message) => void;
 
 export abstract class Client<
-  Config_ extends Config,
   RawIngressMessage,
   InternalError,
   CloseError extends Error,

@@ -4,17 +4,17 @@ import { ErrorCtor } from "../../util/mod.ts";
 import * as B from "../Base.ts";
 import { ClientHooks, ParseRawIngressMessageError } from "../common.ts";
 
-export type ProxyClientHooks<Config_ extends Config<string>> = ClientHooks<Config_, Event>;
+export type ProxyClientHooks = ClientHooks<Event>;
 
-export async function proxyClient<Config_ extends Config<string>>(
-  config: Config_,
-  hooks?: ProxyClientHooks<Config_>,
-): Promise<ProxyClient<Config_> | FailedToOpenConnectionError> {
+export async function proxyClient(
+  config: Config,
+  hooks?: ProxyClientHooks,
+): Promise<ProxyClient | FailedToOpenConnectionError> {
   const ws = new WebSocket(await config.discoveryValue);
   const client = new ProxyClient(ws, hooks);
   ws.addEventListener("error", client.onError);
   ws.addEventListener("message", client.onMessage);
-  const pending = deferred<ProxyClient<Config_> | FailedToOpenConnectionError>();
+  const pending = deferred<ProxyClient | FailedToOpenConnectionError>();
   if (ws.readyState === WebSocket.CONNECTING) {
     const onOpenError = (e: any) => {
       console.log({ log: e });
@@ -37,10 +37,8 @@ export async function proxyClient<Config_ extends Config<string>>(
   return await pending;
 }
 
-export class ProxyClient<Config_ extends Config>
-  extends B.Client<Config_, MessageEvent, Event, FailedToDisconnectError>
-{
-  constructor(ws: WebSocket, hooks?: ProxyClientHooks<Config_>) {
+export class ProxyClient extends B.Client<MessageEvent, Event, FailedToDisconnectError> {
+  constructor(ws: WebSocket, hooks?: ProxyClientHooks) {
     super(
       {
         parseIngressMessage: (e) => {

@@ -1,6 +1,4 @@
-import * as rpc from "../rpc/mod.ts";
-
-export type ErrorDetails = rpc.EnsureErrorDetails<{
+export type ErrorDetails = {
   /** Invalid JSON was received by the server. */
   ParseError: [-32700];
   /** The JSON sent is not a valid Request object. */
@@ -23,7 +21,7 @@ export type ErrorDetails = rpc.EnsureErrorDetails<{
    * Error code must be outside of the range -32000 to -32700.
    */
   MethodError: [number];
-}>;
+};
 
 // TODO:
 // type TodoRpc = {
