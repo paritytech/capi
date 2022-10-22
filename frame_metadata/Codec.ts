@@ -88,7 +88,7 @@ export function DeriveCodec(tys: M.Ty[]): DeriveCodec {
     },
     compact(ty) {
       const inner = this.visit(ty.typeParam);
-      return compactCodecVisitor.visit(inner);
+      return $compact(inner);
     },
     bitSequence() {
       return $.bitSequence;
@@ -126,4 +126,17 @@ const compactCodecVisitor = new $.CodecVisitor<$.Codec<any>>()
   .add($.u32, () => $.compactU32)
   .add($.u64, () => $.compactU64)
   .add($.u128, () => $.compactU128)
-  .add($.u256, () => $.compactU256);
+  .add($.u256, () => $.compactU256)
+  .add(
+    $.object,
+    (_, ...fields) => {
+      if (fields.length !== 1) {
+        // https://github.com/paritytech/parity-scale-codec/blob/75fab93/derive/src/lib.rs#L307
+        throw new Error("Cannot derive Compact codec for structs with more than one key");
+      }
+      const field = fields[0]!;
+      return $.object([field[0], $compact(field[1] as $.Codec<any>)]);
+    },
+  );
+
+const $compact = <T>(x: $.Codec<T>): $.Codec<T> => compactCodecVisitor.visit(x);
