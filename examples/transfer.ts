@@ -17,12 +17,10 @@ const root = new C.Extrinsic(T.westend, {
     },
   },
 })
-  .signed((message) => {
-    return {
-      type: "Sr25519",
-      value: T.alice.sign(message),
-    };
-  })
+  .signed((message) => ({
+    type: "Sr25519",
+    value: T.alice.sign(message),
+  }))
   .watch((stop) => {
     return (event) => {
       if (typeof event.params.result === "string") {
