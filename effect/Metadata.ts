@@ -1,13 +1,13 @@
 import * as Z from "../deps/zones.ts";
 import * as M from "../frame_metadata/mod.ts";
-import * as known from "../known/mod.ts";
+import { Config } from "../mod.ts";
 import * as U from "../util/mod.ts";
 import { RpcCall } from "./RpcCall.ts";
 
-export class Metadata<Rest extends [blockHash?: Z.$<U.HashHexString | undefined>]> extends Z.Name {
+export class Metadata<Rest extends [blockHash?: Z.$<U.HexHash | undefined>]> extends Z.Name {
   root;
 
-  constructor(config: known.rpc.Config<string, "state_getMetadata">, ...[blockHash]: [...Rest]) {
+  constructor(config: Config, ...[blockHash]: [...Rest]) {
     super();
     this.root = Z.call(
       new RpcCall(config, "state_getMetadata", [blockHash]),

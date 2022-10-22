@@ -1,16 +1,16 @@
+import { Config } from "../config/mod.ts";
 import * as Z from "../deps/zones.ts";
-import * as known from "../known/mod.ts";
 import * as U from "../util/mod.ts";
 import { $extrinsic } from "./core/$extrinsic.ts";
 import { deriveCodec } from "./core/deriveCodec.ts";
 import { Metadata } from "./Metadata.ts";
 import { RpcCall } from "./RpcCall.ts";
 
-export class BlockRead<Rest extends [blockHash?: Z.$<U.HashHexString | undefined>]> extends Z.Name {
+export class BlockRead<Rest extends [blockHash?: Z.$<U.HexHash | undefined>]> extends Z.Name {
   root;
 
   constructor(
-    config: known.rpc.Config<string, "state_getMetadata" | "chain_getBlock">,
+    config: Config,
     ...[blockHash]: [...Rest]
   ) {
     super();
@@ -23,7 +23,7 @@ export class BlockRead<Rest extends [blockHash?: Z.$<U.HashHexString | undefined
         justifications,
         block: {
           header,
-          extrinsics: extrinsics.map((extrinsic) => {
+          extrinsics: extrinsics.map((extrinsic: U.Hex) => {
             return $extrinsic_.decode(U.hex.decode(extrinsic));
           }),
         },

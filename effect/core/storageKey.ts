@@ -6,5 +6,5 @@ export const storageKey = Z.call.fac((
   $storageKey: $.Codec<unknown[]>,
   ...keys: unknown[]
 ) => {
-  return U.hex.encode($storageKey.encode(keys)) as U.HexString;
+  return U.hex.encode($storageKey.encode(keys)) as U.Hex;
 });

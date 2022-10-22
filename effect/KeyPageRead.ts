@@ -1,5 +1,5 @@
+import { Config } from "../config/mod.ts";
 import * as Z from "../deps/zones.ts";
-import * as known from "../known/mod.ts";
 import * as U from "../util/mod.ts";
 import { $key } from "./core/$key.ts";
 import { $storageKey } from "./core/$storageKey.ts";
@@ -12,12 +12,12 @@ export class KeyPageRead<
   PalletName extends Z.$<string>,
   EntryName extends Z.$<string>,
   Count extends Z.$<number>,
-  Rest extends [start?: unknown[] | undefined, blockHash?: Z.$<U.HashHexString | undefined>],
+  Rest extends [start?: unknown[] | undefined, blockHash?: Z.$<U.HexHash | undefined>],
 > extends Z.Name {
   root;
 
   constructor(
-    config: known.rpc.Config<string, "state_getMetadata" | "state_getKeysPaged">,
+    config: Config,
     palletName: PalletName,
     entryName: EntryName,
     count: Count,
@@ -50,7 +50,7 @@ export class KeyPageRead<
     const keysDecoded = Z.call(
       Z.ls($key_, keysEncoded),
       function keysDecodedImpl([$key, keysEncoded]) {
-        return keysEncoded.map((keyEncoded) => {
+        return keysEncoded.map((keyEncoded: U.Hex) => {
           return $key.decode(U.hex.decode(keyEncoded));
         });
       },

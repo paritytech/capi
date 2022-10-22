@@ -4,7 +4,7 @@ import * as U from "../../util/mod.ts";
 
 export function decoded<
   Codec extends Z.$<$.Codec<unknown>>,
-  Encoded extends Z.$<U.HexString>,
+  Encoded extends Z.$<U.Hex>,
   Key extends Z.$<string>,
 >(
   codec: Codec,

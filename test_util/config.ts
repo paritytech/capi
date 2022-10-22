@@ -1,7 +1,6 @@
 import { Config } from "../config/mod.ts";
-import { CallMethods, ErrorDetails, SubscriptionMethods } from "../known/rpc.ts";
 
-class TestConfig extends Config<string, CallMethods, SubscriptionMethods, ErrorDetails> {
+class TestConfig extends Config<string> {
   constructor(readonly runtimeName: TestConfigRuntime.Name) {
     super(
       async () => {

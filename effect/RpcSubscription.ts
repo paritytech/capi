@@ -7,21 +7,18 @@ import { rpcClient } from "./core/rpcClient.ts";
 import { run } from "./run.ts";
 
 export class RpcSubscription<
-  Config_ extends Config,
-  MethodName extends Extract<keyof Config_["RpcSubscriptionMethods"], string>,
-  MethodName_ extends Z.$<MethodName>,
-  Params extends Parameters<Config_["RpcSubscriptionMethods"][Z.T<MethodName_>]>,
-  Params_ extends Z.Ls$<Params>,
-  CreateListenerCb extends Z.$<U.CreateWatchHandler<rpc.NotifMessage<Config_, MethodName>>>,
+  MethodName extends Z.$<string>,
+  Params extends Z.Ls$<unknown[]>,
+  CreateListenerCb extends Z.$<U.CreateWatchHandler<rpc.NotifMessage>>,
 > extends Z.Name {
   root;
 
   constructor(
-    config: Config_,
-    methodName: MethodName_,
-    params: [...Params_],
+    config: Config,
+    methodName: MethodName,
+    params: [...Params],
     createListenerCb: CreateListenerCb,
-    cleanup?: (initOk: rpc.OkMessage<Config_, MethodName>) => Z.EffectLike,
+    cleanup?: (initOk: rpc.OkMessage) => Z.EffectLike,
   ) {
     super();
     const client = rpcClient(config);
@@ -30,10 +27,10 @@ export class RpcSubscription<
       Z.ls(deps, Z.rc(client, deps)),
       async function rpcSubscriptionImpl([[client, methodName, createListenerCb, ...params], rc]) {
         const result = await client.subscribe(
-          methodName as MethodName,
-          params as Parameters<Config_["RpcSubscriptionMethods"][MethodName]>,
-          createListenerCb as any,
-          cleanup ? (x) => run(cleanup(x.result), undefined!) : undefined,
+          methodName,
+          params,
+          createListenerCb,
+          cleanup ? (x) => run(cleanup(x), undefined!) : undefined,
         );
         if (result?.error) {
           return new RpcError({
@@ -56,8 +53,8 @@ export class RpcSubscription<
 }
 
 // TODO: handle elsewhere
-export class RpcSubscriptionError<Config_ extends Config> extends U.ErrorCtor("RpcSubscription") {
-  constructor(readonly error: rpc.ErrMessage<Config_>["error"]) {
+export class RpcSubscriptionError extends U.ErrorCtor("RpcSubscription") {
+  constructor(readonly error: rpc.ErrMessage["error"]) {
     super();
   }
 }

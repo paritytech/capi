@@ -1,5 +1,5 @@
+import { Config } from "../config/mod.ts";
 import * as Z from "../deps/zones.ts";
-import * as known from "../known/mod.ts";
 import * as U from "../util/mod.ts";
 import { $storageKey } from "./core/$storageKey.ts";
 import { codec } from "./core/codec.ts";
@@ -13,12 +13,12 @@ export class EntryRead<
   PalletName extends Z.$<string>,
   EntryName extends Z.$<string>,
   Keys extends unknown[],
-  Rest extends [blockHash?: Z.$<U.HashHexString | undefined>],
+  Rest extends [blockHash?: Z.$<U.HexHash | undefined>],
 > extends Z.Name {
   root;
 
   constructor(
-    config: known.rpc.Config<string, "state_getMetadata" | "state_getStorage">,
+    config: Config,
     palletName: PalletName,
     entryName: EntryName,
     keys: [...Keys],

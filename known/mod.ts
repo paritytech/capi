@@ -1,3 +1,3 @@
 export * from "./configs.ts";
-export * as rpc from "./rpc.ts";
-export * as types from "./types/mod.ts";
+export * from "./rpc.ts";
+export * from "./rpc/mod.ts";

@@ -1,7 +1,7 @@
 import { unimplemented } from "../deps/std/testing/asserts.ts";
 import * as Z from "../deps/zones.ts";
 import * as M from "../frame_metadata/mod.ts";
-import * as known from "../known/mod.ts";
+import { Config } from "../mod.ts";
 import * as rpc from "../rpc/mod.ts";
 import * as ss58 from "../ss58/mod.ts";
 import * as U from "../util/mod.ts";
@@ -12,31 +12,17 @@ import { Metadata } from "./Metadata.ts";
 import { RpcCall } from "./RpcCall.ts";
 import { RpcSubscription } from "./RpcSubscription.ts";
 
-export { type Config as SendAndWatchExtrinsicConfig };
-type Config = known.rpc.Config<
-  string,
-  | "state_getMetadata"
-  | "state_getRuntimeVersion"
-  | "chain_getBlockHash"
-  | "system_accountNextIndex"
-  | "system_chain"
-  | "author_unwatchExtrinsic",
-  "author_submitAndWatchExtrinsic"
->;
-
 export interface SendAndWatchExtrinsicProps {
   sender: M.MultiAddress;
   palletName: string;
   methodName: string;
   args: Record<string, unknown>;
-  checkpoint?: U.HashHexString;
+  checkpoint?: U.HexHash;
   mortality?: [period: bigint, phase: bigint];
   nonce?: string;
   tip?: bigint;
   sign: M.SignExtrinsic;
-  createWatchHandler: U.CreateWatchHandler<
-    rpc.NotifMessage<Config, "author_submitAndWatchExtrinsic">
-  >;
+  createWatchHandler: U.CreateWatchHandler<rpc.NotifMessage>;
 }
 
 export class ExtrinsicSentWatch<Props extends Z.Rec$<SendAndWatchExtrinsicProps>> extends Z.Name {
@@ -63,7 +49,7 @@ export class ExtrinsicSentWatch<Props extends Z.Rec$<SendAndWatchExtrinsicProps>
             unimplemented();
           }
         }
-      })() as U.AccountIdString;
+      })();
     });
     const accountNextIndex = new RpcCall(config, "system_accountNextIndex", [senderSs58]);
     const genesisHash = hexDecode(Z.sel(new RpcCall(config, "chain_getBlockHash", [0]), "result"));
@@ -119,7 +105,7 @@ export class ExtrinsicSentWatch<Props extends Z.Rec$<SendAndWatchExtrinsicProps>
             additional: [specVersion, transactionVersion, checkpoint, genesisHash],
           },
         });
-        return U.hex.encode(extrinsicBytes) as U.HexString;
+        return U.hex.encode(extrinsicBytes);
       },
     );
     this.root = new RpcSubscription(
