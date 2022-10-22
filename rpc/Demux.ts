@@ -5,8 +5,8 @@ import * as U from "../util/mod.ts";
 import { Client } from "./Base.ts";
 import * as msg from "./messages.ts";
 
-class DemuxGroup<Config_ extends Config> {
-  members = new Map<U.WatchHandler<msg.NotifMessage<Config_>>, true>();
+class DemuxGroup {
+  members = new Map<U.WatchHandler<msg.NotifMessage>, true>();
 
   constructor(readonly stop: () => void) {}
 }
@@ -18,18 +18,18 @@ export class Demux<
   InternalError,
   CloseError extends Error,
 > {
-  #groups = new Map<string, DemuxGroup<Config_>>();
+  #groups = new Map<string, DemuxGroup>();
 
   constructor(readonly client: Client<Config_, RawIngressMessage, InternalError, CloseError>) {}
 
-  subscribe = async <MethodName extends Extract<keyof Config_["RpcSubscriptionMethods"], string>>(
-    methodName: MethodName,
-    params: Parameters<Config_["RpcSubscriptionMethods"][MethodName]>,
-    createWatchHandler: U.CreateWatchHandler<msg.NotifMessage<Config_, MethodName>>,
-  ): Promise<undefined | msg.ErrMessage<Config_>> => {
+  subscribe = async (
+    methodName: string,
+    params: unknown[],
+    createWatchHandler: U.CreateWatchHandler<msg.NotifMessage>,
+  ): Promise<undefined | msg.ErrMessage> => {
     const key = `${methodName}(${JSON.stringify(params)})`;
     let group = this.#groups.get(key);
-    const status = deferred<undefined | msg.ErrMessage<Config_>>();
+    const status = deferred<undefined | msg.ErrMessage>();
     if (!group) {
       const groupCreated = deferred();
       this.client.subscribe(methodName, params, (stop) => {

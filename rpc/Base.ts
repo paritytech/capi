@@ -3,7 +3,6 @@ import { deferred } from "../deps/std/async.ts";
 import * as U from "../util/mod.ts";
 import { ClientHooks, Provider } from "./common.ts";
 import * as msg from "./messages.ts";
-import { IsCorrespondingRes } from "./util.ts";
 
 export type OnMessage<Message> = (message: Message) => void;
 
@@ -14,7 +13,7 @@ export abstract class Client<
   CloseError extends Error,
 > {
   #nextId = 0;
-  #listenerCbs = new Map<U.WatchHandler<msg.IngressMessage<Config_>>, true>();
+  #listenerCbs = new Map<U.WatchHandler<msg.IngressMessage>, true>();
 
   /**
    * Construct a new RPC client
@@ -22,8 +21,8 @@ export abstract class Client<
    * @param hooks the error handling and message hooks with which you'd like the instance to operate
    */
   constructor(
-    readonly provider: Provider<Config_, RawIngressMessage, CloseError>,
-    readonly hooks?: ClientHooks<Config_, InternalError>,
+    readonly provider: Provider<RawIngressMessage, CloseError>,
+    readonly hooks?: ClientHooks<InternalError>,
   ) {}
 
   /**
@@ -31,7 +30,7 @@ export abstract class Client<
    *
    * @param egressMessage the message you wish to send to the RPC server
    */
-  send = (egressMessage: msg.InitMessage<Config_>): void => {
+  send = (egressMessage: msg.InitMessage): void => {
     this.hooks?.send?.(egressMessage);
     this.provider.send(egressMessage);
   };
@@ -51,7 +50,7 @@ export abstract class Client<
    *
    * @param createListenerCb the factory for the callback to be triggered upon arrival of ingress messages
    */
-  listen = (createListenerCb: U.CreateWatchHandler<msg.IngressMessage<Config_>>): void => {
+  listen = (createListenerCb: U.CreateWatchHandler<msg.IngressMessage>): void => {
     const stopListening = () => {
       this.#listenerCbs.delete(listenerCb);
     };
@@ -85,26 +84,22 @@ export abstract class Client<
    * @param params the params with which to call the method
    * @returns an ingress message corresponding to the given method (or a message-agnostic error)
    */
-  call = <
-    MethodName extends Extract<keyof Config_["RpcMethods"], string>,
-    IngressMessage extends msg.OkMessage<Config_, MethodName> | msg.ErrMessage<Config_>,
-  >(
-    methodName: MethodName,
-    params: Parameters<Config_["RpcMethods"][MethodName]>,
-  ): Promise<IngressMessage> => {
-    const init = <msg.InitMessage<Config_, MethodName>> {
+  call = (
+    methodName: string,
+    params: unknown[],
+  ): Promise<msg.IngressMessage> => {
+    const init = <msg.InitMessage> {
       jsonrpc: "2.0",
       id: this.uid(),
       method: methodName,
       params,
     };
-    const isCorrespondingRes = IsCorrespondingRes(init);
-    const ingressMessagePending = deferred<IngressMessage>();
+    const ingressMessagePending = deferred<msg.IngressMessage>();
     this.listen((stopListening) => {
       return (res) => {
-        if (isCorrespondingRes(res)) {
+        if (res.id === init.id) {
           stopListening();
-          ingressMessagePending.resolve(res as IngressMessage);
+          ingressMessagePending.resolve(res as msg.IngressMessage);
         }
       };
     });
@@ -119,19 +114,18 @@ export abstract class Client<
    * @param params the params with which to init the subscription
    * @param createListenerCb the factory of the callback to which notifications should be supplied
    */
-  subscribe = async <MethodName extends Extract<keyof Config_["RpcSubscriptionMethods"], string>>(
-    methodName: MethodName,
-    params: Parameters<Config_["RpcSubscriptionMethods"][MethodName]>,
-    createListenerCb: CreateListenerCb<Config_, MethodName>,
-    cleanup: SubscriptionCleanup<Config_, MethodName> = () => Promise.resolve(),
-  ): Promise<undefined | msg.ErrMessage<Config_>> => {
+  subscribe = async (
+    methodName: string,
+    params: unknown[],
+    createListenerCb: CreateListenerCb,
+    cleanup: SubscriptionCleanup = () => Promise.resolve(),
+  ): Promise<undefined | msg.ErrMessage> => {
     const initRes = await this.call(methodName, params);
     if (initRes.error) {
-      // TODO: fix typings
-      return initRes as msg.ErrMessage<Config_>;
+      return initRes;
     }
-    const cleanupApplied = () => cleanup(initRes as msg.OkMessage<Config_, MethodName>);
-    const terminalPending = deferred<undefined | msg.ErrMessage<Config_>>();
+    const cleanupApplied = () => cleanup(initRes as msg.OkMessage);
+    const terminalPending = deferred<undefined | msg.ErrMessage>();
     this.listen((stop) => {
       const listenerCb = createListenerCb(
         async () => {
@@ -142,7 +136,7 @@ export abstract class Client<
       );
       return (res) => {
         if (res.params?.subscription && res.params.subscription === initRes.result) {
-          listenerCb(res as msg.NotifMessage<Config_, MethodName>);
+          listenerCb(res as msg.NotifMessage);
         } else {
           // TODO: associate errors with subscriptions & exit
         }
@@ -152,12 +146,6 @@ export abstract class Client<
   };
 }
 
-export type CreateListenerCb<
-  Config_ extends Config,
-  MethodName extends Extract<keyof Config_["RpcSubscriptionMethods"], string>,
-> = U.CreateWatchHandler<msg.NotifMessage<Config_, MethodName>>;
+export type CreateListenerCb = U.CreateWatchHandler<msg.NotifMessage>;
 
-export type SubscriptionCleanup<
-  Config_ extends Config,
-  MethodName extends keyof Config_["RpcMethods"],
-> = (initOk: msg.OkMessage<Config_, MethodName>) => Promise<void>;
+export type SubscriptionCleanup = (initOk: msg.OkMessage) => Promise<void>;

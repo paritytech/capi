@@ -12,7 +12,7 @@ Deno.test({
     const client = await proxyClient(T.polkadot);
     assert(!(client instanceof Error));
     const groups = await Promise.all(
-      (<msg.NotifMessage<T.polkadot, "chain_subscribeAllHeads">[][]> [[], [], []]).map(
+      (<msg.NotifMessage[][]> [[], [], []]).map(
         async (messages) => {
           let i = 1;
           await client.subscribe("chain_subscribeAllHeads", [], (stop) => {

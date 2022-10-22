@@ -1,4 +1,3 @@
-import { Config } from "../config/mod.ts";
 import { ErrorCtor } from "../util/mod.ts";
 import * as msg from "./messages.ts";
 
@@ -6,7 +5,6 @@ export type ProviderMethods = Record<string, (...args: any[]) => any>;
 export type ErrorDetails = Record<string, [code: number, data?: any]>;
 
 export interface Provider<
-  Config_ extends Config,
   RawIngressMessage,
   CloseError extends Error,
 > {
@@ -18,13 +16,13 @@ export interface Provider<
    */
   parseIngressMessage: (
     rawIngressMessage: RawIngressMessage,
-  ) => msg.IngressMessage<Config_> | ParseRawIngressMessageError;
+  ) => msg.IngressMessage | ParseRawIngressMessageError;
   /**
    * The provider-specific send implementation
    *
    * @param egressMessage the message you wish to send to the RPC server
    */
-  send: (egressMessage: msg.InitMessage<Config_>) => void;
+  send: (egressMessage: msg.InitMessage) => void;
   // TODO: introduce `FailedToClose` error in the return type (union with `undefined`)
   /**
    * Close the connection and free up resources
@@ -34,9 +32,9 @@ export interface Provider<
   close: () => Promise<undefined | CloseError>;
 }
 
-export interface ClientHooks<Config_ extends Config, InternalError> {
-  send?: (message: msg.InitMessage<Config_>) => void;
-  receive?: (message: msg.IngressMessage<Config_>) => void;
+export interface ClientHooks<InternalError> {
+  send?: (message: msg.InitMessage) => void;
+  receive?: (message: msg.IngressMessage) => void;
   error?: (error: ParseRawIngressMessageError | InternalError) => void;
   close?: () => void;
 }

@@ -17,7 +17,7 @@ Deno.test({
     });
 
     await t.step("subscribe", async () => {
-      const result: msg.NotifMessage<T.polkadot, "chain_subscribeAllHeads">[] = [];
+      const result: msg.NotifMessage[] = [];
       let i = 1;
       await client.subscribe("chain_subscribeAllHeads", [], (stop) => {
         return (message) => {
