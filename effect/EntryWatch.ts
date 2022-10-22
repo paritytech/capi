@@ -6,7 +6,7 @@ import { $storageKey } from "./core/$storageKey.ts";
 import { codec } from "./core/codec.ts";
 import { deriveCodec } from "./core/deriveCodec.ts";
 import { storageKey } from "./core/storageKey.ts";
-import { entryMetadata, Metadata, palletMetadata } from "./Metadata.ts";
+import { Metadata } from "./Metadata.ts";
 import { RpcCall } from "./RpcCall.ts";
 import { RpcSubscription } from "./RpcSubscription.ts";
 
@@ -29,8 +29,8 @@ export class EntryWatch<
     super();
     const metadata_ = new Metadata(config);
     const deriveCodec_ = deriveCodec(metadata_);
-    const palletMetadata_ = palletMetadata(metadata_, palletName);
-    const entryMetadata_ = entryMetadata(palletMetadata_, entryName);
+    const palletMetadata_ = metadata_.pallet(palletName);
+    const entryMetadata_ = palletMetadata_.entry(entryName);
     const $storageKey_ = $storageKey(deriveCodec_, palletMetadata_, entryMetadata_);
     const entryValueTypeI = Z.sel(entryMetadata_, "value");
     const $entry = codec(deriveCodec_, entryValueTypeI);

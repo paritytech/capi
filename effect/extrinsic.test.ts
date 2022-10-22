@@ -87,15 +87,12 @@ Deno.test({
 
 async function collectExtrinsicEvents(
   config: C.Config,
-  { palletName, methodName, args }: Pick<
-    C.SendAndWatchExtrinsicProps,
-    "palletName" | "methodName" | "args"
-  >,
+  { palletName, methodName, args }: Omit<C.ExtrinsicProps, "sender">,
   sender: KeyringPair,
 ): Promise<string[]> {
   const extrinsicEvents: string[] = [];
   // TODO: get rid of this `any`
-  const root = new C.ExtrinsicSentWatch(config as any, {
+  const root = new C.Extrinsic(config as any, {
     sender: {
       type: "Id",
       value: sender.publicKey,
@@ -103,13 +100,12 @@ async function collectExtrinsicEvents(
     palletName,
     methodName,
     args,
-    sign(message) {
-      return {
-        type: "Sr25519",
-        value: sender.sign(message),
-      };
-    },
-    createWatchHandler(stop) {
+  })
+    .signed((message) => ({
+      type: "Sr25519",
+      value: sender.sign(message),
+    }))
+    .watch((stop) => {
       return (event) => {
         if (typeof event.params.result === "string") {
           extrinsicEvents.push(event.params.result);
@@ -124,8 +120,7 @@ async function collectExtrinsicEvents(
           }
         }
       };
-    },
-  });
+    });
   U.throwIfError(await run(root));
   return extrinsicEvents;
 }

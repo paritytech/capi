@@ -2,7 +2,7 @@ export * from "./BlockRead.ts";
 export * from "./BlockWatch.ts";
 export * from "./EntryRead.ts";
 export * from "./EntryWatch.ts";
-export * from "./ExtrinsicSentWatch.ts";
+export * from "./Extrinsic.ts";
 export * from "./KeyPageRead.ts";
 export * from "./Metadata.ts";
 export * from "./RpcCall.ts";
