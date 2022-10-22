@@ -3,6 +3,7 @@ import * as Z from "../deps/zones.ts";
 import * as M from "../frame_metadata/mod.ts";
 import * as author from "../known/rpc/author.ts";
 import { Config } from "../mod.ts";
+import { NotifMessage } from "../rpc/mod.ts";
 import * as ss58 from "../ss58/mod.ts";
 import * as U from "../util/mod.ts";
 import { $extrinsic } from "./core/$extrinsic.ts";
@@ -126,7 +127,7 @@ export class SignedExtrinsic<
   }
 
   watch<
-    WatchHandler extends U.CreateWatchHandler<author.TransactionStatus>,
+    WatchHandler extends U.CreateWatchHandler<NotifMessage<author.TransactionStatus>>,
   >(watchHandler: WatchHandler): SignedExtrinsicWatch<this, WatchHandler> {
     return new SignedExtrinsicWatch(this.config, this, watchHandler);
   }
@@ -135,7 +136,7 @@ export class SignedExtrinsic<
 // TODO: is this really required? Why not use the RPC call effect directly?
 export class SignedExtrinsicWatch<
   SignedExtrinsic extends Z.$<U.Hex>,
-  WatchHandler extends U.CreateWatchHandler<author.TransactionStatus>,
+  WatchHandler extends U.CreateWatchHandler<NotifMessage<author.TransactionStatus>>,
 > extends Z.Name {
   root;
 

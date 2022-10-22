@@ -7,27 +7,25 @@ interface JsonRpcVersionBearer {
   jsonrpc: "2.0";
 }
 
-export interface InitMessage extends JsonRpcVersionBearer {
+export interface InitMessage<Params extends unknown[] = any[]> extends JsonRpcVersionBearer {
   method: string;
   id: string;
-  params: unknown[];
+  params: Params;
 }
 
-export interface OkMessage extends JsonRpcVersionBearer {
+export interface OkMessage<Result = any> extends JsonRpcVersionBearer {
   id: string;
-  // TODO
-  result: any;
+  result: Result;
   params?: never;
   error?: never;
 }
 
-export interface NotifMessage extends JsonRpcVersionBearer {
+export interface NotifMessage<Result = any> extends JsonRpcVersionBearer {
   method: string;
   id?: never;
   params: {
     subscription: string;
-    // TODO
-    result: any;
+    result: Result;
   };
   result?: never;
   error?: never;
