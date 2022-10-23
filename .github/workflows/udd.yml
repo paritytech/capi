@@ -17,14 +17,8 @@ jobs:
       - name: Regenerated Lockfile
         run: |
           deno task lock
-      - name: Basic tests
-        id: test
-        continue-on-error: true
-        run: |
-          deno task test
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@b4d51739f96fca8047ad065eccef63442d8e99f7 # v4.1.1
-        id: pr
         with:
           commit-message: "update dependencies and regenerate lockfile"
           title: "chore: update dependencies"
@@ -33,22 +27,3 @@ jobs:
           branch: deno-dependency-updates
           author: GitHub <noreply@github.com>
           delete-branch: true
-      - name: Retrieve commit sha
-        id: commit
-        run: |
-          echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-      - name: Set commit status with pending
-        uses: Sibz/github-status-action@650dd1a882a76dbbbc4576fb5974b8d22f29847f # v1.1.6
-        with:
-          authToken: ${{ secrets.GITHUB_TOKEN }}
-          context: "Basic tests"
-          state: "pending"
-          sha: ${{ steps.commit.outputs.sha }}
-      - name: Set commit status with outcome
-        uses: Sibz/github-status-action@650dd1a882a76dbbbc4576fb5974b8d22f29847f # v1.1.6
-        with:
-          authToken: ${{ secrets.GITHUB_TOKEN }}
-          context: "Basic tests"
-          description: "To run other CI actions close/reopen this PR"
-          state: ${{ steps.test.outcome }}
-          sha: ${{ steps.commit.outputs.sha }}
