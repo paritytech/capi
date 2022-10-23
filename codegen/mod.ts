@@ -9,6 +9,10 @@ import { Decl, Files, importSource, printDecls, S } from "./utils.ts";
 export async function run(metadataFile: string, outputDir: string) {
   const metadata = M.fromPrefixedHex(await Deno.readTextFile(metadataFile));
   const output = codegen(metadata);
+  await writeOutput(outputDir, output);
+}
+
+export async function writeOutput(outputDir: string, output: Files) {
   const errors = [];
   try {
     await Deno.remove(outputDir, { recursive: true });
@@ -47,6 +51,7 @@ export function codegen(metadata: M.Metadata): Files {
       "\n",
       ["import { ChainError, BitSequence, Era, $ } from", S.string(importSource)],
       [`import * as _codec from "./codecs.ts"`],
+      [`export { _metadata }`],
     ],
   });
 

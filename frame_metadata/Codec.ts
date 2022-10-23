@@ -59,9 +59,7 @@ export function DeriveCodec(tys: M.Ty[]): DeriveCodec {
           const memberFields = fields.map((field, i) => {
             return [
               field.name || i,
-              $.deferred(() => {
-                return this.visit(field.ty);
-              }),
+              this.visit(field.ty),
             ] as [string, $.Codec<unknown>];
           });
           member = [type, ...memberFields];
