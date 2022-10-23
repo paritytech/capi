@@ -15,6 +15,7 @@
     "Cargo.lock",
     "deno.lock",
     "frame_metadata/raw_erc20_metadata.json",
-    "target"
+    "target",
+    "**/__snapshots__/*.snap"
   ]
 }

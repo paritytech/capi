@@ -1,6 +1,6 @@
 import { Config } from "../config/mod.ts";
 
-class TestConfig extends Config<string> {
+export class TestConfig extends Config<string> {
   constructor(readonly runtimeName: TestConfigRuntime.Name) {
     super(
       async () => {
@@ -47,6 +47,8 @@ export const westend = new TestConfig("westend");
 export type westend = typeof westend;
 export const rococo = new TestConfig("rococo");
 export type rococo = typeof rococo;
+
+export const configs = [polkadot, kusama, westend, rococo];
 
 export namespace TestConfigRuntime {
   export type CODES = typeof CODES;
