@@ -1,13 +1,12 @@
 import { Codec } from "../deps/scale.ts";
 import { assertEquals } from "../deps/std/testing/asserts.ts";
-import { assertSnapshot } from "../deps/std/testing/snapshot.ts";
 import * as M from "../frame_metadata/mod.ts";
 import * as C from "../mod.ts";
 import * as T from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
 
 for (const config of T.configs) {
-  Deno.test(config.runtimeName, async (t) => {
+  Deno.test(config.runtimeName, async () => {
     const metadata = U.throwIfError(await C.run(new C.Metadata(config)));
     const codegen = await T.importCodegen(config);
     const deriveCodec = M.DeriveCodec(metadata.tys);
@@ -37,7 +36,6 @@ for (const config of T.configs) {
         assertEquals(derivedCodecs[i], codegenCodecs[i]);
       }
     }
-    await assertSnapshot(t, derivedCodecs);
     Codec.prototype._inspect = origInspect;
   });
 }
