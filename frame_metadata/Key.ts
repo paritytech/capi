@@ -40,6 +40,7 @@ export function $storageKey(props: StorageKeyProps): $.Codec<unknown[]> {
     {} as Record<number, $.Codec<any[]>>,
   );
   return $.createCodec({
+    name: "$storageKey",
     _metadata: [$storageKey, props],
     _staticSize: $keys[Object.values($keys).length - 1]!._staticSize,
     _encode(buffer, key) {
