@@ -4,15 +4,16 @@ export class TyDecodeCtx {
   tys: Ty[] | null = null;
 }
 
+const $compactU32 = $.compact($.u32);
 export const $tys: $.Codec<Ty[]> = $.createCodec({
   name: "tys",
   _metadata: null,
-  _staticSize: $.compactU32._staticSize,
+  _staticSize: $compactU32._staticSize,
   _encode(buffer, value) {
     $.array($ty)._encode(buffer, value);
   },
   _decode(buffer) {
-    const length = $.compactU32._decode(buffer);
+    const length = $compactU32._decode(buffer);
     const ctx = buffer.context.get(TyDecodeCtx);
     const tys = ctx.tys = Array.from({ length }, (_, id) => ({ id } as Ty));
     for (let i = 0; i < length; i++) {
@@ -25,13 +26,13 @@ export const $tys: $.Codec<Ty[]> = $.createCodec({
 export const $tyId: $.Codec<Ty> = $.createCodec({
   name: "tyId",
   _metadata: null,
-  _staticSize: $.compactU32._staticSize,
+  _staticSize: $compactU32._staticSize,
   _encode(buffer, value) {
-    $.compactU32._encode(buffer, value.id);
+    $.compact($.u32)._encode(buffer, value.id);
   },
   _decode(buffer) {
     const ctx = buffer.context.get(TyDecodeCtx);
-    const id = $.compactU32._decode(buffer);
+    const id = $compactU32._decode(buffer);
     return ctx.tys?.[id] ?? { id } as any;
   },
 });
@@ -181,7 +182,7 @@ export type Ty = {
 export const $ty: $.Codec<Ty> = $.spread(
   $.spread(
     $.object(
-      ["id", $.compactU32],
+      ["id", $.compact($.u32)],
       ["path", $.array($.str)],
       ["params", $.array($param)],
     ),

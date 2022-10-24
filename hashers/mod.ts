@@ -10,29 +10,7 @@ export abstract class Hasher {
   abstract concat: boolean;
 
   $hash<T>($inner: $.Codec<T>): $.Codec<T> {
-    return $.createCodec({
-      _metadata: null,
-      _staticSize: this.digestLength + $inner._staticSize,
-      _encode: (buffer, value) => {
-        const hashArray = buffer.array.subarray(buffer.index, buffer.index += this.digestLength);
-        const cursor = this.concat
-          ? buffer.createCursor($inner._staticSize)
-          : new EncodeBuffer(buffer.stealAlloc($inner._staticSize));
-        $inner._encode(cursor, value);
-        buffer.waitForBuffer(cursor, () => {
-          if (this.concat) (cursor as ReturnType<EncodeBuffer["createCursor"]>).close();
-          else cursor._commitWritten();
-          const hashing = this.create();
-          updateHashing(hashing, cursor);
-          hashing.digestInto(hashArray);
-        });
-      },
-      _decode: (buffer) => {
-        if (!this.concat) throw new DecodeNonTransparentKeyError();
-        buffer.index += this.digestLength;
-        return $inner._decode(buffer);
-      },
-    });
+    return $hash(this, $inner);
   }
 
   hash(data: Uint8Array): Uint8Array {
@@ -45,6 +23,33 @@ export abstract class Hasher {
     }
     return output;
   }
+}
+
+function $hash<T>(hasher: Hasher, $inner: $.Codec<T>): $.Codec<T> {
+  return $.createCodec({
+    name: "$hash",
+    _metadata: [$hash, hasher, $inner],
+    _staticSize: hasher.digestLength + $inner._staticSize,
+    _encode: (buffer, value) => {
+      const hashArray = buffer.array.subarray(buffer.index, buffer.index += hasher.digestLength);
+      const cursor = hasher.concat
+        ? buffer.createCursor($inner._staticSize)
+        : new EncodeBuffer(buffer.stealAlloc($inner._staticSize));
+      $inner._encode(cursor, value);
+      buffer.waitForBuffer(cursor, () => {
+        if (hasher.concat) (cursor as ReturnType<EncodeBuffer["createCursor"]>).close();
+        else cursor._commitWritten();
+        const hashing = hasher.create();
+        updateHashing(hashing, cursor);
+        hashing.digestInto(hashArray);
+      });
+    },
+    _decode: (buffer) => {
+      if (!hasher.concat) throw new DecodeNonTransparentKeyError();
+      buffer.index += hasher.digestLength;
+      return $inner._decode(buffer);
+    },
+  });
 }
 
 export class Blake2Hasher extends Hasher {

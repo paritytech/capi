@@ -27,37 +27,6 @@ export function createCodecVisitor(
     ],
   });
 
-  const compactCodecVisitor = new M.TyVisitor<string | null>(tys, {
-    unitStruct: () => "$null",
-    wrapperStruct(_, inner) {
-      return this.visit(inner);
-    },
-    tupleStruct: () => null,
-    objectStruct: () => null,
-    option: () => null,
-    result: () => null,
-    never: () => null,
-    stringUnion: () => null,
-    taggedUnion: () => null,
-    array: () => null,
-    sizedArray: () => null,
-    primitive: (ty) => {
-      const lookup: Partial<Record<typeof ty.kind, string>> = {
-        u8: "$.compactU8",
-        u16: "$.compactU16",
-        u32: "$.compactU32",
-        u64: "$.compactU64",
-        u128: "$.compactU128",
-        u256: "$.compactU256",
-      };
-      return lookup[ty.kind] ?? null;
-    },
-    compact: () => null,
-    bitSequence: () => null,
-    lenPrefixedWrapper: () => null,
-    circular: () => null,
-  });
-
   return new M.TyVisitor<S>(tys, {
     unitStruct(ty) {
       return addCodecDecl(ty, "$null");
@@ -150,11 +119,7 @@ export function createCodecVisitor(
       return addCodecDecl(ty, getCodecPath(tys, ty)!);
     },
     compact(ty) {
-      const result = compactCodecVisitor.visit(ty.typeParam);
-      if (result) return addCodecDecl(ty, result);
-      throw new Error(
-        "Cannot create compact codec for " + S.toString(typeVisitor.visit(ty.typeParam)),
-      );
+      return addCodecDecl(ty, ["$.compact(", this.visit(ty.typeParam), ")"]);
     },
     bitSequence(ty) {
       return addCodecDecl(ty, "$.bitSequence");

@@ -65,6 +65,7 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
   const totalSize = 1 + $address._staticSize + $sig._staticSize + toSignSize;
 
   const $baseExtrinsic: $.Codec<Extrinsic> = $.createCodec({
+    name: "",
     _metadata: null,
     _staticSize: totalSize,
     _encode(buffer, extrinsic) {
@@ -165,7 +166,11 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
     },
   });
 
-  return $.lenPrefixed($baseExtrinsic);
+  return $.withMetadata(
+    "$extrinsic",
+    [$extrinsic, props],
+    $.lenPrefixed($baseExtrinsic),
+  );
 
   function findExtrinsicTypeParam(name: string) {
     return metadata.extrinsic.ty.params.find((x) => x.name === name)?.ty;
