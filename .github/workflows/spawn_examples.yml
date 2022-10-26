@@ -1,4 +1,4 @@
-name: Spawn examples
+name: Spawn Examples
 on:
   workflow_dispatch:
   push:
