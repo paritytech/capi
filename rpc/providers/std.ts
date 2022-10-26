@@ -22,12 +22,13 @@ export async function stdClient(
 ): Promise<StdClient | StdClientInitError> {
   const discoveryValue = await config.discoveryValue;
   if (typeof discoveryValue === "string") {
+    return proxyClient(config);
     // TODO: improve check / move selection elsewhere
-    if (discoveryValue.startsWith("ws")) {
-      return proxyClient(config);
-    } else {
-      return smoldotClient(config);
-    }
+    // if (discoveryValue.startsWith("ws")) {
+    //   return proxyClient(config);
+    // } else {
+    //   return smoldotClient(config);
+    // }
   }
   return unimplemented();
 }

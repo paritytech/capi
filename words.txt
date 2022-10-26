@@ -185,3 +185,7 @@ neovim
 tostring
 framesystem
 statemigration
+statemine
+westmint
+chainspec
+chainspecs
