@@ -41,6 +41,7 @@ await Promise.all([
     shims: {
       deno: {
         test: true,
+        webSocket: true,
       },
     },
     test: false,
