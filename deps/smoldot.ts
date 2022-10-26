@@ -1,3 +1,1 @@
-// Smoldot is a peer dependency; we only utilize its types, never its runtime.
-// @deno-types="https://esm.sh/@substrate/smoldot-light@0.6.20/dist/index.d.ts"
-export * from "./smoldot_phantom.ts";
+export * from "https://deno.land/x/smoldot@light-js-deno-v0.7.3/index-deno.js";

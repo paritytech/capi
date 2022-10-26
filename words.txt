@@ -186,4 +186,7 @@ tostring
 framesystem
 statemigration
 xxhash
+statemine
+westmint
 chainspec
+chainspecs
