@@ -1,4 +1,4 @@
-name: Run example
+name: Run Example
 on:
   workflow_dispatch:
     inputs:

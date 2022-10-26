@@ -1,4 +1,4 @@
-name: "Check Spelling"
+name: Spellcheck
 on: push
 jobs:
   spellcheck:
