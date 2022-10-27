@@ -12,7 +12,7 @@ export class BlockWatch extends Z.Name {
 
   constructor(
     config: Config,
-    createWatchHandler: U.CreateWatchHandler<known.SignedBlock>,
+    createWatchHandler: U.CreateListener<known.SignedBlock>,
   ) {
     super();
     this.root = new RpcSubscription(

@@ -24,7 +24,7 @@ export class EntryWatch<
     readonly palletName: PalletName,
     readonly entryName: EntryName,
     readonly keys: Keys,
-    readonly createWatchHandler: U.CreateWatchHandler<WatchEntryEvent[]>,
+    readonly createWatchHandler: U.CreateListener<WatchEntryEvent[]>,
   ) {
     super();
     const metadata_ = new Metadata(config);
@@ -41,7 +41,7 @@ export class EntryWatch<
       },
     );
     const watchInit = Z.call($entry, function entryWatchInit($entry) {
-      return U.mapCreateWatchHandler(
+      return U.mapCreateListener(
         createWatchHandler,
         (message: rpc.NotifMessage) => {
           return message.params.result.changes.map(([key, val]: any) => {

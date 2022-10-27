@@ -9,7 +9,7 @@ import { run } from "./run.ts";
 export class RpcSubscription<
   MethodName extends Z.$<string>,
   Params extends Z.Ls$<unknown[]>,
-  CreateListenerCb extends Z.$<U.CreateWatchHandler<rpc.NotifMessage>>,
+  CreateListenerCb extends Z.$<U.CreateListener<rpc.NotifMessage>>,
 > extends Z.Name {
   root;
 

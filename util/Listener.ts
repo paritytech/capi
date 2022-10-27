@@ -1,27 +1,27 @@
 import { deferred } from "../deps/std/async.ts";
 
-export type WatchHandler<Event> = (event: Event) => void;
-export type CreateWatchHandler<Event> = (stop: () => void) => WatchHandler<Event>;
+export type Listener<Event> = (event: Event) => void;
+export type CreateListener<Event> = (stop: () => void) => Listener<Event>;
 
-export function mapCreateWatchHandler<From, Into>(
-  createWatchHandler: CreateWatchHandler<Into>,
+export function mapCreateListener<From, Into>(
+  createListener: CreateListener<Into>,
   map: (message: From) => Into,
-): CreateWatchHandler<From> {
+): CreateListener<From> {
   return (close) => {
-    const listenerCb = createWatchHandler(close);
+    const listenerCb = createListener(close);
     return (message) => {
       listenerCb(map(message));
     };
   };
 }
 
-export type WatchIter<T> = CreateWatchHandler<T> & AsyncIterable<T>;
+export type WatchIter<T> = CreateListener<T> & AsyncIterable<T>;
 
 export function watchIter<T>(): WatchIter<T> {
   const queue: T[] = [];
   const cbs: ((value: IteratorYieldResult<T>) => void)[] = [];
   const onDoneContainer: { onDone?: () => void } = {};
-  const createWatchHandler: CreateWatchHandler<T> = (stop) => {
+  const createWatchHandler: CreateListener<T> = (stop) => {
     onDoneContainer.onDone = stop;
     return (value) => {
       const cb = cbs.shift();

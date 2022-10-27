@@ -11,7 +11,7 @@ export abstract class Client<
   CloseError extends Error,
 > {
   #nextId = 0;
-  #listenerCbs = new Map<U.WatchHandler<msg.IngressMessage>, true>();
+  #listenerCbs = new Map<U.Listener<msg.IngressMessage>, true>();
 
   /**
    * Construct a new RPC client
@@ -48,7 +48,7 @@ export abstract class Client<
    *
    * @param createListenerCb the factory for the callback to be triggered upon arrival of ingress messages
    */
-  listen = (createListenerCb: U.CreateWatchHandler<msg.IngressMessage>): void => {
+  listen = (createListenerCb: U.CreateListener<msg.IngressMessage>): void => {
     const stopListening = () => {
       this.#listenerCbs.delete(listenerCb);
     };
@@ -144,6 +144,6 @@ export abstract class Client<
   };
 }
 
-export type CreateListenerCb = U.CreateWatchHandler<msg.NotifMessage>;
+export type CreateListenerCb = U.CreateListener<msg.NotifMessage>;
 
 export type SubscriptionCleanup = (initOk: msg.OkMessage) => Promise<void>;

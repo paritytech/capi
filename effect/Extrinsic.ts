@@ -127,7 +127,7 @@ export class SignedExtrinsic<
   }
 
   watch<
-    WatchHandler extends U.CreateWatchHandler<NotifMessage<author.TransactionStatus>>,
+    WatchHandler extends U.CreateListener<NotifMessage<author.TransactionStatus>>,
   >(watchHandler: WatchHandler): SignedExtrinsicWatch<this, WatchHandler> {
     return new SignedExtrinsicWatch(this.config, this, watchHandler);
   }
@@ -140,7 +140,7 @@ export class SignedExtrinsic<
 // TODO: is this really required? Why not use the RPC call effect directly?
 export class SignedExtrinsicWatch<
   SignedExtrinsic extends Z.$<U.Hex>,
-  WatchHandler extends U.CreateWatchHandler<NotifMessage<author.TransactionStatus>>,
+  WatchHandler extends U.CreateListener<NotifMessage<author.TransactionStatus>>,
 > extends Z.Name {
   root;
 
