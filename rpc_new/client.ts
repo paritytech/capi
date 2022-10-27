@@ -20,7 +20,7 @@ export class Client<DiscoveryValue, SendE, InternalE, CloseE> {
     this.provider = providerFactory(discoveryValue, this.#listener);
   }
 
-  #listener: ProviderListener<InternalE> = (e) => {
+  #listener: ProviderListener<InternalE, SendE> = (e) => {
     if (e instanceof Error) {
       for (const id in this.pendingCalls) {
         const pendingCall = this.pendingCalls[id]!;
