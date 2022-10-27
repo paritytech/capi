@@ -8,12 +8,13 @@ export type ProxyProvider = Provider<string, Event, Event, Event>;
 
 export const proxyProvider: ProxyProvider = (url, listener) => {
   return {
-    send: async (message) => {
-      const { inner } = connection(url, listener);
-      const openError = await ensureWsOpen(inner);
-      if (openError) return new ProviderSendError(openError);
-      inner.send(JSON.stringify(message));
-      return;
+    send: (message) => {
+      const { inner, forEachListener } = connection(url, listener);
+      (async () => {
+        const openError = await ensureWsOpen(inner);
+        if (openError) forEachListener(new ProviderSendError(openError));
+        inner.send(JSON.stringify(message));
+      })();
     },
     release: () => {
       const { listenerRoot, listeners, inner } = connection(url, listener);
@@ -38,7 +39,10 @@ class ProxyProviderConnection
   }>
 {}
 
-function connection(url: string, listener: ProviderListener<Event>): ProxyProviderConnection {
+function connection(
+  url: string,
+  listener: ProviderListener<Event, Event>,
+): ProxyProviderConnection {
   let conn = connections.get(url);
   if (!conn) {
     const ws = new WebSocket(url);

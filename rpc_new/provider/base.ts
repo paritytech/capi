@@ -8,21 +8,19 @@ import { ProviderCloseError, ProviderHandlerError, ProviderSendError } from "./e
  */
 export type Provider<DiscoveryValue, HandlerErrorData, SendErrorData, CloseErrorData> = (
   discoveryValue: DiscoveryValue,
-  listener: ProviderListener<HandlerErrorData>,
-) => ProviderRef<SendErrorData, CloseErrorData>;
+  listener: ProviderListener<HandlerErrorData, SendErrorData>,
+) => ProviderRef<CloseErrorData>;
 
-export type ProviderListener<HandlerErrorData> = U.Listener<
-  msg.IngressMessage | ProviderHandlerError<HandlerErrorData>
+export type ProviderListener<HandlerErrorData, SendErrorData> = U.Listener<
+  msg.IngressMessage | ProviderHandlerError<HandlerErrorData> | ProviderSendError<SendErrorData>
 >;
 
-export interface ProviderRef<SendErrorData, CloseErrorData> {
-  send: ProviderSend<SendErrorData>;
+export interface ProviderRef<CloseErrorData> {
+  send: ProviderSend;
   release: ProviderRelease<CloseErrorData>;
 }
 
-export type ProviderSend<SendErrorData> = (
-  message: msg.EgressMessage,
-) => Promise<void | ProviderSendError<SendErrorData>>;
+export type ProviderSend = (message: msg.EgressMessage) => void;
 
 export type ProviderRelease<CloseErrorData> = () => Promise<
   void | ProviderCloseError<CloseErrorData>
