@@ -26,7 +26,7 @@ export type ProviderRelease<CloseErrorData> = () => Promise<
   void | ProviderCloseError<CloseErrorData>
 >;
 
-export abstract class ProviderConnection<Inner, HandlerErrorData, ListenerRoot> {
+export abstract class ProviderConnection<Inner, HandlerErrorData, SendErrorData, ListenerRoot> {
   /** The set of high-level listeners, which accept parsed messages and errors */
   listeners;
 
@@ -38,7 +38,9 @@ export abstract class ProviderConnection<Inner, HandlerErrorData, ListenerRoot> 
   constructor(
     readonly inner: Inner,
     readonly listenerRoot: ListenerRoot,
-    readonly firstListener: U.Listener<msg.IngressMessage | ProviderHandlerError<HandlerErrorData>>,
+    readonly firstListener: U.Listener<
+      msg.IngressMessage | ProviderHandlerError<HandlerErrorData> | ProviderSendError<SendErrorData>
+    >,
   ) {
     this.listeners = new Set([firstListener]);
   }
