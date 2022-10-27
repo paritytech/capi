@@ -19,7 +19,6 @@ export const proxyProvider: ProxyProvider = (url, listener) => {
     release: () => {
       const { listenerRoot, listeners, inner } = connection(url, listener);
       listeners.delete(listener);
-
       if (!listeners.size) {
         connections.delete(url);
         inner.removeEventListener("message", listenerRoot.message);
