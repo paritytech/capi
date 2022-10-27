@@ -18,11 +18,12 @@ export const proxyProvider: ProxyProvider = (url, listener) => {
     },
     release: () => {
       const { listenerRoot, listeners, inner } = connection(url, listener);
-      inner.removeEventListener("message", listenerRoot.message);
-      inner.removeEventListener("error", listenerRoot.error);
       listeners.delete(listener);
+
       if (!listeners.size) {
         connections.delete(url);
+        inner.removeEventListener("message", listenerRoot.message);
+        inner.removeEventListener("error", listenerRoot.error);
         return closeWs(inner);
       }
       return Promise.resolve();
@@ -32,12 +33,15 @@ export const proxyProvider: ProxyProvider = (url, listener) => {
 
 /** Global lookup of existing connections and references */
 const connections = new Map<string, ProxyProviderConnection>();
-class ProxyProviderConnection
-  extends ProviderConnection</* inner */ WebSocket, /* handler error */ Event, /* listener root */ {
+class ProxyProviderConnection extends ProviderConnection<
+  /* inner */ WebSocket,
+  /* handler error data */ Event,
+  /* send error data */ Event,
+  /* listener root */ {
     message: U.Listener<MessageEvent>;
     error: U.Listener<Event>;
-  }>
-{}
+  }
+> {}
 
 function connection(
   url: string,
@@ -58,8 +62,6 @@ function connection(
     connections.set(url, conn);
   } else if (!conn.listeners.has(listener)) {
     conn.listeners.add(listener);
-    conn.inner.addEventListener("message", conn.listenerRoot.message);
-    conn.inner.addEventListener("error", conn.listenerRoot.error);
   }
   return conn;
 }
