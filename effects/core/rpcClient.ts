@@ -4,6 +4,6 @@ import * as rpc from "../../rpc/mod.ts";
 
 export function rpcClient<C extends Config>(config: C) {
   return Z.call(config, function rpcClientImpl() {
-    return rpc.stdClient(config);
+    return rpc.proxyClient(config);
   });
 }

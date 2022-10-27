@@ -1,4 +1,4 @@
-export interface Egress<Method extends string = string, Params extends unknown[] = any[]>
+export interface EgressMessage<Method extends string = string, Params extends unknown[] = any[]>
   extends JsonRpcVersionBearer
 {
   method: Method;
@@ -6,16 +6,16 @@ export interface Egress<Method extends string = string, Params extends unknown[]
   params: Params;
 }
 
-export type Ingress = Ok | Err | Notif;
+export type IngressMessage = OkMessage | ErrorMessage | NotificationMessage;
 
-export interface Ok<Result = any> extends JsonRpcVersionBearer {
+export interface OkMessage<Result = any> extends JsonRpcVersionBearer {
   id: string;
   result: Result;
   params?: never;
   error?: never;
 }
 
-export interface Err<Data = any> extends JsonRpcVersionBearer {
+export interface ErrorMessage<Data = any> extends JsonRpcVersionBearer {
   id: string;
   error: {
     code: number;
@@ -26,7 +26,9 @@ export interface Err<Data = any> extends JsonRpcVersionBearer {
   result?: never;
 }
 
-export interface Notif<Method extends string = string, Result = any> extends JsonRpcVersionBearer {
+export interface NotificationMessage<Method extends string = string, Result = any>
+  extends JsonRpcVersionBearer
+{
   method: Method;
   id?: never;
   params: {
