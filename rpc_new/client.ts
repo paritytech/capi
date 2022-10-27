@@ -9,15 +9,15 @@ import {
 } from "./provider/mod.ts";
 
 export class Client<DiscoveryValue, SendE, InternalE, CloseE> {
-  provider;
+  providerRef;
   listeners = new Set<U.Listener<msg.IngressMessage | InternalE>>();
   pendingCalls: Record<string, Deferred<unknown>> = {};
 
   constructor(
-    readonly providerFactory: Provider<DiscoveryValue, InternalE, SendE, CloseE>,
+    readonly provider: Provider<DiscoveryValue, InternalE, SendE, CloseE>,
     readonly discoveryValue: DiscoveryValue,
   ) {
-    this.provider = providerFactory(discoveryValue, this.#listener);
+    this.providerRef = provider(discoveryValue, this.#listener);
   }
 
   #listener: ProviderListener<InternalE, SendE> = (e) => {
@@ -41,12 +41,12 @@ export class Client<DiscoveryValue, SendE, InternalE, CloseE> {
       msg.OkMessage | msg.ErrorMessage | ProviderSendError<SendE> | ProviderHandlerError<InternalE>
     >();
     this.pendingCalls[message.id] = waiter;
-    this.provider.send(message);
+    this.providerRef.send(message);
     return waiter;
   };
 
   close = () => {
-    return this.provider.release();
+    return this.providerRef.release();
   };
 }
 
