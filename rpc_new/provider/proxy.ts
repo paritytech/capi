@@ -11,7 +11,10 @@ export const proxyProvider: ProxyProvider = (url, listener) => {
       const { inner, forEachListener } = connection(url, listener);
       (async () => {
         const openError = await ensureWsOpen(inner);
-        if (openError) forEachListener(new ProviderSendError(openError));
+        if (openError) {
+          forEachListener(new ProviderSendError(openError));
+          return;
+        }
         inner.send(JSON.stringify(message));
       })();
     },
