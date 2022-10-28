@@ -12,33 +12,15 @@ const result = await client.call({
 });
 console.log(result);
 
-// client.subscribe(
-//   {
-//     jsonrpc: "2.0",
-//     id: "1",
-//     method: "chain_subscribeNewHead",
-//     params: [],
-//   },
-//   (message) => {
-//     console.log(message);
-//   },
-// );
-
-client.subscribeWithStop(
+client.subscribe(
   {
     jsonrpc: "2.0",
     id: "1",
     method: "chain_subscribeNewHead",
     params: [],
   },
-  (stop) => {
-    let i = 0;
-    return (message) => {
-      console.log(message);
-      if (++i === 3) {
-        stop();
-      }
-    };
+  function(message) {
+    console.log(message);
   },
 );
 

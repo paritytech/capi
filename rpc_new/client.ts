@@ -1,5 +1,4 @@
 import { Deferred, deferred } from "../deps/std/async.ts";
-import * as U from "../util/mod.ts";
 import * as msg from "./messages.ts";
 import {
   Provider,
@@ -7,6 +6,7 @@ import {
   ProviderListener,
   ProviderSendError,
 } from "./provider/mod.ts";
+import * as U from "./util.ts";
 
 export class Client<DiscoveryValue, SendE, InternalE, CloseE> {
   providerRef;
@@ -40,7 +40,7 @@ export class Client<DiscoveryValue, SendE, InternalE, CloseE> {
     this.providerRef = provider(discoveryValue, this.#listener);
   }
 
-  #listener: ProviderListener<InternalE, SendE> = (e) => {
+  #listener: ProviderListener<InternalE, SendE, CloseE> = (e) => {
     if (e instanceof Error) {
       for (const id in this.pendingCalls) {
         const pendingCall = this.pendingCalls[id]!;
@@ -81,11 +81,6 @@ export class Client<DiscoveryValue, SendE, InternalE, CloseE> {
   };
 
   subscribe: ClientSubscribe<SendE, InternalE> = (message, listener) => {
-    this.pendingSubscriptions[message.id] = listener;
-    this.call(message);
-  };
-
-  subscribeWithStop: ClientSubscribeWithStop<SendE, InternalE> = (message, createListenerCb) => {
     const stop = () => {
       delete this.pendingSubscriptions[message.id];
       const activeSubscriptionId = this.activeSubscriptionByMessageId[message.id];
@@ -93,7 +88,7 @@ export class Client<DiscoveryValue, SendE, InternalE, CloseE> {
         delete this.activeSubscriptions[activeSubscriptionId];
       }
     };
-    this.pendingSubscriptions[message.id] = createListenerCb(stop);
+    this.pendingSubscriptions[message.id] = listener.bind({ stop });
     this.call(message);
   };
 
@@ -112,16 +107,11 @@ export type ClientSubscribe<SendE, InternalE> = (
     | msg.NotificationMessage
     | msg.ErrorMessage
     | ProviderSendError<SendE>
-    | ProviderHandlerError<InternalE>
+    | ProviderHandlerError<InternalE>,
+    ClientSubscribeContext
   >,
 ) => void;
 
-export type ClientSubscribeWithStop<SendE, InternalE> = (
-  message: msg.EgressMessage,
-  listener: U.CreateListener<
-    | msg.NotificationMessage
-    | msg.ErrorMessage
-    | ProviderSendError<SendE>
-    | ProviderHandlerError<InternalE>
-  >,
-) => void;
+interface ClientSubscribeContext {
+  stop: () => void;
+}

@@ -190,3 +190,4 @@ statemine
 westmint
 chainspec
 chainspecs
+contramap

@@ -57,7 +57,12 @@ function connection(
     const error = (e: Event) => {
       conn!.forEachListener(new ProviderHandlerError(e));
     };
-    conn = new ProxyProviderConnection(ws, { message, error }, listener);
+    const listenerBound = listener.bind({
+      stop: () => {
+        conn!.listeners.delete(listenerBound);
+      },
+    });
+    conn = new ProxyProviderConnection(ws, { message, error }, listenerBound);
     ws.addEventListener("message", message);
     ws.addEventListener("error", error);
     connections.set(url, conn);

@@ -1,5 +1,5 @@
-import * as U from "../../util/mod.ts";
 import * as msg from "../messages.ts";
+import * as U from "../util.ts";
 import { ProviderCloseError, ProviderHandlerError, ProviderSendError } from "./errors.ts";
 
 /**
@@ -12,7 +12,8 @@ export type Provider<DiscoveryValue, HandlerErrorData, SendErrorData, CloseError
 ) => ProviderRef<CloseErrorData>;
 
 export type ProviderListener<HandlerErrorData, SendErrorData> = U.Listener<
-  msg.IngressMessage | ProviderHandlerError<HandlerErrorData> | ProviderSendError<SendErrorData>
+  msg.IngressMessage | ProviderHandlerError<HandlerErrorData> | ProviderSendError<SendErrorData>,
+  { stop: () => void }
 >;
 
 export interface ProviderRef<CloseErrorData> {
@@ -39,18 +40,41 @@ export abstract class ProviderConnection<Inner, HandlerErrorData, SendErrorData,
     readonly inner: Inner,
     readonly listenerRoot: ListenerRoot,
     readonly firstListener: U.Listener<
-      msg.IngressMessage | ProviderHandlerError<HandlerErrorData> | ProviderSendError<SendErrorData>
+      | msg.IngressMessage
+      | ProviderHandlerError<HandlerErrorData>
+      | ProviderSendError<SendErrorData>
     >,
   ) {
-    this.listeners = new Set([firstListener]);
+    this.listeners = new Map<
+      U.Listener<
+        | msg.IngressMessage
+        | ProviderHandlerError<HandlerErrorData>
+        | ProviderSendError<SendErrorData>
+      >,
+      U.Listener<
+        | msg.IngressMessage
+        | ProviderHandlerError<HandlerErrorData>
+        | ProviderSendError<SendErrorData>,
+        { stop: () => void }
+      >
+    >();
+    this.listeners.set(
+      firstListener,
+      // @ts-ignore fix later
+      firstListener.bind({
+        stop: () => {
+          this.listeners.delete(firstListener);
+        },
+      }),
+    );
   }
 
   /**
    * Execute each listener in sequence
    * @param message the message to apply to each listener
    */
-  forEachListener: U.Listener<any> = (message) => {
-    for (const listener of this.listeners) {
+  forEachListener: U.Listener<any /* NARROW */> = (message) => {
+    for (const listener of this.listeners.values()) {
       listener(message);
     }
   };
