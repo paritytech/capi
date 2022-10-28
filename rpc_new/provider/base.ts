@@ -27,43 +27,56 @@ export type ProviderRelease<CloseErrorData> = () => Promise<
   void | ProviderCloseError<CloseErrorData>
 >;
 
-export abstract class ProviderConnection<Inner, HandlerErrorData, SendErrorData, ListenerRoot> {
+export abstract class ProviderConnection<
+  Inner,
+  HandlerErrorData,
+  SendErrorData,
+> {
   /** The set of high-level listeners, which accept parsed messages and errors */
-  listeners;
+  listeners = new Map<
+    U.Listener<
+      | msg.IngressMessage
+      | ProviderHandlerError<HandlerErrorData>
+      | ProviderSendError<SendErrorData>
+    >,
+    U.Listener<
+      | msg.IngressMessage
+      | ProviderHandlerError<HandlerErrorData>
+      | ProviderSendError<SendErrorData>
+    >
+  >();
 
   /**
    * @param inner the underlying representation of the connection (such as a websocket or smoldot chain)
-   * @param listenerRoot the means of message-handling – this should delegate to higher-level listeners with `forEachListener`
    * @param firstListener the
    */
   constructor(
     readonly inner: Inner,
-    readonly listenerRoot: ListenerRoot,
+    readonly cleanUp: () => void,
     readonly firstListener: U.Listener<
       | msg.IngressMessage
       | ProviderHandlerError<HandlerErrorData>
       | ProviderSendError<SendErrorData>
     >,
   ) {
-    this.listeners = new Map<
-      U.Listener<
-        | msg.IngressMessage
-        | ProviderHandlerError<HandlerErrorData>
-        | ProviderSendError<SendErrorData>
-      >,
-      U.Listener<
-        | msg.IngressMessage
-        | ProviderHandlerError<HandlerErrorData>
-        | ProviderSendError<SendErrorData>,
-        { stop: () => void }
-      >
-    >();
+    this.addListener(firstListener);
+  }
+
+  addListener(
+    listener: U.Listener<
+      | msg.IngressMessage
+      | ProviderHandlerError<HandlerErrorData>
+      | ProviderSendError<SendErrorData>
+    >,
+  ) {
+    if (this.listeners.has(listener)) {
+      return;
+    }
     this.listeners.set(
-      firstListener,
-      // @ts-ignore fix later
-      firstListener.bind({
+      listener,
+      listener.bind({
         stop: () => {
-          this.listeners.delete(firstListener);
+          this.listeners.delete(listener);
         },
       }),
     );

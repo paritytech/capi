@@ -1,4 +1,4 @@
-export type Listener<Event, This = void> = (this: This, event: Event) => void;
+export type Listener<Event, This = any> = (this: This, event: Event) => void;
 
 export function contramapListener<From, Into>(
   listener: Listener<Into, any>,

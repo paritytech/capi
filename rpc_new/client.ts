@@ -10,8 +10,6 @@ import * as U from "./util.ts";
 
 export class Client<DiscoveryValue, SendE, InternalE, CloseE> {
   providerRef;
-  // Is this used?
-  // listeners = new Set<U.Listener<msg.IngressMessage | InternalE>>();
   pendingCalls: Record<string, Deferred<unknown>> = {};
   pendingSubscriptions: Record<
     string,
@@ -40,7 +38,7 @@ export class Client<DiscoveryValue, SendE, InternalE, CloseE> {
     this.providerRef = provider(discoveryValue, this.#listener);
   }
 
-  #listener: ProviderListener<InternalE, SendE, CloseE> = (e) => {
+  #listener: ProviderListener<InternalE, SendE> = (e) => {
     if (e instanceof Error) {
       for (const id in this.pendingCalls) {
         const pendingCall = this.pendingCalls[id]!;
@@ -50,7 +48,7 @@ export class Client<DiscoveryValue, SendE, InternalE, CloseE> {
         delete this.pendingSubscriptions[id];
       }
       for (const id in this.activeSubscriptions) {
-        this.activeSubscriptions[id]?.(e);
+        this.activeSubscriptions[id]!(e);
         delete this.activeSubscriptions[id];
       }
     } else if (e.id) {
@@ -67,7 +65,7 @@ export class Client<DiscoveryValue, SendE, InternalE, CloseE> {
         delete this.pendingSubscriptions[e.id];
       }
     } else if (e.params) {
-      this.activeSubscriptions[e.params.subscription]?.(e);
+      this.activeSubscriptions[e.params.subscription]!(e);
     }
   };
 

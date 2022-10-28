@@ -12,6 +12,7 @@ const result = await client.call({
 });
 console.log(result);
 
+let i = 0;
 client.subscribe(
   {
     jsonrpc: "2.0",
@@ -21,6 +22,9 @@ client.subscribe(
   },
   function(message) {
     console.log(message);
+    if (++i === 3) {
+      this.stop();
+    }
   },
 );
 

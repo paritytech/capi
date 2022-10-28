@@ -1,4 +1,3 @@
-import * as U from "../../util/mod.ts";
 import * as msg from "../messages.ts";
 import { Provider, ProviderConnection, ProviderListener } from "./base.ts";
 import { ProviderCloseError, ProviderHandlerError, ProviderSendError } from "./errors.ts";
@@ -19,12 +18,11 @@ export const proxyProvider: ProxyProvider = (url, listener) => {
       })();
     },
     release: () => {
-      const { listenerRoot, listeners, inner } = connection(url, listener);
+      const { cleanUp, listeners, inner } = connection(url, listener);
       listeners.delete(listener);
       if (!listeners.size) {
         connections.delete(url);
-        inner.removeEventListener("message", listenerRoot.message);
-        inner.removeEventListener("error", listenerRoot.error);
+        cleanUp();
         return closeWs(inner);
       }
       return Promise.resolve();
@@ -37,11 +35,7 @@ const connections = new Map<string, ProxyProviderConnection>();
 class ProxyProviderConnection extends ProviderConnection<
   /* inner */ WebSocket,
   /* handler error data */ Event,
-  /* send error data */ Event,
-  /* listener root */ {
-    message: U.Listener<MessageEvent>;
-    error: U.Listener<Event>;
-  }
+  /* send error data */ Event
 > {}
 
 function connection(
@@ -50,24 +44,19 @@ function connection(
 ): ProxyProviderConnection {
   let conn = connections.get(url);
   if (!conn) {
+    const controller = new AbortController();
+    const { signal } = controller;
     const ws = new WebSocket(url);
-    const message = (e: MessageEvent) => {
+    ws.addEventListener("message", (e) => {
       conn!.forEachListener(msg.parse(e.data));
-    };
-    const error = (e: Event) => {
+    }, { signal });
+    ws.addEventListener("error", (e) => {
       conn!.forEachListener(new ProviderHandlerError(e));
-    };
-    const listenerBound = listener.bind({
-      stop: () => {
-        conn!.listeners.delete(listenerBound);
-      },
-    });
-    conn = new ProxyProviderConnection(ws, { message, error }, listenerBound);
-    ws.addEventListener("message", message);
-    ws.addEventListener("error", error);
+    }, { signal });
+    conn = new ProxyProviderConnection(ws, () => controller.abort(), listener);
     connections.set(url, conn);
-  } else if (!conn.listeners.has(listener)) {
-    conn.listeners.add(listener);
+  } else {
+    conn.addListener(listener);
   }
   return conn;
 }
