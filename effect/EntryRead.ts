@@ -6,35 +6,30 @@ import { codec } from "./core/codec.ts";
 import { decoded } from "./core/decoded.ts";
 import { deriveCodec } from "./core/deriveCodec.ts";
 import { storageKey } from "./core/storageKey.ts";
-import { Metadata } from "./Metadata.ts";
-import { RpcCall } from "./RpcCall.ts";
+import { entryMetadata, metadata, palletMetadata } from "./metadata.ts";
+import { rpcCall } from "./rpcCall.ts";
 
-export class EntryRead<
+export function entryRead<
   PalletName extends Z.$<string>,
   EntryName extends Z.$<string>,
   Keys extends unknown[],
   Rest extends [blockHash?: Z.$<U.HexHash | undefined>],
-> extends Z.Name {
-  root;
-
-  constructor(
-    config: Config,
-    palletName: PalletName,
-    entryName: EntryName,
-    keys: [...Keys],
-    ...[blockHash]: [...Rest]
-  ) {
-    super();
-    const metadata_ = new Metadata(config, blockHash);
-    const deriveCodec_ = deriveCodec(metadata_);
-    const palletMetadata_ = metadata_.pallet(palletName);
-    const entryMetadata_ = palletMetadata_.entry(entryName);
-    const $storageKey_ = $storageKey(deriveCodec_, palletMetadata_, entryMetadata_);
-    const storageKey_ = storageKey($storageKey_, ...keys);
-    const storageCall = new RpcCall(config, "state_getStorage", [storageKey_, blockHash]);
-    const entryValueTypeI = Z.sel(entryMetadata_, "value");
-    const $entry = codec(deriveCodec_, entryValueTypeI);
-    const resultHex = Z.sel(storageCall, "result");
-    this.root = decoded($entry, resultHex, "value");
-  }
+>(
+  config: Config,
+  palletName: PalletName,
+  entryName: EntryName,
+  keys: [...Keys],
+  ...[blockHash]: [...Rest]
+) {
+  const metadata_ = metadata(config, blockHash);
+  const deriveCodec_ = deriveCodec(metadata_);
+  const palletMetadata_ = palletMetadata(metadata_, palletName);
+  const entryMetadata_ = entryMetadata(palletMetadata_, entryName);
+  const $storageKey_ = $storageKey(deriveCodec_, palletMetadata_, entryMetadata_);
+  const storageKey_ = storageKey($storageKey_, ...keys);
+  const storageCall = rpcCall(config, "state_getStorage", [storageKey_, blockHash]);
+  const entryValueTypeI = entryMetadata_.access("value");
+  const $entry = codec(deriveCodec_, entryValueTypeI);
+  const resultHex = storageCall.access("result");
+  return decoded($entry, resultHex, "value");
 }
