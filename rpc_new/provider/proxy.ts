@@ -1,4 +1,3 @@
-import { deferred } from "../../deps/std/async.ts";
 import * as U from "../../util/mod.ts";
 import * as msg from "../messages.ts";
 import { Provider, ProviderConnection, ProviderListener } from "./base.ts";
@@ -70,38 +69,34 @@ function ensureWsOpen(ws: WebSocket): Promise<void | Event> {
     return Promise.resolve();
   }
   return new Promise<void | Event>((resolve) => {
-    const openHandler = () => {
-      removeOpenHandlers();
+    const controller = new AbortController();
+    const { signal } = controller;
+    ws.addEventListener("open", () => {
+      controller.abort();
       resolve();
-    };
-    const openErrorHandler = (e: Event) => {
-      removeOpenHandlers();
+    }, { signal });
+    ws.addEventListener("error", (e: Event) => {
+      controller.abort();
       resolve(e);
-    };
-    const removeOpenHandlers = () => {
-      ws.removeEventListener("open", openHandler);
-      ws.removeEventListener("error", openErrorHandler);
-    };
-    ws.addEventListener("open", openHandler);
-    ws.addEventListener("error", openErrorHandler);
+    }, { signal });
   });
 }
 
 function closeWs(socket: WebSocket): Promise<void | ProviderCloseError<Event>> {
-  const pending = deferred<void | ProviderCloseError<Event>>();
-  const closeHandler = () => {
-    pending.resolve();
-    removeCloseHandlers();
-  };
-  const closeErrorHandler = (e: Event) => {
-    pending.resolve(new ProviderCloseError(e));
-    removeCloseHandlers();
-  };
-  const removeCloseHandlers = () => {
-    socket.removeEventListener("close", closeHandler);
-    socket.removeEventListener("error", closeErrorHandler);
-  };
-  socket.addEventListener("close", closeHandler);
-  socket.close();
-  return pending;
+  if (socket.readyState === WebSocket.CLOSED) {
+    return Promise.resolve();
+  }
+  return new Promise<void | ProviderCloseError<Event>>((resolve) => {
+    const controller = new AbortController();
+    const { signal } = controller;
+    socket.addEventListener("close", () => {
+      controller.abort();
+      resolve();
+    }, { signal });
+    socket.addEventListener("error", (e: Event) => {
+      controller.abort();
+      resolve(new ProviderCloseError(e));
+    }, { signal });
+    socket.close();
+  });
 }
