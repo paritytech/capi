@@ -12,8 +12,7 @@ export type Provider<DiscoveryValue, HandlerErrorData, SendErrorData, CloseError
 ) => ProviderRef<CloseErrorData>;
 
 export type ProviderListener<HandlerErrorData, SendErrorData> = U.Listener<
-  msg.IngressMessage | ProviderHandlerError<HandlerErrorData> | ProviderSendError<SendErrorData>,
-  { stop: () => void }
+  msg.IngressMessage | ProviderHandlerError<HandlerErrorData> | ProviderSendError<SendErrorData>
 >;
 
 export interface ProviderRef<CloseErrorData> {
@@ -27,42 +26,20 @@ export type ProviderRelease<CloseErrorData> = () => Promise<
   void | ProviderCloseError<CloseErrorData>
 >;
 
-export abstract class ProviderConnection<
-  Inner,
-  HandlerErrorData,
-  SendErrorData,
-> {
+export abstract class ProviderConnection<Inner, HandlerErrorData, SendErrorData> {
   /** The set of high-level listeners, which accept parsed messages and errors */
   listeners = new Map<
-    U.Listener<
-      | msg.IngressMessage
-      | ProviderHandlerError<HandlerErrorData>
-      | ProviderSendError<SendErrorData>
-    >,
-    U.Listener<
-      | msg.IngressMessage
-      | ProviderHandlerError<HandlerErrorData>
-      | ProviderSendError<SendErrorData>
-    >
+    ProviderListener<HandlerErrorData, SendErrorData>,
+    ProviderListener<HandlerErrorData, SendErrorData>
   >();
 
   /**
    * @param inner the underlying representation of the connection (such as a websocket or smoldot chain)
-   * @param firstListener the
+   * @param cleanUp cb to close the connection (`inner`) and free up resources
    */
-  constructor(
-    readonly inner: Inner,
-    readonly cleanUp: () => void,
-  ) {
-  }
+  constructor(readonly inner: Inner, readonly cleanUp: () => void) {}
 
-  addListener(
-    listener: U.Listener<
-      | msg.IngressMessage
-      | ProviderHandlerError<HandlerErrorData>
-      | ProviderSendError<SendErrorData>
-    >,
-  ) {
+  addListener = (listener: ProviderListener<HandlerErrorData, SendErrorData>) => {
     if (this.listeners.has(listener)) {
       return;
     }
@@ -74,13 +51,13 @@ export abstract class ProviderConnection<
         },
       }),
     );
-  }
+  };
 
   /**
    * Execute each listener in sequence
    * @param message the message to apply to each listener
    */
-  forEachListener: U.Listener<any /* NARROW */> = (message) => {
+  forEachListener: ProviderListener<HandlerErrorData, SendErrorData> = (message) => {
     for (const listener of this.listeners.values()) {
       listener(message);
     }
