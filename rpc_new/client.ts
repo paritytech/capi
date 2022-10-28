@@ -65,7 +65,7 @@ export class Client<DiscoveryValue, SendE, InternalE, CloseE> {
         delete this.pendingSubscriptions[e.id];
       }
     } else if (e.params) {
-      this.activeSubscriptions[e.params.subscription]!(e);
+      this.activeSubscriptions[e.params.subscription]?.(e);
     }
   };
 
