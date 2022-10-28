@@ -10,8 +10,28 @@ import {
 
 export class Client<DiscoveryValue, SendE, InternalE, CloseE> {
   providerRef;
-  listeners = new Set<U.Listener<msg.IngressMessage | InternalE>>();
+  // Is this used?
+  // listeners = new Set<U.Listener<msg.IngressMessage | InternalE>>();
   pendingCalls: Record<string, Deferred<unknown>> = {};
+  pendingSubscriptions: Record<
+    string,
+    U.Listener<
+      | msg.NotificationMessage
+      | msg.ErrorMessage
+      | ProviderSendError<SendE>
+      | ProviderHandlerError<InternalE>
+    >
+  > = {};
+  activeSubscriptions: Record<
+    string,
+    U.Listener<
+      | msg.NotificationMessage
+      | msg.ErrorMessage
+      | ProviderSendError<SendE>
+      | ProviderHandlerError<InternalE>
+    >
+  > = {};
+  activeSubscriptionByMessageId: Record<string, string> = {};
 
   constructor(
     readonly provider: Provider<DiscoveryValue, InternalE, SendE, CloseE>,
@@ -26,13 +46,28 @@ export class Client<DiscoveryValue, SendE, InternalE, CloseE> {
         const pendingCall = this.pendingCalls[id]!;
         pendingCall.resolve(e);
         delete this.pendingCalls[id];
+        this.pendingSubscriptions[id]?.(e);
+        delete this.pendingSubscriptions[id];
+      }
+      for (const id in this.activeSubscriptions) {
+        this.activeSubscriptions[id]?.(e);
+        delete this.activeSubscriptions[id];
       }
     } else if (e.id) {
       const pendingCall = this.pendingCalls[e.id]!;
       pendingCall.resolve(e);
       delete this.pendingCalls[e.id];
+      if (this.pendingSubscriptions[e.id]) {
+        if (e.error) {
+          this.pendingSubscriptions[e.id]!(e);
+        } else {
+          this.activeSubscriptions[e.result] = this.pendingSubscriptions[e.id]!;
+          this.activeSubscriptionByMessageId[e.id] = e.result;
+        }
+        delete this.pendingSubscriptions[e.id];
+      }
     } else if (e.params) {
-      // TODO: subscription
+      this.activeSubscriptions[e.params.subscription]?.(e);
     }
   };
 
@@ -45,6 +80,23 @@ export class Client<DiscoveryValue, SendE, InternalE, CloseE> {
     return waiter;
   };
 
+  subscribe: ClientSubscribe<SendE, InternalE> = (message, listener) => {
+    this.pendingSubscriptions[message.id] = listener;
+    this.call(message);
+  };
+
+  subscribeWithStop: ClientSubscribeWithStop<SendE, InternalE> = (message, createListenerCb) => {
+    const stop = () => {
+      delete this.pendingSubscriptions[message.id];
+      const activeSubscriptionId = this.activeSubscriptionByMessageId[message.id];
+      if (activeSubscriptionId) {
+        delete this.activeSubscriptions[activeSubscriptionId];
+      }
+    };
+    this.pendingSubscriptions[message.id] = createListenerCb(stop);
+    this.call(message);
+  };
+
   close = () => {
     return this.providerRef.release();
   };
@@ -53,3 +105,23 @@ export class Client<DiscoveryValue, SendE, InternalE, CloseE> {
 export type ClientCall<SendE, InternalE> = (message: msg.EgressMessage) => Promise<
   msg.OkMessage | msg.ErrorMessage | ProviderSendError<SendE> | ProviderHandlerError<InternalE>
 >;
+
+export type ClientSubscribe<SendE, InternalE> = (
+  message: msg.EgressMessage,
+  listener: U.Listener<
+    | msg.NotificationMessage
+    | msg.ErrorMessage
+    | ProviderSendError<SendE>
+    | ProviderHandlerError<InternalE>
+  >,
+) => void;
+
+export type ClientSubscribeWithStop<SendE, InternalE> = (
+  message: msg.EgressMessage,
+  listener: U.CreateListener<
+    | msg.NotificationMessage
+    | msg.ErrorMessage
+    | ProviderSendError<SendE>
+    | ProviderHandlerError<InternalE>
+  >,
+) => void;
