@@ -7,7 +7,7 @@ import * as U from "../util/mod.ts";
 
 for (const config of T.configs) {
   Deno.test(config.runtimeName, async () => {
-    const metadata = U.throwIfError(await C.run(new C.Metadata(config)));
+    const metadata = U.throwIfError(await C.run(C.metadata(config)));
     const codegen = await T.importCodegen(config);
     const deriveCodec = M.DeriveCodec(metadata.tys);
     const derivedCodecs = metadata.tys.map(deriveCodec);

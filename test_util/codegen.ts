@@ -8,7 +8,7 @@ export type CodegenModule = any;
 const memo = new Map<TestConfig, Promise<CodegenModule>>();
 export function importCodegen(config: TestConfig) {
   return U.getOr(memo, config, async () => {
-    const metadata = U.throwIfError(await C.run(new C.Metadata(config)));
+    const metadata = U.throwIfError(await C.run(C.metadata(config)));
     const outputDir = path.join(
       path.dirname(path.fromFileUrl(import.meta.url)),
       "../target/codegen/",
