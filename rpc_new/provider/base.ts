@@ -53,13 +53,7 @@ export abstract class ProviderConnection<
   constructor(
     readonly inner: Inner,
     readonly cleanUp: () => void,
-    readonly firstListener: U.Listener<
-      | msg.IngressMessage
-      | ProviderHandlerError<HandlerErrorData>
-      | ProviderSendError<SendErrorData>
-    >,
   ) {
-    this.addListener(firstListener);
   }
 
   addListener(
