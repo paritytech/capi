@@ -2,23 +2,25 @@ import * as msg from "../messages.ts";
 import { Provider, ProviderConnection, ProviderListener } from "./base.ts";
 import { ProviderCloseError, ProviderHandlerError, ProviderSendError } from "./errors.ts";
 
-export type ProxyProvider = Provider<string, Event, Event, Event>;
+/** Global lookup of existing connections */
+const connections = new Map<string, ProxyProviderConnection>();
+class ProxyProviderConnection extends ProviderConnection<WebSocket, Event, Event> {}
 
-export const proxyProvider: ProxyProvider = (url, listener) => {
+export const proxyProvider: Provider<string, Event, Event, Event> = (url, listener) => {
   let i = 0;
   return {
     nextId: () => {
       return (i++).toString();
     },
     send: (message) => {
-      const { inner, forEachListener } = connection(url, listener);
+      const conn = connection(url, listener);
       (async () => {
-        const openError = await ensureWsOpen(inner);
+        const openError = await ensureWsOpen(conn.inner);
         if (openError) {
-          forEachListener(new ProviderSendError(openError));
-          return;
+          conn.forEachListener(new ProviderSendError(openError));
+        } else {
+          conn.inner.send(JSON.stringify(message));
         }
-        inner.send(JSON.stringify(message));
       })();
     },
     release: () => {
@@ -34,14 +36,6 @@ export const proxyProvider: ProxyProvider = (url, listener) => {
   };
 };
 
-/** Global lookup of existing connections and references */
-const connections = new Map<string, ProxyProviderConnection>();
-class ProxyProviderConnection extends ProviderConnection<
-  /* inner */ WebSocket,
-  /* handler error data */ Event,
-  /* send error data */ Event
-> {}
-
 function connection(
   url: string,
   listener: ProviderListener<Event, Event>,
@@ -49,15 +43,14 @@ function connection(
   let conn = connections.get(url);
   if (!conn) {
     const controller = new AbortController();
-    const { signal } = controller;
     const ws = new WebSocket(url);
     ws.addEventListener("message", (e) => {
       conn!.forEachListener(msg.parse(e.data));
-    }, { signal });
+    }, controller);
     ws.addEventListener("error", (e) => {
       conn!.forEachListener(new ProviderHandlerError(e));
-    }, { signal });
-    conn = new ProxyProviderConnection(ws, () => controller.abort());
+    }, controller);
+    conn = new ProxyProviderConnection(ws, controller.abort);
     connections.set(url, conn);
   }
   conn.addListener(listener);
@@ -70,15 +63,14 @@ function ensureWsOpen(ws: WebSocket): Promise<void | Event> {
   }
   return new Promise<void | Event>((resolve) => {
     const controller = new AbortController();
-    const { signal } = controller;
     ws.addEventListener("open", () => {
       controller.abort();
       resolve();
-    }, { signal });
+    }, controller);
     ws.addEventListener("error", (e: Event) => {
       controller.abort();
       resolve(e);
-    }, { signal });
+    }, controller);
   });
 }
 
