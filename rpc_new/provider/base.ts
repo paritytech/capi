@@ -11,11 +11,16 @@ export type Provider<DiscoveryValue, HandlerErrorData, SendErrorData, CloseError
   listener: ProviderListener<HandlerErrorData, SendErrorData>,
 ) => ProviderRef<CloseErrorData>;
 
+export type ProviderListenerEvent<HandlerErrorData, SendErrorData> =
+  | msg.IngressMessage
+  | ProviderHandlerError<HandlerErrorData>
+  | ProviderSendError<SendErrorData>;
 export type ProviderListener<HandlerErrorData, SendErrorData> = U.Listener<
-  msg.IngressMessage | ProviderHandlerError<HandlerErrorData> | ProviderSendError<SendErrorData>
+  ProviderListenerEvent<HandlerErrorData, SendErrorData>
 >;
 
 export interface ProviderRef<CloseErrorData> {
+  nextId: () => string;
   send: ProviderSend;
   release: ProviderRelease<CloseErrorData>;
 }

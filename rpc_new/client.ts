@@ -8,37 +8,26 @@ import {
 } from "./provider/mod.ts";
 import * as U from "./util.ts";
 
-export class Client<DiscoveryValue, SendE, InternalE, CloseE> {
+export class Client<
+  DiscoveryValue = any,
+  SendErrorData = any,
+  HandlerErrorData = any,
+  CloseErrorData = any,
+> {
   providerRef;
   pendingCalls: Record<string, Deferred<unknown>> = {};
-  pendingSubscriptions: Record<
-    string,
-    U.Listener<
-      | msg.NotificationMessage
-      | msg.ErrorMessage
-      | ProviderSendError<SendE>
-      | ProviderHandlerError<InternalE>
-    >
-  > = {};
-  activeSubscriptions: Record<
-    string,
-    U.Listener<
-      | msg.NotificationMessage
-      | msg.ErrorMessage
-      | ProviderSendError<SendE>
-      | ProviderHandlerError<InternalE>
-    >
-  > = {};
+  pendingSubscriptions: SubscriptionLookup<SendErrorData, HandlerErrorData> = {};
+  activeSubscriptions: SubscriptionLookup<SendErrorData, HandlerErrorData> = {};
   activeSubscriptionByMessageId: Record<string, string> = {};
 
   constructor(
-    readonly provider: Provider<DiscoveryValue, InternalE, SendE, CloseE>,
+    readonly provider: Provider<DiscoveryValue, HandlerErrorData, SendErrorData, CloseErrorData>,
     readonly discoveryValue: DiscoveryValue,
   ) {
     this.providerRef = provider(discoveryValue, this.#listener);
   }
 
-  #listener: ProviderListener<InternalE, SendE> = (e) => {
+  #listener: ProviderListener<HandlerErrorData, SendErrorData> = (e) => {
     if (e instanceof Error) {
       for (const id in this.pendingCalls) {
         const pendingCall = this.pendingCalls[id]!;
@@ -69,16 +58,14 @@ export class Client<DiscoveryValue, SendE, InternalE, CloseE> {
     }
   };
 
-  call: ClientCall<SendE, InternalE> = (message) => {
-    const waiter = deferred<
-      msg.OkMessage | msg.ErrorMessage | ProviderSendError<SendE> | ProviderHandlerError<InternalE>
-    >();
+  call: ClientCall<SendErrorData, HandlerErrorData> = (message) => {
+    const waiter = deferred<CallEvent<SendErrorData, HandlerErrorData>>();
     this.pendingCalls[message.id] = waiter;
     this.providerRef.send(message);
     return waiter;
   };
 
-  subscribe: ClientSubscribe<SendE, InternalE> = (message, listener) => {
+  subscribe: ClientSubscribe<SendErrorData, HandlerErrorData> = (message, listener) => {
     const stop = () => {
       delete this.pendingSubscriptions[message.id];
       const activeSubscriptionId = this.activeSubscriptionByMessageId[message.id];
@@ -86,7 +73,9 @@ export class Client<DiscoveryValue, SendE, InternalE, CloseE> {
         delete this.activeSubscriptions[activeSubscriptionId];
       }
     };
-    this.pendingSubscriptions[message.id] = listener.bind({ stop });
+    this.pendingSubscriptions[message.id] = listener.bind({ stop }) as U.Listener<
+      SubscriptionEvent<SendErrorData, HandlerErrorData>
+    >;
     this.call(message);
   };
 
@@ -95,21 +84,43 @@ export class Client<DiscoveryValue, SendE, InternalE, CloseE> {
   };
 }
 
-export type ClientCall<SendE, InternalE> = (message: msg.EgressMessage) => Promise<
-  msg.OkMessage | msg.ErrorMessage | ProviderSendError<SendE> | ProviderHandlerError<InternalE>
+export type CallEvent<SendErrorData, HandlerErrorData, Result = any> =
+  | msg.OkMessage<Result>
+  | msg.ErrorMessage
+  | ProviderSendError<SendErrorData>
+  | ProviderHandlerError<HandlerErrorData>;
+
+export type ClientCall<SendErrorData, HandlerErrorData> = <Result = any>(
+  message: msg.EgressMessage,
+) => Promise<CallEvent<SendErrorData, HandlerErrorData, Result>>;
+
+export type SubscriptionEvent<
+  SendErrorData,
+  HandlerErrorData,
+  Method extends string = string,
+  Result = any,
+> =
+  | msg.NotificationMessage<Method, Result>
+  | msg.ErrorMessage
+  | ProviderSendError<SendErrorData>
+  | ProviderHandlerError<HandlerErrorData>;
+
+type SubscriptionLookup<SendErrorData, HandlerErrorData> = Record<
+  string,
+  U.Listener<SubscriptionEvent<SendErrorData, HandlerErrorData>>
 >;
 
-export type ClientSubscribe<SendE, InternalE> = (
+export type ClientSubscribe<SendErrorData, HandlerErrorData> = <
+  Method extends string = string,
+  Result = any,
+>(
   message: msg.EgressMessage,
   listener: U.Listener<
-    | msg.NotificationMessage
-    | msg.ErrorMessage
-    | ProviderSendError<SendE>
-    | ProviderHandlerError<InternalE>,
+    SubscriptionEvent<SendErrorData, HandlerErrorData, Method, Result>,
     ClientSubscribeContext
   >,
 ) => void;
 
-interface ClientSubscribeContext {
+export interface ClientSubscribeContext {
   stop: () => void;
 }

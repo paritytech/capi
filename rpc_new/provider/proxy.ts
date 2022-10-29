@@ -5,7 +5,11 @@ import { ProviderCloseError, ProviderHandlerError, ProviderSendError } from "./e
 export type ProxyProvider = Provider<string, Event, Event, Event>;
 
 export const proxyProvider: ProxyProvider = (url, listener) => {
+  let i = 0;
   return {
+    nextId: () => {
+      return (i++).toString();
+    },
     send: (message) => {
       const { inner, forEachListener } = connection(url, listener);
       (async () => {
