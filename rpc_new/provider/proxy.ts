@@ -80,15 +80,14 @@ function closeWs(socket: WebSocket): Promise<void | ProviderCloseError<Event>> {
   }
   return new Promise<void | ProviderCloseError<Event>>((resolve) => {
     const controller = new AbortController();
-    const { signal } = controller;
     socket.addEventListener("close", () => {
       controller.abort();
       resolve();
-    }, { signal });
+    }, controller);
     socket.addEventListener("error", (e: Event) => {
       controller.abort();
       resolve(new ProviderCloseError(e));
-    }, { signal });
+    }, controller);
     socket.close();
   });
 }
