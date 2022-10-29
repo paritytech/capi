@@ -11,33 +11,26 @@ export type Provider<DiscoveryValue, SendErrorData, HandlerErrorData, CloseError
   listener: ProviderListener<SendErrorData, HandlerErrorData>,
 ) => ProviderRef<CloseErrorData>;
 
-export type ProviderListenerEvent<SendErrorData, HandlerErrorData> =
+export type ProviderListener<SendErrorData, HandlerErrorData> = U.Listener<
   | msg.IngressMessage
   | ProviderSendError<SendErrorData>
-  | ProviderHandlerError<HandlerErrorData>;
-
-export type ProviderListener<SendErrorData, HandlerErrorData> = U.Listener<
-  ProviderListenerEvent<SendErrorData, HandlerErrorData>
+  | ProviderHandlerError<HandlerErrorData>
 >;
 
 export interface ProviderRef<CloseErrorData> {
-  nextId: () => string;
-  send: ProviderSend;
-  release: ProviderRelease<CloseErrorData>;
+  nextId(): string;
+  send(message: msg.EgressMessage): void;
+  release(): Promise<void | ProviderCloseError<CloseErrorData>>;
 }
 
-export type ProviderSend = (message: msg.EgressMessage) => void;
-
-export type ProviderRelease<CloseErrorData> = () => Promise<
-  void | ProviderCloseError<CloseErrorData>
->;
+declare const providerListener_: unique symbol;
+type providerListener_ = typeof providerListener_;
 
 export abstract class ProviderConnection<Inner, SendErrorData, HandlerErrorData> {
+  declare [providerListener_]: ProviderListener<SendErrorData, HandlerErrorData>;
+
   /** The set of high-level listeners, which accept parsed messages and errors */
-  listeners = new Map<
-    ProviderListener<SendErrorData, HandlerErrorData>,
-    ProviderListener<SendErrorData, HandlerErrorData>
-  >();
+  listeners = new Map<this[providerListener_], this[providerListener_]>();
 
   /**
    * @param inner the underlying representation of the connection (such as a websocket or smoldot chain)
@@ -45,7 +38,7 @@ export abstract class ProviderConnection<Inner, SendErrorData, HandlerErrorData>
    */
   constructor(readonly inner: Inner, readonly cleanUp: () => void) {}
 
-  addListener = (listener: ProviderListener<SendErrorData, HandlerErrorData>) => {
+  addListener = (listener: this[providerListener_]) => {
     if (this.listeners.has(listener)) {
       return;
     }
