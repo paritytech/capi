@@ -21,13 +21,13 @@ export class Client<
   activeSubscriptionByMessageId: Record<string, string> = {};
 
   constructor(
-    readonly provider: Provider<DiscoveryValue, HandlerErrorData, SendErrorData, CloseErrorData>,
+    readonly provider: Provider<DiscoveryValue, SendErrorData, HandlerErrorData, CloseErrorData>,
     readonly discoveryValue: DiscoveryValue,
   ) {
     this.providerRef = provider(discoveryValue, this.#listener);
   }
 
-  #listener: ProviderListener<HandlerErrorData, SendErrorData> = (e) => {
+  #listener: ProviderListener<SendErrorData, HandlerErrorData> = (e) => {
     if (e instanceof Error) {
       for (const id in this.pendingCalls) {
         const pendingCall = this.pendingCalls[id]!;
