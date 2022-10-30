@@ -50,7 +50,7 @@ function connection(
     ws.addEventListener("error", (e) => {
       conn!.forEachListener(new ProviderHandlerError(e));
     }, controller);
-    conn = new ProxyProviderConnection(ws, controller.abort);
+    conn = new ProxyProviderConnection(ws, () => controller.abort());
     connections.set(url, conn);
   }
   conn.addListener(listener);
