@@ -33,7 +33,7 @@ export abstract class ProviderConnection<Inner, SendErrorData, HandlerErrorData>
   listeners = new Map<this[providerListener_], this[providerListener_]>();
 
   /**
-   * @param inner the underlying representation of the connection (such as a websocket or smoldot chain)
+   * @param inner the underlying representation of the connection (such as a WebSocket or smoldot chain)
    * @param cleanUp cb to close the connection (`inner`) and free up resources
    */
   constructor(readonly inner: Inner, readonly cleanUp: () => void) {}

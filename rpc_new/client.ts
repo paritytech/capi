@@ -16,8 +16,8 @@ export class Client<
 > {
   providerRef;
   pendingCalls: Record<string, Deferred<unknown>> = {};
-  pendingSubscriptions: SubscriptionLookup<SendErrorData, HandlerErrorData> = {};
-  activeSubscriptions: SubscriptionLookup<SendErrorData, HandlerErrorData> = {};
+  pendingSubscriptions: SubscriptionListeners<SendErrorData, HandlerErrorData> = {};
+  activeSubscriptions: SubscriptionListeners<SendErrorData, HandlerErrorData> = {};
   activeSubscriptionByMessageId: Record<string, string> = {};
 
   constructor(
@@ -33,7 +33,7 @@ export class Client<
         const pendingCall = this.pendingCalls[id]!;
         pendingCall.resolve(e);
         delete this.pendingCalls[id];
-        this.pendingSubscriptions[id]?.(e);
+        this.pendingSubscriptions[id]!(e);
         delete this.pendingSubscriptions[id];
       }
       for (const id in this.activeSubscriptions) {
@@ -54,7 +54,7 @@ export class Client<
         delete this.pendingSubscriptions[e.id];
       }
     } else if (e.params) {
-      this.activeSubscriptions[e.params.subscription]?.(e);
+      this.activeSubscriptions[e.params.subscription]!(e);
     }
   };
 
@@ -105,9 +105,9 @@ export type SubscriptionEvent<
   | ProviderSendError<SendErrorData>
   | ProviderHandlerError<HandlerErrorData>;
 
-type SubscriptionLookup<SendErrorData, HandlerErrorData> = Record<
+type SubscriptionListeners<SendErrorData, HandlerErrorData> = Record<
   string,
-  U.Listener<SubscriptionEvent<SendErrorData, HandlerErrorData>>
+  ClientSubscribeListener<SendErrorData, HandlerErrorData>
 >;
 
 export type ClientSubscribe<SendErrorData, HandlerErrorData> = <
@@ -115,11 +115,25 @@ export type ClientSubscribe<SendErrorData, HandlerErrorData> = <
   Result = any,
 >(
   message: msg.EgressMessage,
-  listener: U.Listener<
-    SubscriptionEvent<SendErrorData, HandlerErrorData, Method, Result>,
-    ClientSubscribeContext
+  listener: ClientSubscribeListener<
+    SendErrorData,
+    HandlerErrorData,
+    ClientSubscribeContext,
+    Method,
+    Result
   >,
 ) => void;
+
+export type ClientSubscribeListener<
+  SendErrorData,
+  HandlerErrorData,
+  Context = void,
+  Method extends string = string,
+  Result = string,
+> = U.Listener<
+  SubscriptionEvent<SendErrorData, HandlerErrorData, Method, Result>,
+  Context
+>;
 
 export interface ClientSubscribeContext {
   stop: () => void;
