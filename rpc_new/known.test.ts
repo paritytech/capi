@@ -21,11 +21,13 @@ class Counter {
 chain.subscribeAllHeads(client, async function(event) {
   const counter = this.state(Counter);
   if (event instanceof Error) {
-    console.log(event);
+    throw event;
+  } else if (event.error) {
+    console.error(event.error);
   } else {
-    console.log(event);
+    console.log(event.params.result);
   }
-  if (counter.i === 5) {
+  if (counter.i === 4) {
     this.stop();
     await client.discard();
   }
