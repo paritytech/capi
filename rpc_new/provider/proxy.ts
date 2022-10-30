@@ -67,7 +67,7 @@ function ensureWsOpen(ws: WebSocket): Promise<void | Event> {
       controller.abort();
       resolve();
     }, controller);
-    ws.addEventListener("error", (e: Event) => {
+    ws.addEventListener("error", (e) => {
       controller.abort();
       resolve(e);
     }, controller);
@@ -84,7 +84,7 @@ function closeWs(socket: WebSocket): Promise<void | ProviderCloseError<Event>> {
       controller.abort();
       resolve();
     }, controller);
-    socket.addEventListener("error", (e: Event) => {
+    socket.addEventListener("error", (e) => {
       controller.abort();
       resolve(new ProviderCloseError(e));
     }, controller);
