@@ -1,3 +1,5 @@
+// TODO: expose these utils from `util/mod.ts`
+
 export type Listener<Event, This = any> = (this: This, event: Event) => void;
 
 export function contramapListener<From, Into>(
