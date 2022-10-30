@@ -1,8 +1,8 @@
-import { config } from "../test_util/config/polkadot.ts";
+import { polkadot } from "../test_util/config.ts";
 import { state } from "./known.ts";
 import { Client, proxyProvider } from "./mod.ts";
 
-const client = new Client(proxyProvider, await config.initDiscoveryValue());
+const client = new Client(proxyProvider, await polkadot.initDiscoveryValue());
 
 const metadata = await state.getMetadata()(client);
 
