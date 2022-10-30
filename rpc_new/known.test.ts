@@ -1,5 +1,5 @@
 import { polkadot } from "../test_util/config.ts";
-import { state } from "./known.ts";
+import { chain, state } from "./known.ts";
 import { Client, proxyProvider } from "./mod.ts";
 
 const client = new Client(proxyProvider, await polkadot.initDiscoveryValue());
@@ -14,4 +14,20 @@ if (metadata instanceof Error) {
   console.log(metadata.result);
 }
 
-await client.discard();
+class Counter {
+  i = 0;
+}
+
+chain.subscribeAllHeads(client, async function(event) {
+  const counter = this.state(Counter);
+  if (event instanceof Error) {
+    console.log(event);
+  } else {
+    console.log(event);
+  }
+  if (counter.i === 5) {
+    this.stop();
+    await client.discard();
+  }
+  counter.i += 1;
+});
