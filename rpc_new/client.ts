@@ -55,7 +55,7 @@ export class Client<
   };
 
   call: ClientCall<SendErrorData, HandlerErrorData> = (message) => {
-    const waiter = deferred<CallEvent<SendErrorData, HandlerErrorData>>();
+    const waiter = deferred<ClientCallEvent<SendErrorData, HandlerErrorData>>();
     this.pendingCalls[message.id] = waiter;
     this.providerRef.send(message);
     return waiter;
@@ -70,7 +70,7 @@ export class Client<
       }
     };
     this.pendingSubscriptions[message.id] = listener.bind({ stop }) as U.Listener<
-      SubscriptionEvent<SendErrorData, HandlerErrorData>
+      ClientSubscriptionEvent<SendErrorData, HandlerErrorData>
     >;
     this.call(message);
   };
@@ -81,7 +81,7 @@ export class Client<
   };
 }
 
-export type CallEvent<SendErrorData, HandlerErrorData, Result = any> =
+export type ClientCallEvent<SendErrorData, HandlerErrorData, Result = any> =
   | msg.OkMessage<Result>
   | msg.ErrorMessage
   | ProviderSendError<SendErrorData>
@@ -89,9 +89,9 @@ export type CallEvent<SendErrorData, HandlerErrorData, Result = any> =
 
 export type ClientCall<SendErrorData, HandlerErrorData> = <Result = any>(
   message: msg.EgressMessage,
-) => Promise<CallEvent<SendErrorData, HandlerErrorData, Result>>;
+) => Promise<ClientCallEvent<SendErrorData, HandlerErrorData, Result>>;
 
-export type SubscriptionEvent<
+export type ClientSubscriptionEvent<
   SendErrorData,
   HandlerErrorData,
   Method extends string = string,
@@ -128,7 +128,7 @@ export type ClientSubscribeListener<
   Method extends string = string,
   Result = string,
 > = U.Listener<
-  SubscriptionEvent<SendErrorData, HandlerErrorData, Method, Result>,
+  ClientSubscriptionEvent<SendErrorData, HandlerErrorData, Method, Result>,
   Context
 >;
 
