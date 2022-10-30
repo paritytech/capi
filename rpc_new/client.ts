@@ -1,11 +1,7 @@
 import { Deferred, deferred } from "../deps/std/async.ts";
 import * as msg from "./messages.ts";
-import {
-  Provider,
-  ProviderHandlerError,
-  ProviderListener,
-  ProviderSendError,
-} from "./provider/mod.ts";
+import { Provider, ProviderListener } from "./provider/base.ts";
+import { ProviderHandlerError, ProviderSendError } from "./provider/errors.ts";
 import * as U from "./util.ts";
 
 export class Client<
