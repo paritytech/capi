@@ -15,7 +15,7 @@ export class Client<
   pendingSubscriptions: SubscriptionListeners<SendErrorData, HandlerErrorData> = {};
   activeSubscriptions: SubscriptionListeners<SendErrorData, HandlerErrorData> = {};
   activeSubscriptionByMessageId: Record<string, string> = {};
-  subscriptionState: Record<string, WeakMap<new() => unknown, unknown>> = {};
+  subscriptionStates: Record<string, WeakMap<new() => unknown, unknown>> = {};
 
   constructor(
     readonly provider: Provider<DiscoveryValue, SendErrorData, HandlerErrorData, CloseErrorData>,
@@ -36,7 +36,7 @@ export class Client<
       for (const id in this.activeSubscriptions) {
         this.activeSubscriptions[id]!(e);
         delete this.activeSubscriptions[id];
-        delete this.subscriptionState[id];
+        delete this.subscriptionStates[id];
       }
     } else if (e.id) {
       const pendingCall = this.pendingCalls[e.id]!;
@@ -74,10 +74,10 @@ export class Client<
     this.pendingSubscriptions[message.id] = listener.bind({
       stop,
       state: <T>(ctor: new() => T) => {
-        let state = this.subscriptionState[message.id];
+        let state = this.subscriptionStates[message.id];
         if (!state) {
           state = new WeakMap();
-          this.subscriptionState[message.id] = state;
+          this.subscriptionStates[message.id] = state;
         }
         let instance = state.get(ctor);
         if (!instance) {
