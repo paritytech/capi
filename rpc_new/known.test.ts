@@ -6,6 +6,12 @@ const client = new Client(proxyProvider, await polkadot.initDiscoveryValue());
 
 const metadata = await state.getMetadata()(client);
 
-console.log(metadata);
+if (metadata instanceof Error) {
+  throw metadata;
+} else if (metadata.error) {
+  console.error(metadata.error);
+} else {
+  console.log(metadata.result);
+}
 
 await client.discard();
