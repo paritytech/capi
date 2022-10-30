@@ -57,9 +57,6 @@ export class Client<
     }
   };
 
-  #connect = () => {
-  };
-
   call: ClientCall<SendErrorData, HandlerErrorData> = (message) => {
     const waiter = deferred<ClientCallEvent<SendErrorData, HandlerErrorData>>();
     this.pendingCalls[message.id] = waiter;
@@ -132,6 +129,10 @@ export type ClientSubscribe<SendErrorData, HandlerErrorData> = <
     Method,
     Result
   >,
+  // TODO: implement this
+  cleanup?: (
+    error?: ProviderSendError<SendErrorData> | ProviderHandlerError<HandlerErrorData>,
+  ) => void,
 ) => void;
 
 export type ClientSubscribeListener<

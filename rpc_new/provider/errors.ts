@@ -1,12 +1,12 @@
-export class ProviderHandlerError<Inner> extends Error {
-  override readonly name = "ProviderInternalError";
+export class ProviderSendError<Inner> extends Error {
+  override readonly name = "ProviderSendError";
   constructor(readonly inner: Inner) {
     super();
   }
 }
 
-export class ProviderSendError<Inner> extends Error {
-  override readonly name = "ProviderSendError";
+export class ProviderHandlerError<Inner> extends Error {
+  override readonly name = "ProviderInternalError";
   constructor(readonly inner: Inner) {
     super();
   }

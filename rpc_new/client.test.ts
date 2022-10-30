@@ -1,33 +1,45 @@
-import { delay } from "../deps/std/async.ts";
+import * as known from "../known/rpc/mod.ts";
 import { polkadot } from "../test_util/config.ts";
-import { Client } from "./client.ts";
-import { proxyProvider } from "./provider/proxy.ts";
+import { Client, proxyProvider } from "./mod.ts";
 
 const client = new Client(proxyProvider, await polkadot.initDiscoveryValue());
-const result = await client.call({
+
+const metadata = await client.call({
   jsonrpc: "2.0",
-  id: "0",
+  id: client.providerRef.nextId(),
   method: "state_getMetadata",
   params: [],
 });
-console.log(result);
 
-let i = 0;
-client.subscribe(
-  {
-    jsonrpc: "2.0",
-    id: "1",
-    method: "chain_subscribeNewHead",
-    params: [],
-  },
-  function(message) {
-    console.log(message);
-    if (++i === 3) {
-      this.stop();
-    }
-  },
-);
+if (metadata instanceof Error) {
+  throw metadata;
+} else if (metadata.error) {
+  console.error(metadata.error);
+} else {
+  console.log(metadata.result);
+}
 
-await delay(30000);
+class Counter {
+  i = 0;
+}
 
-await client.discard();
+client.subscribe<"chain_subscribeAllHeads", known.Header>({
+  jsonrpc: "2.0",
+  id: client.providerRef.nextId(),
+  method: "chain_subscribeAllHeads",
+  params: [],
+}, async function(event) {
+  const counter = this.state(Counter);
+  if (event instanceof Error) {
+    throw event;
+  } else if (event.error) {
+    console.error(event.error);
+  } else {
+    console.log(event.params.result);
+  }
+  if (counter.i === 4) {
+    this.stop();
+    await client.discard();
+  }
+  counter.i += 1;
+});
