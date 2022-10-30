@@ -79,7 +79,8 @@ export class Client<
     this.call(message);
   };
 
-  close = () => {
+  discard = () => {
+    // TODO: more cleanup here?
     return this.providerRef.release();
   };
 }

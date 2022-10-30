@@ -8,4 +8,4 @@ const metadata = await state.getMetadata()(client);
 
 console.log(metadata);
 
-await client.close();
+await client.discard();

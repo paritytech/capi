@@ -30,4 +30,4 @@ client.subscribe(
 
 await delay(30000);
 
-await client.close();
+await client.discard();
