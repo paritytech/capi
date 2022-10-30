@@ -193,7 +193,7 @@ export type StateRpc = {
   state_getStorageSize(key: StorageKey, at?: Hash): RpcResult<number | null>;
   state_getStorageSizeAt: StateRpc["state_getStorageSize"];
   /** Returns the runtime metadata as an opaque blob. */
-  state_getMetadata(at?: Hash): RpcResult<Hex | null>;
+  state_getMetadata(at?: Hash): RpcResult<Hex>;
   /** Get the runtime version. */
   state_getRuntimeVersion(at?: Hash): RpcResult<RuntimeVersion>;
   chain_getRuntimeVersion: StateRpc["state_getRuntimeVersion"];

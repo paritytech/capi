@@ -191,3 +191,5 @@ westmint
 chainspec
 chainspecs
 contramap
+merkle
+dispatchable
