@@ -185,3 +185,4 @@ neovim
 tostring
 framesystem
 statemigration
+xxhash
