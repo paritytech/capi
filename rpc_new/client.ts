@@ -71,6 +71,7 @@ export class Client<
       if (activeSubscriptionId) {
         delete this.activeSubscriptions[activeSubscriptionId];
       }
+      delete this.activeSubscriptionByMessageId[message.id];
     };
     this.pendingSubscriptions[message.id] = listener.bind({
       stop,
