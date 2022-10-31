@@ -68,7 +68,7 @@ async function loadMetadata(src: string) {
 
 // TODO: error message + correct usage suggestion
 function fail(): never {
-  Deno.exit();
+  Deno.exit(1);
 }
 
 // TODO: do we handle help differently depending on what flags were specified?
