@@ -18,6 +18,7 @@ export abstract class Hasher {
     const hashing = this.create();
     hashing.update(data);
     hashing.digestInto(output);
+    hashing.dispose?.();
     if (this.concat) {
       output.set(data, this.digestLength);
     }
@@ -42,6 +43,7 @@ function $hash<T>(hasher: Hasher, $inner: $.Codec<T>): $.Codec<T> {
         const hashing = hasher.create();
         updateHashing(hashing, cursor);
         hashing.digestInto(hashArray);
+        hashing.dispose?.();
       });
     },
     _decode: (buffer) => {
@@ -101,6 +103,7 @@ export class TwoxHasher extends Hasher {
 export interface Hashing {
   update(data: Uint8Array): void;
   digestInto(array: Uint8Array): void;
+  dispose?(): void;
 }
 
 export const Blake2_128 = new Blake2Hasher(128, false);
