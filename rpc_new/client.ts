@@ -53,7 +53,7 @@ export class Client<
         delete this.pendingSubscriptions[e.id];
       }
     } else if (e.params) {
-      this.activeSubscriptions[e.params.subscription]!(e);
+      this.activeSubscriptions[e.params.subscription]?.(e);
     }
   };
 
