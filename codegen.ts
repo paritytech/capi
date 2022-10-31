@@ -73,6 +73,6 @@ function fail(): never {
 
 // TODO: do we handle help differently depending on what flags were specified?
 function help(): never {
-  console.log("Usage: codegen --metadata <file> --output <dir>");
+  console.log("Usage: codegen -s=<scale_file|chain_spec|ws_url> -o=<dir>");
   Deno.exit();
 }
