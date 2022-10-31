@@ -1,10 +1,5 @@
 import * as M from "../frame_metadata/mod.ts";
 
-export const importSource = new URL("../mod.ts", import.meta.url).toString();
-
-export type File = { getContent: () => S };
-export type Files = Map<string, File>;
-
 export type S = string | number | S[];
 
 export namespace S {

@@ -9,7 +9,7 @@
   },
   "lint": {
     "files": {
-      "exclude": ["**/mod.generated.js", "target"],
+      "exclude": ["target"],
       "include": ["."]
     },
     "rules": {
@@ -37,7 +37,6 @@
     "test": "deno task run test_ctx.ts deno test -A --no-check=remote -L=info --ignore=target --parallel",
     "test:update": "deno task test -- -- --update",
     "mdbook:watch": "mdbook watch -o",
-    "bench": "deno bench -A --no-check=remote --unstable",
-    "typegen": "deno task run typegen/typegen.ts"
+    "bench": "deno bench -A --no-check=remote --unstable"
   }
 }

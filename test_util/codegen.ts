@@ -9,13 +9,16 @@ const memo = new Map<TestConfig, Promise<CodegenModule>>();
 export function importCodegen(config: TestConfig) {
   return U.getOr(memo, config, async () => {
     const metadata = U.throwIfError(await C.run(C.metadata(config)));
-    const outputDir = path.join(
+    const outDir = path.join(
       path.dirname(path.fromFileUrl(import.meta.url)),
       "../target/codegen/",
       config.runtimeName,
     );
-    const output = gen.codegen(metadata);
-    await gen.writeOutput(outputDir, output);
-    return await import(path.toFileUrl(path.join(outputDir, "mod.ts")).toString());
+    await gen.codegen({
+      importSpecifier: import.meta.resolve("../mod.ts"),
+      metadata,
+      outDir,
+    }).write();
+    return await import(path.toFileUrl(path.join(outDir, "mod.ts")).toString());
   });
 }

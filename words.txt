@@ -186,3 +186,4 @@ tostring
 framesystem
 statemigration
 xxhash
+chainspec
