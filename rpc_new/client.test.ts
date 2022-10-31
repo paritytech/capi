@@ -12,13 +12,13 @@ import { Client, proxyProvider } from "./mod.ts";
 
 Deno.test({
   name: "RPC Client",
-  sanitizeOps: false,
-  sanitizeResources: false,
   async fn(t) {
     const client = new Client(proxyProvider, await T.polkadot.initDiscoveryValue());
 
     await t.step({
       name: "call",
+      sanitizeOps: false,
+      sanitizeResources: false,
       async fn() {
         const metadata = await client.call({
           jsonrpc: "2.0",
@@ -34,6 +34,8 @@ Deno.test({
 
     await t.step({
       name: "subscribe",
+      sanitizeOps: false,
+      sanitizeResources: false,
       async fn() {
         const stopped = deferred();
         const events: msg.NotificationMessage<"chain_subscribeAllHeads", known.Header>[] = [];
