@@ -10,12 +10,11 @@ export function importCodegen(config: TestConfig) {
   return U.getOr(memo, config, async () => {
     const metadata = U.throwIfError(await C.run(C.metadata(config)));
     const outDir = path.join(
-      path.dirname(path.fromFileUrl(import.meta.url)),
-      "../target/codegen/",
+      new URL("../target/codegen", import.meta.url).pathname,
       config.runtimeName,
     );
     await gen.codegen({
-      importSpecifier: "./mod.ts",
+      importSpecifier: "../../../mod.ts",
       metadata,
       outDir,
     }).write();

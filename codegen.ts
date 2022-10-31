@@ -11,7 +11,7 @@ const args = parse(Deno.args, {
   string: ["src", "out", "import"],
   boolean: ["help"],
   default: {
-    import: "deno",
+    import: "https://deno.land/x/capi/mod.ts",
   },
   alias: {
     src: ["s"],
@@ -25,11 +25,7 @@ if (!args.src) fail();
 if (!args.out) fail();
 
 await codegen({
-  importSpecifier: args.import === "npm"
-    ? "capi"
-    : args.import === "deno"
-    ? "https://deno.land/x/capi/mod.ts"
-    : args.import,
+  importSpecifier: args.import,
   metadata: await getMetadata(args.src),
   outDir: args.out,
 }).write();

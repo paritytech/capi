@@ -1,4 +1,3 @@
-import * as path from "../deps/std/path.ts";
 import * as M from "../frame_metadata/mod.ts";
 import { Files } from "./Files.ts";
 import { CodegenProps } from "./mod.ts";
@@ -18,7 +17,7 @@ export function createCodecVisitor(
       "\n",
       [
         "import { ChainError, BitSequence, Era, $, $era, $null } from",
-        S.string(path.relative(props.outDir, props.importSpecifier)),
+        S.string(props.importSpecifier),
       ],
       [`import type * as t from "./mod.ts"`],
       ...codecs,
