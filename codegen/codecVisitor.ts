@@ -1,28 +1,29 @@
 import * as M from "../frame_metadata/mod.ts";
-import { Decl, Files, getCodecPath, getName, getRawCodecPath, importSource, S } from "./utils.ts";
+import { Files } from "./Files.ts";
+import { CodegenProps } from "./mod.ts";
+import { Decl, getCodecPath, getName, getRawCodecPath, S } from "./utils.ts";
 
 export function createCodecVisitor(
-  tys: M.Ty[],
+  props: CodegenProps,
   decls: Decl[],
   typeVisitor: M.TyVisitor<S>,
   files: Files,
 ) {
-  ["import { $, $null, $era } from", S.string(importSource)];
+  const { tys } = props.metadata;
   const namespaceImports = new Set<string>();
   const codecs: S[] = [];
-
   files.set("codecs.ts", {
     getContent: () => [
       "\n",
       [
         "import { ChainError, BitSequence, Era, $, $era, $null } from",
-        S.string(importSource),
+        S.string(props.importSpecifier),
       ],
       [`import type * as t from "./mod.ts"`],
       ...codecs,
       [
         "export const _all: $.AnyCodec[] =",
-        S.array(tys.map((ty) => getName(getRawCodecPath(ty)))),
+        S.array(props.metadata.tys.map((ty) => getName(getRawCodecPath(ty)))),
       ],
     ],
   });

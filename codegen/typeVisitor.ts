@@ -1,7 +1,9 @@
 import * as M from "../frame_metadata/mod.ts";
+import { CodegenProps } from "./mod.ts";
 import { Decl, getName, getPath, makeDocComment, S } from "./utils.ts";
 
-export function createTypeVisitor(tys: M.Ty[], decls: Decl[]) {
+export function createTypeVisitor(props: CodegenProps, decls: Decl[]) {
+  const { tys } = props.metadata;
   return new M.TyVisitor<S>(tys, {
     unitStruct(ty) {
       return addTypeDecl(ty, "null");
