@@ -10,7 +10,8 @@ export function importCodegen(config: TestConfig) {
   return U.getOr(memo, config, async () => {
     const metadata = U.throwIfError(await C.run(C.metadata(config)));
     const outDir = path.join(
-      new URL("../target/codegen", import.meta.url).pathname,
+      path.dirname(path.fromFileUrl(import.meta.url)),
+      "../target/codegen",
       config.runtimeName,
     );
     await gen.codegen({
