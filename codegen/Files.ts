@@ -9,18 +9,17 @@ export class Files extends Map<string, File> {
   }
 
   write = async () => {
-    const outDir = path.join(Deno.cwd(), this.outDir);
     const errors = [];
     try {
-      await Deno.remove(outDir, { recursive: true });
+      await Deno.remove(this.outDir, { recursive: true });
     } catch (e) {
       if (!(e instanceof Deno.errors.NotFound)) {
         throw e;
       }
     }
-    await Deno.mkdir(outDir, { recursive: true });
+    await Deno.mkdir(this.outDir, { recursive: true });
     for (const [relativePath, file] of this.entries()) {
-      const outputPath = path.join(outDir, relativePath);
+      const outputPath = path.join(this.outDir, relativePath);
       const content = S.toString(file.getContent());
       try {
         const formatted = tsFormatter.formatText("gen.ts", content);

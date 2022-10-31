@@ -21,7 +21,7 @@ export function codegen(props: CodegenProps): Files {
       "\n",
       [
         "import { ChainError, BitSequence, Era, $ } from",
-        S.string(path.relative(Deno.cwd(), props.importSpecifier)),
+        S.string(path.relative(props.outDir, props.importSpecifier)),
       ],
       [`import * as _codec from "./codecs.ts"`],
       [`export { _metadata }`],

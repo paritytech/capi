@@ -15,7 +15,7 @@ export function importCodegen(config: TestConfig) {
       config.runtimeName,
     );
     await gen.codegen({
-      importSpecifier: import.meta.resolve("../mod.ts"),
+      importSpecifier: "./mod.ts",
       metadata,
       outDir,
     }).write();

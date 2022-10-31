@@ -25,7 +25,11 @@ if (!args.src) fail();
 if (!args.out) fail();
 
 await codegen({
-  importSpecifier: args.import,
+  importSpecifier: args.import === "npm"
+    ? "capi"
+    : args.import === "deno"
+    ? "https://deno.land/x/capi/mod.ts"
+    : args.import,
   metadata: await getMetadata(args.src),
   outDir: args.out,
 }).write();
