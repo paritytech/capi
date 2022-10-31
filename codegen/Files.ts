@@ -8,7 +8,7 @@ export class Files extends Map<string, File> {
     super();
   }
 
-  write = async () => {
+  async write() {
     const errors = [];
     try {
       await Deno.remove(this.outDir, { recursive: true });
@@ -32,5 +32,5 @@ export class Files extends Map<string, File> {
     if (errors.length) {
       throw errors;
     }
-  };
+  }
 }
