@@ -41,6 +41,7 @@ for (const [name, data, fullHash] of hashes) {
       const hasher = new Xxhash(rounds);
       hasher.update(data);
       assertEquals(hex.encode(hasher.digest()), hash);
+      hasher.dispose();
     });
     if (size === 512) {
       for (const chunkSize of [1, 13, 31, 32, 33, 49, 64, 65, 113]) {
@@ -50,6 +51,7 @@ for (const [name, data, fullHash] of hashes) {
             hasher.update(data.slice(i, i + chunkSize));
           }
           assertEquals(hex.encode(hasher.digest()), hash);
+          hasher.dispose();
         });
       }
     }

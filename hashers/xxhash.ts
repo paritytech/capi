@@ -1,148 +1,134 @@
-/*
-  Copyright 2022 Parity Technologies
-  SPDX-License-Identifier: Apache-2.0
-  Adapted from https://github.com/polkadot-js/common/blob/40d6a388/packages/util-crypto/src/xxhash/xxhash64.ts
+import wasmCode from "./xxhash.wasm.ts";
 
-  Copyright 2017-2022 @polkadot/util-crypto authors & contributors
-  SPDX-License-Identifier: Apache-2.0
-  Adapted from https://github.com/pierrec/js-xxhash/blob/0504e76f3d31a21ae8528a7f590c7289c9e431d2/lib/xxhash64.js
+const memory = new WebAssembly.Memory({ initial: 1, maximum: 128 });
 
-  xxHash64 implementation in pure Javascript
-  Copyright (C) 2016, Pierre Curto
+const wasmModule = new WebAssembly.Module(wasmCode);
+const wasmInstance = new WebAssembly.Instance(wasmModule, {
+  xxhash: { memory },
+});
 
-  Permission is hereby granted, free of charge, to any person obtaining a copy
-  of this software and associated documentation files (the "Software"), to deal
-  in the Software without restriction, including without limitation the rights
-  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-  copies of the Software, and to permit persons to whom the Software is
-  furnished to do so, subject to the following conditions:
-
-  The above copyright notice and this permission notice shall be included in all
-  copies or substantial portions of the Software.
-
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-  SOFTWARE.
-*/
-
-const P64_1 = 11400714785074694791n;
-const P64_2 = 14029467366897019727n;
-const P64_3 = 1609587929392839161n;
-const P64_4 = 9650029242287828579n;
-const P64_5 = 2870177450012600261n;
-
-// mask for a u64, all bits set
-const U64 = 0xff_ff_ff_ff_ff_ff_ff_ffn;
-
-function rotl(a: bigint, b: bigint): bigint {
-  const c = a & U64;
-
-  return ((c << b) | (c >> (64n - b))) & U64;
+interface XxhashWasm {
+  max_rounds: WebAssembly.Global;
+  free_mem: WebAssembly.Global;
+  init_mod(): void;
+  reset(rounds: number, state_adr: number): void;
+  update(rounds: number, state_adr: number, pos: number, end: number): void;
+  digest(
+    rounds: number,
+    state_adr: number,
+    written: number,
+    pos: number,
+    end: number,
+    digest_adr: number,
+  ): void;
 }
 
+const wasm = wasmInstance.exports as never as XxhashWasm;
+wasm.init_mod();
+
+const maxRounds = wasm.max_rounds.value;
+
+let memBuf = new Uint8Array(memory.buffer);
+let memI = wasm.free_mem.value;
+
+const pool: XxhashInner[] = [];
+const finReg = new FinalizationRegistry<XxhashInner>((inner) => {
+  pool.push(inner);
+});
+
 export class Xxhash {
-  buf = new Uint8Array(32);
-  view = new DataView(this.buf.buffer);
-  bufI = 0;
-  written = 0;
-  vs;
+  private inner = pool.pop() ?? new XxhashInner();
 
   constructor(public rounds: number) {
-    this.vs = new BigUint64Array(rounds * 4);
-    for (let i = 0, seed = 0n; i < this.vs.length; seed++) {
-      this.vs[i++] = seed + P64_1 + P64_2;
-      this.vs[i++] = seed + P64_2;
-      this.vs[i++] = seed;
-      this.vs[i++] = seed - P64_1;
-    }
-  }
-
-  _updateVs(view: DataView, p: number) {
-    const a = view.getBigUint64(p, true);
-    const b = view.getBigUint64(p + 8, true);
-    const c = view.getBigUint64(p + 16, true);
-    const d = view.getBigUint64(p + 24, true);
-    for (let i = 0; i < this.vs.length;) {
-      this.vs[i] = P64_1 * rotl(this.vs[i++]! + P64_2 * a, 31n);
-      this.vs[i] = P64_1 * rotl(this.vs[i++]! + P64_2 * b, 31n);
-      this.vs[i] = P64_1 * rotl(this.vs[i++]! + P64_2 * c, 31n);
-      this.vs[i] = P64_1 * rotl(this.vs[i++]! + P64_2 * d, 31n);
-    }
+    finReg.register(this, this.inner, this.inner);
+    this.inner.reset(rounds);
   }
 
   update(input: Uint8Array) {
-    this.written += input.length;
-    let i = 0;
-    if (this.bufI) {
-      i = Math.min(input.length, 32 - this.bufI);
-      this.buf.set(input.subarray(0, i), this.bufI);
-      this.bufI += i;
-      if (this.bufI < 32) return;
-      this._updateVs(this.view, 0);
-    }
-    if (i <= input.length - 32) {
-      const view = new DataView(input.buffer, input.byteOffset, input.byteLength);
-      do {
-        this._updateVs(view, i);
-        i += 32;
-      } while (i + 32 <= input.length);
-    }
-    this.buf.set(input.subarray(i));
-    this.bufI = input.length - i;
+    this.inner.update(this.rounds, input);
   }
 
   digest() {
-    return this.digestInto(new Uint8Array(this.rounds * 8));
+    return this.inner.digest(this.rounds);
   }
 
   digestInto(digest: Uint8Array) {
-    const digestView = new DataView(digest.buffer, digest.byteOffset, digest.byteLength);
-    for (let i = 0; i < this.rounds; i++) {
-      const v0 = this.vs[i * 4]!;
-      const v1 = this.vs[i * 4 + 1]!;
-      const v2 = this.vs[i * 4 + 2]!;
-      const v3 = this.vs[i * 4 + 3]!;
-
-      let h64 = 0n;
-      if (this.written >= 32) {
-        h64 = U64 & (rotl(v0, 1n) + rotl(v1, 7n) + rotl(v2, 12n) + rotl(v3, 18n));
-        h64 = U64 & ((h64 ^ (P64_1 * rotl(v0 * P64_2, 31n))) * P64_1 + P64_4);
-        h64 = U64 & ((h64 ^ (P64_1 * rotl(v1 * P64_2, 31n))) * P64_1 + P64_4);
-        h64 = U64 & ((h64 ^ (P64_1 * rotl(v2 * P64_2, 31n))) * P64_1 + P64_4);
-        h64 = U64 & ((h64 ^ (P64_1 * rotl(v3 * P64_2, 31n))) * P64_1 + P64_4);
-      } else {
-        h64 = BigInt(i) + P64_5;
-      }
-      h64 = U64 & (BigInt(this.written) + h64);
-
-      let p = 0;
-      while (p + 8 <= this.bufI) {
-        const n = this.view.getBigUint64(p, true);
-        h64 = U64 & (P64_4 + P64_1 * rotl(h64 ^ (P64_1 * rotl(P64_2 * n, 31n)), 27n));
-        p += 8;
-      }
-
-      if (p + 4 <= this.bufI) {
-        const n = BigInt(this.view.getUint32(p, true));
-        h64 = U64 & (P64_3 + P64_2 * rotl(h64 ^ (P64_1 * n), 23n));
-        p += 4;
-      }
-
-      while (p < this.bufI) {
-        const n = BigInt(this.buf[p++]!);
-        h64 = U64 & (P64_1 * rotl(h64 ^ (P64_5 * n), 11n));
-      }
-
-      h64 = U64 & (P64_2 * (h64 ^ (h64 >> 33n)));
-      h64 = U64 & (P64_3 * (h64 ^ (h64 >> 29n)));
-      h64 = U64 & (h64 ^ (h64 >> 32n));
-
-      digestView.setBigUint64(i * 8, h64, true);
-    }
-    return digest;
+    this.inner.digestInto(this.rounds, digest);
   }
+
+  dispose() {
+    pool.push(this.inner);
+    finReg.unregister(this.inner);
+    this.inner = null!;
+  }
+}
+
+class XxhashInner {
+  exLoc = 0;
+  adr;
+  exLen = 0;
+  written = 0;
+
+  constructor() {
+    ensureAvailable(32 + maxRounds * 32);
+    this.exLoc = memI;
+    memI += 32;
+    this.adr = memI;
+    memI += maxRounds * 32;
+  }
+
+  reset(rounds: number) {
+    wasm.reset(rounds, this.adr);
+    this.written = 0;
+    this.exLen = 0;
+  }
+
+  update(rounds: number, input: Uint8Array) {
+    this.written += input.length;
+    const total = this.exLen + input.length;
+    if (total < 32) {
+      memBuf.set(input, this.exLoc + this.exLen);
+      this.exLen += input.length;
+      return;
+    }
+    ensureAvailable(total);
+    if (this.exLen) {
+      memBuf.set(memBuf.subarray(this.exLoc, this.exLoc + this.exLen), memI);
+    }
+    memBuf.set(input, memI + this.exLen);
+    const excess = total % 32;
+    wasm.update(rounds, this.adr, memI, memI + total - excess);
+    if (excess) {
+      memBuf.set(input.subarray(input.length - excess), this.exLoc);
+    }
+    this.exLen = excess;
+  }
+
+  _digest(rounds: number) {
+    ensureAvailable(rounds * 8);
+    wasm.digest(
+      rounds,
+      this.adr,
+      this.written,
+      this.exLoc,
+      this.exLoc + this.exLen,
+      memI,
+    );
+  }
+
+  digestInto(rounds: number, digest: Uint8Array) {
+    this._digest(rounds);
+    digest.set(memBuf.subarray(memI, memI + rounds * 8));
+  }
+
+  digest(rounds: number) {
+    this._digest(rounds);
+    return memBuf.slice(memI, memI + rounds * 8);
+  }
+}
+
+function ensureAvailable(length: number) {
+  if (memI + length <= memBuf.length) return;
+  memory.grow(Math.ceil((memI + length - memBuf.length) / 65536));
+  memBuf = new Uint8Array(memory.buffer);
 }
