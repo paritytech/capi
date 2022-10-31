@@ -34,10 +34,6 @@ await codegen({
   outDir: args.out,
 }).write();
 
-// file:///Users/harrysolovay/Desktop/capi/frame_metadata/_downloaded/polkadot.scale
-// /Users/harrysolovay/Desktop/capi/frame_metadata/_downloaded/polkadot.scale
-// ./frame_metadata/_downloaded/polkadot.scale
-// frame_metadata/_downloaded/polkadot.scale
 async function getMetadata(src: string): Promise<M.Metadata> {
   if (src.startsWith("ws")) {
     const client = U.throwIfError(await proxyClient(new Config(() => src, undefined!)));
@@ -70,11 +66,12 @@ async function loadMetadata(src: string) {
   }
 }
 
+// TODO: error message + correct usage suggestion
 function fail(): never {
-  // TODO: error message + correct usage suggestion
   Deno.exit();
 }
 
+// TODO: do we handle help differently depending on what flags were specified?
 function help(): never {
   console.log("Usage: codegen --metadata <file> --output <dir>");
   Deno.exit();
