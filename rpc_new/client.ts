@@ -87,7 +87,11 @@ export class Client<
   };
 
   discard = () => {
-    // TODO: more cleanup here?
+    this.pendingCalls = {};
+    this.pendingSubscriptions = {};
+    this.activeSubscriptions = {};
+    this.activeSubscriptionByMessageId = {};
+    this.subscriptionStates.clear();
     return this.providerRef.release();
   };
 }
