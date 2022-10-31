@@ -27,8 +27,7 @@ if (!args.out) fail();
 await codegen({
   importSpecifier: args.import,
   metadata: await getMetadata(args.src),
-  outDir: args.out,
-}).write();
+}).write(args.out);
 
 async function getMetadata(src: string): Promise<M.Metadata> {
   if (src.startsWith("ws")) {

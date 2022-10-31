@@ -8,12 +8,11 @@ import { Decl, printDecls, S } from "./utils.ts";
 export interface CodegenProps {
   metadata: M.Metadata;
   importSpecifier: string;
-  outDir: string;
 }
 
 export function codegen(props: CodegenProps): Files {
   const decls: Decl[] = [];
-  const files = new Files(props.outDir);
+  const files = new Files();
   decls.push({
     path: "_",
     code: [

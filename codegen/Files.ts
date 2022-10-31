@@ -4,22 +4,18 @@ import { S } from "./utils.ts";
 
 export type File = { getContent: () => S };
 export class Files extends Map<string, File> {
-  constructor(readonly outDir: string) {
-    super();
-  }
-
-  async write() {
+  async write(outDir: string) {
     const errors = [];
     try {
-      await Deno.remove(this.outDir, { recursive: true });
+      await Deno.remove(outDir, { recursive: true });
     } catch (e) {
       if (!(e instanceof Deno.errors.NotFound)) {
         throw e;
       }
     }
-    await Deno.mkdir(this.outDir, { recursive: true });
+    await Deno.mkdir(outDir, { recursive: true });
     for (const [relativePath, file] of this.entries()) {
-      const outputPath = path.join(this.outDir, relativePath);
+      const outputPath = path.join(outDir, relativePath);
       const content = S.toString(file.getContent());
       try {
         const formatted = tsFormatter.formatText("gen.ts", content);

@@ -16,8 +16,7 @@ export function importCodegen(config: TestConfig) {
     await gen.codegen({
       importSpecifier: "../../../mod.ts",
       metadata,
-      outDir,
-    }).write();
+    }).write(outDir);
     return await import(path.toFileUrl(path.join(outDir, "mod.ts")).toString());
   });
 }
