@@ -1,5 +1,6 @@
 import * as Z from "../deps/zones.ts";
 import { run } from "../effects/run.ts";
+import * as known from "../known/rpc/mod.ts";
 import * as T from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
 import { ClientSubscribeContext } from "./client.ts";
@@ -19,9 +20,9 @@ export namespace polkadot {
   }
 
   export function subscribeNewHeads<
-    Listener_ extends Z.$<Listener<string, ClientSubscribeContext>>,
+    Listener_ extends Z.$<Listener<known.Header, ClientSubscribeContext>>,
   >(listener: Listener_) {
-    return E.subscription(client)<string>()("chain_subscribeNewHeads", [], listener);
+    return E.subscription(client)<known.Header>()("chain_subscribeNewHeads", [], listener);
   }
 }
 
