@@ -9,9 +9,13 @@ export function client<DiscoveryValue, SendErrorData, HandlerErrorData, CloseErr
   provider: Provider<DiscoveryValue, SendErrorData, HandlerErrorData, CloseErrorData>,
   discoveryValue: DiscoveryValue,
 ) {
-  return Z.call(Z.ls(discoveryValue, provider), () => {
-    return new Client(provider, discoveryValue);
-  });
+  return Z.call(
+    Z.ls(provider, discoveryValue),
+    ([provider, discoveryValue]) => {
+      // FIXME: type casting
+      new Client(provider, discoveryValue as Client["discoveryValue"]);
+    },
+  );
 }
 
 // TODO: not narrowing error inner data type
