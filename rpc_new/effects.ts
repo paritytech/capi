@@ -13,7 +13,7 @@ export function client<DiscoveryValue, SendErrorData, HandlerErrorData, CloseErr
     Z.ls(provider, discoveryValue),
     ([provider, discoveryValue]) => {
       // FIXME: type casting
-      new Client(provider, discoveryValue as Client["discoveryValue"]);
+      return new Client(provider, discoveryValue as Client["discoveryValue"]);
     },
   );
 }
