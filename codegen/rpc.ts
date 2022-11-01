@@ -4,9 +4,16 @@ const template = Deno.readTextFileSync(new URL("../rpc_new/template.ts", import.
 const START = "// capi-codegen-replacement-start";
 const END = "// capi-codegen-replacement-end";
 
-export function rpcDecls(methodNames: string[]) {
+export function rpcDecls(
+  discoveryValue: string,
+  methodNames: Record<string, string[]>,
+) {
   const [start, tail] = template.split(START);
-  const [end] = tail!.split(END);
-  console.log(start, end);
-  return "";
+  const [_, end] = tail!.split(END);
+  return [
+    start!,
+    ["const provider = C.proxyProvider;"],
+    [`const discoveryValue =`, S.string(discoveryValue)],
+    end!,
+  ];
 }

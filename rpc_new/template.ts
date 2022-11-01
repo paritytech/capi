@@ -1,10 +1,11 @@
 // TODO: generate the following based on a desc of std methods
+import * as k from "./known.ts";
 
 import * as Z from "../deps/zones.ts";
 import * as known from "../known/rpc/mod.ts";
 import * as U from "../util/mod.ts";
 import { ClientSubscribeContext } from "./client.ts";
-import { call, client, subscription } from "./effects.ts";
+import { client } from "./effects.ts";
 import { Provider } from "./mod.ts";
 import { Listener } from "./util.ts";
 
@@ -18,17 +19,16 @@ const client_ = client(provider, discoveryValue);
 
 export namespace state {
   export function getMetadata<Rest extends [blockHash?: Z.$<U.HexHash>]>(...rest: [...Rest]) {
-    return call(client_)<U.Hex>()("state_getMetadata", rest);
+    return k.state.getMetadata(client_)(...rest);
   }
 }
 export namespace chain {
-  export function unsubscribeNewHeads<Id extends Z.$<string>>(id: Id) {
-    return call(client_)<true>()("chain_unsubscribeNewHeads", [id]);
-  }
-
   export function subscribeNewHeads<
     Listener_ extends Z.$<Listener<known.Header, ClientSubscribeContext>>,
   >(listener: Listener_) {
-    return subscription(client_)<known.Header>()("chain_subscribeNewHeads", [], listener);
+    return k.chain.unsubscribeNewHeads(client_)([], listener);
+  }
+  export function unsubscribeNewHeads<Id extends Z.$<string>>(id: Id) {
+    return k.chain.unsubscribeNewHeads(client_)(id);
   }
 }

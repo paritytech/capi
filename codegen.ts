@@ -27,8 +27,18 @@ if (!args.out) fail();
 await codegen({
   importSpecifier: args.import,
   metadata: await getMetadata(args.src),
+  rpcMethodNames: { // TODO: infer this via source
+    state: [
+      "getMetadata",
+    ],
+    chain: [
+      "unsubscribeNewHeads",
+      "subscribeNewHeads",
+    ],
+  },
 }).write(args.out);
 
+// Should disallow .scale as input?
 async function getMetadata(src: string): Promise<M.Metadata> {
   if (src.startsWith("ws")) {
     const client = U.throwIfError(await proxyClient(new Config(() => src)));

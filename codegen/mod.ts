@@ -9,7 +9,8 @@ import { Decl, printDecls, S } from "./utils.ts";
 export interface CodegenProps {
   metadata: M.Metadata;
   importSpecifier: string;
-  rpcMethodNames: string[];
+  // TODO: this shape or another?
+  rpcMethodNames: Record<string, string[]>;
 }
 
 export function codegen(props: CodegenProps): Files {
@@ -38,7 +39,7 @@ export function codegen(props: CodegenProps): Files {
     getContent: () => printDecls(decls),
   });
   files.set("rpc.ts", {
-    getContent: () => rpcDecls(props.rpcMethodNames),
+    getContent: () => rpcDecls("", props.rpcMethodNames),
   });
   return files;
 }
