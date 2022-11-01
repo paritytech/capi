@@ -159,6 +159,11 @@ export function getEntry(pallet: Pallet, name: string): StorageEntry | EntryNotF
 }
 export class EntryNotFoundError extends U.ErrorCtor("EntryNotFound") {}
 
+export function getConst(pallet: Pallet, name: string): Constant | ConstNotFoundError {
+  return pallet.constants?.find((constant) => constant.name === name) || new ConstNotFoundError();
+}
+export class ConstNotFoundError extends U.ErrorCtor("ConstNotFound") {}
+
 export function getPalletAndEntry(
   metadata: Metadata,
   palletName: string,

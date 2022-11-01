@@ -1,5 +1,6 @@
 export * from "./blockRead.ts";
 export * from "./blockWatch.ts";
+export * from "./const.ts";
 export * from "./entryRead.ts";
 export * from "./entryWatch.ts";
 export * from "./extrinsic.ts";

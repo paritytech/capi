@@ -5,6 +5,7 @@ import { $storageKey } from "./core/$storageKey.ts";
 import { codec } from "./core/codec.ts";
 import { decoded } from "./core/decoded.ts";
 import { deriveCodec } from "./core/deriveCodec.ts";
+import { hexDecode } from "./core/hex.ts";
 import { storageKey } from "./core/storageKey.ts";
 import { entryMetadata, metadata, palletMetadata } from "./metadata.ts";
 import { rpcCall } from "./rpcCall.ts";
@@ -30,6 +31,6 @@ export function entryRead<
   const storageCall = rpcCall(config, "state_getStorage", [storageKey_, blockHash]);
   const entryValueTypeI = entryMetadata_.access("value");
   const $entry = codec(deriveCodec_, entryValueTypeI);
-  const resultHex = storageCall.access("result");
-  return decoded($entry, resultHex, "value");
+  const result = storageCall.access("result");
+  return decoded($entry, hexDecode(result), "value");
 }

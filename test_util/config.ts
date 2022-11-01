@@ -2,31 +2,23 @@ import { Config } from "../config/mod.ts";
 
 export class TestConfig extends Config<string> {
   constructor(readonly runtimeName: TestConfigRuntime.Name) {
-    super(
-      async () => {
-        const hostname = Deno.env.get("TEST_CTX_HOSTNAME");
-        const portRaw = Deno.env.get("TEST_CTX_PORT");
-        if (!hostname || !portRaw) await testCtx();
-        const conn = await Deno.connect({
-          hostname,
-          port: parseInt(portRaw!),
-        });
-        conn.write(new Uint8Array([TestConfigRuntime.CODES[runtimeName]]));
-        const port = await (async () => {
-          for await (const x of conn.readable) {
-            return new DataView(x.buffer).getUint16(0);
-          }
-          return undefined!;
-        })();
-        return `ws://127.0.0.1:${port}`;
-      },
-      {
-        kusama: 2,
-        rococo: undefined!, // TODO
-        westend: 0,
-        polkadot: 0,
-      }[runtimeName],
-    );
+    super(async () => {
+      const hostname = Deno.env.get("TEST_CTX_HOSTNAME");
+      const portRaw = Deno.env.get("TEST_CTX_PORT");
+      if (!hostname || !portRaw) await testCtx();
+      const conn = await Deno.connect({
+        hostname,
+        port: parseInt(portRaw!),
+      });
+      conn.write(new Uint8Array([TestConfigRuntime.CODES[runtimeName]]));
+      const port = await (async () => {
+        for await (const x of conn.readable) {
+          return new DataView(x.buffer).getUint16(0);
+        }
+        return undefined!;
+      })();
+      return `ws://127.0.0.1:${port}`;
+    });
   }
 }
 

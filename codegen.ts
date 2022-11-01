@@ -31,7 +31,7 @@ await codegen({
 
 async function getMetadata(src: string): Promise<M.Metadata> {
   if (src.startsWith("ws")) {
-    const client = U.throwIfError(await proxyClient(new Config(() => src, undefined!)));
+    const client = U.throwIfError(await proxyClient(new Config(() => src)));
     const metadata = U.throwIfError(await client.call("state_getMetadata", []));
     U.throwIfError(await client.close());
     if (metadata.error) fail();

@@ -45,6 +45,21 @@ export function entryMetadata<PalletMetadata extends Z.$<M.Pallet>, EntryName ex
   );
 }
 
+export function constMetadata<
+  PalletMetadata extends Z.$<M.Pallet>,
+  ConstName extends Z.$<string>,
+>(
+  palletMetadata: PalletMetadata,
+  constName: ConstName,
+) {
+  return Z.call(
+    Z.ls(palletMetadata, constName),
+    function constMetadataImpl([palletMetadata, constName]) {
+      return M.getConst(palletMetadata, constName);
+    },
+  );
+}
+
 export function mapMetadata<PalletMetadata extends Z.$<M.Pallet>, EntryName extends Z.$<string>>(
   palletMetadata: PalletMetadata,
   entryName: EntryName,
