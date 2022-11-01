@@ -64,7 +64,8 @@ export class Client<
     return waiter;
   };
 
-  subscribe: ClientSubscribe<SendErrorData, HandlerErrorData> = (message, listener, cleanup) => {
+  subscribe: ClientSubscribe<SendErrorData, HandlerErrorData> = (message, listener) => {
+    const waiter = deferred<string | undefined>();
     const stop = () => {
       delete this.pendingSubscriptions[message.id];
       const activeSubscriptionId = this.activeSubscriptionByMessageId[message.id];
@@ -72,9 +73,10 @@ export class Client<
         delete this.activeSubscriptions[activeSubscriptionId];
       }
       delete this.activeSubscriptionByMessageId[message.id];
-      cleanup?.(activeSubscriptionId);
+      waiter.resolve(activeSubscriptionId);
     };
     this.pendingSubscriptions[message.id] = listener.bind({
+      message,
       stop,
       state: <T>(ctor: new() => T) => {
         return getOrInit(
@@ -85,6 +87,7 @@ export class Client<
       },
     }) as ClientSubscribeListener<SendErrorData, HandlerErrorData>;
     this.call(message);
+    return waiter;
   };
 
   discard = () => {
@@ -135,10 +138,7 @@ export type ClientSubscribe<SendErrorData, HandlerErrorData> = <
     Method,
     Result
   >,
-  cleanup?: (
-    subscriptionId?: string,
-  ) => void,
-) => void;
+) => Promise<undefined | string>;
 
 export type ClientSubscribeListener<
   SendErrorData,
@@ -152,6 +152,7 @@ export type ClientSubscribeListener<
 >;
 
 export interface ClientSubscribeContext {
+  message: msg.EgressMessage;
   stop: () => void;
   state: <T>(ctor: new() => T) => T;
 }

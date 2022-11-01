@@ -6,8 +6,9 @@ import { ProviderCloseError, ProviderHandlerError, ProviderSendError } from "./e
 const connections = new Map<string, ProxyProviderConnection>();
 class ProxyProviderConnection extends ProviderConnection<WebSocket, Event, Event> {}
 
+let i = 0;
+
 export const proxyProvider: Provider<string, Event, Event, Event> = (url, listener) => {
-  let i = 0;
   return {
     nextId: () => {
       return (i++).toString();
