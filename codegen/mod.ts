@@ -2,12 +2,14 @@ import * as M from "../frame_metadata/mod.ts";
 import { createCodecVisitor } from "./codecVisitor.ts";
 import { Files } from "./Files.ts";
 import { genMetadata } from "./genMetadata.ts";
+import { rpcDecls } from "./rpc.ts";
 import { createTypeVisitor } from "./typeVisitor.ts";
 import { Decl, printDecls, S } from "./utils.ts";
 
 export interface CodegenProps {
   metadata: M.Metadata;
   importSpecifier: string;
+  rpcMethodNames: string[];
 }
 
 export function codegen(props: CodegenProps): Files {
@@ -34,6 +36,9 @@ export function codegen(props: CodegenProps): Files {
   genMetadata(props.metadata, decls);
   files.set("mod.ts", {
     getContent: () => printDecls(decls),
+  });
+  files.set("rpc.ts", {
+    getContent: () => rpcDecls(props.rpcMethodNames),
   });
   return files;
 }

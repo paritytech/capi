@@ -193,3 +193,5 @@ chainspecs
 contramap
 merkle
 dispatchable
+xxhash
+polkagen

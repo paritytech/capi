@@ -1,10 +1,4 @@
-import { deferred } from "../deps/std/async.ts";
-import {
-  assert,
-  assertEquals,
-  assertExists,
-  assertNotInstanceOf,
-} from "../deps/std/testing/asserts.ts";
+import * as A from "../deps/std/testing/asserts.ts";
 import * as known from "../known/rpc/mod.ts";
 import * as T from "../test_util/mod.ts";
 import * as msg from "./messages.ts";
@@ -26,9 +20,9 @@ Deno.test({
           method: "state_getMetadata",
           params: [],
         });
-        assertNotInstanceOf(metadata, Error);
-        assert(!metadata.error);
-        assertExists(metadata.result);
+        A.assertNotInstanceOf(metadata, Error);
+        A.assert(!metadata.error);
+        A.assertExists(metadata.result);
       },
     });
 
@@ -52,9 +46,9 @@ Deno.test({
           params: [],
         }, function(event) {
           const counter = this.state(Counter);
-          assertNotInstanceOf(event, Error);
-          assert(!event.error);
-          assertExists(event.params.result.parentHash);
+          A.assertNotInstanceOf(event, Error);
+          A.assert(!event.error);
+          A.assertExists(event.params.result.parentHash);
           subscriptionId = event.params.subscription;
           events.push(event);
           if (counter.i === 2) {
@@ -63,8 +57,8 @@ Deno.test({
           }
           counter.i++;
         });
-        assertEquals(events.length, 3);
-        assertEquals(stoppedSubscriptionId, subscriptionId!);
+        A.assertEquals(events.length, 3);
+        A.assertEquals(stoppedSubscriptionId, subscriptionId!);
       },
     });
 
