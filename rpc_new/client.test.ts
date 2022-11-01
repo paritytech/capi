@@ -38,6 +38,7 @@ Deno.test({
       sanitizeResources: false,
       async fn() {
         const stopped = deferred();
+        let subscriptionId;
         const events: msg.NotificationMessage<"chain_subscribeAllHeads", known.Header>[] = [];
         class Counter {
           i = 0;
@@ -52,16 +53,19 @@ Deno.test({
           assertNotInstanceOf(event, Error);
           assert(!event.error);
           assertExists(event.params.result.parentHash);
+          subscriptionId = event.params.subscription;
           events.push(event);
           if (counter.i === 2) {
             this.stop();
-            stopped.resolve();
             return;
           }
           counter.i++;
+        }, (subscriptionId) => {
+          stopped.resolve(subscriptionId);
         });
-        await stopped;
+        const stoppedSubscriptionId = await stopped;
         assertEquals(events.length, 3);
+        assertEquals(stoppedSubscriptionId, subscriptionId);
       },
     });
 

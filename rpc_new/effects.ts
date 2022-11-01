@@ -72,7 +72,19 @@ export function subscription<
               params,
             },
             listener,
-            pending.resolve,
+            async (subscriptionId) => {
+              if (!subscriptionId) {
+                pending.resolve();
+              }
+              const unsubscribeMethod = method.replace("_subscribe", "_unsubscribe");
+              const result = await client.call({
+                jsonrpc: "2.0",
+                id: client.providerRef.nextId(),
+                method: unsubscribeMethod,
+                params: [subscriptionId],
+              });
+              pending.resolve(result instanceof Error ? result : undefined);
+            },
           );
           return pending;
         },

@@ -64,7 +64,7 @@ export class Client<
     return waiter;
   };
 
-  subscribe: ClientSubscribe<SendErrorData, HandlerErrorData> = (message, listener) => {
+  subscribe: ClientSubscribe<SendErrorData, HandlerErrorData> = (message, listener, cleanup) => {
     const stop = () => {
       delete this.pendingSubscriptions[message.id];
       const activeSubscriptionId = this.activeSubscriptionByMessageId[message.id];
@@ -72,6 +72,7 @@ export class Client<
         delete this.activeSubscriptions[activeSubscriptionId];
       }
       delete this.activeSubscriptionByMessageId[message.id];
+      cleanup?.(activeSubscriptionId);
     };
     this.pendingSubscriptions[message.id] = listener.bind({
       stop,
@@ -134,9 +135,8 @@ export type ClientSubscribe<SendErrorData, HandlerErrorData> = <
     Method,
     Result
   >,
-  // TODO: implement this
   cleanup?: (
-    error?: ProviderSendError<SendErrorData> | ProviderHandlerError<HandlerErrorData>,
+    subscriptionId?: string,
   ) => void,
 ) => void;
 
