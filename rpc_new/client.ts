@@ -5,12 +5,23 @@ import { Provider, ProviderListener } from "./provider/base.ts";
 import { ProviderHandlerError, ProviderSendError } from "./provider/errors.ts";
 import * as U from "./util.ts";
 
+// TODO: delete this upon solving inner-type-access problem of RPC effects
+export declare const ClientE_: unique symbol;
+export type ClientE_ = typeof ClientE_;
+
 export class Client<
   DiscoveryValue = any,
   SendErrorData = any,
   HandlerErrorData = any,
   CloseErrorData = any,
 > {
+  // TODO: delete this as well pending the above `TODO` ^
+  declare [ClientE_]: {
+    send: SendErrorData;
+    handler: HandlerErrorData;
+    close: CloseErrorData;
+  };
+
   providerRef;
   pendingCalls: Record<string, Deferred<unknown>> = {};
   pendingSubscriptions: SubscriptionListeners<SendErrorData, HandlerErrorData> = {};

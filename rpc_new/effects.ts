@@ -1,9 +1,9 @@
 // TODO: close connection based on zones rc
 import * as Z from "../deps/zones.ts";
-import { Client, ClientSubscribeContext } from "./client.ts";
+import { Client, ClientCallEvent, ClientE_, ClientSubscribeContext } from "./client.ts";
 import * as msg from "./messages.ts";
 import { Provider } from "./provider/base.ts";
-import { ProviderCloseError, ProviderHandlerError, ProviderSendError } from "./provider/errors.ts";
+import { ProviderHandlerError, ProviderSendError } from "./provider/errors.ts";
 import * as U from "./util.ts";
 
 export function client<DiscoveryValue, SendErrorData, HandlerErrorData, CloseErrorData>(
@@ -26,7 +26,12 @@ export function call<Client_ extends Z.$<Client>>(client: Client_) {
       params: [...Params],
     ) => {
       return Z.call(Z.ls(client, method, ...params), async ([client, method, ...params]) => {
-        const result = await client.call<Result>({
+        // TODO: why do we need to explicitly type this / why is this not being inferred?
+        const result: ClientCallEvent<
+          typeof client[ClientE_]["send"],
+          typeof client[ClientE_]["handler"],
+          Result
+        > = await client.call<Result>({
           jsonrpc: "2.0",
           id: client.providerRef.nextId(),
           method,
@@ -43,12 +48,8 @@ export function call<Client_ extends Z.$<Client>>(client: Client_) {
   };
 }
 
-export function subscription<
-  SendErrorData,
-  HandlerErrorData,
-  CloseErrorData,
-  Client_ extends Z.$<Client<any, SendErrorData, HandlerErrorData, CloseErrorData>>,
->(client: Client_) {
+// TODO: why are leading type params unknown when `extends Z.$Client<any, SendErrorData, HandlerErrorData, CloseErrorData>`?
+export function subscription<Client_ extends Z.$<Client>>(client: Client_) {
   return <Result>() => {
     return <
       Method extends Z.$<string>,
@@ -65,9 +66,8 @@ export function subscription<
           let error:
             | undefined
             | RpcServerError
-            | ProviderSendError<SendErrorData>
-            | ProviderHandlerError<HandlerErrorData>
-            | ProviderCloseError<CloseErrorData>;
+            | ProviderSendError<typeof client[ClientE_]["send"]>
+            | ProviderHandlerError<typeof client[ClientE_]["handler"]>;
           const id = await client.subscribe<Z.T<Method>, Result>({
             jsonrpc: "2.0",
             id: client.providerRef.nextId(),
@@ -98,26 +98,3 @@ export class RpcServerError extends Error {
     super();
   }
 }
-
-// const c = client(proxyProvider, "" as string);
-
-// export function subscribeNewHeads<Handler extends Z.$<RpcHandlerUtil<typeof c, string>>>(
-//   handler: Handler,
-// ) {
-//   const subscribeNewHeads = subscription(c as any)<string>()(
-//     "chain_subscribeNewHeads",
-//     [],
-//     handler,
-//   );
-//   return call(c as any)<void>()("chain_unsubscribeNewHeads", [
-//     subscribeNewHeads,
-//   ]);
-// }
-
-// const $sub = rpcSubscription("subscribeSomeMethod", [], function(e) {
-//   console.log(e);
-//   if (someCondition) {
-//     this.stop();
-//   }
-// });
-// const $unsub = rpcCall("unsubscribeSomeMethod", [$sub]);

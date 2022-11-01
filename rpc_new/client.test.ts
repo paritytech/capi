@@ -37,13 +37,15 @@ Deno.test({
       sanitizeOps: false,
       sanitizeResources: false,
       async fn() {
-        const stopped = deferred();
-        let subscriptionId;
+        let subscriptionId: string;
         const events: msg.NotificationMessage<"chain_subscribeAllHeads", known.Header>[] = [];
         class Counter {
           i = 0;
         }
-        client.subscribe<"chain_subscribeAllHeads", known.Header>({
+        const stoppedSubscriptionId = await client.subscribe<
+          "chain_subscribeAllHeads",
+          known.Header
+        >({
           jsonrpc: "2.0",
           id: client.providerRef.nextId(),
           method: "chain_subscribeAllHeads",
@@ -60,12 +62,9 @@ Deno.test({
             return;
           }
           counter.i++;
-        }, (subscriptionId) => {
-          stopped.resolve(subscriptionId);
         });
-        const stoppedSubscriptionId = await stopped;
         assertEquals(events.length, 3);
-        assertEquals(stoppedSubscriptionId, subscriptionId);
+        assertEquals(stoppedSubscriptionId, subscriptionId!);
       },
     });
 
