@@ -16,7 +16,7 @@ export namespace polkadot {
   }
 
   export function unsubscribeNewHeads<Id extends Z.$<string>>(id: Id) {
-    return E.call(client)<true>()("chain_unsubscribeNewHeads", [id as Id]);
+    return E.call(client)<true>()("chain_unsubscribeNewHeads", [id]);
   }
 
   export function subscribeNewHeads<
