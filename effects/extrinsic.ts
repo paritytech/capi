@@ -6,6 +6,7 @@ import { Config } from "../mod.ts";
 import { NotifMessage } from "../rpc/mod.ts";
 import * as ss58 from "../ss58/mod.ts";
 import * as U from "../util/mod.ts";
+import { const as const_ } from "./const.ts";
 import { $extrinsic } from "./core/$extrinsic.ts";
 import { deriveCodec } from "./core/deriveCodec.ts";
 import { hexDecode } from "./core/hex.ts";
@@ -49,21 +50,27 @@ export class SignedExtrinsic<
     const props = props_ as Z.Rec$Access<Props>;
     const metadata_ = metadata(config);
     const deriveCodec_ = deriveCodec(metadata_);
-    const $extrinsic_ = $extrinsic(deriveCodec_, metadata_, this.sign, config.addressPrefix);
+    const addrPrefix = const_(config, "System", "SS58Prefix")
+      .access("value")
+      .as<number>();
+    const $extrinsic_ = $extrinsic(deriveCodec_, metadata_, this.sign, addrPrefix);
     const runtimeVersion = rpcCall(config, "state_getRuntimeVersion", []);
-    const senderSs58 = Z.call(props.sender, function senderSs58(sender) {
-      return ((): string => {
-        switch (sender.type) {
-          case "Id": {
-            return ss58.encode(config.addressPrefix, sender.value);
+    const senderSs58 = Z.call(
+      Z.ls(addrPrefix, props.sender),
+      function senderSs58([addrPrefix, sender]) {
+        return ((): string => {
+          switch (sender.type) {
+            case "Id": {
+              return ss58.encode(addrPrefix, sender.value);
+            }
+            // TODO: other types
+            default: {
+              unimplemented();
+            }
           }
-          // TODO: other types
-          default: {
-            unimplemented();
-          }
-        }
-      })();
-    });
+        })();
+      },
+    );
     const accountNextIndex = rpcCall(config, "system_accountNextIndex", [senderSs58]);
     const genesisHash = hexDecode(rpcCall(config, "chain_getBlockHash", [0]).access("result"));
     const checkpointHash = props.checkpoint
