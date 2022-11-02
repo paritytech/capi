@@ -112,6 +112,8 @@ export function DeriveCodec(tys: M.Ty[]): DeriveCodec {
 }
 
 export class ChainError<T> extends Error {
+  override readonly name = "ChainError";
+
   constructor(readonly value: T) {
     super();
   }

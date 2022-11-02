@@ -1,7 +1,6 @@
 import { blake2b } from "../deps/blake2b.ts";
 import * as $ from "../deps/scale.ts";
 import { EncodeBuffer } from "../deps/scale.ts";
-import { DecodeNonTransparentKeyError } from "../frame_metadata/Key.ts";
 import { Xxhash } from "./xxhash.ts";
 
 export abstract class Hasher {
@@ -122,4 +121,8 @@ function updateHashing(hashing: Hashing, data: EncodeBuffer) {
       hashing.update(array);
     }
   }
+}
+
+export class DecodeNonTransparentKeyError extends Error {
+  override readonly name = "DecodeNonTransparentKeyError";
 }

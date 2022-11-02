@@ -49,7 +49,9 @@ export function rpcSubscription<
 }
 
 // TODO: handle elsewhere
-export class RpcSubscriptionError extends U.ErrorCtor("RpcSubscription") {
+export class RpcSubscriptionError extends Error {
+  override readonly name = "RpcSubscriptionError";
+
   constructor(readonly error: rpc.ErrMessage["error"]) {
     super();
   }
