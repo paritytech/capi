@@ -58,7 +58,7 @@ export class SignedExtrinsic<
     const senderSs58 = Z.call(
       Z.ls(addrPrefix, props.sender),
       function senderSs58([addrPrefix, sender]) {
-        return ((): string => {
+        return (() => {
           switch (sender.type) {
             case "Id": {
               return ss58.encode(addrPrefix, sender.value);

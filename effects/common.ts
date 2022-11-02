@@ -1,8 +1,8 @@
 import * as rpc from "../rpc/mod.ts";
-import * as U from "../util/mod.ts";
 
 // TODO: handle this elsewhere
-export class RpcError extends U.ErrorCtor("RpcCall") {
+export class RpcError extends Error {
+  override readonly name = "RpcCall";
   code;
   attempt;
 

@@ -152,17 +152,23 @@ export function fromPrefixedHex(scaleEncoded: string): Metadata {
 export function getPallet(metadata: Metadata, name: string): Pallet | PalletNotFoundError {
   return metadata.pallets.find((pallet) => pallet.name === name) || new PalletNotFoundError();
 }
-export class PalletNotFoundError extends U.ErrorCtor("PalletNotFound") {}
+export class PalletNotFoundError extends Error {
+  override readonly name = "PalletNotFoundError";
+}
 
 export function getEntry(pallet: Pallet, name: string): StorageEntry | EntryNotFoundError {
   return pallet.storage?.entries.find((entry) => entry.name === name) || new EntryNotFoundError();
 }
-export class EntryNotFoundError extends U.ErrorCtor("EntryNotFound") {}
+export class EntryNotFoundError extends Error {
+  override readonly name = "EntryNotFoundError";
+}
 
 export function getConst(pallet: Pallet, name: string): Constant | ConstNotFoundError {
   return pallet.constants?.find((constant) => constant.name === name) || new ConstNotFoundError();
 }
-export class ConstNotFoundError extends U.ErrorCtor("ConstNotFound") {}
+export class ConstNotFoundError extends Error {
+  override readonly name = "ConstNotFoundError";
+}
 
 export function getPalletAndEntry(
   metadata: Metadata,

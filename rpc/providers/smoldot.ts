@@ -1,6 +1,5 @@
 import { Config } from "../../config/mod.ts";
 import type * as smoldot from "../../deps/smoldot.ts";
-import { ErrorCtor } from "../../util/mod.ts";
 import { Client, OnMessage } from "../Base.ts";
 import { ClientHooks, ParseRawIngressMessageError } from "../common.ts";
 
@@ -80,15 +79,21 @@ async function ensureInstance(): Promise<smoldot.Client | FailedToStartSmoldotEr
   return _state.smoldotInstance;
 }
 
-export class FailedToStartSmoldotError extends ErrorCtor("FailedToStartSmoldot") {}
-export class FailedToAddChainError extends ErrorCtor("FailedToAddChain") {
+export class FailedToStartSmoldotError extends Error {
+  override readonly name = "FailedToStartSmoldot";
+}
+export class FailedToAddChainError extends Error {
+  override readonly name = "FailedToAddChain";
   constructor(readonly inner: unknown) {
     super();
   }
 }
-export class SmoldotInternalError extends ErrorCtor("SmoldotInternal") {}
+export class SmoldotInternalError extends Error {
+  override readonly name = "SmoldotInternal";
+}
 // TODO: specify narrow `AlreadyDestroyedError` & `CrashError` from Smoldot
-export class FailedToRemoveChainError extends ErrorCtor("FailedToRemoveChain") {
+export class FailedToRemoveChainError extends Error {
+  override readonly name = "FailedToRemoveChain";
   constructor(readonly inner: unknown) {
     super();
   }

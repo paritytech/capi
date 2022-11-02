@@ -77,4 +77,6 @@ export function mapMetadata<PalletMetadata extends Z.$<M.Pallet>, EntryName exte
   );
 }
 
-export class ExpectedMapError extends U.ErrorCtor("ExpectedMap") {}
+export class ExpectedMapError extends Error {
+  override readonly name = "ExpectedMap";
+}

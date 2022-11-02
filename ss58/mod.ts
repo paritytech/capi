@@ -1,50 +1,44 @@
 import { blake2b } from "../deps/blake2b.ts";
 import * as base58 from "../deps/std/encoding/base58.ts";
-import * as U from "../util/mod.ts";
 
 // SS58PRE string (0x53533538505245 hex) encoded as Uint8Array
 const SS58PRE = Uint8Array.of(83, 83, 53, 56, 80, 82, 69);
-
 const CHECKSUM_LENGTH = 2;
-
 const VALID_ADDRESS_LENGTHS: Record<number, boolean | undefined> = {
   35: true,
   36: true,
   37: true,
   38: true,
 };
-
 const VALID_PUBLIC_KEY_LENGTHS: Record<number, boolean | undefined> = {
   32: true,
   33: true,
 };
 
-export class InvalidPublicKeyLengthError extends U.ErrorCtor("InvalidPublicKeyLengthError") {}
-export class InvalidNetworkPrefixError extends U.ErrorCtor("InvalidNetworkPrefixError") {}
-export class InvalidAddressLengthError extends U.ErrorCtor("InvalidAddressError") {}
-export class InvalidAddressChecksumError extends U.ErrorCtor("InvalidAddressChecksumError") {}
-
 export const encode = (
   prefix: number,
   pubKey: Uint8Array,
   validNetworkPrefixes?: readonly number[],
-) => base58.encode(encodeRaw(prefix, pubKey, validNetworkPrefixes));
-
+) => {
+  const encodeRawResult = encodeRaw(prefix, pubKey, validNetworkPrefixes);
+  if (encodeRawResult instanceof Error) return encodeRawResult;
+  return base58.encode(encodeRawResult);
+};
 export const encodeRaw = (
   prefix: number,
   pubKey: Uint8Array,
   validNetworkPrefixes?: readonly number[],
-): Uint8Array => {
+): Uint8Array | InvalidPublicKeyLengthError | InvalidNetworkPrefixError => {
   const isValidPublicKeyLength = !!VALID_PUBLIC_KEY_LENGTHS[pubKey.length];
 
   if (!isValidPublicKeyLength) {
-    throw new InvalidPublicKeyLengthError();
+    return new InvalidPublicKeyLengthError();
   }
 
   const isValidNetworkPrefix = !validNetworkPrefixes || validNetworkPrefixes.includes(prefix);
 
   if (!isValidNetworkPrefix) {
-    throw new InvalidNetworkPrefixError();
+    return new InvalidNetworkPrefixError();
   }
 
   const prefixBytes = prefix < 64
@@ -73,14 +67,25 @@ export const encodeRaw = (
 
   return address;
 };
+export class InvalidPublicKeyLengthError extends Error {
+  override readonly name = "InvalidPublicKeyLengthError";
+}
+export class InvalidNetworkPrefixError extends Error {
+  override readonly name = "InvalidNetworkPrefixError";
+}
 
 export const decode = (address: string) => decodeRaw(base58.decode(address));
-
-export const decodeRaw = (address: Uint8Array): [prefix: number, pubKey: Uint8Array] => {
+export const decodeRaw = (
+  address: Uint8Array,
+):
+  | [prefix: number, pubKey: Uint8Array]
+  | InvalidAddressLengthError
+  | InvalidAddressChecksumError =>
+{
   const isValidAddressLength = !!VALID_ADDRESS_LENGTHS[address.length];
 
   if (!isValidAddressLength) {
-    throw new InvalidAddressLengthError();
+    return new InvalidAddressLengthError();
   }
 
   const prefixLength = address[0]! & 0b0100_0000 ? 2 : 1;
@@ -90,9 +95,7 @@ export const decodeRaw = (address: Uint8Array): [prefix: number, pubKey: Uint8Ar
     : ((address[0]! & 0b0011_1111) << 2) | (address[1]! >> 6)
       | ((address[1]! & 0b0011_1111) << 8);
 
-  const hasher = blake2b.create({
-    dkLen: 512 / 8,
-  });
+  const hasher = blake2b.create({ dkLen: 512 / 8 });
 
   hasher.update(SS58PRE);
   hasher.update(address.subarray(0, address.length - CHECKSUM_LENGTH));
@@ -101,7 +104,7 @@ export const decodeRaw = (address: Uint8Array): [prefix: number, pubKey: Uint8Ar
   const checksum = address.subarray(address.length - CHECKSUM_LENGTH);
 
   if (digest[0] !== checksum[0] || digest[1] !== checksum[1]) {
-    throw new InvalidAddressChecksumError();
+    return new InvalidAddressChecksumError();
   }
 
   const pubKey = address.subarray(
@@ -111,3 +114,9 @@ export const decodeRaw = (address: Uint8Array): [prefix: number, pubKey: Uint8Ar
 
   return [prefix, pubKey];
 };
+export class InvalidAddressLengthError extends Error {
+  override readonly name = "InvalidAddressError";
+}
+export class InvalidAddressChecksumError extends Error {
+  override readonly name = "InvalidAddressChecksumError";
+}

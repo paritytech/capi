@@ -1,6 +1,5 @@
 import { Config } from "../../config/mod.ts";
 import { deadline, deferred } from "../../deps/std/async.ts";
-import { ErrorCtor } from "../../util/mod.ts";
 import * as B from "../Base.ts";
 import { ClientHooks, ParseRawIngressMessageError } from "../common.ts";
 
@@ -78,5 +77,9 @@ export class ProxyClient extends B.Client<MessageEvent, Event, FailedToDisconnec
   }
 }
 
-export class FailedToOpenConnectionError extends ErrorCtor("FailedToOpenConnection") {}
-export class FailedToDisconnectError extends ErrorCtor("FailedToDisconnect") {}
+export class FailedToOpenConnectionError extends Error {
+  override readonly name = "FailedToOpenConnection";
+}
+export class FailedToDisconnectError extends Error {
+  override readonly name = "FailedToDisconnect";
+}

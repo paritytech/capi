@@ -1,4 +1,3 @@
-import { ErrorCtor } from "../util/mod.ts";
 import * as msg from "./messages.ts";
 
 export type ProviderMethods = Record<string, (...args: any[]) => any>;
@@ -39,4 +38,6 @@ export interface ClientHooks<InternalError> {
   close?: () => void;
 }
 
-export class ParseRawIngressMessageError extends ErrorCtor("ParseRawIngressMessage") {}
+export class ParseRawIngressMessageError extends Error {
+  override readonly name = "ParseRawIngressMessage";
+}
