@@ -60,8 +60,6 @@ async function connection(
       <ClientOptions> {
         forbidTcp: true,
         forbidNonLocalWs: true,
-        maxLogLevel: 1,
-        cpuRateLimit: 0.5,
       },
     );
   }
@@ -81,6 +79,8 @@ async function connection(
     };
     // TODO: should we be greedy & kick off a few additional?
     //       We don't want the inner buffer to overflow.
+    loop();
+    loop();
     loop();
   }
   conn.addListener(listener);

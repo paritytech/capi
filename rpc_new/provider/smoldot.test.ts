@@ -1,28 +1,23 @@
-import { deferred } from "../../deps/std/async.ts";
-import { assertExists, assertNotInstanceOf } from "../../deps/std/testing/asserts.ts";
-import * as T from "../../test_util/mod.ts";
+// TODO
 import { smoldotProvider } from "./smoldot.ts";
+
+const POLKADOT_CHAIN_SPEC_URL =
+  "https://raw.githubusercontent.com/paritytech/smoldot/main/bin/polkadot.json";
 
 Deno.test({
   name: "Proxy Provider",
+  ignore: true,
   async fn() {
-    const stopped = deferred();
-    const provider = smoldotProvider(
-      await T.polkadot.initDiscoveryValue(),
-      (message) => {
-        assertNotInstanceOf(message, Error);
-        assertExists(message.result);
-        stopped.resolve();
-      },
-    );
+    const polkadotChainSpec = await (await fetch(POLKADOT_CHAIN_SPEC_URL)).text();
+    const provider = smoldotProvider(polkadotChainSpec, (message) => {
+      console.log(message);
+      provider.release();
+    });
     provider.send({
       jsonrpc: "2.0",
       id: provider.nextId(),
-      method: "system_health",
+      method: "state_getMetadata",
       params: [],
     });
-    await stopped;
-    const providerRelease = await provider.release();
-    assertNotInstanceOf(providerRelease, Error);
   },
 });

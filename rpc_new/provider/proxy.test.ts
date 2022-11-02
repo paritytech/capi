@@ -7,14 +7,11 @@ Deno.test({
   name: "Proxy Provider",
   async fn() {
     const stopped = deferred();
-    const provider = proxyProvider(
-      await T.polkadot.initDiscoveryValue(),
-      (message) => {
-        assertNotInstanceOf(message, Error);
-        assertExists(message.result);
-        stopped.resolve();
-      },
-    );
+    const provider = proxyProvider(await T.polkadot.discoveryValue, (message) => {
+      assertNotInstanceOf(message, Error);
+      assertExists(message.result);
+      stopped.resolve();
+    });
     provider.send({
       jsonrpc: "2.0",
       id: provider.nextId(),

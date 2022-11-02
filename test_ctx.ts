@@ -89,17 +89,15 @@ async function portReady(port: number): Promise<void> {
 }
 
 function spawnDevNetProcess(port: number, runtimeName: TestConfigRuntime.Name) {
-  // --chain /tmp/raw-local-chainspec.json \
-  const chainSpecPath = path.join("target", `${runtimeName}_spec.json`);
-  const cmd = ["polkadot", "--dev", "--ws-port", port.toString(), "--chain", chainSpecPath];
+  const cmd = ["polkadot", "--dev", "--ws-port", port.toString()];
   if (runtimeName !== "polkadot") {
     cmd.push(`--force-${runtimeName}`);
   }
   try {
     return Deno.run({
       cmd,
-      stdout: "piped",
-      stderr: "piped",
+      stdout: "inherit",
+      stderr: "inherit",
     });
     // TODO: inherit specific logs (how to filter?)
   } catch (e) {
