@@ -9,12 +9,9 @@ export function client<DiscoveryValue, SendErrorData, HandlerErrorData, CloseErr
   provider: Provider<DiscoveryValue, SendErrorData, HandlerErrorData, CloseErrorData>,
   discoveryValue: DiscoveryValue,
 ) {
-  return Z.call(
-    Z.ls(provider, discoveryValue),
-    () => {
-      return new Client(provider, discoveryValue);
-    },
-  );
+  return Z.call(Z.ls(provider, discoveryValue), () => {
+    return new Client(provider, discoveryValue);
+  });
 }
 
 export function call<Params extends unknown[], Result>(method: string) {

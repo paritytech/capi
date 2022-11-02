@@ -37,7 +37,6 @@
     "test": "deno task run test_ctx.ts deno test -A --no-check=remote -L=info --ignore=target --parallel",
     "test:update": "deno task test -- -- --update",
     "mdbook:watch": "mdbook watch -o",
-    "bench": "deno bench -A --no-check=remote --unstable",
-    "polkagen": "deno task run codegen.ts -s=wss://rpc.polkadot.io -o=target/polkagen --import=../../mod.ts"
+    "bench": "deno bench -A --no-check=remote --unstable"
   }
 }
