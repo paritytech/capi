@@ -5,7 +5,7 @@ const POLKADOT_CHAIN_SPEC_URL =
   "https://raw.githubusercontent.com/paritytech/smoldot/main/bin/polkadot.json";
 
 Deno.test({
-  name: "Proxy Provider",
+  name: "Smoldot Provider",
   ignore: true,
   async fn() {
     const polkadotChainSpec = await (await fetch(POLKADOT_CHAIN_SPEC_URL)).text();
