@@ -50,11 +50,11 @@ export class SignedExtrinsic<
     const props = props_ as Z.Rec$Access<Props>;
     const metadata_ = metadata(config);
     const deriveCodec_ = deriveCodec(metadata_);
-    const addrPrefix = const_(config, "System", "SS58Prefix")
-      .access("value")
-      .as<number>();
+    const addrPrefix = const_(config, "System", "SS58Prefix").access("value").as<number>();
     const $extrinsic_ = $extrinsic(deriveCodec_, metadata_, this.sign, addrPrefix);
-    const runtimeVersion = rpcCall(config, "state_getRuntimeVersion", []);
+    const versions = const_(config, "System", "Version").access("value");
+    const specVersion = versions.access("spec_version").as<number>();
+    const transactionVersion = versions.access("transaction_version").as<number>();
     const senderSs58 = Z.call(
       Z.ls(addrPrefix, props.sender),
       function senderSs58([addrPrefix, sender]) {
@@ -69,7 +69,7 @@ export class SignedExtrinsic<
         }
       },
     );
-    const accountNextIndex = rpcCall(config, "system_accountNextIndex", [senderSs58]);
+    const nonce = rpcCall(config, "system_accountNextIndex", [senderSs58]).access("result");
     const genesisHash = hexDecode(rpcCall(config, "chain_getBlockHash", [0]).access("result"));
     const checkpointHash = props.checkpoint
       ? Z.call(props.checkpoint, function checkpointOrUndef(v) {
@@ -82,8 +82,9 @@ export class SignedExtrinsic<
         props.sender,
         props.methodName,
         props.palletName,
-        runtimeVersion,
-        accountNextIndex,
+        specVersion,
+        transactionVersion,
+        nonce,
         genesisHash,
         props.args,
         checkpointHash,
@@ -95,8 +96,9 @@ export class SignedExtrinsic<
         sender,
         methodName,
         palletName,
-        { result: { specVersion, transactionVersion } },
-        { result: nonce },
+        specVersion,
+        transactionVersion,
+        nonce,
         genesisHash,
         args,
         checkpoint,
@@ -131,35 +133,16 @@ export class SignedExtrinsic<
   watch<
     WatchHandler extends U.CreateWatchHandler<NotifMessage<author.TransactionStatus>>,
   >(watchHandler: WatchHandler) {
-    return signedExtrinsicWatch(this.config, this.extrinsic, watchHandler);
+    return rpcSubscription(
+      this.config,
+      "author_submitAndWatchExtrinsic",
+      [this.extrinsic],
+      watchHandler,
+      (ok) => rpcCall(this.config, "author_unwatchExtrinsic", [ok.result]),
+    );
   }
 
   get sent() {
-    return signedExtrinsicSent(this.config, this.extrinsic);
+    return rpcCall(this.config, "author_submitExtrinsic", [this.extrinsic]);
   }
-}
-
-// TODO: is this really required? Why not use the RPC call effect directly?
-export function signedExtrinsicWatch<
-  SignedExtrinsic extends Z.$<U.Hex>,
-  WatchHandler extends U.CreateWatchHandler<NotifMessage<author.TransactionStatus>>,
->(
-  config: Config,
-  signedExtrinsic: SignedExtrinsic,
-  watchHandler: WatchHandler,
-) {
-  return rpcSubscription(
-    config,
-    "author_submitAndWatchExtrinsic",
-    [signedExtrinsic],
-    watchHandler,
-    (ok) => rpcCall(config, "author_unwatchExtrinsic", [ok.result]),
-  );
-}
-
-export function signedExtrinsicSent<SignedExtrinsic extends Z.$<U.Hex>>(
-  config: Config,
-  signedExtrinsic: SignedExtrinsic,
-) {
-  return rpcCall(config, "author_submitExtrinsic", [signedExtrinsic]);
 }
