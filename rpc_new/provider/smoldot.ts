@@ -1,67 +1,88 @@
+import { start } from "../../deps/smoldot.ts";
+import { Chain, Client, ClientOptions } from "../../deps/smoldot/client.d.ts";
+import * as msg from "../messages.ts";
+import { nextIdFactory, Provider, ProviderConnection, ProviderListener } from "./base.ts";
+import { ProviderCloseError, ProviderHandlerError, ProviderSendError } from "./errors.ts";
+
 // TODO
-export {};
+type SmoldotSendErrorData = any;
+type SmoldotHandlerErrorData = any;
+type SmoldotCloseErrorData = any;
 
-// import { start } from "../../deps/smoldot.ts";
-// import { Chain, Client } from "../../deps/smoldot/client.d.ts";
-// import * as msg from "../messages.ts";
-// import { Provider, ProviderConnection } from "./base.ts";
+let client: undefined | Client;
+const connections = new Map<string, SmoldotProviderConnection>();
+class SmoldotProviderConnection
+  extends ProviderConnection<Chain, SmoldotSendErrorData, SmoldotHandlerErrorData>
+{}
 
-// let client: undefined | Client;
-// const connections = new Map<string, Connection>();
-// type Connection = ProviderConnection<Chain, Listener>;
-// type Listener = (messageRaw: string) => void;
+const nextId = nextIdFactory();
 
-// export interface SmoldotProvider extends Provider<string, never, never, never> {}
+export const smoldotProvider: Provider<
+  string,
+  SmoldotSendErrorData,
+  SmoldotHandlerErrorData,
+  SmoldotCloseErrorData
+> = (chainSpec, listener) => {
+  return {
+    nextId,
+    send: (message) => {
+      (async () => {
+        const conn = await connection(chainSpec, listener);
+        try {
+          return conn.inner.sendJsonRpc(JSON.stringify(message));
+        } catch (e) {
+          return new ProviderSendError(e);
+        }
+      })();
+    },
+    release: async () => {
+      const { cleanUp, listeners, inner } = await connection(chainSpec, listener);
+      listeners.delete(listener);
+      if (!listeners.size) {
+        connections.delete(chainSpec);
+        cleanUp();
+        try {
+          return inner.remove();
+        } catch (e) {
+          return new ProviderCloseError(e);
+        }
+      }
+    },
+  };
+};
 
-// export const smoldotProvider: SmoldotProvider = (chainSpec, handler) => {
-//   const listener = (message: string) => {
-//     handler(msg.parse(message));
-//   };
-//   return {
-//     send: async (message) => {
-//       const conn = await connection(chainSpec, listener);
-//       conn.inner.sendJsonRpc(JSON.stringify(message));
-//     },
-//     release: async () => {
-//       const conn = connections.get(chainSpec)!;
-//       conn.listeners.delete(listener);
-//       if (!conn.listeners.size) {
-//         conn.inner.remove();
-//         connections.delete(chainSpec);
-//         if (!connections.size) {
-//           await client!.terminate();
-//         }
-//       }
-//     },
-//   };
-// };
-
-// async function connection(chainSpec: string, listener: Listener): Promise<Connection> {
-//   if (!client) {
-//     client = start({/* TODO */});
-//   }
-//   let connection = connections.get(chainSpec);
-//   if (!connection) {
-//     const inner = await client.addChain({ chainSpec });
-//     connection = {
-//       inner,
-//       listeners: new Set([listener]),
-//     };
-//     connections.set(chainSpec, connection);
-//     const loop = async () => {
-//       const message = await inner.nextJsonRpcResponse();
-//       if (connection) {
-//         for (const listener of connection.listeners) {
-//           listener(message);
-//         }
-//         await loop();
-//       }
-//     };
-//     loop();
-//     loop();
-//     loop();
-//   } else if (!connection.listeners.has(listener)) {
-//     connection.listeners.add(listener);
-//   }
-//   return connection;
-// }
+async function connection(
+  chainSpec: string,
+  listener: ProviderListener<SmoldotSendErrorData, SmoldotHandlerErrorData>,
+): Promise<SmoldotProviderConnection> {
+  if (!client) {
+    client = start(
+      <ClientOptions> {
+        forbidTcp: true,
+        forbidNonLocalWs: true,
+        maxLogLevel: 1,
+        cpuRateLimit: 0.5,
+      },
+    );
+  }
+  let conn = connections.get(chainSpec);
+  if (!conn) {
+    // TODO: try catch this and send through handler within a `ProviderHandlerError`
+    const inner = await client.addChain({ chainSpec });
+    conn = new SmoldotProviderConnection(inner, () => {});
+    connections.set(chainSpec, conn);
+    const loop = async () => {
+      try {
+        conn!.forEachListener(msg.parse(await inner.nextJsonRpcResponse()));
+      } catch (e) {
+        conn!.forEachListener(new ProviderHandlerError(e));
+        await loop();
+      }
+    };
+    // TODO: should we be greedy & kick off a few additional?
+    //       We don't want the inner buffer to overflow.
+    loop();
+  }
+  conn.addListener(listener);
+  return conn;
+}

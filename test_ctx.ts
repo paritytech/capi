@@ -1,3 +1,4 @@
+import * as path from "./deps/std/path.ts";
 import { TestConfigRuntime } from "./test_util/config.ts";
 
 interface DevNet {
@@ -88,7 +89,9 @@ async function portReady(port: number): Promise<void> {
 }
 
 function spawnDevNetProcess(port: number, runtimeName: TestConfigRuntime.Name) {
-  const cmd = ["polkadot", "--dev", "--ws-port", port.toString()];
+  // --chain /tmp/raw-local-chainspec.json \
+  const chainSpecPath = path.join("target", `${runtimeName}_spec.json`);
+  const cmd = ["polkadot", "--dev", "--ws-port", port.toString(), "--chain", chainSpecPath];
   if (runtimeName !== "polkadot") {
     cmd.push(`--force-${runtimeName}`);
   }

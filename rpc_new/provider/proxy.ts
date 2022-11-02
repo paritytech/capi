@@ -1,18 +1,16 @@
 import * as msg from "../messages.ts";
-import { Provider, ProviderConnection, ProviderListener } from "./base.ts";
+import { nextIdFactory, Provider, ProviderConnection, ProviderListener } from "./base.ts";
 import { ProviderCloseError, ProviderHandlerError, ProviderSendError } from "./errors.ts";
 
 /** Global lookup of existing connections */
 const connections = new Map<string, ProxyProviderConnection>();
 class ProxyProviderConnection extends ProviderConnection<WebSocket, Event, Event> {}
 
-let i = 0;
+const nextId = nextIdFactory();
 
 export const proxyProvider: Provider<string, Event, Event, Event> = (url, listener) => {
   return {
-    nextId: () => {
-      return (i++).toString();
-    },
+    nextId,
     send: (message) => {
       const conn = connection(url, listener);
       (async () => {

@@ -62,3 +62,10 @@ export abstract class ProviderConnection<Inner, SendErrorData, HandlerErrorData>
     }
   };
 }
+
+export function nextIdFactory() {
+  let i = 0;
+  return () => {
+    return (i++).toString();
+  };
+}

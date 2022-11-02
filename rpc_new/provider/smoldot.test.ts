@@ -1,13 +1,13 @@
 import { deferred } from "../../deps/std/async.ts";
 import { assertExists, assertNotInstanceOf } from "../../deps/std/testing/asserts.ts";
 import * as T from "../../test_util/mod.ts";
-import { proxyProvider } from "./proxy.ts";
+import { smoldotProvider } from "./smoldot.ts";
 
 Deno.test({
   name: "Proxy Provider",
   async fn() {
     const stopped = deferred();
-    const provider = proxyProvider(
+    const provider = smoldotProvider(
       await T.polkadot.initDiscoveryValue(),
       (message) => {
         assertNotInstanceOf(message, Error);
