@@ -1,4 +1,5 @@
 import * as Z from "../deps/zones.ts";
+import * as M from "../frame_metadata/mod.ts";
 import * as rpc from "../rpc/mod.ts";
 import * as U from "../util/mod.ts";
 import { $extrinsic } from "./$extrinsic.ts";
@@ -16,14 +17,21 @@ export function blockRead<Client extends Z.$<rpc.Client>>(client: Client) {
     return Z
       .ls($extrinsic_, call)
       .next(([$extrinsic_, call]) => {
+        // TODO: decode digest?
         const { block: { extrinsics, header }, justifications } = call;
+        let extrinsicDecoded: undefined | M.Extrinsic[];
         return {
           justifications,
           block: {
             header,
-            extrinsics: extrinsics.map((extrinsic) => {
-              return $extrinsic_.decode(U.hex.decode(extrinsic));
-            }),
+            get extrinsics() {
+              if (!extrinsicDecoded) {
+                extrinsicDecoded = extrinsics.map((extrinsic) => {
+                  return $extrinsic_.decode(U.hex.decode(extrinsic));
+                });
+              }
+              return extrinsicDecoded;
+            },
           },
         };
       }, k0_)
