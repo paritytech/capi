@@ -7,7 +7,7 @@ import { Client, proxyProvider } from "./mod.ts";
 Deno.test({
   name: "RPC Client",
   async fn(t) {
-    const client = new Client(proxyProvider, await T.polkadot.initDiscoveryValue());
+    const client = new Client(proxyProvider, await T.polkadot.discoveryValue);
 
     await t.step({
       name: "call",
