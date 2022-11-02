@@ -2,7 +2,7 @@ import * as Z from "../deps/zones.ts";
 import { Client, ClientCallEvent, ClientE_, ClientSubscribeContext } from "./client.ts";
 import * as msg from "./messages.ts";
 import { Provider } from "./provider/base.ts";
-import { ProviderCloseError, ProviderHandlerError, ProviderSendError } from "./provider/errors.ts";
+import { ProviderHandlerError, ProviderSendError } from "./provider/errors.ts";
 import * as U from "./util.ts";
 
 export function client<DiscoveryValue, SendErrorData, HandlerErrorData, CloseErrorData>(
@@ -58,11 +58,12 @@ export function subscription<Params extends unknown[], Result>() {
         return Z.call(
           Z.rc(client, listener, ...params),
           async ([[client, listener, ...params], counter]) => {
+            type ClientE = typeof client[ClientE_];
             let error:
               | undefined
               | RpcServerError
-              | ProviderSendError<typeof client[ClientE_]["send"]>
-              | ProviderHandlerError<typeof client[ClientE_]["handler"]>;
+              | ProviderSendError<ClientE["send"]>
+              | ProviderHandlerError<ClientE["handler"]>;
             const id = await client.subscribe<Method, Result>({
               jsonrpc: "2.0",
               id: client.providerRef.nextId(),
@@ -79,7 +80,7 @@ export function subscription<Params extends unknown[], Result>() {
                 listener.apply(this, [e.params.result]);
               }
             });
-            const discardCheckResult = await discardCheck(client, counter);
+            const discardCheckResult = await discardCheck<ClientE["close"]>(client, counter);
             return discardCheckResult || error || id!;
           },
         );
