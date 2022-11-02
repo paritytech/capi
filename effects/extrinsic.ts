@@ -58,17 +58,15 @@ export class SignedExtrinsic<
     const senderSs58 = Z.call(
       Z.ls(addrPrefix, props.sender),
       function senderSs58([addrPrefix, sender]) {
-        return (() => {
-          switch (sender.type) {
-            case "Id": {
-              return ss58.encode(addrPrefix, sender.value);
-            }
-            // TODO: other types
-            default: {
-              unimplemented();
-            }
+        switch (sender.type) {
+          case "Id": {
+            return ss58.encode(addrPrefix, sender.value);
           }
-        })();
+          // TODO: other types
+          default: {
+            unimplemented();
+          }
+        }
       },
     );
     const accountNextIndex = rpcCall(config, "system_accountNextIndex", [senderSs58]);
