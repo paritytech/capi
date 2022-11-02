@@ -1,4 +1,3 @@
-import * as path from "./deps/std/path.ts";
 import { TestConfigRuntime } from "./test_util/config.ts";
 
 interface DevNet {
