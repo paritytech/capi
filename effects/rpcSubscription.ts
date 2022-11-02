@@ -18,11 +18,11 @@ export function rpcSubscription<
   // TODO: improve cleanup system
   cleanup?: (initOk: rpc.OkMessage) => Z.Effect,
 ) {
-  const client = rpcClient(config);
-  const deps = Z.ls(client, methodName, createListenerCb, ...params);
   return Z.call(
-    Z.ls(deps, Z.rc(client, deps)),
-    async function rpcSubscriptionImpl([[client, methodName, createListenerCb, ...params], rc]) {
+    Z.rc(rpcClient(config), methodName, createListenerCb, ...params),
+    async function rpcSubscriptionImpl(
+      [[client, methodName, createListenerCb, ...params], counter],
+    ) {
       const result = await client.subscribe(
         methodName,
         params,
@@ -38,7 +38,8 @@ export function rpcSubscription<
           },
         });
       }
-      if (rc() == 1) {
+      counter.i--;
+      if (counter.i === 0) {
         const close = await client.close();
         if (close instanceof Error) return close;
       }

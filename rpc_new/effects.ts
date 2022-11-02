@@ -1,10 +1,8 @@
-// TODO: close connection based on zones rc
 import * as Z from "../deps/zones.ts";
-import { Param } from "../frame_metadata/scale_info.ts";
 import { Client, ClientCallEvent, ClientE_, ClientSubscribeContext } from "./client.ts";
 import * as msg from "./messages.ts";
 import { Provider } from "./provider/base.ts";
-import { ProviderHandlerError, ProviderSendError } from "./provider/errors.ts";
+import { ProviderCloseError, ProviderHandlerError, ProviderSendError } from "./provider/errors.ts";
 import * as U from "./util.ts";
 
 export function client<DiscoveryValue, SendErrorData, HandlerErrorData, CloseErrorData>(
@@ -20,43 +18,46 @@ export function client<DiscoveryValue, SendErrorData, HandlerErrorData, CloseErr
 }
 
 // TODO: not narrowing error inner data type
-export function call<Result>(method: string) {
+export function call<Params extends unknown[], Result>(method: string) {
   return <Client_ extends Z.$<Client>>(client: Client_) => {
-    return <Params extends unknown[]>(...params: Params) => {
-      return Z.call(Z.ls(client, method, ...params), async ([client, method, ...params]) => {
-        // TODO: why do we need to explicitly type this / why is this not being inferred?
-        const result: ClientCallEvent<
-          typeof client[ClientE_]["send"],
-          typeof client[ClientE_]["handler"],
-          Result
-        > = await client.call<Result>({
-          jsonrpc: "2.0",
-          id: client.providerRef.nextId(),
-          method,
-          params,
-        });
-        if (result instanceof Error) {
-          return result;
-        } else if (result.error) {
-          return new RpcServerError(result);
-        }
-        return result.result;
-      });
+    return <Params_ extends Z.Ls$<Params>>(...params: [...Params_]) => {
+      return Z.call(
+        Z.rc(client, method, ...params),
+        async ([[client, method, ...params], counter]) => {
+          type ClientE = typeof client[ClientE_];
+          // TODO: why do we need to explicitly type this / why is this not being inferred?
+          const result: ClientCallEvent<ClientE["send"], ClientE["handler"], Result> = await client
+            .call<Result>({
+              jsonrpc: "2.0",
+              id: client.providerRef.nextId(),
+              method,
+              params,
+            });
+          const discardCheckResult = await discardCheck<ClientE["close"]>(client, counter);
+          if (discardCheckResult) return discardCheckResult;
+          if (result instanceof Error) {
+            return result;
+          } else if (result.error) {
+            return new RpcServerError(result);
+          }
+          return result.result;
+        },
+      );
     };
   };
 }
 
 // TODO: why are leading type params unknown when `extends Z.$Client<any, SendErrorData, HandlerErrorData, CloseErrorData>`?
-export function subscription<Result>() {
+export function subscription<Params extends unknown[], Result>() {
   return <Method extends string>(method: Method) => {
     return <Client_ extends Z.$<Client>>(client: Client_) => {
       return <
-        Params extends unknown[],
+        Params_ extends Z.Ls$<Params>,
         Listener extends Z.$<U.Listener<Result, ClientSubscribeContext>>,
-      >(params: [...Params], listener: Listener) => {
+      >(params: [...Params_], listener: Listener) => {
         return Z.call(
-          Z.ls(client, listener, ...params),
-          async ([client, listener, ...params]) => {
+          Z.rc(client, listener, ...params),
+          async ([[client, listener, ...params], counter]) => {
             let error:
               | undefined
               | RpcServerError
@@ -78,12 +79,23 @@ export function subscription<Result>() {
                 listener.apply(this, [e.params.result]);
               }
             });
-            return error || id!;
+            const discardCheckResult = await discardCheck(client, counter);
+            return discardCheckResult || error || id!;
           },
         );
       };
     };
   };
+}
+
+async function discardCheck<CloseErrorData>(
+  client: Client<any, any, any, CloseErrorData>,
+  counter: Z.RcCounter,
+) {
+  counter.i--;
+  if (counter.i === 1) {
+    return await client.discard();
+  }
 }
 
 export class RpcServerError extends Error {
