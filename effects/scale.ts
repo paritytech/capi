@@ -5,7 +5,7 @@ const k0_ = Symbol();
 const k1_ = Symbol();
 
 export function scaleDecoded<
-  Codec extends Z.$<$.Codec<unknown>>,
+  Codec extends Z.$<$.Codec<any>>,
   Encoded extends Z.$<Uint8Array>,
   Key extends Z.$<PropertyKey>,
 >(

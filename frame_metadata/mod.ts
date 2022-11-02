@@ -1,5 +1,6 @@
 export * from "./Codec.ts";
 export * from "./Contract.ts";
+export * from "./DigestItem.ts";
 export * from "./Era.ts";
 export * from "./Extrinsic.ts";
 export * from "./Key.ts";

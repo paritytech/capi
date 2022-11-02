@@ -56,7 +56,9 @@ export class SignedExtrinsic<
   client;
   props;
   sign;
-  extrinsic;
+  extrinsicBytes;
+  extrinsicHex;
+  extrinsicDecoded;
 
   constructor(
     client: Client,
@@ -114,16 +116,16 @@ export class SignedExtrinsic<
       args: this.props.args,
       signature,
     });
-    this.extrinsic = e$
-      .scaleEncoded($extrinsic_, $extrinsicProps, true)
-      .next(U.hex.encode);
+    this.extrinsicBytes = e$.scaleEncoded($extrinsic_, $extrinsicProps, true);
+    this.extrinsicHex = this.extrinsicBytes.next(U.hex.encode);
+    this.extrinsicDecoded = e$.scaleDecoded($extrinsic_, this.extrinsicBytes, "extrinsic");
   }
 
   watch<Listener extends Z.$<U.Listener<known.TransactionStatus, rpc.ClientSubscribeContext>>>(
     listener: Listener,
   ) {
     const subscriptionId = author.submitAndWatchExtrinsic(this.client)(
-      [this.extrinsic],
+      [this.extrinsicHex],
       listener,
     );
     return author.unwatchExtrinsic(this.client)(subscriptionId)
@@ -131,7 +133,6 @@ export class SignedExtrinsic<
   }
 
   get sent() {
-    return author.submitExtrinsic(this.client)(this.extrinsic)
-      .zoned("ExtrinsicSent");
+    return author.submitExtrinsic(this.client)(this.extrinsicHex);
   }
 }
