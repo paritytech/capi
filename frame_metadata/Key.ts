@@ -56,7 +56,3 @@ export function $storageKey(props: StorageKeyProps): $.Codec<unknown[]> {
     },
   });
 }
-
-export class StorageEntryMissingHasher extends Error {}
-export class InvalidArgErr extends Error {}
-export class DecodeNonTransparentKeyError extends Error {}

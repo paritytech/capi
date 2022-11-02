@@ -2,7 +2,7 @@ import * as rpc from "../rpc/mod.ts";
 
 // TODO: handle this elsewhere
 export class RpcError extends Error {
-  override readonly name = "RpcCall";
+  override readonly name = "RpcError";
   code;
   attempt;
 
