@@ -1,15 +1,6 @@
-import { assertEquals, assertThrows } from "../deps/std/testing/asserts.ts";
+import { assertEquals, assertInstanceOf } from "../deps/std/testing/asserts.ts";
 import * as T from "../test_util/mod.ts";
-
-import {
-  decode,
-  decodeRaw,
-  encode,
-  InvalidAddressChecksumError,
-  InvalidAddressLengthError,
-  InvalidNetworkPrefixError,
-  InvalidPublicKeyLengthError,
-} from "./mod.ts";
+import * as ss58 from "./mod.ts";
 
 for (
   const [networkName, address, [prefix, publicKey]] of [
@@ -31,34 +22,37 @@ for (
   ] as const
 ) {
   Deno.test(`ss58.encode ${networkName}`, () => {
-    const actual = encode(prefix, publicKey);
+    const actual = ss58.encode(prefix, publicKey);
     assertEquals(actual, address);
   });
   Deno.test(`ss58.decode ${networkName}`, () => {
-    const actual = decode(address);
+    const actual = ss58.decode(address);
     assertEquals(actual, [prefix, publicKey]);
   });
 }
 
 Deno.test("ss58.encode invalid public key length", () => {
-  assertThrows(() => encode(0, T.alice.publicKey.slice(0, 30)), InvalidPublicKeyLengthError);
+  assertInstanceOf(
+    ss58.encode(0, T.alice.publicKey.slice(0, 30)),
+    ss58.InvalidPublicKeyLengthError,
+  );
 });
 
 Deno.test("ss58.encode invalid network prefix", () => {
-  assertThrows(() => encode(46, T.alice.publicKey, [0]), InvalidNetworkPrefixError);
+  assertInstanceOf(ss58.encode(46, T.alice.publicKey, [0]), ss58.InvalidNetworkPrefixError);
 });
 
 Deno.test("ss58.decodeRaw long address", () => {
-  assertThrows(() => decodeRaw(new Uint8Array(40)), InvalidAddressLengthError);
+  assertInstanceOf(ss58.decodeRaw(new Uint8Array(40)), ss58.InvalidAddressLengthError);
 });
 
 Deno.test("ss58.decodeRaw short address", () => {
-  assertThrows(() => decodeRaw(new Uint8Array(30)), InvalidAddressLengthError);
+  assertInstanceOf(ss58.decodeRaw(new Uint8Array(30)), ss58.InvalidAddressLengthError);
 });
 
 Deno.test("ss58.decodeRaw invalid checksum", () => {
-  assertThrows(
-    () => decodeRaw(Uint8Array.of(0, ...T.alice.publicKey, 255, 255)),
-    InvalidAddressChecksumError,
+  assertInstanceOf(
+    ss58.decodeRaw(Uint8Array.of(0, ...T.alice.publicKey, 255, 255)),
+    ss58.InvalidAddressChecksumError,
   );
 });
