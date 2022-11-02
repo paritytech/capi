@@ -27,15 +27,6 @@ if (!args.out) fail();
 await codegen({
   importSpecifier: args.import,
   metadata: await getMetadata(args.src),
-  rpcMethodNames: { // TODO: infer this via source
-    state: [
-      "getMetadata",
-    ],
-    chain: [
-      "unsubscribeNewHeads",
-      "subscribeNewHeads",
-    ],
-  },
 }).write(args.out);
 
 // Should disallow .scale as input?

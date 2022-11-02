@@ -39,7 +39,7 @@ export function rpcSubscription<
         });
       }
       counter.i--;
-      if (counter.i === 0) {
+      if (counter.i === 1) {
         const close = await client.close();
         if (close instanceof Error) return close;
       }

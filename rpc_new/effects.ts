@@ -17,7 +17,6 @@ export function client<DiscoveryValue, SendErrorData, HandlerErrorData, CloseErr
   );
 }
 
-// TODO: not narrowing error inner data type
 export function call<Params extends unknown[], Result>(method: string) {
   return <Client_ extends Z.$<Client>>(client: Client_) => {
     return <Params_ extends Z.Ls$<Params>>(...params: [...Params_]) => {
