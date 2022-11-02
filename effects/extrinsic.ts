@@ -135,35 +135,16 @@ export class SignedExtrinsic<
   watch<
     WatchHandler extends U.CreateWatchHandler<NotifMessage<author.TransactionStatus>>,
   >(watchHandler: WatchHandler) {
-    return signedExtrinsicWatch(this.config, this.extrinsic, watchHandler);
+    return rpcSubscription(
+      this.config,
+      "author_submitAndWatchExtrinsic",
+      [this.extrinsic],
+      watchHandler,
+      (ok) => rpcCall(this.config, "author_unwatchExtrinsic", [ok.result]),
+    );
   }
 
   get sent() {
-    return signedExtrinsicSent(this.config, this.extrinsic);
+    return rpcCall(this.config, "author_submitExtrinsic", [this.extrinsic]);
   }
-}
-
-// TODO: is this really required? Why not use the RPC call effect directly?
-export function signedExtrinsicWatch<
-  SignedExtrinsic extends Z.$<U.Hex>,
-  WatchHandler extends U.CreateWatchHandler<NotifMessage<author.TransactionStatus>>,
->(
-  config: Config,
-  signedExtrinsic: SignedExtrinsic,
-  watchHandler: WatchHandler,
-) {
-  return rpcSubscription(
-    config,
-    "author_submitAndWatchExtrinsic",
-    [signedExtrinsic],
-    watchHandler,
-    (ok) => rpcCall(config, "author_unwatchExtrinsic", [ok.result]),
-  );
-}
-
-export function signedExtrinsicSent<SignedExtrinsic extends Z.$<U.Hex>>(
-  config: Config,
-  signedExtrinsic: SignedExtrinsic,
-) {
-  return rpcCall(config, "author_submitExtrinsic", [signedExtrinsic]);
 }
