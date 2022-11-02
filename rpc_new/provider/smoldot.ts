@@ -67,7 +67,11 @@ async function connection(
   if (!conn) {
     // TODO: try catch this and send through handler within a `ProviderHandlerError`
     const inner = await client.addChain({ chainSpec });
-    conn = new SmoldotProviderConnection(inner, () => {});
+    conn = new SmoldotProviderConnection(inner, () => {
+      try {
+        inner.remove();
+      } catch (_e) { /* TODO */ }
+    });
     connections.set(chainSpec, conn);
     const loop = async () => {
       try {
