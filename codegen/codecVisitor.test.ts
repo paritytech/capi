@@ -10,9 +10,8 @@ import { codegen } from "./mod.ts";
 const currentDir = path.dirname(path.fromFileUrl(import.meta.url));
 const codegenTestDir = path.join(currentDir, "../target/codegen");
 
-for (const [runtime, devChain] of Object.entries(T.devChains)) {
+for (const [runtime, client] of Object.entries(T.clients)) {
   Deno.test(runtime, async () => {
-    const client = await devChain.client;
     const metadata = U.throwIfError(await C.metadata(client)().run());
     const outDir = path.join(codegenTestDir, runtime);
     await codegen({

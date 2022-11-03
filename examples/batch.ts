@@ -2,13 +2,11 @@ import * as C from "../mod.ts";
 import * as T from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
 
-const client = await T.westend.client;
-
 const recipients = [T.bob, T.charlie, T.dave, T.eve];
 
 const balances = C.ls(
   ...recipients.map(({ publicKey }) => {
-    return C.entryRead(client)("System", "Account", [publicKey])
+    return C.entryRead(T.westend)("System", "Account", [publicKey])
       .access("value")
       .access("data")
       .access("free");
@@ -16,7 +14,7 @@ const balances = C.ls(
 );
 
 const extrinsic = new C.Extrinsic({
-  client,
+  client: T.westend,
   sender: {
     type: "Id",
     value: T.alice.publicKey,

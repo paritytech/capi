@@ -1,1 +1,1 @@
-export { rococo as config } from "../discovery.ts";
+export { rococo as config } from "../clients.ts";

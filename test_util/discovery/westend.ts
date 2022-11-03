@@ -1,1 +1,1 @@
-export { westend as config } from "../discovery.ts";
+export { westend as config } from "../clients.ts";

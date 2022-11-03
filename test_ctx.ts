@@ -1,4 +1,4 @@
-import { TestDiscovery } from "./test_util/discovery.ts";
+import { TestDiscovery } from "./test_util/clients.ts";
 
 const devNets: Partial<
   Record<TestDiscovery.Name, {

@@ -6,8 +6,6 @@ import { entryRead } from "./entryRead.ts";
 import { CallData, Extrinsic } from "./extrinsic.ts";
 import { run } from "./run.ts";
 
-const client = await T.westend.client;
-
 Deno.test({
   name: "Balances.transfer",
   fn: async (ctx) => {
@@ -34,7 +32,7 @@ Deno.test({
     await ctx.step({
       name: "account balance updated",
       fn: async () => {
-        const state = await run(entryRead(client)("System", "Account", [T.bob.publicKey]));
+        const state = await run(entryRead(T.westend)("System", "Account", [T.bob.publicKey]));
         A.assertObjectMatch(state, { value: { data: { free: 10000000000012345n } } });
       },
     });
@@ -95,7 +93,7 @@ interface TestExtrinsicProps extends CallData {
 }
 function testExtrinsic({ sender, palletName, methodName, args }: TestExtrinsicProps) {
   return new Extrinsic({
-    client,
+    client: T.westend,
     sender: {
       type: "Id",
       value: sender.publicKey,

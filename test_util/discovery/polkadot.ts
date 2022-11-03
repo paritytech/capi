@@ -1,1 +1,1 @@
-export { polkadot as config } from "../discovery.ts";
+export { polkadot as config } from "../clients.ts";

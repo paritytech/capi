@@ -2,7 +2,7 @@ import * as C from "../mod.ts";
 import * as T from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
 
-const root = C.entryWatch(await T.polkadot.client)("Timestamp", "Now", [], function(entry) {
+const root = C.entryWatch(T.polkadot)("Timestamp", "Now", [], function(entry) {
   console.log(entry);
   const counter = this.state(U.Counter);
   if (counter.i === 2) {

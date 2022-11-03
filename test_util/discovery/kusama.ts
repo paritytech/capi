@@ -1,1 +1,1 @@
-export { kusama as config } from "../discovery.ts";
+export { kusama as config } from "../clients.ts";
