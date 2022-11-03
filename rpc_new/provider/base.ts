@@ -20,7 +20,7 @@ export type ProviderListener<SendErrorData, HandlerErrorData> = U.Listener<
 export interface ProviderRef<CloseErrorData> {
   nextId(): string;
   send(message: msg.EgressMessage): void;
-  release(): Promise<void | ProviderCloseError<CloseErrorData>>;
+  release(): Promise<undefined | ProviderCloseError<CloseErrorData>>;
 }
 
 declare const providerListener_: unique symbol;
