@@ -8,11 +8,11 @@ export function getOrInit<K, V>(
   container: MapLike<K, V>,
   key: K,
   init: () => V,
-) {
-  let val = container.get(key);
-  if (!val) {
-    val = init();
-    container.set(key, val);
+): V {
+  let value = container.get(key);
+  if (value === undefined) {
+    value = init();
+    container.set(key, value);
   }
-  return val;
+  return value;
 }

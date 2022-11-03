@@ -31,6 +31,7 @@ export const smoldotProvider: Provider<
         try {
           return conn.inner.sendJsonRpc(JSON.stringify(message));
         } catch (e) {
+          // TODO: funnel this to relevant handler(s)
           return new ProviderSendError(e);
         }
       })();

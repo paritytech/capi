@@ -185,7 +185,6 @@ neovim
 tostring
 framesystem
 statemigration
-xxhash
 statemine
 westmint
 chainspec

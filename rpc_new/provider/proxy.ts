@@ -1,3 +1,4 @@
+import * as U from "../../util/mod.ts";
 import * as msg from "../messages.ts";
 import { nextIdFactory, Provider, ProviderConnection, ProviderListener } from "./base.ts";
 import { ProviderCloseError, ProviderHandlerError, ProviderSendError } from "./errors.ts";
@@ -39,8 +40,7 @@ function connection(
   url: string,
   listener: ProviderListener<Event, Event>,
 ): ProxyProviderConnection {
-  let conn = connections.get(url);
-  if (!conn) {
+  const conn = U.getOrInit(connections, url, () => {
     const controller = new AbortController();
     const ws = new WebSocket(url);
     ws.addEventListener("message", (e) => {
@@ -49,22 +49,21 @@ function connection(
     ws.addEventListener("error", (e) => {
       conn!.forEachListener(new ProviderHandlerError(e));
     }, controller);
-    conn = new ProxyProviderConnection(ws, () => controller.abort());
-    connections.set(url, conn);
-  }
+    return new ProxyProviderConnection(ws, () => controller.abort());
+  });
   conn.addListener(listener);
   return conn;
 }
 
-function ensureWsOpen(ws: WebSocket): Promise<void | Event> {
+function ensureWsOpen(ws: WebSocket): Promise<undefined | Event> {
   if (ws.readyState === WebSocket.OPEN) {
-    return Promise.resolve();
+    return Promise.resolve(undefined);
   }
-  return new Promise<void | Event>((resolve) => {
+  return new Promise<undefined | Event>((resolve) => {
     const controller = new AbortController();
     ws.addEventListener("open", () => {
       controller.abort();
-      resolve();
+      resolve(undefined);
     }, controller);
     ws.addEventListener("error", (e) => {
       controller.abort();
@@ -73,15 +72,15 @@ function ensureWsOpen(ws: WebSocket): Promise<void | Event> {
   });
 }
 
-function closeWs(socket: WebSocket): Promise<void | ProviderCloseError<Event>> {
+function closeWs(socket: WebSocket): Promise<undefined | ProviderCloseError<Event>> {
   if (socket.readyState === WebSocket.CLOSED) {
-    return Promise.resolve();
+    return Promise.resolve(undefined);
   }
-  return new Promise<void | ProviderCloseError<Event>>((resolve) => {
+  return new Promise<undefined | ProviderCloseError<Event>>((resolve) => {
     const controller = new AbortController();
     socket.addEventListener("close", () => {
       controller.abort();
-      resolve();
+      resolve(undefined);
     }, controller);
     socket.addEventListener("error", (e) => {
       controller.abort();
