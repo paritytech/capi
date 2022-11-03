@@ -14,7 +14,7 @@ export function blockWatch<Client extends Z.$<rpc.Client>>(client: Client) {
         // TODO: zones-level solution to this derivation
         const block = await run(
           blockRead(client)(chain.getBlockHash(client)(header.number)),
-          ...[] as any,
+          ...[] as never,
         );
         if (block instanceof Error) throw block;
         listener.apply(this, [block]);
