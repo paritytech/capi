@@ -93,6 +93,7 @@ async function discardCheck<CloseErrorData>(
   if (counter.i === 1) {
     return await client.discard();
   }
+  return;
 }
 
 export class RpcServerError extends Error {

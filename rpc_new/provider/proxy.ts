@@ -31,7 +31,7 @@ export const proxyProvider: Provider<string, Event, Event, Event> = (url, listen
         cleanUp();
         return closeWs(inner);
       }
-      return Promise.resolve();
+      return Promise.resolve(undefined);
     },
   };
 };

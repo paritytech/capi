@@ -43,11 +43,12 @@ export const smoldotProvider: Provider<
         connections.delete(chainSpec);
         cleanUp();
         try {
-          return inner.remove();
+          inner.remove();
         } catch (e) {
           return new ProviderCloseError(e);
         }
       }
+      return;
     },
   };
 };
