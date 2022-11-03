@@ -5,7 +5,7 @@ import { ProviderCloseError, ProviderHandlerError, ProviderSendError } from "./e
 
 /** Global lookup of existing connections */
 const connections = new Map<string, ProxyProviderConnection>();
-class ProxyProviderConnection extends ProviderConnection<WebSocket, Event, Event> {}
+type ProxyProviderConnection = ProviderConnection<WebSocket, Event, Event>;
 
 const nextId = nextIdFactory();
 
@@ -49,7 +49,7 @@ function connection(
     ws.addEventListener("error", (e) => {
       conn!.forEachListener(new ProviderHandlerError(e));
     }, controller);
-    return new ProxyProviderConnection(ws, () => controller.abort());
+    return new ProviderConnection(ws, () => controller.abort());
   });
   conn.addListener(listener);
   return conn;
