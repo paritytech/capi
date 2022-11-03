@@ -57,10 +57,10 @@ async function connection(
 ): Promise<SmoldotProviderConnection> {
   if (!client) {
     client = start(
-      <ClientOptions> {
+      {
         forbidTcp: true,
         forbidNonLocalWs: true,
-      },
+      } as ClientOptions,
     );
   }
   let conn = connections.get(chainSpec);
