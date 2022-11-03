@@ -1,11 +1,11 @@
-import { TestConfigRuntime } from "./test_util/config.ts";
+import { TestDiscovery } from "./test_util/discovery.ts";
 
-interface DevNet {
-  port: number;
-  process: Deno.Process;
-}
-type DevNets = Partial<Record<TestConfigRuntime.Name, DevNet>>;
-const devNets: DevNets = {};
+const devNets: Partial<
+  Record<TestDiscovery.Name, {
+    port: number;
+    process: Deno.Process;
+  }>
+> = {};
 
 const listener = Deno.listen({
   transport: "tcp",
@@ -39,7 +39,7 @@ async function useListener(listener: Deno.Listener) {
       if (typeof e0 !== "number") {
         throw new Error();
       }
-      const runtimeName = (TestConfigRuntime.NAMES as Record<number, TestConfigRuntime.Name>)[e0];
+      const runtimeName = (TestDiscovery.NAMES as Record<number, TestDiscovery.Name>)[e0];
       if (!runtimeName) {
         throw new Error();
       }
@@ -87,7 +87,7 @@ async function portReady(port: number): Promise<void> {
   }
 }
 
-function spawnDevNetProcess(port: number, runtimeName: TestConfigRuntime.Name) {
+function spawnDevNetProcess(port: number, runtimeName: TestDiscovery.Name) {
   const cmd = ["polkadot", "--dev", "--ws-port", port.toString()];
   if (runtimeName !== "polkadot") {
     cmd.push(`--force-${runtimeName}`);

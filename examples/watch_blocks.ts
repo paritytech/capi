@@ -1,15 +1,13 @@
 import * as C from "../mod.ts";
 import * as U from "../util/mod.ts";
 
-const root = C.blockWatch(C.polkadot, (stop) => {
-  let i = 0;
-  return ({ block }) => {
-    console.log(block.header);
-    if (i === 2) {
-      stop();
-    }
-    i++;
-  };
+const root = C.blockWatch(C.polkadot)(function({ block }) {
+  console.log(block.header);
+  const counter = this.state(U.Counter);
+  if (counter.i === 2) {
+    return this.stop();
+  }
+  counter.inc();
 });
 
 U.throwIfError(await C.run(root));

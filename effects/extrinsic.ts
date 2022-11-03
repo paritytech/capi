@@ -1,9 +1,8 @@
 import { unimplemented } from "../deps/std/testing/asserts.ts";
 import * as Z from "../deps/zones.ts";
 import * as M from "../frame_metadata/mod.ts";
-import * as author from "../known/rpc/author.ts";
-import { Config } from "../mod.ts";
-import { NotifMessage } from "../rpc/mod.ts";
+import * as known from "../known/mod.ts";
+import * as rpc from "../rpc/mod.ts";
 import * as ss58 from "../ss58/mod.ts";
 import * as U from "../util/mod.ts";
 import { const as const_ } from "./const.ts";
@@ -11,14 +10,17 @@ import { $extrinsic } from "./core/$extrinsic.ts";
 import { deriveCodec } from "./core/deriveCodec.ts";
 import { hexDecode } from "./core/hex.ts";
 import { metadata } from "./metadata.ts";
-import { rpcCall } from "./rpcCall.ts";
-import { rpcSubscription } from "./rpcSubscription.ts";
+import { author, chain, system } from "./rpc/known.ts";
 
-export interface ExtrinsicProps {
-  sender: M.MultiAddress;
+export interface CallData {
   palletName: string;
   methodName: string;
   args: Record<string, unknown>;
+}
+
+export interface ExtrinsicProps extends CallData {
+  client: rpc.Client;
+  sender: M.MultiAddress;
   checkpoint?: U.HexHash;
   mortality?: [period: bigint, phase: bigint];
   nonce?: string;
@@ -26,13 +28,10 @@ export interface ExtrinsicProps {
 }
 
 export class Extrinsic<Props extends Z.Rec$<ExtrinsicProps>> {
-  constructor(
-    readonly config: Config,
-    readonly props: Props,
-  ) {}
+  constructor(readonly props: Props) {}
 
   signed<Sign extends Z.$<M.SignExtrinsic>>(sign: Sign): SignedExtrinsic<Props, Sign> {
-    return new SignedExtrinsic(this.config, this.props, sign);
+    return new SignedExtrinsic(this.props, sign);
   }
 }
 
@@ -42,17 +41,13 @@ export class SignedExtrinsic<
 > {
   extrinsic;
 
-  constructor(
-    readonly config: Config,
-    readonly props_: Props,
-    readonly sign: Sign,
-  ) {
+  constructor(readonly props_: Props, readonly sign: Sign) {
     const props = props_ as Z.Rec$Access<Props>;
-    const metadata_ = metadata(config);
+    const metadata_ = metadata(props.client)();
     const deriveCodec_ = deriveCodec(metadata_);
-    const addrPrefix = const_(config, "System", "SS58Prefix").access("value").as<number>();
+    const addrPrefix = const_(props.client)("System", "SS58Prefix").access("value").as<number>();
     const $extrinsic_ = $extrinsic(deriveCodec_, metadata_, this.sign, addrPrefix);
-    const versions = const_(config, "System", "Version").access("value");
+    const versions = const_(props.client)("System", "Version").access("value");
     const specVersion = versions.access("spec_version").as<number>();
     const transactionVersion = versions.access("transaction_version").as<number>();
     const senderSs58 = Z.call(
@@ -69,8 +64,8 @@ export class SignedExtrinsic<
         }
       },
     );
-    const nonce = rpcCall(config, "system_accountNextIndex", [senderSs58]).access("result");
-    const genesisHash = hexDecode(rpcCall(config, "chain_getBlockHash", [0]).access("result"));
+    const nonce = system.accountNextIndex(props.client)(senderSs58);
+    const genesisHash = hexDecode(chain.getBlockHash(props.client)(0));
     const checkpointHash = props.checkpoint
       ? Z.call(props.checkpoint, function checkpointOrUndef(v) {
         return v ? U.hex.decode(v) : v;
@@ -130,19 +125,16 @@ export class SignedExtrinsic<
     );
   }
 
-  watch<
-    WatchHandler extends U.CreateListener<NotifMessage<author.TransactionStatus>>,
-  >(watchHandler: WatchHandler) {
-    return rpcSubscription(
-      this.config,
-      "author_submitAndWatchExtrinsic",
-      [this.extrinsic],
-      watchHandler,
-      (ok) => rpcCall(this.config, "author_unwatchExtrinsic", [ok.result]),
-    );
+  watch<Listener extends Z.$<U.Listener<known.TransactionStatus, rpc.ClientSubscribeContext>>>(
+    listener: Listener,
+  ) {
+    const subscriptionId = author.submitAndWatchExtrinsic(
+      this.props_.client as Props["client"],
+    )([this.extrinsic], listener);
+    return author.unwatchExtrinsic(this.props_.client as Props["client"])(subscriptionId);
   }
 
   get sent() {
-    return rpcCall(this.config, "author_submitExtrinsic", [this.extrinsic]);
+    return author.submitExtrinsic(this.props_.client as Props["client"])(this.extrinsic);
   }
 }

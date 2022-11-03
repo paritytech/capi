@@ -1,12 +1,14 @@
-// TODO: ultimately delete this file upon introduction of RPC-method-specific codegen
+import { rpcClient } from "../effects/mod.ts";
+import * as rpc from "../rpc/mod.ts";
 
-import { Config } from "../config/mod.ts";
-
-export const polkadot = new Config(() => "wss://rpc.polkadot.io");
-export const kusama = new Config(() => "wss://kusama-rpc.polkadot.io");
-export const acala = new Config(() => "wss://acala-polkadot.api.onfinality.io/public-ws");
-export const rococo = new Config(() => "wss://rococo-contracts-rpc.polkadot.io");
-export const moonbeam = new Config(() => "wss://wss.api.moonbeam.network");
-export const statemint = new Config(() => "wss://statemint-rpc.polkadot.io");
-export const subsocial = new Config(() => "wss://para.subsocial.network");
-export const westend = new Config(() => "wss://westend-rpc.polkadot.io");
+export const polkadot = rpcClient(rpc.proxyProvider, "wss://rpc.polkadot.io");
+export const kusama = rpcClient(rpc.proxyProvider, "wss://kusama-rpc.polkadot.io");
+export const acala = rpcClient(
+  rpc.proxyProvider,
+  "wss://acala-polkadot.api.onfinality.io/public-ws",
+);
+export const rococo = rpcClient(rpc.proxyProvider, "wss://rococo-contracts-rpc.polkadot.io");
+export const moonbeam = rpcClient(rpc.proxyProvider, "wss://wss.api.moonbeam.network");
+export const statemint = rpcClient(rpc.proxyProvider, "wss://statemint-rpc.polkadot.io");
+export const subsocial = rpcClient(rpc.proxyProvider, "wss://para.subsocial.network");
+export const westend = rpcClient(rpc.proxyProvider, "wss://westend-rpc.polkadot.io");

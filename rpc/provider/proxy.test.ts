@@ -7,7 +7,7 @@ Deno.test({
   name: "Proxy Provider",
   async fn() {
     const stopped = deferred();
-    const provider = proxyProvider(await T.polkadot.discoveryValue, (message) => {
+    const provider = proxyProvider(await T.polkadot.url, (message) => {
       assertNotInstanceOf(message, Error);
       assertExists(message.result);
       stopped.resolve();

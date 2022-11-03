@@ -1,5 +1,5 @@
+import * as U from "../../util/mod.ts";
 import * as msg from "../messages.ts";
-import * as U from "../util.ts";
 import { ProviderCloseError, ProviderHandlerError, ProviderSendError } from "./errors.ts";
 
 /**

@@ -1,21 +1,25 @@
-import * as known from "../known/rpc/mod.ts";
-import * as U from "../util/mod.ts";
-import { call, subscription } from "./effects.ts";
+import * as known from "../../known/mod.ts";
+import * as U from "../../util/mod.ts";
+import { call } from "./call.ts";
+import { subscription } from "./subscription.ts";
 
 // TODO: generate the following?
 export namespace state {
-  export const getMetadata = call<[at?: U.Hash], U.Hex>("state_getMetadata");
-  export const getStorage = call<[key: known.StorageKey, at?: U.Hash], known.StorageData>(
+  export const getMetadata = call<[at?: U.HexHash], U.HexHash>("state_getMetadata");
+  export const getStorage = call<[key: known.StorageKey, at?: U.HexHash], known.StorageData>(
     "state_getStorage",
   );
-  export const subscribeStorage = subscription<[keys: known.StorageKey[]], unknown>()(
+  export const subscribeStorage = subscription<
+    [keys: known.StorageKey[]],
+    known.StorageChangeSet
+  >()(
     "state_subscribeStorage",
   );
   export const unsubscribeStorage = call<[subscriptionId: string], true>(
     "state_unsubscribeStorage",
   );
   export const getKeysPaged = call<
-    [prefix: known.StorageKey, count: number, startKey?: known.StorageKey, at?: U.Hash],
+    [prefix: known.StorageKey, count: number, startKey?: known.StorageKey, at?: U.HexHash],
     known.StorageKey[]
   >("state_getKeysPaged");
 }
@@ -24,8 +28,8 @@ export namespace chain {
   export const unsubscribeNewHeads = call<[subscriptionId: string], true>(
     "chain_unsubscribeNewHeads",
   );
-  export const getBlock = call<[hash?: U.Hash], known.Block>("chain_getBlock");
-  export const getBlockHash = call<[height?: known.ListOrValue<known.NumberOrHex>], U.Hash>(
+  export const getBlock = call<[hash?: U.HexHash], known.SignedBlock>("chain_getBlock");
+  export const getBlockHash = call<[height?: known.ListOrValue<known.NumberOrHex>], U.HexHash>(
     "chain_getBlockHash",
   );
 }

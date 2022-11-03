@@ -1,9 +1,9 @@
 import { Deferred, deferred } from "../deps/std/async.ts";
 import { getOrInit } from "../util/mod.ts";
+import * as U from "../util/mod.ts";
 import * as msg from "./messages.ts";
 import { Provider, ProviderListener } from "./provider/base.ts";
 import { ProviderHandlerError, ProviderSendError } from "./provider/errors.ts";
-import * as U from "./util.ts";
 
 // TODO: delete this upon solving inner-type-access problem of RPC effects
 export declare const ClientE_: unique symbol;

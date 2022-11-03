@@ -25,19 +25,19 @@ export interface Header {
 
 // https://github.com/paritytech/substrate/blob/ded44948/primitives/runtime/src/generic/block.rs#L126
 /** Abstraction over a substrate block and justification. */
-export interface SignedBlock {
+export interface SignedBlock<Extrinsic = Hex> {
   /** Full block. */
-  block: Block;
+  block: Block<Extrinsic>;
   /** Block justification. */
   justifications?: [number[], number[]][];
 }
 
 // https://github.com/paritytech/substrate/blob/ded44948/primitives/runtime/src/generic/block.rs#L88
-export interface Block {
+export interface Block<Extrinsic = Hex> {
   /** The block header. */
   header: Header;
   /** The accompanying extrinsics. */
-  extrinsics: Hex[];
+  extrinsics: Extrinsic[];
 }
 
 // https://github.com/paritytech/substrate/blob/934fbfd/client/rpc-api/src/chain/mod.rs#L27

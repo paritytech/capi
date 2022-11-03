@@ -1,3 +1,3 @@
-export * from "./codegen.ts";
-export * from "./config.ts";
+export * from "./discovery.ts";
+export * from "./extrinsic.ts";
 export * from "./pairs.ts";

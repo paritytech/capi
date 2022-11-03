@@ -1,24 +1,23 @@
 import * as $ from "../deps/scale.ts";
 import * as Z from "../deps/zones.ts";
 import * as M from "../frame_metadata/mod.ts";
-import { Config } from "../mod.ts";
+import * as rpc from "../rpc/mod.ts";
 import * as U from "../util/mod.ts";
-import { rpcCall } from "./rpcCall.ts";
+import { state } from "./rpc/known.ts";
 
-export function metadata<Rest extends [blockHash?: Z.$<U.HexHash | undefined>]>(
-  config: Config,
-  ...[blockHash]: [...Rest]
-) {
-  return Z.call(
-    rpcCall(config, "state_getMetadata", [blockHash]),
-    function metadataImpl(call) {
-      try {
-        return M.fromPrefixedHex(call.result);
-      } catch (e) {
-        return e as $.ScaleError;
-      }
-    },
-  );
+export function metadata<Client extends Z.$<rpc.Client>>(client: Client) {
+  return <Rest extends [blockHash?: Z.$<U.HexHash | undefined>]>(...[blockHash]: [...Rest]) => {
+    return Z.call(
+      state.getMetadata(client)(blockHash),
+      function metadataImpl(encoded) {
+        try {
+          return M.fromPrefixedHex(encoded);
+        } catch (e) {
+          return e as $.ScaleError;
+        }
+      },
+    );
+  };
 }
 
 export function palletMetadata<Metadata extends Z.$<M.Metadata>, PalletName extends Z.$<string>>(

@@ -1,29 +1,27 @@
-import { Config } from "../config/mod.ts";
+import * as Z from "../deps/zones.ts";
+import * as M from "../frame_metadata/mod.ts";
 import * as known from "../known/mod.ts";
+import * as rpc from "../rpc/mod.ts";
 import * as U from "../util/mod.ts";
 import { blockRead } from "./blockRead.ts";
-import { rpcCall } from "./rpcCall.ts";
-import { rpcSubscription } from "./rpcSubscription.ts";
+import { chain } from "./rpc/known.ts";
 import { run } from "./run.ts";
 
-export function blockWatch(
-  config: Config,
-  createWatchHandler: U.CreateListener<known.SignedBlock>,
-) {
-  return rpcSubscription(
-    config,
-    "chain_subscribeNewHeads",
-    [],
-    function subscribeNewHeadsHandler(stop) {
-      const watchHandler = createWatchHandler(stop);
-      return async (result) => {
-        const blockNum: number = result.params.result.number;
-        const blockHash = rpcCall(config, "chain_getBlockHash", [blockNum]).access("result");
-        // TODO: zones-level solution
-        const block = U.throwIfError(await run(blockRead(config, blockHash)));
-        watchHandler(block.block);
+export function blockWatch<Client extends Z.$<rpc.Client>>(client: Client) {
+  return (listener: U.Listener<known.SignedBlock<M.Extrinsic>, rpc.ClientSubscribeContext>) => {
+    const listenerMapped = Z.call(listener, (listener) => {
+      return async function(this: rpc.ClientSubscribeContext, header: known.Header) {
+        // TODO: zones-level solution to this derivation
+        const block = await run(
+          blockRead(client)(chain.getBlockHash(client)(header.number)),
+          ...[] as any,
+        );
+        if (block instanceof Error) throw block;
+        listener.apply(this, [block]);
+        return block;
       };
-    },
-    (ok) => rpcCall(config, "chain_unsubscribeNewHead", [ok.result]),
-  );
+    });
+    const subscriptionId = chain.subscribeNewHeads(client)([], listenerMapped);
+    return chain.unsubscribeNewHeads(client)(subscriptionId);
+  };
 }

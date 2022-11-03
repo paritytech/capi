@@ -1,13 +1,14 @@
 import * as A from "../deps/std/testing/asserts.ts";
-import * as known from "../known/rpc/mod.ts";
+import * as known from "../known/mod.ts";
 import * as T from "../test_util/mod.ts";
+import * as U from "../util/mod.ts";
 import * as msg from "./messages.ts";
 import { Client, proxyProvider } from "./mod.ts";
 
 Deno.test({
   name: "RPC Client",
   async fn(t) {
-    const client = new Client(proxyProvider, await T.polkadot.discoveryValue);
+    const client = new Client(proxyProvider, await T.polkadot.url);
 
     await t.step({
       name: "call",
@@ -33,9 +34,6 @@ Deno.test({
       async fn() {
         let subscriptionId: string;
         const events: msg.NotificationMessage<"chain_subscribeAllHeads", known.Header>[] = [];
-        class Counter {
-          i = 0;
-        }
         const stoppedSubscriptionId = await client.subscribe<
           "chain_subscribeAllHeads",
           known.Header
@@ -45,7 +43,7 @@ Deno.test({
           method: "chain_subscribeAllHeads",
           params: [],
         }, function(event) {
-          const counter = this.state(Counter);
+          const counter = this.state(U.Counter);
           A.assertNotInstanceOf(event, Error);
           A.assert(!event.error);
           A.assertExists(event.params.result.parentHash);
@@ -55,7 +53,7 @@ Deno.test({
             this.stop();
             return;
           }
-          counter.i++;
+          counter.inc();
         });
         A.assertEquals(events.length, 3);
         A.assertEquals(stoppedSubscriptionId, subscriptionId!);
