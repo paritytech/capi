@@ -23,14 +23,12 @@ export interface ProviderRef<CloseErrorData> {
   release(): Promise<undefined | ProviderCloseError<CloseErrorData>>;
 }
 
-declare const providerListener_: unique symbol;
-type providerListener_ = typeof providerListener_;
-
-export abstract class ProviderConnection<Inner, SendErrorData, HandlerErrorData> {
-  declare [providerListener_]: ProviderListener<SendErrorData, HandlerErrorData>;
-
+export class ProviderConnection<Inner, SendErrorData, HandlerErrorData> {
   /** The set of high-level listeners, which accept parsed messages and errors */
-  listeners = new Map<this[providerListener_], this[providerListener_]>();
+  listeners = new Map<
+    ProviderListener<SendErrorData, HandlerErrorData>,
+    ProviderListener<SendErrorData, HandlerErrorData>
+  >();
 
   /**
    * @param inner the underlying representation of the connection (such as a WebSocket or smoldot chain)
@@ -38,7 +36,7 @@ export abstract class ProviderConnection<Inner, SendErrorData, HandlerErrorData>
    */
   constructor(readonly inner: Inner, readonly cleanUp: () => void) {}
 
-  addListener = (listener: this[providerListener_]) => {
+  addListener = (listener: ProviderListener<SendErrorData, HandlerErrorData>) => {
     if (this.listeners.has(listener)) {
       return;
     }
