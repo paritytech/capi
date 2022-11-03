@@ -7,8 +7,7 @@ export function call<Params extends unknown[], Result>(method: string) {
     return <Params_ extends Z.Ls$<Params>>(...params: [...Params_]) => {
       return Z.call(
         Z.rc(client, method, ...params),
-        async ([[client, method, ...params], counter]) => {
-          // console.log({ method, params, counter });
+        async function rpcCallImpl([[client, method, ...params], counter]) {
           type ClientE = typeof client[rpc.ClientE_];
           // TODO: why do we need to explicitly type this / why is this not being inferred?
           const result: rpc.ClientCallEvent<ClientE["send"], ClientE["handler"], Result> =
@@ -19,7 +18,6 @@ export function call<Params extends unknown[], Result>(method: string) {
                 method,
                 params,
               });
-          // console.log({ method, params, result, counter });
           const discardCheckResult = await discardCheck<ClientE["close"]>(client, counter);
           if (discardCheckResult) return discardCheckResult;
           if (result instanceof Error) {

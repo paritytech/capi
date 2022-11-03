@@ -13,8 +13,7 @@ export function subscription<Params extends unknown[], Result>() {
       >(params: [...Params_], listener: Listener) => {
         return Z.call(
           Z.rc(client, listener, ...params),
-          async ([[client, listener, ...params], counter]) => {
-            // console.log({ method, params, counter });
+          async function rpcSubscriptionImpl([[client, listener, ...params], counter]) {
             type ClientE = typeof client[rpc.ClientE_];
             let error:
               | undefined
@@ -38,7 +37,6 @@ export function subscription<Params extends unknown[], Result>() {
               }
             });
             const discardCheckResult = await discardCheck<ClientE["close"]>(client, counter);
-            // console.log({ method, params, result: error || id, counter });
             return discardCheckResult || error || id!;
           },
         );
