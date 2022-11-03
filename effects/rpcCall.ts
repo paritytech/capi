@@ -8,11 +8,9 @@ export function rpcCall<MethodName extends Z.$<string>, Params extends Z.Ls$<unk
   methodName: MethodName,
   params: [...Params],
 ) {
-  const client = rpcClient(config);
-  const deps = Z.ls(client, methodName, ...params);
   return Z.call(
-    Z.ls(deps, Z.rc(client, deps)),
-    async function rpcCallImpl([[client, methodName, ...params], rc]) {
+    Z.rc(rpcClient(config), methodName, ...params),
+    async function rpcCallImpl([[client, methodName, ...params], counter]) {
       const result = await client.call(
         methodName,
         params,
@@ -26,7 +24,8 @@ export function rpcCall<MethodName extends Z.$<string>, Params extends Z.Ls$<unk
           },
         });
       }
-      if (rc() == 1) {
+      counter.i--;
+      if (counter.i === 1) {
         const close = await client.close();
         if (close instanceof Error) return close;
       }

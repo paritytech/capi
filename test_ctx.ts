@@ -14,7 +14,7 @@ const listener = Deno.listen({
 if (listener.addr.transport !== "tcp") {
   throw new Error();
 }
-useListener(listener, devNets);
+useListener(listener);
 
 const cmdProcess = Deno.run({
   cmd: Deno.args,
@@ -28,7 +28,7 @@ cleanup();
 
 Deno.exit(status.code);
 
-async function useListener(listener: Deno.Listener, lookup: DevNets) {
+async function useListener(listener: Deno.Listener) {
   for await (const conn of listener) {
     useConn(conn);
   }
@@ -43,14 +43,14 @@ async function useListener(listener: Deno.Listener, lookup: DevNets) {
       if (!runtimeName) {
         throw new Error();
       }
-      let processContainer = lookup[runtimeName];
+      let processContainer = devNets[runtimeName];
       if (!processContainer) {
         const port = getOpenPort();
         processContainer = {
           port,
           process: spawnDevNetProcess(port, runtimeName),
         };
-        lookup[runtimeName] = processContainer;
+        devNets[runtimeName] = processContainer;
       }
       const message = new Uint8Array(2);
       new DataView(message.buffer).setUint16(0, processContainer.port);

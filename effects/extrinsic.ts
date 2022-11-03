@@ -131,7 +131,7 @@ export class SignedExtrinsic<
   }
 
   watch<
-    WatchHandler extends U.CreateWatchHandler<NotifMessage<author.TransactionStatus>>,
+    WatchHandler extends U.CreateListener<NotifMessage<author.TransactionStatus>>,
   >(watchHandler: WatchHandler) {
     return rpcSubscription(
       this.config,

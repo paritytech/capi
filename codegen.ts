@@ -29,6 +29,7 @@ await codegen({
   metadata: await getMetadata(args.src),
 }).write(args.out);
 
+// Should disallow .scale as input?
 async function getMetadata(src: string): Promise<M.Metadata> {
   if (src.startsWith("ws")) {
     const client = U.throwIfError(await proxyClient(new Config(() => src)));

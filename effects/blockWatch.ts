@@ -8,7 +8,7 @@ import { run } from "./run.ts";
 
 export function blockWatch(
   config: Config,
-  createWatchHandler: U.CreateWatchHandler<known.SignedBlock>,
+  createWatchHandler: U.CreateListener<known.SignedBlock>,
 ) {
   return rpcSubscription(
     config,

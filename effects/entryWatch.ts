@@ -21,7 +21,7 @@ export function entryWatch<
   palletName: PalletName,
   entryName: EntryName,
   keys: Keys,
-  createWatchHandler: U.CreateWatchHandler<WatchEntryEvent[]>,
+  createWatchHandler: U.CreateListener<WatchEntryEvent[]>,
 ) {
   const metadata_ = metadata(config);
   const deriveCodec_ = deriveCodec(metadata_);
@@ -37,7 +37,7 @@ export function entryWatch<
     },
   );
   const watchInit = Z.call($entry, function entryWatchInit($entry) {
-    return U.mapCreateWatchHandler(
+    return U.mapCreateListener(
       createWatchHandler,
       (message: rpc.NotifMessage) => {
         return message.params.result.changes.map(([key, val]: any) => {
