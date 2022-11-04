@@ -1,7 +1,7 @@
-import { getOpenPort, portReady, spawnDevNetProcess, TestDiscovery } from "./test_util/local.ts";
+import * as T from "./test_util/mod.ts";
 
 const devNets: Partial<
-  Record<TestDiscovery.Name, {
+  Record<T.RuntimeName, {
     port: number;
     process: Deno.Process;
   }>
@@ -39,23 +39,23 @@ async function useListener(listener: Deno.Listener) {
       if (typeof e0 !== "number") {
         throw new Error();
       }
-      const runtimeName = (TestDiscovery.NAMES as Record<number, TestDiscovery.Name>)[e0];
+      const runtimeName = (T.RUNTIME_NAMES as Record<number, T.RuntimeName>)[e0];
       if (!runtimeName) {
         throw new Error();
       }
       let processContainer = devNets[runtimeName];
       if (!processContainer) {
-        const port = getOpenPort();
+        const port = T.getOpenPort();
         processContainer = {
           port,
-          process: spawnDevNetProcess(port, runtimeName),
+          process: T.spawnDevNetProcess(port, runtimeName),
         };
         devNets[runtimeName] = processContainer;
       }
       const message = new Uint8Array(2);
       new DataView(message.buffer).setUint16(0, processContainer.port);
       (async () => {
-        await portReady(processContainer.port);
+        await T.portReady(processContainer.port);
         conn.write(message);
       })();
     }
