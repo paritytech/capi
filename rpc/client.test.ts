@@ -3,12 +3,11 @@ import * as known from "../known/mod.ts";
 import * as T from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
 import * as msg from "./messages.ts";
-import { Client, proxyProvider } from "./mod.ts";
 
 Deno.test({
   name: "RPC Client",
   async fn(t) {
-    const client = new Client(proxyProvider, await T.polkadot.url);
+    const client = await T.polkadot.client;
 
     await t.step({
       name: "call",

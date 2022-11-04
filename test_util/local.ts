@@ -1,5 +1,3 @@
-import { upperFirstCase } from "../deps/case.ts";
-import * as colors from "../deps/std/fmt/colors.ts";
 import * as Z from "../deps/zones.ts";
 import * as C from "../mod.ts";
 
@@ -27,11 +25,6 @@ export function localClient(runtime: RuntimeName): Z.Effect<LocalClient, never, 
   let urlPending: undefined | Promise<string>;
   const url = (): Promise<string> => {
     if (!urlPending) {
-      console.log(
-        colors.blue(
-          `${colors.bold("Creating")} a ${upperFirstCase(runtime)}-like development chain`,
-        ),
-      );
       urlPending = (async () => {
         let port: number;
         if (!portRaw) {
@@ -60,11 +53,16 @@ export function localClient(runtime: RuntimeName): Z.Effect<LocalClient, never, 
     }
     return urlPending;
   };
-  const clientFac = async () => {
-    return new LocalClient(await url(), () => {
-      console.log(colors.blue(`${colors.bold("Destroying")} development chain`));
-      close();
-    });
+  let localClient: undefined | Promise<LocalClient>;
+  const clientFac = () => {
+    if (!localClient) {
+      localClient = (async () => {
+        return new LocalClient(await url(), () => {
+          close();
+        });
+      })();
+    }
+    return localClient;
   };
   return {
     ...Z.call(0, clientFac),
