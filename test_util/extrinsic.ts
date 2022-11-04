@@ -24,13 +24,15 @@ export function collectExtrinsicEvents<
   );
 }
 
-export function assertTransactionStatusOrder(
+// TODO: is this a common-enough test to merit existence in `test_util`?
+// TODO: means of specifying some variability?
+export function assertStatusOrder(
   statuses: known.TransactionStatus[],
-  expectedOrder: ExpectedOrder,
+  statusOrderExpectation: StatusOrderExpectation,
 ) {
-  A.assertEquals(statuses.length, expectedOrder.length);
-  for (let i = 0; i < expectedOrder.length; i++) {
-    const expected = expectedOrder[i]!;
+  A.assertEquals(statuses.length, statusOrderExpectation.length);
+  for (let i = 0; i < statusOrderExpectation.length; i++) {
+    const expected = statusOrderExpectation[i]!;
     const actualStatus = statuses[i]!;
     if (typeof actualStatus === "string") {
       A.assertEquals(actualStatus, expected);
@@ -42,7 +44,7 @@ export function assertTransactionStatusOrder(
 // TODO: Is it worth narrowing this with some valid assumptions?
 //       For instance, we'll never get a `finalized` before `inBlock`.
 //       Should we make this a more case-specific tuple with spreads & whatnot?
-type ExpectedOrder = (
+export type StatusOrderExpectation = (
   | "future"
   | "ready"
   | "broadcast"
