@@ -1,1 +1,3 @@
-export { westend as config } from "../clients.ts";
+import { localClient } from "../local.ts";
+
+export const client = localClient("westend");

@@ -1,4 +1,4 @@
-import { TestDiscovery } from "./test_util/clients.ts";
+import { getOpenPort, portReady, spawnDevNetProcess, TestDiscovery } from "./test_util/local.ts";
 
 const devNets: Partial<
   Record<TestDiscovery.Name, {
@@ -68,50 +68,4 @@ function cleanup() {
     process.kill("SIGKILL");
     process.close();
   }
-}
-
-async function portReady(port: number): Promise<void> {
-  let attempts = 60;
-  while (--attempts) {
-    try {
-      const connection = await Deno.connect({ port });
-      connection.close();
-      break;
-    } catch (e) {
-      if (e instanceof Deno.errors.ConnectionRefused && attempts > 0) {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-      } else {
-        throw new Error();
-      }
-    }
-  }
-}
-
-function spawnDevNetProcess(port: number, runtimeName: TestDiscovery.Name) {
-  const cmd = ["polkadot", "--dev", "--ws-port", port.toString()];
-  if (runtimeName !== "polkadot") {
-    cmd.push(`--force-${runtimeName}`);
-  }
-  try {
-    return Deno.run({
-      cmd,
-      stdout: "piped",
-      stderr: "piped",
-    });
-    // TODO: inherit specific logs (how to filter?)
-  } catch (e) {
-    if (e instanceof Deno.errors.NotFound) {
-      throw new Error(
-        `Must have Polkadot installed locally. Visit "https://github.com/paritytech/polkadot".`,
-      );
-    }
-    throw e;
-  }
-}
-
-function getOpenPort(): number {
-  const tmp = Deno.listen({ port: 0 });
-  const { port } = (tmp.addr as Deno.NetAddr);
-  tmp.close();
-  return port;
 }
