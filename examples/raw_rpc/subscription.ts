@@ -1,9 +1,8 @@
 import { assertNotInstanceOf } from "../../deps/std/testing/asserts.ts";
-import * as C from "../../mod.ts";
 import * as T from "../../test_util/mod.ts";
 import * as U from "../../util/mod.ts";
 
-const client = new C.rpc.Client(C.rpc.proxyProvider, await T.polkadot.url);
+const client = await T.polkadot.client;
 
 const subscriptionId = await client.subscribe({
   jsonrpc: "2.0",

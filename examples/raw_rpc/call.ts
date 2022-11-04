@@ -1,7 +1,6 @@
-import * as C from "../../mod.ts";
 import * as T from "../../test_util/mod.ts";
 
-const client = new C.rpc.Client(C.rpc.proxyProvider, await T.westend.url);
+const client = await T.westend.client;
 
 console.log(
   await client.call({

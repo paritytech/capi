@@ -1,15 +1,19 @@
+import { upperFirstCase } from "../deps/case.ts";
+import * as colors from "../deps/std/fmt/colors.ts";
 import * as Z from "../deps/zones.ts";
 import * as C from "../mod.ts";
 
 class LocalClient extends C.rpc.Client<string, Event, Event, Event> {
   constructor(url: string, readonly close: () => void) {
     super(C.rpc.proxyProvider, url);
+    // TODO: why isn't creating an override `discard` and delegating to `super` isn't doing the trick?
+    const prev = this.discard;
+    this.discard = async () => {
+      const closeError = await prev();
+      this.close();
+      return closeError;
+    };
   }
-
-  override discard = () => {
-    this.close();
-    return super.discard();
-  };
 }
 
 const hostname = Deno.env.get("TEST_CTX_HOSTNAME");
@@ -17,13 +21,18 @@ const portRaw = Deno.env.get("TEST_CTX_PORT");
 
 export function localClient(runtime: RuntimeName): Z.Effect<LocalClient, never, never> & {
   url: Promise<string>;
-  close: () => void;
+  client: Promise<LocalClient>;
 } {
   let close = () => {};
-  let initResult: undefined | Promise<string>;
-  const init = (): Promise<string> => {
-    if (!initResult) {
-      initResult = (async () => {
+  let urlPending: undefined | Promise<string>;
+  const url = (): Promise<string> => {
+    if (!urlPending) {
+      console.log(
+        colors.blue(
+          `${colors.bold("Creating")} a ${upperFirstCase(runtime)}-like development chain`,
+        ),
+      );
+      urlPending = (async () => {
         let port: number;
         if (!portRaw) {
           port = getOpenPort();
@@ -49,19 +58,23 @@ export function localClient(runtime: RuntimeName): Z.Effect<LocalClient, never, 
         return `ws://127.0.0.1:${port}`;
       })();
     }
-    return initResult;
+    return urlPending;
   };
-  return Object.assign(
-    Z.call(0, async () => {
-      return new LocalClient(await init(), close);
-    }),
-    {
-      get url() {
-        return init();
-      },
-      close,
+  const clientFac = async () => {
+    return new LocalClient(await url(), () => {
+      console.log(colors.blue(`${colors.bold("Destroying")} development chain`));
+      close();
+    });
+  };
+  return {
+    ...Z.call(0, clientFac),
+    get url() {
+      return url();
     },
-  );
+    get client() {
+      return clientFac();
+    },
+  };
 }
 
 export type RuntimeCode = typeof RUNTIME_CODES;
@@ -109,12 +122,12 @@ export function spawnDevNetProcess(port: number, runtimeName: RuntimeName) {
     cmd.push(`--force-${runtimeName}`);
   }
   try {
+    // TODO: decide which specific logs to pipe to this file's process
     return Deno.run({
       cmd,
       stdout: "piped",
       stderr: "piped",
     });
-    // TODO: inherit specific logs (how to filter?)
   } catch (e) {
     if (e instanceof Deno.errors.NotFound) {
       throw new Error(
