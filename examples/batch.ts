@@ -2,6 +2,8 @@ import * as C from "../mod.ts";
 import * as T from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
 
+const env = C.env();
+
 const recipients = [T.bob, T.charlie, T.dave, T.eve];
 
 const balances = C.ls(
@@ -46,9 +48,10 @@ const extrinsic = new C.Extrinsic({
     }
   });
 
-const initialBalances = U.throwIfError(await C.run(balances));
-U.throwIfError(await C.run(extrinsic));
-const balancesAfterExtrinsicFinalized = U.throwIfError(await C.run(balances));
+const initialBalances = U.throwIfError(await balances.run(env));
+U.throwIfError(await extrinsic.run(env));
+// If we supply the `env`, the following retrieval would be from cache (which we don't want in this case)
+const balancesAfterExtrinsicFinalized = U.throwIfError(await balances.run());
 
 console.log({
   initialBalances,

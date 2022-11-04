@@ -4,7 +4,6 @@ import * as T from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
 import { entryRead } from "./entryRead.ts";
 import { CallData, Extrinsic } from "./extrinsic.ts";
-import { run } from "./run.ts";
 
 Deno.test({
   name: "Balances.transfer",
@@ -28,7 +27,7 @@ Deno.test({
     await ctx.step({
       name: "account balance updated",
       fn: async () => {
-        const state = await run(entryRead(T.westend)("System", "Account", [T.bob.publicKey]));
+        const state = await entryRead(T.westend)("System", "Account", [T.bob.publicKey]).run();
         A.assertObjectMatch(state, {
           value: {
             data: { free: 10000000000012345n },
@@ -90,19 +89,19 @@ export async function assertExtrinsicStatusOrder({
   sender,
   ...rest
 }: AssertExtrinsicStatusOrderProps) {
-  const extrinsicEvents = U.throwIfError(
-    await run(T.extrinsic.collectExtrinsicEvents(new Extrinsic({
-      client: T.westend,
-      sender: {
-        type: "Id",
-        value: sender.publicKey,
-      },
-      ...rest,
-    })
-      .signed((message) => ({
-        type: "Sr25519",
-        value: sender.sign(message),
-      })))),
-  );
+  const extrinsic = new Extrinsic({
+    client: T.westend,
+    sender: {
+      type: "Id",
+      value: sender.publicKey,
+    },
+    ...rest,
+  })
+    .signed((message) => ({
+      type: "Sr25519",
+      value: sender.sign(message),
+    }));
+  const statuses = T.extrinsic.collectExtrinsicEvents(extrinsic);
+  const extrinsicEvents = U.throwIfError(await statuses.run());
   T.extrinsic.assertStatusOrder(extrinsicEvents, orderExpectation);
 }

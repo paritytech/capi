@@ -11,4 +11,4 @@ const root = C.entryWatch(T.polkadot)("Timestamp", "Now", [], function(entry) {
   counter.inc();
 });
 
-U.throwIfError(await C.run(root));
+U.throwIfError(await root.run());

@@ -12,4 +12,4 @@ const root = C.chain.unsubscribeNewHeads(T.polkadot)(
     counter.inc();
   }),
 );
-U.throwIfError(await C.run(root));
+U.throwIfError(await root.run());

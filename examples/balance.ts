@@ -4,4 +4,4 @@ import * as U from "../util/mod.ts";
 
 const root = C.entryRead(T.polkadot)("System", "Account", [T.alice.publicKey]);
 
-console.log(U.throwIfError(await C.run(root)));
+console.log(U.throwIfError(await root.run()));

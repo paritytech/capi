@@ -15,14 +15,15 @@ export function subscription<Params extends unknown[], Result>() {
           Z.rc(client, listener, ...params),
           async function rpcSubscriptionImpl([[client, listener, ...params], counter]) {
             type ClientE = typeof client[rpc.ClientE_];
+            const id = client.providerRef.nextId();
             let error:
               | undefined
               | RpcServerError
               | rpc.ProviderSendError<ClientE["send"]>
               | rpc.ProviderHandlerError<ClientE["handler"]>;
-            const id = await client.subscribe<Method, Result>({
+            const subscriptionId = await client.subscribe<Method, Result>({
               jsonrpc: "2.0",
-              id: client.providerRef.nextId(),
+              id,
               method,
               params,
             }, function(e) {
@@ -37,7 +38,7 @@ export function subscription<Params extends unknown[], Result>() {
               }
             });
             const discardCheckResult = await discardCheck<ClientE["close"]>(client, counter);
-            return discardCheckResult || error || id!;
+            return discardCheckResult || error || subscriptionId!;
           },
         );
       };

@@ -15,7 +15,6 @@ Deno.test({
     const provider = smoldotProvider(polkadotChainSpec, (message) => {
       assertNotInstanceOf(message, Error);
       assertExists(message.result);
-      console.log(message);
       stopped.resolve();
     });
     provider.send({

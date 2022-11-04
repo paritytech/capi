@@ -4,4 +4,4 @@ import * as U from "../util/mod.ts";
 
 const root = C.keyPageRead(T.polkadot)("System", "Account", 10);
 
-console.log(U.throwIfError(await C.run(root)));
+console.log(U.throwIfError(await root.run()));

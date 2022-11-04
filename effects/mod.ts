@@ -11,4 +11,3 @@ export { client as rpcClient } from "./rpc/client.ts";
 export { RpcServerError } from "./rpc/common.ts";
 export * from "./rpc/known.ts";
 export { subscription as rpcSubscription } from "./rpc/subscription.ts";
-export * from "./run.ts";

@@ -10,14 +10,14 @@ export function call<Params extends unknown[], Result>(method: string) {
         async function rpcCallImpl([[client, method, ...params], counter]) {
           type ClientE = typeof client[rpc.ClientE_];
           // TODO: why do we need to explicitly type this / why is this not being inferred?
+          const id = client.providerRef.nextId();
           const result: rpc.ClientCallEvent<ClientE["send"], ClientE["handler"], Result> =
-            await client
-              .call<Result>({
-                jsonrpc: "2.0",
-                id: client.providerRef.nextId(),
-                method,
-                params,
-              });
+            await client.call<Result>({
+              jsonrpc: "2.0",
+              id,
+              method,
+              params,
+            });
           const discardCheckResult = await discardCheck<ClientE["close"]>(client, counter);
           if (discardCheckResult) return discardCheckResult;
           if (result instanceof Error) {

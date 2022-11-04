@@ -10,4 +10,4 @@ const root = C.entryWatch(C.rococo)("System", "Events", [], function(entry) {
   counter.inc();
 });
 
-U.throwIfError(await C.run(root));
+U.throwIfError(await root.run());

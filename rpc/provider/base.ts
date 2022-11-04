@@ -6,7 +6,12 @@ import { ProviderCloseError, ProviderHandlerError, ProviderSendError } from "./e
  * @param discoveryValue the value with which to discover the given chain
  * @param listener the callback to which messages and errors should be applied
  */
-export type Provider<DiscoveryValue, SendErrorData, HandlerErrorData, CloseErrorData> = (
+export type Provider<
+  DiscoveryValue = any,
+  SendErrorData = any,
+  HandlerErrorData = any,
+  CloseErrorData = any,
+> = (
   discoveryValue: DiscoveryValue,
   listener: ProviderListener<SendErrorData, HandlerErrorData>,
 ) => ProviderRef<CloseErrorData>;

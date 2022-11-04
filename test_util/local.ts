@@ -1,23 +1,22 @@
 import * as Z from "../deps/zones.ts";
 import * as C from "../mod.ts";
 
+const hostname = Deno.env.get("TEST_CTX_HOSTNAME");
+const portRaw = Deno.env.get("TEST_CTX_PORT");
+
 class LocalClient extends C.rpc.Client<string, Event, Event, Event> {
-  constructor(url: string, readonly close: () => void) {
+  constructor(url: string, close: () => void) {
     super(C.rpc.proxyProvider, url);
-    // TODO: why isn't creating an override `discard` and delegating to `super` isn't doing the trick?
-    const prev = this.discard;
+    const prevDiscard = this.discard;
     this.discard = async () => {
-      const closeError = await prev();
-      this.close();
+      const closeError = await prevDiscard();
+      close();
       return closeError;
     };
   }
 }
 
-const hostname = Deno.env.get("TEST_CTX_HOSTNAME");
-const portRaw = Deno.env.get("TEST_CTX_PORT");
-
-export function localClient(runtime: RuntimeName): Z.Effect<LocalClient, never, never> & {
+export function localClient(runtime: RuntimeName): Z.Effect<LocalClient, never> & {
   url: Promise<string>;
   client: Promise<LocalClient>;
 } {
@@ -54,16 +53,14 @@ export function localClient(runtime: RuntimeName): Z.Effect<LocalClient, never, 
     return urlPending;
   };
   let localClient: undefined | Promise<LocalClient>;
-  const clientFac = () => {
+  function clientFac() {
     if (!localClient) {
       localClient = (async () => {
-        return new LocalClient(await url(), () => {
-          close();
-        });
+        return new LocalClient(await url(), close);
       })();
     }
     return localClient;
-  };
+  }
   return {
     ...Z.call(0, clientFac),
     get url() {

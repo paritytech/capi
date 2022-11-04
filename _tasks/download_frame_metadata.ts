@@ -10,7 +10,7 @@ await Promise.all(
   Object.entries({ acala, kusama, moonbeam, polkadot, statemint, subsocial, westend }).map(
     async ([name, client]) => {
       try {
-        const metadataHex = U.throwIfError(await C.run(C.state.getMetadata(client)()));
+        const metadataHex = U.throwIfError(await C.state.getMetadata(client)().run());
         const outPath = path.join(outDir, `${name}.scale`);
         console.log(`Downloading ${name} metadata to "${outPath}".`);
         await Deno.writeTextFile(outPath, metadataHex);

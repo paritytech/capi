@@ -1,4 +1,4 @@
-import * as T from "../../test_util/mod.ts";
+import * as T from "../test_util/mod.ts";
 
 const client = await T.westend.client;
 

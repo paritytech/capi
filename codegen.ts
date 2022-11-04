@@ -30,7 +30,7 @@ await codegen({
 // Should disallow .scale as input?
 async function getMetadata(src: string): Promise<C.M.Metadata> {
   if (src.startsWith("ws")) {
-    return U.throwIfError(await C.run(C.metadata(C.rpcClient(C.rpc.proxyProvider, src))()));
+    return U.throwIfError(await C.metadata(C.rpcClient(C.rpc.proxyProvider, src))().run());
   } else if (path.isAbsolute(src)) {
     return await loadMetadata(src);
   } else {

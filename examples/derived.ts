@@ -9,4 +9,4 @@ const root = C.each(ids, (id) => {
   return C.entryRead(C.polkadot)("Paras", "Heads", [id]);
 });
 
-console.log(U.throwIfError(await C.run(root)));
+console.log(U.throwIfError(await root.run()));

@@ -37,4 +37,4 @@ const root = new C.Extrinsic({
     }
   });
 
-U.throwIfError(await C.run(root));
+U.throwIfError(await root.run());

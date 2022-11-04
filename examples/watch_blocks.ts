@@ -1,7 +1,7 @@
 import * as C from "../mod.ts";
 import * as U from "../util/mod.ts";
 
-const root = C.blockWatch(C.polkadot)(function({ block }) {
+const root = C.blockWatch(C.polkadot)(function blockWatchListener({ block }) {
   console.log(block.header);
   const counter = this.state(U.Counter);
   if (counter.i === 2) {
@@ -10,4 +10,4 @@ const root = C.blockWatch(C.polkadot)(function({ block }) {
   counter.inc();
 });
 
-U.throwIfError(await C.run(root));
+U.throwIfError(await root.run());
