@@ -194,3 +194,4 @@ merkle
 dispatchable
 xxhash
 polkagen
+rotr
