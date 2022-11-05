@@ -31,6 +31,6 @@ export function entryRead<Client extends Z.$<rpc.Client>>(client: Client) {
     const storageValueHex = state.getStorage(client)(storageKey_, blockHash);
     const entryValueTypeI = entryMetadata_.access("value");
     const $entry = codec(deriveCodec_, entryValueTypeI);
-    return decoded($entry, hexDecode(storageValueHex), "value");
+    return decoded($entry, hexDecode(storageValueHex), "value").zoned("EntryRead");
   };
 }

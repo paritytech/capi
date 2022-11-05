@@ -131,10 +131,12 @@ export class SignedExtrinsic<
     const subscriptionId = author.submitAndWatchExtrinsic(
       this.props_.client as Props["client"],
     )([this.extrinsic], listener);
-    return author.unwatchExtrinsic(this.props_.client as Props["client"])(subscriptionId);
+    return author.unwatchExtrinsic(this.props_.client as Props["client"])(subscriptionId)
+      .zoned("ExtrinsicWatch");
   }
 
   get sent() {
-    return author.submitExtrinsic(this.props_.client as Props["client"])(this.extrinsic);
+    return author.submitExtrinsic(this.props_.client as Props["client"])(this.extrinsic)
+      .zoned("ExtrinsicSent");
   }
 }

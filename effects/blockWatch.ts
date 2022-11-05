@@ -17,6 +17,6 @@ export function blockWatch<Client extends Z.$<rpc.Client>>(client: Client) {
       };
     });
     const subscriptionId = chain.subscribeNewHeads(client)([], listenerMapped);
-    return chain.unsubscribeNewHeads(client)(subscriptionId);
+    return chain.unsubscribeNewHeads(client)(subscriptionId).zoned("BlockWatch");
   };
 }

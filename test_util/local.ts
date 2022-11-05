@@ -22,7 +22,7 @@ export function localClient(runtime: RuntimeName): Z.Effect<LocalClient, never> 
 } {
   let close = () => {};
   let urlPending: undefined | Promise<string>;
-  const url = (): Promise<string> => {
+  const getUrl = (): Promise<string> => {
     if (!urlPending) {
       urlPending = (async () => {
         let port: number;
@@ -56,7 +56,7 @@ export function localClient(runtime: RuntimeName): Z.Effect<LocalClient, never> 
   function clientFac() {
     if (!localClient) {
       localClient = (async () => {
-        return new LocalClient(await url(), close);
+        return new LocalClient(await getUrl(), close);
       })();
     }
     return localClient;
@@ -64,7 +64,7 @@ export function localClient(runtime: RuntimeName): Z.Effect<LocalClient, never> 
   return {
     ...Z.call(0, clientFac),
     get url() {
-      return url();
+      return getUrl();
     },
     get client() {
       return clientFac();

@@ -13,7 +13,7 @@ export function subscription<Params extends unknown[], Result>() {
       >(params: [...Params_], listener: Listener) => {
         return Z.call(
           Z.rc(client, listener, ...params),
-          async function rpcSubscriptionImpl([[client, listener, ...params], counter]) {
+          async function rpcSubscriptionImpl([[client, listener, _2, ...params], counter]) {
             type ClientE = typeof client[rpc.ClientE_];
             const id = client.providerRef.nextId();
             let error:
@@ -40,7 +40,7 @@ export function subscription<Params extends unknown[], Result>() {
             const discardCheckResult = await discardCheck<ClientE["close"]>(client, counter);
             return discardCheckResult || error || subscriptionId!;
           },
-        );
+        ).zoned("RpcSubscription");
       };
     };
   };

@@ -13,5 +13,5 @@ export function client<
 ) {
   return Z.call(Z.ls(provider, discoveryValue), function initClient([_, discoveryValue]) {
     return new rpc.Client(provider, discoveryValue as DiscoveryValue);
-  });
+  }).zoned("RpcClient");
 }

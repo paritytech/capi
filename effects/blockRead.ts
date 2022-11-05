@@ -22,6 +22,6 @@ export function blockRead<Client extends Z.$<rpc.Client>>(client: Client) {
           }),
         },
       };
-    });
+    }).zoned("BlockRead");
   };
 }

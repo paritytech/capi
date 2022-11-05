@@ -16,7 +16,7 @@ export function metadata<Client extends Z.$<rpc.Client>>(client: Client) {
           return e as $.ScaleError;
         }
       },
-    );
+    ).zoned("Metadata");
   };
 }
 
@@ -29,7 +29,7 @@ export function palletMetadata<Metadata extends Z.$<M.Metadata>, PalletName exte
     function palletMetadataImpl([metadata, palletName]) {
       return M.getPallet(metadata, palletName);
     },
-  );
+  ).zoned("PalletMetadata");
 }
 
 export function entryMetadata<PalletMetadata extends Z.$<M.Pallet>, EntryName extends Z.$<string>>(
@@ -41,7 +41,7 @@ export function entryMetadata<PalletMetadata extends Z.$<M.Pallet>, EntryName ex
     function entryMetadataImpl([palletMetadata, entryName]) {
       return M.getEntry(palletMetadata, entryName);
     },
-  );
+  ).zoned("EntryMetadata");
 }
 
 export function constMetadata<
@@ -56,7 +56,7 @@ export function constMetadata<
     function constMetadataImpl([palletMetadata, constName]) {
       return M.getConst(palletMetadata, constName);
     },
-  );
+  ).zoned("ConstMetadata");
 }
 
 export function mapMetadata<PalletMetadata extends Z.$<M.Pallet>, EntryName extends Z.$<string>>(
@@ -73,7 +73,7 @@ export function mapMetadata<PalletMetadata extends Z.$<M.Pallet>, EntryName exte
       }
       return entryMetadata;
     },
-  );
+  ).zoned("MapMetadata");
 }
 
 export class ExpectedMapError extends Error {

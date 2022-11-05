@@ -23,7 +23,7 @@ export function const_<Client extends Z.$<rpc.Client>>(client: Client) {
     const entryValueTypeI = constMetadata_.access("ty").access("id");
     const constValue = constMetadata_.access("value");
     const $const = codec(deriveCodec_, entryValueTypeI);
-    return decoded($const, constValue, "value");
+    return decoded($const, constValue, "value").zoned("Const");
   };
 }
 Object.defineProperty(const_, "name", {

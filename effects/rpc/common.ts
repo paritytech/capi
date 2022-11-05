@@ -6,7 +6,7 @@ export async function discardCheck<CloseErrorData>(
   counter: Z.RcCounter,
 ) {
   counter.i--;
-  if (counter.i === 1) {
+  if (!counter.i) {
     return await client.discard();
   }
   return;

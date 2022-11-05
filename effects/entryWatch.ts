@@ -47,6 +47,6 @@ export function entryWatch<Client extends Z.$<rpc.Client>>(client: Client) {
       };
     });
     const subscriptionId = state.subscribeStorage(client)([storageKeys], listenerMapped);
-    return state.unsubscribeStorage(client)(subscriptionId);
+    return state.unsubscribeStorage(client)(subscriptionId).zoned("EntryWatch");
   };
 }
