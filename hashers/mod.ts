@@ -1,6 +1,6 @@
-import { blake2b } from "../deps/blake2b.ts";
 import * as $ from "../deps/scale.ts";
 import { EncodeBuffer } from "../deps/scale.ts";
+import { Blake2b } from "./blake2b.ts";
 import { Xxhash } from "./xxhash.ts";
 
 export abstract class Hasher {
@@ -61,7 +61,7 @@ export class Blake2Hasher extends Hasher {
   }
 
   create(): Hashing {
-    return blake2b.create({ dkLen: this.digestLength });
+    return new Blake2b(this.digestLength);
   }
 }
 
