@@ -27,7 +27,7 @@ export function call<Params extends unknown[], Result>(method: string) {
           }
           return result.result;
         },
-      ).zoned("RpcClient");
+      ).zoned("RpcCall");
     };
   };
 }
