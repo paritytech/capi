@@ -3,6 +3,7 @@ import * as hex from "../util/hex.ts";
 
 const wasmPaths = [
   "hashers/xxhash",
+  "hashers/blake2b",
 ];
 
 await Promise.all(wasmPaths.map(build));
