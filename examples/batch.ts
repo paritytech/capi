@@ -2,15 +2,9 @@ import * as C from "../mod.ts";
 import * as T from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
 
-const env = C.env({
-  hooks: {
-    beforeInit() {
-      console.log(this.round);
-    },
-  },
-});
+const env = C.env();
 
-const recipients = [/*T.bob, T.charlie, T.dave,*/ T.eve];
+const recipients = [T.bob, T.charlie, T.dave, T.eve];
 
 const balances = C.ls(
   ...recipients.map(({ publicKey }) => {
@@ -56,10 +50,10 @@ const extrinsic = new C.Extrinsic({
 
 const initialBalances = await U.throwIfError(balances.run(env));
 U.throwIfError(await extrinsic.run(env));
-// // If we supply the `env`, the following retrieval would be from cache (which we don't want in this case)
-// const balancesAfterExtrinsicFinalized = U.throwIfError(await balances.run(env));
+// If we supply the `env`, the following retrieval would be from cache (which we don't want in this case)
+const balancesAfterExtrinsicFinalized = U.throwIfError(await balances.run(env));
 
 console.log({
   initialBalances,
-  // balancesAfterExtrinsicFinalized,
+  balancesAfterExtrinsicFinalized,
 });

@@ -8,7 +8,6 @@ export function call<Params extends unknown[], Result>(method: string) {
       return Z.call(
         Z.rc(client, method, ...params),
         async function rpcCallImpl([[client, method, ...params], counter]) {
-          console.log({ method, params });
           type ClientE = typeof client[rpc.ClientE_];
           // TODO: why do we need to explicitly type this / why is this not being inferred?
           const id = client.providerRef.nextId();
