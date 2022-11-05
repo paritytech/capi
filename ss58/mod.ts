@@ -1,5 +1,5 @@
-import { blake2b } from "../deps/blake2b.ts";
 import * as base58 from "../deps/std/encoding/base58.ts";
+import { Blake2b } from "../hashers/blake2b.ts";
 
 // SS58PRE string (0x53533538505245 hex) encoded as Uint8Array
 const SS58PRE = Uint8Array.of(83, 83, 53, 56, 80, 82, 69);
@@ -48,9 +48,7 @@ export const encodeRaw = (
       (prefix >> 8) | ((prefix & 0b0000_0000_0000_0011) << 6),
     );
 
-  const hasher = blake2b.create({
-    dkLen: 512 / 8,
-  });
+  const hasher = new Blake2b();
 
   hasher.update(SS58PRE);
   hasher.update(prefixBytes);
@@ -58,6 +56,7 @@ export const encodeRaw = (
 
   const digest = hasher.digest();
   const checksum = digest.subarray(0, CHECKSUM_LENGTH);
+  hasher.dispose();
 
   const address = new Uint8Array(prefixBytes.length + pubKey.length + CHECKSUM_LENGTH);
 
@@ -95,13 +94,14 @@ export const decodeRaw = (
     : ((address[0]! & 0b0011_1111) << 2) | (address[1]! >> 6)
       | ((address[1]! & 0b0011_1111) << 8);
 
-  const hasher = blake2b.create({ dkLen: 512 / 8 });
+  const hasher = new Blake2b();
 
   hasher.update(SS58PRE);
   hasher.update(address.subarray(0, address.length - CHECKSUM_LENGTH));
 
   const digest = hasher.digest();
   const checksum = address.subarray(address.length - CHECKSUM_LENGTH);
+  hasher.dispose();
 
   if (digest[0] !== checksum[0] || digest[1] !== checksum[1]) {
     return new InvalidAddressChecksumError();
