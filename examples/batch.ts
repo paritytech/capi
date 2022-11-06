@@ -1,7 +1,8 @@
 import * as C from "../mod.ts";
 import * as T from "../test_util/mod.ts";
+import * as U from "../util/mod.ts";
 
-C.extrinsic({
+const root = C.extrinsic({
   client: T.westend,
   sender: {
     type: "Id",
@@ -32,5 +33,6 @@ C.extrinsic({
     if (C.TransactionStatus.isTerminal(status)) {
       this.stop();
     }
-  })
-  .run();
+  });
+
+U.throwIfError(await root.run());
