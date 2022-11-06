@@ -27,6 +27,10 @@ export interface ExtrinsicProps extends CallData {
   tip?: bigint;
 }
 
+export function extrinsic<Props extends Z.Rec$<ExtrinsicProps>>(props: Props): Extrinsic<Props> {
+  return new Extrinsic(props);
+}
+
 export class Extrinsic<Props extends Z.Rec$<ExtrinsicProps>> {
   constructor(readonly props: Props) {}
 

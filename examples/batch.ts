@@ -1,21 +1,7 @@
 import * as C from "../mod.ts";
 import * as T from "../test_util/mod.ts";
-import * as U from "../util/mod.ts";
 
-const env = C.env();
-
-const recipients = [T.bob, T.charlie, T.dave, T.eve];
-
-const balances = C.ls(
-  ...recipients.map(({ publicKey }) => {
-    return C.entryRead(T.westend)("System", "Account", [publicKey])
-      .access("value")
-      .access("data")
-      .access("free");
-  }),
-);
-
-const extrinsic = new C.Extrinsic({
+C.extrinsic({
   client: T.westend,
   sender: {
     type: "Id",
@@ -24,7 +10,7 @@ const extrinsic = new C.Extrinsic({
   palletName: "Utility",
   methodName: "batch_all",
   args: {
-    calls: recipients.map(({ publicKey }) => ({
+    calls: [T.bob, T.charlie, T.dave, T.eve].map(({ publicKey }) => ({
       type: "Balances",
       value: {
         type: "transfer",
@@ -46,14 +32,5 @@ const extrinsic = new C.Extrinsic({
     if (C.TransactionStatus.isTerminal(status)) {
       this.stop();
     }
-  });
-
-const initialBalances = await U.throwIfError(balances.run(env));
-U.throwIfError(await extrinsic.run(env));
-// If we supply the `env`, the following retrieval would be from cache (which we don't want in this case)
-const balancesAfterExtrinsicFinalized = U.throwIfError(await balances.run(env));
-
-console.log({
-  initialBalances,
-  balancesAfterExtrinsicFinalized,
-});
+  })
+  .run();

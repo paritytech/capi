@@ -3,7 +3,7 @@ import * as A from "../deps/std/testing/asserts.ts";
 import * as T from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
 import { entryRead } from "./entryRead.ts";
-import { CallData, Extrinsic } from "./extrinsic.ts";
+import { CallData, extrinsic } from "./extrinsic.ts";
 
 Deno.test({
   name: "Balances.transfer",
@@ -89,19 +89,21 @@ export async function assertExtrinsicStatusOrder({
   sender,
   ...rest
 }: AssertExtrinsicStatusOrderProps) {
-  const extrinsic = new Extrinsic({
-    client: T.westend,
-    sender: {
-      type: "Id",
-      value: sender.publicKey,
-    },
-    ...rest,
-  })
-    .signed((message) => ({
-      type: "Sr25519",
-      value: sender.sign(message),
-    }));
-  const statuses = T.extrinsic.collectExtrinsicEvents(extrinsic);
-  const extrinsicEvents = U.throwIfError(await statuses.run());
+  const extrinsicEvents = U.throwIfError(
+    await T.extrinsic.collectExtrinsicEvents(
+      extrinsic({
+        client: T.westend,
+        sender: {
+          type: "Id",
+          value: sender.publicKey,
+        },
+        ...rest,
+      })
+        .signed((message) => ({
+          type: "Sr25519",
+          value: sender.sign(message),
+        })),
+    ).run(),
+  );
   T.extrinsic.assertStatusOrder(extrinsicEvents, orderExpectation);
 }
