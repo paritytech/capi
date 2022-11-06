@@ -13,7 +13,7 @@ export function subscription<Params extends unknown[], Result>() {
       >(params: [...Params_], listener: Listener) => {
         return Z.call(
           Z.rc(client, listener, ...params),
-          async function rpcSubscriptionImpl([[client, listener, _2, ...params], counter]) {
+          async function rpcSubscriptionImpl([[client, listener, ...params], counter]) {
             type ClientE = typeof client[rpc.ClientE_];
             const id = client.providerRef.nextId();
             let error:
@@ -32,6 +32,7 @@ export function subscription<Params extends unknown[], Result>() {
                 this.stop();
               } else if (e.error) {
                 error = new RpcServerError(e);
+                console.log(e);
                 this.stop();
               } else {
                 listener.apply(this, [e.params.result]);

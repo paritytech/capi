@@ -27,7 +27,8 @@ const unsubscribed = await client.call({
 });
 
 console.log(
-  `${unsubscribed ? "" : "un"}successfully unsubscribed from subscription ${subscriptionId}`,
+  // cspell:disable-next-line
+  `${unsubscribed ? "S" : "Uns"}uccessfully unsubscribed from subscription ${subscriptionId}`,
 );
 
 await client.discard();
