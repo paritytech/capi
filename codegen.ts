@@ -1,10 +1,8 @@
 import { codegen } from "./codegen/mod.ts";
-import { Config } from "./config/mod.ts";
 import { parse } from "./deps/std/flags.ts";
 import * as path from "./deps/std/path.ts";
 import { unimplemented } from "./deps/std/testing/asserts.ts";
-import * as M from "./frame_metadata/mod.ts";
-import { proxyClient } from "./rpc/providers/proxy.ts";
+import * as C from "./mod.ts";
 import * as U from "./util/mod.ts";
 
 const args = parse(Deno.args, {
@@ -30,13 +28,9 @@ await codegen({
 }).write(args.out);
 
 // Should disallow .scale as input?
-async function getMetadata(src: string): Promise<M.Metadata> {
+async function getMetadata(src: string): Promise<C.M.Metadata> {
   if (src.startsWith("ws")) {
-    const client = U.throwIfError(await proxyClient(new Config(() => src)));
-    const metadata = U.throwIfError(await client.call("state_getMetadata", []));
-    U.throwIfError(await client.close());
-    if (metadata.error) fail();
-    return M.fromPrefixedHex(metadata.result);
+    return U.throwIfError(await C.metadata(C.rpcClient(C.rpc.proxyProvider, src))().run());
   } else if (path.isAbsolute(src)) {
     return await loadMetadata(src);
   } else {
@@ -52,7 +46,7 @@ async function loadMetadata(src: string) {
   const ext = path.extname(src);
   switch (ext) {
     case ".scale": {
-      return M.fromPrefixedHex(await Deno.readTextFile(src));
+      return C.M.fromPrefixedHex(await Deno.readTextFile(src));
     }
     case ".json": {
       return unimplemented();

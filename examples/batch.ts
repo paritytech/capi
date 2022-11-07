@@ -3,17 +3,19 @@ import * as T from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
 
 const recipients = [T.bob, T.charlie, T.dave, T.eve];
-const balances = C.ls(
-  ...recipients.map(({ publicKey }) => {
-    return C.entryRead(T.westend, "System", "Account", [publicKey])
-      .access("value")
-      .access("data")
-      .access("free")
-      .as<bigint>();
-  }),
-);
 
-const extrinsic = new C.Extrinsic(T.westend, {
+const env = C.Z.env();
+
+// TODO: uncomment these lines upon solving `count` in zones
+// const getBalances = C.Z.ls(
+//   ...recipients.map(({ publicKey }) => {
+//     return C.entryRead(T.westend)("System", "Account", [publicKey])
+//       .access("value").access("data").access("free");
+//   }),
+// ).bind(env);
+
+const runTx = C.extrinsic({
+  client: T.westend,
   sender: {
     type: "Id",
     value: T.alice.publicKey,
@@ -38,29 +40,15 @@ const extrinsic = new C.Extrinsic(T.westend, {
     type: "Sr25519",
     value: T.alice.sign(message),
   }))
-  .watch((stop) => {
-    return (event) => {
-      if (typeof event.params.result === "string") {
-        console.log("Extrinsic", event.params.result);
-      } else {
-        if (event.params.result.inBlock) {
-          console.log("Extrinsic in block", event.params.result.inBlock);
-        } else if (event.params.result.finalized) {
-          console.log("Extrinsic finalized as of", event.params.result.finalized);
-          stop();
-        } else {
-          console.log("Misc", event.params.result);
-          stop();
-        }
-      }
-    };
-  });
+  .watch(function(status) {
+    console.log(status);
+    if (C.TransactionStatus.isTerminal(status)) {
+      this.stop();
+    }
+  })
+  .bind(env);
 
-const initialBalances = U.throwIfError(await C.run(balances));
-U.throwIfError(await C.run(extrinsic));
-const balancesAfterExtrinsicFinalized = U.throwIfError(await C.run(balances));
-
-console.log({
-  initialBalances,
-  balancesAfterExtrinsicFinalized,
-});
+// TODO: uncomment these lines upon solving `count` in zones
+// console.log(U.throwIfError(await getBalances()));
+U.throwIfError(await runTx());
+// console.log(U.throwIfError(await getBalances()));

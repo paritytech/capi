@@ -1,11 +1,11 @@
-import { TestConfigRuntime } from "./test_util/config.ts";
+import * as T from "./test_util/mod.ts";
 
-interface DevNet {
-  port: number;
-  process: Deno.Process;
-}
-type DevNets = Partial<Record<TestConfigRuntime.Name, DevNet>>;
-const devNets: DevNets = {};
+const devNets: Partial<
+  Record<T.RuntimeName, {
+    port: number;
+    process: Deno.Process;
+  }>
+> = {};
 
 const listener = Deno.listen({
   transport: "tcp",
@@ -39,23 +39,23 @@ async function useListener(listener: Deno.Listener) {
       if (typeof e0 !== "number") {
         throw new Error();
       }
-      const runtimeName = (TestConfigRuntime.NAMES as Record<number, TestConfigRuntime.Name>)[e0];
+      const runtimeName = (T.RUNTIME_NAMES as Record<number, T.RuntimeName>)[e0];
       if (!runtimeName) {
         throw new Error();
       }
       let processContainer = devNets[runtimeName];
       if (!processContainer) {
-        const port = getOpenPort();
+        const port = T.getOpenPort();
         processContainer = {
           port,
-          process: spawnDevNetProcess(port, runtimeName),
+          process: T.polkadotProcess(port, runtimeName),
         };
         devNets[runtimeName] = processContainer;
       }
       const message = new Uint8Array(2);
       new DataView(message.buffer).setUint16(0, processContainer.port);
       (async () => {
-        await portReady(processContainer.port);
+        await T.portReady(processContainer.port);
         conn.write(message);
       })();
     }
@@ -68,50 +68,4 @@ function cleanup() {
     process.kill("SIGKILL");
     process.close();
   }
-}
-
-async function portReady(port: number): Promise<void> {
-  let attempts = 60;
-  while (--attempts) {
-    try {
-      const connection = await Deno.connect({ port });
-      connection.close();
-      break;
-    } catch (e) {
-      if (e instanceof Deno.errors.ConnectionRefused && attempts > 0) {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-      } else {
-        throw new Error();
-      }
-    }
-  }
-}
-
-function spawnDevNetProcess(port: number, runtimeName: TestConfigRuntime.Name) {
-  const cmd = ["polkadot", "--dev", "--ws-port", port.toString()];
-  if (runtimeName !== "polkadot") {
-    cmd.push(`--force-${runtimeName}`);
-  }
-  try {
-    return Deno.run({
-      cmd,
-      stdout: "piped",
-      stderr: "piped",
-    });
-    // TODO: inherit specific logs (how to filter?)
-  } catch (e) {
-    if (e instanceof Deno.errors.NotFound) {
-      throw new Error(
-        `Must have Polkadot installed locally. Visit "https://github.com/paritytech/polkadot".`,
-      );
-    }
-    throw e;
-  }
-}
-
-function getOpenPort(): number {
-  const tmp = Deno.listen({ port: 0 });
-  const { port } = (tmp.addr as Deno.NetAddr);
-  tmp.close();
-  return port;
 }

@@ -2,15 +2,14 @@ import * as C from "../mod.ts";
 import * as T from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
 
-const root = C.rpcSubscription(T.polkadot, "chain_subscribeNewHead", [], (stop) => {
-  let i = 0;
-  return (m) => {
-    i++;
-    if (i > 5) {
-      stop();
+const root = C.chain.unsubscribeNewHeads(T.polkadot)(
+  C.chain.subscribeNewHeads(T.polkadot)([], function(header) {
+    console.log(header);
+    const counter = this.state(U.Counter);
+    if (counter.i === 2) {
+      return this.stop();
     }
-    console.log(m);
-  };
-});
-
-U.throwIfError(await C.run(root));
+    counter.inc();
+  }),
+);
+U.throwIfError(await root.run());
