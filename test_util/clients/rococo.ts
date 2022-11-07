@@ -1,3 +1,3 @@
-import { localClient } from "../local.ts";
+import { LocalClientEffect } from "../local.ts";
 
-export const client = localClient("rococo");
+export const client = new LocalClientEffect("rococo");

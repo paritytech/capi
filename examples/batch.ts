@@ -2,7 +2,18 @@ import * as C from "../mod.ts";
 import * as T from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
 
-const root = C.extrinsic({
+const recipients = [T.bob, T.charlie, T.dave, T.eve];
+
+const env = C.Z.env();
+
+// const getBalances = C.Z.ls(
+//   ...recipients.map(({ publicKey }) => {
+//     return C.entryRead(T.westend)("System", "Account", [publicKey])
+//       .access("value").access("data").access("free");
+//   }),
+// ).bind(env);
+
+const runTx = C.extrinsic({
   client: T.westend,
   sender: {
     type: "Id",
@@ -11,7 +22,7 @@ const root = C.extrinsic({
   palletName: "Utility",
   methodName: "batch_all",
   args: {
-    calls: [T.bob, T.charlie, T.dave, T.eve].map(({ publicKey }) => ({
+    calls: recipients.map(({ publicKey }) => ({
       type: "Balances",
       value: {
         type: "transfer",
@@ -33,6 +44,9 @@ const root = C.extrinsic({
     if (C.TransactionStatus.isTerminal(status)) {
       this.stop();
     }
-  });
+  })
+  .bind(env);
 
-U.throwIfError(await root.run());
+// console.log(U.throwIfError(await getBalances()));
+U.throwIfError(await runTx());
+// console.log(U.throwIfError(await getBalances()));

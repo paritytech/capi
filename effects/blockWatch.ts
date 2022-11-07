@@ -11,7 +11,7 @@ export function blockWatch<Client extends Z.$<rpc.Client>>(client: Client) {
     const listenerMapped = Z.call(listener, function mapBlockWatchListener(listener, env) {
       return async function(this: rpc.ClientSubscribeContext, header: known.Header) {
         const blockHash = chain.getBlockHash(client)(header.number);
-        const block = await blockRead(client)(blockHash).run(env);
+        const block = await blockRead(client)(blockHash).bind(env)();
         if (block instanceof Error) throw block;
         listener.apply(this, [block]);
       };

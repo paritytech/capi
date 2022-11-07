@@ -1,3 +1,3 @@
-import { localClient } from "../local.ts";
+import { LocalClientEffect } from "../local.ts";
 
-export const client = localClient("kusama");
+export const client = new LocalClientEffect("kusama");

@@ -6,9 +6,10 @@ import { subscription } from "./subscription.ts";
 // TODO: generate the following?
 export namespace state {
   export const getMetadata = call<[at?: U.HexHash], U.HexHash>("state_getMetadata");
-  export const getStorage = call<[key: known.StorageKey, at?: U.HexHash], known.StorageData>(
-    "state_getStorage",
-  );
+  export const getStorage = call<
+    [key: known.StorageKey, at?: U.HexHash],
+    known.StorageData
+  >("state_getStorage", true);
   export const subscribeStorage = subscription<
     [keys: known.StorageKey[]],
     known.StorageChangeSet

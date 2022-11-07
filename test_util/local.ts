@@ -5,8 +5,8 @@ const hostname = Deno.env.get("TEST_CTX_HOSTNAME");
 const portRaw = Deno.env.get("TEST_CTX_PORT");
 
 class LocalClient extends C.rpc.Client<string, Event, Event, Event> {
-  constructor(url: string, close: () => void) {
-    super(C.rpc.proxyProvider, url);
+  constructor(port: number, close: () => void) {
+    super(C.rpc.proxyProvider, `ws://127.0.0.1:${port}`);
     const prevDiscard = this.discard;
     this.discard = async () => {
       const closeError = await prevDiscard();
@@ -16,60 +16,64 @@ class LocalClient extends C.rpc.Client<string, Event, Event, Event> {
   }
 }
 
-export function localClient(runtime: RuntimeName): Z.Effect<LocalClient, never> & {
-  url: Promise<string>;
-  client: Promise<LocalClient>;
-} {
-  let close = () => {};
-  let urlPending: undefined | Promise<string>;
-  const getUrl = (): Promise<string> => {
-    if (!urlPending) {
-      urlPending = (async () => {
-        let port: number;
-        if (!portRaw) {
-          port = getOpenPort();
-          const p = spawnDevNetProcess(port, runtime);
-          close = () => {
-            p.kill("SIGKILL");
-            p.close();
-          };
-          await portReady(port);
-        } else {
-          const conn = await Deno.connect({
-            hostname,
-            port: parseInt(portRaw!),
-          });
-          conn.write(new Uint8Array([RUNTIME_CODES[runtime]]));
-          port = await (async () => {
-            for await (const x of conn.readable) {
-              return new DataView(x.buffer).getUint16(0);
-            }
-            return undefined!;
-          })();
-        }
-        return `ws://127.0.0.1:${port}`;
-      })();
-    }
-    return urlPending;
-  };
-  let localClient: undefined | Promise<LocalClient>;
-  function clientFac() {
-    if (!localClient) {
-      localClient = (async () => {
-        return new LocalClient(await getUrl(), close);
-      })();
-    }
-    return localClient;
+export class LocalClientEffect extends Z.Effect<LocalClient, PolkadotBinNotFoundError> {
+  #clientPending?: Promise<LocalClient>;
+
+  constructor(readonly runtime: RuntimeName) {
+    const getClientContainer: { getClient?: () => Promise<LocalClient> } = {};
+    super({
+      kind: "LocalClient",
+      init(env) {
+        return Z.call(0, async () => {
+          try {
+            return await getClientContainer.getClient!();
+          } catch (e) {
+            return e as PolkadotBinNotFoundError;
+          }
+        }).init(env);
+      },
+      args: [runtime],
+    });
+    getClientContainer.getClient = this.createClient.bind(this);
   }
-  return {
-    ...Z.call(0, clientFac),
-    get url() {
-      return getUrl();
-    },
-    get client() {
-      return clientFac();
-    },
-  };
+
+  get url(): Promise<string> {
+    return null!;
+  }
+
+  get client(): Promise<LocalClient> {
+    if (!this.#clientPending) {
+      this.#clientPending = this.createClient();
+    }
+    return this.#clientPending;
+  }
+
+  private async createClient(): Promise<LocalClient> {
+    let port: number;
+    let close = () => {};
+    if (portRaw /* in a test ctx */) {
+      const conn = await Deno.connect({
+        hostname,
+        port: parseInt(portRaw!),
+      });
+      conn.write(new Uint8Array([RUNTIME_CODES[this.runtime]]));
+      port = await (async () => {
+        for await (const x of conn.readable) {
+          return new DataView(x.buffer).getUint16(0);
+        }
+        return null!;
+      })();
+    } else {
+      port = getOpenPort();
+      const process = polkadotProcess(port, this.runtime);
+      close = () => {
+        process.kill("SIGKILL");
+        process.close();
+      };
+      await portReady(port);
+    }
+    return new LocalClient(port, close);
+  }
 }
 
 export type RuntimeCode = typeof RUNTIME_CODES;
@@ -111,7 +115,14 @@ export function getOpenPort(): number {
   return port;
 }
 
-export function spawnDevNetProcess(port: number, runtimeName: RuntimeName) {
+export class PolkadotBinNotFoundError extends Error {
+  override readonly name = "PolkadotBinNotFoundError";
+  override readonly message =
+    "The Polkadot CLI was not found. Please ensure Polkadot is installed and PATH is set for `polkadot`."
+    + `For more information, visit the following link: "https://github.com/paritytech/polkadot".`;
+}
+
+export function polkadotProcess(port: number, runtimeName: RuntimeName) {
   const cmd = ["polkadot", "--dev", "--ws-port", port.toString()];
   if (runtimeName !== "polkadot") {
     cmd.push(`--force-${runtimeName}`);
@@ -123,12 +134,7 @@ export function spawnDevNetProcess(port: number, runtimeName: RuntimeName) {
       stdout: "piped",
       stderr: "piped",
     });
-  } catch (e) {
-    if (e instanceof Deno.errors.NotFound) {
-      throw new Error(
-        `Must have Polkadot installed locally. Visit "https://github.com/paritytech/polkadot".`,
-      );
-    }
-    throw e;
+  } catch (_e) {
+    throw new PolkadotBinNotFoundError();
   }
 }

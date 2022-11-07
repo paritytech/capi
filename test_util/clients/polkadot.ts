@@ -1,3 +1,3 @@
-import { localClient } from "../local.ts";
+import { LocalClientEffect } from "../local.ts";
 
-export const client = localClient("polkadot");
+export const client = new LocalClientEffect("polkadot");

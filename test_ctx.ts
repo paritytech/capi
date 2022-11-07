@@ -48,7 +48,7 @@ async function useListener(listener: Deno.Listener) {
         const port = T.getOpenPort();
         processContainer = {
           port,
-          process: T.spawnDevNetProcess(port, runtimeName),
+          process: T.polkadotProcess(port, runtimeName),
         };
         devNets[runtimeName] = processContainer;
       }
