@@ -6,12 +6,12 @@ const recipients = [T.bob, T.charlie, T.dave, T.eve];
 
 const env = C.Z.env();
 
-// const getBalances = C.Z.ls(
-//   ...recipients.map(({ publicKey }) => {
-//     return C.entryRead(T.westend)("System", "Account", [publicKey])
-//       .access("value").access("data").access("free");
-//   }),
-// ).bind(env);
+const getBalances = C.Z.ls(
+  ...recipients.map(({ publicKey }) => {
+    return C.entryRead(T.westend)("System", "Account", [publicKey])
+      .access("value").access("data").access("free");
+  }),
+).bind(env);
 
 const runTx = C.extrinsic({
   client: T.westend,
@@ -47,6 +47,7 @@ const runTx = C.extrinsic({
   })
   .bind(env);
 
+// TODO: uncomment these lines upon solving `count` in zones
 // console.log(U.throwIfError(await getBalances()));
 U.throwIfError(await runTx());
 // console.log(U.throwIfError(await getBalances()));

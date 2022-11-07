@@ -19,16 +19,18 @@ const subscriptionId = await client.subscribe({
   counter.inc();
 });
 
-const unsubscribed = await client.call({
-  jsonrpc: "2.0",
-  id: client.providerRef.nextId(),
-  method: "chain_unsubscribeAllHeads",
-  params: [subscriptionId],
-});
+const { result } = U.throwIfError(
+  await client.call({
+    jsonrpc: "2.0",
+    id: client.providerRef.nextId(),
+    method: "chain_unsubscribeAllHeads",
+    params: [subscriptionId],
+  }),
+);
 
 console.log(
   // cspell:disable-next-line
-  `${unsubscribed ? "S" : "Uns"}uccessfully unsubscribed from subscription ${subscriptionId}`,
+  `${result ? "S" : "Uns"}uccessfully unsubscribed from subscription ${subscriptionId}`,
 );
 
 await client.discard();
