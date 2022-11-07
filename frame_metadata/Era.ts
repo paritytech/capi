@@ -15,8 +15,7 @@ export function mortalEra(period: bigint, current: bigint): Era {
 }
 
 export const $era: $.Codec<Era> = $.createCodec({
-  name: "era",
-  _metadata: null,
+  _metadata: $.metadata("$era"),
   _staticSize: 2,
   _encode(buffer, value) {
     if (value.type === "Immortal") {
@@ -43,6 +42,9 @@ export const $era: $.Codec<Era> = $.createCodec({
         throw new Error("Invalid period and phase");
       }
     }
+  },
+  _assert() {
+    // TODO
   },
 });
 

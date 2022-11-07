@@ -1,1 +1,1 @@
-export * from "https://deno.land/x/scale@v0.8.2/mod.ts";
+export * from "https://deno.land/x/scale@v0.9.0/mod.ts";

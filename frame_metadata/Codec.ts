@@ -9,7 +9,7 @@ export type DeriveCodec = (typeI: number | M.Ty) => $.Codec<unknown>;
  * All derived codecs for ZSTs will use this exact codec,
  * so `derivedCodec === $null` is true iff the type is a ZST.
  */
-export const $null = $.dummy(null);
+export const $null = $.constant(null);
 
 // TODO: tuple/array element skip optimization
 export function DeriveCodec(tys: M.Ty[]): DeriveCodec {

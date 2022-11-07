@@ -12,9 +12,9 @@ for (const config of T.configs) {
     const deriveCodec = M.DeriveCodec(metadata.tys);
     const derivedCodecs = metadata.tys.map(deriveCodec);
     const codegenCodecs = codegen._metadata.types;
-    const origInspect = Codec.prototype._inspect!;
+    const origInspect = Codec.prototype["_inspect"]!;
     let inspecting = 0;
-    Codec.prototype._inspect = function(inspect) {
+    Codec.prototype["_inspect"] = function(inspect) {
       if (inspecting) {
         const di = derivedCodecs.indexOf(this);
         if (di !== -1) return "$" + di;
@@ -36,6 +36,6 @@ for (const config of T.configs) {
         assertEquals(derivedCodecs[i], codegenCodecs[i]);
       }
     }
-    Codec.prototype._inspect = origInspect;
+    Codec.prototype["_inspect"] = origInspect;
   });
 }

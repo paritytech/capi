@@ -6,8 +6,7 @@ export class TyDecodeCtx {
 
 const $compactU32 = $.compact($.u32);
 export const $tys: $.Codec<Ty[]> = $.createCodec({
-  name: "tys",
-  _metadata: null,
+  _metadata: $.metadata("$tys"),
   _staticSize: $compactU32._staticSize,
   _encode(buffer, value) {
     $.array($ty)._encode(buffer, value);
@@ -21,11 +20,13 @@ export const $tys: $.Codec<Ty[]> = $.createCodec({
     }
     return tys;
   },
+  _assert() {
+    // TODO #362
+  },
 });
 
 export const $tyId: $.Codec<Ty> = $.createCodec({
-  name: "tyId",
-  _metadata: null,
+  _metadata: $.metadata("$tyId"),
   _staticSize: $compactU32._staticSize,
   _encode(buffer, value) {
     $.compact($.u32)._encode(buffer, value.id);
@@ -34,6 +35,9 @@ export const $tyId: $.Codec<Ty> = $.createCodec({
     const ctx = buffer.context.get(TyDecodeCtx);
     const id = $compactU32._decode(buffer);
     return ctx.tys?.[id] ?? { id } as any;
+  },
+  _assert() {
+    // TODO #362
   },
 });
 

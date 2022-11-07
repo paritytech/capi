@@ -27,10 +27,9 @@ export abstract class Hasher {
 
 function $hash<T>(hasher: Hasher, $inner: $.Codec<T>): $.Codec<T> {
   return $.createCodec({
-    name: "$hash",
-    _metadata: [$hash, hasher, $inner],
+    _metadata: $.metadata("$hash", $hash, hasher, $inner),
     _staticSize: hasher.digestLength + $inner._staticSize,
-    _encode: (buffer, value) => {
+    _encode(buffer, value) {
       const hashArray = buffer.array.subarray(buffer.index, buffer.index += hasher.digestLength);
       const cursor = hasher.concat
         ? buffer.createCursor($inner._staticSize)
@@ -45,10 +44,13 @@ function $hash<T>(hasher: Hasher, $inner: $.Codec<T>): $.Codec<T> {
         hashing.dispose?.();
       });
     },
-    _decode: (buffer) => {
+    _decode(buffer) {
       if (!hasher.concat) throw new DecodeNonTransparentKeyError();
       buffer.index += hasher.digestLength;
       return $inner._decode(buffer);
+    },
+    _assert(assert) {
+      $inner._assert(assert);
     },
   });
 }

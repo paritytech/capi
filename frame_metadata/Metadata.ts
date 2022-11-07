@@ -138,8 +138,8 @@ export interface Metadata {
   extrinsic: ExtrinsicDef;
 }
 export const $metadata: $.Codec<Metadata> = $.object(
-  ["magicNumber", $.constantPattern(magicNumber, $.u32)],
-  ["version", $.constantPattern(14, $.u8)],
+  ["magicNumber", $.constant<typeof magicNumber>(magicNumber, $.u32)],
+  ["version", $.constant<14>(14, $.u8)],
   ["tys", $tys],
   ["pallets", $.array($pallet)],
   ["extrinsic", $extrinsicDef],
