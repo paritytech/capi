@@ -18,7 +18,7 @@ export function $storageKey(props: StorageKeyProps): $.Codec<unknown[]> {
     if (props.storageEntry.hashers.length === 1) {
       keyCodecs = [codec];
     } else {
-      if (codec._metadata?.[0] !== $.tuple) {
+      if (codec._metadata[0]?.factory !== $.tuple) {
         throw new Error("Expected key codec to be a tuple since there are multiple hashers");
       }
       keyCodecs = codec._metadata.slice(1) as any;
@@ -40,8 +40,7 @@ export function $storageKey(props: StorageKeyProps): $.Codec<unknown[]> {
     {} as Record<number, $.Codec<any[]>>,
   );
   return $.createCodec({
-    name: "$storageKey",
-    _metadata: [$storageKey, props],
+    _metadata: $.metadata("$storageKey", $storageKey, props),
     _staticSize: $keys[Object.values($keys).length - 1]!._staticSize,
     _encode(buffer, key) {
       buffer.insertArray(palletHash);
@@ -53,6 +52,9 @@ export function $storageKey(props: StorageKeyProps): $.Codec<unknown[]> {
       // Ignore initial hashes
       buffer.index += 32;
       return $keys[Object.values($keys).length - 1]!._decode(buffer);
+    },
+    _assert() {
+      // TODO #362
     },
   });
 }

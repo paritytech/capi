@@ -23,9 +23,9 @@ await Promise.all([
     }],
     outDir,
     mappings: {
-      "https://deno.land/x/scale@v0.8.2/mod.ts": {
+      "https://deno.land/x/scale@v0.9.0/mod.ts": {
         name: "scale-codec",
-        version: "^0.8.2",
+        version: "^0.9.0",
       },
       "https://deno.land/x/zones@v0.1.0-beta.6/mod.ts": {
         name: "zones",

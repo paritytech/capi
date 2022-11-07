@@ -15,7 +15,7 @@ export function metadata<Rest extends [blockHash?: Z.$<U.HexHash | undefined>]>(
       try {
         return M.fromPrefixedHex(call.result);
       } catch (e) {
-        return e as $.CodecError;
+        return e as $.ScaleError;
       }
     },
   );

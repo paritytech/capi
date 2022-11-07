@@ -65,8 +65,7 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
   const totalSize = 1 + $address._staticSize + $sig._staticSize + toSignSize;
 
   const $baseExtrinsic: $.Codec<Extrinsic> = $.createCodec({
-    name: "",
-    _metadata: null,
+    _metadata: [],
     _staticSize: totalSize,
     _encode(buffer, extrinsic) {
       const firstByte = (+!!extrinsic.signature << 7) | extrinsic.protocolVersion;
@@ -164,11 +163,13 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
       const { type: palletName, value: { type: methodName, ...args } } = call;
       return { protocolVersion, signature, palletName, methodName, args };
     },
+    _assert() {
+      // TODO
+    },
   });
 
   return $.withMetadata(
-    "$extrinsic",
-    [$extrinsic, props],
+    $.metadata("$extrinsic", $extrinsic, props),
     $.lenPrefixed($baseExtrinsic),
   );
 
