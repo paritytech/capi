@@ -23,7 +23,7 @@ const unsubscribed = await client.call({
   jsonrpc: "2.0",
   id: client.providerRef.nextId(),
   method: "chain_unsubscribeAllHeads",
-  params: [],
+  params: [subscriptionId],
 });
 
 console.log(
