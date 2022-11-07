@@ -18,10 +18,10 @@ for (const [runtime, client] of Object.entries(testClients)) {
       importSpecifier: "../../../mod.ts",
       metadata,
     }).write(outDir);
-    const codegenedMod = await import(path.toFileUrl(path.join(outDir, "mod.ts")).toString());
+    const codegened = await import(path.toFileUrl(path.join(outDir, "mod.ts")).toString());
     const deriveCodec = M.DeriveCodec(metadata.tys);
     const derivedCodecs = metadata.tys.map(deriveCodec);
-    const codegenCodecs = codegen._metadata.types;
+    const codegenCodecs = codegened._metadata.types;
     const origInspect = Codec.prototype["_inspect"]!;
     let inspecting = 0;
     Codec.prototype["_inspect"] = function(inspect) {
