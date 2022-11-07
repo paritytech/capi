@@ -5,8 +5,12 @@ const hostname = Deno.env.get("TEST_CTX_HOSTNAME");
 const portRaw = Deno.env.get("TEST_CTX_PORT");
 
 class LocalClient extends C.rpc.Client<string, Event, Event, Event> {
+  url;
+
   constructor(port: number, close: () => void) {
-    super(C.rpc.proxyProvider, `ws://127.0.0.1:${port}`);
+    const url = `ws://127.0.0.1:${port}`;
+    super(C.rpc.proxyProvider, url);
+    this.url = url;
     const prevDiscard = this.discard;
     this.discard = async () => {
       const closeError = await prevDiscard();
@@ -37,15 +41,15 @@ export class LocalClientEffect extends Z.Effect<LocalClient, PolkadotBinNotFound
     getClientContainer.getClient = this.createClient.bind(this);
   }
 
-  get url(): Promise<string> {
-    return null!;
-  }
-
   get client(): Promise<LocalClient> {
     if (!this.#clientPending) {
       this.#clientPending = this.createClient();
     }
     return this.#clientPending;
+  }
+
+  get url(): Promise<string> {
+    return this.client.then(({ url }) => url);
   }
 
   private async createClient(): Promise<LocalClient> {
