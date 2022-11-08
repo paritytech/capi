@@ -74,6 +74,8 @@ export class LocalClientEffect extends Z.Effect<LocalClient, PolkadotBinNotFound
       port = getOpenPort();
       const process = polkadotProcess(port, this.runtime);
       close = () => {
+        // TODO: remove logging
+        console.log("killing polkadotProcess");
         process.kill("SIGKILL");
         process.close();
       };

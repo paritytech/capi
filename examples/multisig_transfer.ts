@@ -14,11 +14,13 @@ const signatories: Uint8Array[] = [
 const THRESHOLD = 2;
 const multisigPublicKey = createKeyMulti(signatories, THRESHOLD);
 
+const env = C.Z.env();
+
 // Transfer initial balance (existential deposit) to multisig address
-U.throwIfError(await addBalanceToMultisigAddress().run());
+U.throwIfError(await addBalanceToMultisigAddress().bind(env)());
 
 // Create proposal
-U.throwIfError(await createOrApproveMultisigProposal({ sender: T.alice }).run());
+U.throwIfError(await createOrApproveMultisigProposal({ sender: T.alice }).bind(env)());
 
 // Get the key of the timepoint
 const key = C.keyPageRead(T.polkadot)("Multisig", "Multisigs", 1, [multisigPublicKey])
@@ -32,15 +34,17 @@ const maybe_timepoint = await C.entryRead(T.polkadot)("Multisig", "Multisigs", [
 ])
   .access("value")
   .access("when")
-  .run();
+  .bind(env)();
 
 U.throwIfError(
-  await createOrApproveMultisigProposal({ sender: T.bob, maybe_timepoint }).run(),
+  await createOrApproveMultisigProposal({ sender: T.bob, maybe_timepoint }).bind(env)(),
 );
 
 // check T.dave new balance
 console.log(
-  U.throwIfError(await C.entryRead(T.polkadot)("System", "Account", [T.dave.publicKey]).run()),
+  U.throwIfError(
+    await C.entryRead(T.polkadot)("System", "Account", [T.dave.publicKey]).bind(env)(),
+  ),
 );
 
 function addBalanceToMultisigAddress() {
@@ -124,10 +128,12 @@ function createOrApproveMultisigProposal(
       }));
   };
   const withoutActualWeight = createEx().extrinsic;
-  const weight = C.payment.queryInfo(T.polkadot)(withoutActualWeight).access("weight");
-  C.Z.call(weight.run(), (d) => {
+  const weight = C.payment.queryInfo(T.polkadot)(withoutActualWeight)
+    .access("weight");
+  C.Z.call(weight, (d) => {
     console.log("queryInfo", d);
-  });
+  }).bind(env)();
+  // FIXME: pass weight as an argument to createEx(weight)
   return createEx().watch(function(status) {
     console.log(status);
     if (C.TransactionStatus.isTerminal(status)) {
