@@ -1,3 +1,10 @@
+// FIXME: remove this check once the Zones .bind(env) fix is merged
+const hostname = Deno.env.get("TEST_CTX_HOSTNAME");
+const portRaw = Deno.env.get("TEST_CTX_PORT");
+if (!hostname || !portRaw) {
+  throw new Error("Must be running inside a test ctx");
+}
+
 import { createKeyMulti } from "../deps/polkadot/util-crypto.ts";
 import * as C from "../mod.ts";
 import * as T from "../test_util/mod.ts";
@@ -114,9 +121,9 @@ function createOrApproveMultisigProposal(
         other_signatories: signatories
           .filter((value) => value !== sender.publicKey),
         store_call: false,
-        // TODO: use RPC payment.queryInfo(extrinsic, atBlockHash)
-        max_weight: {
-          ref_time: weight || 133_179_000n,
+        // FIXME: use RPC payment.queryInfo(extrinsic, atBlockHash)
+        max_weight: weight || {
+          ref_time: 133_179_000n,
           proof_size: 0,
         },
         maybe_timepoint,
