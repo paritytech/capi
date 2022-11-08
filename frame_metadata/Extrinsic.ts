@@ -1,5 +1,4 @@
 import * as $ from "../deps/scale.ts";
-import { AssertState } from "../deps/scale.ts";
 import { assert } from "../deps/std/testing/asserts.ts";
 import * as H from "../hashers/mod.ts";
 import * as ss58 from "../ss58/mod.ts";
