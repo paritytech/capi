@@ -53,6 +53,9 @@ export class LocalClientEffect extends Z.Effect<LocalClient, PolkadotBinNotFound
   }
 
   private async createClient(): Promise<LocalClient> {
+    // TODO: remove logging
+    console.log("creating client...");
+    // return new LocalClient(9944, () => {});
     let port: number;
     let close = () => {};
     if (portRaw /* in a test ctx */) {
