@@ -53,10 +53,11 @@ export class Client<
     } else if (e.id) {
       const pendingCall = this.pendingCalls[e.id];
       if (!pendingCall) {
-        console.log({ e });
+        console.log("!pendingCall for", { e });
         // TODO: pipe error to listeners and message the likely cause,
         //       a duplicate client.
-        throw new Error();
+        // throw new Error();
+        return;
       }
       pendingCall.resolve(e);
       delete this.pendingCalls[e.id];

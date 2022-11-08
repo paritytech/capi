@@ -6,22 +6,36 @@ import * as U from "../util/mod.ts";
 type KeyringPair = typeof T.alice;
 
 // Signatories must be sorted
-const SIGNATORIES: Uint8Array[] = [
+const signatories: Uint8Array[] = [
+  T.alice.publicKey,
   T.bob.publicKey,
   T.charlie.publicKey,
-  T.alice.publicKey,
-];
+].sort();
 const THRESHOLD = 2;
-const ABC_MULTISIG_ADDRESS = createKeyMulti(SIGNATORIES, THRESHOLD);
-const client = T.polkadot;
+const multisigPublicKey = createKeyMulti(signatories, THRESHOLD);
 
+// Transfer initial balance (existential deposit) to multisig address
 U.throwIfError(await addBalanceToMultisigAddress().run());
+
+// Create proposal
 U.throwIfError(await createOrApproveMultisigProposal({ sender: T.alice }).run());
-const key = U.throwIfError(await getKey().run());
-const timepoint = U.throwIfError(await getTimepoint(key).run()) as unknown as Timepoint;
-console.log(timepoint);
+
+// Get the key of the timepoint
+const key = C.keyPageRead(T.polkadot)("Multisig", "Multisigs", 1, [multisigPublicKey])
+  .access(0)
+  .access(1);
+
+// Get the timepoint itself
+const maybe_timepoint = await C.entryRead(T.polkadot)("Multisig", "Multisigs", [
+  multisigPublicKey,
+  key,
+])
+  .access("value")
+  .access("when")
+  .run();
+
 U.throwIfError(
-  await createOrApproveMultisigProposal({ sender: T.bob, maybe_timepoint: timepoint }).run(),
+  await createOrApproveMultisigProposal({ sender: T.bob, maybe_timepoint }).run(),
 );
 
 // check T.dave new balance
@@ -31,7 +45,7 @@ console.log(
 
 function addBalanceToMultisigAddress() {
   return C.extrinsic({
-    client,
+    client: T.polkadot,
     sender: {
       type: "Id",
       value: T.alice.publicKey,
@@ -42,7 +56,7 @@ function addBalanceToMultisigAddress() {
       value: 2_000_000_000_000n,
       dest: {
         type: "Id",
-        value: ABC_MULTISIG_ADDRESS,
+        value: multisigPublicKey,
       },
     },
   })
@@ -71,62 +85,53 @@ interface Timepoint {
 function createOrApproveMultisigProposal(
   { sender, maybe_timepoint }: CreateOrApproveProposalProps,
 ) {
-  return C.extrinsic({
-    client: T.polkadot,
-    sender: {
-      type: "Id",
-      value: sender.publicKey,
-    },
-    palletName: "Multisig",
-    methodName: "as_multi",
-    args: {
-      threshold: THRESHOLD,
-      call: {
-        type: "Balances",
-        value: {
-          type: "transfer_keep_alive",
-          dest: {
-            type: "Id",
-            value: T.dave.publicKey,
+  const createEx = (weight?: bigint) => {
+    return C.extrinsic({
+      client: T.polkadot,
+      sender: {
+        type: "Id",
+        value: sender.publicKey,
+      },
+      palletName: "Multisig",
+      methodName: "as_multi",
+      args: {
+        threshold: THRESHOLD,
+        call: {
+          type: "Balances",
+          value: {
+            type: "transfer_keep_alive",
+            dest: {
+              type: "Id",
+              value: T.dave.publicKey,
+            },
+            value: 1_230_000_000_000n,
           },
-          value: 1_230_000_000_000n,
         },
+        other_signatories: signatories
+          .filter((value) => value !== sender.publicKey),
+        store_call: false,
+        // TODO: use RPC payment.queryInfo(extrinsic, atBlockHash)
+        max_weight: {
+          ref_time: weight || 133_179_000n,
+          proof_size: 0,
+        },
+        maybe_timepoint,
       },
-      other_signatories: SIGNATORIES
-        .filter((value) => value !== sender.publicKey),
-      store_call: false,
-      // TODO: use RPC payment.queryInfo(extrinsic, atBlockHash)
-      max_weight: {
-        ref_time: 133_179_000n,
-        proof_size: 0,
-      },
-      maybe_timepoint,
-    },
-  })
-    .signed((message) => ({
-      type: "Sr25519",
-      value: sender.sign(message),
-    }))
-    .watch(function(status) {
-      console.log(status);
-      if (C.TransactionStatus.isTerminal(status)) {
-        this.stop();
-      }
-    });
-}
-
-function getKey() {
-  // FIXME: why .access(1)
-  return C.keyPageRead(client)("Multisig", "Multisigs", 10)
-    .access(0)
-    .access(1);
-}
-
-function getTimepoint(key: unknown) {
-  return C.entryRead(client)("Multisig", "Multisigs", [
-    ABC_MULTISIG_ADDRESS,
-    key,
-  ])
-    .access("value")
-    .access("when");
+    })
+      .signed((message) => ({
+        type: "Sr25519",
+        value: sender.sign(message),
+      }));
+  };
+  const withoutActualWeight = createEx().extrinsic;
+  const weight = C.payment.queryInfo(T.polkadot)(withoutActualWeight).access("weight");
+  C.Z.call(weight.run(), (d) => {
+    console.log("queryInfo", d);
+  });
+  return createEx().watch(function(status) {
+    console.log(status);
+    if (C.TransactionStatus.isTerminal(status)) {
+      this.stop();
+    }
+  });
 }
