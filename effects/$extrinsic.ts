@@ -1,5 +1,7 @@
-import * as Z from "../../deps/zones.ts";
-import * as M from "../../frame_metadata/mod.ts";
+import * as Z from "../deps/zones.ts";
+import * as M from "../frame_metadata/mod.ts";
+
+const k0_ = Symbol();
 
 export const $extrinsic = Z.call.fac((
   deriveCodec: M.DeriveCodec,
@@ -13,4 +15,4 @@ export const $extrinsic = Z.call.fac((
     sign: sign!,
     prefix: prefix!,
   });
-});
+}, k0_);

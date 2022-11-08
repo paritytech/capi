@@ -52,3 +52,5 @@ const runTx = C.extrinsic({
 // console.log(U.throwIfError(await getBalances()));
 U.throwIfError(await runTx());
 // console.log(U.throwIfError(await getBalances()));
+
+console.log();
