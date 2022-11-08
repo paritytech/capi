@@ -164,7 +164,9 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
       const { type: palletName, value: { type: methodName, ...args } } = call;
       return { protocolVersion, signature, palletName, methodName, args };
     },
-    _assert: assertExtrinsic,
+    _assert() {
+      // TODO
+    },
   });
 
   return $.withMetadata(
@@ -201,25 +203,3 @@ const pjsAdditionalKeyMap: Record<string, string> = {
   CheckVersion: "specVersion",
   CheckGenesis: "genesisHash",
 };
-
-// TODO: tackle with T6
-function assertExtrinsic(
-  this: $.Codec<Extrinsic>,
-  assert: $.AssertState<any>,
-): asserts assert is AssertState<Extrinsic> {
-  if (!assert.value) return;
-  assert.typeof(this, "object");
-  assert.hasKey(this, "protocolVersion");
-  // assert.access("protocolVersion").integer($.u8);
-  // const signature = assert.access("signature");
-  // signature.with((assert) => {
-  //   if (assert.value) {
-  //     assert.access("address");
-  //   }
-  // });
-  // if ("signature" in assert.value) {
-  //   signature.access("address").with(assertMultiAddress.bind(this));
-  //   const extra: $.AssertState = assert.access("extra");
-  //   extra.instanceof(this, Array);
-  // }
-}

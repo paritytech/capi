@@ -31,29 +31,26 @@ export function entryWatch<Client extends Z.$<rpc.Client>>(client: Client) {
     const $entry = codec(deriveCodec_, entryValueTypeI);
     const storageKeys = Z.call(
       e$.encoded($storageKey_, keys.length ? [keys] : []),
-      function wrapWithList(v) {
+      function hexEncodeAndWrapWithList(v) {
         return [U.hex.encode(v)];
       },
     );
-    const listenerMapped = Z.call(
-      Z.ls($entry, listener),
-      function listenerMapped([$entry, listener]) {
-        return function listenerMapped(
-          this: rpc.ClientSubscribeContext,
-          changeset: known.StorageChangeSet,
-        ) {
-          // TODO: in some cases there might be keys to decode
-          // key ? $storageKey.decode(U.hex.decode(key)) : undefined
-          const getKey = (key: known.Hex) => {
-            return key;
-          };
-          const changes: WatchEntryEvent[] = changeset.changes.map(([key, val]) => {
-            return [getKey(key), val ? $entry.decode(U.hex.decode(val)) : undefined];
-          });
-          listener.apply(this, [changes]);
+    const listenerMapped = Z.call(Z.ls($entry, listener), ([$entry, listener]) => {
+      return function listenerMapped(
+        this: rpc.ClientSubscribeContext,
+        changeset: known.StorageChangeSet,
+      ) {
+        // TODO: in some cases there might be keys to decode
+        // key ? $storageKey.decode(U.hex.decode(key)) : undefined
+        const getKey = (key: known.Hex) => {
+          return key;
         };
-      },
-    );
+        const changes: WatchEntryEvent[] = changeset.changes.map(([key, val]) => {
+          return [getKey(key), val ? $entry.decode(U.hex.decode(val)) : undefined];
+        });
+        listener.apply(this, [changes]);
+      };
+    });
     const subscriptionId = state.subscribeStorage(client)([storageKeys], listenerMapped);
     return state.unsubscribeStorage(client)(subscriptionId).zoned("EntryWatch");
   };

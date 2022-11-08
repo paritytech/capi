@@ -5,7 +5,6 @@ import { $storageKey } from "./core/$storageKey.ts";
 import { codec } from "./core/codec.ts";
 import { deriveCodec } from "./core/deriveCodec.ts";
 import * as e$ from "./core/scale.ts";
-import { decoded } from "./core/scale.ts";
 import { entryMetadata, metadata, palletMetadata } from "./metadata.ts";
 import { state } from "./rpc/known.ts";
 
@@ -31,6 +30,6 @@ export function entryRead<Client extends Z.$<rpc.Client>>(client: Client) {
     const storageBytes = Z.call(storageBytesHex, U.hex.decode);
     const entryValueTypeI = entryMetadata_.access("value");
     const $entry = codec(deriveCodec_, entryValueTypeI);
-    return decoded($entry, storageBytes, "value").zoned("EntryRead");
+    return e$.decoded($entry, storageBytes, "value").zoned("EntryRead");
   };
 }
