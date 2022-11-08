@@ -36,7 +36,6 @@ export class LocalClientEffect extends Z.Effect<LocalClient, PolkadotBinNotFound
           }
         })
         .impl,
-
       items: [runtime],
     });
     getClientContainer.getClient = this.createClient.bind(this);
