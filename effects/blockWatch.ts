@@ -7,16 +7,22 @@ import { blockRead } from "./blockRead.ts";
 import { chain } from "./rpc/known.ts";
 
 export function blockWatch<Client extends Z.$<rpc.Client>>(client: Client) {
-  return (listener: U.Listener<known.SignedBlock<M.Extrinsic>, rpc.ClientSubscribeContext>) => {
-    const listenerMapped = Z.call(listener, function mapBlockWatchListener(listener, env) {
-      return async function(this: rpc.ClientSubscribeContext, header: known.Header) {
-        const blockHash = chain.getBlockHash(client)(header.number);
-        const block = await blockRead(client)(blockHash).bind(env)();
-        if (block instanceof Error) throw block;
-        listener.apply(this, [block]);
-      };
-    });
+  return <
+    Listener extends Z.$<U.Listener<known.SignedBlock<M.Extrinsic>, rpc.ClientSubscribeContext>>,
+  >(listener: Listener) => {
+    const listenerMapped = Z
+      .ls(listener, Z.env)
+      .next(function mapBlockWatchListener([listener, env]) {
+        return async function(this: rpc.ClientSubscribeContext, header: known.Header) {
+          const blockHash = chain.getBlockHash(client)(header.number);
+          const block = await blockRead(client)(blockHash).bind(env)();
+          if (block instanceof Error) throw block;
+          listener.apply(this, [block]);
+        };
+      });
     const subscriptionId = chain.subscribeNewHeads(client)([], listenerMapped);
-    return chain.unsubscribeNewHeads(client)(subscriptionId).zoned("BlockWatch");
+    return chain
+      .unsubscribeNewHeads(client)(subscriptionId)
+      .zoned("BlockWatch");
   };
 }

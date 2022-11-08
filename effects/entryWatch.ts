@@ -29,13 +29,11 @@ export function entryWatch<Client extends Z.$<rpc.Client>>(client: Client) {
     const $storageKey_ = $storageKey(deriveCodec_, palletMetadata_, entryMetadata_);
     const entryValueTypeI = entryMetadata_.access("value");
     const $entry = codec(deriveCodec_, entryValueTypeI);
-    const storageKeys = Z.call(
-      e$.encoded($storageKey_, keys.length ? [keys] : []),
-      function hexEncodeAndWrapWithList(v) {
-        return [U.hex.encode(v)];
-      },
-    );
-    const listenerMapped = Z.call(Z.ls($entry, listener), ([$entry, listener]) => {
+    const storageKeys = e$
+      .encoded($storageKey_, keys.length ? [keys] : [])
+      .next(U.hex.encode)
+      .next(U.tuple);
+    const listenerMapped = Z.ls($entry, listener).next(([$entry, listener]) => {
       return function listenerMapped(
         this: rpc.ClientSubscribeContext,
         changeset: known.StorageChangeSet,
@@ -52,6 +50,8 @@ export function entryWatch<Client extends Z.$<rpc.Client>>(client: Client) {
       };
     });
     const subscriptionId = state.subscribeStorage(client)([storageKeys], listenerMapped);
-    return state.unsubscribeStorage(client)(subscriptionId).zoned("EntryWatch");
+    return state
+      .unsubscribeStorage(client)(subscriptionId)
+      .zoned("EntryWatch");
   };
 }

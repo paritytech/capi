@@ -5,9 +5,9 @@ import { discardCheck, RpcServerError } from "./common.ts";
 export function call<Params extends unknown[], Result>(method: string, nonIdempotent?: boolean) {
   return <Client_ extends Z.$<rpc.Client>>(client: Client_) => {
     return <Params_ extends Z.Ls$<Params>>(...params: [...Params_]) => {
-      return Z.call(
-        Z.rc(client, method, nonIdempotent && Z.round, ...params),
-        async function rpcCallImpl([[client, method, _2, ...params], counter]) {
+      return Z
+        .rc(client, method, nonIdempotent, ...params)
+        .next(async function rpcCallImpl([[client, method, _2, ...params], counter]) {
           type ClientE = typeof client[rpc.ClientE_];
           // TODO: why do we need to explicitly type this / why is this not being inferred?
           const id = client.providerRef.nextId();
@@ -26,8 +26,8 @@ export function call<Params extends unknown[], Result>(method: string, nonIdempo
             return new RpcServerError(result);
           }
           return result.result;
-        },
-      ).zoned("RpcCall");
+        })
+        .zoned("RpcCall");
     };
   };
 }

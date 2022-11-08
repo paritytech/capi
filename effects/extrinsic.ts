@@ -58,8 +58,7 @@ export class SignedExtrinsic<
     const specVersion = versions.access("spec_version").as<number>();
     const transactionVersion = versions.access("transaction_version").as<number>();
     // TODO: create match effect in zones and use here
-    const senderSs58 = Z.call(
-      Z.ls(addrPrefix, this.props.sender),
+    const senderSs58 = Z.ls(addrPrefix, this.props.sender).next(
       function senderSs58([addrPrefix, sender]) {
         switch (sender.type) {
           case "Id": {
@@ -74,7 +73,7 @@ export class SignedExtrinsic<
     );
     const nonce = system.accountNextIndex(this.props.client)(senderSs58);
     const genesisHashBytes = chain.getBlockHash(this.props.client)(0);
-    const genesisHash = Z.call(genesisHashBytes, U.hex.decode);
+    const genesisHash = genesisHashBytes.next(U.hex.decode);
     const checkpointHash = this.props.checkpoint
       ? option(this.props.checkpoint, U.hex.decode)
       : genesisHash;
@@ -95,7 +94,7 @@ export class SignedExtrinsic<
         additional: Z.ls(specVersion, transactionVersion, checkpointHash, genesisHash),
       }),
     });
-    this.extrinsic = Z.call(e$.encoded($extrinsic_, $extrinsicProps, true), U.hex.encode);
+    this.extrinsic = e$.encoded($extrinsic_, $extrinsicProps, true).next(U.hex.encode);
   }
 
   watch<Listener extends Z.$<U.Listener<known.TransactionStatus, rpc.ClientSubscribeContext>>>(

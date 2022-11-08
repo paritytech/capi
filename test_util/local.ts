@@ -27,16 +27,17 @@ export class LocalClientEffect extends Z.Effect<LocalClient, PolkadotBinNotFound
     const getClientContainer: { getClient?: () => Promise<LocalClient> } = {};
     super({
       kind: "LocalClient",
-      init(env) {
-        return Z.call(0, async () => {
+      impl: Z
+        .call(async () => {
           try {
             return await getClientContainer.getClient!();
           } catch (e) {
             return e as PolkadotBinNotFoundError;
           }
-        }).init(env);
-      },
-      args: [runtime],
+        })
+        .impl,
+
+      items: [runtime],
     });
     getClientContainer.getClient = this.createClient.bind(this);
   }

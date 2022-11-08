@@ -13,15 +13,14 @@ export function collectExtrinsicEvents<
   extrinsic: SignedExtrinsic<Props, Sign>,
 ) {
   const events: known.TransactionStatus[] = [];
-  return Z.call(
-    extrinsic.watch(function(status) {
+  return extrinsic
+    .watch(function(status) {
       events.push(status);
       if (known.TransactionStatus.isTerminal(status)) {
         this.stop();
       }
-    }),
-    () => events,
-  );
+    })
+    .next(() => events);
 }
 
 // TODO: is this a common-enough test to merit existence in `test_util`?

@@ -11,7 +11,10 @@ export function client<
   provider: rpc.Provider<DiscoveryValue, SendErrorData, HandlerErrorData, CloseErrorData>,
   discoveryValue: DiscoveryValueZ,
 ) {
-  return Z.call(Z.ls(provider, discoveryValue), function initClient([_, discoveryValue]) {
-    return new rpc.Client(provider, discoveryValue as DiscoveryValue);
-  }).zoned("RpcClient");
+  return Z
+    .ls(provider, discoveryValue)
+    .next(function initClient([_, discoveryValue]) {
+      return new rpc.Client(provider, discoveryValue as DiscoveryValue);
+    })
+    .zoned("RpcClient");
 }

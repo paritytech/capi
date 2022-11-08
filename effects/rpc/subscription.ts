@@ -11,9 +11,9 @@ export function subscription<Params extends unknown[], Result>() {
         Params_ extends Z.Ls$<Params>,
         Listener extends Z.$<U.Listener<Result, rpc.ClientSubscribeContext>>,
       >(params: [...Params_], listener: Listener) => {
-        return Z.call(
-          Z.rc(client, listener, ...params),
-          async function rpcSubscriptionImpl([[client, listener, ...params], counter]) {
+        return Z
+          .rc(client, listener, ...params)
+          .next(async function rpcSubscriptionImpl([[client, listener, ...params], counter]) {
             type ClientE = typeof client[rpc.ClientE_];
             const id = client.providerRef.nextId();
             let error:
@@ -35,13 +35,14 @@ export function subscription<Params extends unknown[], Result>() {
                 console.log(e);
                 this.stop();
               } else {
+                // TODO: halt if returns `Error` | `Promise<Error>`?
                 listener.apply(this, [e.params.result]);
               }
             });
             const discardCheckResult = await discardCheck<ClientE["close"]>(client, counter);
             return discardCheckResult || error || subscriptionId!;
-          },
-        ).zoned("RpcSubscription");
+          })
+          .zoned("RpcSubscription");
       };
     };
   };
