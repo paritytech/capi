@@ -2,8 +2,8 @@ import * as Z from "../deps/zones.ts";
 import * as rpc from "../rpc/mod.ts";
 import * as U from "../util/mod.ts";
 import { codec } from "./core/codec.ts";
-import { decoded } from "./core/decoded.ts";
 import { deriveCodec } from "./core/deriveCodec.ts";
+import { decoded } from "./core/scale.ts";
 import { constMetadata, metadata, palletMetadata } from "./metadata.ts";
 
 export function const_<Client extends Z.$<rpc.Client>>(client: Client) {

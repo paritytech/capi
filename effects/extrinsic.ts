@@ -8,7 +8,8 @@ import * as U from "../util/mod.ts";
 import { const as const_ } from "./const.ts";
 import { $extrinsic } from "./core/$extrinsic.ts";
 import { deriveCodec } from "./core/deriveCodec.ts";
-import { hexDecode } from "./core/hex.ts";
+import { option } from "./core/option.ts";
+import * as e$ from "./core/scale.ts";
 import { metadata } from "./metadata.ts";
 import { author, chain, system } from "./rpc/known.ts";
 
@@ -43,19 +44,22 @@ export class SignedExtrinsic<
   Props extends Z.Rec$<ExtrinsicProps>,
   Sign extends Z.$<M.SignExtrinsic>,
 > {
+  props;
   extrinsic;
 
-  constructor(readonly props_: Props, readonly sign: Sign) {
-    const props = props_ as Z.Rec$Access<Props>;
-    const metadata_ = metadata(props.client)();
+  constructor(props_: Props, readonly sign: Sign) {
+    this.props = props_ as Z.Rec$Access<Props>;
+    const metadata_ = metadata(this.props.client)();
     const deriveCodec_ = deriveCodec(metadata_);
-    const addrPrefix = const_(props.client)("System", "SS58Prefix").access("value").as<number>();
+    const addrPrefix = const_(this.props.client)("System", "SS58Prefix")
+      .access("value").as<number>();
     const $extrinsic_ = $extrinsic(deriveCodec_, metadata_, this.sign, addrPrefix);
-    const versions = const_(props.client)("System", "Version").access("value");
+    const versions = const_(this.props.client)("System", "Version").access("value");
     const specVersion = versions.access("spec_version").as<number>();
     const transactionVersion = versions.access("transaction_version").as<number>();
+    // TODO: create match effect in zones and use here
     const senderSs58 = Z.call(
-      Z.ls(addrPrefix, props.sender),
+      Z.ls(addrPrefix, this.props.sender),
       function senderSs58([addrPrefix, sender]) {
         switch (sender.type) {
           case "Id": {
@@ -68,79 +72,45 @@ export class SignedExtrinsic<
         }
       },
     );
-    const nonce = system.accountNextIndex(props.client)(senderSs58);
-    const genesisHash = hexDecode(chain.getBlockHash(props.client)(0));
-    const checkpointHash = props.checkpoint
-      ? Z.call(props.checkpoint, function checkpointOrUndef(v) {
-        return v ? U.hex.decode(v) : v;
-      })
+    const nonce = system.accountNextIndex(this.props.client)(senderSs58);
+    const genesisHashBytes = chain.getBlockHash(this.props.client)(0);
+    const genesisHash = Z.call(genesisHashBytes, U.hex.decode);
+    const checkpointHash = this.props.checkpoint
+      ? option(this.props.checkpoint, U.hex.decode)
       : genesisHash;
-    this.extrinsic = Z.call(
-      Z.ls(
-        $extrinsic_,
-        props.sender,
-        props.methodName,
-        props.palletName,
-        specVersion,
-        transactionVersion,
-        nonce,
-        genesisHash,
-        props.args,
-        checkpointHash,
-        props.tip,
-        props.mortality,
-      ),
-      async function formExtrinsicHex([
-        $extrinsic,
-        sender,
-        methodName,
-        palletName,
-        specVersion,
-        transactionVersion,
-        nonce,
-        genesisHash,
-        args,
-        checkpoint,
-        tip,
-        mortality,
-      ]) {
-        const extrinsicBytes = await $extrinsic.encodeAsync({
-          protocolVersion: 4, // TODO: grab this from elsewhere
-          palletName,
-          methodName,
-          args,
-          signature: {
-            address: sender,
-            extra: [
-              mortality
-                ? {
-                  type: "Mortal",
-                  value: mortality,
-                }
-                : { type: "Immortal" },
-              nonce,
-              tip || 0,
-            ],
-            additional: [specVersion, transactionVersion, checkpoint, genesisHash],
-          },
-        });
-        return U.hex.encode(extrinsicBytes);
-      },
-    );
+    const $extrinsicProps = Z.rec({
+      protocolVersion: 4,
+      palletName: this.props.palletName,
+      methodName: this.props.methodName,
+      args: this.props.args,
+      signature: Z.rec({
+        address: this.props.sender,
+        extra: Z.ls(
+          this.props.mortality
+            ? Z.rec({ type: "Mortal", value: this.props.mortality })
+            : { type: "Immortal" },
+          nonce,
+          this.props.tip || 0,
+        ),
+        additional: Z.ls(specVersion, transactionVersion, checkpointHash, genesisHash),
+      }),
+    });
+    this.extrinsic = Z.call(e$.encoded($extrinsic_, $extrinsicProps, true), U.hex.encode);
   }
 
   watch<Listener extends Z.$<U.Listener<known.TransactionStatus, rpc.ClientSubscribeContext>>>(
     listener: Listener,
   ) {
-    const subscriptionId = author.submitAndWatchExtrinsic(
-      this.props_.client as Props["client"],
-    )([this.extrinsic], listener);
-    return author.unwatchExtrinsic(this.props_.client as Props["client"])(subscriptionId)
+    const subscriptionId = author.submitAndWatchExtrinsic(this.props.client)(
+      [this.extrinsic],
+      listener,
+    );
+    return author.unwatchExtrinsic(this.props.client)(subscriptionId)
       .zoned("ExtrinsicWatch");
   }
 
   get sent() {
-    return author.submitExtrinsic(this.props_.client as Props["client"])(this.extrinsic)
+    return author.submitExtrinsic(this.props.client)(this.extrinsic)
       .zoned("ExtrinsicSent");
   }
 }

@@ -5,6 +5,7 @@ import * as rpc from "../rpc/mod.ts";
 import * as U from "../util/mod.ts";
 import { state } from "./rpc/known.ts";
 
+// TODO: callable object so that one doesn't need the extra parens when not specifying block hash?
 export function metadata<Client extends Z.$<rpc.Client>>(client: Client) {
   return <Rest extends [blockHash?: Z.$<U.HexHash | undefined>]>(...[blockHash]: [...Rest]) => {
     return Z.call(
