@@ -12,11 +12,13 @@ export function keyPageRead<Client extends Z.$<rpc.Client>>(client: Client) {
     PalletName extends Z.$<string>,
     EntryName extends Z.$<string>,
     Count extends Z.$<number>,
+    PartialKey extends unknown[],
     Rest extends [start?: unknown[] | undefined, blockHash?: Z.$<U.HexHash | undefined>],
   >(
     palletName: PalletName,
     entryName: EntryName,
     count: Count,
+    partialKey: [...PartialKey],
     ...[start, blockHash]: [...Rest]
   ) => {
     const metadata_ = metadata(client)(blockHash as Rest[1]);
@@ -24,7 +26,7 @@ export function keyPageRead<Client extends Z.$<rpc.Client>>(client: Client) {
     const palletMetadata_ = palletMetadata(metadata_, palletName);
     const entryMetadata_ = mapMetadata(palletMetadata_, entryName);
     const $storageKey_ = $storageKey(deriveCodec_, palletMetadata_, entryMetadata_);
-    const storageKey = Z.call(e$.encoded($storageKey_, []), U.hex.encode);
+    const storageKey = Z.call(e$.encoded($storageKey_, Z.ls(...partialKey)), U.hex.encode);
     const startKey = start ? Z.call(e$.encoded($storageKey_, []), U.hex.encode) : undefined;
     const keysEncoded = state.getKeysPaged(client)(
       storageKey,
