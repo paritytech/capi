@@ -5,12 +5,14 @@ import * as known from "../known/mod.ts";
 import * as rpc from "../rpc/mod.ts";
 import * as ss58 from "../ss58/mod.ts";
 import * as U from "../util/mod.ts";
+import { $extrinsic } from "./$extrinsic.ts";
 import { const as const_ } from "./const.ts";
-import { $extrinsic } from "./core/$extrinsic.ts";
-import { deriveCodec } from "./core/deriveCodec.ts";
-import * as e$ from "./core/scale.ts";
+import { deriveCodec } from "./deriveCodec.ts";
 import { metadata } from "./metadata.ts";
-import { author, chain, system } from "./rpc/known.ts";
+import { author, chain, system } from "./rpc_known.ts";
+import * as e$ from "./scale.ts";
+
+const k0_ = Symbol();
 
 export interface CallData {
   palletName: string;
@@ -57,19 +59,17 @@ export class SignedExtrinsic<
     const specVersion = versions.access("spec_version").as<number>();
     const transactionVersion = versions.access("transaction_version").as<number>();
     // TODO: create match effect in zones and use here
-    const senderSs58 = Z.ls(addrPrefix, this.props.sender).next(
-      function senderSs58([addrPrefix, sender]) {
-        switch (sender.type) {
-          case "Id": {
-            return ss58.encode(addrPrefix, sender.value);
-          }
-          // TODO: other types
-          default: {
-            unimplemented();
-          }
+    // TODO: MultiAddress conversion utils
+    const senderSs58 = Z.ls(addrPrefix, this.props.sender).next(([addrPrefix, sender]) => {
+      switch (sender.type) {
+        case "Id": {
+          return ss58.encode(addrPrefix, sender.value);
         }
-      },
-    );
+        default: {
+          unimplemented();
+        }
+      }
+    }, k0_);
     const nonce = system.accountNextIndex(this.props.client)(senderSs58);
     const genesisHashBytes = chain.getBlockHash(this.props.client)(0);
     const genesisHash = genesisHashBytes.next(U.hex.decode);
@@ -93,7 +93,7 @@ export class SignedExtrinsic<
         additional: Z.ls(specVersion, transactionVersion, checkpointHash, genesisHash),
       }),
     });
-    this.extrinsic = e$.encoded($extrinsic_, $extrinsicProps, true).next(U.hex.encode);
+    this.extrinsic = e$.scaleEncoded($extrinsic_, $extrinsicProps, true).next(U.hex.encode);
   }
 
   watch<Listener extends Z.$<U.Listener<known.TransactionStatus, rpc.ClientSubscribeContext>>>(

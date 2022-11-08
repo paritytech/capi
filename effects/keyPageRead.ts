@@ -1,11 +1,13 @@
 import * as Z from "../deps/zones.ts";
 import * as rpc from "../rpc/mod.ts";
 import * as U from "../util/mod.ts";
-import { $storageKey } from "./core/$storageKey.ts";
-import { deriveCodec } from "./core/deriveCodec.ts";
-import * as e$ from "./core/scale.ts";
+import { $storageKey } from "./$storageKey.ts";
+import { deriveCodec } from "./deriveCodec.ts";
 import { mapMetadata, metadata, palletMetadata } from "./metadata.ts";
-import { state } from "./rpc/known.ts";
+import { state } from "./rpc_known.ts";
+import * as e$ from "./scale.ts";
+
+const k0_ = Symbol();
 
 export function keyPageRead<Client extends Z.$<rpc.Client>>(client: Client) {
   return <
@@ -24,8 +26,8 @@ export function keyPageRead<Client extends Z.$<rpc.Client>>(client: Client) {
     const palletMetadata_ = palletMetadata(metadata_, palletName);
     const entryMetadata_ = mapMetadata(palletMetadata_, entryName);
     const $storageKey_ = $storageKey(deriveCodec_, palletMetadata_, entryMetadata_);
-    const storageKey = e$.encoded($storageKey_, []).next(U.hex.encode);
-    const startKey = start ? e$.encoded($storageKey_, []).next(U.hex.encode) : undefined;
+    const storageKey = e$.scaleEncoded($storageKey_, []).next(U.hex.encode);
+    const startKey = start ? e$.scaleEncoded($storageKey_, []).next(U.hex.encode) : undefined;
     const keysEncoded = state.getKeysPaged(client)(
       storageKey,
       count,
@@ -34,11 +36,11 @@ export function keyPageRead<Client extends Z.$<rpc.Client>>(client: Client) {
     );
     return Z
       .ls($storageKey_, keysEncoded)
-      .next(function keysDecodedImpl([$key, keysEncoded]) {
+      .next(([$key, keysEncoded]) => {
         return keysEncoded.map((keyEncoded: U.Hex) => {
           return $key.decode(U.hex.decode(keyEncoded));
         });
-      })
+      }, k0_)
       .zoned("KeyPageRead");
   };
 }

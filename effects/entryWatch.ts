@@ -2,14 +2,16 @@ import * as Z from "../deps/zones.ts";
 import * as known from "../known/mod.ts";
 import * as rpc from "../rpc/mod.ts";
 import * as U from "../util/mod.ts";
-import { $storageKey } from "./core/$storageKey.ts";
-import { codec } from "./core/codec.ts";
-import { deriveCodec } from "./core/deriveCodec.ts";
-import * as e$ from "./core/scale.ts";
+import { $storageKey } from "./$storageKey.ts";
+import { codec } from "./codec.ts";
+import { deriveCodec } from "./deriveCodec.ts";
 import { entryMetadata, metadata, palletMetadata } from "./metadata.ts";
-import { state } from "./rpc/known.ts";
+import { state } from "./rpc_known.ts";
+import * as e$ from "./scale.ts";
 
 export type WatchEntryEvent = [key?: unknown, value?: unknown];
+
+const k0_ = Symbol();
 
 export function entryWatch<Client extends Z.$<rpc.Client>>(client: Client) {
   return <
@@ -30,7 +32,7 @@ export function entryWatch<Client extends Z.$<rpc.Client>>(client: Client) {
     const entryValueTypeI = entryMetadata_.access("value");
     const $entry = codec(deriveCodec_, entryValueTypeI);
     const storageKeys = e$
-      .encoded($storageKey_, keys.length ? [keys] : [])
+      .scaleEncoded($storageKey_, keys.length ? [keys] : [])
       .next(U.hex.encode)
       .next(U.tuple);
     const listenerMapped = Z.ls($entry, listener).next(([$entry, listener]) => {
@@ -48,7 +50,7 @@ export function entryWatch<Client extends Z.$<rpc.Client>>(client: Client) {
         });
         listener.apply(this, [changes]);
       };
-    });
+    }, k0_);
     const subscriptionId = state.subscribeStorage(client)([storageKeys], listenerMapped);
     return state
       .unsubscribeStorage(client)(subscriptionId)
