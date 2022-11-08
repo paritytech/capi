@@ -25,9 +25,9 @@ export function entryRead<Client extends Z.$<rpc.Client>>(client: Client) {
     const palletMetadata_ = palletMetadata(metadata_, palletName);
     const entryMetadata_ = entryMetadata(palletMetadata_, entryName);
     const $storageKey_ = $storageKey(deriveCodec_, palletMetadata_, entryMetadata_);
-    const storageKey = Z.call(e$.encoded($storageKey_, Z.ls(...keys)), U.hex.encode);
+    const storageKey = e$.encoded($storageKey_, Z.ls(...keys)).next(U.hex.encode);
     const storageBytesHex = state.getStorage(client)(storageKey, blockHash);
-    const storageBytes = Z.call(storageBytesHex, U.hex.decode);
+    const storageBytes = storageBytesHex.next(U.hex.decode);
     const entryValueTypeI = entryMetadata_.access("value");
     const $entry = codec(deriveCodec_, entryValueTypeI);
     return e$.decoded($entry, storageBytes, "value").zoned("EntryRead");

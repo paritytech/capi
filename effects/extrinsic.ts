@@ -8,7 +8,6 @@ import * as U from "../util/mod.ts";
 import { const as const_ } from "./const.ts";
 import { $extrinsic } from "./core/$extrinsic.ts";
 import { deriveCodec } from "./core/deriveCodec.ts";
-import { option } from "./core/option.ts";
 import * as e$ from "./core/scale.ts";
 import { metadata } from "./metadata.ts";
 import { author, chain, system } from "./rpc/known.ts";
@@ -75,7 +74,7 @@ export class SignedExtrinsic<
     const genesisHashBytes = chain.getBlockHash(this.props.client)(0);
     const genesisHash = genesisHashBytes.next(U.hex.decode);
     const checkpointHash = this.props.checkpoint
-      ? option(this.props.checkpoint, U.hex.decode)
+      ? Z.option(this.props.checkpoint, U.hex.decode)
       : genesisHash;
     const $extrinsicProps = Z.rec({
       protocolVersion: 4,

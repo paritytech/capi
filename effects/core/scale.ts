@@ -10,8 +10,7 @@ export function decoded<
   encoded: Encoded,
   key: Key,
 ) {
-  return Z.call(
-    Z.ls(codec, encoded, key),
+  return Z.ls(codec, encoded, key).next(
     function decodedImpl([codec, encoded, key]): Record<Z.T<Key>, any> {
       return { [key]: codec.decode(encoded) } as any;
     },
@@ -24,7 +23,7 @@ export function encoded<Codec extends Z.$<$.Codec<any>>, Decoded>(
   decoded: Decoded,
   isAsync?: boolean,
 ) {
-  return Z.call(Z.ls(codec, decoded, isAsync), function encodedImpl([codec, decoded]) {
+  return Z.ls(codec, decoded, isAsync).next(function encodedImpl([codec, decoded]) {
     try {
       $.assert(codec, decoded);
     } catch (e) {
