@@ -48,3 +48,8 @@ export namespace author {
   export const submitExtrinsic = call<[extrinsic: U.Hex], U.Hash>("author_submitExtrinsic");
 }
 export const methods = call<[], string[]>("rpc_methods");
+export namespace payment {
+  export const queryInfo = call<[extrinsic: U.Hex, at?: U.HexHash], known.RuntimeDispatchInfo>(
+    "payment_queryInfo",
+  );
+}
