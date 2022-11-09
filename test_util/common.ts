@@ -1,4 +1,4 @@
-export type RuntimeCode = typeof RUNTIME_CODES;
+export type RUNTIME_CODES = typeof RUNTIME_CODES;
 export const RUNTIME_CODES = {
   polkadot: 0,
   kusama: 1,
@@ -6,8 +6,8 @@ export const RUNTIME_CODES = {
   rococo: 3,
 } as const;
 
-export type RuntimeName = keyof RuntimeCode;
-export const RUNTIME_NAMES: { [N in RuntimeName as RuntimeCode[N]]: N } = {
+export type RuntimeName = keyof RUNTIME_CODES;
+export const RUNTIME_NAMES: { [N in RuntimeName as RUNTIME_CODES[N]]: N } = {
   0: "polkadot",
   1: "kusama",
   2: "westend",
