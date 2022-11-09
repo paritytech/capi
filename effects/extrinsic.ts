@@ -155,10 +155,8 @@ export function extrinsicEvents<
     .access("block")
     .access("extrinsics");
   const idx = Z
-    .ls(
-      extrinsics,
-      extrinsic.extrinsicDecoded as Extrinsic["extrinsicDecoded"],
-    )
+    // TODO: devise zones-level solution to the generic access widening
+    .ls(extrinsics, extrinsic.extrinsicDecoded as Extrinsic["extrinsicDecoded"])
     .next(([extrinsics, extrinsicDecoded]) => {
       return extrinsics.findIndex((v) => equal(v, extrinsicDecoded));
     }, k1_);
