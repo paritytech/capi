@@ -21,7 +21,6 @@ export interface CallData {
 }
 
 export interface ExtrinsicProps extends CallData {
-  client: rpc.Client;
   sender: M.MultiAddress;
   checkpoint?: U.HexHash;
   mortality?: [period: bigint, phase: bigint];
@@ -29,34 +28,52 @@ export interface ExtrinsicProps extends CallData {
   tip?: bigint;
 }
 
-export function extrinsic<Props extends Z.Rec$<ExtrinsicProps>>(props: Props): Extrinsic<Props> {
-  return new Extrinsic(props);
+export function extrinsic<Client extends Z.$<rpc.Client>>(client: Client) {
+  return <Props extends Z.Rec$<ExtrinsicProps>>(props: Props): Extrinsic<Client, Props> => {
+    return new Extrinsic(client, props);
+  };
 }
 
-export class Extrinsic<Props extends Z.Rec$<ExtrinsicProps>> {
-  constructor(readonly props: Props) {}
+export class Extrinsic<
+  Client extends Z.$<rpc.Client>,
+  Props extends Z.Rec$<ExtrinsicProps>,
+> {
+  constructor(
+    readonly client: Client,
+    readonly props: Props,
+  ) {}
 
-  signed<Sign extends Z.$<M.Signer>>(sign: Sign): SignedExtrinsic<Props, Sign> {
-    return new SignedExtrinsic(this.props, sign);
+  signed<Sign extends Z.$<M.Signer>>(sign: Sign): SignedExtrinsic<Client, Props, Sign> {
+    return new SignedExtrinsic(this.client, this.props, sign);
   }
 }
 
 export class SignedExtrinsic<
+  Client extends Z.$<rpc.Client>,
   Props extends Z.Rec$<ExtrinsicProps>,
   Sign extends Z.$<M.Signer>,
 > {
+  client;
   props;
+  sign;
   extrinsic;
 
-  constructor(props_: Props, readonly sign: Sign) {
-    this.props = props_ as Z.Rec$Access<Props>;
-    const metadata_ = metadata(this.props.client)();
+  constructor(
+    client: Client,
+    props: Props,
+    sign: Sign,
+  ) {
+    this.client = client as Client;
+    this.props = props as Z.Rec$Access<Props>;
+    this.sign = sign as Sign;
+
+    const metadata_ = metadata(this.client)();
     const deriveCodec_ = deriveCodec(metadata_);
-    const addrPrefix = const_(this.props.client)("System", "SS58Prefix")
+    const addrPrefix = const_(this.client)("System", "SS58Prefix")
       .access("value")
       .as<number>();
     const $extrinsic_ = $extrinsic(deriveCodec_, metadata_, this.sign, addrPrefix);
-    const versions = const_(this.props.client)("System", "Version")
+    const versions = const_(this.client)("System", "Version")
       .access("value");
     const specVersion = versions
       .access("spec_version").as<number>();
@@ -74,8 +91,8 @@ export class SignedExtrinsic<
         }
       }
     }, k0_);
-    const nonce = system.accountNextIndex(this.props.client)(senderSs58);
-    const genesisHashBytes = chain.getBlockHash(this.props.client)(0);
+    const nonce = system.accountNextIndex(this.client)(senderSs58);
+    const genesisHashBytes = chain.getBlockHash(this.client)(0);
     const genesisHash = genesisHashBytes.next(U.hex.decode);
     const checkpointHash = this.props.checkpoint
       ? Z.option(this.props.checkpoint, U.hex.decode)
@@ -105,16 +122,16 @@ export class SignedExtrinsic<
   watch<Listener extends Z.$<U.Listener<known.TransactionStatus, rpc.ClientSubscribeContext>>>(
     listener: Listener,
   ) {
-    const subscriptionId = author.submitAndWatchExtrinsic(this.props.client)(
+    const subscriptionId = author.submitAndWatchExtrinsic(this.client)(
       [this.extrinsic],
       listener,
     );
-    return author.unwatchExtrinsic(this.props.client)(subscriptionId)
+    return author.unwatchExtrinsic(this.client)(subscriptionId)
       .zoned("ExtrinsicWatch");
   }
 
   get sent() {
-    return author.submitExtrinsic(this.props.client)(this.extrinsic)
+    return author.submitExtrinsic(this.client)(this.extrinsic)
       .zoned("ExtrinsicSent");
   }
 }

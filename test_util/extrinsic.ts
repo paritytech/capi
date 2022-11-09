@@ -3,15 +3,17 @@ import * as Z from "../deps/zones.ts";
 import { ExtrinsicProps, SignedExtrinsic } from "../effects/extrinsic.ts";
 import * as M from "../frame_metadata/mod.ts";
 import * as known from "../known/rpc/mod.ts";
+import * as rpc from "../rpc/mod.ts";
 
 const k0_ = Symbol();
 
 // TODO: use context / properly scope context / make it accessible outside of subscription lifecycle
 // TODO: better zones-level way to share context between effects
 export function collectExtrinsicEvents<
+  Client extends Z.$<rpc.Client>,
   Props extends Z.Rec$<ExtrinsicProps>,
   Sign extends Z.$<M.Signer>,
->(extrinsic: SignedExtrinsic<Props, Sign>) {
+>(extrinsic: SignedExtrinsic<Client, Props, Sign>) {
   const events: known.TransactionStatus[] = [];
   return extrinsic
     .watch(function(status) {

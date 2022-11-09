@@ -10,8 +10,7 @@ import * as U from "../util/mod.ts";
 //   }),
 // )
 
-const tx = C.extrinsic({
-  client: T.westend,
+const tx = C.extrinsic(T.westend)({
   sender: C.compat.multiAddressFromKeypair(T.alice),
   palletName: "Utility",
   methodName: "batch_all",
