@@ -196,8 +196,33 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
       const { type: palletName, value: { type: methodName, ...args } } = call;
       return { protocolVersion, signature, palletName, methodName, args };
     },
-    _assert() {
-      // TODO
+    _assert(assert) {
+      assert.typeof(this, "object");
+      assert
+        .key(this, "protocolVersion")
+        .equals($.u8, 4);
+      const value_ = assert.value as any;
+      // TODO: use `assert.key(this, "call")` upon merging https://github.com/paritytech/capi/pull/368
+      $call._assert(
+        new $.AssertState({
+          type: value_.palletName,
+          value: {
+            type: value_.methodName,
+            ...value_.args,
+          },
+        }),
+      );
+      if (value_.signature) {
+        const signatureAssertState = assert.key(this, "signature");
+        signatureAssertState.key($address, "address");
+        signatureAssertState.key($extra, "extra");
+        if ("additional" in signatureAssertState) {
+          signatureAssertState.key($additional, "additional");
+        }
+        if ("sig" in signatureAssertState) {
+          signatureAssertState.key($sig, "sig");
+        }
+      }
     },
   });
 

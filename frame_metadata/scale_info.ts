@@ -20,8 +20,8 @@ export const $tys: $.Codec<Ty[]> = $.createCodec({
     }
     return tys;
   },
-  _assert() {
-    // TODO #362
+  _assert(assert) {
+    $.array($ty)._assert(assert);
   },
 });
 
@@ -29,15 +29,15 @@ export const $tyId: $.Codec<Ty> = $.createCodec({
   _metadata: $.metadata("$tyId"),
   _staticSize: $compactU32._staticSize,
   _encode(buffer, value) {
-    $.compact($.u32)._encode(buffer, value.id);
+    $compactU32._encode(buffer, value.id);
   },
   _decode(buffer) {
     const ctx = buffer.context.get(TyDecodeCtx);
     const id = $compactU32._decode(buffer);
     return ctx.tys?.[id] ?? { id } as any;
   },
-  _assert() {
-    // TODO #362
+  _assert(assert) {
+    $compactU32._assert(assert.key(this, "id"));
   },
 });
 
