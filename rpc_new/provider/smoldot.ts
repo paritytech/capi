@@ -9,6 +9,12 @@
   code and logic. Tests in `smoldot.test.ts` file are 3 simpleones that covers the main
   cases of `AddChain`, `AddWellknownChain` and `Add a Parachain`.
 
+  In `assets` directory exist 4 chainspecs of the WellKnown Chains. These could/should
+  be updated with a CI script (following the logic of Substarte-connect), every X days (normally)
+  every one day. This process, should update the 'light client checkpoint' that exists inside
+  the chainspec, giving the capability to Smoldot, to sync from that point and not not from
+  an older one (the older the checkpoint - the more time smoldot needs to wrap sync).
+
   TODO: Discuss what else we may need to export/use from Smoldot
   Also discuss use cases that may not be too familiar
 */
