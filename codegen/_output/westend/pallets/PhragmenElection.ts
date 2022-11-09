@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
 /**
  *  The present candidate list. A current member or runner-up can never enter this vector
  *  and is always implicitly assumed to be a candidate.

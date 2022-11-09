@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
 export const $call: $.Codec<t.pallet_nomination_pools.pallet.Call> = _codec.$369
 
 export const $defensiveError: $.Codec<t.pallet_nomination_pools.pallet.DefensiveError> = _codec.$633

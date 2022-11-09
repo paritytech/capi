@@ -1,6 +1,9 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
+export * as pallet from "./pallet.ts"
+
 export const $announcement: $.Codec<t.pallet_proxy.Announcement> = _codec.$585
 
 export const $proxyDefinition: $.Codec<t.pallet_proxy.ProxyDefinition> = _codec.$581
@@ -24,5 +27,3 @@ export interface ProxyDefinition {
 export function ProxyDefinition(value: t.pallet_proxy.ProxyDefinition) {
   return value
 }
-
-export * as pallet from "./pallet.ts"

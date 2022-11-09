@@ -1,6 +1,9 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
+export * as pallet from "./pallet.ts"
+
 export const $proposal: $.Codec<t.pallet_treasury.Proposal> = _codec.$556
 
 export interface Proposal {
@@ -13,5 +16,3 @@ export interface Proposal {
 export function Proposal(value: t.pallet_treasury.Proposal) {
   return value
 }
-
-export * as pallet from "./pallet.ts"

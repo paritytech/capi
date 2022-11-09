@@ -1,6 +1,10 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
+export * as pallet from "./pallet/mod.ts"
+export * as slashing from "./slashing.ts"
+
 export const $activeEraInfo: $.Codec<t.pallet_staking.ActiveEraInfo> = _codec.$492
 
 export const $eraRewardPoints: $.Codec<t.pallet_staking.EraRewardPoints> = _codec.$495
@@ -171,7 +175,3 @@ export interface ValidatorPrefs {
 export function ValidatorPrefs(value: t.pallet_staking.ValidatorPrefs) {
   return value
 }
-
-export * as pallet from "./pallet/mod.ts"
-
-export * as slashing from "./slashing.ts"

@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
 /** Items to be executed, indexed by the block number that they should be executed on. */
 export const Agenda = {
   type: "Map",

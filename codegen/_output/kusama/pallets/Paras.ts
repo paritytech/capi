@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
 /** The actions to perform during the start of a specific session index. */
 export const ActionsQueue = {
   type: "Map",

@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
 export const $opaqueMultiaddr: $.Codec<t.sp_core.offchain.OpaqueMultiaddr> = _codec.$232
 
 export const $opaqueNetworkState: $.Codec<t.sp_core.offchain.OpaqueNetworkState> = _codec.$229

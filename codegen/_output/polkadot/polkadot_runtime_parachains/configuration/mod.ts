@@ -1,6 +1,9 @@
 import { $, BitSequence, ChainError, Era } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
 import type * as t from "../../mod.ts"
+
+export * as pallet from "./pallet.ts"
+
 export const $hostConfiguration: $.Codec<
   t.polkadot_runtime_parachains.configuration.HostConfiguration
 > = _codec.$638
@@ -56,5 +59,3 @@ export function HostConfiguration(
 ) {
   return value
 }
-
-export * as pallet from "./pallet.ts"

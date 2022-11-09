@@ -1,6 +1,11 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
+export * as extensions from "./extensions/mod.ts"
+export * as limits from "./limits.ts"
+export * as pallet from "./pallet.ts"
+
 export const $accountInfo: $.Codec<t.frame_system.AccountInfo> = _codec.$3
 
 export const $eventRecord: $.Codec<t.frame_system.EventRecord> = _codec.$18
@@ -67,9 +72,3 @@ export namespace Phase {
     return { type: "Initialization" }
   }
 }
-
-export * as extensions from "./extensions/mod.ts"
-
-export * as limits from "./limits.ts"
-
-export * as pallet from "./pallet.ts"

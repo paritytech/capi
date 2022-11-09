@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
 export const $nextConfigDescriptor: $.Codec<t.sp_consensus_babe.digests.NextConfigDescriptor> =
   _codec.$192
 

@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
 /** Counter for the related counted storage map */
 export const CounterForListNodes = {
   type: "Plain",

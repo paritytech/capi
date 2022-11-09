@@ -1,6 +1,9 @@
 import { $, BitSequence, ChainError, Era } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
 import type * as t from "../../mod.ts"
+
+export * as traits from "./traits.ts"
+
 export const $instruction: $.Codec<t.xcm.v2.Instruction> = _codec.$132
 
 export const $response: $.Codec<t.xcm.v2.Response> = _codec.$140
@@ -361,5 +364,3 @@ export namespace WeightLimit {
     return { type: "Limited", value }
   }
 }
-
-export * as traits from "./traits.ts"

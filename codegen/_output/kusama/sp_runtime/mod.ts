@@ -1,6 +1,11 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
+export * as generic from "./generic/mod.ts"
+export * as multiaddress from "./multiaddress.ts"
+export * as traits from "./traits.ts"
+
 export const $arithmeticError: $.Codec<t.sp_runtime.ArithmeticError> = _codec.$27
 
 export const $dispatchError: $.Codec<t.sp_runtime.DispatchError> = _codec.$24
@@ -211,9 +216,3 @@ export type TokenError =
   | "Unsupported"
 
 export type TransactionalError = "LimitReached" | "NoLayer"
-
-export * as generic from "./generic/mod.ts"
-
-export * as multiaddress from "./multiaddress.ts"
-
-export * as traits from "./traits.ts"

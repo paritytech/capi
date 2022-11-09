@@ -1,6 +1,9 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
+export * as pallet from "./pallet.ts"
+
 export const $storedPendingChange: $.Codec<t.pallet_grandpa.StoredPendingChange> = _codec.$517
 
 export const $storedState: $.Codec<t.pallet_grandpa.StoredState> = _codec.$516
@@ -55,5 +58,3 @@ export namespace StoredState {
     return { type: "PendingResume", ...value }
   }
 }
-
-export * as pallet from "./pallet.ts"

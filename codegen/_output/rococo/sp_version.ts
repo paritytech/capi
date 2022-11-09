@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "./capi.ts"
 import * as _codec from "./codecs.ts"
 import type * as t from "./mod.ts"
+
 export const $runtimeVersion: $.Codec<t.sp_version.RuntimeVersion> = _codec.$172
 
 export interface RuntimeVersion {

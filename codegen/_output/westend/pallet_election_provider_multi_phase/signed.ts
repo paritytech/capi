@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
 export const $signedSubmission: $.Codec<
   t.pallet_election_provider_multi_phase.signed.SignedSubmission
 > = _codec.$610

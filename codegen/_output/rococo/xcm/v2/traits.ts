@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
 import type * as t from "../../mod.ts"
+
 export const $error: $.Codec<t.xcm.v2.traits.Error> = _codec.$110
 
 export const $outcome: $.Codec<t.xcm.v2.traits.Outcome> = _codec.$109

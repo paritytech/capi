@@ -93,17 +93,15 @@ export function printDecls(
       done.push({ path, code })
     }
   }
+  const reexports: S[] = []
   for (const ns in namespaces) {
     const file = printDecls(namespaces[ns]!, imports, [...path, ns], files)
-    done.push({
-      path: ns,
-      code: [
-        "export * as",
-        ns,
-        "from",
-        S.string("./" + file),
-      ],
-    })
+    reexports.push([
+      "export * as",
+      ns,
+      "from",
+      S.string("./" + file),
+    ])
   }
   // sort by path, _s first
   done.sort((a, b) =>
@@ -119,8 +117,10 @@ export function printDecls(
     ? (path.at(-1) + (Object.keys(namespaces).length ? "/mod.ts" : ".ts"))
     : "mod.ts"
   const code = [
-    "\n",
     ...imports(path.length - +!Object.keys(namespaces).length, !path.length),
+    "\n\n",
+    ...reexports,
+    "\n\n",
     // Deduplicate -- metadata has redundant entries (e.g. pallet_collective::RawOrigin)
     [...new Set(done.map((x) => S.toString(x.code)))].join("\n\n"),
   ]

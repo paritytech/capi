@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
 export const $public: $.Codec<t.sp_finality_grandpa.app.Public> = _codec.$50
 
 export const $signature: $.Codec<t.sp_finality_grandpa.app.Signature> = _codec.$221

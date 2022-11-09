@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
 import type * as t from "../../mod.ts"
+
 export const $assetId: $.Codec<t.xcm.v1.multiasset.AssetId> = _codec.$136
 
 export const $assetInstance: $.Codec<t.xcm.v1.multiasset.AssetInstance> = _codec.$138

@@ -1,6 +1,10 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
+export * as pallet from "./pallet.ts"
+export * as sr25519 from "./sr25519/mod.ts"
+
 export const $boundedOpaqueNetworkState: $.Codec<t.pallet_im_online.BoundedOpaqueNetworkState> =
   _codec.$523
 
@@ -26,7 +30,3 @@ export interface Heartbeat {
 export function Heartbeat(value: t.pallet_im_online.Heartbeat) {
   return value
 }
-
-export * as pallet from "./pallet.ts"
-
-export * as sr25519 from "./sr25519/mod.ts"

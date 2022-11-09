@@ -1,11 +1,12 @@
 import { $, BitSequence, ChainError, Era } from "../../../../capi.ts"
 import * as _codec from "../../../../codecs.ts"
 import type * as t from "../../../../mod.ts"
+
+export * as $$sp_arithmetic from "./$$sp_arithmetic/mod.ts"
+
 export const $$$u128: $.Codec<t.pallet_staking.pallet.pallet.ConfigOp.$$u128> = _codec.$207
 
 export const $$$u32: $.Codec<t.pallet_staking.pallet.pallet.ConfigOp.$$u32> = _codec.$208
-
-export * as $$sp_arithmetic from "./$$sp_arithmetic/mod.ts"
 
 export type $$u128 =
   | t.pallet_staking.pallet.pallet.ConfigOp.$$u128.Noop

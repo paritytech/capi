@@ -1,6 +1,9 @@
 import { $, BitSequence, ChainError, Era } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
 import type * as t from "../../mod.ts"
+
+export * as pallet from "./pallet.ts"
+
 export const $hrmpChannel: $.Codec<t.polkadot_runtime_parachains.hrmp.HrmpChannel> = _codec.$688
 
 export const $hrmpOpenChannelRequest: $.Codec<
@@ -36,5 +39,3 @@ export function HrmpOpenChannelRequest(
 ) {
   return value
 }
-
-export * as pallet from "./pallet.ts"

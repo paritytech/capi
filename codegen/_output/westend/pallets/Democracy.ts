@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
 /**
  *  A record of who vetoed what. Maps proposal hash to a possible existent block number
  *  (until when it may not be resubmitted) and who vetoed it.

@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "./capi.ts"
 import * as _codec from "./codecs.ts"
 import type * as t from "./mod.ts"
+
 export const $equivocationProof: $.Codec<t.sp_consensus_slots.EquivocationProof> = _codec.$186
 
 export const $slot: $.Codec<t.sp_consensus_slots.Slot> = _codec.$190

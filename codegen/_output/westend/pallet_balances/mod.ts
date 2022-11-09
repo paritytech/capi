@@ -1,6 +1,9 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
+export * as pallet from "./pallet.ts"
+
 export const $accountData: $.Codec<t.pallet_balances.AccountData> = _codec.$5
 
 export const $balanceLock: $.Codec<t.pallet_balances.BalanceLock> = _codec.$471
@@ -44,5 +47,3 @@ export interface ReserveData {
 export function ReserveData(value: t.pallet_balances.ReserveData) {
   return value
 }
-
-export * as pallet from "./pallet.ts"

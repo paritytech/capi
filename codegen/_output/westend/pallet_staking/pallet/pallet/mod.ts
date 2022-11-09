@@ -1,6 +1,9 @@
 import { $, BitSequence, ChainError, Era } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
 import type * as t from "../../../mod.ts"
+
+export * as ConfigOp from "./ConfigOp/mod.ts"
+
 export const $call: $.Codec<t.pallet_staking.pallet.pallet.Call> = _codec.$202
 
 export const $error: $.Codec<t.pallet_staking.pallet.pallet.Error> = _codec.$508
@@ -954,8 +957,6 @@ export namespace Call {
     return { type: "force_apply_min_commission", ...value }
   }
 }
-
-export * as ConfigOp from "./ConfigOp/mod.ts"
 
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
 export type Error =

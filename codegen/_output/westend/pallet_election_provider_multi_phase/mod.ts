@@ -1,6 +1,10 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
+export * as pallet from "./pallet.ts"
+export * as signed from "./signed.ts"
+
 export const $electionCompute: $.Codec<t.pallet_election_provider_multi_phase.ElectionCompute> =
   _codec.$87
 
@@ -94,7 +98,3 @@ export function SolutionOrSnapshotSize(
 ) {
   return value
 }
-
-export * as pallet from "./pallet.ts"
-
-export * as signed from "./signed.ts"

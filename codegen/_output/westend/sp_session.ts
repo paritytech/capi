@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "./capi.ts"
 import * as _codec from "./codecs.ts"
 import type * as t from "./mod.ts"
+
 export const $membershipProof: $.Codec<t.sp_session.MembershipProof> = _codec.$191
 
 export interface MembershipProof {

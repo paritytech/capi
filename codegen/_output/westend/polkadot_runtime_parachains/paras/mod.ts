@@ -1,6 +1,9 @@
 import { $, BitSequence, ChainError, Era } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
 import type * as t from "../../mod.ts"
+
+export * as pallet from "./pallet.ts"
+
 export const $paraGenesisArgs: $.Codec<t.polkadot_runtime_parachains.paras.ParaGenesisArgs> =
   _codec.$678
 
@@ -95,5 +98,3 @@ export interface ReplacementTimes {
 export function ReplacementTimes(value: t.polkadot_runtime_parachains.paras.ReplacementTimes) {
   return value
 }
-
-export * as pallet from "./pallet.ts"

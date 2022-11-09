@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
 import type * as t from "../../mod.ts"
+
 export const $digest: $.Codec<t.sp_runtime.generic.digest.Digest> = _codec.$13
 
 export const $digestItem: $.Codec<t.sp_runtime.generic.digest.DigestItem> = _codec.$15

@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
 import type * as t from "../../mod.ts"
+
 export const $order: $.Codec<t.xcm.v1.order.Order> = _codec.$432
 
 export type Order =

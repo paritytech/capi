@@ -1,6 +1,9 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
+export * as pallet from "./pallet.ts"
+
 export const $requestStatus: $.Codec<t.pallet_preimage.RequestStatus> = _codec.$451
 
 export type RequestStatus =
@@ -29,5 +32,3 @@ export namespace RequestStatus {
     return { type: "Requested", ...value }
   }
 }
-
-export * as pallet from "./pallet.ts"

@@ -1,6 +1,12 @@
 import { $, BitSequence, ChainError, Era } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
 import type * as t from "../../mod.ts"
+
+export * as junction from "./junction.ts"
+export * as multiasset from "./multiasset.ts"
+export * as multilocation from "./multilocation.ts"
+export * as order from "./order.ts"
+
 export const $response: $.Codec<t.xcm.v1.Response> = _codec.$434
 
 export const $xcm: $.Codec<t.xcm.v1.Xcm> = _codec.$430
@@ -166,11 +172,3 @@ export namespace Xcm {
     return { type: "UnsubscribeVersion" }
   }
 }
-
-export * as junction from "./junction.ts"
-
-export * as multiasset from "./multiasset.ts"
-
-export * as multilocation from "./multilocation.ts"
-
-export * as order from "./order.ts"

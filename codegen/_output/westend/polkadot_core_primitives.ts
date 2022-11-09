@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "./capi.ts"
 import * as _codec from "./codecs.ts"
 import type * as t from "./mod.ts"
+
 export const $candidateHash: $.Codec<t.polkadot_core_primitives.CandidateHash> = _codec.$114
 
 export const $inboundDownwardMessage: $.Codec<t.polkadot_core_primitives.InboundDownwardMessage> =

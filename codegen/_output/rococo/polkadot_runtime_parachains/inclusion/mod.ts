@@ -1,6 +1,9 @@
 import { $, BitSequence, ChainError, Era } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
 import type * as t from "../../mod.ts"
+
+export * as pallet from "./pallet.ts"
+
 export const $availabilityBitfieldRecord: $.Codec<
   t.polkadot_runtime_parachains.inclusion.AvailabilityBitfieldRecord
 > = _codec.$644
@@ -36,5 +39,3 @@ export function CandidatePendingAvailability(
 ) {
   return value
 }
-
-export * as pallet from "./pallet.ts"

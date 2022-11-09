@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
 export const $slashingSpans: $.Codec<t.pallet_staking.slashing.SlashingSpans> = _codec.$503
 
 export const $spanRecord: $.Codec<t.pallet_staking.slashing.SpanRecord> = _codec.$504

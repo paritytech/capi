@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "./capi.ts"
 import * as _codec from "./codecs.ts"
 import type * as t from "./mod.ts"
+
 export const $nposCompactSolution16: $.Codec<t.polkadot_runtime.NposCompactSolution16> = _codec.$312
 
 export const $originCaller: $.Codec<t.polkadot_runtime.OriginCaller> = _codec.$256

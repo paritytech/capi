@@ -1,6 +1,9 @@
 import { $, BitSequence, ChainError, Era } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
 import type * as t from "../../mod.ts"
+
+export * as pallet from "./pallet.ts"
+
 export const $fundInfo: $.Codec<t.polkadot_runtime_common.crowdloan.FundInfo> = _codec.$710
 
 export const $lastContribution: $.Codec<t.polkadot_runtime_common.crowdloan.LastContribution> =
@@ -53,5 +56,3 @@ export namespace LastContribution {
     return { type: "Ending", value }
   }
 }
-
-export * as pallet from "./pallet.ts"

@@ -1,6 +1,9 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
+export * as pallet from "./pallet.ts"
+
 export const $scheduled: $.Codec<t.pallet_scheduler.Scheduled> = _codec.$179
 
 export interface Scheduled {
@@ -14,5 +17,3 @@ export interface Scheduled {
 export function Scheduled(value: t.pallet_scheduler.Scheduled) {
   return value
 }
-
-export * as pallet from "./pallet.ts"
