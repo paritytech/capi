@@ -2,7 +2,7 @@ import * as C from "../mod.ts"
 import * as T from "../test_util/mod.ts"
 import * as U from "../util/mod.ts"
 
-import * as westend from "../codegen/_output/westend/mod.ts"
+import { Balances } from "../codegen/_output/westend/pallets/mod.ts"
 
 let hash: undefined | C.rpc.known.Hash
 
@@ -10,7 +10,7 @@ const env = C.Z.env()
 
 const tx = C.extrinsic(T.westend)({
   sender: C.compat.multiAddressFromKeypair(T.alice),
-  call: westend.pallets.Balances.transfer({
+  call: Balances.transfer({
     value: 12345n,
     dest: C.compat.multiAddressFromKeypair(T.bob),
   }),
