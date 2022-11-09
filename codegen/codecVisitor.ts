@@ -56,7 +56,7 @@ export function createCodecVisitor(
     result(ty, ok, err) {
       return addCodecDecl(ty, ["$.result(", this.visit(ok), ",", [
         "$.instance(ChainError<",
-        fixType(typeVisitor.visit(err)),
+        typeVisitor.visit(err),
         `>, ["value", `,
         this.visit(err),
         "])",
@@ -150,7 +150,7 @@ export function createCodecVisitor(
     codecs.push([
       ["export const", getName(rawPath)],
       ": $.Codec<",
-      fixType(typeVisitor.visit(ty)),
+      typeVisitor.visit(ty),
       "> =",
       value,
     ])
@@ -169,17 +169,5 @@ export function createCodecVisitor(
       })
     }
     return getName(rawPath)
-  }
-
-  /**
-   * Prefix generated types with `t.`
-   * e.g. `[Compact<u8>, foo.Bar, Uint8Array]` -> `[t.Compact<t.u8>, t.foo.Bar, Uint8Array]`
-   */
-  function fixType(type: S) {
-    return S.toString(type).replace(
-      // Matches paths (`a.b.c`) that either contain a `.`, or are a number type (either `u123` or `Compact`)
-      /\b([\w\$]+\.[\w\.$]+|u\d+|Compact)\b/g,
-      (x) => "t." + x,
-    )
   }
 }

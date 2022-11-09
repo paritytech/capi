@@ -6,17 +6,22 @@ export function createTypeVisitor(props: CodegenProps, decls: Decl[]) {
   const { tys } = props.metadata
   return new M.TyVisitor<S>(tys, {
     unitStruct(ty) {
+      addFactoryDecl(ty, "(){ return null }")
       return addTypeDecl(ty, "null")
     },
     wrapperStruct(ty, inner) {
       if (ty.path[0] === "Cow") return this.visit(inner)
-      return addTypeDecl(ty, this.visit(inner))
+      const type = addTypeDecl(ty, this.visit(inner))
+      addFactoryDecl(ty, ["(value:", type, "){ return value }"])
+      return type
     },
     tupleStruct(ty, members) {
-      return addTypeDecl(ty, S.array(members.map((x) => this.visit(x))))
+      const type = addTypeDecl(ty, S.array(members.map((x) => this.visit(x))))
+      addFactoryDecl(ty, ["(...value:", type, "){ return value }"])
+      return type
     },
     objectStruct(ty) {
-      return addInterfaceDecl(
+      const type = addInterfaceDecl(
         ty,
         S.object(
           ...ty.fields.map(
@@ -24,6 +29,8 @@ export function createTypeVisitor(props: CodegenProps, decls: Decl[]) {
           ),
         ),
       )
+      addFactoryDecl(ty, ["(value:", type, "){ return value }"])
+      return type
     },
     option(_ty, some) {
       return [this.visit(some), "| undefined"]
@@ -40,45 +47,63 @@ export function createTypeVisitor(props: CodegenProps, decls: Decl[]) {
     taggedUnion(ty) {
       const path = getPath(tys, ty)!
       const name = getName(path)
+      const factories: S[] = ["\n"]
+      const types: S[] = ["\n"]
+      const union: S[] = []
+      for (const { fields, name: type, docs } of ty.members) {
+        const memberPath = path + "." + type
+        let props: [comment: S, name: S, type: S][]
+        let factory: [params: S, result: S]
+        if (fields.length === 0) {
+          props = []
+          factory = ["", ""]
+        } else if (fields[0]!.name === undefined) {
+          // Tuple variant
+          const value = fields.length === 1
+            ? this.visit(fields[0]!.ty)
+            : S.array(fields.map((f) => this.visit(f.ty)))
+          props = [["", "value", value]]
+          factory = [
+            [fields.length === 1 ? "" : "...", "value: t.", memberPath, `["value"]`],
+            "value",
+          ]
+        } else {
+          // Object variant
+          props = fields.map((field, i) => [
+            makeDocComment(field.docs),
+            field.name || i,
+            this.visit(field.ty),
+          ])
+          factory = [["value: Omit<t.", memberPath, `, "type">`], "...value"]
+        }
+        factories.push([
+          makeDocComment(docs),
+          ["export function", type, "(", factory[0], "): t.", memberPath],
+          ["{ return { type:", S.string(type), ",", factory[1], "}}"],
+        ])
+        types.push([
+          makeDocComment(docs),
+          ["export interface", type],
+          S.object(
+            ["type", S.string(type)],
+            ...props,
+          ),
+        ])
+        union.push(["| t.", memberPath])
+      }
       decls.push({
         path,
         code: [
+          "\n",
           makeDocComment(ty.docs),
-          ["export type", name, "="],
-          ty.members.map(({ fields, name: type, docs }) => {
-            let props: [comment: S, name: S, type: S][]
-            if (fields.length === 0) {
-              props = []
-            } else if (fields[0]!.name === undefined) {
-              // Tuple variant
-              const value = fields.length === 1
-                ? this.visit(fields[0]!.ty)
-                : S.array(fields.map((f) => this.visit(f.ty)))
-              props = [["", "value", value]]
-            } else {
-              // Object variant
-              props = fields.map((field, i) => [
-                makeDocComment(field.docs),
-                field.name || i,
-                this.visit(field.ty),
-              ])
-            }
-            decls.push({
-              path: path + "." + type,
-              code: [
-                makeDocComment(docs),
-                ["export interface", type],
-                S.object(
-                  ["type", S.string(type)],
-                  ...props,
-                ),
-              ],
-            })
-            return ["|", path, ".", type]
-          }),
+          ["export type", name, "=", union],
+          [["export namespace", name, "{"], [
+            types,
+            factories,
+          ], "}"],
         ],
       })
-      return path
+      return "t." + path
     },
     uint8Array(ty) {
       return addTypeDecl(ty, "Uint8Array")
@@ -101,7 +126,7 @@ export function createTypeVisitor(props: CodegenProps, decls: Decl[]) {
     },
     compact(ty) {
       decls.push({ path: "Compact", code: "export type Compact<T> = T" })
-      return ["Compact<", this.visit(ty.typeParam), ">"]
+      return ["t.Compact<", this.visit(ty.typeParam), ">"]
     },
     bitSequence(ty) {
       return addTypeDecl(ty, "BitSequence")
@@ -119,7 +144,9 @@ export function createTypeVisitor(props: CodegenProps, decls: Decl[]) {
       return this.visit(inner)
     },
     circular(ty) {
-      return getPath(tys, ty) || this._visit(ty)
+      const path = getPath(tys, ty)
+      if (path) return "t." + path
+      return this._visit(ty)
     },
   })
 
@@ -131,7 +158,7 @@ export function createTypeVisitor(props: CodegenProps, decls: Decl[]) {
         code: [makeDocComment(ty.docs), ["export type", getName(path)], "=", value],
       })
     }
-    return path || value
+    return path ? "t." + path : value
   }
 
   function addInterfaceDecl(ty: M.Ty, value: S) {
@@ -142,6 +169,16 @@ export function createTypeVisitor(props: CodegenProps, decls: Decl[]) {
         code: [makeDocComment(ty.docs), ["export interface", getName(path)], value],
       })
     }
-    return path || value
+    return path ? "t." + path : value
+  }
+
+  function addFactoryDecl(ty: M.Ty, body: S) {
+    const path = getPath(tys, ty)
+    if (path) {
+      decls.push({
+        path,
+        code: [makeDocComment(ty.docs), ["export function", getName(path)], body],
+      })
+    }
   }
 }

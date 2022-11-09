@@ -13,27 +13,28 @@ export interface CodegenProps {
 export function codegen(props: CodegenProps): Files {
   const decls: Decl[] = []
   const files = new Files()
-  decls.push({
-    path: "_",
-    code: [
-      "\n",
-      [
-        "import { ChainError, BitSequence, Era, $ } from",
-        S.string(props.importSpecifier),
-      ],
-      [`import * as _codec from "./codecs.ts"`],
-      [`export { _metadata }`],
-    ],
-  })
   const typeVisitor = createTypeVisitor(props, decls)
   const codecVisitor = createCodecVisitor(props, decls, typeVisitor, files)
   for (const ty of props.metadata.tys) {
     typeVisitor.visit(ty)
     codecVisitor.visit(ty)
   }
-  genMetadata(props.metadata, decls)
-  files.set("mod.ts", {
-    getContent: () => printDecls(decls),
-  })
+  genMetadata(props.metadata, decls, typeVisitor)
+  files.set("capi.ts", { getContent: () => ["export * from", S.string(props.importSpecifier)] })
+  printDecls(
+    decls,
+    (depth, isRoot) => [
+      isRoot
+        ? []
+        : ["import type * as t from", S.string((depth ? "../".repeat(depth) : "./") + "mod.ts")],
+      ["import * as _codec from", S.string((depth ? "../".repeat(depth) : "./") + "codecs.ts")],
+      [
+        "import { ChainError, BitSequence, Era, $ } from",
+        S.string((depth ? "../".repeat(depth) : "./") + "capi.ts"),
+      ],
+    ],
+    [],
+    files,
+  )
   return files
 }
