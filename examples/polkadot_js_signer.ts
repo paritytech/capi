@@ -3,8 +3,7 @@ import * as C from "../mod.ts";
 import * as T from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
 
-const root = C.extrinsic({
-  client: T.westend,
+const root = C.extrinsic(T.westend)({
   sender: C.compat.multiAddressFromKeypair(T.alice),
   palletName: "Balances",
   methodName: "transfer",

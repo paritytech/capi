@@ -86,8 +86,7 @@ export async function assertExtrinsicStatusOrder({
 }: AssertExtrinsicStatusOrderProps) {
   const extrinsicEvents = U.throwIfError(
     await T.extrinsic.collectExtrinsicEvents(
-      extrinsic({
-        client: T.westend,
+      extrinsic(T.westend)({
         sender: compat.multiAddressFromKeypair(keypair),
         ...rest,
       })

@@ -11,6 +11,9 @@ if (!hostname || !portRaw) {
   throw new Error("Must be running inside a test ctx");
 }
 
+const entryRead = C.entryRead(T.polkadot);
+const extrinsic = C.extrinsic(T.polkadot);
+
 const signatories = T.users
   .slice(0, 3)
   .map(({ publicKey }) => publicKey)
@@ -19,8 +22,7 @@ const THRESHOLD = 2;
 const multisigPublicKey = createKeyMulti(signatories, THRESHOLD);
 
 // Transfer initial balance (existential deposit) to multisig address
-const existentialDeposit = C.extrinsic({
-  client: T.polkadot,
+const existentialDeposit = extrinsic({
   sender: C.compat.multiAddressFromKeypair(T.alice),
   palletName: "Balances",
   methodName: "transfer",
@@ -46,17 +48,14 @@ const key = C.keyPageRead(T.polkadot)("Multisig", "Multisigs", 1, [multisigPubli
   .access(1);
 
 // Get the timepoint itself
-const maybeTimepoint = C.entryRead(T.polkadot)("Multisig", "Multisigs", [
-  multisigPublicKey,
-  key,
-])
+const maybeTimepoint = entryRead("Multisig", "Multisigs", [multisigPublicKey, key])
   .access("value")
   .access("when");
 
 const approval = createOrApproveMultisigProposal("Approval", T.bob, maybeTimepoint);
 
 // check T.dave new balance
-const daveBalance = C.entryRead(T.polkadot)("System", "Account", [T.dave.publicKey]);
+const daveBalance = entryRead("System", "Account", [T.dave.publicKey]);
 
 // TODO: use common env
 U.throwIfError(await existentialDeposit.run());
@@ -77,8 +76,7 @@ function createOrApproveMultisigProposal<
   pair: KeyringPair,
   ...[maybeTimepoint]: Rest
 ) {
-  return C.extrinsic({
-    client: T.polkadot,
+  return extrinsic({
     sender: C.compat.multiAddressFromKeypair(pair),
     palletName: "Multisig",
     methodName: "as_multi",
