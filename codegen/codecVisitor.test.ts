@@ -5,20 +5,16 @@ import * as M from "../frame_metadata/mod.ts"
 import * as C from "../mod.ts"
 import * as testClients from "../test_util/clients/mod.ts"
 import * as U from "../util/mod.ts"
-import { codegen } from "./mod.ts"
 
 const currentDir = path.dirname(path.fromFileUrl(import.meta.url))
-const codegenTestDir = path.join(currentDir, "../target/codegen")
+const codegenDir = path.join(currentDir, "_output")
 
 for (const [runtime, client] of Object.entries(testClients)) {
   Deno.test(runtime, async () => {
     const metadata = U.throwIfError(await C.metadata(client)().run())
-    const outDir = path.join(codegenTestDir, runtime)
-    await codegen({
-      importSpecifier: "../../../mod.ts",
-      metadata,
-    }).write(outDir)
-    const codegened = await import(path.toFileUrl(path.join(outDir, "mod.ts")).toString())
+    const codegened = await import(
+      path.toFileUrl(path.join(codegenDir, runtime, "mod.ts")).toString()
+    )
     const deriveCodec = M.DeriveCodec(metadata.tys)
     const derivedCodecs = metadata.tys.map(deriveCodec)
     const codegenCodecs = codegened._metadata.types
