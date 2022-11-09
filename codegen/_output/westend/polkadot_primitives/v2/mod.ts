@@ -1,4 +1,4 @@
-import { $, BitSequence, ChainError, Era } from "../../capi.ts"
+import { $ } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
 import type * as t from "../../mod.ts"
 
@@ -67,7 +67,7 @@ export const $validatorIndex: $.Codec<t.polkadot_primitives.v2.ValidatorIndex> =
 export const $validityAttestation: $.Codec<t.polkadot_primitives.v2.ValidityAttestation> =
   _codec.$396
 
-export type AvailabilityBitfield = BitSequence
+export type AvailabilityBitfield = $.BitSequence
 
 export function AvailabilityBitfield(value: t.polkadot_primitives.v2.AvailabilityBitfield) {
   return value
@@ -76,7 +76,7 @@ export function AvailabilityBitfield(value: t.polkadot_primitives.v2.Availabilit
 export interface BackedCandidate {
   candidate: t.polkadot_primitives.v2.CommittedCandidateReceipt
   validity_votes: Array<t.polkadot_primitives.v2.ValidityAttestation>
-  validator_indices: BitSequence
+  validator_indices: $.BitSequence
 }
 
 export function BackedCandidate(value: t.polkadot_primitives.v2.BackedCandidate) {
@@ -160,8 +160,8 @@ export namespace CoreOccupied {
 }
 
 export interface DisputeState {
-  validators_for: BitSequence
-  validators_against: BitSequence
+  validators_for: $.BitSequence
+  validators_against: $.BitSequence
   start: t.u32
   concluded_at: t.u32 | undefined
 }

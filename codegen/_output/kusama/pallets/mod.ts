@@ -1,7 +1,3 @@
-import { $, BitSequence, ChainError, Era } from "../capi.ts"
-import * as _codec from "../codecs.ts"
-import type * as t from "../mod.ts"
-
 export * as Auctions from "./Auctions.ts"
 export * as Authorship from "./Authorship.ts"
 export * as Babe from "./Babe.ts"

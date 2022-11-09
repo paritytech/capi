@@ -15,12 +15,11 @@ export function createCodecVisitor(
   files.set("codecs.ts", {
     getContent: () => [
       "\n",
-      [
-        "import { ChainError, BitSequence, Era, $, $era, $null } from",
-        S.string(props.importSpecifier),
-      ],
+      [`import { $, C } from "./capi.ts"`],
       [`import type * as t from "./mod.ts"`],
-      ...codecs,
+      "\n\n",
+      codecs.map(S.toString).join("\n\n"),
+      "\n\n",
       [
         "export const _all: $.AnyCodec[] =",
         S.array(props.metadata.tys.map((ty) => getName(getRawCodecPath(ty)))),
@@ -30,7 +29,7 @@ export function createCodecVisitor(
 
   return new M.TyVisitor<S>(tys, {
     unitStruct(ty) {
-      return addCodecDecl(ty, "$null")
+      return addCodecDecl(ty, "C.$null")
     },
     wrapperStruct(ty, inner) {
       return addCodecDecl(ty, this.visit(inner))
@@ -55,7 +54,7 @@ export function createCodecVisitor(
     },
     result(ty, ok, err) {
       return addCodecDecl(ty, ["$.result(", this.visit(ok), ",", [
-        "$.instance(ChainError<",
+        "$.instance(C.ChainError<",
         typeVisitor.visit(err),
         `>, ["value", `,
         this.visit(err),
@@ -132,7 +131,7 @@ export function createCodecVisitor(
       return addCodecDecl(ty, ["$.set(", this.visit(val), ")"])
     },
     era(ty) {
-      return addCodecDecl(ty, "$era")
+      return addCodecDecl(ty, "C.$era")
     },
     lenPrefixedWrapper(ty, inner) {
       return addCodecDecl(ty, ["$.lenPrefixed(", this.visit(inner), ")"])

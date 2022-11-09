@@ -1,6 +1,5 @@
-import { $, BitSequence, ChainError, Era } from "../capi.ts"
+import { $ } from "../capi.ts"
 import * as _codec from "../codecs.ts"
-import type * as t from "../mod.ts"
 
 /** A vector of reports of the same kind that happened at the same time slot. */
 export const ConcurrentReportsIndex = {

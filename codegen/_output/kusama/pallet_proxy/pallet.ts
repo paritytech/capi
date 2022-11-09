@@ -1,4 +1,4 @@
-import { $, BitSequence, ChainError, Era } from "../capi.ts"
+import { $, C } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
 
@@ -416,7 +416,7 @@ export namespace Event {
   /** A proxy was executed correctly, with the given. */
   export interface ProxyExecuted {
     type: "ProxyExecuted"
-    result: null | ChainError<t.sp_runtime.DispatchError>
+    result: null | C.ChainError<t.sp_runtime.DispatchError>
   }
   /**
    * A pure account has been created by new proxy with given

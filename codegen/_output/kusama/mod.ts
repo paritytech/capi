@@ -1,4 +1,4 @@
-import { $, BitSequence, ChainError, Era } from "./capi.ts"
+import { $, C } from "./capi.ts"
 import * as _codec from "./codecs.ts"
 
 export * as _metadata from "./_metadata.ts"
@@ -58,6 +58,8 @@ export * as sp_staking from "./sp_staking/mod.ts"
 export * as sp_version from "./sp_version.ts"
 export * as sp_weights from "./sp_weights/mod.ts"
 export * as xcm from "./xcm/mod.ts"
+
+export const $era: $.Codec<C.Era> = _codec.$732
 
 export type Compact<T> = T
 
