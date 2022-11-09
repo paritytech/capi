@@ -1,64 +1,57 @@
+// TODO: prettier messaging & help screens
 import { codegen } from "./codegen/mod.ts";
 import { parse } from "./deps/std/flags.ts";
-import * as path from "./deps/std/path.ts";
-import { unimplemented } from "./deps/std/testing/asserts.ts";
 import * as C from "./mod.ts";
+import * as T from "./test_util/mod.ts";
 import * as U from "./util/mod.ts";
 
 const args = parse(Deno.args, {
-  string: ["src", "out", "import"],
+  string: ["src", "out", "import", "dev"],
   boolean: ["help"],
   default: {
     import: "https://deno.land/x/capi/mod.ts",
   },
   alias: {
     src: ["s"],
+    dev: ["d"],
     out: ["o"],
     help: ["h", "?"],
   },
 });
 
 if (args.help) help();
-if (!args.src) fail();
-if (!args.out) fail();
 
-await codegen({
-  importSpecifier: args.import,
-  metadata: await getMetadata(args.src),
-}).write(args.out);
+if (!args.out) {
+  throw new Error("Must specify `out`");
+}
 
-// Should disallow .scale as input?
-async function getMetadata(src: string): Promise<C.M.Metadata> {
-  if (src.startsWith("ws")) {
-    return U.throwIfError(await C.metadata(C.rpcClient(C.rpc.proxyProvider, src))().run());
-  } else if (path.isAbsolute(src)) {
-    return await loadMetadata(src);
+let metadata: C.M.Metadata;
+if (args.src && args.dev) {
+  throw Error("Cannot specify both `src` and `dev`");
+} else if (args.src) {
+  if (args.src.endsWith(".scale")) {
+    metadata = C.M.fromPrefixedHex(await Deno.readTextFile(args.src));
   } else {
-    try {
-      return await loadMetadata(path.fromFileUrl(src));
-    } catch (_e) {
-      unimplemented();
-    }
+    const client = C.rpcClient(C.rpc.proxyProvider, args.src);
+    metadata = U.throwIfError(await C.metadata(client)().run());
   }
-}
-
-async function loadMetadata(src: string) {
-  const ext = path.extname(src);
-  switch (ext) {
-    case ".scale": {
-      return C.M.fromPrefixedHex(await Deno.readTextFile(src));
-    }
-    case ".json": {
-      return unimplemented();
-    }
-    default:
-      fail();
+} else if (args.dev) {
+  if (!T.isRuntimeName(args.dev)) {
+    throw new T.InvalidRuntimeSpecifiedError(args.dev);
   }
+  const client = T[args.dev as T.RuntimeName];
+  metadata = U.throwIfError(await C.metadata(client)().run());
+} else {
+  throw new Error("Please specify either `src` or `dev`");
 }
+await run(metadata, args.out);
 
-// TODO: error message + correct usage suggestion
-function fail(): never {
-  Deno.exit(1);
+function run(metadata: C.M.Metadata, out: string) {
+  return codegen({
+    importSpecifier: args.import,
+    metadata,
+  })
+    .write(out);
 }
 
 // TODO: do we handle help differently depending on what flags were specified?

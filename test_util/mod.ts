@@ -1,4 +1,11 @@
 export * from "./clients/mod.ts";
+export {
+  InvalidRuntimeSpecifiedError,
+  isRuntimeName,
+  PolkadotBinNotFoundError,
+  polkadotProcess,
+  type RuntimeName,
+} from "./common.ts";
 export * as extrinsic from "./extrinsic.ts";
 export * from "./local.ts";
 export * from "./pairs.ts";

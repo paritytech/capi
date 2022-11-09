@@ -4,7 +4,7 @@ inputs:
   polkadot-version:
     description: "Polkadot version"
     required: true
-    default: v0.9.28
+    default: v0.9.31
 runs:
   using: "composite"
   steps:

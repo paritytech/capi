@@ -10,16 +10,24 @@ export interface MultiAddress {
   type: "Id" | "Index" | "Raw" | "Address20" | "Address32";
   value: Uint8Array;
 }
+// TODO: delete upon common generated core types
+export namespace MultiAddress {
+  export function fromId(id: Uint8Array): MultiAddress {
+    return {
+      type: "Id",
+      value: id,
+    };
+  }
+}
 
 export interface Signature {
   type: "Sr25519" | "Ed25519" | "Secp256k"; // TODO: `"Ecdsa"`?;
   value: Uint8Array;
 }
 
-export type SignExtrinsic =
+export type Signer =
   | ((message: Uint8Array) => Signature | Promise<Signature>)
   | PolkadotSigner;
-
 export interface PolkadotSigner {
   signPayload(payload: any): Promise<{ signature: string }>;
 }
@@ -41,7 +49,7 @@ export interface Extrinsic {
 interface ExtrinsicCodecProps {
   metadata: Metadata;
   deriveCodec: DeriveCodec;
-  sign: SignExtrinsic;
+  sign: Signer;
   prefix: number;
 }
 

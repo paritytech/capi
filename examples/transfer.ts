@@ -4,24 +4,15 @@ import * as U from "../util/mod.ts";
 
 const root = C.extrinsic({
   client: T.westend,
-  sender: {
-    type: "Id",
-    value: T.alice.publicKey,
-  },
+  sender: C.compat.multiAddressFromKeypair(T.alice),
   palletName: "Balances",
   methodName: "transfer",
   args: {
     value: 12345n,
-    dest: {
-      type: "Id",
-      value: T.bob.publicKey,
-    },
+    dest: C.compat.multiAddressFromKeypair(T.bob),
   },
 })
-  .signed((message) => ({
-    type: "Sr25519",
-    value: T.alice.sign(message),
-  }))
+  .signed(C.compat.signerFromKeypair(T.alice))
   .watch(function(status) {
     console.log(status);
     if (C.TransactionStatus.isTerminal(status)) {
