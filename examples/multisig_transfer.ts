@@ -31,14 +31,14 @@ const existentialDeposit = C.extrinsic({
 })
   .signed(C.Signer.fromKeypair(T.alice))
   .watch(function(status) {
-    console.log(status);
+    console.log(`Existential deposit:`, status);
     if (C.TransactionStatus.isTerminal(status)) {
       this.stop();
     }
   });
 
 // First approval root
-const proposal = createOrApproveMultisigProposal(T.alice);
+const proposal = createOrApproveMultisigProposal("Proposal", T.alice);
 
 // Get the key of the timepoint
 const key = C.keyPageRead(T.polkadot)("Multisig", "Multisigs", 1, [multisigPublicKey])
@@ -53,7 +53,7 @@ const maybeTimepoint = C.entryRead(T.polkadot)("Multisig", "Multisigs", [
   .access("value")
   .access("when");
 
-const approval = createOrApproveMultisigProposal(T.bob, maybeTimepoint);
+const approval = createOrApproveMultisigProposal("Approval", T.bob, maybeTimepoint);
 
 // check T.dave new balance
 const daveBalance = C.entryRead(T.polkadot)("System", "Account", [T.dave.publicKey]);
@@ -73,6 +73,7 @@ function createOrApproveMultisigProposal<
     }>,
   ],
 >(
+  label: string,
   pair: KeyringPair,
   ...[maybeTimepoint]: Rest
 ) {
@@ -93,17 +94,16 @@ function createOrApproveMultisigProposal<
       },
       other_signatories: signatories.filter((value) => value !== pair.publicKey),
       store_call: false,
-      max_weight: 500_000_000n,
-      // {
-      //   ref_time: 500_000_000n,
-      //   proof_size: 0,
-      // },
+      max_weight: {
+        ref_time: 500_000_000n,
+        proof_size: 0n,
+      },
       maybe_timepoint: maybeTimepoint as Rest[0],
     }),
   })
     .signed(C.Signer.fromKeypair(pair))
     .watch(function(status) {
-      console.log(status);
+      console.log(`${label}:`, status);
       if (C.TransactionStatus.isTerminal(status)) {
         this.stop();
       }
