@@ -1,6 +1,4 @@
-import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
-import type * as t from "../mod.ts"
 
 /**
  *  All the validators actively participating in parachain consensus.

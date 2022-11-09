@@ -1,4 +1,4 @@
-import { $, BitSequence, ChainError, Era } from "../capi.ts"
+import { $, C } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
 
@@ -158,7 +158,7 @@ export namespace Event {
     type: "Dispatched"
     task: [t.u32, t.u32]
     id: Uint8Array | undefined
-    result: null | ChainError<t.sp_runtime.DispatchError>
+    result: null | C.ChainError<t.sp_runtime.DispatchError>
   }
   /** The call for the provided hash was not found so the task has been aborted. */
   export interface CallUnavailable {

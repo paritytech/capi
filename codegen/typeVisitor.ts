@@ -36,7 +36,7 @@ export function createTypeVisitor(props: CodegenProps, decls: Decl[]) {
       return [this.visit(some), "| undefined"]
     },
     result(_ty, ok, err) {
-      return [this.visit(ok), "|", ["ChainError<", this.visit(err), ">"]]
+      return [this.visit(ok), "|", ["C.ChainError<", this.visit(err), ">"]]
     },
     never(ty) {
       return addTypeDecl(ty, "never")
@@ -129,7 +129,7 @@ export function createTypeVisitor(props: CodegenProps, decls: Decl[]) {
       return ["t.Compact<", this.visit(ty.typeParam), ">"]
     },
     bitSequence(ty) {
-      return addTypeDecl(ty, "BitSequence")
+      return addTypeDecl(ty, "$.BitSequence")
     },
     map(_ty, key, val) {
       return ["Map<", this.visit(key), ",", this.visit(val), ">"]
@@ -138,7 +138,7 @@ export function createTypeVisitor(props: CodegenProps, decls: Decl[]) {
       return ["Set<", this.visit(val), ">"]
     },
     era() {
-      return "Era"
+      return "C.Era"
     },
     lenPrefixedWrapper(_ty, inner) {
       return this.visit(inner)

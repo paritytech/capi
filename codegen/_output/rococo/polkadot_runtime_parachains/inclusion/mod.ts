@@ -1,4 +1,4 @@
-import { $, BitSequence, ChainError, Era } from "../../capi.ts"
+import { $ } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
 import type * as t from "../../mod.ts"
 
@@ -27,8 +27,8 @@ export interface CandidatePendingAvailability {
   core: t.polkadot_primitives.v2.CoreIndex
   hash: t.polkadot_core_primitives.CandidateHash
   descriptor: t.polkadot_primitives.v2.CandidateDescriptor
-  availability_votes: BitSequence
-  backers: BitSequence
+  availability_votes: $.BitSequence
+  backers: $.BitSequence
   relay_parent_number: t.u32
   backed_in_number: t.u32
   backing_group: t.polkadot_primitives.v2.GroupIndex

@@ -1,4 +1,4 @@
-import { $, BitSequence, ChainError, Era } from "../../capi.ts"
+import { $ } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
 import type * as t from "../../mod.ts"
 
@@ -52,8 +52,8 @@ export function ParaPastCodeMeta(value: t.polkadot_runtime_parachains.paras.Para
 }
 
 export interface PvfCheckActiveVoteState {
-  votes_accept: BitSequence
-  votes_reject: BitSequence
+  votes_accept: $.BitSequence
+  votes_reject: $.BitSequence
   age: t.u32
   created_at: t.u32
   causes: Array<t.polkadot_runtime_parachains.paras.PvfCheckCause>

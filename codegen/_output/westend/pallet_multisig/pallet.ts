@@ -1,4 +1,4 @@
-import { $, BitSequence, ChainError, Era } from "../capi.ts"
+import { $, C } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
 
@@ -371,7 +371,7 @@ export namespace Event {
     timepoint: t.pallet_multisig.Timepoint
     multisig: t.sp_core.crypto.AccountId32
     call_hash: Uint8Array
-    result: null | ChainError<t.sp_runtime.DispatchError>
+    result: null | C.ChainError<t.sp_runtime.DispatchError>
   }
   /** A multisig operation has been cancelled. */
   export interface MultisigCancelled {

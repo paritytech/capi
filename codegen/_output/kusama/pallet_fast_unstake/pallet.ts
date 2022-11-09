@@ -1,4 +1,4 @@
-import { $, BitSequence, ChainError, Era } from "../capi.ts"
+import { $, C } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
 
@@ -128,7 +128,7 @@ export namespace Event {
   export interface Unstaked {
     type: "Unstaked"
     stash: t.sp_core.crypto.AccountId32
-    result: null | ChainError<t.sp_runtime.DispatchError>
+    result: null | C.ChainError<t.sp_runtime.DispatchError>
   }
   /** A staker was slashed for requesting fast-unstake whilst being exposed. */
   export interface Slashed {

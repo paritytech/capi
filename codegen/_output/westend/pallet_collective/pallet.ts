@@ -1,4 +1,4 @@
-import { $, BitSequence, ChainError, Era } from "../capi.ts"
+import { $, C } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
 
@@ -510,13 +510,13 @@ export namespace Event {
   export interface Executed {
     type: "Executed"
     proposal_hash: t.primitive_types.H256
-    result: null | ChainError<t.sp_runtime.DispatchError>
+    result: null | C.ChainError<t.sp_runtime.DispatchError>
   }
   /** A single member did some action; result will be `Ok` if it returned without error. */
   export interface MemberExecuted {
     type: "MemberExecuted"
     proposal_hash: t.primitive_types.H256
-    result: null | ChainError<t.sp_runtime.DispatchError>
+    result: null | C.ChainError<t.sp_runtime.DispatchError>
   }
   /** A proposal was closed because its threshold was reached or after its duration was up. */
   export interface Closed {

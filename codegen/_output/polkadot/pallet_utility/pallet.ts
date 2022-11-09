@@ -1,4 +1,4 @@
-import { $, BitSequence, ChainError, Era } from "../capi.ts"
+import { $, C } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
 
@@ -266,7 +266,7 @@ export namespace Event {
   /** A call was dispatched. */
   export interface DispatchedAs {
     type: "DispatchedAs"
-    result: null | ChainError<t.sp_runtime.DispatchError>
+    result: null | C.ChainError<t.sp_runtime.DispatchError>
   }
   /**
    * Batch of dispatches did not complete fully. Index of first failing dispatch given, as

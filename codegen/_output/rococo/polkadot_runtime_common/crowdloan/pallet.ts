@@ -1,4 +1,4 @@
-import { $, BitSequence, ChainError, Era } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
 import type * as t from "../../mod.ts"
 
@@ -310,7 +310,7 @@ export namespace Event {
   export interface HandleBidResult {
     type: "HandleBidResult"
     para_id: t.polkadot_parachain.primitives.Id
-    result: null | ChainError<t.sp_runtime.DispatchError>
+    result: null | C.ChainError<t.sp_runtime.DispatchError>
   }
   /** The configuration to a crowdloan has been edited. */
   export interface Edited {

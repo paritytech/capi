@@ -79,7 +79,7 @@ export function getCodecPath(tys: M.Ty[], ty: M.Ty) {
 
 export function printDecls(
   decls: Decl[],
-  imports: (depth: number, isRoot: boolean) => S[],
+  imports: (depth: number, content: string) => S[],
   path: string[],
   files: Files,
 ) {
@@ -116,13 +116,14 @@ export function printDecls(
   const file = path.length
     ? (path.at(-1) + (Object.keys(namespaces).length ? "/mod.ts" : ".ts"))
     : "mod.ts"
+  // Deduplicate -- metadata has redundant entries (e.g. pallet_collective::RawOrigin)
+  const content = [...new Set(done.map((x) => S.toString(x.code)))].join("\n\n")
   const code = [
-    ...imports(path.length - +!Object.keys(namespaces).length, !path.length),
+    ...imports(path.length - +!Object.keys(namespaces).length, content),
     "\n\n",
     ...reexports,
     "\n\n",
-    // Deduplicate -- metadata has redundant entries (e.g. pallet_collective::RawOrigin)
-    [...new Set(done.map((x) => S.toString(x.code)))].join("\n\n"),
+    content,
   ]
   files.set([...path.slice(0, -1), file].join("/"), { getContent: () => code })
   return file
