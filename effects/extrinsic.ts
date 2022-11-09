@@ -16,6 +16,8 @@ import { author, chain, system } from "./rpc_known.ts";
 import * as e$ from "./scale.ts";
 
 const k0_ = Symbol();
+const k1_ = Symbol();
+const k2_ = Symbol();
 
 export interface CallData {
   palletName: string;
@@ -38,8 +40,8 @@ export function extrinsic<Client extends Z.$<rpc.Client>>(client: Client) {
 }
 
 export class Extrinsic<
-  Client extends Z.$<rpc.Client>,
-  Props extends Z.Rec$<ExtrinsicProps>,
+  Client extends Z.$<rpc.Client> = Z.$<rpc.Client>,
+  Props extends Z.Rec$<ExtrinsicProps> = Z.Rec$<ExtrinsicProps>,
 > {
   constructor(
     readonly client: Client,
@@ -52,9 +54,9 @@ export class Extrinsic<
 }
 
 export class SignedExtrinsic<
-  Client extends Z.$<rpc.Client>,
-  Props extends Z.Rec$<ExtrinsicProps>,
-  Sign extends Z.$<M.Signer>,
+  Client extends Z.$<rpc.Client> = Z.$<rpc.Client>,
+  Props extends Z.Rec$<ExtrinsicProps> = Z.Rec$<ExtrinsicProps>,
+  Sign extends Z.$<M.Signer> = Z.$<M.Signer>,
 > {
   client;
   props;
@@ -140,6 +142,7 @@ export class SignedExtrinsic<
   }
 }
 
+// TODO: attach this to `Extrinsic`?
 export function extrinsicEvents<
   Extrinsic extends SignedExtrinsic,
   FinalizedHash extends known.Hash,
@@ -148,23 +151,25 @@ export function extrinsicEvents<
   finalizedHash: FinalizedHash,
 ) {
   const client = extrinsic.props.client as Extrinsic["props"]["client"];
-  const extrinsics = blockRead(client)(
-    finalizedHash,
-  )
+  const extrinsics = blockRead(client)(finalizedHash)
     .access("block")
     .access("extrinsics");
-  const idx = Z.ls(
-    extrinsics,
-    extrinsic.extrinsicDecoded as Extrinsic["extrinsicDecoded"],
-  ).next(([extrinsics, extrinsicDecoded]) => {
-    return extrinsics.findIndex((v) => equal(v, extrinsicDecoded));
-  });
+  const idx = Z
+    .ls(
+      extrinsics,
+      extrinsic.extrinsicDecoded as Extrinsic["extrinsicDecoded"],
+    )
+    .next(([extrinsics, extrinsicDecoded]) => {
+      return extrinsics.findIndex((v) => equal(v, extrinsicDecoded));
+    }, k1_);
   const events = entryRead(client)("System", "Events", [], finalizedHash)
     .access("value")
-    .as<{ phase: { value: number } }[]>(); // TODO: do we want to hard-code the event type / sp types generally?
-  return Z.ls(idx, events).next(([idx, events]) => {
-    return events.filter((event) => {
-      return event.phase.value === idx;
-    });
-  });
+    .as<{ phase: { value: number } }[]>();
+  return Z
+    .ls(idx, events)
+    .next(([idx, events]) => {
+      return events.filter((event) => {
+        return event.phase.value === idx;
+      });
+    }, k2_);
 }
