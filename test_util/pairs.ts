@@ -6,18 +6,16 @@ import { ArrayOfLength } from "../util/mod.ts";
 await cryptoWaitReady();
 
 export interface Pairs {
-  all: ArrayOfLength<KeyringPair, 8>;
+  all: ArrayOfLength<KeyringPair, 6>;
   alice: KeyringPair;
   bob: KeyringPair;
   charlie: KeyringPair;
   dave: KeyringPair;
   eve: KeyringPair;
   ferdie: KeyringPair;
-  one: KeyringPair;
-  two: KeyringPair;
 }
 
-export const { all: users, alice, bob, charlie, dave, eve, ferdie, one, two } = pairs();
+export const { all: users, alice, bob, charlie, dave, eve, ferdie } = pairs();
 export function pairs(...args: Parameters<typeof createTestPairs>): Pairs {
   const raw = createTestPairs(...args);
   const alice = raw["alice"]!;
@@ -26,17 +24,13 @@ export function pairs(...args: Parameters<typeof createTestPairs>): Pairs {
   const dave = raw["dave"]!;
   const eve = raw["eve"]!;
   const ferdie = raw["ferdie"]!;
-  const one = raw["one"]!;
-  const two = raw["two"]!;
   return {
-    all: [alice, bob, charlie, dave, eve, ferdie, one, two],
+    all: [alice, bob, charlie, dave, eve, ferdie],
     alice,
     bob,
     charlie,
     dave,
     eve,
     ferdie,
-    one,
-    two,
   };
 }
