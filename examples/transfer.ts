@@ -2,18 +2,18 @@ import * as C from "../mod.ts"
 import * as T from "../test_util/mod.ts"
 import * as U from "../util/mod.ts"
 
+import * as westend from "../target/codegen/westend/mod.ts"
+
 let hash: undefined | C.rpc.known.Hash
 
 const env = C.Z.env()
 
 const tx = C.extrinsic(T.westend)({
   sender: C.compat.multiAddressFromKeypair(T.alice),
-  palletName: "Balances",
-  methodName: "transfer",
-  args: {
+  call: westend.Balances.transfer({
     value: 12345n,
     dest: C.compat.multiAddressFromKeypair(T.bob),
-  },
+  }),
 })
   .signed(C.compat.signerFromKeypair(T.alice))
 
