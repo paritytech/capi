@@ -24,11 +24,13 @@ const multisigPublicKey = createKeyMulti(signatories, THRESHOLD)
 // Transfer initial balance (existential deposit) to multisig address
 const existentialDeposit = extrinsic({
   sender: C.compat.multiAddressFromKeypair(T.alice),
-  palletName: "Balances",
-  methodName: "transfer",
-  args: {
-    value: 2_000_000_000_000n,
-    dest: C.MultiAddress.fromId(multisigPublicKey),
+  call: {
+    type: "Balances",
+    value: {
+      type: "transfer",
+      value: 2_000_000_000_000n,
+      dest: C.MultiAddress.fromId(multisigPublicKey),
+    },
   },
 })
   .signed(C.compat.signerFromKeypair(T.alice))
@@ -75,14 +77,17 @@ function createOrApproveMultisigProposal<
   pair: KeyringPair,
   ...[maybeTimepoint]: Rest
 ) {
+  const call = {
+    type: "Balances",
+    value: {
+      type: "transfer_keep_alive",
+      dest: C.compat.multiAddressFromKeypair(T.dave),
+      value: 1230000000000n,
+    },
+  }
   const maxWeight = extrinsic({
     sender: C.MultiAddress.fromId(multisigPublicKey),
-    palletName: "Balances",
-    methodName: "transfer_keep_alive",
-    args: {
-      dest: C.compat.multiAddressFromKeypair(T.dave),
-      value: 1_230_000_000_000n,
-    },
+    call,
   })
     .feeEstimate
     .access("weight")
@@ -94,23 +99,18 @@ function createOrApproveMultisigProposal<
     })
   return extrinsic({
     sender: C.compat.multiAddressFromKeypair(pair),
-    palletName: "Multisig",
-    methodName: "as_multi",
-    args: C.Z.rec({
-      threshold: THRESHOLD,
-      call: {
-        type: "Balances",
-        value: {
-          type: "transfer_keep_alive",
-          dest: C.compat.multiAddressFromKeypair(T.dave),
-          value: 1_230_000_000_000n,
-        },
-      },
-      other_signatories: signatories.filter((value) => value !== pair.publicKey),
-      store_call: false,
-      max_weight: maxWeight,
-      maybe_timepoint: maybeTimepoint as Rest[0],
-    }),
+    call: {
+      type: "Multisig",
+      value: C.Z.rec({
+        type: "as_multi",
+        threshold: THRESHOLD,
+        call,
+        other_signatories: signatories.filter((value) => value !== pair.publicKey),
+        store_call: false,
+        max_weight: maxWeight,
+        maybe_timepoint: maybeTimepoint as Rest[0],
+      }),
+    },
   })
     .signed(C.compat.signerFromKeypair(pair))
     .watch(function(status) {

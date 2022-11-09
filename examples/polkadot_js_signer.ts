@@ -5,11 +5,16 @@ import * as U from "../util/mod.ts"
 
 const root = C.extrinsic(T.westend)({
   sender: C.compat.multiAddressFromKeypair(T.alice),
-  palletName: "Balances",
-  methodName: "transfer",
-  args: {
-    value: 12345n,
-    dest: C.compat.multiAddressFromKeypair(T.bob),
+  call: {
+    type: "Balances",
+    value: {
+      type: "transfer",
+      value: 12345n,
+      dest: {
+        type: "Id",
+        value: C.compat.multiAddressFromKeypair(T.bob),
+      },
+    },
   },
 })
   .signed({
