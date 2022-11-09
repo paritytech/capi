@@ -1,4 +1,9 @@
+import { parse } from "../deps/std/flags.ts";
+import { assert } from "../deps/std/testing/asserts.ts";
 import * as common from "./common.ts";
+
+const { ["--"]: cmd } = parse(Deno.args, { "--": true });
+assert(cmd.length);
 
 const processContainers: Partial<Record<common.RuntimeName, ProcessContainer>> = {};
 interface ProcessContainer {
@@ -14,7 +19,7 @@ const { hostname, port } = listener.addr as Deno.NetAddr;
 useListener(listener);
 
 const cmdProcess = Deno.run({
-  cmd: Deno.args,
+  cmd,
   env: {
     TEST_CTX_HOSTNAME: hostname,
     TEST_CTX_PORT: port.toString(),
