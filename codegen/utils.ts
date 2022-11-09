@@ -1,4 +1,5 @@
 import * as M from "../frame_metadata/mod.ts"
+import { Files } from "./Files.ts"
 
 export type S = string | number | S[]
 
@@ -25,9 +26,9 @@ export type Decl = { path: string; code: S }
 
 export function getPath(tys: M.Ty[], ty: M.Ty): string | null {
   if (ty.type === "Struct" && ty.fields.length === 1 && ty.params.length) return null
-  return _getName(ty)
+  return _getPath(ty)
 
-  function _getName(ty: M.Ty): string | null {
+  function _getPath(ty: M.Ty): string | null {
     if (ty.type === "Primitive") {
       return ty.kind
     }
@@ -43,7 +44,7 @@ export function getPath(tys: M.Ty[], ty: M.Ty): string | null {
       if (tys.every((x) => x.path.join(".") !== baseName || x.params[i]!.ty === p.ty)) {
         return ""
       }
-      return ".$$" + (_getName(p.ty) ?? p.ty)
+      return ".$$" + (_getPath(p.ty) ?? p.ty)
     }).join("")
   }
 }
@@ -76,7 +77,12 @@ export function getCodecPath(tys: M.Ty[], ty: M.Ty) {
   ].join(".")
 }
 
-export function printDecls(decls: Decl[]) {
+export function printDecls(
+  decls: Decl[],
+  imports: (depth: number, isRoot: boolean) => S[],
+  path: string[],
+  files: Files,
+) {
   const namespaces: Record<string, Decl[]> = {}
   const done: Decl[] = []
   for (const { path, code } of decls) {
@@ -88,12 +94,14 @@ export function printDecls(decls: Decl[]) {
     }
   }
   for (const ns in namespaces) {
+    const file = printDecls(namespaces[ns]!, imports, [...path, ns], files)
     done.push({
       path: ns,
       code: [
-        [ns.startsWith("_") ? "" : "export", "namespace", ns, "{"],
-        printDecls(namespaces[ns]!),
-        "}",
+        "export * as",
+        ns,
+        "from",
+        S.string("./" + file),
       ],
     })
   }
@@ -107,6 +115,15 @@ export function printDecls(decls: Decl[]) {
       ? 1
       : 0
   )
-  // Deduplicate -- metadata has redundant entries (e.g. pallet_collective::RawOrigin)
-  return [...new Set(done.map((x) => S.toString(x.code)))].join("\n")
+  const file = path.length
+    ? (path.at(-1) + (Object.keys(namespaces).length ? "/mod.ts" : ".ts"))
+    : "mod.ts"
+  const code = [
+    "\n",
+    ...imports(path.length - +!Object.keys(namespaces).length, !path.length),
+    // Deduplicate -- metadata has redundant entries (e.g. pallet_collective::RawOrigin)
+    [...new Set(done.map((x) => S.toString(x.code)))].join("\n\n"),
+  ]
+  files.set([...path.slice(0, -1), file].join("/"), { getContent: () => code })
+  return file
 }

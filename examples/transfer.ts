@@ -10,7 +10,7 @@ const env = C.Z.env()
 
 const tx = C.extrinsic(T.westend)({
   sender: C.compat.multiAddressFromKeypair(T.alice),
-  call: westend.Balances.transfer({
+  call: westend.pallets.Balances.transfer({
     value: 12345n,
     dest: C.compat.multiAddressFromKeypair(T.bob),
   }),

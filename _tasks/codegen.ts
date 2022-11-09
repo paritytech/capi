@@ -11,6 +11,7 @@ await Deno.remove(codegenDir, { recursive: true })
 
 await Promise.all(
   Object.entries(testClients).map(async ([runtime, client]) => {
+    // if (runtime !== "polkadot") return;
     const metadata = U.throwIfError(await C.metadata(client)().run())
     const outDir = path.join(codegenDir, runtime)
     await codegen({
