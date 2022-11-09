@@ -8,33 +8,20 @@ await fs.emptyDir(outDir);
 
 await Promise.all([
   build({
-    entryPoints: ["mod.ts", {
-      name: "./frame_metadata",
-      path: "frame_metadata/mod.ts",
-    }, {
-      name: "./effect",
-      path: "effect/mod.ts",
-    }, {
-      name: "./known",
-      path: "known/mod.ts",
-    }, {
-      name: "./rpc",
-      path: "rpc/mod.ts",
-    }],
+    entryPoints: ["mod.ts"],
     outDir,
     mappings: {
-      "https://deno.land/x/scale@v0.9.0/mod.ts": {
+      "https://deno.land/x/scale@v0.9.1/mod.ts": {
         name: "scale-codec",
-        version: "^0.9.0",
+        version: "^0.9.1",
       },
-      "https://deno.land/x/zones@v0.1.0-beta.6/mod.ts": {
+      "https://deno.land/x/zones@v0.1.0-beta.12/mod.ts": {
         name: "zones",
-        version: "0.1.0-beta.6",
+        version: "0.1.0-beta.12",
       },
-      "deps/smoldot_phantom.ts": {
+      "https://deno.land/x/smoldot@light-js-deno-v0.7.3/index-deno.js": {
         name: "@substrate/smoldot-light",
         version: "0.6.20",
-        peerDependency: true,
       },
     },
     package: {
