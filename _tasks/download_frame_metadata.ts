@@ -12,7 +12,7 @@ U.throwIfError(await Z.ls(...Object.entries(knownClients).map(download)).run());
 function download<Name extends Z.$<string>, Client extends Z.$<C.rpc.Client>>(
   entry: [name: Name, client: Client],
 ) {
-  return Z.call(Z.ls(...entry), async ([name, client]) => {
+  return Z.ls(...entry).next(async ([name, client]) => {
     try {
       const metadataHex = U.throwIfError(await C.state.getMetadata(client)().run());
       const outPath = path.join(outDir, `${name}.scale`);
