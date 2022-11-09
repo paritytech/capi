@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
 /** All ongoing or concluded disputes for the last several sessions. */
 export const Disputes = {
   type: "Map",

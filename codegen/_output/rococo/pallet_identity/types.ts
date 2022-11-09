@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
 export const $data: $.Codec<t.pallet_identity.types.Data> = _codec.$267
 
 export const $identityField: $.Codec<t.pallet_identity.types.IdentityField> = _codec.$301

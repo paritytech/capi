@@ -1,6 +1,10 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
+export * as ConfigOp from "./ConfigOp/mod.ts"
+export * as pallet from "./pallet.ts"
+
 export const $bondExtra: $.Codec<t.pallet_nomination_pools.BondExtra> = _codec.$370
 
 export const $bondedPoolInner: $.Codec<t.pallet_nomination_pools.BondedPoolInner> = _codec.$622
@@ -48,8 +52,6 @@ export interface BondedPoolInner {
 export function BondedPoolInner(value: t.pallet_nomination_pools.BondedPoolInner) {
   return value
 }
-
-export * as ConfigOp from "./ConfigOp/mod.ts"
 
 export interface PoolMember {
   pool_id: t.u32
@@ -102,5 +104,3 @@ export interface UnbondPool {
 export function UnbondPool(value: t.pallet_nomination_pools.UnbondPool) {
   return value
 }
-
-export * as pallet from "./pallet.ts"

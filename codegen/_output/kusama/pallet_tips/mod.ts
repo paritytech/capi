@@ -1,6 +1,9 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
+export * as pallet from "./pallet.ts"
+
 export const $openTip: $.Codec<t.pallet_tips.OpenTip> = _codec.$598
 
 export interface OpenTip {
@@ -16,5 +19,3 @@ export interface OpenTip {
 export function OpenTip(value: t.pallet_tips.OpenTip) {
   return value
 }
-
-export * as pallet from "./pallet.ts"

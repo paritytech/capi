@@ -1,6 +1,12 @@
 import { $, BitSequence, ChainError, Era } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
 import type * as t from "../../mod.ts"
+
+export * as junction from "./junction.ts"
+export * as multi_asset from "./multi_asset.ts"
+export * as multi_location from "./multi_location.ts"
+export * as order from "./order.ts"
+
 export const $originKind: $.Codec<t.xcm.v0.OriginKind> = _codec.$143
 
 export const $response: $.Codec<t.xcm.v0.Response> = _codec.$429
@@ -145,11 +151,3 @@ export namespace Xcm {
     return { type: "RelayedFrom", ...value }
   }
 }
-
-export * as junction from "./junction.ts"
-
-export * as multi_asset from "./multi_asset.ts"
-
-export * as multi_location from "./multi_location.ts"
-
-export * as order from "./order.ts"

@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
 /** The number of auctions that have entered into their ending period so far. */
 export const EndingsCount = {
   type: "Plain",

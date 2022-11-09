@@ -1,6 +1,9 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
+export * as pallet from "./pallet.ts"
+
 export const $rawOrigin: $.Codec<t.pallet_collective.RawOrigin> = _codec.$258
 
 export const $votes: $.Codec<t.pallet_collective.Votes> = _codec.$546
@@ -47,5 +50,3 @@ export interface Votes {
 export function Votes(value: t.pallet_collective.Votes) {
   return value
 }
-
-export * as pallet from "./pallet.ts"

@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
 /**
  *  For each session index, we keep a mapping of `ValidatorId<T>` to the
  *  number of blocks authored by the given authority.

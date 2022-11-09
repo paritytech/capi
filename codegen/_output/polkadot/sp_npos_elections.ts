@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "./capi.ts"
 import * as _codec from "./codecs.ts"
 import type * as t from "./mod.ts"
+
 export const $electionScore: $.Codec<t.sp_npos_elections.ElectionScore> = _codec.$88
 
 export const $support: $.Codec<t.sp_npos_elections.Support> = _codec.$367

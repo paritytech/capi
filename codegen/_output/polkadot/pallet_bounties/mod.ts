@@ -1,6 +1,9 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
+export * as pallet from "./pallet.ts"
+
 export const $bounty: $.Codec<t.pallet_bounties.Bounty> = _codec.$591
 
 export const $bountyStatus: $.Codec<t.pallet_bounties.BountyStatus> = _codec.$592
@@ -75,5 +78,3 @@ export namespace BountyStatus {
     return { type: "PendingPayout", ...value }
   }
 }
-
-export * as pallet from "./pallet.ts"

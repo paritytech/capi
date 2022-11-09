@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
 import type * as t from "../../mod.ts"
+
 export const $bounded: $.Codec<t.frame_support.traits.preimages.Bounded> = _codec.$180
 
 export type Bounded =

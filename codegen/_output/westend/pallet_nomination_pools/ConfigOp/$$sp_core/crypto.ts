@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
 import type * as t from "../../../mod.ts"
+
 export const $accountId32: $.Codec<
   t.pallet_nomination_pools.ConfigOp.$$sp_core.crypto.AccountId32
 > = _codec.$373

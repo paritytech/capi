@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../../../../../capi.ts"
 import * as _codec from "../../../../../codecs.ts"
 import type * as t from "../../../../../mod.ts"
+
 export const $perbill: $.Codec<
   t.pallet_staking.pallet.pallet.ConfigOp.$$sp_arithmetic.per_things.Perbill
 > = _codec.$210

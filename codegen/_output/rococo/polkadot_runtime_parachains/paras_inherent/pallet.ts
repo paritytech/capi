@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
 import type * as t from "../../mod.ts"
+
 export const $call: $.Codec<t.polkadot_runtime_parachains.paras_inherent.pallet.Call> = _codec.$378
 
 export const $error: $.Codec<t.polkadot_runtime_parachains.paras_inherent.pallet.Error> =

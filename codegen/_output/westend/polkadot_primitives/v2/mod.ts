@@ -1,6 +1,12 @@
 import { $, BitSequence, ChainError, Era } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
 import type * as t from "../../mod.ts"
+
+export * as assignment_app from "./assignment_app.ts"
+export * as collator_app from "./collator_app.ts"
+export * as signed from "./signed.ts"
+export * as validator_app from "./validator_app.ts"
+
 export const $availabilityBitfield: $.Codec<t.polkadot_primitives.v2.AvailabilityBitfield> =
   _codec.$382
 
@@ -360,11 +366,3 @@ export namespace ValidityAttestation {
     return { type: "Explicit", value }
   }
 }
-
-export * as assignment_app from "./assignment_app.ts"
-
-export * as collator_app from "./collator_app.ts"
-
-export * as signed from "./signed.ts"
-
-export * as validator_app from "./validator_app.ts"

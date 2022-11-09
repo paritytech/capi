@@ -1,6 +1,9 @@
 import { $, BitSequence, ChainError, Era } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
 import type * as t from "../../mod.ts"
+
+export * as PerDispatchClass from "./PerDispatchClass/mod.ts"
+
 export const $dispatchClass: $.Codec<t.frame_support.dispatch.DispatchClass> = _codec.$22
 
 export const $dispatchInfo: $.Codec<t.frame_support.dispatch.DispatchInfo> = _codec.$21
@@ -22,8 +25,6 @@ export function DispatchInfo(value: t.frame_support.dispatch.DispatchInfo) {
 }
 
 export type Pays = "Yes" | "No"
-
-export * as PerDispatchClass from "./PerDispatchClass/mod.ts"
 
 export type RawOrigin =
   | t.frame_support.dispatch.RawOrigin.Root

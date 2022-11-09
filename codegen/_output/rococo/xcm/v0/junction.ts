@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
 import type * as t from "../../mod.ts"
+
 export const $bodyId: $.Codec<t.xcm.v0.junction.BodyId> = _codec.$128
 
 export const $bodyPart: $.Codec<t.xcm.v0.junction.BodyPart> = _codec.$129

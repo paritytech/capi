@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
 /** The current members of the collective. This is stored sorted (just by value). */
 export const Members = {
   type: "Plain",

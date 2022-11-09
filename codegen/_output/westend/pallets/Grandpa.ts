@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
 /**
  *  The number of changes (both in terms of keys and underlying economic responsibilities)
  *  in the "set" of Grandpa validators from genesis.

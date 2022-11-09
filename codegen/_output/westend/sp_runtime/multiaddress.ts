@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
 export const $multiAddress: $.Codec<t.sp_runtime.multiaddress.MultiAddress> = _codec.$197
 
 export type MultiAddress =

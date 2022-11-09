@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
 import type * as t from "../../mod.ts"
+
 export const $junction: $.Codec<t.xcm.v1.junction.Junction> = _codec.$124
 
 export type Junction =

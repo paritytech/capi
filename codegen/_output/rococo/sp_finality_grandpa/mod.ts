@@ -1,6 +1,9 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
+export * as app from "./app.ts"
+
 export const $equivocation: $.Codec<t.sp_finality_grandpa.Equivocation> = _codec.$218
 
 export const $equivocationProof: $.Codec<t.sp_finality_grandpa.EquivocationProof> = _codec.$217
@@ -37,5 +40,3 @@ export interface EquivocationProof {
 export function EquivocationProof(value: t.sp_finality_grandpa.EquivocationProof) {
   return value
 }
-
-export * as app from "./app.ts"

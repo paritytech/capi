@@ -1,6 +1,9 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
+export * as weight_v2 from "./weight_v2.ts"
+
 export const $oldWeight: $.Codec<t.sp_weights.OldWeight> = _codec.$239
 
 export const $runtimeDbWeight: $.Codec<t.sp_weights.RuntimeDbWeight> = _codec.$171
@@ -19,5 +22,3 @@ export interface RuntimeDbWeight {
 export function RuntimeDbWeight(value: t.sp_weights.RuntimeDbWeight) {
   return value
 }
-
-export * as weight_v2 from "./weight_v2.ts"

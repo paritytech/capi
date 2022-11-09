@@ -1,6 +1,9 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
+export * as pallet from "./pallet.ts"
+
 export const $uncleEntryItem: $.Codec<t.pallet_authorship.UncleEntryItem> = _codec.$482
 
 export type UncleEntryItem =
@@ -26,5 +29,3 @@ export namespace UncleEntryItem {
     return { type: "Uncle", value }
   }
 }
-
-export * as pallet from "./pallet.ts"

@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
 export const $delegations: $.Codec<t.pallet_democracy.types.Delegations> = _codec.$540
 
 export const $referendumInfo: $.Codec<t.pallet_democracy.types.ReferendumInfo> = _codec.$533

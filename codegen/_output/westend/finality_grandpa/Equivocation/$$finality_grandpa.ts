@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
 import type * as t from "../../mod.ts"
+
 export const $precommit: $.Codec<t.finality_grandpa.Equivocation.$$finality_grandpa.Precommit> =
   _codec.$224
 

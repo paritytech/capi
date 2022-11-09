@@ -1,6 +1,9 @@
 import { $, BitSequence, ChainError, Era } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
 import type * as t from "../../mod.ts"
+
+export * as pallet from "./pallet.ts"
+
 export const $ecdsaSignature: $.Codec<t.polkadot_runtime_common.claims.EcdsaSignature> = _codec.$246
 
 export const $ethereumAddress: $.Codec<t.polkadot_runtime_common.claims.EthereumAddress> =
@@ -30,5 +33,3 @@ export function PrevalidateAttests() {
 export type PrevalidateAttests = null
 
 export type StatementKind = "Regular" | "Saft"
-
-export * as pallet from "./pallet.ts"

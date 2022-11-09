@@ -1,6 +1,11 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
+export * as v0 from "./v0/mod.ts"
+export * as v1 from "./v1/mod.ts"
+export * as v2 from "./v2/mod.ts"
+
 export const $versionedMultiAssets: $.Codec<t.xcm.VersionedMultiAssets> = _codec.$150
 
 export const $versionedMultiLocation: $.Codec<t.xcm.VersionedMultiLocation> = _codec.$155
@@ -103,9 +108,3 @@ export namespace VersionedXcm {
     return { type: "V2", value }
   }
 }
-
-export * as v0 from "./v0/mod.ts"
-
-export * as v1 from "./v1/mod.ts"
-
-export * as v2 from "./v2/mod.ts"

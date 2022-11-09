@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
 export const $perU16: $.Codec<t.sp_arithmetic.per_things.PerU16> = _codec.$320
 
 export const $perbill: $.Codec<t.sp_arithmetic.per_things.Perbill> = _codec.$42

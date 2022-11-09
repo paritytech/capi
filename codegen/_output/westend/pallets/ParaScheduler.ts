@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
 /**
  *  One entry for each availability core. Entries are `None` if the core is not currently occupied. Can be
  *  temporarily `Some` if scheduled but not occupied.

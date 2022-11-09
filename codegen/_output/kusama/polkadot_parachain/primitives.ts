@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
 export const $headData: $.Codec<t.polkadot_parachain.primitives.HeadData> = _codec.$104
 
 export const $hrmpChannelId: $.Codec<t.polkadot_parachain.primitives.HrmpChannelId> = _codec.$112

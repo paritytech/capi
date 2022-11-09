@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
 /**
  *  This mapping tracks how many open channel requests were accepted by a given recipient para.
  *  Invariant: `HrmpOpenChannelRequests` should contain the same number of items `(_, X)` with

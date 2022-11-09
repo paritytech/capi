@@ -1,6 +1,7 @@
 import { $, BitSequence, ChainError, Era } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as t from "../mod.ts"
+
 /**
  *  This field should always be populated during block processing unless
  *  secondary plain slots are enabled (which don't contain a VRF output).
