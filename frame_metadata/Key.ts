@@ -53,8 +53,11 @@ export function $storageKey(props: StorageKeyProps): $.Codec<unknown[]> {
       buffer.index += 32;
       return $keys[Object.values($keys).length - 1]!._decode(buffer);
     },
-    _assert() {
-      // TODO #362
+    _assert(assert) {
+      assert.instanceof(this, Array);
+      const value = assert.value as unknown[];
+      if (value.length === 0) return;
+      $keys[value.length]!._assert(assert);
     },
   });
 }

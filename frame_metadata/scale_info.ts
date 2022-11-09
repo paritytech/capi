@@ -20,8 +20,12 @@ export const $tys: $.Codec<Ty[]> = $.createCodec({
     }
     return tys;
   },
-  _assert() {
-    // TODO #362
+  _assert(assert) {
+    assert.instanceof(this, Array);
+    const value = assert.value as unknown[];
+    for (let i = 0; i < value.length; i++) {
+      $tyId._assert(assert.key(this, i));
+    }
   },
 });
 
@@ -36,8 +40,8 @@ export const $tyId: $.Codec<Ty> = $.createCodec({
     const id = $compactU32._decode(buffer);
     return ctx.tys?.[id] ?? { id } as any;
   },
-  _assert() {
-    // TODO #362
+  _assert(assert) {
+    $.compact($.u32)._assert(assert);
   },
 });
 
