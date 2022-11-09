@@ -53,8 +53,6 @@ export class LocalClientEffect extends Z.Effect<LocalClient, PolkadotBinNotFound
   }
 
   private async createClient(): Promise<LocalClient> {
-    // TODO: remove logging
-    console.log("creating client...");
     // return new LocalClient(9944, () => {});
     let port: number;
     let close = () => {};
@@ -74,8 +72,6 @@ export class LocalClientEffect extends Z.Effect<LocalClient, PolkadotBinNotFound
       port = getOpenPort();
       const process = polkadotProcess(port, this.runtime);
       close = () => {
-        // TODO: remove logging
-        console.log("killing polkadotProcess");
         process.kill("SIGKILL");
         process.close();
       };

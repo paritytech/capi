@@ -10,8 +10,6 @@ import * as C from "../mod.ts";
 import * as T from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
 
-type KeyringPair = typeof T.alice;
-
 // Signatories must be sorted
 const signatories: Uint8Array[] = [
   T.alice.publicKey,
@@ -27,7 +25,16 @@ const env = C.Z.env();
 U.throwIfError(await addBalanceToMultisigAddress().bind(env)());
 
 // Create proposal
-U.throwIfError(await createOrApproveMultisigProposal({ sender: T.alice }).bind(env)());
+U.throwIfError(
+  await createOrApproveMultisigProposal({
+    publicKey: T.alice.publicKey,
+    sign: C.Z.call(0, () =>
+      (message) => ({
+        type: "Sr25519",
+        value: T.alice.sign(message),
+      })),
+  }).bind(env)(),
+);
 
 // Get the key of the timepoint
 const key = C.keyPageRead(T.polkadot)("Multisig", "Multisigs", 1, [multisigPublicKey])
@@ -35,7 +42,7 @@ const key = C.keyPageRead(T.polkadot)("Multisig", "Multisigs", 1, [multisigPubli
   .access(1);
 
 // Get the timepoint itself
-const maybe_timepoint = await C.entryRead(T.polkadot)("Multisig", "Multisigs", [
+const maybeTimepoint = await C.entryRead(T.polkadot)("Multisig", "Multisigs", [
   multisigPublicKey,
   key,
 ])
@@ -44,7 +51,15 @@ const maybe_timepoint = await C.entryRead(T.polkadot)("Multisig", "Multisigs", [
   .bind(env)();
 
 U.throwIfError(
-  await createOrApproveMultisigProposal({ sender: T.bob, maybe_timepoint }).bind(env)(),
+  await createOrApproveMultisigProposal({
+    publicKey: T.bob.publicKey,
+    sign: C.Z.call(0, () =>
+      (message) => ({
+        type: "Sr25519",
+        value: T.bob.sign(message),
+      })),
+    maybeTimepoint,
+  }).bind(env)(),
 );
 
 // check T.dave new balance
@@ -83,25 +98,26 @@ function addBalanceToMultisigAddress() {
     });
 }
 
-interface CreateOrApproveProposalProps {
-  sender: KeyringPair;
-  maybe_timepoint?: Timepoint;
-}
-
-interface Timepoint {
-  height: number;
-  index: number;
-}
-
 function createOrApproveMultisigProposal(
-  { sender, maybe_timepoint }: CreateOrApproveProposalProps,
+  {
+    publicKey,
+    sign,
+    maybeTimepoint,
+  }: {
+    publicKey: Uint8Array;
+    sign: C.Z.$<C.M.SignExtrinsic>;
+    maybeTimepoint?: {
+      height: number;
+      index: number;
+    };
+  },
 ) {
   const createEx = (weight?: bigint) => {
     return C.extrinsic({
       client: T.polkadot,
       sender: {
         type: "Id",
-        value: sender.publicKey,
+        value: publicKey,
       },
       palletName: "Multisig",
       methodName: "as_multi",
@@ -119,28 +135,25 @@ function createOrApproveMultisigProposal(
           },
         },
         other_signatories: signatories
-          .filter((value) => value !== sender.publicKey),
+          .filter((value) => value !== publicKey),
         store_call: false,
         // FIXME: use RPC payment.queryInfo(extrinsic, atBlockHash)
         max_weight: weight || {
-          ref_time: 133_179_000n,
+          ref_time: 500_000_000n,
           proof_size: 0,
         },
-        maybe_timepoint,
+        maybe_timepoint: maybeTimepoint,
       },
     })
-      .signed((message) => ({
-        type: "Sr25519",
-        value: sender.sign(message),
-      }));
+      .signed(sign);
   };
-  const withoutActualWeight = createEx().extrinsic;
-  const weight = C.payment.queryInfo(T.polkadot)(withoutActualWeight)
-    .access("weight");
-  C.Z.call(weight, (d) => {
-    console.log("queryInfo", d);
-  }).bind(env)();
   // FIXME: pass weight as an argument to createEx(weight)
+  // const withoutActualWeight = createEx().extrinsic;
+  // const weight = C.payment.queryInfo(T.polkadot)(withoutActualWeight)
+  //   .access("weight");
+  // C.Z.call(weight, (d) => {
+  //   console.log("queryInfo", d);
+  // }).bind(env)();
   return createEx().watch(function(status) {
     console.log(status);
     if (C.TransactionStatus.isTerminal(status)) {
