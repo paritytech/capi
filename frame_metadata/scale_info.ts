@@ -21,7 +21,7 @@ export const $tys: $.Codec<Ty[]> = $.createCodec({
     return tys;
   },
   _assert(assert) {
-    return $.array($ty)._assert(assert);
+    $.array($ty)._assert(assert);
   },
 });
 
