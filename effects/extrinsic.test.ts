@@ -1,3 +1,4 @@
+import * as compat from "../compat/mod.ts";
 import { KeyringPair } from "../deps/polkadot/keyring/types.ts";
 import * as A from "../deps/std/testing/asserts.ts";
 import * as M from "../frame_metadata/mod.ts";
@@ -16,7 +17,7 @@ Deno.test({
         methodName: "transfer",
         args: {
           value: 12345n,
-          dest: M.MultiAddress.fromKeypair(T.bob),
+          dest: compat.multiAddressFromKeypair(T.bob),
         },
         orderExpectation: ["ready", "inBlock", "finalized"],
       });
@@ -46,7 +47,7 @@ Deno.test({
         methodName: "propose_spend",
         args: {
           value: 200n,
-          beneficiary: M.MultiAddress.fromKeypair(T.bob),
+          beneficiary: compat.multiAddressFromKeypair(T.bob),
         },
         orderExpectation: ["ready", "inBlock", "finalized"],
       });
@@ -88,10 +89,10 @@ export async function assertExtrinsicStatusOrder({
     await T.extrinsic.collectExtrinsicEvents(
       extrinsic({
         client: T.westend,
-        sender: M.MultiAddress.fromKeypair(keypair),
+        sender: compat.multiAddressFromKeypair(keypair),
         ...rest,
       })
-        .signed(M.Signer.fromKeypair(keypair)),
+        .signed(compat.signerFromKeypair(keypair)),
     ).run(),
   );
   T.extrinsic.assertStatusOrder(extrinsicEvents, orderExpectation);

@@ -11,15 +11,13 @@ export interface MultiAddress {
   type: "Id" | "Index" | "Raw" | "Address20" | "Address32";
   value: Uint8Array;
 }
+// TODO: delete upon common generated core types
 export namespace MultiAddress {
   export function fromId(id: Uint8Array): MultiAddress {
     return {
       type: "Id",
       value: id,
     };
-  }
-  export function fromKeypair(keypair: KeyringPair): MultiAddress {
-    return fromId(keypair.publicKey);
   }
 }
 
@@ -31,28 +29,6 @@ export interface Signature {
 export type Signer =
   | ((message: Uint8Array) => Signature | Promise<Signature>)
   | PolkadotSigner;
-export namespace Signer {
-  export function fromKeypair(keypair: KeyringPair): Signer {
-    const type = ((): Signature["type"] => {
-      switch (keypair.type) {
-        case "sr25519": {
-          return "Sr25519";
-        }
-        case "ed25519": {
-          return "Ed25519";
-        }
-        default: {
-          return null!;
-        }
-      }
-    })();
-    return (message) => ({
-      type,
-      value: keypair.sign(message),
-    });
-  }
-}
-
 export interface PolkadotSigner {
   signPayload(payload: any): Promise<{ signature: string }>;
 }

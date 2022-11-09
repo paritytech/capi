@@ -21,7 +21,7 @@ const multisigPublicKey = createKeyMulti(signatories, THRESHOLD);
 // Transfer initial balance (existential deposit) to multisig address
 const existentialDeposit = C.extrinsic({
   client: T.polkadot,
-  sender: C.MultiAddress.fromKeypair(T.alice),
+  sender: C.compat.multiAddressFromKeypair(T.alice),
   palletName: "Balances",
   methodName: "transfer",
   args: {
@@ -29,7 +29,7 @@ const existentialDeposit = C.extrinsic({
     dest: C.MultiAddress.fromId(multisigPublicKey),
   },
 })
-  .signed(C.Signer.fromKeypair(T.alice))
+  .signed(C.compat.signerFromKeypair(T.alice))
   .watch(function(status) {
     console.log(`Existential deposit:`, status);
     if (C.TransactionStatus.isTerminal(status)) {
@@ -58,7 +58,7 @@ const approval = createOrApproveMultisigProposal("Approval", T.bob, maybeTimepoi
 // check T.dave new balance
 const daveBalance = C.entryRead(T.polkadot)("System", "Account", [T.dave.publicKey]);
 
-// const env = C.Z.env();
+// TODO: use common env
 U.throwIfError(await existentialDeposit.run());
 U.throwIfError(await proposal.run());
 U.throwIfError(await approval.run());
@@ -79,7 +79,7 @@ function createOrApproveMultisigProposal<
 ) {
   return C.extrinsic({
     client: T.polkadot,
-    sender: C.MultiAddress.fromKeypair(pair),
+    sender: C.compat.multiAddressFromKeypair(pair),
     palletName: "Multisig",
     methodName: "as_multi",
     args: C.Z.rec({
@@ -88,7 +88,7 @@ function createOrApproveMultisigProposal<
         type: "Balances",
         value: {
           type: "transfer_keep_alive",
-          dest: C.MultiAddress.fromKeypair(T.dave),
+          dest: C.compat.multiAddressFromKeypair(T.dave),
           value: 1_230_000_000_000n,
         },
       },
@@ -101,7 +101,7 @@ function createOrApproveMultisigProposal<
       maybe_timepoint: maybeTimepoint as Rest[0],
     }),
   })
-    .signed(C.Signer.fromKeypair(pair))
+    .signed(C.compat.signerFromKeypair(pair))
     .watch(function(status) {
       console.log(`${label}:`, status);
       if (C.TransactionStatus.isTerminal(status)) {
