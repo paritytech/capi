@@ -20,13 +20,7 @@ export const $tys: $.Codec<Ty[]> = $.createCodec({
     }
     return tys;
   },
-  _assert(assert) {
-    assert.instanceof(this, Array);
-    const value = assert.value as unknown[];
-    for (let i = 0; i < value.length; i++) {
-      $tyId._assert(assert.key(this, i));
-    }
-  },
+  _assert: $.array($.ty)._assert,
 });
 
 export const $tyId: $.Codec<Ty> = $.createCodec({
