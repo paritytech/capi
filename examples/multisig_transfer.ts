@@ -28,11 +28,12 @@ U.throwIfError(await addBalanceToMultisigAddress().bind(env)());
 U.throwIfError(
   await createOrApproveMultisigProposal({
     publicKey: T.alice.publicKey,
-    sign: C.Z.call(0, () =>
+    sign: C.Z.ls().next(() =>
       (message) => ({
         type: "Sr25519",
         value: T.alice.sign(message),
-      })),
+      })
+    ),
   }).bind(env)(),
 );
 
@@ -53,11 +54,12 @@ const maybeTimepoint = await C.entryRead(T.polkadot)("Multisig", "Multisigs", [
 U.throwIfError(
   await createOrApproveMultisigProposal({
     publicKey: T.bob.publicKey,
-    sign: C.Z.call(0, () =>
+    sign: C.Z.ls().next(() =>
       (message) => ({
         type: "Sr25519",
         value: T.bob.sign(message),
-      })),
+      })
+    ),
     maybeTimepoint,
   }).bind(env)(),
 );
