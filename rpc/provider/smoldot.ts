@@ -75,19 +75,17 @@ async function connection(
       } catch (_e) { /* TODO */ }
     });
     connections.set(chainSpec, conn);
-    const loop = async () => {
-      try {
-        conn!.forEachListener(msg.parse(await inner.nextJsonRpcResponse()));
-      } catch (e) {
-        conn!.forEachListener(new ProviderHandlerError(e));
-        await loop();
+    (async () => {
+      while (true) {
+        try {
+          const message = msg.parse(await inner.nextJsonRpcResponse());
+          conn!.forEachListener(message);
+        } catch (e) {
+          conn!.forEachListener(new ProviderHandlerError(e));
+          break;
+        }
       }
-    };
-    // TODO: should we be greedy & kick off a few additional?
-    //       We don't want the inner buffer to overflow.
-    loop();
-    loop();
-    loop();
+    })();
   }
   conn.addListener(listener);
   return conn;
