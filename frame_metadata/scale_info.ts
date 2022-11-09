@@ -34,9 +34,7 @@ export const $tyId: $.Codec<Ty> = $.createCodec({
     const id = $compactU32._decode(buffer);
     return ctx.tys?.[id] ?? { id } as any;
   },
-  _assert(assert) {
-    $.compact($.u32)._assert(assert);
-  },
+  _assert: $.compactU32._assert,
 });
 
 export interface Field {
