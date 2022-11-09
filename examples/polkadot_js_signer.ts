@@ -10,7 +10,7 @@ const root = C.extrinsic({
   methodName: "transfer",
   args: {
     value: 12345n,
-    dest: C.compat.signerFromKeypair(T.bob),
+    dest: C.compat.multiAddressFromKeypair(T.bob),
   },
 })
   .signed({
