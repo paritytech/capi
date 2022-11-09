@@ -37,6 +37,7 @@
     "test": "deno task run test_util/ctx.ts -- deno test -A -L=info --ignore=target --parallel",
     "test:update": "deno task test -- -- --update",
     "mdbook:watch": "mdbook watch -o",
-    "bench": "deno bench -A --no-check=remote --unstable"
+    "bench": "deno bench -A --no-check=remote --unstable",
+    "multisig": "deno task run test_util/ctx.ts -- deno task run examples/multisig_transfer.ts"
   }
 }
