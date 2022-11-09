@@ -1,7 +1,6 @@
 import * as compat from "../compat/mod.ts";
 import { KeyringPair } from "../deps/polkadot/keyring/types.ts";
 import * as A from "../deps/std/testing/asserts.ts";
-import * as M from "../frame_metadata/mod.ts";
 import * as T from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
 import { entryRead } from "./entryRead.ts";
