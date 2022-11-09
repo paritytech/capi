@@ -1,4 +1,3 @@
-import { KeyringPair } from "../deps/polkadot/keyring/types.ts";
 import * as $ from "../deps/scale.ts";
 import { assert } from "../deps/std/testing/asserts.ts";
 import * as H from "../hashers/mod.ts";
