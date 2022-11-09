@@ -53,11 +53,15 @@ export class SignedExtrinsic<
     const metadata_ = metadata(this.props.client)();
     const deriveCodec_ = deriveCodec(metadata_);
     const addrPrefix = const_(this.props.client)("System", "SS58Prefix")
-      .access("value").as<number>();
+      .access("value")
+      .as<number>();
     const $extrinsic_ = $extrinsic(deriveCodec_, metadata_, this.sign, addrPrefix);
-    const versions = const_(this.props.client)("System", "Version").access("value");
-    const specVersion = versions.access("spec_version").as<number>();
-    const transactionVersion = versions.access("transaction_version").as<number>();
+    const versions = const_(this.props.client)("System", "Version")
+      .access("value");
+    const specVersion = versions
+      .access("spec_version").as<number>();
+    const transactionVersion = versions
+      .access("transaction_version").as<number>();
     // TODO: create match effect in zones and use here
     // TODO: MultiAddress conversion utils
     const senderSs58 = Z.ls(addrPrefix, this.props.sender).next(([addrPrefix, sender]) => {
@@ -76,24 +80,26 @@ export class SignedExtrinsic<
     const checkpointHash = this.props.checkpoint
       ? Z.option(this.props.checkpoint, U.hex.decode)
       : genesisHash;
+    const mortality = Z
+      .lift(this.props.mortality)
+      .next((mortality) => {
+        return mortality
+          ? M.era.mortal(mortality[0], mortality[1])
+          : M.era.immortal;
+      });
+    const extra = Z.ls(mortality, nonce, this.props.tip || 0);
+    const additional = Z.ls(specVersion, transactionVersion, checkpointHash, genesisHash);
+    const signature = Z.rec({ address: this.props.sender, extra, additional });
     const $extrinsicProps = Z.rec({
       protocolVersion: 4,
       palletName: this.props.palletName,
       methodName: this.props.methodName,
       args: this.props.args,
-      signature: Z.rec({
-        address: this.props.sender,
-        extra: Z.ls(
-          this.props.mortality
-            ? Z.rec({ type: "Mortal", value: this.props.mortality })
-            : { type: "Immortal" },
-          nonce,
-          this.props.tip || 0,
-        ),
-        additional: Z.ls(specVersion, transactionVersion, checkpointHash, genesisHash),
-      }),
+      signature,
     });
-    this.extrinsic = e$.scaleEncoded($extrinsic_, $extrinsicProps, true).next(U.hex.encode);
+    this.extrinsic = e$
+      .scaleEncoded($extrinsic_, $extrinsicProps, true)
+      .next(U.hex.encode);
   }
 
   watch<Listener extends Z.$<U.Listener<known.TransactionStatus, rpc.ClientSubscribeContext>>>(

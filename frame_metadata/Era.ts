@@ -2,16 +2,15 @@ import * as $ from "../deps/scale.ts";
 
 export type Era = { type: "Immortal" } | { type: "Mortal"; period: bigint; phase: bigint };
 
-export function immortalEra(): Era {
-  return { type: "Immortal" };
-}
-
-export function mortalEra(period: bigint, current: bigint): Era {
-  const adjustedPeriod = minN(maxN(nextPowerOfTwo(period), 4n), 1n << 16n);
-  const phase = current % adjustedPeriod;
-  const quantizeFactor = maxN(adjustedPeriod >> 12n, 1n);
-  const quantizedPhase = phase / quantizeFactor * quantizeFactor;
-  return { type: "Mortal", period: adjustedPeriod, phase: quantizedPhase };
+export namespace era {
+  export const immortal: Era = { type: "Immortal" };
+  export function mortal(period: bigint, current: bigint): Era {
+    const adjustedPeriod = minN(maxN(nextPowerOfTwo(period), 4n), 1n << 16n);
+    const phase = current % adjustedPeriod;
+    const quantizeFactor = maxN(adjustedPeriod >> 12n, 1n);
+    const quantizedPhase = phase / quantizeFactor * quantizeFactor;
+    return { type: "Mortal", period: adjustedPeriod, phase: quantizedPhase };
+  }
 }
 
 export const $era: $.Codec<Era> = $.createCodec({
@@ -43,9 +42,12 @@ export const $era: $.Codec<Era> = $.createCodec({
       }
     }
   },
-  _assert() {
-    // TODO
-  },
+  _assert: $
+    .taggedUnion("type", [
+      ["Immortal"],
+      ["Mortal", ["period", $.u64], ["phase", $.u64]],
+    ])
+    ._assert,
 });
 
 function maxN(a: bigint, b: bigint) {
