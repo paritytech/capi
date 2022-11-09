@@ -2,7 +2,7 @@ import * as C from "../mod.ts"
 import * as T from "../test_util/mod.ts"
 import * as U from "../util/mod.ts"
 
-import * as westend from "../codegen/_output/westend/mod.ts"
+import { Balances, Utility } from "../codegen/_output/westend/pallets/mod.ts"
 
 // TODO: uncomment these lines / use env upon solving `count` in zones
 // const getBalances = C.Z.ls(
@@ -14,9 +14,9 @@ import * as westend from "../codegen/_output/westend/mod.ts"
 
 const tx = C.extrinsic(T.westend)({
   sender: C.compat.multiAddressFromKeypair(T.alice),
-  call: westend.pallets.Utility.batch_all({
+  call: Utility.batch_all({
     calls: T.users.map((pair) =>
-      westend.pallets.Balances.transfer({
+      Balances.transfer({
         dest: C.compat.multiAddressFromKeypair(pair),
         value: 12345n,
       })
