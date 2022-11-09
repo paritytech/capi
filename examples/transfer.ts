@@ -2,7 +2,7 @@ import * as C from "../mod.ts"
 import * as T from "../test_util/mod.ts"
 import * as U from "../util/mod.ts"
 
-import * as westend from "../target/codegen/westend/mod.ts"
+import * as westend from "../codegen/_output/westend/mod.ts"
 
 let hash: undefined | C.rpc.known.Hash
 

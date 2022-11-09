@@ -33,6 +33,7 @@
     "dnt": "deno task run _tasks/dnt.ts",
     "star": "deno task run _tasks/star.ts && deno cache --check --no-lock target/star.ts",
     "lint": "deno lint",
+    "codegen": "deno task run _tasks/codegen.ts",
     "test": "deno task run test_util/ctx.ts -- deno test -A --no-lock -L=info --ignore=target --parallel",
     "test:update": "deno task test -- -- --update",
     "mdbook:watch": "mdbook watch -o",
