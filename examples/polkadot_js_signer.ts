@@ -5,18 +5,12 @@ import * as U from "../util/mod.ts";
 
 const root = C.extrinsic({
   client: T.westend,
-  sender: {
-    type: "Id",
-    value: T.alice.publicKey,
-  },
+  sender: C.MultiAddress.fromKeypair(T.alice),
   palletName: "Balances",
   methodName: "transfer",
   args: {
     value: 12345n,
-    dest: {
-      type: "Id",
-      value: T.bob.publicKey,
-    },
+    dest: C.MultiAddress.fromKeypair(T.bob),
   },
 })
   .signed({

@@ -36,14 +36,14 @@ export function extrinsic<Props extends Z.Rec$<ExtrinsicProps>>(props: Props): E
 export class Extrinsic<Props extends Z.Rec$<ExtrinsicProps>> {
   constructor(readonly props: Props) {}
 
-  signed<Sign extends Z.$<M.SignExtrinsic>>(sign: Sign): SignedExtrinsic<Props, Sign> {
+  signed<Sign extends Z.$<M.Signer>>(sign: Sign): SignedExtrinsic<Props, Sign> {
     return new SignedExtrinsic(this.props, sign);
   }
 }
 
 export class SignedExtrinsic<
   Props extends Z.Rec$<ExtrinsicProps>,
-  Sign extends Z.$<M.SignExtrinsic>,
+  Sign extends Z.$<M.Signer>,
 > {
   props;
   extrinsic;

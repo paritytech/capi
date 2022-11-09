@@ -1,3 +1,4 @@
+import { KeyringPair } from "../deps/polkadot/keyring/types.ts";
 import { createKeyMulti } from "../deps/polkadot/util-crypto.ts";
 import * as C from "../mod.ts";
 import * as T from "../test_util/mod.ts";
@@ -10,36 +11,25 @@ if (!hostname || !portRaw) {
   throw new Error("Must be running inside a test ctx");
 }
 
-// Signatories must be sorted
-const signatories: Uint8Array[] = [
-  T.alice.publicKey,
-  T.bob.publicKey,
-  T.charlie.publicKey,
-].sort();
+const signatories = T.users
+  .slice(0, 3)
+  .map(({ publicKey }) => publicKey)
+  .sort();
 const THRESHOLD = 2;
 const multisigPublicKey = createKeyMulti(signatories, THRESHOLD);
 
 // Transfer initial balance (existential deposit) to multisig address
 const existentialDeposit = C.extrinsic({
   client: T.polkadot,
-  sender: {
-    type: "Id",
-    value: T.alice.publicKey,
-  },
+  sender: C.MultiAddress.fromKeypair(T.alice),
   palletName: "Balances",
   methodName: "transfer",
   args: {
     value: 2_000_000_000_000n,
-    dest: {
-      type: "Id",
-      value: multisigPublicKey,
-    },
+    dest: C.MultiAddress.fromId(multisigPublicKey),
   },
 })
-  .signed((message) => ({
-    type: "Sr25519",
-    value: T.alice.sign(message),
-  }))
+  .signed(C.Signer.fromKeypair(T.alice))
   .watch(function(status) {
     console.log(status);
     if (C.TransactionStatus.isTerminal(status)) {
@@ -48,15 +38,7 @@ const existentialDeposit = C.extrinsic({
   });
 
 // First approval root
-const proposal = createOrApproveMultisigProposal({
-  publicKey: T.alice.publicKey,
-  sign: (message) => {
-    return ({
-      type: "Sr25519",
-      value: T.alice.sign(message),
-    });
-  },
-});
+const proposal = createOrApproveMultisigProposal(T.alice);
 
 // Get the key of the timepoint
 const key = C.keyPageRead(T.polkadot)("Multisig", "Multisigs", 1, [multisigPublicKey])
@@ -71,81 +53,55 @@ const maybeTimepoint = C.entryRead(T.polkadot)("Multisig", "Multisigs", [
   .access("value")
   .access("when");
 
-const approval = createOrApproveMultisigProposal({
-  publicKey: T.bob.publicKey,
-  sign: (message) => ({
-    type: "Sr25519",
-    value: T.bob.sign(message),
-  }),
-  maybeTimepoint,
-});
+const approval = createOrApproveMultisigProposal(T.bob, maybeTimepoint);
 
 // check T.dave new balance
 const daveBalance = C.entryRead(T.polkadot)("System", "Account", [T.dave.publicKey]);
 
-const env = C.Z.env();
-U.throwIfError(await existentialDeposit.bind(env)());
-U.throwIfError(await proposal.bind(env)());
-U.throwIfError(await approval.bind(env)());
-// U.throwIfError(await daveBalance.bind(env)());
+// const env = C.Z.env();
+U.throwIfError(await existentialDeposit.run());
+U.throwIfError(await proposal.run());
+U.throwIfError(await approval.run());
+console.log(U.throwIfError(await daveBalance.run()));
 
-function createOrApproveMultisigProposal({
-  publicKey,
-  sign,
-  maybeTimepoint,
-}: {
-  publicKey: Uint8Array;
-  sign: C.Z.$<C.M.SignExtrinsic>;
-  maybeTimepoint?: C.Z.$<{
-    height: number;
-    index: number;
-  }>;
-}) {
-  const createEx = (weight?: bigint) => {
-    return C.extrinsic({
-      client: T.polkadot,
-      sender: {
-        type: "Id",
-        value: publicKey,
-      },
-      palletName: "Multisig",
-      methodName: "as_multi",
-      args: C.Z.rec({
-        threshold: THRESHOLD,
-        call: {
-          type: "Balances",
-          value: {
-            type: "transfer_keep_alive",
-            dest: {
-              type: "Id",
-              value: T.dave.publicKey,
-            },
-            value: 1_230_000_000_000n,
-          },
+// FIXME: weight calculation (`payment.queryInfo(extrinsic, atBlockHash)`)
+function createOrApproveMultisigProposal<
+  Rest extends [
+    MaybeTimepoint?: C.Z.$<{
+      height: number;
+      index: number;
+    }>,
+  ],
+>(
+  pair: KeyringPair,
+  ...[maybeTimepoint]: Rest
+) {
+  return C.extrinsic({
+    client: T.polkadot,
+    sender: C.MultiAddress.fromKeypair(pair),
+    palletName: "Multisig",
+    methodName: "as_multi",
+    args: C.Z.rec({
+      threshold: THRESHOLD,
+      call: {
+        type: "Balances",
+        value: {
+          type: "transfer_keep_alive",
+          dest: C.MultiAddress.fromKeypair(T.dave),
+          value: 1_230_000_000_000n,
         },
-        other_signatories: signatories
-          .filter((value) => value !== publicKey),
-        store_call: false,
-        // FIXME: use RPC payment.queryInfo(extrinsic, atBlockHash)
-        // TODO: versions differ between versions of polkadot (will be resolved by using payment query info result)
-        max_weight: 500_000_000n,
-        // max_weight: weight || {
-        //   ref_time: 500_000_000n,
-        //   // proof_size: 0,
-        // },
-        maybe_timepoint: maybeTimepoint,
-      }),
-    })
-      .signed(sign);
-  };
-  // FIXME: pass weight as an argument to createEx(weight)
-  // const withoutActualWeight = createEx().extrinsic;
-  // const weight = C.payment.queryInfo(T.polkadot)(withoutActualWeight)
-  //   .access("weight");
-  // C.Z.call(weight, (d) => {
-  //   console.log("queryInfo", d);
-  // }).bind(env)();
-  return createEx()
+      },
+      other_signatories: signatories.filter((value) => value !== pair.publicKey),
+      store_call: false,
+      max_weight: 500_000_000n,
+      // {
+      //   ref_time: 500_000_000n,
+      //   proof_size: 0,
+      // },
+      maybe_timepoint: maybeTimepoint as Rest[0],
+    }),
+  })
+    .signed(C.Signer.fromKeypair(pair))
     .watch(function(status) {
       console.log(status);
       if (C.TransactionStatus.isTerminal(status)) {

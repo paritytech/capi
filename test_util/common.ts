@@ -14,8 +14,28 @@ export const RUNTIME_NAMES: { [N in RuntimeName as RUNTIME_CODES[N]]: N } = {
   3: "rococo",
 };
 
+export function isRuntimeName(inQuestion: string): inQuestion is RuntimeName {
+  return inQuestion === "polkadot"
+    || inQuestion === "kusama"
+    || inQuestion === "polkadot"
+    || inQuestion === "polkadot";
+}
+
+export class InvalidRuntimeSpecifiedError extends Error {
+  override readonly name = "InvalidRuntimeSpecifiedError";
+
+  constructor(readonly specified: string) {
+    super(
+      `There is no test runtime with the name "${specified}". Please specify one of the following values: ${
+        Object.values(RUNTIME_NAMES).join(", ")
+      }`,
+    );
+  }
+}
+
 export class PolkadotBinNotFoundError extends Error {
   override readonly name = "PolkadotBinNotFoundError";
+
   constructor() {
     super(
       "The Polkadot CLI was not found. Please ensure Polkadot is installed and PATH is set for `polkadot`."

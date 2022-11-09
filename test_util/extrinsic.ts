@@ -10,7 +10,7 @@ const k0_ = Symbol();
 // TODO: better zones-level way to share context between effects
 export function collectExtrinsicEvents<
   Props extends Z.Rec$<ExtrinsicProps>,
-  Sign extends Z.$<M.SignExtrinsic>,
+  Sign extends Z.$<M.Signer>,
 >(extrinsic: SignedExtrinsic<Props, Sign>) {
   const events: known.TransactionStatus[] = [];
   return extrinsic

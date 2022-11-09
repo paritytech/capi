@@ -2,8 +2,6 @@ import * as C from "../mod.ts";
 import * as T from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
 
-const recipients = [T.bob, T.charlie, T.dave, T.eve];
-
 const env = C.Z.env();
 
 // TODO: uncomment these lines upon solving `count` in zones
@@ -16,30 +14,21 @@ const env = C.Z.env();
 
 const runTx = C.extrinsic({
   client: T.westend,
-  sender: {
-    type: "Id",
-    value: T.alice.publicKey,
-  },
+  sender: C.MultiAddress.fromKeypair(T.alice),
   palletName: "Utility",
   methodName: "batch_all",
   args: {
-    calls: recipients.map(({ publicKey }) => ({
+    calls: T.users.map((pair) => ({
       type: "Balances",
       value: {
         type: "transfer",
-        dest: {
-          type: "Id",
-          value: publicKey,
-        },
+        dest: C.MultiAddress.fromKeypair(pair),
         value: 12345n,
       },
     })),
   },
 })
-  .signed((message) => ({
-    type: "Sr25519",
-    value: T.alice.sign(message),
-  }))
+  .signed(C.Signer.fromKeypair(T.alice))
   .watch(function(status) {
     console.log(status);
     if (C.TransactionStatus.isTerminal(status)) {

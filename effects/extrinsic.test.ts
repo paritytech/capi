@@ -1,5 +1,6 @@
-import type { KeyringPair } from "https://deno.land/x/polkadot@0.0.8/keyring/types.ts";
+import { KeyringPair } from "../deps/polkadot/keyring/types.ts";
 import * as A from "../deps/std/testing/asserts.ts";
+import * as M from "../frame_metadata/mod.ts";
 import * as T from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
 import { entryRead } from "./entryRead.ts";
@@ -10,15 +11,12 @@ Deno.test({
   fn: async (ctx) => {
     await ctx.step("extrinsic events", async () => {
       await assertExtrinsicStatusOrder({
-        sender: T.alice,
+        keypair: T.alice,
         palletName: "Balances",
         methodName: "transfer",
         args: {
           value: 12345n,
-          dest: {
-            type: "Id",
-            value: T.bob.publicKey,
-          },
+          dest: M.MultiAddress.fromKeypair(T.bob),
         },
         orderExpectation: ["ready", "inBlock", "finalized"],
       });
@@ -43,15 +41,12 @@ Deno.test({
   fn: async (ctx) => {
     await ctx.step("extrinsic events", async () => {
       await assertExtrinsicStatusOrder({
-        sender: T.alice,
+        keypair: T.alice,
         palletName: "Treasury",
         methodName: "propose_spend",
         args: {
           value: 200n,
-          beneficiary: {
-            type: "Id",
-            value: T.bob.publicKey,
-          },
+          beneficiary: M.MultiAddress.fromKeypair(T.bob),
         },
         orderExpectation: ["ready", "inBlock", "finalized"],
       });
@@ -64,7 +59,7 @@ Deno.test({
   fn: async (ctx) => {
     await ctx.step("extrinsic events", async () => {
       await assertExtrinsicStatusOrder({
-        sender: T.alice,
+        keypair: T.alice,
         palletName: "Democracy",
         methodName: "propose",
         args: {
@@ -81,28 +76,22 @@ Deno.test({
 
 interface AssertExtrinsicStatusOrderProps extends CallData {
   orderExpectation: T.extrinsic.StatusOrderExpectation;
-  sender: KeyringPair;
+  keypair: KeyringPair;
 }
 
 export async function assertExtrinsicStatusOrder({
   orderExpectation,
-  sender,
+  keypair,
   ...rest
 }: AssertExtrinsicStatusOrderProps) {
   const extrinsicEvents = U.throwIfError(
     await T.extrinsic.collectExtrinsicEvents(
       extrinsic({
         client: T.westend,
-        sender: {
-          type: "Id",
-          value: sender.publicKey,
-        },
+        sender: M.MultiAddress.fromKeypair(keypair),
         ...rest,
       })
-        .signed((message) => ({
-          type: "Sr25519",
-          value: sender.sign(message),
-        })),
+        .signed(M.Signer.fromKeypair(keypair)),
     ).run(),
   );
   T.extrinsic.assertStatusOrder(extrinsicEvents, orderExpectation);

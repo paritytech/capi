@@ -6,7 +6,7 @@ const k0_ = Symbol();
 export const $extrinsic = Z.call.fac((
   deriveCodec: M.DeriveCodec,
   metadata: M.Metadata,
-  sign: M.SignExtrinsic,
+  sign: M.Signer,
   prefix?: number,
 ) => {
   return M.$extrinsic({
