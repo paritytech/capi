@@ -1,17 +1,12 @@
-export type IngressMessage =
-  | OkMessage
-  | ErrMessage
-  | NotifMessage;
-
-interface JsonRpcVersionBearer {
-  jsonrpc: "2.0";
-}
-
-export interface InitMessage<Params extends unknown[] = any[]> extends JsonRpcVersionBearer {
-  method: string;
+export interface EgressMessage<Method extends string = string, Params extends unknown[] = any[]>
+  extends JsonRpcVersionBearer
+{
+  method: Method;
   id: string;
   params: Params;
 }
+
+export type IngressMessage = OkMessage | ErrorMessage | NotificationMessage;
 
 export interface OkMessage<Result = any> extends JsonRpcVersionBearer {
   id: string;
@@ -20,8 +15,21 @@ export interface OkMessage<Result = any> extends JsonRpcVersionBearer {
   error?: never;
 }
 
-export interface NotifMessage<Result = any> extends JsonRpcVersionBearer {
-  method: string;
+export interface ErrorMessage<Data = any> extends JsonRpcVersionBearer {
+  id: string;
+  error: {
+    code: number;
+    message: string;
+    data: Data;
+  };
+  params?: never;
+  result?: never;
+}
+
+export interface NotificationMessage<Method extends string = string, Result = any>
+  extends JsonRpcVersionBearer
+{
+  method: Method;
   id?: never;
   params: {
     subscription: string;
@@ -31,14 +39,11 @@ export interface NotifMessage<Result = any> extends JsonRpcVersionBearer {
   error?: never;
 }
 
-export interface ErrMessage extends JsonRpcVersionBearer {
-  id: string;
-  error: {
-    code: number;
-    message: string;
-    // TODO
-    data?: any;
-  };
-  params?: never;
-  result?: never;
+interface JsonRpcVersionBearer {
+  jsonrpc: "2.0";
+}
+
+export function parse(raw: string) {
+  // TODO
+  return JSON.parse(raw);
 }

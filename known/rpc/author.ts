@@ -78,6 +78,16 @@ export type TransactionStatus = SerdeEnum<{
   invalid: void;
 }>;
 
+export namespace TransactionStatus {
+  // TODO: convert into type guard?
+  export function isTerminal(inQuestion: TransactionStatus): boolean {
+    return typeof inQuestion === "string"
+      ? inQuestion === "invalid" || inQuestion === "dropped"
+      : !!(inQuestion.finalized || inQuestion.finalityTimeout || inQuestion.retracted
+        || inQuestion.usurped);
+  }
+}
+
 // https://github.com/paritytech/substrate/blob/e0ccd00/client/rpc-api/src/author/hash.rs
 /**
  * RPC Extrinsic or hash

@@ -1,4 +1,6 @@
-export * from "./Base.ts";
-export * from "./common.ts";
-export * from "./messages.ts";
-export * from "./providers/proxy.ts";
+export * from "./client.ts";
+export * as msg from "./messages.ts";
+export * from "./provider/base.ts";
+export * from "./provider/errors.ts";
+export * from "./provider/proxy.ts";
+export * from "./provider/smoldot.ts";

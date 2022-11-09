@@ -1,29 +1,30 @@
-import { Config } from "../config/mod.ts";
+import * as Z from "../deps/zones.ts";
+import * as M from "../frame_metadata/mod.ts";
 import * as known from "../known/mod.ts";
+import * as rpc from "../rpc/mod.ts";
 import * as U from "../util/mod.ts";
 import { blockRead } from "./blockRead.ts";
-import { rpcCall } from "./rpcCall.ts";
-import { rpcSubscription } from "./rpcSubscription.ts";
-import { run } from "./run.ts";
+import { chain } from "./rpc_known.ts";
 
-export function blockWatch(
-  config: Config,
-  createWatchHandler: U.CreateListener<known.SignedBlock>,
-) {
-  return rpcSubscription(
-    config,
-    "chain_subscribeNewHeads",
-    [],
-    function subscribeNewHeadsHandler(stop) {
-      const watchHandler = createWatchHandler(stop);
-      return async (result) => {
-        const blockNum: number = result.params.result.number;
-        const blockHash = rpcCall(config, "chain_getBlockHash", [blockNum]).access("result");
-        // TODO: zones-level solution
-        const block = U.throwIfError(await run(blockRead(config, blockHash)));
-        watchHandler(block.block);
-      };
-    },
-    (ok) => rpcCall(config, "chain_unsubscribeNewHead", [ok.result]),
-  );
+const k0_ = Symbol();
+
+export function blockWatch<Client extends Z.$<rpc.Client>>(client: Client) {
+  return <
+    Listener extends Z.$<U.Listener<known.SignedBlock<M.Extrinsic>, rpc.ClientSubscribeContext>>,
+  >(listener: Listener) => {
+    const listenerMapped = Z
+      .ls(listener, Z.env)
+      .next(([listener, env]) => {
+        return async function(this: rpc.ClientSubscribeContext, header: known.Header) {
+          const blockHash = chain.getBlockHash(client)(header.number);
+          const block = await blockRead(client)(blockHash).bind(env)();
+          if (block instanceof Error) throw block;
+          listener.apply(this, [block]);
+        };
+      }, k0_);
+    const subscriptionId = chain.subscribeNewHeads(client)([], listenerMapped);
+    return chain
+      .unsubscribeNewHeads(client)(subscriptionId)
+      .zoned("BlockWatch");
+  };
 }
