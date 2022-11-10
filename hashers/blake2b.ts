@@ -1,4 +1,3 @@
-import { Hex, hex } from "../util/mod.ts";
 import wasmCode from "./blake2b.wasm.ts";
 
 const memory = new WebAssembly.Memory({ initial: 1, maximum: 128 });
@@ -9,7 +8,6 @@ const wasmInstance = new WebAssembly.Instance(wasmModule, {
 });
 
 interface XxhashWasm {
-  iv_adr: WebAssembly.Global;
   free_mem: WebAssembly.Global;
   reset(state_adr: number, dk_len: number): void;
   update(state_adr: number, msg_adr: number, msg_end: number, written: number): void;
@@ -20,22 +18,6 @@ const wasm = wasmInstance.exports as never as XxhashWasm;
 
 let memBuf = new Uint8Array(memory.buffer);
 let memI = wasm.free_mem.value;
-
-memBuf.set(
-  hex.decode(
-"\
-08c9bcf367e6096a3ba7ca8485ae67bb2bf894fe72f36e3cf1361d5f3af54fa5\
-d182e6ad7f520e511f6c3e2b8c68059b6bbd41fbabd9831f79217e1319cde05b\
-0008101820283038404850586068707870502040487868300860001058382818\
-5840600028107868507018303808482038481808686058701030285020007840\
-4800283810205078700858603040186810603050005840182068382878700848\
-6028087870682050003830184810405868583870600818482800782040301050\
-3078704858180040601068380820502850104020383008287858487018606800\
-0008101820283038404850586068707870502040487868300860001058382818\
-" as Hex,
-  ),
-  wasm.iv_adr.value,
-);
 
 const pool: Blake2bInner[] = [];
 const finReg = new FinalizationRegistry<Blake2bInner>((inner) => {
