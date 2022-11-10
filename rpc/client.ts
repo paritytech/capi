@@ -77,7 +77,12 @@ export class Client<
   call: ClientCall<SendErrorData, HandlerErrorData> = (message) => {
     const waiter = deferred<ClientCallEvent<SendErrorData, HandlerErrorData>>();
     this.pendingCalls[message.id] = waiter;
-    this.providerRef.send(message);
+    try {
+      this.providerRef.send(message);
+    } catch (error) {
+      delete this.pendingCalls[message.id];
+      waiter.resolve(error as ProviderSendError<SendErrorData>);
+    }
     return waiter;
   };
 
@@ -103,7 +108,13 @@ export class Client<
         );
       },
     }) as ClientSubscribeListener<SendErrorData, HandlerErrorData>;
-    this.call(message);
+    this.call(message)
+      .then((maybeError) => {
+        if (maybeError instanceof Error) {
+          this.pendingSubscriptions[message.id]!(maybeError);
+          stop();
+        }
+      });
     return waiter;
   };
 
