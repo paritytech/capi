@@ -1,6 +1,11 @@
+import { msg } from "../mod.ts";
+
 export class ProviderSendError<Data> extends Error {
   override readonly name = "ProviderSendError";
-  constructor(override readonly cause: Data) {
+  constructor(
+    override readonly cause: Data,
+    readonly egressMessage?: msg.EgressMessage,
+  ) {
     super();
   }
 }
