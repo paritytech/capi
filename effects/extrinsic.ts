@@ -1,13 +1,12 @@
 import { unimplemented } from "../deps/std/testing/asserts.ts";
 import * as Z from "../deps/zones.ts";
 import * as M from "../frame_metadata/mod.ts";
-import * as known from "../known/mod.ts";
 import * as rpc from "../rpc/mod.ts";
 import * as ss58 from "../ss58/mod.ts";
 import * as U from "../util/mod.ts";
 import { const as const_ } from "./const.ts";
 import { metadata } from "./metadata.ts";
-import { author, chain, system } from "./rpc_known.ts";
+import { author, chain, system } from "./rpc_known_methods.ts";
 import * as scale from "./scale.ts";
 
 const k0_ = Symbol();
@@ -117,7 +116,7 @@ export class SignedExtrinsic<
     this.extrinsicDecoded = scale.scaleDecoded($extrinsic_, this.extrinsicBytes, "extrinsic");
   }
 
-  watch<Listener extends Z.$<U.Listener<known.TransactionStatus, rpc.ClientSubscribeContext>>>(
+  watch<Listener extends Z.$<U.Listener<rpc.known.TransactionStatus, rpc.ClientSubscribeContext>>>(
     listener: Listener,
   ) {
     const subscriptionId = author.submitAndWatchExtrinsic(this.client)(
@@ -136,7 +135,7 @@ export class SignedExtrinsic<
 // TODO: attach to extrinsics sent.finalized result once zones-level method addition implemented
 export function extrinsicsDecoded<
   Client extends Z.$<rpc.Client>,
-  Hexes extends Z.$<known.Hex[]>,
+  Hexes extends Z.$<rpc.known.Hex[]>,
 >(
   client: Client,
   hexes: Hexes,

@@ -7,5 +7,7 @@ export * from "./extrinsic.ts";
 export * from "./keyPageRead.ts";
 export * from "./metadata.ts";
 export * from "./rpc.ts";
-export * from "./rpc_known.ts";
+export * as knownClients from "./rpc_known_clients.ts";
+export * from "./rpc_known_clients.ts";
+export * from "./rpc_known_methods.ts";
 export * from "./scale.ts";

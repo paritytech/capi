@@ -1,4 +1,5 @@
 export * from "./client.ts";
+export * as known from "./known/mod.ts";
 export * as msg from "./messages.ts";
 export * from "./provider/base.ts";
 export * from "./provider/errors.ts";

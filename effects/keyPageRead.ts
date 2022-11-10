@@ -2,7 +2,7 @@ import * as Z from "../deps/zones.ts";
 import * as rpc from "../rpc/mod.ts";
 import * as U from "../util/mod.ts";
 import { mapMetadata, metadata, palletMetadata } from "./metadata.ts";
-import { state } from "./rpc_known.ts";
+import { state } from "./rpc_known_methods.ts";
 import * as scale from "./scale.ts";
 
 const k0_ = Symbol();

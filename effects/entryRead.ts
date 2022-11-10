@@ -2,7 +2,7 @@ import * as Z from "../deps/zones.ts";
 import * as rpc from "../rpc/mod.ts";
 import * as U from "../util/mod.ts";
 import { entryMetadata, metadata, palletMetadata } from "./metadata.ts";
-import { state } from "./rpc_known.ts";
+import { state } from "./rpc_known_methods.ts";
 import * as scale from "./scale.ts";
 
 export function entryRead<Client extends Z.$<rpc.Client>>(client: Client) {

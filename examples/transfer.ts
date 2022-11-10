@@ -1,9 +1,8 @@
-import { Hash } from "../known/rpc/mod.ts";
 import * as C from "../mod.ts";
 import * as T from "../test_util/mod.ts";
 import * as U from "../util/mod.ts";
 
-let hash: undefined | Hash;
+let hash: undefined | C.rpc.known.Hash;
 
 const env = C.Z.env();
 
@@ -21,9 +20,9 @@ const tx = C.extrinsic(T.westend)({
 const runTx = tx
   .watch(function(status) {
     console.log(status);
-    if (C.TransactionStatus.isTerminal(status)) {
+    if (C.rpc.known.TransactionStatus.isTerminal(status)) {
       // TODO: return this upon implementing `this.stop`
-      hash = (status as { finalized: Hash }).finalized;
+      hash = (status as { finalized: C.rpc.known.Hash }).finalized;
       this.stop();
     }
   })
