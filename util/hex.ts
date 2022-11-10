@@ -2,7 +2,6 @@ import { Hex } from "./branded.ts";
 
 export { decode as decodeBuf, encode as encodeBuf } from "../deps/std/encoding/hex.ts";
 
-export function decode<T extends Uint8Array>(hex: Hex<T>): T;
 export function decode(hex: string): Uint8Array {
   if (hex.startsWith("0x")) hex = hex.slice(2);
   if (hex.length % 2 === 1) hex = "0" + hex;
@@ -13,15 +12,14 @@ export function decode(hex: string): Uint8Array {
   return array;
 }
 
-export function encode<T extends Uint8Array>(bytes: T): Hex<T>;
-export function encode(bytes: Uint8Array): string {
+export function encode(bytes: Uint8Array): Hex {
   let str = "";
   for (let i = 0; i < bytes.length; i++) {
     str += bytes[i]!.toString(16).padStart(2, "0");
   }
-  return str;
+  return str as Hex;
 }
 
-export function encodePrefixed(bytes: Uint8Array): string {
-  return "0x" + encode(bytes);
+export function encodePrefixed(bytes: Uint8Array): Hex {
+  return ("0x" + encode(bytes)) as Hex;
 }

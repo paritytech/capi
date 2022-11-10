@@ -83,7 +83,6 @@ export function rpcSubscription<Params extends unknown[], Result>() {
                 this.stop();
               } else if (e.error) {
                 error = new RpcServerError(e);
-                console.log(e);
                 this.stop();
               } else {
                 // TODO: halt if returns `Error` | `Promise<Error>`?
@@ -111,9 +110,9 @@ async function discardCheck<CloseErrorData>(
 }
 
 export class RpcServerError extends Error {
-  override readonly name = "RpcServer";
+  override readonly name = "RpcServerError";
 
-  constructor(readonly inner: rpc.msg.ErrorMessage) {
-    super();
+  constructor(override readonly cause: rpc.msg.ErrorMessage) {
+    super("An error was received from the RPC server.");
   }
 }
