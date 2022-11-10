@@ -10,10 +10,7 @@ const root = C.extrinsic(T.westend)({
     value: {
       type: "transfer",
       value: 12345n,
-      dest: {
-        type: "Id",
-        value: C.compat.multiAddressFromKeypair(T.bob),
-      },
+      dest: C.compat.multiAddressFromKeypair(T.bob),
     },
   },
 })
