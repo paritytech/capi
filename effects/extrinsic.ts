@@ -11,18 +11,13 @@ import * as scale from "./scale.ts"
 
 const k0_ = Symbol()
 
-export interface CallData {
-  palletName: string
-  methodName: string
-  args: Record<string, unknown>
-}
-
-export interface ExtrinsicProps extends CallData {
+export interface ExtrinsicProps {
   sender: M.MultiAddress
   checkpoint?: U.HexHash
   mortality?: [period: bigint, phase: bigint]
   nonce?: string
   tip?: bigint
+  call: unknown
 }
 
 export function extrinsic<Client extends Z.$<rpc.Client>>(client: Client) {
@@ -114,14 +109,12 @@ export class SignedExtrinsic<
           ? M.era.mortal(mortality[0], mortality[1])
           : M.era.immortal
       })
-    const extra = Z.ls(mortality, nonce, this.props.tip || 0)
+    const extra = Z.ls(mortality, nonce, this.props.tip || 0n)
     const additional = Z.ls(specVersion, transactionVersion, checkpointHash, genesisHash)
     const signature = Z.rec({ address: this.props.sender, extra, additional })
     const $extrinsicProps = Z.rec({
       protocolVersion: 4,
-      palletName: this.props.palletName,
-      methodName: this.props.methodName,
-      args: this.props.args,
+      call: this.props.call,
       signature,
     })
     this.extrinsicBytes = scale.scaleEncoded($extrinsic_, $extrinsicProps, true)
