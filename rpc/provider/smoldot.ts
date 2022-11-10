@@ -92,11 +92,21 @@ async function connection(
   }
   let conn = connections.get(chainSpec);
   if (!conn) {
-    const inner = await client.addChain({ chainSpec });
+    const innerMap: Chain[] = [];
+    connections.forEach((value: SmoldotProviderConnection) => {
+      innerMap.push(value.inner);
+    });
+    const inner = await client.addChain({
+      chainSpec,
+      potentialRelayChains: innerMap,
+    });
     conn = new SmoldotProviderConnection(inner, () => {
       try {
         inner.remove();
-      } catch (_e) { /* TODO */ }
+      } catch (_e) {
+        /* TODO */
+        throw new Error(_e.message);
+      }
     });
     connections.set(chainSpec, conn);
     (async () => {
