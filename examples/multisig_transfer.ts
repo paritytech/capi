@@ -4,6 +4,8 @@ import * as C from "../mod.ts"
 import * as T from "../test_util/mod.ts"
 import * as U from "../util/mod.ts"
 
+import { Balances, Multisig } from "../codegen/_output/polkadot/pallets/mod.ts"
+
 // FIXME: remove this check once the Zones .bind(env) fix is merged
 const hostname = Deno.env.get("TEST_CTX_HOSTNAME")
 const portRaw = Deno.env.get("TEST_CTX_PORT")
@@ -24,14 +26,10 @@ const multisigPublicKey = createKeyMulti(signatories, THRESHOLD)
 // Transfer initial balance (existential deposit) to multisig address
 const existentialDeposit = extrinsic({
   sender: C.compat.multiAddressFromKeypair(T.alice),
-  call: {
-    type: "Balances",
-    value: {
-      type: "transfer",
-      value: 2_000_000_000_000n,
-      dest: C.MultiAddress.Id(multisigPublicKey),
-    },
-  },
+  call: Balances.transfer({
+    value: 2_000_000_000_000n,
+    dest: C.MultiAddress.Id(multisigPublicKey),
+  }),
 })
   .signed(C.compat.signerFromKeypair(T.alice))
   .watch(function(status) {
@@ -77,16 +75,12 @@ function createOrApproveMultisigProposal<
   pair: KeyringPair,
   ...[maybeTimepoint]: Rest
 ) {
-  const call = {
-    type: "Balances",
-    value: {
-      type: "transfer_keep_alive",
-      dest: C.compat.multiAddressFromKeypair(T.dave),
-      value: 1230000000000n,
-    },
-  }
+  const call = Balances.transfer_keep_alive({
+    dest: C.compat.multiAddressFromKeypair(T.dave),
+    value: 1230000000000n,
+  })
   const maxWeight = extrinsic({
-    sender: C.MultiAddress.fromId(multisigPublicKey),
+    sender: C.MultiAddress.Id(multisigPublicKey),
     call,
   })
     .feeEstimate
@@ -99,18 +93,14 @@ function createOrApproveMultisigProposal<
     })
   return extrinsic({
     sender: C.compat.multiAddressFromKeypair(pair),
-    call: {
-      type: "Multisig",
-      value: C.Z.rec({
-        type: "as_multi",
-        threshold: THRESHOLD,
-        call,
-        other_signatories: signatories.filter((value) => value !== pair.publicKey),
-        store_call: false,
-        max_weight: maxWeight,
-        maybe_timepoint: maybeTimepoint as Rest[0],
-      }),
-    },
+    call: C.Z.call.fac(Multisig.as_multi, null!)(C.Z.rec({
+      threshold: THRESHOLD,
+      call,
+      other_signatories: signatories.filter((value) => value !== pair.publicKey),
+      store_call: false,
+      max_weight: maxWeight,
+      maybe_timepoint: maybeTimepoint as Rest[0],
+    })),
   })
     .signed(C.compat.signerFromKeypair(pair))
     .watch(function(status) {

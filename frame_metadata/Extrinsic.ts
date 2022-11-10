@@ -66,7 +66,6 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
         $multiAddress._encode(buffer, signature.address)
         if ("additional" in signature) {
           const toSignBuffer = new $.EncodeBuffer(buffer.stealAlloc(toSignSize))
-          console.log($call._metadata[0]!.args![1][14][1][1], call)
           $call._encode(toSignBuffer, call)
           const callEnd = toSignBuffer.finishedSize + toSignBuffer.index
           if ("signPayload" in props.sign) {
@@ -149,29 +148,17 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
     },
     _assert(assert) {
       assert.typeof(this, "object")
-      assert
-        .key(this, "protocolVersion")
-        .equals($.u8, 4)
+      assert.key(this, "protocolVersion").equals($.u8, 4)
       const value_ = assert.value as any
-      // TODO: use `assert.key(this, "call")` upon merging https://github.com/paritytech/capi/pull/368
-      $call._assert(
-        new $.AssertState({
-          type: value_.palletName,
-          value: {
-            type: value_.methodName,
-            ...value_.args,
-          },
-        }),
-      )
+      $call._assert(assert.key(this, "call"))
       if (value_.signature) {
         const signatureAssertState = assert.key(this, "signature")
-        signatureAssertState.key($multiAddress, "address")
-        signatureAssertState.key($extra, "extra")
-        if ("additional" in signatureAssertState) {
-          signatureAssertState.key($additional, "additional")
-        }
-        if ("sig" in signatureAssertState) {
-          signatureAssertState.key($multiSignature, "sig")
+        $multiAddress._assert(signatureAssertState.key(this, "address"))
+        $extra._assert(signatureAssertState.key(this, "extra"))
+        if ("additional" in value_.signature) {
+          $additional._assert(signatureAssertState.key(this, "additional"))
+        } else {
+          $multiSignature._assert(signatureAssertState.key(this, "sig"))
         }
       }
     },
