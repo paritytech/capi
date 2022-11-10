@@ -1,9 +1,8 @@
 import * as Z from "../deps/zones.ts";
-import * as known from "../known/mod.ts";
 import * as rpc from "../rpc/mod.ts";
 import * as U from "../util/mod.ts";
 import { entryMetadata, metadata, palletMetadata } from "./metadata.ts";
-import { state } from "./rpc_known.ts";
+import { state } from "./rpc_known_methods.ts";
 import * as scale from "./scale.ts";
 
 export type WatchEntryEvent = [key?: unknown, value?: unknown];
@@ -35,11 +34,11 @@ export function entryWatch<Client extends Z.$<rpc.Client>>(client: Client) {
     const listenerMapped = Z.ls($entry, listener).next(([$entry, listener]) => {
       return function listenerMapped(
         this: rpc.ClientSubscribeContext,
-        changeset: known.StorageChangeSet,
+        changeset: rpc.known.StorageChangeSet,
       ) {
         // TODO: in some cases there might be keys to decode
         // key ? $storageKey.decode(U.hex.decode(key)) : undefined
-        const getKey = (key: known.Hex) => {
+        const getKey = (key: rpc.known.Hex) => {
           return key;
         };
         const changes: WatchEntryEvent[] = changeset.changes.map(([key, val]) => {

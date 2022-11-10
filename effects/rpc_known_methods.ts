@@ -1,4 +1,4 @@
-import * as known from "../known/mod.ts";
+import { known } from "../rpc/mod.ts";
 import * as U from "../util/mod.ts";
 import { rpcCall, rpcSubscription } from "./rpc.ts";
 

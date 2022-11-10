@@ -34,7 +34,7 @@ const existentialDeposit = extrinsic({
   .signed(C.compat.signerFromKeypair(T.alice))
   .watch(function(status) {
     console.log(`Existential deposit:`, status);
-    if (C.TransactionStatus.isTerminal(status)) {
+    if (C.rpc.known.TransactionStatus.isTerminal(status)) {
       this.stop();
     }
   });
@@ -102,7 +102,7 @@ function createOrApproveMultisigProposal<
     .signed(C.compat.signerFromKeypair(pair))
     .watch(function(status) {
       console.log(`${label}:`, status);
-      if (C.TransactionStatus.isTerminal(status)) {
+      if (C.rpc.known.TransactionStatus.isTerminal(status)) {
         this.stop();
       }
     });

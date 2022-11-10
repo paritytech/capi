@@ -1,13 +1,12 @@
 import * as fs from "../deps/std/fs.ts";
 import * as path from "../deps/std/path.ts";
 import * as Z from "../deps/zones.ts";
-import * as knownClients from "../known/clients.ts";
 import * as C from "../mod.ts";
 import * as U from "../util/mod.ts";
 
 const outDir = path.join(Deno.cwd(), "frame_metadata", "_downloaded");
 await fs.emptyDir(outDir);
-U.throwIfError(await Z.ls(...Object.entries(knownClients).map(download)).run());
+U.throwIfError(await Z.ls(...Object.entries(C.knownClients).map(download)).run());
 
 function download<Name extends Z.$<string>, Client extends Z.$<C.rpc.Client>>(
   entry: [name: Name, client: Client],

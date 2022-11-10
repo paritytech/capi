@@ -1,8 +1,8 @@
 import * as Z from "../deps/zones.ts";
-import * as known from "../known/mod.ts";
+import { known } from "../rpc/mod.ts";
 import { entryRead } from "./entryRead.ts";
 import { SignedExtrinsic } from "./extrinsic.ts";
-import { chain } from "./rpc_known.ts";
+import { chain } from "./rpc_known_methods.ts";
 
 const k1_ = Symbol();
 const k2_ = Symbol();
