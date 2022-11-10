@@ -12,7 +12,7 @@ export function events<Extrinsic extends SignedExtrinsic, FinalizedHash extends 
   extrinsic: Extrinsic,
   finalizedHash: FinalizedHash,
 ) {
-  const client = extrinsic.props.client as Extrinsic["props"]["client"];
+  const client = extrinsic.client as Extrinsic["client"];
   const extrinsics = chain
     .getBlock(client)(finalizedHash)
     .access("block")
