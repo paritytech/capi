@@ -103,10 +103,7 @@ async function connection(
     conn = new SmoldotProviderConnection(inner, () => {
       try {
         inner.remove();
-      } catch (_e) {
-        /* TODO */
-        throw new Error(_e.message);
-      }
+      } catch (_e) { /* TODO */ }
     });
     connections.set(chainSpec, conn);
     (async () => {
