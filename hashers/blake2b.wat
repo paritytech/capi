@@ -49,24 +49,13 @@
     )
   )
 
-  (func $get
-    (param $mem_adr i32)
-    (param $idx i32)
-    (result i64)
-
-    (i64.load (i32.add (local.get $mem_adr) 
-      ;; offset=$sigma_adr
-      (i32.load8_u offset=192 (local.get $idx))
-    ))
-  )
-
   (func $g
     (param $ai i32)
     (param $bi i32)
     (param $ci i32)
     (param $di i32)
     (param $msg_adr i32)
-    (param $idx_1 i32)
+    (param $idx i32)
 
     (local $a i64)
     (local $b i64)
@@ -79,8 +68,10 @@
     (local.set $b (i64.load (local.get $bi)))
     (local.set $c (i64.load (local.get $ci)))
     (local.set $d (i64.load (local.get $di)))
-    (local.set $x (call $get (local.get $msg_adr) (local.get $idx_1)))
-    (local.set $y (call $get (local.get $msg_adr) (i32.add (local.get $idx_1) (i32.const 1))))
+
+    ;; $sigma_adr=192
+    (local.set $x (i64.load (i32.add (local.get $msg_adr) (i32.load8_u offset=192 (local.get $idx)))))
+    (local.set $y (i64.load (i32.add (local.get $msg_adr) (i32.load8_u offset=193 (local.get $idx)))))
 
     (local.set $a (local.get $a) (i64.add (local.get $b)) (i64.add (local.get $x)))
     (local.set $d (local.get $d) (i64.xor (local.get $a)) (i64.rotr (i64.const 32)))
