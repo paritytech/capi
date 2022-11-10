@@ -64,8 +64,8 @@ export const Vesting = {
  * </weight>
  */
 export function attest(
-  value: Omit<t.polkadot_runtime_common.claims.pallet.Call.attest, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_common.claims.pallet.Call.attest, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Claims", value: { ...value, type: "attest" } }
 }
 
@@ -96,8 +96,8 @@ export function attest(
  * </weight>
  */
 export function claim(
-  value: Omit<t.polkadot_runtime_common.claims.pallet.Call.claim, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_common.claims.pallet.Call.claim, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Claims", value: { ...value, type: "claim" } }
 }
 
@@ -130,8 +130,8 @@ export function claim(
  * </weight>
  */
 export function claim_attest(
-  value: Omit<t.polkadot_runtime_common.claims.pallet.Call.claim_attest, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_common.claims.pallet.Call.claim_attest, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Claims", value: { ...value, type: "claim_attest" } }
 }
 
@@ -153,13 +153,13 @@ export function claim_attest(
  * </weight>
  */
 export function mint_claim(
-  value: Omit<t.polkadot_runtime_common.claims.pallet.Call.mint_claim, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_common.claims.pallet.Call.mint_claim, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Claims", value: { ...value, type: "mint_claim" } }
 }
 
 export function move_claim(
-  value: Omit<t.polkadot_runtime_common.claims.pallet.Call.move_claim, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_common.claims.pallet.Call.move_claim, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Claims", value: { ...value, type: "move_claim" } }
 }

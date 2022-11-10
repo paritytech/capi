@@ -26,7 +26,9 @@ export type Decl = { path: string; code: S }
 
 export function getPath(tys: M.Ty[], ty: M.Ty): string | null {
   if (ty.type === "Struct" && ty.fields.length === 1 && ty.params.length) return null
-  return _getPath(ty)
+  const path = _getPath(ty)
+  if (path) return "types." + path
+  return null
 
   function _getPath(ty: M.Ty): string | null {
     if (ty.type === "Primitive") {

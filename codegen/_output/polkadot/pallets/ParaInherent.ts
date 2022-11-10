@@ -28,7 +28,7 @@ export const OnChainVotes = {
 
 /** Enter the paras inherent. This will process bitfields and backed candidates. */
 export function enter(
-  value: Omit<t.polkadot_runtime_parachains.paras_inherent.pallet.Call.enter, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_parachains.paras_inherent.pallet.Call.enter, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "ParaInherent", value: { ...value, type: "enter" } }
 }

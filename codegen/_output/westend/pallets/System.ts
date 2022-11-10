@@ -170,8 +170,8 @@ export const UpgradedToU32RefCount = {
 
 /** A dispatch that will fill the block weight up to the given ratio. */
 export function fill_block(
-  value: Omit<t.frame_system.pallet.Call.fill_block, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.frame_system.pallet.Call.fill_block, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "System", value: { ...value, type: "fill_block" } }
 }
 
@@ -182,15 +182,15 @@ export function fill_block(
  * the prefix we are removing to accurately calculate the weight of this function.
  */
 export function kill_prefix(
-  value: Omit<t.frame_system.pallet.Call.kill_prefix, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.frame_system.pallet.Call.kill_prefix, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "System", value: { ...value, type: "kill_prefix" } }
 }
 
 /** Kill some items from storage. */
 export function kill_storage(
-  value: Omit<t.frame_system.pallet.Call.kill_storage, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.frame_system.pallet.Call.kill_storage, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "System", value: { ...value, type: "kill_storage" } }
 }
 
@@ -202,15 +202,15 @@ export function kill_storage(
  * # </weight>
  */
 export function remark(
-  value: Omit<t.frame_system.pallet.Call.remark, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.frame_system.pallet.Call.remark, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "System", value: { ...value, type: "remark" } }
 }
 
 /** Make some on-chain remark and emit event. */
 export function remark_with_event(
-  value: Omit<t.frame_system.pallet.Call.remark_with_event, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.frame_system.pallet.Call.remark_with_event, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "System", value: { ...value, type: "remark_with_event" } }
 }
 
@@ -229,8 +229,8 @@ export function remark_with_event(
  * # </weight>
  */
 export function set_code(
-  value: Omit<t.frame_system.pallet.Call.set_code, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.frame_system.pallet.Call.set_code, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "System", value: { ...value, type: "set_code" } }
 }
 
@@ -246,21 +246,21 @@ export function set_code(
  * block. # </weight>
  */
 export function set_code_without_checks(
-  value: Omit<t.frame_system.pallet.Call.set_code_without_checks, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.frame_system.pallet.Call.set_code_without_checks, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "System", value: { ...value, type: "set_code_without_checks" } }
 }
 
 /** Set the number of pages in the WebAssembly environment's heap. */
 export function set_heap_pages(
-  value: Omit<t.frame_system.pallet.Call.set_heap_pages, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.frame_system.pallet.Call.set_heap_pages, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "System", value: { ...value, type: "set_heap_pages" } }
 }
 
 /** Set some items of storage. */
 export function set_storage(
-  value: Omit<t.frame_system.pallet.Call.set_storage, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.frame_system.pallet.Call.set_storage, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "System", value: { ...value, type: "set_storage" } }
 }

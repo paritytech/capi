@@ -64,6 +64,6 @@ export const SpamSlots = {
   value: _codec.$94,
 }
 
-export function force_unfreeze(): t.polkadot_runtime.RuntimeCall {
+export function force_unfreeze(): t.types.polkadot_runtime.RuntimeCall {
   return { type: "ParasDisputes", value: "force_unfreeze" }
 }

@@ -70,8 +70,8 @@ export const Winning = {
  * bid win. This amount is held throughout the range.
  */
 export function bid(
-  value: Omit<t.polkadot_runtime_common.auctions.pallet.Call.bid, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_common.auctions.pallet.Call.bid, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Auctions", value: { ...value, type: "bid" } }
 }
 
@@ -80,7 +80,7 @@ export function bid(
  *
  * Can only be called by Root origin.
  */
-export function cancel_auction(): t.polkadot_runtime.RuntimeCall {
+export function cancel_auction(): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Auctions", value: { type: "cancel_auction" } }
 }
 
@@ -92,7 +92,7 @@ export function cancel_auction(): t.polkadot_runtime.RuntimeCall {
  * `lease_period_index` of the initial lease period of the four that are to be auctioned.
  */
 export function new_auction(
-  value: Omit<t.polkadot_runtime_common.auctions.pallet.Call.new_auction, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_common.auctions.pallet.Call.new_auction, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Auctions", value: { ...value, type: "new_auction" } }
 }

@@ -32,7 +32,7 @@ export const Now = { type: "Plain", modifier: "Default", hashers: [], key: [], v
  * # </weight>
  */
 export function set(
-  value: Omit<t.pallet_timestamp.pallet.Call.set, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_timestamp.pallet.Call.set, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Timestamp", value: { ...value, type: "set" } }
 }

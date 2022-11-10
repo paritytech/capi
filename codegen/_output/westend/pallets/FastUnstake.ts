@@ -55,8 +55,8 @@ export const Queue = {
  * Dispatch origin must be signed by the [`Config::ControlOrigin`].
  */
 export function control(
-  value: Omit<t.pallet_fast_unstake.pallet.Call.control, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_fast_unstake.pallet.Call.control, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "FastUnstake", value: { ...value, type: "control" } }
 }
 
@@ -69,7 +69,7 @@ export function control(
  * calling `register_fast_unstake`. This should probably be followed by a call to
  * `Staking::rebond`.
  */
-export function deregister(): t.polkadot_runtime.RuntimeCall {
+export function deregister(): t.types.polkadot_runtime.RuntimeCall {
   return { type: "FastUnstake", value: { type: "deregister" } }
 }
 
@@ -93,6 +93,6 @@ export function deregister(): t.polkadot_runtime.RuntimeCall {
  * the normal staking system, but they lose part of their unbonding chunks due to consuming
  * the chain's resources.
  */
-export function register_fast_unstake(): t.polkadot_runtime.RuntimeCall {
+export function register_fast_unstake(): t.types.polkadot_runtime.RuntimeCall {
   return { type: "FastUnstake", value: { type: "register_fast_unstake" } }
 }

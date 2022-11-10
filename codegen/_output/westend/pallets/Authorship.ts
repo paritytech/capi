@@ -30,7 +30,7 @@ export const Uncles = {
 
 /** Provide a set of uncles. */
 export function set_uncles(
-  value: Omit<t.pallet_authorship.pallet.Call.set_uncles, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_authorship.pallet.Call.set_uncles, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Authorship", value: { ...value, type: "set_uncles" } }
 }

@@ -95,7 +95,7 @@ export const Validators = {
  * - DbWrites per key id: `KeyOwner`
  * # </weight>
  */
-export function purge_keys(): t.polkadot_runtime.RuntimeCall {
+export function purge_keys(): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Session", value: { type: "purge_keys" } }
 }
 
@@ -116,7 +116,7 @@ export function purge_keys(): t.polkadot_runtime.RuntimeCall {
  * # </weight>
  */
 export function set_keys(
-  value: Omit<t.pallet_session.pallet.Call.set_keys, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_session.pallet.Call.set_keys, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Session", value: { ...value, type: "set_keys" } }
 }

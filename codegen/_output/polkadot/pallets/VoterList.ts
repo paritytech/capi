@@ -48,8 +48,8 @@ export const ListNodes = {
  * - and `origin` has a greater `Score` than `lighter`.
  */
 export function put_in_front_of(
-  value: Omit<t.pallet_bags_list.pallet.Call.put_in_front_of, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_bags_list.pallet.Call.put_in_front_of, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "VoterList", value: { ...value, type: "put_in_front_of" } }
 }
 
@@ -66,7 +66,7 @@ export function put_in_front_of(
  * If `dislocated` does not exists, it returns an error.
  */
 export function rebag(
-  value: Omit<t.pallet_bags_list.pallet.Call.rebag, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_bags_list.pallet.Call.rebag, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "VoterList", value: { ...value, type: "rebag" } }
 }

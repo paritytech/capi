@@ -91,8 +91,8 @@ export const Voting = {
  * # </weight>
  */
 export function close(
-  value: Omit<t.pallet_collective.pallet.Call.close, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_collective.pallet.Call.close, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Council", value: { ...value, type: "close" } }
 }
 
@@ -131,8 +131,8 @@ export function close(
  * # </weight>
  */
 export function close_old_weight(
-  value: Omit<t.pallet_collective.pallet.Call.close_old_weight, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_collective.pallet.Call.close_old_weight, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Council", value: { ...value, type: "close_old_weight" } }
 }
 
@@ -153,8 +153,8 @@ export function close_old_weight(
  * # </weight>
  */
 export function disapprove_proposal(
-  value: Omit<t.pallet_collective.pallet.Call.disapprove_proposal, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_collective.pallet.Call.disapprove_proposal, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Council", value: { ...value, type: "disapprove_proposal" } }
 }
 
@@ -172,8 +172,8 @@ export function disapprove_proposal(
  * # </weight>
  */
 export function execute(
-  value: Omit<t.pallet_collective.pallet.Call.execute, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_collective.pallet.Call.execute, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Council", value: { ...value, type: "execute" } }
 }
 
@@ -207,8 +207,8 @@ export function execute(
  * # </weight>
  */
 export function propose(
-  value: Omit<t.pallet_collective.pallet.Call.propose, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_collective.pallet.Call.propose, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Council", value: { ...value, type: "propose" } }
 }
 
@@ -247,8 +247,8 @@ export function propose(
  * # </weight>
  */
 export function set_members(
-  value: Omit<t.pallet_collective.pallet.Call.set_members, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_collective.pallet.Call.set_members, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Council", value: { ...value, type: "set_members" } }
 }
 
@@ -270,7 +270,7 @@ export function set_members(
  * # </weight>
  */
 export function vote(
-  value: Omit<t.pallet_collective.pallet.Call.vote, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_collective.pallet.Call.vote, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Council", value: { ...value, type: "vote" } }
 }

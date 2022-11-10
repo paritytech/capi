@@ -109,7 +109,7 @@ export const RelayDispatchQueues = {
  * - `OverweightServiced`: On success.
  */
 export function service_overweight(
-  value: Omit<t.polkadot_runtime_parachains.ump.pallet.Call.service_overweight, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_parachains.ump.pallet.Call.service_overweight, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Ump", value: { ...value, type: "service_overweight" } }
 }
