@@ -28,7 +28,7 @@ export function blockWatch<Client extends Z.$<rpc.Client>>(client: Client) {
   };
 }
 
-// TODO: generalize
+// TODO: generalize creating watch effects + accessing context + halting with a value
 export interface BlockWatchListenerContext extends rpc.ClientSubscribeContext {
   env: Z.Env;
 }
