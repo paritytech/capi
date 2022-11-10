@@ -1,12 +1,12 @@
 import { KeyringPair } from "../deps/polkadot/keyring/types.ts"
-import { MultiAddress, Signature, Signer } from "../frame_metadata/Extrinsic.ts"
+import { MultiAddress, MultiSignature, Signer } from "../frame_metadata/Extrinsic.ts"
 
 export function multiAddressFromKeypair(keypair: KeyringPair): MultiAddress {
-  return MultiAddress.fromId(keypair.publicKey)
+  return MultiAddress.Id(keypair.publicKey)
 }
 
 export function signerFromKeypair(keypair: KeyringPair): Signer {
-  const type = ((): Signature["type"] => {
+  const type = ((): MultiSignature["type"] => {
     switch (keypair.type) {
       case "sr25519": {
         return "Sr25519"
