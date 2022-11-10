@@ -37,7 +37,18 @@ export class Client<
   }
 
   #listener: ProviderListener<SendErrorData, HandlerErrorData> = (e) => {
-    if (e instanceof Error) {
+    if (e instanceof ProviderSendError && e.egressMessage) {
+      const egressMessageId = e.egressMessage.id;
+      const pendingCall = this.pendingCalls[egressMessageId];
+      if (!pendingCall) {
+        console.log({ e });
+        // TODO: pipe error to listeners and message the likely cause,
+        //       a duplicate client.
+        throw new Error();
+      }
+      pendingCall.resolve(e);
+      delete this.pendingCalls[egressMessageId];
+    } else if (e instanceof Error) {
       for (const id in this.pendingCalls) {
         const pendingCall = this.pendingCalls[id]!;
         pendingCall.resolve(e);
@@ -77,12 +88,7 @@ export class Client<
   call: ClientCall<SendErrorData, HandlerErrorData> = (message) => {
     const waiter = deferred<ClientCallEvent<SendErrorData, HandlerErrorData>>();
     this.pendingCalls[message.id] = waiter;
-    try {
-      this.providerRef.send(message);
-    } catch (error) {
-      delete this.pendingCalls[message.id];
-      waiter.resolve(error as ProviderSendError<SendErrorData>);
-    }
+    this.providerRef.send(message);
     return waiter;
   };
 
