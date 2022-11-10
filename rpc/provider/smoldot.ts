@@ -51,13 +51,9 @@ export const smoldotProvider: Provider<
           return;
         }
         try {
-          return conn.inner.sendJsonRpc(JSON.stringify(message));
+          conn.inner.sendJsonRpc(JSON.stringify(message));
         } catch (error) {
-          if (error instanceof MalformedJsonRpcError || error instanceof QueueFullError) {
-            listener(new ProviderSendError(error, message));
-            return;
-          }
-          conn.forEachListener(new ProviderSendError(error as SmoldotSendErrorData));
+          listener(new ProviderSendError(error as SmoldotSendErrorData, message));
         }
       })();
     },

@@ -37,7 +37,7 @@ export class Client<
   }
 
   #listener: ProviderListener<SendErrorData, HandlerErrorData> = (e) => {
-    if (e instanceof ProviderSendError && e.egressMessage) {
+    if (e instanceof ProviderSendError) {
       const egressMessageId = e.egressMessage.id;
       const pendingCall = this.pendingCalls[egressMessageId];
       if (!pendingCall) {
@@ -103,7 +103,7 @@ export class Client<
       delete this.activeSubscriptionByMessageId[message.id];
       waiter.resolve(activeSubscriptionId);
     };
-    this.pendingSubscriptions[message.id] = listener.bind({
+    const listenerBound = listener.bind({
       message,
       stop,
       state: <T>(ctor: new() => T) => {
@@ -114,10 +114,11 @@ export class Client<
         );
       },
     }) as ClientSubscribeListener<SendErrorData, HandlerErrorData>;
+    this.pendingSubscriptions[message.id] = listenerBound;
     this.call(message)
       .then((maybeError) => {
         if (maybeError instanceof Error) {
-          this.pendingSubscriptions[message.id]!(maybeError);
+          listenerBound(maybeError);
           stop();
         }
       });

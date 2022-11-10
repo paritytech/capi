@@ -17,9 +17,13 @@ export const proxyProvider: Provider<string, Event, Event, Event> = (url, listen
       (async () => {
         const openError = await ensureWsOpen(conn.inner);
         if (openError) {
-          conn.forEachListener(new ProviderSendError(openError));
-        } else {
+          conn.forEachListener(new ProviderSendError(openError, message));
+          return;
+        }
+        try {
           conn.inner.send(JSON.stringify(message));
+        } catch (error) {
+          listener(new ProviderSendError(error as Event, message));
         }
       })();
     },
