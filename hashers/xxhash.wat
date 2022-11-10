@@ -35,8 +35,8 @@
         (local.get $state_adr)
         (i64x2.add (global.get $i12) (local.get $ii))
       )
-      (v128.store
-        (i32.add (local.get $state_adr) (i32.const 16))
+      (v128.store offset=16
+        (local.get $state_adr)
         (i64x2.add (global.get $i34) (local.get $ii))
       )
 
@@ -89,31 +89,28 @@
       (i64x2.mul (global.get $p22))
       (local.set $data01)
 
-      (v128.load (i32.add (local.get $pos) (i32.const 16)))
+      (v128.load offset=16 (local.get $pos))
       (i64x2.mul (global.get $p22))
       (local.set $data23)
 
       (local.set $round_i (i32.const 0))
       (local.set $state_cur (local.get $state_adr))
       (loop $rounds
-        (v128.store
-          (local.get $state_cur)
+        (v128.store (local.get $state_cur)
           (v128.load (local.get $state_cur))
           (i64x2.add (local.get $data01))
           (call $i64x2_rotl_31)
           (i64x2.mul (global.get $p11))
         )
         
-        (local.set $state_cur (i32.add (local.get $state_cur) (i32.const 16)))
-        (v128.store
-          (local.get $state_cur)
-          (v128.load (local.get $state_cur))
+        (v128.store offset=16 (local.get $state_cur)
+          (v128.load offset=16 (local.get $state_cur))
           (i64x2.add (local.get $data23))
           (call $i64x2_rotl_31)
           (i64x2.mul (global.get $p11))
         )
         
-        (local.set $state_cur (i32.add (local.get $state_cur) (i32.const 16)))
+        (local.set $state_cur (i32.add (local.get $state_cur) (i32.const 32)))
         (local.tee $round_i (i32.add (local.get $round_i) (i32.const 1)))
         (br_if $rounds (i32.ne (local.get $rounds)))
       )
@@ -131,7 +128,7 @@
     (local $state23 v128)
 
     (local.set $state01 (v128.load (local.get $state_adr)))
-    (local.set $state23 (v128.load (i32.add (local.get $state_adr) (i32.const 16))))
+    (local.set $state23 (v128.load offset=16 (local.get $state_adr)))
 
     (i64.rotl (i64x2.extract_lane 0 (local.get $state01)) (i64.const 1))
     (i64.rotl (i64x2.extract_lane 1 (local.get $state01)) (i64.const 7))

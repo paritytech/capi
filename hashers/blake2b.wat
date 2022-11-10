@@ -36,7 +36,8 @@
     (result i64)
 
     (i64.load (i32.add (local.get $mem_adr) 
-      (i32.load8_u (i32.add (global.get $sigma_adr) (local.get $idx)))
+      ;; offset=$sigma_adr
+      (i32.load8_u offset=192 (local.get $idx))
     ))
   )
 
@@ -153,20 +154,20 @@
       (v128.xor (v128.load (i32.const 64)))
     )
 
-    (v128.store (local.tee $state_adr (i32.add (local.get $state_adr) (i32.const 16)))
-      (v128.load (local.get $state_adr))
+    (v128.store offset=16 (local.get $state_adr)
+      (v128.load offset=16 (local.get $state_adr))
       (v128.xor (v128.load (i32.const 16)))
       (v128.xor (v128.load (i32.const 80)))
     )
 
-    (v128.store (local.tee $state_adr (i32.add (local.get $state_adr) (i32.const 16)))
-      (v128.load (local.get $state_adr))
+    (v128.store offset=32 (local.get $state_adr)
+      (v128.load offset=32 (local.get $state_adr))
       (v128.xor (v128.load (i32.const 32)))
       (v128.xor (v128.load (i32.const 96)))
     )
 
-    (v128.store (local.tee $state_adr (i32.add (local.get $state_adr) (i32.const 16)))
-      (v128.load (local.get $state_adr))
+    (v128.store offset=48 (local.get $state_adr)
+      (v128.load offset=48 (local.get $state_adr))
       (v128.xor (v128.load (i32.const 48)))
       (v128.xor (v128.load (i32.const 112)))
     )
