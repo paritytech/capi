@@ -8,8 +8,8 @@
 
   (global $max_rounds i32 (i32.const 8))
   (export "max_rounds" (global $max_rounds))
-  (global $init_state_adr i32 (i32.const 0))
-  (global $alt_digest_init_adr i32 (i32.const 256))
+  ;; $init_state_adr = 0
+  ;; $alt_digest_init_adr = 256
   (global $free_mem i32 (i32.const 320))
   (export "free_mem" (global $free_mem))
 
@@ -29,7 +29,7 @@
     (local $ii v128)
     (local $i i32)
 
-    (local.set $state_adr (global.get $init_state_adr))
+    ;; $state_adr = $init_state_adr = 0
     (loop $rounds
       (v128.store
         (local.get $state_adr)
@@ -46,7 +46,7 @@
       (br_if $rounds (i32.ne (global.get $max_rounds)))
     )
 
-    (local.set $state_adr (global.get $alt_digest_init_adr))
+    (local.set $state_adr (i32.const 256)) ;; $alt_digest_init_adr = 256
     (local.set $i (i32.const 0))
     (loop $rounds
       (i64.store (local.get $state_adr) (i64.add (i64.extend_i32_u (local.get $i)) (global.get $p5)))
@@ -67,7 +67,7 @@
   (func (export "reset") (param $rounds i32) (param $state_adr i32)
     (memory.copy 
       (local.get $state_adr)
-      (global.get $init_state_adr)
+      (i32.const 0) ;; $init_state_adr = 0
       (i32.mul (local.get $rounds) (i32.const 32))
     )
   )
@@ -196,7 +196,7 @@
       (else
         (memory.copy
           (local.get $digest_adr)
-          (global.get $alt_digest_init_adr)
+          (i32.const 256) ;; $alt_digest_init_adr = 256
           (i32.mul (local.get $rounds) (i32.const 8))
         )
       )

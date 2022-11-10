@@ -6,9 +6,9 @@
   ;; (func $dbg_u32 (param $v i32) (result i32) local.get $v call $log_u32 local.get $v)
   ;; (func $dbg_u64 (param $v i64) (result i64) local.get $v call $log_u64 local.get $v)
 
-  (global $staging_adr i32 (i32.const 0))
-  (global $iv_adr i32 (i32.const 128))
-  (global $sigma_adr i32 (i32.const 192))
+  ;; $staging_adr = 0
+  ;; $iv_adr = 128
+  ;; $sigma_adr = 192
   (global $free_mem i32 (i32.const 384))
   (export "free_mem" (global $free_mem))
 
@@ -38,7 +38,7 @@
 
     (memory.copy
       (local.get $state_adr)
-      (global.get $iv_adr)
+      (i32.const 128) ;; $iv_adr = 128
       (i32.const 64)
     )
 
@@ -98,14 +98,14 @@
     (local $idx i32)
 
     (memory.copy
-      (i32.const 0)
+      (i32.const 0) ;; $staging_adr
       (local.get $state_adr)
       (i32.const 64)
     )
 
     (memory.copy
-      (i32.const 64)
-      (global.get $iv_adr)
+      (i32.const 64) ;; $staging_adr + 64
+      (i32.const 128) ;; $iv_adr = 128
       (i32.const 64)
     )
 
