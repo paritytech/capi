@@ -47,8 +47,8 @@ export const NextFundIndex = {
  * Origin must be Signed, and the user must have contributed to the crowdloan.
  */
 export function add_memo(
-  value: Omit<t.polkadot_runtime_common.crowdloan.pallet.Call.add_memo, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_common.crowdloan.pallet.Call.add_memo, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Crowdloan", value: { ...value, type: "add_memo" } }
 }
 
@@ -57,8 +57,8 @@ export function add_memo(
  * slot. It will be withdrawable when the crowdloan has ended and the funds are unused.
  */
 export function contribute(
-  value: Omit<t.polkadot_runtime_common.crowdloan.pallet.Call.contribute, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_common.crowdloan.pallet.Call.contribute, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Crowdloan", value: { ...value, type: "contribute" } }
 }
 
@@ -67,8 +67,8 @@ export function contribute(
  * slot. It will be withdrawable when the crowdloan has ended and the funds are unused.
  */
 export function contribute_all(
-  value: Omit<t.polkadot_runtime_common.crowdloan.pallet.Call.contribute_all, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_common.crowdloan.pallet.Call.contribute_all, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Crowdloan", value: { ...value, type: "contribute_all" } }
 }
 
@@ -79,15 +79,15 @@ export function contribute_all(
  * by the parachain manager.
  */
 export function create(
-  value: Omit<t.polkadot_runtime_common.crowdloan.pallet.Call.create, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_common.crowdloan.pallet.Call.create, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Crowdloan", value: { ...value, type: "create" } }
 }
 
 /** Remove a fund after the retirement period has ended and all funds have been returned. */
 export function dissolve(
-  value: Omit<t.polkadot_runtime_common.crowdloan.pallet.Call.dissolve, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_common.crowdloan.pallet.Call.dissolve, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Crowdloan", value: { ...value, type: "dissolve" } }
 }
 
@@ -97,8 +97,8 @@ export function dissolve(
  * Can only be called by Root origin.
  */
 export function edit(
-  value: Omit<t.polkadot_runtime_common.crowdloan.pallet.Call.edit, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_common.crowdloan.pallet.Call.edit, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Crowdloan", value: { ...value, type: "edit" } }
 }
 
@@ -108,8 +108,8 @@ export function edit(
  * Origin must be Signed, and the fund has non-zero raise.
  */
 export function poke(
-  value: Omit<t.polkadot_runtime_common.crowdloan.pallet.Call.poke, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_common.crowdloan.pallet.Call.poke, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Crowdloan", value: { ...value, type: "poke" } }
 }
 
@@ -121,8 +121,8 @@ export function poke(
  * Origin must be signed, but can come from anyone.
  */
 export function refund(
-  value: Omit<t.polkadot_runtime_common.crowdloan.pallet.Call.refund, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_common.crowdloan.pallet.Call.refund, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Crowdloan", value: { ...value, type: "refund" } }
 }
 
@@ -146,7 +146,7 @@ export function refund(
  * - `index`: The parachain to whose crowdloan the contribution was made.
  */
 export function withdraw(
-  value: Omit<t.polkadot_runtime_common.crowdloan.pallet.Call.withdraw, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_common.crowdloan.pallet.Call.withdraw, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Crowdloan", value: { ...value, type: "withdraw" } }
 }

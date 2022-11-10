@@ -42,7 +42,7 @@ export const HasInitialized = {
  * chain are valid and should be finalized.
  */
 export function force_approve(
-  value: Omit<t.polkadot_runtime_parachains.initializer.pallet.Call.force_approve, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_parachains.initializer.pallet.Call.force_approve, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Initializer", value: { ...value, type: "force_approve" } }
 }

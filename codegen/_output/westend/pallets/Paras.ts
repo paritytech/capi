@@ -265,15 +265,18 @@ export const UpgradeRestrictionSignal = {
  * the go-ahead signal while the PVF pre-checking feature is enabled.
  */
 export function add_trusted_validation_code(
-  value: Omit<t.polkadot_runtime_parachains.paras.pallet.Call.add_trusted_validation_code, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<
+    t.types.polkadot_runtime_parachains.paras.pallet.Call.add_trusted_validation_code,
+    "type"
+  >,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Paras", value: { ...value, type: "add_trusted_validation_code" } }
 }
 
 /** Note a new block head for para within the context of the current block. */
 export function force_note_new_head(
-  value: Omit<t.polkadot_runtime_parachains.paras.pallet.Call.force_note_new_head, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_parachains.paras.pallet.Call.force_note_new_head, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Paras", value: { ...value, type: "force_note_new_head" } }
 }
 
@@ -283,29 +286,32 @@ export function force_note_new_head(
  * initializer...
  */
 export function force_queue_action(
-  value: Omit<t.polkadot_runtime_parachains.paras.pallet.Call.force_queue_action, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_parachains.paras.pallet.Call.force_queue_action, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Paras", value: { ...value, type: "force_queue_action" } }
 }
 
 /** Schedule an upgrade as if it was scheduled in the given relay parent block. */
 export function force_schedule_code_upgrade(
-  value: Omit<t.polkadot_runtime_parachains.paras.pallet.Call.force_schedule_code_upgrade, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<
+    t.types.polkadot_runtime_parachains.paras.pallet.Call.force_schedule_code_upgrade,
+    "type"
+  >,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Paras", value: { ...value, type: "force_schedule_code_upgrade" } }
 }
 
 /** Set the storage for the parachain validation code immediately. */
 export function force_set_current_code(
-  value: Omit<t.polkadot_runtime_parachains.paras.pallet.Call.force_set_current_code, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_parachains.paras.pallet.Call.force_set_current_code, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Paras", value: { ...value, type: "force_set_current_code" } }
 }
 
 /** Set the storage for the current parachain head data immediately. */
 export function force_set_current_head(
-  value: Omit<t.polkadot_runtime_parachains.paras.pallet.Call.force_set_current_head, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_parachains.paras.pallet.Call.force_set_current_head, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Paras", value: { ...value, type: "force_set_current_head" } }
 }
 
@@ -314,8 +320,11 @@ export function force_set_current_head(
  * enacts the results if that was the last vote before achieving the supermajority.
  */
 export function include_pvf_check_statement(
-  value: Omit<t.polkadot_runtime_parachains.paras.pallet.Call.include_pvf_check_statement, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<
+    t.types.polkadot_runtime_parachains.paras.pallet.Call.include_pvf_check_statement,
+    "type"
+  >,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Paras", value: { ...value, type: "include_pvf_check_statement" } }
 }
 
@@ -327,7 +336,10 @@ export function include_pvf_check_statement(
  * dispatching.
  */
 export function poke_unused_validation_code(
-  value: Omit<t.polkadot_runtime_parachains.paras.pallet.Call.poke_unused_validation_code, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<
+    t.types.polkadot_runtime_parachains.paras.pallet.Call.poke_unused_validation_code,
+    "type"
+  >,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Paras", value: { ...value, type: "poke_unused_validation_code" } }
 }

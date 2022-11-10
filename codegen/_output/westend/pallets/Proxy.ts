@@ -35,8 +35,8 @@ export const Proxies = {
  * zero.
  */
 export function add_proxy(
-  value: Omit<t.pallet_proxy.pallet.Call.add_proxy, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_proxy.pallet.Call.add_proxy, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Proxy", value: { ...value, type: "add_proxy" } }
 }
 
@@ -58,8 +58,8 @@ export function add_proxy(
  * - `call_hash`: The hash of the call to be made by the `real` account.
  */
 export function announce(
-  value: Omit<t.pallet_proxy.pallet.Call.announce, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_proxy.pallet.Call.announce, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Proxy", value: { ...value, type: "announce" } }
 }
 
@@ -84,8 +84,8 @@ export function announce(
  * Fails if there are insufficient funds to pay for deposit.
  */
 export function create_pure(
-  value: Omit<t.pallet_proxy.pallet.Call.create_pure, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_proxy.pallet.Call.create_pure, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Proxy", value: { ...value, type: "create_pure" } }
 }
 
@@ -108,8 +108,8 @@ export function create_pure(
  * account whose `pure` call has corresponding parameters.
  */
 export function kill_pure(
-  value: Omit<t.pallet_proxy.pallet.Call.kill_pure, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_proxy.pallet.Call.kill_pure, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Proxy", value: { ...value, type: "kill_pure" } }
 }
 
@@ -127,8 +127,8 @@ export function kill_pure(
  * - `call`: The call to be made by the `real` account.
  */
 export function proxy(
-  value: Omit<t.pallet_proxy.pallet.Call.proxy, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_proxy.pallet.Call.proxy, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Proxy", value: { ...value, type: "proxy" } }
 }
 
@@ -146,8 +146,8 @@ export function proxy(
  * - `call`: The call to be made by the `real` account.
  */
 export function proxy_announced(
-  value: Omit<t.pallet_proxy.pallet.Call.proxy_announced, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_proxy.pallet.Call.proxy_announced, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Proxy", value: { ...value, type: "proxy_announced" } }
 }
 
@@ -164,8 +164,8 @@ export function proxy_announced(
  * - `call_hash`: The hash of the call to be made.
  */
 export function reject_announcement(
-  value: Omit<t.pallet_proxy.pallet.Call.reject_announcement, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_proxy.pallet.Call.reject_announcement, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Proxy", value: { ...value, type: "reject_announcement" } }
 }
 
@@ -182,8 +182,8 @@ export function reject_announcement(
  * - `call_hash`: The hash of the call to be made by the `real` account.
  */
 export function remove_announcement(
-  value: Omit<t.pallet_proxy.pallet.Call.remove_announcement, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_proxy.pallet.Call.remove_announcement, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Proxy", value: { ...value, type: "remove_announcement" } }
 }
 
@@ -195,7 +195,7 @@ export function remove_announcement(
  * WARNING: This may be called on accounts created by `pure`, however if done, then
  * the unreserved fees will be inaccessible. **All access to this account will be lost.**
  */
-export function remove_proxies(): t.polkadot_runtime.RuntimeCall {
+export function remove_proxies(): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Proxy", value: { type: "remove_proxies" } }
 }
 
@@ -209,7 +209,7 @@ export function remove_proxies(): t.polkadot_runtime.RuntimeCall {
  * - `proxy_type`: The permissions currently enabled for the removed proxy account.
  */
 export function remove_proxy(
-  value: Omit<t.pallet_proxy.pallet.Call.remove_proxy, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_proxy.pallet.Call.remove_proxy, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Proxy", value: { ...value, type: "remove_proxy" } }
 }

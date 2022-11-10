@@ -48,8 +48,8 @@ export const Multisigs = {
  * # </weight>
  */
 export function approve_as_multi(
-  value: Omit<t.pallet_multisig.pallet.Call.approve_as_multi, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_multisig.pallet.Call.approve_as_multi, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Multisig", value: { ...value, type: "approve_as_multi" } }
 }
 
@@ -101,8 +101,8 @@ export function approve_as_multi(
  * # </weight>
  */
 export function as_multi(
-  value: Omit<t.pallet_multisig.pallet.Call.as_multi, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_multisig.pallet.Call.as_multi, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Multisig", value: { ...value, type: "as_multi" } }
 }
 
@@ -125,8 +125,8 @@ export function as_multi(
  * # </weight>
  */
 export function as_multi_threshold_1(
-  value: Omit<t.pallet_multisig.pallet.Call.as_multi_threshold_1, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_multisig.pallet.Call.as_multi_threshold_1, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Multisig", value: { ...value, type: "as_multi_threshold_1" } }
 }
 
@@ -159,7 +159,7 @@ export function as_multi_threshold_1(
  * # </weight>
  */
 export function cancel_as_multi(
-  value: Omit<t.pallet_multisig.pallet.Call.cancel_as_multi, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_multisig.pallet.Call.cancel_as_multi, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Multisig", value: { ...value, type: "cancel_as_multi" } }
 }

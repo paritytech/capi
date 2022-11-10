@@ -34,8 +34,8 @@ export const Leases = {
  * The dispatch origin for this call must match `T::ForceOrigin`.
  */
 export function clear_all_leases(
-  value: Omit<t.polkadot_runtime_common.slots.pallet.Call.clear_all_leases, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_common.slots.pallet.Call.clear_all_leases, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Slots", value: { ...value, type: "clear_all_leases" } }
 }
 
@@ -46,8 +46,8 @@ export function clear_all_leases(
  * The dispatch origin for this call must match `T::ForceOrigin`.
  */
 export function force_lease(
-  value: Omit<t.polkadot_runtime_common.slots.pallet.Call.force_lease, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_common.slots.pallet.Call.force_lease, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Slots", value: { ...value, type: "force_lease" } }
 }
 
@@ -61,7 +61,7 @@ export function force_lease(
  * Origin must be signed, but can be called by anyone.
  */
 export function trigger_onboard(
-  value: Omit<t.polkadot_runtime_common.slots.pallet.Call.trigger_onboard, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_common.slots.pallet.Call.trigger_onboard, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Slots", value: { ...value, type: "trigger_onboard" } }
 }

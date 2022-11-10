@@ -42,8 +42,8 @@ export const Proposals = {
  * # </weight>
  */
 export function approve_proposal(
-  value: Omit<t.pallet_treasury.pallet.Call.approve_proposal, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_treasury.pallet.Call.approve_proposal, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Treasury", value: { ...value, type: "approve_proposal" } }
 }
 
@@ -59,8 +59,8 @@ export function approve_proposal(
  * # </weight>
  */
 export function propose_spend(
-  value: Omit<t.pallet_treasury.pallet.Call.propose_spend, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_treasury.pallet.Call.propose_spend, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Treasury", value: { ...value, type: "propose_spend" } }
 }
 
@@ -76,8 +76,8 @@ export function propose_spend(
  * # </weight>
  */
 export function reject_proposal(
-  value: Omit<t.pallet_treasury.pallet.Call.reject_proposal, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_treasury.pallet.Call.reject_proposal, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Treasury", value: { ...value, type: "reject_proposal" } }
 }
 
@@ -99,8 +99,8 @@ export function reject_proposal(
  * exist altogether, thus there is no way it would have been approved in the first place.
  */
 export function remove_approval(
-  value: Omit<t.pallet_treasury.pallet.Call.remove_approval, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_treasury.pallet.Call.remove_approval, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Treasury", value: { ...value, type: "remove_approval" } }
 }
 
@@ -115,7 +115,7 @@ export function remove_approval(
  * beneficiary.
  */
 export function spend(
-  value: Omit<t.pallet_treasury.pallet.Call.spend, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_treasury.pallet.Call.spend, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Treasury", value: { ...value, type: "spend" } }
 }

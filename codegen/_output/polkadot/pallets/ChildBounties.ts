@@ -72,8 +72,8 @@ export const ParentChildBounties = {
  * - `child_bounty_id`: Index of child bounty.
  */
 export function accept_curator(
-  value: Omit<t.pallet_child_bounties.pallet.Call.accept_curator, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_child_bounties.pallet.Call.accept_curator, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "ChildBounties", value: { ...value, type: "accept_curator" } }
 }
 
@@ -99,8 +99,8 @@ export function accept_curator(
  * - `description`: Text description for the child-bounty.
  */
 export function add_child_bounty(
-  value: Omit<t.pallet_child_bounties.pallet.Call.add_child_bounty, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_child_bounties.pallet.Call.add_child_bounty, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "ChildBounties", value: { ...value, type: "add_child_bounty" } }
 }
 
@@ -124,8 +124,8 @@ export function add_child_bounty(
  * - `beneficiary`: Beneficiary account.
  */
 export function award_child_bounty(
-  value: Omit<t.pallet_child_bounties.pallet.Call.award_child_bounty, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_child_bounties.pallet.Call.award_child_bounty, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "ChildBounties", value: { ...value, type: "award_child_bounty" } }
 }
 
@@ -148,8 +148,8 @@ export function award_child_bounty(
  * - `child_bounty_id`: Index of child bounty.
  */
 export function claim_child_bounty(
-  value: Omit<t.pallet_child_bounties.pallet.Call.claim_child_bounty, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_child_bounties.pallet.Call.claim_child_bounty, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "ChildBounties", value: { ...value, type: "claim_child_bounty" } }
 }
 
@@ -178,8 +178,8 @@ export function claim_child_bounty(
  * - `child_bounty_id`: Index of child bounty.
  */
 export function close_child_bounty(
-  value: Omit<t.pallet_child_bounties.pallet.Call.close_child_bounty, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_child_bounties.pallet.Call.close_child_bounty, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "ChildBounties", value: { ...value, type: "close_child_bounty" } }
 }
 
@@ -201,8 +201,8 @@ export function close_child_bounty(
  * - `fee`: payment fee to child-bounty curator for execution.
  */
 export function propose_curator(
-  value: Omit<t.pallet_child_bounties.pallet.Call.propose_curator, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_child_bounties.pallet.Call.propose_curator, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "ChildBounties", value: { ...value, type: "propose_curator" } }
 }
 
@@ -243,7 +243,7 @@ export function propose_curator(
  * - `child_bounty_id`: Index of child bounty.
  */
 export function unassign_curator(
-  value: Omit<t.pallet_child_bounties.pallet.Call.unassign_curator, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_child_bounties.pallet.Call.unassign_curator, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "ChildBounties", value: { ...value, type: "unassign_curator" } }
 }

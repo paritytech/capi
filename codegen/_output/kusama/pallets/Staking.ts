@@ -479,8 +479,8 @@ export const Validators = {
  * # </weight>
  */
 export function bond(
-  value: Omit<t.pallet_staking.pallet.pallet.Call.bond, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_staking.pallet.pallet.Call.bond, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Staking", value: { ...value, type: "bond" } }
 }
 
@@ -502,8 +502,8 @@ export function bond(
  * # </weight>
  */
 export function bond_extra(
-  value: Omit<t.pallet_staking.pallet.pallet.Call.bond_extra, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_staking.pallet.pallet.Call.bond_extra, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Staking", value: { ...value, type: "bond_extra" } }
 }
 
@@ -515,8 +515,8 @@ export function bond_extra(
  * Parameters: era and indices of the slashes for that era to kill.
  */
 export function cancel_deferred_slash(
-  value: Omit<t.pallet_staking.pallet.pallet.Call.cancel_deferred_slash, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_staking.pallet.pallet.Call.cancel_deferred_slash, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Staking", value: { ...value, type: "cancel_deferred_slash" } }
 }
 
@@ -533,7 +533,7 @@ export function cancel_deferred_slash(
  * - Writes are limited to the `origin` account key.
  * # </weight>
  */
-export function chill(): t.polkadot_runtime.RuntimeCall {
+export function chill(): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Staking", value: { type: "chill" } }
 }
 
@@ -566,8 +566,8 @@ export function chill(): t.polkadot_runtime.RuntimeCall {
  * who do not satisfy these requirements.
  */
 export function chill_other(
-  value: Omit<t.pallet_staking.pallet.pallet.Call.chill_other, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_staking.pallet.pallet.Call.chill_other, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Staking", value: { ...value, type: "chill_other" } }
 }
 
@@ -577,8 +577,8 @@ export function chill_other(
  * can call this.
  */
 export function force_apply_min_commission(
-  value: Omit<t.pallet_staking.pallet.pallet.Call.force_apply_min_commission, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_staking.pallet.pallet.Call.force_apply_min_commission, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Staking", value: { ...value, type: "force_apply_min_commission" } }
 }
 
@@ -600,7 +600,7 @@ export function force_apply_min_commission(
  * - Write ForceEra
  * # </weight>
  */
-export function force_new_era(): t.polkadot_runtime.RuntimeCall {
+export function force_new_era(): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Staking", value: { type: "force_new_era" } }
 }
 
@@ -615,7 +615,7 @@ export function force_new_era(): t.polkadot_runtime.RuntimeCall {
  * If this is called just before a new era is triggered, the election process may not
  * have enough blocks to get a result.
  */
-export function force_new_era_always(): t.polkadot_runtime.RuntimeCall {
+export function force_new_era_always(): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Staking", value: { type: "force_new_era_always" } }
 }
 
@@ -636,7 +636,7 @@ export function force_new_era_always(): t.polkadot_runtime.RuntimeCall {
  * - Write: ForceEra
  * # </weight>
  */
-export function force_no_eras(): t.polkadot_runtime.RuntimeCall {
+export function force_no_eras(): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Staking", value: { type: "force_no_eras" } }
 }
 
@@ -646,8 +646,8 @@ export function force_no_eras(): t.polkadot_runtime.RuntimeCall {
  * The dispatch origin must be Root.
  */
 export function force_unstake(
-  value: Omit<t.pallet_staking.pallet.pallet.Call.force_unstake, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_staking.pallet.pallet.Call.force_unstake, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Staking", value: { ...value, type: "force_unstake" } }
 }
 
@@ -661,8 +661,8 @@ export function force_unstake(
  * # </weight>
  */
 export function increase_validator_count(
-  value: Omit<t.pallet_staking.pallet.pallet.Call.increase_validator_count, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_staking.pallet.pallet.Call.increase_validator_count, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Staking", value: { ...value, type: "increase_validator_count" } }
 }
 
@@ -680,8 +680,8 @@ export function increase_validator_count(
  * block any further nominations.
  */
 export function kick(
-  value: Omit<t.pallet_staking.pallet.pallet.Call.kick, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_staking.pallet.pallet.Call.kick, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Staking", value: { ...value, type: "kick" } }
 }
 
@@ -699,8 +699,8 @@ export function kick(
  * # </weight>
  */
 export function nominate(
-  value: Omit<t.pallet_staking.pallet.pallet.Call.nominate, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_staking.pallet.pallet.Call.nominate, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Staking", value: { ...value, type: "nominate" } }
 }
 
@@ -728,8 +728,8 @@ export function nominate(
  * # </weight>
  */
 export function payout_stakers(
-  value: Omit<t.pallet_staking.pallet.pallet.Call.payout_stakers, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_staking.pallet.pallet.Call.payout_stakers, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Staking", value: { ...value, type: "payout_stakers" } }
 }
 
@@ -748,8 +748,8 @@ export function payout_stakers(
  * Refunds the transaction fees upon successful execution.
  */
 export function reap_stash(
-  value: Omit<t.pallet_staking.pallet.pallet.Call.reap_stash, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_staking.pallet.pallet.Call.reap_stash, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Staking", value: { ...value, type: "reap_stash" } }
 }
 
@@ -765,8 +765,8 @@ export function reap_stash(
  * # </weight>
  */
 export function rebond(
-  value: Omit<t.pallet_staking.pallet.pallet.Call.rebond, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_staking.pallet.pallet.Call.rebond, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Staking", value: { ...value, type: "rebond" } }
 }
 
@@ -780,8 +780,8 @@ export function rebond(
  * # </weight>
  */
 export function scale_validator_count(
-  value: Omit<t.pallet_staking.pallet.pallet.Call.scale_validator_count, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_staking.pallet.pallet.Call.scale_validator_count, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Staking", value: { ...value, type: "scale_validator_count" } }
 }
 
@@ -804,8 +804,8 @@ export function scale_validator_count(
  * # </weight>
  */
 export function set_controller(
-  value: Omit<t.pallet_staking.pallet.pallet.Call.set_controller, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_staking.pallet.pallet.Call.set_controller, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Staking", value: { ...value, type: "set_controller" } }
 }
 
@@ -815,8 +815,8 @@ export function set_controller(
  * The dispatch origin must be Root.
  */
 export function set_invulnerables(
-  value: Omit<t.pallet_staking.pallet.pallet.Call.set_invulnerables, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_staking.pallet.pallet.Call.set_invulnerables, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Staking", value: { ...value, type: "set_invulnerables" } }
 }
 
@@ -839,8 +839,8 @@ export function set_invulnerables(
  * # </weight>
  */
 export function set_payee(
-  value: Omit<t.pallet_staking.pallet.pallet.Call.set_payee, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_staking.pallet.pallet.Call.set_payee, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Staking", value: { ...value, type: "set_payee" } }
 }
 
@@ -864,8 +864,8 @@ export function set_payee(
  * to kick people under the new limits, `chill_other` should be called.
  */
 export function set_staking_configs(
-  value: Omit<t.pallet_staking.pallet.pallet.Call.set_staking_configs, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_staking.pallet.pallet.Call.set_staking_configs, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Staking", value: { ...value, type: "set_staking_configs" } }
 }
 
@@ -880,8 +880,8 @@ export function set_staking_configs(
  * # </weight>
  */
 export function set_validator_count(
-  value: Omit<t.pallet_staking.pallet.pallet.Call.set_validator_count, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_staking.pallet.pallet.Call.set_validator_count, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Staking", value: { ...value, type: "set_validator_count" } }
 }
 
@@ -907,8 +907,8 @@ export function set_validator_count(
  * See also [`Call::withdraw_unbonded`].
  */
 export function unbond(
-  value: Omit<t.pallet_staking.pallet.pallet.Call.unbond, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_staking.pallet.pallet.Call.unbond, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Staking", value: { ...value, type: "unbond" } }
 }
 
@@ -920,8 +920,8 @@ export function unbond(
  * The dispatch origin for this call must be _Signed_ by the controller, not the stash.
  */
 export function validate(
-  value: Omit<t.pallet_staking.pallet.pallet.Call.validate, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_staking.pallet.pallet.Call.validate, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Staking", value: { ...value, type: "validate" } }
 }
 
@@ -943,7 +943,7 @@ export function validate(
  * # </weight>
  */
 export function withdraw_unbonded(
-  value: Omit<t.pallet_staking.pallet.pallet.Call.withdraw_unbonded, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_staking.pallet.pallet.Call.withdraw_unbonded, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Staking", value: { ...value, type: "withdraw_unbonded" } }
 }

@@ -67,7 +67,7 @@ export const ReceivedHeartbeats = {
  * # </weight>
  */
 export function heartbeat(
-  value: Omit<t.pallet_im_online.pallet.Call.heartbeat, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_im_online.pallet.Call.heartbeat, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "ImOnline", value: { ...value, type: "heartbeat" } }
 }

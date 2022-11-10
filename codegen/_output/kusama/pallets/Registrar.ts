@@ -41,8 +41,8 @@ export const PendingSwap = {
  * Can be called by Root, the parachain, or the parachain manager if the parachain is unlocked.
  */
 export function add_lock(
-  value: Omit<t.polkadot_runtime_common.paras_registrar.pallet.Call.add_lock, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_common.paras_registrar.pallet.Call.add_lock, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Registrar", value: { ...value, type: "add_lock" } }
 }
 
@@ -52,8 +52,8 @@ export function add_lock(
  * The caller must be Root, the `para` owner, or the `para` itself. The para must be a parathread.
  */
 export function deregister(
-  value: Omit<t.polkadot_runtime_common.paras_registrar.pallet.Call.deregister, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_common.paras_registrar.pallet.Call.deregister, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Registrar", value: { ...value, type: "deregister" } }
 }
 
@@ -66,8 +66,8 @@ export function deregister(
  * can be registered, including sub-1000 IDs which are System Parachains.
  */
 export function force_register(
-  value: Omit<t.polkadot_runtime_common.paras_registrar.pallet.Call.force_register, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_common.paras_registrar.pallet.Call.force_register, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Registrar", value: { ...value, type: "force_register" } }
 }
 
@@ -88,8 +88,8 @@ export function force_register(
  * The `Registered` event is emitted in case of success.
  */
 export function register(
-  value: Omit<t.polkadot_runtime_common.paras_registrar.pallet.Call.register, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_common.paras_registrar.pallet.Call.register, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Registrar", value: { ...value, type: "register" } }
 }
 
@@ -100,8 +100,8 @@ export function register(
  * Can only be called by the Root origin or the parachain.
  */
 export function remove_lock(
-  value: Omit<t.polkadot_runtime_common.paras_registrar.pallet.Call.remove_lock, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_common.paras_registrar.pallet.Call.remove_lock, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Registrar", value: { ...value, type: "remove_lock" } }
 }
 
@@ -121,7 +121,7 @@ export function remove_lock(
  * ## Events
  * The `Reserved` event is emitted in case of success, which provides the ID reserved for use.
  */
-export function reserve(): t.polkadot_runtime.RuntimeCall {
+export function reserve(): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Registrar", value: { type: "reserve" } }
 }
 
@@ -131,8 +131,11 @@ export function reserve(): t.polkadot_runtime.RuntimeCall {
  * Can be called by Root, the parachain, or the parachain manager if the parachain is unlocked.
  */
 export function schedule_code_upgrade(
-  value: Omit<t.polkadot_runtime_common.paras_registrar.pallet.Call.schedule_code_upgrade, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<
+    t.types.polkadot_runtime_common.paras_registrar.pallet.Call.schedule_code_upgrade,
+    "type"
+  >,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Registrar", value: { ...value, type: "schedule_code_upgrade" } }
 }
 
@@ -142,8 +145,8 @@ export function schedule_code_upgrade(
  * Can be called by Root, the parachain, or the parachain manager if the parachain is unlocked.
  */
 export function set_current_head(
-  value: Omit<t.polkadot_runtime_common.paras_registrar.pallet.Call.set_current_head, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_common.paras_registrar.pallet.Call.set_current_head, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Registrar", value: { ...value, type: "set_current_head" } }
 }
 
@@ -161,7 +164,7 @@ export function set_current_head(
  * and the auction deposit are switched.
  */
 export function swap(
-  value: Omit<t.polkadot_runtime_common.paras_registrar.pallet.Call.swap, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_common.paras_registrar.pallet.Call.swap, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Registrar", value: { ...value, type: "swap" } }
 }

@@ -79,8 +79,8 @@ export const State = {
  * Only callable by root.
  */
 export function note_stalled(
-  value: Omit<t.pallet_grandpa.pallet.Call.note_stalled, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_grandpa.pallet.Call.note_stalled, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Grandpa", value: { ...value, type: "note_stalled" } }
 }
 
@@ -91,8 +91,8 @@ export function note_stalled(
  * will be reported.
  */
 export function report_equivocation(
-  value: Omit<t.pallet_grandpa.pallet.Call.report_equivocation, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_grandpa.pallet.Call.report_equivocation, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Grandpa", value: { ...value, type: "report_equivocation" } }
 }
 
@@ -108,7 +108,7 @@ export function report_equivocation(
  * reporter.
  */
 export function report_equivocation_unsigned(
-  value: Omit<t.pallet_grandpa.pallet.Call.report_equivocation_unsigned, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.pallet_grandpa.pallet.Call.report_equivocation_unsigned, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Grandpa", value: { ...value, type: "report_equivocation_unsigned" } }
 }

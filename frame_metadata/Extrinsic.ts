@@ -6,8 +6,11 @@ import { $null, DeriveCodec } from "./Codec.ts"
 import { Metadata } from "./Metadata.ts"
 
 // TODO: revisit
-import { $multiSignature, MultiSignature } from "../codegen/_output/polkadot/sp_runtime/mod.ts"
-import { MultiAddress } from "../codegen/_output/polkadot/sp_runtime/multiaddress.ts"
+import {
+  $multiSignature,
+  MultiSignature,
+} from "../codegen/_output/polkadot/types/sp_runtime/mod.ts"
+import { MultiAddress } from "../codegen/_output/polkadot/types/sp_runtime/multiaddress.ts"
 
 export { MultiAddress, MultiSignature }
 

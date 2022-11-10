@@ -172,8 +172,8 @@ export const HrmpWatermarks = {
  * Number of inbound and outbound channels for `para` must be provided as witness data of weighing.
  */
 export function force_clean_hrmp(
-  value: Omit<t.polkadot_runtime_parachains.hrmp.pallet.Call.force_clean_hrmp, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_parachains.hrmp.pallet.Call.force_clean_hrmp, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Hrmp", value: { ...value, type: "force_clean_hrmp" } }
 }
 
@@ -186,8 +186,8 @@ export function force_clean_hrmp(
  * Relay Chain, e.g. a common good parachain.
  */
 export function force_open_hrmp_channel(
-  value: Omit<t.polkadot_runtime_parachains.hrmp.pallet.Call.force_open_hrmp_channel, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_parachains.hrmp.pallet.Call.force_open_hrmp_channel, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Hrmp", value: { ...value, type: "force_open_hrmp_channel" } }
 }
 
@@ -200,8 +200,11 @@ export function force_open_hrmp_channel(
  * Total number of closing channels must be provided as witness data of weighing.
  */
 export function force_process_hrmp_close(
-  value: Omit<t.polkadot_runtime_parachains.hrmp.pallet.Call.force_process_hrmp_close, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<
+    t.types.polkadot_runtime_parachains.hrmp.pallet.Call.force_process_hrmp_close,
+    "type"
+  >,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Hrmp", value: { ...value, type: "force_process_hrmp_close" } }
 }
 
@@ -214,8 +217,8 @@ export function force_process_hrmp_close(
  * Total number of opening channels must be provided as witness data of weighing.
  */
 export function force_process_hrmp_open(
-  value: Omit<t.polkadot_runtime_parachains.hrmp.pallet.Call.force_process_hrmp_open, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_parachains.hrmp.pallet.Call.force_process_hrmp_open, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Hrmp", value: { ...value, type: "force_process_hrmp_open" } }
 }
 
@@ -225,8 +228,11 @@ export function force_process_hrmp_open(
  * The channel will be opened only on the next session boundary.
  */
 export function hrmp_accept_open_channel(
-  value: Omit<t.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_accept_open_channel, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<
+    t.types.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_accept_open_channel,
+    "type"
+  >,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Hrmp", value: { ...value, type: "hrmp_accept_open_channel" } }
 }
 
@@ -241,8 +247,11 @@ export function hrmp_accept_open_channel(
  * witness data.
  */
 export function hrmp_cancel_open_request(
-  value: Omit<t.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_cancel_open_request, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<
+    t.types.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_cancel_open_request,
+    "type"
+  >,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Hrmp", value: { ...value, type: "hrmp_cancel_open_request" } }
 }
 
@@ -253,8 +262,8 @@ export function hrmp_cancel_open_request(
  * The closure can only happen on a session change.
  */
 export function hrmp_close_channel(
-  value: Omit<t.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_close_channel, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_close_channel, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Hrmp", value: { ...value, type: "hrmp_close_channel" } }
 }
 
@@ -271,7 +280,7 @@ export function hrmp_close_channel(
  * change.
  */
 export function hrmp_init_open_channel(
-  value: Omit<t.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_init_open_channel, "type">,
-): t.polkadot_runtime.RuntimeCall {
+  value: Omit<t.types.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_init_open_channel, "type">,
+): t.types.polkadot_runtime.RuntimeCall {
   return { type: "Hrmp", value: { ...value, type: "hrmp_init_open_channel" } }
 }
