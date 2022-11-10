@@ -22,6 +22,7 @@ const runTx = tx
   .watch(function(status) {
     console.log(status);
     if (C.TransactionStatus.isTerminal(status)) {
+      // TODO: return this upon implementing `this.stop`
       hash = (status as { finalized: Hash }).finalized;
       this.stop();
     }
@@ -29,7 +30,7 @@ const runTx = tx
   .bind(env);
 
 const readEvents = C
-  .events(tx, C.Z.call(() => hash))
+  .events(tx, C.Z.call(() => hash!))
   .bind(env);
 
 U.throwIfError(await runTx());

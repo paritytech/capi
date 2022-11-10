@@ -1,5 +1,4 @@
 import { unimplemented } from "../deps/std/testing/asserts.ts";
-import { equal } from "../deps/std/testing/asserts.ts";
 import * as Z from "../deps/zones.ts";
 import * as M from "../frame_metadata/mod.ts";
 import * as known from "../known/mod.ts";
@@ -7,17 +6,13 @@ import * as rpc from "../rpc/mod.ts";
 import * as ss58 from "../ss58/mod.ts";
 import * as U from "../util/mod.ts";
 import { $extrinsic } from "./$extrinsic.ts";
-import { blockRead } from "./blockRead.ts";
 import { const as const_ } from "./const.ts";
 import { deriveCodec } from "./deriveCodec.ts";
-import { entryRead } from "./entryRead.ts";
 import { metadata } from "./metadata.ts";
 import { author, chain, system } from "./rpc_known.ts";
 import * as e$ from "./scale.ts";
 
 const k0_ = Symbol();
-const k1_ = Symbol();
-const k2_ = Symbol();
 
 export interface CallData {
   palletName: string;
@@ -122,7 +117,7 @@ export class SignedExtrinsic<
       signature,
     });
     this.extrinsicBytes = e$.scaleEncoded($extrinsic_, $extrinsicProps, true);
-    this.extrinsicHex = this.extrinsicBytes.next(U.hex.encode);
+    this.extrinsicHex = this.extrinsicBytes.next(U.hex.encodePrefixed);
     this.extrinsicDecoded = e$.scaleDecoded($extrinsic_, this.extrinsicBytes, "extrinsic");
   }
 
@@ -140,34 +135,4 @@ export class SignedExtrinsic<
   get sent() {
     return author.submitExtrinsic(this.client)(this.extrinsicHex);
   }
-}
-
-// TODO: attach this to `Extrinsic`?
-export function extrinsicEvents<
-  Extrinsic extends SignedExtrinsic,
-  FinalizedHash extends known.Hash,
->(
-  extrinsic: Extrinsic,
-  finalizedHash: FinalizedHash,
-) {
-  const client = extrinsic.props.client as Extrinsic["props"]["client"];
-  const extrinsics = blockRead(client)(finalizedHash)
-    .access("block")
-    .access("extrinsics");
-  const idx = Z
-    // TODO: devise zones-level solution to the generic access widening
-    .ls(extrinsics, extrinsic.extrinsicDecoded as Extrinsic["extrinsicDecoded"])
-    .next(([extrinsics, extrinsicDecoded]) => {
-      return extrinsics.findIndex((v) => equal(v, extrinsicDecoded));
-    }, k1_);
-  const events = entryRead(client)("System", "Events", [], finalizedHash)
-    .access("value")
-    .as<{ phase: { value: number } }[]>();
-  return Z
-    .ls(idx, events)
-    .next(([idx, events]) => {
-      return events.filter((event) => {
-        return event.phase.value === idx;
-      });
-    }, k2_);
 }
