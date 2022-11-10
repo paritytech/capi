@@ -29,7 +29,7 @@ const existentialDeposit = extrinsic({
     value: {
       type: "transfer",
       value: 2_000_000_000_000n,
-      dest: C.MultiAddress.fromId(multisigPublicKey),
+      dest: C.MultiAddress.Id(multisigPublicKey),
     },
   },
 })
