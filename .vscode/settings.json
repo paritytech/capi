@@ -18,6 +18,5 @@
   "prettier.printWidth": 100,
   "ltex.disabledRules": {
     "en-US": ["MORFOLOGIK_RULE_EN_US"]
-  },
-  "cSpell.words": []
+  }
 }
