@@ -2,12 +2,9 @@ import * as Z from "../deps/zones.ts";
 import * as known from "../known/mod.ts";
 import * as rpc from "../rpc/mod.ts";
 import * as U from "../util/mod.ts";
-import { $storageKey } from "./$storageKey.ts";
-import { codec } from "./codec.ts";
-import { deriveCodec } from "./deriveCodec.ts";
 import { entryMetadata, metadata, palletMetadata } from "./metadata.ts";
 import { state } from "./rpc_known.ts";
-import * as e$ from "./scale.ts";
+import * as scale from "./scale.ts";
 
 export type WatchEntryEvent = [key?: unknown, value?: unknown];
 
@@ -25,13 +22,13 @@ export function entryWatch<Client extends Z.$<rpc.Client>>(client: Client) {
     listener: U.Listener<WatchEntryEvent[], rpc.ClientSubscribeContext>,
   ) => {
     const metadata_ = metadata(client)();
-    const deriveCodec_ = deriveCodec(metadata_);
+    const deriveCodec_ = scale.deriveCodec(metadata_);
     const palletMetadata_ = palletMetadata(metadata_, palletName);
     const entryMetadata_ = entryMetadata(palletMetadata_, entryName);
-    const $storageKey_ = $storageKey(deriveCodec_, palletMetadata_, entryMetadata_);
+    const $storageKey_ = scale.$storageKey(deriveCodec_, palletMetadata_, entryMetadata_);
     const entryValueTypeI = entryMetadata_.access("value");
-    const $entry = codec(deriveCodec_, entryValueTypeI);
-    const storageKeys = e$
+    const $entry = scale.codec(deriveCodec_, entryValueTypeI);
+    const storageKeys = scale
       .scaleEncoded($storageKey_, keys.length ? [keys] : [])
       .next(U.hex.encode)
       .next(U.tuple);

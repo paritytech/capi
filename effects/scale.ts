@@ -1,8 +1,24 @@
 import * as $ from "../deps/scale.ts";
 import * as Z from "../deps/zones.ts";
+import * as M from "../frame_metadata/mod.ts";
 
 const k0_ = Symbol();
 const k1_ = Symbol();
+const k2_ = Symbol();
+const k3_ = Symbol();
+const k4_ = Symbol();
+const k5_ = Symbol();
+
+export const deriveCodec = Z.call.fac((metadata: M.Metadata) => {
+  return M.DeriveCodec(metadata.tys);
+}, k0_);
+
+export const codec = Z.call.fac((
+  deriveCodec: M.DeriveCodec,
+  ty: number | M.Ty,
+) => {
+  return deriveCodec(ty);
+}, k1_);
 
 export function scaleDecoded<
   Codec extends Z.$<$.Codec<any>>,
@@ -17,7 +33,7 @@ export function scaleDecoded<
     .ls(codec, encoded, key)
     .next(([codec, encoded, key]): Record<Z.T<Key>, any> => {
       return { [key]: codec.decode(encoded) } as any;
-    }, k0_)
+    }, k2_)
     .zoned("ScaleDecoded");
 }
 
@@ -36,5 +52,31 @@ export function scaleEncoded<Codec extends Z.$<$.Codec<any>>, Decoded>(
         return e as $.ScaleAssertError;
       }
       return codec[isAsync ? "encodeAsync" : "encode"](decoded);
-    }, k1_);
+    }, k3_);
 }
+
+export const $extrinsic = Z.call.fac((
+  deriveCodec: M.DeriveCodec,
+  metadata: M.Metadata,
+  sign: M.Signer,
+  prefix?: number,
+) => {
+  return M.$extrinsic({
+    deriveCodec,
+    metadata,
+    sign: sign!,
+    prefix: prefix!,
+  });
+}, k4_);
+
+export const $storageKey = Z.call.fac((
+  deriveCodec: M.DeriveCodec,
+  pallet: M.Pallet,
+  storageEntry: M.StorageEntry,
+) => {
+  return M.$storageKey({
+    deriveCodec,
+    pallet,
+    storageEntry,
+  });
+}, k5_);

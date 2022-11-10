@@ -8,7 +8,7 @@ const k0_ = Symbol();
 
 export function blockWatch<Client extends Z.$<rpc.Client>>(client: Client) {
   return <
-    Listener extends Z.$<U.Listener<known.SignedBlock, rpc.ClientSubscribeContext>>,
+    Listener extends Z.$<U.Listener<known.SignedBlock, BlockWatchListenerContext>>,
   >(listener: Listener) => {
     const listenerMapped = Z
       .ls(listener, Z.env)
@@ -18,7 +18,7 @@ export function blockWatch<Client extends Z.$<rpc.Client>>(client: Client) {
           const block = await chain.getBlock(client)(blockHash).bind(env)();
           // TODO: return error with `this.stop` once implemented
           if (block instanceof Error) throw block;
-          listener.apply(this, [block]);
+          listener.apply({ ...this, env }, [block]);
         };
       }, k0_);
     const subscriptionId = chain.subscribeNewHeads(client)([], listenerMapped);
@@ -26,4 +26,9 @@ export function blockWatch<Client extends Z.$<rpc.Client>>(client: Client) {
       .unsubscribeNewHeads(client)(subscriptionId)
       .zoned("BlockWatch");
   };
+}
+
+// TODO: generalize
+export interface BlockWatchListenerContext extends rpc.ClientSubscribeContext {
+  env: Z.Env;
 }
