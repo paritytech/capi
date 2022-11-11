@@ -25,7 +25,7 @@ const root = C.extrinsic(T.westend)({
   })
   .watch(function(status) {
     console.log(status);
-    if (C.TransactionStatus.isTerminal(status)) {
+    if (C.rpc.known.TransactionStatus.isTerminal(status)) {
       this.stop();
     }
   });

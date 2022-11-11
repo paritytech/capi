@@ -81,7 +81,7 @@ export type StorageDeposit = SerdeEnum<{
 }>;
 
 // https://github.com/paritytech/substrate/blob/622f532/frame/contracts/common/src/lib.rs#L118
-/** Flags used by a contract to customize exit behaviour. */
+/** Flags used by a contract to customize exit behavior. */
 export enum ReturnFlags {
   REVERT = 0x0000_0001,
 }
@@ -202,7 +202,7 @@ export interface CodeUploadRequest {
 }
 
 // https://github.com/paritytech/substrate/blob/622f532/frame/contracts/common/src/lib.rs#L164
-/** The result of succesfully uploading a contract. */
+/** The result of successfully uploading a contract. */
 export interface CodeUploadReturnValue {
   /** The key under which the new code is stored. */
   codeHash: Hash;

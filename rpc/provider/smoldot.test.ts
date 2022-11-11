@@ -1,11 +1,7 @@
-// TODO
 import { deferred } from "../../deps/std/async.ts";
 import { assertExists, assertNotInstanceOf } from "../../deps/std/testing/asserts.ts";
 import { ProviderListener } from "./base.ts";
 import { smoldotProvider } from "./smoldot.ts";
-
-const POLKADOT_CHAIN_SPEC_URL =
-  "https://raw.githubusercontent.com/paritytech/substrate-connect/main/packages/connect/src/connector/specs/polkadot.json";
 
 Deno.test({
   name: "Smoldot Provider",

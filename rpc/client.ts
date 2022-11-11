@@ -63,13 +63,7 @@ export class Client<
       }
     } else if (e.id) {
       const pendingCall = this.pendingCalls[e.id];
-      if (!pendingCall) {
-        console.log({ e });
-        // TODO: pipe error to listeners and message the likely cause,
-        //       a duplicate client.
-        throw new Error();
-      }
-      pendingCall.resolve(e);
+      pendingCall?.resolve(e);
       delete this.pendingCalls[e.id];
       if (this.pendingSubscriptions[e.id]) {
         if (e.error) {
@@ -103,7 +97,7 @@ export class Client<
       delete this.activeSubscriptionByMessageId[message.id];
       waiter.resolve(activeSubscriptionId);
     };
-    this.pendingSubscriptions[message.id] = listener.bind({
+    const listenerBound = listener.bind({
       message,
       stop,
       state: <T>(ctor: new() => T) => {

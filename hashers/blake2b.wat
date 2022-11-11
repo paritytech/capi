@@ -6,12 +6,31 @@
   ;; (func $dbg_u32 (param $v i32) (result i32) local.get $v call $log_u32 local.get $v)
   ;; (func $dbg_u64 (param $v i64) (result i64) local.get $v call $log_u64 local.get $v)
 
-  (global $staging_adr i32 (i32.const 0))
-  (global $iv_adr i32 (i32.const 128))
-  (export "iv_adr" (global $iv_adr))
-  (global $sigma_adr i32 (i32.const 192))
+  ;; $staging_adr = 0
+  ;; $iv_adr = 128
+  ;; $sigma_adr = 192
   (global $free_mem i32 (i32.const 384))
   (export "free_mem" (global $free_mem))
+
+  ;; iv & sigma
+  (data (i32.const 128)
+    "\08\c9\bc\f3\67\e6\09\6a\3b\a7\ca\84\85\ae\67\bb"
+    "\2b\f8\94\fe\72\f3\6e\3c\f1\36\1d\5f\3a\f5\4f\a5"
+    "\d1\82\e6\ad\7f\52\0e\51\1f\6c\3e\2b\8c\68\05\9b"
+    "\6b\bd\41\fb\ab\d9\83\1f\79\21\7e\13\19\cd\e0\5b"
+    "\00\08\10\18\20\28\30\38\40\48\50\58\60\68\70\78"
+    "\70\50\20\40\48\78\68\30\08\60\00\10\58\38\28\18"
+    "\58\40\60\00\28\10\78\68\50\70\18\30\38\08\48\20"
+    "\38\48\18\08\68\60\58\70\10\30\28\50\20\00\78\40"
+    "\48\00\28\38\10\20\50\78\70\08\58\60\30\40\18\68"
+    "\10\60\30\50\00\58\40\18\20\68\38\28\78\70\08\48"
+    "\60\28\08\78\70\68\20\50\00\38\30\18\48\10\40\58"
+    "\68\58\38\70\60\08\18\48\28\00\78\20\40\30\10\50"
+    "\30\78\70\48\58\18\00\40\60\10\68\38\08\20\50\28"
+    "\50\10\40\20\38\30\08\28\78\58\48\70\18\60\68\00"
+    "\00\08\10\18\20\28\30\38\40\48\50\58\60\68\70\78"
+    "\70\50\20\40\48\78\68\30\08\60\00\10\58\38\28\18"
+  )
 
   (func (export "reset")
     (param $state_adr i32)
@@ -19,7 +38,7 @@
 
     (memory.copy
       (local.get $state_adr)
-      (global.get $iv_adr)
+      (i32.const 128) ;; $iv_adr = 128
       (i32.const 64)
     )
 
@@ -30,23 +49,13 @@
     )
   )
 
-  (func $get
-    (param $mem_adr i32)
-    (param $idx i32)
-    (result i64)
-
-    (i64.load (i32.add (local.get $mem_adr) 
-      (i32.load8_u (i32.add (global.get $sigma_adr) (local.get $idx)))
-    ))
-  )
-
   (func $g
     (param $ai i32)
     (param $bi i32)
     (param $ci i32)
     (param $di i32)
     (param $msg_adr i32)
-    (param $idx_1 i32)
+    (param $idx i32)
 
     (local $a i64)
     (local $b i64)
@@ -59,8 +68,10 @@
     (local.set $b (i64.load (local.get $bi)))
     (local.set $c (i64.load (local.get $ci)))
     (local.set $d (i64.load (local.get $di)))
-    (local.set $x (call $get (local.get $msg_adr) (local.get $idx_1)))
-    (local.set $y (call $get (local.get $msg_adr) (i32.add (local.get $idx_1) (i32.const 1))))
+
+    ;; $sigma_adr=192
+    (local.set $x (i64.load (i32.add (local.get $msg_adr) (i32.load8_u offset=192 (local.get $idx)))))
+    (local.set $y (i64.load (i32.add (local.get $msg_adr) (i32.load8_u offset=193 (local.get $idx)))))
 
     (local.set $a (local.get $a) (i64.add (local.get $b)) (i64.add (local.get $x)))
     (local.set $d (local.get $d) (i64.xor (local.get $a)) (i64.rotr (i64.const 32)))
@@ -87,14 +98,14 @@
     (local $idx i32)
 
     (memory.copy
-      (i32.const 0)
+      (i32.const 0) ;; $staging_adr
       (local.get $state_adr)
       (i32.const 64)
     )
 
     (memory.copy
-      (i32.const 64)
-      (global.get $iv_adr)
+      (i32.const 64) ;; $staging_adr + 64
+      (i32.const 128) ;; $iv_adr = 128
       (i32.const 64)
     )
 
@@ -153,20 +164,20 @@
       (v128.xor (v128.load (i32.const 64)))
     )
 
-    (v128.store (local.tee $state_adr (i32.add (local.get $state_adr) (i32.const 16)))
-      (v128.load (local.get $state_adr))
+    (v128.store offset=16 (local.get $state_adr)
+      (v128.load offset=16 (local.get $state_adr))
       (v128.xor (v128.load (i32.const 16)))
       (v128.xor (v128.load (i32.const 80)))
     )
 
-    (v128.store (local.tee $state_adr (i32.add (local.get $state_adr) (i32.const 16)))
-      (v128.load (local.get $state_adr))
+    (v128.store offset=32 (local.get $state_adr)
+      (v128.load offset=32 (local.get $state_adr))
       (v128.xor (v128.load (i32.const 32)))
       (v128.xor (v128.load (i32.const 96)))
     )
 
-    (v128.store (local.tee $state_adr (i32.add (local.get $state_adr) (i32.const 16)))
-      (v128.load (local.get $state_adr))
+    (v128.store offset=48 (local.get $state_adr)
+      (v128.load offset=48 (local.get $state_adr))
       (v128.xor (v128.load (i32.const 48)))
       (v128.xor (v128.load (i32.const 112)))
     )

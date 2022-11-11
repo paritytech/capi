@@ -2,7 +2,6 @@ import * as A from "../deps/std/testing/asserts.ts";
 import * as Z from "../deps/zones.ts";
 import { ExtrinsicProps, SignedExtrinsic } from "../effects/extrinsic.ts";
 import * as M from "../frame_metadata/mod.ts";
-import * as known from "../known/rpc/mod.ts";
 import * as rpc from "../rpc/mod.ts";
 
 const k0_ = Symbol();
@@ -14,11 +13,11 @@ export function collectExtrinsicEvents<
   Props extends Z.Rec$<ExtrinsicProps>,
   Sign extends Z.$<M.Signer>,
 >(extrinsic: SignedExtrinsic<Client, Props, Sign>) {
-  const events: known.TransactionStatus[] = [];
+  const events: rpc.known.TransactionStatus[] = [];
   return extrinsic
     .watch(function(status) {
       events.push(status);
-      if (known.TransactionStatus.isTerminal(status)) {
+      if (rpc.known.TransactionStatus.isTerminal(status)) {
         this.stop();
       }
     })
@@ -28,7 +27,7 @@ export function collectExtrinsicEvents<
 // TODO: is this a common-enough test to merit existence in `test_util`?
 // TODO: means of specifying some variability?
 export function assertStatusOrder(
-  statuses: known.TransactionStatus[],
+  statuses: rpc.known.TransactionStatus[],
   statusOrderExpectation: StatusOrderExpectation,
 ) {
   A.assertEquals(statuses.length, statusOrderExpectation.length);

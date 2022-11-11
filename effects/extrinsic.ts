@@ -1,16 +1,13 @@
 import { unimplemented } from "../deps/std/testing/asserts.ts";
 import * as Z from "../deps/zones.ts";
 import * as M from "../frame_metadata/mod.ts";
-import * as known from "../known/mod.ts";
 import * as rpc from "../rpc/mod.ts";
 import * as ss58 from "../ss58/mod.ts";
 import * as U from "../util/mod.ts";
-import { $extrinsic } from "./$extrinsic.ts";
 import { const as const_ } from "./const.ts";
-import { deriveCodec } from "./deriveCodec.ts";
 import { metadata } from "./metadata.ts";
-import { author, chain, system } from "./rpc_known.ts";
-import * as e$ from "./scale.ts";
+import { author, chain, system } from "./rpc_known_methods.ts";
+import * as scale from "./scale.ts";
 
 const k0_ = Symbol();
 
@@ -35,8 +32,8 @@ export function extrinsic<Client extends Z.$<rpc.Client>>(client: Client) {
 }
 
 export class Extrinsic<
-  Client extends Z.$<rpc.Client>,
-  Props extends Z.Rec$<ExtrinsicProps>,
+  Client extends Z.$<rpc.Client> = Z.$<rpc.Client>,
+  Props extends Z.Rec$<ExtrinsicProps> = Z.Rec$<ExtrinsicProps>,
 > {
   constructor(
     readonly client: Client,
@@ -49,14 +46,16 @@ export class Extrinsic<
 }
 
 export class SignedExtrinsic<
-  Client extends Z.$<rpc.Client>,
-  Props extends Z.Rec$<ExtrinsicProps>,
-  Sign extends Z.$<M.Signer>,
+  Client extends Z.$<rpc.Client> = Z.$<rpc.Client>,
+  Props extends Z.Rec$<ExtrinsicProps> = Z.Rec$<ExtrinsicProps>,
+  Sign extends Z.$<M.Signer> = Z.$<M.Signer>,
 > {
   client;
   props;
   sign;
-  extrinsic;
+  extrinsicBytes;
+  extrinsicHex;
+  extrinsicDecoded;
 
   constructor(
     client: Client,
@@ -67,12 +66,10 @@ export class SignedExtrinsic<
     this.props = props as Z.Rec$Access<Props>;
     this.sign = sign as Sign;
 
-    const metadata_ = metadata(this.client)();
-    const deriveCodec_ = deriveCodec(metadata_);
     const addrPrefix = const_(this.client)("System", "SS58Prefix")
       .access("value")
       .as<number>();
-    const $extrinsic_ = $extrinsic(deriveCodec_, metadata_, this.sign, addrPrefix);
+    const $extrinsic_ = $extrinsic(this.client, this.sign);
     const versions = const_(this.client)("System", "Version")
       .access("value");
     const specVersion = versions
@@ -114,16 +111,16 @@ export class SignedExtrinsic<
       args: this.props.args,
       signature,
     });
-    this.extrinsic = e$
-      .scaleEncoded($extrinsic_, $extrinsicProps, true)
-      .next(U.hex.encode);
+    this.extrinsicBytes = scale.scaleEncoded($extrinsic_, $extrinsicProps, true);
+    this.extrinsicHex = this.extrinsicBytes.next(U.hex.encodePrefixed);
+    this.extrinsicDecoded = scale.scaleDecoded($extrinsic_, this.extrinsicBytes, "extrinsic");
   }
 
-  watch<Listener extends Z.$<U.Listener<known.TransactionStatus, rpc.ClientSubscribeContext>>>(
+  watch<Listener extends Z.$<U.Listener<rpc.known.TransactionStatus, rpc.ClientSubscribeContext>>>(
     listener: Listener,
   ) {
     const subscriptionId = author.submitAndWatchExtrinsic(this.client)(
-      [this.extrinsic],
+      [this.extrinsicHex],
       listener,
     );
     return author.unwatchExtrinsic(this.client)(subscriptionId)
@@ -131,7 +128,33 @@ export class SignedExtrinsic<
   }
 
   get sent() {
-    return author.submitExtrinsic(this.client)(this.extrinsic)
-      .zoned("ExtrinsicSent");
+    return author.submitExtrinsic(this.client)(this.extrinsicHex);
   }
+}
+
+// TODO: attach to extrinsics sent.finalized result once zones-level method addition implemented
+export function extrinsicsDecoded<
+  Client extends Z.$<rpc.Client>,
+  Hexes extends Z.$<rpc.known.Hex[]>,
+>(
+  client: Client,
+  hexes: Hexes,
+) {
+  return Z
+    .ls($extrinsic(client), hexes)
+    .next(([$extrinsic, hexes]) => {
+      return hexes.map((hex) => $extrinsic.decode(U.hex.decode(hex)));
+    });
+}
+
+function $extrinsic<
+  Client extends Z.$<rpc.Client> = Z.$<rpc.Client>,
+  Rest extends [sign?: Z.$<M.Signer>] = [sign?: Z.$<M.Signer>],
+>(client: Client, ...[sign]: Rest) {
+  const metadata_ = metadata(client)();
+  const deriveCodec_ = scale.deriveCodec(metadata_);
+  const addrPrefix = const_(client)("System", "SS58Prefix")
+    .access("value")
+    .as<number>();
+  return scale.$extrinsic(deriveCodec_, metadata_, sign!, addrPrefix);
 }

@@ -3,7 +3,7 @@ import * as Z from "../deps/zones.ts";
 import * as M from "../frame_metadata/mod.ts";
 import * as rpc from "../rpc/mod.ts";
 import * as U from "../util/mod.ts";
-import { state } from "./rpc_known.ts";
+import { state } from "./rpc_known_methods.ts";
 
 const k0_ = Symbol();
 const k1_ = Symbol();

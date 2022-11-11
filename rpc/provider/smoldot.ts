@@ -8,6 +8,7 @@ import {
   start,
 } from "../../deps/smoldot.ts";
 import { Chain, Client, ClientOptions } from "../../deps/smoldot/client.d.ts";
+import { deferred } from "../../deps/std/async.ts";
 import * as msg from "../messages.ts";
 import { nextIdFactory, Provider, ProviderConnection, ProviderListener } from "./base.ts";
 import { ProviderCloseError, ProviderHandlerError, ProviderSendError } from "./errors.ts";
@@ -26,19 +27,26 @@ type SmoldotHandlerErrorData =
 type SmoldotCloseErrorData = AlreadyDestroyedError | CrashError;
 
 let client: undefined | Client;
-const connections = new Map<string, SmoldotProviderConnection>();
+const connections = new Map<SmoldotProviderProps, SmoldotProviderConnection>();
 class SmoldotProviderConnection
   extends ProviderConnection<Chain, SmoldotSendErrorData, SmoldotHandlerErrorData>
 {}
 
 const nextId = nextIdFactory();
 
+export interface SmoldotProviderProps {
+  relayChainSpec: string;
+  parachainSpec?: string;
+  // TODO: support deferring closing (how / what heuristic?)
+  deferClosing?: boolean;
+}
+
 export const smoldotProvider: Provider<
-  string,
+  SmoldotProviderProps,
   SmoldotSendErrorData,
   SmoldotHandlerErrorData,
   SmoldotCloseErrorData
-> = (chainSpec, listener) => {
+> = (props, listener) => {
   return {
     nextId,
     send: (message) => {
@@ -62,12 +70,13 @@ export const smoldotProvider: Provider<
       })();
     },
     release: async () => {
-      const { cleanUp, listeners, inner } = await connection(chainSpec, listener);
+      const { cleanUp, listeners, inner } = await connection(props, listener);
       listeners.delete(listener);
       if (!listeners.size) {
-        connections.delete(chainSpec);
+        connections.delete(props);
         cleanUp();
         try {
+          // TODO: utilize `deferClosing` prop once we flesh out approach
           inner.remove();
         } catch (e) {
           return new ProviderCloseError(e as SmoldotCloseErrorData);
@@ -79,7 +88,7 @@ export const smoldotProvider: Provider<
 };
 
 async function connection(
-  chainSpec: string,
+  props: SmoldotProviderProps,
   listener: ProviderListener<SmoldotSendErrorData, SmoldotHandlerErrorData>,
 ): Promise<SmoldotProviderConnection> {
   if (!client) {
@@ -87,10 +96,11 @@ async function connection(
       {
         forbidTcp: true,
         forbidNonLocalWs: true,
+        cpuRateLimit: .25,
       } as ClientOptions,
     );
   }
-  let conn = connections.get(chainSpec);
+  let conn = connections.get(props);
   if (!conn) {
     const innerMap: Chain[] = [];
     connections.forEach((value: SmoldotProviderConnection) => {
