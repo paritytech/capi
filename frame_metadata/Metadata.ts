@@ -46,7 +46,7 @@ export const $storageEntryType: $.Codec<StorageEntryType> = $.taggedUnion("type"
 export type StorageEntry = {
   name: string;
   modifier: StorageEntryModifier;
-  default: number[];
+  default: Uint8Array;
   docs: string[];
 } & StorageEntryType;
 
@@ -59,7 +59,7 @@ export const $storageEntry: $.Codec<StorageEntry> = $.spread(
     $storageEntryType,
   ),
   $.object(
-    ["default", $.array($.u8)],
+    ["default", $.uint8Array],
     ["docs", $.array($.str)],
   ),
 );
