@@ -40,13 +40,7 @@ export class Client<
     if (e instanceof ProviderSendError) {
       const egressMessageId = e.egressMessage.id;
       const pendingCall = this.pendingCalls[egressMessageId];
-      if (!pendingCall) {
-        console.log({ e });
-        // TODO: pipe error to listeners and message the likely cause,
-        //       a duplicate client.
-        throw new Error();
-      }
-      pendingCall.resolve(e);
+      pendingCall?.resolve(e);
       delete this.pendingCalls[egressMessageId];
     } else if (e instanceof Error) {
       for (const id in this.pendingCalls) {
@@ -63,13 +57,7 @@ export class Client<
       }
     } else if (e.id) {
       const pendingCall = this.pendingCalls[e.id];
-      if (!pendingCall) {
-        console.log({ e });
-        // TODO: pipe error to listeners and message the likely cause,
-        //       a duplicate client.
-        throw new Error();
-      }
-      pendingCall.resolve(e);
+      pendingCall?.resolve(e);
       delete this.pendingCalls[e.id];
       if (this.pendingSubscriptions[e.id]) {
         if (e.error) {
