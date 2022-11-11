@@ -37,7 +37,12 @@ export class Client<
   }
 
   #listener: ProviderListener<SendErrorData, HandlerErrorData> = (e) => {
-    if (e instanceof Error) {
+    if (e instanceof ProviderSendError) {
+      const egressMessageId = e.egressMessage.id;
+      const pendingCall = this.pendingCalls[egressMessageId];
+      pendingCall?.resolve(e);
+      delete this.pendingCalls[egressMessageId];
+    } else if (e instanceof Error) {
       for (const id in this.pendingCalls) {
         const pendingCall = this.pendingCalls[id]!;
         pendingCall.resolve(e);
@@ -52,13 +57,7 @@ export class Client<
       }
     } else if (e.id) {
       const pendingCall = this.pendingCalls[e.id];
-      if (!pendingCall) {
-        console.log({ e });
-        // TODO: pipe error to listeners and message the likely cause,
-        //       a duplicate client.
-        throw new Error();
-      }
-      pendingCall.resolve(e);
+      pendingCall?.resolve(e);
       delete this.pendingCalls[e.id];
       if (this.pendingSubscriptions[e.id]) {
         if (e.error) {
@@ -92,7 +91,7 @@ export class Client<
       delete this.activeSubscriptionByMessageId[message.id];
       waiter.resolve(activeSubscriptionId);
     };
-    this.pendingSubscriptions[message.id] = listener.bind({
+    const listenerBound = listener.bind({
       message,
       stop,
       state: <T>(ctor: new() => T) => {
@@ -103,7 +102,14 @@ export class Client<
         );
       },
     }) as ClientSubscribeListener<SendErrorData, HandlerErrorData>;
-    this.call(message);
+    this.pendingSubscriptions[message.id] = listenerBound;
+    this.call(message)
+      .then((maybeError) => {
+        if (maybeError instanceof Error) {
+          listenerBound(maybeError);
+          stop();
+        }
+      });
     return waiter;
   };
 

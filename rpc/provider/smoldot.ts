@@ -1,51 +1,81 @@
-import { start } from "../../deps/smoldot.ts";
+import {
+  AddChainError,
+  AlreadyDestroyedError,
+  CrashError,
+  JsonRpcDisabledError,
+  MalformedJsonRpcError,
+  QueueFullError,
+  start,
+} from "../../deps/smoldot.ts";
 import { Chain, Client, ClientOptions } from "../../deps/smoldot/client.d.ts";
+import { deferred } from "../../deps/std/async.ts";
 import * as msg from "../messages.ts";
 import { nextIdFactory, Provider, ProviderConnection, ProviderListener } from "./base.ts";
 import { ProviderCloseError, ProviderHandlerError, ProviderSendError } from "./errors.ts";
 
-// TODO
-type SmoldotSendErrorData = any;
-type SmoldotHandlerErrorData = any;
-type SmoldotCloseErrorData = any;
+type SmoldotSendErrorData =
+  | AlreadyDestroyedError
+  | CrashError
+  | JsonRpcDisabledError
+  | MalformedJsonRpcError
+  | QueueFullError;
+type SmoldotHandlerErrorData =
+  | AlreadyDestroyedError
+  | CrashError
+  | JsonRpcDisabledError
+  | AddChainError;
+type SmoldotCloseErrorData = AlreadyDestroyedError | CrashError;
 
 let client: undefined | Client;
-const connections = new Map<string, SmoldotProviderConnection>();
+const connections = new Map<SmoldotProviderProps, SmoldotProviderConnection>();
 class SmoldotProviderConnection
   extends ProviderConnection<Chain, SmoldotSendErrorData, SmoldotHandlerErrorData>
 {}
 
 const nextId = nextIdFactory();
 
+export interface SmoldotProviderProps {
+  relayChainSpec: string;
+  parachainSpec?: string;
+  // TODO: support deferring closing (how / what heuristic?)
+  deferClosing?: boolean;
+}
+
 export const smoldotProvider: Provider<
-  string,
+  SmoldotProviderProps,
   SmoldotSendErrorData,
   SmoldotHandlerErrorData,
   SmoldotCloseErrorData
-> = (chainSpec, listener) => {
+> = (props, listener) => {
   return {
     nextId,
     send: (message) => {
       (async () => {
-        const conn = await connection(chainSpec, listener);
+        let conn: SmoldotProviderConnection;
         try {
-          return conn.inner.sendJsonRpc(JSON.stringify(message));
-        } catch (e) {
-          // TODO: funnel this to relevant handler(s)
-          return new ProviderSendError(e);
+          conn = await connection(props, listener);
+        } catch (error) {
+          listener(new ProviderHandlerError(error as SmoldotHandlerErrorData));
+          return;
+        }
+        try {
+          conn.inner.sendJsonRpc(JSON.stringify(message));
+        } catch (error) {
+          listener(new ProviderSendError(error as SmoldotSendErrorData, message));
         }
       })();
     },
     release: async () => {
-      const { cleanUp, listeners, inner } = await connection(chainSpec, listener);
+      const { cleanUp, listeners, inner } = await connection(props, listener);
       listeners.delete(listener);
       if (!listeners.size) {
-        connections.delete(chainSpec);
+        connections.delete(props);
         cleanUp();
         try {
+          // TODO: utilize `deferClosing` prop once we flesh out approach
           inner.remove();
         } catch (e) {
-          return new ProviderCloseError(e);
+          return new ProviderCloseError(e as SmoldotCloseErrorData);
         }
       }
       return;
@@ -54,7 +84,7 @@ export const smoldotProvider: Provider<
 };
 
 async function connection(
-  chainSpec: string,
+  props: SmoldotProviderProps,
   listener: ProviderListener<SmoldotSendErrorData, SmoldotHandlerErrorData>,
 ): Promise<SmoldotProviderConnection> {
   if (!client) {
@@ -62,32 +92,45 @@ async function connection(
       {
         forbidTcp: true,
         forbidNonLocalWs: true,
+        cpuRateLimit: .25,
       } as ClientOptions,
     );
   }
-  let conn = connections.get(chainSpec);
+  let conn = connections.get(props);
   if (!conn) {
-    // TODO: try catch this and send through handler within a `ProviderHandlerError`
-    const inner = await client.addChain({ chainSpec });
-    conn = new SmoldotProviderConnection(inner, () => {
-      try {
-        inner.remove();
-      } catch (_e) { /* TODO */ }
-    });
-    connections.set(chainSpec, conn);
-    const loop = async () => {
-      try {
-        conn!.forEachListener(msg.parse(await inner.nextJsonRpcResponse()));
-      } catch (e) {
-        conn!.forEachListener(new ProviderHandlerError(e));
-        await loop();
+    let inner: Chain;
+    if (props.parachainSpec) {
+      const relayChainConnection = await client.addChain({
+        chainSpec: props.relayChainSpec,
+      });
+      inner = await client.addChain({
+        chainSpec: props.parachainSpec,
+        potentialRelayChains: [relayChainConnection],
+      });
+    } else {
+      inner = await client.addChain({ chainSpec: props.relayChainSpec });
+    }
+    const stopListening = deferred<undefined>();
+    conn = new SmoldotProviderConnection(inner, () => stopListening.resolve());
+    connections.set(props, conn);
+    (async () => {
+      while (true) {
+        try {
+          const response = await Promise.race([
+            stopListening,
+            inner.nextJsonRpcResponse(),
+          ]);
+          if (!response) {
+            break;
+          }
+          const message = msg.parse(response);
+          conn!.forEachListener(message);
+        } catch (e) {
+          conn!.forEachListener(new ProviderHandlerError(e as SmoldotHandlerErrorData));
+          break;
+        }
       }
-    };
-    // TODO: should we be greedy & kick off a few additional?
-    //       We don't want the inner buffer to overflow.
-    loop();
-    loop();
-    loop();
+    })();
   }
   conn.addListener(listener);
   return conn;
