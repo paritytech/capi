@@ -43,7 +43,7 @@ Deno.test({
             }
           },
         ];
-        const provider = smoldotProvider(relayChainSpec, (message) => {
+        const provider = smoldotProvider({ relayChainSpec }, (message) => {
           if (checks.length > 1) {
             checks.shift()!(message);
           } else {
@@ -111,7 +111,7 @@ Deno.test({
           },
         ];
         const provider = smoldotProvider(
-          [parachainSpec, relayChainSpec],
+          { parachainSpec, relayChainSpec },
           (message) => {
             if (checks.length > 1) {
               checks.shift()!(message);
