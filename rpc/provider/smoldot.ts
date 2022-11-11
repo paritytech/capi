@@ -8,6 +8,7 @@ import {
   start,
 } from "../../deps/smoldot.ts";
 import { Chain, Client, ClientOptions } from "../../deps/smoldot/client.d.ts";
+import { deferred } from "../../deps/std/async.ts";
 import * as msg from "../messages.ts";
 import { nextIdFactory, Provider, ProviderConnection, ProviderListener } from "./base.ts";
 import { ProviderCloseError, ProviderHandlerError, ProviderSendError } from "./errors.ts";
@@ -26,15 +27,17 @@ type SmoldotHandlerErrorData =
 type SmoldotCloseErrorData = AlreadyDestroyedError | CrashError;
 
 let client: undefined | Client;
-const connections = new Map<string, SmoldotProviderConnection>();
+const connections = new Map<ChainSpecOptions, SmoldotProviderConnection>();
 class SmoldotProviderConnection
   extends ProviderConnection<Chain, SmoldotSendErrorData, SmoldotHandlerErrorData>
 {}
 
 const nextId = nextIdFactory();
 
+type ChainSpecOptions = string | [parachainSpec: string, relayChainSpec: string];
+
 export const smoldotProvider: Provider<
-  string,
+  ChainSpecOptions,
   SmoldotSendErrorData,
   SmoldotHandlerErrorData,
   SmoldotCloseErrorData
@@ -75,7 +78,7 @@ export const smoldotProvider: Provider<
 };
 
 async function connection(
-  chainSpec: string,
+  chainSpec: ChainSpecOptions,
   listener: ProviderListener<SmoldotSendErrorData, SmoldotHandlerErrorData>,
 ): Promise<SmoldotProviderConnection> {
   if (!client) {
@@ -88,17 +91,31 @@ async function connection(
   }
   let conn = connections.get(chainSpec);
   if (!conn) {
-    const inner = await client.addChain({ chainSpec });
-    conn = new SmoldotProviderConnection(inner, () => {
-      try {
-        inner.remove();
-      } catch (_e) { /* TODO */ }
-    });
+    let inner: Chain;
+    if (typeof chainSpec === "string") {
+      inner = await client.addChain({ chainSpec });
+    } else {
+      const [parachainSpec, relayChainSpec] = chainSpec;
+      const relayChainConnection = await client.addChain({ chainSpec: relayChainSpec });
+      inner = await client.addChain({
+        chainSpec: parachainSpec,
+        potentialRelayChains: [relayChainConnection],
+      });
+    }
+    const stopListening = deferred<undefined>();
+    conn = new SmoldotProviderConnection(inner, () => stopListening.resolve());
     connections.set(chainSpec, conn);
     (async () => {
       while (true) {
         try {
-          const message = msg.parse(await inner.nextJsonRpcResponse());
+          const response = await Promise.race([
+            stopListening,
+            inner.nextJsonRpcResponse(),
+          ]);
+          if (!response) {
+            break;
+          }
+          const message = msg.parse(response);
           conn!.forEachListener(message);
         } catch (e) {
           conn!.forEachListener(new ProviderHandlerError(e as SmoldotHandlerErrorData));
