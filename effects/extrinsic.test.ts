@@ -63,9 +63,12 @@ Deno.test({
         palletName: "Democracy",
         methodName: "propose",
         args: {
-          proposal_hash: U.hex.decode(
-            "0x123450000000000000000000000000000000000000000000000000000000000" as U.Hex,
-          ),
+          proposal: {
+            type: "Inline",
+            value: U.hex.decode(
+              "0x123450000000000000000000000000000000000000000000000000000000000",
+            ),
+          },
           value: 2000000000000n,
         },
         orderExpectation: ["ready", "inBlock", "finalized"],
