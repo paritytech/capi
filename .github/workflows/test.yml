@@ -9,10 +9,8 @@ jobs:
       - uses: denoland/setup-deno@9db7f66e8e16b5699a514448ce994936c63f0d54 # v1.1.0
         with:
           deno-version: v1.x
-      - name: Download polkadot
-        run: |
-          curl -L -o /usr/local/bin/polkadot https://github.com/paritytech/polkadot/releases/download/v0.9.28/polkadot
-          chmod +x /usr/local/bin/polkadot
+      - name: Setup polkadot
+        uses: ./.github/actions/setup-polkadot
       - run: deno task lint
       - run: deno task star
       - run: deno task test
