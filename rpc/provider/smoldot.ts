@@ -92,6 +92,7 @@ async function connection(
       {
         forbidTcp: true,
         forbidNonLocalWs: true,
+        cpuRateLimit: .25,
       } as ClientOptions,
     );
   }
