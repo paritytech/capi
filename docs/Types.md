@@ -61,7 +61,7 @@ On most chains, `accountsStorage` will look similar to the following.
     "",
     " ```nocompile",
     "  impl pallet_balances::Config for Runtime {",
-    "    type AccountStore = StorageMapShim<Self::Account<Runtime>, frame_system::Provider<Runtime>, Acco...",
+    "    type AccountStore = StorageMapShim<Self::Account<Runtime>, frame_system::Provider<Runtime>, ...",
     "  }",
     " ```",
     "",
