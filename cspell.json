@@ -16,6 +16,7 @@
     "deno.lock",
     "frame_metadata/raw_erc20_metadata.json",
     "target",
-    "**/__snapshots__/*.snap"
+    "**/__snapshots__/*.snap",
+    "codegen/_output"
   ]
 }
