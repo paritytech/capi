@@ -17,7 +17,8 @@
         "no-empty-interface",
         "no-explicit-any",
         "no-namespace",
-        "no-empty"
+        "no-empty",
+        "no-extra-semi"
       ],
       "tags": ["recommended"]
     }
