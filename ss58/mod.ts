@@ -1,5 +1,5 @@
 import * as base58 from "../deps/std/encoding/base58.ts"
-import { Blake2b } from "../hashers/blake2b.ts"
+import { Blake2b } from "../deps/wat_the_crypto.ts"
 
 // SS58PRE string (0x53533538505245 hex) encoded as Uint8Array
 const SS58PRE = Uint8Array.of(83, 83, 53, 56, 80, 82, 69)

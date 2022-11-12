@@ -11,6 +11,10 @@ await Promise.all([
     entryPoints: ["mod.ts"],
     outDir,
     mappings: {
+      "https://deno.land/x/wat_the_crypto@v0.0.1/mod.ts": {
+        name: "wat-the-crypto",
+        version: "^0.0.1",
+      },
       "https://deno.land/x/scale@v0.9.1/mod.ts": {
         name: "scale-codec",
         version: "^0.9.1",

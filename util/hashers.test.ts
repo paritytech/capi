@@ -1,8 +1,7 @@
 import * as $ from "../deps/scale.ts"
 import { assertEquals } from "../deps/std/testing/asserts.ts"
 import { HasherKind } from "../frame_metadata/mod.ts"
-import { hex } from "../util/mod.ts"
-import * as H from "./mod.ts"
+import { hashers, hex } from "./mod.ts"
 
 interface Foo {
   a: Uint8Array
@@ -47,7 +46,7 @@ const hashes: Record<HasherKind, string> = {
 
 for (const hasherKind in hashes) {
   Deno.test(hasherKind, async () => {
-    const hasher = H[hasherKind as HasherKind]
+    const hasher = hashers[hasherKind as HasherKind]
     const hash = hashes[hasherKind as HasherKind]
     assertEquals(hex.encode(hasher.hash(encoded)), hash)
     const hashData = await hasher.$hash($foo).encodeAsync(foo)
