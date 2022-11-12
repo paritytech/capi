@@ -1,6 +1,6 @@
 // @generated
 
-import { Hex, hex } from "../util/mod.ts";
+import { Hex, hex } from "../util/mod.ts"
 
 export default hex.decode(
 "\
@@ -38,4 +38,4 @@ d50110012303fdd50121022001fd1d008523027e23077c2001fd1d018523027e\
 208885210820072008370300200741086a2107200641016a22062000470d000b\
 0b\
 " as Hex,
-);
+)

@@ -23,14 +23,14 @@ deno run -A -r https://deno.land/x/capi/codegen.ts \
 Make use of those bindings.
 
 ```ts
-import * as C from "capi";
-import { system } from "./polkadot/frame.ts";
+import * as C from "capi"
+import { system } from "./polkadot/frame.ts"
 
 // bind to the last inserted key
-const key = system.account.keys.first;
+const key = system.account.keys.first
 
 // bind to the corresponding value
-const value = C.run(system.account.get(key));
+const value = C.run(system.account.get(key))
 ```
 
 ## The Thesis

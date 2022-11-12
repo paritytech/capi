@@ -17,10 +17,10 @@ Let's say you have the following usage.
 `example.ts`
 
 ```ts
-import * as C from "capi";
-import { system } from "./polkadot/frame.ts";
+import * as C from "capi"
+import { system } from "./polkadot/frame.ts"
 
-const result = await C.run(system.events);
+const result = await C.run(system.events)
 ```
 
 Create an import map.

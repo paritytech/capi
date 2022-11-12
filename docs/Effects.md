@@ -7,16 +7,16 @@ Let's say we want to write a program that produces a random number. If the numbe
 ```ts
 class GtPoint5Error extends Error {
   constructor(value: number) {
-    super(`The random number \`${value}\` is greater than \`.5\`.`);
+    super(`The random number \`${value}\` is greater than \`.5\`.`)
   }
 }
 
 function getRand(): number {
-  const rand = Math.random();
+  const rand = Math.random()
   if (rand > .5) {
-    throw new GtPoint5Error(rand);
+    throw new GtPoint5Error(rand)
   }
-  return rand;
+  return rand
 }
 ```
 
@@ -65,11 +65,11 @@ function add<
   b: B,
 ): Result<Extract<A, Error> | Extract<B, Error>> {
   if (a instanceof Error) {
-    return a;
+    return a
   } else if (b instanceof Error) {
-    return b;
+    return b
   }
-  return ok(a.ok + b.ok);
+  return ok(a.ok + b.ok)
 }
 ```
 
@@ -78,23 +78,23 @@ Because the error types of `A` and `B` are generic, we can never truly handle th
 This is precisely what Capi's effect system––[Zones](https://github.com/paritytech/zones)––enables.
 
 ```ts
-import * as Z from "zones";
+import * as Z from "zones"
 
 const rand = Z.call.fac(() => {
-  const rand = Math.random();
+  const rand = Math.random()
   if (rand > .5) {
-    return new GtPoint5Error(rand);
+    return new GtPoint5Error(rand)
   }
-  return rand;
-});
+  return rand
+})
 
 const add = Z.call.fac((a: number, b: number) => {
-  return a + b;
-});
+  return a + b
+})
 
-const root = add(rand(), 1);
+const root = add(rand(), 1)
 
-const result = Z.runtime().run(root);
+const result = Z.runtime().run(root)
 ```
 
 In this example `result` carries the type `number | GtPoint5Error`, which allows us to discriminate with ease.
@@ -114,18 +114,18 @@ Although this may seem overly-complex for such a tiny amount of computation, it 
 In the context of Capi, Effects are used to represent on-chain constructs without actually performing any computation until necessary. As showcased within this project's readme, we can create an effect that represents a key in a map, and then use that effect to represent its corresponding value in the map. This all occurs without any network interaction whatsoever.
 
 ```ts
-import * as C from "capi";
-import { system } from "./polkadot/frame.ts";
+import * as C from "capi"
+import { system } from "./polkadot/frame.ts"
 
-const key = system.account.keys.first;
+const key = system.account.keys.first
 
-const value = system.account.get(key);
+const value = system.account.get(key)
 ```
 
 We can compose atomic effects such as these to create complex, multichain interactions that abstract over common use cases. Meanwhile, the underlying effect system appropriately determines the optimal path to execute effects.
 
 ```ts
-const result = await C.run(value);
+const result = await C.run(value)
 ```
 
 In this example `result` carries a type representing a union of all possible errors (such as `StorageDne`).
@@ -139,25 +139,25 @@ We don't want to accidentally allocate all the JS thread's processing to a block
 Imagine you're forming a derived request, wherein `requestC` accepts the result of `requestA` and `requestB`.
 
 ```ts
-const a = await requestA();
-const b = await requestB();
-const c = await requestC(a, b);
+const a = await requestA()
+const b = await requestB()
+const c = await requestC(a, b)
 ```
 
 In this case, we accidentally block on `requestA`, when we could execute it in parallel with `requestB`.
 
 ```ts
-const a = requestA();
-const b = requestB();
-const c = await requestC(...await Promise.all([a, b]));
+const a = requestA()
+const b = requestB()
+const c = await requestC(...await Promise.all([a, b]))
 ```
 
 Or perhaps there are parts of our program which can produce repeat versions of a request.
 
 ```ts
-const makeD = (value: number) => requestD(value);
-makeD(Math.random());
-makeD(Math.random());
+const makeD = (value: number) => requestD(value)
+makeD(Math.random())
+makeD(Math.random())
 ```
 
 If `Math.random()` miraculously returns `.25` twice, do we need to send the request a second time? If `requestD` is idempotent, then no.

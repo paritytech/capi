@@ -3,13 +3,13 @@
 Before interacting with a given chain, we must have a means of finding nodes of that chain. This means of discovery is called a "config." A config can also contain additional values and type information (more on this below).
 
 ```ts
-import { config as polkadot } from "@capi/polkadot";
+import { config as polkadot } from "@capi/polkadot"
 ```
 
 Let's use the Polkadot config to read some storage.
 
 ```ts
-const result = await C.entry(polkadot, "Staking", "ActiveEra").read();
+const result = await C.entry(polkadot, "Staking", "ActiveEra").read()
 ```
 
 ## Type Safety
@@ -21,7 +21,7 @@ The static type of any config can describe accessible RPC server methods and FRA
 What happens if––in the example above––we accidentally misspell a junction of the storage key? We get an immediate type error.
 
 ```ts
-const result = await C.entry(polkadot, "Stacking", "ActiveEra").read();
+const result = await C.entry(polkadot, "Stacking", "ActiveEra").read()
 //                                     ~~~~~~~~~~
 //                                     ^ argument of type 'Stacking' is not assignable to parameter of type 'PolkadotPalletName'.
 ```
@@ -31,7 +31,7 @@ const result = await C.entry(polkadot, "Stacking", "ActiveEra").read();
 The same is true for RPC method availability.
 
 ```ts
-const result = await C.rpcCall(myConfig, "nonexistent_method", []);
+const result = await C.rpcCall(myConfig, "nonexistent_method", [])
 //                                       ~~~~~~~~~~~~~~~~~~~~
 //                                       ^ argument of type 'nonexistent_method' is not assignable to parameter of type 'existent_method'.
 ```
@@ -58,7 +58,7 @@ The generated directory will contain a root `mod.ts`, which re-exports the value
 We can import and utilize these configs as we would from `capi/known`.
 
 ```ts
-import { config } from "./my_configs/mod.ts";
+import { config } from "./my_configs/mod.ts"
 ```
 
 ## Ecosystem Configs
@@ -66,5 +66,5 @@ import { config } from "./my_configs/mod.ts";
 Proprietors and communities of a given chain may want to take ownership of their configs. Although Capi's typegen encodes all possible constraints from the FRAME metadata, there are further constraints from which users may benefit.
 
 ```ts
-import { config } from "https://deno.land/x/capi-xyz-chain/mod.ts";
+import { config } from "https://deno.land/x/capi-xyz-chain/mod.ts"
 ```

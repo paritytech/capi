@@ -1,10 +1,10 @@
-import * as compat from "../compat/mod.ts";
-import { KeyringPair } from "../deps/polkadot/keyring/types.ts";
-import * as A from "../deps/std/testing/asserts.ts";
-import * as T from "../test_util/mod.ts";
-import * as U from "../util/mod.ts";
-import { entryRead } from "./entryRead.ts";
-import { CallData, extrinsic } from "./extrinsic.ts";
+import * as compat from "../compat/mod.ts"
+import { KeyringPair } from "../deps/polkadot/keyring/types.ts"
+import * as A from "../deps/std/testing/asserts.ts"
+import * as T from "../test_util/mod.ts"
+import * as U from "../util/mod.ts"
+import { entryRead } from "./entryRead.ts"
+import { CallData, extrinsic } from "./extrinsic.ts"
 
 Deno.test({
   name: "Balances.transfer",
@@ -19,22 +19,22 @@ Deno.test({
           dest: compat.multiAddressFromKeypair(T.bob),
         },
         orderExpectation: ["ready", "inBlock", "finalized"],
-      });
-    });
+      })
+    })
 
     await ctx.step({
       name: "account balance updated",
       fn: async () => {
-        const state = await entryRead(T.westend)("System", "Account", [T.bob.publicKey]).run();
+        const state = await entryRead(T.westend)("System", "Account", [T.bob.publicKey]).run()
         A.assertObjectMatch(state, {
           value: {
             data: { free: 10000000000012345n },
           },
-        });
+        })
       },
-    });
+    })
   },
-});
+})
 
 Deno.test({
   name: "Treasury.propose_spend",
@@ -49,10 +49,10 @@ Deno.test({
           beneficiary: compat.multiAddressFromKeypair(T.bob),
         },
         orderExpectation: ["ready", "inBlock", "finalized"],
-      });
-    });
+      })
+    })
   },
-});
+})
 
 Deno.test({
   name: "Democracy.propose",
@@ -72,14 +72,14 @@ Deno.test({
           value: 2000000000000n,
         },
         orderExpectation: ["ready", "inBlock", "finalized"],
-      });
-    });
+      })
+    })
   },
-});
+})
 
 interface AssertExtrinsicStatusOrderProps extends CallData {
-  orderExpectation: T.extrinsic.StatusOrderExpectation;
-  keypair: KeyringPair;
+  orderExpectation: T.extrinsic.StatusOrderExpectation
+  keypair: KeyringPair
 }
 
 export async function assertExtrinsicStatusOrder({
@@ -95,6 +95,6 @@ export async function assertExtrinsicStatusOrder({
       })
         .signed(compat.signerFromKeypair(keypair)),
     ).run(),
-  );
-  T.extrinsic.assertStatusOrder(extrinsicEvents, orderExpectation);
+  )
+  T.extrinsic.assertStatusOrder(extrinsicEvents, orderExpectation)
 }

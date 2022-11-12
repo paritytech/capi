@@ -1,7 +1,7 @@
-import { deferred } from "../../deps/std/async.ts";
-import { assertExists, assertNotInstanceOf } from "../../deps/std/testing/asserts.ts";
-import { ProviderListener } from "./base.ts";
-import { smoldotProvider } from "./smoldot.ts";
+import { deferred } from "../../deps/std/async.ts"
+import { assertExists, assertNotInstanceOf } from "../../deps/std/testing/asserts.ts"
+import { ProviderListener } from "./base.ts"
+import { smoldotProvider } from "./smoldot.ts"
 
 Deno.test({
   name: "Smoldot Provider",
@@ -16,59 +16,59 @@ Deno.test({
             "https://raw.githubusercontent.com/paritytech/substrate-connect/main/packages/connect/src/connector/specs/polkadot.json",
           )
         )
-          .text();
-        const pendingSubscriptionId = deferred<string>();
-        const initialized = deferred();
-        const unsubscribed = deferred();
+          .text()
+        const pendingSubscriptionId = deferred<string>()
+        const initialized = deferred()
+        const unsubscribed = deferred()
         const checks: ProviderListener<any, any>[] = [
           // check for chainHead_unstable_follow subscription
           (message) => {
-            assertNotInstanceOf(message, Error);
-            assertExists(message.result);
-            pendingSubscriptionId.resolve(message.result);
+            assertNotInstanceOf(message, Error)
+            assertExists(message.result)
+            pendingSubscriptionId.resolve(message.result)
           },
           // check for chainHead_unstable_follow initialized event
           (message) => {
-            assertNotInstanceOf(message, Error);
-            assertExists(message.params?.result);
+            assertNotInstanceOf(message, Error)
+            assertExists(message.params?.result)
             if (message.params?.result.event === "initialized") {
-              initialized.resolve();
+              initialized.resolve()
             }
           },
           // check for chainHead_unstable_unfollow unsubscribe
           (message) => {
-            assertNotInstanceOf(message, Error);
+            assertNotInstanceOf(message, Error)
             if (message?.result === null) {
-              unsubscribed.resolve();
+              unsubscribed.resolve()
             }
           },
-        ];
+        ]
         const provider = smoldotProvider({ relayChainSpec }, (message) => {
           if (checks.length > 1) {
-            checks.shift()!(message);
+            checks.shift()!(message)
           } else {
-            checks[0]!(message);
+            checks[0]!(message)
           }
-        });
+        })
         provider.send({
           jsonrpc: "2.0",
           id: provider.nextId(),
           method: "chainHead_unstable_follow",
           params: [false],
-        });
-        const subscriptionId = await pendingSubscriptionId;
-        await initialized;
+        })
+        const subscriptionId = await pendingSubscriptionId
+        await initialized
         provider.send({
           jsonrpc: "2.0",
           id: provider.nextId(),
           method: "chainHead_unstable_unfollow",
           params: [subscriptionId],
-        });
-        await unsubscribed;
-        const providerRelease = await provider.release();
-        assertNotInstanceOf(providerRelease, Error);
+        })
+        await unsubscribed
+        const providerRelease = await provider.release()
+        assertNotInstanceOf(providerRelease, Error)
       },
-    });
+    })
     await t.step({
       name: "parachain connection",
       async fn() {
@@ -77,67 +77,67 @@ Deno.test({
             "https://raw.githubusercontent.com/paritytech/substrate-connect/main/packages/connect/src/connector/specs/westend2.json",
           )
         )
-          .text();
+          .text()
         const parachainSpec = await (
           await fetch(
             "https://raw.githubusercontent.com/paritytech/substrate-connect/main/projects/demo/src/assets/westend-westmint.json",
           )
         )
-          .text();
-        const pendingSubscriptionId = deferred<string>();
-        const initialized = deferred();
-        const unsubscribed = deferred();
+          .text()
+        const pendingSubscriptionId = deferred<string>()
+        const initialized = deferred()
+        const unsubscribed = deferred()
         const checks: ProviderListener<any, any>[] = [
           // check for chainHead_unstable_follow subscription
           (message) => {
-            assertNotInstanceOf(message, Error);
-            assertExists(message.result);
-            pendingSubscriptionId.resolve(message.result);
+            assertNotInstanceOf(message, Error)
+            assertExists(message.result)
+            pendingSubscriptionId.resolve(message.result)
           },
           // check for chainHead_unstable_follow initialized event
           (message) => {
-            assertNotInstanceOf(message, Error);
-            assertExists(message.params?.result);
+            assertNotInstanceOf(message, Error)
+            assertExists(message.params?.result)
             if (message.params?.result.event === "initialized") {
-              initialized.resolve();
+              initialized.resolve()
             }
           },
           // check for chainHead_unstable_unfollow unsubscribe
           (message) => {
-            assertNotInstanceOf(message, Error);
+            assertNotInstanceOf(message, Error)
             if (message?.result === null) {
-              unsubscribed.resolve();
+              unsubscribed.resolve()
             }
           },
-        ];
+        ]
         const provider = smoldotProvider(
           { parachainSpec, relayChainSpec },
           (message) => {
             if (checks.length > 1) {
-              checks.shift()!(message);
+              checks.shift()!(message)
             } else {
-              checks[0]!(message);
+              checks[0]!(message)
             }
           },
-        );
+        )
         provider.send({
           jsonrpc: "2.0",
           id: provider.nextId(),
           method: "chainHead_unstable_follow",
           params: [false],
-        });
-        const subscriptionId = await pendingSubscriptionId;
-        await initialized;
+        })
+        const subscriptionId = await pendingSubscriptionId
+        await initialized
         provider.send({
           jsonrpc: "2.0",
           id: provider.nextId(),
           method: "chainHead_unstable_unfollow",
           params: [subscriptionId],
-        });
-        await unsubscribed;
-        const providerRelease = await provider.release();
-        assertNotInstanceOf(providerRelease, Error);
+        })
+        await unsubscribed
+        const providerRelease = await provider.release()
+        assertNotInstanceOf(providerRelease, Error)
       },
-    });
+    })
   },
-});
+})

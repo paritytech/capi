@@ -1,13 +1,13 @@
-import * as Z from "../deps/zones.ts";
-import * as rpc from "../rpc/mod.ts";
-import * as U from "../util/mod.ts";
-import { entryMetadata, metadata, palletMetadata } from "./metadata.ts";
-import { state } from "./rpc_known_methods.ts";
-import * as scale from "./scale.ts";
+import * as Z from "../deps/zones.ts"
+import * as rpc from "../rpc/mod.ts"
+import * as U from "../util/mod.ts"
+import { entryMetadata, metadata, palletMetadata } from "./metadata.ts"
+import { state } from "./rpc_known_methods.ts"
+import * as scale from "./scale.ts"
 
-export type WatchEntryEvent = [key?: unknown, value?: unknown];
+export type WatchEntryEvent = [key?: unknown, value?: unknown]
 
-const k0_ = Symbol();
+const k0_ = Symbol()
 
 export function entryWatch<Client extends Z.$<rpc.Client>>(client: Client) {
   return <
@@ -20,17 +20,17 @@ export function entryWatch<Client extends Z.$<rpc.Client>>(client: Client) {
     keys: Keys,
     listener: U.Listener<WatchEntryEvent[], rpc.ClientSubscribeContext>,
   ) => {
-    const metadata_ = metadata(client)();
-    const deriveCodec_ = scale.deriveCodec(metadata_);
-    const palletMetadata_ = palletMetadata(metadata_, palletName);
-    const entryMetadata_ = entryMetadata(palletMetadata_, entryName);
-    const $storageKey_ = scale.$storageKey(deriveCodec_, palletMetadata_, entryMetadata_);
-    const entryValueTypeI = entryMetadata_.access("value");
-    const $entry = scale.codec(deriveCodec_, entryValueTypeI);
+    const metadata_ = metadata(client)()
+    const deriveCodec_ = scale.deriveCodec(metadata_)
+    const palletMetadata_ = palletMetadata(metadata_, palletName)
+    const entryMetadata_ = entryMetadata(palletMetadata_, entryName)
+    const $storageKey_ = scale.$storageKey(deriveCodec_, palletMetadata_, entryMetadata_)
+    const entryValueTypeI = entryMetadata_.access("value")
+    const $entry = scale.codec(deriveCodec_, entryValueTypeI)
     const storageKeys = scale
       .scaleEncoded($storageKey_, keys.length ? [keys] : [])
       .next(U.hex.encode)
-      .next(U.tuple);
+      .next(U.tuple)
     const listenerMapped = Z.ls($entry, listener).next(([$entry, listener]) => {
       return function listenerMapped(
         this: rpc.ClientSubscribeContext,
@@ -39,17 +39,17 @@ export function entryWatch<Client extends Z.$<rpc.Client>>(client: Client) {
         // TODO: in some cases there might be keys to decode
         // key ? $storageKey.decode(U.hex.decode(key)) : undefined
         const getKey = (key: rpc.known.Hex) => {
-          return key;
-        };
+          return key
+        }
         const changes: WatchEntryEvent[] = changeset.changes.map(([key, val]) => {
-          return [getKey(key), val ? $entry.decode(U.hex.decode(val)) : undefined];
-        });
-        listener.apply(this, [changes]);
-      };
-    }, k0_);
-    const subscriptionId = state.subscribeStorage(client)([storageKeys], listenerMapped);
+          return [getKey(key), val ? $entry.decode(U.hex.decode(val)) : undefined]
+        })
+        listener.apply(this, [changes])
+      }
+    }, k0_)
+    const subscriptionId = state.subscribeStorage(client)([storageKeys], listenerMapped)
     return state
       .unsubscribeStorage(client)(subscriptionId)
-      .zoned("EntryWatch");
-  };
+      .zoned("EntryWatch")
+  }
 }

@@ -1,1 +1,1 @@
-export * from "https://deno.land/x/polkadot@0.0.8/keyring/mod.ts";
+export * from "https://deno.land/x/polkadot@0.0.8/keyring/mod.ts"

@@ -15,7 +15,7 @@ Every FRAME chain exposes metadata about its types and properties. This metadata
 As always, our first step is to bring Capi into scope.
 
 ```ts
-import * as C from "https://deno.land/x/capi/mod.ts";
+import * as C from "https://deno.land/x/capi/mod.ts"
 ```
 
 Now let's fetch the metadata.
@@ -23,7 +23,7 @@ Now let's fetch the metadata.
 ```ts
 // ...
 
-const metadata = await C.chain(CHAIN_PROXY_WS_URL).metadata.read();
+const metadata = await C.chain(CHAIN_PROXY_WS_URL).metadata.read()
 ```
 
 If we index into `metadata.pallets`, we'll see a list of all pallet metadata. Each element of this list contains a complete description of the given pallet's storage entries, as well as constants, callables (for creating extrinsics), errors and events. Some fields––such as a pallet's `call` field––point to an index in `metadata.tys`, which contains a complete description of the chain's type-level context.
@@ -33,8 +33,8 @@ Let's say we want to learn about the types associated with the `Balances` pallet
 ```ts
 // ...
 
-const balancesPallet = metadata.pallets.find((pallet) => pallet.name === "Balances");
-const accountsStorage = balancesPallet?.storage?.entries.find((entry) => entry.name === "Account");
+const balancesPallet = metadata.pallets.find((pallet) => pallet.name === "Balances")
+const accountsStorage = balancesPallet?.storage?.entries.find((entry) => entry.name === "Account")
 ```
 
 On most chains, `accountsStorage` will look similar to the following.
@@ -61,7 +61,7 @@ On most chains, `accountsStorage` will look similar to the following.
     "",
     " ```nocompile",
     "  impl pallet_balances::Config for Runtime {",
-    "    type AccountStore = StorageMapShim<Self::Account<Runtime>, frame_system::Provider<Runtime>, Acco...",
+    "    type AccountStore = StorageMapShim<Self::Account<Runtime>, frame_system::Provider<Runtime>, ...",
     "  }",
     " ```",
     "",
@@ -90,7 +90,7 @@ On most chains, `accountsStorage` will look similar to the following.
 Let's index into `metadata.tys` with the specified key (`0`).
 
 ```ts
-const keyType = metadata.tys[accountsStorage.key];
+const keyType = metadata.tys[accountsStorage.key]
 ```
 
 `keyType` should evaluate to something along the lines of:
@@ -112,7 +112,7 @@ If we index again into `metadata.tys` with `1` (as specified in the first field)
 namespace sp_core {
   export namespace crypto {
     // Note: `Uint8Array` lengths are untyped in TypeScript
-    export type AccountId32 = Uint8Array;
+    export type AccountId32 = Uint8Array
   }
 }
 ```
@@ -120,7 +120,7 @@ namespace sp_core {
 We can instantiate this as we would any other JS-land value.
 
 ```ts
-const accountId32 = new Uint8Array(RAW_ADDR_BYTES);
+const accountId32 = new Uint8Array(RAW_ADDR_BYTES)
 ```
 
 We'll cover the TypeScript <-> Rust conversions more in depth [in a later section](#typescript---rust).
@@ -131,13 +131,13 @@ Let's now utilize our `accountId32` definition to read a balance.
 // ...
 
 // Which storage map?
-const accounts = C.pallet("Balances").storageMap("Account");
+const accounts = C.pallet("Balances").storageMap("Account")
 
 // Which key?
-const key = accounts.key(accountId32);
+const key = accounts.key(accountId32)
 
 // Read the value.
-const account = await accounts.get(key).read();
+const account = await accounts.get(key).read()
 ```
 
 What value does this retrieve? How can we deduce this from the FRAME metadata?
@@ -145,7 +145,7 @@ What value does this retrieve? How can we deduce this from the FRAME metadata?
 We can do the same as before, but this time index into `metadata.tys` with the `accountsStorage.value`.
 
 ```ts
-const valueType = metadata.tys[accountsStorage.value];
+const valueType = metadata.tys[accountsStorage.value]
 ```
 
 This should give us something along the following lines:
@@ -171,10 +171,10 @@ When we follow type `6` (metadata.tys[6]), we see that it represents a `u128`. I
 ```ts
 namespace pallet_balances {
   export interface AccountData {
-    free: bigint;
-    reserved: bigint;
-    misc_frozen: bigint;
-    fee_frozen: bigint;
+    free: bigint
+    reserved: bigint
+    misc_frozen: bigint
+    fee_frozen: bigint
   }
 }
 ```
@@ -226,31 +226,31 @@ enum E1 {
 <td>
 
 ```ts
-type T0 = null;
-type T1 = A;
-type T2 = [A, B];
-type T3 = Uint8Array;
-type T4 = Uint8Array & { length: n };
-type T5 = A[];
-type T6 = A[] & { length: n };
-type T7 = A | undefined;
-type T8 = O | ChainError<E>;
+type T0 = null
+type T1 = A
+type T2 = [A, B]
+type T3 = Uint8Array
+type T4 = Uint8Array & { length: n }
+type T5 = A[]
+type T6 = A[] & { length: n }
+type T7 = A | undefined
+type T8 = O | ChainError<E>
 
-type S0 = null;
-type S1 = A;
-type S2 = [A, B];
-type S3 = { a: A };
+type S0 = null
+type S1 = A
+type S2 = [A, B]
+type S3 = { a: A }
 
 type E0 =
   | "A"
   | "B"
-  | "C";
+  | "C"
 
 type E1 =
   | { type: "A" }
   | { type: "B"; value: C }
   | { type: "D"; value: [E, F] }
-  | { type: "G"; h: H };
+  | { type: "G"; h: H }
 ```
 
 </td>
@@ -275,14 +275,14 @@ There are several ways to unwrap the inner value. The recommended path is to fir
 if (account instanceof Error) {
   // Handle errors here.
 } else {
-  account.value; // `unknown`
+  account.value // `unknown`
 }
 ```
 
 In situations where convenience is a priority (such as these very docs), we can simply call the `unwrap` method of the result.
 
 ```ts
-const value = account.unwrap();
+const value = account.unwrap()
 ```
 
 TODO

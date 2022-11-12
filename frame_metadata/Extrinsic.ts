@@ -1,14 +1,14 @@
-import * as $ from "../deps/scale.ts";
-import { assert } from "../deps/std/testing/asserts.ts";
-import * as H from "../hashers/mod.ts";
-import * as ss58 from "../ss58/mod.ts";
-import { Hex, hex } from "../util/mod.ts";
-import { $null, DeriveCodec } from "./Codec.ts";
-import { Metadata } from "./Metadata.ts";
+import * as $ from "../deps/scale.ts"
+import { assert } from "../deps/std/testing/asserts.ts"
+import * as H from "../hashers/mod.ts"
+import * as ss58 from "../ss58/mod.ts"
+import { Hex, hex } from "../util/mod.ts"
+import { $null, DeriveCodec } from "./Codec.ts"
+import { Metadata } from "./Metadata.ts"
 
 export interface MultiAddress {
-  type: "Id" | "Index" | "Raw" | "Address20" | "Address32";
-  value: Uint8Array;
+  type: "Id" | "Index" | "Raw" | "Address20" | "Address32"
+  value: Uint8Array
 }
 // TODO: delete upon common generated core types
 export namespace MultiAddress {
@@ -16,167 +16,167 @@ export namespace MultiAddress {
     return {
       type: "Id",
       value: id,
-    };
+    }
   }
 }
 
 export interface Signature {
-  type: "Sr25519" | "Ed25519" | "Secp256k"; // TODO: `"Ecdsa"`?;
-  value: Uint8Array;
+  type: "Sr25519" | "Ed25519" | "Secp256k" // TODO: `"Ecdsa"`?;
+  value: Uint8Array
 }
 
 export type Signer =
   | ((message: Uint8Array) => Signature | Promise<Signature>)
-  | PolkadotSigner;
+  | PolkadotSigner
 export interface PolkadotSigner {
-  signPayload(payload: any): Promise<{ signature: string }>;
+  signPayload(payload: any): Promise<{ signature: string }>
 }
 
 export interface Extrinsic {
-  protocolVersion: number;
+  protocolVersion: number
   // TODO: make generic over chain
   signature?:
     & {
-      address: MultiAddress;
-      extra: unknown[];
+      address: MultiAddress
+      extra: unknown[]
     }
-    & ({ additional: unknown[] } | { sig: Signature });
-  palletName: string;
-  methodName: string;
-  args: Record<string, unknown>;
+    & ({ additional: unknown[] } | { sig: Signature })
+  palletName: string
+  methodName: string
+  args: Record<string, unknown>
 }
 
 interface ExtrinsicCodecProps {
-  metadata: Metadata;
-  deriveCodec: DeriveCodec;
-  sign: Signer;
-  prefix: number;
+  metadata: Metadata
+  deriveCodec: DeriveCodec
+  sign: Signer
+  prefix: number
 }
 
 export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
-  const { metadata, deriveCodec } = props;
-  const { signedExtensions } = metadata.extrinsic;
-  const $sig = deriveCodec(findExtrinsicTypeParam("Signature")!) as $.Codec<Signature>;
-  const $sigPromise = $.promise($sig);
-  const $address = deriveCodec(findExtrinsicTypeParam("Address")!);
-  const callTy = findExtrinsicTypeParam("Call")!;
-  assert(callTy?.type === "Union");
-  const $call = deriveCodec(callTy);
-  const [$extra, extraPjsInfo] = getExtensionInfo(pjsExtraKeyMap, "ty");
+  const { metadata, deriveCodec } = props
+  const { signedExtensions } = metadata.extrinsic
+  const $sig = deriveCodec(findExtrinsicTypeParam("Signature")!) as $.Codec<Signature>
+  const $sigPromise = $.promise($sig)
+  const $address = deriveCodec(findExtrinsicTypeParam("Address")!)
+  const callTy = findExtrinsicTypeParam("Call")!
+  assert(callTy?.type === "Union")
+  const $call = deriveCodec(callTy)
+  const [$extra, extraPjsInfo] = getExtensionInfo(pjsExtraKeyMap, "ty")
   const [$additional, additionalPjsInfo] = getExtensionInfo(
     pjsAdditionalKeyMap,
     "additionalSigned",
-  );
-  const pjsInfo = [...extraPjsInfo, ...additionalPjsInfo];
+  )
+  const pjsInfo = [...extraPjsInfo, ...additionalPjsInfo]
 
-  const toSignSize = $call._staticSize + $extra._staticSize + $additional._staticSize;
-  const totalSize = 1 + $address._staticSize + $sig._staticSize + toSignSize;
+  const toSignSize = $call._staticSize + $extra._staticSize + $additional._staticSize
+  const totalSize = 1 + $address._staticSize + $sig._staticSize + toSignSize
 
   const $baseExtrinsic: $.Codec<Extrinsic> = $.createCodec({
     _metadata: [],
     _staticSize: totalSize,
     _encode(buffer, extrinsic) {
-      const firstByte = (+!!extrinsic.signature << 7) | extrinsic.protocolVersion;
-      buffer.array[buffer.index++] = firstByte;
+      const firstByte = (+!!extrinsic.signature << 7) | extrinsic.protocolVersion
+      buffer.array[buffer.index++] = firstByte
       const call = {
         type: extrinsic.palletName,
         value: {
           type: extrinsic.methodName,
           ...extrinsic.args,
         },
-      };
-      const { signature } = extrinsic;
+      }
+      const { signature } = extrinsic
       if (signature) {
-        $address._encode(buffer, signature.address);
+        $address._encode(buffer, signature.address)
         if ("additional" in signature) {
-          const toSignBuffer = new $.EncodeBuffer(buffer.stealAlloc(toSignSize));
-          $call._encode(toSignBuffer, call);
-          const callEnd = toSignBuffer.finishedSize + toSignBuffer.index;
+          const toSignBuffer = new $.EncodeBuffer(buffer.stealAlloc(toSignSize))
+          $call._encode(toSignBuffer, call)
+          const callEnd = toSignBuffer.finishedSize + toSignBuffer.index
           if ("signPayload" in props.sign) {
-            const exts = [...signature.extra, ...signature.additional];
-            const extEnds = [];
+            const exts = [...signature.extra, ...signature.additional]
+            const extEnds = []
             for (let i = 0; i < pjsInfo.length; i++) {
-              pjsInfo[i]!.codec._encode(toSignBuffer, exts[i]);
-              extEnds.push(toSignBuffer.finishedSize + toSignBuffer.index);
+              pjsInfo[i]!.codec._encode(toSignBuffer, exts[i])
+              extEnds.push(toSignBuffer.finishedSize + toSignBuffer.index)
             }
-            const extraEnd = extEnds[extraPjsInfo.length - 1] ?? callEnd;
-            const toSignEncoded = toSignBuffer.finish();
-            const callEncoded = toSignEncoded.subarray(0, callEnd);
-            const extraEncoded = toSignEncoded.subarray(callEnd, extraEnd);
+            const extraEnd = extEnds[extraPjsInfo.length - 1] ?? callEnd
+            const toSignEncoded = toSignBuffer.finish()
+            const callEncoded = toSignEncoded.subarray(0, callEnd)
+            const extraEncoded = toSignEncoded.subarray(callEnd, extraEnd)
             if (signature.address.type !== "Id") {
-              throw new Error("polkadot signer: address types other than Id are not supported");
+              throw new Error("polkadot signer: address types other than Id are not supported")
             }
             const payload: Record<string, unknown> = {
               address: ss58.encode(props.prefix, signature.address.value),
               method: hex.encodePrefixed(callEncoded),
               signedExtensions: signedExtensions.map((x) => x.ident),
               version: extrinsic.protocolVersion,
-            };
-            let last = callEnd;
+            }
+            let last = callEnd
             for (let i = 0; i < pjsInfo.length; i++) {
-              const { key } = pjsInfo[i]!;
-              if (!key) throw new Error("polkadot signer: unknown extension");
+              const { key } = pjsInfo[i]!
+              if (!key) throw new Error("polkadot signer: unknown extension")
               payload[key] = typeof exts[i] === "number"
                 ? exts[i]
-                : hex.encodePrefixed(toSignEncoded.subarray(last, extEnds[i]!));
-              last = extEnds[i]!;
+                : hex.encodePrefixed(toSignEncoded.subarray(last, extEnds[i]!))
+              last = extEnds[i]!
             }
-            const signer = props.sign;
+            const signer = props.sign
             buffer.writeAsync(0, async (buffer) => {
-              const { signature } = await signer.signPayload(payload);
-              buffer.insertArray(hex.decode(signature as Hex));
-            });
-            buffer.insertArray(extraEncoded);
-            buffer.insertArray(callEncoded);
+              const { signature } = await signer.signPayload(payload)
+              buffer.insertArray(hex.decode(signature as Hex))
+            })
+            buffer.insertArray(extraEncoded)
+            buffer.insertArray(callEncoded)
           } else {
-            $extra._encode(toSignBuffer, signature.extra);
-            const extraEnd = toSignBuffer.finishedSize + toSignBuffer.index;
-            $additional._encode(toSignBuffer, signature.additional);
-            const toSignEncoded = toSignBuffer.finish();
-            const callEncoded = toSignEncoded.subarray(0, callEnd);
-            const extraEncoded = toSignEncoded.subarray(callEnd, extraEnd);
+            $extra._encode(toSignBuffer, signature.extra)
+            const extraEnd = toSignBuffer.finishedSize + toSignBuffer.index
+            $additional._encode(toSignBuffer, signature.additional)
+            const toSignEncoded = toSignBuffer.finish()
+            const callEncoded = toSignEncoded.subarray(0, callEnd)
+            const extraEncoded = toSignEncoded.subarray(callEnd, extraEnd)
             const toSign = toSignEncoded.length > 256
               ? H.Blake2_256.hash(toSignEncoded)
-              : toSignEncoded;
-            const sig = props.sign(toSign);
+              : toSignEncoded
+            const sig = props.sign(toSign)
             if (sig instanceof Promise) {
-              $sigPromise._encode(buffer, sig);
+              $sigPromise._encode(buffer, sig)
             } else {
-              $sig._encode(buffer, sig);
+              $sig._encode(buffer, sig)
             }
-            buffer.insertArray(extraEncoded);
-            buffer.insertArray(callEncoded);
+            buffer.insertArray(extraEncoded)
+            buffer.insertArray(callEncoded)
           }
         } else {
-          $sig._encode(buffer, signature.sig);
-          $extra._encode(buffer, signature.extra);
-          $call._encode(buffer, call);
+          $sig._encode(buffer, signature.sig)
+          $extra._encode(buffer, signature.extra)
+          $call._encode(buffer, call)
         }
       } else {
-        $call._encode(buffer, call);
+        $call._encode(buffer, call)
       }
     },
     _decode(buffer) {
-      const firstByte = buffer.array[buffer.index++]!;
-      const hasSignature = firstByte & (1 << 7);
-      const protocolVersion = firstByte & ~(1 << 7);
-      let signature: Extrinsic["signature"];
+      const firstByte = buffer.array[buffer.index++]!
+      const hasSignature = firstByte & (1 << 7)
+      const protocolVersion = firstByte & ~(1 << 7)
+      let signature: Extrinsic["signature"]
       if (hasSignature) {
-        const address = $address._decode(buffer) as MultiAddress;
-        const sig = $sig._decode(buffer);
-        const extra = $extra._decode(buffer);
-        signature = { address, sig, extra };
+        const address = $address._decode(buffer) as MultiAddress
+        const sig = $sig._decode(buffer)
+        const extra = $extra._decode(buffer)
+        signature = { address, sig, extra }
       }
-      const call = $call._decode(buffer) as any;
-      const { type: palletName, value: { type: methodName, ...args } } = call;
-      return { protocolVersion, signature, palletName, methodName, args };
+      const call = $call._decode(buffer) as any
+      const { type: palletName, value: { type: methodName, ...args } } = call
+      return { protocolVersion, signature, palletName, methodName, args }
     },
     _assert(assert) {
-      assert.typeof(this, "object");
+      assert.typeof(this, "object")
       assert
         .key(this, "protocolVersion")
-        .equals($.u8, 4);
-      const value_ = assert.value as any;
+        .equals($.u8, 4)
+      const value_ = assert.value as any
       // TODO: use `assert.key(this, "call")` upon merging https://github.com/paritytech/capi/pull/368
       $call._assert(
         new $.AssertState({
@@ -186,28 +186,28 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
             ...value_.args,
           },
         }),
-      );
+      )
       if (value_.signature) {
-        const signatureAssertState = assert.key(this, "signature");
-        signatureAssertState.key($address, "address");
-        signatureAssertState.key($extra, "extra");
+        const signatureAssertState = assert.key(this, "signature")
+        signatureAssertState.key($address, "address")
+        signatureAssertState.key($extra, "extra")
         if ("additional" in signatureAssertState) {
-          signatureAssertState.key($additional, "additional");
+          signatureAssertState.key($additional, "additional")
         }
         if ("sig" in signatureAssertState) {
-          signatureAssertState.key($sig, "sig");
+          signatureAssertState.key($sig, "sig")
         }
       }
     },
-  });
+  })
 
   return $.withMetadata(
     $.metadata("$extrinsic", $extrinsic, props),
     $.lenPrefixed($baseExtrinsic),
-  );
+  )
 
   function findExtrinsicTypeParam(name: string) {
-    return metadata.extrinsic.ty.params.find((x) => x.name === name)?.ty;
+    return metadata.extrinsic.ty.params.find((x) => x.name === name)?.ty
   }
   function getExtensionInfo(
     keyMap: Record<string, string | undefined>,
@@ -215,8 +215,8 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
   ): [codec: $.Codec<any>, pjsInfo: { key: string | undefined; codec: $.Codec<any> }[]] {
     const pjsInfo = signedExtensions
       .map((e) => ({ key: keyMap[e.ident], codec: deriveCodec(e[key]) }))
-      .filter((x) => x.codec !== $null);
-    return [$.tuple(...pjsInfo.map((x) => x.codec)), pjsInfo];
+      .filter((x) => x.codec !== $null)
+    return [$.tuple(...pjsInfo.map((x) => x.codec)), pjsInfo]
   }
 }
 
@@ -225,7 +225,7 @@ const pjsExtraKeyMap: Record<string, string> = {
   CheckMortality: "era",
   ChargeTransactionPayment: "tip",
   CheckNonce: "nonce",
-};
+}
 
 const pjsAdditionalKeyMap: Record<string, string> = {
   CheckEra: "blockHash",
@@ -234,4 +234,4 @@ const pjsAdditionalKeyMap: Record<string, string> = {
   CheckTxVersion: "transactionVersion",
   CheckVersion: "specVersion",
   CheckGenesis: "genesisHash",
-};
+}

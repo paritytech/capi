@@ -4,7 +4,8 @@
   "lineWidth": 100,
   "typescript": {
     "quoteProps": "asNeeded",
-    "arrowFunction.useParentheses": "force"
+    "arrowFunction.useParentheses": "force",
+    "semiColons": "asi"
   },
   "includes": ["**.{dockerfile,json,md,ts}"],
   "excludes": ["frame_metadata/raw_erc20_metadata.json", "target"],

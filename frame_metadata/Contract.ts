@@ -1,85 +1,85 @@
-import { unreachable } from "../deps/std/testing/asserts.ts";
-import { Ty, TyDef, UnionTyDefMember } from "./scale_info.ts";
+import { unreachable } from "../deps/std/testing/asserts.ts"
+import { Ty, TyDef, UnionTyDefMember } from "./scale_info.ts"
 
 export interface ContractMetadata<Ty_ = Ty> {
-  source: ContractMetadata.Source;
-  contract: ContractMetadata.Contract;
-  V3: ContractMetadata.Abi<Ty_>;
+  source: ContractMetadata.Source
+  contract: ContractMetadata.Contract
+  V3: ContractMetadata.Abi<Ty_>
 }
 export namespace ContractMetadata {
   // TODO: serde `Value` type
-  export type Value = unknown;
+  export type Value = unknown
 
   export interface Source {
-    hash: string;
-    language: string;
-    compiler: string;
-    wasm?: string;
+    hash: string
+    language: string
+    compiler: string
+    wasm?: string
   }
 
   export interface Contract {
-    name: string;
-    version: string;
-    authors: string[];
-    description?: string;
-    documentation?: string;
-    repository?: string;
-    homepage?: string;
-    license?: string;
+    name: string
+    version: string
+    authors: string[]
+    description?: string
+    documentation?: string
+    repository?: string
+    homepage?: string
+    license?: string
   }
 
   export interface User {
-    json: Record<string, Value>;
+    json: Record<string, Value>
   }
 
   export interface Abi<Ty> {
-    spec: Spec;
-    storage: Storage;
+    spec: Spec
+    storage: Storage
     // TODO: type the raw serde-defined shape?
-    types: Ty[];
+    types: Ty[]
   }
 
   export interface Spec {
-    constructors: Constructor[];
-    docs: string[];
-    events: Event[];
-    messages: Message[];
+    constructors: Constructor[]
+    docs: string[]
+    events: Event[]
+    messages: Message[]
   }
 
   export interface Constructor {
-    args: Arg[];
-    docs: string[];
-    label: string;
-    payable: boolean;
-    selector: string;
+    args: Arg[]
+    docs: string[]
+    label: string
+    payable: boolean
+    selector: string
   }
 
   export interface Arg {
-    label: string;
-    type: TypeRef;
-    docs?: string[];
-    indexed?: boolean;
+    label: string
+    type: TypeRef
+    docs?: string[]
+    indexed?: boolean
   }
 
   export interface Event {
-    args: Arg[];
-    docs: string[];
-    label: string;
+    args: Arg[]
+    docs: string[]
+    label: string
   }
 
   export interface TypeRef {
-    displayName: string[];
-    type: number;
+    displayName: string[]
+    type: number
   }
 
   export interface Message {
-    args: Arg[];
-    docs: string[];
-    label: string;
-    mutates: boolean;
-    payable: boolean;
-    returnType: TypeRef;
-    selector: string;
+    args: Arg[]
+    docs: string[]
+    label: string
+    mutates: boolean
+    payable: boolean
+    returnType: TypeRef
+    selector: string
   }
 
   export interface Storage {
@@ -87,13 +87,13 @@ export namespace ContractMetadata {
       fields: {
         layout: {
           cell: {
-            key: string;
-            ty: number;
-          };
-        };
-        name: string;
-      }[];
-    };
+            key: string
+            ty: number
+          }
+        }
+        name: string
+      }[]
+    }
   }
 
   // TODO: stricter typings? Not the most necessary atm.
@@ -109,61 +109,61 @@ export namespace ContractMetadata {
           return {
             type: "Primitive",
             kind: def.primitive,
-          };
+          }
         } else if (def.composite) {
           return {
             type: "Struct",
             fields: normalizeFields(def.composite.fields),
-          };
+          }
         } else if (def.variant) {
           return {
             type: "Union",
             members: def.variant.variants.map((variant: any) => {
-              const { fields, ...rest } = variant;
+              const { fields, ...rest } = variant
               const member: UnionTyDefMember = {
                 fields: fields ? normalizeFields(fields) : [],
                 ...rest,
-              };
-              return member;
+              }
+              return member
             }),
-          };
+          }
         } else if (def.tuple) {
           return {
             type: "Tuple",
             fields: def.tuple,
-          };
+          }
         } else if (def.array) {
           return {
             type: "SizedArray",
             len: def.array.len,
             typeParam: def.array.type,
-          };
+          }
         } else if (def.sequence) {
           return {
             type: "Sequence",
             typeParam: def.sequence.type,
-          };
+          }
         } else if (def.compact) {
           return {
             type: "Compact",
             typeParam: def.compact.typeParam,
-          };
+          }
         } else if (def.bitSequence) {
           return {
             type: "BitSequence",
             bitOrderType: def.bitSequence.bitOrderType,
             bitStoreType: def.bitSequence.bitStoreType,
-          };
+          }
         }
-        unreachable();
+        unreachable()
       })(),
-    };
+    }
   }
 
   function normalizeFields(fields: any[]) {
     return fields.map(({ type: ty, ...rest }: any) => {
-      return { ty, ...rest };
-    });
+      return { ty, ...rest }
+    })
   }
 
   export function normalize(
@@ -175,10 +175,10 @@ export namespace ContractMetadata {
         ...v3Rest,
         types: types.map(fromRawTy),
       },
-    };
+    }
   }
 
   export function tys(contractMetadata: ContractMetadata): Ty[] {
-    return normalize(contractMetadata).V3.types;
+    return normalize(contractMetadata).V3.types
   }
 }

@@ -1,13 +1,13 @@
-import * as M from "../frame_metadata/mod.ts";
-import { Decl, getPath, getRawCodecPath, makeDocComment, S } from "./utils.ts";
+import * as M from "../frame_metadata/mod.ts"
+import { Decl, getPath, getRawCodecPath, makeDocComment, S } from "./utils.ts"
 
 export function genMetadata(metadata: M.Metadata, decls: Decl[]) {
-  const { tys, extrinsic, pallets } = metadata;
+  const { tys, extrinsic, pallets } = metadata
 
   const isUnitVisitor = new M.TyVisitor<boolean>(tys, {
     unitStruct: () => true,
     wrapperStruct(_, inner) {
-      return this.visit(inner);
+      return this.visit(inner)
     },
     tupleStruct: () => false,
     objectStruct: () => false,
@@ -23,7 +23,7 @@ export function genMetadata(metadata: M.Metadata, decls: Decl[]) {
     bitSequence: () => false,
     lenPrefixedWrapper: () => false,
     circular: () => false,
-  });
+  })
 
   decls.push({
     path: "_metadata.extrinsic",
@@ -38,7 +38,7 @@ export function genMetadata(metadata: M.Metadata, decls: Decl[]) {
         ],
       ),
     ],
-  });
+  })
   for (const pallet of pallets) {
     for (const entry of pallet.storage?.entries ?? []) {
       decls.push({
@@ -64,13 +64,13 @@ export function genMetadata(metadata: M.Metadata, decls: Decl[]) {
             ["value", getRawCodecPath(entry.value)],
           ),
         ],
-      });
+      })
     }
     if (pallet.calls) {
-      const ty = pallet.calls as M.Ty & M.UnionTyDef;
-      const isStringUnion = ty.members.every((x) => !x.fields.length);
+      const ty = pallet.calls as M.Ty & M.UnionTyDef
+      const isStringUnion = ty.members.every((x) => !x.fields.length)
       for (const call of ty.members) {
-        const typeName = isStringUnion ? S.string(call.name) : getPath(tys, ty)! + "." + call.name;
+        const typeName = isStringUnion ? S.string(call.name) : getPath(tys, ty)! + "." + call.name
         const [params, data]: [S, S] = call.fields.length
           ? call.fields[0]!.name
             ? [`value: Omit<${typeName}, "type">`, ["{ ...value, type:", S.string(call.name), "}"]]
@@ -79,7 +79,7 @@ export function genMetadata(metadata: M.Metadata, decls: Decl[]) {
               S.string(call.name),
               "}",
             ]]
-          : ["", isStringUnion ? S.string(call.name) : S.object(["type", S.string(call.name)])];
+          : ["", isStringUnion ? S.string(call.name) : S.object(["type", S.string(call.name)])]
         decls.push({
           path: `${pallet.name}.${call.name}`,
           code: [
@@ -90,7 +90,7 @@ export function genMetadata(metadata: M.Metadata, decls: Decl[]) {
             [":", typeName],
             ["{ return", data, "}"],
           ],
-        });
+        })
       }
     }
   }
@@ -98,11 +98,11 @@ export function genMetadata(metadata: M.Metadata, decls: Decl[]) {
   decls.push({
     path: "_metadata.types",
     code: "export const types = _codec._all",
-  });
+  })
 
   function getExtrasCodec(xs: [string, M.Ty][]) {
     return S.array(
       xs.filter((x) => !isUnitVisitor.visit(x[1])).map((x) => getRawCodecPath(x[1])),
-    );
+    )
   }
 }

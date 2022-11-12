@@ -1,4 +1,4 @@
-import { Hash, Hex, NumberOrHex, SerdeEnum } from "./utils.ts";
+import { Hash, Hex, NumberOrHex, SerdeEnum } from "./utils.ts"
 
 // https://github.com/paritytech/substrate/blob/23bb5a6/frame/transaction-payment/src/types.rs#L99
 /**
@@ -6,9 +6,9 @@ import { Hash, Hex, NumberOrHex, SerdeEnum } from "./utils.ts";
  * runtime.
  */
 export interface RuntimeDispatchInfo {
-  weight: number;
-  class: DispatchClass;
-  partialFee: number;
+  weight: number
+  class: DispatchClass
+  partialFee: number
 }
 
 // https://github.com/paritytech/substrate/blob/23bb5a6255bbcd7ce2999044710428bc4a7a924f/frame/support/src/dispatch.rs#L140
@@ -20,9 +20,9 @@ export interface RuntimeDispatchInfo {
  */
 export type DispatchClass = SerdeEnum<{
   /** A normal dispatch. */
-  normal: void;
+  normal: void
   /** An operational dispatch. */
-  operational: void;
+  operational: void
   /**
    * A mandatory dispatch. These kinds of dispatch are always included regardless of their
    * weight, therefore it is critical that they are separately validated to ensure that a
@@ -38,8 +38,8 @@ export type DispatchClass = SerdeEnum<{
    * block. Essentially, we assume that in these exceptional circumstances, it is better to
    * allow an overweight block to be created than to not allow any block at all to be created.
    */
-  mandatory: void;
-}>;
+  mandatory: void
+}>
 
 // https://github.com/paritytech/substrate/blob/23bb5a6/frame/transaction-payment/src/types.rs#L69
 /**
@@ -49,8 +49,8 @@ export type DispatchClass = SerdeEnum<{
  *     transactions can have a tip.
  */
 export interface FeeDetails {
-  inclusionFee?: InclusionFee;
-  tip: NumberOrHex;
+  inclusionFee?: InclusionFee
+  tip: NumberOrHex
 }
 
 // https://github.com/paritytech/substrate/blob/23bb5a6/frame/transaction-payment/src/types.rs#L33
@@ -60,9 +60,9 @@ export interface InclusionFee {
    * This is the minimum amount a user pays for a transaction. It is declared
    * as a base _weight_ in the runtime and converted to a fee using `WeightToFee`.
    */
-  baseFee: NumberOrHex;
+  baseFee: NumberOrHex
   /** The length fee, the amount paid for the encoded length (in bytes) of the transaction. */
-  lenFee: NumberOrHex;
+  lenFee: NumberOrHex
   /**
    * - `targeted_fee_adjustment`: This is a multiplier that can tune the final fee based on the
    *   congestion of the network.
@@ -71,11 +71,11 @@ export interface InclusionFee {
    *
    * adjusted_weight_fee = targeted_fee_adjustment * weight_fee
    */
-  adjustedWeightFee: NumberOrHex;
+  adjustedWeightFee: NumberOrHex
 }
 
 // https://github.com/paritytech/substrate/blob/eddf888/frame/transaction-payment/rpc/src/lib.rs#L41
 export type TransactionPaymentApi = {
-  payment_queryInfo(extrinsic: Hex, at?: Hash): RuntimeDispatchInfo;
-  payment_queryFeeDetails(extrinsic: Hex, at?: Hash): FeeDetails;
-};
+  payment_queryInfo(extrinsic: Hex, at?: Hash): RuntimeDispatchInfo
+  payment_queryFeeDetails(extrinsic: Hex, at?: Hash): FeeDetails
+}
