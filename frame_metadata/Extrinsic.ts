@@ -1,8 +1,7 @@
 import * as $ from "../deps/scale.ts"
 import { assert } from "../deps/std/testing/asserts.ts"
-import * as H from "../hashers/mod.ts"
 import * as ss58 from "../ss58/mod.ts"
-import { Hex, hex } from "../util/mod.ts"
+import { hashers, Hex, hex } from "../util/mod.ts"
 import { $null, DeriveCodec } from "./Codec.ts"
 import { Metadata } from "./Metadata.ts"
 
@@ -136,7 +135,7 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
             const callEncoded = toSignEncoded.subarray(0, callEnd)
             const extraEncoded = toSignEncoded.subarray(callEnd, extraEnd)
             const toSign = toSignEncoded.length > 256
-              ? H.Blake2_256.hash(toSignEncoded)
+              ? hashers.Blake2_256.hash(toSignEncoded)
               : toSignEncoded
             const sig = props.sign(toSign)
             if (sig instanceof Promise) {

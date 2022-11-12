@@ -1,5 +1,5 @@
 import * as $ from "../deps/scale.ts"
-import * as H from "../hashers/mod.ts"
+import { hashers } from "../util/mod.ts"
 import { DeriveCodec } from "./Codec.ts"
 import * as M from "./Metadata.ts"
 
@@ -26,13 +26,13 @@ export function $storageKey(props: StorageKeyProps): $.Codec<unknown[]> {
   } else {
     keyCodecs = []
   }
-  const palletHash = H.Twox128.hash(new TextEncoder().encode(props.pallet.name))
-  const entryHash = H.Twox128.hash(new TextEncoder().encode(props.storageEntry.name))
+  const palletHash = hashers.Twox128.hash(new TextEncoder().encode(props.pallet.name))
+  const entryHash = hashers.Twox128.hash(new TextEncoder().encode(props.storageEntry.name))
   const $keys = [...Array(keyCodecs.length + 1).keys()].reduce(
     (keys, i) => {
       keys[i] = $.tuple(
         ...keyCodecs.slice(0, i).map(($key, i) =>
-          H[(props.storageEntry as M.MapStorageEntryType).hashers[i]!].$hash($key)
+          hashers[(props.storageEntry as M.MapStorageEntryType).hashers[i]!].$hash($key)
         ),
       )
       return keys
