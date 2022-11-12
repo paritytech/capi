@@ -1,8 +1,8 @@
-import { assertNotInstanceOf } from "../deps/std/testing/asserts.ts";
-import * as T from "../test_util/mod.ts";
-import * as U from "../util/mod.ts";
+import { assertNotInstanceOf } from "../deps/std/testing/asserts.ts"
+import * as T from "../test_util/mod.ts"
+import * as U from "../util/mod.ts"
 
-const client = await T.polkadot.client;
+const client = await T.polkadot.client
 
 const subscriptionId = await client.subscribe({
   jsonrpc: "2.0",
@@ -10,14 +10,14 @@ const subscriptionId = await client.subscribe({
   method: "chain_subscribeAllHeads",
   params: [],
 }, function(e) {
-  assertNotInstanceOf(e, Error);
-  console.log(e);
-  const counter = this.state(U.Counter);
+  assertNotInstanceOf(e, Error)
+  console.log(e)
+  const counter = this.state(U.Counter)
   if (counter.i === 2) {
-    return this.stop();
+    return this.stop()
   }
-  counter.inc();
-});
+  counter.inc()
+})
 
 const { result } = U.throwIfError(
   await client.call({
@@ -26,11 +26,11 @@ const { result } = U.throwIfError(
     method: "chain_unsubscribeAllHeads",
     params: [subscriptionId],
   }),
-);
+)
 
 console.log(
   // cspell:disable-next-line
   `${result ? "S" : "Uns"}uccessfully unsubscribed from subscription ${subscriptionId}`,
-);
+)
 
-await client.discard();
+await client.discard()

@@ -1,6 +1,6 @@
-import * as C from "../mod.ts";
-import * as T from "../test_util/mod.ts";
-import * as U from "../util/mod.ts";
+import * as C from "../mod.ts"
+import * as T from "../test_util/mod.ts"
+import * as U from "../util/mod.ts"
 
 // TODO: uncomment these lines / use env upon solving `count` in zones
 // const getBalances = C.Z.ls(
@@ -27,10 +27,10 @@ const tx = C.extrinsic(T.westend)({
 })
   .signed(C.compat.signerFromKeypair(T.alice))
   .watch(function(status) {
-    console.log(status);
+    console.log(status)
     if (C.rpc.known.TransactionStatus.isTerminal(status)) {
-      this.stop();
+      this.stop()
     }
-  });
+  })
 
-U.throwIfError(await tx.run());
+U.throwIfError(await tx.run())

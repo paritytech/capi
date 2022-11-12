@@ -1,6 +1,6 @@
-import * as T from "../test_util/mod.ts";
+import * as T from "../test_util/mod.ts"
 
-const client = await T.westend.client;
+const client = await T.westend.client
 
 console.log(
   await client.call({
@@ -9,6 +9,6 @@ console.log(
     method: "state_getMetadata",
     params: [],
   }),
-);
+)
 
-await client.discard();
+await client.discard()

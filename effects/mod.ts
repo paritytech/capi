@@ -1,13 +1,13 @@
-export * from "./blockWatch.ts";
-export * from "./const.ts";
-export * from "./entryRead.ts";
-export * from "./entryWatch.ts";
-export * from "./events.ts";
-export * from "./extrinsic.ts";
-export * from "./keyPageRead.ts";
-export * from "./metadata.ts";
-export * from "./rpc.ts";
-export * as knownClients from "./rpc_known_clients.ts";
-export * from "./rpc_known_clients.ts";
-export * from "./rpc_known_methods.ts";
-export * from "./scale.ts";
+export * from "./blockWatch.ts"
+export * from "./const.ts"
+export * from "./entryRead.ts"
+export * from "./entryWatch.ts"
+export * from "./events.ts"
+export * from "./extrinsic.ts"
+export * from "./keyPageRead.ts"
+export * from "./metadata.ts"
+export * from "./rpc.ts"
+export * as knownClients from "./rpc_known_clients.ts"
+export * from "./rpc_known_clients.ts"
+export * from "./rpc_known_methods.ts"
+export * from "./scale.ts"

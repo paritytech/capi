@@ -1,3 +1,3 @@
-import { LocalClientEffect } from "../local.ts";
+import { LocalClientEffect } from "../local.ts"
 
-export const client = new LocalClientEffect("westend");
+export const client = new LocalClientEffect("westend")

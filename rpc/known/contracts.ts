@@ -1,14 +1,14 @@
-import { AccountId, Hash, Hex, NumberOrHex, RpcResult, SerdeEnum, SerdeResult } from "./utils.ts";
+import { AccountId, Hash, Hex, NumberOrHex, RpcResult, SerdeEnum, SerdeResult } from "./utils.ts"
 
 // https://github.com/paritytech/substrate/blob/0246883/frame/contracts/rpc/src/lib.rs#L92
 /** A struct that encodes RPC parameters required for a call to a smart-contract. */
 export interface CallRequest {
-  origin: AccountId;
-  dest: AccountId;
-  value: NumberOrHex;
-  gasLimit: NumberOrHex;
-  storageDepositLimit: NumberOrHex | undefined;
-  inputData: Hex;
+  origin: AccountId
+  dest: AccountId
+  value: NumberOrHex
+  gasLimit: NumberOrHex
+  storageDepositLimit: NumberOrHex | undefined
+  inputData: Hex
 }
 
 // https://github.com/paritytech/substrate/blob/622f532/frame/contracts/common/src/lib.rs#L50
@@ -19,7 +19,7 @@ export interface CallRequest {
  */
 export interface ContractResult<R> {
   /** How much gas was consumed during execution. */
-  gasConsumed: number;
+  gasConsumed: number
   /**
    * How much gas is required as gas limit in order to execute this call.
    *
@@ -32,14 +32,14 @@ export interface ContractResult<R> {
    * Additionally, any `seal_call` or `seal_instantiate` makes use of pre-charging
    * when a non-zero `gas_limit` argument is supplied.
    */
-  gasRequired: number;
+  gasRequired: number
   /**
    * How much balance was deposited and reserved during execution in order to pay for storage.
    *
    * The storage deposit is never actually charged from the caller in case of [`Self::result`]
    * is `Err`. This is because on error all storage changes are rolled back.
    */
-  storageDeposit: StorageDeposit;
+  storageDeposit: StorageDeposit
   /**
    * An optional debug message. This message is only filled when explicitly requested
    * by the code that calls into the contract. Otherwise it is empty.
@@ -56,9 +56,9 @@ export interface ContractResult<R> {
    * The debug message is never generated during on-chain execution. It is reserved for
    * RPC calls.
    */
-  debugMessage: string;
+  debugMessage: string
   /** The execution result of the wasm code. */
-  result: R;
+  result: R
 }
 
 // https://github.com/paritytech/substrate/blob/622f532/frame/contracts/common/src/lib.rs#L200
@@ -70,15 +70,15 @@ export type StorageDeposit = SerdeEnum<{
    * This means that the specified amount of balance was transferred from the involved
    * contracts to the call origin.
    */
-  Refund: NumberOrHex;
+  Refund: NumberOrHex
   /**
    * The transaction increased overall storage usage.
    *
    * This means that the specified amount of balance was transferred from the call origin
    * to the contracts involved.
    */
-  Charge: NumberOrHex;
-}>;
+  Charge: NumberOrHex
+}>
 
 // https://github.com/paritytech/substrate/blob/622f532/frame/contracts/common/src/lib.rs#L118
 /** Flags used by a contract to customize exit behavior. */
@@ -89,134 +89,134 @@ export enum ReturnFlags {
 /** Output of a contract call or instantiation which ran to completion. */
 export interface ExecReturnValue {
   /** Flags passed along by `seal_return`. Empty when `seal_return` was never called. */
-  flags: ReturnFlags;
+  flags: ReturnFlags
   /** Buffer passed along by `seal_return`. Empty when `seal_return` was never called. */
-  data: Hex;
+  data: Hex
 }
 
 // https://github.com/paritytech/substrate/blob/dc22e48/primitives/runtime/src/lib.rs#L524
 /** Reason why a dispatch call failed. */
 export type DispatchError = SerdeEnum<{
   /** Some error occurred. */
-  Other: string;
+  Other: string
   /** Failed to lookup some data. */
-  CannotLookup: void;
+  CannotLookup: void
   /** A bad origin. */
-  BadOrigin: void;
+  BadOrigin: void
   /** A custom error in a module. */
-  Module: ModuleError;
+  Module: ModuleError
   /** At least one consumer is remaining so the account cannot be destroyed. */
-  ConsumerRemaining: void;
+  ConsumerRemaining: void
   /** There are no providers so the account cannot be created. */
-  NoProviders: void;
+  NoProviders: void
   /** There are too many consumers so the account cannot be created. */
-  TooManyConsumers: void;
+  TooManyConsumers: void
   /** An error to do with tokens. */
-  Token: TokenError;
+  Token: TokenError
   /** An arithmetic error. */
-  Arithmetic: ArithmeticError;
+  Arithmetic: ArithmeticError
   /**
    * The number of transactional layers has been reached, or we are not in a transactional
    * layer.
    */
-  Transactional: TransactionalError;
-}>;
+  Transactional: TransactionalError
+}>
 
 // https://github.com/paritytech/substrate/blob/dc22e48/primitives/runtime/src/lib.rs#L479
 /** Reason why a pallet call failed. */
 export type ModuleError = {
   /** Module index, matching the metadata module index. */
-  index: number;
+  index: number
   /** Module specific error value. */
-  error: number;
+  error: number
   /** Optional error message. */
-  message: string | undefined;
-};
+  message: string | undefined
+}
 
 // https://github.com/paritytech/substrate/blob/dc22e48/primitives/runtime/src/lib.rs#L641
 /** Arithmetic errors. */
 export type ArithmeticError = SerdeEnum<{
   /** Underflow. */
-  Underflow: void;
+  Underflow: void
   /** Overflow. */
-  Overflow: void;
+  Overflow: void
   /** Division by zero. */
-  DivisionByZero: void;
-}>;
+  DivisionByZero: void
+}>
 
 // https://github.com/paritytech/substrate/blob/dc22e48/primitives/runtime/src/lib.rs#L601
 /** Description of what went wrong when trying to complete an operation on a token. */
 export type TokenError = SerdeEnum<{
   /** Funds are unavailable. */
-  NoFunds: void;
+  NoFunds: void
   /** Account that must exist would die. */
-  WouldDie: void;
+  WouldDie: void
   /** Account cannot exist with the funds that would be given. */
-  BelowMinimum: void;
+  BelowMinimum: void
   /** Account cannot be created. */
-  CannotCreate: void;
+  CannotCreate: void
   /** The asset in question is unknown. */
-  UnknownAsset: void;
+  UnknownAsset: void
   /** Funds exist but are frozen. */
-  Frozen: void;
+  Frozen: void
   /** Operation is not supported by the asset. */
-  Unsupported: void;
-}>;
+  Unsupported: void
+}>
 
 // https://github.com/paritytech/substrate/blob/dc22e48/primitives/runtime/src/lib.rs#L499
 /** Errors related to transactional storage layers. */
 export type TransactionalError = SerdeEnum<{
   /** Too many transactional layers have been spawned. */
-  LimitReached: void;
+  LimitReached: void
   /** A transactional layer was expected, but does not exist. */
-  NoLayer: void;
-}>;
+  NoLayer: void
+}>
 
 // https://github.com/paritytech/substrate/blob/622f532/frame/contracts/common/src/lib.rs#L176
 /** Reference to an existing code hash or a new wasm module */
 export type Code = SerdeEnum<{
   /** A wasm module as raw bytes. */
-  upload: Hex;
+  upload: Hex
   /** The code hash of an on-chain wasm blob. */
-  existing: Hash;
-}>;
+  existing: Hash
+}>
 
 // https://github.com/paritytech/substrate/blob/0246883/frame/contracts/rpc/src/lib.rs#L105
 /** A struct that encodes RPC parameters required to instantiate a new smart-contract. */
 export interface InstantiateRequest {
-  origin: AccountId;
-  value: NumberOrHex;
-  gasLimit: NumberOrHex;
-  storageDepositLimit: NumberOrHex | undefined;
-  code: Code;
-  data: Hex;
-  salt: Hex;
+  origin: AccountId
+  value: NumberOrHex
+  gasLimit: NumberOrHex
+  storageDepositLimit: NumberOrHex | undefined
+  code: Code
+  data: Hex
+  salt: Hex
 }
 
 // https://github.com/paritytech/substrate/blob/0246883/frame/contracts/rpc/src/lib.rs#L119
 /** A struct that encodes RPC parameters required for a call to upload a new code. */
 export interface CodeUploadRequest {
-  origin: AccountId;
-  code: Hex;
-  storageDepositLimit: NumberOrHex | undefined;
+  origin: AccountId
+  code: Hex
+  storageDepositLimit: NumberOrHex | undefined
 }
 
 // https://github.com/paritytech/substrate/blob/622f532/frame/contracts/common/src/lib.rs#L164
 /** The result of successfully uploading a contract. */
 export interface CodeUploadReturnValue {
   /** The key under which the new code is stored. */
-  codeHash: Hash;
+  codeHash: Hash
   /** The deposit that was reserved at the caller. Is zero when the code already existed. */
-  deposit: NumberOrHex;
+  deposit: NumberOrHex
 }
 
 // https://github.com/paritytech/substrate/blob/622f532/frame/contracts/common/src/lib.rs#L146
 /** The result of a successful contract instantiation. */
 export interface InstantiateReturnValue {
   /** The output of the called constructor. */
-  result: ExecReturnValue;
+  result: ExecReturnValue
   /** The account id of the new contract. */
-  account_id: AccountId;
+  account_id: AccountId
 }
 
 // https://github.com/paritytech/substrate/blob/0246883/frame/contracts/rpc/src/lib.rs#L127
@@ -233,7 +233,7 @@ export type ContractsRpc = {
   contracts_call(
     callRequest: CallRequest,
     at?: Hash,
-  ): RpcResult<ContractResult<SerdeResult<ExecReturnValue, DispatchError>>>;
+  ): RpcResult<ContractResult<SerdeResult<ExecReturnValue, DispatchError>>>
   /**
    * Instantiate a new contract.
    *
@@ -244,7 +244,7 @@ export type ContractsRpc = {
    */
   contracts_instantiate(
     instantiateRequest: InstantiateRequest,
-  ): RpcResult<ContractResult<SerdeResult<InstantiateReturnValue, DispatchError>>>;
+  ): RpcResult<ContractResult<SerdeResult<InstantiateReturnValue, DispatchError>>>
   /**
    * Upload new code without instantiating a contract from it.
    *
@@ -256,7 +256,7 @@ export type ContractsRpc = {
   contracts_upload_code(
     uploadRequest: CodeUploadRequest,
     at?: Hash,
-  ): RpcResult<SerdeResult<CodeUploadReturnValue, DispatchError>>;
+  ): RpcResult<SerdeResult<CodeUploadReturnValue, DispatchError>>
   /**
    * Returns the value under a specified storage `key` in a contract given by `address` param,
    * or `None` if it is not set.
@@ -265,5 +265,5 @@ export type ContractsRpc = {
     accountId: AccountId,
     key: Hex,
     aat?: Hash,
-  ): RpcResult<Hex | null>;
-};
+  ): RpcResult<Hex | null>
+}

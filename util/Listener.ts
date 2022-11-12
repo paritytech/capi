@@ -1,4 +1,4 @@
-export type Listener<Event, This = any> = (this: This, event: Event) => void;
+export type Listener<Event, This = any> = (this: This, event: Event) => void
 
 export function contramapListener<This>() {
   return <From, Into>(
@@ -6,7 +6,7 @@ export function contramapListener<This>() {
     map: (this: This, message: From) => Into,
   ): Listener<From> => {
     return function(e: From) {
-      return listener.apply(this, [map.apply(this, [e])]);
-    };
-  };
+      return listener.apply(this, [map.apply(this, [e])])
+    }
+  }
 }

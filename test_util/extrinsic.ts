@@ -1,10 +1,10 @@
-import * as A from "../deps/std/testing/asserts.ts";
-import * as Z from "../deps/zones.ts";
-import { ExtrinsicProps, SignedExtrinsic } from "../effects/extrinsic.ts";
-import * as M from "../frame_metadata/mod.ts";
-import * as rpc from "../rpc/mod.ts";
+import * as A from "../deps/std/testing/asserts.ts"
+import * as Z from "../deps/zones.ts"
+import { ExtrinsicProps, SignedExtrinsic } from "../effects/extrinsic.ts"
+import * as M from "../frame_metadata/mod.ts"
+import * as rpc from "../rpc/mod.ts"
 
-const k0_ = Symbol();
+const k0_ = Symbol()
 
 // TODO: use context / properly scope context / make it accessible outside of subscription lifecycle
 // TODO: better zones-level way to share context between effects
@@ -13,15 +13,15 @@ export function collectExtrinsicEvents<
   Props extends Z.Rec$<ExtrinsicProps>,
   Sign extends Z.$<M.Signer>,
 >(extrinsic: SignedExtrinsic<Client, Props, Sign>) {
-  const events: rpc.known.TransactionStatus[] = [];
+  const events: rpc.known.TransactionStatus[] = []
   return extrinsic
     .watch(function(status) {
-      events.push(status);
+      events.push(status)
       if (rpc.known.TransactionStatus.isTerminal(status)) {
-        this.stop();
+        this.stop()
       }
     })
-    .next(() => events, k0_);
+    .next(() => events, k0_)
 }
 
 // TODO: is this a common-enough test to merit existence in `test_util`?
@@ -30,14 +30,14 @@ export function assertStatusOrder(
   statuses: rpc.known.TransactionStatus[],
   statusOrderExpectation: StatusOrderExpectation,
 ) {
-  A.assertEquals(statuses.length, statusOrderExpectation.length);
+  A.assertEquals(statuses.length, statusOrderExpectation.length)
   for (let i = 0; i < statusOrderExpectation.length; i++) {
-    const expected = statusOrderExpectation[i]!;
-    const actualStatus = statuses[i]!;
+    const expected = statusOrderExpectation[i]!
+    const actualStatus = statuses[i]!
     if (typeof actualStatus === "string") {
-      A.assertEquals(actualStatus, expected);
+      A.assertEquals(actualStatus, expected)
     } else if (actualStatus.broadcast) {
-      A.assert(actualStatus[expected]);
+      A.assert(actualStatus[expected])
     }
   }
 }
@@ -55,4 +55,4 @@ export type StatusOrderExpectation = (
   | "usurped"
   | "dropped"
   | "invalid"
-)[];
+)[]

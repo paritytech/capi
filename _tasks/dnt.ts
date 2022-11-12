@@ -1,10 +1,10 @@
-import { build } from "https://deno.land/x/dnt@0.26.0/mod.ts";
-import * as fs from "../deps/std/fs.ts";
-import * as path from "../deps/std/path.ts";
+import { build } from "https://deno.land/x/dnt@0.26.0/mod.ts"
+import * as fs from "../deps/std/fs.ts"
+import * as path from "../deps/std/path.ts"
 
-const outDir = path.join("target", "npm");
+const outDir = path.join("target", "npm")
 
-await fs.emptyDir(outDir);
+await fs.emptyDir(outDir)
 
 await Promise.all([
   build({
@@ -49,4 +49,4 @@ await Promise.all([
   }),
   fs.copy("LICENSE", path.join(outDir, "LICENSE")),
   fs.copy("Readme.md", path.join(outDir, "Readme.md")),
-]);
+])

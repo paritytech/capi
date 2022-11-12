@@ -1,14 +1,14 @@
-import * as $ from "../deps/scale.ts";
-import { assertEquals } from "../deps/std/testing/asserts.ts";
-import { HasherKind } from "../frame_metadata/mod.ts";
-import { hex } from "../util/mod.ts";
-import * as H from "./mod.ts";
+import * as $ from "../deps/scale.ts"
+import { assertEquals } from "../deps/std/testing/asserts.ts"
+import { HasherKind } from "../frame_metadata/mod.ts"
+import { hex } from "../util/mod.ts"
+import * as H from "./mod.ts"
 
 interface Foo {
-  a: Uint8Array;
-  b: boolean[];
-  c: Promise<string>;
-  d: Foo | undefined;
+  a: Uint8Array
+  b: boolean[]
+  c: Promise<string>
+  d: Foo | undefined
 }
 
 const $foo: $.Codec<Foo> = $.object(
@@ -16,7 +16,7 @@ const $foo: $.Codec<Foo> = $.object(
   ["b", $.array($.bool)],
   ["c", $.promise($.str)],
   ["d", $.option($.deferred(() => $foo))],
-);
+)
 
 const foo: Foo = {
   a: new Uint8Array(1024),
@@ -30,10 +30,10 @@ const foo: Foo = {
     c: Promise.resolve("abc"),
     d: undefined,
   },
-};
+}
 
-const encoded = await $foo.encodeAsync(foo);
-const hexEncoded = hex.encode(encoded);
+const encoded = await $foo.encodeAsync(foo)
+const hexEncoded = hex.encode(encoded)
 
 const hashes: Record<HasherKind, string> = {
   Blake2_128: "1f709e4fba4e77dc0e5f0d8ad9a34772",
@@ -43,17 +43,17 @@ const hashes: Record<HasherKind, string> = {
   Twox128: "ea44441eaac4e86f012f973ddc3032b0",
   Twox256: "ea44441eaac4e86f012f973ddc3032b09ffb7852c4e93f2a9e6284582996b4f6",
   Twox64Concat: "ea44441eaac4e86f" + hexEncoded,
-};
+}
 
 for (const hasherKind in hashes) {
   Deno.test(hasherKind, async () => {
-    const hasher = H[hasherKind as HasherKind];
-    const hash = hashes[hasherKind as HasherKind];
-    assertEquals(hex.encode(hasher.hash(encoded)), hash);
-    const hashData = await hasher.$hash($foo).encodeAsync(foo);
-    assertEquals(hex.encode(hashData), hash);
+    const hasher = H[hasherKind as HasherKind]
+    const hash = hashes[hasherKind as HasherKind]
+    assertEquals(hex.encode(hasher.hash(encoded)), hash)
+    const hashData = await hasher.$hash($foo).encodeAsync(foo)
+    assertEquals(hex.encode(hashData), hash)
     if (hasher.concat) {
-      assertEquals(hasher.$hash($foo).decode(hashData), foo);
+      assertEquals(hasher.$hash($foo).decode(hashData), foo)
     }
-  });
+  })
 }

@@ -1,11 +1,11 @@
-import * as refImpl from "https://esm.sh/@polkadot/util-crypto@10.1.6/xxhash/index.js";
-import { assertEquals } from "../deps/std/testing/asserts.ts";
-import { hex } from "../util/mod.ts";
-import { Xxhash } from "./xxhash.ts";
+import * as refImpl from "https://esm.sh/@polkadot/util-crypto@10.1.6/xxhash/index.js"
+import { assertEquals } from "../deps/std/testing/asserts.ts"
+import { hex } from "../util/mod.ts"
+import { Xxhash } from "./xxhash.ts"
 
 const lorem =
   // cspell:disable-next-line
-  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 
 const hashes: [name: string, data: Uint8Array, hash: string][] = [
   [
@@ -28,31 +28,31 @@ const hashes: [name: string, data: Uint8Array, hash: string][] = [
     new TextEncoder().encode(lorem),
     "3056764314b1a8c5331511d478ff3f1203586c1a9308a54594234d9956fa6173dde73c6f4d92a266b80f4ea640fc58880baa7ba549315bf42b06d60439cdd4cc",
   ],
-];
+]
 
 for (const [name, data, fullHash] of hashes) {
   for (const size of [64, 128, 256, 512] as const) {
-    const hash = fullHash.slice(0, size / 4);
-    const rounds = size / 64;
+    const hash = fullHash.slice(0, size / 4)
+    const rounds = size / 64
     Deno.test(`${name} ${size} reference`, () => {
-      assertEquals(refImpl.xxhashAsHex(data, size).slice(2), hash);
-    });
+      assertEquals(refImpl.xxhashAsHex(data, size).slice(2), hash)
+    })
     Deno.test(`${name} ${size} straight`, () => {
-      const hasher = new Xxhash(rounds);
-      hasher.update(data);
-      assertEquals(hex.encode(hasher.digest()), hash);
-      hasher.dispose();
-    });
+      const hasher = new Xxhash(rounds)
+      hasher.update(data)
+      assertEquals(hex.encode(hasher.digest()), hash)
+      hasher.dispose()
+    })
     if (size === 512) {
       for (const chunkSize of [1, 13, 31, 32, 33, 49, 64, 65, 113]) {
         Deno.test(`${name} ${size} chunked ${chunkSize}`, () => {
-          const hasher = new Xxhash(rounds);
+          const hasher = new Xxhash(rounds)
           for (let i = 0; i < data.length; i += chunkSize) {
-            hasher.update(data.slice(i, i + chunkSize));
+            hasher.update(data.slice(i, i + chunkSize))
           }
-          assertEquals(hex.encode(hasher.digest()), hash);
-          hasher.dispose();
-        });
+          assertEquals(hex.encode(hasher.digest()), hash)
+          hasher.dispose()
+        })
       }
     }
   }

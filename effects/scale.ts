@@ -1,24 +1,24 @@
-import * as $ from "../deps/scale.ts";
-import * as Z from "../deps/zones.ts";
-import * as M from "../frame_metadata/mod.ts";
+import * as $ from "../deps/scale.ts"
+import * as Z from "../deps/zones.ts"
+import * as M from "../frame_metadata/mod.ts"
 
-const k0_ = Symbol();
-const k1_ = Symbol();
-const k2_ = Symbol();
-const k3_ = Symbol();
-const k4_ = Symbol();
-const k5_ = Symbol();
+const k0_ = Symbol()
+const k1_ = Symbol()
+const k2_ = Symbol()
+const k3_ = Symbol()
+const k4_ = Symbol()
+const k5_ = Symbol()
 
 export const deriveCodec = Z.call.fac((metadata: M.Metadata) => {
-  return M.DeriveCodec(metadata.tys);
-}, k0_);
+  return M.DeriveCodec(metadata.tys)
+}, k0_)
 
 export const codec = Z.call.fac((
   deriveCodec: M.DeriveCodec,
   ty: number | M.Ty,
 ) => {
-  return deriveCodec(ty);
-}, k1_);
+  return deriveCodec(ty)
+}, k1_)
 
 export function scaleDecoded<
   Codec extends Z.$<$.Codec<any>>,
@@ -32,9 +32,9 @@ export function scaleDecoded<
   return Z
     .ls(codec, encoded, key)
     .next(([codec, encoded, key]): Record<Z.T<Key>, any> => {
-      return { [key]: codec.decode(encoded) } as any;
+      return { [key]: codec.decode(encoded) } as any
     }, k2_)
-    .zoned("ScaleDecoded");
+    .zoned("ScaleDecoded")
 }
 
 // TODO: eventually, utilize `V` to toggle runtime validation
@@ -47,12 +47,12 @@ export function scaleEncoded<Codec extends Z.$<$.Codec<any>>, Decoded>(
     .ls(codec, decoded, isAsync)
     .next(([codec, decoded]) => {
       try {
-        $.assert(codec, decoded);
+        $.assert(codec, decoded)
       } catch (e) {
-        return e as $.ScaleAssertError;
+        return e as $.ScaleAssertError
       }
-      return codec[isAsync ? "encodeAsync" : "encode"](decoded);
-    }, k3_);
+      return codec[isAsync ? "encodeAsync" : "encode"](decoded)
+    }, k3_)
 }
 
 export const $extrinsic = Z.call.fac((
@@ -66,8 +66,8 @@ export const $extrinsic = Z.call.fac((
     metadata,
     sign: sign!,
     prefix: prefix!,
-  });
-}, k4_);
+  })
+}, k4_)
 
 export const $storageKey = Z.call.fac((
   deriveCodec: M.DeriveCodec,
@@ -78,5 +78,5 @@ export const $storageKey = Z.call.fac((
     deriveCodec,
     pallet,
     storageEntry,
-  });
-}, k5_);
+  })
+}, k5_)

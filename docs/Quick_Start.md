@@ -5,7 +5,7 @@
 If you're using [Deno](https://deno.land/), import Capi via its [`denoland/x`](https://deno.land/x) URI.
 
 ```ts
-import * as C from "https://deno.land/x/capi/mod.ts";
+import * as C from "https://deno.land/x/capi/mod.ts"
 ```
 
 > Note: you may want to pin the version in the import specifier (`"https://deno.land/x/capi@x.x.x/mod.ts"`).
@@ -19,7 +19,7 @@ npm install capi
 Then import as follows.
 
 ```ts
-import * as C from "capi";
+import * as C from "capi"
 ```
 
 > The `capi` NPM package contains both ESM & CJS formats, alongside corresponding type definitions.
@@ -47,10 +47,10 @@ deno run -A -r https://deno.land/x/capi/codegen.ts \
 ## Read the Latest Block
 
 ```ts
-import * as C from "capi";
-import { block } from "./polkadot/core.ts";
+import * as C from "capi"
+import { block } from "./polkadot/core.ts"
 
-const block = await C.run(block.latest);
+const block = await C.run(block.latest)
 ```
 
 ## Reading From Storage
@@ -58,14 +58,14 @@ const block = await C.run(block.latest);
 Let's read from on-chain storage.
 
 ```ts
-import * as C from "capi";
-import { system } from "./polkadot/frame.ts";
+import * as C from "capi"
+import { system } from "./polkadot/frame.ts"
 
 // bind to the last inserted key
-const key = system.account.keys.first;
+const key = system.account.keys.first
 
 // bind to the corresponding value
-const value = C.run(system.account.get(key));
+const value = C.run(system.account.get(key))
 ```
 
 ## Transferring Some Funds
@@ -73,10 +73,10 @@ const value = C.run(system.account.get(key));
 In the following example, we create and sign an extrinsic that calls the Balance pallet's transfer method.
 
 ```ts
-import * as C from "capi";
-import { balances } from "./polkadot/frame.ts";
+import * as C from "capi"
+import { balances } from "./polkadot/frame.ts"
 
-declare const aliceSigner: C.Signer;
+declare const aliceSigner: C.Signer
 
 const tx = balances.transfer({
   value: 12345n,
@@ -84,9 +84,9 @@ const tx = balances.transfer({
 })
   .signed(aliceSigner)
   .sent
-  .finalized;
+  .finalized
 
-const result = await C.run(tx);
+const result = await C.run(tx)
 ```
 
 ### Observe Transfer Events

@@ -1,4 +1,4 @@
-import { Hash, Hex, RpcResult, SerdeEnum, Subscription } from "./utils.ts";
+import { Hash, Hex, RpcResult, SerdeEnum, Subscription } from "./utils.ts"
 
 // https://github.com/paritytech/substrate/blob/e0ccd00/client/transaction-pool/api/src/lib.rs#L104
 /**
@@ -51,32 +51,32 @@ import { Hash, Hex, RpcResult, SerdeEnum, Subscription } from "./utils.ts";
  */
 export type TransactionStatus = SerdeEnum<{
   /** Transaction is part of the future queue. */
-  future: void;
+  future: void
   /** Transaction is part of the ready queue. */
-  ready: void;
+  ready: void
   /** The transaction has been broadcast to the given peers. */
-  broadcast: string[];
+  broadcast: string[]
   /** Transaction has been included in block with given hash. */
-  inBlock: Hash;
+  inBlock: Hash
   /** The block this transaction was included in has been retracted. */
-  retracted: Hash;
+  retracted: Hash
   /**
    * Maximum number of finality watchers has been reached,
    * old watchers are being removed.
    */
-  finalityTimeout: Hash;
+  finalityTimeout: Hash
   /** Transaction has been finalized by a finality-gadget, e.g GRANDPA */
-  finalized: Hash;
+  finalized: Hash
   /**
    * Transaction has been replaced in the pool, by another transaction
    * that provides the same tags. (e.g. same (sender, nonce)).
    */
-  usurped: Hash;
+  usurped: Hash
   /** Transaction has been dropped from the pool because of the limit. */
-  dropped: void;
+  dropped: void
   /** Transaction is no longer valid in the current state. */
-  invalid: void;
-}>;
+  invalid: void
+}>
 
 export namespace TransactionStatus {
   // TODO: convert into type guard?
@@ -84,7 +84,7 @@ export namespace TransactionStatus {
     return typeof inQuestion === "string"
       ? inQuestion === "invalid" || inQuestion === "dropped"
       : !!(inQuestion.finalized || inQuestion.finalityTimeout || inQuestion.retracted
-        || inQuestion.usurped);
+        || inQuestion.usurped)
   }
 }
 
@@ -96,34 +96,34 @@ export namespace TransactionStatus {
  */
 export type ExtrinsicOrHash = SerdeEnum<{
   /** The hash of the extrinsic. */
-  hash: Hash;
+  hash: Hash
   /** Raw extrinsic bytes. */
-  extrinsic: Hex;
-}>;
+  extrinsic: Hex
+}>
 
 // https://github.com/paritytech/substrate/blob/e0ccd00/client/rpc-api/src/author/mod.rs#L30
 export type AuthorRpc = {
   /** Submit hex-encoded extrinsic for inclusion in block. */
-  author_submitExtrinsic(extrinsic: Hex): RpcResult<Hash>;
+  author_submitExtrinsic(extrinsic: Hex): RpcResult<Hash>
   /** Insert a key into the keystore. */
-  author_insertKey(keyType: string, suri: string, publicKey: Hex): RpcResult<null>;
+  author_insertKey(keyType: string, suri: string, publicKey: Hex): RpcResult<null>
   /** Generate new session keys and returns the corresponding public keys. */
-  author_rotateKeys(): RpcResult<Hex>;
+  author_rotateKeys(): RpcResult<Hex>
   /**
    * Checks if the keystore has private keys for the given session public keys.
    * `sessionKeys` is the SCALE encoded session keys object from the runtime.
    * Returns `true` iff all private keys could be found.
    */
-  author_hasSessionKeys(sessionsKeys: Hex): RpcResult<boolean>;
+  author_hasSessionKeys(sessionsKeys: Hex): RpcResult<boolean>
   /**
    * Checks if the keystore has private keys for the given public key and key type.
    * Returns `true` if a private key could be found.
    */
-  author_hasKey(pubKey: Hex, keyType: string): RpcResult<boolean>;
+  author_hasKey(pubKey: Hex, keyType: string): RpcResult<boolean>
   /** Returns all pending extrinsics, potentially grouped by sender.  */
-  author_pendingExtrinsics(): RpcResult<Hex[]>;
+  author_pendingExtrinsics(): RpcResult<Hex[]>
   /** Remove given extrinsic from the pool and temporarily ban it to prevent reimporting. */
-  author_removeExtrinsic(extrinsics: ExtrinsicOrHash[]): RpcResult<Hex[]>; // todo
+  author_removeExtrinsic(extrinsics: ExtrinsicOrHash[]): RpcResult<Hex[]> // todo
   /**
    * Submit an extrinsic to watch.
    *
@@ -132,8 +132,8 @@ export type AuthorRpc = {
    */
   author_submitAndWatchExtrinsic(
     extrinsic: Hex,
-  ): RpcResult<Subscription<"author_submitAndWatchExtrinsic", TransactionStatus>>;
+  ): RpcResult<Subscription<"author_submitAndWatchExtrinsic", TransactionStatus>>
   author_unwatchExtrinsic(
     subscription: Subscription<"author_submitAndWatchExtrinsic", TransactionStatus>,
-  ): RpcResult<void>;
-};
+  ): RpcResult<void>
+}

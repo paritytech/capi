@@ -1,18 +1,18 @@
-import * as M from "../frame_metadata/mod.ts";
-import { createCodecVisitor } from "./codecVisitor.ts";
-import { Files } from "./Files.ts";
-import { genMetadata } from "./genMetadata.ts";
-import { createTypeVisitor } from "./typeVisitor.ts";
-import { Decl, printDecls, S } from "./utils.ts";
+import * as M from "../frame_metadata/mod.ts"
+import { createCodecVisitor } from "./codecVisitor.ts"
+import { Files } from "./Files.ts"
+import { genMetadata } from "./genMetadata.ts"
+import { createTypeVisitor } from "./typeVisitor.ts"
+import { Decl, printDecls, S } from "./utils.ts"
 
 export interface CodegenProps {
-  metadata: M.Metadata;
-  importSpecifier: string;
+  metadata: M.Metadata
+  importSpecifier: string
 }
 
 export function codegen(props: CodegenProps): Files {
-  const decls: Decl[] = [];
-  const files = new Files();
+  const decls: Decl[] = []
+  const files = new Files()
   decls.push({
     path: "_",
     code: [
@@ -24,16 +24,16 @@ export function codegen(props: CodegenProps): Files {
       [`import * as _codec from "./codecs.ts"`],
       [`export { _metadata }`],
     ],
-  });
-  const typeVisitor = createTypeVisitor(props, decls);
-  const codecVisitor = createCodecVisitor(props, decls, typeVisitor, files);
+  })
+  const typeVisitor = createTypeVisitor(props, decls)
+  const codecVisitor = createCodecVisitor(props, decls, typeVisitor, files)
   for (const ty of props.metadata.tys) {
-    typeVisitor.visit(ty);
-    codecVisitor.visit(ty);
+    typeVisitor.visit(ty)
+    codecVisitor.visit(ty)
   }
-  genMetadata(props.metadata, decls);
+  genMetadata(props.metadata, decls)
   files.set("mod.ts", {
     getContent: () => printDecls(decls),
-  });
-  return files;
+  })
+  return files
 }
