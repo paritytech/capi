@@ -42,6 +42,7 @@ await Promise.all([
       deno: {
         test: true,
       },
+      webSocket: true,
     },
     test: false,
     typeCheck: false,
