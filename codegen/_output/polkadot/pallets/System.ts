@@ -130,13 +130,7 @@ export const LastRuntimeUpgrade = {
 }
 
 /** The current block number being processed. Set by `execute_block`. */
-export const Number = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const Number = { type: "Plain", modifier: "Default", hashers: [], key: [], value: _codec.$4 }
 
 /** Hash of the previous block. */
 export const ParentHash = {

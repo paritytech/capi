@@ -222,10 +222,7 @@ export const $51: $.Codec<t.types.sp_core.ed25519.Public> = $1
 
 export const $50: $.Codec<t.types.sp_finality_grandpa.app.Public> = $51
 
-export const $49: $.Codec<[t.types.sp_finality_grandpa.app.Public, t.types.u64]> = $.tuple(
-  $50,
-  $10,
-)
+export const $49: $.Codec<[t.types.sp_finality_grandpa.app.Public, t.types.u64]> = $.tuple($50, $10)
 
 export const $48: $.Codec<Array<[t.types.sp_finality_grandpa.app.Public, t.types.u64]>> = $.array(
   $49,
@@ -3322,10 +3319,7 @@ export const $455: $.Codec<t.types.pallet_preimage.pallet.Error> = $.stringUnion
   5: "NotRequested",
 })
 
-export const $457: $.Codec<[t.types.sp_consensus_babe.app.Public, t.types.u64]> = $.tuple(
-  $189,
-  $10,
-)
+export const $457: $.Codec<[t.types.sp_consensus_babe.app.Public, t.types.u64]> = $.tuple($189, $10)
 
 export const $458: $.Codec<Array<[t.types.sp_consensus_babe.app.Public, t.types.u64]>> = $.array(
   $457,
@@ -3362,9 +3356,7 @@ export const $462: $.Codec<t.types.sp_consensus_babe.digests.PreDigest> = $.tagg
   3: ["SecondaryVRF", ["value", $465]],
 })
 
-export const $461: $.Codec<t.types.sp_consensus_babe.digests.PreDigest | undefined> = $.option(
-  $462,
-)
+export const $461: $.Codec<t.types.sp_consensus_babe.digests.PreDigest | undefined> = $.option($462)
 
 export const $466: $.Codec<t.types.sp_consensus_babe.BabeEpochConfiguration> = $.object(
   ["c", $193],
@@ -3502,9 +3494,7 @@ export const $495: $.Codec<t.types.pallet_staking.EraRewardPoints> = $.object(["
 
 export const $498: $.Codec<[t.types.sp_core.crypto.AccountId32, t.types.u32]> = $.tuple($0, $4)
 
-export const $497: $.Codec<Array<[t.types.sp_core.crypto.AccountId32, t.types.u32]>> = $.array(
-  $498,
-)
+export const $497: $.Codec<Array<[t.types.sp_core.crypto.AccountId32, t.types.u32]>> = $.array($498)
 
 export const $499: $.Codec<t.types.pallet_staking.Forcing> = $.stringUnion({
   0: "NotForcing",
@@ -3657,9 +3647,7 @@ export const $523: $.Codec<t.types.pallet_im_online.BoundedOpaqueNetworkState> =
   $524,
 ], ["external_addresses", $525])
 
-export const $522: $.Codec<t.types.pallet_im_online.BoundedOpaqueNetworkState> = $.lenPrefixed(
-  $523,
-)
+export const $522: $.Codec<t.types.pallet_im_online.BoundedOpaqueNetworkState> = $.lenPrefixed($523)
 
 export const $527: $.Codec<t.types.pallet_im_online.pallet.Error> = $.stringUnion({
   0: "InvalidKey",
@@ -3936,9 +3924,7 @@ export const $576: $.Codec<t.types.pallet_identity.types.RegistrarInfo> = $.obje
   ["fields", $300],
 )
 
-export const $575: $.Codec<t.types.pallet_identity.types.RegistrarInfo | undefined> = $.option(
-  $576,
-)
+export const $575: $.Codec<t.types.pallet_identity.types.RegistrarInfo | undefined> = $.option($576)
 
 export const $577: $.Codec<Array<t.types.pallet_identity.types.RegistrarInfo | undefined>> = $
   .array($575)
@@ -4506,9 +4492,7 @@ export const $661: $.Codec<t.types.polkadot_primitives.v2.CoreOccupied> = $.tagg
   1: ["Parachain"],
 })
 
-export const $660: $.Codec<t.types.polkadot_primitives.v2.CoreOccupied | undefined> = $.option(
-  $661,
-)
+export const $660: $.Codec<t.types.polkadot_primitives.v2.CoreOccupied | undefined> = $.option($661)
 
 export const $659: $.Codec<Array<t.types.polkadot_primitives.v2.CoreOccupied | undefined>> = $
   .array($660)
@@ -4939,9 +4923,7 @@ export const $718: $.Codec<[t.types.u64, t.types.u64, t.types.u32]> = $.tuple($1
 
 export const $720: $.Codec<[t.types.xcm.VersionedMultiLocation, t.types.u32]> = $.tuple($155, $4)
 
-export const $721: $.Codec<Array<[t.types.xcm.VersionedMultiLocation, t.types.u32]>> = $.array(
-  $720,
-)
+export const $721: $.Codec<Array<[t.types.xcm.VersionedMultiLocation, t.types.u32]>> = $.array($720)
 
 export const $719: $.Codec<Array<[t.types.xcm.VersionedMultiLocation, t.types.u32]>> = $721
 

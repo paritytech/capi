@@ -35,13 +35,7 @@ export const HeartbeatAfter = {
 }
 
 /** The current set of keys that may issue a heartbeat. */
-export const Keys = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$520,
-}
+export const Keys = { type: "Plain", modifier: "Default", hashers: [], key: [], value: _codec.$520 }
 
 /**
  *  For each session index, we keep a mapping of `SessionIndex` and `AuthIndex` to

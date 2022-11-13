@@ -12,13 +12,7 @@ export const Members = {
 }
 
 /** The prime member that helps determine the default vote behavior in case of absentations. */
-export const Prime = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$0,
-}
+export const Prime = { type: "Plain", modifier: "Optional", hashers: [], key: [], value: _codec.$0 }
 
 /** Proposals so far. */
 export const ProposalCount = {

@@ -11,13 +11,7 @@ export const Members = {
 }
 
 /** The current prime member, if one exists. */
-export const Prime = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$0,
-}
+export const Prime = { type: "Plain", modifier: "Optional", hashers: [], key: [], value: _codec.$0 }
 
 /**
  * Add a member `who` to the set.
