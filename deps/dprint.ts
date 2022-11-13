@@ -12,4 +12,5 @@ tsFormatter.setConfig({
 }, {
   quoteProps: "asNeeded",
   "arrowFunction.useParentheses": "force",
+  semiColons: "asi",
 })
