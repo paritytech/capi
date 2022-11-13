@@ -64,7 +64,7 @@ export function createTypeVisitor(props: CodegenProps, decls: Decl[]) {
             : S.array(fields.map((f) => this.visit(f.ty)))
           props = [["", "value", value]]
           factory = [
-            `${fields.length === 1 ? "" : "..."}value: t.${memberPath}["value"]`,
+            `${fields.length === 1 ? "" : "..."}value: ${memberPath}["value"]`,
             "value",
           ]
         } else {
@@ -74,11 +74,11 @@ export function createTypeVisitor(props: CodegenProps, decls: Decl[]) {
             `${field.name || i}`,
             this.visit(field.ty),
           ])
-          factory = [`value: Omit<t.${memberPath}, "type">`, "...value"]
+          factory = [`value: Omit<${memberPath}, "type">`, "...value"]
         }
         factories.push(
           makeDocComment(docs)
-            + `export function ${type} (${factory[0]}): t.${memberPath}`
+            + `export function ${type} (${factory[0]}): ${memberPath}`
             + `{ return { type: ${S.string(type)}, ${factory[1]} } }`,
         )
         types.push(
@@ -89,7 +89,7 @@ export function createTypeVisitor(props: CodegenProps, decls: Decl[]) {
               ...props,
             ),
         )
-        union.push(`| t.${memberPath}`)
+        union.push(`| ${memberPath}`)
       }
       decls.push({
         path,
@@ -102,7 +102,7 @@ export function createTypeVisitor(props: CodegenProps, decls: Decl[]) {
             ].join("\n")
           } }`,
       })
-      return "t." + path
+      return path
     },
     uint8Array(ty) {
       return addTypeDecl(ty, "Uint8Array")
@@ -124,8 +124,8 @@ export function createTypeVisitor(props: CodegenProps, decls: Decl[]) {
       return addTypeDecl(ty, "bigint")
     },
     compact(ty) {
-      decls.push({ path: "Compact", code: "export type Compact<T> = T" })
-      return `t.Compact<${this.visit(ty.typeParam)}>`
+      decls.push({ path: "types.Compact", code: "export type Compact<T> = T" })
+      return `types.Compact<${this.visit(ty.typeParam)}>`
     },
     bitSequence(ty) {
       return addTypeDecl(ty, "$.BitSequence")
@@ -144,7 +144,7 @@ export function createTypeVisitor(props: CodegenProps, decls: Decl[]) {
     },
     circular(ty) {
       const path = getPath(tys, ty)
-      if (path) return "t." + path
+      if (path) return path
       return this._visit(ty)
     },
   })
@@ -157,7 +157,7 @@ export function createTypeVisitor(props: CodegenProps, decls: Decl[]) {
         code: makeDocComment(ty.docs) + `export type ${getName(path)} = ${value}`,
       })
     }
-    return path ? "t." + path : value
+    return path || value
   }
 
   function addInterfaceDecl(ty: M.Ty, value: string) {
@@ -168,7 +168,7 @@ export function createTypeVisitor(props: CodegenProps, decls: Decl[]) {
         code: makeDocComment(ty.docs) + `export interface ${getName(path)} ${value}`,
       })
     }
-    return path ? "t." + path : value
+    return path || value
   }
 
   function addFactoryDecl(ty: M.Ty, body: string) {

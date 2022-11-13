@@ -14,7 +14,7 @@ export function genCodecs(
 
   let file = `\
 import { $, C } from "./capi.ts"
-import type * as t from "./mod.ts"
+import type * as types from "./types/mod.ts"
 
 `
 

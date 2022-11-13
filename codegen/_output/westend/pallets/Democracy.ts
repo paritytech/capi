@@ -1,6 +1,6 @@
 import { $ } from "../capi.ts"
 import * as _codec from "../codecs.ts"
-import type * as t from "../mod.ts"
+import type * as types from "../types/mod.ts"
 
 /**
  *  A record of who vetoed what. Maps proposal hash to a possible existent block number
@@ -146,8 +146,8 @@ export const VotingOf = {
  *   reasonable value).
  */
 export function blacklist(
-  value: Omit<t.types.pallet_democracy.pallet.Call.blacklist, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_democracy.pallet.Call.blacklist, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Democracy", value: { ...value, type: "blacklist" } }
 }
 
@@ -161,8 +161,8 @@ export function blacklist(
  * Weight: `O(p)` where `p = PublicProps::<T>::decode_len()`
  */
 export function cancel_proposal(
-  value: Omit<t.types.pallet_democracy.pallet.Call.cancel_proposal, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_democracy.pallet.Call.cancel_proposal, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Democracy", value: { ...value, type: "cancel_proposal" } }
 }
 
@@ -176,8 +176,8 @@ export function cancel_proposal(
  * # Weight: `O(1)`.
  */
 export function cancel_referendum(
-  value: Omit<t.types.pallet_democracy.pallet.Call.cancel_referendum, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_democracy.pallet.Call.cancel_referendum, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Democracy", value: { ...value, type: "cancel_referendum" } }
 }
 
@@ -188,7 +188,7 @@ export function cancel_referendum(
  *
  * Weight: `O(1)`.
  */
-export function clear_public_proposals(): t.types.polkadot_runtime.RuntimeCall {
+export function clear_public_proposals(): types.polkadot_runtime.RuntimeCall {
   return { type: "Democracy", value: { type: "clear_public_proposals" } }
 }
 
@@ -215,8 +215,8 @@ export function clear_public_proposals(): t.types.polkadot_runtime.RuntimeCall {
  *   voted on. Weight is charged as if maximum votes.
  */
 export function delegate(
-  value: Omit<t.types.pallet_democracy.pallet.Call.delegate, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_democracy.pallet.Call.delegate, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Democracy", value: { ...value, type: "delegate" } }
 }
 
@@ -231,8 +231,8 @@ export function delegate(
  * Weight: `O(1)`.
  */
 export function emergency_cancel(
-  value: Omit<t.types.pallet_democracy.pallet.Call.emergency_cancel, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_democracy.pallet.Call.emergency_cancel, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Democracy", value: { ...value, type: "emergency_cancel" } }
 }
 
@@ -245,8 +245,8 @@ export function emergency_cancel(
  * - `proposal_hash`: The preimage hash of the proposal.
  */
 export function external_propose(
-  value: Omit<t.types.pallet_democracy.pallet.Call.external_propose, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_democracy.pallet.Call.external_propose, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Democracy", value: { ...value, type: "external_propose" } }
 }
 
@@ -264,8 +264,8 @@ export function external_propose(
  * Weight: `O(1)`
  */
 export function external_propose_default(
-  value: Omit<t.types.pallet_democracy.pallet.Call.external_propose_default, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_democracy.pallet.Call.external_propose_default, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Democracy", value: { ...value, type: "external_propose_default" } }
 }
 
@@ -283,8 +283,8 @@ export function external_propose_default(
  * Weight: `O(1)`
  */
 export function external_propose_majority(
-  value: Omit<t.types.pallet_democracy.pallet.Call.external_propose_majority, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_democracy.pallet.Call.external_propose_majority, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Democracy", value: { ...value, type: "external_propose_majority" } }
 }
 
@@ -307,8 +307,8 @@ export function external_propose_majority(
  * Weight: `O(1)`
  */
 export function fast_track(
-  value: Omit<t.types.pallet_democracy.pallet.Call.fast_track, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_democracy.pallet.Call.fast_track, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Democracy", value: { ...value, type: "fast_track" } }
 }
 
@@ -324,8 +324,8 @@ export function fast_track(
  * Emits `Proposed`.
  */
 export function propose(
-  value: Omit<t.types.pallet_democracy.pallet.Call.propose, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_democracy.pallet.Call.propose, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Democracy", value: { ...value, type: "propose" } }
 }
 
@@ -347,8 +347,8 @@ export function propose(
  *   Weight is calculated for the maximum number of vote.
  */
 export function remove_other_vote(
-  value: Omit<t.types.pallet_democracy.pallet.Call.remove_other_vote, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_democracy.pallet.Call.remove_other_vote, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Democracy", value: { ...value, type: "remove_other_vote" } }
 }
 
@@ -382,8 +382,8 @@ export function remove_other_vote(
  *   Weight is calculated for the maximum number of vote.
  */
 export function remove_vote(
-  value: Omit<t.types.pallet_democracy.pallet.Call.remove_vote, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_democracy.pallet.Call.remove_vote, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Democracy", value: { ...value, type: "remove_vote" } }
 }
 
@@ -396,8 +396,8 @@ export function remove_vote(
  * - `proposal`: The index of the proposal to second.
  */
 export function second(
-  value: Omit<t.types.pallet_democracy.pallet.Call.second, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_democracy.pallet.Call.second, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Democracy", value: { ...value, type: "second" } }
 }
 
@@ -415,7 +415,7 @@ export function second(
  * Weight: `O(R)` where R is the number of referendums the voter delegating to has
  *   voted on. Weight is charged as if maximum votes.
  */
-export function undelegate(): t.types.polkadot_runtime.RuntimeCall {
+export function undelegate(): types.polkadot_runtime.RuntimeCall {
   return { type: "Democracy", value: { type: "undelegate" } }
 }
 
@@ -429,8 +429,8 @@ export function undelegate(): t.types.polkadot_runtime.RuntimeCall {
  * Weight: `O(R)` with R number of vote of target.
  */
 export function unlock(
-  value: Omit<t.types.pallet_democracy.pallet.Call.unlock, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_democracy.pallet.Call.unlock, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Democracy", value: { ...value, type: "unlock" } }
 }
 
@@ -446,8 +446,8 @@ export function unlock(
  * Weight: `O(V + log(V))` where V is number of `existing vetoers`
  */
 export function veto_external(
-  value: Omit<t.types.pallet_democracy.pallet.Call.veto_external, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_democracy.pallet.Call.veto_external, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Democracy", value: { ...value, type: "veto_external" } }
 }
 
@@ -461,7 +461,7 @@ export function veto_external(
  * - `vote`: The vote configuration.
  */
 export function vote(
-  value: Omit<t.types.pallet_democracy.pallet.Call.vote, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_democracy.pallet.Call.vote, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Democracy", value: { ...value, type: "vote" } }
 }

@@ -1,15 +1,15 @@
 import { $ } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as t from "../../../mod.ts"
+import type * as types from "../../../types/mod.ts"
 
-export const $call: $.Codec<t.types.polkadot_runtime_parachains.ump.pallet.Call> = _codec.$408
+export const $call: $.Codec<types.polkadot_runtime_parachains.ump.pallet.Call> = _codec.$408
 
-export const $error: $.Codec<t.types.polkadot_runtime_parachains.ump.pallet.Error> = _codec.$685
+export const $error: $.Codec<types.polkadot_runtime_parachains.ump.pallet.Error> = _codec.$685
 
-export const $event: $.Codec<t.types.polkadot_runtime_parachains.ump.pallet.Event> = _codec.$108
+export const $event: $.Codec<types.polkadot_runtime_parachains.ump.pallet.Event> = _codec.$108
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
-export type Call = t.types.polkadot_runtime_parachains.ump.pallet.Call.service_overweight
+export type Call = types.polkadot_runtime_parachains.ump.pallet.Call.service_overweight
 export namespace Call {
   /**
    * Service a single overweight upward message.
@@ -27,8 +27,8 @@ export namespace Call {
    */
   export interface service_overweight {
     type: "service_overweight"
-    index: t.types.u64
-    weight_limit: t.types.sp_weights.weight_v2.Weight
+    index: types.u64
+    weight_limit: types.sp_weights.weight_v2.Weight
   }
   /**
    * Service a single overweight upward message.
@@ -45,8 +45,8 @@ export namespace Call {
    * - `OverweightServiced`: On success.
    */
   export function service_overweight(
-    value: Omit<t.types.polkadot_runtime_parachains.ump.pallet.Call.service_overweight, "type">,
-  ): t.types.polkadot_runtime_parachains.ump.pallet.Call.service_overweight {
+    value: Omit<types.polkadot_runtime_parachains.ump.pallet.Call.service_overweight, "type">,
+  ): types.polkadot_runtime_parachains.ump.pallet.Call.service_overweight {
     return { type: "service_overweight", ...value }
   }
 }
@@ -56,13 +56,13 @@ export type Error = "UnknownMessageIndex" | "WeightOverLimit"
 
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
 export type Event =
-  | t.types.polkadot_runtime_parachains.ump.pallet.Event.InvalidFormat
-  | t.types.polkadot_runtime_parachains.ump.pallet.Event.UnsupportedVersion
-  | t.types.polkadot_runtime_parachains.ump.pallet.Event.ExecutedUpward
-  | t.types.polkadot_runtime_parachains.ump.pallet.Event.WeightExhausted
-  | t.types.polkadot_runtime_parachains.ump.pallet.Event.UpwardMessagesReceived
-  | t.types.polkadot_runtime_parachains.ump.pallet.Event.OverweightEnqueued
-  | t.types.polkadot_runtime_parachains.ump.pallet.Event.OverweightServiced
+  | types.polkadot_runtime_parachains.ump.pallet.Event.InvalidFormat
+  | types.polkadot_runtime_parachains.ump.pallet.Event.UnsupportedVersion
+  | types.polkadot_runtime_parachains.ump.pallet.Event.ExecutedUpward
+  | types.polkadot_runtime_parachains.ump.pallet.Event.WeightExhausted
+  | types.polkadot_runtime_parachains.ump.pallet.Event.UpwardMessagesReceived
+  | types.polkadot_runtime_parachains.ump.pallet.Event.OverweightEnqueued
+  | types.polkadot_runtime_parachains.ump.pallet.Event.OverweightServiced
 export namespace Event {
   /**
    * Upward message is invalid XCM.
@@ -86,7 +86,7 @@ export namespace Event {
    */
   export interface ExecutedUpward {
     type: "ExecutedUpward"
-    value: [Uint8Array, t.types.xcm.v2.traits.Outcome]
+    value: [Uint8Array, types.xcm.v2.traits.Outcome]
   }
   /**
    * The weight limit for handling upward messages was reached.
@@ -94,7 +94,7 @@ export namespace Event {
    */
   export interface WeightExhausted {
     type: "WeightExhausted"
-    value: [Uint8Array, t.types.sp_weights.weight_v2.Weight, t.types.sp_weights.weight_v2.Weight]
+    value: [Uint8Array, types.sp_weights.weight_v2.Weight, types.sp_weights.weight_v2.Weight]
   }
   /**
    * Some upward messages have been received and will be processed.
@@ -102,7 +102,7 @@ export namespace Event {
    */
   export interface UpwardMessagesReceived {
     type: "UpwardMessagesReceived"
-    value: [t.types.polkadot_parachain.primitives.Id, t.types.u32, t.types.u32]
+    value: [types.polkadot_parachain.primitives.Id, types.u32, types.u32]
   }
   /**
    * The weight budget was exceeded for an individual upward message.
@@ -115,10 +115,10 @@ export namespace Event {
   export interface OverweightEnqueued {
     type: "OverweightEnqueued"
     value: [
-      t.types.polkadot_parachain.primitives.Id,
+      types.polkadot_parachain.primitives.Id,
       Uint8Array,
-      t.types.u64,
-      t.types.sp_weights.weight_v2.Weight,
+      types.u64,
+      types.sp_weights.weight_v2.Weight,
     ]
   }
   /**
@@ -129,15 +129,15 @@ export namespace Event {
    */
   export interface OverweightServiced {
     type: "OverweightServiced"
-    value: [t.types.u64, t.types.sp_weights.weight_v2.Weight]
+    value: [types.u64, types.sp_weights.weight_v2.Weight]
   }
   /**
    * Upward message is invalid XCM.
    * \[ id \]
    */
   export function InvalidFormat(
-    value: t.types.polkadot_runtime_parachains.ump.pallet.Event.InvalidFormat["value"],
-  ): t.types.polkadot_runtime_parachains.ump.pallet.Event.InvalidFormat {
+    value: types.polkadot_runtime_parachains.ump.pallet.Event.InvalidFormat["value"],
+  ): types.polkadot_runtime_parachains.ump.pallet.Event.InvalidFormat {
     return { type: "InvalidFormat", value }
   }
   /**
@@ -145,8 +145,8 @@ export namespace Event {
    * \[ id \]
    */
   export function UnsupportedVersion(
-    value: t.types.polkadot_runtime_parachains.ump.pallet.Event.UnsupportedVersion["value"],
-  ): t.types.polkadot_runtime_parachains.ump.pallet.Event.UnsupportedVersion {
+    value: types.polkadot_runtime_parachains.ump.pallet.Event.UnsupportedVersion["value"],
+  ): types.polkadot_runtime_parachains.ump.pallet.Event.UnsupportedVersion {
     return { type: "UnsupportedVersion", value }
   }
   /**
@@ -154,8 +154,8 @@ export namespace Event {
    * \[ id, outcome \]
    */
   export function ExecutedUpward(
-    ...value: t.types.polkadot_runtime_parachains.ump.pallet.Event.ExecutedUpward["value"]
-  ): t.types.polkadot_runtime_parachains.ump.pallet.Event.ExecutedUpward {
+    ...value: types.polkadot_runtime_parachains.ump.pallet.Event.ExecutedUpward["value"]
+  ): types.polkadot_runtime_parachains.ump.pallet.Event.ExecutedUpward {
     return { type: "ExecutedUpward", value }
   }
   /**
@@ -163,8 +163,8 @@ export namespace Event {
    * \[ id, remaining, required \]
    */
   export function WeightExhausted(
-    ...value: t.types.polkadot_runtime_parachains.ump.pallet.Event.WeightExhausted["value"]
-  ): t.types.polkadot_runtime_parachains.ump.pallet.Event.WeightExhausted {
+    ...value: types.polkadot_runtime_parachains.ump.pallet.Event.WeightExhausted["value"]
+  ): types.polkadot_runtime_parachains.ump.pallet.Event.WeightExhausted {
     return { type: "WeightExhausted", value }
   }
   /**
@@ -172,8 +172,8 @@ export namespace Event {
    * \[ para, count, size \]
    */
   export function UpwardMessagesReceived(
-    ...value: t.types.polkadot_runtime_parachains.ump.pallet.Event.UpwardMessagesReceived["value"]
-  ): t.types.polkadot_runtime_parachains.ump.pallet.Event.UpwardMessagesReceived {
+    ...value: types.polkadot_runtime_parachains.ump.pallet.Event.UpwardMessagesReceived["value"]
+  ): types.polkadot_runtime_parachains.ump.pallet.Event.UpwardMessagesReceived {
     return { type: "UpwardMessagesReceived", value }
   }
   /**
@@ -185,8 +185,8 @@ export namespace Event {
    * \[ para, id, overweight_index, required \]
    */
   export function OverweightEnqueued(
-    ...value: t.types.polkadot_runtime_parachains.ump.pallet.Event.OverweightEnqueued["value"]
-  ): t.types.polkadot_runtime_parachains.ump.pallet.Event.OverweightEnqueued {
+    ...value: types.polkadot_runtime_parachains.ump.pallet.Event.OverweightEnqueued["value"]
+  ): types.polkadot_runtime_parachains.ump.pallet.Event.OverweightEnqueued {
     return { type: "OverweightEnqueued", value }
   }
   /**
@@ -196,8 +196,8 @@ export namespace Event {
    * \[ overweight_index, used \]
    */
   export function OverweightServiced(
-    ...value: t.types.polkadot_runtime_parachains.ump.pallet.Event.OverweightServiced["value"]
-  ): t.types.polkadot_runtime_parachains.ump.pallet.Event.OverweightServiced {
+    ...value: types.polkadot_runtime_parachains.ump.pallet.Event.OverweightServiced["value"]
+  ): types.polkadot_runtime_parachains.ump.pallet.Event.OverweightServiced {
     return { type: "OverweightServiced", value }
   }
 }

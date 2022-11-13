@@ -1,21 +1,21 @@
 import { $ } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as t from "../../mod.ts"
+import type * as types from "../../types/mod.ts"
 
-export const $call: $.Codec<t.types.pallet_elections_phragmen.pallet.Call> = _codec.$241
+export const $call: $.Codec<types.pallet_elections_phragmen.pallet.Call> = _codec.$241
 
-export const $error: $.Codec<t.types.pallet_elections_phragmen.pallet.Error> = _codec.$553
+export const $error: $.Codec<types.pallet_elections_phragmen.pallet.Error> = _codec.$553
 
-export const $event: $.Codec<t.types.pallet_elections_phragmen.pallet.Event> = _codec.$67
+export const $event: $.Codec<types.pallet_elections_phragmen.pallet.Event> = _codec.$67
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 export type Call =
-  | t.types.pallet_elections_phragmen.pallet.Call.vote
-  | t.types.pallet_elections_phragmen.pallet.Call.remove_voter
-  | t.types.pallet_elections_phragmen.pallet.Call.submit_candidacy
-  | t.types.pallet_elections_phragmen.pallet.Call.renounce_candidacy
-  | t.types.pallet_elections_phragmen.pallet.Call.remove_member
-  | t.types.pallet_elections_phragmen.pallet.Call.clean_defunct_voters
+  | types.pallet_elections_phragmen.pallet.Call.vote
+  | types.pallet_elections_phragmen.pallet.Call.remove_voter
+  | types.pallet_elections_phragmen.pallet.Call.submit_candidacy
+  | types.pallet_elections_phragmen.pallet.Call.renounce_candidacy
+  | types.pallet_elections_phragmen.pallet.Call.remove_member
+  | types.pallet_elections_phragmen.pallet.Call.clean_defunct_voters
 export namespace Call {
   /**
    * Vote for a set of candidates for the upcoming round of election. This can be called to
@@ -44,8 +44,8 @@ export namespace Call {
    */
   export interface vote {
     type: "vote"
-    votes: Array<t.types.sp_core.crypto.AccountId32>
-    value: t.Compact<t.types.u128>
+    votes: Array<types.sp_core.crypto.AccountId32>
+    value: types.Compact<types.u128>
   }
   /**
    * Remove `origin` as a voter.
@@ -76,7 +76,7 @@ export namespace Call {
    */
   export interface submit_candidacy {
     type: "submit_candidacy"
-    candidate_count: t.Compact<t.types.u32>
+    candidate_count: types.Compact<types.u32>
   }
   /**
    * Renounce one's intention to be a candidate for the next election round. 3 potential
@@ -100,7 +100,7 @@ export namespace Call {
    */
   export interface renounce_candidacy {
     type: "renounce_candidacy"
-    renouncing: t.types.pallet_elections_phragmen.Renouncing
+    renouncing: types.pallet_elections_phragmen.Renouncing
   }
   /**
    * Remove a particular member from the set. This is effective immediately and the bond of
@@ -124,7 +124,7 @@ export namespace Call {
    */
   export interface remove_member {
     type: "remove_member"
-    who: t.types.sp_runtime.multiaddress.MultiAddress
+    who: types.sp_runtime.multiaddress.MultiAddress
     slash_bond: boolean
     rerun_election: boolean
   }
@@ -142,8 +142,8 @@ export namespace Call {
    */
   export interface clean_defunct_voters {
     type: "clean_defunct_voters"
-    num_voters: t.types.u32
-    num_defunct: t.types.u32
+    num_voters: types.u32
+    num_defunct: types.u32
   }
   /**
    * Vote for a set of candidates for the upcoming round of election. This can be called to
@@ -171,8 +171,8 @@ export namespace Call {
    * # </weight>
    */
   export function vote(
-    value: Omit<t.types.pallet_elections_phragmen.pallet.Call.vote, "type">,
-  ): t.types.pallet_elections_phragmen.pallet.Call.vote {
+    value: Omit<types.pallet_elections_phragmen.pallet.Call.vote, "type">,
+  ): types.pallet_elections_phragmen.pallet.Call.vote {
     return { type: "vote", ...value }
   }
   /**
@@ -182,7 +182,7 @@ export namespace Call {
    *
    * The dispatch origin of this call must be signed and be a voter.
    */
-  export function remove_voter(): t.types.pallet_elections_phragmen.pallet.Call.remove_voter {
+  export function remove_voter(): types.pallet_elections_phragmen.pallet.Call.remove_voter {
     return { type: "remove_voter" }
   }
   /**
@@ -203,8 +203,8 @@ export namespace Call {
    * # </weight>
    */
   export function submit_candidacy(
-    value: Omit<t.types.pallet_elections_phragmen.pallet.Call.submit_candidacy, "type">,
-  ): t.types.pallet_elections_phragmen.pallet.Call.submit_candidacy {
+    value: Omit<types.pallet_elections_phragmen.pallet.Call.submit_candidacy, "type">,
+  ): types.pallet_elections_phragmen.pallet.Call.submit_candidacy {
     return { type: "submit_candidacy", ...value }
   }
   /**
@@ -228,8 +228,8 @@ export namespace Call {
    * # </weight>
    */
   export function renounce_candidacy(
-    value: Omit<t.types.pallet_elections_phragmen.pallet.Call.renounce_candidacy, "type">,
-  ): t.types.pallet_elections_phragmen.pallet.Call.renounce_candidacy {
+    value: Omit<types.pallet_elections_phragmen.pallet.Call.renounce_candidacy, "type">,
+  ): types.pallet_elections_phragmen.pallet.Call.renounce_candidacy {
     return { type: "renounce_candidacy", ...value }
   }
   /**
@@ -253,8 +253,8 @@ export namespace Call {
    * # </weight>
    */
   export function remove_member(
-    value: Omit<t.types.pallet_elections_phragmen.pallet.Call.remove_member, "type">,
-  ): t.types.pallet_elections_phragmen.pallet.Call.remove_member {
+    value: Omit<types.pallet_elections_phragmen.pallet.Call.remove_member, "type">,
+  ): types.pallet_elections_phragmen.pallet.Call.remove_member {
     return { type: "remove_member", ...value }
   }
   /**
@@ -270,8 +270,8 @@ export namespace Call {
    * # </weight>
    */
   export function clean_defunct_voters(
-    value: Omit<t.types.pallet_elections_phragmen.pallet.Call.clean_defunct_voters, "type">,
-  ): t.types.pallet_elections_phragmen.pallet.Call.clean_defunct_voters {
+    value: Omit<types.pallet_elections_phragmen.pallet.Call.clean_defunct_voters, "type">,
+  ): types.pallet_elections_phragmen.pallet.Call.clean_defunct_voters {
     return { type: "clean_defunct_voters", ...value }
   }
 }
@@ -298,13 +298,13 @@ export type Error =
 
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
 export type Event =
-  | t.types.pallet_elections_phragmen.pallet.Event.NewTerm
-  | t.types.pallet_elections_phragmen.pallet.Event.EmptyTerm
-  | t.types.pallet_elections_phragmen.pallet.Event.ElectionError
-  | t.types.pallet_elections_phragmen.pallet.Event.MemberKicked
-  | t.types.pallet_elections_phragmen.pallet.Event.Renounced
-  | t.types.pallet_elections_phragmen.pallet.Event.CandidateSlashed
-  | t.types.pallet_elections_phragmen.pallet.Event.SeatHolderSlashed
+  | types.pallet_elections_phragmen.pallet.Event.NewTerm
+  | types.pallet_elections_phragmen.pallet.Event.EmptyTerm
+  | types.pallet_elections_phragmen.pallet.Event.ElectionError
+  | types.pallet_elections_phragmen.pallet.Event.MemberKicked
+  | types.pallet_elections_phragmen.pallet.Event.Renounced
+  | types.pallet_elections_phragmen.pallet.Event.CandidateSlashed
+  | types.pallet_elections_phragmen.pallet.Event.SeatHolderSlashed
 export namespace Event {
   /**
    * A new term with new_members. This indicates that enough candidates existed to run
@@ -315,7 +315,7 @@ export namespace Event {
    */
   export interface NewTerm {
     type: "NewTerm"
-    new_members: Array<[t.types.sp_core.crypto.AccountId32, t.types.u128]>
+    new_members: Array<[types.sp_core.crypto.AccountId32, types.u128]>
   }
   /**
    * No (or not enough) candidates existed for this round. This is different from
@@ -334,12 +334,12 @@ export namespace Event {
    */
   export interface MemberKicked {
     type: "MemberKicked"
-    member: t.types.sp_core.crypto.AccountId32
+    member: types.sp_core.crypto.AccountId32
   }
   /** Someone has renounced their candidacy. */
   export interface Renounced {
     type: "Renounced"
-    candidate: t.types.sp_core.crypto.AccountId32
+    candidate: types.sp_core.crypto.AccountId32
   }
   /**
    * A candidate was slashed by amount due to failing to obtain a seat as member or
@@ -349,14 +349,14 @@ export namespace Event {
    */
   export interface CandidateSlashed {
     type: "CandidateSlashed"
-    candidate: t.types.sp_core.crypto.AccountId32
-    amount: t.types.u128
+    candidate: types.sp_core.crypto.AccountId32
+    amount: types.u128
   }
   /** A seat holder was slashed by amount by being forcefully removed from the set. */
   export interface SeatHolderSlashed {
     type: "SeatHolderSlashed"
-    seat_holder: t.types.sp_core.crypto.AccountId32
-    amount: t.types.u128
+    seat_holder: types.sp_core.crypto.AccountId32
+    amount: types.u128
   }
   /**
    * A new term with new_members. This indicates that enough candidates existed to run
@@ -366,19 +366,19 @@ export namespace Event {
    * begin with.
    */
   export function NewTerm(
-    value: Omit<t.types.pallet_elections_phragmen.pallet.Event.NewTerm, "type">,
-  ): t.types.pallet_elections_phragmen.pallet.Event.NewTerm {
+    value: Omit<types.pallet_elections_phragmen.pallet.Event.NewTerm, "type">,
+  ): types.pallet_elections_phragmen.pallet.Event.NewTerm {
     return { type: "NewTerm", ...value }
   }
   /**
    * No (or not enough) candidates existed for this round. This is different from
    * `NewTerm(\[\])`. See the description of `NewTerm`.
    */
-  export function EmptyTerm(): t.types.pallet_elections_phragmen.pallet.Event.EmptyTerm {
+  export function EmptyTerm(): types.pallet_elections_phragmen.pallet.Event.EmptyTerm {
     return { type: "EmptyTerm" }
   }
   /** Internal error happened while trying to perform election. */
-  export function ElectionError(): t.types.pallet_elections_phragmen.pallet.Event.ElectionError {
+  export function ElectionError(): types.pallet_elections_phragmen.pallet.Event.ElectionError {
     return { type: "ElectionError" }
   }
   /**
@@ -386,14 +386,14 @@ export namespace Event {
    * `EmptyTerm`.
    */
   export function MemberKicked(
-    value: Omit<t.types.pallet_elections_phragmen.pallet.Event.MemberKicked, "type">,
-  ): t.types.pallet_elections_phragmen.pallet.Event.MemberKicked {
+    value: Omit<types.pallet_elections_phragmen.pallet.Event.MemberKicked, "type">,
+  ): types.pallet_elections_phragmen.pallet.Event.MemberKicked {
     return { type: "MemberKicked", ...value }
   }
   /** Someone has renounced their candidacy. */
   export function Renounced(
-    value: Omit<t.types.pallet_elections_phragmen.pallet.Event.Renounced, "type">,
-  ): t.types.pallet_elections_phragmen.pallet.Event.Renounced {
+    value: Omit<types.pallet_elections_phragmen.pallet.Event.Renounced, "type">,
+  ): types.pallet_elections_phragmen.pallet.Event.Renounced {
     return { type: "Renounced", ...value }
   }
   /**
@@ -403,14 +403,14 @@ export namespace Event {
    * Note that old members and runners-up are also candidates.
    */
   export function CandidateSlashed(
-    value: Omit<t.types.pallet_elections_phragmen.pallet.Event.CandidateSlashed, "type">,
-  ): t.types.pallet_elections_phragmen.pallet.Event.CandidateSlashed {
+    value: Omit<types.pallet_elections_phragmen.pallet.Event.CandidateSlashed, "type">,
+  ): types.pallet_elections_phragmen.pallet.Event.CandidateSlashed {
     return { type: "CandidateSlashed", ...value }
   }
   /** A seat holder was slashed by amount by being forcefully removed from the set. */
   export function SeatHolderSlashed(
-    value: Omit<t.types.pallet_elections_phragmen.pallet.Event.SeatHolderSlashed, "type">,
-  ): t.types.pallet_elections_phragmen.pallet.Event.SeatHolderSlashed {
+    value: Omit<types.pallet_elections_phragmen.pallet.Event.SeatHolderSlashed, "type">,
+  ): types.pallet_elections_phragmen.pallet.Event.SeatHolderSlashed {
     return { type: "SeatHolderSlashed", ...value }
   }
 }

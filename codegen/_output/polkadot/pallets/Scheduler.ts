@@ -1,6 +1,6 @@
 import { $ } from "../capi.ts"
 import * as _codec from "../codecs.ts"
-import type * as t from "../mod.ts"
+import type * as types from "../types/mod.ts"
 
 /** Items to be executed, indexed by the block number that they should be executed on. */
 export const Agenda = {
@@ -35,22 +35,22 @@ export const Lookup = {
 
 /** Cancel an anonymously scheduled task. */
 export function cancel(
-  value: Omit<t.types.pallet_scheduler.pallet.Call.cancel, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_scheduler.pallet.Call.cancel, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Scheduler", value: { ...value, type: "cancel" } }
 }
 
 /** Cancel a named scheduled task. */
 export function cancel_named(
-  value: Omit<t.types.pallet_scheduler.pallet.Call.cancel_named, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_scheduler.pallet.Call.cancel_named, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Scheduler", value: { ...value, type: "cancel_named" } }
 }
 
 /** Anonymously schedule a task. */
 export function schedule(
-  value: Omit<t.types.pallet_scheduler.pallet.Call.schedule, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_scheduler.pallet.Call.schedule, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Scheduler", value: { ...value, type: "schedule" } }
 }
 
@@ -62,15 +62,15 @@ export function schedule(
  * # </weight>
  */
 export function schedule_after(
-  value: Omit<t.types.pallet_scheduler.pallet.Call.schedule_after, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_scheduler.pallet.Call.schedule_after, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Scheduler", value: { ...value, type: "schedule_after" } }
 }
 
 /** Schedule a named task. */
 export function schedule_named(
-  value: Omit<t.types.pallet_scheduler.pallet.Call.schedule_named, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_scheduler.pallet.Call.schedule_named, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Scheduler", value: { ...value, type: "schedule_named" } }
 }
 
@@ -82,7 +82,7 @@ export function schedule_named(
  * # </weight>
  */
 export function schedule_named_after(
-  value: Omit<t.types.pallet_scheduler.pallet.Call.schedule_named_after, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_scheduler.pallet.Call.schedule_named_after, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Scheduler", value: { ...value, type: "schedule_named_after" } }
 }

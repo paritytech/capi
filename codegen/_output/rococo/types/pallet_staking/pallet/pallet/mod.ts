@@ -1,42 +1,42 @@
 import { $ } from "../../../../capi.ts"
 import * as _codec from "../../../../codecs.ts"
-import type * as t from "../../../../mod.ts"
+import type * as types from "../../../../types/mod.ts"
 
 export * as ConfigOp from "./ConfigOp/mod.ts"
 
-export const $call: $.Codec<t.types.pallet_staking.pallet.pallet.Call> = _codec.$202
+export const $call: $.Codec<types.pallet_staking.pallet.pallet.Call> = _codec.$202
 
-export const $error: $.Codec<t.types.pallet_staking.pallet.pallet.Error> = _codec.$508
+export const $error: $.Codec<types.pallet_staking.pallet.pallet.Error> = _codec.$508
 
-export const $event: $.Codec<t.types.pallet_staking.pallet.pallet.Event> = _codec.$39
+export const $event: $.Codec<types.pallet_staking.pallet.pallet.Event> = _codec.$39
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 export type Call =
-  | t.types.pallet_staking.pallet.pallet.Call.bond
-  | t.types.pallet_staking.pallet.pallet.Call.bond_extra
-  | t.types.pallet_staking.pallet.pallet.Call.unbond
-  | t.types.pallet_staking.pallet.pallet.Call.withdraw_unbonded
-  | t.types.pallet_staking.pallet.pallet.Call.validate
-  | t.types.pallet_staking.pallet.pallet.Call.nominate
-  | t.types.pallet_staking.pallet.pallet.Call.chill
-  | t.types.pallet_staking.pallet.pallet.Call.set_payee
-  | t.types.pallet_staking.pallet.pallet.Call.set_controller
-  | t.types.pallet_staking.pallet.pallet.Call.set_validator_count
-  | t.types.pallet_staking.pallet.pallet.Call.increase_validator_count
-  | t.types.pallet_staking.pallet.pallet.Call.scale_validator_count
-  | t.types.pallet_staking.pallet.pallet.Call.force_no_eras
-  | t.types.pallet_staking.pallet.pallet.Call.force_new_era
-  | t.types.pallet_staking.pallet.pallet.Call.set_invulnerables
-  | t.types.pallet_staking.pallet.pallet.Call.force_unstake
-  | t.types.pallet_staking.pallet.pallet.Call.force_new_era_always
-  | t.types.pallet_staking.pallet.pallet.Call.cancel_deferred_slash
-  | t.types.pallet_staking.pallet.pallet.Call.payout_stakers
-  | t.types.pallet_staking.pallet.pallet.Call.rebond
-  | t.types.pallet_staking.pallet.pallet.Call.reap_stash
-  | t.types.pallet_staking.pallet.pallet.Call.kick
-  | t.types.pallet_staking.pallet.pallet.Call.set_staking_configs
-  | t.types.pallet_staking.pallet.pallet.Call.chill_other
-  | t.types.pallet_staking.pallet.pallet.Call.force_apply_min_commission
+  | types.pallet_staking.pallet.pallet.Call.bond
+  | types.pallet_staking.pallet.pallet.Call.bond_extra
+  | types.pallet_staking.pallet.pallet.Call.unbond
+  | types.pallet_staking.pallet.pallet.Call.withdraw_unbonded
+  | types.pallet_staking.pallet.pallet.Call.validate
+  | types.pallet_staking.pallet.pallet.Call.nominate
+  | types.pallet_staking.pallet.pallet.Call.chill
+  | types.pallet_staking.pallet.pallet.Call.set_payee
+  | types.pallet_staking.pallet.pallet.Call.set_controller
+  | types.pallet_staking.pallet.pallet.Call.set_validator_count
+  | types.pallet_staking.pallet.pallet.Call.increase_validator_count
+  | types.pallet_staking.pallet.pallet.Call.scale_validator_count
+  | types.pallet_staking.pallet.pallet.Call.force_no_eras
+  | types.pallet_staking.pallet.pallet.Call.force_new_era
+  | types.pallet_staking.pallet.pallet.Call.set_invulnerables
+  | types.pallet_staking.pallet.pallet.Call.force_unstake
+  | types.pallet_staking.pallet.pallet.Call.force_new_era_always
+  | types.pallet_staking.pallet.pallet.Call.cancel_deferred_slash
+  | types.pallet_staking.pallet.pallet.Call.payout_stakers
+  | types.pallet_staking.pallet.pallet.Call.rebond
+  | types.pallet_staking.pallet.pallet.Call.reap_stash
+  | types.pallet_staking.pallet.pallet.Call.kick
+  | types.pallet_staking.pallet.pallet.Call.set_staking_configs
+  | types.pallet_staking.pallet.pallet.Call.chill_other
+  | types.pallet_staking.pallet.pallet.Call.force_apply_min_commission
 export namespace Call {
   /**
    * Take the origin account as a stash and lock up `value` of its balance. `controller` will
@@ -59,9 +59,9 @@ export namespace Call {
    */
   export interface bond {
     type: "bond"
-    controller: t.types.sp_runtime.multiaddress.MultiAddress
-    value: t.Compact<t.types.u128>
-    payee: t.types.pallet_staking.RewardDestination
+    controller: types.sp_runtime.multiaddress.MultiAddress
+    value: types.Compact<types.u128>
+    payee: types.pallet_staking.RewardDestination
   }
   /**
    * Add some extra amount that have appeared in the stash `free_balance` into the balance up
@@ -82,7 +82,7 @@ export namespace Call {
    */
   export interface bond_extra {
     type: "bond_extra"
-    max_additional: t.Compact<t.types.u128>
+    max_additional: types.Compact<types.u128>
   }
   /**
    * Schedule a portion of the stash to be unlocked ready for transfer out after the bond
@@ -107,7 +107,7 @@ export namespace Call {
    */
   export interface unbond {
     type: "unbond"
-    value: t.Compact<t.types.u128>
+    value: types.Compact<types.u128>
   }
   /**
    * Remove any unlocked chunks from the `unlocking` queue from our management.
@@ -128,7 +128,7 @@ export namespace Call {
    */
   export interface withdraw_unbonded {
     type: "withdraw_unbonded"
-    num_slashing_spans: t.types.u32
+    num_slashing_spans: types.u32
   }
   /**
    * Declare the desire to validate for the origin controller.
@@ -139,7 +139,7 @@ export namespace Call {
    */
   export interface validate {
     type: "validate"
-    prefs: t.types.pallet_staking.ValidatorPrefs
+    prefs: types.pallet_staking.ValidatorPrefs
   }
   /**
    * Declare the desire to nominate `targets` for the origin controller.
@@ -156,7 +156,7 @@ export namespace Call {
    */
   export interface nominate {
     type: "nominate"
-    targets: Array<t.types.sp_runtime.multiaddress.MultiAddress>
+    targets: Array<types.sp_runtime.multiaddress.MultiAddress>
   }
   /**
    * Declare no desire to either validate or nominate.
@@ -194,7 +194,7 @@ export namespace Call {
    */
   export interface set_payee {
     type: "set_payee"
-    payee: t.types.pallet_staking.RewardDestination
+    payee: types.pallet_staking.RewardDestination
   }
   /**
    * (Re-)set the controller of a stash.
@@ -216,7 +216,7 @@ export namespace Call {
    */
   export interface set_controller {
     type: "set_controller"
-    controller: t.types.sp_runtime.multiaddress.MultiAddress
+    controller: types.sp_runtime.multiaddress.MultiAddress
   }
   /**
    * Sets the ideal number of validators.
@@ -230,7 +230,7 @@ export namespace Call {
    */
   export interface set_validator_count {
     type: "set_validator_count"
-    new: t.Compact<t.types.u32>
+    new: types.Compact<types.u32>
   }
   /**
    * Increments the ideal number of validators.
@@ -243,7 +243,7 @@ export namespace Call {
    */
   export interface increase_validator_count {
     type: "increase_validator_count"
-    additional: t.Compact<t.types.u32>
+    additional: types.Compact<types.u32>
   }
   /**
    * Scale up the ideal number of validators by a factor.
@@ -256,7 +256,7 @@ export namespace Call {
    */
   export interface scale_validator_count {
     type: "scale_validator_count"
-    factor: t.types.sp_arithmetic.per_things.Percent
+    factor: types.sp_arithmetic.per_things.Percent
   }
   /**
    * Force there to be no new eras indefinitely.
@@ -306,7 +306,7 @@ export namespace Call {
    */
   export interface set_invulnerables {
     type: "set_invulnerables"
-    invulnerables: Array<t.types.sp_core.crypto.AccountId32>
+    invulnerables: Array<types.sp_core.crypto.AccountId32>
   }
   /**
    * Force a current staker to become completely unstaked, immediately.
@@ -315,8 +315,8 @@ export namespace Call {
    */
   export interface force_unstake {
     type: "force_unstake"
-    stash: t.types.sp_core.crypto.AccountId32
-    num_slashing_spans: t.types.u32
+    stash: types.sp_core.crypto.AccountId32
+    num_slashing_spans: types.u32
   }
   /**
    * Force there to be a new era at the end of sessions indefinitely.
@@ -341,8 +341,8 @@ export namespace Call {
    */
   export interface cancel_deferred_slash {
     type: "cancel_deferred_slash"
-    era: t.types.u32
-    slash_indices: Array<t.types.u32>
+    era: types.u32
+    slash_indices: Array<types.u32>
   }
   /**
    * Pay out all the stakers behind a single validator for a single era.
@@ -369,8 +369,8 @@ export namespace Call {
    */
   export interface payout_stakers {
     type: "payout_stakers"
-    validator_stash: t.types.sp_core.crypto.AccountId32
-    era: t.types.u32
+    validator_stash: types.sp_core.crypto.AccountId32
+    era: types.u32
   }
   /**
    * Rebond a portion of the stash scheduled to be unlocked.
@@ -385,7 +385,7 @@ export namespace Call {
    */
   export interface rebond {
     type: "rebond"
-    value: t.Compact<t.types.u128>
+    value: types.Compact<types.u128>
   }
   /**
    * Remove all data structures concerning a staker/stash once it is at a state where it can
@@ -403,8 +403,8 @@ export namespace Call {
    */
   export interface reap_stash {
     type: "reap_stash"
-    stash: t.types.sp_core.crypto.AccountId32
-    num_slashing_spans: t.types.u32
+    stash: types.sp_core.crypto.AccountId32
+    num_slashing_spans: types.u32
   }
   /**
    * Remove the given nominations from the calling validator.
@@ -421,7 +421,7 @@ export namespace Call {
    */
   export interface kick {
     type: "kick"
-    who: Array<t.types.sp_runtime.multiaddress.MultiAddress>
+    who: Array<types.sp_runtime.multiaddress.MultiAddress>
   }
   /**
    * Update the various staking configurations .
@@ -444,13 +444,12 @@ export namespace Call {
    */
   export interface set_staking_configs {
     type: "set_staking_configs"
-    min_nominator_bond: t.types.pallet_staking.pallet.pallet.ConfigOp.$$u128
-    min_validator_bond: t.types.pallet_staking.pallet.pallet.ConfigOp.$$u128
-    max_nominator_count: t.types.pallet_staking.pallet.pallet.ConfigOp.$$u32
-    max_validator_count: t.types.pallet_staking.pallet.pallet.ConfigOp.$$u32
-    chill_threshold:
-      t.types.pallet_staking.pallet.pallet.ConfigOp.$$sp_arithmetic.per_things.Percent
-    min_commission: t.types.pallet_staking.pallet.pallet.ConfigOp.$$sp_arithmetic.per_things.Perbill
+    min_nominator_bond: types.pallet_staking.pallet.pallet.ConfigOp.$$u128
+    min_validator_bond: types.pallet_staking.pallet.pallet.ConfigOp.$$u128
+    max_nominator_count: types.pallet_staking.pallet.pallet.ConfigOp.$$u32
+    max_validator_count: types.pallet_staking.pallet.pallet.ConfigOp.$$u32
+    chill_threshold: types.pallet_staking.pallet.pallet.ConfigOp.$$sp_arithmetic.per_things.Percent
+    min_commission: types.pallet_staking.pallet.pallet.ConfigOp.$$sp_arithmetic.per_things.Perbill
   }
   /**
    * Declare a `controller` to stop participating as either a validator or nominator.
@@ -482,7 +481,7 @@ export namespace Call {
    */
   export interface chill_other {
     type: "chill_other"
-    controller: t.types.sp_core.crypto.AccountId32
+    controller: types.sp_core.crypto.AccountId32
   }
   /**
    * Force a validator to have at least the minimum commission. This will not affect a
@@ -491,7 +490,7 @@ export namespace Call {
    */
   export interface force_apply_min_commission {
     type: "force_apply_min_commission"
-    validator_stash: t.types.sp_core.crypto.AccountId32
+    validator_stash: types.sp_core.crypto.AccountId32
   }
   /**
    * Take the origin account as a stash and lock up `value` of its balance. `controller` will
@@ -513,8 +512,8 @@ export namespace Call {
    * # </weight>
    */
   export function bond(
-    value: Omit<t.types.pallet_staking.pallet.pallet.Call.bond, "type">,
-  ): t.types.pallet_staking.pallet.pallet.Call.bond {
+    value: Omit<types.pallet_staking.pallet.pallet.Call.bond, "type">,
+  ): types.pallet_staking.pallet.pallet.Call.bond {
     return { type: "bond", ...value }
   }
   /**
@@ -535,8 +534,8 @@ export namespace Call {
    * # </weight>
    */
   export function bond_extra(
-    value: Omit<t.types.pallet_staking.pallet.pallet.Call.bond_extra, "type">,
-  ): t.types.pallet_staking.pallet.pallet.Call.bond_extra {
+    value: Omit<types.pallet_staking.pallet.pallet.Call.bond_extra, "type">,
+  ): types.pallet_staking.pallet.pallet.Call.bond_extra {
     return { type: "bond_extra", ...value }
   }
   /**
@@ -561,8 +560,8 @@ export namespace Call {
    * See also [`Call::withdraw_unbonded`].
    */
   export function unbond(
-    value: Omit<t.types.pallet_staking.pallet.pallet.Call.unbond, "type">,
-  ): t.types.pallet_staking.pallet.pallet.Call.unbond {
+    value: Omit<types.pallet_staking.pallet.pallet.Call.unbond, "type">,
+  ): types.pallet_staking.pallet.pallet.Call.unbond {
     return { type: "unbond", ...value }
   }
   /**
@@ -583,8 +582,8 @@ export namespace Call {
    * # </weight>
    */
   export function withdraw_unbonded(
-    value: Omit<t.types.pallet_staking.pallet.pallet.Call.withdraw_unbonded, "type">,
-  ): t.types.pallet_staking.pallet.pallet.Call.withdraw_unbonded {
+    value: Omit<types.pallet_staking.pallet.pallet.Call.withdraw_unbonded, "type">,
+  ): types.pallet_staking.pallet.pallet.Call.withdraw_unbonded {
     return { type: "withdraw_unbonded", ...value }
   }
   /**
@@ -595,8 +594,8 @@ export namespace Call {
    * The dispatch origin for this call must be _Signed_ by the controller, not the stash.
    */
   export function validate(
-    value: Omit<t.types.pallet_staking.pallet.pallet.Call.validate, "type">,
-  ): t.types.pallet_staking.pallet.pallet.Call.validate {
+    value: Omit<types.pallet_staking.pallet.pallet.Call.validate, "type">,
+  ): types.pallet_staking.pallet.pallet.Call.validate {
     return { type: "validate", ...value }
   }
   /**
@@ -613,8 +612,8 @@ export namespace Call {
    * # </weight>
    */
   export function nominate(
-    value: Omit<t.types.pallet_staking.pallet.pallet.Call.nominate, "type">,
-  ): t.types.pallet_staking.pallet.pallet.Call.nominate {
+    value: Omit<types.pallet_staking.pallet.pallet.Call.nominate, "type">,
+  ): types.pallet_staking.pallet.pallet.Call.nominate {
     return { type: "nominate", ...value }
   }
   /**
@@ -630,7 +629,7 @@ export namespace Call {
    * - Writes are limited to the `origin` account key.
    * # </weight>
    */
-  export function chill(): t.types.pallet_staking.pallet.pallet.Call.chill {
+  export function chill(): types.pallet_staking.pallet.pallet.Call.chill {
     return { type: "chill" }
   }
   /**
@@ -652,8 +651,8 @@ export namespace Call {
    * # </weight>
    */
   export function set_payee(
-    value: Omit<t.types.pallet_staking.pallet.pallet.Call.set_payee, "type">,
-  ): t.types.pallet_staking.pallet.pallet.Call.set_payee {
+    value: Omit<types.pallet_staking.pallet.pallet.Call.set_payee, "type">,
+  ): types.pallet_staking.pallet.pallet.Call.set_payee {
     return { type: "set_payee", ...value }
   }
   /**
@@ -675,8 +674,8 @@ export namespace Call {
    * # </weight>
    */
   export function set_controller(
-    value: Omit<t.types.pallet_staking.pallet.pallet.Call.set_controller, "type">,
-  ): t.types.pallet_staking.pallet.pallet.Call.set_controller {
+    value: Omit<types.pallet_staking.pallet.pallet.Call.set_controller, "type">,
+  ): types.pallet_staking.pallet.pallet.Call.set_controller {
     return { type: "set_controller", ...value }
   }
   /**
@@ -690,8 +689,8 @@ export namespace Call {
    * # </weight>
    */
   export function set_validator_count(
-    value: Omit<t.types.pallet_staking.pallet.pallet.Call.set_validator_count, "type">,
-  ): t.types.pallet_staking.pallet.pallet.Call.set_validator_count {
+    value: Omit<types.pallet_staking.pallet.pallet.Call.set_validator_count, "type">,
+  ): types.pallet_staking.pallet.pallet.Call.set_validator_count {
     return { type: "set_validator_count", ...value }
   }
   /**
@@ -704,8 +703,8 @@ export namespace Call {
    * # </weight>
    */
   export function increase_validator_count(
-    value: Omit<t.types.pallet_staking.pallet.pallet.Call.increase_validator_count, "type">,
-  ): t.types.pallet_staking.pallet.pallet.Call.increase_validator_count {
+    value: Omit<types.pallet_staking.pallet.pallet.Call.increase_validator_count, "type">,
+  ): types.pallet_staking.pallet.pallet.Call.increase_validator_count {
     return { type: "increase_validator_count", ...value }
   }
   /**
@@ -718,8 +717,8 @@ export namespace Call {
    * # </weight>
    */
   export function scale_validator_count(
-    value: Omit<t.types.pallet_staking.pallet.pallet.Call.scale_validator_count, "type">,
-  ): t.types.pallet_staking.pallet.pallet.Call.scale_validator_count {
+    value: Omit<types.pallet_staking.pallet.pallet.Call.scale_validator_count, "type">,
+  ): types.pallet_staking.pallet.pallet.Call.scale_validator_count {
     return { type: "scale_validator_count", ...value }
   }
   /**
@@ -739,7 +738,7 @@ export namespace Call {
    * - Write: ForceEra
    * # </weight>
    */
-  export function force_no_eras(): t.types.pallet_staking.pallet.pallet.Call.force_no_eras {
+  export function force_no_eras(): types.pallet_staking.pallet.pallet.Call.force_no_eras {
     return { type: "force_no_eras" }
   }
   /**
@@ -760,7 +759,7 @@ export namespace Call {
    * - Write ForceEra
    * # </weight>
    */
-  export function force_new_era(): t.types.pallet_staking.pallet.pallet.Call.force_new_era {
+  export function force_new_era(): types.pallet_staking.pallet.pallet.Call.force_new_era {
     return { type: "force_new_era" }
   }
   /**
@@ -769,8 +768,8 @@ export namespace Call {
    * The dispatch origin must be Root.
    */
   export function set_invulnerables(
-    value: Omit<t.types.pallet_staking.pallet.pallet.Call.set_invulnerables, "type">,
-  ): t.types.pallet_staking.pallet.pallet.Call.set_invulnerables {
+    value: Omit<types.pallet_staking.pallet.pallet.Call.set_invulnerables, "type">,
+  ): types.pallet_staking.pallet.pallet.Call.set_invulnerables {
     return { type: "set_invulnerables", ...value }
   }
   /**
@@ -779,8 +778,8 @@ export namespace Call {
    * The dispatch origin must be Root.
    */
   export function force_unstake(
-    value: Omit<t.types.pallet_staking.pallet.pallet.Call.force_unstake, "type">,
-  ): t.types.pallet_staking.pallet.pallet.Call.force_unstake {
+    value: Omit<types.pallet_staking.pallet.pallet.Call.force_unstake, "type">,
+  ): types.pallet_staking.pallet.pallet.Call.force_unstake {
     return { type: "force_unstake", ...value }
   }
   /**
@@ -794,7 +793,7 @@ export namespace Call {
    * If this is called just before a new era is triggered, the election process may not
    * have enough blocks to get a result.
    */
-  export function force_new_era_always(): t.types.pallet_staking.pallet.pallet.Call.force_new_era_always {
+  export function force_new_era_always(): types.pallet_staking.pallet.pallet.Call.force_new_era_always {
     return { type: "force_new_era_always" }
   }
   /**
@@ -805,8 +804,8 @@ export namespace Call {
    * Parameters: era and indices of the slashes for that era to kill.
    */
   export function cancel_deferred_slash(
-    value: Omit<t.types.pallet_staking.pallet.pallet.Call.cancel_deferred_slash, "type">,
-  ): t.types.pallet_staking.pallet.pallet.Call.cancel_deferred_slash {
+    value: Omit<types.pallet_staking.pallet.pallet.Call.cancel_deferred_slash, "type">,
+  ): types.pallet_staking.pallet.pallet.Call.cancel_deferred_slash {
     return { type: "cancel_deferred_slash", ...value }
   }
   /**
@@ -833,8 +832,8 @@ export namespace Call {
    * # </weight>
    */
   export function payout_stakers(
-    value: Omit<t.types.pallet_staking.pallet.pallet.Call.payout_stakers, "type">,
-  ): t.types.pallet_staking.pallet.pallet.Call.payout_stakers {
+    value: Omit<types.pallet_staking.pallet.pallet.Call.payout_stakers, "type">,
+  ): types.pallet_staking.pallet.pallet.Call.payout_stakers {
     return { type: "payout_stakers", ...value }
   }
   /**
@@ -849,8 +848,8 @@ export namespace Call {
    * # </weight>
    */
   export function rebond(
-    value: Omit<t.types.pallet_staking.pallet.pallet.Call.rebond, "type">,
-  ): t.types.pallet_staking.pallet.pallet.Call.rebond {
+    value: Omit<types.pallet_staking.pallet.pallet.Call.rebond, "type">,
+  ): types.pallet_staking.pallet.pallet.Call.rebond {
     return { type: "rebond", ...value }
   }
   /**
@@ -868,8 +867,8 @@ export namespace Call {
    * Refunds the transaction fees upon successful execution.
    */
   export function reap_stash(
-    value: Omit<t.types.pallet_staking.pallet.pallet.Call.reap_stash, "type">,
-  ): t.types.pallet_staking.pallet.pallet.Call.reap_stash {
+    value: Omit<types.pallet_staking.pallet.pallet.Call.reap_stash, "type">,
+  ): types.pallet_staking.pallet.pallet.Call.reap_stash {
     return { type: "reap_stash", ...value }
   }
   /**
@@ -886,8 +885,8 @@ export namespace Call {
    * block any further nominations.
    */
   export function kick(
-    value: Omit<t.types.pallet_staking.pallet.pallet.Call.kick, "type">,
-  ): t.types.pallet_staking.pallet.pallet.Call.kick {
+    value: Omit<types.pallet_staking.pallet.pallet.Call.kick, "type">,
+  ): types.pallet_staking.pallet.pallet.Call.kick {
     return { type: "kick", ...value }
   }
   /**
@@ -910,8 +909,8 @@ export namespace Call {
    * to kick people under the new limits, `chill_other` should be called.
    */
   export function set_staking_configs(
-    value: Omit<t.types.pallet_staking.pallet.pallet.Call.set_staking_configs, "type">,
-  ): t.types.pallet_staking.pallet.pallet.Call.set_staking_configs {
+    value: Omit<types.pallet_staking.pallet.pallet.Call.set_staking_configs, "type">,
+  ): types.pallet_staking.pallet.pallet.Call.set_staking_configs {
     return { type: "set_staking_configs", ...value }
   }
   /**
@@ -943,8 +942,8 @@ export namespace Call {
    * who do not satisfy these requirements.
    */
   export function chill_other(
-    value: Omit<t.types.pallet_staking.pallet.pallet.Call.chill_other, "type">,
-  ): t.types.pallet_staking.pallet.pallet.Call.chill_other {
+    value: Omit<types.pallet_staking.pallet.pallet.Call.chill_other, "type">,
+  ): types.pallet_staking.pallet.pallet.Call.chill_other {
     return { type: "chill_other", ...value }
   }
   /**
@@ -953,8 +952,8 @@ export namespace Call {
    * can call this.
    */
   export function force_apply_min_commission(
-    value: Omit<t.types.pallet_staking.pallet.pallet.Call.force_apply_min_commission, "type">,
-  ): t.types.pallet_staking.pallet.pallet.Call.force_apply_min_commission {
+    value: Omit<types.pallet_staking.pallet.pallet.Call.force_apply_min_commission, "type">,
+  ): types.pallet_staking.pallet.pallet.Call.force_apply_min_commission {
     return { type: "force_apply_min_commission", ...value }
   }
 }
@@ -989,19 +988,19 @@ export type Error =
 
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
 export type Event =
-  | t.types.pallet_staking.pallet.pallet.Event.EraPaid
-  | t.types.pallet_staking.pallet.pallet.Event.Rewarded
-  | t.types.pallet_staking.pallet.pallet.Event.Slashed
-  | t.types.pallet_staking.pallet.pallet.Event.OldSlashingReportDiscarded
-  | t.types.pallet_staking.pallet.pallet.Event.StakersElected
-  | t.types.pallet_staking.pallet.pallet.Event.Bonded
-  | t.types.pallet_staking.pallet.pallet.Event.Unbonded
-  | t.types.pallet_staking.pallet.pallet.Event.Withdrawn
-  | t.types.pallet_staking.pallet.pallet.Event.Kicked
-  | t.types.pallet_staking.pallet.pallet.Event.StakingElectionFailed
-  | t.types.pallet_staking.pallet.pallet.Event.Chilled
-  | t.types.pallet_staking.pallet.pallet.Event.PayoutStarted
-  | t.types.pallet_staking.pallet.pallet.Event.ValidatorPrefsSet
+  | types.pallet_staking.pallet.pallet.Event.EraPaid
+  | types.pallet_staking.pallet.pallet.Event.Rewarded
+  | types.pallet_staking.pallet.pallet.Event.Slashed
+  | types.pallet_staking.pallet.pallet.Event.OldSlashingReportDiscarded
+  | types.pallet_staking.pallet.pallet.Event.StakersElected
+  | types.pallet_staking.pallet.pallet.Event.Bonded
+  | types.pallet_staking.pallet.pallet.Event.Unbonded
+  | types.pallet_staking.pallet.pallet.Event.Withdrawn
+  | types.pallet_staking.pallet.pallet.Event.Kicked
+  | types.pallet_staking.pallet.pallet.Event.StakingElectionFailed
+  | types.pallet_staking.pallet.pallet.Event.Chilled
+  | types.pallet_staking.pallet.pallet.Event.PayoutStarted
+  | types.pallet_staking.pallet.pallet.Event.ValidatorPrefsSet
 export namespace Event {
   /**
    * The era payout has been set; the first balance is the validator-payout; the second is
@@ -1009,21 +1008,21 @@ export namespace Event {
    */
   export interface EraPaid {
     type: "EraPaid"
-    era_index: t.types.u32
-    validator_payout: t.types.u128
-    remainder: t.types.u128
+    era_index: types.u32
+    validator_payout: types.u128
+    remainder: types.u128
   }
   /** The nominator has been rewarded by this amount. */
   export interface Rewarded {
     type: "Rewarded"
-    stash: t.types.sp_core.crypto.AccountId32
-    amount: t.types.u128
+    stash: types.sp_core.crypto.AccountId32
+    amount: types.u128
   }
   /** One staker (and potentially its nominators) has been slashed by the given amount. */
   export interface Slashed {
     type: "Slashed"
-    staker: t.types.sp_core.crypto.AccountId32
-    amount: t.types.u128
+    staker: types.sp_core.crypto.AccountId32
+    amount: types.u128
   }
   /**
    * An old slashing report from a prior era was discarded because it could
@@ -1031,7 +1030,7 @@ export namespace Event {
    */
   export interface OldSlashingReportDiscarded {
     type: "OldSlashingReportDiscarded"
-    session_index: t.types.u32
+    session_index: types.u32
   }
   /** A new set of stakers was elected. */
   export interface StakersElected {
@@ -1045,14 +1044,14 @@ export namespace Event {
    */
   export interface Bonded {
     type: "Bonded"
-    stash: t.types.sp_core.crypto.AccountId32
-    amount: t.types.u128
+    stash: types.sp_core.crypto.AccountId32
+    amount: types.u128
   }
   /** An account has unbonded this amount. */
   export interface Unbonded {
     type: "Unbonded"
-    stash: t.types.sp_core.crypto.AccountId32
-    amount: t.types.u128
+    stash: types.sp_core.crypto.AccountId32
+    amount: types.u128
   }
   /**
    * An account has called `withdraw_unbonded` and removed unbonding chunks worth `Balance`
@@ -1060,14 +1059,14 @@ export namespace Event {
    */
   export interface Withdrawn {
     type: "Withdrawn"
-    stash: t.types.sp_core.crypto.AccountId32
-    amount: t.types.u128
+    stash: types.sp_core.crypto.AccountId32
+    amount: types.u128
   }
   /** A nominator has been kicked from a validator. */
   export interface Kicked {
     type: "Kicked"
-    nominator: t.types.sp_core.crypto.AccountId32
-    stash: t.types.sp_core.crypto.AccountId32
+    nominator: types.sp_core.crypto.AccountId32
+    stash: types.sp_core.crypto.AccountId32
   }
   /** The election failed. No new era is planned. */
   export interface StakingElectionFailed {
@@ -1076,39 +1075,39 @@ export namespace Event {
   /** An account has stopped participating as either a validator or nominator. */
   export interface Chilled {
     type: "Chilled"
-    stash: t.types.sp_core.crypto.AccountId32
+    stash: types.sp_core.crypto.AccountId32
   }
   /** The stakers' rewards are getting paid. */
   export interface PayoutStarted {
     type: "PayoutStarted"
-    era_index: t.types.u32
-    validator_stash: t.types.sp_core.crypto.AccountId32
+    era_index: types.u32
+    validator_stash: types.sp_core.crypto.AccountId32
   }
   /** A validator has set their preferences. */
   export interface ValidatorPrefsSet {
     type: "ValidatorPrefsSet"
-    stash: t.types.sp_core.crypto.AccountId32
-    prefs: t.types.pallet_staking.ValidatorPrefs
+    stash: types.sp_core.crypto.AccountId32
+    prefs: types.pallet_staking.ValidatorPrefs
   }
   /**
    * The era payout has been set; the first balance is the validator-payout; the second is
    * the remainder from the maximum amount of reward.
    */
   export function EraPaid(
-    value: Omit<t.types.pallet_staking.pallet.pallet.Event.EraPaid, "type">,
-  ): t.types.pallet_staking.pallet.pallet.Event.EraPaid {
+    value: Omit<types.pallet_staking.pallet.pallet.Event.EraPaid, "type">,
+  ): types.pallet_staking.pallet.pallet.Event.EraPaid {
     return { type: "EraPaid", ...value }
   }
   /** The nominator has been rewarded by this amount. */
   export function Rewarded(
-    value: Omit<t.types.pallet_staking.pallet.pallet.Event.Rewarded, "type">,
-  ): t.types.pallet_staking.pallet.pallet.Event.Rewarded {
+    value: Omit<types.pallet_staking.pallet.pallet.Event.Rewarded, "type">,
+  ): types.pallet_staking.pallet.pallet.Event.Rewarded {
     return { type: "Rewarded", ...value }
   }
   /** One staker (and potentially its nominators) has been slashed by the given amount. */
   export function Slashed(
-    value: Omit<t.types.pallet_staking.pallet.pallet.Event.Slashed, "type">,
-  ): t.types.pallet_staking.pallet.pallet.Event.Slashed {
+    value: Omit<types.pallet_staking.pallet.pallet.Event.Slashed, "type">,
+  ): types.pallet_staking.pallet.pallet.Event.Slashed {
     return { type: "Slashed", ...value }
   }
   /**
@@ -1116,12 +1115,12 @@ export namespace Event {
    * not be processed.
    */
   export function OldSlashingReportDiscarded(
-    value: Omit<t.types.pallet_staking.pallet.pallet.Event.OldSlashingReportDiscarded, "type">,
-  ): t.types.pallet_staking.pallet.pallet.Event.OldSlashingReportDiscarded {
+    value: Omit<types.pallet_staking.pallet.pallet.Event.OldSlashingReportDiscarded, "type">,
+  ): types.pallet_staking.pallet.pallet.Event.OldSlashingReportDiscarded {
     return { type: "OldSlashingReportDiscarded", ...value }
   }
   /** A new set of stakers was elected. */
-  export function StakersElected(): t.types.pallet_staking.pallet.pallet.Event.StakersElected {
+  export function StakersElected(): types.pallet_staking.pallet.pallet.Event.StakersElected {
     return { type: "StakersElected" }
   }
   /**
@@ -1131,14 +1130,14 @@ export namespace Event {
    * it will not be emitted for staking rewards when they are added to stake.
    */
   export function Bonded(
-    value: Omit<t.types.pallet_staking.pallet.pallet.Event.Bonded, "type">,
-  ): t.types.pallet_staking.pallet.pallet.Event.Bonded {
+    value: Omit<types.pallet_staking.pallet.pallet.Event.Bonded, "type">,
+  ): types.pallet_staking.pallet.pallet.Event.Bonded {
     return { type: "Bonded", ...value }
   }
   /** An account has unbonded this amount. */
   export function Unbonded(
-    value: Omit<t.types.pallet_staking.pallet.pallet.Event.Unbonded, "type">,
-  ): t.types.pallet_staking.pallet.pallet.Event.Unbonded {
+    value: Omit<types.pallet_staking.pallet.pallet.Event.Unbonded, "type">,
+  ): types.pallet_staking.pallet.pallet.Event.Unbonded {
     return { type: "Unbonded", ...value }
   }
   /**
@@ -1146,36 +1145,36 @@ export namespace Event {
    * from the unlocking queue.
    */
   export function Withdrawn(
-    value: Omit<t.types.pallet_staking.pallet.pallet.Event.Withdrawn, "type">,
-  ): t.types.pallet_staking.pallet.pallet.Event.Withdrawn {
+    value: Omit<types.pallet_staking.pallet.pallet.Event.Withdrawn, "type">,
+  ): types.pallet_staking.pallet.pallet.Event.Withdrawn {
     return { type: "Withdrawn", ...value }
   }
   /** A nominator has been kicked from a validator. */
   export function Kicked(
-    value: Omit<t.types.pallet_staking.pallet.pallet.Event.Kicked, "type">,
-  ): t.types.pallet_staking.pallet.pallet.Event.Kicked {
+    value: Omit<types.pallet_staking.pallet.pallet.Event.Kicked, "type">,
+  ): types.pallet_staking.pallet.pallet.Event.Kicked {
     return { type: "Kicked", ...value }
   }
   /** The election failed. No new era is planned. */
-  export function StakingElectionFailed(): t.types.pallet_staking.pallet.pallet.Event.StakingElectionFailed {
+  export function StakingElectionFailed(): types.pallet_staking.pallet.pallet.Event.StakingElectionFailed {
     return { type: "StakingElectionFailed" }
   }
   /** An account has stopped participating as either a validator or nominator. */
   export function Chilled(
-    value: Omit<t.types.pallet_staking.pallet.pallet.Event.Chilled, "type">,
-  ): t.types.pallet_staking.pallet.pallet.Event.Chilled {
+    value: Omit<types.pallet_staking.pallet.pallet.Event.Chilled, "type">,
+  ): types.pallet_staking.pallet.pallet.Event.Chilled {
     return { type: "Chilled", ...value }
   }
   /** The stakers' rewards are getting paid. */
   export function PayoutStarted(
-    value: Omit<t.types.pallet_staking.pallet.pallet.Event.PayoutStarted, "type">,
-  ): t.types.pallet_staking.pallet.pallet.Event.PayoutStarted {
+    value: Omit<types.pallet_staking.pallet.pallet.Event.PayoutStarted, "type">,
+  ): types.pallet_staking.pallet.pallet.Event.PayoutStarted {
     return { type: "PayoutStarted", ...value }
   }
   /** A validator has set their preferences. */
   export function ValidatorPrefsSet(
-    value: Omit<t.types.pallet_staking.pallet.pallet.Event.ValidatorPrefsSet, "type">,
-  ): t.types.pallet_staking.pallet.pallet.Event.ValidatorPrefsSet {
+    value: Omit<types.pallet_staking.pallet.pallet.Event.ValidatorPrefsSet, "type">,
+  ): types.pallet_staking.pallet.pallet.Event.ValidatorPrefsSet {
     return { type: "ValidatorPrefsSet", ...value }
   }
 }

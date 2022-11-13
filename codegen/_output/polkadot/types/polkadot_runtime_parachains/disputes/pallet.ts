@@ -1,14 +1,12 @@
 import { $ } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as t from "../../../mod.ts"
+import type * as types from "../../../types/mod.ts"
 
-export const $call: $.Codec<t.types.polkadot_runtime_parachains.disputes.pallet.Call> = _codec.$410
+export const $call: $.Codec<types.polkadot_runtime_parachains.disputes.pallet.Call> = _codec.$410
 
-export const $error: $.Codec<t.types.polkadot_runtime_parachains.disputes.pallet.Error> =
-  _codec.$700
+export const $error: $.Codec<types.polkadot_runtime_parachains.disputes.pallet.Error> = _codec.$700
 
-export const $event: $.Codec<t.types.polkadot_runtime_parachains.disputes.pallet.Event> =
-  _codec.$113
+export const $event: $.Codec<types.polkadot_runtime_parachains.disputes.pallet.Event> = _codec.$113
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 export type Call = "force_unfreeze"
@@ -25,17 +23,17 @@ export type Error =
 
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
 export type Event =
-  | t.types.polkadot_runtime_parachains.disputes.pallet.Event.DisputeInitiated
-  | t.types.polkadot_runtime_parachains.disputes.pallet.Event.DisputeConcluded
-  | t.types.polkadot_runtime_parachains.disputes.pallet.Event.DisputeTimedOut
-  | t.types.polkadot_runtime_parachains.disputes.pallet.Event.Revert
+  | types.polkadot_runtime_parachains.disputes.pallet.Event.DisputeInitiated
+  | types.polkadot_runtime_parachains.disputes.pallet.Event.DisputeConcluded
+  | types.polkadot_runtime_parachains.disputes.pallet.Event.DisputeTimedOut
+  | types.polkadot_runtime_parachains.disputes.pallet.Event.Revert
 export namespace Event {
   /** A dispute has been initiated. \[candidate hash, dispute location\] */
   export interface DisputeInitiated {
     type: "DisputeInitiated"
     value: [
-      t.types.polkadot_core_primitives.CandidateHash,
-      t.types.polkadot_runtime_parachains.disputes.DisputeLocation,
+      types.polkadot_core_primitives.CandidateHash,
+      types.polkadot_runtime_parachains.disputes.DisputeLocation,
     ]
   }
   /**
@@ -45,8 +43,8 @@ export namespace Event {
   export interface DisputeConcluded {
     type: "DisputeConcluded"
     value: [
-      t.types.polkadot_core_primitives.CandidateHash,
-      t.types.polkadot_runtime_parachains.disputes.DisputeResult,
+      types.polkadot_core_primitives.CandidateHash,
+      types.polkadot_runtime_parachains.disputes.DisputeResult,
     ]
   }
   /**
@@ -55,7 +53,7 @@ export namespace Event {
    */
   export interface DisputeTimedOut {
     type: "DisputeTimedOut"
-    value: t.types.polkadot_core_primitives.CandidateHash
+    value: types.polkadot_core_primitives.CandidateHash
   }
   /**
    * A dispute has concluded with supermajority against a candidate.
@@ -65,12 +63,12 @@ export namespace Event {
    */
   export interface Revert {
     type: "Revert"
-    value: t.types.u32
+    value: types.u32
   }
   /** A dispute has been initiated. \[candidate hash, dispute location\] */
   export function DisputeInitiated(
-    ...value: t.types.polkadot_runtime_parachains.disputes.pallet.Event.DisputeInitiated["value"]
-  ): t.types.polkadot_runtime_parachains.disputes.pallet.Event.DisputeInitiated {
+    ...value: types.polkadot_runtime_parachains.disputes.pallet.Event.DisputeInitiated["value"]
+  ): types.polkadot_runtime_parachains.disputes.pallet.Event.DisputeInitiated {
     return { type: "DisputeInitiated", value }
   }
   /**
@@ -78,8 +76,8 @@ export namespace Event {
    * `\[para id, candidate hash, dispute result\]`
    */
   export function DisputeConcluded(
-    ...value: t.types.polkadot_runtime_parachains.disputes.pallet.Event.DisputeConcluded["value"]
-  ): t.types.polkadot_runtime_parachains.disputes.pallet.Event.DisputeConcluded {
+    ...value: types.polkadot_runtime_parachains.disputes.pallet.Event.DisputeConcluded["value"]
+  ): types.polkadot_runtime_parachains.disputes.pallet.Event.DisputeConcluded {
     return { type: "DisputeConcluded", value }
   }
   /**
@@ -87,8 +85,8 @@ export namespace Event {
    * `\[para id, candidate hash\]`
    */
   export function DisputeTimedOut(
-    value: t.types.polkadot_runtime_parachains.disputes.pallet.Event.DisputeTimedOut["value"],
-  ): t.types.polkadot_runtime_parachains.disputes.pallet.Event.DisputeTimedOut {
+    value: types.polkadot_runtime_parachains.disputes.pallet.Event.DisputeTimedOut["value"],
+  ): types.polkadot_runtime_parachains.disputes.pallet.Event.DisputeTimedOut {
     return { type: "DisputeTimedOut", value }
   }
   /**
@@ -98,8 +96,8 @@ export namespace Event {
    * number of the child of the last known valid block in the chain.
    */
   export function Revert(
-    value: t.types.polkadot_runtime_parachains.disputes.pallet.Event.Revert["value"],
-  ): t.types.polkadot_runtime_parachains.disputes.pallet.Event.Revert {
+    value: types.polkadot_runtime_parachains.disputes.pallet.Event.Revert["value"],
+  ): types.polkadot_runtime_parachains.disputes.pallet.Event.Revert {
     return { type: "Revert", value }
   }
 }

@@ -1,5 +1,5 @@
 import * as _codec from "../codecs.ts"
-import type * as t from "../mod.ts"
+import type * as types from "../types/mod.ts"
 
 /** Author of current block. */
 export const Author = {
@@ -30,7 +30,7 @@ export const Uncles = {
 
 /** Provide a set of uncles. */
 export function set_uncles(
-  value: Omit<t.types.pallet_authorship.pallet.Call.set_uncles, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_authorship.pallet.Call.set_uncles, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Authorship", value: { ...value, type: "set_uncles" } }
 }

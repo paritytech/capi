@@ -1,22 +1,22 @@
 import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as t from "../../mod.ts"
+import type * as types from "../../types/mod.ts"
 
-export const $call: $.Codec<t.types.pallet_collective.pallet.Call> = _codec.$237
+export const $call: $.Codec<types.pallet_collective.pallet.Call> = _codec.$237
 
-export const $error: $.Codec<t.types.pallet_collective.pallet.Error> = _codec.$547
+export const $error: $.Codec<types.pallet_collective.pallet.Error> = _codec.$547
 
-export const $event: $.Codec<t.types.pallet_collective.pallet.Event> = _codec.$65
+export const $event: $.Codec<types.pallet_collective.pallet.Event> = _codec.$65
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 export type Call =
-  | t.types.pallet_collective.pallet.Call.set_members
-  | t.types.pallet_collective.pallet.Call.execute
-  | t.types.pallet_collective.pallet.Call.propose
-  | t.types.pallet_collective.pallet.Call.vote
-  | t.types.pallet_collective.pallet.Call.close_old_weight
-  | t.types.pallet_collective.pallet.Call.disapprove_proposal
-  | t.types.pallet_collective.pallet.Call.close
+  | types.pallet_collective.pallet.Call.set_members
+  | types.pallet_collective.pallet.Call.execute
+  | types.pallet_collective.pallet.Call.propose
+  | types.pallet_collective.pallet.Call.vote
+  | types.pallet_collective.pallet.Call.close_old_weight
+  | types.pallet_collective.pallet.Call.disapprove_proposal
+  | types.pallet_collective.pallet.Call.close
 export namespace Call {
   /**
    * Set the collective's membership.
@@ -54,9 +54,9 @@ export namespace Call {
    */
   export interface set_members {
     type: "set_members"
-    new_members: Array<t.types.sp_core.crypto.AccountId32>
-    prime: t.types.sp_core.crypto.AccountId32 | undefined
-    old_count: t.types.u32
+    new_members: Array<types.sp_core.crypto.AccountId32>
+    prime: types.sp_core.crypto.AccountId32 | undefined
+    old_count: types.u32
   }
   /**
    * Dispatch a proposal from a member using the `Member` origin.
@@ -73,8 +73,8 @@ export namespace Call {
    */
   export interface execute {
     type: "execute"
-    proposal: t.types.polkadot_runtime.RuntimeCall
-    length_bound: t.Compact<t.types.u32>
+    proposal: types.polkadot_runtime.RuntimeCall
+    length_bound: types.Compact<types.u32>
   }
   /**
    * Add a new proposal to either be voted on or executed directly.
@@ -107,9 +107,9 @@ export namespace Call {
    */
   export interface propose {
     type: "propose"
-    threshold: t.Compact<t.types.u32>
-    proposal: t.types.polkadot_runtime.RuntimeCall
-    length_bound: t.Compact<t.types.u32>
+    threshold: types.Compact<types.u32>
+    proposal: types.polkadot_runtime.RuntimeCall
+    length_bound: types.Compact<types.u32>
   }
   /**
    * Add an aye or nay vote for the sender to the given proposal.
@@ -130,8 +130,8 @@ export namespace Call {
    */
   export interface vote {
     type: "vote"
-    proposal: t.types.primitive_types.H256
-    index: t.Compact<t.types.u32>
+    proposal: types.primitive_types.H256
+    index: types.Compact<types.u32>
     approve: boolean
   }
   /**
@@ -170,10 +170,10 @@ export namespace Call {
    */
   export interface close_old_weight {
     type: "close_old_weight"
-    proposal_hash: t.types.primitive_types.H256
-    index: t.Compact<t.types.u32>
-    proposal_weight_bound: t.Compact<t.types.sp_weights.OldWeight>
-    length_bound: t.Compact<t.types.u32>
+    proposal_hash: types.primitive_types.H256
+    index: types.Compact<types.u32>
+    proposal_weight_bound: types.Compact<types.sp_weights.OldWeight>
+    length_bound: types.Compact<types.u32>
   }
   /**
    * Disapprove a proposal, close, and remove it from the system, regardless of its current
@@ -193,7 +193,7 @@ export namespace Call {
    */
   export interface disapprove_proposal {
     type: "disapprove_proposal"
-    proposal_hash: t.types.primitive_types.H256
+    proposal_hash: types.primitive_types.H256
   }
   /**
    * Close a vote that is either approved, disapproved or whose voting period has ended.
@@ -231,10 +231,10 @@ export namespace Call {
    */
   export interface close {
     type: "close"
-    proposal_hash: t.types.primitive_types.H256
-    index: t.Compact<t.types.u32>
-    proposal_weight_bound: t.types.sp_weights.weight_v2.Weight
-    length_bound: t.Compact<t.types.u32>
+    proposal_hash: types.primitive_types.H256
+    index: types.Compact<types.u32>
+    proposal_weight_bound: types.sp_weights.weight_v2.Weight
+    length_bound: types.Compact<types.u32>
   }
   /**
    * Set the collective's membership.
@@ -271,8 +271,8 @@ export namespace Call {
    * # </weight>
    */
   export function set_members(
-    value: Omit<t.types.pallet_collective.pallet.Call.set_members, "type">,
-  ): t.types.pallet_collective.pallet.Call.set_members {
+    value: Omit<types.pallet_collective.pallet.Call.set_members, "type">,
+  ): types.pallet_collective.pallet.Call.set_members {
     return { type: "set_members", ...value }
   }
   /**
@@ -289,8 +289,8 @@ export namespace Call {
    * # </weight>
    */
   export function execute(
-    value: Omit<t.types.pallet_collective.pallet.Call.execute, "type">,
-  ): t.types.pallet_collective.pallet.Call.execute {
+    value: Omit<types.pallet_collective.pallet.Call.execute, "type">,
+  ): types.pallet_collective.pallet.Call.execute {
     return { type: "execute", ...value }
   }
   /**
@@ -323,8 +323,8 @@ export namespace Call {
    * # </weight>
    */
   export function propose(
-    value: Omit<t.types.pallet_collective.pallet.Call.propose, "type">,
-  ): t.types.pallet_collective.pallet.Call.propose {
+    value: Omit<types.pallet_collective.pallet.Call.propose, "type">,
+  ): types.pallet_collective.pallet.Call.propose {
     return { type: "propose", ...value }
   }
   /**
@@ -345,8 +345,8 @@ export namespace Call {
    * # </weight>
    */
   export function vote(
-    value: Omit<t.types.pallet_collective.pallet.Call.vote, "type">,
-  ): t.types.pallet_collective.pallet.Call.vote {
+    value: Omit<types.pallet_collective.pallet.Call.vote, "type">,
+  ): types.pallet_collective.pallet.Call.vote {
     return { type: "vote", ...value }
   }
   /**
@@ -384,8 +384,8 @@ export namespace Call {
    * # </weight>
    */
   export function close_old_weight(
-    value: Omit<t.types.pallet_collective.pallet.Call.close_old_weight, "type">,
-  ): t.types.pallet_collective.pallet.Call.close_old_weight {
+    value: Omit<types.pallet_collective.pallet.Call.close_old_weight, "type">,
+  ): types.pallet_collective.pallet.Call.close_old_weight {
     return { type: "close_old_weight", ...value }
   }
   /**
@@ -405,8 +405,8 @@ export namespace Call {
    * # </weight>
    */
   export function disapprove_proposal(
-    value: Omit<t.types.pallet_collective.pallet.Call.disapprove_proposal, "type">,
-  ): t.types.pallet_collective.pallet.Call.disapprove_proposal {
+    value: Omit<types.pallet_collective.pallet.Call.disapprove_proposal, "type">,
+  ): types.pallet_collective.pallet.Call.disapprove_proposal {
     return { type: "disapprove_proposal", ...value }
   }
   /**
@@ -444,8 +444,8 @@ export namespace Call {
    * # </weight>
    */
   export function close(
-    value: Omit<t.types.pallet_collective.pallet.Call.close, "type">,
-  ): t.types.pallet_collective.pallet.Call.close {
+    value: Omit<types.pallet_collective.pallet.Call.close, "type">,
+  ): types.pallet_collective.pallet.Call.close {
     return { type: "close", ...value }
   }
 }
@@ -465,13 +465,13 @@ export type Error =
 
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
 export type Event =
-  | t.types.pallet_collective.pallet.Event.Proposed
-  | t.types.pallet_collective.pallet.Event.Voted
-  | t.types.pallet_collective.pallet.Event.Approved
-  | t.types.pallet_collective.pallet.Event.Disapproved
-  | t.types.pallet_collective.pallet.Event.Executed
-  | t.types.pallet_collective.pallet.Event.MemberExecuted
-  | t.types.pallet_collective.pallet.Event.Closed
+  | types.pallet_collective.pallet.Event.Proposed
+  | types.pallet_collective.pallet.Event.Voted
+  | types.pallet_collective.pallet.Event.Approved
+  | types.pallet_collective.pallet.Event.Disapproved
+  | types.pallet_collective.pallet.Event.Executed
+  | types.pallet_collective.pallet.Event.MemberExecuted
+  | types.pallet_collective.pallet.Event.Closed
 export namespace Event {
   /**
    * A motion (given hash) has been proposed (by given account) with a threshold (given
@@ -479,10 +479,10 @@ export namespace Event {
    */
   export interface Proposed {
     type: "Proposed"
-    account: t.types.sp_core.crypto.AccountId32
-    proposal_index: t.types.u32
-    proposal_hash: t.types.primitive_types.H256
-    threshold: t.types.u32
+    account: types.sp_core.crypto.AccountId32
+    proposal_index: types.u32
+    proposal_hash: types.primitive_types.H256
+    threshold: types.u32
   }
   /**
    * A motion (given hash) has been voted on by given account, leaving
@@ -490,48 +490,48 @@ export namespace Event {
    */
   export interface Voted {
     type: "Voted"
-    account: t.types.sp_core.crypto.AccountId32
-    proposal_hash: t.types.primitive_types.H256
+    account: types.sp_core.crypto.AccountId32
+    proposal_hash: types.primitive_types.H256
     voted: boolean
-    yes: t.types.u32
-    no: t.types.u32
+    yes: types.u32
+    no: types.u32
   }
   /** A motion was approved by the required threshold. */
   export interface Approved {
     type: "Approved"
-    proposal_hash: t.types.primitive_types.H256
+    proposal_hash: types.primitive_types.H256
   }
   /** A motion was not approved by the required threshold. */
   export interface Disapproved {
     type: "Disapproved"
-    proposal_hash: t.types.primitive_types.H256
+    proposal_hash: types.primitive_types.H256
   }
   /** A motion was executed; result will be `Ok` if it returned without error. */
   export interface Executed {
     type: "Executed"
-    proposal_hash: t.types.primitive_types.H256
-    result: null | C.ChainError<t.types.sp_runtime.DispatchError>
+    proposal_hash: types.primitive_types.H256
+    result: null | C.ChainError<types.sp_runtime.DispatchError>
   }
   /** A single member did some action; result will be `Ok` if it returned without error. */
   export interface MemberExecuted {
     type: "MemberExecuted"
-    proposal_hash: t.types.primitive_types.H256
-    result: null | C.ChainError<t.types.sp_runtime.DispatchError>
+    proposal_hash: types.primitive_types.H256
+    result: null | C.ChainError<types.sp_runtime.DispatchError>
   }
   /** A proposal was closed because its threshold was reached or after its duration was up. */
   export interface Closed {
     type: "Closed"
-    proposal_hash: t.types.primitive_types.H256
-    yes: t.types.u32
-    no: t.types.u32
+    proposal_hash: types.primitive_types.H256
+    yes: types.u32
+    no: types.u32
   }
   /**
    * A motion (given hash) has been proposed (by given account) with a threshold (given
    * `MemberCount`).
    */
   export function Proposed(
-    value: Omit<t.types.pallet_collective.pallet.Event.Proposed, "type">,
-  ): t.types.pallet_collective.pallet.Event.Proposed {
+    value: Omit<types.pallet_collective.pallet.Event.Proposed, "type">,
+  ): types.pallet_collective.pallet.Event.Proposed {
     return { type: "Proposed", ...value }
   }
   /**
@@ -539,38 +539,38 @@ export namespace Event {
    * a tally (yes votes and no votes given respectively as `MemberCount`).
    */
   export function Voted(
-    value: Omit<t.types.pallet_collective.pallet.Event.Voted, "type">,
-  ): t.types.pallet_collective.pallet.Event.Voted {
+    value: Omit<types.pallet_collective.pallet.Event.Voted, "type">,
+  ): types.pallet_collective.pallet.Event.Voted {
     return { type: "Voted", ...value }
   }
   /** A motion was approved by the required threshold. */
   export function Approved(
-    value: Omit<t.types.pallet_collective.pallet.Event.Approved, "type">,
-  ): t.types.pallet_collective.pallet.Event.Approved {
+    value: Omit<types.pallet_collective.pallet.Event.Approved, "type">,
+  ): types.pallet_collective.pallet.Event.Approved {
     return { type: "Approved", ...value }
   }
   /** A motion was not approved by the required threshold. */
   export function Disapproved(
-    value: Omit<t.types.pallet_collective.pallet.Event.Disapproved, "type">,
-  ): t.types.pallet_collective.pallet.Event.Disapproved {
+    value: Omit<types.pallet_collective.pallet.Event.Disapproved, "type">,
+  ): types.pallet_collective.pallet.Event.Disapproved {
     return { type: "Disapproved", ...value }
   }
   /** A motion was executed; result will be `Ok` if it returned without error. */
   export function Executed(
-    value: Omit<t.types.pallet_collective.pallet.Event.Executed, "type">,
-  ): t.types.pallet_collective.pallet.Event.Executed {
+    value: Omit<types.pallet_collective.pallet.Event.Executed, "type">,
+  ): types.pallet_collective.pallet.Event.Executed {
     return { type: "Executed", ...value }
   }
   /** A single member did some action; result will be `Ok` if it returned without error. */
   export function MemberExecuted(
-    value: Omit<t.types.pallet_collective.pallet.Event.MemberExecuted, "type">,
-  ): t.types.pallet_collective.pallet.Event.MemberExecuted {
+    value: Omit<types.pallet_collective.pallet.Event.MemberExecuted, "type">,
+  ): types.pallet_collective.pallet.Event.MemberExecuted {
     return { type: "MemberExecuted", ...value }
   }
   /** A proposal was closed because its threshold was reached or after its duration was up. */
   export function Closed(
-    value: Omit<t.types.pallet_collective.pallet.Event.Closed, "type">,
-  ): t.types.pallet_collective.pallet.Event.Closed {
+    value: Omit<types.pallet_collective.pallet.Event.Closed, "type">,
+  ): types.pallet_collective.pallet.Event.Closed {
     return { type: "Closed", ...value }
   }
 }

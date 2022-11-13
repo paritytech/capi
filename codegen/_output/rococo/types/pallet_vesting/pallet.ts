@@ -1,20 +1,20 @@
 import { $ } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as t from "../../mod.ts"
+import type * as types from "../../types/mod.ts"
 
-export const $call: $.Codec<t.types.pallet_vesting.pallet.Call> = _codec.$252
+export const $call: $.Codec<types.pallet_vesting.pallet.Call> = _codec.$252
 
-export const $error: $.Codec<t.types.pallet_vesting.pallet.Error> = _codec.$566
+export const $error: $.Codec<types.pallet_vesting.pallet.Error> = _codec.$566
 
-export const $event: $.Codec<t.types.pallet_vesting.pallet.Event> = _codec.$75
+export const $event: $.Codec<types.pallet_vesting.pallet.Event> = _codec.$75
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 export type Call =
-  | t.types.pallet_vesting.pallet.Call.vest
-  | t.types.pallet_vesting.pallet.Call.vest_other
-  | t.types.pallet_vesting.pallet.Call.vested_transfer
-  | t.types.pallet_vesting.pallet.Call.force_vested_transfer
-  | t.types.pallet_vesting.pallet.Call.merge_schedules
+  | types.pallet_vesting.pallet.Call.vest
+  | types.pallet_vesting.pallet.Call.vest_other
+  | types.pallet_vesting.pallet.Call.vested_transfer
+  | types.pallet_vesting.pallet.Call.force_vested_transfer
+  | types.pallet_vesting.pallet.Call.merge_schedules
 export namespace Call {
   /**
    * Unlock any vested funds of the sender account.
@@ -53,7 +53,7 @@ export namespace Call {
    */
   export interface vest_other {
     type: "vest_other"
-    target: t.types.sp_runtime.multiaddress.MultiAddress
+    target: types.sp_runtime.multiaddress.MultiAddress
   }
   /**
    * Create a vested transfer.
@@ -76,8 +76,8 @@ export namespace Call {
    */
   export interface vested_transfer {
     type: "vested_transfer"
-    target: t.types.sp_runtime.multiaddress.MultiAddress
-    schedule: t.types.pallet_vesting.vesting_info.VestingInfo
+    target: types.sp_runtime.multiaddress.MultiAddress
+    schedule: types.pallet_vesting.vesting_info.VestingInfo
   }
   /**
    * Force a vested transfer.
@@ -101,9 +101,9 @@ export namespace Call {
    */
   export interface force_vested_transfer {
     type: "force_vested_transfer"
-    source: t.types.sp_runtime.multiaddress.MultiAddress
-    target: t.types.sp_runtime.multiaddress.MultiAddress
-    schedule: t.types.pallet_vesting.vesting_info.VestingInfo
+    source: types.sp_runtime.multiaddress.MultiAddress
+    target: types.sp_runtime.multiaddress.MultiAddress
+    schedule: types.pallet_vesting.vesting_info.VestingInfo
   }
   /**
    * Merge two vesting schedules together, creating a new vesting schedule that unlocks over
@@ -130,8 +130,8 @@ export namespace Call {
    */
   export interface merge_schedules {
     type: "merge_schedules"
-    schedule1_index: t.types.u32
-    schedule2_index: t.types.u32
+    schedule1_index: types.u32
+    schedule2_index: types.u32
   }
   /**
    * Unlock any vested funds of the sender account.
@@ -148,7 +148,7 @@ export namespace Call {
    *     - Writes: Vesting Storage, Balances Locks, [Sender Account]
    * # </weight>
    */
-  export function vest(): t.types.pallet_vesting.pallet.Call.vest {
+  export function vest(): types.pallet_vesting.pallet.Call.vest {
     return { type: "vest" }
   }
   /**
@@ -169,8 +169,8 @@ export namespace Call {
    * # </weight>
    */
   export function vest_other(
-    value: Omit<t.types.pallet_vesting.pallet.Call.vest_other, "type">,
-  ): t.types.pallet_vesting.pallet.Call.vest_other {
+    value: Omit<types.pallet_vesting.pallet.Call.vest_other, "type">,
+  ): types.pallet_vesting.pallet.Call.vest_other {
     return { type: "vest_other", ...value }
   }
   /**
@@ -193,8 +193,8 @@ export namespace Call {
    * # </weight>
    */
   export function vested_transfer(
-    value: Omit<t.types.pallet_vesting.pallet.Call.vested_transfer, "type">,
-  ): t.types.pallet_vesting.pallet.Call.vested_transfer {
+    value: Omit<types.pallet_vesting.pallet.Call.vested_transfer, "type">,
+  ): types.pallet_vesting.pallet.Call.vested_transfer {
     return { type: "vested_transfer", ...value }
   }
   /**
@@ -218,8 +218,8 @@ export namespace Call {
    * # </weight>
    */
   export function force_vested_transfer(
-    value: Omit<t.types.pallet_vesting.pallet.Call.force_vested_transfer, "type">,
-  ): t.types.pallet_vesting.pallet.Call.force_vested_transfer {
+    value: Omit<types.pallet_vesting.pallet.Call.force_vested_transfer, "type">,
+  ): types.pallet_vesting.pallet.Call.force_vested_transfer {
     return { type: "force_vested_transfer", ...value }
   }
   /**
@@ -246,8 +246,8 @@ export namespace Call {
    * - `schedule2_index`: index of the second schedule to merge.
    */
   export function merge_schedules(
-    value: Omit<t.types.pallet_vesting.pallet.Call.merge_schedules, "type">,
-  ): t.types.pallet_vesting.pallet.Call.merge_schedules {
+    value: Omit<types.pallet_vesting.pallet.Call.merge_schedules, "type">,
+  ): types.pallet_vesting.pallet.Call.merge_schedules {
     return { type: "merge_schedules", ...value }
   }
 }
@@ -262,8 +262,8 @@ export type Error =
 
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
 export type Event =
-  | t.types.pallet_vesting.pallet.Event.VestingUpdated
-  | t.types.pallet_vesting.pallet.Event.VestingCompleted
+  | types.pallet_vesting.pallet.Event.VestingUpdated
+  | types.pallet_vesting.pallet.Event.VestingCompleted
 export namespace Event {
   /**
    * The amount vested has been updated. This could indicate a change in funds available.
@@ -271,27 +271,27 @@ export namespace Event {
    */
   export interface VestingUpdated {
     type: "VestingUpdated"
-    account: t.types.sp_core.crypto.AccountId32
-    unvested: t.types.u128
+    account: types.sp_core.crypto.AccountId32
+    unvested: types.u128
   }
   /** An \[account\] has become fully vested. */
   export interface VestingCompleted {
     type: "VestingCompleted"
-    account: t.types.sp_core.crypto.AccountId32
+    account: types.sp_core.crypto.AccountId32
   }
   /**
    * The amount vested has been updated. This could indicate a change in funds available.
    * The balance given is the amount which is left unvested (and thus locked).
    */
   export function VestingUpdated(
-    value: Omit<t.types.pallet_vesting.pallet.Event.VestingUpdated, "type">,
-  ): t.types.pallet_vesting.pallet.Event.VestingUpdated {
+    value: Omit<types.pallet_vesting.pallet.Event.VestingUpdated, "type">,
+  ): types.pallet_vesting.pallet.Event.VestingUpdated {
     return { type: "VestingUpdated", ...value }
   }
   /** An \[account\] has become fully vested. */
   export function VestingCompleted(
-    value: Omit<t.types.pallet_vesting.pallet.Event.VestingCompleted, "type">,
-  ): t.types.pallet_vesting.pallet.Event.VestingCompleted {
+    value: Omit<types.pallet_vesting.pallet.Event.VestingCompleted, "type">,
+  ): types.pallet_vesting.pallet.Event.VestingCompleted {
     return { type: "VestingCompleted", ...value }
   }
 }

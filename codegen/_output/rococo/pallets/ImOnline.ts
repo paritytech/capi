@@ -1,5 +1,5 @@
 import * as _codec from "../codecs.ts"
-import type * as t from "../mod.ts"
+import type * as types from "../types/mod.ts"
 
 /**
  *  For each session index, we keep a mapping of `ValidatorId<T>` to the
@@ -61,7 +61,7 @@ export const ReceivedHeartbeats = {
  * # </weight>
  */
 export function heartbeat(
-  value: Omit<t.types.pallet_im_online.pallet.Call.heartbeat, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_im_online.pallet.Call.heartbeat, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "ImOnline", value: { ...value, type: "heartbeat" } }
 }

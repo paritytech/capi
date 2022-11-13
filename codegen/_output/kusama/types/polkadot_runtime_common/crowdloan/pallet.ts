@@ -1,24 +1,24 @@
 import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as t from "../../../mod.ts"
+import type * as types from "../../../types/mod.ts"
 
-export const $call: $.Codec<t.types.polkadot_runtime_common.crowdloan.pallet.Call> = _codec.$415
+export const $call: $.Codec<types.polkadot_runtime_common.crowdloan.pallet.Call> = _codec.$415
 
-export const $error: $.Codec<t.types.polkadot_runtime_common.crowdloan.pallet.Error> = _codec.$712
+export const $error: $.Codec<types.polkadot_runtime_common.crowdloan.pallet.Error> = _codec.$712
 
-export const $event: $.Codec<t.types.polkadot_runtime_common.crowdloan.pallet.Event> = _codec.$120
+export const $event: $.Codec<types.polkadot_runtime_common.crowdloan.pallet.Event> = _codec.$120
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 export type Call =
-  | t.types.polkadot_runtime_common.crowdloan.pallet.Call.create
-  | t.types.polkadot_runtime_common.crowdloan.pallet.Call.contribute
-  | t.types.polkadot_runtime_common.crowdloan.pallet.Call.withdraw
-  | t.types.polkadot_runtime_common.crowdloan.pallet.Call.refund
-  | t.types.polkadot_runtime_common.crowdloan.pallet.Call.dissolve
-  | t.types.polkadot_runtime_common.crowdloan.pallet.Call.edit
-  | t.types.polkadot_runtime_common.crowdloan.pallet.Call.add_memo
-  | t.types.polkadot_runtime_common.crowdloan.pallet.Call.poke
-  | t.types.polkadot_runtime_common.crowdloan.pallet.Call.contribute_all
+  | types.polkadot_runtime_common.crowdloan.pallet.Call.create
+  | types.polkadot_runtime_common.crowdloan.pallet.Call.contribute
+  | types.polkadot_runtime_common.crowdloan.pallet.Call.withdraw
+  | types.polkadot_runtime_common.crowdloan.pallet.Call.refund
+  | types.polkadot_runtime_common.crowdloan.pallet.Call.dissolve
+  | types.polkadot_runtime_common.crowdloan.pallet.Call.edit
+  | types.polkadot_runtime_common.crowdloan.pallet.Call.add_memo
+  | types.polkadot_runtime_common.crowdloan.pallet.Call.poke
+  | types.polkadot_runtime_common.crowdloan.pallet.Call.contribute_all
 export namespace Call {
   /**
    * Create a new crowdloaning campaign for a parachain slot with the given lease period range.
@@ -28,12 +28,12 @@ export namespace Call {
    */
   export interface create {
     type: "create"
-    index: t.Compact<t.types.polkadot_parachain.primitives.Id>
-    cap: t.Compact<t.types.u128>
-    first_period: t.Compact<t.types.u32>
-    last_period: t.Compact<t.types.u32>
-    end: t.Compact<t.types.u32>
-    verifier: t.types.sp_runtime.MultiSigner | undefined
+    index: types.Compact<types.polkadot_parachain.primitives.Id>
+    cap: types.Compact<types.u128>
+    first_period: types.Compact<types.u32>
+    last_period: types.Compact<types.u32>
+    end: types.Compact<types.u32>
+    verifier: types.sp_runtime.MultiSigner | undefined
   }
   /**
    * Contribute to a crowd sale. This will transfer some balance over to fund a parachain
@@ -41,9 +41,9 @@ export namespace Call {
    */
   export interface contribute {
     type: "contribute"
-    index: t.Compact<t.types.polkadot_parachain.primitives.Id>
-    value: t.Compact<t.types.u128>
-    signature: t.types.sp_runtime.MultiSignature | undefined
+    index: types.Compact<types.polkadot_parachain.primitives.Id>
+    value: types.Compact<types.u128>
+    signature: types.sp_runtime.MultiSignature | undefined
   }
   /**
    * Withdraw full balance of a specific contributor.
@@ -66,8 +66,8 @@ export namespace Call {
    */
   export interface withdraw {
     type: "withdraw"
-    who: t.types.sp_core.crypto.AccountId32
-    index: t.Compact<t.types.polkadot_parachain.primitives.Id>
+    who: types.sp_core.crypto.AccountId32
+    index: types.Compact<types.polkadot_parachain.primitives.Id>
   }
   /**
    * Automatically refund contributors of an ended crowdloan.
@@ -78,12 +78,12 @@ export namespace Call {
    */
   export interface refund {
     type: "refund"
-    index: t.Compact<t.types.polkadot_parachain.primitives.Id>
+    index: types.Compact<types.polkadot_parachain.primitives.Id>
   }
   /** Remove a fund after the retirement period has ended and all funds have been returned. */
   export interface dissolve {
     type: "dissolve"
-    index: t.Compact<t.types.polkadot_parachain.primitives.Id>
+    index: types.Compact<types.polkadot_parachain.primitives.Id>
   }
   /**
    * Edit the configuration for an in-progress crowdloan.
@@ -92,12 +92,12 @@ export namespace Call {
    */
   export interface edit {
     type: "edit"
-    index: t.Compact<t.types.polkadot_parachain.primitives.Id>
-    cap: t.Compact<t.types.u128>
-    first_period: t.Compact<t.types.u32>
-    last_period: t.Compact<t.types.u32>
-    end: t.Compact<t.types.u32>
-    verifier: t.types.sp_runtime.MultiSigner | undefined
+    index: types.Compact<types.polkadot_parachain.primitives.Id>
+    cap: types.Compact<types.u128>
+    first_period: types.Compact<types.u32>
+    last_period: types.Compact<types.u32>
+    end: types.Compact<types.u32>
+    verifier: types.sp_runtime.MultiSigner | undefined
   }
   /**
    * Add an optional memo to an existing crowdloan contribution.
@@ -106,7 +106,7 @@ export namespace Call {
    */
   export interface add_memo {
     type: "add_memo"
-    index: t.types.polkadot_parachain.primitives.Id
+    index: types.polkadot_parachain.primitives.Id
     memo: Uint8Array
   }
   /**
@@ -116,7 +116,7 @@ export namespace Call {
    */
   export interface poke {
     type: "poke"
-    index: t.types.polkadot_parachain.primitives.Id
+    index: types.polkadot_parachain.primitives.Id
   }
   /**
    * Contribute your entire balance to a crowd sale. This will transfer the entire balance of a user over to fund a parachain
@@ -124,8 +124,8 @@ export namespace Call {
    */
   export interface contribute_all {
     type: "contribute_all"
-    index: t.Compact<t.types.polkadot_parachain.primitives.Id>
-    signature: t.types.sp_runtime.MultiSignature | undefined
+    index: types.Compact<types.polkadot_parachain.primitives.Id>
+    signature: types.sp_runtime.MultiSignature | undefined
   }
   /**
    * Create a new crowdloaning campaign for a parachain slot with the given lease period range.
@@ -134,8 +134,8 @@ export namespace Call {
    * by the parachain manager.
    */
   export function create(
-    value: Omit<t.types.polkadot_runtime_common.crowdloan.pallet.Call.create, "type">,
-  ): t.types.polkadot_runtime_common.crowdloan.pallet.Call.create {
+    value: Omit<types.polkadot_runtime_common.crowdloan.pallet.Call.create, "type">,
+  ): types.polkadot_runtime_common.crowdloan.pallet.Call.create {
     return { type: "create", ...value }
   }
   /**
@@ -143,8 +143,8 @@ export namespace Call {
    * slot. It will be withdrawable when the crowdloan has ended and the funds are unused.
    */
   export function contribute(
-    value: Omit<t.types.polkadot_runtime_common.crowdloan.pallet.Call.contribute, "type">,
-  ): t.types.polkadot_runtime_common.crowdloan.pallet.Call.contribute {
+    value: Omit<types.polkadot_runtime_common.crowdloan.pallet.Call.contribute, "type">,
+  ): types.polkadot_runtime_common.crowdloan.pallet.Call.contribute {
     return { type: "contribute", ...value }
   }
   /**
@@ -167,8 +167,8 @@ export namespace Call {
    * - `index`: The parachain to whose crowdloan the contribution was made.
    */
   export function withdraw(
-    value: Omit<t.types.polkadot_runtime_common.crowdloan.pallet.Call.withdraw, "type">,
-  ): t.types.polkadot_runtime_common.crowdloan.pallet.Call.withdraw {
+    value: Omit<types.polkadot_runtime_common.crowdloan.pallet.Call.withdraw, "type">,
+  ): types.polkadot_runtime_common.crowdloan.pallet.Call.withdraw {
     return { type: "withdraw", ...value }
   }
   /**
@@ -179,14 +179,14 @@ export namespace Call {
    * Origin must be signed, but can come from anyone.
    */
   export function refund(
-    value: Omit<t.types.polkadot_runtime_common.crowdloan.pallet.Call.refund, "type">,
-  ): t.types.polkadot_runtime_common.crowdloan.pallet.Call.refund {
+    value: Omit<types.polkadot_runtime_common.crowdloan.pallet.Call.refund, "type">,
+  ): types.polkadot_runtime_common.crowdloan.pallet.Call.refund {
     return { type: "refund", ...value }
   }
   /** Remove a fund after the retirement period has ended and all funds have been returned. */
   export function dissolve(
-    value: Omit<t.types.polkadot_runtime_common.crowdloan.pallet.Call.dissolve, "type">,
-  ): t.types.polkadot_runtime_common.crowdloan.pallet.Call.dissolve {
+    value: Omit<types.polkadot_runtime_common.crowdloan.pallet.Call.dissolve, "type">,
+  ): types.polkadot_runtime_common.crowdloan.pallet.Call.dissolve {
     return { type: "dissolve", ...value }
   }
   /**
@@ -195,8 +195,8 @@ export namespace Call {
    * Can only be called by Root origin.
    */
   export function edit(
-    value: Omit<t.types.polkadot_runtime_common.crowdloan.pallet.Call.edit, "type">,
-  ): t.types.polkadot_runtime_common.crowdloan.pallet.Call.edit {
+    value: Omit<types.polkadot_runtime_common.crowdloan.pallet.Call.edit, "type">,
+  ): types.polkadot_runtime_common.crowdloan.pallet.Call.edit {
     return { type: "edit", ...value }
   }
   /**
@@ -205,8 +205,8 @@ export namespace Call {
    * Origin must be Signed, and the user must have contributed to the crowdloan.
    */
   export function add_memo(
-    value: Omit<t.types.polkadot_runtime_common.crowdloan.pallet.Call.add_memo, "type">,
-  ): t.types.polkadot_runtime_common.crowdloan.pallet.Call.add_memo {
+    value: Omit<types.polkadot_runtime_common.crowdloan.pallet.Call.add_memo, "type">,
+  ): types.polkadot_runtime_common.crowdloan.pallet.Call.add_memo {
     return { type: "add_memo", ...value }
   }
   /**
@@ -215,8 +215,8 @@ export namespace Call {
    * Origin must be Signed, and the fund has non-zero raise.
    */
   export function poke(
-    value: Omit<t.types.polkadot_runtime_common.crowdloan.pallet.Call.poke, "type">,
-  ): t.types.polkadot_runtime_common.crowdloan.pallet.Call.poke {
+    value: Omit<types.polkadot_runtime_common.crowdloan.pallet.Call.poke, "type">,
+  ): types.polkadot_runtime_common.crowdloan.pallet.Call.poke {
     return { type: "poke", ...value }
   }
   /**
@@ -224,8 +224,8 @@ export namespace Call {
    * slot. It will be withdrawable when the crowdloan has ended and the funds are unused.
    */
   export function contribute_all(
-    value: Omit<t.types.polkadot_runtime_common.crowdloan.pallet.Call.contribute_all, "type">,
-  ): t.types.polkadot_runtime_common.crowdloan.pallet.Call.contribute_all {
+    value: Omit<types.polkadot_runtime_common.crowdloan.pallet.Call.contribute_all, "type">,
+  ): types.polkadot_runtime_common.crowdloan.pallet.Call.contribute_all {
     return { type: "contribute_all", ...value }
   }
 }
@@ -258,35 +258,35 @@ export type Error =
 
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
 export type Event =
-  | t.types.polkadot_runtime_common.crowdloan.pallet.Event.Created
-  | t.types.polkadot_runtime_common.crowdloan.pallet.Event.Contributed
-  | t.types.polkadot_runtime_common.crowdloan.pallet.Event.Withdrew
-  | t.types.polkadot_runtime_common.crowdloan.pallet.Event.PartiallyRefunded
-  | t.types.polkadot_runtime_common.crowdloan.pallet.Event.AllRefunded
-  | t.types.polkadot_runtime_common.crowdloan.pallet.Event.Dissolved
-  | t.types.polkadot_runtime_common.crowdloan.pallet.Event.HandleBidResult
-  | t.types.polkadot_runtime_common.crowdloan.pallet.Event.Edited
-  | t.types.polkadot_runtime_common.crowdloan.pallet.Event.MemoUpdated
-  | t.types.polkadot_runtime_common.crowdloan.pallet.Event.AddedToNewRaise
+  | types.polkadot_runtime_common.crowdloan.pallet.Event.Created
+  | types.polkadot_runtime_common.crowdloan.pallet.Event.Contributed
+  | types.polkadot_runtime_common.crowdloan.pallet.Event.Withdrew
+  | types.polkadot_runtime_common.crowdloan.pallet.Event.PartiallyRefunded
+  | types.polkadot_runtime_common.crowdloan.pallet.Event.AllRefunded
+  | types.polkadot_runtime_common.crowdloan.pallet.Event.Dissolved
+  | types.polkadot_runtime_common.crowdloan.pallet.Event.HandleBidResult
+  | types.polkadot_runtime_common.crowdloan.pallet.Event.Edited
+  | types.polkadot_runtime_common.crowdloan.pallet.Event.MemoUpdated
+  | types.polkadot_runtime_common.crowdloan.pallet.Event.AddedToNewRaise
 export namespace Event {
   /** Create a new crowdloaning campaign. */
   export interface Created {
     type: "Created"
-    para_id: t.types.polkadot_parachain.primitives.Id
+    para_id: types.polkadot_parachain.primitives.Id
   }
   /** Contributed to a crowd sale. */
   export interface Contributed {
     type: "Contributed"
-    who: t.types.sp_core.crypto.AccountId32
-    fund_index: t.types.polkadot_parachain.primitives.Id
-    amount: t.types.u128
+    who: types.sp_core.crypto.AccountId32
+    fund_index: types.polkadot_parachain.primitives.Id
+    amount: types.u128
   }
   /** Withdrew full balance of a contributor. */
   export interface Withdrew {
     type: "Withdrew"
-    who: t.types.sp_core.crypto.AccountId32
-    fund_index: t.types.polkadot_parachain.primitives.Id
-    amount: t.types.u128
+    who: types.sp_core.crypto.AccountId32
+    fund_index: types.polkadot_parachain.primitives.Id
+    amount: types.u128
   }
   /**
    * The loans in a fund have been partially dissolved, i.e. there are some left
@@ -294,57 +294,57 @@ export namespace Event {
    */
   export interface PartiallyRefunded {
     type: "PartiallyRefunded"
-    para_id: t.types.polkadot_parachain.primitives.Id
+    para_id: types.polkadot_parachain.primitives.Id
   }
   /** All loans in a fund have been refunded. */
   export interface AllRefunded {
     type: "AllRefunded"
-    para_id: t.types.polkadot_parachain.primitives.Id
+    para_id: types.polkadot_parachain.primitives.Id
   }
   /** Fund is dissolved. */
   export interface Dissolved {
     type: "Dissolved"
-    para_id: t.types.polkadot_parachain.primitives.Id
+    para_id: types.polkadot_parachain.primitives.Id
   }
   /** The result of trying to submit a new bid to the Slots pallet. */
   export interface HandleBidResult {
     type: "HandleBidResult"
-    para_id: t.types.polkadot_parachain.primitives.Id
-    result: null | C.ChainError<t.types.sp_runtime.DispatchError>
+    para_id: types.polkadot_parachain.primitives.Id
+    result: null | C.ChainError<types.sp_runtime.DispatchError>
   }
   /** The configuration to a crowdloan has been edited. */
   export interface Edited {
     type: "Edited"
-    para_id: t.types.polkadot_parachain.primitives.Id
+    para_id: types.polkadot_parachain.primitives.Id
   }
   /** A memo has been updated. */
   export interface MemoUpdated {
     type: "MemoUpdated"
-    who: t.types.sp_core.crypto.AccountId32
-    para_id: t.types.polkadot_parachain.primitives.Id
+    who: types.sp_core.crypto.AccountId32
+    para_id: types.polkadot_parachain.primitives.Id
     memo: Uint8Array
   }
   /** A parachain has been moved to `NewRaise` */
   export interface AddedToNewRaise {
     type: "AddedToNewRaise"
-    para_id: t.types.polkadot_parachain.primitives.Id
+    para_id: types.polkadot_parachain.primitives.Id
   }
   /** Create a new crowdloaning campaign. */
   export function Created(
-    value: Omit<t.types.polkadot_runtime_common.crowdloan.pallet.Event.Created, "type">,
-  ): t.types.polkadot_runtime_common.crowdloan.pallet.Event.Created {
+    value: Omit<types.polkadot_runtime_common.crowdloan.pallet.Event.Created, "type">,
+  ): types.polkadot_runtime_common.crowdloan.pallet.Event.Created {
     return { type: "Created", ...value }
   }
   /** Contributed to a crowd sale. */
   export function Contributed(
-    value: Omit<t.types.polkadot_runtime_common.crowdloan.pallet.Event.Contributed, "type">,
-  ): t.types.polkadot_runtime_common.crowdloan.pallet.Event.Contributed {
+    value: Omit<types.polkadot_runtime_common.crowdloan.pallet.Event.Contributed, "type">,
+  ): types.polkadot_runtime_common.crowdloan.pallet.Event.Contributed {
     return { type: "Contributed", ...value }
   }
   /** Withdrew full balance of a contributor. */
   export function Withdrew(
-    value: Omit<t.types.polkadot_runtime_common.crowdloan.pallet.Event.Withdrew, "type">,
-  ): t.types.polkadot_runtime_common.crowdloan.pallet.Event.Withdrew {
+    value: Omit<types.polkadot_runtime_common.crowdloan.pallet.Event.Withdrew, "type">,
+  ): types.polkadot_runtime_common.crowdloan.pallet.Event.Withdrew {
     return { type: "Withdrew", ...value }
   }
   /**
@@ -352,44 +352,44 @@ export namespace Event {
    * over child keys that still need to be killed.
    */
   export function PartiallyRefunded(
-    value: Omit<t.types.polkadot_runtime_common.crowdloan.pallet.Event.PartiallyRefunded, "type">,
-  ): t.types.polkadot_runtime_common.crowdloan.pallet.Event.PartiallyRefunded {
+    value: Omit<types.polkadot_runtime_common.crowdloan.pallet.Event.PartiallyRefunded, "type">,
+  ): types.polkadot_runtime_common.crowdloan.pallet.Event.PartiallyRefunded {
     return { type: "PartiallyRefunded", ...value }
   }
   /** All loans in a fund have been refunded. */
   export function AllRefunded(
-    value: Omit<t.types.polkadot_runtime_common.crowdloan.pallet.Event.AllRefunded, "type">,
-  ): t.types.polkadot_runtime_common.crowdloan.pallet.Event.AllRefunded {
+    value: Omit<types.polkadot_runtime_common.crowdloan.pallet.Event.AllRefunded, "type">,
+  ): types.polkadot_runtime_common.crowdloan.pallet.Event.AllRefunded {
     return { type: "AllRefunded", ...value }
   }
   /** Fund is dissolved. */
   export function Dissolved(
-    value: Omit<t.types.polkadot_runtime_common.crowdloan.pallet.Event.Dissolved, "type">,
-  ): t.types.polkadot_runtime_common.crowdloan.pallet.Event.Dissolved {
+    value: Omit<types.polkadot_runtime_common.crowdloan.pallet.Event.Dissolved, "type">,
+  ): types.polkadot_runtime_common.crowdloan.pallet.Event.Dissolved {
     return { type: "Dissolved", ...value }
   }
   /** The result of trying to submit a new bid to the Slots pallet. */
   export function HandleBidResult(
-    value: Omit<t.types.polkadot_runtime_common.crowdloan.pallet.Event.HandleBidResult, "type">,
-  ): t.types.polkadot_runtime_common.crowdloan.pallet.Event.HandleBidResult {
+    value: Omit<types.polkadot_runtime_common.crowdloan.pallet.Event.HandleBidResult, "type">,
+  ): types.polkadot_runtime_common.crowdloan.pallet.Event.HandleBidResult {
     return { type: "HandleBidResult", ...value }
   }
   /** The configuration to a crowdloan has been edited. */
   export function Edited(
-    value: Omit<t.types.polkadot_runtime_common.crowdloan.pallet.Event.Edited, "type">,
-  ): t.types.polkadot_runtime_common.crowdloan.pallet.Event.Edited {
+    value: Omit<types.polkadot_runtime_common.crowdloan.pallet.Event.Edited, "type">,
+  ): types.polkadot_runtime_common.crowdloan.pallet.Event.Edited {
     return { type: "Edited", ...value }
   }
   /** A memo has been updated. */
   export function MemoUpdated(
-    value: Omit<t.types.polkadot_runtime_common.crowdloan.pallet.Event.MemoUpdated, "type">,
-  ): t.types.polkadot_runtime_common.crowdloan.pallet.Event.MemoUpdated {
+    value: Omit<types.polkadot_runtime_common.crowdloan.pallet.Event.MemoUpdated, "type">,
+  ): types.polkadot_runtime_common.crowdloan.pallet.Event.MemoUpdated {
     return { type: "MemoUpdated", ...value }
   }
   /** A parachain has been moved to `NewRaise` */
   export function AddedToNewRaise(
-    value: Omit<t.types.polkadot_runtime_common.crowdloan.pallet.Event.AddedToNewRaise, "type">,
-  ): t.types.polkadot_runtime_common.crowdloan.pallet.Event.AddedToNewRaise {
+    value: Omit<types.polkadot_runtime_common.crowdloan.pallet.Event.AddedToNewRaise, "type">,
+  ): types.polkadot_runtime_common.crowdloan.pallet.Event.AddedToNewRaise {
     return { type: "AddedToNewRaise", ...value }
   }
 }

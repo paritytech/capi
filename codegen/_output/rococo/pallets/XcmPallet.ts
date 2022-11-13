@@ -1,6 +1,6 @@
 import { $ } from "../capi.ts"
 import * as _codec from "../codecs.ts"
-import type * as t from "../mod.ts"
+import type * as types from "../types/mod.ts"
 
 /**
  *  The existing asset traps.
@@ -112,8 +112,8 @@ export const VersionNotifyTargets = {
  * to completion; only that *some* of it was executed.
  */
 export function execute(
-  value: Omit<t.types.pallet_xcm.pallet.Call.execute, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_xcm.pallet.Call.execute, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "XcmPallet", value: { ...value, type: "execute" } }
 }
 
@@ -125,8 +125,8 @@ export function execute(
  * - `maybe_xcm_version`: The default XCM encoding version, or `None` to disable.
  */
 export function force_default_xcm_version(
-  value: Omit<t.types.pallet_xcm.pallet.Call.force_default_xcm_version, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_xcm.pallet.Call.force_default_xcm_version, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "XcmPallet", value: { ...value, type: "force_default_xcm_version" } }
 }
 
@@ -137,8 +137,8 @@ export function force_default_xcm_version(
  * - `location`: The location to which we should subscribe for XCM version notifications.
  */
 export function force_subscribe_version_notify(
-  value: Omit<t.types.pallet_xcm.pallet.Call.force_subscribe_version_notify, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_xcm.pallet.Call.force_subscribe_version_notify, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "XcmPallet", value: { ...value, type: "force_subscribe_version_notify" } }
 }
 
@@ -151,8 +151,8 @@ export function force_subscribe_version_notify(
  *   notifications which we no longer desire.
  */
 export function force_unsubscribe_version_notify(
-  value: Omit<t.types.pallet_xcm.pallet.Call.force_unsubscribe_version_notify, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_xcm.pallet.Call.force_unsubscribe_version_notify, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "XcmPallet", value: { ...value, type: "force_unsubscribe_version_notify" } }
 }
 
@@ -165,8 +165,8 @@ export function force_unsubscribe_version_notify(
  * - `xcm_version`: The latest version of XCM that `location` supports.
  */
 export function force_xcm_version(
-  value: Omit<t.types.pallet_xcm.pallet.Call.force_xcm_version, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_xcm.pallet.Call.force_xcm_version, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "XcmPallet", value: { ...value, type: "force_xcm_version" } }
 }
 
@@ -191,8 +191,8 @@ export function force_xcm_version(
  * - `weight_limit`: The remote-side weight limit, if any, for the XCM fee purchase.
  */
 export function limited_reserve_transfer_assets(
-  value: Omit<t.types.pallet_xcm.pallet.Call.limited_reserve_transfer_assets, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_xcm.pallet.Call.limited_reserve_transfer_assets, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "XcmPallet", value: { ...value, type: "limited_reserve_transfer_assets" } }
 }
 
@@ -216,8 +216,8 @@ export function limited_reserve_transfer_assets(
  * - `weight_limit`: The remote-side weight limit, if any, for the XCM fee purchase.
  */
 export function limited_teleport_assets(
-  value: Omit<t.types.pallet_xcm.pallet.Call.limited_teleport_assets, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_xcm.pallet.Call.limited_teleport_assets, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "XcmPallet", value: { ...value, type: "limited_teleport_assets" } }
 }
 
@@ -240,14 +240,14 @@ export function limited_teleport_assets(
  *   fees.
  */
 export function reserve_transfer_assets(
-  value: Omit<t.types.pallet_xcm.pallet.Call.reserve_transfer_assets, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_xcm.pallet.Call.reserve_transfer_assets, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "XcmPallet", value: { ...value, type: "reserve_transfer_assets" } }
 }
 
 export function send(
-  value: Omit<t.types.pallet_xcm.pallet.Call.send, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_xcm.pallet.Call.send, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "XcmPallet", value: { ...value, type: "send" } }
 }
 
@@ -269,7 +269,7 @@ export function send(
  *   fees.
  */
 export function teleport_assets(
-  value: Omit<t.types.pallet_xcm.pallet.Call.teleport_assets, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_xcm.pallet.Call.teleport_assets, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "XcmPallet", value: { ...value, type: "teleport_assets" } }
 }

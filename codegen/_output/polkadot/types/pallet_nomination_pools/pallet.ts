@@ -1,31 +1,31 @@
 import { $ } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as t from "../../mod.ts"
+import type * as types from "../../types/mod.ts"
 
-export const $call: $.Codec<t.types.pallet_nomination_pools.pallet.Call> = _codec.$369
+export const $call: $.Codec<types.pallet_nomination_pools.pallet.Call> = _codec.$369
 
-export const $defensiveError: $.Codec<t.types.pallet_nomination_pools.pallet.DefensiveError> =
+export const $defensiveError: $.Codec<types.pallet_nomination_pools.pallet.DefensiveError> =
   _codec.$633
 
-export const $error: $.Codec<t.types.pallet_nomination_pools.pallet.Error> = _codec.$632
+export const $error: $.Codec<types.pallet_nomination_pools.pallet.Error> = _codec.$632
 
-export const $event: $.Codec<t.types.pallet_nomination_pools.pallet.Event> = _codec.$90
+export const $event: $.Codec<types.pallet_nomination_pools.pallet.Event> = _codec.$90
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 export type Call =
-  | t.types.pallet_nomination_pools.pallet.Call.join
-  | t.types.pallet_nomination_pools.pallet.Call.bond_extra
-  | t.types.pallet_nomination_pools.pallet.Call.claim_payout
-  | t.types.pallet_nomination_pools.pallet.Call.unbond
-  | t.types.pallet_nomination_pools.pallet.Call.pool_withdraw_unbonded
-  | t.types.pallet_nomination_pools.pallet.Call.withdraw_unbonded
-  | t.types.pallet_nomination_pools.pallet.Call.create
-  | t.types.pallet_nomination_pools.pallet.Call.nominate
-  | t.types.pallet_nomination_pools.pallet.Call.set_state
-  | t.types.pallet_nomination_pools.pallet.Call.set_metadata
-  | t.types.pallet_nomination_pools.pallet.Call.set_configs
-  | t.types.pallet_nomination_pools.pallet.Call.update_roles
-  | t.types.pallet_nomination_pools.pallet.Call.chill
+  | types.pallet_nomination_pools.pallet.Call.join
+  | types.pallet_nomination_pools.pallet.Call.bond_extra
+  | types.pallet_nomination_pools.pallet.Call.claim_payout
+  | types.pallet_nomination_pools.pallet.Call.unbond
+  | types.pallet_nomination_pools.pallet.Call.pool_withdraw_unbonded
+  | types.pallet_nomination_pools.pallet.Call.withdraw_unbonded
+  | types.pallet_nomination_pools.pallet.Call.create
+  | types.pallet_nomination_pools.pallet.Call.nominate
+  | types.pallet_nomination_pools.pallet.Call.set_state
+  | types.pallet_nomination_pools.pallet.Call.set_metadata
+  | types.pallet_nomination_pools.pallet.Call.set_configs
+  | types.pallet_nomination_pools.pallet.Call.update_roles
+  | types.pallet_nomination_pools.pallet.Call.chill
 export namespace Call {
   /**
    * Stake funds with a pool. The amount to bond is transferred from the member to the
@@ -41,8 +41,8 @@ export namespace Call {
    */
   export interface join {
     type: "join"
-    amount: t.Compact<t.types.u128>
-    pool_id: t.types.u32
+    amount: types.Compact<types.u128>
+    pool_id: types.u32
   }
   /**
    * Bond `extra` more funds from `origin` into the pool to which they already belong.
@@ -54,7 +54,7 @@ export namespace Call {
    */
   export interface bond_extra {
     type: "bond_extra"
-    extra: t.types.pallet_nomination_pools.BondExtra
+    extra: types.pallet_nomination_pools.BondExtra
   }
   /**
    * A bonded member can use this to claim their payout based on the rewards that the pool
@@ -99,8 +99,8 @@ export namespace Call {
    */
   export interface unbond {
     type: "unbond"
-    member_account: t.types.sp_runtime.multiaddress.MultiAddress
-    unbonding_points: t.Compact<t.types.u128>
+    member_account: types.sp_runtime.multiaddress.MultiAddress
+    unbonding_points: types.Compact<types.u128>
   }
   /**
    * Call `withdraw_unbonded` for the pools account. This call can be made by any account.
@@ -112,8 +112,8 @@ export namespace Call {
    */
   export interface pool_withdraw_unbonded {
     type: "pool_withdraw_unbonded"
-    pool_id: t.types.u32
-    num_slashing_spans: t.types.u32
+    pool_id: types.u32
+    num_slashing_spans: types.u32
   }
   /**
    * Withdraw unbonded funds from `member_account`. If no bonded funds can be unbonded, an
@@ -138,8 +138,8 @@ export namespace Call {
    */
   export interface withdraw_unbonded {
     type: "withdraw_unbonded"
-    member_account: t.types.sp_runtime.multiaddress.MultiAddress
-    num_slashing_spans: t.types.u32
+    member_account: types.sp_runtime.multiaddress.MultiAddress
+    num_slashing_spans: types.u32
   }
   /**
    * Create a new delegation pool.
@@ -162,10 +162,10 @@ export namespace Call {
    */
   export interface create {
     type: "create"
-    amount: t.Compact<t.types.u128>
-    root: t.types.sp_runtime.multiaddress.MultiAddress
-    nominator: t.types.sp_runtime.multiaddress.MultiAddress
-    state_toggler: t.types.sp_runtime.multiaddress.MultiAddress
+    amount: types.Compact<types.u128>
+    root: types.sp_runtime.multiaddress.MultiAddress
+    nominator: types.sp_runtime.multiaddress.MultiAddress
+    state_toggler: types.sp_runtime.multiaddress.MultiAddress
   }
   /**
    * Nominate on behalf of the pool.
@@ -178,8 +178,8 @@ export namespace Call {
    */
   export interface nominate {
     type: "nominate"
-    pool_id: t.types.u32
-    validators: Array<t.types.sp_core.crypto.AccountId32>
+    pool_id: types.u32
+    validators: Array<types.sp_core.crypto.AccountId32>
   }
   /**
    * Set a new state for the pool.
@@ -195,8 +195,8 @@ export namespace Call {
    */
   export interface set_state {
     type: "set_state"
-    pool_id: t.types.u32
-    state: t.types.pallet_nomination_pools.PoolState
+    pool_id: types.u32
+    state: types.pallet_nomination_pools.PoolState
   }
   /**
    * Set a new metadata for the pool.
@@ -206,7 +206,7 @@ export namespace Call {
    */
   export interface set_metadata {
     type: "set_metadata"
-    pool_id: t.types.u32
+    pool_id: types.u32
     metadata: Uint8Array
   }
   /**
@@ -223,11 +223,11 @@ export namespace Call {
    */
   export interface set_configs {
     type: "set_configs"
-    min_join_bond: t.types.pallet_nomination_pools.ConfigOp.$$u128
-    min_create_bond: t.types.pallet_nomination_pools.ConfigOp.$$u128
-    max_pools: t.types.pallet_nomination_pools.ConfigOp.$$u32
-    max_members: t.types.pallet_nomination_pools.ConfigOp.$$u32
-    max_members_per_pool: t.types.pallet_nomination_pools.ConfigOp.$$u32
+    min_join_bond: types.pallet_nomination_pools.ConfigOp.$$u128
+    min_create_bond: types.pallet_nomination_pools.ConfigOp.$$u128
+    max_pools: types.pallet_nomination_pools.ConfigOp.$$u32
+    max_members: types.pallet_nomination_pools.ConfigOp.$$u32
+    max_members_per_pool: types.pallet_nomination_pools.ConfigOp.$$u32
   }
   /**
    * Update the roles of the pool.
@@ -240,10 +240,10 @@ export namespace Call {
    */
   export interface update_roles {
     type: "update_roles"
-    pool_id: t.types.u32
-    new_root: t.types.pallet_nomination_pools.ConfigOp.$$sp_core.crypto.AccountId32
-    new_nominator: t.types.pallet_nomination_pools.ConfigOp.$$sp_core.crypto.AccountId32
-    new_state_toggler: t.types.pallet_nomination_pools.ConfigOp.$$sp_core.crypto.AccountId32
+    pool_id: types.u32
+    new_root: types.pallet_nomination_pools.ConfigOp.$$sp_core.crypto.AccountId32
+    new_nominator: types.pallet_nomination_pools.ConfigOp.$$sp_core.crypto.AccountId32
+    new_state_toggler: types.pallet_nomination_pools.ConfigOp.$$sp_core.crypto.AccountId32
   }
   /**
    * Chill on behalf of the pool.
@@ -256,7 +256,7 @@ export namespace Call {
    */
   export interface chill {
     type: "chill"
-    pool_id: t.types.u32
+    pool_id: types.u32
   }
   /**
    * Stake funds with a pool. The amount to bond is transferred from the member to the
@@ -271,8 +271,8 @@ export namespace Call {
    * * Only a pool with [`PoolState::Open`] can be joined
    */
   export function join(
-    value: Omit<t.types.pallet_nomination_pools.pallet.Call.join, "type">,
-  ): t.types.pallet_nomination_pools.pallet.Call.join {
+    value: Omit<types.pallet_nomination_pools.pallet.Call.join, "type">,
+  ): types.pallet_nomination_pools.pallet.Call.join {
     return { type: "join", ...value }
   }
   /**
@@ -284,8 +284,8 @@ export namespace Call {
    * Bonding extra funds implies an automatic payout of all pending rewards as well.
    */
   export function bond_extra(
-    value: Omit<t.types.pallet_nomination_pools.pallet.Call.bond_extra, "type">,
-  ): t.types.pallet_nomination_pools.pallet.Call.bond_extra {
+    value: Omit<types.pallet_nomination_pools.pallet.Call.bond_extra, "type">,
+  ): types.pallet_nomination_pools.pallet.Call.bond_extra {
     return { type: "bond_extra", ...value }
   }
   /**
@@ -296,7 +296,7 @@ export namespace Call {
    * The member will earn rewards pro rata based on the members stake vs the sum of the
    * members in the pools stake. Rewards do not "expire".
    */
-  export function claim_payout(): t.types.pallet_nomination_pools.pallet.Call.claim_payout {
+  export function claim_payout(): types.pallet_nomination_pools.pallet.Call.claim_payout {
     return { type: "claim_payout" }
   }
   /**
@@ -330,8 +330,8 @@ export namespace Call {
    * `NoMoreChunks` error from the staking system.
    */
   export function unbond(
-    value: Omit<t.types.pallet_nomination_pools.pallet.Call.unbond, "type">,
-  ): t.types.pallet_nomination_pools.pallet.Call.unbond {
+    value: Omit<types.pallet_nomination_pools.pallet.Call.unbond, "type">,
+  ): types.pallet_nomination_pools.pallet.Call.unbond {
     return { type: "unbond", ...value }
   }
   /**
@@ -343,8 +343,8 @@ export namespace Call {
    * they attempt to unbond.
    */
   export function pool_withdraw_unbonded(
-    value: Omit<t.types.pallet_nomination_pools.pallet.Call.pool_withdraw_unbonded, "type">,
-  ): t.types.pallet_nomination_pools.pallet.Call.pool_withdraw_unbonded {
+    value: Omit<types.pallet_nomination_pools.pallet.Call.pool_withdraw_unbonded, "type">,
+  ): types.pallet_nomination_pools.pallet.Call.pool_withdraw_unbonded {
     return { type: "pool_withdraw_unbonded", ...value }
   }
   /**
@@ -369,8 +369,8 @@ export namespace Call {
    * If the target is the depositor, the pool will be destroyed.
    */
   export function withdraw_unbonded(
-    value: Omit<t.types.pallet_nomination_pools.pallet.Call.withdraw_unbonded, "type">,
-  ): t.types.pallet_nomination_pools.pallet.Call.withdraw_unbonded {
+    value: Omit<types.pallet_nomination_pools.pallet.Call.withdraw_unbonded, "type">,
+  ): types.pallet_nomination_pools.pallet.Call.withdraw_unbonded {
     return { type: "withdraw_unbonded", ...value }
   }
   /**
@@ -393,8 +393,8 @@ export namespace Call {
    * needs at have at least `amount + existential_deposit` transferrable.
    */
   export function create(
-    value: Omit<t.types.pallet_nomination_pools.pallet.Call.create, "type">,
-  ): t.types.pallet_nomination_pools.pallet.Call.create {
+    value: Omit<types.pallet_nomination_pools.pallet.Call.create, "type">,
+  ): types.pallet_nomination_pools.pallet.Call.create {
     return { type: "create", ...value }
   }
   /**
@@ -407,8 +407,8 @@ export namespace Call {
    * account.
    */
   export function nominate(
-    value: Omit<t.types.pallet_nomination_pools.pallet.Call.nominate, "type">,
-  ): t.types.pallet_nomination_pools.pallet.Call.nominate {
+    value: Omit<types.pallet_nomination_pools.pallet.Call.nominate, "type">,
+  ): types.pallet_nomination_pools.pallet.Call.nominate {
     return { type: "nominate", ...value }
   }
   /**
@@ -424,8 +424,8 @@ export namespace Call {
    *    then the state of the pool can be permissionlessly changed to `Destroying`.
    */
   export function set_state(
-    value: Omit<t.types.pallet_nomination_pools.pallet.Call.set_state, "type">,
-  ): t.types.pallet_nomination_pools.pallet.Call.set_state {
+    value: Omit<types.pallet_nomination_pools.pallet.Call.set_state, "type">,
+  ): types.pallet_nomination_pools.pallet.Call.set_state {
     return { type: "set_state", ...value }
   }
   /**
@@ -435,8 +435,8 @@ export namespace Call {
    * of the pool.
    */
   export function set_metadata(
-    value: Omit<t.types.pallet_nomination_pools.pallet.Call.set_metadata, "type">,
-  ): t.types.pallet_nomination_pools.pallet.Call.set_metadata {
+    value: Omit<types.pallet_nomination_pools.pallet.Call.set_metadata, "type">,
+  ): types.pallet_nomination_pools.pallet.Call.set_metadata {
     return { type: "set_metadata", ...value }
   }
   /**
@@ -452,8 +452,8 @@ export namespace Call {
    * * `max_members_per_pool` - Set [`MaxPoolMembersPerPool`].
    */
   export function set_configs(
-    value: Omit<t.types.pallet_nomination_pools.pallet.Call.set_configs, "type">,
-  ): t.types.pallet_nomination_pools.pallet.Call.set_configs {
+    value: Omit<types.pallet_nomination_pools.pallet.Call.set_configs, "type">,
+  ): types.pallet_nomination_pools.pallet.Call.set_configs {
     return { type: "set_configs", ...value }
   }
   /**
@@ -466,8 +466,8 @@ export namespace Call {
    * most pool members and they should be informed of changes to pool roles.
    */
   export function update_roles(
-    value: Omit<t.types.pallet_nomination_pools.pallet.Call.update_roles, "type">,
-  ): t.types.pallet_nomination_pools.pallet.Call.update_roles {
+    value: Omit<types.pallet_nomination_pools.pallet.Call.update_roles, "type">,
+  ): types.pallet_nomination_pools.pallet.Call.update_roles {
     return { type: "update_roles", ...value }
   }
   /**
@@ -480,8 +480,8 @@ export namespace Call {
    * account.
    */
   export function chill(
-    value: Omit<t.types.pallet_nomination_pools.pallet.Call.chill, "type">,
-  ): t.types.pallet_nomination_pools.pallet.Call.chill {
+    value: Omit<types.pallet_nomination_pools.pallet.Call.chill, "type">,
+  ): types.pallet_nomination_pools.pallet.Call.chill {
     return { type: "chill", ...value }
   }
 }
@@ -495,27 +495,27 @@ export type DefensiveError =
 
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
 export type Error =
-  | t.types.pallet_nomination_pools.pallet.Error.PoolNotFound
-  | t.types.pallet_nomination_pools.pallet.Error.PoolMemberNotFound
-  | t.types.pallet_nomination_pools.pallet.Error.RewardPoolNotFound
-  | t.types.pallet_nomination_pools.pallet.Error.SubPoolsNotFound
-  | t.types.pallet_nomination_pools.pallet.Error.AccountBelongsToOtherPool
-  | t.types.pallet_nomination_pools.pallet.Error.FullyUnbonding
-  | t.types.pallet_nomination_pools.pallet.Error.MaxUnbondingLimit
-  | t.types.pallet_nomination_pools.pallet.Error.CannotWithdrawAny
-  | t.types.pallet_nomination_pools.pallet.Error.MinimumBondNotMet
-  | t.types.pallet_nomination_pools.pallet.Error.OverflowRisk
-  | t.types.pallet_nomination_pools.pallet.Error.NotDestroying
-  | t.types.pallet_nomination_pools.pallet.Error.NotNominator
-  | t.types.pallet_nomination_pools.pallet.Error.NotKickerOrDestroying
-  | t.types.pallet_nomination_pools.pallet.Error.NotOpen
-  | t.types.pallet_nomination_pools.pallet.Error.MaxPools
-  | t.types.pallet_nomination_pools.pallet.Error.MaxPoolMembers
-  | t.types.pallet_nomination_pools.pallet.Error.CanNotChangeState
-  | t.types.pallet_nomination_pools.pallet.Error.DoesNotHavePermission
-  | t.types.pallet_nomination_pools.pallet.Error.MetadataExceedsMaxLen
-  | t.types.pallet_nomination_pools.pallet.Error.Defensive
-  | t.types.pallet_nomination_pools.pallet.Error.PartialUnbondNotAllowedPermissionlessly
+  | types.pallet_nomination_pools.pallet.Error.PoolNotFound
+  | types.pallet_nomination_pools.pallet.Error.PoolMemberNotFound
+  | types.pallet_nomination_pools.pallet.Error.RewardPoolNotFound
+  | types.pallet_nomination_pools.pallet.Error.SubPoolsNotFound
+  | types.pallet_nomination_pools.pallet.Error.AccountBelongsToOtherPool
+  | types.pallet_nomination_pools.pallet.Error.FullyUnbonding
+  | types.pallet_nomination_pools.pallet.Error.MaxUnbondingLimit
+  | types.pallet_nomination_pools.pallet.Error.CannotWithdrawAny
+  | types.pallet_nomination_pools.pallet.Error.MinimumBondNotMet
+  | types.pallet_nomination_pools.pallet.Error.OverflowRisk
+  | types.pallet_nomination_pools.pallet.Error.NotDestroying
+  | types.pallet_nomination_pools.pallet.Error.NotNominator
+  | types.pallet_nomination_pools.pallet.Error.NotKickerOrDestroying
+  | types.pallet_nomination_pools.pallet.Error.NotOpen
+  | types.pallet_nomination_pools.pallet.Error.MaxPools
+  | types.pallet_nomination_pools.pallet.Error.MaxPoolMembers
+  | types.pallet_nomination_pools.pallet.Error.CanNotChangeState
+  | types.pallet_nomination_pools.pallet.Error.DoesNotHavePermission
+  | types.pallet_nomination_pools.pallet.Error.MetadataExceedsMaxLen
+  | types.pallet_nomination_pools.pallet.Error.Defensive
+  | types.pallet_nomination_pools.pallet.Error.PartialUnbondNotAllowedPermissionlessly
 export namespace Error {
   /** A (bonded) pool id does not exist. */
   export interface PoolNotFound {
@@ -614,48 +614,48 @@ export namespace Error {
    */
   export interface Defensive {
     type: "Defensive"
-    value: t.types.pallet_nomination_pools.pallet.DefensiveError
+    value: types.pallet_nomination_pools.pallet.DefensiveError
   }
   /** Partial unbonding now allowed permissionlessly. */
   export interface PartialUnbondNotAllowedPermissionlessly {
     type: "PartialUnbondNotAllowedPermissionlessly"
   }
   /** A (bonded) pool id does not exist. */
-  export function PoolNotFound(): t.types.pallet_nomination_pools.pallet.Error.PoolNotFound {
+  export function PoolNotFound(): types.pallet_nomination_pools.pallet.Error.PoolNotFound {
     return { type: "PoolNotFound" }
   }
   /** An account is not a member. */
-  export function PoolMemberNotFound(): t.types.pallet_nomination_pools.pallet.Error.PoolMemberNotFound {
+  export function PoolMemberNotFound(): types.pallet_nomination_pools.pallet.Error.PoolMemberNotFound {
     return { type: "PoolMemberNotFound" }
   }
   /** A reward pool does not exist. In all cases this is a system logic error. */
-  export function RewardPoolNotFound(): t.types.pallet_nomination_pools.pallet.Error.RewardPoolNotFound {
+  export function RewardPoolNotFound(): types.pallet_nomination_pools.pallet.Error.RewardPoolNotFound {
     return { type: "RewardPoolNotFound" }
   }
   /** A sub pool does not exist. */
-  export function SubPoolsNotFound(): t.types.pallet_nomination_pools.pallet.Error.SubPoolsNotFound {
+  export function SubPoolsNotFound(): types.pallet_nomination_pools.pallet.Error.SubPoolsNotFound {
     return { type: "SubPoolsNotFound" }
   }
   /**
    * An account is already delegating in another pool. An account may only belong to one
    * pool at a time.
    */
-  export function AccountBelongsToOtherPool(): t.types.pallet_nomination_pools.pallet.Error.AccountBelongsToOtherPool {
+  export function AccountBelongsToOtherPool(): types.pallet_nomination_pools.pallet.Error.AccountBelongsToOtherPool {
     return { type: "AccountBelongsToOtherPool" }
   }
   /**
    * The member is fully unbonded (and thus cannot access the bonded and reward pool
    * anymore to, for example, collect rewards).
    */
-  export function FullyUnbonding(): t.types.pallet_nomination_pools.pallet.Error.FullyUnbonding {
+  export function FullyUnbonding(): types.pallet_nomination_pools.pallet.Error.FullyUnbonding {
     return { type: "FullyUnbonding" }
   }
   /** The member cannot unbond further chunks due to reaching the limit. */
-  export function MaxUnbondingLimit(): t.types.pallet_nomination_pools.pallet.Error.MaxUnbondingLimit {
+  export function MaxUnbondingLimit(): types.pallet_nomination_pools.pallet.Error.MaxUnbondingLimit {
     return { type: "MaxUnbondingLimit" }
   }
   /** None of the funds can be withdrawn yet because the bonding duration has not passed. */
-  export function CannotWithdrawAny(): t.types.pallet_nomination_pools.pallet.Error.CannotWithdrawAny {
+  export function CannotWithdrawAny(): types.pallet_nomination_pools.pallet.Error.CannotWithdrawAny {
     return { type: "CannotWithdrawAny" }
   }
   /**
@@ -665,50 +665,50 @@ export namespace Error {
    * `Pallet::depositor_min_bond`. The caller does not have nominating
    * permissions for the pool. Members can never unbond to a value below `MinJoinBond`.
    */
-  export function MinimumBondNotMet(): t.types.pallet_nomination_pools.pallet.Error.MinimumBondNotMet {
+  export function MinimumBondNotMet(): types.pallet_nomination_pools.pallet.Error.MinimumBondNotMet {
     return { type: "MinimumBondNotMet" }
   }
   /** The transaction could not be executed due to overflow risk for the pool. */
-  export function OverflowRisk(): t.types.pallet_nomination_pools.pallet.Error.OverflowRisk {
+  export function OverflowRisk(): types.pallet_nomination_pools.pallet.Error.OverflowRisk {
     return { type: "OverflowRisk" }
   }
   /**
    * A pool must be in [`PoolState::Destroying`] in order for the depositor to unbond or for
    * other members to be permissionlessly unbonded.
    */
-  export function NotDestroying(): t.types.pallet_nomination_pools.pallet.Error.NotDestroying {
+  export function NotDestroying(): types.pallet_nomination_pools.pallet.Error.NotDestroying {
     return { type: "NotDestroying" }
   }
   /** The caller does not have nominating permissions for the pool. */
-  export function NotNominator(): t.types.pallet_nomination_pools.pallet.Error.NotNominator {
+  export function NotNominator(): types.pallet_nomination_pools.pallet.Error.NotNominator {
     return { type: "NotNominator" }
   }
   /** Either a) the caller cannot make a valid kick or b) the pool is not destroying. */
-  export function NotKickerOrDestroying(): t.types.pallet_nomination_pools.pallet.Error.NotKickerOrDestroying {
+  export function NotKickerOrDestroying(): types.pallet_nomination_pools.pallet.Error.NotKickerOrDestroying {
     return { type: "NotKickerOrDestroying" }
   }
   /** The pool is not open to join */
-  export function NotOpen(): t.types.pallet_nomination_pools.pallet.Error.NotOpen {
+  export function NotOpen(): types.pallet_nomination_pools.pallet.Error.NotOpen {
     return { type: "NotOpen" }
   }
   /** The system is maxed out on pools. */
-  export function MaxPools(): t.types.pallet_nomination_pools.pallet.Error.MaxPools {
+  export function MaxPools(): types.pallet_nomination_pools.pallet.Error.MaxPools {
     return { type: "MaxPools" }
   }
   /** Too many members in the pool or system. */
-  export function MaxPoolMembers(): t.types.pallet_nomination_pools.pallet.Error.MaxPoolMembers {
+  export function MaxPoolMembers(): types.pallet_nomination_pools.pallet.Error.MaxPoolMembers {
     return { type: "MaxPoolMembers" }
   }
   /** The pools state cannot be changed. */
-  export function CanNotChangeState(): t.types.pallet_nomination_pools.pallet.Error.CanNotChangeState {
+  export function CanNotChangeState(): types.pallet_nomination_pools.pallet.Error.CanNotChangeState {
     return { type: "CanNotChangeState" }
   }
   /** The caller does not have adequate permissions. */
-  export function DoesNotHavePermission(): t.types.pallet_nomination_pools.pallet.Error.DoesNotHavePermission {
+  export function DoesNotHavePermission(): types.pallet_nomination_pools.pallet.Error.DoesNotHavePermission {
     return { type: "DoesNotHavePermission" }
   }
   /** Metadata exceeds [`Config::MaxMetadataLen`] */
-  export function MetadataExceedsMaxLen(): t.types.pallet_nomination_pools.pallet.Error.MetadataExceedsMaxLen {
+  export function MetadataExceedsMaxLen(): types.pallet_nomination_pools.pallet.Error.MetadataExceedsMaxLen {
     return { type: "MetadataExceedsMaxLen" }
   }
   /**
@@ -716,50 +716,50 @@ export namespace Error {
    * maintainers.
    */
   export function Defensive(
-    value: t.types.pallet_nomination_pools.pallet.Error.Defensive["value"],
-  ): t.types.pallet_nomination_pools.pallet.Error.Defensive {
+    value: types.pallet_nomination_pools.pallet.Error.Defensive["value"],
+  ): types.pallet_nomination_pools.pallet.Error.Defensive {
     return { type: "Defensive", value }
   }
   /** Partial unbonding now allowed permissionlessly. */
-  export function PartialUnbondNotAllowedPermissionlessly(): t.types.pallet_nomination_pools.pallet.Error.PartialUnbondNotAllowedPermissionlessly {
+  export function PartialUnbondNotAllowedPermissionlessly(): types.pallet_nomination_pools.pallet.Error.PartialUnbondNotAllowedPermissionlessly {
     return { type: "PartialUnbondNotAllowedPermissionlessly" }
   }
 }
 
 /** Events of this pallet. */
 export type Event =
-  | t.types.pallet_nomination_pools.pallet.Event.Created
-  | t.types.pallet_nomination_pools.pallet.Event.Bonded
-  | t.types.pallet_nomination_pools.pallet.Event.PaidOut
-  | t.types.pallet_nomination_pools.pallet.Event.Unbonded
-  | t.types.pallet_nomination_pools.pallet.Event.Withdrawn
-  | t.types.pallet_nomination_pools.pallet.Event.Destroyed
-  | t.types.pallet_nomination_pools.pallet.Event.StateChanged
-  | t.types.pallet_nomination_pools.pallet.Event.MemberRemoved
-  | t.types.pallet_nomination_pools.pallet.Event.RolesUpdated
-  | t.types.pallet_nomination_pools.pallet.Event.PoolSlashed
-  | t.types.pallet_nomination_pools.pallet.Event.UnbondingPoolSlashed
+  | types.pallet_nomination_pools.pallet.Event.Created
+  | types.pallet_nomination_pools.pallet.Event.Bonded
+  | types.pallet_nomination_pools.pallet.Event.PaidOut
+  | types.pallet_nomination_pools.pallet.Event.Unbonded
+  | types.pallet_nomination_pools.pallet.Event.Withdrawn
+  | types.pallet_nomination_pools.pallet.Event.Destroyed
+  | types.pallet_nomination_pools.pallet.Event.StateChanged
+  | types.pallet_nomination_pools.pallet.Event.MemberRemoved
+  | types.pallet_nomination_pools.pallet.Event.RolesUpdated
+  | types.pallet_nomination_pools.pallet.Event.PoolSlashed
+  | types.pallet_nomination_pools.pallet.Event.UnbondingPoolSlashed
 export namespace Event {
   /** A pool has been created. */
   export interface Created {
     type: "Created"
-    depositor: t.types.sp_core.crypto.AccountId32
-    pool_id: t.types.u32
+    depositor: types.sp_core.crypto.AccountId32
+    pool_id: types.u32
   }
   /** A member has became bonded in a pool. */
   export interface Bonded {
     type: "Bonded"
-    member: t.types.sp_core.crypto.AccountId32
-    pool_id: t.types.u32
-    bonded: t.types.u128
+    member: types.sp_core.crypto.AccountId32
+    pool_id: types.u32
+    bonded: types.u128
     joined: boolean
   }
   /** A payout has been made to a member. */
   export interface PaidOut {
     type: "PaidOut"
-    member: t.types.sp_core.crypto.AccountId32
-    pool_id: t.types.u32
-    payout: t.types.u128
+    member: types.sp_core.crypto.AccountId32
+    pool_id: types.u32
+    payout: types.u128
   }
   /**
    * A member has unbonded from their pool.
@@ -776,11 +776,11 @@ export namespace Event {
    */
   export interface Unbonded {
     type: "Unbonded"
-    member: t.types.sp_core.crypto.AccountId32
-    pool_id: t.types.u32
-    balance: t.types.u128
-    points: t.types.u128
-    era: t.types.u32
+    member: types.sp_core.crypto.AccountId32
+    pool_id: types.u32
+    balance: types.u128
+    points: types.u128
+    era: types.u32
   }
   /**
    * A member has withdrawn from their pool.
@@ -792,21 +792,21 @@ export namespace Event {
    */
   export interface Withdrawn {
     type: "Withdrawn"
-    member: t.types.sp_core.crypto.AccountId32
-    pool_id: t.types.u32
-    balance: t.types.u128
-    points: t.types.u128
+    member: types.sp_core.crypto.AccountId32
+    pool_id: types.u32
+    balance: types.u128
+    points: types.u128
   }
   /** A pool has been destroyed. */
   export interface Destroyed {
     type: "Destroyed"
-    pool_id: t.types.u32
+    pool_id: types.u32
   }
   /** The state of a pool has changed */
   export interface StateChanged {
     type: "StateChanged"
-    pool_id: t.types.u32
-    new_state: t.types.pallet_nomination_pools.PoolState
+    pool_id: types.u32
+    new_state: types.pallet_nomination_pools.PoolState
   }
   /**
    * A member has been removed from a pool.
@@ -815,8 +815,8 @@ export namespace Event {
    */
   export interface MemberRemoved {
     type: "MemberRemoved"
-    pool_id: t.types.u32
-    member: t.types.sp_core.crypto.AccountId32
+    pool_id: types.u32
+    member: types.sp_core.crypto.AccountId32
   }
   /**
    * The roles of a pool have been updated to the given new roles. Note that the depositor
@@ -824,39 +824,39 @@ export namespace Event {
    */
   export interface RolesUpdated {
     type: "RolesUpdated"
-    root: t.types.sp_core.crypto.AccountId32 | undefined
-    state_toggler: t.types.sp_core.crypto.AccountId32 | undefined
-    nominator: t.types.sp_core.crypto.AccountId32 | undefined
+    root: types.sp_core.crypto.AccountId32 | undefined
+    state_toggler: types.sp_core.crypto.AccountId32 | undefined
+    nominator: types.sp_core.crypto.AccountId32 | undefined
   }
   /** The active balance of pool `pool_id` has been slashed to `balance`. */
   export interface PoolSlashed {
     type: "PoolSlashed"
-    pool_id: t.types.u32
-    balance: t.types.u128
+    pool_id: types.u32
+    balance: types.u128
   }
   /** The unbond pool at `era` of pool `pool_id` has been slashed to `balance`. */
   export interface UnbondingPoolSlashed {
     type: "UnbondingPoolSlashed"
-    pool_id: t.types.u32
-    era: t.types.u32
-    balance: t.types.u128
+    pool_id: types.u32
+    era: types.u32
+    balance: types.u128
   }
   /** A pool has been created. */
   export function Created(
-    value: Omit<t.types.pallet_nomination_pools.pallet.Event.Created, "type">,
-  ): t.types.pallet_nomination_pools.pallet.Event.Created {
+    value: Omit<types.pallet_nomination_pools.pallet.Event.Created, "type">,
+  ): types.pallet_nomination_pools.pallet.Event.Created {
     return { type: "Created", ...value }
   }
   /** A member has became bonded in a pool. */
   export function Bonded(
-    value: Omit<t.types.pallet_nomination_pools.pallet.Event.Bonded, "type">,
-  ): t.types.pallet_nomination_pools.pallet.Event.Bonded {
+    value: Omit<types.pallet_nomination_pools.pallet.Event.Bonded, "type">,
+  ): types.pallet_nomination_pools.pallet.Event.Bonded {
     return { type: "Bonded", ...value }
   }
   /** A payout has been made to a member. */
   export function PaidOut(
-    value: Omit<t.types.pallet_nomination_pools.pallet.Event.PaidOut, "type">,
-  ): t.types.pallet_nomination_pools.pallet.Event.PaidOut {
+    value: Omit<types.pallet_nomination_pools.pallet.Event.PaidOut, "type">,
+  ): types.pallet_nomination_pools.pallet.Event.PaidOut {
     return { type: "PaidOut", ...value }
   }
   /**
@@ -873,8 +873,8 @@ export namespace Event {
    * requested to be unbonded.
    */
   export function Unbonded(
-    value: Omit<t.types.pallet_nomination_pools.pallet.Event.Unbonded, "type">,
-  ): t.types.pallet_nomination_pools.pallet.Event.Unbonded {
+    value: Omit<types.pallet_nomination_pools.pallet.Event.Unbonded, "type">,
+  ): types.pallet_nomination_pools.pallet.Event.Unbonded {
     return { type: "Unbonded", ...value }
   }
   /**
@@ -886,20 +886,20 @@ export namespace Event {
    * will be 1.
    */
   export function Withdrawn(
-    value: Omit<t.types.pallet_nomination_pools.pallet.Event.Withdrawn, "type">,
-  ): t.types.pallet_nomination_pools.pallet.Event.Withdrawn {
+    value: Omit<types.pallet_nomination_pools.pallet.Event.Withdrawn, "type">,
+  ): types.pallet_nomination_pools.pallet.Event.Withdrawn {
     return { type: "Withdrawn", ...value }
   }
   /** A pool has been destroyed. */
   export function Destroyed(
-    value: Omit<t.types.pallet_nomination_pools.pallet.Event.Destroyed, "type">,
-  ): t.types.pallet_nomination_pools.pallet.Event.Destroyed {
+    value: Omit<types.pallet_nomination_pools.pallet.Event.Destroyed, "type">,
+  ): types.pallet_nomination_pools.pallet.Event.Destroyed {
     return { type: "Destroyed", ...value }
   }
   /** The state of a pool has changed */
   export function StateChanged(
-    value: Omit<t.types.pallet_nomination_pools.pallet.Event.StateChanged, "type">,
-  ): t.types.pallet_nomination_pools.pallet.Event.StateChanged {
+    value: Omit<types.pallet_nomination_pools.pallet.Event.StateChanged, "type">,
+  ): types.pallet_nomination_pools.pallet.Event.StateChanged {
     return { type: "StateChanged", ...value }
   }
   /**
@@ -908,8 +908,8 @@ export namespace Event {
    * The removal can be voluntary (withdrawn all unbonded funds) or involuntary (kicked).
    */
   export function MemberRemoved(
-    value: Omit<t.types.pallet_nomination_pools.pallet.Event.MemberRemoved, "type">,
-  ): t.types.pallet_nomination_pools.pallet.Event.MemberRemoved {
+    value: Omit<types.pallet_nomination_pools.pallet.Event.MemberRemoved, "type">,
+  ): types.pallet_nomination_pools.pallet.Event.MemberRemoved {
     return { type: "MemberRemoved", ...value }
   }
   /**
@@ -917,20 +917,20 @@ export namespace Event {
    * can never change.
    */
   export function RolesUpdated(
-    value: Omit<t.types.pallet_nomination_pools.pallet.Event.RolesUpdated, "type">,
-  ): t.types.pallet_nomination_pools.pallet.Event.RolesUpdated {
+    value: Omit<types.pallet_nomination_pools.pallet.Event.RolesUpdated, "type">,
+  ): types.pallet_nomination_pools.pallet.Event.RolesUpdated {
     return { type: "RolesUpdated", ...value }
   }
   /** The active balance of pool `pool_id` has been slashed to `balance`. */
   export function PoolSlashed(
-    value: Omit<t.types.pallet_nomination_pools.pallet.Event.PoolSlashed, "type">,
-  ): t.types.pallet_nomination_pools.pallet.Event.PoolSlashed {
+    value: Omit<types.pallet_nomination_pools.pallet.Event.PoolSlashed, "type">,
+  ): types.pallet_nomination_pools.pallet.Event.PoolSlashed {
     return { type: "PoolSlashed", ...value }
   }
   /** The unbond pool at `era` of pool `pool_id` has been slashed to `balance`. */
   export function UnbondingPoolSlashed(
-    value: Omit<t.types.pallet_nomination_pools.pallet.Event.UnbondingPoolSlashed, "type">,
-  ): t.types.pallet_nomination_pools.pallet.Event.UnbondingPoolSlashed {
+    value: Omit<types.pallet_nomination_pools.pallet.Event.UnbondingPoolSlashed, "type">,
+  ): types.pallet_nomination_pools.pallet.Event.UnbondingPoolSlashed {
     return { type: "UnbondingPoolSlashed", ...value }
   }
 }

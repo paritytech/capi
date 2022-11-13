@@ -1,20 +1,20 @@
 import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as t from "../../mod.ts"
+import type * as types from "../../types/mod.ts"
 
-export const $call: $.Codec<t.types.pallet_utility.pallet.Call> = _codec.$254
+export const $call: $.Codec<types.pallet_utility.pallet.Call> = _codec.$254
 
-export const $error: $.Codec<t.types.pallet_utility.pallet.Error> = _codec.$567
+export const $error: $.Codec<types.pallet_utility.pallet.Error> = _codec.$567
 
-export const $event: $.Codec<t.types.pallet_utility.pallet.Event> = _codec.$76
+export const $event: $.Codec<types.pallet_utility.pallet.Event> = _codec.$76
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 export type Call =
-  | t.types.pallet_utility.pallet.Call.batch
-  | t.types.pallet_utility.pallet.Call.as_derivative
-  | t.types.pallet_utility.pallet.Call.batch_all
-  | t.types.pallet_utility.pallet.Call.dispatch_as
-  | t.types.pallet_utility.pallet.Call.force_batch
+  | types.pallet_utility.pallet.Call.batch
+  | types.pallet_utility.pallet.Call.as_derivative
+  | types.pallet_utility.pallet.Call.batch_all
+  | types.pallet_utility.pallet.Call.dispatch_as
+  | types.pallet_utility.pallet.Call.force_batch
 export namespace Call {
   /**
    * Send a batch of dispatch calls.
@@ -39,7 +39,7 @@ export namespace Call {
    */
   export interface batch {
     type: "batch"
-    calls: Array<t.types.polkadot_runtime.RuntimeCall>
+    calls: Array<types.polkadot_runtime.RuntimeCall>
   }
   /**
    * Send a call through an indexed pseudonym of the sender.
@@ -58,8 +58,8 @@ export namespace Call {
    */
   export interface as_derivative {
     type: "as_derivative"
-    index: t.types.u16
-    call: t.types.polkadot_runtime.RuntimeCall
+    index: types.u16
+    call: types.polkadot_runtime.RuntimeCall
   }
   /**
    * Send a batch of dispatch calls and atomically execute them.
@@ -79,7 +79,7 @@ export namespace Call {
    */
   export interface batch_all {
     type: "batch_all"
-    calls: Array<t.types.polkadot_runtime.RuntimeCall>
+    calls: Array<types.polkadot_runtime.RuntimeCall>
   }
   /**
    * Dispatches a function call with a provided origin.
@@ -95,8 +95,8 @@ export namespace Call {
    */
   export interface dispatch_as {
     type: "dispatch_as"
-    as_origin: t.types.polkadot_runtime.OriginCaller
-    call: t.types.polkadot_runtime.RuntimeCall
+    as_origin: types.polkadot_runtime.OriginCaller
+    call: types.polkadot_runtime.RuntimeCall
   }
   /**
    * Send a batch of dispatch calls.
@@ -116,7 +116,7 @@ export namespace Call {
    */
   export interface force_batch {
     type: "force_batch"
-    calls: Array<t.types.polkadot_runtime.RuntimeCall>
+    calls: Array<types.polkadot_runtime.RuntimeCall>
   }
   /**
    * Send a batch of dispatch calls.
@@ -140,8 +140,8 @@ export namespace Call {
    * event is deposited.
    */
   export function batch(
-    value: Omit<t.types.pallet_utility.pallet.Call.batch, "type">,
-  ): t.types.pallet_utility.pallet.Call.batch {
+    value: Omit<types.pallet_utility.pallet.Call.batch, "type">,
+  ): types.pallet_utility.pallet.Call.batch {
     return { type: "batch", ...value }
   }
   /**
@@ -160,8 +160,8 @@ export namespace Call {
    * The dispatch origin for this call must be _Signed_.
    */
   export function as_derivative(
-    value: Omit<t.types.pallet_utility.pallet.Call.as_derivative, "type">,
-  ): t.types.pallet_utility.pallet.Call.as_derivative {
+    value: Omit<types.pallet_utility.pallet.Call.as_derivative, "type">,
+  ): types.pallet_utility.pallet.Call.as_derivative {
     return { type: "as_derivative", ...value }
   }
   /**
@@ -181,8 +181,8 @@ export namespace Call {
    * # </weight>
    */
   export function batch_all(
-    value: Omit<t.types.pallet_utility.pallet.Call.batch_all, "type">,
-  ): t.types.pallet_utility.pallet.Call.batch_all {
+    value: Omit<types.pallet_utility.pallet.Call.batch_all, "type">,
+  ): types.pallet_utility.pallet.Call.batch_all {
     return { type: "batch_all", ...value }
   }
   /**
@@ -198,8 +198,8 @@ export namespace Call {
    * # </weight>
    */
   export function dispatch_as(
-    value: Omit<t.types.pallet_utility.pallet.Call.dispatch_as, "type">,
-  ): t.types.pallet_utility.pallet.Call.dispatch_as {
+    value: Omit<types.pallet_utility.pallet.Call.dispatch_as, "type">,
+  ): types.pallet_utility.pallet.Call.dispatch_as {
     return { type: "dispatch_as", ...value }
   }
   /**
@@ -219,8 +219,8 @@ export namespace Call {
    * # </weight>
    */
   export function force_batch(
-    value: Omit<t.types.pallet_utility.pallet.Call.force_batch, "type">,
-  ): t.types.pallet_utility.pallet.Call.force_batch {
+    value: Omit<types.pallet_utility.pallet.Call.force_batch, "type">,
+  ): types.pallet_utility.pallet.Call.force_batch {
     return { type: "force_batch", ...value }
   }
 }
@@ -230,12 +230,12 @@ export type Error = "TooManyCalls"
 
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
 export type Event =
-  | t.types.pallet_utility.pallet.Event.BatchInterrupted
-  | t.types.pallet_utility.pallet.Event.BatchCompleted
-  | t.types.pallet_utility.pallet.Event.BatchCompletedWithErrors
-  | t.types.pallet_utility.pallet.Event.ItemCompleted
-  | t.types.pallet_utility.pallet.Event.ItemFailed
-  | t.types.pallet_utility.pallet.Event.DispatchedAs
+  | types.pallet_utility.pallet.Event.BatchInterrupted
+  | types.pallet_utility.pallet.Event.BatchCompleted
+  | types.pallet_utility.pallet.Event.BatchCompletedWithErrors
+  | types.pallet_utility.pallet.Event.ItemCompleted
+  | types.pallet_utility.pallet.Event.ItemFailed
+  | types.pallet_utility.pallet.Event.DispatchedAs
 export namespace Event {
   /**
    * Batch of dispatches did not complete fully. Index of first failing dispatch given, as
@@ -243,8 +243,8 @@ export namespace Event {
    */
   export interface BatchInterrupted {
     type: "BatchInterrupted"
-    index: t.types.u32
-    error: t.types.sp_runtime.DispatchError
+    index: types.u32
+    error: types.sp_runtime.DispatchError
   }
   /** Batch of dispatches completed fully with no error. */
   export interface BatchCompleted {
@@ -261,44 +261,44 @@ export namespace Event {
   /** A single item within a Batch of dispatches has completed with error. */
   export interface ItemFailed {
     type: "ItemFailed"
-    error: t.types.sp_runtime.DispatchError
+    error: types.sp_runtime.DispatchError
   }
   /** A call was dispatched. */
   export interface DispatchedAs {
     type: "DispatchedAs"
-    result: null | C.ChainError<t.types.sp_runtime.DispatchError>
+    result: null | C.ChainError<types.sp_runtime.DispatchError>
   }
   /**
    * Batch of dispatches did not complete fully. Index of first failing dispatch given, as
    * well as the error.
    */
   export function BatchInterrupted(
-    value: Omit<t.types.pallet_utility.pallet.Event.BatchInterrupted, "type">,
-  ): t.types.pallet_utility.pallet.Event.BatchInterrupted {
+    value: Omit<types.pallet_utility.pallet.Event.BatchInterrupted, "type">,
+  ): types.pallet_utility.pallet.Event.BatchInterrupted {
     return { type: "BatchInterrupted", ...value }
   }
   /** Batch of dispatches completed fully with no error. */
-  export function BatchCompleted(): t.types.pallet_utility.pallet.Event.BatchCompleted {
+  export function BatchCompleted(): types.pallet_utility.pallet.Event.BatchCompleted {
     return { type: "BatchCompleted" }
   }
   /** Batch of dispatches completed but has errors. */
-  export function BatchCompletedWithErrors(): t.types.pallet_utility.pallet.Event.BatchCompletedWithErrors {
+  export function BatchCompletedWithErrors(): types.pallet_utility.pallet.Event.BatchCompletedWithErrors {
     return { type: "BatchCompletedWithErrors" }
   }
   /** A single item within a Batch of dispatches has completed with no error. */
-  export function ItemCompleted(): t.types.pallet_utility.pallet.Event.ItemCompleted {
+  export function ItemCompleted(): types.pallet_utility.pallet.Event.ItemCompleted {
     return { type: "ItemCompleted" }
   }
   /** A single item within a Batch of dispatches has completed with error. */
   export function ItemFailed(
-    value: Omit<t.types.pallet_utility.pallet.Event.ItemFailed, "type">,
-  ): t.types.pallet_utility.pallet.Event.ItemFailed {
+    value: Omit<types.pallet_utility.pallet.Event.ItemFailed, "type">,
+  ): types.pallet_utility.pallet.Event.ItemFailed {
     return { type: "ItemFailed", ...value }
   }
   /** A call was dispatched. */
   export function DispatchedAs(
-    value: Omit<t.types.pallet_utility.pallet.Event.DispatchedAs, "type">,
-  ): t.types.pallet_utility.pallet.Event.DispatchedAs {
+    value: Omit<types.pallet_utility.pallet.Event.DispatchedAs, "type">,
+  ): types.pallet_utility.pallet.Event.DispatchedAs {
     return { type: "DispatchedAs", ...value }
   }
 }

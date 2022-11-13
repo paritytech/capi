@@ -1,30 +1,30 @@
 import { $ } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as t from "../../mod.ts"
+import type * as types from "../../types/mod.ts"
 
-export const $call: $.Codec<t.types.pallet_identity.pallet.Call> = _codec.$263
+export const $call: $.Codec<types.pallet_identity.pallet.Call> = _codec.$263
 
-export const $error: $.Codec<t.types.pallet_identity.pallet.Error> = _codec.$578
+export const $error: $.Codec<types.pallet_identity.pallet.Error> = _codec.$578
 
-export const $event: $.Codec<t.types.pallet_identity.pallet.Event> = _codec.$77
+export const $event: $.Codec<types.pallet_identity.pallet.Event> = _codec.$77
 
 /** Identity pallet declaration. */
 export type Call =
-  | t.types.pallet_identity.pallet.Call.add_registrar
-  | t.types.pallet_identity.pallet.Call.set_identity
-  | t.types.pallet_identity.pallet.Call.set_subs
-  | t.types.pallet_identity.pallet.Call.clear_identity
-  | t.types.pallet_identity.pallet.Call.request_judgement
-  | t.types.pallet_identity.pallet.Call.cancel_request
-  | t.types.pallet_identity.pallet.Call.set_fee
-  | t.types.pallet_identity.pallet.Call.set_account_id
-  | t.types.pallet_identity.pallet.Call.set_fields
-  | t.types.pallet_identity.pallet.Call.provide_judgement
-  | t.types.pallet_identity.pallet.Call.kill_identity
-  | t.types.pallet_identity.pallet.Call.add_sub
-  | t.types.pallet_identity.pallet.Call.rename_sub
-  | t.types.pallet_identity.pallet.Call.remove_sub
-  | t.types.pallet_identity.pallet.Call.quit_sub
+  | types.pallet_identity.pallet.Call.add_registrar
+  | types.pallet_identity.pallet.Call.set_identity
+  | types.pallet_identity.pallet.Call.set_subs
+  | types.pallet_identity.pallet.Call.clear_identity
+  | types.pallet_identity.pallet.Call.request_judgement
+  | types.pallet_identity.pallet.Call.cancel_request
+  | types.pallet_identity.pallet.Call.set_fee
+  | types.pallet_identity.pallet.Call.set_account_id
+  | types.pallet_identity.pallet.Call.set_fields
+  | types.pallet_identity.pallet.Call.provide_judgement
+  | types.pallet_identity.pallet.Call.kill_identity
+  | types.pallet_identity.pallet.Call.add_sub
+  | types.pallet_identity.pallet.Call.rename_sub
+  | types.pallet_identity.pallet.Call.remove_sub
+  | types.pallet_identity.pallet.Call.quit_sub
 export namespace Call {
   /**
    * Add a registrar to the system.
@@ -43,7 +43,7 @@ export namespace Call {
    */
   export interface add_registrar {
     type: "add_registrar"
-    account: t.types.sp_runtime.multiaddress.MultiAddress
+    account: types.sp_runtime.multiaddress.MultiAddress
   }
   /**
    * Set an account's identity information and reserve the appropriate deposit.
@@ -68,7 +68,7 @@ export namespace Call {
    */
   export interface set_identity {
     type: "set_identity"
-    info: t.types.pallet_identity.types.IdentityInfo
+    info: types.pallet_identity.types.IdentityInfo
   }
   /**
    * Set the sub-accounts of the sender.
@@ -95,7 +95,7 @@ export namespace Call {
    */
   export interface set_subs {
     type: "set_subs"
-    subs: Array<[t.types.sp_core.crypto.AccountId32, t.types.pallet_identity.types.Data]>
+    subs: Array<[types.sp_core.crypto.AccountId32, types.pallet_identity.types.Data]>
   }
   /**
    * Clear an account's identity info and all sub-accounts and return all deposits.
@@ -147,8 +147,8 @@ export namespace Call {
    */
   export interface request_judgement {
     type: "request_judgement"
-    reg_index: t.Compact<t.types.u32>
-    max_fee: t.Compact<t.types.u128>
+    reg_index: types.Compact<types.u32>
+    max_fee: types.Compact<types.u128>
   }
   /**
    * Cancel a previous request.
@@ -171,7 +171,7 @@ export namespace Call {
    */
   export interface cancel_request {
     type: "cancel_request"
-    reg_index: t.types.u32
+    reg_index: types.u32
   }
   /**
    * Set the fee required for a judgement to be requested from a registrar.
@@ -190,8 +190,8 @@ export namespace Call {
    */
   export interface set_fee {
     type: "set_fee"
-    index: t.Compact<t.types.u32>
-    fee: t.Compact<t.types.u128>
+    index: types.Compact<types.u32>
+    fee: types.Compact<types.u128>
   }
   /**
    * Change the account associated with a registrar.
@@ -210,8 +210,8 @@ export namespace Call {
    */
   export interface set_account_id {
     type: "set_account_id"
-    index: t.Compact<t.types.u32>
-    new: t.types.sp_runtime.multiaddress.MultiAddress
+    index: types.Compact<types.u32>
+    new: types.sp_runtime.multiaddress.MultiAddress
   }
   /**
    * Set the field information for a registrar.
@@ -230,8 +230,8 @@ export namespace Call {
    */
   export interface set_fields {
     type: "set_fields"
-    index: t.Compact<t.types.u32>
-    fields: t.types.u64
+    index: types.Compact<types.u32>
+    fields: types.u64
   }
   /**
    * Provide a judgement for an account's identity.
@@ -257,10 +257,10 @@ export namespace Call {
    */
   export interface provide_judgement {
     type: "provide_judgement"
-    reg_index: t.Compact<t.types.u32>
-    target: t.types.sp_runtime.multiaddress.MultiAddress
-    judgement: t.types.pallet_identity.types.Judgement
-    identity: t.types.primitive_types.H256
+    reg_index: types.Compact<types.u32>
+    target: types.sp_runtime.multiaddress.MultiAddress
+    judgement: types.pallet_identity.types.Judgement
+    identity: types.primitive_types.H256
   }
   /**
    * Remove an account's identity and sub-account information and slash the deposits.
@@ -285,7 +285,7 @@ export namespace Call {
    */
   export interface kill_identity {
     type: "kill_identity"
-    target: t.types.sp_runtime.multiaddress.MultiAddress
+    target: types.sp_runtime.multiaddress.MultiAddress
   }
   /**
    * Add the given account to the sender's subs.
@@ -298,8 +298,8 @@ export namespace Call {
    */
   export interface add_sub {
     type: "add_sub"
-    sub: t.types.sp_runtime.multiaddress.MultiAddress
-    data: t.types.pallet_identity.types.Data
+    sub: types.sp_runtime.multiaddress.MultiAddress
+    data: types.pallet_identity.types.Data
   }
   /**
    * Alter the associated name of the given sub-account.
@@ -309,8 +309,8 @@ export namespace Call {
    */
   export interface rename_sub {
     type: "rename_sub"
-    sub: t.types.sp_runtime.multiaddress.MultiAddress
-    data: t.types.pallet_identity.types.Data
+    sub: types.sp_runtime.multiaddress.MultiAddress
+    data: types.pallet_identity.types.Data
   }
   /**
    * Remove the given account from the sender's subs.
@@ -323,7 +323,7 @@ export namespace Call {
    */
   export interface remove_sub {
     type: "remove_sub"
-    sub: t.types.sp_runtime.multiaddress.MultiAddress
+    sub: types.sp_runtime.multiaddress.MultiAddress
   }
   /**
    * Remove the sender as a sub-account.
@@ -356,8 +356,8 @@ export namespace Call {
    * # </weight>
    */
   export function add_registrar(
-    value: Omit<t.types.pallet_identity.pallet.Call.add_registrar, "type">,
-  ): t.types.pallet_identity.pallet.Call.add_registrar {
+    value: Omit<types.pallet_identity.pallet.Call.add_registrar, "type">,
+  ): types.pallet_identity.pallet.Call.add_registrar {
     return { type: "add_registrar", ...value }
   }
   /**
@@ -382,8 +382,8 @@ export namespace Call {
    * # </weight>
    */
   export function set_identity(
-    value: Omit<t.types.pallet_identity.pallet.Call.set_identity, "type">,
-  ): t.types.pallet_identity.pallet.Call.set_identity {
+    value: Omit<types.pallet_identity.pallet.Call.set_identity, "type">,
+  ): types.pallet_identity.pallet.Call.set_identity {
     return { type: "set_identity", ...value }
   }
   /**
@@ -410,8 +410,8 @@ export namespace Call {
    * # </weight>
    */
   export function set_subs(
-    value: Omit<t.types.pallet_identity.pallet.Call.set_subs, "type">,
-  ): t.types.pallet_identity.pallet.Call.set_subs {
+    value: Omit<types.pallet_identity.pallet.Call.set_subs, "type">,
+  ): types.pallet_identity.pallet.Call.set_subs {
     return { type: "set_subs", ...value }
   }
   /**
@@ -434,7 +434,7 @@ export namespace Call {
    * - One event.
    * # </weight>
    */
-  export function clear_identity(): t.types.pallet_identity.pallet.Call.clear_identity {
+  export function clear_identity(): types.pallet_identity.pallet.Call.clear_identity {
     return { type: "clear_identity" }
   }
   /**
@@ -463,8 +463,8 @@ export namespace Call {
    * # </weight>
    */
   export function request_judgement(
-    value: Omit<t.types.pallet_identity.pallet.Call.request_judgement, "type">,
-  ): t.types.pallet_identity.pallet.Call.request_judgement {
+    value: Omit<types.pallet_identity.pallet.Call.request_judgement, "type">,
+  ): types.pallet_identity.pallet.Call.request_judgement {
     return { type: "request_judgement", ...value }
   }
   /**
@@ -487,8 +487,8 @@ export namespace Call {
    * # </weight>
    */
   export function cancel_request(
-    value: Omit<t.types.pallet_identity.pallet.Call.cancel_request, "type">,
-  ): t.types.pallet_identity.pallet.Call.cancel_request {
+    value: Omit<types.pallet_identity.pallet.Call.cancel_request, "type">,
+  ): types.pallet_identity.pallet.Call.cancel_request {
     return { type: "cancel_request", ...value }
   }
   /**
@@ -507,8 +507,8 @@ export namespace Call {
    * # </weight>
    */
   export function set_fee(
-    value: Omit<t.types.pallet_identity.pallet.Call.set_fee, "type">,
-  ): t.types.pallet_identity.pallet.Call.set_fee {
+    value: Omit<types.pallet_identity.pallet.Call.set_fee, "type">,
+  ): types.pallet_identity.pallet.Call.set_fee {
     return { type: "set_fee", ...value }
   }
   /**
@@ -527,8 +527,8 @@ export namespace Call {
    * # </weight>
    */
   export function set_account_id(
-    value: Omit<t.types.pallet_identity.pallet.Call.set_account_id, "type">,
-  ): t.types.pallet_identity.pallet.Call.set_account_id {
+    value: Omit<types.pallet_identity.pallet.Call.set_account_id, "type">,
+  ): types.pallet_identity.pallet.Call.set_account_id {
     return { type: "set_account_id", ...value }
   }
   /**
@@ -547,8 +547,8 @@ export namespace Call {
    * # </weight>
    */
   export function set_fields(
-    value: Omit<t.types.pallet_identity.pallet.Call.set_fields, "type">,
-  ): t.types.pallet_identity.pallet.Call.set_fields {
+    value: Omit<types.pallet_identity.pallet.Call.set_fields, "type">,
+  ): types.pallet_identity.pallet.Call.set_fields {
     return { type: "set_fields", ...value }
   }
   /**
@@ -574,8 +574,8 @@ export namespace Call {
    * # </weight>
    */
   export function provide_judgement(
-    value: Omit<t.types.pallet_identity.pallet.Call.provide_judgement, "type">,
-  ): t.types.pallet_identity.pallet.Call.provide_judgement {
+    value: Omit<types.pallet_identity.pallet.Call.provide_judgement, "type">,
+  ): types.pallet_identity.pallet.Call.provide_judgement {
     return { type: "provide_judgement", ...value }
   }
   /**
@@ -600,8 +600,8 @@ export namespace Call {
    * # </weight>
    */
   export function kill_identity(
-    value: Omit<t.types.pallet_identity.pallet.Call.kill_identity, "type">,
-  ): t.types.pallet_identity.pallet.Call.kill_identity {
+    value: Omit<types.pallet_identity.pallet.Call.kill_identity, "type">,
+  ): types.pallet_identity.pallet.Call.kill_identity {
     return { type: "kill_identity", ...value }
   }
   /**
@@ -614,8 +614,8 @@ export namespace Call {
    * sub identity of `sub`.
    */
   export function add_sub(
-    value: Omit<t.types.pallet_identity.pallet.Call.add_sub, "type">,
-  ): t.types.pallet_identity.pallet.Call.add_sub {
+    value: Omit<types.pallet_identity.pallet.Call.add_sub, "type">,
+  ): types.pallet_identity.pallet.Call.add_sub {
     return { type: "add_sub", ...value }
   }
   /**
@@ -625,8 +625,8 @@ export namespace Call {
    * sub identity of `sub`.
    */
   export function rename_sub(
-    value: Omit<t.types.pallet_identity.pallet.Call.rename_sub, "type">,
-  ): t.types.pallet_identity.pallet.Call.rename_sub {
+    value: Omit<types.pallet_identity.pallet.Call.rename_sub, "type">,
+  ): types.pallet_identity.pallet.Call.rename_sub {
     return { type: "rename_sub", ...value }
   }
   /**
@@ -639,8 +639,8 @@ export namespace Call {
    * sub identity of `sub`.
    */
   export function remove_sub(
-    value: Omit<t.types.pallet_identity.pallet.Call.remove_sub, "type">,
-  ): t.types.pallet_identity.pallet.Call.remove_sub {
+    value: Omit<types.pallet_identity.pallet.Call.remove_sub, "type">,
+  ): types.pallet_identity.pallet.Call.remove_sub {
     return { type: "remove_sub", ...value }
   }
   /**
@@ -655,7 +655,7 @@ export namespace Call {
    * NOTE: This should not normally be used, but is provided in the case that the non-
    * controller of an account is maliciously registered as a sub-account.
    */
-  export function quit_sub(): t.types.pallet_identity.pallet.Call.quit_sub {
+  export function quit_sub(): types.pallet_identity.pallet.Call.quit_sub {
     return { type: "quit_sub" }
   }
 }
@@ -682,70 +682,70 @@ export type Error =
 
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
 export type Event =
-  | t.types.pallet_identity.pallet.Event.IdentitySet
-  | t.types.pallet_identity.pallet.Event.IdentityCleared
-  | t.types.pallet_identity.pallet.Event.IdentityKilled
-  | t.types.pallet_identity.pallet.Event.JudgementRequested
-  | t.types.pallet_identity.pallet.Event.JudgementUnrequested
-  | t.types.pallet_identity.pallet.Event.JudgementGiven
-  | t.types.pallet_identity.pallet.Event.RegistrarAdded
-  | t.types.pallet_identity.pallet.Event.SubIdentityAdded
-  | t.types.pallet_identity.pallet.Event.SubIdentityRemoved
-  | t.types.pallet_identity.pallet.Event.SubIdentityRevoked
+  | types.pallet_identity.pallet.Event.IdentitySet
+  | types.pallet_identity.pallet.Event.IdentityCleared
+  | types.pallet_identity.pallet.Event.IdentityKilled
+  | types.pallet_identity.pallet.Event.JudgementRequested
+  | types.pallet_identity.pallet.Event.JudgementUnrequested
+  | types.pallet_identity.pallet.Event.JudgementGiven
+  | types.pallet_identity.pallet.Event.RegistrarAdded
+  | types.pallet_identity.pallet.Event.SubIdentityAdded
+  | types.pallet_identity.pallet.Event.SubIdentityRemoved
+  | types.pallet_identity.pallet.Event.SubIdentityRevoked
 export namespace Event {
   /** A name was set or reset (which will remove all judgements). */
   export interface IdentitySet {
     type: "IdentitySet"
-    who: t.types.sp_core.crypto.AccountId32
+    who: types.sp_core.crypto.AccountId32
   }
   /** A name was cleared, and the given balance returned. */
   export interface IdentityCleared {
     type: "IdentityCleared"
-    who: t.types.sp_core.crypto.AccountId32
-    deposit: t.types.u128
+    who: types.sp_core.crypto.AccountId32
+    deposit: types.u128
   }
   /** A name was removed and the given balance slashed. */
   export interface IdentityKilled {
     type: "IdentityKilled"
-    who: t.types.sp_core.crypto.AccountId32
-    deposit: t.types.u128
+    who: types.sp_core.crypto.AccountId32
+    deposit: types.u128
   }
   /** A judgement was asked from a registrar. */
   export interface JudgementRequested {
     type: "JudgementRequested"
-    who: t.types.sp_core.crypto.AccountId32
-    registrar_index: t.types.u32
+    who: types.sp_core.crypto.AccountId32
+    registrar_index: types.u32
   }
   /** A judgement request was retracted. */
   export interface JudgementUnrequested {
     type: "JudgementUnrequested"
-    who: t.types.sp_core.crypto.AccountId32
-    registrar_index: t.types.u32
+    who: types.sp_core.crypto.AccountId32
+    registrar_index: types.u32
   }
   /** A judgement was given by a registrar. */
   export interface JudgementGiven {
     type: "JudgementGiven"
-    target: t.types.sp_core.crypto.AccountId32
-    registrar_index: t.types.u32
+    target: types.sp_core.crypto.AccountId32
+    registrar_index: types.u32
   }
   /** A registrar was added. */
   export interface RegistrarAdded {
     type: "RegistrarAdded"
-    registrar_index: t.types.u32
+    registrar_index: types.u32
   }
   /** A sub-identity was added to an identity and the deposit paid. */
   export interface SubIdentityAdded {
     type: "SubIdentityAdded"
-    sub: t.types.sp_core.crypto.AccountId32
-    main: t.types.sp_core.crypto.AccountId32
-    deposit: t.types.u128
+    sub: types.sp_core.crypto.AccountId32
+    main: types.sp_core.crypto.AccountId32
+    deposit: types.u128
   }
   /** A sub-identity was removed from an identity and the deposit freed. */
   export interface SubIdentityRemoved {
     type: "SubIdentityRemoved"
-    sub: t.types.sp_core.crypto.AccountId32
-    main: t.types.sp_core.crypto.AccountId32
-    deposit: t.types.u128
+    sub: types.sp_core.crypto.AccountId32
+    main: types.sp_core.crypto.AccountId32
+    deposit: types.u128
   }
   /**
    * A sub-identity was cleared, and the given deposit repatriated from the
@@ -753,62 +753,62 @@ export namespace Event {
    */
   export interface SubIdentityRevoked {
     type: "SubIdentityRevoked"
-    sub: t.types.sp_core.crypto.AccountId32
-    main: t.types.sp_core.crypto.AccountId32
-    deposit: t.types.u128
+    sub: types.sp_core.crypto.AccountId32
+    main: types.sp_core.crypto.AccountId32
+    deposit: types.u128
   }
   /** A name was set or reset (which will remove all judgements). */
   export function IdentitySet(
-    value: Omit<t.types.pallet_identity.pallet.Event.IdentitySet, "type">,
-  ): t.types.pallet_identity.pallet.Event.IdentitySet {
+    value: Omit<types.pallet_identity.pallet.Event.IdentitySet, "type">,
+  ): types.pallet_identity.pallet.Event.IdentitySet {
     return { type: "IdentitySet", ...value }
   }
   /** A name was cleared, and the given balance returned. */
   export function IdentityCleared(
-    value: Omit<t.types.pallet_identity.pallet.Event.IdentityCleared, "type">,
-  ): t.types.pallet_identity.pallet.Event.IdentityCleared {
+    value: Omit<types.pallet_identity.pallet.Event.IdentityCleared, "type">,
+  ): types.pallet_identity.pallet.Event.IdentityCleared {
     return { type: "IdentityCleared", ...value }
   }
   /** A name was removed and the given balance slashed. */
   export function IdentityKilled(
-    value: Omit<t.types.pallet_identity.pallet.Event.IdentityKilled, "type">,
-  ): t.types.pallet_identity.pallet.Event.IdentityKilled {
+    value: Omit<types.pallet_identity.pallet.Event.IdentityKilled, "type">,
+  ): types.pallet_identity.pallet.Event.IdentityKilled {
     return { type: "IdentityKilled", ...value }
   }
   /** A judgement was asked from a registrar. */
   export function JudgementRequested(
-    value: Omit<t.types.pallet_identity.pallet.Event.JudgementRequested, "type">,
-  ): t.types.pallet_identity.pallet.Event.JudgementRequested {
+    value: Omit<types.pallet_identity.pallet.Event.JudgementRequested, "type">,
+  ): types.pallet_identity.pallet.Event.JudgementRequested {
     return { type: "JudgementRequested", ...value }
   }
   /** A judgement request was retracted. */
   export function JudgementUnrequested(
-    value: Omit<t.types.pallet_identity.pallet.Event.JudgementUnrequested, "type">,
-  ): t.types.pallet_identity.pallet.Event.JudgementUnrequested {
+    value: Omit<types.pallet_identity.pallet.Event.JudgementUnrequested, "type">,
+  ): types.pallet_identity.pallet.Event.JudgementUnrequested {
     return { type: "JudgementUnrequested", ...value }
   }
   /** A judgement was given by a registrar. */
   export function JudgementGiven(
-    value: Omit<t.types.pallet_identity.pallet.Event.JudgementGiven, "type">,
-  ): t.types.pallet_identity.pallet.Event.JudgementGiven {
+    value: Omit<types.pallet_identity.pallet.Event.JudgementGiven, "type">,
+  ): types.pallet_identity.pallet.Event.JudgementGiven {
     return { type: "JudgementGiven", ...value }
   }
   /** A registrar was added. */
   export function RegistrarAdded(
-    value: Omit<t.types.pallet_identity.pallet.Event.RegistrarAdded, "type">,
-  ): t.types.pallet_identity.pallet.Event.RegistrarAdded {
+    value: Omit<types.pallet_identity.pallet.Event.RegistrarAdded, "type">,
+  ): types.pallet_identity.pallet.Event.RegistrarAdded {
     return { type: "RegistrarAdded", ...value }
   }
   /** A sub-identity was added to an identity and the deposit paid. */
   export function SubIdentityAdded(
-    value: Omit<t.types.pallet_identity.pallet.Event.SubIdentityAdded, "type">,
-  ): t.types.pallet_identity.pallet.Event.SubIdentityAdded {
+    value: Omit<types.pallet_identity.pallet.Event.SubIdentityAdded, "type">,
+  ): types.pallet_identity.pallet.Event.SubIdentityAdded {
     return { type: "SubIdentityAdded", ...value }
   }
   /** A sub-identity was removed from an identity and the deposit freed. */
   export function SubIdentityRemoved(
-    value: Omit<t.types.pallet_identity.pallet.Event.SubIdentityRemoved, "type">,
-  ): t.types.pallet_identity.pallet.Event.SubIdentityRemoved {
+    value: Omit<types.pallet_identity.pallet.Event.SubIdentityRemoved, "type">,
+  ): types.pallet_identity.pallet.Event.SubIdentityRemoved {
     return { type: "SubIdentityRemoved", ...value }
   }
   /**
@@ -816,8 +816,8 @@ export namespace Event {
    * main identity account to the sub-identity account.
    */
   export function SubIdentityRevoked(
-    value: Omit<t.types.pallet_identity.pallet.Event.SubIdentityRevoked, "type">,
-  ): t.types.pallet_identity.pallet.Event.SubIdentityRevoked {
+    value: Omit<types.pallet_identity.pallet.Event.SubIdentityRevoked, "type">,
+  ): types.pallet_identity.pallet.Event.SubIdentityRevoked {
     return { type: "SubIdentityRevoked", ...value }
   }
 }

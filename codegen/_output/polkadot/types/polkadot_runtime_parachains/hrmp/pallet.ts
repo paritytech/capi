@@ -1,23 +1,23 @@
 import { $ } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as t from "../../../mod.ts"
+import type * as types from "../../../types/mod.ts"
 
-export const $call: $.Codec<t.types.polkadot_runtime_parachains.hrmp.pallet.Call> = _codec.$409
+export const $call: $.Codec<types.polkadot_runtime_parachains.hrmp.pallet.Call> = _codec.$409
 
-export const $error: $.Codec<t.types.polkadot_runtime_parachains.hrmp.pallet.Error> = _codec.$694
+export const $error: $.Codec<types.polkadot_runtime_parachains.hrmp.pallet.Error> = _codec.$694
 
-export const $event: $.Codec<t.types.polkadot_runtime_parachains.hrmp.pallet.Event> = _codec.$111
+export const $event: $.Codec<types.polkadot_runtime_parachains.hrmp.pallet.Event> = _codec.$111
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 export type Call =
-  | t.types.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_init_open_channel
-  | t.types.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_accept_open_channel
-  | t.types.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_close_channel
-  | t.types.polkadot_runtime_parachains.hrmp.pallet.Call.force_clean_hrmp
-  | t.types.polkadot_runtime_parachains.hrmp.pallet.Call.force_process_hrmp_open
-  | t.types.polkadot_runtime_parachains.hrmp.pallet.Call.force_process_hrmp_close
-  | t.types.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_cancel_open_request
-  | t.types.polkadot_runtime_parachains.hrmp.pallet.Call.force_open_hrmp_channel
+  | types.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_init_open_channel
+  | types.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_accept_open_channel
+  | types.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_close_channel
+  | types.polkadot_runtime_parachains.hrmp.pallet.Call.force_clean_hrmp
+  | types.polkadot_runtime_parachains.hrmp.pallet.Call.force_process_hrmp_open
+  | types.polkadot_runtime_parachains.hrmp.pallet.Call.force_process_hrmp_close
+  | types.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_cancel_open_request
+  | types.polkadot_runtime_parachains.hrmp.pallet.Call.force_open_hrmp_channel
 export namespace Call {
   /**
    * Initiate opening a channel from a parachain to a given recipient with given channel
@@ -33,9 +33,9 @@ export namespace Call {
    */
   export interface hrmp_init_open_channel {
     type: "hrmp_init_open_channel"
-    recipient: t.types.polkadot_parachain.primitives.Id
-    proposed_max_capacity: t.types.u32
-    proposed_max_message_size: t.types.u32
+    recipient: types.polkadot_parachain.primitives.Id
+    proposed_max_capacity: types.u32
+    proposed_max_message_size: types.u32
   }
   /**
    * Accept a pending open channel request from the given sender.
@@ -44,7 +44,7 @@ export namespace Call {
    */
   export interface hrmp_accept_open_channel {
     type: "hrmp_accept_open_channel"
-    sender: t.types.polkadot_parachain.primitives.Id
+    sender: types.polkadot_parachain.primitives.Id
   }
   /**
    * Initiate unilateral closing of a channel. The origin must be either the sender or the
@@ -54,7 +54,7 @@ export namespace Call {
    */
   export interface hrmp_close_channel {
     type: "hrmp_close_channel"
-    channel_id: t.types.polkadot_parachain.primitives.HrmpChannelId
+    channel_id: types.polkadot_parachain.primitives.HrmpChannelId
   }
   /**
    * This extrinsic triggers the cleanup of all the HRMP storage items that
@@ -67,9 +67,9 @@ export namespace Call {
    */
   export interface force_clean_hrmp {
     type: "force_clean_hrmp"
-    para: t.types.polkadot_parachain.primitives.Id
-    inbound: t.types.u32
-    outbound: t.types.u32
+    para: types.polkadot_parachain.primitives.Id
+    inbound: types.u32
+    outbound: types.u32
   }
   /**
    * Force process HRMP open channel requests.
@@ -81,7 +81,7 @@ export namespace Call {
    */
   export interface force_process_hrmp_open {
     type: "force_process_hrmp_open"
-    channels: t.types.u32
+    channels: types.u32
   }
   /**
    * Force process HRMP close channel requests.
@@ -93,7 +93,7 @@ export namespace Call {
    */
   export interface force_process_hrmp_close {
     type: "force_process_hrmp_close"
-    channels: t.types.u32
+    channels: types.u32
   }
   /**
    * This cancels a pending open channel request. It can be canceled by either of the sender
@@ -107,8 +107,8 @@ export namespace Call {
    */
   export interface hrmp_cancel_open_request {
     type: "hrmp_cancel_open_request"
-    channel_id: t.types.polkadot_parachain.primitives.HrmpChannelId
-    open_requests: t.types.u32
+    channel_id: types.polkadot_parachain.primitives.HrmpChannelId
+    open_requests: types.u32
   }
   /**
    * Open a channel from a `sender` to a `recipient` `ParaId` using the Root origin. Although
@@ -120,10 +120,10 @@ export namespace Call {
    */
   export interface force_open_hrmp_channel {
     type: "force_open_hrmp_channel"
-    sender: t.types.polkadot_parachain.primitives.Id
-    recipient: t.types.polkadot_parachain.primitives.Id
-    max_capacity: t.types.u32
-    max_message_size: t.types.u32
+    sender: types.polkadot_parachain.primitives.Id
+    recipient: types.polkadot_parachain.primitives.Id
+    max_capacity: types.u32
+    max_message_size: types.u32
   }
   /**
    * Initiate opening a channel from a parachain to a given recipient with given channel
@@ -138,11 +138,8 @@ export namespace Call {
    * change.
    */
   export function hrmp_init_open_channel(
-    value: Omit<
-      t.types.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_init_open_channel,
-      "type"
-    >,
-  ): t.types.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_init_open_channel {
+    value: Omit<types.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_init_open_channel, "type">,
+  ): types.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_init_open_channel {
     return { type: "hrmp_init_open_channel", ...value }
   }
   /**
@@ -152,10 +149,10 @@ export namespace Call {
    */
   export function hrmp_accept_open_channel(
     value: Omit<
-      t.types.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_accept_open_channel,
+      types.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_accept_open_channel,
       "type"
     >,
-  ): t.types.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_accept_open_channel {
+  ): types.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_accept_open_channel {
     return { type: "hrmp_accept_open_channel", ...value }
   }
   /**
@@ -165,8 +162,8 @@ export namespace Call {
    * The closure can only happen on a session change.
    */
   export function hrmp_close_channel(
-    value: Omit<t.types.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_close_channel, "type">,
-  ): t.types.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_close_channel {
+    value: Omit<types.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_close_channel, "type">,
+  ): types.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_close_channel {
     return { type: "hrmp_close_channel", ...value }
   }
   /**
@@ -179,8 +176,8 @@ export namespace Call {
    * Number of inbound and outbound channels for `para` must be provided as witness data of weighing.
    */
   export function force_clean_hrmp(
-    value: Omit<t.types.polkadot_runtime_parachains.hrmp.pallet.Call.force_clean_hrmp, "type">,
-  ): t.types.polkadot_runtime_parachains.hrmp.pallet.Call.force_clean_hrmp {
+    value: Omit<types.polkadot_runtime_parachains.hrmp.pallet.Call.force_clean_hrmp, "type">,
+  ): types.polkadot_runtime_parachains.hrmp.pallet.Call.force_clean_hrmp {
     return { type: "force_clean_hrmp", ...value }
   }
   /**
@@ -192,11 +189,8 @@ export namespace Call {
    * Total number of opening channels must be provided as witness data of weighing.
    */
   export function force_process_hrmp_open(
-    value: Omit<
-      t.types.polkadot_runtime_parachains.hrmp.pallet.Call.force_process_hrmp_open,
-      "type"
-    >,
-  ): t.types.polkadot_runtime_parachains.hrmp.pallet.Call.force_process_hrmp_open {
+    value: Omit<types.polkadot_runtime_parachains.hrmp.pallet.Call.force_process_hrmp_open, "type">,
+  ): types.polkadot_runtime_parachains.hrmp.pallet.Call.force_process_hrmp_open {
     return { type: "force_process_hrmp_open", ...value }
   }
   /**
@@ -209,10 +203,10 @@ export namespace Call {
    */
   export function force_process_hrmp_close(
     value: Omit<
-      t.types.polkadot_runtime_parachains.hrmp.pallet.Call.force_process_hrmp_close,
+      types.polkadot_runtime_parachains.hrmp.pallet.Call.force_process_hrmp_close,
       "type"
     >,
-  ): t.types.polkadot_runtime_parachains.hrmp.pallet.Call.force_process_hrmp_close {
+  ): types.polkadot_runtime_parachains.hrmp.pallet.Call.force_process_hrmp_close {
     return { type: "force_process_hrmp_close", ...value }
   }
   /**
@@ -227,10 +221,10 @@ export namespace Call {
    */
   export function hrmp_cancel_open_request(
     value: Omit<
-      t.types.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_cancel_open_request,
+      types.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_cancel_open_request,
       "type"
     >,
-  ): t.types.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_cancel_open_request {
+  ): types.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_cancel_open_request {
     return { type: "hrmp_cancel_open_request", ...value }
   }
   /**
@@ -242,11 +236,8 @@ export namespace Call {
    * Relay Chain, e.g. a common good parachain.
    */
   export function force_open_hrmp_channel(
-    value: Omit<
-      t.types.polkadot_runtime_parachains.hrmp.pallet.Call.force_open_hrmp_channel,
-      "type"
-    >,
-  ): t.types.polkadot_runtime_parachains.hrmp.pallet.Call.force_open_hrmp_channel {
+    value: Omit<types.polkadot_runtime_parachains.hrmp.pallet.Call.force_open_hrmp_channel, "type">,
+  ): types.polkadot_runtime_parachains.hrmp.pallet.Call.force_open_hrmp_channel {
     return { type: "force_open_hrmp_channel", ...value }
   }
 }
@@ -275,11 +266,11 @@ export type Error =
 
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
 export type Event =
-  | t.types.polkadot_runtime_parachains.hrmp.pallet.Event.OpenChannelRequested
-  | t.types.polkadot_runtime_parachains.hrmp.pallet.Event.OpenChannelCanceled
-  | t.types.polkadot_runtime_parachains.hrmp.pallet.Event.OpenChannelAccepted
-  | t.types.polkadot_runtime_parachains.hrmp.pallet.Event.ChannelClosed
-  | t.types.polkadot_runtime_parachains.hrmp.pallet.Event.HrmpChannelForceOpened
+  | types.polkadot_runtime_parachains.hrmp.pallet.Event.OpenChannelRequested
+  | types.polkadot_runtime_parachains.hrmp.pallet.Event.OpenChannelCanceled
+  | types.polkadot_runtime_parachains.hrmp.pallet.Event.OpenChannelAccepted
+  | types.polkadot_runtime_parachains.hrmp.pallet.Event.ChannelClosed
+  | types.polkadot_runtime_parachains.hrmp.pallet.Event.HrmpChannelForceOpened
 export namespace Event {
   /**
    * Open HRMP channel requested.
@@ -288,10 +279,10 @@ export namespace Event {
   export interface OpenChannelRequested {
     type: "OpenChannelRequested"
     value: [
-      t.types.polkadot_parachain.primitives.Id,
-      t.types.polkadot_parachain.primitives.Id,
-      t.types.u32,
-      t.types.u32,
+      types.polkadot_parachain.primitives.Id,
+      types.polkadot_parachain.primitives.Id,
+      types.u32,
+      types.u32,
     ]
   }
   /**
@@ -301,21 +292,21 @@ export namespace Event {
   export interface OpenChannelCanceled {
     type: "OpenChannelCanceled"
     value: [
-      t.types.polkadot_parachain.primitives.Id,
-      t.types.polkadot_parachain.primitives.HrmpChannelId,
+      types.polkadot_parachain.primitives.Id,
+      types.polkadot_parachain.primitives.HrmpChannelId,
     ]
   }
   /** Open HRMP channel accepted. `[sender, recipient]` */
   export interface OpenChannelAccepted {
     type: "OpenChannelAccepted"
-    value: [t.types.polkadot_parachain.primitives.Id, t.types.polkadot_parachain.primitives.Id]
+    value: [types.polkadot_parachain.primitives.Id, types.polkadot_parachain.primitives.Id]
   }
   /** HRMP channel closed. `[by_parachain, channel_id]` */
   export interface ChannelClosed {
     type: "ChannelClosed"
     value: [
-      t.types.polkadot_parachain.primitives.Id,
-      t.types.polkadot_parachain.primitives.HrmpChannelId,
+      types.polkadot_parachain.primitives.Id,
+      types.polkadot_parachain.primitives.HrmpChannelId,
     ]
   }
   /**
@@ -325,10 +316,10 @@ export namespace Event {
   export interface HrmpChannelForceOpened {
     type: "HrmpChannelForceOpened"
     value: [
-      t.types.polkadot_parachain.primitives.Id,
-      t.types.polkadot_parachain.primitives.Id,
-      t.types.u32,
-      t.types.u32,
+      types.polkadot_parachain.primitives.Id,
+      types.polkadot_parachain.primitives.Id,
+      types.u32,
+      types.u32,
     ]
   }
   /**
@@ -336,8 +327,8 @@ export namespace Event {
    * `[sender, recipient, proposed_max_capacity, proposed_max_message_size]`
    */
   export function OpenChannelRequested(
-    ...value: t.types.polkadot_runtime_parachains.hrmp.pallet.Event.OpenChannelRequested["value"]
-  ): t.types.polkadot_runtime_parachains.hrmp.pallet.Event.OpenChannelRequested {
+    ...value: types.polkadot_runtime_parachains.hrmp.pallet.Event.OpenChannelRequested["value"]
+  ): types.polkadot_runtime_parachains.hrmp.pallet.Event.OpenChannelRequested {
     return { type: "OpenChannelRequested", value }
   }
   /**
@@ -345,20 +336,20 @@ export namespace Event {
    * `[by_parachain, channel_id]`
    */
   export function OpenChannelCanceled(
-    ...value: t.types.polkadot_runtime_parachains.hrmp.pallet.Event.OpenChannelCanceled["value"]
-  ): t.types.polkadot_runtime_parachains.hrmp.pallet.Event.OpenChannelCanceled {
+    ...value: types.polkadot_runtime_parachains.hrmp.pallet.Event.OpenChannelCanceled["value"]
+  ): types.polkadot_runtime_parachains.hrmp.pallet.Event.OpenChannelCanceled {
     return { type: "OpenChannelCanceled", value }
   }
   /** Open HRMP channel accepted. `[sender, recipient]` */
   export function OpenChannelAccepted(
-    ...value: t.types.polkadot_runtime_parachains.hrmp.pallet.Event.OpenChannelAccepted["value"]
-  ): t.types.polkadot_runtime_parachains.hrmp.pallet.Event.OpenChannelAccepted {
+    ...value: types.polkadot_runtime_parachains.hrmp.pallet.Event.OpenChannelAccepted["value"]
+  ): types.polkadot_runtime_parachains.hrmp.pallet.Event.OpenChannelAccepted {
     return { type: "OpenChannelAccepted", value }
   }
   /** HRMP channel closed. `[by_parachain, channel_id]` */
   export function ChannelClosed(
-    ...value: t.types.polkadot_runtime_parachains.hrmp.pallet.Event.ChannelClosed["value"]
-  ): t.types.polkadot_runtime_parachains.hrmp.pallet.Event.ChannelClosed {
+    ...value: types.polkadot_runtime_parachains.hrmp.pallet.Event.ChannelClosed["value"]
+  ): types.polkadot_runtime_parachains.hrmp.pallet.Event.ChannelClosed {
     return { type: "ChannelClosed", value }
   }
   /**
@@ -366,8 +357,8 @@ export namespace Event {
    * `[sender, recipient, proposed_max_capacity, proposed_max_message_size]`
    */
   export function HrmpChannelForceOpened(
-    ...value: t.types.polkadot_runtime_parachains.hrmp.pallet.Event.HrmpChannelForceOpened["value"]
-  ): t.types.polkadot_runtime_parachains.hrmp.pallet.Event.HrmpChannelForceOpened {
+    ...value: types.polkadot_runtime_parachains.hrmp.pallet.Event.HrmpChannelForceOpened["value"]
+  ): types.polkadot_runtime_parachains.hrmp.pallet.Event.HrmpChannelForceOpened {
     return { type: "HrmpChannelForceOpened", value }
   }
 }

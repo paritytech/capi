@@ -1,17 +1,17 @@
 import { $ } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as t from "../../../mod.ts"
+import type * as types from "../../../types/mod.ts"
 
-export const $header: $.Codec<t.types.sp_runtime.generic.header.Header> = _codec.$187
+export const $header: $.Codec<types.sp_runtime.generic.header.Header> = _codec.$187
 
 export interface Header {
-  parent_hash: t.types.primitive_types.H256
-  number: t.Compact<t.types.u32>
-  state_root: t.types.primitive_types.H256
-  extrinsics_root: t.types.primitive_types.H256
-  digest: t.types.sp_runtime.generic.digest.Digest
+  parent_hash: types.primitive_types.H256
+  number: types.Compact<types.u32>
+  state_root: types.primitive_types.H256
+  extrinsics_root: types.primitive_types.H256
+  digest: types.sp_runtime.generic.digest.Digest
 }
 
-export function Header(value: t.types.sp_runtime.generic.header.Header) {
+export function Header(value: types.sp_runtime.generic.header.Header) {
   return value
 }

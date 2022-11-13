@@ -1,6 +1,6 @@
 import { $ } from "../capi.ts"
 import * as _codec from "../codecs.ts"
-import type * as t from "../mod.ts"
+import type * as types from "../types/mod.ts"
 
 /**
  *  The present candidate list. A current member or runner-up can never enter this vector
@@ -80,8 +80,8 @@ export const Voting = {
  * # </weight>
  */
 export function clean_defunct_voters(
-  value: Omit<t.types.pallet_elections_phragmen.pallet.Call.clean_defunct_voters, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_elections_phragmen.pallet.Call.clean_defunct_voters, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "PhragmenElection", value: { ...value, type: "clean_defunct_voters" } }
 }
 
@@ -106,8 +106,8 @@ export function clean_defunct_voters(
  * # </weight>
  */
 export function remove_member(
-  value: Omit<t.types.pallet_elections_phragmen.pallet.Call.remove_member, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_elections_phragmen.pallet.Call.remove_member, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "PhragmenElection", value: { ...value, type: "remove_member" } }
 }
 
@@ -118,7 +118,7 @@ export function remove_member(
  *
  * The dispatch origin of this call must be signed and be a voter.
  */
-export function remove_voter(): t.types.polkadot_runtime.RuntimeCall {
+export function remove_voter(): types.polkadot_runtime.RuntimeCall {
   return { type: "PhragmenElection", value: { type: "remove_voter" } }
 }
 
@@ -143,8 +143,8 @@ export function remove_voter(): t.types.polkadot_runtime.RuntimeCall {
  * # </weight>
  */
 export function renounce_candidacy(
-  value: Omit<t.types.pallet_elections_phragmen.pallet.Call.renounce_candidacy, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_elections_phragmen.pallet.Call.renounce_candidacy, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "PhragmenElection", value: { ...value, type: "renounce_candidacy" } }
 }
 
@@ -166,8 +166,8 @@ export function renounce_candidacy(
  * # </weight>
  */
 export function submit_candidacy(
-  value: Omit<t.types.pallet_elections_phragmen.pallet.Call.submit_candidacy, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_elections_phragmen.pallet.Call.submit_candidacy, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "PhragmenElection", value: { ...value, type: "submit_candidacy" } }
 }
 
@@ -197,7 +197,7 @@ export function submit_candidacy(
  * # </weight>
  */
 export function vote(
-  value: Omit<t.types.pallet_elections_phragmen.pallet.Call.vote, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_elections_phragmen.pallet.Call.vote, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "PhragmenElection", value: { ...value, type: "vote" } }
 }

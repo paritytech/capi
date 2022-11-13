@@ -1,19 +1,19 @@
 import { $ } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as t from "../../mod.ts"
+import type * as types from "../../types/mod.ts"
 
-export const $public: $.Codec<t.types.sp_finality_grandpa.app.Public> = _codec.$50
+export const $public: $.Codec<types.sp_finality_grandpa.app.Public> = _codec.$50
 
-export const $signature: $.Codec<t.types.sp_finality_grandpa.app.Signature> = _codec.$221
+export const $signature: $.Codec<types.sp_finality_grandpa.app.Signature> = _codec.$221
 
-export type Public = t.types.sp_core.ed25519.Public
+export type Public = types.sp_core.ed25519.Public
 
-export function Public(value: t.types.sp_finality_grandpa.app.Public) {
+export function Public(value: types.sp_finality_grandpa.app.Public) {
   return value
 }
 
-export type Signature = t.types.sp_core.ed25519.Signature
+export type Signature = types.sp_core.ed25519.Signature
 
-export function Signature(value: t.types.sp_finality_grandpa.app.Signature) {
+export function Signature(value: types.sp_finality_grandpa.app.Signature) {
   return value
 }

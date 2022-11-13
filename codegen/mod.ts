@@ -34,8 +34,10 @@ export * as C from ${S.string(props.importSpecifier)}
   printDecls(
     decls,
     (depth, content) => [
-      /\bt\./.test(content)
-        ? `import type * as t from ${S.string((depth ? "../".repeat(depth) : "./") + "mod.ts")}`
+      /\btypes\./.test(content)
+        ? `import type * as types from ${
+          S.string((depth ? "../".repeat(depth) : "./") + "types/mod.ts")
+        }`
         : "",
       /\b_codec\./.test(content)
         ? `import * as _codec from ${S.string((depth ? "../".repeat(depth) : "./") + "codecs.ts")}`

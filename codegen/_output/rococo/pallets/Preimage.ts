@@ -1,6 +1,6 @@
 import { $ } from "../capi.ts"
 import * as _codec from "../codecs.ts"
-import type * as t from "../mod.ts"
+import type * as types from "../types/mod.ts"
 
 export const PreimageFor = {
   type: "Map",
@@ -26,8 +26,8 @@ export const StatusFor = {
  * the preimage. Otherwise, a deposit is taken proportional to the size of the preimage.
  */
 export function note_preimage(
-  value: Omit<t.types.pallet_preimage.pallet.Call.note_preimage, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_preimage.pallet.Call.note_preimage, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Preimage", value: { ...value, type: "note_preimage" } }
 }
 
@@ -38,8 +38,8 @@ export function note_preimage(
  * a user may have paid, and take the control of the preimage out of their hands.
  */
 export function request_preimage(
-  value: Omit<t.types.pallet_preimage.pallet.Call.request_preimage, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_preimage.pallet.Call.request_preimage, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Preimage", value: { ...value, type: "request_preimage" } }
 }
 
@@ -52,8 +52,8 @@ export function request_preimage(
  * - `len`: The length of the preimage of `hash`.
  */
 export function unnote_preimage(
-  value: Omit<t.types.pallet_preimage.pallet.Call.unnote_preimage, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_preimage.pallet.Call.unnote_preimage, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Preimage", value: { ...value, type: "unnote_preimage" } }
 }
 
@@ -63,7 +63,7 @@ export function unnote_preimage(
  * NOTE: THIS MUST NOT BE CALLED ON `hash` MORE TIMES THAN `request_preimage`.
  */
 export function unrequest_preimage(
-  value: Omit<t.types.pallet_preimage.pallet.Call.unrequest_preimage, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_preimage.pallet.Call.unrequest_preimage, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Preimage", value: { ...value, type: "unrequest_preimage" } }
 }

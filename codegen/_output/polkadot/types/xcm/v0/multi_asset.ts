@@ -1,22 +1,22 @@
 import { $ } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as t from "../../../mod.ts"
+import type * as types from "../../../types/mod.ts"
 
-export const $multiAsset: $.Codec<t.types.xcm.v0.multi_asset.MultiAsset> = _codec.$152
+export const $multiAsset: $.Codec<types.xcm.v0.multi_asset.MultiAsset> = _codec.$152
 
 export type MultiAsset =
-  | t.types.xcm.v0.multi_asset.MultiAsset.None
-  | t.types.xcm.v0.multi_asset.MultiAsset.All
-  | t.types.xcm.v0.multi_asset.MultiAsset.AllFungible
-  | t.types.xcm.v0.multi_asset.MultiAsset.AllNonFungible
-  | t.types.xcm.v0.multi_asset.MultiAsset.AllAbstractFungible
-  | t.types.xcm.v0.multi_asset.MultiAsset.AllAbstractNonFungible
-  | t.types.xcm.v0.multi_asset.MultiAsset.AllConcreteFungible
-  | t.types.xcm.v0.multi_asset.MultiAsset.AllConcreteNonFungible
-  | t.types.xcm.v0.multi_asset.MultiAsset.AbstractFungible
-  | t.types.xcm.v0.multi_asset.MultiAsset.AbstractNonFungible
-  | t.types.xcm.v0.multi_asset.MultiAsset.ConcreteFungible
-  | t.types.xcm.v0.multi_asset.MultiAsset.ConcreteNonFungible
+  | types.xcm.v0.multi_asset.MultiAsset.None
+  | types.xcm.v0.multi_asset.MultiAsset.All
+  | types.xcm.v0.multi_asset.MultiAsset.AllFungible
+  | types.xcm.v0.multi_asset.MultiAsset.AllNonFungible
+  | types.xcm.v0.multi_asset.MultiAsset.AllAbstractFungible
+  | types.xcm.v0.multi_asset.MultiAsset.AllAbstractNonFungible
+  | types.xcm.v0.multi_asset.MultiAsset.AllConcreteFungible
+  | types.xcm.v0.multi_asset.MultiAsset.AllConcreteNonFungible
+  | types.xcm.v0.multi_asset.MultiAsset.AbstractFungible
+  | types.xcm.v0.multi_asset.MultiAsset.AbstractNonFungible
+  | types.xcm.v0.multi_asset.MultiAsset.ConcreteFungible
+  | types.xcm.v0.multi_asset.MultiAsset.ConcreteNonFungible
 export namespace MultiAsset {
   export interface None {
     type: "None"
@@ -40,82 +40,82 @@ export namespace MultiAsset {
   }
   export interface AllConcreteFungible {
     type: "AllConcreteFungible"
-    id: t.types.xcm.v0.multi_location.MultiLocation
+    id: types.xcm.v0.multi_location.MultiLocation
   }
   export interface AllConcreteNonFungible {
     type: "AllConcreteNonFungible"
-    class: t.types.xcm.v0.multi_location.MultiLocation
+    class: types.xcm.v0.multi_location.MultiLocation
   }
   export interface AbstractFungible {
     type: "AbstractFungible"
     id: Uint8Array
-    amount: t.Compact<t.types.u128>
+    amount: types.Compact<types.u128>
   }
   export interface AbstractNonFungible {
     type: "AbstractNonFungible"
     class: Uint8Array
-    instance: t.types.xcm.v1.multiasset.AssetInstance
+    instance: types.xcm.v1.multiasset.AssetInstance
   }
   export interface ConcreteFungible {
     type: "ConcreteFungible"
-    id: t.types.xcm.v0.multi_location.MultiLocation
-    amount: t.Compact<t.types.u128>
+    id: types.xcm.v0.multi_location.MultiLocation
+    amount: types.Compact<types.u128>
   }
   export interface ConcreteNonFungible {
     type: "ConcreteNonFungible"
-    class: t.types.xcm.v0.multi_location.MultiLocation
-    instance: t.types.xcm.v1.multiasset.AssetInstance
+    class: types.xcm.v0.multi_location.MultiLocation
+    instance: types.xcm.v1.multiasset.AssetInstance
   }
-  export function None(): t.types.xcm.v0.multi_asset.MultiAsset.None {
+  export function None(): types.xcm.v0.multi_asset.MultiAsset.None {
     return { type: "None" }
   }
-  export function All(): t.types.xcm.v0.multi_asset.MultiAsset.All {
+  export function All(): types.xcm.v0.multi_asset.MultiAsset.All {
     return { type: "All" }
   }
-  export function AllFungible(): t.types.xcm.v0.multi_asset.MultiAsset.AllFungible {
+  export function AllFungible(): types.xcm.v0.multi_asset.MultiAsset.AllFungible {
     return { type: "AllFungible" }
   }
-  export function AllNonFungible(): t.types.xcm.v0.multi_asset.MultiAsset.AllNonFungible {
+  export function AllNonFungible(): types.xcm.v0.multi_asset.MultiAsset.AllNonFungible {
     return { type: "AllNonFungible" }
   }
   export function AllAbstractFungible(
-    value: Omit<t.types.xcm.v0.multi_asset.MultiAsset.AllAbstractFungible, "type">,
-  ): t.types.xcm.v0.multi_asset.MultiAsset.AllAbstractFungible {
+    value: Omit<types.xcm.v0.multi_asset.MultiAsset.AllAbstractFungible, "type">,
+  ): types.xcm.v0.multi_asset.MultiAsset.AllAbstractFungible {
     return { type: "AllAbstractFungible", ...value }
   }
   export function AllAbstractNonFungible(
-    value: Omit<t.types.xcm.v0.multi_asset.MultiAsset.AllAbstractNonFungible, "type">,
-  ): t.types.xcm.v0.multi_asset.MultiAsset.AllAbstractNonFungible {
+    value: Omit<types.xcm.v0.multi_asset.MultiAsset.AllAbstractNonFungible, "type">,
+  ): types.xcm.v0.multi_asset.MultiAsset.AllAbstractNonFungible {
     return { type: "AllAbstractNonFungible", ...value }
   }
   export function AllConcreteFungible(
-    value: Omit<t.types.xcm.v0.multi_asset.MultiAsset.AllConcreteFungible, "type">,
-  ): t.types.xcm.v0.multi_asset.MultiAsset.AllConcreteFungible {
+    value: Omit<types.xcm.v0.multi_asset.MultiAsset.AllConcreteFungible, "type">,
+  ): types.xcm.v0.multi_asset.MultiAsset.AllConcreteFungible {
     return { type: "AllConcreteFungible", ...value }
   }
   export function AllConcreteNonFungible(
-    value: Omit<t.types.xcm.v0.multi_asset.MultiAsset.AllConcreteNonFungible, "type">,
-  ): t.types.xcm.v0.multi_asset.MultiAsset.AllConcreteNonFungible {
+    value: Omit<types.xcm.v0.multi_asset.MultiAsset.AllConcreteNonFungible, "type">,
+  ): types.xcm.v0.multi_asset.MultiAsset.AllConcreteNonFungible {
     return { type: "AllConcreteNonFungible", ...value }
   }
   export function AbstractFungible(
-    value: Omit<t.types.xcm.v0.multi_asset.MultiAsset.AbstractFungible, "type">,
-  ): t.types.xcm.v0.multi_asset.MultiAsset.AbstractFungible {
+    value: Omit<types.xcm.v0.multi_asset.MultiAsset.AbstractFungible, "type">,
+  ): types.xcm.v0.multi_asset.MultiAsset.AbstractFungible {
     return { type: "AbstractFungible", ...value }
   }
   export function AbstractNonFungible(
-    value: Omit<t.types.xcm.v0.multi_asset.MultiAsset.AbstractNonFungible, "type">,
-  ): t.types.xcm.v0.multi_asset.MultiAsset.AbstractNonFungible {
+    value: Omit<types.xcm.v0.multi_asset.MultiAsset.AbstractNonFungible, "type">,
+  ): types.xcm.v0.multi_asset.MultiAsset.AbstractNonFungible {
     return { type: "AbstractNonFungible", ...value }
   }
   export function ConcreteFungible(
-    value: Omit<t.types.xcm.v0.multi_asset.MultiAsset.ConcreteFungible, "type">,
-  ): t.types.xcm.v0.multi_asset.MultiAsset.ConcreteFungible {
+    value: Omit<types.xcm.v0.multi_asset.MultiAsset.ConcreteFungible, "type">,
+  ): types.xcm.v0.multi_asset.MultiAsset.ConcreteFungible {
     return { type: "ConcreteFungible", ...value }
   }
   export function ConcreteNonFungible(
-    value: Omit<t.types.xcm.v0.multi_asset.MultiAsset.ConcreteNonFungible, "type">,
-  ): t.types.xcm.v0.multi_asset.MultiAsset.ConcreteNonFungible {
+    value: Omit<types.xcm.v0.multi_asset.MultiAsset.ConcreteNonFungible, "type">,
+  ): types.xcm.v0.multi_asset.MultiAsset.ConcreteNonFungible {
     return { type: "ConcreteNonFungible", ...value }
   }
 }

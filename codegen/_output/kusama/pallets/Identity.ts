@@ -1,6 +1,6 @@
 import { $ } from "../capi.ts"
 import * as _codec from "../codecs.ts"
-import type * as t from "../mod.ts"
+import type * as types from "../types/mod.ts"
 
 /**
  *  Information that is pertinent to identify the entity behind an account.
@@ -72,8 +72,8 @@ export const SuperOf = {
  * # </weight>
  */
 export function add_registrar(
-  value: Omit<t.types.pallet_identity.pallet.Call.add_registrar, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_identity.pallet.Call.add_registrar, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Identity", value: { ...value, type: "add_registrar" } }
 }
 
@@ -87,8 +87,8 @@ export function add_registrar(
  * sub identity of `sub`.
  */
 export function add_sub(
-  value: Omit<t.types.pallet_identity.pallet.Call.add_sub, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_identity.pallet.Call.add_sub, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Identity", value: { ...value, type: "add_sub" } }
 }
 
@@ -112,8 +112,8 @@ export function add_sub(
  * # </weight>
  */
 export function cancel_request(
-  value: Omit<t.types.pallet_identity.pallet.Call.cancel_request, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_identity.pallet.Call.cancel_request, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Identity", value: { ...value, type: "cancel_request" } }
 }
 
@@ -137,7 +137,7 @@ export function cancel_request(
  * - One event.
  * # </weight>
  */
-export function clear_identity(): t.types.polkadot_runtime.RuntimeCall {
+export function clear_identity(): types.polkadot_runtime.RuntimeCall {
   return { type: "Identity", value: { type: "clear_identity" } }
 }
 
@@ -163,8 +163,8 @@ export function clear_identity(): t.types.polkadot_runtime.RuntimeCall {
  * # </weight>
  */
 export function kill_identity(
-  value: Omit<t.types.pallet_identity.pallet.Call.kill_identity, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_identity.pallet.Call.kill_identity, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Identity", value: { ...value, type: "kill_identity" } }
 }
 
@@ -191,8 +191,8 @@ export function kill_identity(
  * # </weight>
  */
 export function provide_judgement(
-  value: Omit<t.types.pallet_identity.pallet.Call.provide_judgement, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_identity.pallet.Call.provide_judgement, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Identity", value: { ...value, type: "provide_judgement" } }
 }
 
@@ -208,7 +208,7 @@ export function provide_judgement(
  * NOTE: This should not normally be used, but is provided in the case that the non-
  * controller of an account is maliciously registered as a sub-account.
  */
-export function quit_sub(): t.types.polkadot_runtime.RuntimeCall {
+export function quit_sub(): types.polkadot_runtime.RuntimeCall {
   return { type: "Identity", value: { type: "quit_sub" } }
 }
 
@@ -222,8 +222,8 @@ export function quit_sub(): t.types.polkadot_runtime.RuntimeCall {
  * sub identity of `sub`.
  */
 export function remove_sub(
-  value: Omit<t.types.pallet_identity.pallet.Call.remove_sub, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_identity.pallet.Call.remove_sub, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Identity", value: { ...value, type: "remove_sub" } }
 }
 
@@ -234,8 +234,8 @@ export function remove_sub(
  * sub identity of `sub`.
  */
 export function rename_sub(
-  value: Omit<t.types.pallet_identity.pallet.Call.rename_sub, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_identity.pallet.Call.rename_sub, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Identity", value: { ...value, type: "rename_sub" } }
 }
 
@@ -265,8 +265,8 @@ export function rename_sub(
  * # </weight>
  */
 export function request_judgement(
-  value: Omit<t.types.pallet_identity.pallet.Call.request_judgement, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_identity.pallet.Call.request_judgement, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Identity", value: { ...value, type: "request_judgement" } }
 }
 
@@ -286,8 +286,8 @@ export function request_judgement(
  * # </weight>
  */
 export function set_account_id(
-  value: Omit<t.types.pallet_identity.pallet.Call.set_account_id, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_identity.pallet.Call.set_account_id, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Identity", value: { ...value, type: "set_account_id" } }
 }
 
@@ -307,8 +307,8 @@ export function set_account_id(
  * # </weight>
  */
 export function set_fee(
-  value: Omit<t.types.pallet_identity.pallet.Call.set_fee, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_identity.pallet.Call.set_fee, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Identity", value: { ...value, type: "set_fee" } }
 }
 
@@ -328,8 +328,8 @@ export function set_fee(
  * # </weight>
  */
 export function set_fields(
-  value: Omit<t.types.pallet_identity.pallet.Call.set_fields, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_identity.pallet.Call.set_fields, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Identity", value: { ...value, type: "set_fields" } }
 }
 
@@ -355,8 +355,8 @@ export function set_fields(
  * # </weight>
  */
 export function set_identity(
-  value: Omit<t.types.pallet_identity.pallet.Call.set_identity, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_identity.pallet.Call.set_identity, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Identity", value: { ...value, type: "set_identity" } }
 }
 
@@ -384,7 +384,7 @@ export function set_identity(
  * # </weight>
  */
 export function set_subs(
-  value: Omit<t.types.pallet_identity.pallet.Call.set_subs, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_identity.pallet.Call.set_subs, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Identity", value: { ...value, type: "set_subs" } }
 }

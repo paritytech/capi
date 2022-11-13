@@ -1,14 +1,14 @@
 import { $ } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as t from "../../mod.ts"
+import type * as types from "../../types/mod.ts"
 
-export const $offenceDetails: $.Codec<t.types.sp_staking.offence.OffenceDetails> = _codec.$509
+export const $offenceDetails: $.Codec<types.sp_staking.offence.OffenceDetails> = _codec.$509
 
 export interface OffenceDetails {
-  offender: [t.types.sp_core.crypto.AccountId32, t.types.pallet_staking.Exposure]
-  reporters: Array<t.types.sp_core.crypto.AccountId32>
+  offender: [types.sp_core.crypto.AccountId32, types.pallet_staking.Exposure]
+  reporters: Array<types.sp_core.crypto.AccountId32>
 }
 
-export function OffenceDetails(value: t.types.sp_staking.offence.OffenceDetails) {
+export function OffenceDetails(value: types.sp_staking.offence.OffenceDetails) {
   return value
 }

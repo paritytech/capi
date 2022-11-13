@@ -76,7 +76,7 @@ export function genMetadata(metadata: M.Metadata, decls: Decl[], typeVisitor: M.
       const ty = pallet.calls as M.Ty & M.UnionTyDef
       const isStringUnion = ty.members.every((x) => !x.fields.length)
       for (const call of ty.members) {
-        const typeName = "t." + getPath(tys, ty)! + "." + call.name
+        const typeName = getPath(tys, ty)! + "." + call.name
         const [params, data]: [string, string] = call.fields.length
           ? call.fields[0]!.name
             ? [`value: Omit<${typeName}, "type">`, `{ ...value, type: ${S.string(call.name)} }`]

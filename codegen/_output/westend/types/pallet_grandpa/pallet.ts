@@ -1,18 +1,18 @@
 import { $ } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as t from "../../mod.ts"
+import type * as types from "../../types/mod.ts"
 
-export const $call: $.Codec<t.types.pallet_grandpa.pallet.Call> = _codec.$216
+export const $call: $.Codec<types.pallet_grandpa.pallet.Call> = _codec.$216
 
-export const $error: $.Codec<t.types.pallet_grandpa.pallet.Error> = _codec.$519
+export const $error: $.Codec<types.pallet_grandpa.pallet.Error> = _codec.$519
 
-export const $event: $.Codec<t.types.pallet_grandpa.pallet.Event> = _codec.$47
+export const $event: $.Codec<types.pallet_grandpa.pallet.Event> = _codec.$47
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 export type Call =
-  | t.types.pallet_grandpa.pallet.Call.report_equivocation
-  | t.types.pallet_grandpa.pallet.Call.report_equivocation_unsigned
-  | t.types.pallet_grandpa.pallet.Call.note_stalled
+  | types.pallet_grandpa.pallet.Call.report_equivocation
+  | types.pallet_grandpa.pallet.Call.report_equivocation_unsigned
+  | types.pallet_grandpa.pallet.Call.note_stalled
 export namespace Call {
   /**
    * Report voter equivocation/misbehavior. This method will verify the
@@ -22,8 +22,8 @@ export namespace Call {
    */
   export interface report_equivocation {
     type: "report_equivocation"
-    equivocation_proof: t.types.sp_finality_grandpa.EquivocationProof
-    key_owner_proof: t.types.sp_session.MembershipProof
+    equivocation_proof: types.sp_finality_grandpa.EquivocationProof
+    key_owner_proof: types.sp_session.MembershipProof
   }
   /**
    * Report voter equivocation/misbehavior. This method will verify the
@@ -38,8 +38,8 @@ export namespace Call {
    */
   export interface report_equivocation_unsigned {
     type: "report_equivocation_unsigned"
-    equivocation_proof: t.types.sp_finality_grandpa.EquivocationProof
-    key_owner_proof: t.types.sp_session.MembershipProof
+    equivocation_proof: types.sp_finality_grandpa.EquivocationProof
+    key_owner_proof: types.sp_session.MembershipProof
   }
   /**
    * Note that the current authority set of the GRANDPA finality gadget has stalled.
@@ -57,8 +57,8 @@ export namespace Call {
    */
   export interface note_stalled {
     type: "note_stalled"
-    delay: t.types.u32
-    best_finalized_block_number: t.types.u32
+    delay: types.u32
+    best_finalized_block_number: types.u32
   }
   /**
    * Report voter equivocation/misbehavior. This method will verify the
@@ -67,8 +67,8 @@ export namespace Call {
    * will be reported.
    */
   export function report_equivocation(
-    value: Omit<t.types.pallet_grandpa.pallet.Call.report_equivocation, "type">,
-  ): t.types.pallet_grandpa.pallet.Call.report_equivocation {
+    value: Omit<types.pallet_grandpa.pallet.Call.report_equivocation, "type">,
+  ): types.pallet_grandpa.pallet.Call.report_equivocation {
     return { type: "report_equivocation", ...value }
   }
   /**
@@ -83,8 +83,8 @@ export namespace Call {
    * reporter.
    */
   export function report_equivocation_unsigned(
-    value: Omit<t.types.pallet_grandpa.pallet.Call.report_equivocation_unsigned, "type">,
-  ): t.types.pallet_grandpa.pallet.Call.report_equivocation_unsigned {
+    value: Omit<types.pallet_grandpa.pallet.Call.report_equivocation_unsigned, "type">,
+  ): types.pallet_grandpa.pallet.Call.report_equivocation_unsigned {
     return { type: "report_equivocation_unsigned", ...value }
   }
   /**
@@ -102,8 +102,8 @@ export namespace Call {
    * Only callable by root.
    */
   export function note_stalled(
-    value: Omit<t.types.pallet_grandpa.pallet.Call.note_stalled, "type">,
-  ): t.types.pallet_grandpa.pallet.Call.note_stalled {
+    value: Omit<types.pallet_grandpa.pallet.Call.note_stalled, "type">,
+  ): types.pallet_grandpa.pallet.Call.note_stalled {
     return { type: "note_stalled", ...value }
   }
 }
@@ -120,14 +120,14 @@ export type Error =
 
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
 export type Event =
-  | t.types.pallet_grandpa.pallet.Event.NewAuthorities
-  | t.types.pallet_grandpa.pallet.Event.Paused
-  | t.types.pallet_grandpa.pallet.Event.Resumed
+  | types.pallet_grandpa.pallet.Event.NewAuthorities
+  | types.pallet_grandpa.pallet.Event.Paused
+  | types.pallet_grandpa.pallet.Event.Resumed
 export namespace Event {
   /** New authority set has been applied. */
   export interface NewAuthorities {
     type: "NewAuthorities"
-    authority_set: Array<[t.types.sp_finality_grandpa.app.Public, t.types.u64]>
+    authority_set: Array<[types.sp_finality_grandpa.app.Public, types.u64]>
   }
   /** Current authority set has been paused. */
   export interface Paused {
@@ -139,16 +139,16 @@ export namespace Event {
   }
   /** New authority set has been applied. */
   export function NewAuthorities(
-    value: Omit<t.types.pallet_grandpa.pallet.Event.NewAuthorities, "type">,
-  ): t.types.pallet_grandpa.pallet.Event.NewAuthorities {
+    value: Omit<types.pallet_grandpa.pallet.Event.NewAuthorities, "type">,
+  ): types.pallet_grandpa.pallet.Event.NewAuthorities {
     return { type: "NewAuthorities", ...value }
   }
   /** Current authority set has been paused. */
-  export function Paused(): t.types.pallet_grandpa.pallet.Event.Paused {
+  export function Paused(): types.pallet_grandpa.pallet.Event.Paused {
     return { type: "Paused" }
   }
   /** Current authority set has been resumed. */
-  export function Resumed(): t.types.pallet_grandpa.pallet.Event.Resumed {
+  export function Resumed(): types.pallet_grandpa.pallet.Event.Resumed {
     return { type: "Resumed" }
   }
 }

@@ -1,19 +1,19 @@
 import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as t from "../../mod.ts"
+import type * as types from "../../types/mod.ts"
 
-export const $call: $.Codec<t.types.pallet_multisig.pallet.Call> = _codec.$305
+export const $call: $.Codec<types.pallet_multisig.pallet.Call> = _codec.$305
 
-export const $error: $.Codec<t.types.pallet_multisig.pallet.Error> = _codec.$590
+export const $error: $.Codec<types.pallet_multisig.pallet.Error> = _codec.$590
 
-export const $event: $.Codec<t.types.pallet_multisig.pallet.Event> = _codec.$81
+export const $event: $.Codec<types.pallet_multisig.pallet.Event> = _codec.$81
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 export type Call =
-  | t.types.pallet_multisig.pallet.Call.as_multi_threshold_1
-  | t.types.pallet_multisig.pallet.Call.as_multi
-  | t.types.pallet_multisig.pallet.Call.approve_as_multi
-  | t.types.pallet_multisig.pallet.Call.cancel_as_multi
+  | types.pallet_multisig.pallet.Call.as_multi_threshold_1
+  | types.pallet_multisig.pallet.Call.as_multi
+  | types.pallet_multisig.pallet.Call.approve_as_multi
+  | types.pallet_multisig.pallet.Call.cancel_as_multi
 export namespace Call {
   /**
    * Immediately dispatch a multi-signature call using a single approval from the caller.
@@ -35,8 +35,8 @@ export namespace Call {
    */
   export interface as_multi_threshold_1 {
     type: "as_multi_threshold_1"
-    other_signatories: Array<t.types.sp_core.crypto.AccountId32>
-    call: t.types.polkadot_runtime.RuntimeCall
+    other_signatories: Array<types.sp_core.crypto.AccountId32>
+    call: types.polkadot_runtime.RuntimeCall
   }
   /**
    * Register approval for a dispatch to be made from a deterministic composite account if
@@ -87,11 +87,11 @@ export namespace Call {
    */
   export interface as_multi {
     type: "as_multi"
-    threshold: t.types.u16
-    other_signatories: Array<t.types.sp_core.crypto.AccountId32>
-    maybe_timepoint: t.types.pallet_multisig.Timepoint | undefined
-    call: t.types.polkadot_runtime.RuntimeCall
-    max_weight: t.types.sp_weights.weight_v2.Weight
+    threshold: types.u16
+    other_signatories: Array<types.sp_core.crypto.AccountId32>
+    maybe_timepoint: types.pallet_multisig.Timepoint | undefined
+    call: types.polkadot_runtime.RuntimeCall
+    max_weight: types.sp_weights.weight_v2.Weight
   }
   /**
    * Register approval for a dispatch to be made from a deterministic composite account if
@@ -132,11 +132,11 @@ export namespace Call {
    */
   export interface approve_as_multi {
     type: "approve_as_multi"
-    threshold: t.types.u16
-    other_signatories: Array<t.types.sp_core.crypto.AccountId32>
-    maybe_timepoint: t.types.pallet_multisig.Timepoint | undefined
+    threshold: types.u16
+    other_signatories: Array<types.sp_core.crypto.AccountId32>
+    maybe_timepoint: types.pallet_multisig.Timepoint | undefined
     call_hash: Uint8Array
-    max_weight: t.types.sp_weights.weight_v2.Weight
+    max_weight: types.sp_weights.weight_v2.Weight
   }
   /**
    * Cancel a pre-existing, on-going multisig transaction. Any deposit reserved previously
@@ -168,9 +168,9 @@ export namespace Call {
    */
   export interface cancel_as_multi {
     type: "cancel_as_multi"
-    threshold: t.types.u16
-    other_signatories: Array<t.types.sp_core.crypto.AccountId32>
-    timepoint: t.types.pallet_multisig.Timepoint
+    threshold: types.u16
+    other_signatories: Array<types.sp_core.crypto.AccountId32>
+    timepoint: types.pallet_multisig.Timepoint
     call_hash: Uint8Array
   }
   /**
@@ -192,8 +192,8 @@ export namespace Call {
    * # </weight>
    */
   export function as_multi_threshold_1(
-    value: Omit<t.types.pallet_multisig.pallet.Call.as_multi_threshold_1, "type">,
-  ): t.types.pallet_multisig.pallet.Call.as_multi_threshold_1 {
+    value: Omit<types.pallet_multisig.pallet.Call.as_multi_threshold_1, "type">,
+  ): types.pallet_multisig.pallet.Call.as_multi_threshold_1 {
     return { type: "as_multi_threshold_1", ...value }
   }
   /**
@@ -244,8 +244,8 @@ export namespace Call {
    * # </weight>
    */
   export function as_multi(
-    value: Omit<t.types.pallet_multisig.pallet.Call.as_multi, "type">,
-  ): t.types.pallet_multisig.pallet.Call.as_multi {
+    value: Omit<types.pallet_multisig.pallet.Call.as_multi, "type">,
+  ): types.pallet_multisig.pallet.Call.as_multi {
     return { type: "as_multi", ...value }
   }
   /**
@@ -286,8 +286,8 @@ export namespace Call {
    * # </weight>
    */
   export function approve_as_multi(
-    value: Omit<t.types.pallet_multisig.pallet.Call.approve_as_multi, "type">,
-  ): t.types.pallet_multisig.pallet.Call.approve_as_multi {
+    value: Omit<types.pallet_multisig.pallet.Call.approve_as_multi, "type">,
+  ): types.pallet_multisig.pallet.Call.approve_as_multi {
     return { type: "approve_as_multi", ...value }
   }
   /**
@@ -319,8 +319,8 @@ export namespace Call {
    * # </weight>
    */
   export function cancel_as_multi(
-    value: Omit<t.types.pallet_multisig.pallet.Call.cancel_as_multi, "type">,
-  ): t.types.pallet_multisig.pallet.Call.cancel_as_multi {
+    value: Omit<types.pallet_multisig.pallet.Call.cancel_as_multi, "type">,
+  ): types.pallet_multisig.pallet.Call.cancel_as_multi {
     return { type: "cancel_as_multi", ...value }
   }
 }
@@ -344,65 +344,65 @@ export type Error =
 
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
 export type Event =
-  | t.types.pallet_multisig.pallet.Event.NewMultisig
-  | t.types.pallet_multisig.pallet.Event.MultisigApproval
-  | t.types.pallet_multisig.pallet.Event.MultisigExecuted
-  | t.types.pallet_multisig.pallet.Event.MultisigCancelled
+  | types.pallet_multisig.pallet.Event.NewMultisig
+  | types.pallet_multisig.pallet.Event.MultisigApproval
+  | types.pallet_multisig.pallet.Event.MultisigExecuted
+  | types.pallet_multisig.pallet.Event.MultisigCancelled
 export namespace Event {
   /** A new multisig operation has begun. */
   export interface NewMultisig {
     type: "NewMultisig"
-    approving: t.types.sp_core.crypto.AccountId32
-    multisig: t.types.sp_core.crypto.AccountId32
+    approving: types.sp_core.crypto.AccountId32
+    multisig: types.sp_core.crypto.AccountId32
     call_hash: Uint8Array
   }
   /** A multisig operation has been approved by someone. */
   export interface MultisigApproval {
     type: "MultisigApproval"
-    approving: t.types.sp_core.crypto.AccountId32
-    timepoint: t.types.pallet_multisig.Timepoint
-    multisig: t.types.sp_core.crypto.AccountId32
+    approving: types.sp_core.crypto.AccountId32
+    timepoint: types.pallet_multisig.Timepoint
+    multisig: types.sp_core.crypto.AccountId32
     call_hash: Uint8Array
   }
   /** A multisig operation has been executed. */
   export interface MultisigExecuted {
     type: "MultisigExecuted"
-    approving: t.types.sp_core.crypto.AccountId32
-    timepoint: t.types.pallet_multisig.Timepoint
-    multisig: t.types.sp_core.crypto.AccountId32
+    approving: types.sp_core.crypto.AccountId32
+    timepoint: types.pallet_multisig.Timepoint
+    multisig: types.sp_core.crypto.AccountId32
     call_hash: Uint8Array
-    result: null | C.ChainError<t.types.sp_runtime.DispatchError>
+    result: null | C.ChainError<types.sp_runtime.DispatchError>
   }
   /** A multisig operation has been cancelled. */
   export interface MultisigCancelled {
     type: "MultisigCancelled"
-    cancelling: t.types.sp_core.crypto.AccountId32
-    timepoint: t.types.pallet_multisig.Timepoint
-    multisig: t.types.sp_core.crypto.AccountId32
+    cancelling: types.sp_core.crypto.AccountId32
+    timepoint: types.pallet_multisig.Timepoint
+    multisig: types.sp_core.crypto.AccountId32
     call_hash: Uint8Array
   }
   /** A new multisig operation has begun. */
   export function NewMultisig(
-    value: Omit<t.types.pallet_multisig.pallet.Event.NewMultisig, "type">,
-  ): t.types.pallet_multisig.pallet.Event.NewMultisig {
+    value: Omit<types.pallet_multisig.pallet.Event.NewMultisig, "type">,
+  ): types.pallet_multisig.pallet.Event.NewMultisig {
     return { type: "NewMultisig", ...value }
   }
   /** A multisig operation has been approved by someone. */
   export function MultisigApproval(
-    value: Omit<t.types.pallet_multisig.pallet.Event.MultisigApproval, "type">,
-  ): t.types.pallet_multisig.pallet.Event.MultisigApproval {
+    value: Omit<types.pallet_multisig.pallet.Event.MultisigApproval, "type">,
+  ): types.pallet_multisig.pallet.Event.MultisigApproval {
     return { type: "MultisigApproval", ...value }
   }
   /** A multisig operation has been executed. */
   export function MultisigExecuted(
-    value: Omit<t.types.pallet_multisig.pallet.Event.MultisigExecuted, "type">,
-  ): t.types.pallet_multisig.pallet.Event.MultisigExecuted {
+    value: Omit<types.pallet_multisig.pallet.Event.MultisigExecuted, "type">,
+  ): types.pallet_multisig.pallet.Event.MultisigExecuted {
     return { type: "MultisigExecuted", ...value }
   }
   /** A multisig operation has been cancelled. */
   export function MultisigCancelled(
-    value: Omit<t.types.pallet_multisig.pallet.Event.MultisigCancelled, "type">,
-  ): t.types.pallet_multisig.pallet.Event.MultisigCancelled {
+    value: Omit<types.pallet_multisig.pallet.Event.MultisigCancelled, "type">,
+  ): types.pallet_multisig.pallet.Event.MultisigCancelled {
     return { type: "MultisigCancelled", ...value }
   }
 }

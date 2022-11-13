@@ -1,19 +1,19 @@
 import { $ } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as t from "../../mod.ts"
+import type * as types from "../../types/mod.ts"
 
-export const $call: $.Codec<t.types.pallet_preimage.pallet.Call> = _codec.$184
+export const $call: $.Codec<types.pallet_preimage.pallet.Call> = _codec.$184
 
-export const $error: $.Codec<t.types.pallet_preimage.pallet.Error> = _codec.$455
+export const $error: $.Codec<types.pallet_preimage.pallet.Error> = _codec.$455
 
-export const $event: $.Codec<t.types.pallet_preimage.pallet.Event> = _codec.$34
+export const $event: $.Codec<types.pallet_preimage.pallet.Event> = _codec.$34
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 export type Call =
-  | t.types.pallet_preimage.pallet.Call.note_preimage
-  | t.types.pallet_preimage.pallet.Call.unnote_preimage
-  | t.types.pallet_preimage.pallet.Call.request_preimage
-  | t.types.pallet_preimage.pallet.Call.unrequest_preimage
+  | types.pallet_preimage.pallet.Call.note_preimage
+  | types.pallet_preimage.pallet.Call.unnote_preimage
+  | types.pallet_preimage.pallet.Call.request_preimage
+  | types.pallet_preimage.pallet.Call.unrequest_preimage
 export namespace Call {
   /**
    * Register a preimage on-chain.
@@ -35,7 +35,7 @@ export namespace Call {
    */
   export interface unnote_preimage {
     type: "unnote_preimage"
-    hash: t.types.primitive_types.H256
+    hash: types.primitive_types.H256
   }
   /**
    * Request a preimage be uploaded to the chain without paying any fees or deposits.
@@ -45,7 +45,7 @@ export namespace Call {
    */
   export interface request_preimage {
     type: "request_preimage"
-    hash: t.types.primitive_types.H256
+    hash: types.primitive_types.H256
   }
   /**
    * Clear a previously made request for a preimage.
@@ -54,7 +54,7 @@ export namespace Call {
    */
   export interface unrequest_preimage {
     type: "unrequest_preimage"
-    hash: t.types.primitive_types.H256
+    hash: types.primitive_types.H256
   }
   /**
    * Register a preimage on-chain.
@@ -63,8 +63,8 @@ export namespace Call {
    * the preimage. Otherwise, a deposit is taken proportional to the size of the preimage.
    */
   export function note_preimage(
-    value: Omit<t.types.pallet_preimage.pallet.Call.note_preimage, "type">,
-  ): t.types.pallet_preimage.pallet.Call.note_preimage {
+    value: Omit<types.pallet_preimage.pallet.Call.note_preimage, "type">,
+  ): types.pallet_preimage.pallet.Call.note_preimage {
     return { type: "note_preimage", ...value }
   }
   /**
@@ -76,8 +76,8 @@ export namespace Call {
    * - `len`: The length of the preimage of `hash`.
    */
   export function unnote_preimage(
-    value: Omit<t.types.pallet_preimage.pallet.Call.unnote_preimage, "type">,
-  ): t.types.pallet_preimage.pallet.Call.unnote_preimage {
+    value: Omit<types.pallet_preimage.pallet.Call.unnote_preimage, "type">,
+  ): types.pallet_preimage.pallet.Call.unnote_preimage {
     return { type: "unnote_preimage", ...value }
   }
   /**
@@ -87,8 +87,8 @@ export namespace Call {
    * a user may have paid, and take the control of the preimage out of their hands.
    */
   export function request_preimage(
-    value: Omit<t.types.pallet_preimage.pallet.Call.request_preimage, "type">,
-  ): t.types.pallet_preimage.pallet.Call.request_preimage {
+    value: Omit<types.pallet_preimage.pallet.Call.request_preimage, "type">,
+  ): types.pallet_preimage.pallet.Call.request_preimage {
     return { type: "request_preimage", ...value }
   }
   /**
@@ -97,8 +97,8 @@ export namespace Call {
    * NOTE: THIS MUST NOT BE CALLED ON `hash` MORE TIMES THAN `request_preimage`.
    */
   export function unrequest_preimage(
-    value: Omit<t.types.pallet_preimage.pallet.Call.unrequest_preimage, "type">,
-  ): t.types.pallet_preimage.pallet.Call.unrequest_preimage {
+    value: Omit<types.pallet_preimage.pallet.Call.unrequest_preimage, "type">,
+  ): types.pallet_preimage.pallet.Call.unrequest_preimage {
     return { type: "unrequest_preimage", ...value }
   }
 }
@@ -114,41 +114,41 @@ export type Error =
 
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
 export type Event =
-  | t.types.pallet_preimage.pallet.Event.Noted
-  | t.types.pallet_preimage.pallet.Event.Requested
-  | t.types.pallet_preimage.pallet.Event.Cleared
+  | types.pallet_preimage.pallet.Event.Noted
+  | types.pallet_preimage.pallet.Event.Requested
+  | types.pallet_preimage.pallet.Event.Cleared
 export namespace Event {
   /** A preimage has been noted. */
   export interface Noted {
     type: "Noted"
-    hash: t.types.primitive_types.H256
+    hash: types.primitive_types.H256
   }
   /** A preimage has been requested. */
   export interface Requested {
     type: "Requested"
-    hash: t.types.primitive_types.H256
+    hash: types.primitive_types.H256
   }
   /** A preimage has ben cleared. */
   export interface Cleared {
     type: "Cleared"
-    hash: t.types.primitive_types.H256
+    hash: types.primitive_types.H256
   }
   /** A preimage has been noted. */
   export function Noted(
-    value: Omit<t.types.pallet_preimage.pallet.Event.Noted, "type">,
-  ): t.types.pallet_preimage.pallet.Event.Noted {
+    value: Omit<types.pallet_preimage.pallet.Event.Noted, "type">,
+  ): types.pallet_preimage.pallet.Event.Noted {
     return { type: "Noted", ...value }
   }
   /** A preimage has been requested. */
   export function Requested(
-    value: Omit<t.types.pallet_preimage.pallet.Event.Requested, "type">,
-  ): t.types.pallet_preimage.pallet.Event.Requested {
+    value: Omit<types.pallet_preimage.pallet.Event.Requested, "type">,
+  ): types.pallet_preimage.pallet.Event.Requested {
     return { type: "Requested", ...value }
   }
   /** A preimage has ben cleared. */
   export function Cleared(
-    value: Omit<t.types.pallet_preimage.pallet.Event.Cleared, "type">,
-  ): t.types.pallet_preimage.pallet.Event.Cleared {
+    value: Omit<types.pallet_preimage.pallet.Event.Cleared, "type">,
+  ): types.pallet_preimage.pallet.Event.Cleared {
     return { type: "Cleared", ...value }
   }
 }

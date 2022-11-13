@@ -1,6 +1,6 @@
 import { $ } from "../capi.ts"
 import * as _codec from "../codecs.ts"
-import type * as t from "../mod.ts"
+import type * as types from "../types/mod.ts"
 
 /**
  *  The ordered list of `ParaId`s that have a `RelayDispatchQueue` entry.
@@ -109,7 +109,7 @@ export const RelayDispatchQueues = {
  * - `OverweightServiced`: On success.
  */
 export function service_overweight(
-  value: Omit<t.types.polkadot_runtime_parachains.ump.pallet.Call.service_overweight, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.polkadot_runtime_parachains.ump.pallet.Call.service_overweight, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Ump", value: { ...value, type: "service_overweight" } }
 }

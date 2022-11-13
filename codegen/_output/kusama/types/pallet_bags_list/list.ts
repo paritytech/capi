@@ -1,32 +1,32 @@
 import { $ } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as t from "../../mod.ts"
+import type * as types from "../../types/mod.ts"
 
-export const $bag: $.Codec<t.types.pallet_bags_list.list.Bag> = _codec.$613
+export const $bag: $.Codec<types.pallet_bags_list.list.Bag> = _codec.$613
 
-export const $listError: $.Codec<t.types.pallet_bags_list.list.ListError> = _codec.$616
+export const $listError: $.Codec<types.pallet_bags_list.list.ListError> = _codec.$616
 
-export const $node: $.Codec<t.types.pallet_bags_list.list.Node> = _codec.$612
+export const $node: $.Codec<types.pallet_bags_list.list.Node> = _codec.$612
 
 export interface Bag {
-  head: t.types.sp_core.crypto.AccountId32 | undefined
-  tail: t.types.sp_core.crypto.AccountId32 | undefined
+  head: types.sp_core.crypto.AccountId32 | undefined
+  tail: types.sp_core.crypto.AccountId32 | undefined
 }
 
-export function Bag(value: t.types.pallet_bags_list.list.Bag) {
+export function Bag(value: types.pallet_bags_list.list.Bag) {
   return value
 }
 
 export type ListError = "Duplicate" | "NotHeavier" | "NotInSameBag" | "NodeNotFound"
 
 export interface Node {
-  id: t.types.sp_core.crypto.AccountId32
-  prev: t.types.sp_core.crypto.AccountId32 | undefined
-  next: t.types.sp_core.crypto.AccountId32 | undefined
-  bag_upper: t.types.u64
-  score: t.types.u64
+  id: types.sp_core.crypto.AccountId32
+  prev: types.sp_core.crypto.AccountId32 | undefined
+  next: types.sp_core.crypto.AccountId32 | undefined
+  bag_upper: types.u64
+  score: types.u64
 }
 
-export function Node(value: t.types.pallet_bags_list.list.Node) {
+export function Node(value: types.pallet_bags_list.list.Node) {
   return value
 }

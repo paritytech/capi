@@ -1,6 +1,6 @@
 import { $ } from "../capi.ts"
 import * as _codec from "../codecs.ts"
-import type * as t from "../mod.ts"
+import type * as types from "../types/mod.ts"
 
 /** Proposal indices that have been approved but not yet awarded. */
 export const Approvals = {
@@ -42,8 +42,8 @@ export const Proposals = {
  * # </weight>
  */
 export function approve_proposal(
-  value: Omit<t.types.pallet_treasury.pallet.Call.approve_proposal, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_treasury.pallet.Call.approve_proposal, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Treasury", value: { ...value, type: "approve_proposal" } }
 }
 
@@ -59,8 +59,8 @@ export function approve_proposal(
  * # </weight>
  */
 export function propose_spend(
-  value: Omit<t.types.pallet_treasury.pallet.Call.propose_spend, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_treasury.pallet.Call.propose_spend, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Treasury", value: { ...value, type: "propose_spend" } }
 }
 
@@ -76,8 +76,8 @@ export function propose_spend(
  * # </weight>
  */
 export function reject_proposal(
-  value: Omit<t.types.pallet_treasury.pallet.Call.reject_proposal, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_treasury.pallet.Call.reject_proposal, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Treasury", value: { ...value, type: "reject_proposal" } }
 }
 
@@ -99,8 +99,8 @@ export function reject_proposal(
  * exist altogether, thus there is no way it would have been approved in the first place.
  */
 export function remove_approval(
-  value: Omit<t.types.pallet_treasury.pallet.Call.remove_approval, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_treasury.pallet.Call.remove_approval, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Treasury", value: { ...value, type: "remove_approval" } }
 }
 
@@ -115,7 +115,7 @@ export function remove_approval(
  * beneficiary.
  */
 export function spend(
-  value: Omit<t.types.pallet_treasury.pallet.Call.spend, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_treasury.pallet.Call.spend, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Treasury", value: { ...value, type: "spend" } }
 }

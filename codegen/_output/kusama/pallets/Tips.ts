@@ -1,6 +1,6 @@
 import { $ } from "../capi.ts"
 import * as _codec from "../codecs.ts"
-import type * as t from "../mod.ts"
+import type * as types from "../types/mod.ts"
 
 /**
  *  Simple preimage lookup from the reason's hash to the original data. Again, has an
@@ -46,8 +46,8 @@ export const Tips = {
  * # </weight>
  */
 export function close_tip(
-  value: Omit<t.types.pallet_tips.pallet.Call.close_tip, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_tips.pallet.Call.close_tip, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Tips", value: { ...value, type: "close_tip" } }
 }
 
@@ -73,8 +73,8 @@ export function close_tip(
  * # </weight>
  */
 export function report_awesome(
-  value: Omit<t.types.pallet_tips.pallet.Call.report_awesome, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_tips.pallet.Call.report_awesome, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Tips", value: { ...value, type: "report_awesome" } }
 }
 
@@ -100,8 +100,8 @@ export function report_awesome(
  * # </weight>
  */
 export function retract_tip(
-  value: Omit<t.types.pallet_tips.pallet.Call.retract_tip, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_tips.pallet.Call.retract_tip, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Tips", value: { ...value, type: "retract_tip" } }
 }
 
@@ -120,8 +120,8 @@ export function retract_tip(
  * # </weight>
  */
 export function slash_tip(
-  value: Omit<t.types.pallet_tips.pallet.Call.slash_tip, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_tips.pallet.Call.slash_tip, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Tips", value: { ...value, type: "slash_tip" } }
 }
 
@@ -152,8 +152,8 @@ export function slash_tip(
  * # </weight>
  */
 export function tip(
-  value: Omit<t.types.pallet_tips.pallet.Call.tip, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_tips.pallet.Call.tip, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Tips", value: { ...value, type: "tip" } }
 }
 
@@ -182,7 +182,7 @@ export function tip(
  * # </weight>
  */
 export function tip_new(
-  value: Omit<t.types.pallet_tips.pallet.Call.tip_new, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_tips.pallet.Call.tip_new, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Tips", value: { ...value, type: "tip_new" } }
 }

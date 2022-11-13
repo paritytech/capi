@@ -1,16 +1,16 @@
 import { $ } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as t from "../../mod.ts"
+import type * as types from "../../types/mod.ts"
 
-export const $call: $.Codec<t.types.pallet_babe.pallet.Call> = _codec.$185
+export const $call: $.Codec<types.pallet_babe.pallet.Call> = _codec.$185
 
-export const $error: $.Codec<t.types.pallet_babe.pallet.Error> = _codec.$467
+export const $error: $.Codec<types.pallet_babe.pallet.Error> = _codec.$467
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 export type Call =
-  | t.types.pallet_babe.pallet.Call.report_equivocation
-  | t.types.pallet_babe.pallet.Call.report_equivocation_unsigned
-  | t.types.pallet_babe.pallet.Call.plan_config_change
+  | types.pallet_babe.pallet.Call.report_equivocation
+  | types.pallet_babe.pallet.Call.report_equivocation_unsigned
+  | types.pallet_babe.pallet.Call.plan_config_change
 export namespace Call {
   /**
    * Report authority equivocation/misbehavior. This method will verify
@@ -20,8 +20,8 @@ export namespace Call {
    */
   export interface report_equivocation {
     type: "report_equivocation"
-    equivocation_proof: t.types.sp_consensus_slots.EquivocationProof
-    key_owner_proof: t.types.sp_session.MembershipProof
+    equivocation_proof: types.sp_consensus_slots.EquivocationProof
+    key_owner_proof: types.sp_session.MembershipProof
   }
   /**
    * Report authority equivocation/misbehavior. This method will verify
@@ -35,8 +35,8 @@ export namespace Call {
    */
   export interface report_equivocation_unsigned {
     type: "report_equivocation_unsigned"
-    equivocation_proof: t.types.sp_consensus_slots.EquivocationProof
-    key_owner_proof: t.types.sp_session.MembershipProof
+    equivocation_proof: types.sp_consensus_slots.EquivocationProof
+    key_owner_proof: types.sp_session.MembershipProof
   }
   /**
    * Plan an epoch config change. The epoch config change is recorded and will be enacted on
@@ -46,7 +46,7 @@ export namespace Call {
    */
   export interface plan_config_change {
     type: "plan_config_change"
-    config: t.types.sp_consensus_babe.digests.NextConfigDescriptor
+    config: types.sp_consensus_babe.digests.NextConfigDescriptor
   }
   /**
    * Report authority equivocation/misbehavior. This method will verify
@@ -55,8 +55,8 @@ export namespace Call {
    * be reported.
    */
   export function report_equivocation(
-    value: Omit<t.types.pallet_babe.pallet.Call.report_equivocation, "type">,
-  ): t.types.pallet_babe.pallet.Call.report_equivocation {
+    value: Omit<types.pallet_babe.pallet.Call.report_equivocation, "type">,
+  ): types.pallet_babe.pallet.Call.report_equivocation {
     return { type: "report_equivocation", ...value }
   }
   /**
@@ -70,8 +70,8 @@ export namespace Call {
    * reporter.
    */
   export function report_equivocation_unsigned(
-    value: Omit<t.types.pallet_babe.pallet.Call.report_equivocation_unsigned, "type">,
-  ): t.types.pallet_babe.pallet.Call.report_equivocation_unsigned {
+    value: Omit<types.pallet_babe.pallet.Call.report_equivocation_unsigned, "type">,
+  ): types.pallet_babe.pallet.Call.report_equivocation_unsigned {
     return { type: "report_equivocation_unsigned", ...value }
   }
   /**
@@ -81,8 +81,8 @@ export namespace Call {
    * not been enacted yet.
    */
   export function plan_config_change(
-    value: Omit<t.types.pallet_babe.pallet.Call.plan_config_change, "type">,
-  ): t.types.pallet_babe.pallet.Call.plan_config_change {
+    value: Omit<types.pallet_babe.pallet.Call.plan_config_change, "type">,
+  ): types.pallet_babe.pallet.Call.plan_config_change {
     return { type: "plan_config_change", ...value }
   }
 }

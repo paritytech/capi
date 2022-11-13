@@ -1,4 +1,4 @@
-import type * as t from "../mod.ts"
+import type * as types from "../types/mod.ts"
 
 /**
  * Send a call through an indexed pseudonym of the sender.
@@ -16,8 +16,8 @@ import type * as t from "../mod.ts"
  * The dispatch origin for this call must be _Signed_.
  */
 export function as_derivative(
-  value: Omit<t.types.pallet_utility.pallet.Call.as_derivative, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_utility.pallet.Call.as_derivative, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Utility", value: { ...value, type: "as_derivative" } }
 }
 
@@ -43,8 +43,8 @@ export function as_derivative(
  * event is deposited.
  */
 export function batch(
-  value: Omit<t.types.pallet_utility.pallet.Call.batch, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_utility.pallet.Call.batch, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Utility", value: { ...value, type: "batch" } }
 }
 
@@ -65,8 +65,8 @@ export function batch(
  * # </weight>
  */
 export function batch_all(
-  value: Omit<t.types.pallet_utility.pallet.Call.batch_all, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_utility.pallet.Call.batch_all, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Utility", value: { ...value, type: "batch_all" } }
 }
 
@@ -83,8 +83,8 @@ export function batch_all(
  * # </weight>
  */
 export function dispatch_as(
-  value: Omit<t.types.pallet_utility.pallet.Call.dispatch_as, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_utility.pallet.Call.dispatch_as, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Utility", value: { ...value, type: "dispatch_as" } }
 }
 
@@ -105,7 +105,7 @@ export function dispatch_as(
  * # </weight>
  */
 export function force_batch(
-  value: Omit<t.types.pallet_utility.pallet.Call.force_batch, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_utility.pallet.Call.force_batch, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Utility", value: { ...value, type: "force_batch" } }
 }
