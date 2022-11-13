@@ -1,20 +1,20 @@
 import { $ } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as t from "../../../mod.ts"
+import type * as types from "../../../types/mod.ts"
 
-export const $call: $.Codec<t.types.polkadot_runtime_common.claims.pallet.Call> = _codec.$245
+export const $call: $.Codec<types.polkadot_runtime_common.claims.pallet.Call> = _codec.$245
 
-export const $error: $.Codec<t.types.polkadot_runtime_common.claims.pallet.Error> = _codec.$562
+export const $error: $.Codec<types.polkadot_runtime_common.claims.pallet.Error> = _codec.$562
 
-export const $event: $.Codec<t.types.polkadot_runtime_common.claims.pallet.Event> = _codec.$72
+export const $event: $.Codec<types.polkadot_runtime_common.claims.pallet.Event> = _codec.$72
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 export type Call =
-  | t.types.polkadot_runtime_common.claims.pallet.Call.claim
-  | t.types.polkadot_runtime_common.claims.pallet.Call.mint_claim
-  | t.types.polkadot_runtime_common.claims.pallet.Call.claim_attest
-  | t.types.polkadot_runtime_common.claims.pallet.Call.attest
-  | t.types.polkadot_runtime_common.claims.pallet.Call.move_claim
+  | types.polkadot_runtime_common.claims.pallet.Call.claim
+  | types.polkadot_runtime_common.claims.pallet.Call.mint_claim
+  | types.polkadot_runtime_common.claims.pallet.Call.claim_attest
+  | types.polkadot_runtime_common.claims.pallet.Call.attest
+  | types.polkadot_runtime_common.claims.pallet.Call.move_claim
 export namespace Call {
   /**
    * Make a claim to collect your DOTs.
@@ -44,8 +44,8 @@ export namespace Call {
    */
   export interface claim {
     type: "claim"
-    dest: t.types.sp_core.crypto.AccountId32
-    ethereum_signature: t.types.polkadot_runtime_common.claims.EcdsaSignature
+    dest: types.sp_core.crypto.AccountId32
+    ethereum_signature: types.polkadot_runtime_common.claims.EcdsaSignature
   }
   /**
    * Mint a new claim to collect DOTs.
@@ -66,10 +66,10 @@ export namespace Call {
    */
   export interface mint_claim {
     type: "mint_claim"
-    who: t.types.polkadot_runtime_common.claims.EthereumAddress
-    value: t.types.u128
-    vesting_schedule: [t.types.u128, t.types.u128, t.types.u32] | undefined
-    statement: t.types.polkadot_runtime_common.claims.StatementKind | undefined
+    who: types.polkadot_runtime_common.claims.EthereumAddress
+    value: types.u128
+    vesting_schedule: [types.u128, types.u128, types.u32] | undefined
+    statement: types.polkadot_runtime_common.claims.StatementKind | undefined
   }
   /**
    * Make a claim to collect your DOTs by signing a statement.
@@ -101,8 +101,8 @@ export namespace Call {
    */
   export interface claim_attest {
     type: "claim_attest"
-    dest: t.types.sp_core.crypto.AccountId32
-    ethereum_signature: t.types.polkadot_runtime_common.claims.EcdsaSignature
+    dest: types.sp_core.crypto.AccountId32
+    ethereum_signature: types.polkadot_runtime_common.claims.EcdsaSignature
     statement: Uint8Array
   }
   /**
@@ -130,9 +130,9 @@ export namespace Call {
   }
   export interface move_claim {
     type: "move_claim"
-    old: t.types.polkadot_runtime_common.claims.EthereumAddress
-    new: t.types.polkadot_runtime_common.claims.EthereumAddress
-    maybe_preclaim: t.types.sp_core.crypto.AccountId32 | undefined
+    old: types.polkadot_runtime_common.claims.EthereumAddress
+    new: types.polkadot_runtime_common.claims.EthereumAddress
+    maybe_preclaim: types.sp_core.crypto.AccountId32 | undefined
   }
   /**
    * Make a claim to collect your DOTs.
@@ -161,8 +161,8 @@ export namespace Call {
    * </weight>
    */
   export function claim(
-    value: Omit<t.types.polkadot_runtime_common.claims.pallet.Call.claim, "type">,
-  ): t.types.polkadot_runtime_common.claims.pallet.Call.claim {
+    value: Omit<types.polkadot_runtime_common.claims.pallet.Call.claim, "type">,
+  ): types.polkadot_runtime_common.claims.pallet.Call.claim {
     return { type: "claim", ...value }
   }
   /**
@@ -183,8 +183,8 @@ export namespace Call {
    * </weight>
    */
   export function mint_claim(
-    value: Omit<t.types.polkadot_runtime_common.claims.pallet.Call.mint_claim, "type">,
-  ): t.types.polkadot_runtime_common.claims.pallet.Call.mint_claim {
+    value: Omit<types.polkadot_runtime_common.claims.pallet.Call.mint_claim, "type">,
+  ): types.polkadot_runtime_common.claims.pallet.Call.mint_claim {
     return { type: "mint_claim", ...value }
   }
   /**
@@ -216,8 +216,8 @@ export namespace Call {
    * </weight>
    */
   export function claim_attest(
-    value: Omit<t.types.polkadot_runtime_common.claims.pallet.Call.claim_attest, "type">,
-  ): t.types.polkadot_runtime_common.claims.pallet.Call.claim_attest {
+    value: Omit<types.polkadot_runtime_common.claims.pallet.Call.claim_attest, "type">,
+  ): types.polkadot_runtime_common.claims.pallet.Call.claim_attest {
     return { type: "claim_attest", ...value }
   }
   /**
@@ -240,13 +240,13 @@ export namespace Call {
    * </weight>
    */
   export function attest(
-    value: Omit<t.types.polkadot_runtime_common.claims.pallet.Call.attest, "type">,
-  ): t.types.polkadot_runtime_common.claims.pallet.Call.attest {
+    value: Omit<types.polkadot_runtime_common.claims.pallet.Call.attest, "type">,
+  ): types.polkadot_runtime_common.claims.pallet.Call.attest {
     return { type: "attest", ...value }
   }
   export function move_claim(
-    value: Omit<t.types.polkadot_runtime_common.claims.pallet.Call.move_claim, "type">,
-  ): t.types.polkadot_runtime_common.claims.pallet.Call.move_claim {
+    value: Omit<types.polkadot_runtime_common.claims.pallet.Call.move_claim, "type">,
+  ): types.polkadot_runtime_common.claims.pallet.Call.move_claim {
     return { type: "move_claim", ...value }
   }
 }
@@ -261,19 +261,19 @@ export type Error =
   | "VestedBalanceExists"
 
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
-export type Event = t.types.polkadot_runtime_common.claims.pallet.Event.Claimed
+export type Event = types.polkadot_runtime_common.claims.pallet.Event.Claimed
 export namespace Event {
   /** Someone claimed some DOTs. */
   export interface Claimed {
     type: "Claimed"
-    who: t.types.sp_core.crypto.AccountId32
-    ethereum_address: t.types.polkadot_runtime_common.claims.EthereumAddress
-    amount: t.types.u128
+    who: types.sp_core.crypto.AccountId32
+    ethereum_address: types.polkadot_runtime_common.claims.EthereumAddress
+    amount: types.u128
   }
   /** Someone claimed some DOTs. */
   export function Claimed(
-    value: Omit<t.types.polkadot_runtime_common.claims.pallet.Event.Claimed, "type">,
-  ): t.types.polkadot_runtime_common.claims.pallet.Event.Claimed {
+    value: Omit<types.polkadot_runtime_common.claims.pallet.Event.Claimed, "type">,
+  ): types.polkadot_runtime_common.claims.pallet.Event.Claimed {
     return { type: "Claimed", ...value }
   }
 }

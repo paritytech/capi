@@ -1,6 +1,6 @@
 import { $ } from "../capi.ts"
 import * as _codec from "../codecs.ts"
-import type * as t from "../mod.ts"
+import type * as types from "../types/mod.ts"
 
 /** Storage for bonded pools. */
 export const BondedPools = {
@@ -201,8 +201,8 @@ export const SubPoolsStorage = {
  * Bonding extra funds implies an automatic payout of all pending rewards as well.
  */
 export function bond_extra(
-  value: Omit<t.types.pallet_nomination_pools.pallet.Call.bond_extra, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_nomination_pools.pallet.Call.bond_extra, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "NominationPools", value: { ...value, type: "bond_extra" } }
 }
 
@@ -216,8 +216,8 @@ export function bond_extra(
  * account.
  */
 export function chill(
-  value: Omit<t.types.pallet_nomination_pools.pallet.Call.chill, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_nomination_pools.pallet.Call.chill, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "NominationPools", value: { ...value, type: "chill" } }
 }
 
@@ -229,7 +229,7 @@ export function chill(
  * The member will earn rewards pro rata based on the members stake vs the sum of the
  * members in the pools stake. Rewards do not "expire".
  */
-export function claim_payout(): t.types.polkadot_runtime.RuntimeCall {
+export function claim_payout(): types.polkadot_runtime.RuntimeCall {
   return { type: "NominationPools", value: { type: "claim_payout" } }
 }
 
@@ -253,8 +253,8 @@ export function claim_payout(): t.types.polkadot_runtime.RuntimeCall {
  * needs at have at least `amount + existential_deposit` transferrable.
  */
 export function create(
-  value: Omit<t.types.pallet_nomination_pools.pallet.Call.create, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_nomination_pools.pallet.Call.create, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "NominationPools", value: { ...value, type: "create" } }
 }
 
@@ -271,8 +271,8 @@ export function create(
  * * Only a pool with [`PoolState::Open`] can be joined
  */
 export function join(
-  value: Omit<t.types.pallet_nomination_pools.pallet.Call.join, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_nomination_pools.pallet.Call.join, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "NominationPools", value: { ...value, type: "join" } }
 }
 
@@ -286,8 +286,8 @@ export function join(
  * account.
  */
 export function nominate(
-  value: Omit<t.types.pallet_nomination_pools.pallet.Call.nominate, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_nomination_pools.pallet.Call.nominate, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "NominationPools", value: { ...value, type: "nominate" } }
 }
 
@@ -300,8 +300,8 @@ export function nominate(
  * they attempt to unbond.
  */
 export function pool_withdraw_unbonded(
-  value: Omit<t.types.pallet_nomination_pools.pallet.Call.pool_withdraw_unbonded, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_nomination_pools.pallet.Call.pool_withdraw_unbonded, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "NominationPools", value: { ...value, type: "pool_withdraw_unbonded" } }
 }
 
@@ -318,8 +318,8 @@ export function pool_withdraw_unbonded(
  * * `max_members_per_pool` - Set [`MaxPoolMembersPerPool`].
  */
 export function set_configs(
-  value: Omit<t.types.pallet_nomination_pools.pallet.Call.set_configs, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_nomination_pools.pallet.Call.set_configs, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "NominationPools", value: { ...value, type: "set_configs" } }
 }
 
@@ -330,8 +330,8 @@ export function set_configs(
  * of the pool.
  */
 export function set_metadata(
-  value: Omit<t.types.pallet_nomination_pools.pallet.Call.set_metadata, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_nomination_pools.pallet.Call.set_metadata, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "NominationPools", value: { ...value, type: "set_metadata" } }
 }
 
@@ -348,8 +348,8 @@ export function set_metadata(
  *    then the state of the pool can be permissionlessly changed to `Destroying`.
  */
 export function set_state(
-  value: Omit<t.types.pallet_nomination_pools.pallet.Call.set_state, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_nomination_pools.pallet.Call.set_state, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "NominationPools", value: { ...value, type: "set_state" } }
 }
 
@@ -384,8 +384,8 @@ export function set_state(
  * `NoMoreChunks` error from the staking system.
  */
 export function unbond(
-  value: Omit<t.types.pallet_nomination_pools.pallet.Call.unbond, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_nomination_pools.pallet.Call.unbond, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "NominationPools", value: { ...value, type: "unbond" } }
 }
 
@@ -399,8 +399,8 @@ export function unbond(
  * most pool members and they should be informed of changes to pool roles.
  */
 export function update_roles(
-  value: Omit<t.types.pallet_nomination_pools.pallet.Call.update_roles, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_nomination_pools.pallet.Call.update_roles, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "NominationPools", value: { ...value, type: "update_roles" } }
 }
 
@@ -426,7 +426,7 @@ export function update_roles(
  * If the target is the depositor, the pool will be destroyed.
  */
 export function withdraw_unbonded(
-  value: Omit<t.types.pallet_nomination_pools.pallet.Call.withdraw_unbonded, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_nomination_pools.pallet.Call.withdraw_unbonded, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "NominationPools", value: { ...value, type: "withdraw_unbonded" } }
 }

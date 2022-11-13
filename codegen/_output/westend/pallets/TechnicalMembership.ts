@@ -1,5 +1,5 @@
 import * as _codec from "../codecs.ts"
-import type * as t from "../mod.ts"
+import type * as types from "../types/mod.ts"
 
 /** The current membership, stored as an ordered Vec. */
 export const Members = {
@@ -19,8 +19,8 @@ export const Prime = { type: "Plain", modifier: "Optional", hashers: [], key: []
  * May only be called from `T::AddOrigin`.
  */
 export function add_member(
-  value: Omit<t.types.pallet_membership.pallet.Call.add_member, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_membership.pallet.Call.add_member, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "TechnicalMembership", value: { ...value, type: "add_member" } }
 }
 
@@ -32,8 +32,8 @@ export function add_member(
  * Prime membership is passed from the origin account to `new`, if extant.
  */
 export function change_key(
-  value: Omit<t.types.pallet_membership.pallet.Call.change_key, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_membership.pallet.Call.change_key, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "TechnicalMembership", value: { ...value, type: "change_key" } }
 }
 
@@ -42,7 +42,7 @@ export function change_key(
  *
  * May only be called from `T::PrimeOrigin`.
  */
-export function clear_prime(): t.types.polkadot_runtime.RuntimeCall {
+export function clear_prime(): types.polkadot_runtime.RuntimeCall {
   return { type: "TechnicalMembership", value: { type: "clear_prime" } }
 }
 
@@ -52,8 +52,8 @@ export function clear_prime(): t.types.polkadot_runtime.RuntimeCall {
  * May only be called from `T::RemoveOrigin`.
  */
 export function remove_member(
-  value: Omit<t.types.pallet_membership.pallet.Call.remove_member, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_membership.pallet.Call.remove_member, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "TechnicalMembership", value: { ...value, type: "remove_member" } }
 }
 
@@ -64,8 +64,8 @@ export function remove_member(
  * May only be called from `T::ResetOrigin`.
  */
 export function reset_members(
-  value: Omit<t.types.pallet_membership.pallet.Call.reset_members, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_membership.pallet.Call.reset_members, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "TechnicalMembership", value: { ...value, type: "reset_members" } }
 }
 
@@ -75,8 +75,8 @@ export function reset_members(
  * May only be called from `T::PrimeOrigin`.
  */
 export function set_prime(
-  value: Omit<t.types.pallet_membership.pallet.Call.set_prime, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_membership.pallet.Call.set_prime, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "TechnicalMembership", value: { ...value, type: "set_prime" } }
 }
 
@@ -88,7 +88,7 @@ export function set_prime(
  * Prime membership is *not* passed from `remove` to `add`, if extant.
  */
 export function swap_member(
-  value: Omit<t.types.pallet_membership.pallet.Call.swap_member, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_membership.pallet.Call.swap_member, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "TechnicalMembership", value: { ...value, type: "swap_member" } }
 }

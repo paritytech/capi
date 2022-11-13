@@ -1,48 +1,48 @@
 import { $ } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as t from "../../../mod.ts"
+import type * as types from "../../../types/mod.ts"
 
-export const $call: $.Codec<t.types.polkadot_runtime_parachains.paras.pallet.Call> = _codec.$404
+export const $call: $.Codec<types.polkadot_runtime_parachains.paras.pallet.Call> = _codec.$404
 
-export const $error: $.Codec<t.types.polkadot_runtime_parachains.paras.pallet.Error> = _codec.$679
+export const $error: $.Codec<types.polkadot_runtime_parachains.paras.pallet.Error> = _codec.$679
 
-export const $event: $.Codec<t.types.polkadot_runtime_parachains.paras.pallet.Event> = _codec.$107
+export const $event: $.Codec<types.polkadot_runtime_parachains.paras.pallet.Event> = _codec.$107
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 export type Call =
-  | t.types.polkadot_runtime_parachains.paras.pallet.Call.force_set_current_code
-  | t.types.polkadot_runtime_parachains.paras.pallet.Call.force_set_current_head
-  | t.types.polkadot_runtime_parachains.paras.pallet.Call.force_schedule_code_upgrade
-  | t.types.polkadot_runtime_parachains.paras.pallet.Call.force_note_new_head
-  | t.types.polkadot_runtime_parachains.paras.pallet.Call.force_queue_action
-  | t.types.polkadot_runtime_parachains.paras.pallet.Call.add_trusted_validation_code
-  | t.types.polkadot_runtime_parachains.paras.pallet.Call.poke_unused_validation_code
-  | t.types.polkadot_runtime_parachains.paras.pallet.Call.include_pvf_check_statement
+  | types.polkadot_runtime_parachains.paras.pallet.Call.force_set_current_code
+  | types.polkadot_runtime_parachains.paras.pallet.Call.force_set_current_head
+  | types.polkadot_runtime_parachains.paras.pallet.Call.force_schedule_code_upgrade
+  | types.polkadot_runtime_parachains.paras.pallet.Call.force_note_new_head
+  | types.polkadot_runtime_parachains.paras.pallet.Call.force_queue_action
+  | types.polkadot_runtime_parachains.paras.pallet.Call.add_trusted_validation_code
+  | types.polkadot_runtime_parachains.paras.pallet.Call.poke_unused_validation_code
+  | types.polkadot_runtime_parachains.paras.pallet.Call.include_pvf_check_statement
 export namespace Call {
   /** Set the storage for the parachain validation code immediately. */
   export interface force_set_current_code {
     type: "force_set_current_code"
-    para: t.types.polkadot_parachain.primitives.Id
-    new_code: t.types.polkadot_parachain.primitives.ValidationCode
+    para: types.polkadot_parachain.primitives.Id
+    new_code: types.polkadot_parachain.primitives.ValidationCode
   }
   /** Set the storage for the current parachain head data immediately. */
   export interface force_set_current_head {
     type: "force_set_current_head"
-    para: t.types.polkadot_parachain.primitives.Id
-    new_head: t.types.polkadot_parachain.primitives.HeadData
+    para: types.polkadot_parachain.primitives.Id
+    new_head: types.polkadot_parachain.primitives.HeadData
   }
   /** Schedule an upgrade as if it was scheduled in the given relay parent block. */
   export interface force_schedule_code_upgrade {
     type: "force_schedule_code_upgrade"
-    para: t.types.polkadot_parachain.primitives.Id
-    new_code: t.types.polkadot_parachain.primitives.ValidationCode
-    relay_parent_number: t.types.u32
+    para: types.polkadot_parachain.primitives.Id
+    new_code: types.polkadot_parachain.primitives.ValidationCode
+    relay_parent_number: types.u32
   }
   /** Note a new block head for para within the context of the current block. */
   export interface force_note_new_head {
     type: "force_note_new_head"
-    para: t.types.polkadot_parachain.primitives.Id
-    new_head: t.types.polkadot_parachain.primitives.HeadData
+    para: types.polkadot_parachain.primitives.Id
+    new_head: types.polkadot_parachain.primitives.HeadData
   }
   /**
    * Put a parachain directly into the next session's action queue.
@@ -51,7 +51,7 @@ export namespace Call {
    */
   export interface force_queue_action {
     type: "force_queue_action"
-    para: t.types.polkadot_parachain.primitives.Id
+    para: types.polkadot_parachain.primitives.Id
   }
   /**
    * Adds the validation code to the storage.
@@ -70,7 +70,7 @@ export namespace Call {
    */
   export interface add_trusted_validation_code {
     type: "add_trusted_validation_code"
-    validation_code: t.types.polkadot_parachain.primitives.ValidationCode
+    validation_code: types.polkadot_parachain.primitives.ValidationCode
   }
   /**
    * Remove the validation code from the storage iff the reference count is 0.
@@ -81,7 +81,7 @@ export namespace Call {
    */
   export interface poke_unused_validation_code {
     type: "poke_unused_validation_code"
-    validation_code_hash: t.types.polkadot_parachain.primitives.ValidationCodeHash
+    validation_code_hash: types.polkadot_parachain.primitives.ValidationCodeHash
   }
   /**
    * Includes a statement for a PVF pre-checking vote. Potentially, finalizes the vote and
@@ -89,40 +89,34 @@ export namespace Call {
    */
   export interface include_pvf_check_statement {
     type: "include_pvf_check_statement"
-    stmt: t.types.polkadot_primitives.v2.PvfCheckStatement
-    signature: t.types.polkadot_primitives.v2.validator_app.Signature
+    stmt: types.polkadot_primitives.v2.PvfCheckStatement
+    signature: types.polkadot_primitives.v2.validator_app.Signature
   }
   /** Set the storage for the parachain validation code immediately. */
   export function force_set_current_code(
-    value: Omit<
-      t.types.polkadot_runtime_parachains.paras.pallet.Call.force_set_current_code,
-      "type"
-    >,
-  ): t.types.polkadot_runtime_parachains.paras.pallet.Call.force_set_current_code {
+    value: Omit<types.polkadot_runtime_parachains.paras.pallet.Call.force_set_current_code, "type">,
+  ): types.polkadot_runtime_parachains.paras.pallet.Call.force_set_current_code {
     return { type: "force_set_current_code", ...value }
   }
   /** Set the storage for the current parachain head data immediately. */
   export function force_set_current_head(
-    value: Omit<
-      t.types.polkadot_runtime_parachains.paras.pallet.Call.force_set_current_head,
-      "type"
-    >,
-  ): t.types.polkadot_runtime_parachains.paras.pallet.Call.force_set_current_head {
+    value: Omit<types.polkadot_runtime_parachains.paras.pallet.Call.force_set_current_head, "type">,
+  ): types.polkadot_runtime_parachains.paras.pallet.Call.force_set_current_head {
     return { type: "force_set_current_head", ...value }
   }
   /** Schedule an upgrade as if it was scheduled in the given relay parent block. */
   export function force_schedule_code_upgrade(
     value: Omit<
-      t.types.polkadot_runtime_parachains.paras.pallet.Call.force_schedule_code_upgrade,
+      types.polkadot_runtime_parachains.paras.pallet.Call.force_schedule_code_upgrade,
       "type"
     >,
-  ): t.types.polkadot_runtime_parachains.paras.pallet.Call.force_schedule_code_upgrade {
+  ): types.polkadot_runtime_parachains.paras.pallet.Call.force_schedule_code_upgrade {
     return { type: "force_schedule_code_upgrade", ...value }
   }
   /** Note a new block head for para within the context of the current block. */
   export function force_note_new_head(
-    value: Omit<t.types.polkadot_runtime_parachains.paras.pallet.Call.force_note_new_head, "type">,
-  ): t.types.polkadot_runtime_parachains.paras.pallet.Call.force_note_new_head {
+    value: Omit<types.polkadot_runtime_parachains.paras.pallet.Call.force_note_new_head, "type">,
+  ): types.polkadot_runtime_parachains.paras.pallet.Call.force_note_new_head {
     return { type: "force_note_new_head", ...value }
   }
   /**
@@ -131,8 +125,8 @@ export namespace Call {
    * initializer...
    */
   export function force_queue_action(
-    value: Omit<t.types.polkadot_runtime_parachains.paras.pallet.Call.force_queue_action, "type">,
-  ): t.types.polkadot_runtime_parachains.paras.pallet.Call.force_queue_action {
+    value: Omit<types.polkadot_runtime_parachains.paras.pallet.Call.force_queue_action, "type">,
+  ): types.polkadot_runtime_parachains.paras.pallet.Call.force_queue_action {
     return { type: "force_queue_action", ...value }
   }
   /**
@@ -152,10 +146,10 @@ export namespace Call {
    */
   export function add_trusted_validation_code(
     value: Omit<
-      t.types.polkadot_runtime_parachains.paras.pallet.Call.add_trusted_validation_code,
+      types.polkadot_runtime_parachains.paras.pallet.Call.add_trusted_validation_code,
       "type"
     >,
-  ): t.types.polkadot_runtime_parachains.paras.pallet.Call.add_trusted_validation_code {
+  ): types.polkadot_runtime_parachains.paras.pallet.Call.add_trusted_validation_code {
     return { type: "add_trusted_validation_code", ...value }
   }
   /**
@@ -167,10 +161,10 @@ export namespace Call {
    */
   export function poke_unused_validation_code(
     value: Omit<
-      t.types.polkadot_runtime_parachains.paras.pallet.Call.poke_unused_validation_code,
+      types.polkadot_runtime_parachains.paras.pallet.Call.poke_unused_validation_code,
       "type"
     >,
-  ): t.types.polkadot_runtime_parachains.paras.pallet.Call.poke_unused_validation_code {
+  ): types.polkadot_runtime_parachains.paras.pallet.Call.poke_unused_validation_code {
     return { type: "poke_unused_validation_code", ...value }
   }
   /**
@@ -179,10 +173,10 @@ export namespace Call {
    */
   export function include_pvf_check_statement(
     value: Omit<
-      t.types.polkadot_runtime_parachains.paras.pallet.Call.include_pvf_check_statement,
+      types.polkadot_runtime_parachains.paras.pallet.Call.include_pvf_check_statement,
       "type"
     >,
-  ): t.types.polkadot_runtime_parachains.paras.pallet.Call.include_pvf_check_statement {
+  ): types.polkadot_runtime_parachains.paras.pallet.Call.include_pvf_check_statement {
     return { type: "include_pvf_check_statement", ...value }
   }
 }
@@ -205,39 +199,39 @@ export type Error =
 
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
 export type Event =
-  | t.types.polkadot_runtime_parachains.paras.pallet.Event.CurrentCodeUpdated
-  | t.types.polkadot_runtime_parachains.paras.pallet.Event.CurrentHeadUpdated
-  | t.types.polkadot_runtime_parachains.paras.pallet.Event.CodeUpgradeScheduled
-  | t.types.polkadot_runtime_parachains.paras.pallet.Event.NewHeadNoted
-  | t.types.polkadot_runtime_parachains.paras.pallet.Event.ActionQueued
-  | t.types.polkadot_runtime_parachains.paras.pallet.Event.PvfCheckStarted
-  | t.types.polkadot_runtime_parachains.paras.pallet.Event.PvfCheckAccepted
-  | t.types.polkadot_runtime_parachains.paras.pallet.Event.PvfCheckRejected
+  | types.polkadot_runtime_parachains.paras.pallet.Event.CurrentCodeUpdated
+  | types.polkadot_runtime_parachains.paras.pallet.Event.CurrentHeadUpdated
+  | types.polkadot_runtime_parachains.paras.pallet.Event.CodeUpgradeScheduled
+  | types.polkadot_runtime_parachains.paras.pallet.Event.NewHeadNoted
+  | types.polkadot_runtime_parachains.paras.pallet.Event.ActionQueued
+  | types.polkadot_runtime_parachains.paras.pallet.Event.PvfCheckStarted
+  | types.polkadot_runtime_parachains.paras.pallet.Event.PvfCheckAccepted
+  | types.polkadot_runtime_parachains.paras.pallet.Event.PvfCheckRejected
 export namespace Event {
   /** Current code has been updated for a Para. `para_id` */
   export interface CurrentCodeUpdated {
     type: "CurrentCodeUpdated"
-    value: t.types.polkadot_parachain.primitives.Id
+    value: types.polkadot_parachain.primitives.Id
   }
   /** Current head has been updated for a Para. `para_id` */
   export interface CurrentHeadUpdated {
     type: "CurrentHeadUpdated"
-    value: t.types.polkadot_parachain.primitives.Id
+    value: types.polkadot_parachain.primitives.Id
   }
   /** A code upgrade has been scheduled for a Para. `para_id` */
   export interface CodeUpgradeScheduled {
     type: "CodeUpgradeScheduled"
-    value: t.types.polkadot_parachain.primitives.Id
+    value: types.polkadot_parachain.primitives.Id
   }
   /** A new head has been noted for a Para. `para_id` */
   export interface NewHeadNoted {
     type: "NewHeadNoted"
-    value: t.types.polkadot_parachain.primitives.Id
+    value: types.polkadot_parachain.primitives.Id
   }
   /** A para has been queued to execute pending actions. `para_id` */
   export interface ActionQueued {
     type: "ActionQueued"
-    value: [t.types.polkadot_parachain.primitives.Id, t.types.u32]
+    value: [types.polkadot_parachain.primitives.Id, types.u32]
   }
   /**
    * The given para either initiated or subscribed to a PVF check for the given validation
@@ -246,8 +240,8 @@ export namespace Event {
   export interface PvfCheckStarted {
     type: "PvfCheckStarted"
     value: [
-      t.types.polkadot_parachain.primitives.ValidationCodeHash,
-      t.types.polkadot_parachain.primitives.Id,
+      types.polkadot_parachain.primitives.ValidationCodeHash,
+      types.polkadot_parachain.primitives.Id,
     ]
   }
   /**
@@ -257,8 +251,8 @@ export namespace Event {
   export interface PvfCheckAccepted {
     type: "PvfCheckAccepted"
     value: [
-      t.types.polkadot_parachain.primitives.ValidationCodeHash,
-      t.types.polkadot_parachain.primitives.Id,
+      types.polkadot_parachain.primitives.ValidationCodeHash,
+      types.polkadot_parachain.primitives.Id,
     ]
   }
   /**
@@ -268,38 +262,38 @@ export namespace Event {
   export interface PvfCheckRejected {
     type: "PvfCheckRejected"
     value: [
-      t.types.polkadot_parachain.primitives.ValidationCodeHash,
-      t.types.polkadot_parachain.primitives.Id,
+      types.polkadot_parachain.primitives.ValidationCodeHash,
+      types.polkadot_parachain.primitives.Id,
     ]
   }
   /** Current code has been updated for a Para. `para_id` */
   export function CurrentCodeUpdated(
-    value: t.types.polkadot_runtime_parachains.paras.pallet.Event.CurrentCodeUpdated["value"],
-  ): t.types.polkadot_runtime_parachains.paras.pallet.Event.CurrentCodeUpdated {
+    value: types.polkadot_runtime_parachains.paras.pallet.Event.CurrentCodeUpdated["value"],
+  ): types.polkadot_runtime_parachains.paras.pallet.Event.CurrentCodeUpdated {
     return { type: "CurrentCodeUpdated", value }
   }
   /** Current head has been updated for a Para. `para_id` */
   export function CurrentHeadUpdated(
-    value: t.types.polkadot_runtime_parachains.paras.pallet.Event.CurrentHeadUpdated["value"],
-  ): t.types.polkadot_runtime_parachains.paras.pallet.Event.CurrentHeadUpdated {
+    value: types.polkadot_runtime_parachains.paras.pallet.Event.CurrentHeadUpdated["value"],
+  ): types.polkadot_runtime_parachains.paras.pallet.Event.CurrentHeadUpdated {
     return { type: "CurrentHeadUpdated", value }
   }
   /** A code upgrade has been scheduled for a Para. `para_id` */
   export function CodeUpgradeScheduled(
-    value: t.types.polkadot_runtime_parachains.paras.pallet.Event.CodeUpgradeScheduled["value"],
-  ): t.types.polkadot_runtime_parachains.paras.pallet.Event.CodeUpgradeScheduled {
+    value: types.polkadot_runtime_parachains.paras.pallet.Event.CodeUpgradeScheduled["value"],
+  ): types.polkadot_runtime_parachains.paras.pallet.Event.CodeUpgradeScheduled {
     return { type: "CodeUpgradeScheduled", value }
   }
   /** A new head has been noted for a Para. `para_id` */
   export function NewHeadNoted(
-    value: t.types.polkadot_runtime_parachains.paras.pallet.Event.NewHeadNoted["value"],
-  ): t.types.polkadot_runtime_parachains.paras.pallet.Event.NewHeadNoted {
+    value: types.polkadot_runtime_parachains.paras.pallet.Event.NewHeadNoted["value"],
+  ): types.polkadot_runtime_parachains.paras.pallet.Event.NewHeadNoted {
     return { type: "NewHeadNoted", value }
   }
   /** A para has been queued to execute pending actions. `para_id` */
   export function ActionQueued(
-    ...value: t.types.polkadot_runtime_parachains.paras.pallet.Event.ActionQueued["value"]
-  ): t.types.polkadot_runtime_parachains.paras.pallet.Event.ActionQueued {
+    ...value: types.polkadot_runtime_parachains.paras.pallet.Event.ActionQueued["value"]
+  ): types.polkadot_runtime_parachains.paras.pallet.Event.ActionQueued {
     return { type: "ActionQueued", value }
   }
   /**
@@ -307,8 +301,8 @@ export namespace Event {
    * code. `code_hash` `para_id`
    */
   export function PvfCheckStarted(
-    ...value: t.types.polkadot_runtime_parachains.paras.pallet.Event.PvfCheckStarted["value"]
-  ): t.types.polkadot_runtime_parachains.paras.pallet.Event.PvfCheckStarted {
+    ...value: types.polkadot_runtime_parachains.paras.pallet.Event.PvfCheckStarted["value"]
+  ): types.polkadot_runtime_parachains.paras.pallet.Event.PvfCheckStarted {
     return { type: "PvfCheckStarted", value }
   }
   /**
@@ -316,8 +310,8 @@ export namespace Event {
    * `code_hash` `para_id`
    */
   export function PvfCheckAccepted(
-    ...value: t.types.polkadot_runtime_parachains.paras.pallet.Event.PvfCheckAccepted["value"]
-  ): t.types.polkadot_runtime_parachains.paras.pallet.Event.PvfCheckAccepted {
+    ...value: types.polkadot_runtime_parachains.paras.pallet.Event.PvfCheckAccepted["value"]
+  ): types.polkadot_runtime_parachains.paras.pallet.Event.PvfCheckAccepted {
     return { type: "PvfCheckAccepted", value }
   }
   /**
@@ -325,8 +319,8 @@ export namespace Event {
    * `code_hash` `para_id`
    */
   export function PvfCheckRejected(
-    ...value: t.types.polkadot_runtime_parachains.paras.pallet.Event.PvfCheckRejected["value"]
-  ): t.types.polkadot_runtime_parachains.paras.pallet.Event.PvfCheckRejected {
+    ...value: types.polkadot_runtime_parachains.paras.pallet.Event.PvfCheckRejected["value"]
+  ): types.polkadot_runtime_parachains.paras.pallet.Event.PvfCheckRejected {
     return { type: "PvfCheckRejected", value }
   }
 }

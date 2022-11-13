@@ -1,6 +1,6 @@
 import { $ } from "../capi.ts"
 import * as _codec from "../codecs.ts"
-import type * as t from "../mod.ts"
+import type * as types from "../types/mod.ts"
 
 /** Current phase. */
 export const CurrentPhase = {
@@ -142,8 +142,8 @@ export const SnapshotMetadata = {
  * calling [`Call::set_emergency_election_result`].
  */
 export function governance_fallback(
-  value: Omit<t.types.pallet_election_provider_multi_phase.pallet.Call.governance_fallback, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_election_provider_multi_phase.pallet.Call.governance_fallback, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "ElectionProviderMultiPhase", value: { ...value, type: "governance_fallback" } }
 }
 
@@ -159,10 +159,10 @@ export function governance_fallback(
  */
 export function set_emergency_election_result(
   value: Omit<
-    t.types.pallet_election_provider_multi_phase.pallet.Call.set_emergency_election_result,
+    types.pallet_election_provider_multi_phase.pallet.Call.set_emergency_election_result,
     "type"
   >,
-): t.types.polkadot_runtime.RuntimeCall {
+): types.polkadot_runtime.RuntimeCall {
   return {
     type: "ElectionProviderMultiPhase",
     value: { ...value, type: "set_emergency_election_result" },
@@ -178,10 +178,10 @@ export function set_emergency_election_result(
  */
 export function set_minimum_untrusted_score(
   value: Omit<
-    t.types.pallet_election_provider_multi_phase.pallet.Call.set_minimum_untrusted_score,
+    types.pallet_election_provider_multi_phase.pallet.Call.set_minimum_untrusted_score,
     "type"
   >,
-): t.types.polkadot_runtime.RuntimeCall {
+): types.polkadot_runtime.RuntimeCall {
   return {
     type: "ElectionProviderMultiPhase",
     value: { ...value, type: "set_minimum_untrusted_score" },
@@ -200,8 +200,8 @@ export function set_minimum_untrusted_score(
  * might be rewarded, slashed, or get all or a part of the deposit back.
  */
 export function submit(
-  value: Omit<t.types.pallet_election_provider_multi_phase.pallet.Call.submit, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_election_provider_multi_phase.pallet.Call.submit, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "ElectionProviderMultiPhase", value: { ...value, type: "submit" } }
 }
 
@@ -222,7 +222,7 @@ export function submit(
  * No deposit or reward is associated with this submission.
  */
 export function submit_unsigned(
-  value: Omit<t.types.pallet_election_provider_multi_phase.pallet.Call.submit_unsigned, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_election_provider_multi_phase.pallet.Call.submit_unsigned, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "ElectionProviderMultiPhase", value: { ...value, type: "submit_unsigned" } }
 }

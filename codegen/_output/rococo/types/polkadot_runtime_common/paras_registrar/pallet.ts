@@ -1,27 +1,26 @@
 import { $ } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as t from "../../../mod.ts"
+import type * as types from "../../../types/mod.ts"
 
-export const $call: $.Codec<t.types.polkadot_runtime_common.paras_registrar.pallet.Call> =
-  _codec.$411
+export const $call: $.Codec<types.polkadot_runtime_common.paras_registrar.pallet.Call> = _codec.$411
 
-export const $error: $.Codec<t.types.polkadot_runtime_common.paras_registrar.pallet.Error> =
+export const $error: $.Codec<types.polkadot_runtime_common.paras_registrar.pallet.Error> =
   _codec.$702
 
-export const $event: $.Codec<t.types.polkadot_runtime_common.paras_registrar.pallet.Event> =
+export const $event: $.Codec<types.polkadot_runtime_common.paras_registrar.pallet.Event> =
   _codec.$117
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 export type Call =
-  | t.types.polkadot_runtime_common.paras_registrar.pallet.Call.register
-  | t.types.polkadot_runtime_common.paras_registrar.pallet.Call.force_register
-  | t.types.polkadot_runtime_common.paras_registrar.pallet.Call.deregister
-  | t.types.polkadot_runtime_common.paras_registrar.pallet.Call.swap
-  | t.types.polkadot_runtime_common.paras_registrar.pallet.Call.remove_lock
-  | t.types.polkadot_runtime_common.paras_registrar.pallet.Call.reserve
-  | t.types.polkadot_runtime_common.paras_registrar.pallet.Call.add_lock
-  | t.types.polkadot_runtime_common.paras_registrar.pallet.Call.schedule_code_upgrade
-  | t.types.polkadot_runtime_common.paras_registrar.pallet.Call.set_current_head
+  | types.polkadot_runtime_common.paras_registrar.pallet.Call.register
+  | types.polkadot_runtime_common.paras_registrar.pallet.Call.force_register
+  | types.polkadot_runtime_common.paras_registrar.pallet.Call.deregister
+  | types.polkadot_runtime_common.paras_registrar.pallet.Call.swap
+  | types.polkadot_runtime_common.paras_registrar.pallet.Call.remove_lock
+  | types.polkadot_runtime_common.paras_registrar.pallet.Call.reserve
+  | types.polkadot_runtime_common.paras_registrar.pallet.Call.add_lock
+  | types.polkadot_runtime_common.paras_registrar.pallet.Call.schedule_code_upgrade
+  | types.polkadot_runtime_common.paras_registrar.pallet.Call.set_current_head
 export namespace Call {
   /**
    * Register head data and validation code for a reserved Para Id.
@@ -41,9 +40,9 @@ export namespace Call {
    */
   export interface register {
     type: "register"
-    id: t.types.polkadot_parachain.primitives.Id
-    genesis_head: t.types.polkadot_parachain.primitives.HeadData
-    validation_code: t.types.polkadot_parachain.primitives.ValidationCode
+    id: types.polkadot_parachain.primitives.Id
+    genesis_head: types.polkadot_parachain.primitives.HeadData
+    validation_code: types.polkadot_parachain.primitives.ValidationCode
   }
   /**
    * Force the registration of a Para Id on the relay chain.
@@ -55,11 +54,11 @@ export namespace Call {
    */
   export interface force_register {
     type: "force_register"
-    who: t.types.sp_core.crypto.AccountId32
-    deposit: t.types.u128
-    id: t.types.polkadot_parachain.primitives.Id
-    genesis_head: t.types.polkadot_parachain.primitives.HeadData
-    validation_code: t.types.polkadot_parachain.primitives.ValidationCode
+    who: types.sp_core.crypto.AccountId32
+    deposit: types.u128
+    id: types.polkadot_parachain.primitives.Id
+    genesis_head: types.polkadot_parachain.primitives.HeadData
+    validation_code: types.polkadot_parachain.primitives.ValidationCode
   }
   /**
    * Deregister a Para Id, freeing all data and returning any deposit.
@@ -68,7 +67,7 @@ export namespace Call {
    */
   export interface deregister {
     type: "deregister"
-    id: t.types.polkadot_parachain.primitives.Id
+    id: types.polkadot_parachain.primitives.Id
   }
   /**
    * Swap a parachain with another parachain or parathread.
@@ -85,8 +84,8 @@ export namespace Call {
    */
   export interface swap {
     type: "swap"
-    id: t.types.polkadot_parachain.primitives.Id
-    other: t.types.polkadot_parachain.primitives.Id
+    id: types.polkadot_parachain.primitives.Id
+    other: types.polkadot_parachain.primitives.Id
   }
   /**
    * Remove a manager lock from a para. This will allow the manager of a
@@ -96,7 +95,7 @@ export namespace Call {
    */
   export interface remove_lock {
     type: "remove_lock"
-    para: t.types.polkadot_parachain.primitives.Id
+    para: types.polkadot_parachain.primitives.Id
   }
   /**
    * Reserve a Para Id on the relay chain.
@@ -125,7 +124,7 @@ export namespace Call {
    */
   export interface add_lock {
     type: "add_lock"
-    para: t.types.polkadot_parachain.primitives.Id
+    para: types.polkadot_parachain.primitives.Id
   }
   /**
    * Schedule a parachain upgrade.
@@ -134,8 +133,8 @@ export namespace Call {
    */
   export interface schedule_code_upgrade {
     type: "schedule_code_upgrade"
-    para: t.types.polkadot_parachain.primitives.Id
-    new_code: t.types.polkadot_parachain.primitives.ValidationCode
+    para: types.polkadot_parachain.primitives.Id
+    new_code: types.polkadot_parachain.primitives.ValidationCode
   }
   /**
    * Set the parachain's current head.
@@ -144,8 +143,8 @@ export namespace Call {
    */
   export interface set_current_head {
     type: "set_current_head"
-    para: t.types.polkadot_parachain.primitives.Id
-    new_head: t.types.polkadot_parachain.primitives.HeadData
+    para: types.polkadot_parachain.primitives.Id
+    new_head: types.polkadot_parachain.primitives.HeadData
   }
   /**
    * Register head data and validation code for a reserved Para Id.
@@ -164,8 +163,8 @@ export namespace Call {
    * The `Registered` event is emitted in case of success.
    */
   export function register(
-    value: Omit<t.types.polkadot_runtime_common.paras_registrar.pallet.Call.register, "type">,
-  ): t.types.polkadot_runtime_common.paras_registrar.pallet.Call.register {
+    value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.register, "type">,
+  ): types.polkadot_runtime_common.paras_registrar.pallet.Call.register {
     return { type: "register", ...value }
   }
   /**
@@ -177,8 +176,8 @@ export namespace Call {
    * can be registered, including sub-1000 IDs which are System Parachains.
    */
   export function force_register(
-    value: Omit<t.types.polkadot_runtime_common.paras_registrar.pallet.Call.force_register, "type">,
-  ): t.types.polkadot_runtime_common.paras_registrar.pallet.Call.force_register {
+    value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.force_register, "type">,
+  ): types.polkadot_runtime_common.paras_registrar.pallet.Call.force_register {
     return { type: "force_register", ...value }
   }
   /**
@@ -187,8 +186,8 @@ export namespace Call {
    * The caller must be Root, the `para` owner, or the `para` itself. The para must be a parathread.
    */
   export function deregister(
-    value: Omit<t.types.polkadot_runtime_common.paras_registrar.pallet.Call.deregister, "type">,
-  ): t.types.polkadot_runtime_common.paras_registrar.pallet.Call.deregister {
+    value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.deregister, "type">,
+  ): types.polkadot_runtime_common.paras_registrar.pallet.Call.deregister {
     return { type: "deregister", ...value }
   }
   /**
@@ -205,8 +204,8 @@ export namespace Call {
    * and the auction deposit are switched.
    */
   export function swap(
-    value: Omit<t.types.polkadot_runtime_common.paras_registrar.pallet.Call.swap, "type">,
-  ): t.types.polkadot_runtime_common.paras_registrar.pallet.Call.swap {
+    value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.swap, "type">,
+  ): types.polkadot_runtime_common.paras_registrar.pallet.Call.swap {
     return { type: "swap", ...value }
   }
   /**
@@ -216,8 +215,8 @@ export namespace Call {
    * Can only be called by the Root origin or the parachain.
    */
   export function remove_lock(
-    value: Omit<t.types.polkadot_runtime_common.paras_registrar.pallet.Call.remove_lock, "type">,
-  ): t.types.polkadot_runtime_common.paras_registrar.pallet.Call.remove_lock {
+    value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.remove_lock, "type">,
+  ): types.polkadot_runtime_common.paras_registrar.pallet.Call.remove_lock {
     return { type: "remove_lock", ...value }
   }
   /**
@@ -236,7 +235,7 @@ export namespace Call {
    * ## Events
    * The `Reserved` event is emitted in case of success, which provides the ID reserved for use.
    */
-  export function reserve(): t.types.polkadot_runtime_common.paras_registrar.pallet.Call.reserve {
+  export function reserve(): types.polkadot_runtime_common.paras_registrar.pallet.Call.reserve {
     return { type: "reserve" }
   }
   /**
@@ -246,8 +245,8 @@ export namespace Call {
    * Can be called by Root, the parachain, or the parachain manager if the parachain is unlocked.
    */
   export function add_lock(
-    value: Omit<t.types.polkadot_runtime_common.paras_registrar.pallet.Call.add_lock, "type">,
-  ): t.types.polkadot_runtime_common.paras_registrar.pallet.Call.add_lock {
+    value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.add_lock, "type">,
+  ): types.polkadot_runtime_common.paras_registrar.pallet.Call.add_lock {
     return { type: "add_lock", ...value }
   }
   /**
@@ -257,10 +256,10 @@ export namespace Call {
    */
   export function schedule_code_upgrade(
     value: Omit<
-      t.types.polkadot_runtime_common.paras_registrar.pallet.Call.schedule_code_upgrade,
+      types.polkadot_runtime_common.paras_registrar.pallet.Call.schedule_code_upgrade,
       "type"
     >,
-  ): t.types.polkadot_runtime_common.paras_registrar.pallet.Call.schedule_code_upgrade {
+  ): types.polkadot_runtime_common.paras_registrar.pallet.Call.schedule_code_upgrade {
     return { type: "schedule_code_upgrade", ...value }
   }
   /**
@@ -269,11 +268,8 @@ export namespace Call {
    * Can be called by Root, the parachain, or the parachain manager if the parachain is unlocked.
    */
   export function set_current_head(
-    value: Omit<
-      t.types.polkadot_runtime_common.paras_registrar.pallet.Call.set_current_head,
-      "type"
-    >,
-  ): t.types.polkadot_runtime_common.paras_registrar.pallet.Call.set_current_head {
+    value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.set_current_head, "type">,
+  ): types.polkadot_runtime_common.paras_registrar.pallet.Call.set_current_head {
     return { type: "set_current_head", ...value }
   }
 }
@@ -297,37 +293,37 @@ export type Error =
 
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
 export type Event =
-  | t.types.polkadot_runtime_common.paras_registrar.pallet.Event.Registered
-  | t.types.polkadot_runtime_common.paras_registrar.pallet.Event.Deregistered
-  | t.types.polkadot_runtime_common.paras_registrar.pallet.Event.Reserved
+  | types.polkadot_runtime_common.paras_registrar.pallet.Event.Registered
+  | types.polkadot_runtime_common.paras_registrar.pallet.Event.Deregistered
+  | types.polkadot_runtime_common.paras_registrar.pallet.Event.Reserved
 export namespace Event {
   export interface Registered {
     type: "Registered"
-    para_id: t.types.polkadot_parachain.primitives.Id
-    manager: t.types.sp_core.crypto.AccountId32
+    para_id: types.polkadot_parachain.primitives.Id
+    manager: types.sp_core.crypto.AccountId32
   }
   export interface Deregistered {
     type: "Deregistered"
-    para_id: t.types.polkadot_parachain.primitives.Id
+    para_id: types.polkadot_parachain.primitives.Id
   }
   export interface Reserved {
     type: "Reserved"
-    para_id: t.types.polkadot_parachain.primitives.Id
-    who: t.types.sp_core.crypto.AccountId32
+    para_id: types.polkadot_parachain.primitives.Id
+    who: types.sp_core.crypto.AccountId32
   }
   export function Registered(
-    value: Omit<t.types.polkadot_runtime_common.paras_registrar.pallet.Event.Registered, "type">,
-  ): t.types.polkadot_runtime_common.paras_registrar.pallet.Event.Registered {
+    value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Event.Registered, "type">,
+  ): types.polkadot_runtime_common.paras_registrar.pallet.Event.Registered {
     return { type: "Registered", ...value }
   }
   export function Deregistered(
-    value: Omit<t.types.polkadot_runtime_common.paras_registrar.pallet.Event.Deregistered, "type">,
-  ): t.types.polkadot_runtime_common.paras_registrar.pallet.Event.Deregistered {
+    value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Event.Deregistered, "type">,
+  ): types.polkadot_runtime_common.paras_registrar.pallet.Event.Deregistered {
     return { type: "Deregistered", ...value }
   }
   export function Reserved(
-    value: Omit<t.types.polkadot_runtime_common.paras_registrar.pallet.Event.Reserved, "type">,
-  ): t.types.polkadot_runtime_common.paras_registrar.pallet.Event.Reserved {
+    value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Event.Reserved, "type">,
+  ): types.polkadot_runtime_common.paras_registrar.pallet.Event.Reserved {
     return { type: "Reserved", ...value }
   }
 }

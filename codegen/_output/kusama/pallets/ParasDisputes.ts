@@ -1,6 +1,6 @@
 import { $ } from "../capi.ts"
 import * as _codec from "../codecs.ts"
-import type * as t from "../mod.ts"
+import type * as types from "../types/mod.ts"
 
 /** All ongoing or concluded disputes for the last several sessions. */
 export const Disputes = {
@@ -64,6 +64,6 @@ export const SpamSlots = {
   value: _codec.$94,
 }
 
-export function force_unfreeze(): t.types.polkadot_runtime.RuntimeCall {
+export function force_unfreeze(): types.polkadot_runtime.RuntimeCall {
   return { type: "ParasDisputes", value: "force_unfreeze" }
 }

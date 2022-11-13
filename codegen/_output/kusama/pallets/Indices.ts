@@ -1,6 +1,6 @@
 import { $ } from "../capi.ts"
 import * as _codec from "../codecs.ts"
-import type * as t from "../mod.ts"
+import type * as types from "../types/mod.ts"
 
 /** The lookup from index to account. */
 export const Accounts = {
@@ -32,8 +32,8 @@ export const Accounts = {
  * # </weight>
  */
 export function claim(
-  value: Omit<t.types.pallet_indices.pallet.Call.claim, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_indices.pallet.Call.claim, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Indices", value: { ...value, type: "claim" } }
 }
 
@@ -61,8 +61,8 @@ export function claim(
  * # </weight>
  */
 export function force_transfer(
-  value: Omit<t.types.pallet_indices.pallet.Call.force_transfer, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_indices.pallet.Call.force_transfer, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Indices", value: { ...value, type: "force_transfer" } }
 }
 
@@ -87,8 +87,8 @@ export function force_transfer(
  * # </weight>
  */
 export function free(
-  value: Omit<t.types.pallet_indices.pallet.Call.free, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_indices.pallet.Call.free, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Indices", value: { ...value, type: "free" } }
 }
 
@@ -113,8 +113,8 @@ export function free(
  * # </weight>
  */
 export function freeze(
-  value: Omit<t.types.pallet_indices.pallet.Call.freeze, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_indices.pallet.Call.freeze, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Indices", value: { ...value, type: "freeze" } }
 }
 
@@ -141,7 +141,7 @@ export function freeze(
  * # </weight>
  */
 export function transfer(
-  value: Omit<t.types.pallet_indices.pallet.Call.transfer, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_indices.pallet.Call.transfer, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Indices", value: { ...value, type: "transfer" } }
 }

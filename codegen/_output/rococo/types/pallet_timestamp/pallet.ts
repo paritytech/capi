@@ -1,11 +1,11 @@
 import { $ } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as t from "../../mod.ts"
+import type * as types from "../../types/mod.ts"
 
-export const $call: $.Codec<t.types.pallet_timestamp.pallet.Call> = _codec.$195
+export const $call: $.Codec<types.pallet_timestamp.pallet.Call> = _codec.$195
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
-export type Call = t.types.pallet_timestamp.pallet.Call.set
+export type Call = types.pallet_timestamp.pallet.Call.set
 export namespace Call {
   /**
    * Set the current time.
@@ -27,7 +27,7 @@ export namespace Call {
    */
   export interface set {
     type: "set"
-    now: t.Compact<t.types.u64>
+    now: types.Compact<types.u64>
   }
   /**
    * Set the current time.
@@ -48,8 +48,8 @@ export namespace Call {
    * # </weight>
    */
   export function set(
-    value: Omit<t.types.pallet_timestamp.pallet.Call.set, "type">,
-  ): t.types.pallet_timestamp.pallet.Call.set {
+    value: Omit<types.pallet_timestamp.pallet.Call.set, "type">,
+  ): types.pallet_timestamp.pallet.Call.set {
     return { type: "set", ...value }
   }
 }

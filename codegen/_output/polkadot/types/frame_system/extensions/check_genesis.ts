@@ -1,8 +1,8 @@
 import { $ } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as t from "../../../mod.ts"
+import type * as types from "../../../types/mod.ts"
 
-export const $checkGenesis: $.Codec<t.types.frame_system.extensions.check_genesis.CheckGenesis> =
+export const $checkGenesis: $.Codec<types.frame_system.extensions.check_genesis.CheckGenesis> =
   _codec.$730
 
 export function CheckGenesis() {

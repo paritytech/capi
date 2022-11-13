@@ -1,17 +1,17 @@
 import { $ } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as t from "../../../mod.ts"
+import type * as types from "../../../types/mod.ts"
 
-export const $bounded: $.Codec<t.types.frame_support.traits.preimages.Bounded> = _codec.$180
+export const $bounded: $.Codec<types.frame_support.traits.preimages.Bounded> = _codec.$180
 
 export type Bounded =
-  | t.types.frame_support.traits.preimages.Bounded.Legacy
-  | t.types.frame_support.traits.preimages.Bounded.Inline
-  | t.types.frame_support.traits.preimages.Bounded.Lookup
+  | types.frame_support.traits.preimages.Bounded.Legacy
+  | types.frame_support.traits.preimages.Bounded.Inline
+  | types.frame_support.traits.preimages.Bounded.Lookup
 export namespace Bounded {
   export interface Legacy {
     type: "Legacy"
-    hash: t.types.primitive_types.H256
+    hash: types.primitive_types.H256
   }
   export interface Inline {
     type: "Inline"
@@ -19,22 +19,22 @@ export namespace Bounded {
   }
   export interface Lookup {
     type: "Lookup"
-    hash: t.types.primitive_types.H256
-    len: t.types.u32
+    hash: types.primitive_types.H256
+    len: types.u32
   }
   export function Legacy(
-    value: Omit<t.types.frame_support.traits.preimages.Bounded.Legacy, "type">,
-  ): t.types.frame_support.traits.preimages.Bounded.Legacy {
+    value: Omit<types.frame_support.traits.preimages.Bounded.Legacy, "type">,
+  ): types.frame_support.traits.preimages.Bounded.Legacy {
     return { type: "Legacy", ...value }
   }
   export function Inline(
-    value: t.types.frame_support.traits.preimages.Bounded.Inline["value"],
-  ): t.types.frame_support.traits.preimages.Bounded.Inline {
+    value: types.frame_support.traits.preimages.Bounded.Inline["value"],
+  ): types.frame_support.traits.preimages.Bounded.Inline {
     return { type: "Inline", value }
   }
   export function Lookup(
-    value: Omit<t.types.frame_support.traits.preimages.Bounded.Lookup, "type">,
-  ): t.types.frame_support.traits.preimages.Bounded.Lookup {
+    value: Omit<types.frame_support.traits.preimages.Bounded.Lookup, "type">,
+  ): types.frame_support.traits.preimages.Bounded.Lookup {
     return { type: "Lookup", ...value }
   }
 }

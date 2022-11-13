@@ -1,5 +1,5 @@
 import * as _codec from "../codecs.ts"
-import type * as t from "../mod.ts"
+import type * as types from "../types/mod.ts"
 
 /** Did the timestamp get updated in this block? */
 export const DidUpdate = {
@@ -32,7 +32,7 @@ export const Now = { type: "Plain", modifier: "Default", hashers: [], key: [], v
  * # </weight>
  */
 export function set(
-  value: Omit<t.types.pallet_timestamp.pallet.Call.set, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_timestamp.pallet.Call.set, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Timestamp", value: { ...value, type: "set" } }
 }

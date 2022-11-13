@@ -1,18 +1,18 @@
 import { $ } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as t from "../../../mod.ts"
+import type * as types from "../../../types/mod.ts"
 
-export const $call: $.Codec<t.types.polkadot_runtime_common.slots.pallet.Call> = _codec.$412
+export const $call: $.Codec<types.polkadot_runtime_common.slots.pallet.Call> = _codec.$412
 
-export const $error: $.Codec<t.types.polkadot_runtime_common.slots.pallet.Error> = _codec.$704
+export const $error: $.Codec<types.polkadot_runtime_common.slots.pallet.Error> = _codec.$704
 
-export const $event: $.Codec<t.types.polkadot_runtime_common.slots.pallet.Event> = _codec.$118
+export const $event: $.Codec<types.polkadot_runtime_common.slots.pallet.Event> = _codec.$118
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 export type Call =
-  | t.types.polkadot_runtime_common.slots.pallet.Call.force_lease
-  | t.types.polkadot_runtime_common.slots.pallet.Call.clear_all_leases
-  | t.types.polkadot_runtime_common.slots.pallet.Call.trigger_onboard
+  | types.polkadot_runtime_common.slots.pallet.Call.force_lease
+  | types.polkadot_runtime_common.slots.pallet.Call.clear_all_leases
+  | types.polkadot_runtime_common.slots.pallet.Call.trigger_onboard
 export namespace Call {
   /**
    * Just a connect into the `lease_out` call, in case Root wants to force some lease to happen
@@ -22,11 +22,11 @@ export namespace Call {
    */
   export interface force_lease {
     type: "force_lease"
-    para: t.types.polkadot_parachain.primitives.Id
-    leaser: t.types.sp_core.crypto.AccountId32
-    amount: t.types.u128
-    period_begin: t.types.u32
-    period_count: t.types.u32
+    para: types.polkadot_parachain.primitives.Id
+    leaser: types.sp_core.crypto.AccountId32
+    amount: types.u128
+    period_begin: types.u32
+    period_count: types.u32
   }
   /**
    * Clear all leases for a Para Id, refunding any deposits back to the original owners.
@@ -35,7 +35,7 @@ export namespace Call {
    */
   export interface clear_all_leases {
     type: "clear_all_leases"
-    para: t.types.polkadot_parachain.primitives.Id
+    para: types.polkadot_parachain.primitives.Id
   }
   /**
    * Try to onboard a parachain that has a lease for the current lease period.
@@ -48,7 +48,7 @@ export namespace Call {
    */
   export interface trigger_onboard {
     type: "trigger_onboard"
-    para: t.types.polkadot_parachain.primitives.Id
+    para: types.polkadot_parachain.primitives.Id
   }
   /**
    * Just a connect into the `lease_out` call, in case Root wants to force some lease to happen
@@ -57,8 +57,8 @@ export namespace Call {
    * The dispatch origin for this call must match `T::ForceOrigin`.
    */
   export function force_lease(
-    value: Omit<t.types.polkadot_runtime_common.slots.pallet.Call.force_lease, "type">,
-  ): t.types.polkadot_runtime_common.slots.pallet.Call.force_lease {
+    value: Omit<types.polkadot_runtime_common.slots.pallet.Call.force_lease, "type">,
+  ): types.polkadot_runtime_common.slots.pallet.Call.force_lease {
     return { type: "force_lease", ...value }
   }
   /**
@@ -67,8 +67,8 @@ export namespace Call {
    * The dispatch origin for this call must match `T::ForceOrigin`.
    */
   export function clear_all_leases(
-    value: Omit<t.types.polkadot_runtime_common.slots.pallet.Call.clear_all_leases, "type">,
-  ): t.types.polkadot_runtime_common.slots.pallet.Call.clear_all_leases {
+    value: Omit<types.polkadot_runtime_common.slots.pallet.Call.clear_all_leases, "type">,
+  ): types.polkadot_runtime_common.slots.pallet.Call.clear_all_leases {
     return { type: "clear_all_leases", ...value }
   }
   /**
@@ -81,8 +81,8 @@ export namespace Call {
    * Origin must be signed, but can be called by anyone.
    */
   export function trigger_onboard(
-    value: Omit<t.types.polkadot_runtime_common.slots.pallet.Call.trigger_onboard, "type">,
-  ): t.types.polkadot_runtime_common.slots.pallet.Call.trigger_onboard {
+    value: Omit<types.polkadot_runtime_common.slots.pallet.Call.trigger_onboard, "type">,
+  ): types.polkadot_runtime_common.slots.pallet.Call.trigger_onboard {
     return { type: "trigger_onboard", ...value }
   }
 }
@@ -92,13 +92,13 @@ export type Error = "ParaNotOnboarding" | "LeaseError"
 
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
 export type Event =
-  | t.types.polkadot_runtime_common.slots.pallet.Event.NewLeasePeriod
-  | t.types.polkadot_runtime_common.slots.pallet.Event.Leased
+  | types.polkadot_runtime_common.slots.pallet.Event.NewLeasePeriod
+  | types.polkadot_runtime_common.slots.pallet.Event.Leased
 export namespace Event {
   /** A new `[lease_period]` is beginning. */
   export interface NewLeasePeriod {
     type: "NewLeasePeriod"
-    lease_period: t.types.u32
+    lease_period: types.u32
   }
   /**
    * A para has won the right to a continuous set of lease periods as a parachain.
@@ -107,17 +107,17 @@ export namespace Event {
    */
   export interface Leased {
     type: "Leased"
-    para_id: t.types.polkadot_parachain.primitives.Id
-    leaser: t.types.sp_core.crypto.AccountId32
-    period_begin: t.types.u32
-    period_count: t.types.u32
-    extra_reserved: t.types.u128
-    total_amount: t.types.u128
+    para_id: types.polkadot_parachain.primitives.Id
+    leaser: types.sp_core.crypto.AccountId32
+    period_begin: types.u32
+    period_count: types.u32
+    extra_reserved: types.u128
+    total_amount: types.u128
   }
   /** A new `[lease_period]` is beginning. */
   export function NewLeasePeriod(
-    value: Omit<t.types.polkadot_runtime_common.slots.pallet.Event.NewLeasePeriod, "type">,
-  ): t.types.polkadot_runtime_common.slots.pallet.Event.NewLeasePeriod {
+    value: Omit<types.polkadot_runtime_common.slots.pallet.Event.NewLeasePeriod, "type">,
+  ): types.polkadot_runtime_common.slots.pallet.Event.NewLeasePeriod {
     return { type: "NewLeasePeriod", ...value }
   }
   /**
@@ -126,8 +126,8 @@ export namespace Event {
    * Second balance is the total amount reserved.
    */
   export function Leased(
-    value: Omit<t.types.polkadot_runtime_common.slots.pallet.Event.Leased, "type">,
-  ): t.types.polkadot_runtime_common.slots.pallet.Event.Leased {
+    value: Omit<types.polkadot_runtime_common.slots.pallet.Event.Leased, "type">,
+  ): types.polkadot_runtime_common.slots.pallet.Event.Leased {
     return { type: "Leased", ...value }
   }
 }

@@ -1,23 +1,23 @@
 import { $ } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as t from "../../../mod.ts"
+import type * as types from "../../../types/mod.ts"
 
-export const $bodyId: $.Codec<t.types.xcm.v0.junction.BodyId> = _codec.$128
+export const $bodyId: $.Codec<types.xcm.v0.junction.BodyId> = _codec.$128
 
-export const $bodyPart: $.Codec<t.types.xcm.v0.junction.BodyPart> = _codec.$129
+export const $bodyPart: $.Codec<types.xcm.v0.junction.BodyPart> = _codec.$129
 
-export const $junction: $.Codec<t.types.xcm.v0.junction.Junction> = _codec.$154
+export const $junction: $.Codec<types.xcm.v0.junction.Junction> = _codec.$154
 
-export const $networkId: $.Codec<t.types.xcm.v0.junction.NetworkId> = _codec.$126
+export const $networkId: $.Codec<types.xcm.v0.junction.NetworkId> = _codec.$126
 
 export type BodyId =
-  | t.types.xcm.v0.junction.BodyId.Unit
-  | t.types.xcm.v0.junction.BodyId.Named
-  | t.types.xcm.v0.junction.BodyId.Index
-  | t.types.xcm.v0.junction.BodyId.Executive
-  | t.types.xcm.v0.junction.BodyId.Technical
-  | t.types.xcm.v0.junction.BodyId.Legislative
-  | t.types.xcm.v0.junction.BodyId.Judicial
+  | types.xcm.v0.junction.BodyId.Unit
+  | types.xcm.v0.junction.BodyId.Named
+  | types.xcm.v0.junction.BodyId.Index
+  | types.xcm.v0.junction.BodyId.Executive
+  | types.xcm.v0.junction.BodyId.Technical
+  | types.xcm.v0.junction.BodyId.Legislative
+  | types.xcm.v0.junction.BodyId.Judicial
 export namespace BodyId {
   export interface Unit {
     type: "Unit"
@@ -28,7 +28,7 @@ export namespace BodyId {
   }
   export interface Index {
     type: "Index"
-    value: t.Compact<t.types.u32>
+    value: types.Compact<types.u32>
   }
   export interface Executive {
     type: "Executive"
@@ -42,128 +42,128 @@ export namespace BodyId {
   export interface Judicial {
     type: "Judicial"
   }
-  export function Unit(): t.types.xcm.v0.junction.BodyId.Unit {
+  export function Unit(): types.xcm.v0.junction.BodyId.Unit {
     return { type: "Unit" }
   }
   export function Named(
-    value: t.types.xcm.v0.junction.BodyId.Named["value"],
-  ): t.types.xcm.v0.junction.BodyId.Named {
+    value: types.xcm.v0.junction.BodyId.Named["value"],
+  ): types.xcm.v0.junction.BodyId.Named {
     return { type: "Named", value }
   }
   export function Index(
-    value: t.types.xcm.v0.junction.BodyId.Index["value"],
-  ): t.types.xcm.v0.junction.BodyId.Index {
+    value: types.xcm.v0.junction.BodyId.Index["value"],
+  ): types.xcm.v0.junction.BodyId.Index {
     return { type: "Index", value }
   }
-  export function Executive(): t.types.xcm.v0.junction.BodyId.Executive {
+  export function Executive(): types.xcm.v0.junction.BodyId.Executive {
     return { type: "Executive" }
   }
-  export function Technical(): t.types.xcm.v0.junction.BodyId.Technical {
+  export function Technical(): types.xcm.v0.junction.BodyId.Technical {
     return { type: "Technical" }
   }
-  export function Legislative(): t.types.xcm.v0.junction.BodyId.Legislative {
+  export function Legislative(): types.xcm.v0.junction.BodyId.Legislative {
     return { type: "Legislative" }
   }
-  export function Judicial(): t.types.xcm.v0.junction.BodyId.Judicial {
+  export function Judicial(): types.xcm.v0.junction.BodyId.Judicial {
     return { type: "Judicial" }
   }
 }
 
 export type BodyPart =
-  | t.types.xcm.v0.junction.BodyPart.Voice
-  | t.types.xcm.v0.junction.BodyPart.Members
-  | t.types.xcm.v0.junction.BodyPart.Fraction
-  | t.types.xcm.v0.junction.BodyPart.AtLeastProportion
-  | t.types.xcm.v0.junction.BodyPart.MoreThanProportion
+  | types.xcm.v0.junction.BodyPart.Voice
+  | types.xcm.v0.junction.BodyPart.Members
+  | types.xcm.v0.junction.BodyPart.Fraction
+  | types.xcm.v0.junction.BodyPart.AtLeastProportion
+  | types.xcm.v0.junction.BodyPart.MoreThanProportion
 export namespace BodyPart {
   export interface Voice {
     type: "Voice"
   }
   export interface Members {
     type: "Members"
-    count: t.Compact<t.types.u32>
+    count: types.Compact<types.u32>
   }
   export interface Fraction {
     type: "Fraction"
-    nom: t.Compact<t.types.u32>
-    denom: t.Compact<t.types.u32>
+    nom: types.Compact<types.u32>
+    denom: types.Compact<types.u32>
   }
   export interface AtLeastProportion {
     type: "AtLeastProportion"
-    nom: t.Compact<t.types.u32>
-    denom: t.Compact<t.types.u32>
+    nom: types.Compact<types.u32>
+    denom: types.Compact<types.u32>
   }
   export interface MoreThanProportion {
     type: "MoreThanProportion"
-    nom: t.Compact<t.types.u32>
-    denom: t.Compact<t.types.u32>
+    nom: types.Compact<types.u32>
+    denom: types.Compact<types.u32>
   }
-  export function Voice(): t.types.xcm.v0.junction.BodyPart.Voice {
+  export function Voice(): types.xcm.v0.junction.BodyPart.Voice {
     return { type: "Voice" }
   }
   export function Members(
-    value: Omit<t.types.xcm.v0.junction.BodyPart.Members, "type">,
-  ): t.types.xcm.v0.junction.BodyPart.Members {
+    value: Omit<types.xcm.v0.junction.BodyPart.Members, "type">,
+  ): types.xcm.v0.junction.BodyPart.Members {
     return { type: "Members", ...value }
   }
   export function Fraction(
-    value: Omit<t.types.xcm.v0.junction.BodyPart.Fraction, "type">,
-  ): t.types.xcm.v0.junction.BodyPart.Fraction {
+    value: Omit<types.xcm.v0.junction.BodyPart.Fraction, "type">,
+  ): types.xcm.v0.junction.BodyPart.Fraction {
     return { type: "Fraction", ...value }
   }
   export function AtLeastProportion(
-    value: Omit<t.types.xcm.v0.junction.BodyPart.AtLeastProportion, "type">,
-  ): t.types.xcm.v0.junction.BodyPart.AtLeastProportion {
+    value: Omit<types.xcm.v0.junction.BodyPart.AtLeastProportion, "type">,
+  ): types.xcm.v0.junction.BodyPart.AtLeastProportion {
     return { type: "AtLeastProportion", ...value }
   }
   export function MoreThanProportion(
-    value: Omit<t.types.xcm.v0.junction.BodyPart.MoreThanProportion, "type">,
-  ): t.types.xcm.v0.junction.BodyPart.MoreThanProportion {
+    value: Omit<types.xcm.v0.junction.BodyPart.MoreThanProportion, "type">,
+  ): types.xcm.v0.junction.BodyPart.MoreThanProportion {
     return { type: "MoreThanProportion", ...value }
   }
 }
 
 export type Junction =
-  | t.types.xcm.v0.junction.Junction.Parent
-  | t.types.xcm.v0.junction.Junction.Parachain
-  | t.types.xcm.v0.junction.Junction.AccountId32
-  | t.types.xcm.v0.junction.Junction.AccountIndex64
-  | t.types.xcm.v0.junction.Junction.AccountKey20
-  | t.types.xcm.v0.junction.Junction.PalletInstance
-  | t.types.xcm.v0.junction.Junction.GeneralIndex
-  | t.types.xcm.v0.junction.Junction.GeneralKey
-  | t.types.xcm.v0.junction.Junction.OnlyChild
-  | t.types.xcm.v0.junction.Junction.Plurality
+  | types.xcm.v0.junction.Junction.Parent
+  | types.xcm.v0.junction.Junction.Parachain
+  | types.xcm.v0.junction.Junction.AccountId32
+  | types.xcm.v0.junction.Junction.AccountIndex64
+  | types.xcm.v0.junction.Junction.AccountKey20
+  | types.xcm.v0.junction.Junction.PalletInstance
+  | types.xcm.v0.junction.Junction.GeneralIndex
+  | types.xcm.v0.junction.Junction.GeneralKey
+  | types.xcm.v0.junction.Junction.OnlyChild
+  | types.xcm.v0.junction.Junction.Plurality
 export namespace Junction {
   export interface Parent {
     type: "Parent"
   }
   export interface Parachain {
     type: "Parachain"
-    value: t.Compact<t.types.u32>
+    value: types.Compact<types.u32>
   }
   export interface AccountId32 {
     type: "AccountId32"
-    network: t.types.xcm.v0.junction.NetworkId
+    network: types.xcm.v0.junction.NetworkId
     id: Uint8Array
   }
   export interface AccountIndex64 {
     type: "AccountIndex64"
-    network: t.types.xcm.v0.junction.NetworkId
-    index: t.Compact<t.types.u64>
+    network: types.xcm.v0.junction.NetworkId
+    index: types.Compact<types.u64>
   }
   export interface AccountKey20 {
     type: "AccountKey20"
-    network: t.types.xcm.v0.junction.NetworkId
+    network: types.xcm.v0.junction.NetworkId
     key: Uint8Array
   }
   export interface PalletInstance {
     type: "PalletInstance"
-    value: t.types.u8
+    value: types.u8
   }
   export interface GeneralIndex {
     type: "GeneralIndex"
-    value: t.Compact<t.types.u128>
+    value: types.Compact<types.u128>
   }
   export interface GeneralKey {
     type: "GeneralKey"
@@ -174,62 +174,62 @@ export namespace Junction {
   }
   export interface Plurality {
     type: "Plurality"
-    id: t.types.xcm.v0.junction.BodyId
-    part: t.types.xcm.v0.junction.BodyPart
+    id: types.xcm.v0.junction.BodyId
+    part: types.xcm.v0.junction.BodyPart
   }
-  export function Parent(): t.types.xcm.v0.junction.Junction.Parent {
+  export function Parent(): types.xcm.v0.junction.Junction.Parent {
     return { type: "Parent" }
   }
   export function Parachain(
-    value: t.types.xcm.v0.junction.Junction.Parachain["value"],
-  ): t.types.xcm.v0.junction.Junction.Parachain {
+    value: types.xcm.v0.junction.Junction.Parachain["value"],
+  ): types.xcm.v0.junction.Junction.Parachain {
     return { type: "Parachain", value }
   }
   export function AccountId32(
-    value: Omit<t.types.xcm.v0.junction.Junction.AccountId32, "type">,
-  ): t.types.xcm.v0.junction.Junction.AccountId32 {
+    value: Omit<types.xcm.v0.junction.Junction.AccountId32, "type">,
+  ): types.xcm.v0.junction.Junction.AccountId32 {
     return { type: "AccountId32", ...value }
   }
   export function AccountIndex64(
-    value: Omit<t.types.xcm.v0.junction.Junction.AccountIndex64, "type">,
-  ): t.types.xcm.v0.junction.Junction.AccountIndex64 {
+    value: Omit<types.xcm.v0.junction.Junction.AccountIndex64, "type">,
+  ): types.xcm.v0.junction.Junction.AccountIndex64 {
     return { type: "AccountIndex64", ...value }
   }
   export function AccountKey20(
-    value: Omit<t.types.xcm.v0.junction.Junction.AccountKey20, "type">,
-  ): t.types.xcm.v0.junction.Junction.AccountKey20 {
+    value: Omit<types.xcm.v0.junction.Junction.AccountKey20, "type">,
+  ): types.xcm.v0.junction.Junction.AccountKey20 {
     return { type: "AccountKey20", ...value }
   }
   export function PalletInstance(
-    value: t.types.xcm.v0.junction.Junction.PalletInstance["value"],
-  ): t.types.xcm.v0.junction.Junction.PalletInstance {
+    value: types.xcm.v0.junction.Junction.PalletInstance["value"],
+  ): types.xcm.v0.junction.Junction.PalletInstance {
     return { type: "PalletInstance", value }
   }
   export function GeneralIndex(
-    value: t.types.xcm.v0.junction.Junction.GeneralIndex["value"],
-  ): t.types.xcm.v0.junction.Junction.GeneralIndex {
+    value: types.xcm.v0.junction.Junction.GeneralIndex["value"],
+  ): types.xcm.v0.junction.Junction.GeneralIndex {
     return { type: "GeneralIndex", value }
   }
   export function GeneralKey(
-    value: t.types.xcm.v0.junction.Junction.GeneralKey["value"],
-  ): t.types.xcm.v0.junction.Junction.GeneralKey {
+    value: types.xcm.v0.junction.Junction.GeneralKey["value"],
+  ): types.xcm.v0.junction.Junction.GeneralKey {
     return { type: "GeneralKey", value }
   }
-  export function OnlyChild(): t.types.xcm.v0.junction.Junction.OnlyChild {
+  export function OnlyChild(): types.xcm.v0.junction.Junction.OnlyChild {
     return { type: "OnlyChild" }
   }
   export function Plurality(
-    value: Omit<t.types.xcm.v0.junction.Junction.Plurality, "type">,
-  ): t.types.xcm.v0.junction.Junction.Plurality {
+    value: Omit<types.xcm.v0.junction.Junction.Plurality, "type">,
+  ): types.xcm.v0.junction.Junction.Plurality {
     return { type: "Plurality", ...value }
   }
 }
 
 export type NetworkId =
-  | t.types.xcm.v0.junction.NetworkId.Any
-  | t.types.xcm.v0.junction.NetworkId.Named
-  | t.types.xcm.v0.junction.NetworkId.Polkadot
-  | t.types.xcm.v0.junction.NetworkId.Kusama
+  | types.xcm.v0.junction.NetworkId.Any
+  | types.xcm.v0.junction.NetworkId.Named
+  | types.xcm.v0.junction.NetworkId.Polkadot
+  | types.xcm.v0.junction.NetworkId.Kusama
 export namespace NetworkId {
   export interface Any {
     type: "Any"
@@ -244,18 +244,18 @@ export namespace NetworkId {
   export interface Kusama {
     type: "Kusama"
   }
-  export function Any(): t.types.xcm.v0.junction.NetworkId.Any {
+  export function Any(): types.xcm.v0.junction.NetworkId.Any {
     return { type: "Any" }
   }
   export function Named(
-    value: t.types.xcm.v0.junction.NetworkId.Named["value"],
-  ): t.types.xcm.v0.junction.NetworkId.Named {
+    value: types.xcm.v0.junction.NetworkId.Named["value"],
+  ): types.xcm.v0.junction.NetworkId.Named {
     return { type: "Named", value }
   }
-  export function Polkadot(): t.types.xcm.v0.junction.NetworkId.Polkadot {
+  export function Polkadot(): types.xcm.v0.junction.NetworkId.Polkadot {
     return { type: "Polkadot" }
   }
-  export function Kusama(): t.types.xcm.v0.junction.NetworkId.Kusama {
+  export function Kusama(): types.xcm.v0.junction.NetworkId.Kusama {
     return { type: "Kusama" }
   }
 }

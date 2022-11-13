@@ -1,6 +1,6 @@
 import { $ } from "../capi.ts"
 import * as _codec from "../codecs.ts"
-import type * as t from "../mod.ts"
+import type * as types from "../types/mod.ts"
 
 /** Bounties that have been made. */
 export const Bounties = {
@@ -49,8 +49,8 @@ export const BountyDescriptions = {
  * # </weight>
  */
 export function accept_curator(
-  value: Omit<t.types.pallet_bounties.pallet.Call.accept_curator, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_bounties.pallet.Call.accept_curator, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Bounties", value: { ...value, type: "accept_curator" } }
 }
 
@@ -65,8 +65,8 @@ export function accept_curator(
  * # </weight>
  */
 export function approve_bounty(
-  value: Omit<t.types.pallet_bounties.pallet.Call.approve_bounty, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_bounties.pallet.Call.approve_bounty, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Bounties", value: { ...value, type: "approve_bounty" } }
 }
 
@@ -84,8 +84,8 @@ export function approve_bounty(
  * # </weight>
  */
 export function award_bounty(
-  value: Omit<t.types.pallet_bounties.pallet.Call.award_bounty, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_bounties.pallet.Call.award_bounty, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Bounties", value: { ...value, type: "award_bounty" } }
 }
 
@@ -101,8 +101,8 @@ export function award_bounty(
  * # </weight>
  */
 export function claim_bounty(
-  value: Omit<t.types.pallet_bounties.pallet.Call.claim_bounty, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_bounties.pallet.Call.claim_bounty, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Bounties", value: { ...value, type: "claim_bounty" } }
 }
 
@@ -119,8 +119,8 @@ export function claim_bounty(
  * # </weight>
  */
 export function close_bounty(
-  value: Omit<t.types.pallet_bounties.pallet.Call.close_bounty, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_bounties.pallet.Call.close_bounty, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Bounties", value: { ...value, type: "close_bounty" } }
 }
 
@@ -137,8 +137,8 @@ export function close_bounty(
  * # </weight>
  */
 export function extend_bounty_expiry(
-  value: Omit<t.types.pallet_bounties.pallet.Call.extend_bounty_expiry, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_bounties.pallet.Call.extend_bounty_expiry, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Bounties", value: { ...value, type: "extend_bounty_expiry" } }
 }
 
@@ -157,8 +157,8 @@ export function extend_bounty_expiry(
  * - `description`: The description of this bounty.
  */
 export function propose_bounty(
-  value: Omit<t.types.pallet_bounties.pallet.Call.propose_bounty, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_bounties.pallet.Call.propose_bounty, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Bounties", value: { ...value, type: "propose_bounty" } }
 }
 
@@ -172,8 +172,8 @@ export function propose_bounty(
  * # </weight>
  */
 export function propose_curator(
-  value: Omit<t.types.pallet_bounties.pallet.Call.propose_curator, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_bounties.pallet.Call.propose_curator, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Bounties", value: { ...value, type: "propose_curator" } }
 }
 
@@ -198,7 +198,7 @@ export function propose_curator(
  * # </weight>
  */
 export function unassign_curator(
-  value: Omit<t.types.pallet_bounties.pallet.Call.unassign_curator, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_bounties.pallet.Call.unassign_curator, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Bounties", value: { ...value, type: "unassign_curator" } }
 }

@@ -1,8 +1,8 @@
 import { $ } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as t from "../../mod.ts"
+import type * as types from "../../types/mod.ts"
 
-export const $conviction: $.Codec<t.types.pallet_democracy.conviction.Conviction> = _codec.$235
+export const $conviction: $.Codec<types.pallet_democracy.conviction.Conviction> = _codec.$235
 
 export type Conviction =
   | "None"

@@ -1,37 +1,35 @@
 import { $ } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as t from "../../../mod.ts"
+import type * as types from "../../../types/mod.ts"
 
 export * as pallet from "./pallet.ts"
 
-export const $paraGenesisArgs: $.Codec<t.types.polkadot_runtime_parachains.paras.ParaGenesisArgs> =
+export const $paraGenesisArgs: $.Codec<types.polkadot_runtime_parachains.paras.ParaGenesisArgs> =
   _codec.$678
 
-export const $paraLifecycle: $.Codec<t.types.polkadot_runtime_parachains.paras.ParaLifecycle> =
+export const $paraLifecycle: $.Codec<types.polkadot_runtime_parachains.paras.ParaLifecycle> =
   _codec.$670
 
-export const $paraPastCodeMeta: $.Codec<
-  t.types.polkadot_runtime_parachains.paras.ParaPastCodeMeta
-> = _codec.$672
+export const $paraPastCodeMeta: $.Codec<types.polkadot_runtime_parachains.paras.ParaPastCodeMeta> =
+  _codec.$672
 
 export const $pvfCheckActiveVoteState: $.Codec<
-  t.types.polkadot_runtime_parachains.paras.PvfCheckActiveVoteState
+  types.polkadot_runtime_parachains.paras.PvfCheckActiveVoteState
 > = _codec.$666
 
-export const $pvfCheckCause: $.Codec<t.types.polkadot_runtime_parachains.paras.PvfCheckCause> =
+export const $pvfCheckCause: $.Codec<types.polkadot_runtime_parachains.paras.PvfCheckCause> =
   _codec.$668
 
-export const $replacementTimes: $.Codec<
-  t.types.polkadot_runtime_parachains.paras.ReplacementTimes
-> = _codec.$674
+export const $replacementTimes: $.Codec<types.polkadot_runtime_parachains.paras.ReplacementTimes> =
+  _codec.$674
 
 export interface ParaGenesisArgs {
-  genesis_head: t.types.polkadot_parachain.primitives.HeadData
-  validation_code: t.types.polkadot_parachain.primitives.ValidationCode
+  genesis_head: types.polkadot_parachain.primitives.HeadData
+  validation_code: types.polkadot_parachain.primitives.ValidationCode
   parachain: boolean
 }
 
-export function ParaGenesisArgs(value: t.types.polkadot_runtime_parachains.paras.ParaGenesisArgs) {
+export function ParaGenesisArgs(value: types.polkadot_runtime_parachains.paras.ParaGenesisArgs) {
   return value
 }
 
@@ -45,62 +43,58 @@ export type ParaLifecycle =
   | "OffboardingParachain"
 
 export interface ParaPastCodeMeta {
-  upgrade_times: Array<t.types.polkadot_runtime_parachains.paras.ReplacementTimes>
-  last_pruned: t.types.u32 | undefined
+  upgrade_times: Array<types.polkadot_runtime_parachains.paras.ReplacementTimes>
+  last_pruned: types.u32 | undefined
 }
 
-export function ParaPastCodeMeta(
-  value: t.types.polkadot_runtime_parachains.paras.ParaPastCodeMeta,
-) {
+export function ParaPastCodeMeta(value: types.polkadot_runtime_parachains.paras.ParaPastCodeMeta) {
   return value
 }
 
 export interface PvfCheckActiveVoteState {
   votes_accept: $.BitSequence
   votes_reject: $.BitSequence
-  age: t.types.u32
-  created_at: t.types.u32
-  causes: Array<t.types.polkadot_runtime_parachains.paras.PvfCheckCause>
+  age: types.u32
+  created_at: types.u32
+  causes: Array<types.polkadot_runtime_parachains.paras.PvfCheckCause>
 }
 
 export function PvfCheckActiveVoteState(
-  value: t.types.polkadot_runtime_parachains.paras.PvfCheckActiveVoteState,
+  value: types.polkadot_runtime_parachains.paras.PvfCheckActiveVoteState,
 ) {
   return value
 }
 
 export type PvfCheckCause =
-  | t.types.polkadot_runtime_parachains.paras.PvfCheckCause.Onboarding
-  | t.types.polkadot_runtime_parachains.paras.PvfCheckCause.Upgrade
+  | types.polkadot_runtime_parachains.paras.PvfCheckCause.Onboarding
+  | types.polkadot_runtime_parachains.paras.PvfCheckCause.Upgrade
 export namespace PvfCheckCause {
   export interface Onboarding {
     type: "Onboarding"
-    value: t.types.polkadot_parachain.primitives.Id
+    value: types.polkadot_parachain.primitives.Id
   }
   export interface Upgrade {
     type: "Upgrade"
-    id: t.types.polkadot_parachain.primitives.Id
-    relay_parent_number: t.types.u32
+    id: types.polkadot_parachain.primitives.Id
+    relay_parent_number: types.u32
   }
   export function Onboarding(
-    value: t.types.polkadot_runtime_parachains.paras.PvfCheckCause.Onboarding["value"],
-  ): t.types.polkadot_runtime_parachains.paras.PvfCheckCause.Onboarding {
+    value: types.polkadot_runtime_parachains.paras.PvfCheckCause.Onboarding["value"],
+  ): types.polkadot_runtime_parachains.paras.PvfCheckCause.Onboarding {
     return { type: "Onboarding", value }
   }
   export function Upgrade(
-    value: Omit<t.types.polkadot_runtime_parachains.paras.PvfCheckCause.Upgrade, "type">,
-  ): t.types.polkadot_runtime_parachains.paras.PvfCheckCause.Upgrade {
+    value: Omit<types.polkadot_runtime_parachains.paras.PvfCheckCause.Upgrade, "type">,
+  ): types.polkadot_runtime_parachains.paras.PvfCheckCause.Upgrade {
     return { type: "Upgrade", ...value }
   }
 }
 
 export interface ReplacementTimes {
-  expected_at: t.types.u32
-  activated_at: t.types.u32
+  expected_at: types.u32
+  activated_at: types.u32
 }
 
-export function ReplacementTimes(
-  value: t.types.polkadot_runtime_parachains.paras.ReplacementTimes,
-) {
+export function ReplacementTimes(value: types.polkadot_runtime_parachains.paras.ReplacementTimes) {
   return value
 }

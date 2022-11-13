@@ -1,6 +1,6 @@
 import { $ } from "../capi.ts"
 import * as _codec from "../codecs.ts"
-import type * as t from "../mod.ts"
+import type * as types from "../types/mod.ts"
 
 /** Counter for the related counted storage map */
 export const CounterForListNodes = {
@@ -48,8 +48,8 @@ export const ListNodes = {
  * - and `origin` has a greater `Score` than `lighter`.
  */
 export function put_in_front_of(
-  value: Omit<t.types.pallet_bags_list.pallet.Call.put_in_front_of, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_bags_list.pallet.Call.put_in_front_of, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "VoterList", value: { ...value, type: "put_in_front_of" } }
 }
 
@@ -66,7 +66,7 @@ export function put_in_front_of(
  * If `dislocated` does not exists, it returns an error.
  */
 export function rebag(
-  value: Omit<t.types.pallet_bags_list.pallet.Call.rebag, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_bags_list.pallet.Call.rebag, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "VoterList", value: { ...value, type: "rebag" } }
 }

@@ -1,60 +1,60 @@
 import { $ } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as t from "../../mod.ts"
+import type * as types from "../../types/mod.ts"
 
 export * as pallet from "./pallet.ts"
 
-export const $storedPendingChange: $.Codec<t.types.pallet_grandpa.StoredPendingChange> = _codec.$517
+export const $storedPendingChange: $.Codec<types.pallet_grandpa.StoredPendingChange> = _codec.$517
 
-export const $storedState: $.Codec<t.types.pallet_grandpa.StoredState> = _codec.$516
+export const $storedState: $.Codec<types.pallet_grandpa.StoredState> = _codec.$516
 
 export interface StoredPendingChange {
-  scheduled_at: t.types.u32
-  delay: t.types.u32
-  next_authorities: Array<[t.types.sp_finality_grandpa.app.Public, t.types.u64]>
-  forced: t.types.u32 | undefined
+  scheduled_at: types.u32
+  delay: types.u32
+  next_authorities: Array<[types.sp_finality_grandpa.app.Public, types.u64]>
+  forced: types.u32 | undefined
 }
 
-export function StoredPendingChange(value: t.types.pallet_grandpa.StoredPendingChange) {
+export function StoredPendingChange(value: types.pallet_grandpa.StoredPendingChange) {
   return value
 }
 
 export type StoredState =
-  | t.types.pallet_grandpa.StoredState.Live
-  | t.types.pallet_grandpa.StoredState.PendingPause
-  | t.types.pallet_grandpa.StoredState.Paused
-  | t.types.pallet_grandpa.StoredState.PendingResume
+  | types.pallet_grandpa.StoredState.Live
+  | types.pallet_grandpa.StoredState.PendingPause
+  | types.pallet_grandpa.StoredState.Paused
+  | types.pallet_grandpa.StoredState.PendingResume
 export namespace StoredState {
   export interface Live {
     type: "Live"
   }
   export interface PendingPause {
     type: "PendingPause"
-    scheduled_at: t.types.u32
-    delay: t.types.u32
+    scheduled_at: types.u32
+    delay: types.u32
   }
   export interface Paused {
     type: "Paused"
   }
   export interface PendingResume {
     type: "PendingResume"
-    scheduled_at: t.types.u32
-    delay: t.types.u32
+    scheduled_at: types.u32
+    delay: types.u32
   }
-  export function Live(): t.types.pallet_grandpa.StoredState.Live {
+  export function Live(): types.pallet_grandpa.StoredState.Live {
     return { type: "Live" }
   }
   export function PendingPause(
-    value: Omit<t.types.pallet_grandpa.StoredState.PendingPause, "type">,
-  ): t.types.pallet_grandpa.StoredState.PendingPause {
+    value: Omit<types.pallet_grandpa.StoredState.PendingPause, "type">,
+  ): types.pallet_grandpa.StoredState.PendingPause {
     return { type: "PendingPause", ...value }
   }
-  export function Paused(): t.types.pallet_grandpa.StoredState.Paused {
+  export function Paused(): types.pallet_grandpa.StoredState.Paused {
     return { type: "Paused" }
   }
   export function PendingResume(
-    value: Omit<t.types.pallet_grandpa.StoredState.PendingResume, "type">,
-  ): t.types.pallet_grandpa.StoredState.PendingResume {
+    value: Omit<types.pallet_grandpa.StoredState.PendingResume, "type">,
+  ): types.pallet_grandpa.StoredState.PendingResume {
     return { type: "PendingResume", ...value }
   }
 }

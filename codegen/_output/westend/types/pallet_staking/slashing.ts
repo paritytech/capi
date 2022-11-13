@@ -1,27 +1,27 @@
 import { $ } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as t from "../../mod.ts"
+import type * as types from "../../types/mod.ts"
 
-export const $slashingSpans: $.Codec<t.types.pallet_staking.slashing.SlashingSpans> = _codec.$503
+export const $slashingSpans: $.Codec<types.pallet_staking.slashing.SlashingSpans> = _codec.$503
 
-export const $spanRecord: $.Codec<t.types.pallet_staking.slashing.SpanRecord> = _codec.$504
+export const $spanRecord: $.Codec<types.pallet_staking.slashing.SpanRecord> = _codec.$504
 
 export interface SlashingSpans {
-  span_index: t.types.u32
-  last_start: t.types.u32
-  last_nonzero_slash: t.types.u32
-  prior: Array<t.types.u32>
+  span_index: types.u32
+  last_start: types.u32
+  last_nonzero_slash: types.u32
+  prior: Array<types.u32>
 }
 
-export function SlashingSpans(value: t.types.pallet_staking.slashing.SlashingSpans) {
+export function SlashingSpans(value: types.pallet_staking.slashing.SlashingSpans) {
   return value
 }
 
 export interface SpanRecord {
-  slashed: t.types.u128
-  paid_out: t.types.u128
+  slashed: types.u128
+  paid_out: types.u128
 }
 
-export function SpanRecord(value: t.types.pallet_staking.slashing.SpanRecord) {
+export function SpanRecord(value: types.pallet_staking.slashing.SpanRecord) {
   return value
 }

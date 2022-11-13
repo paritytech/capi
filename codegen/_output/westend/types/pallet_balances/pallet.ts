@@ -1,21 +1,21 @@
 import { $ } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as t from "../../mod.ts"
+import type * as types from "../../types/mod.ts"
 
-export const $call: $.Codec<t.types.pallet_balances.pallet.Call> = _codec.$199
+export const $call: $.Codec<types.pallet_balances.pallet.Call> = _codec.$199
 
-export const $error: $.Codec<t.types.pallet_balances.pallet.Error> = _codec.$478
+export const $error: $.Codec<types.pallet_balances.pallet.Error> = _codec.$478
 
-export const $event: $.Codec<t.types.pallet_balances.pallet.Event> = _codec.$36
+export const $event: $.Codec<types.pallet_balances.pallet.Event> = _codec.$36
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 export type Call =
-  | t.types.pallet_balances.pallet.Call.transfer
-  | t.types.pallet_balances.pallet.Call.set_balance
-  | t.types.pallet_balances.pallet.Call.force_transfer
-  | t.types.pallet_balances.pallet.Call.transfer_keep_alive
-  | t.types.pallet_balances.pallet.Call.transfer_all
-  | t.types.pallet_balances.pallet.Call.force_unreserve
+  | types.pallet_balances.pallet.Call.transfer
+  | types.pallet_balances.pallet.Call.set_balance
+  | types.pallet_balances.pallet.Call.force_transfer
+  | types.pallet_balances.pallet.Call.transfer_keep_alive
+  | types.pallet_balances.pallet.Call.transfer_all
+  | types.pallet_balances.pallet.Call.force_unreserve
 export namespace Call {
   /**
    * Transfer some liquid free balance to another account.
@@ -46,8 +46,8 @@ export namespace Call {
    */
   export interface transfer {
     type: "transfer"
-    dest: t.types.sp_runtime.multiaddress.MultiAddress
-    value: t.Compact<t.types.u128>
+    dest: types.sp_runtime.multiaddress.MultiAddress
+    value: types.Compact<types.u128>
   }
   /**
    * Set the balances of a given account.
@@ -61,9 +61,9 @@ export namespace Call {
    */
   export interface set_balance {
     type: "set_balance"
-    who: t.types.sp_runtime.multiaddress.MultiAddress
-    new_free: t.Compact<t.types.u128>
-    new_reserved: t.Compact<t.types.u128>
+    who: types.sp_runtime.multiaddress.MultiAddress
+    new_free: types.Compact<types.u128>
+    new_reserved: types.Compact<types.u128>
   }
   /**
    * Exactly as `transfer`, except the origin must be root and the source account may be
@@ -75,9 +75,9 @@ export namespace Call {
    */
   export interface force_transfer {
     type: "force_transfer"
-    source: t.types.sp_runtime.multiaddress.MultiAddress
-    dest: t.types.sp_runtime.multiaddress.MultiAddress
-    value: t.Compact<t.types.u128>
+    source: types.sp_runtime.multiaddress.MultiAddress
+    dest: types.sp_runtime.multiaddress.MultiAddress
+    value: types.Compact<types.u128>
   }
   /**
    * Same as the [`transfer`] call, but with a check that the transfer will not kill the
@@ -89,8 +89,8 @@ export namespace Call {
    */
   export interface transfer_keep_alive {
     type: "transfer_keep_alive"
-    dest: t.types.sp_runtime.multiaddress.MultiAddress
-    value: t.Compact<t.types.u128>
+    dest: types.sp_runtime.multiaddress.MultiAddress
+    value: types.Compact<types.u128>
   }
   /**
    * Transfer the entire transferable balance from the caller account.
@@ -113,7 +113,7 @@ export namespace Call {
    */
   export interface transfer_all {
     type: "transfer_all"
-    dest: t.types.sp_runtime.multiaddress.MultiAddress
+    dest: types.sp_runtime.multiaddress.MultiAddress
     keep_alive: boolean
   }
   /**
@@ -123,8 +123,8 @@ export namespace Call {
    */
   export interface force_unreserve {
     type: "force_unreserve"
-    who: t.types.sp_runtime.multiaddress.MultiAddress
-    amount: t.types.u128
+    who: types.sp_runtime.multiaddress.MultiAddress
+    amount: types.u128
   }
   /**
    * Transfer some liquid free balance to another account.
@@ -154,8 +154,8 @@ export namespace Call {
    * # </weight>
    */
   export function transfer(
-    value: Omit<t.types.pallet_balances.pallet.Call.transfer, "type">,
-  ): t.types.pallet_balances.pallet.Call.transfer {
+    value: Omit<types.pallet_balances.pallet.Call.transfer, "type">,
+  ): types.pallet_balances.pallet.Call.transfer {
     return { type: "transfer", ...value }
   }
   /**
@@ -169,8 +169,8 @@ export namespace Call {
    * The dispatch origin for this call is `root`.
    */
   export function set_balance(
-    value: Omit<t.types.pallet_balances.pallet.Call.set_balance, "type">,
-  ): t.types.pallet_balances.pallet.Call.set_balance {
+    value: Omit<types.pallet_balances.pallet.Call.set_balance, "type">,
+  ): types.pallet_balances.pallet.Call.set_balance {
     return { type: "set_balance", ...value }
   }
   /**
@@ -182,8 +182,8 @@ export namespace Call {
    * # </weight>
    */
   export function force_transfer(
-    value: Omit<t.types.pallet_balances.pallet.Call.force_transfer, "type">,
-  ): t.types.pallet_balances.pallet.Call.force_transfer {
+    value: Omit<types.pallet_balances.pallet.Call.force_transfer, "type">,
+  ): types.pallet_balances.pallet.Call.force_transfer {
     return { type: "force_transfer", ...value }
   }
   /**
@@ -195,8 +195,8 @@ export namespace Call {
    * [`transfer`]: struct.Pallet.html#method.transfer
    */
   export function transfer_keep_alive(
-    value: Omit<t.types.pallet_balances.pallet.Call.transfer_keep_alive, "type">,
-  ): t.types.pallet_balances.pallet.Call.transfer_keep_alive {
+    value: Omit<types.pallet_balances.pallet.Call.transfer_keep_alive, "type">,
+  ): types.pallet_balances.pallet.Call.transfer_keep_alive {
     return { type: "transfer_keep_alive", ...value }
   }
   /**
@@ -219,8 +219,8 @@ export namespace Call {
    *   #</weight>
    */
   export function transfer_all(
-    value: Omit<t.types.pallet_balances.pallet.Call.transfer_all, "type">,
-  ): t.types.pallet_balances.pallet.Call.transfer_all {
+    value: Omit<types.pallet_balances.pallet.Call.transfer_all, "type">,
+  ): types.pallet_balances.pallet.Call.transfer_all {
     return { type: "transfer_all", ...value }
   }
   /**
@@ -229,8 +229,8 @@ export namespace Call {
    * Can only be called by ROOT.
    */
   export function force_unreserve(
-    value: Omit<t.types.pallet_balances.pallet.Call.force_unreserve, "type">,
-  ): t.types.pallet_balances.pallet.Call.force_unreserve {
+    value: Omit<types.pallet_balances.pallet.Call.force_unreserve, "type">,
+  ): types.pallet_balances.pallet.Call.force_unreserve {
     return { type: "force_unreserve", ...value }
   }
 }
@@ -248,22 +248,22 @@ export type Error =
 
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
 export type Event =
-  | t.types.pallet_balances.pallet.Event.Endowed
-  | t.types.pallet_balances.pallet.Event.DustLost
-  | t.types.pallet_balances.pallet.Event.Transfer
-  | t.types.pallet_balances.pallet.Event.BalanceSet
-  | t.types.pallet_balances.pallet.Event.Reserved
-  | t.types.pallet_balances.pallet.Event.Unreserved
-  | t.types.pallet_balances.pallet.Event.ReserveRepatriated
-  | t.types.pallet_balances.pallet.Event.Deposit
-  | t.types.pallet_balances.pallet.Event.Withdraw
-  | t.types.pallet_balances.pallet.Event.Slashed
+  | types.pallet_balances.pallet.Event.Endowed
+  | types.pallet_balances.pallet.Event.DustLost
+  | types.pallet_balances.pallet.Event.Transfer
+  | types.pallet_balances.pallet.Event.BalanceSet
+  | types.pallet_balances.pallet.Event.Reserved
+  | types.pallet_balances.pallet.Event.Unreserved
+  | types.pallet_balances.pallet.Event.ReserveRepatriated
+  | types.pallet_balances.pallet.Event.Deposit
+  | types.pallet_balances.pallet.Event.Withdraw
+  | types.pallet_balances.pallet.Event.Slashed
 export namespace Event {
   /** An account was created with some free balance. */
   export interface Endowed {
     type: "Endowed"
-    account: t.types.sp_core.crypto.AccountId32
-    free_balance: t.types.u128
+    account: types.sp_core.crypto.AccountId32
+    free_balance: types.u128
   }
   /**
    * An account was removed whose balance was non-zero but below ExistentialDeposit,
@@ -271,34 +271,34 @@ export namespace Event {
    */
   export interface DustLost {
     type: "DustLost"
-    account: t.types.sp_core.crypto.AccountId32
-    amount: t.types.u128
+    account: types.sp_core.crypto.AccountId32
+    amount: types.u128
   }
   /** Transfer succeeded. */
   export interface Transfer {
     type: "Transfer"
-    from: t.types.sp_core.crypto.AccountId32
-    to: t.types.sp_core.crypto.AccountId32
-    amount: t.types.u128
+    from: types.sp_core.crypto.AccountId32
+    to: types.sp_core.crypto.AccountId32
+    amount: types.u128
   }
   /** A balance was set by root. */
   export interface BalanceSet {
     type: "BalanceSet"
-    who: t.types.sp_core.crypto.AccountId32
-    free: t.types.u128
-    reserved: t.types.u128
+    who: types.sp_core.crypto.AccountId32
+    free: types.u128
+    reserved: types.u128
   }
   /** Some balance was reserved (moved from free to reserved). */
   export interface Reserved {
     type: "Reserved"
-    who: t.types.sp_core.crypto.AccountId32
-    amount: t.types.u128
+    who: types.sp_core.crypto.AccountId32
+    amount: types.u128
   }
   /** Some balance was unreserved (moved from reserved to free). */
   export interface Unreserved {
     type: "Unreserved"
-    who: t.types.sp_core.crypto.AccountId32
-    amount: t.types.u128
+    who: types.sp_core.crypto.AccountId32
+    amount: types.u128
   }
   /**
    * Some balance was moved from the reserve of the first account to the second account.
@@ -306,33 +306,33 @@ export namespace Event {
    */
   export interface ReserveRepatriated {
     type: "ReserveRepatriated"
-    from: t.types.sp_core.crypto.AccountId32
-    to: t.types.sp_core.crypto.AccountId32
-    amount: t.types.u128
-    destination_status: t.types.frame_support.traits.tokens.misc.BalanceStatus
+    from: types.sp_core.crypto.AccountId32
+    to: types.sp_core.crypto.AccountId32
+    amount: types.u128
+    destination_status: types.frame_support.traits.tokens.misc.BalanceStatus
   }
   /** Some amount was deposited (e.g. for transaction fees). */
   export interface Deposit {
     type: "Deposit"
-    who: t.types.sp_core.crypto.AccountId32
-    amount: t.types.u128
+    who: types.sp_core.crypto.AccountId32
+    amount: types.u128
   }
   /** Some amount was withdrawn from the account (e.g. for transaction fees). */
   export interface Withdraw {
     type: "Withdraw"
-    who: t.types.sp_core.crypto.AccountId32
-    amount: t.types.u128
+    who: types.sp_core.crypto.AccountId32
+    amount: types.u128
   }
   /** Some amount was removed from the account (e.g. for misbehavior). */
   export interface Slashed {
     type: "Slashed"
-    who: t.types.sp_core.crypto.AccountId32
-    amount: t.types.u128
+    who: types.sp_core.crypto.AccountId32
+    amount: types.u128
   }
   /** An account was created with some free balance. */
   export function Endowed(
-    value: Omit<t.types.pallet_balances.pallet.Event.Endowed, "type">,
-  ): t.types.pallet_balances.pallet.Event.Endowed {
+    value: Omit<types.pallet_balances.pallet.Event.Endowed, "type">,
+  ): types.pallet_balances.pallet.Event.Endowed {
     return { type: "Endowed", ...value }
   }
   /**
@@ -340,32 +340,32 @@ export namespace Event {
    * resulting in an outright loss.
    */
   export function DustLost(
-    value: Omit<t.types.pallet_balances.pallet.Event.DustLost, "type">,
-  ): t.types.pallet_balances.pallet.Event.DustLost {
+    value: Omit<types.pallet_balances.pallet.Event.DustLost, "type">,
+  ): types.pallet_balances.pallet.Event.DustLost {
     return { type: "DustLost", ...value }
   }
   /** Transfer succeeded. */
   export function Transfer(
-    value: Omit<t.types.pallet_balances.pallet.Event.Transfer, "type">,
-  ): t.types.pallet_balances.pallet.Event.Transfer {
+    value: Omit<types.pallet_balances.pallet.Event.Transfer, "type">,
+  ): types.pallet_balances.pallet.Event.Transfer {
     return { type: "Transfer", ...value }
   }
   /** A balance was set by root. */
   export function BalanceSet(
-    value: Omit<t.types.pallet_balances.pallet.Event.BalanceSet, "type">,
-  ): t.types.pallet_balances.pallet.Event.BalanceSet {
+    value: Omit<types.pallet_balances.pallet.Event.BalanceSet, "type">,
+  ): types.pallet_balances.pallet.Event.BalanceSet {
     return { type: "BalanceSet", ...value }
   }
   /** Some balance was reserved (moved from free to reserved). */
   export function Reserved(
-    value: Omit<t.types.pallet_balances.pallet.Event.Reserved, "type">,
-  ): t.types.pallet_balances.pallet.Event.Reserved {
+    value: Omit<types.pallet_balances.pallet.Event.Reserved, "type">,
+  ): types.pallet_balances.pallet.Event.Reserved {
     return { type: "Reserved", ...value }
   }
   /** Some balance was unreserved (moved from reserved to free). */
   export function Unreserved(
-    value: Omit<t.types.pallet_balances.pallet.Event.Unreserved, "type">,
-  ): t.types.pallet_balances.pallet.Event.Unreserved {
+    value: Omit<types.pallet_balances.pallet.Event.Unreserved, "type">,
+  ): types.pallet_balances.pallet.Event.Unreserved {
     return { type: "Unreserved", ...value }
   }
   /**
@@ -373,26 +373,26 @@ export namespace Event {
    * Final argument indicates the destination balance type.
    */
   export function ReserveRepatriated(
-    value: Omit<t.types.pallet_balances.pallet.Event.ReserveRepatriated, "type">,
-  ): t.types.pallet_balances.pallet.Event.ReserveRepatriated {
+    value: Omit<types.pallet_balances.pallet.Event.ReserveRepatriated, "type">,
+  ): types.pallet_balances.pallet.Event.ReserveRepatriated {
     return { type: "ReserveRepatriated", ...value }
   }
   /** Some amount was deposited (e.g. for transaction fees). */
   export function Deposit(
-    value: Omit<t.types.pallet_balances.pallet.Event.Deposit, "type">,
-  ): t.types.pallet_balances.pallet.Event.Deposit {
+    value: Omit<types.pallet_balances.pallet.Event.Deposit, "type">,
+  ): types.pallet_balances.pallet.Event.Deposit {
     return { type: "Deposit", ...value }
   }
   /** Some amount was withdrawn from the account (e.g. for transaction fees). */
   export function Withdraw(
-    value: Omit<t.types.pallet_balances.pallet.Event.Withdraw, "type">,
-  ): t.types.pallet_balances.pallet.Event.Withdraw {
+    value: Omit<types.pallet_balances.pallet.Event.Withdraw, "type">,
+  ): types.pallet_balances.pallet.Event.Withdraw {
     return { type: "Withdraw", ...value }
   }
   /** Some amount was removed from the account (e.g. for misbehavior). */
   export function Slashed(
-    value: Omit<t.types.pallet_balances.pallet.Event.Slashed, "type">,
-  ): t.types.pallet_balances.pallet.Event.Slashed {
+    value: Omit<types.pallet_balances.pallet.Event.Slashed, "type">,
+  ): types.pallet_balances.pallet.Event.Slashed {
     return { type: "Slashed", ...value }
   }
 }

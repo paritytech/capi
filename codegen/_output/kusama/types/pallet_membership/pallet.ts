@@ -1,22 +1,22 @@
 import { $ } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as t from "../../mod.ts"
+import type * as types from "../../types/mod.ts"
 
-export const $call: $.Codec<t.types.pallet_membership.pallet.Call> = _codec.$243
+export const $call: $.Codec<types.pallet_membership.pallet.Call> = _codec.$243
 
-export const $error: $.Codec<t.types.pallet_membership.pallet.Error> = _codec.$555
+export const $error: $.Codec<types.pallet_membership.pallet.Error> = _codec.$555
 
-export const $event: $.Codec<t.types.pallet_membership.pallet.Event> = _codec.$70
+export const $event: $.Codec<types.pallet_membership.pallet.Event> = _codec.$70
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 export type Call =
-  | t.types.pallet_membership.pallet.Call.add_member
-  | t.types.pallet_membership.pallet.Call.remove_member
-  | t.types.pallet_membership.pallet.Call.swap_member
-  | t.types.pallet_membership.pallet.Call.reset_members
-  | t.types.pallet_membership.pallet.Call.change_key
-  | t.types.pallet_membership.pallet.Call.set_prime
-  | t.types.pallet_membership.pallet.Call.clear_prime
+  | types.pallet_membership.pallet.Call.add_member
+  | types.pallet_membership.pallet.Call.remove_member
+  | types.pallet_membership.pallet.Call.swap_member
+  | types.pallet_membership.pallet.Call.reset_members
+  | types.pallet_membership.pallet.Call.change_key
+  | types.pallet_membership.pallet.Call.set_prime
+  | types.pallet_membership.pallet.Call.clear_prime
 export namespace Call {
   /**
    * Add a member `who` to the set.
@@ -25,7 +25,7 @@ export namespace Call {
    */
   export interface add_member {
     type: "add_member"
-    who: t.types.sp_runtime.multiaddress.MultiAddress
+    who: types.sp_runtime.multiaddress.MultiAddress
   }
   /**
    * Remove a member `who` from the set.
@@ -34,7 +34,7 @@ export namespace Call {
    */
   export interface remove_member {
     type: "remove_member"
-    who: t.types.sp_runtime.multiaddress.MultiAddress
+    who: types.sp_runtime.multiaddress.MultiAddress
   }
   /**
    * Swap out one member `remove` for another `add`.
@@ -45,8 +45,8 @@ export namespace Call {
    */
   export interface swap_member {
     type: "swap_member"
-    remove: t.types.sp_runtime.multiaddress.MultiAddress
-    add: t.types.sp_runtime.multiaddress.MultiAddress
+    remove: types.sp_runtime.multiaddress.MultiAddress
+    add: types.sp_runtime.multiaddress.MultiAddress
   }
   /**
    * Change the membership to a new set, disregarding the existing membership. Be nice and
@@ -56,7 +56,7 @@ export namespace Call {
    */
   export interface reset_members {
     type: "reset_members"
-    members: Array<t.types.sp_core.crypto.AccountId32>
+    members: Array<types.sp_core.crypto.AccountId32>
   }
   /**
    * Swap out the sending member for some other key `new`.
@@ -67,7 +67,7 @@ export namespace Call {
    */
   export interface change_key {
     type: "change_key"
-    new: t.types.sp_runtime.multiaddress.MultiAddress
+    new: types.sp_runtime.multiaddress.MultiAddress
   }
   /**
    * Set the prime member. Must be a current member.
@@ -76,7 +76,7 @@ export namespace Call {
    */
   export interface set_prime {
     type: "set_prime"
-    who: t.types.sp_runtime.multiaddress.MultiAddress
+    who: types.sp_runtime.multiaddress.MultiAddress
   }
   /**
    * Remove the prime member if it exists.
@@ -92,8 +92,8 @@ export namespace Call {
    * May only be called from `T::AddOrigin`.
    */
   export function add_member(
-    value: Omit<t.types.pallet_membership.pallet.Call.add_member, "type">,
-  ): t.types.pallet_membership.pallet.Call.add_member {
+    value: Omit<types.pallet_membership.pallet.Call.add_member, "type">,
+  ): types.pallet_membership.pallet.Call.add_member {
     return { type: "add_member", ...value }
   }
   /**
@@ -102,8 +102,8 @@ export namespace Call {
    * May only be called from `T::RemoveOrigin`.
    */
   export function remove_member(
-    value: Omit<t.types.pallet_membership.pallet.Call.remove_member, "type">,
-  ): t.types.pallet_membership.pallet.Call.remove_member {
+    value: Omit<types.pallet_membership.pallet.Call.remove_member, "type">,
+  ): types.pallet_membership.pallet.Call.remove_member {
     return { type: "remove_member", ...value }
   }
   /**
@@ -114,8 +114,8 @@ export namespace Call {
    * Prime membership is *not* passed from `remove` to `add`, if extant.
    */
   export function swap_member(
-    value: Omit<t.types.pallet_membership.pallet.Call.swap_member, "type">,
-  ): t.types.pallet_membership.pallet.Call.swap_member {
+    value: Omit<types.pallet_membership.pallet.Call.swap_member, "type">,
+  ): types.pallet_membership.pallet.Call.swap_member {
     return { type: "swap_member", ...value }
   }
   /**
@@ -125,8 +125,8 @@ export namespace Call {
    * May only be called from `T::ResetOrigin`.
    */
   export function reset_members(
-    value: Omit<t.types.pallet_membership.pallet.Call.reset_members, "type">,
-  ): t.types.pallet_membership.pallet.Call.reset_members {
+    value: Omit<types.pallet_membership.pallet.Call.reset_members, "type">,
+  ): types.pallet_membership.pallet.Call.reset_members {
     return { type: "reset_members", ...value }
   }
   /**
@@ -137,8 +137,8 @@ export namespace Call {
    * Prime membership is passed from the origin account to `new`, if extant.
    */
   export function change_key(
-    value: Omit<t.types.pallet_membership.pallet.Call.change_key, "type">,
-  ): t.types.pallet_membership.pallet.Call.change_key {
+    value: Omit<types.pallet_membership.pallet.Call.change_key, "type">,
+  ): types.pallet_membership.pallet.Call.change_key {
     return { type: "change_key", ...value }
   }
   /**
@@ -147,8 +147,8 @@ export namespace Call {
    * May only be called from `T::PrimeOrigin`.
    */
   export function set_prime(
-    value: Omit<t.types.pallet_membership.pallet.Call.set_prime, "type">,
-  ): t.types.pallet_membership.pallet.Call.set_prime {
+    value: Omit<types.pallet_membership.pallet.Call.set_prime, "type">,
+  ): types.pallet_membership.pallet.Call.set_prime {
     return { type: "set_prime", ...value }
   }
   /**
@@ -156,7 +156,7 @@ export namespace Call {
    *
    * May only be called from `T::PrimeOrigin`.
    */
-  export function clear_prime(): t.types.pallet_membership.pallet.Call.clear_prime {
+  export function clear_prime(): types.pallet_membership.pallet.Call.clear_prime {
     return { type: "clear_prime" }
   }
 }

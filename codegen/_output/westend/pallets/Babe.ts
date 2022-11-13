@@ -1,6 +1,6 @@
 import { $ } from "../capi.ts"
 import * as _codec from "../codecs.ts"
-import type * as t from "../mod.ts"
+import type * as types from "../types/mod.ts"
 
 /**
  *  This field should always be populated during block processing unless
@@ -203,8 +203,8 @@ export const UnderConstruction = {
  * not been enacted yet.
  */
 export function plan_config_change(
-  value: Omit<t.types.pallet_babe.pallet.Call.plan_config_change, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_babe.pallet.Call.plan_config_change, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Babe", value: { ...value, type: "plan_config_change" } }
 }
 
@@ -215,8 +215,8 @@ export function plan_config_change(
  * be reported.
  */
 export function report_equivocation(
-  value: Omit<t.types.pallet_babe.pallet.Call.report_equivocation, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_babe.pallet.Call.report_equivocation, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Babe", value: { ...value, type: "report_equivocation" } }
 }
 
@@ -231,7 +231,7 @@ export function report_equivocation(
  * reporter.
  */
 export function report_equivocation_unsigned(
-  value: Omit<t.types.pallet_babe.pallet.Call.report_equivocation_unsigned, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_babe.pallet.Call.report_equivocation_unsigned, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Babe", value: { ...value, type: "report_equivocation_unsigned" } }
 }

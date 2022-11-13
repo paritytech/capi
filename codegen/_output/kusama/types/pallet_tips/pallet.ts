@@ -1,21 +1,21 @@
 import { $ } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as t from "../../mod.ts"
+import type * as types from "../../types/mod.ts"
 
-export const $call: $.Codec<t.types.pallet_tips.pallet.Call> = _codec.$309
+export const $call: $.Codec<types.pallet_tips.pallet.Call> = _codec.$309
 
-export const $error: $.Codec<t.types.pallet_tips.pallet.Error> = _codec.$599
+export const $error: $.Codec<types.pallet_tips.pallet.Error> = _codec.$599
 
-export const $event: $.Codec<t.types.pallet_tips.pallet.Event> = _codec.$85
+export const $event: $.Codec<types.pallet_tips.pallet.Event> = _codec.$85
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 export type Call =
-  | t.types.pallet_tips.pallet.Call.report_awesome
-  | t.types.pallet_tips.pallet.Call.retract_tip
-  | t.types.pallet_tips.pallet.Call.tip_new
-  | t.types.pallet_tips.pallet.Call.tip
-  | t.types.pallet_tips.pallet.Call.close_tip
-  | t.types.pallet_tips.pallet.Call.slash_tip
+  | types.pallet_tips.pallet.Call.report_awesome
+  | types.pallet_tips.pallet.Call.retract_tip
+  | types.pallet_tips.pallet.Call.tip_new
+  | types.pallet_tips.pallet.Call.tip
+  | types.pallet_tips.pallet.Call.close_tip
+  | types.pallet_tips.pallet.Call.slash_tip
 export namespace Call {
   /**
    * Report something `reason` that deserves a tip and claim any eventual the finder's fee.
@@ -41,7 +41,7 @@ export namespace Call {
   export interface report_awesome {
     type: "report_awesome"
     reason: Uint8Array
-    who: t.types.sp_runtime.multiaddress.MultiAddress
+    who: types.sp_runtime.multiaddress.MultiAddress
   }
   /**
    * Retract a prior tip-report from `report_awesome`, and cancel the process of tipping.
@@ -66,7 +66,7 @@ export namespace Call {
    */
   export interface retract_tip {
     type: "retract_tip"
-    hash: t.types.primitive_types.H256
+    hash: types.primitive_types.H256
   }
   /**
    * Give a tip for something new; no finder's fee will be taken.
@@ -95,8 +95,8 @@ export namespace Call {
   export interface tip_new {
     type: "tip_new"
     reason: Uint8Array
-    who: t.types.sp_runtime.multiaddress.MultiAddress
-    tip_value: t.Compact<t.types.u128>
+    who: types.sp_runtime.multiaddress.MultiAddress
+    tip_value: types.Compact<types.u128>
   }
   /**
    * Declare a tip value for an already-open tip.
@@ -126,8 +126,8 @@ export namespace Call {
    */
   export interface tip {
     type: "tip"
-    hash: t.types.primitive_types.H256
-    tip_value: t.Compact<t.types.u128>
+    hash: types.primitive_types.H256
+    tip_value: types.Compact<types.u128>
   }
   /**
    * Close and payout a tip.
@@ -149,7 +149,7 @@ export namespace Call {
    */
   export interface close_tip {
     type: "close_tip"
-    hash: t.types.primitive_types.H256
+    hash: types.primitive_types.H256
   }
   /**
    * Remove and slash an already-open tip.
@@ -167,7 +167,7 @@ export namespace Call {
    */
   export interface slash_tip {
     type: "slash_tip"
-    hash: t.types.primitive_types.H256
+    hash: types.primitive_types.H256
   }
   /**
    * Report something `reason` that deserves a tip and claim any eventual the finder's fee.
@@ -191,8 +191,8 @@ export namespace Call {
    * # </weight>
    */
   export function report_awesome(
-    value: Omit<t.types.pallet_tips.pallet.Call.report_awesome, "type">,
-  ): t.types.pallet_tips.pallet.Call.report_awesome {
+    value: Omit<types.pallet_tips.pallet.Call.report_awesome, "type">,
+  ): types.pallet_tips.pallet.Call.report_awesome {
     return { type: "report_awesome", ...value }
   }
   /**
@@ -217,8 +217,8 @@ export namespace Call {
    * # </weight>
    */
   export function retract_tip(
-    value: Omit<t.types.pallet_tips.pallet.Call.retract_tip, "type">,
-  ): t.types.pallet_tips.pallet.Call.retract_tip {
+    value: Omit<types.pallet_tips.pallet.Call.retract_tip, "type">,
+  ): types.pallet_tips.pallet.Call.retract_tip {
     return { type: "retract_tip", ...value }
   }
   /**
@@ -246,8 +246,8 @@ export namespace Call {
    * # </weight>
    */
   export function tip_new(
-    value: Omit<t.types.pallet_tips.pallet.Call.tip_new, "type">,
-  ): t.types.pallet_tips.pallet.Call.tip_new {
+    value: Omit<types.pallet_tips.pallet.Call.tip_new, "type">,
+  ): types.pallet_tips.pallet.Call.tip_new {
     return { type: "tip_new", ...value }
   }
   /**
@@ -277,8 +277,8 @@ export namespace Call {
    * # </weight>
    */
   export function tip(
-    value: Omit<t.types.pallet_tips.pallet.Call.tip, "type">,
-  ): t.types.pallet_tips.pallet.Call.tip {
+    value: Omit<types.pallet_tips.pallet.Call.tip, "type">,
+  ): types.pallet_tips.pallet.Call.tip {
     return { type: "tip", ...value }
   }
   /**
@@ -300,8 +300,8 @@ export namespace Call {
    * # </weight>
    */
   export function close_tip(
-    value: Omit<t.types.pallet_tips.pallet.Call.close_tip, "type">,
-  ): t.types.pallet_tips.pallet.Call.close_tip {
+    value: Omit<types.pallet_tips.pallet.Call.close_tip, "type">,
+  ): types.pallet_tips.pallet.Call.close_tip {
     return { type: "close_tip", ...value }
   }
   /**
@@ -319,8 +319,8 @@ export namespace Call {
    * # </weight>
    */
   export function slash_tip(
-    value: Omit<t.types.pallet_tips.pallet.Call.slash_tip, "type">,
-  ): t.types.pallet_tips.pallet.Call.slash_tip {
+    value: Omit<types.pallet_tips.pallet.Call.slash_tip, "type">,
+  ): types.pallet_tips.pallet.Call.slash_tip {
     return { type: "slash_tip", ...value }
   }
 }
@@ -336,69 +336,69 @@ export type Error =
 
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
 export type Event =
-  | t.types.pallet_tips.pallet.Event.NewTip
-  | t.types.pallet_tips.pallet.Event.TipClosing
-  | t.types.pallet_tips.pallet.Event.TipClosed
-  | t.types.pallet_tips.pallet.Event.TipRetracted
-  | t.types.pallet_tips.pallet.Event.TipSlashed
+  | types.pallet_tips.pallet.Event.NewTip
+  | types.pallet_tips.pallet.Event.TipClosing
+  | types.pallet_tips.pallet.Event.TipClosed
+  | types.pallet_tips.pallet.Event.TipRetracted
+  | types.pallet_tips.pallet.Event.TipSlashed
 export namespace Event {
   /** A new tip suggestion has been opened. */
   export interface NewTip {
     type: "NewTip"
-    tip_hash: t.types.primitive_types.H256
+    tip_hash: types.primitive_types.H256
   }
   /** A tip suggestion has reached threshold and is closing. */
   export interface TipClosing {
     type: "TipClosing"
-    tip_hash: t.types.primitive_types.H256
+    tip_hash: types.primitive_types.H256
   }
   /** A tip suggestion has been closed. */
   export interface TipClosed {
     type: "TipClosed"
-    tip_hash: t.types.primitive_types.H256
-    who: t.types.sp_core.crypto.AccountId32
-    payout: t.types.u128
+    tip_hash: types.primitive_types.H256
+    who: types.sp_core.crypto.AccountId32
+    payout: types.u128
   }
   /** A tip suggestion has been retracted. */
   export interface TipRetracted {
     type: "TipRetracted"
-    tip_hash: t.types.primitive_types.H256
+    tip_hash: types.primitive_types.H256
   }
   /** A tip suggestion has been slashed. */
   export interface TipSlashed {
     type: "TipSlashed"
-    tip_hash: t.types.primitive_types.H256
-    finder: t.types.sp_core.crypto.AccountId32
-    deposit: t.types.u128
+    tip_hash: types.primitive_types.H256
+    finder: types.sp_core.crypto.AccountId32
+    deposit: types.u128
   }
   /** A new tip suggestion has been opened. */
   export function NewTip(
-    value: Omit<t.types.pallet_tips.pallet.Event.NewTip, "type">,
-  ): t.types.pallet_tips.pallet.Event.NewTip {
+    value: Omit<types.pallet_tips.pallet.Event.NewTip, "type">,
+  ): types.pallet_tips.pallet.Event.NewTip {
     return { type: "NewTip", ...value }
   }
   /** A tip suggestion has reached threshold and is closing. */
   export function TipClosing(
-    value: Omit<t.types.pallet_tips.pallet.Event.TipClosing, "type">,
-  ): t.types.pallet_tips.pallet.Event.TipClosing {
+    value: Omit<types.pallet_tips.pallet.Event.TipClosing, "type">,
+  ): types.pallet_tips.pallet.Event.TipClosing {
     return { type: "TipClosing", ...value }
   }
   /** A tip suggestion has been closed. */
   export function TipClosed(
-    value: Omit<t.types.pallet_tips.pallet.Event.TipClosed, "type">,
-  ): t.types.pallet_tips.pallet.Event.TipClosed {
+    value: Omit<types.pallet_tips.pallet.Event.TipClosed, "type">,
+  ): types.pallet_tips.pallet.Event.TipClosed {
     return { type: "TipClosed", ...value }
   }
   /** A tip suggestion has been retracted. */
   export function TipRetracted(
-    value: Omit<t.types.pallet_tips.pallet.Event.TipRetracted, "type">,
-  ): t.types.pallet_tips.pallet.Event.TipRetracted {
+    value: Omit<types.pallet_tips.pallet.Event.TipRetracted, "type">,
+  ): types.pallet_tips.pallet.Event.TipRetracted {
     return { type: "TipRetracted", ...value }
   }
   /** A tip suggestion has been slashed. */
   export function TipSlashed(
-    value: Omit<t.types.pallet_tips.pallet.Event.TipSlashed, "type">,
-  ): t.types.pallet_tips.pallet.Event.TipSlashed {
+    value: Omit<types.pallet_tips.pallet.Event.TipSlashed, "type">,
+  ): types.pallet_tips.pallet.Event.TipSlashed {
     return { type: "TipSlashed", ...value }
   }
 }

@@ -1,19 +1,19 @@
 import { $ } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as t from "../../mod.ts"
+import type * as types from "../../types/mod.ts"
 
 export * as pallet from "./pallet.ts"
 
-export const $renouncing: $.Codec<t.types.pallet_elections_phragmen.Renouncing> = _codec.$242
+export const $renouncing: $.Codec<types.pallet_elections_phragmen.Renouncing> = _codec.$242
 
-export const $seatHolder: $.Codec<t.types.pallet_elections_phragmen.SeatHolder> = _codec.$551
+export const $seatHolder: $.Codec<types.pallet_elections_phragmen.SeatHolder> = _codec.$551
 
-export const $voter: $.Codec<t.types.pallet_elections_phragmen.Voter> = _codec.$552
+export const $voter: $.Codec<types.pallet_elections_phragmen.Voter> = _codec.$552
 
 export type Renouncing =
-  | t.types.pallet_elections_phragmen.Renouncing.Member
-  | t.types.pallet_elections_phragmen.Renouncing.RunnerUp
-  | t.types.pallet_elections_phragmen.Renouncing.Candidate
+  | types.pallet_elections_phragmen.Renouncing.Member
+  | types.pallet_elections_phragmen.Renouncing.RunnerUp
+  | types.pallet_elections_phragmen.Renouncing.Candidate
 export namespace Renouncing {
   export interface Member {
     type: "Member"
@@ -23,37 +23,37 @@ export namespace Renouncing {
   }
   export interface Candidate {
     type: "Candidate"
-    value: t.Compact<t.types.u32>
+    value: types.Compact<types.u32>
   }
-  export function Member(): t.types.pallet_elections_phragmen.Renouncing.Member {
+  export function Member(): types.pallet_elections_phragmen.Renouncing.Member {
     return { type: "Member" }
   }
-  export function RunnerUp(): t.types.pallet_elections_phragmen.Renouncing.RunnerUp {
+  export function RunnerUp(): types.pallet_elections_phragmen.Renouncing.RunnerUp {
     return { type: "RunnerUp" }
   }
   export function Candidate(
-    value: t.types.pallet_elections_phragmen.Renouncing.Candidate["value"],
-  ): t.types.pallet_elections_phragmen.Renouncing.Candidate {
+    value: types.pallet_elections_phragmen.Renouncing.Candidate["value"],
+  ): types.pallet_elections_phragmen.Renouncing.Candidate {
     return { type: "Candidate", value }
   }
 }
 
 export interface SeatHolder {
-  who: t.types.sp_core.crypto.AccountId32
-  stake: t.types.u128
-  deposit: t.types.u128
+  who: types.sp_core.crypto.AccountId32
+  stake: types.u128
+  deposit: types.u128
 }
 
-export function SeatHolder(value: t.types.pallet_elections_phragmen.SeatHolder) {
+export function SeatHolder(value: types.pallet_elections_phragmen.SeatHolder) {
   return value
 }
 
 export interface Voter {
-  votes: Array<t.types.sp_core.crypto.AccountId32>
-  stake: t.types.u128
-  deposit: t.types.u128
+  votes: Array<types.sp_core.crypto.AccountId32>
+  stake: types.u128
+  deposit: types.u128
 }
 
-export function Voter(value: t.types.pallet_elections_phragmen.Voter) {
+export function Voter(value: types.pallet_elections_phragmen.Voter) {
   return value
 }

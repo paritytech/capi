@@ -1,33 +1,33 @@
 import { $ } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as t from "../../mod.ts"
+import type * as types from "../../types/mod.ts"
 
-export const $call: $.Codec<t.types.pallet_democracy.pallet.Call> = _codec.$234
+export const $call: $.Codec<types.pallet_democracy.pallet.Call> = _codec.$234
 
-export const $error: $.Codec<t.types.pallet_democracy.pallet.Error> = _codec.$544
+export const $error: $.Codec<types.pallet_democracy.pallet.Error> = _codec.$544
 
-export const $event: $.Codec<t.types.pallet_democracy.pallet.Event> = _codec.$61
+export const $event: $.Codec<types.pallet_democracy.pallet.Event> = _codec.$61
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 export type Call =
-  | t.types.pallet_democracy.pallet.Call.propose
-  | t.types.pallet_democracy.pallet.Call.second
-  | t.types.pallet_democracy.pallet.Call.vote
-  | t.types.pallet_democracy.pallet.Call.emergency_cancel
-  | t.types.pallet_democracy.pallet.Call.external_propose
-  | t.types.pallet_democracy.pallet.Call.external_propose_majority
-  | t.types.pallet_democracy.pallet.Call.external_propose_default
-  | t.types.pallet_democracy.pallet.Call.fast_track
-  | t.types.pallet_democracy.pallet.Call.veto_external
-  | t.types.pallet_democracy.pallet.Call.cancel_referendum
-  | t.types.pallet_democracy.pallet.Call.delegate
-  | t.types.pallet_democracy.pallet.Call.undelegate
-  | t.types.pallet_democracy.pallet.Call.clear_public_proposals
-  | t.types.pallet_democracy.pallet.Call.unlock
-  | t.types.pallet_democracy.pallet.Call.remove_vote
-  | t.types.pallet_democracy.pallet.Call.remove_other_vote
-  | t.types.pallet_democracy.pallet.Call.blacklist
-  | t.types.pallet_democracy.pallet.Call.cancel_proposal
+  | types.pallet_democracy.pallet.Call.propose
+  | types.pallet_democracy.pallet.Call.second
+  | types.pallet_democracy.pallet.Call.vote
+  | types.pallet_democracy.pallet.Call.emergency_cancel
+  | types.pallet_democracy.pallet.Call.external_propose
+  | types.pallet_democracy.pallet.Call.external_propose_majority
+  | types.pallet_democracy.pallet.Call.external_propose_default
+  | types.pallet_democracy.pallet.Call.fast_track
+  | types.pallet_democracy.pallet.Call.veto_external
+  | types.pallet_democracy.pallet.Call.cancel_referendum
+  | types.pallet_democracy.pallet.Call.delegate
+  | types.pallet_democracy.pallet.Call.undelegate
+  | types.pallet_democracy.pallet.Call.clear_public_proposals
+  | types.pallet_democracy.pallet.Call.unlock
+  | types.pallet_democracy.pallet.Call.remove_vote
+  | types.pallet_democracy.pallet.Call.remove_other_vote
+  | types.pallet_democracy.pallet.Call.blacklist
+  | types.pallet_democracy.pallet.Call.cancel_proposal
 export namespace Call {
   /**
    * Propose a sensitive action to be taken.
@@ -42,8 +42,8 @@ export namespace Call {
    */
   export interface propose {
     type: "propose"
-    proposal: t.types.frame_support.traits.preimages.Bounded
-    value: t.Compact<t.types.u128>
+    proposal: types.frame_support.traits.preimages.Bounded
+    value: types.Compact<types.u128>
   }
   /**
    * Signals agreement with a particular proposal.
@@ -55,7 +55,7 @@ export namespace Call {
    */
   export interface second {
     type: "second"
-    proposal: t.Compact<t.types.u32>
+    proposal: types.Compact<types.u32>
   }
   /**
    * Vote in a referendum. If `vote.is_aye()`, the vote is to enact the proposal;
@@ -68,8 +68,8 @@ export namespace Call {
    */
   export interface vote {
     type: "vote"
-    ref_index: t.Compact<t.types.u32>
-    vote: t.types.pallet_democracy.vote.AccountVote
+    ref_index: types.Compact<types.u32>
+    vote: types.pallet_democracy.vote.AccountVote
   }
   /**
    * Schedule an emergency cancellation of a referendum. Cannot happen twice to the same
@@ -83,7 +83,7 @@ export namespace Call {
    */
   export interface emergency_cancel {
     type: "emergency_cancel"
-    ref_index: t.types.u32
+    ref_index: types.u32
   }
   /**
    * Schedule a referendum to be tabled once it is legal to schedule an external
@@ -95,7 +95,7 @@ export namespace Call {
    */
   export interface external_propose {
     type: "external_propose"
-    proposal: t.types.frame_support.traits.preimages.Bounded
+    proposal: types.frame_support.traits.preimages.Bounded
   }
   /**
    * Schedule a majority-carries referendum to be tabled next once it is legal to schedule
@@ -112,7 +112,7 @@ export namespace Call {
    */
   export interface external_propose_majority {
     type: "external_propose_majority"
-    proposal: t.types.frame_support.traits.preimages.Bounded
+    proposal: types.frame_support.traits.preimages.Bounded
   }
   /**
    * Schedule a negative-turnout-bias referendum to be tabled next once it is legal to
@@ -129,7 +129,7 @@ export namespace Call {
    */
   export interface external_propose_default {
     type: "external_propose_default"
-    proposal: t.types.frame_support.traits.preimages.Bounded
+    proposal: types.frame_support.traits.preimages.Bounded
   }
   /**
    * Schedule the currently externally-proposed majority-carries referendum to be tabled
@@ -151,9 +151,9 @@ export namespace Call {
    */
   export interface fast_track {
     type: "fast_track"
-    proposal_hash: t.types.primitive_types.H256
-    voting_period: t.types.u32
-    delay: t.types.u32
+    proposal_hash: types.primitive_types.H256
+    voting_period: types.u32
+    delay: types.u32
   }
   /**
    * Veto and blacklist the external proposal hash.
@@ -168,7 +168,7 @@ export namespace Call {
    */
   export interface veto_external {
     type: "veto_external"
-    proposal_hash: t.types.primitive_types.H256
+    proposal_hash: types.primitive_types.H256
   }
   /**
    * Remove a referendum.
@@ -181,7 +181,7 @@ export namespace Call {
    */
   export interface cancel_referendum {
     type: "cancel_referendum"
-    ref_index: t.Compact<t.types.u32>
+    ref_index: types.Compact<types.u32>
   }
   /**
    * Delegate the voting power (with some given conviction) of the sending account.
@@ -207,9 +207,9 @@ export namespace Call {
    */
   export interface delegate {
     type: "delegate"
-    to: t.types.sp_runtime.multiaddress.MultiAddress
-    conviction: t.types.pallet_democracy.conviction.Conviction
-    balance: t.types.u128
+    to: types.sp_runtime.multiaddress.MultiAddress
+    conviction: types.pallet_democracy.conviction.Conviction
+    balance: types.u128
   }
   /**
    * Undelegate the voting power of the sending account.
@@ -249,7 +249,7 @@ export namespace Call {
    */
   export interface unlock {
     type: "unlock"
-    target: t.types.sp_runtime.multiaddress.MultiAddress
+    target: types.sp_runtime.multiaddress.MultiAddress
   }
   /**
    * Remove a vote for a referendum.
@@ -282,7 +282,7 @@ export namespace Call {
    */
   export interface remove_vote {
     type: "remove_vote"
-    index: t.types.u32
+    index: types.u32
   }
   /**
    * Remove a vote for a referendum.
@@ -303,8 +303,8 @@ export namespace Call {
    */
   export interface remove_other_vote {
     type: "remove_other_vote"
-    target: t.types.sp_runtime.multiaddress.MultiAddress
-    index: t.types.u32
+    target: types.sp_runtime.multiaddress.MultiAddress
+    index: types.u32
   }
   /**
    * Permanently place a proposal into the blacklist. This prevents it from ever being
@@ -325,8 +325,8 @@ export namespace Call {
    */
   export interface blacklist {
     type: "blacklist"
-    proposal_hash: t.types.primitive_types.H256
-    maybe_ref_index: t.types.u32 | undefined
+    proposal_hash: types.primitive_types.H256
+    maybe_ref_index: types.u32 | undefined
   }
   /**
    * Remove a proposal.
@@ -339,7 +339,7 @@ export namespace Call {
    */
   export interface cancel_proposal {
     type: "cancel_proposal"
-    prop_index: t.Compact<t.types.u32>
+    prop_index: types.Compact<types.u32>
   }
   /**
    * Propose a sensitive action to be taken.
@@ -353,8 +353,8 @@ export namespace Call {
    * Emits `Proposed`.
    */
   export function propose(
-    value: Omit<t.types.pallet_democracy.pallet.Call.propose, "type">,
-  ): t.types.pallet_democracy.pallet.Call.propose {
+    value: Omit<types.pallet_democracy.pallet.Call.propose, "type">,
+  ): types.pallet_democracy.pallet.Call.propose {
     return { type: "propose", ...value }
   }
   /**
@@ -366,8 +366,8 @@ export namespace Call {
    * - `proposal`: The index of the proposal to second.
    */
   export function second(
-    value: Omit<t.types.pallet_democracy.pallet.Call.second, "type">,
-  ): t.types.pallet_democracy.pallet.Call.second {
+    value: Omit<types.pallet_democracy.pallet.Call.second, "type">,
+  ): types.pallet_democracy.pallet.Call.second {
     return { type: "second", ...value }
   }
   /**
@@ -380,8 +380,8 @@ export namespace Call {
    * - `vote`: The vote configuration.
    */
   export function vote(
-    value: Omit<t.types.pallet_democracy.pallet.Call.vote, "type">,
-  ): t.types.pallet_democracy.pallet.Call.vote {
+    value: Omit<types.pallet_democracy.pallet.Call.vote, "type">,
+  ): types.pallet_democracy.pallet.Call.vote {
     return { type: "vote", ...value }
   }
   /**
@@ -395,8 +395,8 @@ export namespace Call {
    * Weight: `O(1)`.
    */
   export function emergency_cancel(
-    value: Omit<t.types.pallet_democracy.pallet.Call.emergency_cancel, "type">,
-  ): t.types.pallet_democracy.pallet.Call.emergency_cancel {
+    value: Omit<types.pallet_democracy.pallet.Call.emergency_cancel, "type">,
+  ): types.pallet_democracy.pallet.Call.emergency_cancel {
     return { type: "emergency_cancel", ...value }
   }
   /**
@@ -408,8 +408,8 @@ export namespace Call {
    * - `proposal_hash`: The preimage hash of the proposal.
    */
   export function external_propose(
-    value: Omit<t.types.pallet_democracy.pallet.Call.external_propose, "type">,
-  ): t.types.pallet_democracy.pallet.Call.external_propose {
+    value: Omit<types.pallet_democracy.pallet.Call.external_propose, "type">,
+  ): types.pallet_democracy.pallet.Call.external_propose {
     return { type: "external_propose", ...value }
   }
   /**
@@ -426,8 +426,8 @@ export namespace Call {
    * Weight: `O(1)`
    */
   export function external_propose_majority(
-    value: Omit<t.types.pallet_democracy.pallet.Call.external_propose_majority, "type">,
-  ): t.types.pallet_democracy.pallet.Call.external_propose_majority {
+    value: Omit<types.pallet_democracy.pallet.Call.external_propose_majority, "type">,
+  ): types.pallet_democracy.pallet.Call.external_propose_majority {
     return { type: "external_propose_majority", ...value }
   }
   /**
@@ -444,8 +444,8 @@ export namespace Call {
    * Weight: `O(1)`
    */
   export function external_propose_default(
-    value: Omit<t.types.pallet_democracy.pallet.Call.external_propose_default, "type">,
-  ): t.types.pallet_democracy.pallet.Call.external_propose_default {
+    value: Omit<types.pallet_democracy.pallet.Call.external_propose_default, "type">,
+  ): types.pallet_democracy.pallet.Call.external_propose_default {
     return { type: "external_propose_default", ...value }
   }
   /**
@@ -467,8 +467,8 @@ export namespace Call {
    * Weight: `O(1)`
    */
   export function fast_track(
-    value: Omit<t.types.pallet_democracy.pallet.Call.fast_track, "type">,
-  ): t.types.pallet_democracy.pallet.Call.fast_track {
+    value: Omit<types.pallet_democracy.pallet.Call.fast_track, "type">,
+  ): types.pallet_democracy.pallet.Call.fast_track {
     return { type: "fast_track", ...value }
   }
   /**
@@ -483,8 +483,8 @@ export namespace Call {
    * Weight: `O(V + log(V))` where V is number of `existing vetoers`
    */
   export function veto_external(
-    value: Omit<t.types.pallet_democracy.pallet.Call.veto_external, "type">,
-  ): t.types.pallet_democracy.pallet.Call.veto_external {
+    value: Omit<types.pallet_democracy.pallet.Call.veto_external, "type">,
+  ): types.pallet_democracy.pallet.Call.veto_external {
     return { type: "veto_external", ...value }
   }
   /**
@@ -497,8 +497,8 @@ export namespace Call {
    * # Weight: `O(1)`.
    */
   export function cancel_referendum(
-    value: Omit<t.types.pallet_democracy.pallet.Call.cancel_referendum, "type">,
-  ): t.types.pallet_democracy.pallet.Call.cancel_referendum {
+    value: Omit<types.pallet_democracy.pallet.Call.cancel_referendum, "type">,
+  ): types.pallet_democracy.pallet.Call.cancel_referendum {
     return { type: "cancel_referendum", ...value }
   }
   /**
@@ -524,8 +524,8 @@ export namespace Call {
    *   voted on. Weight is charged as if maximum votes.
    */
   export function delegate(
-    value: Omit<t.types.pallet_democracy.pallet.Call.delegate, "type">,
-  ): t.types.pallet_democracy.pallet.Call.delegate {
+    value: Omit<types.pallet_democracy.pallet.Call.delegate, "type">,
+  ): types.pallet_democracy.pallet.Call.delegate {
     return { type: "delegate", ...value }
   }
   /**
@@ -542,7 +542,7 @@ export namespace Call {
    * Weight: `O(R)` where R is the number of referendums the voter delegating to has
    *   voted on. Weight is charged as if maximum votes.
    */
-  export function undelegate(): t.types.pallet_democracy.pallet.Call.undelegate {
+  export function undelegate(): types.pallet_democracy.pallet.Call.undelegate {
     return { type: "undelegate" }
   }
   /**
@@ -552,7 +552,7 @@ export namespace Call {
    *
    * Weight: `O(1)`.
    */
-  export function clear_public_proposals(): t.types.pallet_democracy.pallet.Call.clear_public_proposals {
+  export function clear_public_proposals(): types.pallet_democracy.pallet.Call.clear_public_proposals {
     return { type: "clear_public_proposals" }
   }
   /**
@@ -565,8 +565,8 @@ export namespace Call {
    * Weight: `O(R)` with R number of vote of target.
    */
   export function unlock(
-    value: Omit<t.types.pallet_democracy.pallet.Call.unlock, "type">,
-  ): t.types.pallet_democracy.pallet.Call.unlock {
+    value: Omit<types.pallet_democracy.pallet.Call.unlock, "type">,
+  ): types.pallet_democracy.pallet.Call.unlock {
     return { type: "unlock", ...value }
   }
   /**
@@ -599,8 +599,8 @@ export namespace Call {
    *   Weight is calculated for the maximum number of vote.
    */
   export function remove_vote(
-    value: Omit<t.types.pallet_democracy.pallet.Call.remove_vote, "type">,
-  ): t.types.pallet_democracy.pallet.Call.remove_vote {
+    value: Omit<types.pallet_democracy.pallet.Call.remove_vote, "type">,
+  ): types.pallet_democracy.pallet.Call.remove_vote {
     return { type: "remove_vote", ...value }
   }
   /**
@@ -621,8 +621,8 @@ export namespace Call {
    *   Weight is calculated for the maximum number of vote.
    */
   export function remove_other_vote(
-    value: Omit<t.types.pallet_democracy.pallet.Call.remove_other_vote, "type">,
-  ): t.types.pallet_democracy.pallet.Call.remove_other_vote {
+    value: Omit<types.pallet_democracy.pallet.Call.remove_other_vote, "type">,
+  ): types.pallet_democracy.pallet.Call.remove_other_vote {
     return { type: "remove_other_vote", ...value }
   }
   /**
@@ -643,8 +643,8 @@ export namespace Call {
    *   reasonable value).
    */
   export function blacklist(
-    value: Omit<t.types.pallet_democracy.pallet.Call.blacklist, "type">,
-  ): t.types.pallet_democracy.pallet.Call.blacklist {
+    value: Omit<types.pallet_democracy.pallet.Call.blacklist, "type">,
+  ): types.pallet_democracy.pallet.Call.blacklist {
     return { type: "blacklist", ...value }
   }
   /**
@@ -657,8 +657,8 @@ export namespace Call {
    * Weight: `O(p)` where `p = PublicProps::<T>::decode_len()`
    */
   export function cancel_proposal(
-    value: Omit<t.types.pallet_democracy.pallet.Call.cancel_proposal, "type">,
-  ): t.types.pallet_democracy.pallet.Call.cancel_proposal {
+    value: Omit<types.pallet_democracy.pallet.Call.cancel_proposal, "type">,
+  ): types.pallet_democracy.pallet.Call.cancel_proposal {
     return { type: "cancel_proposal", ...value }
   }
 }
@@ -691,32 +691,32 @@ export type Error =
 
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
 export type Event =
-  | t.types.pallet_democracy.pallet.Event.Proposed
-  | t.types.pallet_democracy.pallet.Event.Tabled
-  | t.types.pallet_democracy.pallet.Event.ExternalTabled
-  | t.types.pallet_democracy.pallet.Event.Started
-  | t.types.pallet_democracy.pallet.Event.Passed
-  | t.types.pallet_democracy.pallet.Event.NotPassed
-  | t.types.pallet_democracy.pallet.Event.Cancelled
-  | t.types.pallet_democracy.pallet.Event.Delegated
-  | t.types.pallet_democracy.pallet.Event.Undelegated
-  | t.types.pallet_democracy.pallet.Event.Vetoed
-  | t.types.pallet_democracy.pallet.Event.Blacklisted
-  | t.types.pallet_democracy.pallet.Event.Voted
-  | t.types.pallet_democracy.pallet.Event.Seconded
-  | t.types.pallet_democracy.pallet.Event.ProposalCanceled
+  | types.pallet_democracy.pallet.Event.Proposed
+  | types.pallet_democracy.pallet.Event.Tabled
+  | types.pallet_democracy.pallet.Event.ExternalTabled
+  | types.pallet_democracy.pallet.Event.Started
+  | types.pallet_democracy.pallet.Event.Passed
+  | types.pallet_democracy.pallet.Event.NotPassed
+  | types.pallet_democracy.pallet.Event.Cancelled
+  | types.pallet_democracy.pallet.Event.Delegated
+  | types.pallet_democracy.pallet.Event.Undelegated
+  | types.pallet_democracy.pallet.Event.Vetoed
+  | types.pallet_democracy.pallet.Event.Blacklisted
+  | types.pallet_democracy.pallet.Event.Voted
+  | types.pallet_democracy.pallet.Event.Seconded
+  | types.pallet_democracy.pallet.Event.ProposalCanceled
 export namespace Event {
   /** A motion has been proposed by a public account. */
   export interface Proposed {
     type: "Proposed"
-    proposal_index: t.types.u32
-    deposit: t.types.u128
+    proposal_index: types.u32
+    deposit: types.u128
   }
   /** A public proposal has been tabled for referendum vote. */
   export interface Tabled {
     type: "Tabled"
-    proposal_index: t.types.u32
-    deposit: t.types.u128
+    proposal_index: types.u32
+    deposit: types.u128
   }
   /** An external proposal has been tabled. */
   export interface ExternalTabled {
@@ -725,145 +725,145 @@ export namespace Event {
   /** A referendum has begun. */
   export interface Started {
     type: "Started"
-    ref_index: t.types.u32
-    threshold: t.types.pallet_democracy.vote_threshold.VoteThreshold
+    ref_index: types.u32
+    threshold: types.pallet_democracy.vote_threshold.VoteThreshold
   }
   /** A proposal has been approved by referendum. */
   export interface Passed {
     type: "Passed"
-    ref_index: t.types.u32
+    ref_index: types.u32
   }
   /** A proposal has been rejected by referendum. */
   export interface NotPassed {
     type: "NotPassed"
-    ref_index: t.types.u32
+    ref_index: types.u32
   }
   /** A referendum has been cancelled. */
   export interface Cancelled {
     type: "Cancelled"
-    ref_index: t.types.u32
+    ref_index: types.u32
   }
   /** An account has delegated their vote to another account. */
   export interface Delegated {
     type: "Delegated"
-    who: t.types.sp_core.crypto.AccountId32
-    target: t.types.sp_core.crypto.AccountId32
+    who: types.sp_core.crypto.AccountId32
+    target: types.sp_core.crypto.AccountId32
   }
   /** An account has cancelled a previous delegation operation. */
   export interface Undelegated {
     type: "Undelegated"
-    account: t.types.sp_core.crypto.AccountId32
+    account: types.sp_core.crypto.AccountId32
   }
   /** An external proposal has been vetoed. */
   export interface Vetoed {
     type: "Vetoed"
-    who: t.types.sp_core.crypto.AccountId32
-    proposal_hash: t.types.primitive_types.H256
-    until: t.types.u32
+    who: types.sp_core.crypto.AccountId32
+    proposal_hash: types.primitive_types.H256
+    until: types.u32
   }
   /** A proposal_hash has been blacklisted permanently. */
   export interface Blacklisted {
     type: "Blacklisted"
-    proposal_hash: t.types.primitive_types.H256
+    proposal_hash: types.primitive_types.H256
   }
   /** An account has voted in a referendum */
   export interface Voted {
     type: "Voted"
-    voter: t.types.sp_core.crypto.AccountId32
-    ref_index: t.types.u32
-    vote: t.types.pallet_democracy.vote.AccountVote
+    voter: types.sp_core.crypto.AccountId32
+    ref_index: types.u32
+    vote: types.pallet_democracy.vote.AccountVote
   }
   /** An account has secconded a proposal */
   export interface Seconded {
     type: "Seconded"
-    seconder: t.types.sp_core.crypto.AccountId32
-    prop_index: t.types.u32
+    seconder: types.sp_core.crypto.AccountId32
+    prop_index: types.u32
   }
   /** A proposal got canceled. */
   export interface ProposalCanceled {
     type: "ProposalCanceled"
-    prop_index: t.types.u32
+    prop_index: types.u32
   }
   /** A motion has been proposed by a public account. */
   export function Proposed(
-    value: Omit<t.types.pallet_democracy.pallet.Event.Proposed, "type">,
-  ): t.types.pallet_democracy.pallet.Event.Proposed {
+    value: Omit<types.pallet_democracy.pallet.Event.Proposed, "type">,
+  ): types.pallet_democracy.pallet.Event.Proposed {
     return { type: "Proposed", ...value }
   }
   /** A public proposal has been tabled for referendum vote. */
   export function Tabled(
-    value: Omit<t.types.pallet_democracy.pallet.Event.Tabled, "type">,
-  ): t.types.pallet_democracy.pallet.Event.Tabled {
+    value: Omit<types.pallet_democracy.pallet.Event.Tabled, "type">,
+  ): types.pallet_democracy.pallet.Event.Tabled {
     return { type: "Tabled", ...value }
   }
   /** An external proposal has been tabled. */
-  export function ExternalTabled(): t.types.pallet_democracy.pallet.Event.ExternalTabled {
+  export function ExternalTabled(): types.pallet_democracy.pallet.Event.ExternalTabled {
     return { type: "ExternalTabled" }
   }
   /** A referendum has begun. */
   export function Started(
-    value: Omit<t.types.pallet_democracy.pallet.Event.Started, "type">,
-  ): t.types.pallet_democracy.pallet.Event.Started {
+    value: Omit<types.pallet_democracy.pallet.Event.Started, "type">,
+  ): types.pallet_democracy.pallet.Event.Started {
     return { type: "Started", ...value }
   }
   /** A proposal has been approved by referendum. */
   export function Passed(
-    value: Omit<t.types.pallet_democracy.pallet.Event.Passed, "type">,
-  ): t.types.pallet_democracy.pallet.Event.Passed {
+    value: Omit<types.pallet_democracy.pallet.Event.Passed, "type">,
+  ): types.pallet_democracy.pallet.Event.Passed {
     return { type: "Passed", ...value }
   }
   /** A proposal has been rejected by referendum. */
   export function NotPassed(
-    value: Omit<t.types.pallet_democracy.pallet.Event.NotPassed, "type">,
-  ): t.types.pallet_democracy.pallet.Event.NotPassed {
+    value: Omit<types.pallet_democracy.pallet.Event.NotPassed, "type">,
+  ): types.pallet_democracy.pallet.Event.NotPassed {
     return { type: "NotPassed", ...value }
   }
   /** A referendum has been cancelled. */
   export function Cancelled(
-    value: Omit<t.types.pallet_democracy.pallet.Event.Cancelled, "type">,
-  ): t.types.pallet_democracy.pallet.Event.Cancelled {
+    value: Omit<types.pallet_democracy.pallet.Event.Cancelled, "type">,
+  ): types.pallet_democracy.pallet.Event.Cancelled {
     return { type: "Cancelled", ...value }
   }
   /** An account has delegated their vote to another account. */
   export function Delegated(
-    value: Omit<t.types.pallet_democracy.pallet.Event.Delegated, "type">,
-  ): t.types.pallet_democracy.pallet.Event.Delegated {
+    value: Omit<types.pallet_democracy.pallet.Event.Delegated, "type">,
+  ): types.pallet_democracy.pallet.Event.Delegated {
     return { type: "Delegated", ...value }
   }
   /** An account has cancelled a previous delegation operation. */
   export function Undelegated(
-    value: Omit<t.types.pallet_democracy.pallet.Event.Undelegated, "type">,
-  ): t.types.pallet_democracy.pallet.Event.Undelegated {
+    value: Omit<types.pallet_democracy.pallet.Event.Undelegated, "type">,
+  ): types.pallet_democracy.pallet.Event.Undelegated {
     return { type: "Undelegated", ...value }
   }
   /** An external proposal has been vetoed. */
   export function Vetoed(
-    value: Omit<t.types.pallet_democracy.pallet.Event.Vetoed, "type">,
-  ): t.types.pallet_democracy.pallet.Event.Vetoed {
+    value: Omit<types.pallet_democracy.pallet.Event.Vetoed, "type">,
+  ): types.pallet_democracy.pallet.Event.Vetoed {
     return { type: "Vetoed", ...value }
   }
   /** A proposal_hash has been blacklisted permanently. */
   export function Blacklisted(
-    value: Omit<t.types.pallet_democracy.pallet.Event.Blacklisted, "type">,
-  ): t.types.pallet_democracy.pallet.Event.Blacklisted {
+    value: Omit<types.pallet_democracy.pallet.Event.Blacklisted, "type">,
+  ): types.pallet_democracy.pallet.Event.Blacklisted {
     return { type: "Blacklisted", ...value }
   }
   /** An account has voted in a referendum */
   export function Voted(
-    value: Omit<t.types.pallet_democracy.pallet.Event.Voted, "type">,
-  ): t.types.pallet_democracy.pallet.Event.Voted {
+    value: Omit<types.pallet_democracy.pallet.Event.Voted, "type">,
+  ): types.pallet_democracy.pallet.Event.Voted {
     return { type: "Voted", ...value }
   }
   /** An account has secconded a proposal */
   export function Seconded(
-    value: Omit<t.types.pallet_democracy.pallet.Event.Seconded, "type">,
-  ): t.types.pallet_democracy.pallet.Event.Seconded {
+    value: Omit<types.pallet_democracy.pallet.Event.Seconded, "type">,
+  ): types.pallet_democracy.pallet.Event.Seconded {
     return { type: "Seconded", ...value }
   }
   /** A proposal got canceled. */
   export function ProposalCanceled(
-    value: Omit<t.types.pallet_democracy.pallet.Event.ProposalCanceled, "type">,
-  ): t.types.pallet_democracy.pallet.Event.ProposalCanceled {
+    value: Omit<types.pallet_democracy.pallet.Event.ProposalCanceled, "type">,
+  ): types.pallet_democracy.pallet.Event.ProposalCanceled {
     return { type: "ProposalCanceled", ...value }
   }
 }

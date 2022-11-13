@@ -1,20 +1,20 @@
 import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as t from "../../mod.ts"
+import type * as types from "../../types/mod.ts"
 
-export const $call: $.Codec<t.types.pallet_fast_unstake.pallet.Call> = _codec.$374
+export const $call: $.Codec<types.pallet_fast_unstake.pallet.Call> = _codec.$374
 
-export const $error: $.Codec<t.types.pallet_fast_unstake.pallet.Error> = _codec.$637
+export const $error: $.Codec<types.pallet_fast_unstake.pallet.Error> = _codec.$637
 
-export const $event: $.Codec<t.types.pallet_fast_unstake.pallet.Event> = _codec.$93
+export const $event: $.Codec<types.pallet_fast_unstake.pallet.Event> = _codec.$93
 
-export const $maxChecking: $.Codec<t.types.pallet_fast_unstake.pallet.MaxChecking> = _codec.$635
+export const $maxChecking: $.Codec<types.pallet_fast_unstake.pallet.MaxChecking> = _codec.$635
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 export type Call =
-  | t.types.pallet_fast_unstake.pallet.Call.register_fast_unstake
-  | t.types.pallet_fast_unstake.pallet.Call.deregister
-  | t.types.pallet_fast_unstake.pallet.Call.control
+  | types.pallet_fast_unstake.pallet.Call.register_fast_unstake
+  | types.pallet_fast_unstake.pallet.Call.deregister
+  | types.pallet_fast_unstake.pallet.Call.control
 export namespace Call {
   /**
    * Register oneself for fast-unstake.
@@ -58,7 +58,7 @@ export namespace Call {
    */
   export interface control {
     type: "control"
-    unchecked_eras_to_check: t.types.u32
+    unchecked_eras_to_check: types.u32
   }
   /**
    * Register oneself for fast-unstake.
@@ -80,7 +80,7 @@ export namespace Call {
    * the normal staking system, but they lose part of their unbonding chunks due to consuming
    * the chain's resources.
    */
-  export function register_fast_unstake(): t.types.pallet_fast_unstake.pallet.Call.register_fast_unstake {
+  export function register_fast_unstake(): types.pallet_fast_unstake.pallet.Call.register_fast_unstake {
     return { type: "register_fast_unstake" }
   }
   /**
@@ -92,7 +92,7 @@ export namespace Call {
    * calling `register_fast_unstake`. This should probably be followed by a call to
    * `Staking::rebond`.
    */
-  export function deregister(): t.types.pallet_fast_unstake.pallet.Call.deregister {
+  export function deregister(): types.pallet_fast_unstake.pallet.Call.deregister {
     return { type: "deregister" }
   }
   /**
@@ -101,8 +101,8 @@ export namespace Call {
    * Dispatch origin must be signed by the [`Config::ControlOrigin`].
    */
   export function control(
-    value: Omit<t.types.pallet_fast_unstake.pallet.Call.control, "type">,
-  ): t.types.pallet_fast_unstake.pallet.Call.control {
+    value: Omit<types.pallet_fast_unstake.pallet.Call.control, "type">,
+  ): types.pallet_fast_unstake.pallet.Call.control {
     return { type: "control", ...value }
   }
 }
@@ -118,29 +118,29 @@ export type Error =
 
 /** The events of this pallet. */
 export type Event =
-  | t.types.pallet_fast_unstake.pallet.Event.Unstaked
-  | t.types.pallet_fast_unstake.pallet.Event.Slashed
-  | t.types.pallet_fast_unstake.pallet.Event.Checking
-  | t.types.pallet_fast_unstake.pallet.Event.Errored
-  | t.types.pallet_fast_unstake.pallet.Event.InternalError
+  | types.pallet_fast_unstake.pallet.Event.Unstaked
+  | types.pallet_fast_unstake.pallet.Event.Slashed
+  | types.pallet_fast_unstake.pallet.Event.Checking
+  | types.pallet_fast_unstake.pallet.Event.Errored
+  | types.pallet_fast_unstake.pallet.Event.InternalError
 export namespace Event {
   /** A staker was unstaked. */
   export interface Unstaked {
     type: "Unstaked"
-    stash: t.types.sp_core.crypto.AccountId32
-    result: null | C.ChainError<t.types.sp_runtime.DispatchError>
+    stash: types.sp_core.crypto.AccountId32
+    result: null | C.ChainError<types.sp_runtime.DispatchError>
   }
   /** A staker was slashed for requesting fast-unstake whilst being exposed. */
   export interface Slashed {
     type: "Slashed"
-    stash: t.types.sp_core.crypto.AccountId32
-    amount: t.types.u128
+    stash: types.sp_core.crypto.AccountId32
+    amount: types.u128
   }
   /** A staker was partially checked for the given eras, but the process did not finish. */
   export interface Checking {
     type: "Checking"
-    stash: t.types.sp_core.crypto.AccountId32
-    eras: Array<t.types.u32>
+    stash: types.sp_core.crypto.AccountId32
+    eras: Array<types.u32>
   }
   /**
    * Some internal error happened while migrating stash. They are removed as head as a
@@ -148,7 +148,7 @@ export namespace Event {
    */
   export interface Errored {
     type: "Errored"
-    stash: t.types.sp_core.crypto.AccountId32
+    stash: types.sp_core.crypto.AccountId32
   }
   /** An internal error happened. Operations will be paused now. */
   export interface InternalError {
@@ -156,20 +156,20 @@ export namespace Event {
   }
   /** A staker was unstaked. */
   export function Unstaked(
-    value: Omit<t.types.pallet_fast_unstake.pallet.Event.Unstaked, "type">,
-  ): t.types.pallet_fast_unstake.pallet.Event.Unstaked {
+    value: Omit<types.pallet_fast_unstake.pallet.Event.Unstaked, "type">,
+  ): types.pallet_fast_unstake.pallet.Event.Unstaked {
     return { type: "Unstaked", ...value }
   }
   /** A staker was slashed for requesting fast-unstake whilst being exposed. */
   export function Slashed(
-    value: Omit<t.types.pallet_fast_unstake.pallet.Event.Slashed, "type">,
-  ): t.types.pallet_fast_unstake.pallet.Event.Slashed {
+    value: Omit<types.pallet_fast_unstake.pallet.Event.Slashed, "type">,
+  ): types.pallet_fast_unstake.pallet.Event.Slashed {
     return { type: "Slashed", ...value }
   }
   /** A staker was partially checked for the given eras, but the process did not finish. */
   export function Checking(
-    value: Omit<t.types.pallet_fast_unstake.pallet.Event.Checking, "type">,
-  ): t.types.pallet_fast_unstake.pallet.Event.Checking {
+    value: Omit<types.pallet_fast_unstake.pallet.Event.Checking, "type">,
+  ): types.pallet_fast_unstake.pallet.Event.Checking {
     return { type: "Checking", ...value }
   }
   /**
@@ -177,12 +177,12 @@ export namespace Event {
    * consequence.
    */
   export function Errored(
-    value: Omit<t.types.pallet_fast_unstake.pallet.Event.Errored, "type">,
-  ): t.types.pallet_fast_unstake.pallet.Event.Errored {
+    value: Omit<types.pallet_fast_unstake.pallet.Event.Errored, "type">,
+  ): types.pallet_fast_unstake.pallet.Event.Errored {
     return { type: "Errored", ...value }
   }
   /** An internal error happened. Operations will be paused now. */
-  export function InternalError(): t.types.pallet_fast_unstake.pallet.Event.InternalError {
+  export function InternalError(): types.pallet_fast_unstake.pallet.Event.InternalError {
     return { type: "InternalError" }
   }
 }

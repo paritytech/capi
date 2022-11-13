@@ -1,20 +1,20 @@
 import { $ } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as t from "../../mod.ts"
+import type * as types from "../../types/mod.ts"
 
-export const $call: $.Codec<t.types.pallet_indices.pallet.Call> = _codec.$196
+export const $call: $.Codec<types.pallet_indices.pallet.Call> = _codec.$196
 
-export const $error: $.Codec<t.types.pallet_indices.pallet.Error> = _codec.$469
+export const $error: $.Codec<types.pallet_indices.pallet.Error> = _codec.$469
 
-export const $event: $.Codec<t.types.pallet_indices.pallet.Event> = _codec.$35
+export const $event: $.Codec<types.pallet_indices.pallet.Event> = _codec.$35
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 export type Call =
-  | t.types.pallet_indices.pallet.Call.claim
-  | t.types.pallet_indices.pallet.Call.transfer
-  | t.types.pallet_indices.pallet.Call.free
-  | t.types.pallet_indices.pallet.Call.force_transfer
-  | t.types.pallet_indices.pallet.Call.freeze
+  | types.pallet_indices.pallet.Call.claim
+  | types.pallet_indices.pallet.Call.transfer
+  | types.pallet_indices.pallet.Call.free
+  | types.pallet_indices.pallet.Call.force_transfer
+  | types.pallet_indices.pallet.Call.freeze
 export namespace Call {
   /**
    * Assign an previously unassigned index.
@@ -38,7 +38,7 @@ export namespace Call {
    */
   export interface claim {
     type: "claim"
-    index: t.types.u32
+    index: types.u32
   }
   /**
    * Assign an index already owned by the sender to another account. The balance reservation
@@ -64,8 +64,8 @@ export namespace Call {
    */
   export interface transfer {
     type: "transfer"
-    new: t.types.sp_runtime.multiaddress.MultiAddress
-    index: t.types.u32
+    new: types.sp_runtime.multiaddress.MultiAddress
+    index: types.u32
   }
   /**
    * Free up an index owned by the sender.
@@ -89,7 +89,7 @@ export namespace Call {
    */
   export interface free {
     type: "free"
-    index: t.types.u32
+    index: types.u32
   }
   /**
    * Force an index to an account. This doesn't require a deposit. If the index is already
@@ -116,8 +116,8 @@ export namespace Call {
    */
   export interface force_transfer {
     type: "force_transfer"
-    new: t.types.sp_runtime.multiaddress.MultiAddress
-    index: t.types.u32
+    new: types.sp_runtime.multiaddress.MultiAddress
+    index: types.u32
     freeze: boolean
   }
   /**
@@ -142,7 +142,7 @@ export namespace Call {
    */
   export interface freeze {
     type: "freeze"
-    index: t.types.u32
+    index: types.u32
   }
   /**
    * Assign an previously unassigned index.
@@ -165,8 +165,8 @@ export namespace Call {
    * # </weight>
    */
   export function claim(
-    value: Omit<t.types.pallet_indices.pallet.Call.claim, "type">,
-  ): t.types.pallet_indices.pallet.Call.claim {
+    value: Omit<types.pallet_indices.pallet.Call.claim, "type">,
+  ): types.pallet_indices.pallet.Call.claim {
     return { type: "claim", ...value }
   }
   /**
@@ -192,8 +192,8 @@ export namespace Call {
    * # </weight>
    */
   export function transfer(
-    value: Omit<t.types.pallet_indices.pallet.Call.transfer, "type">,
-  ): t.types.pallet_indices.pallet.Call.transfer {
+    value: Omit<types.pallet_indices.pallet.Call.transfer, "type">,
+  ): types.pallet_indices.pallet.Call.transfer {
     return { type: "transfer", ...value }
   }
   /**
@@ -217,8 +217,8 @@ export namespace Call {
    * # </weight>
    */
   export function free(
-    value: Omit<t.types.pallet_indices.pallet.Call.free, "type">,
-  ): t.types.pallet_indices.pallet.Call.free {
+    value: Omit<types.pallet_indices.pallet.Call.free, "type">,
+  ): types.pallet_indices.pallet.Call.free {
     return { type: "free", ...value }
   }
   /**
@@ -245,8 +245,8 @@ export namespace Call {
    * # </weight>
    */
   export function force_transfer(
-    value: Omit<t.types.pallet_indices.pallet.Call.force_transfer, "type">,
-  ): t.types.pallet_indices.pallet.Call.force_transfer {
+    value: Omit<types.pallet_indices.pallet.Call.force_transfer, "type">,
+  ): types.pallet_indices.pallet.Call.force_transfer {
     return { type: "force_transfer", ...value }
   }
   /**
@@ -270,8 +270,8 @@ export namespace Call {
    * # </weight>
    */
   export function freeze(
-    value: Omit<t.types.pallet_indices.pallet.Call.freeze, "type">,
-  ): t.types.pallet_indices.pallet.Call.freeze {
+    value: Omit<types.pallet_indices.pallet.Call.freeze, "type">,
+  ): types.pallet_indices.pallet.Call.freeze {
     return { type: "freeze", ...value }
   }
 }
@@ -281,43 +281,43 @@ export type Error = "NotAssigned" | "NotOwner" | "InUse" | "NotTransfer" | "Perm
 
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
 export type Event =
-  | t.types.pallet_indices.pallet.Event.IndexAssigned
-  | t.types.pallet_indices.pallet.Event.IndexFreed
-  | t.types.pallet_indices.pallet.Event.IndexFrozen
+  | types.pallet_indices.pallet.Event.IndexAssigned
+  | types.pallet_indices.pallet.Event.IndexFreed
+  | types.pallet_indices.pallet.Event.IndexFrozen
 export namespace Event {
   /** A account index was assigned. */
   export interface IndexAssigned {
     type: "IndexAssigned"
-    who: t.types.sp_core.crypto.AccountId32
-    index: t.types.u32
+    who: types.sp_core.crypto.AccountId32
+    index: types.u32
   }
   /** A account index has been freed up (unassigned). */
   export interface IndexFreed {
     type: "IndexFreed"
-    index: t.types.u32
+    index: types.u32
   }
   /** A account index has been frozen to its current account ID. */
   export interface IndexFrozen {
     type: "IndexFrozen"
-    index: t.types.u32
-    who: t.types.sp_core.crypto.AccountId32
+    index: types.u32
+    who: types.sp_core.crypto.AccountId32
   }
   /** A account index was assigned. */
   export function IndexAssigned(
-    value: Omit<t.types.pallet_indices.pallet.Event.IndexAssigned, "type">,
-  ): t.types.pallet_indices.pallet.Event.IndexAssigned {
+    value: Omit<types.pallet_indices.pallet.Event.IndexAssigned, "type">,
+  ): types.pallet_indices.pallet.Event.IndexAssigned {
     return { type: "IndexAssigned", ...value }
   }
   /** A account index has been freed up (unassigned). */
   export function IndexFreed(
-    value: Omit<t.types.pallet_indices.pallet.Event.IndexFreed, "type">,
-  ): t.types.pallet_indices.pallet.Event.IndexFreed {
+    value: Omit<types.pallet_indices.pallet.Event.IndexFreed, "type">,
+  ): types.pallet_indices.pallet.Event.IndexFreed {
     return { type: "IndexFreed", ...value }
   }
   /** A account index has been frozen to its current account ID. */
   export function IndexFrozen(
-    value: Omit<t.types.pallet_indices.pallet.Event.IndexFrozen, "type">,
-  ): t.types.pallet_indices.pallet.Event.IndexFrozen {
+    value: Omit<types.pallet_indices.pallet.Event.IndexFrozen, "type">,
+  ): types.pallet_indices.pallet.Event.IndexFrozen {
     return { type: "IndexFrozen", ...value }
   }
 }

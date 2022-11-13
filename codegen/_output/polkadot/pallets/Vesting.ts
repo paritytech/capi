@@ -1,6 +1,6 @@
 import { $ } from "../capi.ts"
 import * as _codec from "../codecs.ts"
-import type * as t from "../mod.ts"
+import type * as types from "../types/mod.ts"
 
 /**
  *  Storage version of the pallet.
@@ -45,8 +45,8 @@ export const Vesting = {
  * # </weight>
  */
 export function force_vested_transfer(
-  value: Omit<t.types.pallet_vesting.pallet.Call.force_vested_transfer, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_vesting.pallet.Call.force_vested_transfer, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Vesting", value: { ...value, type: "force_vested_transfer" } }
 }
 
@@ -74,8 +74,8 @@ export function force_vested_transfer(
  * - `schedule2_index`: index of the second schedule to merge.
  */
 export function merge_schedules(
-  value: Omit<t.types.pallet_vesting.pallet.Call.merge_schedules, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_vesting.pallet.Call.merge_schedules, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Vesting", value: { ...value, type: "merge_schedules" } }
 }
 
@@ -94,7 +94,7 @@ export function merge_schedules(
  *     - Writes: Vesting Storage, Balances Locks, [Sender Account]
  * # </weight>
  */
-export function vest(): t.types.polkadot_runtime.RuntimeCall {
+export function vest(): types.polkadot_runtime.RuntimeCall {
   return { type: "Vesting", value: { type: "vest" } }
 }
 
@@ -116,8 +116,8 @@ export function vest(): t.types.polkadot_runtime.RuntimeCall {
  * # </weight>
  */
 export function vest_other(
-  value: Omit<t.types.pallet_vesting.pallet.Call.vest_other, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_vesting.pallet.Call.vest_other, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Vesting", value: { ...value, type: "vest_other" } }
 }
 
@@ -141,7 +141,7 @@ export function vest_other(
  * # </weight>
  */
 export function vested_transfer(
-  value: Omit<t.types.pallet_vesting.pallet.Call.vested_transfer, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_vesting.pallet.Call.vested_transfer, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Vesting", value: { ...value, type: "vested_transfer" } }
 }

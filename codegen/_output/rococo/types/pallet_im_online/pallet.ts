@@ -1,15 +1,15 @@
 import { $ } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as t from "../../mod.ts"
+import type * as types from "../../types/mod.ts"
 
-export const $call: $.Codec<t.types.pallet_im_online.pallet.Call> = _codec.$227
+export const $call: $.Codec<types.pallet_im_online.pallet.Call> = _codec.$227
 
-export const $error: $.Codec<t.types.pallet_im_online.pallet.Error> = _codec.$527
+export const $error: $.Codec<types.pallet_im_online.pallet.Error> = _codec.$527
 
-export const $event: $.Codec<t.types.pallet_im_online.pallet.Event> = _codec.$52
+export const $event: $.Codec<types.pallet_im_online.pallet.Event> = _codec.$52
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
-export type Call = t.types.pallet_im_online.pallet.Call.heartbeat
+export type Call = types.pallet_im_online.pallet.Call.heartbeat
 export namespace Call {
   /**
    * # <weight>
@@ -24,8 +24,8 @@ export namespace Call {
    */
   export interface heartbeat {
     type: "heartbeat"
-    heartbeat: t.types.pallet_im_online.Heartbeat
-    signature: t.types.pallet_im_online.sr25519.app_sr25519.Signature
+    heartbeat: types.pallet_im_online.Heartbeat
+    signature: types.pallet_im_online.sr25519.app_sr25519.Signature
   }
   /**
    * # <weight>
@@ -39,8 +39,8 @@ export namespace Call {
    * # </weight>
    */
   export function heartbeat(
-    value: Omit<t.types.pallet_im_online.pallet.Call.heartbeat, "type">,
-  ): t.types.pallet_im_online.pallet.Call.heartbeat {
+    value: Omit<types.pallet_im_online.pallet.Call.heartbeat, "type">,
+  ): types.pallet_im_online.pallet.Call.heartbeat {
     return { type: "heartbeat", ...value }
   }
 }
@@ -50,14 +50,14 @@ export type Error = "InvalidKey" | "DuplicatedHeartbeat"
 
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
 export type Event =
-  | t.types.pallet_im_online.pallet.Event.HeartbeatReceived
-  | t.types.pallet_im_online.pallet.Event.AllGood
-  | t.types.pallet_im_online.pallet.Event.SomeOffline
+  | types.pallet_im_online.pallet.Event.HeartbeatReceived
+  | types.pallet_im_online.pallet.Event.AllGood
+  | types.pallet_im_online.pallet.Event.SomeOffline
 export namespace Event {
   /** A new heartbeat was received from `AuthorityId`. */
   export interface HeartbeatReceived {
     type: "HeartbeatReceived"
-    authority_id: t.types.pallet_im_online.sr25519.app_sr25519.Public
+    authority_id: types.pallet_im_online.sr25519.app_sr25519.Public
   }
   /** At the end of the session, no offence was committed. */
   export interface AllGood {
@@ -66,22 +66,22 @@ export namespace Event {
   /** At the end of the session, at least one validator was found to be offline. */
   export interface SomeOffline {
     type: "SomeOffline"
-    offline: Array<[t.types.sp_core.crypto.AccountId32, t.types.pallet_staking.Exposure]>
+    offline: Array<[types.sp_core.crypto.AccountId32, types.pallet_staking.Exposure]>
   }
   /** A new heartbeat was received from `AuthorityId`. */
   export function HeartbeatReceived(
-    value: Omit<t.types.pallet_im_online.pallet.Event.HeartbeatReceived, "type">,
-  ): t.types.pallet_im_online.pallet.Event.HeartbeatReceived {
+    value: Omit<types.pallet_im_online.pallet.Event.HeartbeatReceived, "type">,
+  ): types.pallet_im_online.pallet.Event.HeartbeatReceived {
     return { type: "HeartbeatReceived", ...value }
   }
   /** At the end of the session, no offence was committed. */
-  export function AllGood(): t.types.pallet_im_online.pallet.Event.AllGood {
+  export function AllGood(): types.pallet_im_online.pallet.Event.AllGood {
     return { type: "AllGood" }
   }
   /** At the end of the session, at least one validator was found to be offline. */
   export function SomeOffline(
-    value: Omit<t.types.pallet_im_online.pallet.Event.SomeOffline, "type">,
-  ): t.types.pallet_im_online.pallet.Event.SomeOffline {
+    value: Omit<types.pallet_im_online.pallet.Event.SomeOffline, "type">,
+  ): types.pallet_im_online.pallet.Event.SomeOffline {
     return { type: "SomeOffline", ...value }
   }
 }

@@ -1,20 +1,20 @@
 import { $ } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as t from "../../mod.ts"
+import type * as types from "../../types/mod.ts"
 
-export const $call: $.Codec<t.types.pallet_treasury.pallet.Call> = _codec.$244
+export const $call: $.Codec<types.pallet_treasury.pallet.Call> = _codec.$244
 
-export const $error: $.Codec<t.types.pallet_treasury.pallet.Error> = _codec.$561
+export const $error: $.Codec<types.pallet_treasury.pallet.Error> = _codec.$561
 
-export const $event: $.Codec<t.types.pallet_treasury.pallet.Event> = _codec.$71
+export const $event: $.Codec<types.pallet_treasury.pallet.Event> = _codec.$71
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 export type Call =
-  | t.types.pallet_treasury.pallet.Call.propose_spend
-  | t.types.pallet_treasury.pallet.Call.reject_proposal
-  | t.types.pallet_treasury.pallet.Call.approve_proposal
-  | t.types.pallet_treasury.pallet.Call.spend
-  | t.types.pallet_treasury.pallet.Call.remove_approval
+  | types.pallet_treasury.pallet.Call.propose_spend
+  | types.pallet_treasury.pallet.Call.reject_proposal
+  | types.pallet_treasury.pallet.Call.approve_proposal
+  | types.pallet_treasury.pallet.Call.spend
+  | types.pallet_treasury.pallet.Call.remove_approval
 export namespace Call {
   /**
    * Put forward a suggestion for spending. A deposit proportional to the value
@@ -29,8 +29,8 @@ export namespace Call {
    */
   export interface propose_spend {
     type: "propose_spend"
-    value: t.Compact<t.types.u128>
-    beneficiary: t.types.sp_runtime.multiaddress.MultiAddress
+    value: types.Compact<types.u128>
+    beneficiary: types.sp_runtime.multiaddress.MultiAddress
   }
   /**
    * Reject a proposed spend. The original deposit will be slashed.
@@ -45,7 +45,7 @@ export namespace Call {
    */
   export interface reject_proposal {
     type: "reject_proposal"
-    proposal_id: t.Compact<t.types.u32>
+    proposal_id: types.Compact<types.u32>
   }
   /**
    * Approve a proposal. At a later time, the proposal will be allocated to the beneficiary
@@ -61,7 +61,7 @@ export namespace Call {
    */
   export interface approve_proposal {
     type: "approve_proposal"
-    proposal_id: t.Compact<t.types.u32>
+    proposal_id: types.Compact<types.u32>
   }
   /**
    * Propose and approve a spend of treasury funds.
@@ -75,8 +75,8 @@ export namespace Call {
    */
   export interface spend {
     type: "spend"
-    amount: t.Compact<t.types.u128>
-    beneficiary: t.types.sp_runtime.multiaddress.MultiAddress
+    amount: types.Compact<types.u128>
+    beneficiary: types.sp_runtime.multiaddress.MultiAddress
   }
   /**
    * Force a previously approved proposal to be removed from the approval queue.
@@ -97,7 +97,7 @@ export namespace Call {
    */
   export interface remove_approval {
     type: "remove_approval"
-    proposal_id: t.Compact<t.types.u32>
+    proposal_id: types.Compact<types.u32>
   }
   /**
    * Put forward a suggestion for spending. A deposit proportional to the value
@@ -111,8 +111,8 @@ export namespace Call {
    * # </weight>
    */
   export function propose_spend(
-    value: Omit<t.types.pallet_treasury.pallet.Call.propose_spend, "type">,
-  ): t.types.pallet_treasury.pallet.Call.propose_spend {
+    value: Omit<types.pallet_treasury.pallet.Call.propose_spend, "type">,
+  ): types.pallet_treasury.pallet.Call.propose_spend {
     return { type: "propose_spend", ...value }
   }
   /**
@@ -127,8 +127,8 @@ export namespace Call {
    * # </weight>
    */
   export function reject_proposal(
-    value: Omit<t.types.pallet_treasury.pallet.Call.reject_proposal, "type">,
-  ): t.types.pallet_treasury.pallet.Call.reject_proposal {
+    value: Omit<types.pallet_treasury.pallet.Call.reject_proposal, "type">,
+  ): types.pallet_treasury.pallet.Call.reject_proposal {
     return { type: "reject_proposal", ...value }
   }
   /**
@@ -144,8 +144,8 @@ export namespace Call {
    * # </weight>
    */
   export function approve_proposal(
-    value: Omit<t.types.pallet_treasury.pallet.Call.approve_proposal, "type">,
-  ): t.types.pallet_treasury.pallet.Call.approve_proposal {
+    value: Omit<types.pallet_treasury.pallet.Call.approve_proposal, "type">,
+  ): types.pallet_treasury.pallet.Call.approve_proposal {
     return { type: "approve_proposal", ...value }
   }
   /**
@@ -159,8 +159,8 @@ export namespace Call {
    * beneficiary.
    */
   export function spend(
-    value: Omit<t.types.pallet_treasury.pallet.Call.spend, "type">,
-  ): t.types.pallet_treasury.pallet.Call.spend {
+    value: Omit<types.pallet_treasury.pallet.Call.spend, "type">,
+  ): types.pallet_treasury.pallet.Call.spend {
     return { type: "spend", ...value }
   }
   /**
@@ -181,8 +181,8 @@ export namespace Call {
    * exist altogether, thus there is no way it would have been approved in the first place.
    */
   export function remove_approval(
-    value: Omit<t.types.pallet_treasury.pallet.Call.remove_approval, "type">,
-  ): t.types.pallet_treasury.pallet.Call.remove_approval {
+    value: Omit<types.pallet_treasury.pallet.Call.remove_approval, "type">,
+  ): types.pallet_treasury.pallet.Call.remove_approval {
     return { type: "remove_approval", ...value }
   }
 }
@@ -197,106 +197,106 @@ export type Error =
 
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
 export type Event =
-  | t.types.pallet_treasury.pallet.Event.Proposed
-  | t.types.pallet_treasury.pallet.Event.Spending
-  | t.types.pallet_treasury.pallet.Event.Awarded
-  | t.types.pallet_treasury.pallet.Event.Rejected
-  | t.types.pallet_treasury.pallet.Event.Burnt
-  | t.types.pallet_treasury.pallet.Event.Rollover
-  | t.types.pallet_treasury.pallet.Event.Deposit
-  | t.types.pallet_treasury.pallet.Event.SpendApproved
+  | types.pallet_treasury.pallet.Event.Proposed
+  | types.pallet_treasury.pallet.Event.Spending
+  | types.pallet_treasury.pallet.Event.Awarded
+  | types.pallet_treasury.pallet.Event.Rejected
+  | types.pallet_treasury.pallet.Event.Burnt
+  | types.pallet_treasury.pallet.Event.Rollover
+  | types.pallet_treasury.pallet.Event.Deposit
+  | types.pallet_treasury.pallet.Event.SpendApproved
 export namespace Event {
   /** New proposal. */
   export interface Proposed {
     type: "Proposed"
-    proposal_index: t.types.u32
+    proposal_index: types.u32
   }
   /** We have ended a spend period and will now allocate funds. */
   export interface Spending {
     type: "Spending"
-    budget_remaining: t.types.u128
+    budget_remaining: types.u128
   }
   /** Some funds have been allocated. */
   export interface Awarded {
     type: "Awarded"
-    proposal_index: t.types.u32
-    award: t.types.u128
-    account: t.types.sp_core.crypto.AccountId32
+    proposal_index: types.u32
+    award: types.u128
+    account: types.sp_core.crypto.AccountId32
   }
   /** A proposal was rejected; funds were slashed. */
   export interface Rejected {
     type: "Rejected"
-    proposal_index: t.types.u32
-    slashed: t.types.u128
+    proposal_index: types.u32
+    slashed: types.u128
   }
   /** Some of our funds have been burnt. */
   export interface Burnt {
     type: "Burnt"
-    burnt_funds: t.types.u128
+    burnt_funds: types.u128
   }
   /** Spending has finished; this is the amount that rolls over until next spend. */
   export interface Rollover {
     type: "Rollover"
-    rollover_balance: t.types.u128
+    rollover_balance: types.u128
   }
   /** Some funds have been deposited. */
   export interface Deposit {
     type: "Deposit"
-    value: t.types.u128
+    value: types.u128
   }
   /** A new spend proposal has been approved. */
   export interface SpendApproved {
     type: "SpendApproved"
-    proposal_index: t.types.u32
-    amount: t.types.u128
-    beneficiary: t.types.sp_core.crypto.AccountId32
+    proposal_index: types.u32
+    amount: types.u128
+    beneficiary: types.sp_core.crypto.AccountId32
   }
   /** New proposal. */
   export function Proposed(
-    value: Omit<t.types.pallet_treasury.pallet.Event.Proposed, "type">,
-  ): t.types.pallet_treasury.pallet.Event.Proposed {
+    value: Omit<types.pallet_treasury.pallet.Event.Proposed, "type">,
+  ): types.pallet_treasury.pallet.Event.Proposed {
     return { type: "Proposed", ...value }
   }
   /** We have ended a spend period and will now allocate funds. */
   export function Spending(
-    value: Omit<t.types.pallet_treasury.pallet.Event.Spending, "type">,
-  ): t.types.pallet_treasury.pallet.Event.Spending {
+    value: Omit<types.pallet_treasury.pallet.Event.Spending, "type">,
+  ): types.pallet_treasury.pallet.Event.Spending {
     return { type: "Spending", ...value }
   }
   /** Some funds have been allocated. */
   export function Awarded(
-    value: Omit<t.types.pallet_treasury.pallet.Event.Awarded, "type">,
-  ): t.types.pallet_treasury.pallet.Event.Awarded {
+    value: Omit<types.pallet_treasury.pallet.Event.Awarded, "type">,
+  ): types.pallet_treasury.pallet.Event.Awarded {
     return { type: "Awarded", ...value }
   }
   /** A proposal was rejected; funds were slashed. */
   export function Rejected(
-    value: Omit<t.types.pallet_treasury.pallet.Event.Rejected, "type">,
-  ): t.types.pallet_treasury.pallet.Event.Rejected {
+    value: Omit<types.pallet_treasury.pallet.Event.Rejected, "type">,
+  ): types.pallet_treasury.pallet.Event.Rejected {
     return { type: "Rejected", ...value }
   }
   /** Some of our funds have been burnt. */
   export function Burnt(
-    value: Omit<t.types.pallet_treasury.pallet.Event.Burnt, "type">,
-  ): t.types.pallet_treasury.pallet.Event.Burnt {
+    value: Omit<types.pallet_treasury.pallet.Event.Burnt, "type">,
+  ): types.pallet_treasury.pallet.Event.Burnt {
     return { type: "Burnt", ...value }
   }
   /** Spending has finished; this is the amount that rolls over until next spend. */
   export function Rollover(
-    value: Omit<t.types.pallet_treasury.pallet.Event.Rollover, "type">,
-  ): t.types.pallet_treasury.pallet.Event.Rollover {
+    value: Omit<types.pallet_treasury.pallet.Event.Rollover, "type">,
+  ): types.pallet_treasury.pallet.Event.Rollover {
     return { type: "Rollover", ...value }
   }
   /** Some funds have been deposited. */
   export function Deposit(
-    value: Omit<t.types.pallet_treasury.pallet.Event.Deposit, "type">,
-  ): t.types.pallet_treasury.pallet.Event.Deposit {
+    value: Omit<types.pallet_treasury.pallet.Event.Deposit, "type">,
+  ): types.pallet_treasury.pallet.Event.Deposit {
     return { type: "Deposit", ...value }
   }
   /** A new spend proposal has been approved. */
   export function SpendApproved(
-    value: Omit<t.types.pallet_treasury.pallet.Event.SpendApproved, "type">,
-  ): t.types.pallet_treasury.pallet.Event.SpendApproved {
+    value: Omit<types.pallet_treasury.pallet.Event.SpendApproved, "type">,
+  ): types.pallet_treasury.pallet.Event.SpendApproved {
     return { type: "SpendApproved", ...value }
   }
 }

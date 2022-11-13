@@ -1,6 +1,6 @@
 import { $ } from "../capi.ts"
 import * as _codec from "../codecs.ts"
-import type * as t from "../mod.ts"
+import type * as types from "../types/mod.ts"
 
 /**
  *  The Balances pallet example of storing the balance of an account.
@@ -88,8 +88,8 @@ export const TotalIssuance = {
  * # </weight>
  */
 export function force_transfer(
-  value: Omit<t.types.pallet_balances.pallet.Call.force_transfer, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_balances.pallet.Call.force_transfer, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Balances", value: { ...value, type: "force_transfer" } }
 }
 
@@ -99,8 +99,8 @@ export function force_transfer(
  * Can only be called by ROOT.
  */
 export function force_unreserve(
-  value: Omit<t.types.pallet_balances.pallet.Call.force_unreserve, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_balances.pallet.Call.force_unreserve, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Balances", value: { ...value, type: "force_unreserve" } }
 }
 
@@ -115,8 +115,8 @@ export function force_unreserve(
  * The dispatch origin for this call is `root`.
  */
 export function set_balance(
-  value: Omit<t.types.pallet_balances.pallet.Call.set_balance, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_balances.pallet.Call.set_balance, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Balances", value: { ...value, type: "set_balance" } }
 }
 
@@ -148,8 +148,8 @@ export function set_balance(
  * # </weight>
  */
 export function transfer(
-  value: Omit<t.types.pallet_balances.pallet.Call.transfer, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_balances.pallet.Call.transfer, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Balances", value: { ...value, type: "transfer" } }
 }
 
@@ -173,8 +173,8 @@ export function transfer(
  *   #</weight>
  */
 export function transfer_all(
-  value: Omit<t.types.pallet_balances.pallet.Call.transfer_all, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_balances.pallet.Call.transfer_all, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Balances", value: { ...value, type: "transfer_all" } }
 }
 
@@ -187,7 +187,7 @@ export function transfer_all(
  * [`transfer`]: struct.Pallet.html#method.transfer
  */
 export function transfer_keep_alive(
-  value: Omit<t.types.pallet_balances.pallet.Call.transfer_keep_alive, "type">,
-): t.types.polkadot_runtime.RuntimeCall {
+  value: Omit<types.pallet_balances.pallet.Call.transfer_keep_alive, "type">,
+): types.polkadot_runtime.RuntimeCall {
   return { type: "Balances", value: { ...value, type: "transfer_keep_alive" } }
 }
