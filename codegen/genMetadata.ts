@@ -1,7 +1,7 @@
 import * as M from "../frame_metadata/mod.ts"
 import { Decl, getPath, getRawCodecPath, makeDocComment, S } from "./utils.ts"
 
-export function genMetadata(metadata: M.Metadata, decls: Decl[], typeVisitor: M.TyVisitor<S>) {
+export function genMetadata(metadata: M.Metadata, decls: Decl[], typeVisitor: M.TyVisitor<string>) {
   const { tys, extrinsic, pallets } = metadata
 
   const isUnitVisitor = new M.TyVisitor<boolean>(tys, {
@@ -35,10 +35,9 @@ export function genMetadata(metadata: M.Metadata, decls: Decl[], typeVisitor: M.
 
   decls.push({
     path: "_metadata.extrinsic",
-    code: [
-      "export const extrinsic =",
-      S.object(
-        ["version", extrinsic.version],
+    code: "export const extrinsic ="
+      + S.object(
+        ["version", `${extrinsic.version}`],
         ["extras", getExtrasCodec(extrinsic.signedExtensions.map((x) => [x.ident, x.ty]))],
         [
           "additional",
@@ -48,16 +47,13 @@ export function genMetadata(metadata: M.Metadata, decls: Decl[], typeVisitor: M.
         ["address", getRawCodecPath(addressTy!)],
         ["signature", getRawCodecPath(signatureTy!)],
       ),
-    ],
   })
   for (const pallet of pallets) {
     for (const entry of pallet.storage?.entries ?? []) {
       decls.push({
         path: `pallets.${pallet.name}.${entry.name}`,
-        code: [
-          makeDocComment(entry.docs),
-          `export const ${entry.name} =`,
-          S.object(
+        code: makeDocComment(entry.docs) + `export const ${entry.name} =`
+          + S.object(
             ["type", S.string(entry.type)],
             ["modifier", S.string(entry.modifier)],
             [
@@ -68,13 +64,12 @@ export function genMetadata(metadata: M.Metadata, decls: Decl[], typeVisitor: M.
               "key",
               entry.type === "Map"
                 ? entry.hashers.length === 1
-                  ? ["$.tuple(", getRawCodecPath(entry.key), ")"]
+                  ? `$.tuple(${getRawCodecPath(entry.key)})`
                   : getRawCodecPath(entry.key)
                 : "[]",
             ],
             ["value", getRawCodecPath(entry.value)],
           ),
-        ],
       })
     }
     if (pallet.calls) {
@@ -82,25 +77,19 @@ export function genMetadata(metadata: M.Metadata, decls: Decl[], typeVisitor: M.
       const isStringUnion = ty.members.every((x) => !x.fields.length)
       for (const call of ty.members) {
         const typeName = "t." + getPath(tys, ty)! + "." + call.name
-        const [params, data]: [S, S] = call.fields.length
+        const [params, data]: [string, string] = call.fields.length
           ? call.fields[0]!.name
-            ? [`value: Omit<${typeName}, "type">`, ["{ ...value, type:", S.string(call.name), "}"]]
-            : [[call.fields.length > 1 ? "..." : "", `value: ${typeName}["value"]`], [
-              "{ ...value, type:",
-              S.string(call.name),
-              "}",
-            ]]
+            ? [`value: Omit<${typeName}, "type">`, `{ ...value, type: ${S.string(call.name)} }`]
+            : [
+              `${call.fields.length > 1 ? "..." : ""}value: ${typeName}["value"]`,
+              `{ ...value, type: ${S.string(call.name)} }`,
+            ]
           : ["", isStringUnion ? S.string(call.name) : S.object(["type", S.string(call.name)])]
         decls.push({
           path: `pallets.${pallet.name}.${call.name}`,
-          code: [
-            makeDocComment(call.docs),
-            "export function",
-            call.name,
-            ["(", params, ")"],
-            [":", typeVisitor.visit(callTy!)],
-            ["{ return { type:", S.string(pallet.name), ", value: ", data, "} }"],
-          ],
+          code: makeDocComment(call.docs)
+            + `export function ${call.name}(${params}): ${typeVisitor.visit(callTy!)}`
+            + `{ return { type: ${S.string(pallet.name)}, value: ${data} } }`,
         })
       }
     }

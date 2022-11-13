@@ -1,9 +1,7 @@
 import { tsFormatter } from "../deps/dprint.ts"
 import * as path from "../deps/std/path.ts"
-import { S } from "./utils.ts"
 
-export type File = { getContent: () => S }
-export class Files extends Map<string, File> {
+export class Files extends Map<string, string> {
   async write(outDir: string) {
     outDir = path.normalize(outDir)
     const errors = []
@@ -15,12 +13,11 @@ export class Files extends Map<string, File> {
       }
     }
     await Deno.mkdir(outDir, { recursive: true })
-    for (const [relativePath, file] of this.entries()) {
+    for (const [relativePath, content] of this.entries()) {
       const outputPath = path.join(outDir, relativePath)
       if (path.dirname(outputPath) !== outDir) {
         await Deno.mkdir(path.dirname(outputPath), { recursive: true })
       }
-      const content = S.toString(file.getContent())
       try {
         const formatted = tsFormatter.formatText("gen.ts", content)
         await Deno.writeTextFile(outputPath, formatted)
