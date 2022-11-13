@@ -1,28 +1,22 @@
 import * as M from "../frame_metadata/mod.ts"
 import { Files } from "./Files.ts"
 
-export type S = string | number | S[]
-
 export namespace S {
-  export function array(items: S[]): S {
-    return ["[", items.map((x) => [x, ","]), "]"]
+  export function array(items: string[]): string {
+    return `[${items}]`
   }
   export function object(
-    ...items: (readonly [doc: S, prop: S, val: S] | readonly [prop: S, val: S])[]
-  ): S {
-    return ["{", items.map((x) => [x.slice(0, -1), ":", x.at(-1)!, ","]), "}"]
+    ...items:
+      (readonly [doc: string, prop: string, val: string] | readonly [prop: string, val: string])[]
+  ): string {
+    return `{${items.map((x) => [...x.slice(0, -1), ":", x.at(-1)!].join(""))}}`
   }
-  export function string(value: string): S {
+  export function string(value: string): string {
     return JSON.stringify(value)
-  }
-  export function toString(value: S): string {
-    if (!(value instanceof Array)) return value.toString()
-    const parts = value.map(S.toString)
-    return parts.map((x) => x.trim()).join(parts.some((x) => x.includes("\n")) ? "\n" : " ").trim()
   }
 }
 
-export type Decl = { path: string; code: S }
+export type Decl = { path: string; code: string }
 
 export function getPath(tys: M.Ty[], ty: M.Ty): string | null {
   if (ty.type === "Struct" && ty.fields.length === 1 && ty.params.length) return null
@@ -59,7 +53,7 @@ export function makeDocComment(docs: string[]) {
   docs = docs.map((x) => x.replace(/^\s*\n\s*|\s*\n\s*$/, "").replace(/\s*\n\s*/g, " "))
   if (!docs.length) return ""
   if (docs.length === 1) return `/** ${docs[0]!.trim()} */\n`
-  return `/**\n  * ${docs.join("\n  * ")}\n  */`
+  return `/**\n  * ${docs.join("\n  * ")}\n  */\n`
 }
 
 export function getRawCodecPath(ty: M.Ty) {
@@ -81,7 +75,7 @@ export function getCodecPath(tys: M.Ty[], ty: M.Ty) {
 
 export function printDecls(
   decls: Decl[],
-  imports: (depth: number, content: string) => S[],
+  imports: (depth: number, content: string) => string[],
   path: string[],
   files: Files,
 ) {
@@ -95,15 +89,10 @@ export function printDecls(
       done.push({ path, code })
     }
   }
-  const reexports: S[] = []
+  const reexports: string[] = []
   for (const ns in namespaces) {
     const file = printDecls(namespaces[ns]!, imports, [...path, ns], files)
-    reexports.push([
-      "export * as",
-      ns,
-      "from",
-      S.string("./" + file),
-    ])
+    reexports.push(`export * as ${ns} from ${S.string("./" + file)}`)
   }
   // sort by path, _s first
   done.sort((a, b) =>
@@ -119,14 +108,14 @@ export function printDecls(
     ? (path.at(-1) + (Object.keys(namespaces).length ? "/mod.ts" : ".ts"))
     : "mod.ts"
   // Deduplicate -- metadata has redundant entries (e.g. pallet_collective::RawOrigin)
-  const content = [...new Set(done.map((x) => S.toString(x.code)))].join("\n\n")
+  const content = [...new Set(done.map((x) => x.code))].join("\n\n")
   const code = [
     ...imports(path.length - +!Object.keys(namespaces).length, content),
-    "\n\n",
+    "",
     ...reexports,
-    "\n\n",
+    "",
     content,
-  ]
-  files.set([...path.slice(0, -1), file].join("/"), { getContent: () => code })
+  ].join("\n")
+  files.set([...path.slice(0, -1), file].join("/"), code)
   return file
 }
