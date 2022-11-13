@@ -6,13 +6,7 @@ import { $null, DeriveCodec } from "./Codec.ts"
 import { Metadata } from "./Metadata.ts"
 
 // TODO: revisit
-import {
-  $multiSignature,
-  MultiSignature,
-} from "../codegen/_output/polkadot/types/sp_runtime/mod.ts"
-import { MultiAddress } from "../codegen/_output/polkadot/types/sp_runtime/multiaddress.ts"
-
-export { MultiAddress, MultiSignature }
+import { $multiAddress, $multiSignature, MultiAddress, MultiSignature } from "./primitives.ts"
 
 export type Signer =
   | ((message: Uint8Array) => MultiSignature | Promise<MultiSignature>)
@@ -44,7 +38,6 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
   const { metadata, deriveCodec } = props
   const { signedExtensions } = metadata.extrinsic
   const $multisigPromise = $.promise($multiSignature)
-  const $multiAddress = deriveCodec(findExtrinsicTypeParam("Address")!)
   const callTy = findExtrinsicTypeParam("Call")!
   assert(callTy?.type === "Union")
   const $call = deriveCodec(callTy)

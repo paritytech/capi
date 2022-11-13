@@ -1,5 +1,5 @@
 import { KeyringPair } from "../deps/polkadot/keyring/types.ts"
-import { MultiAddress, MultiSignature, Signer } from "../frame_metadata/Extrinsic.ts"
+import { MultiAddress, MultiSignature, Signer } from "../frame_metadata/mod.ts"
 
 export function multiAddressFromKeypair(keypair: KeyringPair): MultiAddress {
   return MultiAddress.Id(keypair.publicKey)
