@@ -1,16 +1,11 @@
-import { $ } from "../../../../capi.ts"
+import { $, C } from "../../../../capi.ts"
 import * as _codec from "../../../../codecs.ts"
-import type * as types from "../../../../types/mod.ts"
+import type * as types from "../../../mod.ts"
 
 export * as ConfigOp from "./ConfigOp/mod.ts"
 
-export const $call: $.Codec<types.pallet_staking.pallet.pallet.Call> = _codec.$202
-
-export const $error: $.Codec<types.pallet_staking.pallet.pallet.Error> = _codec.$508
-
-export const $event: $.Codec<types.pallet_staking.pallet.pallet.Event> = _codec.$39
-
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
+
 export type Call =
   | types.pallet_staking.pallet.pallet.Call.bond
   | types.pallet_staking.pallet.pallet.Call.bond_extra
@@ -957,8 +952,8 @@ export namespace Call {
     return { type: "force_apply_min_commission", ...value }
   }
 }
-
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
+
 export type Error =
   | "NotController"
   | "NotStash"
@@ -985,8 +980,8 @@ export type Error =
   | "TooManyValidators"
   | "CommissionTooLow"
   | "BoundNotMet"
-
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
+
 export type Event =
   | types.pallet_staking.pallet.pallet.Event.EraPaid
   | types.pallet_staking.pallet.pallet.Event.Rewarded

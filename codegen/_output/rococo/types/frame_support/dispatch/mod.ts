@@ -1,16 +1,8 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
+import type * as types from "../../mod.ts"
 
 export * as PerDispatchClass from "./PerDispatchClass/mod.ts"
-
-export const $dispatchClass: $.Codec<types.frame_support.dispatch.DispatchClass> = _codec.$22
-
-export const $dispatchInfo: $.Codec<types.frame_support.dispatch.DispatchInfo> = _codec.$21
-
-export const $pays: $.Codec<types.frame_support.dispatch.Pays> = _codec.$23
-
-export const $rawOrigin: $.Codec<types.frame_support.dispatch.RawOrigin> = _codec.$257
 
 export type DispatchClass = "Normal" | "Operational" | "Mandatory"
 

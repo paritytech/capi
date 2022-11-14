@@ -1,14 +1,9 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $call: $.Codec<types.pallet_child_bounties.pallet.Call> = _codec.$308
-
-export const $error: $.Codec<types.pallet_child_bounties.pallet.Error> = _codec.$597
-
-export const $event: $.Codec<types.pallet_child_bounties.pallet.Event> = _codec.$84
+import type * as types from "../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
+
 export type Call =
   | types.pallet_child_bounties.pallet.Call.add_child_bounty
   | types.pallet_child_bounties.pallet.Call.propose_curator
@@ -405,11 +400,11 @@ export namespace Call {
     return { type: "close_child_bounty", ...value }
   }
 }
-
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
-export type Error = "ParentBountyNotActive" | "InsufficientBountyBalance" | "TooManyChildBounties"
 
+export type Error = "ParentBountyNotActive" | "InsufficientBountyBalance" | "TooManyChildBounties"
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
+
 export type Event =
   | types.pallet_child_bounties.pallet.Event.Added
   | types.pallet_child_bounties.pallet.Event.Awarded

@@ -1,18 +1,11 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
+import type * as types from "../mod.ts"
 
+export * as double_encoded from "./double_encoded.ts"
 export * as v0 from "./v0/mod.ts"
 export * as v1 from "./v1/mod.ts"
 export * as v2 from "./v2/mod.ts"
-
-export const $versionedMultiAssets: $.Codec<types.xcm.VersionedMultiAssets> = _codec.$150
-
-export const $versionedMultiLocation: $.Codec<types.xcm.VersionedMultiLocation> = _codec.$155
-
-export const $versionedResponse: $.Codec<types.xcm.VersionedResponse> = _codec.$716
-
-export const $versionedXcm: $.Codec<types.xcm.VersionedXcm> = _codec.$424
 
 export type VersionedMultiAssets =
   | types.xcm.VersionedMultiAssets.V0
@@ -111,7 +104,7 @@ export namespace VersionedXcm {
   }
   export interface V2 {
     type: "V2"
-    value: Array<types.xcm.v2.Instruction>
+    value: types.xcm.v2.Xcm
   }
   export function V0(value: types.xcm.VersionedXcm.V0["value"]): types.xcm.VersionedXcm.V0 {
     return { type: "V0", value }

@@ -1,14 +1,9 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $call: $.Codec<types.pallet_bounties.pallet.Call> = _codec.$307
-
-export const $error: $.Codec<types.pallet_bounties.pallet.Error> = _codec.$594
-
-export const $event: $.Codec<types.pallet_bounties.pallet.Event> = _codec.$83
+import type * as types from "../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
+
 export type Call =
   | types.pallet_bounties.pallet.Call.propose_bounty
   | types.pallet_bounties.pallet.Call.approve_bounty
@@ -329,8 +324,8 @@ export namespace Call {
     return { type: "extend_bounty_expiry", ...value }
   }
 }
-
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
+
 export type Error =
   | "InsufficientProposersBalance"
   | "InvalidIndex"
@@ -343,8 +338,8 @@ export type Error =
   | "Premature"
   | "HasActiveChildBounty"
   | "TooManyQueued"
-
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
+
 export type Event =
   | types.pallet_bounties.pallet.Event.BountyProposed
   | types.pallet_bounties.pallet.Event.BountyRejected

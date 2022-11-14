@@ -1,17 +1,11 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
+import type * as types from "../../mod.ts"
 
 export * as junction from "./junction.ts"
 export * as multi_asset from "./multi_asset.ts"
 export * as multi_location from "./multi_location.ts"
 export * as order from "./order.ts"
-
-export const $originKind: $.Codec<types.xcm.v0.OriginKind> = _codec.$143
-
-export const $response: $.Codec<types.xcm.v0.Response> = _codec.$429
-
-export const $xcm: $.Codec<types.xcm.v0.Xcm> = _codec.$425
 
 export type OriginKind = "Native" | "SovereignAccount" | "Superuser" | "Xcm"
 
@@ -76,7 +70,7 @@ export namespace Xcm {
     type: "Transact"
     origin_type: types.xcm.v0.OriginKind
     require_weight_at_most: types.u64
-    call: { encoded: Uint8Array }
+    call: types.xcm.double_encoded.DoubleEncoded
   }
   export interface HrmpNewChannelOpenRequest {
     type: "HrmpNewChannelOpenRequest"

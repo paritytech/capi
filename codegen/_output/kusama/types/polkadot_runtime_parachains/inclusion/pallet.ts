@@ -1,17 +1,12 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
-
-export const $call: $.Codec<types.polkadot_runtime_parachains.inclusion.pallet.Call> = _codec.$377
-
-export const $error: $.Codec<types.polkadot_runtime_parachains.inclusion.pallet.Error> = _codec.$646
-
-export const $event: $.Codec<types.polkadot_runtime_parachains.inclusion.pallet.Event> = _codec.$95
+import type * as types from "../../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
-export type Call = never
 
+export type Call = never
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
+
 export type Error =
   | "UnsortedOrDuplicateValidatorIndices"
   | "UnsortedOrDuplicateDisputeStatementSet"
@@ -42,8 +37,8 @@ export type Error =
   | "InvalidValidationCodeHash"
   | "ParaHeadMismatch"
   | "BitfieldReferencesFreedCore"
-
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
+
 export type Event =
   | types.polkadot_runtime_parachains.inclusion.pallet.Event.CandidateBacked
   | types.polkadot_runtime_parachains.inclusion.pallet.Event.CandidateIncluded

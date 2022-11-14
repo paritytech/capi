@@ -1,22 +1,6 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $nextConfigDescriptor: $.Codec<types.sp_consensus_babe.digests.NextConfigDescriptor> =
-  _codec.$192
-
-export const $preDigest: $.Codec<types.sp_consensus_babe.digests.PreDigest> = _codec.$462
-
-export const $primaryPreDigest: $.Codec<types.sp_consensus_babe.digests.PrimaryPreDigest> =
-  _codec.$463
-
-export const $secondaryPlainPreDigest: $.Codec<
-  types.sp_consensus_babe.digests.SecondaryPlainPreDigest
-> = _codec.$464
-
-export const $secondaryVRFPreDigest: $.Codec<
-  types.sp_consensus_babe.digests.SecondaryVRFPreDigest
-> = _codec.$465
+import type * as types from "../mod.ts"
 
 export type NextConfigDescriptor = types.sp_consensus_babe.digests.NextConfigDescriptor.V1
 export namespace NextConfigDescriptor {

@@ -1,10 +1,8 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
+import type * as types from "../mod.ts"
 
 export * as pallet from "./pallet.ts"
-
-export const $uncleEntryItem: $.Codec<types.pallet_authorship.UncleEntryItem> = _codec.$482
 
 export type UncleEntryItem =
   | types.pallet_authorship.UncleEntryItem.InclusionHeight

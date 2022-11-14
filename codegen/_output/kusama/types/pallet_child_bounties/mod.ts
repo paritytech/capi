@@ -1,13 +1,8 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
+import type * as types from "../mod.ts"
 
 export * as pallet from "./pallet.ts"
-
-export const $childBounty: $.Codec<types.pallet_child_bounties.ChildBounty> = _codec.$595
-
-export const $childBountyStatus: $.Codec<types.pallet_child_bounties.ChildBountyStatus> =
-  _codec.$596
 
 export interface ChildBounty {
   parent_bounty: types.u32

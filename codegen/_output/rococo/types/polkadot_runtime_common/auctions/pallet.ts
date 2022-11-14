@@ -1,14 +1,9 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
-
-export const $call: $.Codec<types.polkadot_runtime_common.auctions.pallet.Call> = _codec.$413
-
-export const $error: $.Codec<types.polkadot_runtime_common.auctions.pallet.Error> = _codec.$709
-
-export const $event: $.Codec<types.polkadot_runtime_common.auctions.pallet.Event> = _codec.$119
+import type * as types from "../../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
+
 export type Call =
   | types.polkadot_runtime_common.auctions.pallet.Call.new_auction
   | types.polkadot_runtime_common.auctions.pallet.Call.bid
@@ -104,8 +99,8 @@ export namespace Call {
     return { type: "cancel_auction" }
   }
 }
-
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
+
 export type Error =
   | "AuctionInProgress"
   | "LeasePeriodInPast"
@@ -114,8 +109,8 @@ export type Error =
   | "NotAuction"
   | "AuctionEnded"
   | "AlreadyLeasedOut"
-
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
+
 export type Event =
   | types.polkadot_runtime_common.auctions.pallet.Event.AuctionStarted
   | types.polkadot_runtime_common.auctions.pallet.Event.AuctionClosed

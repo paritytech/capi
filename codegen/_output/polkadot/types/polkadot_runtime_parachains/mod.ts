@@ -1,3 +1,7 @@
+import { $, C } from "../../capi.ts"
+import * as _codec from "../../codecs.ts"
+import type * as types from "../mod.ts"
+
 export * as configuration from "./configuration/mod.ts"
 export * as disputes from "./disputes/mod.ts"
 export * as dmp from "./dmp/mod.ts"

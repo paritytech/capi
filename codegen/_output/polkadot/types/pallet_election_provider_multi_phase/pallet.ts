@@ -1,14 +1,9 @@
-import { $, client } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $call: $.Codec<types.pallet_election_provider_multi_phase.pallet.Call> = _codec.$310
-
-export const $error: $.Codec<types.pallet_election_provider_multi_phase.pallet.Error> = _codec.$611
-
-export const $event: $.Codec<types.pallet_election_provider_multi_phase.pallet.Event> = _codec.$86
+import type * as types from "../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
+
 export type Call =
   | types.pallet_election_provider_multi_phase.pallet.Call.submit_unsigned
   | types.pallet_election_provider_multi_phase.pallet.Call.set_minimum_untrusted_score
@@ -170,8 +165,8 @@ export namespace Call {
     return { type: "governance_fallback", ...value }
   }
 }
-
 /** Error of the pallet that can be returned in response to dispatches. */
+
 export type Error =
   | "PreDispatchEarlySubmission"
   | "PreDispatchWrongWinnerCount"
@@ -185,8 +180,8 @@ export type Error =
   | "InvalidSubmissionIndex"
   | "CallNotAllowed"
   | "FallbackFailed"
-
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
+
 export type Event =
   | types.pallet_election_provider_multi_phase.pallet.Event.SolutionStored
   | types.pallet_election_provider_multi_phase.pallet.Event.ElectionFinalized

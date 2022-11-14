@@ -1,16 +1,9 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
-
-export const $call: $.Codec<types.polkadot_runtime_common.paras_registrar.pallet.Call> = _codec.$411
-
-export const $error: $.Codec<types.polkadot_runtime_common.paras_registrar.pallet.Error> =
-  _codec.$702
-
-export const $event: $.Codec<types.polkadot_runtime_common.paras_registrar.pallet.Event> =
-  _codec.$117
+import type * as types from "../../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
+
 export type Call =
   | types.polkadot_runtime_common.paras_registrar.pallet.Call.register
   | types.polkadot_runtime_common.paras_registrar.pallet.Call.force_register
@@ -273,8 +266,8 @@ export namespace Call {
     return { type: "set_current_head", ...value }
   }
 }
-
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
+
 export type Error =
   | "NotRegistered"
   | "AlreadyRegistered"
@@ -290,8 +283,8 @@ export type Error =
   | "NotReserved"
   | "EmptyCode"
   | "CannotSwap"
-
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
+
 export type Event =
   | types.polkadot_runtime_common.paras_registrar.pallet.Event.Registered
   | types.polkadot_runtime_common.paras_registrar.pallet.Event.Deregistered

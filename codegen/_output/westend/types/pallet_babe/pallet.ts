@@ -1,12 +1,9 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $call: $.Codec<types.pallet_babe.pallet.Call> = _codec.$185
-
-export const $error: $.Codec<types.pallet_babe.pallet.Error> = _codec.$467
+import type * as types from "../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
+
 export type Call =
   | types.pallet_babe.pallet.Call.report_equivocation
   | types.pallet_babe.pallet.Call.report_equivocation_unsigned
@@ -86,8 +83,8 @@ export namespace Call {
     return { type: "plan_config_change", ...value }
   }
 }
-
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
+
 export type Error =
   | "InvalidEquivocationProof"
   | "InvalidKeyOwnershipProof"

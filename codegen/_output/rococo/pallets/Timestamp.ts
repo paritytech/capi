@@ -2,17 +2,6 @@ import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
-/** Did the timestamp get updated in this block? */
-export const DidUpdate = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Default",
-  "Timestamp",
-  "DidUpdate",
-  $.tuple(),
-  _codec.$43,
-)
-
 /** Current time for the current block. */
 export const Now = new C.fluent.Storage(
   client,
@@ -22,6 +11,17 @@ export const Now = new C.fluent.Storage(
   "Now",
   $.tuple(),
   _codec.$10,
+)
+
+/** Did the timestamp get updated in this block? */
+export const DidUpdate = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Timestamp",
+  "DidUpdate",
+  $.tuple(),
+  _codec.$43,
 )
 
 /**

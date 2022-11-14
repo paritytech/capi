@@ -2,6 +2,17 @@ import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
+/** The total units issued in the system. */
+export const TotalIssuance = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Balances",
+  "TotalIssuance",
+  $.tuple(),
+  _codec.$6,
+)
+
 /**
  *  The Balances pallet example of storing the balance of an account.
  *
@@ -78,58 +89,6 @@ export const StorageVersion = new C.fluent.Storage(
   _codec.$477,
 )
 
-/** The total units issued in the system. */
-export const TotalIssuance = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Default",
-  "Balances",
-  "TotalIssuance",
-  $.tuple(),
-  _codec.$6,
-)
-
-/**
- * Exactly as `transfer`, except the origin must be root and the source account may be
- * specified.
- * # <weight>
- * - Same as transfer, but additional read and write because the source account is not
- *   assumed to be in the overlay.
- * # </weight>
- */
-export function force_transfer(
-  value: Omit<types.pallet_balances.pallet.Call.force_transfer, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Balances", value: { ...value, type: "force_transfer" } }
-}
-
-/**
- * Unreserve some balance from a user by force.
- *
- * Can only be called by ROOT.
- */
-export function force_unreserve(
-  value: Omit<types.pallet_balances.pallet.Call.force_unreserve, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Balances", value: { ...value, type: "force_unreserve" } }
-}
-
-/**
- * Set the balances of a given account.
- *
- * This will alter `FreeBalance` and `ReservedBalance` in storage. it will
- * also alter the total issuance of the system (`TotalIssuance`) appropriately.
- * If the new free or reserved balance is below the existential deposit,
- * it will reset the account nonce (`frame_system::AccountNonce`).
- *
- * The dispatch origin for this call is `root`.
- */
-export function set_balance(
-  value: Omit<types.pallet_balances.pallet.Call.set_balance, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Balances", value: { ...value, type: "set_balance" } }
-}
-
 /**
  * Transfer some liquid free balance to another account.
  *
@@ -164,6 +123,50 @@ export function transfer(
 }
 
 /**
+ * Set the balances of a given account.
+ *
+ * This will alter `FreeBalance` and `ReservedBalance` in storage. it will
+ * also alter the total issuance of the system (`TotalIssuance`) appropriately.
+ * If the new free or reserved balance is below the existential deposit,
+ * it will reset the account nonce (`frame_system::AccountNonce`).
+ *
+ * The dispatch origin for this call is `root`.
+ */
+export function set_balance(
+  value: Omit<types.pallet_balances.pallet.Call.set_balance, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Balances", value: { ...value, type: "set_balance" } }
+}
+
+/**
+ * Exactly as `transfer`, except the origin must be root and the source account may be
+ * specified.
+ * # <weight>
+ * - Same as transfer, but additional read and write because the source account is not
+ *   assumed to be in the overlay.
+ * # </weight>
+ */
+export function force_transfer(
+  value: Omit<types.pallet_balances.pallet.Call.force_transfer, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Balances", value: { ...value, type: "force_transfer" } }
+}
+
+/**
+ * Same as the [`transfer`] call, but with a check that the transfer will not kill the
+ * origin account.
+ *
+ * 99% of the time you want [`transfer`] instead.
+ *
+ * [`transfer`]: struct.Pallet.html#method.transfer
+ */
+export function transfer_keep_alive(
+  value: Omit<types.pallet_balances.pallet.Call.transfer_keep_alive, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Balances", value: { ...value, type: "transfer_keep_alive" } }
+}
+
+/**
  * Transfer the entire transferable balance from the caller account.
  *
  * NOTE: This function only attempts to transfer _transferable_ balances. This means that
@@ -189,15 +192,12 @@ export function transfer_all(
 }
 
 /**
- * Same as the [`transfer`] call, but with a check that the transfer will not kill the
- * origin account.
+ * Unreserve some balance from a user by force.
  *
- * 99% of the time you want [`transfer`] instead.
- *
- * [`transfer`]: struct.Pallet.html#method.transfer
+ * Can only be called by ROOT.
  */
-export function transfer_keep_alive(
-  value: Omit<types.pallet_balances.pallet.Call.transfer_keep_alive, "type">,
+export function force_unreserve(
+  value: Omit<types.pallet_balances.pallet.Call.force_unreserve, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Balances", value: { ...value, type: "transfer_keep_alive" } }
+  return { type: "Balances", value: { ...value, type: "force_unreserve" } }
 }

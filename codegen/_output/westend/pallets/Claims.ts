@@ -12,28 +12,6 @@ export const Claims = new C.fluent.Storage(
   _codec.$6,
 )
 
-/** Pre-claimed Ethereum accounts, by the Account ID that they are claimed to. */
-export const Preclaims = new C.fluent.Storage(
-  client,
-  "Map",
-  "Optional",
-  "Claims",
-  "Preclaims",
-  $.tuple(_codec.$0),
-  _codec.$73,
-)
-
-/** The statement kind that must be signed, if any. */
-export const Signing = new C.fluent.Storage(
-  client,
-  "Map",
-  "Optional",
-  "Claims",
-  "Signing",
-  $.tuple(_codec.$73),
-  _codec.$251,
-)
-
 export const Total = new C.fluent.Storage(
   client,
   "Plain",
@@ -60,30 +38,27 @@ export const Vesting = new C.fluent.Storage(
   _codec.$249,
 )
 
-/**
- * Attest to a statement, needed to finalize the claims process.
- *
- * WARNING: Insecure unless your chain includes `PrevalidateAttests` as a `SignedExtension`.
- *
- * Unsigned Validation:
- * A call to attest is deemed valid if the sender has a `Preclaim` registered
- * and provides a `statement` which is expected for the account.
- *
- * Parameters:
- * - `statement`: The identity of the statement which is being attested to in the signature.
- *
- * <weight>
- * The weight of this call is invariant over the input parameters.
- * Weight includes logic to do pre-validation on `attest` call.
- *
- * Total Complexity: O(1)
- * </weight>
- */
-export function attest(
-  value: Omit<types.polkadot_runtime_common.claims.pallet.Call.attest, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Claims", value: { ...value, type: "attest" } }
-}
+/** The statement kind that must be signed, if any. */
+export const Signing = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Claims",
+  "Signing",
+  $.tuple(_codec.$73),
+  _codec.$251,
+)
+
+/** Pre-claimed Ethereum accounts, by the Account ID that they are claimed to. */
+export const Preclaims = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Claims",
+  "Preclaims",
+  $.tuple(_codec.$0),
+  _codec.$73,
+)
 
 /**
  * Make a claim to collect your DOTs.
@@ -115,6 +90,29 @@ export function claim(
   value: Omit<types.polkadot_runtime_common.claims.pallet.Call.claim, "type">,
 ): types.polkadot_runtime.RuntimeCall {
   return { type: "Claims", value: { ...value, type: "claim" } }
+}
+
+/**
+ * Mint a new claim to collect DOTs.
+ *
+ * The dispatch origin for this call must be _Root_.
+ *
+ * Parameters:
+ * - `who`: The Ethereum address allowed to collect this claim.
+ * - `value`: The number of DOTs that will be claimed.
+ * - `vesting_schedule`: An optional vesting schedule for these DOTs.
+ *
+ * <weight>
+ * The weight of this call is invariant over the input parameters.
+ * We assume worst case that both vesting and statement is being inserted.
+ *
+ * Total Complexity: O(1)
+ * </weight>
+ */
+export function mint_claim(
+  value: Omit<types.polkadot_runtime_common.claims.pallet.Call.mint_claim, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Claims", value: { ...value, type: "mint_claim" } }
 }
 
 /**
@@ -152,26 +150,28 @@ export function claim_attest(
 }
 
 /**
- * Mint a new claim to collect DOTs.
+ * Attest to a statement, needed to finalize the claims process.
  *
- * The dispatch origin for this call must be _Root_.
+ * WARNING: Insecure unless your chain includes `PrevalidateAttests` as a `SignedExtension`.
+ *
+ * Unsigned Validation:
+ * A call to attest is deemed valid if the sender has a `Preclaim` registered
+ * and provides a `statement` which is expected for the account.
  *
  * Parameters:
- * - `who`: The Ethereum address allowed to collect this claim.
- * - `value`: The number of DOTs that will be claimed.
- * - `vesting_schedule`: An optional vesting schedule for these DOTs.
+ * - `statement`: The identity of the statement which is being attested to in the signature.
  *
  * <weight>
  * The weight of this call is invariant over the input parameters.
- * We assume worst case that both vesting and statement is being inserted.
+ * Weight includes logic to do pre-validation on `attest` call.
  *
  * Total Complexity: O(1)
  * </weight>
  */
-export function mint_claim(
-  value: Omit<types.polkadot_runtime_common.claims.pallet.Call.mint_claim, "type">,
+export function attest(
+  value: Omit<types.polkadot_runtime_common.claims.pallet.Call.attest, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Claims", value: { ...value, type: "mint_claim" } }
+  return { type: "Claims", value: { ...value, type: "attest" } }
 }
 
 export function move_claim(

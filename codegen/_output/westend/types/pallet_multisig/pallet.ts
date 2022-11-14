@@ -1,14 +1,9 @@
 import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $call: $.Codec<types.pallet_multisig.pallet.Call> = _codec.$305
-
-export const $error: $.Codec<types.pallet_multisig.pallet.Error> = _codec.$590
-
-export const $event: $.Codec<types.pallet_multisig.pallet.Event> = _codec.$81
+import type * as types from "../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
+
 export type Call =
   | types.pallet_multisig.pallet.Call.as_multi_threshold_1
   | types.pallet_multisig.pallet.Call.as_multi
@@ -324,8 +319,8 @@ export namespace Call {
     return { type: "cancel_as_multi", ...value }
   }
 }
-
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
+
 export type Error =
   | "MinimumThreshold"
   | "AlreadyApproved"
@@ -341,8 +336,8 @@ export type Error =
   | "UnexpectedTimepoint"
   | "MaxWeightTooLow"
   | "AlreadyStored"
-
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
+
 export type Event =
   | types.pallet_multisig.pallet.Event.NewMultisig
   | types.pallet_multisig.pallet.Event.MultisigApproval

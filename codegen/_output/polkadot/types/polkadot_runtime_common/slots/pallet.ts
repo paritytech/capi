@@ -1,14 +1,9 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
-
-export const $call: $.Codec<types.polkadot_runtime_common.slots.pallet.Call> = _codec.$412
-
-export const $error: $.Codec<types.polkadot_runtime_common.slots.pallet.Error> = _codec.$704
-
-export const $event: $.Codec<types.polkadot_runtime_common.slots.pallet.Event> = _codec.$118
+import type * as types from "../../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
+
 export type Call =
   | types.polkadot_runtime_common.slots.pallet.Call.force_lease
   | types.polkadot_runtime_common.slots.pallet.Call.clear_all_leases
@@ -86,11 +81,11 @@ export namespace Call {
     return { type: "trigger_onboard", ...value }
   }
 }
-
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
-export type Error = "ParaNotOnboarding" | "LeaseError"
 
+export type Error = "ParaNotOnboarding" | "LeaseError"
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
+
 export type Event =
   | types.polkadot_runtime_common.slots.pallet.Event.NewLeasePeriod
   | types.polkadot_runtime_common.slots.pallet.Event.Leased

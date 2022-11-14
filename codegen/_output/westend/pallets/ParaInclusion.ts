@@ -1,5 +1,6 @@
 import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
+import type * as types from "../types/mod.ts"
 
 /** The latest bitfield for each validator, referred to by their index in the validator set. */
 export const AvailabilityBitfields = new C.fluent.Storage(

@@ -1,12 +1,8 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
+import type * as types from "../../mod.ts"
 
 export * as pallet from "./pallet.ts"
-
-export const $bufferedSessionChange: $.Codec<
-  types.polkadot_runtime_parachains.initializer.BufferedSessionChange
-> = _codec.$681
 
 export interface BufferedSessionChange {
   validators: Array<types.polkadot_primitives.v2.validator_app.Public>

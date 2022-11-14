@@ -1,10 +1,6 @@
-import { $ } from "../capi.ts"
+import { $, C } from "../capi.ts"
 import * as _codec from "../codecs.ts"
-import type * as types from "../types/mod.ts"
-
-export const $equivocationProof: $.Codec<types.sp_consensus_slots.EquivocationProof> = _codec.$186
-
-export const $slot: $.Codec<types.sp_consensus_slots.Slot> = _codec.$190
+import type * as types from "./mod.ts"
 
 export interface EquivocationProof {
   offender: types.sp_consensus_babe.app.Public

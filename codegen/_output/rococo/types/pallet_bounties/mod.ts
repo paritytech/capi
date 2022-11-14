@@ -1,12 +1,8 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
+import type * as types from "../mod.ts"
 
 export * as pallet from "./pallet.ts"
-
-export const $bounty: $.Codec<types.pallet_bounties.Bounty> = _codec.$591
-
-export const $bountyStatus: $.Codec<types.pallet_bounties.BountyStatus> = _codec.$592
 
 export interface Bounty {
   proposer: types.sp_core.crypto.AccountId32

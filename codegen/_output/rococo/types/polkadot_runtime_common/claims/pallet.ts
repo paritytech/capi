@@ -1,14 +1,9 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
-
-export const $call: $.Codec<types.polkadot_runtime_common.claims.pallet.Call> = _codec.$245
-
-export const $error: $.Codec<types.polkadot_runtime_common.claims.pallet.Error> = _codec.$562
-
-export const $event: $.Codec<types.polkadot_runtime_common.claims.pallet.Event> = _codec.$72
+import type * as types from "../../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
+
 export type Call =
   | types.polkadot_runtime_common.claims.pallet.Call.claim
   | types.polkadot_runtime_common.claims.pallet.Call.mint_claim
@@ -250,8 +245,8 @@ export namespace Call {
     return { type: "move_claim", ...value }
   }
 }
-
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
+
 export type Error =
   | "InvalidEthereumSignature"
   | "SignerHasNoClaim"
@@ -259,8 +254,8 @@ export type Error =
   | "PotUnderflow"
   | "InvalidStatement"
   | "VestedBalanceExists"
-
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
+
 export type Event = types.polkadot_runtime_common.claims.pallet.Event.Claimed
 export namespace Event {
   /** Someone claimed some DOTs. */

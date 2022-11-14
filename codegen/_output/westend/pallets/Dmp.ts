@@ -1,5 +1,17 @@
 import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
+import type * as types from "../types/mod.ts"
+
+/** The downward messages addressed for a certain para. */
+export const DownwardMessageQueues = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Dmp",
+  "DownwardMessageQueues",
+  $.tuple(_codec.$98),
+  _codec.$682,
+)
 
 /**
  *  A mapping that stores the downward message queue MQC head for each para.
@@ -18,15 +30,4 @@ export const DownwardMessageQueueHeads = new C.fluent.Storage(
   "DownwardMessageQueueHeads",
   $.tuple(_codec.$98),
   _codec.$11,
-)
-
-/** The downward messages addressed for a certain para. */
-export const DownwardMessageQueues = new C.fluent.Storage(
-  client,
-  "Map",
-  "Default",
-  "Dmp",
-  "DownwardMessageQueues",
-  $.tuple(_codec.$98),
-  _codec.$682,
 )

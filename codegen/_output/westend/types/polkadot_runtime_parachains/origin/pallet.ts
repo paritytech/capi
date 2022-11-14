@@ -1,8 +1,6 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
-
-export const $origin: $.Codec<types.polkadot_runtime_parachains.origin.pallet.Origin> = _codec.$260
+import type * as types from "../../mod.ts"
 
 export type Origin = types.polkadot_runtime_parachains.origin.pallet.Origin.Parachain
 export namespace Origin {

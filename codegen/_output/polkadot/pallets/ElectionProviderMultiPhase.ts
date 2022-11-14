@@ -2,59 +2,6 @@ import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
-/** Current phase. */
-export const CurrentPhase = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Default",
-  "ElectionProviderMultiPhase",
-  "CurrentPhase",
-  $.tuple(),
-  _codec.$600,
-)
-
-/**
- *  Desired number of targets to elect for this round.
- *
- *  Only exists when [`Snapshot`] is present.
- */
-export const DesiredTargets = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Optional",
-  "ElectionProviderMultiPhase",
-  "DesiredTargets",
-  $.tuple(),
-  _codec.$4,
-)
-
-/**
- *  The minimum score that each 'untrusted' solution must attain in order to be considered
- *  feasible.
- *
- *  Can be set via `set_minimum_untrusted_score`.
- */
-export const MinimumUntrustedScore = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Optional",
-  "ElectionProviderMultiPhase",
-  "MinimumUntrustedScore",
-  $.tuple(),
-  _codec.$88,
-)
-
-/** Current best solution, signed or unsigned, queued to be returned upon `elect`. */
-export const QueuedSolution = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Optional",
-  "ElectionProviderMultiPhase",
-  "QueuedSolution",
-  $.tuple(),
-  _codec.$602,
-)
-
 /**
  *  Internal counter for the number of rounds.
  *
@@ -73,22 +20,71 @@ export const Round = new C.fluent.Storage(
   _codec.$4,
 )
 
-/**
- *  A sorted, bounded set of `(score, index)`, where each `index` points to a value in
- *  `SignedSubmissions`.
- *
- *  We never need to process more than a single signed submission at a time. Signed submissions
- *  can be quite large, so we're willing to pay the cost of multiple database accesses to access
- *  them one at a time instead of reading and decoding all of them at once.
- */
-export const SignedSubmissionIndices = new C.fluent.Storage(
+/** Current phase. */
+export const CurrentPhase = new C.fluent.Storage(
   client,
   "Plain",
   "Default",
   "ElectionProviderMultiPhase",
-  "SignedSubmissionIndices",
+  "CurrentPhase",
   $.tuple(),
-  _codec.$606,
+  _codec.$600,
+)
+
+/** Current best solution, signed or unsigned, queued to be returned upon `elect`. */
+export const QueuedSolution = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "ElectionProviderMultiPhase",
+  "QueuedSolution",
+  $.tuple(),
+  _codec.$602,
+)
+
+/**
+ *  Snapshot data of the round.
+ *
+ *  This is created at the beginning of the signed phase and cleared upon calling `elect`.
+ */
+export const Snapshot = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "ElectionProviderMultiPhase",
+  "Snapshot",
+  $.tuple(),
+  _codec.$603,
+)
+
+/**
+ *  Desired number of targets to elect for this round.
+ *
+ *  Only exists when [`Snapshot`] is present.
+ */
+export const DesiredTargets = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "ElectionProviderMultiPhase",
+  "DesiredTargets",
+  $.tuple(),
+  _codec.$4,
+)
+
+/**
+ *  The metadata of the [`RoundSnapshot`]
+ *
+ *  Only exists when [`Snapshot`] is present.
+ */
+export const SnapshotMetadata = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "ElectionProviderMultiPhase",
+  "SnapshotMetadata",
+  $.tuple(),
+  _codec.$363,
 )
 
 /**
@@ -113,6 +109,24 @@ export const SignedSubmissionNextIndex = new C.fluent.Storage(
 )
 
 /**
+ *  A sorted, bounded set of `(score, index)`, where each `index` points to a value in
+ *  `SignedSubmissions`.
+ *
+ *  We never need to process more than a single signed submission at a time. Signed submissions
+ *  can be quite large, so we're willing to pay the cost of multiple database accesses to access
+ *  them one at a time instead of reading and decoding all of them at once.
+ */
+export const SignedSubmissionIndices = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "ElectionProviderMultiPhase",
+  "SignedSubmissionIndices",
+  $.tuple(),
+  _codec.$606,
+)
+
+/**
  *  Unchecked, signed solutions.
  *
  *  Together with `SubmissionIndices`, this stores a bounded set of `SignedSubmissions` while
@@ -132,45 +146,60 @@ export const SignedSubmissionsMap = new C.fluent.Storage(
 )
 
 /**
- *  Snapshot data of the round.
+ *  The minimum score that each 'untrusted' solution must attain in order to be considered
+ *  feasible.
  *
- *  This is created at the beginning of the signed phase and cleared upon calling `elect`.
+ *  Can be set via `set_minimum_untrusted_score`.
  */
-export const Snapshot = new C.fluent.Storage(
+export const MinimumUntrustedScore = new C.fluent.Storage(
   client,
   "Plain",
   "Optional",
   "ElectionProviderMultiPhase",
-  "Snapshot",
+  "MinimumUntrustedScore",
   $.tuple(),
-  _codec.$603,
+  _codec.$88,
 )
 
 /**
- *  The metadata of the [`RoundSnapshot`]
+ * Submit a solution for the unsigned phase.
  *
- *  Only exists when [`Snapshot`] is present.
- */
-export const SnapshotMetadata = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Optional",
-  "ElectionProviderMultiPhase",
-  "SnapshotMetadata",
-  $.tuple(),
-  _codec.$363,
-)
-
-/**
- * Trigger the governance fallback.
+ * The dispatch origin fo this call must be __none__.
  *
- * This can only be called when [`Phase::Emergency`] is enabled, as an alternative to
- * calling [`Call::set_emergency_election_result`].
+ * This submission is checked on the fly. Moreover, this unsigned solution is only
+ * validated when submitted to the pool from the **local** node. Effectively, this means
+ * that only active validators can submit this transaction when authoring a block (similar
+ * to an inherent).
+ *
+ * To prevent any incorrect solution (and thus wasted time/weight), this transaction will
+ * panic if the solution submitted by the validator is invalid in any way, effectively
+ * putting their authoring reward at risk.
+ *
+ * No deposit or reward is associated with this submission.
  */
-export function governance_fallback(
-  value: Omit<types.pallet_election_provider_multi_phase.pallet.Call.governance_fallback, "type">,
+export function submit_unsigned(
+  value: Omit<types.pallet_election_provider_multi_phase.pallet.Call.submit_unsigned, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "ElectionProviderMultiPhase", value: { ...value, type: "governance_fallback" } }
+  return { type: "ElectionProviderMultiPhase", value: { ...value, type: "submit_unsigned" } }
+}
+
+/**
+ * Set a new value for `MinimumUntrustedScore`.
+ *
+ * Dispatch origin must be aligned with `T::ForceOrigin`.
+ *
+ * This check can be turned off by setting the value to `None`.
+ */
+export function set_minimum_untrusted_score(
+  value: Omit<
+    types.pallet_election_provider_multi_phase.pallet.Call.set_minimum_untrusted_score,
+    "type"
+  >,
+): types.polkadot_runtime.RuntimeCall {
+  return {
+    type: "ElectionProviderMultiPhase",
+    value: { ...value, type: "set_minimum_untrusted_score" },
+  }
 }
 
 /**
@@ -196,25 +225,6 @@ export function set_emergency_election_result(
 }
 
 /**
- * Set a new value for `MinimumUntrustedScore`.
- *
- * Dispatch origin must be aligned with `T::ForceOrigin`.
- *
- * This check can be turned off by setting the value to `None`.
- */
-export function set_minimum_untrusted_score(
-  value: Omit<
-    types.pallet_election_provider_multi_phase.pallet.Call.set_minimum_untrusted_score,
-    "type"
-  >,
-): types.polkadot_runtime.RuntimeCall {
-  return {
-    type: "ElectionProviderMultiPhase",
-    value: { ...value, type: "set_minimum_untrusted_score" },
-  }
-}
-
-/**
  * Submit a solution for the signed phase.
  *
  * The dispatch origin fo this call must be __signed__.
@@ -232,23 +242,13 @@ export function submit(
 }
 
 /**
- * Submit a solution for the unsigned phase.
+ * Trigger the governance fallback.
  *
- * The dispatch origin fo this call must be __none__.
- *
- * This submission is checked on the fly. Moreover, this unsigned solution is only
- * validated when submitted to the pool from the **local** node. Effectively, this means
- * that only active validators can submit this transaction when authoring a block (similar
- * to an inherent).
- *
- * To prevent any incorrect solution (and thus wasted time/weight), this transaction will
- * panic if the solution submitted by the validator is invalid in any way, effectively
- * putting their authoring reward at risk.
- *
- * No deposit or reward is associated with this submission.
+ * This can only be called when [`Phase::Emergency`] is enabled, as an alternative to
+ * calling [`Call::set_emergency_election_result`].
  */
-export function submit_unsigned(
-  value: Omit<types.pallet_election_provider_multi_phase.pallet.Call.submit_unsigned, "type">,
+export function governance_fallback(
+  value: Omit<types.pallet_election_provider_multi_phase.pallet.Call.governance_fallback, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "ElectionProviderMultiPhase", value: { ...value, type: "submit_unsigned" } }
+  return { type: "ElectionProviderMultiPhase", value: { ...value, type: "governance_fallback" } }
 }

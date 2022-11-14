@@ -1,8 +1,6 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
-
-export const $order: $.Codec<types.xcm.v1.order.Order> = _codec.$432
+import type * as types from "../../mod.ts"
 
 export type Order =
   | types.xcm.v1.order.Order.Noop

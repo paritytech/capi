@@ -2,18 +2,26 @@ import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
-/**
- *  The number of changes (both in terms of keys and underlying economic responsibilities)
- *  in the "set" of Grandpa validators from genesis.
- */
-export const CurrentSetId = new C.fluent.Storage(
+/** State of the current authority set. */
+export const State = new C.fluent.Storage(
   client,
   "Plain",
   "Default",
   "Grandpa",
-  "CurrentSetId",
+  "State",
   $.tuple(),
-  _codec.$10,
+  _codec.$516,
+)
+
+/** Pending change: (signaled at, scheduled change). */
+export const PendingChange = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "Grandpa",
+  "PendingChange",
+  $.tuple(),
+  _codec.$517,
 )
 
 /** next block number where we can force a change. */
@@ -27,15 +35,29 @@ export const NextForced = new C.fluent.Storage(
   _codec.$4,
 )
 
-/** Pending change: (signaled at, scheduled change). */
-export const PendingChange = new C.fluent.Storage(
+/** `true` if we are currently stalled. */
+export const Stalled = new C.fluent.Storage(
   client,
   "Plain",
   "Optional",
   "Grandpa",
-  "PendingChange",
+  "Stalled",
   $.tuple(),
-  _codec.$517,
+  _codec.$30,
+)
+
+/**
+ *  The number of changes (both in terms of keys and underlying economic responsibilities)
+ *  in the "set" of Grandpa validators from genesis.
+ */
+export const CurrentSetId = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Grandpa",
+  "CurrentSetId",
+  $.tuple(),
+  _codec.$10,
 )
 
 /**
@@ -53,48 +75,6 @@ export const SetIdSession = new C.fluent.Storage(
   $.tuple(_codec.$10),
   _codec.$4,
 )
-
-/** `true` if we are currently stalled. */
-export const Stalled = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Optional",
-  "Grandpa",
-  "Stalled",
-  $.tuple(),
-  _codec.$30,
-)
-
-/** State of the current authority set. */
-export const State = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Default",
-  "Grandpa",
-  "State",
-  $.tuple(),
-  _codec.$516,
-)
-
-/**
- * Note that the current authority set of the GRANDPA finality gadget has stalled.
- *
- * This will trigger a forced authority set change at the beginning of the next session, to
- * be enacted `delay` blocks after that. The `delay` should be high enough to safely assume
- * that the block signalling the forced change will not be re-orged e.g. 1000 blocks.
- * The block production rate (which may be slowed down because of finality lagging) should
- * be taken into account when choosing the `delay`. The GRANDPA voters based on the new
- * authority will start voting on top of `best_finalized_block_number` for new finalized
- * blocks. `best_finalized_block_number` should be the highest of the latest finalized
- * block of all validators of the new authority set.
- *
- * Only callable by root.
- */
-export function note_stalled(
-  value: Omit<types.pallet_grandpa.pallet.Call.note_stalled, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Grandpa", value: { ...value, type: "note_stalled" } }
-}
 
 /**
  * Report voter equivocation/misbehavior. This method will verify the
@@ -123,4 +103,24 @@ export function report_equivocation_unsigned(
   value: Omit<types.pallet_grandpa.pallet.Call.report_equivocation_unsigned, "type">,
 ): types.polkadot_runtime.RuntimeCall {
   return { type: "Grandpa", value: { ...value, type: "report_equivocation_unsigned" } }
+}
+
+/**
+ * Note that the current authority set of the GRANDPA finality gadget has stalled.
+ *
+ * This will trigger a forced authority set change at the beginning of the next session, to
+ * be enacted `delay` blocks after that. The `delay` should be high enough to safely assume
+ * that the block signalling the forced change will not be re-orged e.g. 1000 blocks.
+ * The block production rate (which may be slowed down because of finality lagging) should
+ * be taken into account when choosing the `delay`. The GRANDPA voters based on the new
+ * authority will start voting on top of `best_finalized_block_number` for new finalized
+ * blocks. `best_finalized_block_number` should be the highest of the latest finalized
+ * block of all validators of the new authority set.
+ *
+ * Only callable by root.
+ */
+export function note_stalled(
+  value: Omit<types.pallet_grandpa.pallet.Call.note_stalled, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Grandpa", value: { ...value, type: "note_stalled" } }
 }

@@ -31,17 +31,6 @@ export const Leases = new C.fluent.Storage(
 )
 
 /**
- * Clear all leases for a Para Id, refunding any deposits back to the original owners.
- *
- * The dispatch origin for this call must match `T::ForceOrigin`.
- */
-export function clear_all_leases(
-  value: Omit<types.polkadot_runtime_common.slots.pallet.Call.clear_all_leases, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Slots", value: { ...value, type: "clear_all_leases" } }
-}
-
-/**
  * Just a connect into the `lease_out` call, in case Root wants to force some lease to happen
  * independently of any other on-chain mechanism to use it.
  *
@@ -51,6 +40,17 @@ export function force_lease(
   value: Omit<types.polkadot_runtime_common.slots.pallet.Call.force_lease, "type">,
 ): types.polkadot_runtime.RuntimeCall {
   return { type: "Slots", value: { ...value, type: "force_lease" } }
+}
+
+/**
+ * Clear all leases for a Para Id, refunding any deposits back to the original owners.
+ *
+ * The dispatch origin for this call must match `T::ForceOrigin`.
+ */
+export function clear_all_leases(
+  value: Omit<types.polkadot_runtime_common.slots.pallet.Call.clear_all_leases, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Slots", value: { ...value, type: "clear_all_leases" } }
 }
 
 /**

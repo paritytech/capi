@@ -60,6 +60,19 @@ export const Winning = new C.fluent.Storage(
 )
 
 /**
+ * Create a new auction.
+ *
+ * This can only happen when there isn't already an auction in progress and may only be
+ * called by the root origin. Accepts the `duration` of this auction and the
+ * `lease_period_index` of the initial lease period of the four that are to be auctioned.
+ */
+export function new_auction(
+  value: Omit<types.polkadot_runtime_common.auctions.pallet.Call.new_auction, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Auctions", value: { ...value, type: "new_auction" } }
+}
+
+/**
  * Make a new bid from an account (including a parachain account) for deploying a new
  * parachain.
  *
@@ -90,17 +103,4 @@ export function bid(
  */
 export function cancel_auction(): types.polkadot_runtime.RuntimeCall {
   return { type: "Auctions", value: { type: "cancel_auction" } }
-}
-
-/**
- * Create a new auction.
- *
- * This can only happen when there isn't already an auction in progress and may only be
- * called by the root origin. Accepts the `duration` of this auction and the
- * `lease_period_index` of the initial lease period of the four that are to be auctioned.
- */
-export function new_auction(
-  value: Omit<types.polkadot_runtime_common.auctions.pallet.Call.new_auction, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Auctions", value: { ...value, type: "new_auction" } }
 }

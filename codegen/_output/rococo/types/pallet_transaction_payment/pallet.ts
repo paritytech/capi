@@ -1,10 +1,9 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $event: $.Codec<types.pallet_transaction_payment.pallet.Event> = _codec.$38
+import type * as types from "../mod.ts"
 
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
+
 export type Event = types.pallet_transaction_payment.pallet.Event.TransactionFeePaid
 export namespace Event {
   /**

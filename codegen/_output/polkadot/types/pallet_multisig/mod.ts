@@ -1,12 +1,8 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
+import type * as types from "../mod.ts"
 
 export * as pallet from "./pallet.ts"
-
-export const $multisig: $.Codec<types.pallet_multisig.Multisig> = _codec.$589
-
-export const $timepoint: $.Codec<types.pallet_multisig.Timepoint> = _codec.$82
 
 export interface Multisig {
   when: types.pallet_multisig.Timepoint

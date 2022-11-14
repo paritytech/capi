@@ -1,14 +1,9 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $call: $.Codec<types.pallet_treasury.pallet.Call> = _codec.$244
-
-export const $error: $.Codec<types.pallet_treasury.pallet.Error> = _codec.$561
-
-export const $event: $.Codec<types.pallet_treasury.pallet.Event> = _codec.$71
+import type * as types from "../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
+
 export type Call =
   | types.pallet_treasury.pallet.Call.propose_spend
   | types.pallet_treasury.pallet.Call.reject_proposal
@@ -186,16 +181,16 @@ export namespace Call {
     return { type: "remove_approval", ...value }
   }
 }
-
 /** Error for the treasury pallet. */
+
 export type Error =
   | "InsufficientProposersBalance"
   | "InvalidIndex"
   | "TooManyApprovals"
   | "InsufficientPermission"
   | "ProposalNotApproved"
-
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
+
 export type Event =
   | types.pallet_treasury.pallet.Event.Proposed
   | types.pallet_treasury.pallet.Event.Spending

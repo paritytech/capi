@@ -36,28 +36,6 @@ export function add_member(
 }
 
 /**
- * Swap out the sending member for some other key `new`.
- *
- * May only be called from `Signed` origin of a current member.
- *
- * Prime membership is passed from the origin account to `new`, if extant.
- */
-export function change_key(
-  value: Omit<types.pallet_membership.pallet.Call.change_key, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "TechnicalMembership", value: { ...value, type: "change_key" } }
-}
-
-/**
- * Remove the prime member if it exists.
- *
- * May only be called from `T::PrimeOrigin`.
- */
-export function clear_prime(): types.polkadot_runtime.RuntimeCall {
-  return { type: "TechnicalMembership", value: { type: "clear_prime" } }
-}
-
-/**
  * Remove a member `who` from the set.
  *
  * May only be called from `T::RemoveOrigin`.
@@ -66,6 +44,19 @@ export function remove_member(
   value: Omit<types.pallet_membership.pallet.Call.remove_member, "type">,
 ): types.polkadot_runtime.RuntimeCall {
   return { type: "TechnicalMembership", value: { ...value, type: "remove_member" } }
+}
+
+/**
+ * Swap out one member `remove` for another `add`.
+ *
+ * May only be called from `T::SwapOrigin`.
+ *
+ * Prime membership is *not* passed from `remove` to `add`, if extant.
+ */
+export function swap_member(
+  value: Omit<types.pallet_membership.pallet.Call.swap_member, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "TechnicalMembership", value: { ...value, type: "swap_member" } }
 }
 
 /**
@@ -81,6 +72,19 @@ export function reset_members(
 }
 
 /**
+ * Swap out the sending member for some other key `new`.
+ *
+ * May only be called from `Signed` origin of a current member.
+ *
+ * Prime membership is passed from the origin account to `new`, if extant.
+ */
+export function change_key(
+  value: Omit<types.pallet_membership.pallet.Call.change_key, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "TechnicalMembership", value: { ...value, type: "change_key" } }
+}
+
+/**
  * Set the prime member. Must be a current member.
  *
  * May only be called from `T::PrimeOrigin`.
@@ -92,14 +96,10 @@ export function set_prime(
 }
 
 /**
- * Swap out one member `remove` for another `add`.
+ * Remove the prime member if it exists.
  *
- * May only be called from `T::SwapOrigin`.
- *
- * Prime membership is *not* passed from `remove` to `add`, if extant.
+ * May only be called from `T::PrimeOrigin`.
  */
-export function swap_member(
-  value: Omit<types.pallet_membership.pallet.Call.swap_member, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "TechnicalMembership", value: { ...value, type: "swap_member" } }
+export function clear_prime(): types.polkadot_runtime.RuntimeCall {
+  return { type: "TechnicalMembership", value: { type: "clear_prime" } }
 }

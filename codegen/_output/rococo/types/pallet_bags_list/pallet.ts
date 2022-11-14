@@ -1,14 +1,9 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $call: $.Codec<types.pallet_bags_list.pallet.Call> = _codec.$368
-
-export const $error: $.Codec<types.pallet_bags_list.pallet.Error> = _codec.$615
-
-export const $event: $.Codec<types.pallet_bags_list.pallet.Event> = _codec.$89
+import type * as types from "../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
+
 export type Call =
   | types.pallet_bags_list.pallet.Call.rebag
   | types.pallet_bags_list.pallet.Call.put_in_front_of
@@ -76,8 +71,8 @@ export namespace Call {
     return { type: "put_in_front_of", ...value }
   }
 }
-
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
+
 export type Error = types.pallet_bags_list.pallet.Error.List
 export namespace Error {
   /** A error in the list interface implementation. */
@@ -92,8 +87,8 @@ export namespace Error {
     return { type: "List", value }
   }
 }
-
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
+
 export type Event =
   | types.pallet_bags_list.pallet.Event.Rebagged
   | types.pallet_bags_list.pallet.Event.ScoreUpdated

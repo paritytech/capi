@@ -1,8 +1,6 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
-
-export const $header: $.Codec<types.sp_runtime.generic.header.Header> = _codec.$187
+import type * as types from "../../mod.ts"
 
 export interface Header {
   parent_hash: types.primitive_types.H256

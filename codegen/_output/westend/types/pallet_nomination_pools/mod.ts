@@ -1,25 +1,9 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
+import type * as types from "../mod.ts"
 
 export * as ConfigOp from "./ConfigOp/mod.ts"
 export * as pallet from "./pallet.ts"
-
-export const $bondExtra: $.Codec<types.pallet_nomination_pools.BondExtra> = _codec.$370
-
-export const $bondedPoolInner: $.Codec<types.pallet_nomination_pools.BondedPoolInner> = _codec.$622
-
-export const $poolMember: $.Codec<types.pallet_nomination_pools.PoolMember> = _codec.$617
-
-export const $poolRoles: $.Codec<types.pallet_nomination_pools.PoolRoles> = _codec.$623
-
-export const $poolState: $.Codec<types.pallet_nomination_pools.PoolState> = _codec.$91
-
-export const $rewardPool: $.Codec<types.pallet_nomination_pools.RewardPool> = _codec.$624
-
-export const $subPools: $.Codec<types.pallet_nomination_pools.SubPools> = _codec.$625
-
-export const $unbondPool: $.Codec<types.pallet_nomination_pools.UnbondPool> = _codec.$626
 
 export type BondExtra =
   | types.pallet_nomination_pools.BondExtra.FreeBalance

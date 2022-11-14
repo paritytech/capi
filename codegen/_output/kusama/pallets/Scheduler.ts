@@ -2,6 +2,16 @@ import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
+export const IncompleteSince = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "Scheduler",
+  "IncompleteSince",
+  $.tuple(),
+  _codec.$4,
+)
+
 /** Items to be executed, indexed by the block number that they should be executed on. */
 export const Agenda = new C.fluent.Storage(
   client,
@@ -11,16 +21,6 @@ export const Agenda = new C.fluent.Storage(
   "Agenda",
   $.tuple(_codec.$4),
   _codec.$177,
-)
-
-export const IncompleteSince = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Optional",
-  "Scheduler",
-  "IncompleteSince",
-  $.tuple(),
-  _codec.$4,
 )
 
 /**
@@ -39,6 +39,13 @@ export const Lookup = new C.fluent.Storage(
   _codec.$30,
 )
 
+/** Anonymously schedule a task. */
+export function schedule(
+  value: Omit<types.pallet_scheduler.pallet.Call.schedule, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Scheduler", value: { ...value, type: "schedule" } }
+}
+
 /** Cancel an anonymously scheduled task. */
 export function cancel(
   value: Omit<types.pallet_scheduler.pallet.Call.cancel, "type">,
@@ -46,18 +53,18 @@ export function cancel(
   return { type: "Scheduler", value: { ...value, type: "cancel" } }
 }
 
+/** Schedule a named task. */
+export function schedule_named(
+  value: Omit<types.pallet_scheduler.pallet.Call.schedule_named, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Scheduler", value: { ...value, type: "schedule_named" } }
+}
+
 /** Cancel a named scheduled task. */
 export function cancel_named(
   value: Omit<types.pallet_scheduler.pallet.Call.cancel_named, "type">,
 ): types.polkadot_runtime.RuntimeCall {
   return { type: "Scheduler", value: { ...value, type: "cancel_named" } }
-}
-
-/** Anonymously schedule a task. */
-export function schedule(
-  value: Omit<types.pallet_scheduler.pallet.Call.schedule, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Scheduler", value: { ...value, type: "schedule" } }
 }
 
 /**
@@ -71,13 +78,6 @@ export function schedule_after(
   value: Omit<types.pallet_scheduler.pallet.Call.schedule_after, "type">,
 ): types.polkadot_runtime.RuntimeCall {
   return { type: "Scheduler", value: { ...value, type: "schedule_after" } }
-}
-
-/** Schedule a named task. */
-export function schedule_named(
-  value: Omit<types.pallet_scheduler.pallet.Call.schedule_named, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Scheduler", value: { ...value, type: "schedule_named" } }
 }
 
 /**

@@ -1,16 +1,6 @@
 import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
-
-/** A vector of reports of the same kind that happened at the same time slot. */
-export const ConcurrentReportsIndex = new C.fluent.Storage(
-  client,
-  "Map",
-  "Default",
-  "Offences",
-  "ConcurrentReportsIndex",
-  _codec.$510,
-  _codec.$157,
-)
+import type * as types from "../types/mod.ts"
 
 /** The primary structure that holds all offence records keyed by report identifiers. */
 export const Reports = new C.fluent.Storage(
@@ -21,6 +11,17 @@ export const Reports = new C.fluent.Storage(
   "Reports",
   $.tuple(_codec.$11),
   _codec.$509,
+)
+
+/** A vector of reports of the same kind that happened at the same time slot. */
+export const ConcurrentReportsIndex = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Offences",
+  "ConcurrentReportsIndex",
+  _codec.$510,
+  _codec.$157,
 )
 
 /**

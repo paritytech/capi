@@ -1,11 +1,8 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
+import type * as types from "../../mod.ts"
 
 export * as pallet from "./pallet.ts"
-
-export const $paraInfo: $.Codec<types.polkadot_runtime_common.paras_registrar.ParaInfo> =
-  _codec.$701
 
 export interface ParaInfo {
   manager: types.sp_core.crypto.AccountId32

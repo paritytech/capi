@@ -2,6 +2,32 @@ import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
+/** The current "head of the queue" being unstaked. */
+export const Head = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "FastUnstake",
+  "Head",
+  $.tuple(),
+  _codec.$634,
+)
+
+/**
+ *  The map of all accounts wishing to be unstaked.
+ *
+ *  Keeps track of `AccountId` wishing to unstake and it's corresponding deposit.
+ */
+export const Queue = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "FastUnstake",
+  "Queue",
+  $.tuple(_codec.$0),
+  _codec.$6,
+)
+
 /** Counter for the related counted storage map */
 export const CounterForQueue = new C.fluent.Storage(
   client,
@@ -31,56 +57,6 @@ export const ErasToCheckPerBlock = new C.fluent.Storage(
   _codec.$4,
 )
 
-/** The current "head of the queue" being unstaked. */
-export const Head = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Optional",
-  "FastUnstake",
-  "Head",
-  $.tuple(),
-  _codec.$634,
-)
-
-/**
- *  The map of all accounts wishing to be unstaked.
- *
- *  Keeps track of `AccountId` wishing to unstake and it's corresponding deposit.
- */
-export const Queue = new C.fluent.Storage(
-  client,
-  "Map",
-  "Optional",
-  "FastUnstake",
-  "Queue",
-  $.tuple(_codec.$0),
-  _codec.$6,
-)
-
-/**
- * Control the operation of this pallet.
- *
- * Dispatch origin must be signed by the [`Config::ControlOrigin`].
- */
-export function control(
-  value: Omit<types.pallet_fast_unstake.pallet.Call.control, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "FastUnstake", value: { ...value, type: "control" } }
-}
-
-/**
- * Deregister oneself from the fast-unstake.
- *
- * This is useful if one is registered, they are still waiting, and they change their mind.
- *
- * Note that the associated stash is still fully unbonded and chilled as a consequence of
- * calling `register_fast_unstake`. This should probably be followed by a call to
- * `Staking::rebond`.
- */
-export function deregister(): types.polkadot_runtime.RuntimeCall {
-  return { type: "FastUnstake", value: { type: "deregister" } }
-}
-
 /**
  * Register oneself for fast-unstake.
  *
@@ -103,4 +79,28 @@ export function deregister(): types.polkadot_runtime.RuntimeCall {
  */
 export function register_fast_unstake(): types.polkadot_runtime.RuntimeCall {
   return { type: "FastUnstake", value: { type: "register_fast_unstake" } }
+}
+
+/**
+ * Deregister oneself from the fast-unstake.
+ *
+ * This is useful if one is registered, they are still waiting, and they change their mind.
+ *
+ * Note that the associated stash is still fully unbonded and chilled as a consequence of
+ * calling `register_fast_unstake`. This should probably be followed by a call to
+ * `Staking::rebond`.
+ */
+export function deregister(): types.polkadot_runtime.RuntimeCall {
+  return { type: "FastUnstake", value: { type: "deregister" } }
+}
+
+/**
+ * Control the operation of this pallet.
+ *
+ * Dispatch origin must be signed by the [`Config::ControlOrigin`].
+ */
+export function control(
+  value: Omit<types.pallet_fast_unstake.pallet.Call.control, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "FastUnstake", value: { ...value, type: "control" } }
 }

@@ -1,16 +1,9 @@
 import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $call: $.Codec<types.pallet_fast_unstake.pallet.Call> = _codec.$374
-
-export const $error: $.Codec<types.pallet_fast_unstake.pallet.Error> = _codec.$637
-
-export const $event: $.Codec<types.pallet_fast_unstake.pallet.Event> = _codec.$93
-
-export const $maxChecking: $.Codec<types.pallet_fast_unstake.pallet.MaxChecking> = _codec.$635
+import type * as types from "../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
+
 export type Call =
   | types.pallet_fast_unstake.pallet.Call.register_fast_unstake
   | types.pallet_fast_unstake.pallet.Call.deregister
@@ -106,8 +99,8 @@ export namespace Call {
     return { type: "control", ...value }
   }
 }
-
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
+
 export type Error =
   | "NotController"
   | "AlreadyQueued"
@@ -115,8 +108,8 @@ export type Error =
   | "NotQueued"
   | "AlreadyHead"
   | "CallNotAllowed"
-
 /** The events of this pallet. */
+
 export type Event =
   | types.pallet_fast_unstake.pallet.Event.Unstaked
   | types.pallet_fast_unstake.pallet.Event.Slashed
@@ -187,8 +180,8 @@ export namespace Event {
   }
 }
 
+export type MaxChecking = null
+
 export function MaxChecking() {
   return null
 }
-
-export type MaxChecking = null

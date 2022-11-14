@@ -1,8 +1,6 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
-
-export const $bounded: $.Codec<types.frame_support.traits.preimages.Bounded> = _codec.$180
+import type * as types from "../../mod.ts"
 
 export type Bounded =
   | types.frame_support.traits.preimages.Bounded.Legacy

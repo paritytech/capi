@@ -40,32 +40,31 @@ export function claim(
 }
 
 /**
- * Force an index to an account. This doesn't require a deposit. If the index is already
- * held, then any deposit is reimbursed to its current owner.
+ * Assign an index already owned by the sender to another account. The balance reservation
+ * is effectively transferred to the new account.
  *
- * The dispatch origin for this call must be _Root_.
+ * The dispatch origin for this call must be _Signed_.
  *
- * - `index`: the index to be (re-)assigned.
+ * - `index`: the index to be re-assigned. This must be owned by the sender.
  * - `new`: the new owner of the index. This function is a no-op if it is equal to sender.
- * - `freeze`: if set to `true`, will freeze the index so it cannot be transferred.
  *
  * Emits `IndexAssigned` if successful.
  *
  * # <weight>
  * - `O(1)`.
  * - One storage mutation (codec `O(1)`).
- * - Up to one reserve operation.
+ * - One transfer operation.
  * - One event.
  * -------------------
  * - DB Weight:
- *    - Reads: Indices Accounts, System Account (original owner)
- *    - Writes: Indices Accounts, System Account (original owner)
+ *    - Reads: Indices Accounts, System Account (recipient)
+ *    - Writes: Indices Accounts, System Account (recipient)
  * # </weight>
  */
-export function force_transfer(
-  value: Omit<types.pallet_indices.pallet.Call.force_transfer, "type">,
+export function transfer(
+  value: Omit<types.pallet_indices.pallet.Call.transfer, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Indices", value: { ...value, type: "force_transfer" } }
+  return { type: "Indices", value: { ...value, type: "transfer" } }
 }
 
 /**
@@ -95,6 +94,35 @@ export function free(
 }
 
 /**
+ * Force an index to an account. This doesn't require a deposit. If the index is already
+ * held, then any deposit is reimbursed to its current owner.
+ *
+ * The dispatch origin for this call must be _Root_.
+ *
+ * - `index`: the index to be (re-)assigned.
+ * - `new`: the new owner of the index. This function is a no-op if it is equal to sender.
+ * - `freeze`: if set to `true`, will freeze the index so it cannot be transferred.
+ *
+ * Emits `IndexAssigned` if successful.
+ *
+ * # <weight>
+ * - `O(1)`.
+ * - One storage mutation (codec `O(1)`).
+ * - Up to one reserve operation.
+ * - One event.
+ * -------------------
+ * - DB Weight:
+ *    - Reads: Indices Accounts, System Account (original owner)
+ *    - Writes: Indices Accounts, System Account (original owner)
+ * # </weight>
+ */
+export function force_transfer(
+  value: Omit<types.pallet_indices.pallet.Call.force_transfer, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Indices", value: { ...value, type: "force_transfer" } }
+}
+
+/**
  * Freeze an index so it will always point to the sender account. This consumes the
  * deposit.
  *
@@ -118,32 +146,4 @@ export function freeze(
   value: Omit<types.pallet_indices.pallet.Call.freeze, "type">,
 ): types.polkadot_runtime.RuntimeCall {
   return { type: "Indices", value: { ...value, type: "freeze" } }
-}
-
-/**
- * Assign an index already owned by the sender to another account. The balance reservation
- * is effectively transferred to the new account.
- *
- * The dispatch origin for this call must be _Signed_.
- *
- * - `index`: the index to be re-assigned. This must be owned by the sender.
- * - `new`: the new owner of the index. This function is a no-op if it is equal to sender.
- *
- * Emits `IndexAssigned` if successful.
- *
- * # <weight>
- * - `O(1)`.
- * - One storage mutation (codec `O(1)`).
- * - One transfer operation.
- * - One event.
- * -------------------
- * - DB Weight:
- *    - Reads: Indices Accounts, System Account (recipient)
- *    - Writes: Indices Accounts, System Account (recipient)
- * # </weight>
- */
-export function transfer(
-  value: Omit<types.pallet_indices.pallet.Call.transfer, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Indices", value: { ...value, type: "transfer" } }
 }

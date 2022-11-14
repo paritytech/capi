@@ -1,17 +1,9 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $call: $.Codec<types.pallet_nomination_pools.pallet.Call> = _codec.$369
-
-export const $defensiveError: $.Codec<types.pallet_nomination_pools.pallet.DefensiveError> =
-  _codec.$633
-
-export const $error: $.Codec<types.pallet_nomination_pools.pallet.Error> = _codec.$632
-
-export const $event: $.Codec<types.pallet_nomination_pools.pallet.Event> = _codec.$90
+import type * as types from "../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
+
 export type Call =
   | types.pallet_nomination_pools.pallet.Call.join
   | types.pallet_nomination_pools.pallet.Call.bond_extra
@@ -492,8 +484,8 @@ export type DefensiveError =
   | "RewardPoolNotFound"
   | "SubPoolsNotFound"
   | "BondedStashKilledPrematurely"
-
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
+
 export type Error =
   | types.pallet_nomination_pools.pallet.Error.PoolNotFound
   | types.pallet_nomination_pools.pallet.Error.PoolMemberNotFound
@@ -725,8 +717,8 @@ export namespace Error {
     return { type: "PartialUnbondNotAllowedPermissionlessly" }
   }
 }
-
 /** Events of this pallet. */
+
 export type Event =
   | types.pallet_nomination_pools.pallet.Event.Created
   | types.pallet_nomination_pools.pallet.Event.Bonded

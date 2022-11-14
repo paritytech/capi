@@ -1,10 +1,6 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $accountId32: $.Codec<types.sp_core.crypto.AccountId32> = _codec.$0
-
-export const $keyTypeId: $.Codec<types.sp_core.crypto.KeyTypeId> = _codec.$514
+import type * as types from "../mod.ts"
 
 export type AccountId32 = Uint8Array
 

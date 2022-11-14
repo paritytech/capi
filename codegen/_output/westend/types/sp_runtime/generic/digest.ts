@@ -1,10 +1,6 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
-
-export const $digest: $.Codec<types.sp_runtime.generic.digest.Digest> = _codec.$13
-
-export const $digestItem: $.Codec<types.sp_runtime.generic.digest.DigestItem> = _codec.$15
+import type * as types from "../../mod.ts"
 
 export interface Digest {
   logs: Array<types.sp_runtime.generic.digest.DigestItem>

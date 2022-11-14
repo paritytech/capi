@@ -1,5 +1,17 @@
 import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
+import type * as types from "../types/mod.ts"
+
+/** The current session index. */
+export const CurrentSessionIndex = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "ParasShared",
+  "CurrentSessionIndex",
+  $.tuple(),
+  _codec.$4,
+)
 
 /**
  *  All the validators actively participating in parachain consensus.
@@ -27,15 +39,4 @@ export const ActiveValidatorKeys = new C.fluent.Storage(
   "ActiveValidatorKeys",
   $.tuple(),
   _codec.$643,
-)
-
-/** The current session index. */
-export const CurrentSessionIndex = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Default",
-  "ParasShared",
-  "CurrentSessionIndex",
-  $.tuple(),
-  _codec.$4,
 )

@@ -2,90 +2,46 @@ import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
-/** Storage for bonded pools. */
-export const BondedPools = new C.fluent.Storage(
+/** Minimum amount to bond to join a pool. */
+export const MinJoinBond = new C.fluent.Storage(
   client,
-  "Map",
+  "Plain",
+  "Default",
+  "NominationPools",
+  "MinJoinBond",
+  $.tuple(),
+  _codec.$6,
+)
+
+/**
+ *  Minimum bond required to create a pool.
+ *
+ *  This is the amount that the depositor must put as their initial stake in the pool, as an
+ *  indication of "skin in the game".
+ *
+ *  This is the value that will always exist in the staking ledger of the pool bonded account
+ *  while all other accounts leave.
+ */
+export const MinCreateBond = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "NominationPools",
+  "MinCreateBond",
+  $.tuple(),
+  _codec.$6,
+)
+
+/**
+ *  Maximum number of nomination pools that can exist. If `None`, then an unbounded number of
+ *  pools can exist.
+ */
+export const MaxPools = new C.fluent.Storage(
+  client,
+  "Plain",
   "Optional",
   "NominationPools",
-  "BondedPools",
-  $.tuple(_codec.$4),
-  _codec.$622,
-)
-
-/** Counter for the related counted storage map */
-export const CounterForBondedPools = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Default",
-  "NominationPools",
-  "CounterForBondedPools",
-  $.tuple(),
-  _codec.$4,
-)
-
-/** Counter for the related counted storage map */
-export const CounterForMetadata = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Default",
-  "NominationPools",
-  "CounterForMetadata",
-  $.tuple(),
-  _codec.$4,
-)
-
-/** Counter for the related counted storage map */
-export const CounterForPoolMembers = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Default",
-  "NominationPools",
-  "CounterForPoolMembers",
-  $.tuple(),
-  _codec.$4,
-)
-
-/** Counter for the related counted storage map */
-export const CounterForReversePoolIdLookup = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Default",
-  "NominationPools",
-  "CounterForReversePoolIdLookup",
-  $.tuple(),
-  _codec.$4,
-)
-
-/** Counter for the related counted storage map */
-export const CounterForRewardPools = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Default",
-  "NominationPools",
-  "CounterForRewardPools",
-  $.tuple(),
-  _codec.$4,
-)
-
-/** Counter for the related counted storage map */
-export const CounterForSubPoolsStorage = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Default",
-  "NominationPools",
-  "CounterForSubPoolsStorage",
-  $.tuple(),
-  _codec.$4,
-)
-
-/** Ever increasing number of all pools created so far. */
-export const LastPoolId = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Default",
-  "NominationPools",
-  "LastPoolId",
+  "MaxPools",
   $.tuple(),
   _codec.$4,
 )
@@ -118,16 +74,96 @@ export const MaxPoolMembersPerPool = new C.fluent.Storage(
   _codec.$4,
 )
 
-/**
- *  Maximum number of nomination pools that can exist. If `None`, then an unbounded number of
- *  pools can exist.
- */
-export const MaxPools = new C.fluent.Storage(
+/** Active members. */
+export const PoolMembers = new C.fluent.Storage(
   client,
-  "Plain",
+  "Map",
   "Optional",
   "NominationPools",
-  "MaxPools",
+  "PoolMembers",
+  $.tuple(_codec.$0),
+  _codec.$617,
+)
+
+/** Counter for the related counted storage map */
+export const CounterForPoolMembers = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "NominationPools",
+  "CounterForPoolMembers",
+  $.tuple(),
+  _codec.$4,
+)
+
+/** Storage for bonded pools. */
+export const BondedPools = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "NominationPools",
+  "BondedPools",
+  $.tuple(_codec.$4),
+  _codec.$622,
+)
+
+/** Counter for the related counted storage map */
+export const CounterForBondedPools = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "NominationPools",
+  "CounterForBondedPools",
+  $.tuple(),
+  _codec.$4,
+)
+
+/**
+ *  Reward pools. This is where there rewards for each pool accumulate. When a members payout
+ *  is claimed, the balance comes out fo the reward pool. Keyed by the bonded pools account.
+ */
+export const RewardPools = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "NominationPools",
+  "RewardPools",
+  $.tuple(_codec.$4),
+  _codec.$624,
+)
+
+/** Counter for the related counted storage map */
+export const CounterForRewardPools = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "NominationPools",
+  "CounterForRewardPools",
+  $.tuple(),
+  _codec.$4,
+)
+
+/**
+ *  Groups of unbonding pools. Each group of unbonding pools belongs to a bonded pool,
+ *  hence the name sub-pools. Keyed by the bonded pools account.
+ */
+export const SubPoolsStorage = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "NominationPools",
+  "SubPoolsStorage",
+  $.tuple(_codec.$4),
+  _codec.$625,
+)
+
+/** Counter for the related counted storage map */
+export const CounterForSubPoolsStorage = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "NominationPools",
+  "CounterForSubPoolsStorage",
   $.tuple(),
   _codec.$4,
 )
@@ -143,45 +179,26 @@ export const Metadata = new C.fluent.Storage(
   _codec.$631,
 )
 
-/**
- *  Minimum bond required to create a pool.
- *
- *  This is the amount that the depositor must put as their initial stake in the pool, as an
- *  indication of "skin in the game".
- *
- *  This is the value that will always exist in the staking ledger of the pool bonded account
- *  while all other accounts leave.
- */
-export const MinCreateBond = new C.fluent.Storage(
+/** Counter for the related counted storage map */
+export const CounterForMetadata = new C.fluent.Storage(
   client,
   "Plain",
   "Default",
   "NominationPools",
-  "MinCreateBond",
+  "CounterForMetadata",
   $.tuple(),
-  _codec.$6,
+  _codec.$4,
 )
 
-/** Minimum amount to bond to join a pool. */
-export const MinJoinBond = new C.fluent.Storage(
+/** Ever increasing number of all pools created so far. */
+export const LastPoolId = new C.fluent.Storage(
   client,
   "Plain",
   "Default",
   "NominationPools",
-  "MinJoinBond",
+  "LastPoolId",
   $.tuple(),
-  _codec.$6,
-)
-
-/** Active members. */
-export const PoolMembers = new C.fluent.Storage(
-  client,
-  "Map",
-  "Optional",
-  "NominationPools",
-  "PoolMembers",
-  $.tuple(_codec.$0),
-  _codec.$617,
+  _codec.$4,
 )
 
 /**
@@ -200,99 +217,16 @@ export const ReversePoolIdLookup = new C.fluent.Storage(
   _codec.$4,
 )
 
-/**
- *  Reward pools. This is where there rewards for each pool accumulate. When a members payout
- *  is claimed, the balance comes out fo the reward pool. Keyed by the bonded pools account.
- */
-export const RewardPools = new C.fluent.Storage(
+/** Counter for the related counted storage map */
+export const CounterForReversePoolIdLookup = new C.fluent.Storage(
   client,
-  "Map",
-  "Optional",
+  "Plain",
+  "Default",
   "NominationPools",
-  "RewardPools",
-  $.tuple(_codec.$4),
-  _codec.$624,
+  "CounterForReversePoolIdLookup",
+  $.tuple(),
+  _codec.$4,
 )
-
-/**
- *  Groups of unbonding pools. Each group of unbonding pools belongs to a bonded pool,
- *  hence the name sub-pools. Keyed by the bonded pools account.
- */
-export const SubPoolsStorage = new C.fluent.Storage(
-  client,
-  "Map",
-  "Optional",
-  "NominationPools",
-  "SubPoolsStorage",
-  $.tuple(_codec.$4),
-  _codec.$625,
-)
-
-/**
- * Bond `extra` more funds from `origin` into the pool to which they already belong.
- *
- * Additional funds can come from either the free balance of the account, of from the
- * accumulated rewards, see [`BondExtra`].
- *
- * Bonding extra funds implies an automatic payout of all pending rewards as well.
- */
-export function bond_extra(
-  value: Omit<types.pallet_nomination_pools.pallet.Call.bond_extra, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "NominationPools", value: { ...value, type: "bond_extra" } }
-}
-
-/**
- * Chill on behalf of the pool.
- *
- * The dispatch origin of this call must be signed by the pool nominator or the pool
- * root role, same as [`Pallet::nominate`].
- *
- * This directly forward the call to the staking pallet, on behalf of the pool bonded
- * account.
- */
-export function chill(
-  value: Omit<types.pallet_nomination_pools.pallet.Call.chill, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "NominationPools", value: { ...value, type: "chill" } }
-}
-
-/**
- * A bonded member can use this to claim their payout based on the rewards that the pool
- * has accumulated since their last claimed payout (OR since joining if this is there first
- * time claiming rewards). The payout will be transferred to the member's account.
- *
- * The member will earn rewards pro rata based on the members stake vs the sum of the
- * members in the pools stake. Rewards do not "expire".
- */
-export function claim_payout(): types.polkadot_runtime.RuntimeCall {
-  return { type: "NominationPools", value: { type: "claim_payout" } }
-}
-
-/**
- * Create a new delegation pool.
- *
- * # Arguments
- *
- * * `amount` - The amount of funds to delegate to the pool. This also acts of a sort of
- *   deposit since the pools creator cannot fully unbond funds until the pool is being
- *   destroyed.
- * * `index` - A disambiguation index for creating the account. Likely only useful when
- *   creating multiple pools in the same extrinsic.
- * * `root` - The account to set as [`PoolRoles::root`].
- * * `nominator` - The account to set as the [`PoolRoles::nominator`].
- * * `state_toggler` - The account to set as the [`PoolRoles::state_toggler`].
- *
- * # Note
- *
- * In addition to `amount`, the caller will transfer the existential deposit; so the caller
- * needs at have at least `amount + existential_deposit` transferrable.
- */
-export function create(
-  value: Omit<types.pallet_nomination_pools.pallet.Call.create, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "NominationPools", value: { ...value, type: "create" } }
-}
 
 /**
  * Stake funds with a pool. The amount to bond is transferred from the member to the
@@ -313,80 +247,29 @@ export function join(
 }
 
 /**
- * Nominate on behalf of the pool.
+ * Bond `extra` more funds from `origin` into the pool to which they already belong.
  *
- * The dispatch origin of this call must be signed by the pool nominator or the pool
- * root role.
+ * Additional funds can come from either the free balance of the account, of from the
+ * accumulated rewards, see [`BondExtra`].
  *
- * This directly forward the call to the staking pallet, on behalf of the pool bonded
- * account.
+ * Bonding extra funds implies an automatic payout of all pending rewards as well.
  */
-export function nominate(
-  value: Omit<types.pallet_nomination_pools.pallet.Call.nominate, "type">,
+export function bond_extra(
+  value: Omit<types.pallet_nomination_pools.pallet.Call.bond_extra, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "NominationPools", value: { ...value, type: "nominate" } }
+  return { type: "NominationPools", value: { ...value, type: "bond_extra" } }
 }
 
 /**
- * Call `withdraw_unbonded` for the pools account. This call can be made by any account.
+ * A bonded member can use this to claim their payout based on the rewards that the pool
+ * has accumulated since their last claimed payout (OR since joining if this is there first
+ * time claiming rewards). The payout will be transferred to the member's account.
  *
- * This is useful if their are too many unlocking chunks to call `unbond`, and some
- * can be cleared by withdrawing. In the case there are too many unlocking chunks, the user
- * would probably see an error like `NoMoreChunks` emitted from the staking system when
- * they attempt to unbond.
+ * The member will earn rewards pro rata based on the members stake vs the sum of the
+ * members in the pools stake. Rewards do not "expire".
  */
-export function pool_withdraw_unbonded(
-  value: Omit<types.pallet_nomination_pools.pallet.Call.pool_withdraw_unbonded, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "NominationPools", value: { ...value, type: "pool_withdraw_unbonded" } }
-}
-
-/**
- * Update configurations for the nomination pools. The origin for this call must be
- * Root.
- *
- * # Arguments
- *
- * * `min_join_bond` - Set [`MinJoinBond`].
- * * `min_create_bond` - Set [`MinCreateBond`].
- * * `max_pools` - Set [`MaxPools`].
- * * `max_members` - Set [`MaxPoolMembers`].
- * * `max_members_per_pool` - Set [`MaxPoolMembersPerPool`].
- */
-export function set_configs(
-  value: Omit<types.pallet_nomination_pools.pallet.Call.set_configs, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "NominationPools", value: { ...value, type: "set_configs" } }
-}
-
-/**
- * Set a new metadata for the pool.
- *
- * The dispatch origin of this call must be signed by the state toggler, or the root role
- * of the pool.
- */
-export function set_metadata(
-  value: Omit<types.pallet_nomination_pools.pallet.Call.set_metadata, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "NominationPools", value: { ...value, type: "set_metadata" } }
-}
-
-/**
- * Set a new state for the pool.
- *
- * If a pool is already in the `Destroying` state, then under no condition can its state
- * change again.
- *
- * The dispatch origin of this call must be either:
- *
- * 1. signed by the state toggler, or the root role of the pool,
- * 2. if the pool conditions to be open are NOT met (as described by `ok_to_be_open`), and
- *    then the state of the pool can be permissionlessly changed to `Destroying`.
- */
-export function set_state(
-  value: Omit<types.pallet_nomination_pools.pallet.Call.set_state, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "NominationPools", value: { ...value, type: "set_state" } }
+export function claim_payout(): types.polkadot_runtime.RuntimeCall {
+  return { type: "NominationPools", value: { type: "claim_payout" } }
 }
 
 /**
@@ -426,18 +309,17 @@ export function unbond(
 }
 
 /**
- * Update the roles of the pool.
+ * Call `withdraw_unbonded` for the pools account. This call can be made by any account.
  *
- * The root is the only entity that can change any of the roles, including itself,
- * excluding the depositor, who can never change.
- *
- * It emits an event, notifying UIs of the role change. This event is quite relevant to
- * most pool members and they should be informed of changes to pool roles.
+ * This is useful if their are too many unlocking chunks to call `unbond`, and some
+ * can be cleared by withdrawing. In the case there are too many unlocking chunks, the user
+ * would probably see an error like `NoMoreChunks` emitted from the staking system when
+ * they attempt to unbond.
  */
-export function update_roles(
-  value: Omit<types.pallet_nomination_pools.pallet.Call.update_roles, "type">,
+export function pool_withdraw_unbonded(
+  value: Omit<types.pallet_nomination_pools.pallet.Call.pool_withdraw_unbonded, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "NominationPools", value: { ...value, type: "update_roles" } }
+  return { type: "NominationPools", value: { ...value, type: "pool_withdraw_unbonded" } }
 }
 
 /**
@@ -465,4 +347,122 @@ export function withdraw_unbonded(
   value: Omit<types.pallet_nomination_pools.pallet.Call.withdraw_unbonded, "type">,
 ): types.polkadot_runtime.RuntimeCall {
   return { type: "NominationPools", value: { ...value, type: "withdraw_unbonded" } }
+}
+
+/**
+ * Create a new delegation pool.
+ *
+ * # Arguments
+ *
+ * * `amount` - The amount of funds to delegate to the pool. This also acts of a sort of
+ *   deposit since the pools creator cannot fully unbond funds until the pool is being
+ *   destroyed.
+ * * `index` - A disambiguation index for creating the account. Likely only useful when
+ *   creating multiple pools in the same extrinsic.
+ * * `root` - The account to set as [`PoolRoles::root`].
+ * * `nominator` - The account to set as the [`PoolRoles::nominator`].
+ * * `state_toggler` - The account to set as the [`PoolRoles::state_toggler`].
+ *
+ * # Note
+ *
+ * In addition to `amount`, the caller will transfer the existential deposit; so the caller
+ * needs at have at least `amount + existential_deposit` transferrable.
+ */
+export function create(
+  value: Omit<types.pallet_nomination_pools.pallet.Call.create, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "NominationPools", value: { ...value, type: "create" } }
+}
+
+/**
+ * Nominate on behalf of the pool.
+ *
+ * The dispatch origin of this call must be signed by the pool nominator or the pool
+ * root role.
+ *
+ * This directly forward the call to the staking pallet, on behalf of the pool bonded
+ * account.
+ */
+export function nominate(
+  value: Omit<types.pallet_nomination_pools.pallet.Call.nominate, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "NominationPools", value: { ...value, type: "nominate" } }
+}
+
+/**
+ * Set a new state for the pool.
+ *
+ * If a pool is already in the `Destroying` state, then under no condition can its state
+ * change again.
+ *
+ * The dispatch origin of this call must be either:
+ *
+ * 1. signed by the state toggler, or the root role of the pool,
+ * 2. if the pool conditions to be open are NOT met (as described by `ok_to_be_open`), and
+ *    then the state of the pool can be permissionlessly changed to `Destroying`.
+ */
+export function set_state(
+  value: Omit<types.pallet_nomination_pools.pallet.Call.set_state, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "NominationPools", value: { ...value, type: "set_state" } }
+}
+
+/**
+ * Set a new metadata for the pool.
+ *
+ * The dispatch origin of this call must be signed by the state toggler, or the root role
+ * of the pool.
+ */
+export function set_metadata(
+  value: Omit<types.pallet_nomination_pools.pallet.Call.set_metadata, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "NominationPools", value: { ...value, type: "set_metadata" } }
+}
+
+/**
+ * Update configurations for the nomination pools. The origin for this call must be
+ * Root.
+ *
+ * # Arguments
+ *
+ * * `min_join_bond` - Set [`MinJoinBond`].
+ * * `min_create_bond` - Set [`MinCreateBond`].
+ * * `max_pools` - Set [`MaxPools`].
+ * * `max_members` - Set [`MaxPoolMembers`].
+ * * `max_members_per_pool` - Set [`MaxPoolMembersPerPool`].
+ */
+export function set_configs(
+  value: Omit<types.pallet_nomination_pools.pallet.Call.set_configs, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "NominationPools", value: { ...value, type: "set_configs" } }
+}
+
+/**
+ * Update the roles of the pool.
+ *
+ * The root is the only entity that can change any of the roles, including itself,
+ * excluding the depositor, who can never change.
+ *
+ * It emits an event, notifying UIs of the role change. This event is quite relevant to
+ * most pool members and they should be informed of changes to pool roles.
+ */
+export function update_roles(
+  value: Omit<types.pallet_nomination_pools.pallet.Call.update_roles, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "NominationPools", value: { ...value, type: "update_roles" } }
+}
+
+/**
+ * Chill on behalf of the pool.
+ *
+ * The dispatch origin of this call must be signed by the pool nominator or the pool
+ * root role, same as [`Pallet::nominate`].
+ *
+ * This directly forward the call to the staking pallet, on behalf of the pool bonded
+ * account.
+ */
+export function chill(
+  value: Omit<types.pallet_nomination_pools.pallet.Call.chill, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "NominationPools", value: { ...value, type: "chill" } }
 }

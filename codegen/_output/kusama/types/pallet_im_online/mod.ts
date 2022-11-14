@@ -1,14 +1,9 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
+import type * as types from "../mod.ts"
 
 export * as pallet from "./pallet.ts"
 export * as sr25519 from "./sr25519/mod.ts"
-
-export const $boundedOpaqueNetworkState: $.Codec<types.pallet_im_online.BoundedOpaqueNetworkState> =
-  _codec.$523
-
-export const $heartbeat: $.Codec<types.pallet_im_online.Heartbeat> = _codec.$228
 
 export interface BoundedOpaqueNetworkState {
   peer_id: Uint8Array

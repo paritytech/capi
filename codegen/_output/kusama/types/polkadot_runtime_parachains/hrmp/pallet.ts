@@ -1,14 +1,9 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
-
-export const $call: $.Codec<types.polkadot_runtime_parachains.hrmp.pallet.Call> = _codec.$409
-
-export const $error: $.Codec<types.polkadot_runtime_parachains.hrmp.pallet.Error> = _codec.$694
-
-export const $event: $.Codec<types.polkadot_runtime_parachains.hrmp.pallet.Event> = _codec.$111
+import type * as types from "../../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
+
 export type Call =
   | types.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_init_open_channel
   | types.polkadot_runtime_parachains.hrmp.pallet.Call.hrmp_accept_open_channel
@@ -241,8 +236,8 @@ export namespace Call {
     return { type: "force_open_hrmp_channel", ...value }
   }
 }
-
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
+
 export type Error =
   | "OpenHrmpChannelToSelf"
   | "OpenHrmpChannelInvalidRecipient"
@@ -263,8 +258,8 @@ export type Error =
   | "OpenHrmpChannelDoesntExist"
   | "OpenHrmpChannelAlreadyConfirmed"
   | "WrongWitness"
-
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
+
 export type Event =
   | types.polkadot_runtime_parachains.hrmp.pallet.Event.OpenChannelRequested
   | types.polkadot_runtime_parachains.hrmp.pallet.Event.OpenChannelCanceled

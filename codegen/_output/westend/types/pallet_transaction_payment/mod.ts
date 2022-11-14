@@ -1,9 +1,15 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
+import type * as types from "../mod.ts"
 
 export * as pallet from "./pallet.ts"
 
-export const $releases: $.Codec<types.pallet_transaction_payment.Releases> = _codec.$480
+export type ChargeTransactionPayment = types.Compact<types.u128>
+
+export function ChargeTransactionPayment(
+  value: types.pallet_transaction_payment.ChargeTransactionPayment,
+) {
+  return value
+}
 
 export type Releases = "V1Ancient" | "V2"

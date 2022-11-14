@@ -1,14 +1,9 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $call: $.Codec<types.pallet_preimage.pallet.Call> = _codec.$184
-
-export const $error: $.Codec<types.pallet_preimage.pallet.Error> = _codec.$455
-
-export const $event: $.Codec<types.pallet_preimage.pallet.Event> = _codec.$34
+import type * as types from "../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
+
 export type Call =
   | types.pallet_preimage.pallet.Call.note_preimage
   | types.pallet_preimage.pallet.Call.unnote_preimage
@@ -102,8 +97,8 @@ export namespace Call {
     return { type: "unrequest_preimage", ...value }
   }
 }
-
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
+
 export type Error =
   | "TooBig"
   | "AlreadyNoted"
@@ -111,8 +106,8 @@ export type Error =
   | "NotNoted"
   | "Requested"
   | "NotRequested"
-
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
+
 export type Event =
   | types.pallet_preimage.pallet.Event.Noted
   | types.pallet_preimage.pallet.Event.Requested

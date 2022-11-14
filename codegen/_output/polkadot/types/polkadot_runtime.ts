@@ -1,21 +1,6 @@
-import { $ } from "../capi.ts"
+import { $, C } from "../capi.ts"
 import * as _codec from "../codecs.ts"
-import type * as types from "../types/mod.ts"
-
-export const $nposCompactSolution16: $.Codec<types.polkadot_runtime.NposCompactSolution16> =
-  _codec.$312
-
-export const $originCaller: $.Codec<types.polkadot_runtime.OriginCaller> = _codec.$256
-
-export const $proxyType: $.Codec<types.polkadot_runtime.ProxyType> = _codec.$79
-
-export const $runtime: $.Codec<types.polkadot_runtime.Runtime> = _codec.$737
-
-export const $runtimeCall: $.Codec<types.polkadot_runtime.RuntimeCall> = _codec.$181
-
-export const $runtimeEvent: $.Codec<types.polkadot_runtime.RuntimeEvent> = _codec.$19
-
-export const $sessionKeys: $.Codec<types.polkadot_runtime.SessionKeys> = _codec.$212
+import type * as types from "./mod.ts"
 
 export interface NposCompactSolution16 {
   votes1: Array<[types.Compact<types.u32>, types.Compact<types.u16>]>
@@ -336,11 +321,11 @@ export type ProxyType =
   | "CancelProxy"
   | "Auction"
 
+export type Runtime = null
+
 export function Runtime() {
   return null
 }
-
-export type Runtime = null
 
 export type RuntimeCall =
   | types.polkadot_runtime.RuntimeCall.System

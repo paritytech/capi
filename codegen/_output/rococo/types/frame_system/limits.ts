@@ -1,12 +1,6 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $blockLength: $.Codec<types.frame_system.limits.BlockLength> = _codec.$169
-
-export const $blockWeights: $.Codec<types.frame_system.limits.BlockWeights> = _codec.$165
-
-export const $weightsPerClass: $.Codec<types.frame_system.limits.WeightsPerClass> = _codec.$167
+import type * as types from "../mod.ts"
 
 export interface BlockLength {
   max: types.frame_support.dispatch.PerDispatchClass.$$u32

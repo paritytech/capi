@@ -1,10 +1,6 @@
-import { $ } from "../../../../capi.ts"
+import { $, C } from "../../../../capi.ts"
 import * as _codec from "../../../../codecs.ts"
-import type * as types from "../../../../types/mod.ts"
-
-export const $accountId32: $.Codec<
-  types.pallet_nomination_pools.ConfigOp.$$sp_core.crypto.AccountId32
-> = _codec.$373
+import type * as types from "../../../mod.ts"
 
 export type AccountId32 =
   | types.pallet_nomination_pools.ConfigOp.$$sp_core.crypto.AccountId32.Noop

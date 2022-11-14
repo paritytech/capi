@@ -2,6 +2,20 @@ import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
+/**
+ *  The last pruned session, if any. All data stored by this module
+ *  references sessions.
+ */
+export const LastPrunedSession = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "ParasDisputes",
+  "LastPrunedSession",
+  $.tuple(),
+  _codec.$4,
+)
+
 /** All ongoing or concluded disputes for the last several sessions. */
 export const Disputes = new C.fluent.Storage(
   client,
@@ -11,22 +25,6 @@ export const Disputes = new C.fluent.Storage(
   "Disputes",
   _codec.$698,
   _codec.$699,
-)
-
-/**
- *  Whether the chain is frozen. Starts as `None`. When this is `Some`,
- *  the chain will not accept any new parachain blocks for backing or inclusion,
- *  and its value indicates the last valid block number in the chain.
- *  It can only be set back to `None` by governance intervention.
- */
-export const Frozen = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Default",
-  "ParasDisputes",
-  "Frozen",
-  $.tuple(),
-  _codec.$236,
 )
 
 /**
@@ -40,20 +38,6 @@ export const Included = new C.fluent.Storage(
   "ParasDisputes",
   "Included",
   _codec.$698,
-  _codec.$4,
-)
-
-/**
- *  The last pruned session, if any. All data stored by this module
- *  references sessions.
- */
-export const LastPrunedSession = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Optional",
-  "ParasDisputes",
-  "LastPrunedSession",
-  $.tuple(),
   _codec.$4,
 )
 
@@ -72,6 +56,22 @@ export const SpamSlots = new C.fluent.Storage(
   "SpamSlots",
   $.tuple(_codec.$4),
   _codec.$94,
+)
+
+/**
+ *  Whether the chain is frozen. Starts as `None`. When this is `Some`,
+ *  the chain will not accept any new parachain blocks for backing or inclusion,
+ *  and its value indicates the last valid block number in the chain.
+ *  It can only be set back to `None` by governance intervention.
+ */
+export const Frozen = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "ParasDisputes",
+  "Frozen",
+  $.tuple(),
+  _codec.$236,
 )
 
 export function force_unfreeze(): types.polkadot_runtime.RuntimeCall {

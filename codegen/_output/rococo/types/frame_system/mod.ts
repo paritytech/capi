@@ -1,19 +1,10 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
+import type * as types from "../mod.ts"
 
 export * as extensions from "./extensions/mod.ts"
 export * as limits from "./limits.ts"
 export * as pallet from "./pallet.ts"
-
-export const $accountInfo: $.Codec<types.frame_system.AccountInfo> = _codec.$3
-
-export const $eventRecord: $.Codec<types.frame_system.EventRecord> = _codec.$18
-
-export const $lastRuntimeUpgradeInfo: $.Codec<types.frame_system.LastRuntimeUpgradeInfo> =
-  _codec.$159
-
-export const $phase: $.Codec<types.frame_system.Phase> = _codec.$156
 
 export interface AccountInfo {
   nonce: types.u32

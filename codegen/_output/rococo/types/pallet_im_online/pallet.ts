@@ -1,14 +1,9 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $call: $.Codec<types.pallet_im_online.pallet.Call> = _codec.$227
-
-export const $error: $.Codec<types.pallet_im_online.pallet.Error> = _codec.$527
-
-export const $event: $.Codec<types.pallet_im_online.pallet.Event> = _codec.$52
+import type * as types from "../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
+
 export type Call = types.pallet_im_online.pallet.Call.heartbeat
 export namespace Call {
   /**
@@ -44,11 +39,11 @@ export namespace Call {
     return { type: "heartbeat", ...value }
   }
 }
-
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
-export type Error = "InvalidKey" | "DuplicatedHeartbeat"
 
+export type Error = "InvalidKey" | "DuplicatedHeartbeat"
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
+
 export type Event =
   | types.pallet_im_online.pallet.Event.HeartbeatReceived
   | types.pallet_im_online.pallet.Event.AllGood

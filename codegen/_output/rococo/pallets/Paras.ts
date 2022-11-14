@@ -2,109 +2,31 @@ import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
-/** The actions to perform during the start of a specific session index. */
-export const ActionsQueue = new C.fluent.Storage(
+/**
+ *  All currently active PVF pre-checking votes.
+ *
+ *  Invariant:
+ *  - There are no PVF pre-checking votes that exists in list but not in the set and vice versa.
+ */
+export const PvfActiveVoteMap = new C.fluent.Storage(
   client,
   "Map",
+  "Optional",
+  "Paras",
+  "PvfActiveVoteMap",
+  $.tuple(_codec.$103),
+  _codec.$666,
+)
+
+/** The list of all currently active PVF votes. Auxiliary to `PvfActiveVoteMap`. */
+export const PvfActiveVoteList = new C.fluent.Storage(
+  client,
+  "Plain",
   "Default",
   "Paras",
-  "ActionsQueue",
-  $.tuple(_codec.$4),
-  _codec.$662,
-)
-
-/**
- *  Validation code stored by its hash.
- *
- *  This storage is consistent with [`FutureCodeHash`], [`CurrentCodeHash`] and
- *  [`PastCodeHash`].
- */
-export const CodeByHash = new C.fluent.Storage(
-  client,
-  "Map",
-  "Optional",
-  "Paras",
-  "CodeByHash",
-  $.tuple(_codec.$103),
-  _codec.$394,
-)
-
-/** The number of reference on the validation code in [`CodeByHash`] storage. */
-export const CodeByHashRefs = new C.fluent.Storage(
-  client,
-  "Map",
-  "Default",
-  "Paras",
-  "CodeByHashRefs",
-  $.tuple(_codec.$103),
-  _codec.$4,
-)
-
-/**
- *  The validation code hash of every live para.
- *
- *  Corresponding code can be retrieved with [`CodeByHash`].
- */
-export const CurrentCodeHash = new C.fluent.Storage(
-  client,
-  "Map",
-  "Optional",
-  "Paras",
-  "CurrentCodeHash",
-  $.tuple(_codec.$98),
-  _codec.$103,
-)
-
-/**
- *  The actual future code hash of a para.
- *
- *  Corresponding code can be retrieved with [`CodeByHash`].
- */
-export const FutureCodeHash = new C.fluent.Storage(
-  client,
-  "Map",
-  "Optional",
-  "Paras",
-  "FutureCodeHash",
-  $.tuple(_codec.$98),
-  _codec.$103,
-)
-
-/**
- *  The block number at which the planned code change is expected for a para.
- *  The change will be applied after the first parablock for this ID included which executes
- *  in the context of a relay chain block with a number >= `expected_at`.
- */
-export const FutureCodeUpgrades = new C.fluent.Storage(
-  client,
-  "Map",
-  "Optional",
-  "Paras",
-  "FutureCodeUpgrades",
-  $.tuple(_codec.$98),
-  _codec.$4,
-)
-
-/** The head-data of every registered para. */
-export const Heads = new C.fluent.Storage(
-  client,
-  "Map",
-  "Optional",
-  "Paras",
-  "Heads",
-  $.tuple(_codec.$98),
-  _codec.$104,
-)
-
-/** The current lifecycle of a all known Para IDs. */
-export const ParaLifecycles = new C.fluent.Storage(
-  client,
-  "Map",
-  "Optional",
-  "Paras",
-  "ParaLifecycles",
-  $.tuple(_codec.$98),
-  _codec.$670,
+  "PvfActiveVoteList",
+  $.tuple(),
+  _codec.$669,
 )
 
 /**
@@ -120,6 +42,43 @@ export const Parachains = new C.fluent.Storage(
   "Parachains",
   $.tuple(),
   _codec.$662,
+)
+
+/** The current lifecycle of a all known Para IDs. */
+export const ParaLifecycles = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Paras",
+  "ParaLifecycles",
+  $.tuple(_codec.$98),
+  _codec.$670,
+)
+
+/** The head-data of every registered para. */
+export const Heads = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Paras",
+  "Heads",
+  $.tuple(_codec.$98),
+  _codec.$104,
+)
+
+/**
+ *  The validation code hash of every live para.
+ *
+ *  Corresponding code can be retrieved with [`CodeByHash`].
+ */
+export const CurrentCodeHash = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Paras",
+  "CurrentCodeHash",
+  $.tuple(_codec.$98),
+  _codec.$103,
 )
 
 /**
@@ -171,78 +130,34 @@ export const PastCodePruning = new C.fluent.Storage(
   _codec.$675,
 )
 
-/** The list of all currently active PVF votes. Auxiliary to `PvfActiveVoteMap`. */
-export const PvfActiveVoteList = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Default",
-  "Paras",
-  "PvfActiveVoteList",
-  $.tuple(),
-  _codec.$669,
-)
-
 /**
- *  All currently active PVF pre-checking votes.
- *
- *  Invariant:
- *  - There are no PVF pre-checking votes that exists in list but not in the set and vice versa.
+ *  The block number at which the planned code change is expected for a para.
+ *  The change will be applied after the first parablock for this ID included which executes
+ *  in the context of a relay chain block with a number >= `expected_at`.
  */
-export const PvfActiveVoteMap = new C.fluent.Storage(
+export const FutureCodeUpgrades = new C.fluent.Storage(
   client,
   "Map",
   "Optional",
   "Paras",
-  "PvfActiveVoteMap",
-  $.tuple(_codec.$103),
-  _codec.$666,
-)
-
-/**
- *  Upcoming paras instantiation arguments.
- *
- *  NOTE that after PVF pre-checking is enabled the para genesis arg will have it's code set
- *  to empty. Instead, the code will be saved into the storage right away via `CodeByHash`.
- */
-export const UpcomingParasGenesis = new C.fluent.Storage(
-  client,
-  "Map",
-  "Optional",
-  "Paras",
-  "UpcomingParasGenesis",
+  "FutureCodeUpgrades",
   $.tuple(_codec.$98),
-  _codec.$678,
+  _codec.$4,
 )
 
 /**
- *  The list of upcoming code upgrades. Each item is a pair of which para performs a code
- *  upgrade and at which relay-chain block it is expected at.
+ *  The actual future code hash of a para.
  *
- *  Ordered ascending by block number.
+ *  Corresponding code can be retrieved with [`CodeByHash`].
  */
-export const UpcomingUpgrades = new C.fluent.Storage(
+export const FutureCodeHash = new C.fluent.Storage(
   client,
-  "Plain",
-  "Default",
+  "Map",
+  "Optional",
   "Paras",
-  "UpcomingUpgrades",
-  $.tuple(),
-  _codec.$675,
-)
-
-/**
- *  The list of parachains that are awaiting for their upgrade restriction to cooldown.
- *
- *  Ordered ascending by block number.
- */
-export const UpgradeCooldowns = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Default",
-  "Paras",
-  "UpgradeCooldowns",
-  $.tuple(),
-  _codec.$675,
+  "FutureCodeHash",
+  $.tuple(_codec.$98),
+  _codec.$103,
 )
 
 /**
@@ -288,6 +203,133 @@ export const UpgradeRestrictionSignal = new C.fluent.Storage(
 )
 
 /**
+ *  The list of parachains that are awaiting for their upgrade restriction to cooldown.
+ *
+ *  Ordered ascending by block number.
+ */
+export const UpgradeCooldowns = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Paras",
+  "UpgradeCooldowns",
+  $.tuple(),
+  _codec.$675,
+)
+
+/**
+ *  The list of upcoming code upgrades. Each item is a pair of which para performs a code
+ *  upgrade and at which relay-chain block it is expected at.
+ *
+ *  Ordered ascending by block number.
+ */
+export const UpcomingUpgrades = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Paras",
+  "UpcomingUpgrades",
+  $.tuple(),
+  _codec.$675,
+)
+
+/** The actions to perform during the start of a specific session index. */
+export const ActionsQueue = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Paras",
+  "ActionsQueue",
+  $.tuple(_codec.$4),
+  _codec.$662,
+)
+
+/**
+ *  Upcoming paras instantiation arguments.
+ *
+ *  NOTE that after PVF pre-checking is enabled the para genesis arg will have it's code set
+ *  to empty. Instead, the code will be saved into the storage right away via `CodeByHash`.
+ */
+export const UpcomingParasGenesis = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Paras",
+  "UpcomingParasGenesis",
+  $.tuple(_codec.$98),
+  _codec.$678,
+)
+
+/** The number of reference on the validation code in [`CodeByHash`] storage. */
+export const CodeByHashRefs = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Paras",
+  "CodeByHashRefs",
+  $.tuple(_codec.$103),
+  _codec.$4,
+)
+
+/**
+ *  Validation code stored by its hash.
+ *
+ *  This storage is consistent with [`FutureCodeHash`], [`CurrentCodeHash`] and
+ *  [`PastCodeHash`].
+ */
+export const CodeByHash = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Paras",
+  "CodeByHash",
+  $.tuple(_codec.$103),
+  _codec.$394,
+)
+
+/** Set the storage for the parachain validation code immediately. */
+export function force_set_current_code(
+  value: Omit<types.polkadot_runtime_parachains.paras.pallet.Call.force_set_current_code, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Paras", value: { ...value, type: "force_set_current_code" } }
+}
+
+/** Set the storage for the current parachain head data immediately. */
+export function force_set_current_head(
+  value: Omit<types.polkadot_runtime_parachains.paras.pallet.Call.force_set_current_head, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Paras", value: { ...value, type: "force_set_current_head" } }
+}
+
+/** Schedule an upgrade as if it was scheduled in the given relay parent block. */
+export function force_schedule_code_upgrade(
+  value: Omit<
+    types.polkadot_runtime_parachains.paras.pallet.Call.force_schedule_code_upgrade,
+    "type"
+  >,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Paras", value: { ...value, type: "force_schedule_code_upgrade" } }
+}
+
+/** Note a new block head for para within the context of the current block. */
+export function force_note_new_head(
+  value: Omit<types.polkadot_runtime_parachains.paras.pallet.Call.force_note_new_head, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Paras", value: { ...value, type: "force_note_new_head" } }
+}
+
+/**
+ * Put a parachain directly into the next session's action queue.
+ * We can't queue it any sooner than this without going into the
+ * initializer...
+ */
+export function force_queue_action(
+  value: Omit<types.polkadot_runtime_parachains.paras.pallet.Call.force_queue_action, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Paras", value: { ...value, type: "force_queue_action" } }
+}
+
+/**
  * Adds the validation code to the storage.
  *
  * The code will not be added if it is already present. Additionally, if PVF pre-checking
@@ -311,61 +353,6 @@ export function add_trusted_validation_code(
   return { type: "Paras", value: { ...value, type: "add_trusted_validation_code" } }
 }
 
-/** Note a new block head for para within the context of the current block. */
-export function force_note_new_head(
-  value: Omit<types.polkadot_runtime_parachains.paras.pallet.Call.force_note_new_head, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Paras", value: { ...value, type: "force_note_new_head" } }
-}
-
-/**
- * Put a parachain directly into the next session's action queue.
- * We can't queue it any sooner than this without going into the
- * initializer...
- */
-export function force_queue_action(
-  value: Omit<types.polkadot_runtime_parachains.paras.pallet.Call.force_queue_action, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Paras", value: { ...value, type: "force_queue_action" } }
-}
-
-/** Schedule an upgrade as if it was scheduled in the given relay parent block. */
-export function force_schedule_code_upgrade(
-  value: Omit<
-    types.polkadot_runtime_parachains.paras.pallet.Call.force_schedule_code_upgrade,
-    "type"
-  >,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Paras", value: { ...value, type: "force_schedule_code_upgrade" } }
-}
-
-/** Set the storage for the parachain validation code immediately. */
-export function force_set_current_code(
-  value: Omit<types.polkadot_runtime_parachains.paras.pallet.Call.force_set_current_code, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Paras", value: { ...value, type: "force_set_current_code" } }
-}
-
-/** Set the storage for the current parachain head data immediately. */
-export function force_set_current_head(
-  value: Omit<types.polkadot_runtime_parachains.paras.pallet.Call.force_set_current_head, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Paras", value: { ...value, type: "force_set_current_head" } }
-}
-
-/**
- * Includes a statement for a PVF pre-checking vote. Potentially, finalizes the vote and
- * enacts the results if that was the last vote before achieving the supermajority.
- */
-export function include_pvf_check_statement(
-  value: Omit<
-    types.polkadot_runtime_parachains.paras.pallet.Call.include_pvf_check_statement,
-    "type"
-  >,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Paras", value: { ...value, type: "include_pvf_check_statement" } }
-}
-
 /**
  * Remove the validation code from the storage iff the reference count is 0.
  *
@@ -380,4 +367,17 @@ export function poke_unused_validation_code(
   >,
 ): types.polkadot_runtime.RuntimeCall {
   return { type: "Paras", value: { ...value, type: "poke_unused_validation_code" } }
+}
+
+/**
+ * Includes a statement for a PVF pre-checking vote. Potentially, finalizes the vote and
+ * enacts the results if that was the last vote before achieving the supermajority.
+ */
+export function include_pvf_check_statement(
+  value: Omit<
+    types.polkadot_runtime_parachains.paras.pallet.Call.include_pvf_check_statement,
+    "type"
+  >,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Paras", value: { ...value, type: "include_pvf_check_statement" } }
 }

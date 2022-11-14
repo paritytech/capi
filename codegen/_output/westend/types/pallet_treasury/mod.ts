@@ -1,10 +1,8 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
+import type * as types from "../mod.ts"
 
 export * as pallet from "./pallet.ts"
-
-export const $proposal: $.Codec<types.pallet_treasury.Proposal> = _codec.$556
 
 export interface Proposal {
   proposer: types.sp_core.crypto.AccountId32

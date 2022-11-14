@@ -1,15 +1,11 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
+import type * as types from "../../mod.ts"
 
 export * as junction from "./junction.ts"
 export * as multiasset from "./multiasset.ts"
 export * as multilocation from "./multilocation.ts"
 export * as order from "./order.ts"
-
-export const $response: $.Codec<types.xcm.v1.Response> = _codec.$434
-
-export const $xcm: $.Codec<types.xcm.v1.Xcm> = _codec.$430
 
 export type Response = types.xcm.v1.Response.Assets | types.xcm.v1.Response.Version
 export namespace Response {
@@ -83,7 +79,7 @@ export namespace Xcm {
     type: "Transact"
     origin_type: types.xcm.v0.OriginKind
     require_weight_at_most: types.u64
-    call: { encoded: Uint8Array }
+    call: types.xcm.double_encoded.DoubleEncoded
   }
   export interface HrmpNewChannelOpenRequest {
     type: "HrmpNewChannelOpenRequest"

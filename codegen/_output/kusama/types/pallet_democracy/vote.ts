@@ -1,14 +1,6 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $accountVote: $.Codec<types.pallet_democracy.vote.AccountVote> = _codec.$63
-
-export const $priorLock: $.Codec<types.pallet_democracy.vote.PriorLock> = _codec.$541
-
-export const $vote: $.Codec<types.pallet_democracy.vote.Vote> = _codec.$64
-
-export const $voting: $.Codec<types.pallet_democracy.vote.Voting> = _codec.$536
+import type * as types from "../mod.ts"
 
 export type AccountVote =
   | types.pallet_democracy.vote.AccountVote.Standard

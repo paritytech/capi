@@ -1,8 +1,6 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
-
-export const $junction: $.Codec<types.xcm.v1.junction.Junction> = _codec.$124
+import type * as types from "../../mod.ts"
 
 export type Junction =
   | types.xcm.v1.junction.Junction.Parachain
