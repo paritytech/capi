@@ -1,5 +1,3 @@
-import * as compat from "../compat/mod.ts"
-import { KeyringPair } from "../deps/polkadot/keyring/types.ts"
 import * as A from "../deps/std/testing/asserts.ts"
 import * as T from "../test_util/mod.ts"
 import * as U from "../util/mod.ts"
@@ -93,7 +91,7 @@ Deno.test({
 
 interface AssertExtrinsicStatusOrderProps {
   orderExpectation: T.extrinsic.StatusOrderExpectation
-  keypair: KeyringPair
+  keypair: U.Sr25519
   call: unknown
 }
 
@@ -105,10 +103,10 @@ export async function assertExtrinsicStatusOrder({
   const extrinsicEvents = U.throwIfError(
     await T.extrinsic.collectExtrinsicEvents(
       extrinsic(T.westend)({
-        sender: compat.multiAddressFromKeypair(keypair),
+        sender: keypair.address,
         call,
       })
-        .signed(compat.signerFromKeypair(keypair)),
+        .signed(keypair.sign),
     ).run(),
   )
   T.extrinsic.assertStatusOrder(extrinsicEvents, orderExpectation)

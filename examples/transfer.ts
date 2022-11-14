@@ -10,13 +10,13 @@ let hash: undefined | C.rpc.known.Hash
 const env = C.Z.env()
 
 const tx = extrinsic({
-  sender: C.compat.multiAddressFromKeypair(T.alice),
+  sender: T.alice.address,
   call: Balances.transfer({
     value: 12345n,
-    dest: C.compat.multiAddressFromKeypair(T.bob),
+    dest: T.bob.address,
   }),
 })
-  .signed(C.compat.signerFromKeypair(T.alice))
+  .signed(T.alice.sign)
 
 const runTx = tx
   .watch(function(status) {

@@ -1,4 +1,3 @@
-export * as compat from "./compat/mod.ts"
 export * as $ from "./deps/scale.ts"
 export { BitSequence } from "./deps/scale.ts"
 export * as Z from "./deps/zones.ts"

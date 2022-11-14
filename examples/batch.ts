@@ -14,17 +14,17 @@ import { Balances, Utility } from "../codegen/_output/westend/pallets/mod.ts"
 // )
 
 const tx = extrinsic({
-  sender: C.compat.multiAddressFromKeypair(T.alice),
+  sender: T.alice.address,
   call: Utility.batch_all({
     calls: T.users.map((pair) =>
       Balances.transfer({
-        dest: C.compat.multiAddressFromKeypair(pair),
+        dest: pair.address,
         value: 12345n,
       })
     ),
   }),
 })
-  .signed(C.compat.signerFromKeypair(T.alice))
+  .signed(T.alice.sign)
   .watch(function(status) {
     console.log(status)
     if (C.rpc.known.TransactionStatus.isTerminal(status)) {
