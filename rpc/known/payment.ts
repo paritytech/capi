@@ -1,12 +1,20 @@
 import { Hash, Hex, NumberOrHex, SerdeEnum } from "./utils.ts"
 
+// https://github.com/paritytech/substrate/blob/3e71d606b7d1e91d9c1701c0a443530eefca1a39/primitives/weights/src/weight_v2.rs#L29
+export interface Weight {
+  // The weight of computational time used based on some reference hardware.
+  ref_time: bigint
+  // The weight of storage space used by proof of validity.
+  proof_size: bigint
+}
+
 // https://github.com/paritytech/substrate/blob/23bb5a6/frame/transaction-payment/src/types.rs#L99
 /**
  * Information related to a dispatchable's class, weight, and fee that can be queried from the
  * runtime.
  */
 export interface RuntimeDispatchInfo {
-  weight: number
+  weight: Weight
   class: DispatchClass
   partialFee: number
 }
