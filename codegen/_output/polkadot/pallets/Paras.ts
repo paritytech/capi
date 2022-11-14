@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /**
@@ -14,8 +14,8 @@ export const PvfActiveVoteMap = new C.fluent.Storage(
   "Optional",
   "Paras",
   "PvfActiveVoteMap",
-  $.tuple(_codec.$103),
-  _codec.$666,
+  $.tuple(codecs.$103),
+  codecs.$666,
 )
 
 /** The list of all currently active PVF votes. Auxiliary to `PvfActiveVoteMap`. */
@@ -26,7 +26,7 @@ export const PvfActiveVoteList = new C.fluent.Storage(
   "Paras",
   "PvfActiveVoteList",
   $.tuple(),
-  _codec.$669,
+  codecs.$669,
 )
 
 /**
@@ -41,7 +41,7 @@ export const Parachains = new C.fluent.Storage(
   "Paras",
   "Parachains",
   $.tuple(),
-  _codec.$662,
+  codecs.$662,
 )
 
 /** The current lifecycle of a all known Para IDs. */
@@ -51,8 +51,8 @@ export const ParaLifecycles = new C.fluent.Storage(
   "Optional",
   "Paras",
   "ParaLifecycles",
-  $.tuple(_codec.$98),
-  _codec.$670,
+  $.tuple(codecs.$98),
+  codecs.$670,
 )
 
 /** The head-data of every registered para. */
@@ -62,8 +62,8 @@ export const Heads = new C.fluent.Storage(
   "Optional",
   "Paras",
   "Heads",
-  $.tuple(_codec.$98),
-  _codec.$104,
+  $.tuple(codecs.$98),
+  codecs.$104,
 )
 
 /**
@@ -77,8 +77,8 @@ export const CurrentCodeHash = new C.fluent.Storage(
   "Optional",
   "Paras",
   "CurrentCodeHash",
-  $.tuple(_codec.$98),
-  _codec.$103,
+  $.tuple(codecs.$98),
+  codecs.$103,
 )
 
 /**
@@ -93,8 +93,8 @@ export const PastCodeHash = new C.fluent.Storage(
   "Optional",
   "Paras",
   "PastCodeHash",
-  $.tuple(_codec.$671),
-  _codec.$103,
+  $.tuple(codecs.$671),
+  codecs.$103,
 )
 
 /**
@@ -108,8 +108,8 @@ export const PastCodeMeta = new C.fluent.Storage(
   "Default",
   "Paras",
   "PastCodeMeta",
-  $.tuple(_codec.$98),
-  _codec.$672,
+  $.tuple(codecs.$98),
+  codecs.$672,
 )
 
 /**
@@ -127,7 +127,7 @@ export const PastCodePruning = new C.fluent.Storage(
   "Paras",
   "PastCodePruning",
   $.tuple(),
-  _codec.$675,
+  codecs.$675,
 )
 
 /**
@@ -141,8 +141,8 @@ export const FutureCodeUpgrades = new C.fluent.Storage(
   "Optional",
   "Paras",
   "FutureCodeUpgrades",
-  $.tuple(_codec.$98),
-  _codec.$4,
+  $.tuple(codecs.$98),
+  codecs.$4,
 )
 
 /**
@@ -156,8 +156,8 @@ export const FutureCodeHash = new C.fluent.Storage(
   "Optional",
   "Paras",
   "FutureCodeHash",
-  $.tuple(_codec.$98),
-  _codec.$103,
+  $.tuple(codecs.$98),
+  codecs.$103,
 )
 
 /**
@@ -177,8 +177,8 @@ export const UpgradeGoAheadSignal = new C.fluent.Storage(
   "Optional",
   "Paras",
   "UpgradeGoAheadSignal",
-  $.tuple(_codec.$98),
-  _codec.$676,
+  $.tuple(codecs.$98),
+  codecs.$676,
 )
 
 /**
@@ -198,8 +198,8 @@ export const UpgradeRestrictionSignal = new C.fluent.Storage(
   "Optional",
   "Paras",
   "UpgradeRestrictionSignal",
-  $.tuple(_codec.$98),
-  _codec.$677,
+  $.tuple(codecs.$98),
+  codecs.$677,
 )
 
 /**
@@ -214,7 +214,7 @@ export const UpgradeCooldowns = new C.fluent.Storage(
   "Paras",
   "UpgradeCooldowns",
   $.tuple(),
-  _codec.$675,
+  codecs.$675,
 )
 
 /**
@@ -230,7 +230,7 @@ export const UpcomingUpgrades = new C.fluent.Storage(
   "Paras",
   "UpcomingUpgrades",
   $.tuple(),
-  _codec.$675,
+  codecs.$675,
 )
 
 /** The actions to perform during the start of a specific session index. */
@@ -240,8 +240,8 @@ export const ActionsQueue = new C.fluent.Storage(
   "Default",
   "Paras",
   "ActionsQueue",
-  $.tuple(_codec.$4),
-  _codec.$662,
+  $.tuple(codecs.$4),
+  codecs.$662,
 )
 
 /**
@@ -256,8 +256,8 @@ export const UpcomingParasGenesis = new C.fluent.Storage(
   "Optional",
   "Paras",
   "UpcomingParasGenesis",
-  $.tuple(_codec.$98),
-  _codec.$678,
+  $.tuple(codecs.$98),
+  codecs.$678,
 )
 
 /** The number of reference on the validation code in [`CodeByHash`] storage. */
@@ -267,8 +267,8 @@ export const CodeByHashRefs = new C.fluent.Storage(
   "Default",
   "Paras",
   "CodeByHashRefs",
-  $.tuple(_codec.$103),
-  _codec.$4,
+  $.tuple(codecs.$103),
+  codecs.$4,
 )
 
 /**
@@ -283,8 +283,8 @@ export const CodeByHash = new C.fluent.Storage(
   "Optional",
   "Paras",
   "CodeByHash",
-  $.tuple(_codec.$103),
-  _codec.$394,
+  $.tuple(codecs.$103),
+  codecs.$394,
 )
 
 /** Set the storage for the parachain validation code immediately. */

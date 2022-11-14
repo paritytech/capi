@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /**
@@ -17,7 +17,7 @@ export const ValidatorGroups = new C.fluent.Storage(
   "ParaScheduler",
   "ValidatorGroups",
   $.tuple(),
-  _codec.$653,
+  codecs.$653,
 )
 
 /**
@@ -33,7 +33,7 @@ export const ParathreadQueue = new C.fluent.Storage(
   "ParaScheduler",
   "ParathreadQueue",
   $.tuple(),
-  _codec.$654,
+  codecs.$654,
 )
 
 /**
@@ -53,7 +53,7 @@ export const AvailabilityCores = new C.fluent.Storage(
   "ParaScheduler",
   "AvailabilityCores",
   $.tuple(),
-  _codec.$659,
+  codecs.$659,
 )
 
 /**
@@ -69,7 +69,7 @@ export const ParathreadClaimIndex = new C.fluent.Storage(
   "ParaScheduler",
   "ParathreadClaimIndex",
   $.tuple(),
-  _codec.$662,
+  codecs.$662,
 )
 
 /**
@@ -87,7 +87,7 @@ export const SessionStartBlock = new C.fluent.Storage(
   "ParaScheduler",
   "SessionStartBlock",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /**
@@ -105,5 +105,5 @@ export const Scheduled = new C.fluent.Storage(
   "ParaScheduler",
   "Scheduled",
   $.tuple(),
-  _codec.$663,
+  codecs.$663,
 )

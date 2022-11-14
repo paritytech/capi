@@ -1,5 +1,5 @@
 import { $, C } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 
 export * as bitvec from "./bitvec/mod.ts"
 export * as finality_grandpa from "./finality_grandpa/mod.ts"

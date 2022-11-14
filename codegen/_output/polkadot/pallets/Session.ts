@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** The current set of validators. */
@@ -10,7 +10,7 @@ export const Validators = new C.fluent.Storage(
   "Session",
   "Validators",
   $.tuple(),
-  _codec.$206,
+  codecs.$206,
 )
 
 /** Current index of the session. */
@@ -21,7 +21,7 @@ export const CurrentIndex = new C.fluent.Storage(
   "Session",
   "CurrentIndex",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /**
@@ -35,7 +35,7 @@ export const QueuedChanged = new C.fluent.Storage(
   "Session",
   "QueuedChanged",
   $.tuple(),
-  _codec.$43,
+  codecs.$43,
 )
 
 /**
@@ -49,7 +49,7 @@ export const QueuedKeys = new C.fluent.Storage(
   "Session",
   "QueuedKeys",
   $.tuple(),
-  _codec.$511,
+  codecs.$511,
 )
 
 /**
@@ -66,7 +66,7 @@ export const DisabledValidators = new C.fluent.Storage(
   "Session",
   "DisabledValidators",
   $.tuple(),
-  _codec.$94,
+  codecs.$94,
 )
 
 /** The next session keys for a validator. */
@@ -76,8 +76,8 @@ export const NextKeys = new C.fluent.Storage(
   "Optional",
   "Session",
   "NextKeys",
-  $.tuple(_codec.$0),
-  _codec.$212,
+  $.tuple(codecs.$0),
+  codecs.$212,
 )
 
 /** The owner of a key. The key is the `KeyTypeId` + the encoded key. */
@@ -87,8 +87,8 @@ export const KeyOwner = new C.fluent.Storage(
   "Optional",
   "Session",
   "KeyOwner",
-  $.tuple(_codec.$513),
-  _codec.$0,
+  $.tuple(codecs.$513),
+  codecs.$0,
 )
 
 /**

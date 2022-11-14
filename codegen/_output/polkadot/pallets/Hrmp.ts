@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /**
@@ -16,8 +16,8 @@ export const HrmpOpenChannelRequests = new C.fluent.Storage(
   "Optional",
   "Hrmp",
   "HrmpOpenChannelRequests",
-  $.tuple(_codec.$112),
-  _codec.$686,
+  $.tuple(codecs.$112),
+  codecs.$686,
 )
 
 export const HrmpOpenChannelRequestsList = new C.fluent.Storage(
@@ -27,7 +27,7 @@ export const HrmpOpenChannelRequestsList = new C.fluent.Storage(
   "Hrmp",
   "HrmpOpenChannelRequestsList",
   $.tuple(),
-  _codec.$687,
+  codecs.$687,
 )
 
 /**
@@ -41,8 +41,8 @@ export const HrmpOpenChannelRequestCount = new C.fluent.Storage(
   "Default",
   "Hrmp",
   "HrmpOpenChannelRequestCount",
-  $.tuple(_codec.$98),
-  _codec.$4,
+  $.tuple(codecs.$98),
+  codecs.$4,
 )
 
 /**
@@ -56,8 +56,8 @@ export const HrmpAcceptedChannelRequestCount = new C.fluent.Storage(
   "Default",
   "Hrmp",
   "HrmpAcceptedChannelRequestCount",
-  $.tuple(_codec.$98),
-  _codec.$4,
+  $.tuple(codecs.$98),
+  codecs.$4,
 )
 
 /**
@@ -75,8 +75,8 @@ export const HrmpCloseChannelRequests = new C.fluent.Storage(
   "Optional",
   "Hrmp",
   "HrmpCloseChannelRequests",
-  $.tuple(_codec.$112),
-  _codec.$33,
+  $.tuple(codecs.$112),
+  codecs.$33,
 )
 
 export const HrmpCloseChannelRequestsList = new C.fluent.Storage(
@@ -86,7 +86,7 @@ export const HrmpCloseChannelRequestsList = new C.fluent.Storage(
   "Hrmp",
   "HrmpCloseChannelRequestsList",
   $.tuple(),
-  _codec.$687,
+  codecs.$687,
 )
 
 /**
@@ -100,8 +100,8 @@ export const HrmpWatermarks = new C.fluent.Storage(
   "Optional",
   "Hrmp",
   "HrmpWatermarks",
-  $.tuple(_codec.$98),
-  _codec.$4,
+  $.tuple(codecs.$98),
+  codecs.$4,
 )
 
 /**
@@ -115,8 +115,8 @@ export const HrmpChannels = new C.fluent.Storage(
   "Optional",
   "Hrmp",
   "HrmpChannels",
-  $.tuple(_codec.$112),
-  _codec.$688,
+  $.tuple(codecs.$112),
+  codecs.$688,
 )
 
 /**
@@ -140,8 +140,8 @@ export const HrmpIngressChannelsIndex = new C.fluent.Storage(
   "Default",
   "Hrmp",
   "HrmpIngressChannelsIndex",
-  $.tuple(_codec.$98),
-  _codec.$662,
+  $.tuple(codecs.$98),
+  codecs.$662,
 )
 
 export const HrmpEgressChannelsIndex = new C.fluent.Storage(
@@ -150,8 +150,8 @@ export const HrmpEgressChannelsIndex = new C.fluent.Storage(
   "Default",
   "Hrmp",
   "HrmpEgressChannelsIndex",
-  $.tuple(_codec.$98),
-  _codec.$662,
+  $.tuple(codecs.$98),
+  codecs.$662,
 )
 
 /**
@@ -164,8 +164,8 @@ export const HrmpChannelContents = new C.fluent.Storage(
   "Default",
   "Hrmp",
   "HrmpChannelContents",
-  $.tuple(_codec.$112),
-  _codec.$690,
+  $.tuple(codecs.$112),
+  codecs.$690,
 )
 
 /**
@@ -182,8 +182,8 @@ export const HrmpChannelDigests = new C.fluent.Storage(
   "Default",
   "Hrmp",
   "HrmpChannelDigests",
-  $.tuple(_codec.$98),
-  _codec.$692,
+  $.tuple(codecs.$98),
+  codecs.$692,
 )
 
 /**

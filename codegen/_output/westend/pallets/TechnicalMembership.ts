@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** The current membership, stored as an ordered Vec. */
@@ -10,7 +10,7 @@ export const Members = new C.fluent.Storage(
   "TechnicalMembership",
   "Members",
   $.tuple(),
-  _codec.$554,
+  codecs.$554,
 )
 
 /** The current prime member, if one exists. */
@@ -21,7 +21,7 @@ export const Prime = new C.fluent.Storage(
   "TechnicalMembership",
   "Prime",
   $.tuple(),
-  _codec.$0,
+  codecs.$0,
 )
 
 /**

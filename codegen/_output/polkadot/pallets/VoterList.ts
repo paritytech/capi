@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /**
@@ -13,8 +13,8 @@ export const ListNodes = new C.fluent.Storage(
   "Optional",
   "VoterList",
   "ListNodes",
-  $.tuple(_codec.$0),
-  _codec.$612,
+  $.tuple(codecs.$0),
+  codecs.$612,
 )
 
 /** Counter for the related counted storage map */
@@ -25,7 +25,7 @@ export const CounterForListNodes = new C.fluent.Storage(
   "VoterList",
   "CounterForListNodes",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /**
@@ -39,8 +39,8 @@ export const ListBags = new C.fluent.Storage(
   "Optional",
   "VoterList",
   "ListBags",
-  $.tuple(_codec.$10),
-  _codec.$613,
+  $.tuple(codecs.$10),
+  codecs.$613,
 )
 
 /**

@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /**
@@ -13,8 +13,8 @@ export const IdentityOf = new C.fluent.Storage(
   "Optional",
   "Identity",
   "IdentityOf",
-  $.tuple(_codec.$0),
-  _codec.$568,
+  $.tuple(codecs.$0),
+  codecs.$568,
 )
 
 /**
@@ -27,8 +27,8 @@ export const SuperOf = new C.fluent.Storage(
   "Optional",
   "Identity",
   "SuperOf",
-  $.tuple(_codec.$0),
-  _codec.$299,
+  $.tuple(codecs.$0),
+  codecs.$299,
 )
 
 /**
@@ -44,8 +44,8 @@ export const SubsOf = new C.fluent.Storage(
   "Default",
   "Identity",
   "SubsOf",
-  $.tuple(_codec.$0),
-  _codec.$572,
+  $.tuple(codecs.$0),
+  codecs.$572,
 )
 
 /**
@@ -61,7 +61,7 @@ export const Registrars = new C.fluent.Storage(
   "Identity",
   "Registrars",
   $.tuple(),
-  _codec.$574,
+  codecs.$574,
 )
 
 /**

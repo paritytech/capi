@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** The number of (public) proposals that have been made so far. */
@@ -10,7 +10,7 @@ export const PublicPropCount = new C.fluent.Storage(
   "Democracy",
   "PublicPropCount",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /** The public proposals. Unsorted. The second item is the proposal. */
@@ -21,7 +21,7 @@ export const PublicProps = new C.fluent.Storage(
   "Democracy",
   "PublicProps",
   $.tuple(),
-  _codec.$528,
+  codecs.$528,
 )
 
 /**
@@ -35,8 +35,8 @@ export const DepositOf = new C.fluent.Storage(
   "Optional",
   "Democracy",
   "DepositOf",
-  $.tuple(_codec.$4),
-  _codec.$531,
+  $.tuple(codecs.$4),
+  codecs.$531,
 )
 
 /** The next free referendum index, aka the number of referenda started so far. */
@@ -47,7 +47,7 @@ export const ReferendumCount = new C.fluent.Storage(
   "Democracy",
   "ReferendumCount",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /**
@@ -61,7 +61,7 @@ export const LowestUnbaked = new C.fluent.Storage(
   "Democracy",
   "LowestUnbaked",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /**
@@ -75,8 +75,8 @@ export const ReferendumInfoOf = new C.fluent.Storage(
   "Optional",
   "Democracy",
   "ReferendumInfoOf",
-  $.tuple(_codec.$4),
-  _codec.$533,
+  $.tuple(codecs.$4),
+  codecs.$533,
 )
 
 /**
@@ -91,8 +91,8 @@ export const VotingOf = new C.fluent.Storage(
   "Default",
   "Democracy",
   "VotingOf",
-  $.tuple(_codec.$0),
-  _codec.$536,
+  $.tuple(codecs.$0),
+  codecs.$536,
 )
 
 /**
@@ -106,7 +106,7 @@ export const LastTabledWasExternal = new C.fluent.Storage(
   "Democracy",
   "LastTabledWasExternal",
   $.tuple(),
-  _codec.$43,
+  codecs.$43,
 )
 
 /**
@@ -122,7 +122,7 @@ export const NextExternal = new C.fluent.Storage(
   "Democracy",
   "NextExternal",
   $.tuple(),
-  _codec.$542,
+  codecs.$542,
 )
 
 /**
@@ -135,8 +135,8 @@ export const Blacklist = new C.fluent.Storage(
   "Optional",
   "Democracy",
   "Blacklist",
-  $.tuple(_codec.$11),
-  _codec.$543,
+  $.tuple(codecs.$11),
+  codecs.$543,
 )
 
 /** Record of all proposals that have been subject to emergency cancellation. */
@@ -146,8 +146,8 @@ export const Cancellations = new C.fluent.Storage(
   "Default",
   "Democracy",
   "Cancellations",
-  $.tuple(_codec.$11),
-  _codec.$43,
+  $.tuple(codecs.$11),
+  codecs.$43,
 )
 
 /**

@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** The set of open multisig operations. */
@@ -9,8 +9,8 @@ export const Multisigs = new C.fluent.Storage(
   "Optional",
   "Multisig",
   "Multisigs",
-  _codec.$588,
-  _codec.$589,
+  codecs.$588,
+  codecs.$589,
 )
 
 /**

@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 export const IncompleteSince = new C.fluent.Storage(
@@ -9,7 +9,7 @@ export const IncompleteSince = new C.fluent.Storage(
   "Scheduler",
   "IncompleteSince",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /** Items to be executed, indexed by the block number that they should be executed on. */
@@ -19,8 +19,8 @@ export const Agenda = new C.fluent.Storage(
   "Default",
   "Scheduler",
   "Agenda",
-  $.tuple(_codec.$4),
-  _codec.$177,
+  $.tuple(codecs.$4),
+  codecs.$177,
 )
 
 /**
@@ -35,8 +35,8 @@ export const Lookup = new C.fluent.Storage(
   "Optional",
   "Scheduler",
   "Lookup",
-  $.tuple(_codec.$1),
-  _codec.$30,
+  $.tuple(codecs.$1),
+  codecs.$30,
 )
 
 /** Anonymously schedule a task. */

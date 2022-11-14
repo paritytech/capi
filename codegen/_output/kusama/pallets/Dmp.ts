@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** The downward messages addressed for a certain para. */
@@ -9,8 +9,8 @@ export const DownwardMessageQueues = new C.fluent.Storage(
   "Default",
   "Dmp",
   "DownwardMessageQueues",
-  $.tuple(_codec.$98),
-  _codec.$682,
+  $.tuple(codecs.$98),
+  codecs.$682,
 )
 
 /**
@@ -28,6 +28,6 @@ export const DownwardMessageQueueHeads = new C.fluent.Storage(
   "Default",
   "Dmp",
   "DownwardMessageQueueHeads",
-  $.tuple(_codec.$98),
-  _codec.$11,
+  $.tuple(codecs.$98),
+  codecs.$11,
 )

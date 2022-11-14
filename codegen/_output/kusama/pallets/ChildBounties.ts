@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** Number of total child bounties. */
@@ -10,7 +10,7 @@ export const ChildBountyCount = new C.fluent.Storage(
   "ChildBounties",
   "ChildBountyCount",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /**
@@ -23,8 +23,8 @@ export const ParentChildBounties = new C.fluent.Storage(
   "Default",
   "ChildBounties",
   "ParentChildBounties",
-  $.tuple(_codec.$4),
-  _codec.$4,
+  $.tuple(codecs.$4),
+  codecs.$4,
 )
 
 /** Child bounties that have been added. */
@@ -34,8 +34,8 @@ export const ChildBounties = new C.fluent.Storage(
   "Optional",
   "ChildBounties",
   "ChildBounties",
-  _codec.$30,
-  _codec.$595,
+  codecs.$30,
+  codecs.$595,
 )
 
 /** The description of each child-bounty. */
@@ -45,8 +45,8 @@ export const ChildBountyDescriptions = new C.fluent.Storage(
   "Optional",
   "ChildBounties",
   "ChildBountyDescriptions",
-  $.tuple(_codec.$4),
-  _codec.$593,
+  $.tuple(codecs.$4),
+  codecs.$593,
 )
 
 /** The cumulative child-bounty curator fee for each parent bounty. */
@@ -56,8 +56,8 @@ export const ChildrenCuratorFees = new C.fluent.Storage(
   "Default",
   "ChildBounties",
   "ChildrenCuratorFees",
-  $.tuple(_codec.$4),
-  _codec.$6,
+  $.tuple(codecs.$4),
+  codecs.$6,
 )
 
 /**

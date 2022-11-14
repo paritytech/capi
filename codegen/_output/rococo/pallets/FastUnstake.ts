@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** The current "head of the queue" being unstaked. */
@@ -10,7 +10,7 @@ export const Head = new C.fluent.Storage(
   "FastUnstake",
   "Head",
   $.tuple(),
-  _codec.$634,
+  codecs.$634,
 )
 
 /**
@@ -24,8 +24,8 @@ export const Queue = new C.fluent.Storage(
   "Optional",
   "FastUnstake",
   "Queue",
-  $.tuple(_codec.$0),
-  _codec.$6,
+  $.tuple(codecs.$0),
+  codecs.$6,
 )
 
 /** Counter for the related counted storage map */
@@ -36,7 +36,7 @@ export const CounterForQueue = new C.fluent.Storage(
   "FastUnstake",
   "CounterForQueue",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /**
@@ -54,7 +54,7 @@ export const ErasToCheckPerBlock = new C.fluent.Storage(
   "FastUnstake",
   "ErasToCheckPerBlock",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /**

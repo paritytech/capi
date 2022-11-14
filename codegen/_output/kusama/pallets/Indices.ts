@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** The lookup from index to account. */
@@ -9,8 +9,8 @@ export const Accounts = new C.fluent.Storage(
   "Optional",
   "Indices",
   "Accounts",
-  $.tuple(_codec.$4),
-  _codec.$468,
+  $.tuple(codecs.$4),
+  codecs.$468,
 )
 
 /**

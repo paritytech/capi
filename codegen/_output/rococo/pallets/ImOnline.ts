@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /**
@@ -22,7 +22,7 @@ export const HeartbeatAfter = new C.fluent.Storage(
   "ImOnline",
   "HeartbeatAfter",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /** The current set of keys that may issue a heartbeat. */
@@ -33,7 +33,7 @@ export const Keys = new C.fluent.Storage(
   "ImOnline",
   "Keys",
   $.tuple(),
-  _codec.$520,
+  codecs.$520,
 )
 
 /**
@@ -46,8 +46,8 @@ export const ReceivedHeartbeats = new C.fluent.Storage(
   "Optional",
   "ImOnline",
   "ReceivedHeartbeats",
-  _codec.$30,
-  _codec.$522,
+  codecs.$30,
+  codecs.$522,
 )
 
 /**
@@ -60,8 +60,8 @@ export const AuthoredBlocks = new C.fluent.Storage(
   "Default",
   "ImOnline",
   "AuthoredBlocks",
-  _codec.$494,
-  _codec.$4,
+  codecs.$494,
+  codecs.$4,
 )
 
 /**

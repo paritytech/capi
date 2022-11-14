@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** Info on all of the funds. */
@@ -9,8 +9,8 @@ export const Funds = new C.fluent.Storage(
   "Optional",
   "Crowdloan",
   "Funds",
-  $.tuple(_codec.$98),
-  _codec.$710,
+  $.tuple(codecs.$98),
+  codecs.$710,
 )
 
 /**
@@ -24,7 +24,7 @@ export const NewRaise = new C.fluent.Storage(
   "Crowdloan",
   "NewRaise",
   $.tuple(),
-  _codec.$662,
+  codecs.$662,
 )
 
 /** The number of auctions that have entered into their ending period so far. */
@@ -35,7 +35,7 @@ export const EndingsCount = new C.fluent.Storage(
   "Crowdloan",
   "EndingsCount",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /** Tracker for the next available fund index */
@@ -46,7 +46,7 @@ export const NextFundIndex = new C.fluent.Storage(
   "Crowdloan",
   "NextFundIndex",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /**

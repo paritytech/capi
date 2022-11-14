@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** The total units issued in the system. */
@@ -10,7 +10,7 @@ export const TotalIssuance = new C.fluent.Storage(
   "Balances",
   "TotalIssuance",
   $.tuple(),
-  _codec.$6,
+  codecs.$6,
 )
 
 /**
@@ -45,8 +45,8 @@ export const Account = new C.fluent.Storage(
   "Default",
   "Balances",
   "Account",
-  $.tuple(_codec.$0),
-  _codec.$5,
+  $.tuple(codecs.$0),
+  codecs.$5,
 )
 
 /**
@@ -59,8 +59,8 @@ export const Locks = new C.fluent.Storage(
   "Default",
   "Balances",
   "Locks",
-  $.tuple(_codec.$0),
-  _codec.$470,
+  $.tuple(codecs.$0),
+  codecs.$470,
 )
 
 /** Named reserves on some account balances. */
@@ -70,8 +70,8 @@ export const Reserves = new C.fluent.Storage(
   "Default",
   "Balances",
   "Reserves",
-  $.tuple(_codec.$0),
-  _codec.$474,
+  $.tuple(codecs.$0),
+  codecs.$474,
 )
 
 /**
@@ -86,7 +86,7 @@ export const StorageVersion = new C.fluent.Storage(
   "Balances",
   "StorageVersion",
   $.tuple(),
-  _codec.$477,
+  codecs.$477,
 )
 
 /**

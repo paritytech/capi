@@ -33,8 +33,10 @@ export { client } from ${S.string(props.clientFile)}
 
   files.set("mod.ts", () =>
     `\
-export * from "./pallets/mod.ts"
-export * from "./types/mod.ts"
+export * as pallets from "./pallets/mod.ts"
+export * as types from "./types/mod.ts"
+export * as codecs from "./codecs.ts"
+
 export * from "./extrinsic.ts"
 `)
   console.timeEnd("base")

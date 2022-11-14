@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** The current session index. */
@@ -10,7 +10,7 @@ export const CurrentSessionIndex = new C.fluent.Storage(
   "ParasShared",
   "CurrentSessionIndex",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /**
@@ -24,7 +24,7 @@ export const ActiveValidatorIndices = new C.fluent.Storage(
   "ParasShared",
   "ActiveValidatorIndices",
   $.tuple(),
-  _codec.$642,
+  codecs.$642,
 )
 
 /**
@@ -38,5 +38,5 @@ export const ActiveValidatorKeys = new C.fluent.Storage(
   "ParasShared",
   "ActiveValidatorKeys",
   $.tuple(),
-  _codec.$643,
+  codecs.$643,
 )

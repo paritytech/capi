@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** Pending swap operations. */
@@ -9,8 +9,8 @@ export const PendingSwap = new C.fluent.Storage(
   "Optional",
   "Registrar",
   "PendingSwap",
-  $.tuple(_codec.$98),
-  _codec.$98,
+  $.tuple(codecs.$98),
+  codecs.$98,
 )
 
 /**
@@ -25,8 +25,8 @@ export const Paras = new C.fluent.Storage(
   "Optional",
   "Registrar",
   "Paras",
-  $.tuple(_codec.$98),
-  _codec.$701,
+  $.tuple(codecs.$98),
+  codecs.$701,
 )
 
 /** The next free `ParaId`. */
@@ -37,7 +37,7 @@ export const NextFreeParaId = new C.fluent.Storage(
   "Registrar",
   "NextFreeParaId",
   $.tuple(),
-  _codec.$98,
+  codecs.$98,
 )
 
 /**
