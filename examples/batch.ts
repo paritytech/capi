@@ -2,6 +2,7 @@ import * as C from "../mod.ts"
 import * as T from "../test_util/mod.ts"
 import * as U from "../util/mod.ts"
 
+import { extrinsic } from "../codegen/_output/westend/mod.ts"
 import { Balances, Utility } from "../codegen/_output/westend/pallets/mod.ts"
 
 // TODO: uncomment these lines / use env upon solving `count` in zones
@@ -12,7 +13,7 @@ import { Balances, Utility } from "../codegen/_output/westend/pallets/mod.ts"
 //   }),
 // )
 
-const tx = C.extrinsic(T.westend)({
+const tx = extrinsic({
   sender: C.compat.multiAddressFromKeypair(T.alice),
   call: Utility.batch_all({
     calls: T.users.map((pair) =>

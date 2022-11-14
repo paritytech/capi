@@ -11,16 +11,16 @@ import * as scale from "./scale.ts"
 
 const k0_ = Symbol()
 
-export interface ExtrinsicProps {
+export interface ExtrinsicProps<Call = unknown> {
   sender: M.MultiAddress
   checkpoint?: U.HexHash
   mortality?: [period: bigint, phase: bigint]
   nonce?: string
   tip?: bigint
-  call: unknown
+  call: Call
 }
 
-export function extrinsic<Client extends Z.$<rpc.Client>>(client: Client) {
+export function extrinsic<Client extends Z.$<rpc.Client>, Call = unknown>(client: Client) {
   return <Props extends Z.Rec$<ExtrinsicProps>>(props: Props): Extrinsic<Client, Props> => {
     return new Extrinsic(client, props)
   }

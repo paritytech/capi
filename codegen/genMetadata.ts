@@ -1,7 +1,11 @@
 import * as M from "../frame_metadata/mod.ts"
 import { Decl, getPath, getRawCodecPath, makeDocComment, S } from "./utils.ts"
 
-export function genMetadata(metadata: M.Metadata, decls: Decl[], typeVisitor: M.TyVisitor<string>) {
+export function genMetadata(
+  metadata: M.Metadata,
+  decls: Decl[],
+  typeVisitor: M.TyVisitor<string>,
+) {
   const { tys, extrinsic, pallets } = metadata
 
   const isUnitVisitor = new M.TyVisitor<boolean>(tys, {
@@ -93,6 +97,14 @@ export function genMetadata(metadata: M.Metadata, decls: Decl[], typeVisitor: M.
   decls.push({
     path: "_metadata.types",
     code: "export const types = _codec._all",
+  })
+
+  decls.push({
+    path: "",
+    code: `
+export { client }
+export const extrinsic = C.extrinsic<typeof client, ${typeVisitor.visit(callTy!)}>(client);
+`,
   })
 
   function getExtrasCodec(xs: [string, M.Ty][]) {
