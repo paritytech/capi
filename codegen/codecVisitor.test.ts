@@ -17,7 +17,7 @@ for (const [runtime, client] of Object.entries(testClients)) {
     )
     const deriveCodec = M.DeriveCodec(metadata.tys)
     const derivedCodecs = metadata.tys.map(deriveCodec)
-    const codegenCodecs = codegened.codecs.all
+    const codegenCodecs = codegened.codecs._all
     const origInspect = Codec.prototype["_inspect"]!
     let inspecting = 0
     Codec.prototype["_inspect"] = function(inspect) {
