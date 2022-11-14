@@ -1,7 +1,7 @@
 import * as C from "../mod.ts"
 import * as U from "../util/mod.ts"
 
-const root = C.entryWatch(C.rococo)("System", "Events", [], function(entry) {
+const root = C.entryWatch(C.rococo.proxy)("System", "Events", [], function(entry) {
   console.log(entry)
   const counter = this.state(U.Counter)
   if (counter.i === 2) {

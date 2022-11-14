@@ -1,9 +1,9 @@
 import * as C from "../mod.ts"
 import * as U from "../util/mod.ts"
 
-const root = C.blockWatch(C.polkadot)(async function blockWatchListener({ block }) {
+const root = C.blockWatch(C.polkadot.proxy)(async function blockWatchListener({ block }) {
   const extrinsicsDecoded = C
-    .extrinsicsDecoded(C.polkadot, block.extrinsics)
+    .extrinsicsDecoded(C.polkadot.proxy, block.extrinsics)
     .bind(this.env)
   console.log(await extrinsicsDecoded())
   const counter = this.state(U.Counter)

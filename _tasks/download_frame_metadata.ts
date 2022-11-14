@@ -6,7 +6,13 @@ import * as U from "../util/mod.ts"
 
 const outDir = path.join(Deno.cwd(), "frame_metadata", "_downloaded")
 await fs.emptyDir(outDir)
-U.throwIfError(await Z.ls(...Object.entries(C.knownClients).map(download)).run())
+U.throwIfError(
+  await Z.ls(
+    ...Object.entries(C.knownClients)
+      .map(([k, { proxy }]) => [k, proxy] as [Z.$<string>, Z.$<C.rpc.Client>])
+      .map(download),
+  ).run(),
+)
 
 function download<Name extends Z.$<string>, Client extends Z.$<C.rpc.Client>>(
   entry: [name: Name, client: Client],

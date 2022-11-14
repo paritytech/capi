@@ -2,7 +2,7 @@ import * as C from "../mod.ts"
 import * as T from "../test_util/mod.ts"
 import * as U from "../util/mod.ts"
 
-const extrinsicsRaw = C.chain.getBlock(C.polkadot)()
+const extrinsicsRaw = C.chain.getBlock(C.polkadot.proxy)()
   .access("block")
   .access("extrinsics")
 const root = C.extrinsicsDecoded(T.polkadot, extrinsicsRaw)
