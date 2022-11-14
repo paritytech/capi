@@ -6,7 +6,7 @@ import * as ss58 from "../ss58/mod.ts"
 import * as U from "../util/mod.ts"
 import { const as const_ } from "./const.ts"
 import { metadata } from "./metadata.ts"
-import { author, chain, system } from "./rpc_known_methods.ts"
+import { author, chain, payment, system } from "./rpc_known_methods.ts"
 import * as scale from "./scale.ts"
 
 const k0_ = Symbol()
@@ -42,6 +42,19 @@ export class Extrinsic<
 
   signed<Sign extends Z.$<M.Signer>>(sign: Sign): SignedExtrinsic<Client, Props, Sign> {
     return new SignedExtrinsic(this.client, this.props, sign)
+  }
+
+  get feeEstimate() {
+    const $extrinsic_ = $extrinsic(this.client)
+    const $extrinsicProps = Z.rec({
+      protocolVersion: 4,
+      palletName: this.props.palletName,
+      methodName: this.props.methodName,
+      args: this.props.args,
+    })
+    const extrinsicBytes = scale.scaleEncoded($extrinsic_, $extrinsicProps, true)
+    const extrinsicHex = extrinsicBytes.next(U.hex.encodePrefixed)
+    return payment.queryInfo(this.client)(extrinsicHex)
   }
 }
 
