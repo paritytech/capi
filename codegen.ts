@@ -47,6 +47,7 @@ if (args.src && args.dev) {
 await run(metadata, args.out)
 
 function run(metadata: C.M.Metadata, out: string) {
+  // @ts-ignore TODO
   return codegen({
     importSpecifier: args.import,
     metadata,
