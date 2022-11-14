@@ -76,7 +76,7 @@ function createOrApproveMultisigProposal<
   pair: KeyringPair,
   ...[maybeTimepoint]: Rest
 ) {
-  return extrinsic({
+  const maxWeight = extrinsic({
     sender: C.compat.multiAddressFromKeypair(pair),
     palletName: "Multisig",
     methodName: "as_multi",
@@ -93,9 +93,37 @@ function createOrApproveMultisigProposal<
       other_signatories: signatories.filter((value) => value !== pair.publicKey),
       store_call: false,
       max_weight: {
-        ref_time: 500_000_000n,
+        ref_time: 0n,
         proof_size: 0n,
       },
+      maybe_timepoint: maybeTimepoint as Rest[0],
+    }),
+  })
+    .feeEstimate
+    .access("weight")
+    .next((weight) => {
+      return {
+        ref_time: BigInt(weight.ref_time),
+        proof_size: BigInt(weight.proof_size),
+      }
+    })
+  return extrinsic({
+    sender: C.compat.multiAddressFromKeypair(pair),
+    palletName: "Multisig",
+    methodName: "as_multi",
+    args: C.Z.rec({
+      threshold: THRESHOLD,
+      call: {
+        type: "Balances",
+        value: {
+          type: "transfer_keep_alive",
+          dest: C.compat.multiAddressFromKeypair(T.dave),
+          value: 1_230_000_000_000n,
+        },
+      },
+      other_signatories: signatories.filter((value) => value !== pair.publicKey),
+      store_call: false,
+      max_weight: maxWeight,
       maybe_timepoint: maybeTimepoint as Rest[0],
     }),
   })
