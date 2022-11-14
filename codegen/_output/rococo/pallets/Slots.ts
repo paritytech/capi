@@ -1,4 +1,4 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
@@ -20,13 +20,15 @@ import type * as types from "../types/mod.ts"
  *
  *  It is illegal for a `None` value to trail in the list.
  */
-export const Leases = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$98),
-  value: _codec.$703,
-}
+export const Leases = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Slots",
+  "Leases",
+  $.tuple(_codec.$98),
+  _codec.$703,
+)
 
 /**
  * Clear all leases for a Para Id, refunding any deposits back to the original owners.

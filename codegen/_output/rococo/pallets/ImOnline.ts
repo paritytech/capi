@@ -1,3 +1,4 @@
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
@@ -5,13 +6,15 @@ import type * as types from "../types/mod.ts"
  *  For each session index, we keep a mapping of `ValidatorId<T>` to the
  *  number of blocks authored by the given authority.
  */
-export const AuthoredBlocks = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat", "Twox64Concat"],
-  key: _codec.$494,
-  value: _codec.$4,
-}
+export const AuthoredBlocks = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "ImOnline",
+  "AuthoredBlocks",
+  _codec.$494,
+  _codec.$4,
+)
 
 /**
  *  The block number after which it's ok to send heartbeats in the current
@@ -26,28 +29,40 @@ export const AuthoredBlocks = {
  *  progress estimate from `NextSessionRotation`, as those estimates should be
  *  more accurate then the value we calculate for `HeartbeatAfter`.
  */
-export const HeartbeatAfter = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const HeartbeatAfter = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "ImOnline",
+  "HeartbeatAfter",
+  $.tuple(),
+  _codec.$4,
+)
 
 /** The current set of keys that may issue a heartbeat. */
-export const Keys = { type: "Plain", modifier: "Default", hashers: [], key: [], value: _codec.$520 }
+export const Keys = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "ImOnline",
+  "Keys",
+  $.tuple(),
+  _codec.$520,
+)
 
 /**
  *  For each session index, we keep a mapping of `SessionIndex` and `AuthIndex` to
  *  `WrapperOpaque<BoundedOpaqueNetworkState>`.
  */
-export const ReceivedHeartbeats = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat", "Twox64Concat"],
-  key: _codec.$30,
-  value: _codec.$522,
-}
+export const ReceivedHeartbeats = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "ImOnline",
+  "ReceivedHeartbeats",
+  _codec.$30,
+  _codec.$522,
+)
 
 /**
  * # <weight>

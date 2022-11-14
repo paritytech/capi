@@ -1,42 +1,50 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** Bounties that have been made. */
-export const Bounties = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$4),
-  value: _codec.$591,
-}
+export const Bounties = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Bounties",
+  "Bounties",
+  $.tuple(_codec.$4),
+  _codec.$591,
+)
 
 /** Bounty indices that have been approved but not yet funded. */
-export const BountyApprovals = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$557,
-}
+export const BountyApprovals = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Bounties",
+  "BountyApprovals",
+  $.tuple(),
+  _codec.$557,
+)
 
 /** Number of bounty proposals that have been made. */
-export const BountyCount = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const BountyCount = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Bounties",
+  "BountyCount",
+  $.tuple(),
+  _codec.$4,
+)
 
 /** The description of each bounty. */
-export const BountyDescriptions = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$4),
-  value: _codec.$593,
-}
+export const BountyDescriptions = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Bounties",
+  "BountyDescriptions",
+  $.tuple(_codec.$4),
+  _codec.$593,
+)
 
 /**
  * Accept the curator role for a bounty.

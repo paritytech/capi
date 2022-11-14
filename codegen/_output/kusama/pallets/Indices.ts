@@ -1,15 +1,17 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** The lookup from index to account. */
-export const Accounts = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Blake2_128Concat"],
-  key: $.tuple(_codec.$4),
-  value: _codec.$468,
-}
+export const Accounts = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Indices",
+  "Accounts",
+  $.tuple(_codec.$4),
+  _codec.$468,
+)
 
 /**
  * Assign an previously unassigned index.

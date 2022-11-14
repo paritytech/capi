@@ -1,14 +1,17 @@
+import { C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** The set of open multisig operations. */
-export const Multisigs = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat", "Blake2_128Concat"],
-  key: _codec.$588,
-  value: _codec.$589,
-}
+export const Multisigs = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Multisig",
+  "Multisigs",
+  _codec.$588,
+  _codec.$589,
+)
 
 /**
  * Register approval for a dispatch to be made from a deterministic composite account if

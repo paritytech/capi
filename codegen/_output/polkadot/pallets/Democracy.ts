@@ -1,4 +1,4 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
@@ -6,59 +6,69 @@ import type * as types from "../types/mod.ts"
  *  A record of who vetoed what. Maps proposal hash to a possible existent block number
  *  (until when it may not be resubmitted) and who vetoed it.
  */
-export const Blacklist = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Identity"],
-  key: $.tuple(_codec.$11),
-  value: _codec.$543,
-}
+export const Blacklist = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Democracy",
+  "Blacklist",
+  $.tuple(_codec.$11),
+  _codec.$543,
+)
 
 /** Record of all proposals that have been subject to emergency cancellation. */
-export const Cancellations = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Identity"],
-  key: $.tuple(_codec.$11),
-  value: _codec.$43,
-}
+export const Cancellations = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Democracy",
+  "Cancellations",
+  $.tuple(_codec.$11),
+  _codec.$43,
+)
 
 /**
  *  Those who have locked a deposit.
  *
  *  TWOX-NOTE: Safe, as increasing integer keys are safe.
  */
-export const DepositOf = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$4),
-  value: _codec.$531,
-}
+export const DepositOf = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Democracy",
+  "DepositOf",
+  $.tuple(_codec.$4),
+  _codec.$531,
+)
 
 /**
  *  True if the last referendum tabled was submitted externally. False if it was a public
  *  proposal.
  */
-export const LastTabledWasExternal = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$43,
-}
+export const LastTabledWasExternal = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Democracy",
+  "LastTabledWasExternal",
+  $.tuple(),
+  _codec.$43,
+)
 
 /**
  *  The lowest referendum index representing an unbaked referendum. Equal to
  *  `ReferendumCount` if there isn't a unbaked referendum.
  */
-export const LowestUnbaked = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const LowestUnbaked = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Democracy",
+  "LowestUnbaked",
+  $.tuple(),
+  _codec.$4,
+)
 
 /**
  *  The referendum to be tabled whenever it would be valid to table an external proposal.
@@ -66,53 +76,63 @@ export const LowestUnbaked = {
  *  - `LastTabledWasExternal` is `false`; or
  *  - `PublicProps` is empty.
  */
-export const NextExternal = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$542,
-}
+export const NextExternal = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "Democracy",
+  "NextExternal",
+  $.tuple(),
+  _codec.$542,
+)
 
 /** The number of (public) proposals that have been made so far. */
-export const PublicPropCount = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const PublicPropCount = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Democracy",
+  "PublicPropCount",
+  $.tuple(),
+  _codec.$4,
+)
 
 /** The public proposals. Unsorted. The second item is the proposal. */
-export const PublicProps = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$528,
-}
+export const PublicProps = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Democracy",
+  "PublicProps",
+  $.tuple(),
+  _codec.$528,
+)
 
 /** The next free referendum index, aka the number of referenda started so far. */
-export const ReferendumCount = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const ReferendumCount = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Democracy",
+  "ReferendumCount",
+  $.tuple(),
+  _codec.$4,
+)
 
 /**
  *  Information concerning any given referendum.
  *
  *  TWOX-NOTE: SAFE as indexes are not under an attacker’s control.
  */
-export const ReferendumInfoOf = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$4),
-  value: _codec.$533,
-}
+export const ReferendumInfoOf = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Democracy",
+  "ReferendumInfoOf",
+  $.tuple(_codec.$4),
+  _codec.$533,
+)
 
 /**
  *  All votes for a particular voter. We store the balance for the number of votes that we
@@ -120,13 +140,15 @@ export const ReferendumInfoOf = {
  *
  *  TWOX-NOTE: SAFE as `AccountId`s are crypto hashes anyway.
  */
-export const VotingOf = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$0),
-  value: _codec.$536,
-}
+export const VotingOf = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Democracy",
+  "VotingOf",
+  $.tuple(_codec.$0),
+  _codec.$536,
+)
 
 /**
  * Permanently place a proposal into the blacklist. This prevents it from ever being

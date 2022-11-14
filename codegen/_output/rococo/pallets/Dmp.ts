@@ -1,4 +1,4 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 
 /**
@@ -10,19 +10,23 @@ import * as _codec from "../codecs.ts"
  *  - `B`: is the relay-chain block number in which a message was appended.
  *  - `H(M)`: is the hash of the message being appended.
  */
-export const DownwardMessageQueueHeads = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$98),
-  value: _codec.$11,
-}
+export const DownwardMessageQueueHeads = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Dmp",
+  "DownwardMessageQueueHeads",
+  $.tuple(_codec.$98),
+  _codec.$11,
+)
 
 /** The downward messages addressed for a certain para. */
-export const DownwardMessageQueues = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$98),
-  value: _codec.$682,
-}
+export const DownwardMessageQueues = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Dmp",
+  "DownwardMessageQueues",
+  $.tuple(_codec.$98),
+  _codec.$682,
+)

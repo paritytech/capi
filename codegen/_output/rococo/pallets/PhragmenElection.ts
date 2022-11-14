@@ -1,4 +1,4 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
@@ -10,35 +10,41 @@ import type * as types from "../types/mod.ts"
  *
  *  Invariant: Always sorted based on account id.
  */
-export const Candidates = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$68,
-}
+export const Candidates = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "PhragmenElection",
+  "Candidates",
+  $.tuple(),
+  _codec.$68,
+)
 
 /** The total number of vote rounds that have happened, excluding the upcoming one. */
-export const ElectionRounds = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const ElectionRounds = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "PhragmenElection",
+  "ElectionRounds",
+  $.tuple(),
+  _codec.$4,
+)
 
 /**
  *  The current elected members.
  *
  *  Invariant: Always sorted based on account id.
  */
-export const Members = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$550,
-}
+export const Members = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "PhragmenElection",
+  "Members",
+  $.tuple(),
+  _codec.$550,
+)
 
 /**
  *  The current reserved runners-up.
@@ -46,26 +52,30 @@ export const Members = {
  *  Invariant: Always sorted based on rank (worse to best). Upon removal of a member, the
  *  last (i.e. _best_) runner-up will be replaced.
  */
-export const RunnersUp = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$550,
-}
+export const RunnersUp = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "PhragmenElection",
+  "RunnersUp",
+  $.tuple(),
+  _codec.$550,
+)
 
 /**
  *  Votes and locked stake of a particular voter.
  *
  *  TWOX-NOTE: SAFE as `AccountId` is a crypto hash.
  */
-export const Voting = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$0),
-  value: _codec.$552,
-}
+export const Voting = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "PhragmenElection",
+  "Voting",
+  $.tuple(_codec.$0),
+  _codec.$552,
+)
 
 /**
  * Clean all voters who are defunct (i.e. they do not serve any purpose at all). The

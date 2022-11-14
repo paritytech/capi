@@ -1,54 +1,64 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** Child bounties that have been added. */
-export const ChildBounties = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat", "Twox64Concat"],
-  key: _codec.$30,
-  value: _codec.$595,
-}
+export const ChildBounties = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "ChildBounties",
+  "ChildBounties",
+  _codec.$30,
+  _codec.$595,
+)
 
 /** Number of total child bounties. */
-export const ChildBountyCount = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const ChildBountyCount = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "ChildBounties",
+  "ChildBountyCount",
+  $.tuple(),
+  _codec.$4,
+)
 
 /** The description of each child-bounty. */
-export const ChildBountyDescriptions = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$4),
-  value: _codec.$593,
-}
+export const ChildBountyDescriptions = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "ChildBounties",
+  "ChildBountyDescriptions",
+  $.tuple(_codec.$4),
+  _codec.$593,
+)
 
 /** The cumulative child-bounty curator fee for each parent bounty. */
-export const ChildrenCuratorFees = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$4),
-  value: _codec.$6,
-}
+export const ChildrenCuratorFees = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "ChildBounties",
+  "ChildrenCuratorFees",
+  $.tuple(_codec.$4),
+  _codec.$6,
+)
 
 /**
  *  Number of child bounties per parent bounty.
  *  Map of parent bounty index to number of child bounties.
  */
-export const ParentChildBounties = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$4),
-  value: _codec.$4,
-}
+export const ParentChildBounties = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "ChildBounties",
+  "ParentChildBounties",
+  $.tuple(_codec.$4),
+  _codec.$4,
+)
 
 /**
  * Accept the curator role for the child-bounty.

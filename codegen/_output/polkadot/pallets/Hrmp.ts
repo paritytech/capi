@@ -1,4 +1,4 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
@@ -7,25 +7,29 @@ import type * as types from "../types/mod.ts"
  *  Invariant: `HrmpOpenChannelRequests` should contain the same number of items `(_, X)` with
  *  `confirmed` set to true, as the number of `HrmpAcceptedChannelRequestCount` for `X`.
  */
-export const HrmpAcceptedChannelRequestCount = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$98),
-  value: _codec.$4,
-}
+export const HrmpAcceptedChannelRequestCount = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Hrmp",
+  "HrmpAcceptedChannelRequestCount",
+  $.tuple(_codec.$98),
+  _codec.$4,
+)
 
 /**
  *  Storage for the messages for each channel.
  *  Invariant: cannot be non-empty if the corresponding channel in `HrmpChannels` is `None`.
  */
-export const HrmpChannelContents = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$112),
-  value: _codec.$690,
-}
+export const HrmpChannelContents = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Hrmp",
+  "HrmpChannelContents",
+  $.tuple(_codec.$112),
+  _codec.$690,
+)
 
 /**
  *  Maintains a mapping that can be used to answer the question: What paras sent a message at
@@ -35,26 +39,30 @@ export const HrmpChannelContents = {
  *  - The outer vector is sorted ascending by block number and cannot store two items with the
  *    same block number.
  */
-export const HrmpChannelDigests = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$98),
-  value: _codec.$692,
-}
+export const HrmpChannelDigests = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Hrmp",
+  "HrmpChannelDigests",
+  $.tuple(_codec.$98),
+  _codec.$692,
+)
 
 /**
  *  HRMP channel data associated with each para.
  *  Invariant:
  *  - each participant in the channel should satisfy `Paras::is_valid_para(P)` within a session.
  */
-export const HrmpChannels = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$112),
-  value: _codec.$688,
-}
+export const HrmpChannels = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Hrmp",
+  "HrmpChannels",
+  $.tuple(_codec.$112),
+  _codec.$688,
+)
 
 /**
  *  A set of pending HRMP close channel requests that are going to be closed during the session
@@ -65,29 +73,35 @@ export const HrmpChannels = {
  *  Invariant:
  *  - There are no channels that exists in list but not in the set and vice versa.
  */
-export const HrmpCloseChannelRequests = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$112),
-  value: _codec.$33,
-}
+export const HrmpCloseChannelRequests = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Hrmp",
+  "HrmpCloseChannelRequests",
+  $.tuple(_codec.$112),
+  _codec.$33,
+)
 
-export const HrmpCloseChannelRequestsList = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$687,
-}
+export const HrmpCloseChannelRequestsList = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Hrmp",
+  "HrmpCloseChannelRequestsList",
+  $.tuple(),
+  _codec.$687,
+)
 
-export const HrmpEgressChannelsIndex = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$98),
-  value: _codec.$662,
-}
+export const HrmpEgressChannelsIndex = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Hrmp",
+  "HrmpEgressChannelsIndex",
+  $.tuple(_codec.$98),
+  _codec.$662,
+)
 
 /**
  *  Ingress/egress indexes allow to find all the senders and receivers given the opposite side.
@@ -104,26 +118,30 @@ export const HrmpEgressChannelsIndex = {
  *  - there should be no other dangling channels in `HrmpChannels`.
  *  - the vectors are sorted.
  */
-export const HrmpIngressChannelsIndex = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$98),
-  value: _codec.$662,
-}
+export const HrmpIngressChannelsIndex = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Hrmp",
+  "HrmpIngressChannelsIndex",
+  $.tuple(_codec.$98),
+  _codec.$662,
+)
 
 /**
  *  This mapping tracks how many open channel requests are initiated by a given sender para.
  *  Invariant: `HrmpOpenChannelRequests` should contain the same number of items that has
  *  `(X, _)` as the number of `HrmpOpenChannelRequestCount` for `X`.
  */
-export const HrmpOpenChannelRequestCount = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$98),
-  value: _codec.$4,
-}
+export const HrmpOpenChannelRequestCount = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Hrmp",
+  "HrmpOpenChannelRequestCount",
+  $.tuple(_codec.$98),
+  _codec.$4,
+)
 
 /**
  *  The set of pending HRMP open channel requests.
@@ -133,34 +151,40 @@ export const HrmpOpenChannelRequestCount = {
  *  Invariant:
  *  - There are no channels that exists in list but not in the set and vice versa.
  */
-export const HrmpOpenChannelRequests = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$112),
-  value: _codec.$686,
-}
+export const HrmpOpenChannelRequests = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Hrmp",
+  "HrmpOpenChannelRequests",
+  $.tuple(_codec.$112),
+  _codec.$686,
+)
 
-export const HrmpOpenChannelRequestsList = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$687,
-}
+export const HrmpOpenChannelRequestsList = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Hrmp",
+  "HrmpOpenChannelRequestsList",
+  $.tuple(),
+  _codec.$687,
+)
 
 /**
  *  The HRMP watermark associated with each para.
  *  Invariant:
  *  - each para `P` used here as a key should satisfy `Paras::is_valid_para(P)` within a session.
  */
-export const HrmpWatermarks = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$98),
-  value: _codec.$4,
-}
+export const HrmpWatermarks = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Hrmp",
+  "HrmpWatermarks",
+  $.tuple(_codec.$98),
+  _codec.$4,
+)
 
 /**
  * This extrinsic triggers the cleanup of all the HRMP storage items that

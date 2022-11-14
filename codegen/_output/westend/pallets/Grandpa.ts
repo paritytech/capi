@@ -1,4 +1,4 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
@@ -6,31 +6,37 @@ import type * as types from "../types/mod.ts"
  *  The number of changes (both in terms of keys and underlying economic responsibilities)
  *  in the "set" of Grandpa validators from genesis.
  */
-export const CurrentSetId = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$10,
-}
+export const CurrentSetId = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Grandpa",
+  "CurrentSetId",
+  $.tuple(),
+  _codec.$10,
+)
 
 /** next block number where we can force a change. */
-export const NextForced = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const NextForced = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "Grandpa",
+  "NextForced",
+  $.tuple(),
+  _codec.$4,
+)
 
 /** Pending change: (signaled at, scheduled change). */
-export const PendingChange = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$517,
-}
+export const PendingChange = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "Grandpa",
+  "PendingChange",
+  $.tuple(),
+  _codec.$517,
+)
 
 /**
  *  A mapping from grandpa set ID to the index of the *most recent* session for which its
@@ -38,31 +44,37 @@ export const PendingChange = {
  *
  *  TWOX-NOTE: `SetId` is not under user control.
  */
-export const SetIdSession = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$10),
-  value: _codec.$4,
-}
+export const SetIdSession = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Grandpa",
+  "SetIdSession",
+  $.tuple(_codec.$10),
+  _codec.$4,
+)
 
 /** `true` if we are currently stalled. */
-export const Stalled = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$30,
-}
+export const Stalled = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "Grandpa",
+  "Stalled",
+  $.tuple(),
+  _codec.$30,
+)
 
 /** State of the current authority set. */
-export const State = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$516,
-}
+export const State = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Grandpa",
+  "State",
+  $.tuple(),
+  _codec.$516,
+)
 
 /**
  * Note that the current authority set of the GRANDPA finality gadget has stalled.

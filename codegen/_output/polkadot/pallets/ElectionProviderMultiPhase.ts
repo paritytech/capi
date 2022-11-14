@@ -1,28 +1,32 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** Current phase. */
-export const CurrentPhase = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$600,
-}
+export const CurrentPhase = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "ElectionProviderMultiPhase",
+  "CurrentPhase",
+  $.tuple(),
+  _codec.$600,
+)
 
 /**
  *  Desired number of targets to elect for this round.
  *
  *  Only exists when [`Snapshot`] is present.
  */
-export const DesiredTargets = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const DesiredTargets = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "ElectionProviderMultiPhase",
+  "DesiredTargets",
+  $.tuple(),
+  _codec.$4,
+)
 
 /**
  *  The minimum score that each 'untrusted' solution must attain in order to be considered
@@ -30,22 +34,26 @@ export const DesiredTargets = {
  *
  *  Can be set via `set_minimum_untrusted_score`.
  */
-export const MinimumUntrustedScore = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$88,
-}
+export const MinimumUntrustedScore = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "ElectionProviderMultiPhase",
+  "MinimumUntrustedScore",
+  $.tuple(),
+  _codec.$88,
+)
 
 /** Current best solution, signed or unsigned, queued to be returned upon `elect`. */
-export const QueuedSolution = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$602,
-}
+export const QueuedSolution = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "ElectionProviderMultiPhase",
+  "QueuedSolution",
+  $.tuple(),
+  _codec.$602,
+)
 
 /**
  *  Internal counter for the number of rounds.
@@ -55,7 +63,15 @@ export const QueuedSolution = {
  *
  *  This is merely incremented once per every time that an upstream `elect` is called.
  */
-export const Round = { type: "Plain", modifier: "Default", hashers: [], key: [], value: _codec.$4 }
+export const Round = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "ElectionProviderMultiPhase",
+  "Round",
+  $.tuple(),
+  _codec.$4,
+)
 
 /**
  *  A sorted, bounded set of `(score, index)`, where each `index` points to a value in
@@ -65,13 +81,15 @@ export const Round = { type: "Plain", modifier: "Default", hashers: [], key: [],
  *  can be quite large, so we're willing to pay the cost of multiple database accesses to access
  *  them one at a time instead of reading and decoding all of them at once.
  */
-export const SignedSubmissionIndices = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$606,
-}
+export const SignedSubmissionIndices = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "ElectionProviderMultiPhase",
+  "SignedSubmissionIndices",
+  $.tuple(),
+  _codec.$606,
+)
 
 /**
  *  The next index to be assigned to an incoming signed submission.
@@ -84,13 +102,15 @@ export const SignedSubmissionIndices = {
  *  capacity, it will simply saturate. We can't just iterate over `SignedSubmissionsMap`,
  *  because iteration is slow. Instead, we store the value here.
  */
-export const SignedSubmissionNextIndex = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const SignedSubmissionNextIndex = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "ElectionProviderMultiPhase",
+  "SignedSubmissionNextIndex",
+  $.tuple(),
+  _codec.$4,
+)
 
 /**
  *  Unchecked, signed solutions.
@@ -101,39 +121,45 @@ export const SignedSubmissionNextIndex = {
  *  Twox note: the key of the map is an auto-incrementing index which users cannot inspect or
  *  affect; we shouldn't need a cryptographically secure hasher.
  */
-export const SignedSubmissionsMap = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$4),
-  value: _codec.$610,
-}
+export const SignedSubmissionsMap = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "ElectionProviderMultiPhase",
+  "SignedSubmissionsMap",
+  $.tuple(_codec.$4),
+  _codec.$610,
+)
 
 /**
  *  Snapshot data of the round.
  *
  *  This is created at the beginning of the signed phase and cleared upon calling `elect`.
  */
-export const Snapshot = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$603,
-}
+export const Snapshot = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "ElectionProviderMultiPhase",
+  "Snapshot",
+  $.tuple(),
+  _codec.$603,
+)
 
 /**
  *  The metadata of the [`RoundSnapshot`]
  *
  *  Only exists when [`Snapshot`] is present.
  */
-export const SnapshotMetadata = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$363,
-}
+export const SnapshotMetadata = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "ElectionProviderMultiPhase",
+  "SnapshotMetadata",
+  $.tuple(),
+  _codec.$363,
+)
 
 /**
  * Trigger the governance fallback.

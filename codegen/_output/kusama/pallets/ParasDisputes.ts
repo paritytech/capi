@@ -1,15 +1,17 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** All ongoing or concluded disputes for the last several sessions. */
-export const Disputes = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat", "Blake2_128Concat"],
-  key: _codec.$698,
-  value: _codec.$699,
-}
+export const Disputes = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "ParasDisputes",
+  "Disputes",
+  _codec.$698,
+  _codec.$699,
+)
 
 /**
  *  Whether the chain is frozen. Starts as `None`. When this is `Some`,
@@ -17,37 +19,43 @@ export const Disputes = {
  *  and its value indicates the last valid block number in the chain.
  *  It can only be set back to `None` by governance intervention.
  */
-export const Frozen = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$236,
-}
+export const Frozen = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "ParasDisputes",
+  "Frozen",
+  $.tuple(),
+  _codec.$236,
+)
 
 /**
  *  All included blocks on the chain, as well as the block number in this chain that
  *  should be reverted back to if the candidate is disputed and determined to be invalid.
  */
-export const Included = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat", "Blake2_128Concat"],
-  key: _codec.$698,
-  value: _codec.$4,
-}
+export const Included = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "ParasDisputes",
+  "Included",
+  _codec.$698,
+  _codec.$4,
+)
 
 /**
  *  The last pruned session, if any. All data stored by this module
  *  references sessions.
  */
-export const LastPrunedSession = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const LastPrunedSession = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "ParasDisputes",
+  "LastPrunedSession",
+  $.tuple(),
+  _codec.$4,
+)
 
 /**
  *  Maps session indices to a vector indicating the number of potentially-spam disputes
@@ -56,13 +64,15 @@ export const LastPrunedSession = {
  *
  *  The i'th entry of the vector corresponds to the i'th validator in the session.
  */
-export const SpamSlots = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$4),
-  value: _codec.$94,
-}
+export const SpamSlots = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "ParasDisputes",
+  "SpamSlots",
+  $.tuple(_codec.$4),
+  _codec.$94,
+)
 
 export function force_unfreeze(): types.polkadot_runtime.RuntimeCall {
   return { type: "ParasDisputes", value: "force_unfreeze" }

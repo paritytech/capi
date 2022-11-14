@@ -1,4 +1,4 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
@@ -8,52 +8,62 @@ import type * as types from "../types/mod.ts"
  *
  *  It is set in `on_finalize`, before it will contain the value from the last block.
  */
-export const AuthorVrfRandomness = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$31,
-}
+export const AuthorVrfRandomness = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Babe",
+  "AuthorVrfRandomness",
+  $.tuple(),
+  _codec.$31,
+)
 
 /** Current epoch authorities. */
-export const Authorities = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$456,
-}
+export const Authorities = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Babe",
+  "Authorities",
+  $.tuple(),
+  _codec.$456,
+)
 
 /** Current slot number. */
-export const CurrentSlot = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$190,
-}
+export const CurrentSlot = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Babe",
+  "CurrentSlot",
+  $.tuple(),
+  _codec.$190,
+)
 
 /**
  *  The configuration for the current epoch. Should never be `None` as it is initialized in
  *  genesis.
  */
-export const EpochConfig = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$466,
-}
+export const EpochConfig = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "Babe",
+  "EpochConfig",
+  $.tuple(),
+  _codec.$466,
+)
 
 /** Current epoch index. */
-export const EpochIndex = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$10,
-}
+export const EpochIndex = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Babe",
+  "EpochIndex",
+  $.tuple(),
+  _codec.$10,
+)
 
 /**
  *  The block numbers when the last and current epoch have started, respectively `N-1` and
@@ -62,37 +72,43 @@ export const EpochIndex = {
  *  entropy was fixed (i.e. it was known to chain observers). Since epochs are defined in
  *  slots, which may be skipped, the block numbers may not line up with the slot numbers.
  */
-export const EpochStart = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$30,
-}
+export const EpochStart = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Babe",
+  "EpochStart",
+  $.tuple(),
+  _codec.$30,
+)
 
 /**
  *  The slot at which the first epoch actually started. This is 0
  *  until the first block of the chain.
  */
-export const GenesisSlot = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$190,
-}
+export const GenesisSlot = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Babe",
+  "GenesisSlot",
+  $.tuple(),
+  _codec.$190,
+)
 
 /**
  *  Temporary value (cleared at block finalization) which is `Some`
  *  if per-block initialization has already been called for current block.
  */
-export const Initialized = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$461,
-}
+export const Initialized = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "Babe",
+  "Initialized",
+  $.tuple(),
+  _codec.$461,
+)
 
 /**
  *  How late the current block is compared to its parent.
@@ -101,52 +117,62 @@ export const Initialized = {
  *  on block finalization. Querying this storage entry outside of block
  *  execution context should always yield zero.
  */
-export const Lateness = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const Lateness = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Babe",
+  "Lateness",
+  $.tuple(),
+  _codec.$4,
+)
 
 /** Next epoch authorities. */
-export const NextAuthorities = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$456,
-}
+export const NextAuthorities = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Babe",
+  "NextAuthorities",
+  $.tuple(),
+  _codec.$456,
+)
 
 /**
  *  The configuration for the next epoch, `None` if the config will not change
  *  (you can fallback to `EpochConfig` instead in that case).
  */
-export const NextEpochConfig = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$466,
-}
+export const NextEpochConfig = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "Babe",
+  "NextEpochConfig",
+  $.tuple(),
+  _codec.$466,
+)
 
 /** Next epoch randomness. */
-export const NextRandomness = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$1,
-}
+export const NextRandomness = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Babe",
+  "NextRandomness",
+  $.tuple(),
+  _codec.$1,
+)
 
 /** Pending epoch configuration change that will be applied when the next epoch is enacted. */
-export const PendingEpochConfigChange = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$192,
-}
+export const PendingEpochConfigChange = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "Babe",
+  "PendingEpochConfigChange",
+  $.tuple(),
+  _codec.$192,
+)
 
 /**
  *  The epoch randomness for the *current* epoch.
@@ -160,13 +186,15 @@ export const PendingEpochConfigChange = {
  *  used where a number is needed that cannot have been chosen by an
  *  adversary, for purposes such as public-coin zero-knowledge proofs.
  */
-export const Randomness = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$1,
-}
+export const Randomness = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Babe",
+  "Randomness",
+  $.tuple(),
+  _codec.$1,
+)
 
 /**
  *  Randomness under construction.
@@ -179,22 +207,26 @@ export const Randomness = {
  *  We reset all segments and return to `0` at the beginning of every
  *  epoch.
  */
-export const SegmentIndex = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const SegmentIndex = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Babe",
+  "SegmentIndex",
+  $.tuple(),
+  _codec.$4,
+)
 
 /** TWOX-NOTE: `SegmentIndex` is an increasing integer, so this is okay. */
-export const UnderConstruction = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$4),
-  value: _codec.$459,
-}
+export const UnderConstruction = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Babe",
+  "UnderConstruction",
+  $.tuple(_codec.$4),
+  _codec.$459,
+)
 
 /**
  * Plan an epoch config change. The epoch config change is recorded and will be enacted on

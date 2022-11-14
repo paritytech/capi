@@ -1,17 +1,22 @@
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 
-export const NextFeeMultiplier = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$479,
-}
+export const NextFeeMultiplier = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "TransactionPayment",
+  "NextFeeMultiplier",
+  $.tuple(),
+  _codec.$479,
+)
 
-export const StorageVersion = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$480,
-}
+export const StorageVersion = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "TransactionPayment",
+  "StorageVersion",
+  $.tuple(),
+  _codec.$480,
+)

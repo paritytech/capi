@@ -1,4 +1,4 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
@@ -8,95 +8,113 @@ import type * as types from "../types/mod.ts"
  *  Key is the blake2 256 hash of (origin, versioned `MultiAssets`) pair. Value is the number of
  *  times this pair has been trapped (usually just 1 if it exists at all).
  */
-export const AssetTraps = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Identity"],
-  key: $.tuple(_codec.$11),
-  value: _codec.$4,
-}
+export const AssetTraps = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "XcmPallet",
+  "AssetTraps",
+  $.tuple(_codec.$11),
+  _codec.$4,
+)
 
 /** The current migration's stage, if any. */
-export const CurrentMigration = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$722,
-}
+export const CurrentMigration = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "XcmPallet",
+  "CurrentMigration",
+  $.tuple(),
+  _codec.$722,
+)
 
 /** The ongoing queries. */
-export const Queries = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Blake2_128Concat"],
-  key: $.tuple(_codec.$10),
-  value: _codec.$713,
-}
+export const Queries = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "XcmPallet",
+  "Queries",
+  $.tuple(_codec.$10),
+  _codec.$713,
+)
 
 /** The latest available query index. */
-export const QueryCounter = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$10,
-}
+export const QueryCounter = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "XcmPallet",
+  "QueryCounter",
+  $.tuple(),
+  _codec.$10,
+)
 
 /**
  *  Default version to encode XCM when latest version of destination is unknown. If `None`,
  *  then the destinations whose XCM version is unknown are considered unreachable.
  */
-export const SafeXcmVersion = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const SafeXcmVersion = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "XcmPallet",
+  "SafeXcmVersion",
+  $.tuple(),
+  _codec.$4,
+)
 
 /** The Latest versions that we know various locations support. */
-export const SupportedVersion = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat", "Blake2_128Concat"],
-  key: _codec.$717,
-  value: _codec.$4,
-}
+export const SupportedVersion = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "XcmPallet",
+  "SupportedVersion",
+  _codec.$717,
+  _codec.$4,
+)
 
 /**
  *  Destinations whose latest XCM version we would like to know. Duplicates not allowed, and
  *  the `u32` counter is the number of times that a send to the destination has been attempted,
  *  which is used as a prioritization.
  */
-export const VersionDiscoveryQueue = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$719,
-}
+export const VersionDiscoveryQueue = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "XcmPallet",
+  "VersionDiscoveryQueue",
+  $.tuple(),
+  _codec.$719,
+)
 
 /** All locations that we have requested version notifications from. */
-export const VersionNotifiers = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat", "Blake2_128Concat"],
-  key: _codec.$717,
-  value: _codec.$10,
-}
+export const VersionNotifiers = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "XcmPallet",
+  "VersionNotifiers",
+  _codec.$717,
+  _codec.$10,
+)
 
 /**
  *  The target locations that are subscribed to our version changes, as well as the most recent
  *  of our versions we informed them of.
  */
-export const VersionNotifyTargets = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat", "Blake2_128Concat"],
-  key: _codec.$717,
-  value: _codec.$718,
-}
+export const VersionNotifyTargets = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "XcmPallet",
+  "VersionNotifyTargets",
+  _codec.$717,
+  _codec.$718,
+)
 
 /**
  * Execute an XCM message from a local, signed, origin.

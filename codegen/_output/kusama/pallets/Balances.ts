@@ -1,4 +1,4 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
@@ -28,56 +28,66 @@ import type * as types from "../types/mod.ts"
  *  `Balances` pallet, which uses a `StorageMap` to store balances data only.
  *  NOTE: This is only used in the case that this pallet is used to store balances.
  */
-export const Account = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Blake2_128Concat"],
-  key: $.tuple(_codec.$0),
-  value: _codec.$5,
-}
+export const Account = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Balances",
+  "Account",
+  $.tuple(_codec.$0),
+  _codec.$5,
+)
 
 /**
  *  Any liquidity locks on some account balances.
  *  NOTE: Should only be accessed when setting, changing and freeing a lock.
  */
-export const Locks = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Blake2_128Concat"],
-  key: $.tuple(_codec.$0),
-  value: _codec.$470,
-}
+export const Locks = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Balances",
+  "Locks",
+  $.tuple(_codec.$0),
+  _codec.$470,
+)
 
 /** Named reserves on some account balances. */
-export const Reserves = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Blake2_128Concat"],
-  key: $.tuple(_codec.$0),
-  value: _codec.$474,
-}
+export const Reserves = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Balances",
+  "Reserves",
+  $.tuple(_codec.$0),
+  _codec.$474,
+)
 
 /**
  *  Storage version of the pallet.
  *
  *  This is set to v2.0.0 for new networks.
  */
-export const StorageVersion = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$477,
-}
+export const StorageVersion = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Balances",
+  "StorageVersion",
+  $.tuple(),
+  _codec.$477,
+)
 
 /** The total units issued in the system. */
-export const TotalIssuance = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$6,
-}
+export const TotalIssuance = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Balances",
+  "TotalIssuance",
+  $.tuple(),
+  _codec.$6,
+)
 
 /**
  * Exactly as `transfer`, except the origin must be root and the source account may be

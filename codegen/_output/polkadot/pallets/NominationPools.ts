@@ -1,123 +1,147 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** Storage for bonded pools. */
-export const BondedPools = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$4),
-  value: _codec.$622,
-}
+export const BondedPools = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "NominationPools",
+  "BondedPools",
+  $.tuple(_codec.$4),
+  _codec.$622,
+)
 
 /** Counter for the related counted storage map */
-export const CounterForBondedPools = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const CounterForBondedPools = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "NominationPools",
+  "CounterForBondedPools",
+  $.tuple(),
+  _codec.$4,
+)
 
 /** Counter for the related counted storage map */
-export const CounterForMetadata = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const CounterForMetadata = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "NominationPools",
+  "CounterForMetadata",
+  $.tuple(),
+  _codec.$4,
+)
 
 /** Counter for the related counted storage map */
-export const CounterForPoolMembers = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const CounterForPoolMembers = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "NominationPools",
+  "CounterForPoolMembers",
+  $.tuple(),
+  _codec.$4,
+)
 
 /** Counter for the related counted storage map */
-export const CounterForReversePoolIdLookup = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const CounterForReversePoolIdLookup = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "NominationPools",
+  "CounterForReversePoolIdLookup",
+  $.tuple(),
+  _codec.$4,
+)
 
 /** Counter for the related counted storage map */
-export const CounterForRewardPools = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const CounterForRewardPools = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "NominationPools",
+  "CounterForRewardPools",
+  $.tuple(),
+  _codec.$4,
+)
 
 /** Counter for the related counted storage map */
-export const CounterForSubPoolsStorage = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const CounterForSubPoolsStorage = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "NominationPools",
+  "CounterForSubPoolsStorage",
+  $.tuple(),
+  _codec.$4,
+)
 
 /** Ever increasing number of all pools created so far. */
-export const LastPoolId = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const LastPoolId = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "NominationPools",
+  "LastPoolId",
+  $.tuple(),
+  _codec.$4,
+)
 
 /**
  *  Maximum number of members that can exist in the system. If `None`, then the count
  *  members are not bound on a system wide basis.
  */
-export const MaxPoolMembers = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const MaxPoolMembers = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "NominationPools",
+  "MaxPoolMembers",
+  $.tuple(),
+  _codec.$4,
+)
 
 /**
  *  Maximum number of members that may belong to pool. If `None`, then the count of
  *  members is not bound on a per pool basis.
  */
-export const MaxPoolMembersPerPool = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const MaxPoolMembersPerPool = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "NominationPools",
+  "MaxPoolMembersPerPool",
+  $.tuple(),
+  _codec.$4,
+)
 
 /**
  *  Maximum number of nomination pools that can exist. If `None`, then an unbounded number of
  *  pools can exist.
  */
-export const MaxPools = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const MaxPools = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "NominationPools",
+  "MaxPools",
+  $.tuple(),
+  _codec.$4,
+)
 
 /** Metadata for the pool. */
-export const Metadata = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$4),
-  value: _codec.$631,
-}
+export const Metadata = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "NominationPools",
+  "Metadata",
+  $.tuple(_codec.$4),
+  _codec.$631,
+)
 
 /**
  *  Minimum bond required to create a pool.
@@ -128,31 +152,37 @@ export const Metadata = {
  *  This is the value that will always exist in the staking ledger of the pool bonded account
  *  while all other accounts leave.
  */
-export const MinCreateBond = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$6,
-}
+export const MinCreateBond = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "NominationPools",
+  "MinCreateBond",
+  $.tuple(),
+  _codec.$6,
+)
 
 /** Minimum amount to bond to join a pool. */
-export const MinJoinBond = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$6,
-}
+export const MinJoinBond = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "NominationPools",
+  "MinJoinBond",
+  $.tuple(),
+  _codec.$6,
+)
 
 /** Active members. */
-export const PoolMembers = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$0),
-  value: _codec.$617,
-}
+export const PoolMembers = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "NominationPools",
+  "PoolMembers",
+  $.tuple(_codec.$0),
+  _codec.$617,
+)
 
 /**
  *  A reverse lookup from the pool's account id to its id.
@@ -160,37 +190,43 @@ export const PoolMembers = {
  *  This is only used for slashing. In all other instances, the pool id is used, and the
  *  accounts are deterministically derived from it.
  */
-export const ReversePoolIdLookup = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$0),
-  value: _codec.$4,
-}
+export const ReversePoolIdLookup = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "NominationPools",
+  "ReversePoolIdLookup",
+  $.tuple(_codec.$0),
+  _codec.$4,
+)
 
 /**
  *  Reward pools. This is where there rewards for each pool accumulate. When a members payout
  *  is claimed, the balance comes out fo the reward pool. Keyed by the bonded pools account.
  */
-export const RewardPools = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$4),
-  value: _codec.$624,
-}
+export const RewardPools = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "NominationPools",
+  "RewardPools",
+  $.tuple(_codec.$4),
+  _codec.$624,
+)
 
 /**
  *  Groups of unbonding pools. Each group of unbonding pools belongs to a bonded pool,
  *  hence the name sub-pools. Keyed by the bonded pools account.
  */
-export const SubPoolsStorage = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$4),
-  value: _codec.$625,
-}
+export const SubPoolsStorage = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "NominationPools",
+  "SubPoolsStorage",
+  $.tuple(_codec.$4),
+  _codec.$625,
+)
 
 /**
  * Bond `extra` more funds from `origin` into the pool to which they already belong.

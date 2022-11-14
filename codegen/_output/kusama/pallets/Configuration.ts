@@ -1,26 +1,31 @@
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** The active configuration for the current session. */
-export const ActiveConfig = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$638,
-}
+export const ActiveConfig = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Configuration",
+  "ActiveConfig",
+  $.tuple(),
+  _codec.$638,
+)
 
 /**
  *  If this is set, then the configuration setters will bypass the consistency checks. This
  *  is meant to be used only as the last resort.
  */
-export const BypassConsistencyCheck = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$43,
-}
+export const BypassConsistencyCheck = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Configuration",
+  "BypassConsistencyCheck",
+  $.tuple(),
+  _codec.$43,
+)
 
 /**
  *  Pending configuration changes.
@@ -31,13 +36,15 @@ export const BypassConsistencyCheck = {
  *  The list is sorted ascending by session index. Also, this list can only contain at most
  *  2 items: for the next session and for the `scheduled_session`.
  */
-export const PendingConfigs = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$639,
-}
+export const PendingConfigs = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Configuration",
+  "PendingConfigs",
+  $.tuple(),
+  _codec.$639,
+)
 
 /**
  * Setting this to true will disable consistency checks for the configuration setters.

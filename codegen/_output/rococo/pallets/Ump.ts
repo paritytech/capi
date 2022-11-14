@@ -1,4 +1,4 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
@@ -9,13 +9,15 @@ import type * as types from "../types/mod.ts"
  *  - The set of items from this vector should be exactly the set of the keys in
  *    `RelayDispatchQueues` and `RelayDispatchQueueSize`.
  */
-export const NeedsDispatch = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$662,
-}
+export const NeedsDispatch = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Ump",
+  "NeedsDispatch",
+  $.tuple(),
+  _codec.$662,
+)
 
 /**
  *  This is the para that gets will get dispatched first during the next upward dispatchable queue
@@ -24,38 +26,44 @@ export const NeedsDispatch = {
  *  Invariant:
  *  - If `Some(para)`, then `para` must be present in `NeedsDispatch`.
  */
-export const NextDispatchRoundStartWith = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$98,
-}
+export const NextDispatchRoundStartWith = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "Ump",
+  "NextDispatchRoundStartWith",
+  $.tuple(),
+  _codec.$98,
+)
 
 /**
  *  The messages that exceeded max individual message weight budget.
  *
  *  These messages stay there until manually dispatched.
  */
-export const Overweight = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$10),
-  value: _codec.$684,
-}
+export const Overweight = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Ump",
+  "Overweight",
+  $.tuple(_codec.$10),
+  _codec.$684,
+)
 
 /**
  *  The number of overweight messages ever recorded in `Overweight` (and thus the lowest free
  *  index).
  */
-export const OverweightCount = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$10,
-}
+export const OverweightCount = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Ump",
+  "OverweightCount",
+  $.tuple(),
+  _codec.$10,
+)
 
 /**
  *  Size of the dispatch queues. Caches sizes of the queues in `RelayDispatchQueue`.
@@ -70,13 +78,15 @@ export const OverweightCount = {
  *  Invariant:
  *  - The set of keys should exactly match the set of keys of `RelayDispatchQueues`.
  */
-export const RelayDispatchQueueSize = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$98),
-  value: _codec.$30,
-}
+export const RelayDispatchQueueSize = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Ump",
+  "RelayDispatchQueueSize",
+  $.tuple(_codec.$98),
+  _codec.$30,
+)
 
 /**
  *  The messages waiting to be handled by the relay-chain originating from a certain parachain.
@@ -86,13 +96,15 @@ export const RelayDispatchQueueSize = {
  *
  *  The messages are processed in FIFO order.
  */
-export const RelayDispatchQueues = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$98),
-  value: _codec.$164,
-}
+export const RelayDispatchQueues = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Ump",
+  "RelayDispatchQueues",
+  $.tuple(_codec.$98),
+  _codec.$164,
+)
 
 /**
  * Service a single overweight upward message.

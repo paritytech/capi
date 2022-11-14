@@ -1,15 +1,17 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** Current index of the session. */
-export const CurrentIndex = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const CurrentIndex = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Session",
+  "CurrentIndex",
+  $.tuple(),
+  _codec.$4,
+)
 
 /**
  *  Indices of disabled validators.
@@ -18,64 +20,76 @@ export const CurrentIndex = {
  *  disabled using binary search. It gets cleared when `on_session_ending` returns
  *  a new set of identities.
  */
-export const DisabledValidators = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$94,
-}
+export const DisabledValidators = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Session",
+  "DisabledValidators",
+  $.tuple(),
+  _codec.$94,
+)
 
 /** The owner of a key. The key is the `KeyTypeId` + the encoded key. */
-export const KeyOwner = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$513),
-  value: _codec.$0,
-}
+export const KeyOwner = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Session",
+  "KeyOwner",
+  $.tuple(_codec.$513),
+  _codec.$0,
+)
 
 /** The next session keys for a validator. */
-export const NextKeys = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$0),
-  value: _codec.$212,
-}
+export const NextKeys = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Session",
+  "NextKeys",
+  $.tuple(_codec.$0),
+  _codec.$212,
+)
 
 /**
  *  True if the underlying economic identities or weighting behind the validators
  *  has changed in the queued validator set.
  */
-export const QueuedChanged = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$43,
-}
+export const QueuedChanged = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Session",
+  "QueuedChanged",
+  $.tuple(),
+  _codec.$43,
+)
 
 /**
  *  The queued keys for the next session. When the next session begins, these keys
  *  will be used to determine the validator's session keys.
  */
-export const QueuedKeys = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$511,
-}
+export const QueuedKeys = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Session",
+  "QueuedKeys",
+  $.tuple(),
+  _codec.$511,
+)
 
 /** The current set of validators. */
-export const Validators = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$206,
-}
+export const Validators = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Session",
+  "Validators",
+  $.tuple(),
+  _codec.$206,
+)
 
 /**
  * Removes any session key(s) of the function caller.

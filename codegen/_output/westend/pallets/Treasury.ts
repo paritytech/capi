@@ -1,33 +1,39 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** Proposal indices that have been approved but not yet awarded. */
-export const Approvals = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$557,
-}
+export const Approvals = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Treasury",
+  "Approvals",
+  $.tuple(),
+  _codec.$557,
+)
 
 /** Number of proposals that have been made. */
-export const ProposalCount = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const ProposalCount = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Treasury",
+  "ProposalCount",
+  $.tuple(),
+  _codec.$4,
+)
 
 /** Proposals that have been made. */
-export const Proposals = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$4),
-  value: _codec.$556,
-}
+export const Proposals = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Treasury",
+  "Proposals",
+  $.tuple(_codec.$4),
+  _codec.$556,
+)
 
 /**
  * Approve a proposal. At a later time, the proposal will be allocated to the beneficiary

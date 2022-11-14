@@ -1,45 +1,53 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** The number of auctions that have entered into their ending period so far. */
-export const EndingsCount = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const EndingsCount = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Crowdloan",
+  "EndingsCount",
+  $.tuple(),
+  _codec.$4,
+)
 
 /** Info on all of the funds. */
-export const Funds = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$98),
-  value: _codec.$710,
-}
+export const Funds = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Crowdloan",
+  "Funds",
+  $.tuple(_codec.$98),
+  _codec.$710,
+)
 
 /**
  *  The funds that have had additional contributions during the last block. This is used
  *  in order to determine which funds should submit new or updated bids.
  */
-export const NewRaise = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$662,
-}
+export const NewRaise = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Crowdloan",
+  "NewRaise",
+  $.tuple(),
+  _codec.$662,
+)
 
 /** Tracker for the next available fund index */
-export const NextFundIndex = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const NextFundIndex = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Crowdloan",
+  "NextFundIndex",
+  $.tuple(),
+  _codec.$4,
+)
 
 /**
  * Add an optional memo to an existing crowdloan contribution.
