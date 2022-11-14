@@ -43,9 +43,7 @@ export class Extrinsic<
     const $extrinsic_ = $extrinsic(this.client)
     const $extrinsicProps = Z.rec({
       protocolVersion: 4,
-      palletName: this.props.palletName,
-      methodName: this.props.methodName,
-      args: this.props.args,
+      call: this.props.call,
     })
     const extrinsicBytes = scale.scaleEncoded($extrinsic_, $extrinsicProps, true)
     const extrinsicHex = extrinsicBytes.next(U.hex.encodePrefixed)

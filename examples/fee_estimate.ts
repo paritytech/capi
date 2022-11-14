@@ -1,14 +1,14 @@
-import * as C from "../mod.ts"
 import * as T from "../test_util/mod.ts"
 
-const tx = C.extrinsic(T.westend)({
-  sender: C.compat.multiAddressFromKeypair(T.alice),
-  palletName: "Balances",
-  methodName: "transfer",
-  args: {
+import { extrinsic } from "../codegen/_output/westend/mod.ts"
+import { Balances } from "../codegen/_output/westend/pallets/mod.ts"
+
+const tx = extrinsic({
+  sender: T.alice.address,
+  call: Balances.transfer({
     value: 12345n,
-    dest: C.compat.multiAddressFromKeypair(T.bob),
-  },
+    dest: T.bob.address,
+  }),
 })
   .feeEstimate
 
