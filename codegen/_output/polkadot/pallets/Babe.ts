@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** Current epoch index. */
@@ -10,7 +10,7 @@ export const EpochIndex = new C.fluent.Storage(
   "Babe",
   "EpochIndex",
   $.tuple(),
-  _codec.$10,
+  codecs.$10,
 )
 
 /** Current epoch authorities. */
@@ -21,7 +21,7 @@ export const Authorities = new C.fluent.Storage(
   "Babe",
   "Authorities",
   $.tuple(),
-  _codec.$456,
+  codecs.$456,
 )
 
 /**
@@ -35,7 +35,7 @@ export const GenesisSlot = new C.fluent.Storage(
   "Babe",
   "GenesisSlot",
   $.tuple(),
-  _codec.$190,
+  codecs.$190,
 )
 
 /** Current slot number. */
@@ -46,7 +46,7 @@ export const CurrentSlot = new C.fluent.Storage(
   "Babe",
   "CurrentSlot",
   $.tuple(),
-  _codec.$190,
+  codecs.$190,
 )
 
 /**
@@ -68,7 +68,7 @@ export const Randomness = new C.fluent.Storage(
   "Babe",
   "Randomness",
   $.tuple(),
-  _codec.$1,
+  codecs.$1,
 )
 
 /** Pending epoch configuration change that will be applied when the next epoch is enacted. */
@@ -79,7 +79,7 @@ export const PendingEpochConfigChange = new C.fluent.Storage(
   "Babe",
   "PendingEpochConfigChange",
   $.tuple(),
-  _codec.$192,
+  codecs.$192,
 )
 
 /** Next epoch randomness. */
@@ -90,7 +90,7 @@ export const NextRandomness = new C.fluent.Storage(
   "Babe",
   "NextRandomness",
   $.tuple(),
-  _codec.$1,
+  codecs.$1,
 )
 
 /** Next epoch authorities. */
@@ -101,7 +101,7 @@ export const NextAuthorities = new C.fluent.Storage(
   "Babe",
   "NextAuthorities",
   $.tuple(),
-  _codec.$456,
+  codecs.$456,
 )
 
 /**
@@ -122,7 +122,7 @@ export const SegmentIndex = new C.fluent.Storage(
   "Babe",
   "SegmentIndex",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /** TWOX-NOTE: `SegmentIndex` is an increasing integer, so this is okay. */
@@ -132,8 +132,8 @@ export const UnderConstruction = new C.fluent.Storage(
   "Default",
   "Babe",
   "UnderConstruction",
-  $.tuple(_codec.$4),
-  _codec.$459,
+  $.tuple(codecs.$4),
+  codecs.$459,
 )
 
 /**
@@ -147,7 +147,7 @@ export const Initialized = new C.fluent.Storage(
   "Babe",
   "Initialized",
   $.tuple(),
-  _codec.$461,
+  codecs.$461,
 )
 
 /**
@@ -163,7 +163,7 @@ export const AuthorVrfRandomness = new C.fluent.Storage(
   "Babe",
   "AuthorVrfRandomness",
   $.tuple(),
-  _codec.$31,
+  codecs.$31,
 )
 
 /**
@@ -180,7 +180,7 @@ export const EpochStart = new C.fluent.Storage(
   "Babe",
   "EpochStart",
   $.tuple(),
-  _codec.$30,
+  codecs.$30,
 )
 
 /**
@@ -197,7 +197,7 @@ export const Lateness = new C.fluent.Storage(
   "Babe",
   "Lateness",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /**
@@ -211,7 +211,7 @@ export const EpochConfig = new C.fluent.Storage(
   "Babe",
   "EpochConfig",
   $.tuple(),
-  _codec.$466,
+  codecs.$466,
 )
 
 /**
@@ -225,7 +225,7 @@ export const NextEpochConfig = new C.fluent.Storage(
   "Babe",
   "NextEpochConfig",
   $.tuple(),
-  _codec.$466,
+  codecs.$466,
 )
 
 /**

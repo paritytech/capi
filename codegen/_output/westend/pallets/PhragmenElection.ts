@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /**
@@ -14,7 +14,7 @@ export const Members = new C.fluent.Storage(
   "PhragmenElection",
   "Members",
   $.tuple(),
-  _codec.$550,
+  codecs.$550,
 )
 
 /**
@@ -30,7 +30,7 @@ export const RunnersUp = new C.fluent.Storage(
   "PhragmenElection",
   "RunnersUp",
   $.tuple(),
-  _codec.$550,
+  codecs.$550,
 )
 
 /**
@@ -48,7 +48,7 @@ export const Candidates = new C.fluent.Storage(
   "PhragmenElection",
   "Candidates",
   $.tuple(),
-  _codec.$68,
+  codecs.$68,
 )
 
 /** The total number of vote rounds that have happened, excluding the upcoming one. */
@@ -59,7 +59,7 @@ export const ElectionRounds = new C.fluent.Storage(
   "PhragmenElection",
   "ElectionRounds",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /**
@@ -73,8 +73,8 @@ export const Voting = new C.fluent.Storage(
   "Default",
   "PhragmenElection",
   "Voting",
-  $.tuple(_codec.$0),
-  _codec.$552,
+  $.tuple(codecs.$0),
+  codecs.$552,
 )
 
 /**

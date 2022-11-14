@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** Minimum amount to bond to join a pool. */
@@ -10,7 +10,7 @@ export const MinJoinBond = new C.fluent.Storage(
   "NominationPools",
   "MinJoinBond",
   $.tuple(),
-  _codec.$6,
+  codecs.$6,
 )
 
 /**
@@ -29,7 +29,7 @@ export const MinCreateBond = new C.fluent.Storage(
   "NominationPools",
   "MinCreateBond",
   $.tuple(),
-  _codec.$6,
+  codecs.$6,
 )
 
 /**
@@ -43,7 +43,7 @@ export const MaxPools = new C.fluent.Storage(
   "NominationPools",
   "MaxPools",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /**
@@ -57,7 +57,7 @@ export const MaxPoolMembers = new C.fluent.Storage(
   "NominationPools",
   "MaxPoolMembers",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /**
@@ -71,7 +71,7 @@ export const MaxPoolMembersPerPool = new C.fluent.Storage(
   "NominationPools",
   "MaxPoolMembersPerPool",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /** Active members. */
@@ -81,8 +81,8 @@ export const PoolMembers = new C.fluent.Storage(
   "Optional",
   "NominationPools",
   "PoolMembers",
-  $.tuple(_codec.$0),
-  _codec.$617,
+  $.tuple(codecs.$0),
+  codecs.$617,
 )
 
 /** Counter for the related counted storage map */
@@ -93,7 +93,7 @@ export const CounterForPoolMembers = new C.fluent.Storage(
   "NominationPools",
   "CounterForPoolMembers",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /** Storage for bonded pools. */
@@ -103,8 +103,8 @@ export const BondedPools = new C.fluent.Storage(
   "Optional",
   "NominationPools",
   "BondedPools",
-  $.tuple(_codec.$4),
-  _codec.$622,
+  $.tuple(codecs.$4),
+  codecs.$622,
 )
 
 /** Counter for the related counted storage map */
@@ -115,7 +115,7 @@ export const CounterForBondedPools = new C.fluent.Storage(
   "NominationPools",
   "CounterForBondedPools",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /**
@@ -128,8 +128,8 @@ export const RewardPools = new C.fluent.Storage(
   "Optional",
   "NominationPools",
   "RewardPools",
-  $.tuple(_codec.$4),
-  _codec.$624,
+  $.tuple(codecs.$4),
+  codecs.$624,
 )
 
 /** Counter for the related counted storage map */
@@ -140,7 +140,7 @@ export const CounterForRewardPools = new C.fluent.Storage(
   "NominationPools",
   "CounterForRewardPools",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /**
@@ -153,8 +153,8 @@ export const SubPoolsStorage = new C.fluent.Storage(
   "Optional",
   "NominationPools",
   "SubPoolsStorage",
-  $.tuple(_codec.$4),
-  _codec.$625,
+  $.tuple(codecs.$4),
+  codecs.$625,
 )
 
 /** Counter for the related counted storage map */
@@ -165,7 +165,7 @@ export const CounterForSubPoolsStorage = new C.fluent.Storage(
   "NominationPools",
   "CounterForSubPoolsStorage",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /** Metadata for the pool. */
@@ -175,8 +175,8 @@ export const Metadata = new C.fluent.Storage(
   "Default",
   "NominationPools",
   "Metadata",
-  $.tuple(_codec.$4),
-  _codec.$631,
+  $.tuple(codecs.$4),
+  codecs.$631,
 )
 
 /** Counter for the related counted storage map */
@@ -187,7 +187,7 @@ export const CounterForMetadata = new C.fluent.Storage(
   "NominationPools",
   "CounterForMetadata",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /** Ever increasing number of all pools created so far. */
@@ -198,7 +198,7 @@ export const LastPoolId = new C.fluent.Storage(
   "NominationPools",
   "LastPoolId",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /**
@@ -213,8 +213,8 @@ export const ReversePoolIdLookup = new C.fluent.Storage(
   "Optional",
   "NominationPools",
   "ReversePoolIdLookup",
-  $.tuple(_codec.$0),
-  _codec.$4,
+  $.tuple(codecs.$0),
+  codecs.$4,
 )
 
 /** Counter for the related counted storage map */
@@ -225,7 +225,7 @@ export const CounterForReversePoolIdLookup = new C.fluent.Storage(
   "NominationPools",
   "CounterForReversePoolIdLookup",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /**

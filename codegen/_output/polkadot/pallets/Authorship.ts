@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** Uncles */
@@ -10,7 +10,7 @@ export const Uncles = new C.fluent.Storage(
   "Authorship",
   "Uncles",
   $.tuple(),
-  _codec.$481,
+  codecs.$481,
 )
 
 /** Author of current block. */
@@ -21,7 +21,7 @@ export const Author = new C.fluent.Storage(
   "Authorship",
   "Author",
   $.tuple(),
-  _codec.$0,
+  codecs.$0,
 )
 
 /** Whether uncles were already set in this block. */
@@ -32,7 +32,7 @@ export const DidSetUncles = new C.fluent.Storage(
   "Authorship",
   "DidSetUncles",
   $.tuple(),
-  _codec.$43,
+  codecs.$43,
 )
 
 /** Provide a set of uncles. */

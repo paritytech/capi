@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 export const Claims = new C.fluent.Storage(
@@ -8,8 +8,8 @@ export const Claims = new C.fluent.Storage(
   "Optional",
   "Claims",
   "Claims",
-  $.tuple(_codec.$73),
-  _codec.$6,
+  $.tuple(codecs.$73),
+  codecs.$6,
 )
 
 export const Total = new C.fluent.Storage(
@@ -19,7 +19,7 @@ export const Total = new C.fluent.Storage(
   "Claims",
   "Total",
   $.tuple(),
-  _codec.$6,
+  codecs.$6,
 )
 
 /**
@@ -34,8 +34,8 @@ export const Vesting = new C.fluent.Storage(
   "Optional",
   "Claims",
   "Vesting",
-  $.tuple(_codec.$73),
-  _codec.$249,
+  $.tuple(codecs.$73),
+  codecs.$249,
 )
 
 /** The statement kind that must be signed, if any. */
@@ -45,8 +45,8 @@ export const Signing = new C.fluent.Storage(
   "Optional",
   "Claims",
   "Signing",
-  $.tuple(_codec.$73),
-  _codec.$251,
+  $.tuple(codecs.$73),
+  codecs.$251,
 )
 
 /** Pre-claimed Ethereum accounts, by the Account ID that they are claimed to. */
@@ -56,8 +56,8 @@ export const Preclaims = new C.fluent.Storage(
   "Optional",
   "Claims",
   "Preclaims",
-  $.tuple(_codec.$0),
-  _codec.$73,
+  $.tuple(codecs.$0),
+  codecs.$73,
 )
 
 /**

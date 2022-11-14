@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /**
@@ -17,7 +17,7 @@ export const Included = new C.fluent.Storage(
   "ParaInherent",
   "Included",
   $.tuple(),
-  _codec.$33,
+  codecs.$33,
 )
 
 /** Scraped on chain data for extracting resolved disputes as well as backing votes. */
@@ -28,7 +28,7 @@ export const OnChainVotes = new C.fluent.Storage(
   "ParaInherent",
   "OnChainVotes",
   $.tuple(),
-  _codec.$647,
+  codecs.$647,
 )
 
 /** Enter the paras inherent. This will process bitfields and backed candidates. */

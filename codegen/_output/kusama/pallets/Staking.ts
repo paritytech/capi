@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** The ideal number of staking participants. */
@@ -10,7 +10,7 @@ export const ValidatorCount = new C.fluent.Storage(
   "Staking",
   "ValidatorCount",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /** Minimum number of staking participants before emergency conditions are imposed. */
@@ -21,7 +21,7 @@ export const MinimumValidatorCount = new C.fluent.Storage(
   "Staking",
   "MinimumValidatorCount",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /**
@@ -36,7 +36,7 @@ export const Invulnerables = new C.fluent.Storage(
   "Staking",
   "Invulnerables",
   $.tuple(),
-  _codec.$206,
+  codecs.$206,
 )
 
 /** Map from all locked "stash" accounts to the controller account. */
@@ -46,8 +46,8 @@ export const Bonded = new C.fluent.Storage(
   "Optional",
   "Staking",
   "Bonded",
-  $.tuple(_codec.$0),
-  _codec.$0,
+  $.tuple(codecs.$0),
+  codecs.$0,
 )
 
 /** The minimum active bond to become and maintain the role of a nominator. */
@@ -58,7 +58,7 @@ export const MinNominatorBond = new C.fluent.Storage(
   "Staking",
   "MinNominatorBond",
   $.tuple(),
-  _codec.$6,
+  codecs.$6,
 )
 
 /** The minimum active bond to become and maintain the role of a validator. */
@@ -69,7 +69,7 @@ export const MinValidatorBond = new C.fluent.Storage(
   "Staking",
   "MinValidatorBond",
   $.tuple(),
-  _codec.$6,
+  codecs.$6,
 )
 
 /**
@@ -84,7 +84,7 @@ export const MinCommission = new C.fluent.Storage(
   "Staking",
   "MinCommission",
   $.tuple(),
-  _codec.$42,
+  codecs.$42,
 )
 
 /** Map from all (unlocked) "controller" accounts to the info regarding the staking. */
@@ -94,8 +94,8 @@ export const Ledger = new C.fluent.Storage(
   "Optional",
   "Staking",
   "Ledger",
-  $.tuple(_codec.$0),
-  _codec.$485,
+  $.tuple(codecs.$0),
+  codecs.$485,
 )
 
 /** Where the reward payment should be made. Keyed by stash. */
@@ -105,8 +105,8 @@ export const Payee = new C.fluent.Storage(
   "Default",
   "Staking",
   "Payee",
-  $.tuple(_codec.$0),
-  _codec.$203,
+  $.tuple(codecs.$0),
+  codecs.$203,
 )
 
 /** The map from (wannabe) validator stash key to the preferences of that validator. */
@@ -116,8 +116,8 @@ export const Validators = new C.fluent.Storage(
   "Default",
   "Staking",
   "Validators",
-  $.tuple(_codec.$0),
-  _codec.$40,
+  $.tuple(codecs.$0),
+  codecs.$40,
 )
 
 /** Counter for the related counted storage map */
@@ -128,7 +128,7 @@ export const CounterForValidators = new C.fluent.Storage(
   "Staking",
   "CounterForValidators",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /**
@@ -143,7 +143,7 @@ export const MaxValidatorsCount = new C.fluent.Storage(
   "Staking",
   "MaxValidatorsCount",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /**
@@ -170,8 +170,8 @@ export const Nominators = new C.fluent.Storage(
   "Optional",
   "Staking",
   "Nominators",
-  $.tuple(_codec.$0),
-  _codec.$490,
+  $.tuple(codecs.$0),
+  codecs.$490,
 )
 
 /** Counter for the related counted storage map */
@@ -182,7 +182,7 @@ export const CounterForNominators = new C.fluent.Storage(
   "Staking",
   "CounterForNominators",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /**
@@ -197,7 +197,7 @@ export const MaxNominatorsCount = new C.fluent.Storage(
   "Staking",
   "MaxNominatorsCount",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /**
@@ -213,7 +213,7 @@ export const CurrentEra = new C.fluent.Storage(
   "Staking",
   "CurrentEra",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /**
@@ -229,7 +229,7 @@ export const ActiveEra = new C.fluent.Storage(
   "Staking",
   "ActiveEra",
   $.tuple(),
-  _codec.$492,
+  codecs.$492,
 )
 
 /**
@@ -244,8 +244,8 @@ export const ErasStartSessionIndex = new C.fluent.Storage(
   "Optional",
   "Staking",
   "ErasStartSessionIndex",
-  $.tuple(_codec.$4),
-  _codec.$4,
+  $.tuple(codecs.$4),
+  codecs.$4,
 )
 
 /**
@@ -262,8 +262,8 @@ export const ErasStakers = new C.fluent.Storage(
   "Default",
   "Staking",
   "ErasStakers",
-  _codec.$494,
-  _codec.$57,
+  codecs.$494,
+  codecs.$57,
 )
 
 /**
@@ -285,8 +285,8 @@ export const ErasStakersClipped = new C.fluent.Storage(
   "Default",
   "Staking",
   "ErasStakersClipped",
-  _codec.$494,
-  _codec.$57,
+  codecs.$494,
+  codecs.$57,
 )
 
 /**
@@ -302,8 +302,8 @@ export const ErasValidatorPrefs = new C.fluent.Storage(
   "Default",
   "Staking",
   "ErasValidatorPrefs",
-  _codec.$494,
-  _codec.$40,
+  codecs.$494,
+  codecs.$40,
 )
 
 /**
@@ -317,8 +317,8 @@ export const ErasValidatorReward = new C.fluent.Storage(
   "Optional",
   "Staking",
   "ErasValidatorReward",
-  $.tuple(_codec.$4),
-  _codec.$6,
+  $.tuple(codecs.$4),
+  codecs.$6,
 )
 
 /**
@@ -331,8 +331,8 @@ export const ErasRewardPoints = new C.fluent.Storage(
   "Default",
   "Staking",
   "ErasRewardPoints",
-  $.tuple(_codec.$4),
-  _codec.$495,
+  $.tuple(codecs.$4),
+  codecs.$495,
 )
 
 /**
@@ -345,8 +345,8 @@ export const ErasTotalStake = new C.fluent.Storage(
   "Default",
   "Staking",
   "ErasTotalStake",
-  $.tuple(_codec.$4),
-  _codec.$6,
+  $.tuple(codecs.$4),
+  codecs.$6,
 )
 
 /** Mode of era forcing. */
@@ -357,7 +357,7 @@ export const ForceEra = new C.fluent.Storage(
   "Staking",
   "ForceEra",
   $.tuple(),
-  _codec.$499,
+  codecs.$499,
 )
 
 /**
@@ -372,7 +372,7 @@ export const SlashRewardFraction = new C.fluent.Storage(
   "Staking",
   "SlashRewardFraction",
   $.tuple(),
-  _codec.$42,
+  codecs.$42,
 )
 
 /**
@@ -386,7 +386,7 @@ export const CanceledSlashPayout = new C.fluent.Storage(
   "Staking",
   "CanceledSlashPayout",
   $.tuple(),
-  _codec.$6,
+  codecs.$6,
 )
 
 /** All unapplied slashes that are queued for later. */
@@ -396,8 +396,8 @@ export const UnappliedSlashes = new C.fluent.Storage(
   "Default",
   "Staking",
   "UnappliedSlashes",
-  $.tuple(_codec.$4),
-  _codec.$500,
+  $.tuple(codecs.$4),
+  codecs.$500,
 )
 
 /**
@@ -413,7 +413,7 @@ export const BondedEras = new C.fluent.Storage(
   "Staking",
   "BondedEras",
   $.tuple(),
-  _codec.$158,
+  codecs.$158,
 )
 
 /**
@@ -426,8 +426,8 @@ export const ValidatorSlashInEra = new C.fluent.Storage(
   "Optional",
   "Staking",
   "ValidatorSlashInEra",
-  _codec.$494,
-  _codec.$502,
+  codecs.$494,
+  codecs.$502,
 )
 
 /** All slashing events on nominators, mapped by era to the highest slash value of the era. */
@@ -437,8 +437,8 @@ export const NominatorSlashInEra = new C.fluent.Storage(
   "Optional",
   "Staking",
   "NominatorSlashInEra",
-  _codec.$494,
-  _codec.$6,
+  codecs.$494,
+  codecs.$6,
 )
 
 /** Slashing spans for stash accounts. */
@@ -448,8 +448,8 @@ export const SlashingSpans = new C.fluent.Storage(
   "Optional",
   "Staking",
   "SlashingSpans",
-  $.tuple(_codec.$0),
-  _codec.$503,
+  $.tuple(codecs.$0),
+  codecs.$503,
 )
 
 /**
@@ -462,8 +462,8 @@ export const SpanSlash = new C.fluent.Storage(
   "Default",
   "Staking",
   "SpanSlash",
-  $.tuple(_codec.$498),
-  _codec.$504,
+  $.tuple(codecs.$498),
+  codecs.$504,
 )
 
 /**
@@ -478,7 +478,7 @@ export const CurrentPlannedSession = new C.fluent.Storage(
   "Staking",
   "CurrentPlannedSession",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /**
@@ -499,7 +499,7 @@ export const OffendingValidators = new C.fluent.Storage(
   "Staking",
   "OffendingValidators",
   $.tuple(),
-  _codec.$505,
+  codecs.$505,
 )
 
 /**
@@ -515,7 +515,7 @@ export const StorageVersion = new C.fluent.Storage(
   "Staking",
   "StorageVersion",
   $.tuple(),
-  _codec.$507,
+  codecs.$507,
 )
 
 /**
@@ -530,7 +530,7 @@ export const ChillThreshold = new C.fluent.Storage(
   "Staking",
   "ChillThreshold",
   $.tuple(),
-  _codec.$205,
+  codecs.$205,
 )
 
 /**

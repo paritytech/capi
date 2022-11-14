@@ -3,7 +3,7 @@ import * as M from "../frame_metadata/mod.ts"
 import { getOrInit } from "../util/map.ts"
 import { Files } from "./Files.ts"
 import { CodegenProps } from "./mod.ts"
-import { S } from "./utils.ts"
+import { makeDocComment, S } from "./utils.ts"
 
 class TypeFile {
   reexports = new Set<string>()
@@ -12,6 +12,7 @@ class TypeFile {
     return this.reexports.size ? "/mod.ts" : ".ts"
   }
 }
+
 export function createTypeVisitor(props: CodegenProps, files: Files) {
   const { tys } = props.metadata
   const paths = new Map<M.Ty, string | null>()
@@ -104,7 +105,7 @@ export function createTypeVisitor(props: CodegenProps, files: Files) {
       if (path !== "types") {
         file += `import type * as types from ${S.string(importPath(filePath, "types/mod.ts"))}\n`
       }
-      file += `import * as _codec from ${S.string(importPath(filePath, "codecs.ts"))}\n`
+      file += `import * as codecs from ${S.string(importPath(filePath, "codecs.ts"))}\n`
       file += `import { $, C } from ${S.string(importPath(filePath, "capi.ts"))}\n`
       file += "\n"
       for (const reexport of [...typeFile.reexports].sort()) {
@@ -322,11 +323,4 @@ function importPath(from: string, to: string) {
   let path = pathPosix.relative(pathPosix.dirname("/" + from), "/" + to)
   if (!path.startsWith(".")) path = "./" + path
   return path
-}
-
-function makeDocComment(docs: string[] = []) {
-  docs = docs.map((x) => x.replace(/^\s*\n\s*|\s*\n\s*$/, "").replace(/\s*\n\s*/g, " "))
-  if (!docs.length) return ""
-  if (docs.length === 1) return `/** ${docs[0]!.trim()} */\n`
-  return `/**\n  * ${docs.join("\n  * ")}\n  */\n`
 }

@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /**
@@ -17,7 +17,7 @@ export const Round = new C.fluent.Storage(
   "ElectionProviderMultiPhase",
   "Round",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /** Current phase. */
@@ -28,7 +28,7 @@ export const CurrentPhase = new C.fluent.Storage(
   "ElectionProviderMultiPhase",
   "CurrentPhase",
   $.tuple(),
-  _codec.$600,
+  codecs.$600,
 )
 
 /** Current best solution, signed or unsigned, queued to be returned upon `elect`. */
@@ -39,7 +39,7 @@ export const QueuedSolution = new C.fluent.Storage(
   "ElectionProviderMultiPhase",
   "QueuedSolution",
   $.tuple(),
-  _codec.$602,
+  codecs.$602,
 )
 
 /**
@@ -54,7 +54,7 @@ export const Snapshot = new C.fluent.Storage(
   "ElectionProviderMultiPhase",
   "Snapshot",
   $.tuple(),
-  _codec.$603,
+  codecs.$603,
 )
 
 /**
@@ -69,7 +69,7 @@ export const DesiredTargets = new C.fluent.Storage(
   "ElectionProviderMultiPhase",
   "DesiredTargets",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /**
@@ -84,7 +84,7 @@ export const SnapshotMetadata = new C.fluent.Storage(
   "ElectionProviderMultiPhase",
   "SnapshotMetadata",
   $.tuple(),
-  _codec.$363,
+  codecs.$363,
 )
 
 /**
@@ -105,7 +105,7 @@ export const SignedSubmissionNextIndex = new C.fluent.Storage(
   "ElectionProviderMultiPhase",
   "SignedSubmissionNextIndex",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /**
@@ -123,7 +123,7 @@ export const SignedSubmissionIndices = new C.fluent.Storage(
   "ElectionProviderMultiPhase",
   "SignedSubmissionIndices",
   $.tuple(),
-  _codec.$606,
+  codecs.$606,
 )
 
 /**
@@ -141,8 +141,8 @@ export const SignedSubmissionsMap = new C.fluent.Storage(
   "Optional",
   "ElectionProviderMultiPhase",
   "SignedSubmissionsMap",
-  $.tuple(_codec.$4),
-  _codec.$610,
+  $.tuple(codecs.$4),
+  codecs.$610,
 )
 
 /**
@@ -158,7 +158,7 @@ export const MinimumUntrustedScore = new C.fluent.Storage(
   "ElectionProviderMultiPhase",
   "MinimumUntrustedScore",
   $.tuple(),
-  _codec.$88,
+  codecs.$88,
 )
 
 /**

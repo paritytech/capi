@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** Number of proposals that have been made. */
@@ -10,7 +10,7 @@ export const ProposalCount = new C.fluent.Storage(
   "Treasury",
   "ProposalCount",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /** Proposals that have been made. */
@@ -20,8 +20,8 @@ export const Proposals = new C.fluent.Storage(
   "Optional",
   "Treasury",
   "Proposals",
-  $.tuple(_codec.$4),
-  _codec.$556,
+  $.tuple(codecs.$4),
+  codecs.$556,
 )
 
 /** Proposal indices that have been approved but not yet awarded. */
@@ -32,7 +32,7 @@ export const Approvals = new C.fluent.Storage(
   "Treasury",
   "Approvals",
   $.tuple(),
-  _codec.$557,
+  codecs.$557,
 )
 
 /**

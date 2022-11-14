@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** The active configuration for the current session. */
@@ -10,7 +10,7 @@ export const ActiveConfig = new C.fluent.Storage(
   "Configuration",
   "ActiveConfig",
   $.tuple(),
-  _codec.$638,
+  codecs.$638,
 )
 
 /**
@@ -29,7 +29,7 @@ export const PendingConfigs = new C.fluent.Storage(
   "Configuration",
   "PendingConfigs",
   $.tuple(),
-  _codec.$639,
+  codecs.$639,
 )
 
 /**
@@ -43,7 +43,7 @@ export const BypassConsistencyCheck = new C.fluent.Storage(
   "Configuration",
   "BypassConsistencyCheck",
   $.tuple(),
-  _codec.$43,
+  codecs.$43,
 )
 
 /** Set the validation upgrade cooldown. */

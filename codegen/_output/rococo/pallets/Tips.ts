@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /**
@@ -13,8 +13,8 @@ export const Tips = new C.fluent.Storage(
   "Optional",
   "Tips",
   "Tips",
-  $.tuple(_codec.$11),
-  _codec.$598,
+  $.tuple(codecs.$11),
+  codecs.$598,
 )
 
 /**
@@ -27,8 +27,8 @@ export const Reasons = new C.fluent.Storage(
   "Optional",
   "Tips",
   "Reasons",
-  $.tuple(_codec.$11),
-  _codec.$12,
+  $.tuple(codecs.$11),
+  codecs.$12,
 )
 
 /**

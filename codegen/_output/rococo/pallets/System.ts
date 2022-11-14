@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** The full account information for a particular account ID. */
@@ -9,8 +9,8 @@ export const Account = new C.fluent.Storage(
   "Default",
   "System",
   "Account",
-  $.tuple(_codec.$0),
-  _codec.$3,
+  $.tuple(codecs.$0),
+  codecs.$3,
 )
 
 /** Total extrinsics count for the current block. */
@@ -21,7 +21,7 @@ export const ExtrinsicCount = new C.fluent.Storage(
   "System",
   "ExtrinsicCount",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /** The current weight for the block. */
@@ -32,7 +32,7 @@ export const BlockWeight = new C.fluent.Storage(
   "System",
   "BlockWeight",
   $.tuple(),
-  _codec.$7,
+  codecs.$7,
 )
 
 /** Total length (in bytes) for all extrinsics put together, for the current block. */
@@ -43,7 +43,7 @@ export const AllExtrinsicsLen = new C.fluent.Storage(
   "System",
   "AllExtrinsicsLen",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /** Map of block numbers to block hashes. */
@@ -53,8 +53,8 @@ export const BlockHash = new C.fluent.Storage(
   "Default",
   "System",
   "BlockHash",
-  $.tuple(_codec.$4),
-  _codec.$11,
+  $.tuple(codecs.$4),
+  codecs.$11,
 )
 
 /** Extrinsics data for the current block (maps an extrinsic's index to its data). */
@@ -64,8 +64,8 @@ export const ExtrinsicData = new C.fluent.Storage(
   "Default",
   "System",
   "ExtrinsicData",
-  $.tuple(_codec.$4),
-  _codec.$12,
+  $.tuple(codecs.$4),
+  codecs.$12,
 )
 
 /** The current block number being processed. Set by `execute_block`. */
@@ -76,7 +76,7 @@ export const Number = new C.fluent.Storage(
   "System",
   "Number",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /** Hash of the previous block. */
@@ -87,7 +87,7 @@ export const ParentHash = new C.fluent.Storage(
   "System",
   "ParentHash",
   $.tuple(),
-  _codec.$11,
+  codecs.$11,
 )
 
 /** Digest of the current block, also part of the block header. */
@@ -98,7 +98,7 @@ export const Digest = new C.fluent.Storage(
   "System",
   "Digest",
   $.tuple(),
-  _codec.$13,
+  codecs.$13,
 )
 
 /**
@@ -117,7 +117,7 @@ export const Events = new C.fluent.Storage(
   "System",
   "Events",
   $.tuple(),
-  _codec.$17,
+  codecs.$17,
 )
 
 /** The number of events in the `Events<T>` list. */
@@ -128,7 +128,7 @@ export const EventCount = new C.fluent.Storage(
   "System",
   "EventCount",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /**
@@ -149,8 +149,8 @@ export const EventTopics = new C.fluent.Storage(
   "Default",
   "System",
   "EventTopics",
-  $.tuple(_codec.$11),
-  _codec.$158,
+  $.tuple(codecs.$11),
+  codecs.$158,
 )
 
 /** Stores the `spec_version` and `spec_name` of when the last runtime upgrade happened. */
@@ -161,7 +161,7 @@ export const LastRuntimeUpgrade = new C.fluent.Storage(
   "System",
   "LastRuntimeUpgrade",
   $.tuple(),
-  _codec.$159,
+  codecs.$159,
 )
 
 /** True if we have upgraded so that `type RefCount` is `u32`. False (default) if not. */
@@ -172,7 +172,7 @@ export const UpgradedToU32RefCount = new C.fluent.Storage(
   "System",
   "UpgradedToU32RefCount",
   $.tuple(),
-  _codec.$43,
+  codecs.$43,
 )
 
 /**
@@ -186,7 +186,7 @@ export const UpgradedToTripleRefCount = new C.fluent.Storage(
   "System",
   "UpgradedToTripleRefCount",
   $.tuple(),
-  _codec.$43,
+  codecs.$43,
 )
 
 /** The execution phase of the block. */
@@ -197,7 +197,7 @@ export const ExecutionPhase = new C.fluent.Storage(
   "System",
   "ExecutionPhase",
   $.tuple(),
-  _codec.$156,
+  codecs.$156,
 )
 
 /** A dispatch that will fill the block weight up to the given ratio. */

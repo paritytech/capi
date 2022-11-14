@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** Information regarding the vesting of a given account. */
@@ -9,8 +9,8 @@ export const Vesting = new C.fluent.Storage(
   "Optional",
   "Vesting",
   "Vesting",
-  $.tuple(_codec.$0),
-  _codec.$563,
+  $.tuple(codecs.$0),
+  codecs.$563,
 )
 
 /**
@@ -25,7 +25,7 @@ export const StorageVersion = new C.fluent.Storage(
   "Vesting",
   "StorageVersion",
   $.tuple(),
-  _codec.$565,
+  codecs.$565,
 )
 
 /**

@@ -23,5 +23,5 @@ export function makeDocComment(docs: string[] = []) {
 }
 
 export function getRawCodecPath(ty: M.Ty) {
-  return `_codec.$${ty.id}`
+  return `codecs.$${ty.id}`
 }

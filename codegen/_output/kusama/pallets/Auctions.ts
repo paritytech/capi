@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** Number of auctions started so far. */
@@ -10,7 +10,7 @@ export const AuctionCounter = new C.fluent.Storage(
   "Auctions",
   "AuctionCounter",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /**
@@ -27,7 +27,7 @@ export const AuctionInfo = new C.fluent.Storage(
   "Auctions",
   "AuctionInfo",
   $.tuple(),
-  _codec.$30,
+  codecs.$30,
 )
 
 /**
@@ -40,8 +40,8 @@ export const ReservedAmounts = new C.fluent.Storage(
   "Optional",
   "Auctions",
   "ReservedAmounts",
-  $.tuple(_codec.$705),
-  _codec.$6,
+  $.tuple(codecs.$705),
+  codecs.$6,
 )
 
 /**
@@ -55,8 +55,8 @@ export const Winning = new C.fluent.Storage(
   "Optional",
   "Auctions",
   "Winning",
-  $.tuple(_codec.$4),
-  _codec.$706,
+  $.tuple(codecs.$4),
+  codecs.$706,
 )
 
 /**

@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /**
@@ -13,7 +13,7 @@ export const LastPrunedSession = new C.fluent.Storage(
   "ParasDisputes",
   "LastPrunedSession",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /** All ongoing or concluded disputes for the last several sessions. */
@@ -23,8 +23,8 @@ export const Disputes = new C.fluent.Storage(
   "Optional",
   "ParasDisputes",
   "Disputes",
-  _codec.$698,
-  _codec.$699,
+  codecs.$698,
+  codecs.$699,
 )
 
 /**
@@ -37,8 +37,8 @@ export const Included = new C.fluent.Storage(
   "Optional",
   "ParasDisputes",
   "Included",
-  _codec.$698,
-  _codec.$4,
+  codecs.$698,
+  codecs.$4,
 )
 
 /**
@@ -54,8 +54,8 @@ export const SpamSlots = new C.fluent.Storage(
   "Optional",
   "ParasDisputes",
   "SpamSlots",
-  $.tuple(_codec.$4),
-  _codec.$94,
+  $.tuple(codecs.$4),
+  codecs.$94,
 )
 
 /**
@@ -71,7 +71,7 @@ export const Frozen = new C.fluent.Storage(
   "ParasDisputes",
   "Frozen",
   $.tuple(),
-  _codec.$236,
+  codecs.$236,
 )
 
 export function force_unfreeze(): types.polkadot_runtime.RuntimeCall {

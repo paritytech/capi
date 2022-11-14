@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /**
@@ -16,8 +16,8 @@ export const RelayDispatchQueues = new C.fluent.Storage(
   "Default",
   "Ump",
   "RelayDispatchQueues",
-  $.tuple(_codec.$98),
-  _codec.$164,
+  $.tuple(codecs.$98),
+  codecs.$164,
 )
 
 /**
@@ -39,8 +39,8 @@ export const RelayDispatchQueueSize = new C.fluent.Storage(
   "Default",
   "Ump",
   "RelayDispatchQueueSize",
-  $.tuple(_codec.$98),
-  _codec.$30,
+  $.tuple(codecs.$98),
+  codecs.$30,
 )
 
 /**
@@ -57,7 +57,7 @@ export const NeedsDispatch = new C.fluent.Storage(
   "Ump",
   "NeedsDispatch",
   $.tuple(),
-  _codec.$662,
+  codecs.$662,
 )
 
 /**
@@ -74,7 +74,7 @@ export const NextDispatchRoundStartWith = new C.fluent.Storage(
   "Ump",
   "NextDispatchRoundStartWith",
   $.tuple(),
-  _codec.$98,
+  codecs.$98,
 )
 
 /**
@@ -88,8 +88,8 @@ export const Overweight = new C.fluent.Storage(
   "Optional",
   "Ump",
   "Overweight",
-  $.tuple(_codec.$10),
-  _codec.$684,
+  $.tuple(codecs.$10),
+  codecs.$684,
 )
 
 /**
@@ -103,7 +103,7 @@ export const OverweightCount = new C.fluent.Storage(
   "Ump",
   "OverweightCount",
   $.tuple(),
-  _codec.$10,
+  codecs.$10,
 )
 
 /**

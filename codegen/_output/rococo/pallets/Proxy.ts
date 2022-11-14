@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /**
@@ -12,8 +12,8 @@ export const Proxies = new C.fluent.Storage(
   "Default",
   "Proxy",
   "Proxies",
-  $.tuple(_codec.$0),
-  _codec.$579,
+  $.tuple(codecs.$0),
+  codecs.$579,
 )
 
 /** The announcements made by the proxy (key). */
@@ -23,8 +23,8 @@ export const Announcements = new C.fluent.Storage(
   "Default",
   "Proxy",
   "Announcements",
-  $.tuple(_codec.$0),
-  _codec.$583,
+  $.tuple(codecs.$0),
+  codecs.$583,
 )
 
 /**

@@ -43,7 +43,7 @@ export function genMetadata(
       const items = [
         `\
 import type * as types from "../types/mod.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import { $, C, client } from "../capi.ts"
 `,
       ]
@@ -97,7 +97,7 @@ import { $, C, client } from "../capi.ts"
 
   files.set("extrinsic.ts", () => `
 import { $, C, client } from "./capi.ts"
-import * as _codec from "./codecs.ts"
+import * as codecs from "./codecs.ts"
 import type * as types from "./types/mod.ts"
 
 const _extrinsic = ${

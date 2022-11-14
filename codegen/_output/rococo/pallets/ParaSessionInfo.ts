@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /**
@@ -14,7 +14,7 @@ export const AssignmentKeysUnsafe = new C.fluent.Storage(
   "ParaSessionInfo",
   "AssignmentKeysUnsafe",
   $.tuple(),
-  _codec.$695,
+  codecs.$695,
 )
 
 /** The earliest session for which previous session info is stored. */
@@ -25,7 +25,7 @@ export const EarliestStoredSession = new C.fluent.Storage(
   "ParaSessionInfo",
   "EarliestStoredSession",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /**
@@ -39,8 +39,8 @@ export const Sessions = new C.fluent.Storage(
   "Optional",
   "ParaSessionInfo",
   "Sessions",
-  $.tuple(_codec.$4),
-  _codec.$696,
+  $.tuple(codecs.$4),
+  codecs.$696,
 )
 
 /** The validator account keys of the validators actively participating in parachain consensus. */
@@ -50,6 +50,6 @@ export const AccountKeys = new C.fluent.Storage(
   "Optional",
   "ParaSessionInfo",
   "AccountKeys",
-  $.tuple(_codec.$4),
-  _codec.$206,
+  $.tuple(codecs.$4),
+  codecs.$206,
 )

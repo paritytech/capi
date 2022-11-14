@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** State of the current authority set. */
@@ -10,7 +10,7 @@ export const State = new C.fluent.Storage(
   "Grandpa",
   "State",
   $.tuple(),
-  _codec.$516,
+  codecs.$516,
 )
 
 /** Pending change: (signaled at, scheduled change). */
@@ -21,7 +21,7 @@ export const PendingChange = new C.fluent.Storage(
   "Grandpa",
   "PendingChange",
   $.tuple(),
-  _codec.$517,
+  codecs.$517,
 )
 
 /** next block number where we can force a change. */
@@ -32,7 +32,7 @@ export const NextForced = new C.fluent.Storage(
   "Grandpa",
   "NextForced",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /** `true` if we are currently stalled. */
@@ -43,7 +43,7 @@ export const Stalled = new C.fluent.Storage(
   "Grandpa",
   "Stalled",
   $.tuple(),
-  _codec.$30,
+  codecs.$30,
 )
 
 /**
@@ -57,7 +57,7 @@ export const CurrentSetId = new C.fluent.Storage(
   "Grandpa",
   "CurrentSetId",
   $.tuple(),
-  _codec.$10,
+  codecs.$10,
 )
 
 /**
@@ -72,8 +72,8 @@ export const SetIdSession = new C.fluent.Storage(
   "Optional",
   "Grandpa",
   "SetIdSession",
-  $.tuple(_codec.$10),
-  _codec.$4,
+  $.tuple(codecs.$10),
+  codecs.$4,
 )
 
 /**

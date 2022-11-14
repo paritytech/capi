@@ -1,5 +1,5 @@
 import { $, C, client } from "../capi.ts"
-import * as _codec from "../codecs.ts"
+import * as codecs from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** The latest available query index. */
@@ -10,7 +10,7 @@ export const QueryCounter = new C.fluent.Storage(
   "XcmPallet",
   "QueryCounter",
   $.tuple(),
-  _codec.$10,
+  codecs.$10,
 )
 
 /** The ongoing queries. */
@@ -20,8 +20,8 @@ export const Queries = new C.fluent.Storage(
   "Optional",
   "XcmPallet",
   "Queries",
-  $.tuple(_codec.$10),
-  _codec.$713,
+  $.tuple(codecs.$10),
+  codecs.$713,
 )
 
 /**
@@ -36,8 +36,8 @@ export const AssetTraps = new C.fluent.Storage(
   "Default",
   "XcmPallet",
   "AssetTraps",
-  $.tuple(_codec.$11),
-  _codec.$4,
+  $.tuple(codecs.$11),
+  codecs.$4,
 )
 
 /**
@@ -51,7 +51,7 @@ export const SafeXcmVersion = new C.fluent.Storage(
   "XcmPallet",
   "SafeXcmVersion",
   $.tuple(),
-  _codec.$4,
+  codecs.$4,
 )
 
 /** The Latest versions that we know various locations support. */
@@ -61,8 +61,8 @@ export const SupportedVersion = new C.fluent.Storage(
   "Optional",
   "XcmPallet",
   "SupportedVersion",
-  _codec.$717,
-  _codec.$4,
+  codecs.$717,
+  codecs.$4,
 )
 
 /** All locations that we have requested version notifications from. */
@@ -72,8 +72,8 @@ export const VersionNotifiers = new C.fluent.Storage(
   "Optional",
   "XcmPallet",
   "VersionNotifiers",
-  _codec.$717,
-  _codec.$10,
+  codecs.$717,
+  codecs.$10,
 )
 
 /**
@@ -86,8 +86,8 @@ export const VersionNotifyTargets = new C.fluent.Storage(
   "Optional",
   "XcmPallet",
   "VersionNotifyTargets",
-  _codec.$717,
-  _codec.$718,
+  codecs.$717,
+  codecs.$718,
 )
 
 /**
@@ -102,7 +102,7 @@ export const VersionDiscoveryQueue = new C.fluent.Storage(
   "XcmPallet",
   "VersionDiscoveryQueue",
   $.tuple(),
-  _codec.$719,
+  codecs.$719,
 )
 
 /** The current migration's stage, if any. */
@@ -113,7 +113,7 @@ export const CurrentMigration = new C.fluent.Storage(
   "XcmPallet",
   "CurrentMigration",
   $.tuple(),
-  _codec.$722,
+  codecs.$722,
 )
 
 export function send(
