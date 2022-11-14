@@ -1,23 +1,27 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** Items to be executed, indexed by the block number that they should be executed on. */
-export const Agenda = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$4),
-  value: _codec.$177,
-}
+export const Agenda = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Scheduler",
+  "Agenda",
+  $.tuple(_codec.$4),
+  _codec.$177,
+)
 
-export const IncompleteSince = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const IncompleteSince = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "Scheduler",
+  "IncompleteSince",
+  $.tuple(),
+  _codec.$4,
+)
 
 /**
  *  Lookup from a name to the block number and index of the task.
@@ -25,13 +29,15 @@ export const IncompleteSince = {
  *  For v3 -> v4 the previously unbounded identities are Blake2-256 hashed to form the v4
  *  identities.
  */
-export const Lookup = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$1),
-  value: _codec.$30,
-}
+export const Lookup = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Scheduler",
+  "Lookup",
+  $.tuple(_codec.$1),
+  _codec.$30,
+)
 
 /** Cancel an anonymously scheduled task. */
 export function cancel(

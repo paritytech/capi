@@ -1,15 +1,17 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** Number of auctions started so far. */
-export const AuctionCounter = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const AuctionCounter = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Auctions",
+  "AuctionCounter",
+  $.tuple(),
+  _codec.$4,
+)
 
 /**
  *  Information relating to the current auction, if there is one.
@@ -18,38 +20,44 @@ export const AuctionCounter = {
  *  contiguous lease periods on auction is for. The second is the block number when the
  *  auction will "begin to end", i.e. the first block of the Ending Period of the auction.
  */
-export const AuctionInfo = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$30,
-}
+export const AuctionInfo = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "Auctions",
+  "AuctionInfo",
+  $.tuple(),
+  _codec.$30,
+)
 
 /**
  *  Amounts currently reserved in the accounts of the bidders currently winning
  *  (sub-)ranges.
  */
-export const ReservedAmounts = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$705),
-  value: _codec.$6,
-}
+export const ReservedAmounts = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Auctions",
+  "ReservedAmounts",
+  $.tuple(_codec.$705),
+  _codec.$6,
+)
 
 /**
  *  The winning bids for each of the 10 ranges at each sample in the final Ending Period of
  *  the current auction. The map's key is the 0-based index into the Sample Size. The
  *  first sample of the ending period is 0; the last is `Sample Size - 1`.
  */
-export const Winning = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$4),
-  value: _codec.$706,
-}
+export const Winning = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Auctions",
+  "Winning",
+  $.tuple(_codec.$4),
+  _codec.$706,
+)
 
 /**
  * Make a new bid from an account (including a parachain account) for deploying a new

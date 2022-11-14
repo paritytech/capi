@@ -1,60 +1,72 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** The full account information for a particular account ID. */
-export const Account = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Blake2_128Concat"],
-  key: $.tuple(_codec.$0),
-  value: _codec.$3,
-}
+export const Account = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "System",
+  "Account",
+  $.tuple(_codec.$0),
+  _codec.$3,
+)
 
 /** Total length (in bytes) for all extrinsics put together, for the current block. */
-export const AllExtrinsicsLen = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const AllExtrinsicsLen = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "System",
+  "AllExtrinsicsLen",
+  $.tuple(),
+  _codec.$4,
+)
 
 /** Map of block numbers to block hashes. */
-export const BlockHash = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$4),
-  value: _codec.$11,
-}
+export const BlockHash = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "System",
+  "BlockHash",
+  $.tuple(_codec.$4),
+  _codec.$11,
+)
 
 /** The current weight for the block. */
-export const BlockWeight = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$7,
-}
+export const BlockWeight = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "System",
+  "BlockWeight",
+  $.tuple(),
+  _codec.$7,
+)
 
 /** Digest of the current block, also part of the block header. */
-export const Digest = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$13,
-}
+export const Digest = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "System",
+  "Digest",
+  $.tuple(),
+  _codec.$13,
+)
 
 /** The number of events in the `Events<T>` list. */
-export const EventCount = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const EventCount = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "System",
+  "EventCount",
+  $.tuple(),
+  _codec.$4,
+)
 
 /**
  *  Mapping between a topic (represented by T::Hash) and a vector of indexes
@@ -68,13 +80,15 @@ export const EventCount = {
  *  the `EventIndex` then in case if the topic has the same contents on the next block
  *  no notification will be triggered thus the event might be lost.
  */
-export const EventTopics = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Blake2_128Concat"],
-  key: $.tuple(_codec.$11),
-  value: _codec.$158,
-}
+export const EventTopics = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "System",
+  "EventTopics",
+  $.tuple(_codec.$11),
+  _codec.$158,
+)
 
 /**
  *  Events deposited for the current block.
@@ -85,82 +99,106 @@ export const EventTopics = {
  *  Events have a large in-memory size. Box the events to not go out-of-memory
  *  just in case someone still reads them from within the runtime.
  */
-export const Events = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$17,
-}
+export const Events = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "System",
+  "Events",
+  $.tuple(),
+  _codec.$17,
+)
 
 /** The execution phase of the block. */
-export const ExecutionPhase = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$156,
-}
+export const ExecutionPhase = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "System",
+  "ExecutionPhase",
+  $.tuple(),
+  _codec.$156,
+)
 
 /** Total extrinsics count for the current block. */
-export const ExtrinsicCount = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const ExtrinsicCount = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "System",
+  "ExtrinsicCount",
+  $.tuple(),
+  _codec.$4,
+)
 
 /** Extrinsics data for the current block (maps an extrinsic's index to its data). */
-export const ExtrinsicData = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$4),
-  value: _codec.$12,
-}
+export const ExtrinsicData = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "System",
+  "ExtrinsicData",
+  $.tuple(_codec.$4),
+  _codec.$12,
+)
 
 /** Stores the `spec_version` and `spec_name` of when the last runtime upgrade happened. */
-export const LastRuntimeUpgrade = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$159,
-}
+export const LastRuntimeUpgrade = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "System",
+  "LastRuntimeUpgrade",
+  $.tuple(),
+  _codec.$159,
+)
 
 /** The current block number being processed. Set by `execute_block`. */
-export const Number = { type: "Plain", modifier: "Default", hashers: [], key: [], value: _codec.$4 }
+export const Number = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "System",
+  "Number",
+  $.tuple(),
+  _codec.$4,
+)
 
 /** Hash of the previous block. */
-export const ParentHash = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$11,
-}
+export const ParentHash = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "System",
+  "ParentHash",
+  $.tuple(),
+  _codec.$11,
+)
 
 /**
  *  True if we have upgraded so that AccountInfo contains three types of `RefCount`. False
  *  (default) if not.
  */
-export const UpgradedToTripleRefCount = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$43,
-}
+export const UpgradedToTripleRefCount = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "System",
+  "UpgradedToTripleRefCount",
+  $.tuple(),
+  _codec.$43,
+)
 
 /** True if we have upgraded so that `type RefCount` is `u32`. False (default) if not. */
-export const UpgradedToU32RefCount = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$43,
-}
+export const UpgradedToU32RefCount = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "System",
+  "UpgradedToU32RefCount",
+  $.tuple(),
+  _codec.$43,
+)
 
 /** A dispatch that will fill the block weight up to the given ratio. */
 export function fill_block(

@@ -1,29 +1,35 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 
 /** The latest bitfield for each validator, referred to by their index in the validator set. */
-export const AvailabilityBitfields = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$385),
-  value: _codec.$644,
-}
+export const AvailabilityBitfields = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "ParaInclusion",
+  "AvailabilityBitfields",
+  $.tuple(_codec.$385),
+  _codec.$644,
+)
 
 /** Candidates pending availability by `ParaId`. */
-export const PendingAvailability = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$98),
-  value: _codec.$645,
-}
+export const PendingAvailability = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "ParaInclusion",
+  "PendingAvailability",
+  $.tuple(_codec.$98),
+  _codec.$645,
+)
 
 /** The commitments of candidates pending availability, by `ParaId`. */
-export const PendingAvailabilityCommitments = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$98),
-  value: _codec.$390,
-}
+export const PendingAvailabilityCommitments = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "ParaInclusion",
+  "PendingAvailabilityCommitments",
+  $.tuple(_codec.$98),
+  _codec.$390,
+)

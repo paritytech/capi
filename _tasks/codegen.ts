@@ -16,6 +16,7 @@ await Promise.all(
     const outDir = path.join(codegenDir, runtime)
     await codegen({
       importSpecifier: "../../../mod.ts",
+      clientFile: `../../../test_util/clients/${runtime}.ts`,
       metadata,
     }).write(outDir)
   }),

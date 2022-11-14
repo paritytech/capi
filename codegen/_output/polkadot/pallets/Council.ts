@@ -1,54 +1,72 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** The current members of the collective. This is stored sorted (just by value). */
-export const Members = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$206,
-}
+export const Members = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Council",
+  "Members",
+  $.tuple(),
+  _codec.$206,
+)
 
 /** The prime member that helps determine the default vote behavior in case of absentations. */
-export const Prime = { type: "Plain", modifier: "Optional", hashers: [], key: [], value: _codec.$0 }
+export const Prime = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "Council",
+  "Prime",
+  $.tuple(),
+  _codec.$0,
+)
 
 /** Proposals so far. */
-export const ProposalCount = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const ProposalCount = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Council",
+  "ProposalCount",
+  $.tuple(),
+  _codec.$4,
+)
 
 /** Actual proposal for a given hash, if it's current. */
-export const ProposalOf = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Identity"],
-  key: $.tuple(_codec.$11),
-  value: _codec.$181,
-}
+export const ProposalOf = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Council",
+  "ProposalOf",
+  $.tuple(_codec.$11),
+  _codec.$181,
+)
 
 /** The hashes of the active proposals. */
-export const Proposals = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$545,
-}
+export const Proposals = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Council",
+  "Proposals",
+  $.tuple(),
+  _codec.$545,
+)
 
 /** Votes on a given proposal, if it is ongoing. */
-export const Voting = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Identity"],
-  key: $.tuple(_codec.$11),
-  value: _codec.$546,
-}
+export const Voting = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Council",
+  "Voting",
+  $.tuple(_codec.$11),
+  _codec.$546,
+)
 
 /**
  * Close a vote that is either approved, disapproved or whose voting period has ended.

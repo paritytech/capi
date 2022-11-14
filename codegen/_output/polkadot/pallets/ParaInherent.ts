@@ -1,3 +1,4 @@
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
@@ -9,22 +10,26 @@ import type * as types from "../types/mod.ts"
  *
  *  If this is `None` at the end of the block, we panic and render the block invalid.
  */
-export const Included = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$33,
-}
+export const Included = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "ParaInherent",
+  "Included",
+  $.tuple(),
+  _codec.$33,
+)
 
 /** Scraped on chain data for extracting resolved disputes as well as backing votes. */
-export const OnChainVotes = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$647,
-}
+export const OnChainVotes = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "ParaInherent",
+  "OnChainVotes",
+  $.tuple(),
+  _codec.$647,
+)
 
 /** Enter the paras inherent. This will process bitfields and backed candidates. */
 export function enter(

@@ -1,15 +1,17 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** Counter for the related counted storage map */
-export const CounterForQueue = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const CounterForQueue = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "FastUnstake",
+  "CounterForQueue",
+  $.tuple(),
+  _codec.$4,
+)
 
 /**
  *  Number of eras to check per block.
@@ -19,35 +21,41 @@ export const CounterForQueue = {
  *  Based on the amount of weight available at `on_idle`, up to this many eras of a single
  *  nominator might be checked.
  */
-export const ErasToCheckPerBlock = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const ErasToCheckPerBlock = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "FastUnstake",
+  "ErasToCheckPerBlock",
+  $.tuple(),
+  _codec.$4,
+)
 
 /** The current "head of the queue" being unstaked. */
-export const Head = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$634,
-}
+export const Head = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "FastUnstake",
+  "Head",
+  $.tuple(),
+  _codec.$634,
+)
 
 /**
  *  The map of all accounts wishing to be unstaked.
  *
  *  Keeps track of `AccountId` wishing to unstake and it's corresponding deposit.
  */
-export const Queue = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$0),
-  value: _codec.$6,
-}
+export const Queue = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "FastUnstake",
+  "Queue",
+  $.tuple(_codec.$0),
+  _codec.$6,
+)
 
 /**
  * Control the operation of this pallet.

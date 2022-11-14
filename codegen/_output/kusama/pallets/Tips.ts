@@ -1,4 +1,4 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
@@ -6,26 +6,30 @@ import type * as types from "../types/mod.ts"
  *  Simple preimage lookup from the reason's hash to the original data. Again, has an
  *  insecure enumerable hash since the key is guaranteed to be the result of a secure hash.
  */
-export const Reasons = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Identity"],
-  key: $.tuple(_codec.$11),
-  value: _codec.$12,
-}
+export const Reasons = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Tips",
+  "Reasons",
+  $.tuple(_codec.$11),
+  _codec.$12,
+)
 
 /**
  *  TipsMap that are not yet completed. Keyed by the hash of `(reason, who)` from the value.
  *  This has the insecure enumerable hash function since the key itself is already
  *  guaranteed to be a secure hash.
  */
-export const Tips = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$11),
-  value: _codec.$598,
-}
+export const Tips = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Tips",
+  "Tips",
+  $.tuple(_codec.$11),
+  _codec.$598,
+)
 
 /**
  * Close and payout a tip.

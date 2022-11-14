@@ -1,3 +1,4 @@
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
@@ -10,13 +11,15 @@ import type * as types from "../types/mod.ts"
  *  However this is a `Vec` regardless to handle various edge cases that may occur at runtime
  *  upgrade boundaries or if governance intervenes.
  */
-export const BufferedSessionChanges = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$680,
-}
+export const BufferedSessionChanges = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Initializer",
+  "BufferedSessionChanges",
+  $.tuple(),
+  _codec.$680,
+)
 
 /**
  *  Whether the parachains modules have been initialized within this block.
@@ -28,13 +31,15 @@ export const BufferedSessionChanges = {
  *  them writes to the trie and one does not. This confusion makes `Option<()>` more suitable for
  *  the semantics of this variable.
  */
-export const HasInitialized = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$33,
-}
+export const HasInitialized = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "Initializer",
+  "HasInitialized",
+  $.tuple(),
+  _codec.$33,
+)
 
 /**
  * Issue a signal to the consensus engine to forcibly act as though all parachain

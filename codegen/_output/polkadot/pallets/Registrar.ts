@@ -1,15 +1,17 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** The next free `ParaId`. */
-export const NextFreeParaId = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$98,
-}
+export const NextFreeParaId = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Registrar",
+  "NextFreeParaId",
+  $.tuple(),
+  _codec.$98,
+)
 
 /**
  *  Amount held on deposit for each para and the original depositor.
@@ -17,22 +19,26 @@ export const NextFreeParaId = {
  *  The given account ID is responsible for registering the code and initial head data, but may only do
  *  so if it isn't yet registered. (After that, it's up to governance to do so.)
  */
-export const Paras = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$98),
-  value: _codec.$701,
-}
+export const Paras = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Registrar",
+  "Paras",
+  $.tuple(_codec.$98),
+  _codec.$701,
+)
 
 /** Pending swap operations. */
-export const PendingSwap = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$98),
-  value: _codec.$98,
-}
+export const PendingSwap = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Registrar",
+  "PendingSwap",
+  $.tuple(_codec.$98),
+  _codec.$98,
+)
 
 /**
  * Add a manager lock from a para. This will prevent the manager of a

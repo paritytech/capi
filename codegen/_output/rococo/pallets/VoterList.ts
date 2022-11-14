@@ -1,41 +1,47 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** Counter for the related counted storage map */
-export const CounterForListNodes = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const CounterForListNodes = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "VoterList",
+  "CounterForListNodes",
+  $.tuple(),
+  _codec.$4,
+)
 
 /**
  *  A bag stored in storage.
  *
  *  Stores a `Bag` struct, which stores head and tail pointers to itself.
  */
-export const ListBags = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$10),
-  value: _codec.$613,
-}
+export const ListBags = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "VoterList",
+  "ListBags",
+  $.tuple(_codec.$10),
+  _codec.$613,
+)
 
 /**
  *  A single node, within some bag.
  *
  *  Nodes store links forward and back within their respective bags.
  */
-export const ListNodes = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$0),
-  value: _codec.$612,
-}
+export const ListNodes = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "VoterList",
+  "ListNodes",
+  $.tuple(_codec.$0),
+  _codec.$612,
+)
 
 /**
  * Move the caller's Id directly in front of `lighter`.

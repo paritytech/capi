@@ -1,15 +1,17 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** The actions to perform during the start of a specific session index. */
-export const ActionsQueue = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$4),
-  value: _codec.$662,
-}
+export const ActionsQueue = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Paras",
+  "ActionsQueue",
+  $.tuple(_codec.$4),
+  _codec.$662,
+)
 
 /**
  *  Validation code stored by its hash.
@@ -17,92 +19,108 @@ export const ActionsQueue = {
  *  This storage is consistent with [`FutureCodeHash`], [`CurrentCodeHash`] and
  *  [`PastCodeHash`].
  */
-export const CodeByHash = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Identity"],
-  key: $.tuple(_codec.$103),
-  value: _codec.$394,
-}
+export const CodeByHash = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Paras",
+  "CodeByHash",
+  $.tuple(_codec.$103),
+  _codec.$394,
+)
 
 /** The number of reference on the validation code in [`CodeByHash`] storage. */
-export const CodeByHashRefs = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Identity"],
-  key: $.tuple(_codec.$103),
-  value: _codec.$4,
-}
+export const CodeByHashRefs = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Paras",
+  "CodeByHashRefs",
+  $.tuple(_codec.$103),
+  _codec.$4,
+)
 
 /**
  *  The validation code hash of every live para.
  *
  *  Corresponding code can be retrieved with [`CodeByHash`].
  */
-export const CurrentCodeHash = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$98),
-  value: _codec.$103,
-}
+export const CurrentCodeHash = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Paras",
+  "CurrentCodeHash",
+  $.tuple(_codec.$98),
+  _codec.$103,
+)
 
 /**
  *  The actual future code hash of a para.
  *
  *  Corresponding code can be retrieved with [`CodeByHash`].
  */
-export const FutureCodeHash = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$98),
-  value: _codec.$103,
-}
+export const FutureCodeHash = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Paras",
+  "FutureCodeHash",
+  $.tuple(_codec.$98),
+  _codec.$103,
+)
 
 /**
  *  The block number at which the planned code change is expected for a para.
  *  The change will be applied after the first parablock for this ID included which executes
  *  in the context of a relay chain block with a number >= `expected_at`.
  */
-export const FutureCodeUpgrades = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$98),
-  value: _codec.$4,
-}
+export const FutureCodeUpgrades = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Paras",
+  "FutureCodeUpgrades",
+  $.tuple(_codec.$98),
+  _codec.$4,
+)
 
 /** The head-data of every registered para. */
-export const Heads = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$98),
-  value: _codec.$104,
-}
+export const Heads = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Paras",
+  "Heads",
+  $.tuple(_codec.$98),
+  _codec.$104,
+)
 
 /** The current lifecycle of a all known Para IDs. */
-export const ParaLifecycles = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$98),
-  value: _codec.$670,
-}
+export const ParaLifecycles = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Paras",
+  "ParaLifecycles",
+  $.tuple(_codec.$98),
+  _codec.$670,
+)
 
 /**
  *  All parachains. Ordered ascending by `ParaId`. Parathreads are not included.
  *
  *  Consider using the [`ParachainsCache`] type of modifying.
  */
-export const Parachains = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$662,
-}
+export const Parachains = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Paras",
+  "Parachains",
+  $.tuple(),
+  _codec.$662,
+)
 
 /**
  *  Actual past code hash, indicated by the para id as well as the block number at which it
@@ -110,26 +128,30 @@ export const Parachains = {
  *
  *  Corresponding code can be retrieved with [`CodeByHash`].
  */
-export const PastCodeHash = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$671),
-  value: _codec.$103,
-}
+export const PastCodeHash = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Paras",
+  "PastCodeHash",
+  $.tuple(_codec.$671),
+  _codec.$103,
+)
 
 /**
  *  Past code of parachains. The parachains themselves may not be registered anymore,
  *  but we also keep their code on-chain for the same amount of time as outdated code
  *  to keep it available for secondary checkers.
  */
-export const PastCodeMeta = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$98),
-  value: _codec.$672,
-}
+export const PastCodeMeta = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Paras",
+  "PastCodeMeta",
+  $.tuple(_codec.$98),
+  _codec.$672,
+)
 
 /**
  *  Which paras have past code that needs pruning and the relay-chain block at which the code was replaced.
@@ -139,22 +161,26 @@ export const PastCodeMeta = {
  *  from the time at which the parachain perceives a code upgrade as having occurred.
  *  Multiple entries for a single para are permitted. Ordered ascending by block number.
  */
-export const PastCodePruning = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$675,
-}
+export const PastCodePruning = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Paras",
+  "PastCodePruning",
+  $.tuple(),
+  _codec.$675,
+)
 
 /** The list of all currently active PVF votes. Auxiliary to `PvfActiveVoteMap`. */
-export const PvfActiveVoteList = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$669,
-}
+export const PvfActiveVoteList = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Paras",
+  "PvfActiveVoteList",
+  $.tuple(),
+  _codec.$669,
+)
 
 /**
  *  All currently active PVF pre-checking votes.
@@ -162,13 +188,15 @@ export const PvfActiveVoteList = {
  *  Invariant:
  *  - There are no PVF pre-checking votes that exists in list but not in the set and vice versa.
  */
-export const PvfActiveVoteMap = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$103),
-  value: _codec.$666,
-}
+export const PvfActiveVoteMap = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Paras",
+  "PvfActiveVoteMap",
+  $.tuple(_codec.$103),
+  _codec.$666,
+)
 
 /**
  *  Upcoming paras instantiation arguments.
@@ -176,13 +204,15 @@ export const PvfActiveVoteMap = {
  *  NOTE that after PVF pre-checking is enabled the para genesis arg will have it's code set
  *  to empty. Instead, the code will be saved into the storage right away via `CodeByHash`.
  */
-export const UpcomingParasGenesis = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$98),
-  value: _codec.$678,
-}
+export const UpcomingParasGenesis = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Paras",
+  "UpcomingParasGenesis",
+  $.tuple(_codec.$98),
+  _codec.$678,
+)
 
 /**
  *  The list of upcoming code upgrades. Each item is a pair of which para performs a code
@@ -190,26 +220,30 @@ export const UpcomingParasGenesis = {
  *
  *  Ordered ascending by block number.
  */
-export const UpcomingUpgrades = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$675,
-}
+export const UpcomingUpgrades = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Paras",
+  "UpcomingUpgrades",
+  $.tuple(),
+  _codec.$675,
+)
 
 /**
  *  The list of parachains that are awaiting for their upgrade restriction to cooldown.
  *
  *  Ordered ascending by block number.
  */
-export const UpgradeCooldowns = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$675,
-}
+export const UpgradeCooldowns = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Paras",
+  "UpgradeCooldowns",
+  $.tuple(),
+  _codec.$675,
+)
 
 /**
  *  This is used by the relay-chain to communicate to a parachain a go-ahead with in the upgrade procedure.
@@ -222,13 +256,15 @@ export const UpgradeCooldowns = {
  *  NOTE that this field is used by parachains via merkle storage proofs, therefore changing
  *  the format will require migration of parachains.
  */
-export const UpgradeGoAheadSignal = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$98),
-  value: _codec.$676,
-}
+export const UpgradeGoAheadSignal = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Paras",
+  "UpgradeGoAheadSignal",
+  $.tuple(_codec.$98),
+  _codec.$676,
+)
 
 /**
  *  This is used by the relay-chain to communicate that there are restrictions for performing
@@ -241,13 +277,15 @@ export const UpgradeGoAheadSignal = {
  *  NOTE that this field is used by parachains via merkle storage proofs, therefore changing
  *  the format will require migration of parachains.
  */
-export const UpgradeRestrictionSignal = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$98),
-  value: _codec.$677,
-}
+export const UpgradeRestrictionSignal = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Paras",
+  "UpgradeRestrictionSignal",
+  $.tuple(_codec.$98),
+  _codec.$677,
+)
 
 /**
  * Adds the validation code to the storage.

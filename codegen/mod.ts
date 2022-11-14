@@ -8,6 +8,7 @@ import { Decl, printDecls, S } from "./utils.ts"
 export interface CodegenProps {
   metadata: M.Metadata
   importSpecifier: string
+  clientFile: string
 }
 
 export function codegen(props: CodegenProps): Files {
@@ -28,6 +29,7 @@ export function codegen(props: CodegenProps): Files {
     `\
 export { $ } from ${S.string(props.importSpecifier)}
 export * as C from ${S.string(props.importSpecifier)}
+export { client } from ${S.string(props.clientFile)}
 `,
   )
 
@@ -42,10 +44,12 @@ export * as C from ${S.string(props.importSpecifier)}
       /\b_codec\./.test(content)
         ? `import * as _codec from ${S.string((depth ? "../".repeat(depth) : "./") + "codecs.ts")}`
         : "",
-      /(\W\$|\bC)\./.test(content)
+      /(\W\$|\bC)\.|\bclient\b/.test(content)
         ? `import { ${/\W\$\./.test(content) ? "$," : ""} ${
-          /\bC\./.test(content) ? "C," : ""
-        } } from ${S.string((depth ? "../".repeat(depth) : "./") + "capi.ts")}`
+          /\bclient\b/.test(content) ? "client," : ""
+        } ${/\bC\./.test(content) ? "C," : ""} } from ${
+          S.string((depth ? "../".repeat(depth) : "./") + "capi.ts")
+        }`
         : "",
     ],
     [],

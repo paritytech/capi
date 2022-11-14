@@ -1,17 +1,28 @@
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** The current membership, stored as an ordered Vec. */
-export const Members = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$554,
-}
+export const Members = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "TechnicalMembership",
+  "Members",
+  $.tuple(),
+  _codec.$554,
+)
 
 /** The current prime member, if one exists. */
-export const Prime = { type: "Plain", modifier: "Optional", hashers: [], key: [], value: _codec.$0 }
+export const Prime = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "TechnicalMembership",
+  "Prime",
+  $.tuple(),
+  _codec.$0,
+)
 
 /**
  * Add a member `who` to the set.

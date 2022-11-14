@@ -1,34 +1,48 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
-export const Claims = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Identity"],
-  key: $.tuple(_codec.$73),
-  value: _codec.$6,
-}
+export const Claims = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Claims",
+  "Claims",
+  $.tuple(_codec.$73),
+  _codec.$6,
+)
 
 /** Pre-claimed Ethereum accounts, by the Account ID that they are claimed to. */
-export const Preclaims = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Identity"],
-  key: $.tuple(_codec.$0),
-  value: _codec.$73,
-}
+export const Preclaims = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Claims",
+  "Preclaims",
+  $.tuple(_codec.$0),
+  _codec.$73,
+)
 
 /** The statement kind that must be signed, if any. */
-export const Signing = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Identity"],
-  key: $.tuple(_codec.$73),
-  value: _codec.$251,
-}
+export const Signing = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Claims",
+  "Signing",
+  $.tuple(_codec.$73),
+  _codec.$251,
+)
 
-export const Total = { type: "Plain", modifier: "Default", hashers: [], key: [], value: _codec.$6 }
+export const Total = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Claims",
+  "Total",
+  $.tuple(),
+  _codec.$6,
+)
 
 /**
  *  Vesting schedule for a claim.
@@ -36,13 +50,15 @@ export const Total = { type: "Plain", modifier: "Default", hashers: [], key: [],
  *  Second balance is how much should be unlocked per block.
  *  The block number is when the vesting should start.
  */
-export const Vesting = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Identity"],
-  key: $.tuple(_codec.$73),
-  value: _codec.$249,
-}
+export const Vesting = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Claims",
+  "Vesting",
+  $.tuple(_codec.$73),
+  _codec.$249,
+)
 
 /**
  * Attest to a statement, needed to finalize the claims process.

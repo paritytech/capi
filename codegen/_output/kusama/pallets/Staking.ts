@@ -1,4 +1,4 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
@@ -8,22 +8,26 @@ import type * as types from "../types/mod.ts"
  *  The active era is the era being currently rewarded. Validator set of this era must be
  *  equal to [`SessionInterface::validators`].
  */
-export const ActiveEra = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$492,
-}
+export const ActiveEra = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "Staking",
+  "ActiveEra",
+  $.tuple(),
+  _codec.$492,
+)
 
 /** Map from all locked "stash" accounts to the controller account. */
-export const Bonded = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$0),
-  value: _codec.$0,
-}
+export const Bonded = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Staking",
+  "Bonded",
+  $.tuple(_codec.$0),
+  _codec.$0,
+)
 
 /**
  *  A mapping from still-bonded eras to the first session index of that era.
@@ -31,56 +35,66 @@ export const Bonded = {
  *  Must contains information for eras for the range:
  *  `[active_era - bounding_duration; active_era]`
  */
-export const BondedEras = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$158,
-}
+export const BondedEras = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Staking",
+  "BondedEras",
+  $.tuple(),
+  _codec.$158,
+)
 
 /**
  *  The amount of currency given to reporters of a slash event which was
  *  canceled by extraordinary circumstances (e.g. governance).
  */
-export const CanceledSlashPayout = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$6,
-}
+export const CanceledSlashPayout = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Staking",
+  "CanceledSlashPayout",
+  $.tuple(),
+  _codec.$6,
+)
 
 /**
  *  The threshold for when users can start calling `chill_other` for other validators /
  *  nominators. The threshold is compared to the actual number of validators / nominators
  *  (`CountFor*`) in the system compared to the configured max (`Max*Count`).
  */
-export const ChillThreshold = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$205,
-}
+export const ChillThreshold = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "Staking",
+  "ChillThreshold",
+  $.tuple(),
+  _codec.$205,
+)
 
 /** Counter for the related counted storage map */
-export const CounterForNominators = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const CounterForNominators = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Staking",
+  "CounterForNominators",
+  $.tuple(),
+  _codec.$4,
+)
 
 /** Counter for the related counted storage map */
-export const CounterForValidators = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const CounterForValidators = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Staking",
+  "CounterForValidators",
+  $.tuple(),
+  _codec.$4,
+)
 
 /**
  *  The current era index.
@@ -88,38 +102,44 @@ export const CounterForValidators = {
  *  This is the latest planned era, depending on how the Session pallet queues the validator
  *  set, it might be active or not.
  */
-export const CurrentEra = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const CurrentEra = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "Staking",
+  "CurrentEra",
+  $.tuple(),
+  _codec.$4,
+)
 
 /**
  *  The last planned session scheduled by the session pallet.
  *
  *  This is basically in sync with the call to [`pallet_session::SessionManager::new_session`].
  */
-export const CurrentPlannedSession = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const CurrentPlannedSession = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Staking",
+  "CurrentPlannedSession",
+  $.tuple(),
+  _codec.$4,
+)
 
 /**
  *  Rewards for the last `HISTORY_DEPTH` eras.
  *  If reward hasn't been set or has been removed then 0 reward is returned.
  */
-export const ErasRewardPoints = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$4),
-  value: _codec.$495,
-}
+export const ErasRewardPoints = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Staking",
+  "ErasRewardPoints",
+  $.tuple(_codec.$4),
+  _codec.$495,
+)
 
 /**
  *  Exposure of validator at era.
@@ -129,13 +149,15 @@ export const ErasRewardPoints = {
  *  Is it removed after `HISTORY_DEPTH` eras.
  *  If stakers hasn't been set or has been removed then empty exposure is returned.
  */
-export const ErasStakers = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat", "Twox64Concat"],
-  key: _codec.$494,
-  value: _codec.$57,
-}
+export const ErasStakers = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Staking",
+  "ErasStakers",
+  _codec.$494,
+  _codec.$57,
+)
 
 /**
  *  Clipped Exposure of validator at era.
@@ -150,13 +172,15 @@ export const ErasStakers = {
  *  Is it removed after `HISTORY_DEPTH` eras.
  *  If stakers hasn't been set or has been removed then empty exposure is returned.
  */
-export const ErasStakersClipped = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat", "Twox64Concat"],
-  key: _codec.$494,
-  value: _codec.$57,
-}
+export const ErasStakersClipped = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Staking",
+  "ErasStakersClipped",
+  _codec.$494,
+  _codec.$57,
+)
 
 /**
  *  The session index at which the era start for the last `HISTORY_DEPTH` eras.
@@ -164,25 +188,29 @@ export const ErasStakersClipped = {
  *  Note: This tracks the starting session (i.e. session index when era start being active)
  *  for the eras in `[CurrentEra - HISTORY_DEPTH, CurrentEra]`.
  */
-export const ErasStartSessionIndex = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$4),
-  value: _codec.$4,
-}
+export const ErasStartSessionIndex = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Staking",
+  "ErasStartSessionIndex",
+  $.tuple(_codec.$4),
+  _codec.$4,
+)
 
 /**
  *  The total amount staked for the last `HISTORY_DEPTH` eras.
  *  If total hasn't been set or has been removed then 0 stake is returned.
  */
-export const ErasTotalStake = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$4),
-  value: _codec.$6,
-}
+export const ErasTotalStake = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Staking",
+  "ErasTotalStake",
+  $.tuple(_codec.$4),
+  _codec.$6,
+)
 
 /**
  *  Similar to `ErasStakers`, this holds the preferences of validators.
@@ -191,132 +219,156 @@ export const ErasTotalStake = {
  *
  *  Is it removed after `HISTORY_DEPTH` eras.
  */
-export const ErasValidatorPrefs = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat", "Twox64Concat"],
-  key: _codec.$494,
-  value: _codec.$40,
-}
+export const ErasValidatorPrefs = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Staking",
+  "ErasValidatorPrefs",
+  _codec.$494,
+  _codec.$40,
+)
 
 /**
  *  The total validator era payout for the last `HISTORY_DEPTH` eras.
  *
  *  Eras that haven't finished yet or has been removed doesn't have reward.
  */
-export const ErasValidatorReward = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$4),
-  value: _codec.$6,
-}
+export const ErasValidatorReward = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Staking",
+  "ErasValidatorReward",
+  $.tuple(_codec.$4),
+  _codec.$6,
+)
 
 /** Mode of era forcing. */
-export const ForceEra = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$499,
-}
+export const ForceEra = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Staking",
+  "ForceEra",
+  $.tuple(),
+  _codec.$499,
+)
 
 /**
  *  Any validators that may never be slashed or forcibly kicked. It's a Vec since they're
  *  easy to initialize and the performance hit is minimal (we expect no more than four
  *  invulnerables) and restricted to testnets.
  */
-export const Invulnerables = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$206,
-}
+export const Invulnerables = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Staking",
+  "Invulnerables",
+  $.tuple(),
+  _codec.$206,
+)
 
 /** Map from all (unlocked) "controller" accounts to the info regarding the staking. */
-export const Ledger = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Blake2_128Concat"],
-  key: $.tuple(_codec.$0),
-  value: _codec.$485,
-}
+export const Ledger = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Staking",
+  "Ledger",
+  $.tuple(_codec.$0),
+  _codec.$485,
+)
 
 /**
  *  The maximum nominator count before we stop allowing new validators to join.
  *
  *  When this value is not set, no limits are enforced.
  */
-export const MaxNominatorsCount = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const MaxNominatorsCount = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "Staking",
+  "MaxNominatorsCount",
+  $.tuple(),
+  _codec.$4,
+)
 
 /**
  *  The maximum validator count before we stop allowing new validators to join.
  *
  *  When this value is not set, no limits are enforced.
  */
-export const MaxValidatorsCount = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const MaxValidatorsCount = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "Staking",
+  "MaxValidatorsCount",
+  $.tuple(),
+  _codec.$4,
+)
 
 /**
  *  The minimum amount of commission that validators can set.
  *
  *  If set to `0`, no limit exists.
  */
-export const MinCommission = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$42,
-}
+export const MinCommission = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Staking",
+  "MinCommission",
+  $.tuple(),
+  _codec.$42,
+)
 
 /** The minimum active bond to become and maintain the role of a nominator. */
-export const MinNominatorBond = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$6,
-}
+export const MinNominatorBond = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Staking",
+  "MinNominatorBond",
+  $.tuple(),
+  _codec.$6,
+)
 
 /** The minimum active bond to become and maintain the role of a validator. */
-export const MinValidatorBond = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$6,
-}
+export const MinValidatorBond = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Staking",
+  "MinValidatorBond",
+  $.tuple(),
+  _codec.$6,
+)
 
 /** Minimum number of staking participants before emergency conditions are imposed. */
-export const MinimumValidatorCount = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const MinimumValidatorCount = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Staking",
+  "MinimumValidatorCount",
+  $.tuple(),
+  _codec.$4,
+)
 
 /** All slashing events on nominators, mapped by era to the highest slash value of the era. */
-export const NominatorSlashInEra = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat", "Twox64Concat"],
-  key: _codec.$494,
-  value: _codec.$6,
-}
+export const NominatorSlashInEra = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Staking",
+  "NominatorSlashInEra",
+  _codec.$494,
+  _codec.$6,
+)
 
 /**
  *  The map from nominator stash key to their nomination preferences, namely the validators that
@@ -336,13 +388,15 @@ export const NominatorSlashInEra = {
  *  Lastly, if any of the nominators become non-decodable, they can be chilled immediately via
  *  [`Call::chill_other`] dispatchable by anyone.
  */
-export const Nominators = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$0),
-  value: _codec.$490,
-}
+export const Nominators = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Staking",
+  "Nominators",
+  $.tuple(_codec.$0),
+  _codec.$490,
+)
 
 /**
  *  Indices of validators that have offended in the active era and whether they are currently
@@ -355,56 +409,66 @@ export const Nominators = {
  *  whether a given validator has previously offended using binary search. It gets cleared when
  *  the era ends.
  */
-export const OffendingValidators = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$505,
-}
+export const OffendingValidators = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Staking",
+  "OffendingValidators",
+  $.tuple(),
+  _codec.$505,
+)
 
 /** Where the reward payment should be made. Keyed by stash. */
-export const Payee = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$0),
-  value: _codec.$203,
-}
+export const Payee = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Staking",
+  "Payee",
+  $.tuple(_codec.$0),
+  _codec.$203,
+)
 
 /**
  *  The percentage of the slash that is distributed to reporters.
  *
  *  The rest of the slashed value is handled by the `Slash`.
  */
-export const SlashRewardFraction = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$42,
-}
+export const SlashRewardFraction = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Staking",
+  "SlashRewardFraction",
+  $.tuple(),
+  _codec.$42,
+)
 
 /** Slashing spans for stash accounts. */
-export const SlashingSpans = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$0),
-  value: _codec.$503,
-}
+export const SlashingSpans = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Staking",
+  "SlashingSpans",
+  $.tuple(_codec.$0),
+  _codec.$503,
+)
 
 /**
  *  Records information about the maximum slash of a stash within a slashing span,
  *  as well as how much reward has been paid out.
  */
-export const SpanSlash = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$498),
-  value: _codec.$504,
-}
+export const SpanSlash = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Staking",
+  "SpanSlash",
+  $.tuple(_codec.$498),
+  _codec.$504,
+)
 
 /**
  *  True if network has been upgraded to this version.
@@ -412,52 +476,62 @@ export const SpanSlash = {
  *
  *  This is set to v7.0.0 for new networks.
  */
-export const StorageVersion = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$507,
-}
+export const StorageVersion = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Staking",
+  "StorageVersion",
+  $.tuple(),
+  _codec.$507,
+)
 
 /** All unapplied slashes that are queued for later. */
-export const UnappliedSlashes = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$4),
-  value: _codec.$500,
-}
+export const UnappliedSlashes = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Staking",
+  "UnappliedSlashes",
+  $.tuple(_codec.$4),
+  _codec.$500,
+)
 
 /** The ideal number of staking participants. */
-export const ValidatorCount = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$4,
-}
+export const ValidatorCount = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Staking",
+  "ValidatorCount",
+  $.tuple(),
+  _codec.$4,
+)
 
 /**
  *  All slashing events on validators, mapped by era to the highest slash proportion
  *  and slash value of the era.
  */
-export const ValidatorSlashInEra = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat", "Twox64Concat"],
-  key: _codec.$494,
-  value: _codec.$502,
-}
+export const ValidatorSlashInEra = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Staking",
+  "ValidatorSlashInEra",
+  _codec.$494,
+  _codec.$502,
+)
 
 /** The map from (wannabe) validator stash key to the preferences of that validator. */
-export const Validators = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$0),
-  value: _codec.$40,
-}
+export const Validators = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Staking",
+  "Validators",
+  $.tuple(_codec.$0),
+  _codec.$40,
+)
 
 /**
  * Take the origin account as a stash and lock up `value` of its balance. `controller` will

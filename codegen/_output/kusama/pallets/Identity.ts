@@ -1,4 +1,4 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
@@ -7,13 +7,15 @@ import type * as types from "../types/mod.ts"
  *
  *  TWOX-NOTE: OK ― `AccountId` is a secure hash.
  */
-export const IdentityOf = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$0),
-  value: _codec.$568,
-}
+export const IdentityOf = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Identity",
+  "IdentityOf",
+  $.tuple(_codec.$0),
+  _codec.$568,
+)
 
 /**
  *  The set of registrars. Not expected to get very big as can only be added through a
@@ -21,13 +23,15 @@ export const IdentityOf = {
  *
  *  The index into this can be cast to `RegistrarIndex` to get a valid value.
  */
-export const Registrars = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$574,
-}
+export const Registrars = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Identity",
+  "Registrars",
+  $.tuple(),
+  _codec.$574,
+)
 
 /**
  *  Alternative "sub" identities of this account.
@@ -36,25 +40,29 @@ export const Registrars = {
  *
  *  TWOX-NOTE: OK ― `AccountId` is a secure hash.
  */
-export const SubsOf = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$0),
-  value: _codec.$572,
-}
+export const SubsOf = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Identity",
+  "SubsOf",
+  $.tuple(_codec.$0),
+  _codec.$572,
+)
 
 /**
  *  The super-identity of an alternative "sub" identity together with its name, within that
  *  context. If the account is not some other account's sub-identity, then just `None`.
  */
-export const SuperOf = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Blake2_128Concat"],
-  key: $.tuple(_codec.$0),
-  value: _codec.$299,
-}
+export const SuperOf = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Identity",
+  "SuperOf",
+  $.tuple(_codec.$0),
+  _codec.$299,
+)
 
 /**
  * Add a registrar to the system.

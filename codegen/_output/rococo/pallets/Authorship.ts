@@ -1,32 +1,39 @@
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** Author of current block. */
-export const Author = {
-  type: "Plain",
-  modifier: "Optional",
-  hashers: [],
-  key: [],
-  value: _codec.$0,
-}
+export const Author = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "Authorship",
+  "Author",
+  $.tuple(),
+  _codec.$0,
+)
 
 /** Whether uncles were already set in this block. */
-export const DidSetUncles = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$43,
-}
+export const DidSetUncles = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Authorship",
+  "DidSetUncles",
+  $.tuple(),
+  _codec.$43,
+)
 
 /** Uncles */
-export const Uncles = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$481,
-}
+export const Uncles = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Authorship",
+  "Uncles",
+  $.tuple(),
+  _codec.$481,
+)
 
 /** Provide a set of uncles. */
 export function set_uncles(

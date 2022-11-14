@@ -1,27 +1,31 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /** The announcements made by the proxy (key). */
-export const Announcements = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$0),
-  value: _codec.$583,
-}
+export const Announcements = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Proxy",
+  "Announcements",
+  $.tuple(_codec.$0),
+  _codec.$583,
+)
 
 /**
  *  The set of account proxies. Maps the account which has delegated to the accounts
  *  which are being delegated to, together with the amount held on deposit.
  */
-export const Proxies = {
-  type: "Map",
-  modifier: "Default",
-  hashers: ["Twox64Concat"],
-  key: $.tuple(_codec.$0),
-  value: _codec.$579,
-}
+export const Proxies = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Proxy",
+  "Proxies",
+  $.tuple(_codec.$0),
+  _codec.$579,
+)
 
 /**
  * Register a proxy account for the sender that is able to make calls on its behalf.

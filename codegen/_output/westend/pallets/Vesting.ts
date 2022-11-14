@@ -1,4 +1,4 @@
-import { $ } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
@@ -7,22 +7,26 @@ import type * as types from "../types/mod.ts"
  *
  *  New networks start with latest version, as determined by the genesis build.
  */
-export const StorageVersion = {
-  type: "Plain",
-  modifier: "Default",
-  hashers: [],
-  key: [],
-  value: _codec.$565,
-}
+export const StorageVersion = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Vesting",
+  "StorageVersion",
+  $.tuple(),
+  _codec.$565,
+)
 
 /** Information regarding the vesting of a given account. */
-export const Vesting = {
-  type: "Map",
-  modifier: "Optional",
-  hashers: ["Blake2_128Concat"],
-  key: $.tuple(_codec.$0),
-  value: _codec.$563,
-}
+export const Vesting = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Vesting",
+  "Vesting",
+  $.tuple(_codec.$0),
+  _codec.$563,
+)
 
 /**
  * Force a vested transfer.
