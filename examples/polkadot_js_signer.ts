@@ -1,16 +1,18 @@
-import { TypeRegistry } from "../deps/polkadot/types.ts"
+import { createTestPairs } from "https://deno.land/x/polkadot@0.0.8/keyring/mod.ts"
+import { TypeRegistry } from "https://deno.land/x/polkadot@0.0.8/types/mod.ts"
+
 import * as C from "../mod.ts"
 import * as T from "../test_util/mod.ts"
 import * as U from "../util/mod.ts"
 
 const root = C.extrinsic(T.westend)({
-  sender: C.compat.multiAddressFromKeypair(T.alice),
+  sender: T.alice.address,
   call: {
     type: "Balances",
     value: {
       type: "transfer",
       value: 12345n,
-      dest: C.compat.multiAddressFromKeypair(T.bob),
+      dest: T.bob.address,
     },
   },
 })
@@ -21,7 +23,7 @@ const root = C.extrinsic(T.westend)({
       return Promise.resolve(
         tr
           .createType("ExtrinsicPayload", payload, { version: payload.version })
-          .sign(T.alice),
+          .sign(createTestPairs().alice!),
       )
     },
   })

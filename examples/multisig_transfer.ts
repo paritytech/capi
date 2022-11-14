@@ -1,5 +1,3 @@
-import { KeyringPair } from "../deps/polkadot/keyring/types.ts"
-import { createKeyMulti } from "../deps/polkadot/util-crypto.ts"
 import * as C from "../mod.ts"
 import * as T from "../test_util/mod.ts"
 import * as U from "../util/mod.ts"
@@ -14,22 +12,19 @@ if (!hostname || !portRaw) {
   throw new Error("Must be running inside a test ctx")
 }
 
-const signatories = T.users
-  .slice(0, 3)
-  .map(({ publicKey }) => publicKey)
-  .sort()
+const signatories = T.users.slice(0, 3).map((pair) => pair.publicKey)
 const THRESHOLD = 2
-const multisigPublicKey = createKeyMulti(signatories, THRESHOLD)
+const multisigAddress = U.multisigAddress(signatories, THRESHOLD)
 
 // Transfer initial balance (existential deposit) to multisig address
 const existentialDeposit = extrinsic({
-  sender: C.compat.multiAddressFromKeypair(T.alice),
+  sender: T.alice.address,
   call: Balances.transfer({
     value: 2_000_000_000_000n,
-    dest: C.MultiAddress.Id(multisigPublicKey),
+    dest: C.MultiAddress.Id(multisigAddress),
   }),
 })
-  .signed(C.compat.signerFromKeypair(T.alice))
+  .signed(T.alice.sign)
   .watch(function(status) {
     console.log(`Existential deposit:`, status)
     if (C.rpc.known.TransactionStatus.isTerminal(status)) {
@@ -41,12 +36,12 @@ const existentialDeposit = extrinsic({
 const proposal = createOrApproveMultisigProposal("Proposal", T.alice)
 
 // Get the key of the timepoint
-const key = Multisig.Multisigs.keys(multisigPublicKey).readPage(1)
+const key = Multisig.Multisigs.keys(multisigAddress).readPage(1)
   .access(0)
   .access(1)
 
 // Get the timepoint itself
-const maybeTimepoint = Multisig.Multisigs.entry(multisigPublicKey, key).read()
+const maybeTimepoint = Multisig.Multisigs.entry(multisigAddress, key).read()
   .access("value")
   .access("when")
 
@@ -70,15 +65,15 @@ function createOrApproveMultisigProposal<
   ],
 >(
   label: string,
-  pair: KeyringPair,
+  pair: U.Sr25519,
   ...[maybeTimepoint]: Rest
 ) {
   const call = Balances.transfer_keep_alive({
-    dest: C.compat.multiAddressFromKeypair(T.dave),
+    dest: T.dave.address,
     value: 1230000000000n,
   })
   const maxWeight = extrinsic({
-    sender: C.MultiAddress.Id(multisigPublicKey),
+    sender: C.MultiAddress.Id(multisigAddress),
     call,
   })
     .feeEstimate
@@ -90,17 +85,24 @@ function createOrApproveMultisigProposal<
       }
     })
   return extrinsic({
-    sender: C.compat.multiAddressFromKeypair(pair),
+    sender: pair.address,
     call: C.Z.call.fac(Multisig.as_multi, null!)(C.Z.rec({
       threshold: THRESHOLD,
-      call,
+      call: {
+        type: "Balances",
+        value: {
+          type: "transfer_keep_alive",
+          dest: T.dave.address,
+          value: 1_230_000_000_000n,
+        },
+      },
       other_signatories: signatories.filter((value) => value !== pair.publicKey),
       store_call: false,
       max_weight: maxWeight,
       maybe_timepoint: maybeTimepoint as Rest[0],
     })),
   })
-    .signed(C.compat.signerFromKeypair(pair))
+    .signed(pair.sign)
     .watch(function(status) {
       console.log(`${label}:`, status)
       if (C.rpc.known.TransactionStatus.isTerminal(status)) {
