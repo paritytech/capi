@@ -9,7 +9,7 @@
   },
   "lint": {
     "files": {
-      "exclude": ["target"],
+      "exclude": ["target", "codegen/_output"],
       "include": ["."]
     },
     "rules": {
