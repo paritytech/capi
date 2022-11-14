@@ -4,7 +4,8 @@ import * as C from "../mod.ts"
 import * as T from "../test_util/mod.ts"
 import * as U from "../util/mod.ts"
 
-import { Balances, Multisig } from "../codegen/_output/polkadot/pallets/mod.ts"
+import { extrinsic } from "../codegen/_output/polkadot/mod.ts"
+import { Balances, Multisig, System } from "../codegen/_output/polkadot/pallets/mod.ts"
 
 // FIXME: remove this check once the Zones .bind(env) fix is merged
 const hostname = Deno.env.get("TEST_CTX_HOSTNAME")
@@ -12,9 +13,6 @@ const portRaw = Deno.env.get("TEST_CTX_PORT")
 if (!hostname || !portRaw) {
   throw new Error("Must be running inside a test ctx")
 }
-
-const entryRead = C.entryRead(T.polkadot)
-const extrinsic = C.extrinsic(T.polkadot)
 
 const signatories = T.users
   .slice(0, 3)
@@ -43,19 +41,19 @@ const existentialDeposit = extrinsic({
 const proposal = createOrApproveMultisigProposal("Proposal", T.alice)
 
 // Get the key of the timepoint
-const key = C.keyPageRead(T.polkadot)("Multisig", "Multisigs", 1, [multisigPublicKey])
+const key = Multisig.Multisigs.keys(multisigPublicKey).readPage(1)
   .access(0)
   .access(1)
 
 // Get the timepoint itself
-const maybeTimepoint = entryRead("Multisig", "Multisigs", [multisigPublicKey, key])
+const maybeTimepoint = Multisig.Multisigs.entry(multisigPublicKey, key).read()
   .access("value")
   .access("when")
 
 const approval = createOrApproveMultisigProposal("Approval", T.bob, maybeTimepoint)
 
 // check T.dave new balance
-const daveBalance = entryRead("System", "Account", [T.dave.publicKey])
+const daveBalance = System.Account.entry(T.dave.publicKey).read()
 
 // TODO: use common env
 U.throwIfError(await existentialDeposit.run())

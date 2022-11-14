@@ -15,6 +15,12 @@ export class Storage<C extends C.Z.$<C.rpc.Client>, K extends unknown[], V> {
   entry<Key extends C.Z.Ls$<K>>(...key: Key): StorageEntry<C, K, V, Key> {
     return new StorageEntry(this, key)
   }
+
+  keys<PartialKey extends C.Z.Ls$<Partial<K>>>(
+    ...partialKey: PartialKey
+  ): StorageKeys<C, K, V, PartialKey> {
+    return new StorageKeys(this, partialKey)
+  }
 }
 
 export class StorageEntry<
@@ -32,5 +38,32 @@ export class StorageEntry<
       this.key,
       ...maybeHash,
     ).as<{ value: V }>()
+  }
+}
+export class StorageKeys<
+  C extends C.Z.$<C.rpc.Client>,
+  K extends unknown[],
+  V,
+  PartialKey extends C.Z.Ls$<Partial<K>>,
+> {
+  constructor(readonly storage: Storage<C, K, V>, readonly partialKey: PartialKey) {}
+
+  readPage<
+    Count extends C.Z.$<number>,
+    Rest extends [start?: C.Z.Ls$<K>, blockHash?: C.Z.$<U.HexHash | undefined>],
+  >(count: Count, ...rest: Rest) {
+    return C.keyPageRead(this.storage.client)<
+      string,
+      string,
+      Count,
+      PartialKey,
+      Rest
+    >(
+      this.storage.pallet,
+      this.storage.name,
+      count,
+      this.partialKey as [...PartialKey],
+      ...rest,
+    ).as<K[]>()
   }
 }
