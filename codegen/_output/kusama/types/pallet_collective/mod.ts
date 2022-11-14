@@ -1,12 +1,8 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
+import type * as types from "../mod.ts"
 
 export * as pallet from "./pallet.ts"
-
-export const $rawOrigin: $.Codec<types.pallet_collective.RawOrigin> = _codec.$258
-
-export const $votes: $.Codec<types.pallet_collective.Votes> = _codec.$546
 
 export type RawOrigin =
   | types.pallet_collective.RawOrigin.Members

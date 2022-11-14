@@ -1,10 +1,6 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $opaqueMultiaddr: $.Codec<types.sp_core.offchain.OpaqueMultiaddr> = _codec.$232
-
-export const $opaqueNetworkState: $.Codec<types.sp_core.offchain.OpaqueNetworkState> = _codec.$229
+import type * as types from "../mod.ts"
 
 export type OpaqueMultiaddr = Uint8Array
 

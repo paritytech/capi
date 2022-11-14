@@ -3,20 +3,6 @@ import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /**
- *  For each session index, we keep a mapping of `ValidatorId<T>` to the
- *  number of blocks authored by the given authority.
- */
-export const AuthoredBlocks = new C.fluent.Storage(
-  client,
-  "Map",
-  "Default",
-  "ImOnline",
-  "AuthoredBlocks",
-  _codec.$494,
-  _codec.$4,
-)
-
-/**
  *  The block number after which it's ok to send heartbeats in the current
  *  session.
  *
@@ -62,6 +48,20 @@ export const ReceivedHeartbeats = new C.fluent.Storage(
   "ReceivedHeartbeats",
   _codec.$30,
   _codec.$522,
+)
+
+/**
+ *  For each session index, we keep a mapping of `ValidatorId<T>` to the
+ *  number of blocks authored by the given authority.
+ */
+export const AuthoredBlocks = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "ImOnline",
+  "AuthoredBlocks",
+  _codec.$494,
+  _codec.$4,
 )
 
 /**

@@ -1,14 +1,9 @@
 import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $call: $.Codec<types.pallet_collective.pallet.Call> = _codec.$237
-
-export const $error: $.Codec<types.pallet_collective.pallet.Error> = _codec.$547
-
-export const $event: $.Codec<types.pallet_collective.pallet.Event> = _codec.$65
+import type * as types from "../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
+
 export type Call =
   | types.pallet_collective.pallet.Call.set_members
   | types.pallet_collective.pallet.Call.execute
@@ -449,8 +444,8 @@ export namespace Call {
     return { type: "close", ...value }
   }
 }
-
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
+
 export type Error =
   | "NotMember"
   | "DuplicateProposal"
@@ -462,8 +457,8 @@ export type Error =
   | "TooManyProposals"
   | "WrongProposalWeight"
   | "WrongProposalLength"
-
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
+
 export type Event =
   | types.pallet_collective.pallet.Event.Proposed
   | types.pallet_collective.pallet.Event.Voted

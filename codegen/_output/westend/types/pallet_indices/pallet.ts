@@ -1,14 +1,9 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $call: $.Codec<types.pallet_indices.pallet.Call> = _codec.$196
-
-export const $error: $.Codec<types.pallet_indices.pallet.Error> = _codec.$469
-
-export const $event: $.Codec<types.pallet_indices.pallet.Event> = _codec.$35
+import type * as types from "../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
+
 export type Call =
   | types.pallet_indices.pallet.Call.claim
   | types.pallet_indices.pallet.Call.transfer
@@ -275,11 +270,11 @@ export namespace Call {
     return { type: "freeze", ...value }
   }
 }
-
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
-export type Error = "NotAssigned" | "NotOwner" | "InUse" | "NotTransfer" | "Permanent"
 
+export type Error = "NotAssigned" | "NotOwner" | "InUse" | "NotTransfer" | "Permanent"
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
+
 export type Event =
   | types.pallet_indices.pallet.Event.IndexAssigned
   | types.pallet_indices.pallet.Event.IndexFreed

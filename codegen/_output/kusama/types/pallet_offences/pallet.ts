@@ -1,10 +1,9 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $event: $.Codec<types.pallet_offences.pallet.Event> = _codec.$44
+import type * as types from "../mod.ts"
 
 /** Events type. */
+
 export type Event = types.pallet_offences.pallet.Event.Offence
 export namespace Event {
   /**

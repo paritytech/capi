@@ -1,18 +1,8 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
+import type * as types from "../mod.ts"
 
 export * as pallet from "./pallet.ts"
-
-export const $accountData: $.Codec<types.pallet_balances.AccountData> = _codec.$5
-
-export const $balanceLock: $.Codec<types.pallet_balances.BalanceLock> = _codec.$471
-
-export const $reasons: $.Codec<types.pallet_balances.Reasons> = _codec.$472
-
-export const $releases: $.Codec<types.pallet_balances.Releases> = _codec.$477
-
-export const $reserveData: $.Codec<types.pallet_balances.ReserveData> = _codec.$475
 
 export interface AccountData {
   free: types.u128

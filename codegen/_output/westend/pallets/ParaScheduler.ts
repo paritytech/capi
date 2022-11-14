@@ -1,5 +1,40 @@
 import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
+import type * as types from "../types/mod.ts"
+
+/**
+ *  All the validator groups. One for each core. Indices are into `ActiveValidators` - not the
+ *  broader set of Polkadot validators, but instead just the subset used for parachains during
+ *  this session.
+ *
+ *  Bound: The number of cores is the sum of the numbers of parachains and parathread multiplexers.
+ *  Reasonably, 100-1000. The dominant factor is the number of validators: safe upper bound at 10k.
+ */
+export const ValidatorGroups = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "ParaScheduler",
+  "ValidatorGroups",
+  $.tuple(),
+  _codec.$653,
+)
+
+/**
+ *  A queue of upcoming claims and which core they should be mapped onto.
+ *
+ *  The number of queued claims is bounded at the `scheduling_lookahead`
+ *  multiplied by the number of parathread multiplexer cores. Reasonably, 10 * 50 = 500.
+ */
+export const ParathreadQueue = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "ParaScheduler",
+  "ParathreadQueue",
+  $.tuple(),
+  _codec.$654,
+)
 
 /**
  *  One entry for each availability core. Entries are `None` if the core is not currently occupied. Can be
@@ -38,40 +73,6 @@ export const ParathreadClaimIndex = new C.fluent.Storage(
 )
 
 /**
- *  A queue of upcoming claims and which core they should be mapped onto.
- *
- *  The number of queued claims is bounded at the `scheduling_lookahead`
- *  multiplied by the number of parathread multiplexer cores. Reasonably, 10 * 50 = 500.
- */
-export const ParathreadQueue = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Default",
-  "ParaScheduler",
-  "ParathreadQueue",
-  $.tuple(),
-  _codec.$654,
-)
-
-/**
- *  Currently scheduled cores - free but up to be occupied.
- *
- *  Bounded by the number of cores: one for each parachain and parathread multiplexer.
- *
- *  The value contained here will not be valid after the end of a block. Runtime APIs should be used to determine scheduled cores/
- *  for the upcoming block.
- */
-export const Scheduled = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Default",
-  "ParaScheduler",
-  "Scheduled",
-  $.tuple(),
-  _codec.$663,
-)
-
-/**
  *  The block number where the session start occurred. Used to track how many group rotations have occurred.
  *
  *  Note that in the context of parachains modules the session change is signaled during
@@ -90,19 +91,19 @@ export const SessionStartBlock = new C.fluent.Storage(
 )
 
 /**
- *  All the validator groups. One for each core. Indices are into `ActiveValidators` - not the
- *  broader set of Polkadot validators, but instead just the subset used for parachains during
- *  this session.
+ *  Currently scheduled cores - free but up to be occupied.
  *
- *  Bound: The number of cores is the sum of the numbers of parachains and parathread multiplexers.
- *  Reasonably, 100-1000. The dominant factor is the number of validators: safe upper bound at 10k.
+ *  Bounded by the number of cores: one for each parachain and parathread multiplexer.
+ *
+ *  The value contained here will not be valid after the end of a block. Runtime APIs should be used to determine scheduled cores/
+ *  for the upcoming block.
  */
-export const ValidatorGroups = new C.fluent.Storage(
+export const Scheduled = new C.fluent.Storage(
   client,
   "Plain",
   "Default",
   "ParaScheduler",
-  "ValidatorGroups",
+  "Scheduled",
   $.tuple(),
-  _codec.$653,
+  _codec.$663,
 )

@@ -1,14 +1,9 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $call: $.Codec<types.pallet_vesting.pallet.Call> = _codec.$252
-
-export const $error: $.Codec<types.pallet_vesting.pallet.Error> = _codec.$566
-
-export const $event: $.Codec<types.pallet_vesting.pallet.Event> = _codec.$75
+import type * as types from "../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
+
 export type Call =
   | types.pallet_vesting.pallet.Call.vest
   | types.pallet_vesting.pallet.Call.vest_other
@@ -251,16 +246,16 @@ export namespace Call {
     return { type: "merge_schedules", ...value }
   }
 }
-
 /** Error for the vesting pallet. */
+
 export type Error =
   | "NotVesting"
   | "AtMaxVestingSchedules"
   | "AmountLow"
   | "ScheduleIndexOutOfBounds"
   | "InvalidScheduleParams"
-
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
+
 export type Event =
   | types.pallet_vesting.pallet.Event.VestingUpdated
   | types.pallet_vesting.pallet.Event.VestingCompleted

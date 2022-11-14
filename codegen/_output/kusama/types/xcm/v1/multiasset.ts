@@ -1,22 +1,6 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
-
-export const $assetId: $.Codec<types.xcm.v1.multiasset.AssetId> = _codec.$136
-
-export const $assetInstance: $.Codec<types.xcm.v1.multiasset.AssetInstance> = _codec.$138
-
-export const $fungibility: $.Codec<types.xcm.v1.multiasset.Fungibility> = _codec.$137
-
-export const $multiAsset: $.Codec<types.xcm.v1.multiasset.MultiAsset> = _codec.$135
-
-export const $multiAssetFilter: $.Codec<types.xcm.v1.multiasset.MultiAssetFilter> = _codec.$145
-
-export const $multiAssets: $.Codec<types.xcm.v1.multiasset.MultiAssets> = _codec.$133
-
-export const $wildFungibility: $.Codec<types.xcm.v1.multiasset.WildFungibility> = _codec.$147
-
-export const $wildMultiAsset: $.Codec<types.xcm.v1.multiasset.WildMultiAsset> = _codec.$146
+import type * as types from "../../mod.ts"
 
 export type AssetId =
   | types.xcm.v1.multiasset.AssetId.Concrete

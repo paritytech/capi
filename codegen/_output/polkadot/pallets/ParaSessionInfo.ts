@@ -1,16 +1,6 @@
 import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
-
-/** The validator account keys of the validators actively participating in parachain consensus. */
-export const AccountKeys = new C.fluent.Storage(
-  client,
-  "Map",
-  "Optional",
-  "ParaSessionInfo",
-  "AccountKeys",
-  $.tuple(_codec.$4),
-  _codec.$206,
-)
+import type * as types from "../types/mod.ts"
 
 /**
  *  Assignment keys for the current session.
@@ -51,4 +41,15 @@ export const Sessions = new C.fluent.Storage(
   "Sessions",
   $.tuple(_codec.$4),
   _codec.$696,
+)
+
+/** The validator account keys of the validators actively participating in parachain consensus. */
+export const AccountKeys = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "ParaSessionInfo",
+  "AccountKeys",
+  $.tuple(_codec.$4),
+  _codec.$206,
 )

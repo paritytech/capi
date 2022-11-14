@@ -1,10 +1,6 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
-
-export const $error: $.Codec<types.xcm.v2.traits.Error> = _codec.$110
-
-export const $outcome: $.Codec<types.xcm.v2.traits.Outcome> = _codec.$109
+import type * as types from "../../mod.ts"
 
 export type Error =
   | types.xcm.v2.traits.Error.Overflow

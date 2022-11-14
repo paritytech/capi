@@ -132,7 +132,7 @@ export const $33: $.Codec<null> = C.$null
 
 export const $32: $.Codec<null | C.ChainError<types.sp_runtime.DispatchError>> = $.result(
   $33,
-  $.instance(C.ChainError<types.sp_runtime.DispatchError>, ["value", $24]),
+  $.instance(C.ChainError<$.Native<typeof $24>>, ["value", $24]),
 )
 
 export const $29: $.Codec<types.pallet_scheduler.pallet.Event> = $.taggedUnion("type", {
@@ -804,7 +804,7 @@ export const $143: $.Codec<types.xcm.v0.OriginKind> = $.stringUnion({
   3: "Xcm",
 })
 
-export const $144: $.Codec<{ encoded: Uint8Array }> = $.object(["encoded", $12])
+export const $144: $.Codec<types.xcm.double_encoded.DoubleEncoded> = $.object(["encoded", $12])
 
 export const $147: $.Codec<types.xcm.v1.multiasset.WildFungibility> = $.stringUnion({
   0: "Fungible",
@@ -871,7 +871,7 @@ export const $132: $.Codec<types.xcm.v2.Instruction> = $.taggedUnion("type", {
 
 export const $131: $.Codec<Array<types.xcm.v2.Instruction>> = $.array($132)
 
-export const $130: $.Codec<Array<types.xcm.v2.Instruction>> = $131
+export const $130: $.Codec<types.xcm.v2.Xcm> = $131
 
 export const $149: $.Codec<types.xcm.v1.multilocation.MultiLocation | undefined> = $.option($122)
 
@@ -3093,7 +3093,7 @@ export const $438: $.Codec<types.xcm.v0.order.Order> = $.taggedUnion("type", {
 
 export const $437: $.Codec<Array<types.xcm.v0.order.Order>> = $.array($438)
 
-export const $440: $.Codec<{ encoded: Uint8Array }> = $.object(["encoded", $12])
+export const $440: $.Codec<types.xcm.double_encoded.DoubleEncoded> = $.object(["encoded", $12])
 
 export const $436: $.Codec<types.xcm.v0.Xcm> = $.taggedUnion("type", {
   0: ["WithdrawAsset", ["assets", $151], ["effects", $437]],
@@ -3194,7 +3194,7 @@ export const $447: $.Codec<types.xcm.v2.Instruction> = $.taggedUnion("type", {
 
 export const $446: $.Codec<Array<types.xcm.v2.Instruction>> = $.array($447)
 
-export const $445: $.Codec<Array<types.xcm.v2.Instruction>> = $446
+export const $445: $.Codec<types.xcm.v2.Xcm> = $446
 
 export const $435: $.Codec<types.xcm.VersionedXcm> = $.taggedUnion("type", {
   0: ["V0", ["value", $436]],
@@ -4911,13 +4911,13 @@ export const $730: $.Codec<types.frame_system.extensions.check_genesis.CheckGene
 
 export const $732: $.Codec<C.Era> = C.$era
 
-export const $731: $.Codec<C.Era> = $732
+export const $731: $.Codec<types.frame_system.extensions.check_mortality.CheckMortality> = $732
 
-export const $733: $.Codec<types.Compact<types.u32>> = $125
+export const $733: $.Codec<types.frame_system.extensions.check_nonce.CheckNonce> = $125
 
 export const $734: $.Codec<types.frame_system.extensions.check_weight.CheckWeight> = C.$null
 
-export const $735: $.Codec<types.Compact<types.u128>> = $58
+export const $735: $.Codec<types.pallet_transaction_payment.ChargeTransactionPayment> = $58
 
 export const $736: $.Codec<types.polkadot_runtime_common.claims.PrevalidateAttests> = C.$null
 
@@ -4927,10 +4927,10 @@ export const $726: $.Codec<
     types.frame_system.extensions.check_spec_version.CheckSpecVersion,
     types.frame_system.extensions.check_tx_version.CheckTxVersion,
     types.frame_system.extensions.check_genesis.CheckGenesis,
-    C.Era,
-    types.Compact<types.u32>,
+    types.frame_system.extensions.check_mortality.CheckMortality,
+    types.frame_system.extensions.check_nonce.CheckNonce,
     types.frame_system.extensions.check_weight.CheckWeight,
-    types.Compact<types.u128>,
+    types.pallet_transaction_payment.ChargeTransactionPayment,
     types.polkadot_runtime_common.claims.PrevalidateAttests,
   ]
 > = $.tuple($727, $728, $729, $730, $731, $733, $734, $735, $736)

@@ -13,6 +13,28 @@ export const Account = new C.fluent.Storage(
   _codec.$3,
 )
 
+/** Total extrinsics count for the current block. */
+export const ExtrinsicCount = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "System",
+  "ExtrinsicCount",
+  $.tuple(),
+  _codec.$4,
+)
+
+/** The current weight for the block. */
+export const BlockWeight = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "System",
+  "BlockWeight",
+  $.tuple(),
+  _codec.$7,
+)
+
 /** Total length (in bytes) for all extrinsics put together, for the current block. */
 export const AllExtrinsicsLen = new C.fluent.Storage(
   client,
@@ -35,15 +57,37 @@ export const BlockHash = new C.fluent.Storage(
   _codec.$11,
 )
 
-/** The current weight for the block. */
-export const BlockWeight = new C.fluent.Storage(
+/** Extrinsics data for the current block (maps an extrinsic's index to its data). */
+export const ExtrinsicData = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "System",
+  "ExtrinsicData",
+  $.tuple(_codec.$4),
+  _codec.$12,
+)
+
+/** The current block number being processed. Set by `execute_block`. */
+export const Number = new C.fluent.Storage(
   client,
   "Plain",
   "Default",
   "System",
-  "BlockWeight",
+  "Number",
   $.tuple(),
-  _codec.$7,
+  _codec.$4,
+)
+
+/** Hash of the previous block. */
+export const ParentHash = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "System",
+  "ParentHash",
+  $.tuple(),
+  _codec.$11,
 )
 
 /** Digest of the current block, also part of the block header. */
@@ -55,6 +99,25 @@ export const Digest = new C.fluent.Storage(
   "Digest",
   $.tuple(),
   _codec.$13,
+)
+
+/**
+ *  Events deposited for the current block.
+ *
+ *  NOTE: The item is unbound and should therefore never be read on chain.
+ *  It could otherwise inflate the PoV size of a block.
+ *
+ *  Events have a large in-memory size. Box the events to not go out-of-memory
+ *  just in case someone still reads them from within the runtime.
+ */
+export const Events = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "System",
+  "Events",
+  $.tuple(),
+  _codec.$17,
 )
 
 /** The number of events in the `Events<T>` list. */
@@ -90,58 +153,6 @@ export const EventTopics = new C.fluent.Storage(
   _codec.$158,
 )
 
-/**
- *  Events deposited for the current block.
- *
- *  NOTE: The item is unbound and should therefore never be read on chain.
- *  It could otherwise inflate the PoV size of a block.
- *
- *  Events have a large in-memory size. Box the events to not go out-of-memory
- *  just in case someone still reads them from within the runtime.
- */
-export const Events = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Default",
-  "System",
-  "Events",
-  $.tuple(),
-  _codec.$17,
-)
-
-/** The execution phase of the block. */
-export const ExecutionPhase = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Optional",
-  "System",
-  "ExecutionPhase",
-  $.tuple(),
-  _codec.$156,
-)
-
-/** Total extrinsics count for the current block. */
-export const ExtrinsicCount = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Optional",
-  "System",
-  "ExtrinsicCount",
-  $.tuple(),
-  _codec.$4,
-)
-
-/** Extrinsics data for the current block (maps an extrinsic's index to its data). */
-export const ExtrinsicData = new C.fluent.Storage(
-  client,
-  "Map",
-  "Default",
-  "System",
-  "ExtrinsicData",
-  $.tuple(_codec.$4),
-  _codec.$12,
-)
-
 /** Stores the `spec_version` and `spec_name` of when the last runtime upgrade happened. */
 export const LastRuntimeUpgrade = new C.fluent.Storage(
   client,
@@ -153,26 +164,15 @@ export const LastRuntimeUpgrade = new C.fluent.Storage(
   _codec.$159,
 )
 
-/** The current block number being processed. Set by `execute_block`. */
-export const Number = new C.fluent.Storage(
+/** True if we have upgraded so that `type RefCount` is `u32`. False (default) if not. */
+export const UpgradedToU32RefCount = new C.fluent.Storage(
   client,
   "Plain",
   "Default",
   "System",
-  "Number",
+  "UpgradedToU32RefCount",
   $.tuple(),
-  _codec.$4,
-)
-
-/** Hash of the previous block. */
-export const ParentHash = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Default",
-  "System",
-  "ParentHash",
-  $.tuple(),
-  _codec.$11,
+  _codec.$43,
 )
 
 /**
@@ -189,15 +189,15 @@ export const UpgradedToTripleRefCount = new C.fluent.Storage(
   _codec.$43,
 )
 
-/** True if we have upgraded so that `type RefCount` is `u32`. False (default) if not. */
-export const UpgradedToU32RefCount = new C.fluent.Storage(
+/** The execution phase of the block. */
+export const ExecutionPhase = new C.fluent.Storage(
   client,
   "Plain",
-  "Default",
+  "Optional",
   "System",
-  "UpgradedToU32RefCount",
+  "ExecutionPhase",
   $.tuple(),
-  _codec.$43,
+  _codec.$156,
 )
 
 /** A dispatch that will fill the block weight up to the given ratio. */
@@ -205,25 +205,6 @@ export function fill_block(
   value: Omit<types.frame_system.pallet.Call.fill_block, "type">,
 ): types.polkadot_runtime.RuntimeCall {
   return { type: "System", value: { ...value, type: "fill_block" } }
-}
-
-/**
- * Kill all storage items with a key that starts with the given prefix.
- *
- * **NOTE:** We rely on the Root origin to provide us the number of subkeys under
- * the prefix we are removing to accurately calculate the weight of this function.
- */
-export function kill_prefix(
-  value: Omit<types.frame_system.pallet.Call.kill_prefix, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "System", value: { ...value, type: "kill_prefix" } }
-}
-
-/** Kill some items from storage. */
-export function kill_storage(
-  value: Omit<types.frame_system.pallet.Call.kill_storage, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "System", value: { ...value, type: "kill_storage" } }
 }
 
 /**
@@ -239,11 +220,11 @@ export function remark(
   return { type: "System", value: { ...value, type: "remark" } }
 }
 
-/** Make some on-chain remark and emit event. */
-export function remark_with_event(
-  value: Omit<types.frame_system.pallet.Call.remark_with_event, "type">,
+/** Set the number of pages in the WebAssembly environment's heap. */
+export function set_heap_pages(
+  value: Omit<types.frame_system.pallet.Call.set_heap_pages, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "System", value: { ...value, type: "remark_with_event" } }
+  return { type: "System", value: { ...value, type: "set_heap_pages" } }
 }
 
 /**
@@ -283,16 +264,35 @@ export function set_code_without_checks(
   return { type: "System", value: { ...value, type: "set_code_without_checks" } }
 }
 
-/** Set the number of pages in the WebAssembly environment's heap. */
-export function set_heap_pages(
-  value: Omit<types.frame_system.pallet.Call.set_heap_pages, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "System", value: { ...value, type: "set_heap_pages" } }
-}
-
 /** Set some items of storage. */
 export function set_storage(
   value: Omit<types.frame_system.pallet.Call.set_storage, "type">,
 ): types.polkadot_runtime.RuntimeCall {
   return { type: "System", value: { ...value, type: "set_storage" } }
+}
+
+/** Kill some items from storage. */
+export function kill_storage(
+  value: Omit<types.frame_system.pallet.Call.kill_storage, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "System", value: { ...value, type: "kill_storage" } }
+}
+
+/**
+ * Kill all storage items with a key that starts with the given prefix.
+ *
+ * **NOTE:** We rely on the Root origin to provide us the number of subkeys under
+ * the prefix we are removing to accurately calculate the weight of this function.
+ */
+export function kill_prefix(
+  value: Omit<types.frame_system.pallet.Call.kill_prefix, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "System", value: { ...value, type: "kill_prefix" } }
+}
+
+/** Make some on-chain remark and emit event. */
+export function remark_with_event(
+  value: Omit<types.frame_system.pallet.Call.remark_with_event, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "System", value: { ...value, type: "remark_with_event" } }
 }

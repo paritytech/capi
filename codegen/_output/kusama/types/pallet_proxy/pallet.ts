@@ -1,14 +1,9 @@
 import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $call: $.Codec<types.pallet_proxy.pallet.Call> = _codec.$303
-
-export const $error: $.Codec<types.pallet_proxy.pallet.Error> = _codec.$587
-
-export const $event: $.Codec<types.pallet_proxy.pallet.Event> = _codec.$78
+import type * as types from "../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
+
 export type Call =
   | types.pallet_proxy.pallet.Call.proxy
   | types.pallet_proxy.pallet.Call.add_proxy
@@ -393,8 +388,8 @@ export namespace Call {
     return { type: "proxy_announced", ...value }
   }
 }
-
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
+
 export type Error =
   | "TooMany"
   | "NotFound"
@@ -404,8 +399,8 @@ export type Error =
   | "NoPermission"
   | "Unannounced"
   | "NoSelfProxy"
-
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
+
 export type Event =
   | types.pallet_proxy.pallet.Event.ProxyExecuted
   | types.pallet_proxy.pallet.Event.PureCreated

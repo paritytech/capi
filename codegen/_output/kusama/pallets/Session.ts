@@ -2,6 +2,17 @@ import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
+/** The current set of validators. */
+export const Validators = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Session",
+  "Validators",
+  $.tuple(),
+  _codec.$206,
+)
+
 /** Current index of the session. */
 export const CurrentIndex = new C.fluent.Storage(
   client,
@@ -11,45 +22,6 @@ export const CurrentIndex = new C.fluent.Storage(
   "CurrentIndex",
   $.tuple(),
   _codec.$4,
-)
-
-/**
- *  Indices of disabled validators.
- *
- *  The vec is always kept sorted so that we can find whether a given validator is
- *  disabled using binary search. It gets cleared when `on_session_ending` returns
- *  a new set of identities.
- */
-export const DisabledValidators = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Default",
-  "Session",
-  "DisabledValidators",
-  $.tuple(),
-  _codec.$94,
-)
-
-/** The owner of a key. The key is the `KeyTypeId` + the encoded key. */
-export const KeyOwner = new C.fluent.Storage(
-  client,
-  "Map",
-  "Optional",
-  "Session",
-  "KeyOwner",
-  $.tuple(_codec.$513),
-  _codec.$0,
-)
-
-/** The next session keys for a validator. */
-export const NextKeys = new C.fluent.Storage(
-  client,
-  "Map",
-  "Optional",
-  "Session",
-  "NextKeys",
-  $.tuple(_codec.$0),
-  _codec.$212,
 )
 
 /**
@@ -80,38 +52,44 @@ export const QueuedKeys = new C.fluent.Storage(
   _codec.$511,
 )
 
-/** The current set of validators. */
-export const Validators = new C.fluent.Storage(
+/**
+ *  Indices of disabled validators.
+ *
+ *  The vec is always kept sorted so that we can find whether a given validator is
+ *  disabled using binary search. It gets cleared when `on_session_ending` returns
+ *  a new set of identities.
+ */
+export const DisabledValidators = new C.fluent.Storage(
   client,
   "Plain",
   "Default",
   "Session",
-  "Validators",
+  "DisabledValidators",
   $.tuple(),
-  _codec.$206,
+  _codec.$94,
 )
 
-/**
- * Removes any session key(s) of the function caller.
- *
- * This doesn't take effect until the next session.
- *
- * The dispatch origin of this function must be Signed and the account must be either be
- * convertible to a validator ID using the chain's typical addressing system (this usually
- * means being a controller account) or directly convertible into a validator ID (which
- * usually means being a stash account).
- *
- * # <weight>
- * - Complexity: `O(1)` in number of key types. Actual cost depends on the number of length
- *   of `T::Keys::key_ids()` which is fixed.
- * - DbReads: `T::ValidatorIdOf`, `NextKeys`, `origin account`
- * - DbWrites: `NextKeys`, `origin account`
- * - DbWrites per key id: `KeyOwner`
- * # </weight>
- */
-export function purge_keys(): types.polkadot_runtime.RuntimeCall {
-  return { type: "Session", value: { type: "purge_keys" } }
-}
+/** The next session keys for a validator. */
+export const NextKeys = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Session",
+  "NextKeys",
+  $.tuple(_codec.$0),
+  _codec.$212,
+)
+
+/** The owner of a key. The key is the `KeyTypeId` + the encoded key. */
+export const KeyOwner = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Session",
+  "KeyOwner",
+  $.tuple(_codec.$513),
+  _codec.$0,
+)
 
 /**
  * Sets the session key(s) of the function caller to `keys`.
@@ -133,4 +111,26 @@ export function set_keys(
   value: Omit<types.pallet_session.pallet.Call.set_keys, "type">,
 ): types.polkadot_runtime.RuntimeCall {
   return { type: "Session", value: { ...value, type: "set_keys" } }
+}
+
+/**
+ * Removes any session key(s) of the function caller.
+ *
+ * This doesn't take effect until the next session.
+ *
+ * The dispatch origin of this function must be Signed and the account must be either be
+ * convertible to a validator ID using the chain's typical addressing system (this usually
+ * means being a controller account) or directly convertible into a validator ID (which
+ * usually means being a stash account).
+ *
+ * # <weight>
+ * - Complexity: `O(1)` in number of key types. Actual cost depends on the number of length
+ *   of `T::Keys::key_ids()` which is fixed.
+ * - DbReads: `T::ValidatorIdOf`, `NextKeys`, `origin account`
+ * - DbWrites: `NextKeys`, `origin account`
+ * - DbWrites per key id: `KeyOwner`
+ * # </weight>
+ */
+export function purge_keys(): types.polkadot_runtime.RuntimeCall {
+  return { type: "Session", value: { type: "purge_keys" } }
 }

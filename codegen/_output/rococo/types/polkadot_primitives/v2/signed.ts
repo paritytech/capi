@@ -1,9 +1,6 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
-
-export const $uncheckedSigned: $.Codec<types.polkadot_primitives.v2.signed.UncheckedSigned> =
-  _codec.$381
+import type * as types from "../../mod.ts"
 
 export interface UncheckedSigned {
   payload: types.polkadot_primitives.v2.AvailabilityBitfield

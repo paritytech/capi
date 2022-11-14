@@ -1,13 +1,8 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
+import type * as types from "../../mod.ts"
 
 export * as pallet from "./pallet.ts"
-
-export const $fundInfo: $.Codec<types.polkadot_runtime_common.crowdloan.FundInfo> = _codec.$710
-
-export const $lastContribution: $.Codec<types.polkadot_runtime_common.crowdloan.LastContribution> =
-  _codec.$711
 
 export interface FundInfo {
   depositor: types.sp_core.crypto.AccountId32

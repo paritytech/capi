@@ -1,14 +1,9 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
-
-export const $call: $.Codec<types.polkadot_runtime_parachains.paras.pallet.Call> = _codec.$404
-
-export const $error: $.Codec<types.polkadot_runtime_parachains.paras.pallet.Error> = _codec.$679
-
-export const $event: $.Codec<types.polkadot_runtime_parachains.paras.pallet.Event> = _codec.$107
+import type * as types from "../../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
+
 export type Call =
   | types.polkadot_runtime_parachains.paras.pallet.Call.force_set_current_code
   | types.polkadot_runtime_parachains.paras.pallet.Call.force_set_current_head
@@ -180,8 +175,8 @@ export namespace Call {
     return { type: "include_pvf_check_statement", ...value }
   }
 }
-
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
+
 export type Error =
   | "NotRegistered"
   | "CannotOnboard"
@@ -196,8 +191,8 @@ export type Error =
   | "PvfCheckSubjectInvalid"
   | "PvfCheckDisabled"
   | "CannotUpgradeCode"
-
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
+
 export type Event =
   | types.polkadot_runtime_parachains.paras.pallet.Event.CurrentCodeUpdated
   | types.polkadot_runtime_parachains.paras.pallet.Event.CurrentHeadUpdated

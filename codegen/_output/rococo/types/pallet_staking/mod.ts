@@ -1,33 +1,9 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
+import type * as types from "../mod.ts"
 
 export * as pallet from "./pallet/mod.ts"
 export * as slashing from "./slashing.ts"
-
-export const $activeEraInfo: $.Codec<types.pallet_staking.ActiveEraInfo> = _codec.$492
-
-export const $eraRewardPoints: $.Codec<types.pallet_staking.EraRewardPoints> = _codec.$495
-
-export const $exposure: $.Codec<types.pallet_staking.Exposure> = _codec.$57
-
-export const $forcing: $.Codec<types.pallet_staking.Forcing> = _codec.$499
-
-export const $individualExposure: $.Codec<types.pallet_staking.IndividualExposure> = _codec.$60
-
-export const $nominations: $.Codec<types.pallet_staking.Nominations> = _codec.$490
-
-export const $releases: $.Codec<types.pallet_staking.Releases> = _codec.$507
-
-export const $rewardDestination: $.Codec<types.pallet_staking.RewardDestination> = _codec.$203
-
-export const $stakingLedger: $.Codec<types.pallet_staking.StakingLedger> = _codec.$485
-
-export const $unappliedSlash: $.Codec<types.pallet_staking.UnappliedSlash> = _codec.$501
-
-export const $unlockChunk: $.Codec<types.pallet_staking.UnlockChunk> = _codec.$487
-
-export const $validatorPrefs: $.Codec<types.pallet_staking.ValidatorPrefs> = _codec.$40
 
 export interface ActiveEraInfo {
   index: types.u32

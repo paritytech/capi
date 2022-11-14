@@ -2,17 +2,6 @@ import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
-/** Proposal indices that have been approved but not yet awarded. */
-export const Approvals = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Default",
-  "Treasury",
-  "Approvals",
-  $.tuple(),
-  _codec.$557,
-)
-
 /** Number of proposals that have been made. */
 export const ProposalCount = new C.fluent.Storage(
   client,
@@ -35,23 +24,16 @@ export const Proposals = new C.fluent.Storage(
   _codec.$556,
 )
 
-/**
- * Approve a proposal. At a later time, the proposal will be allocated to the beneficiary
- * and the original deposit will be returned.
- *
- * May only be called from `T::ApproveOrigin`.
- *
- * # <weight>
- * - Complexity: O(1).
- * - DbReads: `Proposals`, `Approvals`
- * - DbWrite: `Approvals`
- * # </weight>
- */
-export function approve_proposal(
-  value: Omit<types.pallet_treasury.pallet.Call.approve_proposal, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Treasury", value: { ...value, type: "approve_proposal" } }
-}
+/** Proposal indices that have been approved but not yet awarded. */
+export const Approvals = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Treasury",
+  "Approvals",
+  $.tuple(),
+  _codec.$557,
+)
 
 /**
  * Put forward a suggestion for spending. A deposit proportional to the value
@@ -88,6 +70,40 @@ export function reject_proposal(
 }
 
 /**
+ * Approve a proposal. At a later time, the proposal will be allocated to the beneficiary
+ * and the original deposit will be returned.
+ *
+ * May only be called from `T::ApproveOrigin`.
+ *
+ * # <weight>
+ * - Complexity: O(1).
+ * - DbReads: `Proposals`, `Approvals`
+ * - DbWrite: `Approvals`
+ * # </weight>
+ */
+export function approve_proposal(
+  value: Omit<types.pallet_treasury.pallet.Call.approve_proposal, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Treasury", value: { ...value, type: "approve_proposal" } }
+}
+
+/**
+ * Propose and approve a spend of treasury funds.
+ *
+ * - `origin`: Must be `SpendOrigin` with the `Success` value being at least `amount`.
+ * - `amount`: The amount to be transferred from the treasury to the `beneficiary`.
+ * - `beneficiary`: The destination account for the transfer.
+ *
+ * NOTE: For record-keeping purposes, the proposer is deemed to be equivalent to the
+ * beneficiary.
+ */
+export function spend(
+  value: Omit<types.pallet_treasury.pallet.Call.spend, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Treasury", value: { ...value, type: "spend" } }
+}
+
+/**
  * Force a previously approved proposal to be removed from the approval queue.
  * The original deposit will no longer be returned.
  *
@@ -108,20 +124,4 @@ export function remove_approval(
   value: Omit<types.pallet_treasury.pallet.Call.remove_approval, "type">,
 ): types.polkadot_runtime.RuntimeCall {
   return { type: "Treasury", value: { ...value, type: "remove_approval" } }
-}
-
-/**
- * Propose and approve a spend of treasury funds.
- *
- * - `origin`: Must be `SpendOrigin` with the `Success` value being at least `amount`.
- * - `amount`: The amount to be transferred from the treasury to the `beneficiary`.
- * - `beneficiary`: The destination account for the transfer.
- *
- * NOTE: For record-keeping purposes, the proposer is deemed to be equivalent to the
- * beneficiary.
- */
-export function spend(
-  value: Omit<types.pallet_treasury.pallet.Call.spend, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Treasury", value: { ...value, type: "spend" } }
 }

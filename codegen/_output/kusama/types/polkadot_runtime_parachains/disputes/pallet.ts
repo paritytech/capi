@@ -1,17 +1,12 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
-
-export const $call: $.Codec<types.polkadot_runtime_parachains.disputes.pallet.Call> = _codec.$410
-
-export const $error: $.Codec<types.polkadot_runtime_parachains.disputes.pallet.Error> = _codec.$700
-
-export const $event: $.Codec<types.polkadot_runtime_parachains.disputes.pallet.Event> = _codec.$113
+import type * as types from "../../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
-export type Call = "force_unfreeze"
 
+export type Call = "force_unfreeze"
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
+
 export type Error =
   | "DuplicateDisputeStatementSets"
   | "AncientDisputeStatement"
@@ -20,8 +15,8 @@ export type Error =
   | "DuplicateStatement"
   | "PotentialSpam"
   | "SingleSidedDispute"
-
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
+
 export type Event =
   | types.polkadot_runtime_parachains.disputes.pallet.Event.DisputeInitiated
   | types.polkadot_runtime_parachains.disputes.pallet.Event.DisputeConcluded

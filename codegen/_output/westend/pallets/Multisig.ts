@@ -1,4 +1,4 @@
-import { C, client } from "../capi.ts"
+import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
@@ -14,46 +14,27 @@ export const Multisigs = new C.fluent.Storage(
 )
 
 /**
- * Register approval for a dispatch to be made from a deterministic composite account if
- * approved by a total of `threshold - 1` of `other_signatories`.
- *
- * Payment: `DepositBase` will be reserved if this is the first approval, plus
- * `threshold` times `DepositFactor`. It is returned once this dispatch happens or
- * is cancelled.
+ * Immediately dispatch a multi-signature call using a single approval from the caller.
  *
  * The dispatch origin for this call must be _Signed_.
  *
- * - `threshold`: The total number of approvals for this dispatch before it is executed.
- * - `other_signatories`: The accounts (other than the sender) who can approve this
- * dispatch. May not be empty.
- * - `maybe_timepoint`: If this is the first approval, then this must be `None`. If it is
- * not the first approval, then it must be `Some`, with the timepoint (block number and
- * transaction index) of the first approval transaction.
- * - `call_hash`: The hash of the call to be executed.
+ * - `other_signatories`: The accounts (other than the sender) who are part of the
+ * multi-signature, but do not participate in the approval process.
+ * - `call`: The call to be executed.
  *
- * NOTE: If this is the final approval, you will want to use `as_multi` instead.
+ * Result is equivalent to the dispatched result.
  *
  * # <weight>
- * - `O(S)`.
- * - Up to one balance-reserve or unreserve operation.
- * - One passthrough operation, one insert, both `O(S)` where `S` is the number of
- *   signatories. `S` is capped by `MaxSignatories`, with weight being proportional.
- * - One encode & hash, both of complexity `O(S)`.
- * - Up to one binary search and insert (`O(logS + S)`).
- * - I/O: 1 read `O(S)`, up to 1 mutate `O(S)`. Up to one remove.
- * - One event.
- * - Storage: inserts one item, value size bounded by `MaxSignatories`, with a deposit
- *   taken for its lifetime of `DepositBase + threshold * DepositFactor`.
- * ----------------------------------
- * - DB Weight:
- *     - Read: Multisig Storage, [Caller Account]
- *     - Write: Multisig Storage, [Caller Account]
+ * O(Z + C) where Z is the length of the call and C its execution weight.
+ * -------------------------------
+ * - DB Weight: None
+ * - Plus Call Weight
  * # </weight>
  */
-export function approve_as_multi(
-  value: Omit<types.pallet_multisig.pallet.Call.approve_as_multi, "type">,
+export function as_multi_threshold_1(
+  value: Omit<types.pallet_multisig.pallet.Call.as_multi_threshold_1, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Multisig", value: { ...value, type: "approve_as_multi" } }
+  return { type: "Multisig", value: { ...value, type: "as_multi_threshold_1" } }
 }
 
 /**
@@ -110,27 +91,46 @@ export function as_multi(
 }
 
 /**
- * Immediately dispatch a multi-signature call using a single approval from the caller.
+ * Register approval for a dispatch to be made from a deterministic composite account if
+ * approved by a total of `threshold - 1` of `other_signatories`.
+ *
+ * Payment: `DepositBase` will be reserved if this is the first approval, plus
+ * `threshold` times `DepositFactor`. It is returned once this dispatch happens or
+ * is cancelled.
  *
  * The dispatch origin for this call must be _Signed_.
  *
- * - `other_signatories`: The accounts (other than the sender) who are part of the
- * multi-signature, but do not participate in the approval process.
- * - `call`: The call to be executed.
+ * - `threshold`: The total number of approvals for this dispatch before it is executed.
+ * - `other_signatories`: The accounts (other than the sender) who can approve this
+ * dispatch. May not be empty.
+ * - `maybe_timepoint`: If this is the first approval, then this must be `None`. If it is
+ * not the first approval, then it must be `Some`, with the timepoint (block number and
+ * transaction index) of the first approval transaction.
+ * - `call_hash`: The hash of the call to be executed.
  *
- * Result is equivalent to the dispatched result.
+ * NOTE: If this is the final approval, you will want to use `as_multi` instead.
  *
  * # <weight>
- * O(Z + C) where Z is the length of the call and C its execution weight.
- * -------------------------------
- * - DB Weight: None
- * - Plus Call Weight
+ * - `O(S)`.
+ * - Up to one balance-reserve or unreserve operation.
+ * - One passthrough operation, one insert, both `O(S)` where `S` is the number of
+ *   signatories. `S` is capped by `MaxSignatories`, with weight being proportional.
+ * - One encode & hash, both of complexity `O(S)`.
+ * - Up to one binary search and insert (`O(logS + S)`).
+ * - I/O: 1 read `O(S)`, up to 1 mutate `O(S)`. Up to one remove.
+ * - One event.
+ * - Storage: inserts one item, value size bounded by `MaxSignatories`, with a deposit
+ *   taken for its lifetime of `DepositBase + threshold * DepositFactor`.
+ * ----------------------------------
+ * - DB Weight:
+ *     - Read: Multisig Storage, [Caller Account]
+ *     - Write: Multisig Storage, [Caller Account]
  * # </weight>
  */
-export function as_multi_threshold_1(
-  value: Omit<types.pallet_multisig.pallet.Call.as_multi_threshold_1, "type">,
+export function approve_as_multi(
+  value: Omit<types.pallet_multisig.pallet.Call.approve_as_multi, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Multisig", value: { ...value, type: "as_multi_threshold_1" } }
+  return { type: "Multisig", value: { ...value, type: "approve_as_multi" } }
 }
 
 /**

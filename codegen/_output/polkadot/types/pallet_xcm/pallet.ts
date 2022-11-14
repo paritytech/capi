@@ -1,21 +1,9 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $call: $.Codec<types.pallet_xcm.pallet.Call> = _codec.$423
-
-export const $error: $.Codec<types.pallet_xcm.pallet.Error> = _codec.$724
-
-export const $event: $.Codec<types.pallet_xcm.pallet.Event> = _codec.$121
-
-export const $origin: $.Codec<types.pallet_xcm.pallet.Origin> = _codec.$261
-
-export const $queryStatus: $.Codec<types.pallet_xcm.pallet.QueryStatus> = _codec.$713
-
-export const $versionMigrationStage: $.Codec<types.pallet_xcm.pallet.VersionMigrationStage> =
-  _codec.$722
+import type * as types from "../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
+
 export type Call =
   | types.pallet_xcm.pallet.Call.send
   | types.pallet_xcm.pallet.Call.teleport_assets
@@ -368,8 +356,8 @@ export namespace Call {
     return { type: "limited_teleport_assets", ...value }
   }
 }
-
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
+
 export type Error =
   | "Unreachable"
   | "SendFailure"
@@ -384,8 +372,8 @@ export type Error =
   | "BadLocation"
   | "NoSubscription"
   | "AlreadySubscribed"
-
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
+
 export type Event =
   | types.pallet_xcm.pallet.Event.Attempted
   | types.pallet_xcm.pallet.Event.Sent
@@ -424,7 +412,7 @@ export namespace Event {
     value: [
       types.xcm.v1.multilocation.MultiLocation,
       types.xcm.v1.multilocation.MultiLocation,
-      Array<types.xcm.v2.Instruction>,
+      types.xcm.v2.Xcm,
     ]
   }
   /**

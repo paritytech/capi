@@ -1,14 +1,9 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $call: $.Codec<types.frame_system.pallet.Call> = _codec.$161
-
-export const $error: $.Codec<types.frame_system.pallet.Error> = _codec.$176
-
-export const $event: $.Codec<types.frame_system.pallet.Event> = _codec.$20
+import type * as types from "../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
+
 export type Call =
   | types.frame_system.pallet.Call.fill_block
   | types.frame_system.pallet.Call.remark
@@ -189,8 +184,8 @@ export namespace Call {
     return { type: "remark_with_event", ...value }
   }
 }
-
 /** Error for the System pallet */
+
 export type Error =
   | "InvalidSpecName"
   | "SpecVersionNeedsToIncrease"
@@ -198,8 +193,8 @@ export type Error =
   | "NonDefaultComposite"
   | "NonZeroRefCount"
   | "CallFiltered"
-
 /** Event for the System pallet. */
+
 export type Event =
   | types.frame_system.pallet.Event.ExtrinsicSuccess
   | types.frame_system.pallet.Event.ExtrinsicFailed

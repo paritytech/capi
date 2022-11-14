@@ -2,28 +2,6 @@ import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
-/** Bounties that have been made. */
-export const Bounties = new C.fluent.Storage(
-  client,
-  "Map",
-  "Optional",
-  "Bounties",
-  "Bounties",
-  $.tuple(_codec.$4),
-  _codec.$591,
-)
-
-/** Bounty indices that have been approved but not yet funded. */
-export const BountyApprovals = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Default",
-  "Bounties",
-  "BountyApprovals",
-  $.tuple(),
-  _codec.$557,
-)
-
 /** Number of bounty proposals that have been made. */
 export const BountyCount = new C.fluent.Storage(
   client,
@@ -33,6 +11,17 @@ export const BountyCount = new C.fluent.Storage(
   "BountyCount",
   $.tuple(),
   _codec.$4,
+)
+
+/** Bounties that have been made. */
+export const Bounties = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Bounties",
+  "Bounties",
+  $.tuple(_codec.$4),
+  _codec.$591,
 )
 
 /** The description of each bounty. */
@@ -46,20 +35,35 @@ export const BountyDescriptions = new C.fluent.Storage(
   _codec.$593,
 )
 
+/** Bounty indices that have been approved but not yet funded. */
+export const BountyApprovals = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Bounties",
+  "BountyApprovals",
+  $.tuple(),
+  _codec.$557,
+)
+
 /**
- * Accept the curator role for a bounty.
- * A deposit will be reserved from curator and refund upon successful payout.
+ * Propose a new bounty.
  *
- * May only be called from the curator.
+ * The dispatch origin for this call must be _Signed_.
  *
- * # <weight>
- * - O(1).
- * # </weight>
+ * Payment: `TipReportDepositBase` will be reserved from the origin account, as well as
+ * `DataDepositPerByte` for each byte in `reason`. It will be unreserved upon approval,
+ * or slashed when rejected.
+ *
+ * - `curator`: The curator account whom will manage this bounty.
+ * - `fee`: The curator fee.
+ * - `value`: The total payment amount of this bounty, curator fee included.
+ * - `description`: The description of this bounty.
  */
-export function accept_curator(
-  value: Omit<types.pallet_bounties.pallet.Call.accept_curator, "type">,
+export function propose_bounty(
+  value: Omit<types.pallet_bounties.pallet.Call.propose_bounty, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Bounties", value: { ...value, type: "accept_curator" } }
+  return { type: "Bounties", value: { ...value, type: "propose_bounty" } }
 }
 
 /**
@@ -76,6 +80,63 @@ export function approve_bounty(
   value: Omit<types.pallet_bounties.pallet.Call.approve_bounty, "type">,
 ): types.polkadot_runtime.RuntimeCall {
   return { type: "Bounties", value: { ...value, type: "approve_bounty" } }
+}
+
+/**
+ * Assign a curator to a funded bounty.
+ *
+ * May only be called from `T::ApproveOrigin`.
+ *
+ * # <weight>
+ * - O(1).
+ * # </weight>
+ */
+export function propose_curator(
+  value: Omit<types.pallet_bounties.pallet.Call.propose_curator, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Bounties", value: { ...value, type: "propose_curator" } }
+}
+
+/**
+ * Unassign curator from a bounty.
+ *
+ * This function can only be called by the `RejectOrigin` a signed origin.
+ *
+ * If this function is called by the `RejectOrigin`, we assume that the curator is
+ * malicious or inactive. As a result, we will slash the curator when possible.
+ *
+ * If the origin is the curator, we take this as a sign they are unable to do their job and
+ * they willingly give up. We could slash them, but for now we allow them to recover their
+ * deposit and exit without issue. (We may want to change this if it is abused.)
+ *
+ * Finally, the origin can be anyone if and only if the curator is "inactive". This allows
+ * anyone in the community to call out that a curator is not doing their due diligence, and
+ * we should pick a new curator. In this case the curator should also be slashed.
+ *
+ * # <weight>
+ * - O(1).
+ * # </weight>
+ */
+export function unassign_curator(
+  value: Omit<types.pallet_bounties.pallet.Call.unassign_curator, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Bounties", value: { ...value, type: "unassign_curator" } }
+}
+
+/**
+ * Accept the curator role for a bounty.
+ * A deposit will be reserved from curator and refund upon successful payout.
+ *
+ * May only be called from the curator.
+ *
+ * # <weight>
+ * - O(1).
+ * # </weight>
+ */
+export function accept_curator(
+  value: Omit<types.pallet_bounties.pallet.Call.accept_curator, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Bounties", value: { ...value, type: "accept_curator" } }
 }
 
 /**
@@ -148,65 +209,4 @@ export function extend_bounty_expiry(
   value: Omit<types.pallet_bounties.pallet.Call.extend_bounty_expiry, "type">,
 ): types.polkadot_runtime.RuntimeCall {
   return { type: "Bounties", value: { ...value, type: "extend_bounty_expiry" } }
-}
-
-/**
- * Propose a new bounty.
- *
- * The dispatch origin for this call must be _Signed_.
- *
- * Payment: `TipReportDepositBase` will be reserved from the origin account, as well as
- * `DataDepositPerByte` for each byte in `reason`. It will be unreserved upon approval,
- * or slashed when rejected.
- *
- * - `curator`: The curator account whom will manage this bounty.
- * - `fee`: The curator fee.
- * - `value`: The total payment amount of this bounty, curator fee included.
- * - `description`: The description of this bounty.
- */
-export function propose_bounty(
-  value: Omit<types.pallet_bounties.pallet.Call.propose_bounty, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Bounties", value: { ...value, type: "propose_bounty" } }
-}
-
-/**
- * Assign a curator to a funded bounty.
- *
- * May only be called from `T::ApproveOrigin`.
- *
- * # <weight>
- * - O(1).
- * # </weight>
- */
-export function propose_curator(
-  value: Omit<types.pallet_bounties.pallet.Call.propose_curator, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Bounties", value: { ...value, type: "propose_curator" } }
-}
-
-/**
- * Unassign curator from a bounty.
- *
- * This function can only be called by the `RejectOrigin` a signed origin.
- *
- * If this function is called by the `RejectOrigin`, we assume that the curator is
- * malicious or inactive. As a result, we will slash the curator when possible.
- *
- * If the origin is the curator, we take this as a sign they are unable to do their job and
- * they willingly give up. We could slash them, but for now we allow them to recover their
- * deposit and exit without issue. (We may want to change this if it is abused.)
- *
- * Finally, the origin can be anyone if and only if the curator is "inactive". This allows
- * anyone in the community to call out that a curator is not doing their due diligence, and
- * we should pick a new curator. In this case the curator should also be slashed.
- *
- * # <weight>
- * - O(1).
- * # </weight>
- */
-export function unassign_curator(
-  value: Omit<types.pallet_bounties.pallet.Call.unassign_curator, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Bounties", value: { ...value, type: "unassign_curator" } }
 }

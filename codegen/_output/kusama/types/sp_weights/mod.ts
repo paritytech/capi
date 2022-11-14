@@ -1,12 +1,8 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
+import type * as types from "../mod.ts"
 
 export * as weight_v2 from "./weight_v2.ts"
-
-export const $oldWeight: $.Codec<types.sp_weights.OldWeight> = _codec.$239
-
-export const $runtimeDbWeight: $.Codec<types.sp_weights.RuntimeDbWeight> = _codec.$171
 
 export type OldWeight = types.u64
 

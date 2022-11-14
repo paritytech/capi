@@ -1,12 +1,8 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
+import type * as types from "../../mod.ts"
 
 export * as $$sp_core from "./$$sp_core/mod.ts"
-
-export const $$$u128: $.Codec<types.pallet_nomination_pools.ConfigOp.$$u128> = _codec.$371
-
-export const $$$u32: $.Codec<types.pallet_nomination_pools.ConfigOp.$$u32> = _codec.$372
 
 export type $$u128 =
   | types.pallet_nomination_pools.ConfigOp.$$u128.Noop

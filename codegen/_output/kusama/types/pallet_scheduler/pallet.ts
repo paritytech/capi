@@ -1,14 +1,9 @@
 import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $call: $.Codec<types.pallet_scheduler.pallet.Call> = _codec.$182
-
-export const $error: $.Codec<types.pallet_scheduler.pallet.Error> = _codec.$450
-
-export const $event: $.Codec<types.pallet_scheduler.pallet.Event> = _codec.$29
+import type * as types from "../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
+
 export type Call =
   | types.pallet_scheduler.pallet.Call.schedule
   | types.pallet_scheduler.pallet.Call.cancel
@@ -123,16 +118,16 @@ export namespace Call {
     return { type: "schedule_named_after", ...value }
   }
 }
-
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
+
 export type Error =
   | "FailedToSchedule"
   | "NotFound"
   | "TargetBlockNumberInPast"
   | "RescheduleNoChange"
   | "Named"
-
 /** Events type. */
+
 export type Event =
   | types.pallet_scheduler.pallet.Event.Scheduled
   | types.pallet_scheduler.pallet.Event.Canceled

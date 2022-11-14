@@ -1,24 +1,10 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
+import type * as types from "../mod.ts"
 
 export * as generic from "./generic/mod.ts"
 export * as multiaddress from "./multiaddress.ts"
 export * as traits from "./traits.ts"
-
-export const $arithmeticError: $.Codec<types.sp_runtime.ArithmeticError> = _codec.$27
-
-export const $dispatchError: $.Codec<types.sp_runtime.DispatchError> = _codec.$24
-
-export const $moduleError: $.Codec<types.sp_runtime.ModuleError> = _codec.$25
-
-export const $multiSignature: $.Codec<types.sp_runtime.MultiSignature> = _codec.$421
-
-export const $multiSigner: $.Codec<types.sp_runtime.MultiSigner> = _codec.$417
-
-export const $tokenError: $.Codec<types.sp_runtime.TokenError> = _codec.$26
-
-export const $transactionalError: $.Codec<types.sp_runtime.TransactionalError> = _codec.$28
 
 export type ArithmeticError = "Underflow" | "Overflow" | "DivisionByZero"
 

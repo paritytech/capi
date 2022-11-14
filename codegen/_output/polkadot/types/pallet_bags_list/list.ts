@@ -1,12 +1,6 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $bag: $.Codec<types.pallet_bags_list.list.Bag> = _codec.$613
-
-export const $listError: $.Codec<types.pallet_bags_list.list.ListError> = _codec.$616
-
-export const $node: $.Codec<types.pallet_bags_list.list.Node> = _codec.$612
+import type * as types from "../mod.ts"
 
 export interface Bag {
   head: types.sp_core.crypto.AccountId32 | undefined

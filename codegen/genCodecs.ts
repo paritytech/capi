@@ -1,14 +1,8 @@
 import * as M from "../frame_metadata/mod.ts"
-import { Files } from "./Files.ts"
 import { CodegenProps } from "./mod.ts"
-import { Decl, getCodecPath, getName, getRawCodecPath, S } from "./utils.ts"
+import { S } from "./utils.ts"
 
-export function genCodecs(
-  props: CodegenProps,
-  decls: Decl[],
-  typeVisitor: M.TyVisitor<string>,
-  files: Files,
-) {
+export function genCodecs(props: CodegenProps, typeVisitor: M.TyVisitor<string>) {
   const { tys } = props.metadata
   const namespaceImports = new Set<string>()
 
@@ -42,9 +36,9 @@ import type * as types from "./types/mod.ts"
     result(ty, ok, err) {
       return addCodecDecl(
         ty,
-        `$.result(${this.visit(ok)}, $.instance(C.ChainError<${
-          typeVisitor.visit(err)
-        }>, ["value", ${this.visit(err)}]))`,
+        `$.result(${
+          this.visit(ok)
+        }, $.instance(C.ChainError<$.Native<typeof $${err.id}>>, ["value", ${this.visit(err)}]))`,
       )
     },
     never(ty) {
@@ -101,7 +95,7 @@ import type * as types from "./types/mod.ts"
       return addCodecDecl(ty, `$.sizedArray(${this.visit(ty.typeParam)}, ${ty.len})`)
     },
     primitive(ty) {
-      return addCodecDecl(ty, getCodecPath(tys, ty)!)
+      return addCodecDecl(ty, ty.kind === "char" ? "$.str" : "$." + ty.kind)
     },
     compact(ty) {
       return addCodecDecl(ty, `$.compact(${this.visit(ty.typeParam)})`)
@@ -122,7 +116,7 @@ import type * as types from "./types/mod.ts"
       return addCodecDecl(ty, `$.lenPrefixed(${this.visit(inner)})`)
     },
     circular(ty) {
-      return `$.deferred(() => ${getName(getRawCodecPath(ty))})`
+      return `$.deferred(() => $${ty.id})`
     },
   })
 
@@ -131,25 +125,16 @@ import type * as types from "./types/mod.ts"
   }
 
   file += `export const _all: $.AnyCodec[] = ${
-    S.array(props.metadata.tys.map((ty) => getName(getRawCodecPath(ty))))
+    S.array(props.metadata.tys.map((ty) => `$${ty.id}`))
   }`
 
-  files.set("codecs.ts", file)
+  return file
 
   function addCodecDecl(ty: M.Ty, value: string) {
-    const rawPath = getRawCodecPath(ty)
     if (ty.path.length > 1) {
       namespaceImports.add(ty.path[0]!)
     }
-    file += `export const ${getName(rawPath)}: $.Codec<${typeVisitor.visit(ty)}> = ${value}\n\n`
-    const path = getCodecPath(tys, ty)
-    // Deduplicate -- metadata has redundant entries (e.g. pallet_collective::RawOrigin)
-    if (path !== rawPath && path !== value && !decls.some((x) => x.path === path)) {
-      decls.push({
-        path,
-        code: `export const ${getName(path)}: $.Codec<${typeVisitor.visit(ty)}> = ${rawPath}`,
-      })
-    }
-    return getName(rawPath)
+    file += `export const $${ty.id}: $.Codec<${typeVisitor.visit(ty)}> = ${value}\n\n`
+    return `$${ty.id}`
   }
 }

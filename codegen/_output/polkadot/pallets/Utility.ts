@@ -1,25 +1,6 @@
+import { $, C, client } from "../capi.ts"
+import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
-
-/**
- * Send a call through an indexed pseudonym of the sender.
- *
- * Filter from origin are passed along. The call will be dispatched with an origin which
- * use the same filter as the origin of this call.
- *
- * NOTE: If you need to ensure that any account-based filtering is not honored (i.e.
- * because you expect `proxy` to have been used prior in the call stack and you do not want
- * the call restrictions to apply to any sub-accounts), then use `as_multi_threshold_1`
- * in the Multisig pallet instead.
- *
- * NOTE: Prior to version *12, this was called `as_limited_sub`.
- *
- * The dispatch origin for this call must be _Signed_.
- */
-export function as_derivative(
-  value: Omit<types.pallet_utility.pallet.Call.as_derivative, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Utility", value: { ...value, type: "as_derivative" } }
-}
 
 /**
  * Send a batch of dispatch calls.
@@ -46,6 +27,27 @@ export function batch(
   value: Omit<types.pallet_utility.pallet.Call.batch, "type">,
 ): types.polkadot_runtime.RuntimeCall {
   return { type: "Utility", value: { ...value, type: "batch" } }
+}
+
+/**
+ * Send a call through an indexed pseudonym of the sender.
+ *
+ * Filter from origin are passed along. The call will be dispatched with an origin which
+ * use the same filter as the origin of this call.
+ *
+ * NOTE: If you need to ensure that any account-based filtering is not honored (i.e.
+ * because you expect `proxy` to have been used prior in the call stack and you do not want
+ * the call restrictions to apply to any sub-accounts), then use `as_multi_threshold_1`
+ * in the Multisig pallet instead.
+ *
+ * NOTE: Prior to version *12, this was called `as_limited_sub`.
+ *
+ * The dispatch origin for this call must be _Signed_.
+ */
+export function as_derivative(
+  value: Omit<types.pallet_utility.pallet.Call.as_derivative, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Utility", value: { ...value, type: "as_derivative" } }
 }
 
 /**

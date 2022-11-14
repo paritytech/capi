@@ -1,14 +1,8 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
+import type * as types from "../../mod.ts"
 
 export * as traits from "./traits.ts"
-
-export const $instruction: $.Codec<types.xcm.v2.Instruction> = _codec.$132
-
-export const $response: $.Codec<types.xcm.v2.Response> = _codec.$140
-
-export const $weightLimit: $.Codec<types.xcm.v2.WeightLimit> = _codec.$148
 
 export type Instruction =
   | types.xcm.v2.Instruction.WithdrawAsset
@@ -67,13 +61,13 @@ export namespace Instruction {
     type: "TransferReserveAsset"
     assets: types.xcm.v1.multiasset.MultiAssets
     dest: types.xcm.v1.multilocation.MultiLocation
-    xcm: Array<types.xcm.v2.Instruction>
+    xcm: types.xcm.v2.Xcm
   }
   export interface Transact {
     type: "Transact"
     origin_type: types.xcm.v0.OriginKind
     require_weight_at_most: types.Compact<types.u64>
-    call: { encoded: Uint8Array }
+    call: types.xcm.double_encoded.DoubleEncoded
   }
   export interface HrmpNewChannelOpenRequest {
     type: "HrmpNewChannelOpenRequest"
@@ -115,7 +109,7 @@ export namespace Instruction {
     assets: types.xcm.v1.multiasset.MultiAssetFilter
     max_assets: types.Compact<types.u32>
     dest: types.xcm.v1.multilocation.MultiLocation
-    xcm: Array<types.xcm.v2.Instruction>
+    xcm: types.xcm.v2.Xcm
   }
   export interface ExchangeAsset {
     type: "ExchangeAsset"
@@ -126,13 +120,13 @@ export namespace Instruction {
     type: "InitiateReserveWithdraw"
     assets: types.xcm.v1.multiasset.MultiAssetFilter
     reserve: types.xcm.v1.multilocation.MultiLocation
-    xcm: Array<types.xcm.v2.Instruction>
+    xcm: types.xcm.v2.Xcm
   }
   export interface InitiateTeleport {
     type: "InitiateTeleport"
     assets: types.xcm.v1.multiasset.MultiAssetFilter
     dest: types.xcm.v1.multilocation.MultiLocation
-    xcm: Array<types.xcm.v2.Instruction>
+    xcm: types.xcm.v2.Xcm
   }
   export interface QueryHolding {
     type: "QueryHolding"
@@ -151,11 +145,11 @@ export namespace Instruction {
   }
   export interface SetErrorHandler {
     type: "SetErrorHandler"
-    value: Array<types.xcm.v2.Instruction>
+    value: types.xcm.v2.Xcm
   }
   export interface SetAppendix {
     type: "SetAppendix"
-    value: Array<types.xcm.v2.Instruction>
+    value: types.xcm.v2.Xcm
   }
   export interface ClearError {
     type: "ClearError"
@@ -369,4 +363,10 @@ export namespace WeightLimit {
   ): types.xcm.v2.WeightLimit.Limited {
     return { type: "Limited", value }
   }
+}
+
+export type Xcm = Array<types.xcm.v2.Instruction>
+
+export function Xcm(value: types.xcm.v2.Xcm) {
+  return value
 }

@@ -1,12 +1,8 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
+import type * as types from "../mod.ts"
 
 export * as app from "./app.ts"
-
-export const $equivocation: $.Codec<types.sp_finality_grandpa.Equivocation> = _codec.$218
-
-export const $equivocationProof: $.Codec<types.sp_finality_grandpa.EquivocationProof> = _codec.$217
 
 export type Equivocation =
   | types.sp_finality_grandpa.Equivocation.Prevote

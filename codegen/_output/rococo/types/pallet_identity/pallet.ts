@@ -1,14 +1,9 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $call: $.Codec<types.pallet_identity.pallet.Call> = _codec.$263
-
-export const $error: $.Codec<types.pallet_identity.pallet.Error> = _codec.$578
-
-export const $event: $.Codec<types.pallet_identity.pallet.Event> = _codec.$77
+import type * as types from "../mod.ts"
 
 /** Identity pallet declaration. */
+
 export type Call =
   | types.pallet_identity.pallet.Call.add_registrar
   | types.pallet_identity.pallet.Call.set_identity
@@ -659,8 +654,8 @@ export namespace Call {
     return { type: "quit_sub" }
   }
 }
-
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
+
 export type Error =
   | "TooManySubAccounts"
   | "NotFound"
@@ -679,8 +674,8 @@ export type Error =
   | "NotSub"
   | "NotOwned"
   | "JudgementForDifferentIdentity"
-
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
+
 export type Event =
   | types.pallet_identity.pallet.Event.IdentitySet
   | types.pallet_identity.pallet.Event.IdentityCleared

@@ -1,14 +1,6 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $delegations: $.Codec<types.pallet_democracy.types.Delegations> = _codec.$540
-
-export const $referendumInfo: $.Codec<types.pallet_democracy.types.ReferendumInfo> = _codec.$533
-
-export const $referendumStatus: $.Codec<types.pallet_democracy.types.ReferendumStatus> = _codec.$534
-
-export const $tally: $.Codec<types.pallet_democracy.types.Tally> = _codec.$535
+import type * as types from "../mod.ts"
 
 export interface Delegations {
   votes: types.u128

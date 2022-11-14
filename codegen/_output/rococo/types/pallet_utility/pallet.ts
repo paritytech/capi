@@ -1,14 +1,9 @@
 import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $call: $.Codec<types.pallet_utility.pallet.Call> = _codec.$254
-
-export const $error: $.Codec<types.pallet_utility.pallet.Error> = _codec.$567
-
-export const $event: $.Codec<types.pallet_utility.pallet.Event> = _codec.$76
+import type * as types from "../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
+
 export type Call =
   | types.pallet_utility.pallet.Call.batch
   | types.pallet_utility.pallet.Call.as_derivative
@@ -224,11 +219,11 @@ export namespace Call {
     return { type: "force_batch", ...value }
   }
 }
-
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
-export type Error = "TooManyCalls"
 
+export type Error = "TooManyCalls"
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
+
 export type Event =
   | types.pallet_utility.pallet.Event.BatchInterrupted
   | types.pallet_utility.pallet.Event.BatchCompleted

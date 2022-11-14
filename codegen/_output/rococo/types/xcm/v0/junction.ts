@@ -1,14 +1,6 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
-
-export const $bodyId: $.Codec<types.xcm.v0.junction.BodyId> = _codec.$128
-
-export const $bodyPart: $.Codec<types.xcm.v0.junction.BodyPart> = _codec.$129
-
-export const $junction: $.Codec<types.xcm.v0.junction.Junction> = _codec.$154
-
-export const $networkId: $.Codec<types.xcm.v0.junction.NetworkId> = _codec.$126
+import type * as types from "../../mod.ts"
 
 export type BodyId =
   | types.xcm.v0.junction.BodyId.Unit

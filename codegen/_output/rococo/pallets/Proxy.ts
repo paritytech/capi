@@ -2,17 +2,6 @@ import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
-/** The announcements made by the proxy (key). */
-export const Announcements = new C.fluent.Storage(
-  client,
-  "Map",
-  "Default",
-  "Proxy",
-  "Announcements",
-  $.tuple(_codec.$0),
-  _codec.$583,
-)
-
 /**
  *  The set of account proxies. Maps the account which has delegated to the accounts
  *  which are being delegated to, together with the amount held on deposit.
@@ -26,6 +15,36 @@ export const Proxies = new C.fluent.Storage(
   $.tuple(_codec.$0),
   _codec.$579,
 )
+
+/** The announcements made by the proxy (key). */
+export const Announcements = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Proxy",
+  "Announcements",
+  $.tuple(_codec.$0),
+  _codec.$583,
+)
+
+/**
+ * Dispatch the given `call` from an account that the sender is authorised for through
+ * `add_proxy`.
+ *
+ * Removes any corresponding announcement(s).
+ *
+ * The dispatch origin for this call must be _Signed_.
+ *
+ * Parameters:
+ * - `real`: The account that the proxy will make a call on behalf of.
+ * - `force_proxy_type`: Specify the exact proxy type to be used and checked for this call.
+ * - `call`: The call to be made by the `real` account.
+ */
+export function proxy(
+  value: Omit<types.pallet_proxy.pallet.Call.proxy, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Proxy", value: { ...value, type: "proxy" } }
+}
 
 /**
  * Register a proxy account for the sender that is able to make calls on its behalf.
@@ -45,26 +64,30 @@ export function add_proxy(
 }
 
 /**
- * Publish the hash of a proxy-call that will be made in the future.
+ * Unregister a proxy account for the sender.
  *
- * This must be called some number of blocks before the corresponding `proxy` is attempted
- * if the delay associated with the proxy relationship is greater than zero.
- *
- * No more than `MaxPending` announcements may be made at any one time.
- *
- * This will take a deposit of `AnnouncementDepositFactor` as well as
- * `AnnouncementDepositBase` if there are no other pending announcements.
- *
- * The dispatch origin for this call must be _Signed_ and a proxy of `real`.
+ * The dispatch origin for this call must be _Signed_.
  *
  * Parameters:
- * - `real`: The account that the proxy will make a call on behalf of.
- * - `call_hash`: The hash of the call to be made by the `real` account.
+ * - `proxy`: The account that the `caller` would like to remove as a proxy.
+ * - `proxy_type`: The permissions currently enabled for the removed proxy account.
  */
-export function announce(
-  value: Omit<types.pallet_proxy.pallet.Call.announce, "type">,
+export function remove_proxy(
+  value: Omit<types.pallet_proxy.pallet.Call.remove_proxy, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Proxy", value: { ...value, type: "announce" } }
+  return { type: "Proxy", value: { ...value, type: "remove_proxy" } }
+}
+
+/**
+ * Unregister all proxy accounts for the sender.
+ *
+ * The dispatch origin for this call must be _Signed_.
+ *
+ * WARNING: This may be called on accounts created by `pure`, however if done, then
+ * the unreserved fees will be inaccessible. **All access to this account will be lost.**
+ */
+export function remove_proxies(): types.polkadot_runtime.RuntimeCall {
+  return { type: "Proxy", value: { type: "remove_proxies" } }
 }
 
 /**
@@ -118,59 +141,26 @@ export function kill_pure(
 }
 
 /**
- * Dispatch the given `call` from an account that the sender is authorised for through
- * `add_proxy`.
+ * Publish the hash of a proxy-call that will be made in the future.
  *
- * Removes any corresponding announcement(s).
+ * This must be called some number of blocks before the corresponding `proxy` is attempted
+ * if the delay associated with the proxy relationship is greater than zero.
  *
- * The dispatch origin for this call must be _Signed_.
+ * No more than `MaxPending` announcements may be made at any one time.
  *
- * Parameters:
- * - `real`: The account that the proxy will make a call on behalf of.
- * - `force_proxy_type`: Specify the exact proxy type to be used and checked for this call.
- * - `call`: The call to be made by the `real` account.
- */
-export function proxy(
-  value: Omit<types.pallet_proxy.pallet.Call.proxy, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Proxy", value: { ...value, type: "proxy" } }
-}
-
-/**
- * Dispatch the given `call` from an account that the sender is authorized for through
- * `add_proxy`.
+ * This will take a deposit of `AnnouncementDepositFactor` as well as
+ * `AnnouncementDepositBase` if there are no other pending announcements.
  *
- * Removes any corresponding announcement(s).
- *
- * The dispatch origin for this call must be _Signed_.
+ * The dispatch origin for this call must be _Signed_ and a proxy of `real`.
  *
  * Parameters:
  * - `real`: The account that the proxy will make a call on behalf of.
- * - `force_proxy_type`: Specify the exact proxy type to be used and checked for this call.
- * - `call`: The call to be made by the `real` account.
+ * - `call_hash`: The hash of the call to be made by the `real` account.
  */
-export function proxy_announced(
-  value: Omit<types.pallet_proxy.pallet.Call.proxy_announced, "type">,
+export function announce(
+  value: Omit<types.pallet_proxy.pallet.Call.announce, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Proxy", value: { ...value, type: "proxy_announced" } }
-}
-
-/**
- * Remove the given announcement of a delegate.
- *
- * May be called by a target (proxied) account to remove a call that one of their delegates
- * (`delegate`) has announced they want to execute. The deposit is returned.
- *
- * The dispatch origin for this call must be _Signed_.
- *
- * Parameters:
- * - `delegate`: The account that previously announced the call.
- * - `call_hash`: The hash of the call to be made.
- */
-export function reject_announcement(
-  value: Omit<types.pallet_proxy.pallet.Call.reject_announcement, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Proxy", value: { ...value, type: "reject_announcement" } }
+  return { type: "Proxy", value: { ...value, type: "announce" } }
 }
 
 /**
@@ -192,28 +182,38 @@ export function remove_announcement(
 }
 
 /**
- * Unregister all proxy accounts for the sender.
+ * Remove the given announcement of a delegate.
  *
- * The dispatch origin for this call must be _Signed_.
- *
- * WARNING: This may be called on accounts created by `pure`, however if done, then
- * the unreserved fees will be inaccessible. **All access to this account will be lost.**
- */
-export function remove_proxies(): types.polkadot_runtime.RuntimeCall {
-  return { type: "Proxy", value: { type: "remove_proxies" } }
-}
-
-/**
- * Unregister a proxy account for the sender.
+ * May be called by a target (proxied) account to remove a call that one of their delegates
+ * (`delegate`) has announced they want to execute. The deposit is returned.
  *
  * The dispatch origin for this call must be _Signed_.
  *
  * Parameters:
- * - `proxy`: The account that the `caller` would like to remove as a proxy.
- * - `proxy_type`: The permissions currently enabled for the removed proxy account.
+ * - `delegate`: The account that previously announced the call.
+ * - `call_hash`: The hash of the call to be made.
  */
-export function remove_proxy(
-  value: Omit<types.pallet_proxy.pallet.Call.remove_proxy, "type">,
+export function reject_announcement(
+  value: Omit<types.pallet_proxy.pallet.Call.reject_announcement, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Proxy", value: { ...value, type: "remove_proxy" } }
+  return { type: "Proxy", value: { ...value, type: "reject_announcement" } }
+}
+
+/**
+ * Dispatch the given `call` from an account that the sender is authorized for through
+ * `add_proxy`.
+ *
+ * Removes any corresponding announcement(s).
+ *
+ * The dispatch origin for this call must be _Signed_.
+ *
+ * Parameters:
+ * - `real`: The account that the proxy will make a call on behalf of.
+ * - `force_proxy_type`: Specify the exact proxy type to be used and checked for this call.
+ * - `call`: The call to be made by the `real` account.
+ */
+export function proxy_announced(
+  value: Omit<types.pallet_proxy.pallet.Call.proxy_announced, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Proxy", value: { ...value, type: "proxy_announced" } }
 }

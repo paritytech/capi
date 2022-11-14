@@ -1,14 +1,6 @@
-import { $ } from "../../../../../../capi.ts"
+import { $, C } from "../../../../../../capi.ts"
 import * as _codec from "../../../../../../codecs.ts"
-import type * as types from "../../../../../../types/mod.ts"
-
-export const $perbill: $.Codec<
-  types.pallet_staking.pallet.pallet.ConfigOp.$$sp_arithmetic.per_things.Perbill
-> = _codec.$210
-
-export const $percent: $.Codec<
-  types.pallet_staking.pallet.pallet.ConfigOp.$$sp_arithmetic.per_things.Percent
-> = _codec.$209
+import type * as types from "../../../../../mod.ts"
 
 export type Perbill =
   | types.pallet_staking.pallet.pallet.ConfigOp.$$sp_arithmetic.per_things.Perbill.Noop

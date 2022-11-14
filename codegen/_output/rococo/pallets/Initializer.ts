@@ -3,25 +3,6 @@ import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /**
- *  Buffered session changes along with the block number at which they should be applied.
- *
- *  Typically this will be empty or one element long. Apart from that this item never hits
- *  the storage.
- *
- *  However this is a `Vec` regardless to handle various edge cases that may occur at runtime
- *  upgrade boundaries or if governance intervenes.
- */
-export const BufferedSessionChanges = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Default",
-  "Initializer",
-  "BufferedSessionChanges",
-  $.tuple(),
-  _codec.$680,
-)
-
-/**
  *  Whether the parachains modules have been initialized within this block.
  *
  *  Semantically a `bool`, but this guarantees it should never hit the trie,
@@ -39,6 +20,25 @@ export const HasInitialized = new C.fluent.Storage(
   "HasInitialized",
   $.tuple(),
   _codec.$33,
+)
+
+/**
+ *  Buffered session changes along with the block number at which they should be applied.
+ *
+ *  Typically this will be empty or one element long. Apart from that this item never hits
+ *  the storage.
+ *
+ *  However this is a `Vec` regardless to handle various edge cases that may occur at runtime
+ *  upgrade boundaries or if governance intervenes.
+ */
+export const BufferedSessionChanges = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Initializer",
+  "BufferedSessionChanges",
+  $.tuple(),
+  _codec.$680,
 )
 
 /**

@@ -1,18 +1,6 @@
-import { $ } from "../capi.ts"
+import { $, C } from "../capi.ts"
 import * as _codec from "../codecs.ts"
-import type * as types from "../types/mod.ts"
-
-export const $candidateHash: $.Codec<types.polkadot_core_primitives.CandidateHash> = _codec.$114
-
-export const $inboundDownwardMessage: $.Codec<
-  types.polkadot_core_primitives.InboundDownwardMessage
-> = _codec.$683
-
-export const $inboundHrmpMessage: $.Codec<types.polkadot_core_primitives.InboundHrmpMessage> =
-  _codec.$691
-
-export const $outboundHrmpMessage: $.Codec<types.polkadot_core_primitives.OutboundHrmpMessage> =
-  _codec.$392
+import type * as types from "./mod.ts"
 
 export type CandidateHash = types.primitive_types.H256
 

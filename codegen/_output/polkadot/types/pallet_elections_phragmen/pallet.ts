@@ -1,14 +1,9 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $call: $.Codec<types.pallet_elections_phragmen.pallet.Call> = _codec.$241
-
-export const $error: $.Codec<types.pallet_elections_phragmen.pallet.Error> = _codec.$553
-
-export const $event: $.Codec<types.pallet_elections_phragmen.pallet.Event> = _codec.$67
+import type * as types from "../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
+
 export type Call =
   | types.pallet_elections_phragmen.pallet.Call.vote
   | types.pallet_elections_phragmen.pallet.Call.remove_voter
@@ -275,8 +270,8 @@ export namespace Call {
     return { type: "clean_defunct_voters", ...value }
   }
 }
-
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
+
 export type Error =
   | "UnableToVote"
   | "NoVotes"
@@ -295,8 +290,8 @@ export type Error =
   | "InvalidVoteCount"
   | "InvalidRenouncing"
   | "InvalidReplacement"
-
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
+
 export type Event =
   | types.pallet_elections_phragmen.pallet.Event.NewTerm
   | types.pallet_elections_phragmen.pallet.Event.EmptyTerm

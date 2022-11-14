@@ -1,8 +1,6 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $multiAddress: $.Codec<types.sp_runtime.multiaddress.MultiAddress> = _codec.$197
+import type * as types from "../mod.ts"
 
 export type MultiAddress =
   | types.sp_runtime.multiaddress.MultiAddress.Id

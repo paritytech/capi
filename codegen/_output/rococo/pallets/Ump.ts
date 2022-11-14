@@ -3,6 +3,47 @@ import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /**
+ *  The messages waiting to be handled by the relay-chain originating from a certain parachain.
+ *
+ *  Note that some upward messages might have been already processed by the inclusion logic. E.g.
+ *  channel management messages.
+ *
+ *  The messages are processed in FIFO order.
+ */
+export const RelayDispatchQueues = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Ump",
+  "RelayDispatchQueues",
+  $.tuple(_codec.$98),
+  _codec.$164,
+)
+
+/**
+ *  Size of the dispatch queues. Caches sizes of the queues in `RelayDispatchQueue`.
+ *
+ *  First item in the tuple is the count of messages and second
+ *  is the total length (in bytes) of the message payloads.
+ *
+ *  Note that this is an auxiliary mapping: it's possible to tell the byte size and the number of
+ *  messages only looking at `RelayDispatchQueues`. This mapping is separate to avoid the cost of
+ *  loading the whole message queue if only the total size and count are required.
+ *
+ *  Invariant:
+ *  - The set of keys should exactly match the set of keys of `RelayDispatchQueues`.
+ */
+export const RelayDispatchQueueSize = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Ump",
+  "RelayDispatchQueueSize",
+  $.tuple(_codec.$98),
+  _codec.$30,
+)
+
+/**
  *  The ordered list of `ParaId`s that have a `RelayDispatchQueue` entry.
  *
  *  Invariant:
@@ -63,47 +104,6 @@ export const OverweightCount = new C.fluent.Storage(
   "OverweightCount",
   $.tuple(),
   _codec.$10,
-)
-
-/**
- *  Size of the dispatch queues. Caches sizes of the queues in `RelayDispatchQueue`.
- *
- *  First item in the tuple is the count of messages and second
- *  is the total length (in bytes) of the message payloads.
- *
- *  Note that this is an auxiliary mapping: it's possible to tell the byte size and the number of
- *  messages only looking at `RelayDispatchQueues`. This mapping is separate to avoid the cost of
- *  loading the whole message queue if only the total size and count are required.
- *
- *  Invariant:
- *  - The set of keys should exactly match the set of keys of `RelayDispatchQueues`.
- */
-export const RelayDispatchQueueSize = new C.fluent.Storage(
-  client,
-  "Map",
-  "Default",
-  "Ump",
-  "RelayDispatchQueueSize",
-  $.tuple(_codec.$98),
-  _codec.$30,
-)
-
-/**
- *  The messages waiting to be handled by the relay-chain originating from a certain parachain.
- *
- *  Note that some upward messages might have been already processed by the inclusion logic. E.g.
- *  channel management messages.
- *
- *  The messages are processed in FIFO order.
- */
-export const RelayDispatchQueues = new C.fluent.Storage(
-  client,
-  "Map",
-  "Default",
-  "Ump",
-  "RelayDispatchQueues",
-  $.tuple(_codec.$98),
-  _codec.$164,
 )
 
 /**

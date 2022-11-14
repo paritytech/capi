@@ -1,14 +1,9 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $call: $.Codec<types.pallet_balances.pallet.Call> = _codec.$199
-
-export const $error: $.Codec<types.pallet_balances.pallet.Error> = _codec.$478
-
-export const $event: $.Codec<types.pallet_balances.pallet.Event> = _codec.$36
+import type * as types from "../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
+
 export type Call =
   | types.pallet_balances.pallet.Call.transfer
   | types.pallet_balances.pallet.Call.set_balance
@@ -234,8 +229,8 @@ export namespace Call {
     return { type: "force_unreserve", ...value }
   }
 }
-
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
+
 export type Error =
   | "VestingBalance"
   | "LiquidityRestrictions"
@@ -245,8 +240,8 @@ export type Error =
   | "ExistingVestingSchedule"
   | "DeadAccount"
   | "TooManyReserves"
-
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
+
 export type Event =
   | types.pallet_balances.pallet.Event.Endowed
   | types.pallet_balances.pallet.Event.DustLost

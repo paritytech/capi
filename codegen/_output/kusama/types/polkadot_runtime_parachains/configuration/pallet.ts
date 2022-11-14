@@ -1,14 +1,9 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
-
-export const $call: $.Codec<types.polkadot_runtime_parachains.configuration.pallet.Call> =
-  _codec.$375
-
-export const $error: $.Codec<types.polkadot_runtime_parachains.configuration.pallet.Error> =
-  _codec.$641
+import type * as types from "../../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
+
 export type Call =
   | types.polkadot_runtime_parachains.configuration.pallet.Call.set_validation_upgrade_cooldown
   | types.polkadot_runtime_parachains.configuration.pallet.Call.set_validation_upgrade_delay
@@ -715,6 +710,6 @@ export namespace Call {
     return { type: "set_bypass_consistency_check", ...value }
   }
 }
-
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
+
 export type Error = "InvalidNewValue"

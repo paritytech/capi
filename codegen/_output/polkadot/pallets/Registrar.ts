@@ -2,14 +2,14 @@ import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
-/** The next free `ParaId`. */
-export const NextFreeParaId = new C.fluent.Storage(
+/** Pending swap operations. */
+export const PendingSwap = new C.fluent.Storage(
   client,
-  "Plain",
-  "Default",
+  "Map",
+  "Optional",
   "Registrar",
-  "NextFreeParaId",
-  $.tuple(),
+  "PendingSwap",
+  $.tuple(_codec.$98),
   _codec.$98,
 )
 
@@ -29,53 +29,16 @@ export const Paras = new C.fluent.Storage(
   _codec.$701,
 )
 
-/** Pending swap operations. */
-export const PendingSwap = new C.fluent.Storage(
+/** The next free `ParaId`. */
+export const NextFreeParaId = new C.fluent.Storage(
   client,
-  "Map",
-  "Optional",
+  "Plain",
+  "Default",
   "Registrar",
-  "PendingSwap",
-  $.tuple(_codec.$98),
+  "NextFreeParaId",
+  $.tuple(),
   _codec.$98,
 )
-
-/**
- * Add a manager lock from a para. This will prevent the manager of a
- * para to deregister or swap a para.
- *
- * Can be called by Root, the parachain, or the parachain manager if the parachain is unlocked.
- */
-export function add_lock(
-  value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.add_lock, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Registrar", value: { ...value, type: "add_lock" } }
-}
-
-/**
- * Deregister a Para Id, freeing all data and returning any deposit.
- *
- * The caller must be Root, the `para` owner, or the `para` itself. The para must be a parathread.
- */
-export function deregister(
-  value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.deregister, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Registrar", value: { ...value, type: "deregister" } }
-}
-
-/**
- * Force the registration of a Para Id on the relay chain.
- *
- * This function must be called by a Root origin.
- *
- * The deposit taken can be specified for this registration. Any `ParaId`
- * can be registered, including sub-1000 IDs which are System Parachains.
- */
-export function force_register(
-  value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.force_register, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Registrar", value: { ...value, type: "force_register" } }
-}
 
 /**
  * Register head data and validation code for a reserved Para Id.
@@ -97,6 +60,50 @@ export function register(
   value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.register, "type">,
 ): types.polkadot_runtime.RuntimeCall {
   return { type: "Registrar", value: { ...value, type: "register" } }
+}
+
+/**
+ * Force the registration of a Para Id on the relay chain.
+ *
+ * This function must be called by a Root origin.
+ *
+ * The deposit taken can be specified for this registration. Any `ParaId`
+ * can be registered, including sub-1000 IDs which are System Parachains.
+ */
+export function force_register(
+  value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.force_register, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Registrar", value: { ...value, type: "force_register" } }
+}
+
+/**
+ * Deregister a Para Id, freeing all data and returning any deposit.
+ *
+ * The caller must be Root, the `para` owner, or the `para` itself. The para must be a parathread.
+ */
+export function deregister(
+  value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.deregister, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Registrar", value: { ...value, type: "deregister" } }
+}
+
+/**
+ * Swap a parachain with another parachain or parathread.
+ *
+ * The origin must be Root, the `para` owner, or the `para` itself.
+ *
+ * The swap will happen only if there is already an opposite swap pending. If there is not,
+ * the swap will be stored in the pending swaps map, ready for a later confirmatory swap.
+ *
+ * The `ParaId`s remain mapped to the same head data and code so external code can rely on
+ * `ParaId` to be a long-term identifier of a notional "parachain". However, their
+ * scheduling info (i.e. whether they're a parathread or parachain), auction information
+ * and the auction deposit are switched.
+ */
+export function swap(
+  value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.swap, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Registrar", value: { ...value, type: "swap" } }
 }
 
 /**
@@ -132,6 +139,18 @@ export function reserve(): types.polkadot_runtime.RuntimeCall {
 }
 
 /**
+ * Add a manager lock from a para. This will prevent the manager of a
+ * para to deregister or swap a para.
+ *
+ * Can be called by Root, the parachain, or the parachain manager if the parachain is unlocked.
+ */
+export function add_lock(
+  value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.add_lock, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Registrar", value: { ...value, type: "add_lock" } }
+}
+
+/**
  * Schedule a parachain upgrade.
  *
  * Can be called by Root, the parachain, or the parachain manager if the parachain is unlocked.
@@ -154,23 +173,4 @@ export function set_current_head(
   value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.set_current_head, "type">,
 ): types.polkadot_runtime.RuntimeCall {
   return { type: "Registrar", value: { ...value, type: "set_current_head" } }
-}
-
-/**
- * Swap a parachain with another parachain or parathread.
- *
- * The origin must be Root, the `para` owner, or the `para` itself.
- *
- * The swap will happen only if there is already an opposite swap pending. If there is not,
- * the swap will be stored in the pending swaps map, ready for a later confirmatory swap.
- *
- * The `ParaId`s remain mapped to the same head data and code so external code can rely on
- * `ParaId` to be a long-term identifier of a notional "parachain". However, their
- * scheduling info (i.e. whether they're a parathread or parachain), auction information
- * and the auction deposit are switched.
- */
-export function swap(
-  value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.swap, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Registrar", value: { ...value, type: "swap" } }
 }

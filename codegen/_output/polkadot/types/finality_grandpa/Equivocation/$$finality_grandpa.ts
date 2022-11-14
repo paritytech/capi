@@ -1,12 +1,6 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
-
-export const $precommit: $.Codec<types.finality_grandpa.Equivocation.$$finality_grandpa.Precommit> =
-  _codec.$224
-
-export const $prevote: $.Codec<types.finality_grandpa.Equivocation.$$finality_grandpa.Prevote> =
-  _codec.$219
+import type * as types from "../../mod.ts"
 
 export interface Precommit {
   round_number: types.u64

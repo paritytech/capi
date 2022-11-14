@@ -1,10 +1,6 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
-
-export const $junctions: $.Codec<types.xcm.v1.multilocation.Junctions> = _codec.$123
-
-export const $multiLocation: $.Codec<types.xcm.v1.multilocation.MultiLocation> = _codec.$122
+import type * as types from "../../mod.ts"
 
 export type Junctions =
   | types.xcm.v1.multilocation.Junctions.Here

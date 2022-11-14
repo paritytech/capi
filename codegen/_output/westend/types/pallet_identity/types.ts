@@ -1,18 +1,6 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $data: $.Codec<types.pallet_identity.types.Data> = _codec.$267
-
-export const $identityField: $.Codec<types.pallet_identity.types.IdentityField> = _codec.$301
-
-export const $identityInfo: $.Codec<types.pallet_identity.types.IdentityInfo> = _codec.$264
-
-export const $judgement: $.Codec<types.pallet_identity.types.Judgement> = _codec.$302
-
-export const $registrarInfo: $.Codec<types.pallet_identity.types.RegistrarInfo> = _codec.$576
-
-export const $registration: $.Codec<types.pallet_identity.types.Registration> = _codec.$568
+import type * as types from "../mod.ts"
 
 export type Data =
   | types.pallet_identity.types.Data.None

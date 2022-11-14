@@ -3,20 +3,6 @@ import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
 /**
- *  Simple preimage lookup from the reason's hash to the original data. Again, has an
- *  insecure enumerable hash since the key is guaranteed to be the result of a secure hash.
- */
-export const Reasons = new C.fluent.Storage(
-  client,
-  "Map",
-  "Optional",
-  "Tips",
-  "Reasons",
-  $.tuple(_codec.$11),
-  _codec.$12,
-)
-
-/**
  *  TipsMap that are not yet completed. Keyed by the hash of `(reason, who)` from the value.
  *  This has the insecure enumerable hash function since the key itself is already
  *  guaranteed to be a secure hash.
@@ -32,28 +18,18 @@ export const Tips = new C.fluent.Storage(
 )
 
 /**
- * Close and payout a tip.
- *
- * The dispatch origin for this call must be _Signed_.
- *
- * The tip identified by `hash` must have finished its countdown period.
- *
- * - `hash`: The identity of the open tip for which a tip value is declared. This is formed
- *   as the hash of the tuple of the original tip `reason` and the beneficiary account ID.
- *
- * # <weight>
- * - Complexity: `O(T)` where `T` is the number of tippers. decoding `Tipper` vec of length
- *   `T`. `T` is charged as upper bound given by `ContainsLengthBound`. The actual cost
- *   depends on the implementation of `T::Tippers`.
- * - DbReads: `Tips`, `Tippers`, `tip finder`
- * - DbWrites: `Reasons`, `Tips`, `Tippers`, `tip finder`
- * # </weight>
+ *  Simple preimage lookup from the reason's hash to the original data. Again, has an
+ *  insecure enumerable hash since the key is guaranteed to be the result of a secure hash.
  */
-export function close_tip(
-  value: Omit<types.pallet_tips.pallet.Call.close_tip, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Tips", value: { ...value, type: "close_tip" } }
-}
+export const Reasons = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Tips",
+  "Reasons",
+  $.tuple(_codec.$11),
+  _codec.$12,
+)
 
 /**
  * Report something `reason` that deserves a tip and claim any eventual the finder's fee.
@@ -110,23 +86,33 @@ export function retract_tip(
 }
 
 /**
- * Remove and slash an already-open tip.
+ * Give a tip for something new; no finder's fee will be taken.
  *
- * May only be called from `T::RejectOrigin`.
+ * The dispatch origin for this call must be _Signed_ and the signing account must be a
+ * member of the `Tippers` set.
  *
- * As a result, the finder is slashed and the deposits are lost.
+ * - `reason`: The reason for, or the thing that deserves, the tip; generally this will be
+ *   a UTF-8-encoded URL.
+ * - `who`: The account which should be credited for the tip.
+ * - `tip_value`: The amount of tip that the sender would like to give. The median tip
+ *   value of active tippers will be given to the `who`.
  *
- * Emits `TipSlashed` if successful.
+ * Emits `NewTip` if successful.
  *
  * # <weight>
- *   `T` is charged as upper bound given by `ContainsLengthBound`.
- *   The actual cost depends on the implementation of `T::Tippers`.
+ * - Complexity: `O(R + T)` where `R` length of `reason`, `T` is the number of tippers.
+ *   - `O(T)`: decoding `Tipper` vec of length `T`. `T` is charged as upper bound given by
+ *     `ContainsLengthBound`. The actual cost depends on the implementation of
+ *     `T::Tippers`.
+ *   - `O(R)`: hashing and encoding of reason of length `R`
+ * - DbReads: `Tippers`, `Reasons`
+ * - DbWrites: `Reasons`, `Tips`
  * # </weight>
  */
-export function slash_tip(
-  value: Omit<types.pallet_tips.pallet.Call.slash_tip, "type">,
+export function tip_new(
+  value: Omit<types.pallet_tips.pallet.Call.tip_new, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Tips", value: { ...value, type: "slash_tip" } }
+  return { type: "Tips", value: { ...value, type: "tip_new" } }
 }
 
 /**
@@ -162,31 +148,45 @@ export function tip(
 }
 
 /**
- * Give a tip for something new; no finder's fee will be taken.
+ * Close and payout a tip.
  *
- * The dispatch origin for this call must be _Signed_ and the signing account must be a
- * member of the `Tippers` set.
+ * The dispatch origin for this call must be _Signed_.
  *
- * - `reason`: The reason for, or the thing that deserves, the tip; generally this will be
- *   a UTF-8-encoded URL.
- * - `who`: The account which should be credited for the tip.
- * - `tip_value`: The amount of tip that the sender would like to give. The median tip
- *   value of active tippers will be given to the `who`.
+ * The tip identified by `hash` must have finished its countdown period.
  *
- * Emits `NewTip` if successful.
+ * - `hash`: The identity of the open tip for which a tip value is declared. This is formed
+ *   as the hash of the tuple of the original tip `reason` and the beneficiary account ID.
  *
  * # <weight>
- * - Complexity: `O(R + T)` where `R` length of `reason`, `T` is the number of tippers.
- *   - `O(T)`: decoding `Tipper` vec of length `T`. `T` is charged as upper bound given by
- *     `ContainsLengthBound`. The actual cost depends on the implementation of
- *     `T::Tippers`.
- *   - `O(R)`: hashing and encoding of reason of length `R`
- * - DbReads: `Tippers`, `Reasons`
- * - DbWrites: `Reasons`, `Tips`
+ * - Complexity: `O(T)` where `T` is the number of tippers. decoding `Tipper` vec of length
+ *   `T`. `T` is charged as upper bound given by `ContainsLengthBound`. The actual cost
+ *   depends on the implementation of `T::Tippers`.
+ * - DbReads: `Tips`, `Tippers`, `tip finder`
+ * - DbWrites: `Reasons`, `Tips`, `Tippers`, `tip finder`
  * # </weight>
  */
-export function tip_new(
-  value: Omit<types.pallet_tips.pallet.Call.tip_new, "type">,
+export function close_tip(
+  value: Omit<types.pallet_tips.pallet.Call.close_tip, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Tips", value: { ...value, type: "tip_new" } }
+  return { type: "Tips", value: { ...value, type: "close_tip" } }
+}
+
+/**
+ * Remove and slash an already-open tip.
+ *
+ * May only be called from `T::RejectOrigin`.
+ *
+ * As a result, the finder is slashed and the deposits are lost.
+ *
+ * Emits `TipSlashed` if successful.
+ *
+ * # <weight>
+ *   `T` is charged as upper bound given by `ContainsLengthBound`.
+ *   The actual cost depends on the implementation of `T::Tippers`.
+ * # </weight>
+ */
+export function slash_tip(
+  value: Omit<types.pallet_tips.pallet.Call.slash_tip, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Tips", value: { ...value, type: "slash_tip" } }
 }

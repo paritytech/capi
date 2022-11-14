@@ -2,16 +2,6 @@ import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
-export const PreimageFor = new C.fluent.Storage(
-  client,
-  "Map",
-  "Optional",
-  "Preimage",
-  "PreimageFor",
-  $.tuple(_codec.$453),
-  _codec.$454,
-)
-
 /** The request status of a given hash. */
 export const StatusFor = new C.fluent.Storage(
   client,
@@ -21,6 +11,16 @@ export const StatusFor = new C.fluent.Storage(
   "StatusFor",
   $.tuple(_codec.$11),
   _codec.$451,
+)
+
+export const PreimageFor = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Preimage",
+  "PreimageFor",
+  $.tuple(_codec.$453),
+  _codec.$454,
 )
 
 /**
@@ -36,18 +36,6 @@ export function note_preimage(
 }
 
 /**
- * Request a preimage be uploaded to the chain without paying any fees or deposits.
- *
- * If the preimage requests has already been provided on-chain, we unreserve any deposit
- * a user may have paid, and take the control of the preimage out of their hands.
- */
-export function request_preimage(
-  value: Omit<types.pallet_preimage.pallet.Call.request_preimage, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Preimage", value: { ...value, type: "request_preimage" } }
-}
-
-/**
  * Clear an unrequested preimage from the runtime storage.
  *
  * If `len` is provided, then it will be a much cheaper operation.
@@ -59,6 +47,18 @@ export function unnote_preimage(
   value: Omit<types.pallet_preimage.pallet.Call.unnote_preimage, "type">,
 ): types.polkadot_runtime.RuntimeCall {
   return { type: "Preimage", value: { ...value, type: "unnote_preimage" } }
+}
+
+/**
+ * Request a preimage be uploaded to the chain without paying any fees or deposits.
+ *
+ * If the preimage requests has already been provided on-chain, we unreserve any deposit
+ * a user may have paid, and take the control of the preimage out of their hands.
+ */
+export function request_preimage(
+  value: Omit<types.pallet_preimage.pallet.Call.request_preimage, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Preimage", value: { ...value, type: "request_preimage" } }
 }
 
 /**

@@ -1,10 +1,6 @@
-import { $ } from "../capi.ts"
+import { $, C } from "../capi.ts"
 import * as _codec from "../codecs.ts"
-import type * as types from "../types/mod.ts"
-
-export const $electionScore: $.Codec<types.sp_npos_elections.ElectionScore> = _codec.$88
-
-export const $support: $.Codec<types.sp_npos_elections.Support> = _codec.$367
+import type * as types from "./mod.ts"
 
 export interface ElectionScore {
   minimal_stake: types.u128

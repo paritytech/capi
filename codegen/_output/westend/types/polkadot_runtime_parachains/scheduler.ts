@@ -1,20 +1,6 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $assignmentKind: $.Codec<types.polkadot_runtime_parachains.scheduler.AssignmentKind> =
-  _codec.$665
-
-export const $coreAssignment: $.Codec<types.polkadot_runtime_parachains.scheduler.CoreAssignment> =
-  _codec.$664
-
-export const $parathreadClaimQueue: $.Codec<
-  types.polkadot_runtime_parachains.scheduler.ParathreadClaimQueue
-> = _codec.$654
-
-export const $queuedParathread: $.Codec<
-  types.polkadot_runtime_parachains.scheduler.QueuedParathread
-> = _codec.$656
+import type * as types from "../mod.ts"
 
 export type AssignmentKind =
   | types.polkadot_runtime_parachains.scheduler.AssignmentKind.Parachain

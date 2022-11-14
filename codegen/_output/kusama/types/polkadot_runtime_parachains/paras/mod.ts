@@ -1,27 +1,8 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
+import type * as types from "../../mod.ts"
 
 export * as pallet from "./pallet.ts"
-
-export const $paraGenesisArgs: $.Codec<types.polkadot_runtime_parachains.paras.ParaGenesisArgs> =
-  _codec.$678
-
-export const $paraLifecycle: $.Codec<types.polkadot_runtime_parachains.paras.ParaLifecycle> =
-  _codec.$670
-
-export const $paraPastCodeMeta: $.Codec<types.polkadot_runtime_parachains.paras.ParaPastCodeMeta> =
-  _codec.$672
-
-export const $pvfCheckActiveVoteState: $.Codec<
-  types.polkadot_runtime_parachains.paras.PvfCheckActiveVoteState
-> = _codec.$666
-
-export const $pvfCheckCause: $.Codec<types.polkadot_runtime_parachains.paras.PvfCheckCause> =
-  _codec.$668
-
-export const $replacementTimes: $.Codec<types.polkadot_runtime_parachains.paras.ReplacementTimes> =
-  _codec.$674
 
 export interface ParaGenesisArgs {
   genesis_head: types.polkadot_parachain.primitives.HeadData

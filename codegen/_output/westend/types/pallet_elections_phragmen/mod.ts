@@ -1,14 +1,8 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
+import type * as types from "../mod.ts"
 
 export * as pallet from "./pallet.ts"
-
-export const $renouncing: $.Codec<types.pallet_elections_phragmen.Renouncing> = _codec.$242
-
-export const $seatHolder: $.Codec<types.pallet_elections_phragmen.SeatHolder> = _codec.$551
-
-export const $voter: $.Codec<types.pallet_elections_phragmen.Voter> = _codec.$552
 
 export type Renouncing =
   | types.pallet_elections_phragmen.Renouncing.Member

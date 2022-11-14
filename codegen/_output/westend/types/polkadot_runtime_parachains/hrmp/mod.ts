@@ -1,14 +1,8 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
+import type * as types from "../../mod.ts"
 
 export * as pallet from "./pallet.ts"
-
-export const $hrmpChannel: $.Codec<types.polkadot_runtime_parachains.hrmp.HrmpChannel> = _codec.$688
-
-export const $hrmpOpenChannelRequest: $.Codec<
-  types.polkadot_runtime_parachains.hrmp.HrmpOpenChannelRequest
-> = _codec.$686
 
 export interface HrmpChannel {
   max_capacity: types.u32

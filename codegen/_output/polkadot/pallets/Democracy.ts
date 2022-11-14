@@ -2,90 +2,6 @@ import { $, C, client } from "../capi.ts"
 import * as _codec from "../codecs.ts"
 import type * as types from "../types/mod.ts"
 
-/**
- *  A record of who vetoed what. Maps proposal hash to a possible existent block number
- *  (until when it may not be resubmitted) and who vetoed it.
- */
-export const Blacklist = new C.fluent.Storage(
-  client,
-  "Map",
-  "Optional",
-  "Democracy",
-  "Blacklist",
-  $.tuple(_codec.$11),
-  _codec.$543,
-)
-
-/** Record of all proposals that have been subject to emergency cancellation. */
-export const Cancellations = new C.fluent.Storage(
-  client,
-  "Map",
-  "Default",
-  "Democracy",
-  "Cancellations",
-  $.tuple(_codec.$11),
-  _codec.$43,
-)
-
-/**
- *  Those who have locked a deposit.
- *
- *  TWOX-NOTE: Safe, as increasing integer keys are safe.
- */
-export const DepositOf = new C.fluent.Storage(
-  client,
-  "Map",
-  "Optional",
-  "Democracy",
-  "DepositOf",
-  $.tuple(_codec.$4),
-  _codec.$531,
-)
-
-/**
- *  True if the last referendum tabled was submitted externally. False if it was a public
- *  proposal.
- */
-export const LastTabledWasExternal = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Default",
-  "Democracy",
-  "LastTabledWasExternal",
-  $.tuple(),
-  _codec.$43,
-)
-
-/**
- *  The lowest referendum index representing an unbaked referendum. Equal to
- *  `ReferendumCount` if there isn't a unbaked referendum.
- */
-export const LowestUnbaked = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Default",
-  "Democracy",
-  "LowestUnbaked",
-  $.tuple(),
-  _codec.$4,
-)
-
-/**
- *  The referendum to be tabled whenever it would be valid to table an external proposal.
- *  This happens when a referendum needs to be tabled and one of two conditions are met:
- *  - `LastTabledWasExternal` is `false`; or
- *  - `PublicProps` is empty.
- */
-export const NextExternal = new C.fluent.Storage(
-  client,
-  "Plain",
-  "Optional",
-  "Democracy",
-  "NextExternal",
-  $.tuple(),
-  _codec.$542,
-)
-
 /** The number of (public) proposals that have been made so far. */
 export const PublicPropCount = new C.fluent.Storage(
   client,
@@ -108,6 +24,21 @@ export const PublicProps = new C.fluent.Storage(
   _codec.$528,
 )
 
+/**
+ *  Those who have locked a deposit.
+ *
+ *  TWOX-NOTE: Safe, as increasing integer keys are safe.
+ */
+export const DepositOf = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Democracy",
+  "DepositOf",
+  $.tuple(_codec.$4),
+  _codec.$531,
+)
+
 /** The next free referendum index, aka the number of referenda started so far. */
 export const ReferendumCount = new C.fluent.Storage(
   client,
@@ -115,6 +46,20 @@ export const ReferendumCount = new C.fluent.Storage(
   "Default",
   "Democracy",
   "ReferendumCount",
+  $.tuple(),
+  _codec.$4,
+)
+
+/**
+ *  The lowest referendum index representing an unbaked referendum. Equal to
+ *  `ReferendumCount` if there isn't a unbaked referendum.
+ */
+export const LowestUnbaked = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Democracy",
+  "LowestUnbaked",
   $.tuple(),
   _codec.$4,
 )
@@ -151,95 +96,104 @@ export const VotingOf = new C.fluent.Storage(
 )
 
 /**
- * Permanently place a proposal into the blacklist. This prevents it from ever being
- * proposed again.
- *
- * If called on a queued public or external proposal, then this will result in it being
- * removed. If the `ref_index` supplied is an active referendum with the proposal hash,
- * then it will be cancelled.
- *
- * The dispatch origin of this call must be `BlacklistOrigin`.
- *
- * - `proposal_hash`: The proposal hash to blacklist permanently.
- * - `ref_index`: An ongoing referendum whose hash is `proposal_hash`, which will be
- * cancelled.
- *
- * Weight: `O(p)` (though as this is an high-privilege dispatch, we assume it has a
- *   reasonable value).
+ *  True if the last referendum tabled was submitted externally. False if it was a public
+ *  proposal.
  */
-export function blacklist(
-  value: Omit<types.pallet_democracy.pallet.Call.blacklist, "type">,
+export const LastTabledWasExternal = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Default",
+  "Democracy",
+  "LastTabledWasExternal",
+  $.tuple(),
+  _codec.$43,
+)
+
+/**
+ *  The referendum to be tabled whenever it would be valid to table an external proposal.
+ *  This happens when a referendum needs to be tabled and one of two conditions are met:
+ *  - `LastTabledWasExternal` is `false`; or
+ *  - `PublicProps` is empty.
+ */
+export const NextExternal = new C.fluent.Storage(
+  client,
+  "Plain",
+  "Optional",
+  "Democracy",
+  "NextExternal",
+  $.tuple(),
+  _codec.$542,
+)
+
+/**
+ *  A record of who vetoed what. Maps proposal hash to a possible existent block number
+ *  (until when it may not be resubmitted) and who vetoed it.
+ */
+export const Blacklist = new C.fluent.Storage(
+  client,
+  "Map",
+  "Optional",
+  "Democracy",
+  "Blacklist",
+  $.tuple(_codec.$11),
+  _codec.$543,
+)
+
+/** Record of all proposals that have been subject to emergency cancellation. */
+export const Cancellations = new C.fluent.Storage(
+  client,
+  "Map",
+  "Default",
+  "Democracy",
+  "Cancellations",
+  $.tuple(_codec.$11),
+  _codec.$43,
+)
+
+/**
+ * Propose a sensitive action to be taken.
+ *
+ * The dispatch origin of this call must be _Signed_ and the sender must
+ * have funds to cover the deposit.
+ *
+ * - `proposal_hash`: The hash of the proposal preimage.
+ * - `value`: The amount of deposit (must be at least `MinimumDeposit`).
+ *
+ * Emits `Proposed`.
+ */
+export function propose(
+  value: Omit<types.pallet_democracy.pallet.Call.propose, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Democracy", value: { ...value, type: "blacklist" } }
+  return { type: "Democracy", value: { ...value, type: "propose" } }
 }
 
 /**
- * Remove a proposal.
+ * Signals agreement with a particular proposal.
  *
- * The dispatch origin of this call must be `CancelProposalOrigin`.
+ * The dispatch origin of this call must be _Signed_ and the sender
+ * must have funds to cover the deposit, equal to the original deposit.
  *
- * - `prop_index`: The index of the proposal to cancel.
- *
- * Weight: `O(p)` where `p = PublicProps::<T>::decode_len()`
+ * - `proposal`: The index of the proposal to second.
  */
-export function cancel_proposal(
-  value: Omit<types.pallet_democracy.pallet.Call.cancel_proposal, "type">,
+export function second(
+  value: Omit<types.pallet_democracy.pallet.Call.second, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Democracy", value: { ...value, type: "cancel_proposal" } }
+  return { type: "Democracy", value: { ...value, type: "second" } }
 }
 
 /**
- * Remove a referendum.
+ * Vote in a referendum. If `vote.is_aye()`, the vote is to enact the proposal;
+ * otherwise it is a vote to keep the status quo.
  *
- * The dispatch origin of this call must be _Root_.
+ * The dispatch origin of this call must be _Signed_.
  *
- * - `ref_index`: The index of the referendum to cancel.
- *
- * # Weight: `O(1)`.
+ * - `ref_index`: The index of the referendum to vote for.
+ * - `vote`: The vote configuration.
  */
-export function cancel_referendum(
-  value: Omit<types.pallet_democracy.pallet.Call.cancel_referendum, "type">,
+export function vote(
+  value: Omit<types.pallet_democracy.pallet.Call.vote, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Democracy", value: { ...value, type: "cancel_referendum" } }
-}
-
-/**
- * Clears all public proposals.
- *
- * The dispatch origin of this call must be _Root_.
- *
- * Weight: `O(1)`.
- */
-export function clear_public_proposals(): types.polkadot_runtime.RuntimeCall {
-  return { type: "Democracy", value: { type: "clear_public_proposals" } }
-}
-
-/**
- * Delegate the voting power (with some given conviction) of the sending account.
- *
- * The balance delegated is locked for as long as it's delegated, and thereafter for the
- * time appropriate for the conviction's lock period.
- *
- * The dispatch origin of this call must be _Signed_, and the signing account must either:
- *   - be delegating already; or
- *   - have no voting activity (if there is, then it will need to be removed/consolidated
- *     through `reap_vote` or `unvote`).
- *
- * - `to`: The account whose voting the `target` account's voting power will follow.
- * - `conviction`: The conviction that will be attached to the delegated votes. When the
- *   account is undelegated, the funds will be locked for the corresponding period.
- * - `balance`: The amount of the account's balance to be used in delegating. This must not
- *   be more than the account's current balance.
- *
- * Emits `Delegated`.
- *
- * Weight: `O(R)` where R is the number of referendums the voter delegating to has
- *   voted on. Weight is charged as if maximum votes.
- */
-export function delegate(
-  value: Omit<types.pallet_democracy.pallet.Call.delegate, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Democracy", value: { ...value, type: "delegate" } }
+  return { type: "Democracy", value: { ...value, type: "vote" } }
 }
 
 /**
@@ -273,25 +227,6 @@ export function external_propose(
 }
 
 /**
- * Schedule a negative-turnout-bias referendum to be tabled next once it is legal to
- * schedule an external referendum.
- *
- * The dispatch of this call must be `ExternalDefaultOrigin`.
- *
- * - `proposal_hash`: The preimage hash of the proposal.
- *
- * Unlike `external_propose`, blacklisting has no effect on this and it may replace a
- * pre-scheduled `external_propose` call.
- *
- * Weight: `O(1)`
- */
-export function external_propose_default(
-  value: Omit<types.pallet_democracy.pallet.Call.external_propose_default, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Democracy", value: { ...value, type: "external_propose_default" } }
-}
-
-/**
  * Schedule a majority-carries referendum to be tabled next once it is legal to schedule
  * an external referendum.
  *
@@ -308,6 +243,25 @@ export function external_propose_majority(
   value: Omit<types.pallet_democracy.pallet.Call.external_propose_majority, "type">,
 ): types.polkadot_runtime.RuntimeCall {
   return { type: "Democracy", value: { ...value, type: "external_propose_majority" } }
+}
+
+/**
+ * Schedule a negative-turnout-bias referendum to be tabled next once it is legal to
+ * schedule an external referendum.
+ *
+ * The dispatch of this call must be `ExternalDefaultOrigin`.
+ *
+ * - `proposal_hash`: The preimage hash of the proposal.
+ *
+ * Unlike `external_propose`, blacklisting has no effect on this and it may replace a
+ * pre-scheduled `external_propose` call.
+ *
+ * Weight: `O(1)`
+ */
+export function external_propose_default(
+  value: Omit<types.pallet_democracy.pallet.Call.external_propose_default, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Democracy", value: { ...value, type: "external_propose_default" } }
 }
 
 /**
@@ -335,43 +289,107 @@ export function fast_track(
 }
 
 /**
- * Propose a sensitive action to be taken.
+ * Veto and blacklist the external proposal hash.
  *
- * The dispatch origin of this call must be _Signed_ and the sender must
- * have funds to cover the deposit.
+ * The dispatch origin of this call must be `VetoOrigin`.
  *
- * - `proposal_hash`: The hash of the proposal preimage.
- * - `value`: The amount of deposit (must be at least `MinimumDeposit`).
+ * - `proposal_hash`: The preimage hash of the proposal to veto and blacklist.
  *
- * Emits `Proposed`.
+ * Emits `Vetoed`.
+ *
+ * Weight: `O(V + log(V))` where V is number of `existing vetoers`
  */
-export function propose(
-  value: Omit<types.pallet_democracy.pallet.Call.propose, "type">,
+export function veto_external(
+  value: Omit<types.pallet_democracy.pallet.Call.veto_external, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Democracy", value: { ...value, type: "propose" } }
+  return { type: "Democracy", value: { ...value, type: "veto_external" } }
 }
 
 /**
- * Remove a vote for a referendum.
+ * Remove a referendum.
  *
- * If the `target` is equal to the signer, then this function is exactly equivalent to
- * `remove_vote`. If not equal to the signer, then the vote must have expired,
- * either because the referendum was cancelled, because the voter lost the referendum or
- * because the conviction period is over.
+ * The dispatch origin of this call must be _Root_.
+ *
+ * - `ref_index`: The index of the referendum to cancel.
+ *
+ * # Weight: `O(1)`.
+ */
+export function cancel_referendum(
+  value: Omit<types.pallet_democracy.pallet.Call.cancel_referendum, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Democracy", value: { ...value, type: "cancel_referendum" } }
+}
+
+/**
+ * Delegate the voting power (with some given conviction) of the sending account.
+ *
+ * The balance delegated is locked for as long as it's delegated, and thereafter for the
+ * time appropriate for the conviction's lock period.
+ *
+ * The dispatch origin of this call must be _Signed_, and the signing account must either:
+ *   - be delegating already; or
+ *   - have no voting activity (if there is, then it will need to be removed/consolidated
+ *     through `reap_vote` or `unvote`).
+ *
+ * - `to`: The account whose voting the `target` account's voting power will follow.
+ * - `conviction`: The conviction that will be attached to the delegated votes. When the
+ *   account is undelegated, the funds will be locked for the corresponding period.
+ * - `balance`: The amount of the account's balance to be used in delegating. This must not
+ *   be more than the account's current balance.
+ *
+ * Emits `Delegated`.
+ *
+ * Weight: `O(R)` where R is the number of referendums the voter delegating to has
+ *   voted on. Weight is charged as if maximum votes.
+ */
+export function delegate(
+  value: Omit<types.pallet_democracy.pallet.Call.delegate, "type">,
+): types.polkadot_runtime.RuntimeCall {
+  return { type: "Democracy", value: { ...value, type: "delegate" } }
+}
+
+/**
+ * Undelegate the voting power of the sending account.
+ *
+ * Tokens may be unlocked following once an amount of time consistent with the lock period
+ * of the conviction with which the delegation was issued.
+ *
+ * The dispatch origin of this call must be _Signed_ and the signing account must be
+ * currently delegating.
+ *
+ * Emits `Undelegated`.
+ *
+ * Weight: `O(R)` where R is the number of referendums the voter delegating to has
+ *   voted on. Weight is charged as if maximum votes.
+ */
+export function undelegate(): types.polkadot_runtime.RuntimeCall {
+  return { type: "Democracy", value: { type: "undelegate" } }
+}
+
+/**
+ * Clears all public proposals.
+ *
+ * The dispatch origin of this call must be _Root_.
+ *
+ * Weight: `O(1)`.
+ */
+export function clear_public_proposals(): types.polkadot_runtime.RuntimeCall {
+  return { type: "Democracy", value: { type: "clear_public_proposals" } }
+}
+
+/**
+ * Unlock tokens that have an expired lock.
  *
  * The dispatch origin of this call must be _Signed_.
  *
- * - `target`: The account of the vote to be removed; this account must have voted for
- *   referendum `index`.
- * - `index`: The index of referendum of the vote to be removed.
+ * - `target`: The account to remove the lock on.
  *
- * Weight: `O(R + log R)` where R is the number of referenda that `target` has voted on.
- *   Weight is calculated for the maximum number of vote.
+ * Weight: `O(R)` with R number of vote of target.
  */
-export function remove_other_vote(
-  value: Omit<types.pallet_democracy.pallet.Call.remove_other_vote, "type">,
+export function unlock(
+  value: Omit<types.pallet_democracy.pallet.Call.unlock, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Democracy", value: { ...value, type: "remove_other_vote" } }
+  return { type: "Democracy", value: { ...value, type: "unlock" } }
 }
 
 /**
@@ -410,80 +428,62 @@ export function remove_vote(
 }
 
 /**
- * Signals agreement with a particular proposal.
+ * Remove a vote for a referendum.
  *
- * The dispatch origin of this call must be _Signed_ and the sender
- * must have funds to cover the deposit, equal to the original deposit.
- *
- * - `proposal`: The index of the proposal to second.
- */
-export function second(
-  value: Omit<types.pallet_democracy.pallet.Call.second, "type">,
-): types.polkadot_runtime.RuntimeCall {
-  return { type: "Democracy", value: { ...value, type: "second" } }
-}
-
-/**
- * Undelegate the voting power of the sending account.
- *
- * Tokens may be unlocked following once an amount of time consistent with the lock period
- * of the conviction with which the delegation was issued.
- *
- * The dispatch origin of this call must be _Signed_ and the signing account must be
- * currently delegating.
- *
- * Emits `Undelegated`.
- *
- * Weight: `O(R)` where R is the number of referendums the voter delegating to has
- *   voted on. Weight is charged as if maximum votes.
- */
-export function undelegate(): types.polkadot_runtime.RuntimeCall {
-  return { type: "Democracy", value: { type: "undelegate" } }
-}
-
-/**
- * Unlock tokens that have an expired lock.
+ * If the `target` is equal to the signer, then this function is exactly equivalent to
+ * `remove_vote`. If not equal to the signer, then the vote must have expired,
+ * either because the referendum was cancelled, because the voter lost the referendum or
+ * because the conviction period is over.
  *
  * The dispatch origin of this call must be _Signed_.
  *
- * - `target`: The account to remove the lock on.
+ * - `target`: The account of the vote to be removed; this account must have voted for
+ *   referendum `index`.
+ * - `index`: The index of referendum of the vote to be removed.
  *
- * Weight: `O(R)` with R number of vote of target.
+ * Weight: `O(R + log R)` where R is the number of referenda that `target` has voted on.
+ *   Weight is calculated for the maximum number of vote.
  */
-export function unlock(
-  value: Omit<types.pallet_democracy.pallet.Call.unlock, "type">,
+export function remove_other_vote(
+  value: Omit<types.pallet_democracy.pallet.Call.remove_other_vote, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Democracy", value: { ...value, type: "unlock" } }
+  return { type: "Democracy", value: { ...value, type: "remove_other_vote" } }
 }
 
 /**
- * Veto and blacklist the external proposal hash.
+ * Permanently place a proposal into the blacklist. This prevents it from ever being
+ * proposed again.
  *
- * The dispatch origin of this call must be `VetoOrigin`.
+ * If called on a queued public or external proposal, then this will result in it being
+ * removed. If the `ref_index` supplied is an active referendum with the proposal hash,
+ * then it will be cancelled.
  *
- * - `proposal_hash`: The preimage hash of the proposal to veto and blacklist.
+ * The dispatch origin of this call must be `BlacklistOrigin`.
  *
- * Emits `Vetoed`.
+ * - `proposal_hash`: The proposal hash to blacklist permanently.
+ * - `ref_index`: An ongoing referendum whose hash is `proposal_hash`, which will be
+ * cancelled.
  *
- * Weight: `O(V + log(V))` where V is number of `existing vetoers`
+ * Weight: `O(p)` (though as this is an high-privilege dispatch, we assume it has a
+ *   reasonable value).
  */
-export function veto_external(
-  value: Omit<types.pallet_democracy.pallet.Call.veto_external, "type">,
+export function blacklist(
+  value: Omit<types.pallet_democracy.pallet.Call.blacklist, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Democracy", value: { ...value, type: "veto_external" } }
+  return { type: "Democracy", value: { ...value, type: "blacklist" } }
 }
 
 /**
- * Vote in a referendum. If `vote.is_aye()`, the vote is to enact the proposal;
- * otherwise it is a vote to keep the status quo.
+ * Remove a proposal.
  *
- * The dispatch origin of this call must be _Signed_.
+ * The dispatch origin of this call must be `CancelProposalOrigin`.
  *
- * - `ref_index`: The index of the referendum to vote for.
- * - `vote`: The vote configuration.
+ * - `prop_index`: The index of the proposal to cancel.
+ *
+ * Weight: `O(p)` where `p = PublicProps::<T>::decode_len()`
  */
-export function vote(
-  value: Omit<types.pallet_democracy.pallet.Call.vote, "type">,
+export function cancel_proposal(
+  value: Omit<types.pallet_democracy.pallet.Call.cancel_proposal, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Democracy", value: { ...value, type: "vote" } }
+  return { type: "Democracy", value: { ...value, type: "cancel_proposal" } }
 }

@@ -1,73 +1,11 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
+import type * as types from "../../mod.ts"
 
 export * as assignment_app from "./assignment_app.ts"
 export * as collator_app from "./collator_app.ts"
 export * as signed from "./signed.ts"
 export * as validator_app from "./validator_app.ts"
-
-export const $availabilityBitfield: $.Codec<types.polkadot_primitives.v2.AvailabilityBitfield> =
-  _codec.$382
-
-export const $backedCandidate: $.Codec<types.polkadot_primitives.v2.BackedCandidate> = _codec.$388
-
-export const $candidateCommitments: $.Codec<types.polkadot_primitives.v2.CandidateCommitments> =
-  _codec.$390
-
-export const $candidateDescriptor: $.Codec<types.polkadot_primitives.v2.CandidateDescriptor> =
-  _codec.$97
-
-export const $candidateReceipt: $.Codec<types.polkadot_primitives.v2.CandidateReceipt> = _codec.$96
-
-export const $committedCandidateReceipt: $.Codec<
-  types.polkadot_primitives.v2.CommittedCandidateReceipt
-> = _codec.$389
-
-export const $coreIndex: $.Codec<types.polkadot_primitives.v2.CoreIndex> = _codec.$105
-
-export const $coreOccupied: $.Codec<types.polkadot_primitives.v2.CoreOccupied> = _codec.$661
-
-export const $disputeState: $.Codec<types.polkadot_primitives.v2.DisputeState> = _codec.$699
-
-export const $disputeStatement: $.Codec<types.polkadot_primitives.v2.DisputeStatement> = _codec.$401
-
-export const $disputeStatementSet: $.Codec<types.polkadot_primitives.v2.DisputeStatementSet> =
-  _codec.$398
-
-export const $groupIndex: $.Codec<types.polkadot_primitives.v2.GroupIndex> = _codec.$106
-
-export const $inherentData: $.Codec<types.polkadot_primitives.v2.InherentData> = _codec.$379
-
-export const $invalidDisputeStatementKind: $.Codec<
-  types.polkadot_primitives.v2.InvalidDisputeStatementKind
-> = _codec.$403
-
-export const $parathreadClaim: $.Codec<types.polkadot_primitives.v2.ParathreadClaim> = _codec.$658
-
-export const $parathreadEntry: $.Codec<types.polkadot_primitives.v2.ParathreadEntry> = _codec.$657
-
-export const $pvfCheckStatement: $.Codec<types.polkadot_primitives.v2.PvfCheckStatement> =
-  _codec.$405
-
-export const $scrapedOnChainVotes: $.Codec<types.polkadot_primitives.v2.ScrapedOnChainVotes> =
-  _codec.$647
-
-export const $sessionInfo: $.Codec<types.polkadot_primitives.v2.SessionInfo> = _codec.$696
-
-export const $upgradeGoAhead: $.Codec<types.polkadot_primitives.v2.UpgradeGoAhead> = _codec.$676
-
-export const $upgradeRestriction: $.Codec<types.polkadot_primitives.v2.UpgradeRestriction> =
-  _codec.$677
-
-export const $validDisputeStatementKind: $.Codec<
-  types.polkadot_primitives.v2.ValidDisputeStatementKind
-> = _codec.$402
-
-export const $validatorIndex: $.Codec<types.polkadot_primitives.v2.ValidatorIndex> = _codec.$385
-
-export const $validityAttestation: $.Codec<types.polkadot_primitives.v2.ValidityAttestation> =
-  _codec.$396
 
 export type AvailabilityBitfield = $.BitSequence
 

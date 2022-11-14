@@ -1,27 +1,9 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
+import type * as types from "../mod.ts"
 
 export * as pallet from "./pallet.ts"
 export * as signed from "./signed.ts"
-
-export const $electionCompute: $.Codec<types.pallet_election_provider_multi_phase.ElectionCompute> =
-  _codec.$87
-
-export const $phase: $.Codec<types.pallet_election_provider_multi_phase.Phase> = _codec.$600
-
-export const $rawSolution: $.Codec<types.pallet_election_provider_multi_phase.RawSolution> =
-  _codec.$311
-
-export const $readySolution: $.Codec<types.pallet_election_provider_multi_phase.ReadySolution> =
-  _codec.$602
-
-export const $roundSnapshot: $.Codec<types.pallet_election_provider_multi_phase.RoundSnapshot> =
-  _codec.$603
-
-export const $solutionOrSnapshotSize: $.Codec<
-  types.pallet_election_provider_multi_phase.SolutionOrSnapshotSize
-> = _codec.$363
 
 export type ElectionCompute = "OnChain" | "Signed" | "Unsigned" | "Fallback" | "Emergency"
 

@@ -1,14 +1,9 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $call: $.Codec<types.pallet_grandpa.pallet.Call> = _codec.$216
-
-export const $error: $.Codec<types.pallet_grandpa.pallet.Error> = _codec.$519
-
-export const $event: $.Codec<types.pallet_grandpa.pallet.Event> = _codec.$47
+import type * as types from "../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
+
 export type Call =
   | types.pallet_grandpa.pallet.Call.report_equivocation
   | types.pallet_grandpa.pallet.Call.report_equivocation_unsigned
@@ -107,8 +102,8 @@ export namespace Call {
     return { type: "note_stalled", ...value }
   }
 }
-
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
+
 export type Error =
   | "PauseFailed"
   | "ResumeFailed"
@@ -117,8 +112,8 @@ export type Error =
   | "InvalidKeyOwnershipProof"
   | "InvalidEquivocationProof"
   | "DuplicateOffenceReport"
-
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
+
 export type Event =
   | types.pallet_grandpa.pallet.Event.NewAuthorities
   | types.pallet_grandpa.pallet.Event.Paused

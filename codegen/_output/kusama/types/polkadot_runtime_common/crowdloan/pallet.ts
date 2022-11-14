@@ -1,14 +1,9 @@
 import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
-
-export const $call: $.Codec<types.polkadot_runtime_common.crowdloan.pallet.Call> = _codec.$415
-
-export const $error: $.Codec<types.polkadot_runtime_common.crowdloan.pallet.Error> = _codec.$712
-
-export const $event: $.Codec<types.polkadot_runtime_common.crowdloan.pallet.Event> = _codec.$120
+import type * as types from "../../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
+
 export type Call =
   | types.polkadot_runtime_common.crowdloan.pallet.Call.create
   | types.polkadot_runtime_common.crowdloan.pallet.Call.contribute
@@ -229,8 +224,8 @@ export namespace Call {
     return { type: "contribute_all", ...value }
   }
 }
-
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
+
 export type Error =
   | "FirstPeriodInPast"
   | "FirstPeriodTooFarInFuture"
@@ -255,8 +250,8 @@ export type Error =
   | "AlreadyInNewRaise"
   | "VrfDelayInProgress"
   | "NoLeasePeriod"
-
 /** The [event](https://docs.substrate.io/main-docs/build/events-errors/) emitted by this pallet. */
+
 export type Event =
   | types.polkadot_runtime_common.crowdloan.pallet.Event.Created
   | types.polkadot_runtime_common.crowdloan.pallet.Event.Contributed

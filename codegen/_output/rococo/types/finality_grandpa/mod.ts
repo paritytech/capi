@@ -1,12 +1,8 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
+import type * as types from "../mod.ts"
 
 export * as Equivocation from "./Equivocation/mod.ts"
-
-export const $precommit: $.Codec<types.finality_grandpa.Precommit> = _codec.$225
-
-export const $prevote: $.Codec<types.finality_grandpa.Prevote> = _codec.$220
 
 export interface Precommit {
   target_hash: types.primitive_types.H256

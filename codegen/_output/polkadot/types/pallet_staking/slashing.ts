@@ -1,10 +1,6 @@
-import { $ } from "../../capi.ts"
+import { $, C } from "../../capi.ts"
 import * as _codec from "../../codecs.ts"
-import type * as types from "../../types/mod.ts"
-
-export const $slashingSpans: $.Codec<types.pallet_staking.slashing.SlashingSpans> = _codec.$503
-
-export const $spanRecord: $.Codec<types.pallet_staking.slashing.SpanRecord> = _codec.$504
+import type * as types from "../mod.ts"
 
 export interface SlashingSpans {
   span_index: types.u32

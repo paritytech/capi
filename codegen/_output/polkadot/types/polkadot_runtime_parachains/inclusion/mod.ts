@@ -1,16 +1,8 @@
-import { $ } from "../../../capi.ts"
+import { $, C } from "../../../capi.ts"
 import * as _codec from "../../../codecs.ts"
-import type * as types from "../../../types/mod.ts"
+import type * as types from "../../mod.ts"
 
 export * as pallet from "./pallet.ts"
-
-export const $availabilityBitfieldRecord: $.Codec<
-  types.polkadot_runtime_parachains.inclusion.AvailabilityBitfieldRecord
-> = _codec.$644
-
-export const $candidatePendingAvailability: $.Codec<
-  types.polkadot_runtime_parachains.inclusion.CandidatePendingAvailability
-> = _codec.$645
 
 export interface AvailabilityBitfieldRecord {
   bitfield: types.polkadot_primitives.v2.AvailabilityBitfield

@@ -18,7 +18,8 @@
         "no-explicit-any",
         "no-namespace",
         "no-empty",
-        "no-extra-semi"
+        "no-extra-semi",
+        "ban-types"
       ],
       "tags": ["recommended"]
     }
