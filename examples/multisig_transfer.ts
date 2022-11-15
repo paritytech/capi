@@ -63,7 +63,6 @@ U.throwIfError(await proposal.run())
 U.throwIfError(await approval.run())
 console.log(U.throwIfError(await daveBalance.run()))
 
-// FIXME: weight calculation (`payment.queryInfo(extrinsic, atBlockHash)`)
 function createOrApproveMultisigProposal<
   Rest extends [
     MaybeTimepoint?: C.Z.$<{
@@ -76,6 +75,23 @@ function createOrApproveMultisigProposal<
   pair: KeyringPair,
   ...[maybeTimepoint]: Rest
 ) {
+  const maxWeight = extrinsic({
+    sender: C.MultiAddress.fromId(multisigPublicKey),
+    palletName: "Balances",
+    methodName: "transfer_keep_alive",
+    args: {
+      dest: C.compat.multiAddressFromKeypair(T.dave),
+      value: 1_230_000_000_000n,
+    },
+  })
+    .feeEstimate
+    .access("weight")
+    .next((weight) => {
+      return {
+        ref_time: BigInt(weight.ref_time),
+        proof_size: BigInt(weight.proof_size),
+      }
+    })
   return extrinsic({
     sender: C.compat.multiAddressFromKeypair(pair),
     palletName: "Multisig",
@@ -92,10 +108,7 @@ function createOrApproveMultisigProposal<
       },
       other_signatories: signatories.filter((value) => value !== pair.publicKey),
       store_call: false,
-      max_weight: {
-        ref_time: 500_000_000n,
-        proof_size: 0n,
-      },
+      max_weight: maxWeight,
       maybe_timepoint: maybeTimepoint as Rest[0],
     }),
   })
