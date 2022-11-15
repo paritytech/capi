@@ -18,8 +18,9 @@ export function collectExtrinsicEvents<
     .watch(function(status) {
       events.push(status)
       if (rpc.known.TransactionStatus.isTerminal(status)) {
-        this.stop()
+        return this.end()
       }
+      return
     })
     .next(() => events, k0_)
 }

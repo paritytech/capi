@@ -14,8 +14,6 @@ export namespace state {
     known.StorageChangeSet
   >()(
     "state_subscribeStorage",
-  )
-  export const unsubscribeStorage = rpcCall<[subscriptionId: string], true>(
     "state_unsubscribeStorage",
   )
   export const getKeysPaged = rpcCall<
@@ -24,8 +22,8 @@ export namespace state {
   >("state_getKeysPaged")
 }
 export namespace chain {
-  export const subscribeNewHeads = rpcSubscription<[], known.Header>()("chain_subscribeNewHeads")
-  export const unsubscribeNewHeads = rpcCall<[subscriptionId: string], true>(
+  export const subscribeNewHeads = rpcSubscription<[], known.Header>()(
+    "chain_subscribeNewHeads",
     "chain_unsubscribeNewHeads",
   )
   export const getBlock = rpcCall<[hash?: U.HexHash], known.SignedBlock>("chain_getBlock")
@@ -42,8 +40,8 @@ export namespace author {
   export const submitAndWatchExtrinsic = rpcSubscription<
     [extrinsic: U.Hex],
     known.TransactionStatus
-  >()("author_submitAndWatchExtrinsic")
-  export const unwatchExtrinsic = rpcCall<[subscriptionId: string], true>(
+  >()(
+    "author_submitAndWatchExtrinsic",
     "author_unwatchExtrinsic",
   )
   export const submitExtrinsic = rpcCall<[extrinsic: U.Hex], U.Hash>("author_submitExtrinsic")

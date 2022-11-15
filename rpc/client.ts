@@ -80,41 +80,63 @@ export class Client<
     return waiter
   }
 
-  subscribe: ClientSubscribe<SendErrorData, HandlerErrorData> = (message, listener) => {
-    const waiter = deferred<string | undefined>()
-    const stop = () => {
+  subscribe: ClientSubscribe<SendErrorData, HandlerErrorData> = (
+    message,
+    unsubscribeMethod,
+    listener,
+  ) => {
+    // const waiter = deferred<Awaited<ReturnType<typeof listener>>>() // TODO: type this narrowly
+    const waiter = deferred<any>() // TODO: type this narrowly
+    const stop = async (value?: unknown) => {
       delete this.pendingSubscriptions[message.id]
       const activeSubscriptionId = this.activeSubscriptionByMessageId[message.id]
       if (activeSubscriptionId) {
         delete this.activeSubscriptions[activeSubscriptionId]
       }
       delete this.activeSubscriptionByMessageId[message.id]
-      waiter.resolve(activeSubscriptionId)
+      await this.call({
+        jsonrpc: "2.0",
+        id: this.providerRef.nextId(),
+        method: unsubscribeMethod,
+        params: [activeSubscriptionId],
+      })
+      return waiter.resolve(value)
     }
     const listenerBound = listener.bind({
       message,
-      stop,
       state: <T>(ctor: new() => T) => {
-        return getOrInit(
-          getOrInit(this.subscriptionStates, message.id, () => new WeakMap()),
-          ctor,
-          () => new ctor(),
-        )
+        const messageState = getOrInit(this.subscriptionStates, message.id, () => new WeakMap())
+        return getOrInit(messageState, ctor, () => new ctor())
+      },
+      end<T = void>(value: T = undefined!): U.End<T> {
+        return new U.End(value)
       },
     }) as ClientSubscribeListener<SendErrorData, HandlerErrorData>
-    this.pendingSubscriptions[message.id] = (maybeError) => {
-      listenerBound(maybeError)
-      if (maybeError instanceof Error) {
-        stop()
+    const maybeStop = (maybeEnd: unknown) => {
+      if (maybeEnd instanceof U.End) {
+        stop(maybeEnd.value)
+      } else if (maybeEnd instanceof Error) {
+        stop(maybeEnd)
       }
     }
-    this.call(message)
-      .then((maybeError) => {
-        if (maybeError instanceof Error || maybeError.error) {
-          listenerBound(maybeError)
-          stop()
-        }
-      })
+    const listenerBoundWithStop: ClientSubscribeListener<SendErrorData, HandlerErrorData> = (
+      event,
+    ) => {
+      const result = listenerBound(event)
+      if (result instanceof Promise) {
+        result.then(maybeStop)
+      } else {
+        maybeStop(result)
+      }
+    }
+    this.pendingSubscriptions[message.id] = listenerBoundWithStop
+    ;(async () => {
+      const maybeError = await this.call(message)
+      if (maybeError instanceof Error || maybeError.error) {
+        listenerBound(maybeError)
+        stop()
+      }
+    })()
     return waiter
   }
 
@@ -157,16 +179,19 @@ type SubscriptionListeners<SendErrorData, HandlerErrorData> = Record<
 export type ClientSubscribe<SendErrorData, HandlerErrorData> = <
   Method extends string = string,
   Result = any,
+  EndResult = any,
 >(
   message: msg.EgressMessage,
+  subscribeMethod: string,
   listener: ClientSubscribeListener<
     SendErrorData,
     HandlerErrorData,
     ClientSubscribeContext,
     Method,
-    Result
+    Result,
+    EndResult
   >,
-) => Promise<undefined | string>
+) => Promise<EndResult>
 
 export type ClientSubscribeListener<
   SendErrorData,
@@ -174,13 +199,15 @@ export type ClientSubscribeListener<
   Context = void,
   Method extends string = string,
   Result = string,
+  EndResult = any,
 > = U.Listener<
   ClientSubscriptionEvent<SendErrorData, HandlerErrorData, Method, Result>,
-  Context
+  Context,
+  EndResult
 >
 
 export interface ClientSubscribeContext {
   message: msg.EgressMessage
-  stop: () => void
   state: <T>(ctor: new() => T) => T
+  end: <T>(value?: T) => U.End<T>
 }

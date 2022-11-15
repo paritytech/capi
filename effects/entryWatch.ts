@@ -47,9 +47,6 @@ export function entryWatch<Client extends Z.$<rpc.Client>>(client: Client) {
         listener.apply(this, [changes])
       }
     }, k0_)
-    const subscriptionId = state.subscribeStorage(client)([storageKeys], listenerMapped)
-    return state
-      .unsubscribeStorage(client)(subscriptionId)
-      .zoned("EntryWatch")
+    return state.subscribeStorage(client)([storageKeys], listenerMapped).zoned("EntryWatch")
   }
 }

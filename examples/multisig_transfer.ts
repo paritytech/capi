@@ -28,8 +28,9 @@ const existentialDeposit = extrinsic({
   .watch(function(status) {
     console.log(`Existential deposit:`, status)
     if (C.rpc.known.TransactionStatus.isTerminal(status)) {
-      this.stop()
+      return this.end()
     }
+    return
   })
 
 // First approval root
@@ -99,7 +100,8 @@ function createOrApproveMultisigProposal<
     .watch(function(status) {
       console.log(`${label}:`, status)
       if (C.rpc.known.TransactionStatus.isTerminal(status)) {
-        this.stop()
+        return this.end("HELLO")
       }
+      return
     })
 }

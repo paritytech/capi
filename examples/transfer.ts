@@ -20,12 +20,12 @@ const tx = extrinsic({
 
 const runTx = tx
   .watch(function(status) {
-    console.log(status)
-    if (C.rpc.known.TransactionStatus.isTerminal(status)) {
-      // TODO: return this upon implementing `this.stop`
-      hash = (status as { finalized: C.rpc.known.Hash }).finalized
-      this.stop()
+    if (typeof status !== "string" && status.finalized) {
+      return this.end(status.finalized)
+    } else if (C.rpc.known.TransactionStatus.isTerminal(status)) {
+      return this.end(new NeverFinalized())
     }
+    return
   })
   .bind(env)
 
@@ -35,3 +35,7 @@ const readEvents = C
 
 U.throwIfError(await runTx())
 console.log(U.throwIfError(await readEvents()))
+
+class NeverFinalized extends Error {
+  override readonly name = "NeverFinalizedError"
+}

@@ -28,8 +28,9 @@ const tx = extrinsic({
   .watch(function(status) {
     console.log(status)
     if (C.rpc.known.TransactionStatus.isTerminal(status)) {
-      this.stop()
+      return this.end()
     }
+    return
   })
 
 U.throwIfError(await tx.run())

@@ -44,24 +44,28 @@ Deno.test({
         const stoppedSubscriptionId = await client.subscribe<
           "chain_subscribeAllHeads",
           known.Header
-        >({
-          jsonrpc: "2.0",
-          id: client.providerRef.nextId(),
-          method: "chain_subscribeAllHeads",
-          params: [],
-        }, function(event) {
-          const counter = this.state(U.Counter)
-          A.assertNotInstanceOf(event, Error)
-          A.assert(!event.error)
-          A.assertExists(event.params.result.parentHash)
-          subscriptionId = event.params.subscription
-          events.push(event)
-          if (counter.i === 2) {
-            this.stop()
+        >(
+          {
+            jsonrpc: "2.0",
+            id: client.providerRef.nextId(),
+            method: "chain_subscribeAllHeads",
+            params: [],
+          },
+          "chain_unsubscribeNewHeads",
+          function(event) {
+            const counter = this.state(U.Counter)
+            A.assertNotInstanceOf(event, Error)
+            A.assert(!event.error)
+            A.assertExists(event.params.result.parentHash)
+            subscriptionId = event.params.subscription
+            events.push(event)
+            if (counter.i === 2) {
+              return this.end("HELLO")
+            }
+            counter.inc()
             return
-          }
-          counter.inc()
-        })
+          },
+        )
         A.assertEquals(events.length, 3)
         A.assertEquals(stoppedSubscriptionId, subscriptionId!)
       },

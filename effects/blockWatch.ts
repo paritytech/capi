@@ -15,15 +15,12 @@ export function blockWatch<Client extends Z.$<rpc.Client>>(client: Client) {
         return async function(this: rpc.ClientSubscribeContext, header: rpc.known.Header) {
           const blockHash = chain.getBlockHash(client)(header.number)
           const block = await chain.getBlock(client)(blockHash).bind(env)()
-          // TODO: return error with `this.stop` once implemented
-          if (block instanceof Error) throw block
-          listener.apply({ ...this, env }, [block])
+          return block instanceof Error
+            ? this.end(block)
+            : listener.apply({ ...this, env }, [block])
         }
       }, k0_)
-    const subscriptionId = chain.subscribeNewHeads(client)([], listenerMapped)
-    return chain
-      .unsubscribeNewHeads(client)(subscriptionId)
-      .zoned("BlockWatch")
+    return chain.subscribeNewHeads(client)([], listenerMapped).zoned("BlockWatch")
   }
 }
 

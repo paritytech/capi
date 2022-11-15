@@ -8,9 +8,10 @@ const root = C.blockWatch(C.polkadot)(async function blockWatchListener({ block 
   console.log(await extrinsicsDecoded())
   const counter = this.state(U.Counter)
   if (counter.i === 2) {
-    return this.stop()
+    return this.end("HELLO")
   }
   counter.inc()
+  return
 })
 
 U.throwIfError(await root.run())

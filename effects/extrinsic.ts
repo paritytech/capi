@@ -123,11 +123,7 @@ export class SignedExtrinsic<
   watch<Listener extends Z.$<U.Listener<rpc.known.TransactionStatus, rpc.ClientSubscribeContext>>>(
     listener: Listener,
   ) {
-    const subscriptionId = author.submitAndWatchExtrinsic(this.client)(
-      [this.extrinsicHex],
-      listener,
-    )
-    return author.unwatchExtrinsic(this.client)(subscriptionId)
+    return author.submitAndWatchExtrinsic(this.client)([this.extrinsicHex], listener)
       .zoned("ExtrinsicWatch")
   }
 
@@ -140,10 +136,7 @@ export class SignedExtrinsic<
 export function extrinsicsDecoded<
   Client extends Z.$<rpc.Client>,
   Hexes extends Z.$<rpc.known.Hex[]>,
->(
-  client: Client,
-  hexes: Hexes,
-) {
+>(client: Client, hexes: Hexes) {
   return Z
     .ls($extrinsic(client), hexes)
     .next(([$extrinsic, hexes]) => {

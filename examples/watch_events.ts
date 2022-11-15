@@ -5,9 +5,10 @@ const root = C.entryWatch(C.rococo)("System", "Events", [], function(entry) {
   console.log(entry)
   const counter = this.state(U.Counter)
   if (counter.i === 2) {
-    return this.stop()
+    return this.end("HELLO")
   }
   counter.inc()
+  return
 })
 
 U.throwIfError(await root.run())
