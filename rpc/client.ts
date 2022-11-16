@@ -47,7 +47,7 @@ export class Client<
         const pendingCall = this.pendingCalls[id]!
         pendingCall.resolve(e)
         delete this.pendingCalls[id]
-        this.pendingSubscriptions[id]!(e)
+        this.pendingSubscriptions[id]?.(e)
         delete this.pendingSubscriptions[id]
       }
       for (const id in this.activeSubscriptions) {
@@ -102,10 +102,15 @@ export class Client<
         )
       },
     }) as ClientSubscribeListener<SendErrorData, HandlerErrorData>
-    this.pendingSubscriptions[message.id] = listenerBound
+    this.pendingSubscriptions[message.id] = (maybeError) => {
+      listenerBound(maybeError)
+      if (maybeError instanceof Error) {
+        stop()
+      }
+    }
     this.call(message)
       .then((maybeError) => {
-        if (maybeError instanceof Error) {
+        if (maybeError instanceof Error || maybeError.error) {
           listenerBound(maybeError)
           stop()
         }
