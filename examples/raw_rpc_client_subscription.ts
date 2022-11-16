@@ -4,38 +4,22 @@ import * as U from "#capi/util/mod.ts"
 
 const client = await T.polkadot.client
 
-const subscriptionId = await client.subscribe(
-  {
-    jsonrpc: "2.0",
-    id: client.providerRef.nextId(),
-    method: "chain_subscribeAllHeads",
-    params: [],
-  },
+const result = await client.subscribe(
+  client.providerRef.nextId(),
+  "chain_subscribeAllHeads",
   "chain_unsubscribeNewHeads",
-  function(e) {
-    assertNotInstanceOf(e, Error)
-    console.log(e)
-    const counter = this.state(U.Counter)
-    if (counter.i === 2) {
-      return this.end()
-    }
-    counter.inc()
-    return
-  },
-)
+)(function(e) {
+  assertNotInstanceOf(e, Error)
+  console.log(e)
+  const counter = this.state(U.Counter)
+  if (counter.i === 2) {
+    return this.end(true)
+  }
+  counter.inc()
+  return
+})
 
-const { result } = U.throwIfError(
-  await client.call<boolean>({
-    jsonrpc: "2.0",
-    id: client.providerRef.nextId(),
-    method: "chain_unsubscribeAllHeads",
-    params: [subscriptionId],
-  }),
-)
-
-console.log(
-  // cspell:disable-next-line
-  `${result ? "S" : "Uns"}uccessfully unsubscribed from subscription ${subscriptionId}`,
-)
+// cspell:disable-next-line
+console.log(`${result ? "S" : "Uns"}uccessfully unsubscribed`)
 
 await client.discard()

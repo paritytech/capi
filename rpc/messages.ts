@@ -2,7 +2,7 @@ export interface EgressMessage<Method extends string = string, Params extends un
   extends JsonRpcVersionBearer
 {
   method: Method
-  id: string
+  id: number | string
   params: Params
 }
 

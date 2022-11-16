@@ -5,11 +5,7 @@ import * as U from "#capi/util/mod.ts"
 import { extrinsic } from "#capi/proxy/dev:westend/@v0.9.31/mod.ts"
 import { Balances } from "#capi/proxy/dev:westend/@v0.9.31/pallets/mod.ts"
 
-let hash: undefined | C.rpc.known.Hash
-
-const env = C.Z.env()
-
-const tx = extrinsic({
+const ex = extrinsic({
   sender: T.alice.address,
   call: Balances.transfer({
     value: 12345n,
@@ -18,23 +14,16 @@ const tx = extrinsic({
 })
   .signed(T.alice.sign)
 
-const runTx = tx
-  .watch(function(status) {
-    if (typeof status !== "string" && status.finalized) {
-      return this.end(status.finalized)
-    } else if (C.rpc.known.TransactionStatus.isTerminal(status)) {
-      return this.end(new NeverFinalized())
-    }
-    return
-  })
-  .bind(env)
+const finalizedIn = ex.watch(function(status) {
+  if (typeof status !== "string" && status.finalized) {
+    return this.end(status.finalized)
+  } else if (C.rpc.known.TransactionStatus.isTerminal(status)) {
+    return this.end(new NeverFinalized())
+  }
+  return
+})
 
-const readEvents = C
-  .events(tx, C.Z.call(() => hash!))
-  .bind(env)
-
-U.throwIfError(await runTx())
-console.log(U.throwIfError(await readEvents()))
+console.log(U.throwIfError(await C.events(ex, finalizedIn).run()))
 
 class NeverFinalized extends Error {
   override readonly name = "NeverFinalizedError"

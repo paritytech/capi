@@ -73,71 +73,80 @@ export class Client<
     }
   }
 
-  call: ClientCall<SendErrorData, HandlerErrorData> = (message) => {
+  call: ClientCall<SendErrorData, HandlerErrorData> = (id, method, ...params) => {
     const waiter = deferred<ClientCallEvent<SendErrorData, HandlerErrorData>>()
-    this.pendingCalls[message.id] = waiter
-    this.providerRef.send(message)
+    this.pendingCalls[id] = waiter
+    this.providerRef.send({
+      jsonrpc: "2.0",
+      id,
+      method,
+      params,
+    })
     return waiter
   }
 
   subscribe: ClientSubscribe<SendErrorData, HandlerErrorData> = (
-    message,
+    id,
+    subscribeMethod,
     unsubscribeMethod,
-    listener,
+    ...params
   ) => {
-    // const waiter = deferred<Awaited<ReturnType<typeof listener>>>() // TODO: type this narrowly
-    const waiter = deferred<any>() // TODO: type this narrowly
-    const stop = async (value?: unknown) => {
-      delete this.pendingSubscriptions[message.id]
-      const activeSubscriptionId = this.activeSubscriptionByMessageId[message.id]
-      if (activeSubscriptionId) {
-        delete this.activeSubscriptions[activeSubscriptionId]
+    return (listener) => {
+      const waiter = deferred<any>() // TODO: type this narrowly
+      const stop = async (value?: unknown) => {
+        delete this.pendingSubscriptions[id]
+        const activeSubscriptionId = this.activeSubscriptionByMessageId[id]
+        if (activeSubscriptionId) {
+          delete this.activeSubscriptions[activeSubscriptionId]
+        }
+        delete this.activeSubscriptionByMessageId[id]
+        // TODO: utilize the error
+        const _maybeError = await this.call(
+          this.providerRef.nextId(),
+          unsubscribeMethod,
+          activeSubscriptionId,
+        )
+        waiter.resolve(value)
       }
-      delete this.activeSubscriptionByMessageId[message.id]
-      await this.call({
-        jsonrpc: "2.0",
-        id: this.providerRef.nextId(),
-        method: unsubscribeMethod,
-        params: [activeSubscriptionId],
-      })
-      return waiter.resolve(value)
+      const listenerBound = listener.bind({
+        subscribeMethod,
+        unsubscribeMethod,
+        params,
+        state: <T>(ctor: new() => T) => {
+          const messageState = getOrInit(this.subscriptionStates, id, () => new WeakMap())
+          return getOrInit(messageState, ctor, () => new ctor())
+        },
+        end<T = void>(value: T = undefined!): U.End<T> {
+          return new U.End(value)
+        },
+      }) as ClientSubscribeListener<SendErrorData, HandlerErrorData>
+      const maybeStop = (maybeEnd: unknown) => {
+        if (maybeEnd instanceof U.End) {
+          stop(maybeEnd.value)
+        } else if (maybeEnd instanceof Error) {
+          stop(maybeEnd)
+        }
+      }
+      const listenerBoundWithStop: ClientSubscribeListener<SendErrorData, HandlerErrorData> = (
+        event,
+      ) => {
+        const result = listenerBound(event)
+        if (result instanceof Promise) {
+          result.then(maybeStop)
+        } else {
+          maybeStop(result)
+        }
+      }
+      this.pendingSubscriptions[id] = listenerBoundWithStop
+      ;(async () => {
+        const maybeError = await this.call(id, subscribeMethod, ...params)
+        if (maybeError instanceof Error || maybeError.error) {
+          listenerBound(maybeError)
+          stop()
+        }
+      })()
+      return waiter
     }
-    const listenerBound = listener.bind({
-      message,
-      state: <T>(ctor: new() => T) => {
-        const messageState = getOrInit(this.subscriptionStates, message.id, () => new WeakMap())
-        return getOrInit(messageState, ctor, () => new ctor())
-      },
-      end<T = void>(value: T = undefined!): U.End<T> {
-        return new U.End(value)
-      },
-    }) as ClientSubscribeListener<SendErrorData, HandlerErrorData>
-    const maybeStop = (maybeEnd: unknown) => {
-      if (maybeEnd instanceof U.End) {
-        stop(maybeEnd.value)
-      } else if (maybeEnd instanceof Error) {
-        stop(maybeEnd)
-      }
-    }
-    const listenerBoundWithStop: ClientSubscribeListener<SendErrorData, HandlerErrorData> = (
-      event,
-    ) => {
-      const result = listenerBound(event)
-      if (result instanceof Promise) {
-        result.then(maybeStop)
-      } else {
-        maybeStop(result)
-      }
-    }
-    this.pendingSubscriptions[message.id] = listenerBoundWithStop
-    ;(async () => {
-      const maybeError = await this.call(message)
-      if (maybeError instanceof Error || maybeError.error) {
-        listenerBound(maybeError)
-        stop()
-      }
-    })()
-    return waiter
   }
 
   discard = () => {
@@ -157,7 +166,9 @@ export type ClientCallEvent<SendErrorData, HandlerErrorData, Result = any> =
   | ProviderHandlerError<HandlerErrorData>
 
 export type ClientCall<SendErrorData, HandlerErrorData> = <Result = any>(
-  message: msg.EgressMessage,
+  id: number | string,
+  method: string,
+  ...params: unknown[]
 ) => Promise<ClientCallEvent<SendErrorData, HandlerErrorData, Result>>
 
 export type ClientSubscriptionEvent<
@@ -176,18 +187,21 @@ type SubscriptionListeners<SendErrorData, HandlerErrorData> = Record<
   ClientSubscribeListener<SendErrorData, HandlerErrorData>
 >
 
+// Do we really care about narrowing the `SubscriptionMethod`?
 export type ClientSubscribe<SendErrorData, HandlerErrorData> = <
-  Method extends string = string,
+  SubscriptionMethod extends string = string,
   Result = any,
-  EndResult = any,
 >(
-  message: msg.EgressMessage,
+  id: number | string,
   subscribeMethod: string,
+  unsubscribeMethod: string,
+  ...params: unknown[]
+) => <EndResult>(
   listener: ClientSubscribeListener<
     SendErrorData,
     HandlerErrorData,
     ClientSubscribeContext,
-    Method,
+    SubscriptionMethod,
     Result,
     EndResult
   >,
@@ -197,17 +211,19 @@ export type ClientSubscribeListener<
   SendErrorData,
   HandlerErrorData,
   Context = void,
-  Method extends string = string,
+  SubscriptionMethod extends string = string,
   Result = string,
   EndResult = any,
 > = U.Listener<
-  ClientSubscriptionEvent<SendErrorData, HandlerErrorData, Method, Result>,
+  ClientSubscriptionEvent<SendErrorData, HandlerErrorData, SubscriptionMethod, Result>,
   Context,
   EndResult
 >
 
 export interface ClientSubscribeContext {
-  message: msg.EgressMessage
+  subscribeMethod: string
+  unsubscribeMethod: string
+  params: unknown[]
   state: <T>(ctor: new() => T) => T
   end: <T>(value?: T) => U.End<T>
 }

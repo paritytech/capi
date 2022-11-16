@@ -22,12 +22,7 @@ Deno.test({
       sanitizeOps: false,
       sanitizeResources: false,
       async fn() {
-        const metadata = await client.call({
-          jsonrpc: "2.0",
-          id: client.providerRef.nextId(),
-          method: "state_getMetadata",
-          params: [],
-        })
+        const metadata = await client.call(client.providerRef.nextId(), "state_getMetadata", [])
         A.assertNotInstanceOf(metadata, Error)
         A.assert(!metadata.error)
         A.assertExists(metadata.result)
@@ -44,14 +39,7 @@ Deno.test({
         const stoppedSubscriptionId = await client.subscribe<
           "chain_subscribeAllHeads",
           known.Header
-        >(
-          {
-            jsonrpc: "2.0",
-            id: client.providerRef.nextId(),
-            method: "chain_subscribeAllHeads",
-            params: [],
-          },
-          "chain_unsubscribeNewHeads",
+        >(client.providerRef.nextId(), "chain_subscribeAllHeads", "chain_unsubscribeNewHeads")(
           function(event) {
             const counter = this.state(U.Counter)
             A.assertNotInstanceOf(event, Error)
