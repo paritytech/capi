@@ -32,7 +32,26 @@ for await (const conn of server) {
 async function serveHttp(conn: Deno.Conn) {
   const httpConn = Deno.serveHttp(conn)
   for await (const event of httpConn) {
-    event.respondWith(handleRequest(new URL(event.request.url).pathname))
+    event.respondWith(
+      handleRequest(new URL(event.request.url).pathname).then(async (r) => {
+        if (r.ok && r.headers.get("Content-Type") === "application/typescript") {
+          if (event.request.headers.get("Accept")?.split(",").includes("text/html")) {
+            return new Response(
+              `<h3><code>${new URL(event.request.url).pathname}</code></h3><pre>${await r
+                .text()}</pre>`,
+              {
+                headers: {
+                  "Content-Type": "text/html",
+                },
+              },
+            )
+          }
+        }
+        return r
+      }).catch((e) => {
+        return new Response(Deno.inspect(e), { status: 500 })
+      }),
+    )
   }
 }
 
