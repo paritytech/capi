@@ -209,7 +209,13 @@ export type ${name} = ${(visitor[key] as any)!(...args)}
 `
       }
 
-    return new M.TyVisitor<string>(tys, {
+    const codec = ty.type === "Compact" ? "" : `\
+export const $${name[0]!.toLowerCase()}${name.slice(1)}: $.Codec<${
+      ty.type === "Primitive" ? name : path
+    }> = codecs.$${ty.id}
+`
+
+    return codec + new M.TyVisitor<string>(tys, {
       unitStruct() {
         return `\
 ${docs}
@@ -309,7 +315,7 @@ export namespace ${name} { ${
       sizedArray: fallback("sizedArray"),
       primitive: fallback("primitive"),
       compact() {
-        return `export type Compact<T> = T`
+        return `export type Compact<T> = T\n`
       },
       bitSequence: fallback("bitSequence"),
       map: fallback("map"),
