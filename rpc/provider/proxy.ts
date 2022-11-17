@@ -13,7 +13,13 @@ export const proxyProvider: Provider<string, Event, Event, Event> = (url, listen
   return {
     nextId,
     send: (message) => {
-      const conn = connection(url, listener)
+      let conn
+      try {
+        conn = connection(url, listener)
+      } catch (error) {
+        listener(new ProviderHandlerError(error as Event))
+        return
+      }
       ;(async () => {
         const openError = await ensureWsOpen(conn.inner)
         if (openError) {
@@ -28,7 +34,13 @@ export const proxyProvider: Provider<string, Event, Event, Event> = (url, listen
       })()
     },
     release: () => {
-      const { cleanUp, listeners, inner } = connection(url, listener)
+      let conn
+      try {
+        conn = connection(url, listener)
+      } catch (_error) {
+        return Promise.resolve(undefined)
+      }
+      const { cleanUp, listeners, inner } = conn
       listeners.delete(listener)
       if (!listeners.size) {
         connections.delete(url)
