@@ -5,19 +5,19 @@ import type * as types from "../mod.ts"
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 
 export type Call =
-  | types.frame_system.pallet.Call.fill_block
+  | types.frame_system.pallet.Call.fillBlock
   | types.frame_system.pallet.Call.remark
-  | types.frame_system.pallet.Call.set_heap_pages
-  | types.frame_system.pallet.Call.set_code
-  | types.frame_system.pallet.Call.set_code_without_checks
-  | types.frame_system.pallet.Call.set_storage
-  | types.frame_system.pallet.Call.kill_storage
-  | types.frame_system.pallet.Call.kill_prefix
-  | types.frame_system.pallet.Call.remark_with_event
+  | types.frame_system.pallet.Call.setHeapPages
+  | types.frame_system.pallet.Call.setCode
+  | types.frame_system.pallet.Call.setCodeWithoutChecks
+  | types.frame_system.pallet.Call.setStorage
+  | types.frame_system.pallet.Call.killStorage
+  | types.frame_system.pallet.Call.killPrefix
+  | types.frame_system.pallet.Call.remarkWithEvent
 export namespace Call {
   /** A dispatch that will fill the block weight up to the given ratio. */
-  export interface fill_block {
-    type: "fill_block"
+  export interface fillBlock {
+    type: "fillBlock"
     ratio: types.sp_arithmetic.per_things.Perbill
   }
   /**
@@ -32,8 +32,8 @@ export namespace Call {
     remark: Uint8Array
   }
   /** Set the number of pages in the WebAssembly environment's heap. */
-  export interface set_heap_pages {
-    type: "set_heap_pages"
+  export interface setHeapPages {
+    type: "setHeapPages"
     pages: types.u64
   }
   /**
@@ -50,8 +50,8 @@ export namespace Call {
    * expensive. We will treat this as a full block.
    * # </weight>
    */
-  export interface set_code {
-    type: "set_code"
+  export interface setCode {
+    type: "setCode"
     code: Uint8Array
   }
   /**
@@ -65,18 +65,18 @@ export namespace Call {
    * The weight of this function is dependent on the runtime. We will treat this as a full
    * block. # </weight>
    */
-  export interface set_code_without_checks {
-    type: "set_code_without_checks"
+  export interface setCodeWithoutChecks {
+    type: "setCodeWithoutChecks"
     code: Uint8Array
   }
   /** Set some items of storage. */
-  export interface set_storage {
-    type: "set_storage"
+  export interface setStorage {
+    type: "setStorage"
     items: Array<[Uint8Array, Uint8Array]>
   }
   /** Kill some items from storage. */
-  export interface kill_storage {
-    type: "kill_storage"
+  export interface killStorage {
+    type: "killStorage"
     keys: Array<Uint8Array>
   }
   /**
@@ -85,21 +85,21 @@ export namespace Call {
    * **NOTE:** We rely on the Root origin to provide us the number of subkeys under
    * the prefix we are removing to accurately calculate the weight of this function.
    */
-  export interface kill_prefix {
-    type: "kill_prefix"
+  export interface killPrefix {
+    type: "killPrefix"
     prefix: Uint8Array
     subkeys: types.u32
   }
   /** Make some on-chain remark and emit event. */
-  export interface remark_with_event {
-    type: "remark_with_event"
+  export interface remarkWithEvent {
+    type: "remarkWithEvent"
     remark: Uint8Array
   }
   /** A dispatch that will fill the block weight up to the given ratio. */
-  export function fill_block(
-    value: Omit<types.frame_system.pallet.Call.fill_block, "type">,
-  ): types.frame_system.pallet.Call.fill_block {
-    return { type: "fill_block", ...value }
+  export function fillBlock(
+    value: Omit<types.frame_system.pallet.Call.fillBlock, "type">,
+  ): types.frame_system.pallet.Call.fillBlock {
+    return { type: "fillBlock", ...value }
   }
   /**
    * Make some on-chain remark.
@@ -114,10 +114,10 @@ export namespace Call {
     return { type: "remark", ...value }
   }
   /** Set the number of pages in the WebAssembly environment's heap. */
-  export function set_heap_pages(
-    value: Omit<types.frame_system.pallet.Call.set_heap_pages, "type">,
-  ): types.frame_system.pallet.Call.set_heap_pages {
-    return { type: "set_heap_pages", ...value }
+  export function setHeapPages(
+    value: Omit<types.frame_system.pallet.Call.setHeapPages, "type">,
+  ): types.frame_system.pallet.Call.setHeapPages {
+    return { type: "setHeapPages", ...value }
   }
   /**
    * Set the new runtime code.
@@ -133,10 +133,10 @@ export namespace Call {
    * expensive. We will treat this as a full block.
    * # </weight>
    */
-  export function set_code(
-    value: Omit<types.frame_system.pallet.Call.set_code, "type">,
-  ): types.frame_system.pallet.Call.set_code {
-    return { type: "set_code", ...value }
+  export function setCode(
+    value: Omit<types.frame_system.pallet.Call.setCode, "type">,
+  ): types.frame_system.pallet.Call.setCode {
+    return { type: "setCode", ...value }
   }
   /**
    * Set the new runtime code without doing any checks of the given `code`.
@@ -149,22 +149,22 @@ export namespace Call {
    * The weight of this function is dependent on the runtime. We will treat this as a full
    * block. # </weight>
    */
-  export function set_code_without_checks(
-    value: Omit<types.frame_system.pallet.Call.set_code_without_checks, "type">,
-  ): types.frame_system.pallet.Call.set_code_without_checks {
-    return { type: "set_code_without_checks", ...value }
+  export function setCodeWithoutChecks(
+    value: Omit<types.frame_system.pallet.Call.setCodeWithoutChecks, "type">,
+  ): types.frame_system.pallet.Call.setCodeWithoutChecks {
+    return { type: "setCodeWithoutChecks", ...value }
   }
   /** Set some items of storage. */
-  export function set_storage(
-    value: Omit<types.frame_system.pallet.Call.set_storage, "type">,
-  ): types.frame_system.pallet.Call.set_storage {
-    return { type: "set_storage", ...value }
+  export function setStorage(
+    value: Omit<types.frame_system.pallet.Call.setStorage, "type">,
+  ): types.frame_system.pallet.Call.setStorage {
+    return { type: "setStorage", ...value }
   }
   /** Kill some items from storage. */
-  export function kill_storage(
-    value: Omit<types.frame_system.pallet.Call.kill_storage, "type">,
-  ): types.frame_system.pallet.Call.kill_storage {
-    return { type: "kill_storage", ...value }
+  export function killStorage(
+    value: Omit<types.frame_system.pallet.Call.killStorage, "type">,
+  ): types.frame_system.pallet.Call.killStorage {
+    return { type: "killStorage", ...value }
   }
   /**
    * Kill all storage items with a key that starts with the given prefix.
@@ -172,16 +172,16 @@ export namespace Call {
    * **NOTE:** We rely on the Root origin to provide us the number of subkeys under
    * the prefix we are removing to accurately calculate the weight of this function.
    */
-  export function kill_prefix(
-    value: Omit<types.frame_system.pallet.Call.kill_prefix, "type">,
-  ): types.frame_system.pallet.Call.kill_prefix {
-    return { type: "kill_prefix", ...value }
+  export function killPrefix(
+    value: Omit<types.frame_system.pallet.Call.killPrefix, "type">,
+  ): types.frame_system.pallet.Call.killPrefix {
+    return { type: "killPrefix", ...value }
   }
   /** Make some on-chain remark and emit event. */
-  export function remark_with_event(
-    value: Omit<types.frame_system.pallet.Call.remark_with_event, "type">,
-  ): types.frame_system.pallet.Call.remark_with_event {
-    return { type: "remark_with_event", ...value }
+  export function remarkWithEvent(
+    value: Omit<types.frame_system.pallet.Call.remarkWithEvent, "type">,
+  ): types.frame_system.pallet.Call.remarkWithEvent {
+    return { type: "remarkWithEvent", ...value }
   }
 }
 /** Error for the System pallet */
@@ -206,13 +206,13 @@ export namespace Event {
   /** An extrinsic completed successfully. */
   export interface ExtrinsicSuccess {
     type: "ExtrinsicSuccess"
-    dispatch_info: types.frame_support.dispatch.DispatchInfo
+    dispatchInfo: types.frame_support.dispatch.DispatchInfo
   }
   /** An extrinsic failed. */
   export interface ExtrinsicFailed {
     type: "ExtrinsicFailed"
-    dispatch_error: types.sp_runtime.DispatchError
-    dispatch_info: types.frame_support.dispatch.DispatchInfo
+    dispatchError: types.sp_runtime.DispatchError
+    dispatchInfo: types.frame_support.dispatch.DispatchInfo
   }
   /** `:code` was updated. */
   export interface CodeUpdated {

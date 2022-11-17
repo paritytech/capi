@@ -81,10 +81,10 @@ export const ChildrenCuratorFees = new C.fluent.Storage(
  * - `value`: Value for executing the proposal.
  * - `description`: Text description for the child-bounty.
  */
-export function add_child_bounty(
-  value: Omit<types.pallet_child_bounties.pallet.Call.add_child_bounty, "type">,
+export function addChildBounty(
+  value: Omit<types.pallet_child_bounties.pallet.Call.addChildBounty, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "ChildBounties", value: { ...value, type: "add_child_bounty" } }
+  return { type: "ChildBounties", value: { ...value, type: "addChildBounty" } }
 }
 
 /**
@@ -104,10 +104,10 @@ export function add_child_bounty(
  * - `curator`: Address of child-bounty curator.
  * - `fee`: payment fee to child-bounty curator for execution.
  */
-export function propose_curator(
-  value: Omit<types.pallet_child_bounties.pallet.Call.propose_curator, "type">,
+export function proposeCurator(
+  value: Omit<types.pallet_child_bounties.pallet.Call.proposeCurator, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "ChildBounties", value: { ...value, type: "propose_curator" } }
+  return { type: "ChildBounties", value: { ...value, type: "proposeCurator" } }
 }
 
 /**
@@ -131,10 +131,10 @@ export function propose_curator(
  * - `parent_bounty_id`: Index of parent bounty.
  * - `child_bounty_id`: Index of child bounty.
  */
-export function accept_curator(
-  value: Omit<types.pallet_child_bounties.pallet.Call.accept_curator, "type">,
+export function acceptCurator(
+  value: Omit<types.pallet_child_bounties.pallet.Call.acceptCurator, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "ChildBounties", value: { ...value, type: "accept_curator" } }
+  return { type: "ChildBounties", value: { ...value, type: "acceptCurator" } }
 }
 
 /**
@@ -173,10 +173,10 @@ export function accept_curator(
  * - `parent_bounty_id`: Index of parent bounty.
  * - `child_bounty_id`: Index of child bounty.
  */
-export function unassign_curator(
-  value: Omit<types.pallet_child_bounties.pallet.Call.unassign_curator, "type">,
+export function unassignCurator(
+  value: Omit<types.pallet_child_bounties.pallet.Call.unassignCurator, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "ChildBounties", value: { ...value, type: "unassign_curator" } }
+  return { type: "ChildBounties", value: { ...value, type: "unassignCurator" } }
 }
 
 /**
@@ -198,10 +198,10 @@ export function unassign_curator(
  * - `child_bounty_id`: Index of child bounty.
  * - `beneficiary`: Beneficiary account.
  */
-export function award_child_bounty(
-  value: Omit<types.pallet_child_bounties.pallet.Call.award_child_bounty, "type">,
+export function awardChildBounty(
+  value: Omit<types.pallet_child_bounties.pallet.Call.awardChildBounty, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "ChildBounties", value: { ...value, type: "award_child_bounty" } }
+  return { type: "ChildBounties", value: { ...value, type: "awardChildBounty" } }
 }
 
 /**
@@ -222,10 +222,10 @@ export function award_child_bounty(
  * - `parent_bounty_id`: Index of parent bounty.
  * - `child_bounty_id`: Index of child bounty.
  */
-export function claim_child_bounty(
-  value: Omit<types.pallet_child_bounties.pallet.Call.claim_child_bounty, "type">,
+export function claimChildBounty(
+  value: Omit<types.pallet_child_bounties.pallet.Call.claimChildBounty, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "ChildBounties", value: { ...value, type: "claim_child_bounty" } }
+  return { type: "ChildBounties", value: { ...value, type: "claimChildBounty" } }
 }
 
 /**
@@ -252,8 +252,8 @@ export function claim_child_bounty(
  * - `parent_bounty_id`: Index of parent bounty.
  * - `child_bounty_id`: Index of child bounty.
  */
-export function close_child_bounty(
-  value: Omit<types.pallet_child_bounties.pallet.Call.close_child_bounty, "type">,
+export function closeChildBounty(
+  value: Omit<types.pallet_child_bounties.pallet.Call.closeChildBounty, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "ChildBounties", value: { ...value, type: "close_child_bounty" } }
+  return { type: "ChildBounties", value: { ...value, type: "closeChildBounty" } }
 }

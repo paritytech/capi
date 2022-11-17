@@ -25,9 +25,9 @@ export namespace AssignmentKind {
 
 export interface CoreAssignment {
   core: types.polkadot_primitives.v2.CoreIndex
-  para_id: types.polkadot_parachain.primitives.Id
+  paraId: types.polkadot_parachain.primitives.Id
   kind: types.polkadot_runtime_parachains.scheduler.AssignmentKind
-  group_idx: types.polkadot_primitives.v2.GroupIndex
+  groupIdx: types.polkadot_primitives.v2.GroupIndex
 }
 
 export function CoreAssignment(value: types.polkadot_runtime_parachains.scheduler.CoreAssignment) {
@@ -36,7 +36,7 @@ export function CoreAssignment(value: types.polkadot_runtime_parachains.schedule
 
 export interface ParathreadClaimQueue {
   queue: Array<types.polkadot_runtime_parachains.scheduler.QueuedParathread>
-  next_core_offset: types.u32
+  nextCoreOffset: types.u32
 }
 
 export function ParathreadClaimQueue(
@@ -47,7 +47,7 @@ export function ParathreadClaimQueue(
 
 export interface QueuedParathread {
   claim: types.polkadot_primitives.v2.ParathreadEntry
-  core_offset: types.u32
+  coreOffset: types.u32
 }
 
 export function QueuedParathread(

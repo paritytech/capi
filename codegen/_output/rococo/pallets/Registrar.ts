@@ -70,10 +70,10 @@ export function register(
  * The deposit taken can be specified for this registration. Any `ParaId`
  * can be registered, including sub-1000 IDs which are System Parachains.
  */
-export function force_register(
-  value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.force_register, "type">,
+export function forceRegister(
+  value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.forceRegister, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Registrar", value: { ...value, type: "force_register" } }
+  return { type: "Registrar", value: { ...value, type: "forceRegister" } }
 }
 
 /**
@@ -112,10 +112,10 @@ export function swap(
  *
  * Can only be called by the Root origin or the parachain.
  */
-export function remove_lock(
-  value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.remove_lock, "type">,
+export function removeLock(
+  value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.removeLock, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Registrar", value: { ...value, type: "remove_lock" } }
+  return { type: "Registrar", value: { ...value, type: "removeLock" } }
 }
 
 /**
@@ -144,10 +144,10 @@ export function reserve(): types.polkadot_runtime.RuntimeCall {
  *
  * Can be called by Root, the parachain, or the parachain manager if the parachain is unlocked.
  */
-export function add_lock(
-  value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.add_lock, "type">,
+export function addLock(
+  value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.addLock, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Registrar", value: { ...value, type: "add_lock" } }
+  return { type: "Registrar", value: { ...value, type: "addLock" } }
 }
 
 /**
@@ -155,13 +155,13 @@ export function add_lock(
  *
  * Can be called by Root, the parachain, or the parachain manager if the parachain is unlocked.
  */
-export function schedule_code_upgrade(
+export function scheduleCodeUpgrade(
   value: Omit<
-    types.polkadot_runtime_common.paras_registrar.pallet.Call.schedule_code_upgrade,
+    types.polkadot_runtime_common.paras_registrar.pallet.Call.scheduleCodeUpgrade,
     "type"
   >,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Registrar", value: { ...value, type: "schedule_code_upgrade" } }
+  return { type: "Registrar", value: { ...value, type: "scheduleCodeUpgrade" } }
 }
 
 /**
@@ -169,8 +169,8 @@ export function schedule_code_upgrade(
  *
  * Can be called by Root, the parachain, or the parachain manager if the parachain is unlocked.
  */
-export function set_current_head(
-  value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.set_current_head, "type">,
+export function setCurrentHead(
+  value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.setCurrentHead, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Registrar", value: { ...value, type: "set_current_head" } }
+  return { type: "Registrar", value: { ...value, type: "setCurrentHead" } }
 }

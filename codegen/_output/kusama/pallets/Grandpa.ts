@@ -82,10 +82,10 @@ export const SetIdSession = new C.fluent.Storage(
  * against the extracted offender. If both are valid, the offence
  * will be reported.
  */
-export function report_equivocation(
-  value: Omit<types.pallet_grandpa.pallet.Call.report_equivocation, "type">,
+export function reportEquivocation(
+  value: Omit<types.pallet_grandpa.pallet.Call.reportEquivocation, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Grandpa", value: { ...value, type: "report_equivocation" } }
+  return { type: "Grandpa", value: { ...value, type: "reportEquivocation" } }
 }
 
 /**
@@ -99,10 +99,10 @@ export function report_equivocation(
  * if the block author is defined it will be defined as the equivocation
  * reporter.
  */
-export function report_equivocation_unsigned(
-  value: Omit<types.pallet_grandpa.pallet.Call.report_equivocation_unsigned, "type">,
+export function reportEquivocationUnsigned(
+  value: Omit<types.pallet_grandpa.pallet.Call.reportEquivocationUnsigned, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Grandpa", value: { ...value, type: "report_equivocation_unsigned" } }
+  return { type: "Grandpa", value: { ...value, type: "reportEquivocationUnsigned" } }
 }
 
 /**
@@ -119,8 +119,8 @@ export function report_equivocation_unsigned(
  *
  * Only callable by root.
  */
-export function note_stalled(
-  value: Omit<types.pallet_grandpa.pallet.Call.note_stalled, "type">,
+export function noteStalled(
+  value: Omit<types.pallet_grandpa.pallet.Call.noteStalled, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Grandpa", value: { ...value, type: "note_stalled" } }
+  return { type: "Grandpa", value: { ...value, type: "noteStalled" } }
 }

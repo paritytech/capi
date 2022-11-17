@@ -52,7 +52,7 @@ export namespace Event {
   /** A new heartbeat was received from `AuthorityId`. */
   export interface HeartbeatReceived {
     type: "HeartbeatReceived"
-    authority_id: types.pallet_im_online.sr25519.app_sr25519.Public
+    authorityId: types.pallet_im_online.sr25519.app_sr25519.Public
   }
   /** At the end of the session, no offence was committed. */
   export interface AllGood {

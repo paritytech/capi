@@ -11,10 +11,10 @@ export interface FundInfo {
   raised: types.u128
   end: types.u32
   cap: types.u128
-  last_contribution: types.polkadot_runtime_common.crowdloan.LastContribution
-  first_period: types.u32
-  last_period: types.u32
-  fund_index: types.u32
+  lastContribution: types.polkadot_runtime_common.crowdloan.LastContribution
+  firstPeriod: types.u32
+  lastPeriod: types.u32
+  fundIndex: types.u32
 }
 
 export function FundInfo(value: types.polkadot_runtime_common.crowdloan.FundInfo) {

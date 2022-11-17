@@ -48,7 +48,7 @@ Deno.test({
         call: {
           type: "Treasury",
           value: {
-            type: "propose_spend",
+            type: "proposeSpend",
             value: 200n,
             beneficiary: {
               type: "Id",

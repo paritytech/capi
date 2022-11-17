@@ -132,10 +132,10 @@ export function transfer(
  *
  * The dispatch origin for this call is `root`.
  */
-export function set_balance(
-  value: Omit<types.pallet_balances.pallet.Call.set_balance, "type">,
+export function setBalance(
+  value: Omit<types.pallet_balances.pallet.Call.setBalance, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Balances", value: { ...value, type: "set_balance" } }
+  return { type: "Balances", value: { ...value, type: "setBalance" } }
 }
 
 /**
@@ -146,10 +146,10 @@ export function set_balance(
  *   assumed to be in the overlay.
  * # </weight>
  */
-export function force_transfer(
-  value: Omit<types.pallet_balances.pallet.Call.force_transfer, "type">,
+export function forceTransfer(
+  value: Omit<types.pallet_balances.pallet.Call.forceTransfer, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Balances", value: { ...value, type: "force_transfer" } }
+  return { type: "Balances", value: { ...value, type: "forceTransfer" } }
 }
 
 /**
@@ -160,10 +160,10 @@ export function force_transfer(
  *
  * [`transfer`]: struct.Pallet.html#method.transfer
  */
-export function transfer_keep_alive(
-  value: Omit<types.pallet_balances.pallet.Call.transfer_keep_alive, "type">,
+export function transferKeepAlive(
+  value: Omit<types.pallet_balances.pallet.Call.transferKeepAlive, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Balances", value: { ...value, type: "transfer_keep_alive" } }
+  return { type: "Balances", value: { ...value, type: "transferKeepAlive" } }
 }
 
 /**
@@ -185,10 +185,10 @@ export function transfer_keep_alive(
  * - O(1). Just like transfer, but reading the user's transferable balance first.
  *   #</weight>
  */
-export function transfer_all(
-  value: Omit<types.pallet_balances.pallet.Call.transfer_all, "type">,
+export function transferAll(
+  value: Omit<types.pallet_balances.pallet.Call.transferAll, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Balances", value: { ...value, type: "transfer_all" } }
+  return { type: "Balances", value: { ...value, type: "transferAll" } }
 }
 
 /**
@@ -196,8 +196,8 @@ export function transfer_all(
  *
  * Can only be called by ROOT.
  */
-export function force_unreserve(
-  value: Omit<types.pallet_balances.pallet.Call.force_unreserve, "type">,
+export function forceUnreserve(
+  value: Omit<types.pallet_balances.pallet.Call.forceUnreserve, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Balances", value: { ...value, type: "force_unreserve" } }
+  return { type: "Balances", value: { ...value, type: "forceUnreserve" } }
 }

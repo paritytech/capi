@@ -6,10 +6,10 @@ import type * as types from "../mod.ts"
 
 export type Call =
   | types.pallet_utility.pallet.Call.batch
-  | types.pallet_utility.pallet.Call.as_derivative
-  | types.pallet_utility.pallet.Call.batch_all
-  | types.pallet_utility.pallet.Call.dispatch_as
-  | types.pallet_utility.pallet.Call.force_batch
+  | types.pallet_utility.pallet.Call.asDerivative
+  | types.pallet_utility.pallet.Call.batchAll
+  | types.pallet_utility.pallet.Call.dispatchAs
+  | types.pallet_utility.pallet.Call.forceBatch
 export namespace Call {
   /**
    * Send a batch of dispatch calls.
@@ -51,8 +51,8 @@ export namespace Call {
    *
    * The dispatch origin for this call must be _Signed_.
    */
-  export interface as_derivative {
-    type: "as_derivative"
+  export interface asDerivative {
+    type: "asDerivative"
     index: types.u16
     call: types.polkadot_runtime.RuntimeCall
   }
@@ -72,8 +72,8 @@ export namespace Call {
    * - Complexity: O(C) where C is the number of calls to be batched.
    * # </weight>
    */
-  export interface batch_all {
-    type: "batch_all"
+  export interface batchAll {
+    type: "batchAll"
     calls: Array<types.polkadot_runtime.RuntimeCall>
   }
   /**
@@ -88,9 +88,9 @@ export namespace Call {
    * - Weight of derivative `call` execution + T::WeightInfo::dispatch_as().
    * # </weight>
    */
-  export interface dispatch_as {
-    type: "dispatch_as"
-    as_origin: types.polkadot_runtime.OriginCaller
+  export interface dispatchAs {
+    type: "dispatchAs"
+    asOrigin: types.polkadot_runtime.OriginCaller
     call: types.polkadot_runtime.RuntimeCall
   }
   /**
@@ -109,8 +109,8 @@ export namespace Call {
    * - Complexity: O(C) where C is the number of calls to be batched.
    * # </weight>
    */
-  export interface force_batch {
-    type: "force_batch"
+  export interface forceBatch {
+    type: "forceBatch"
     calls: Array<types.polkadot_runtime.RuntimeCall>
   }
   /**
@@ -154,10 +154,10 @@ export namespace Call {
    *
    * The dispatch origin for this call must be _Signed_.
    */
-  export function as_derivative(
-    value: Omit<types.pallet_utility.pallet.Call.as_derivative, "type">,
-  ): types.pallet_utility.pallet.Call.as_derivative {
-    return { type: "as_derivative", ...value }
+  export function asDerivative(
+    value: Omit<types.pallet_utility.pallet.Call.asDerivative, "type">,
+  ): types.pallet_utility.pallet.Call.asDerivative {
+    return { type: "asDerivative", ...value }
   }
   /**
    * Send a batch of dispatch calls and atomically execute them.
@@ -175,10 +175,10 @@ export namespace Call {
    * - Complexity: O(C) where C is the number of calls to be batched.
    * # </weight>
    */
-  export function batch_all(
-    value: Omit<types.pallet_utility.pallet.Call.batch_all, "type">,
-  ): types.pallet_utility.pallet.Call.batch_all {
-    return { type: "batch_all", ...value }
+  export function batchAll(
+    value: Omit<types.pallet_utility.pallet.Call.batchAll, "type">,
+  ): types.pallet_utility.pallet.Call.batchAll {
+    return { type: "batchAll", ...value }
   }
   /**
    * Dispatches a function call with a provided origin.
@@ -192,10 +192,10 @@ export namespace Call {
    * - Weight of derivative `call` execution + T::WeightInfo::dispatch_as().
    * # </weight>
    */
-  export function dispatch_as(
-    value: Omit<types.pallet_utility.pallet.Call.dispatch_as, "type">,
-  ): types.pallet_utility.pallet.Call.dispatch_as {
-    return { type: "dispatch_as", ...value }
+  export function dispatchAs(
+    value: Omit<types.pallet_utility.pallet.Call.dispatchAs, "type">,
+  ): types.pallet_utility.pallet.Call.dispatchAs {
+    return { type: "dispatchAs", ...value }
   }
   /**
    * Send a batch of dispatch calls.
@@ -213,10 +213,10 @@ export namespace Call {
    * - Complexity: O(C) where C is the number of calls to be batched.
    * # </weight>
    */
-  export function force_batch(
-    value: Omit<types.pallet_utility.pallet.Call.force_batch, "type">,
-  ): types.pallet_utility.pallet.Call.force_batch {
-    return { type: "force_batch", ...value }
+  export function forceBatch(
+    value: Omit<types.pallet_utility.pallet.Call.forceBatch, "type">,
+  ): types.pallet_utility.pallet.Call.forceBatch {
+    return { type: "forceBatch", ...value }
   }
 }
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */

@@ -15,7 +15,7 @@ import { Balances, Utility } from "../codegen/_output/westend/pallets/mod.ts"
 
 const tx = extrinsic({
   sender: T.alice.address,
-  call: Utility.batch_all({
+  call: Utility.batchAll({
     calls: T.users.map((pair) =>
       Balances.transfer({
         dest: pair.address,

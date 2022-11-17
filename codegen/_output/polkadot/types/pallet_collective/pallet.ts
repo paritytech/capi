@@ -5,12 +5,12 @@ import type * as types from "../mod.ts"
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 
 export type Call =
-  | types.pallet_collective.pallet.Call.set_members
+  | types.pallet_collective.pallet.Call.setMembers
   | types.pallet_collective.pallet.Call.execute
   | types.pallet_collective.pallet.Call.propose
   | types.pallet_collective.pallet.Call.vote
-  | types.pallet_collective.pallet.Call.close_old_weight
-  | types.pallet_collective.pallet.Call.disapprove_proposal
+  | types.pallet_collective.pallet.Call.closeOldWeight
+  | types.pallet_collective.pallet.Call.disapproveProposal
   | types.pallet_collective.pallet.Call.close
 export namespace Call {
   /**
@@ -47,11 +47,11 @@ export namespace Call {
    *   - 1 storage write (codec `O(1)`) for deleting the old `prime` and setting the new one
    * # </weight>
    */
-  export interface set_members {
-    type: "set_members"
-    new_members: Array<types.sp_core.crypto.AccountId32>
+  export interface setMembers {
+    type: "setMembers"
+    newMembers: Array<types.sp_core.crypto.AccountId32>
     prime: types.sp_core.crypto.AccountId32 | undefined
-    old_count: types.u32
+    oldCount: types.u32
   }
   /**
    * Dispatch a proposal from a member using the `Member` origin.
@@ -69,7 +69,7 @@ export namespace Call {
   export interface execute {
     type: "execute"
     proposal: types.polkadot_runtime.RuntimeCall
-    length_bound: types.Compact<types.u32>
+    lengthBound: types.Compact<types.u32>
   }
   /**
    * Add a new proposal to either be voted on or executed directly.
@@ -104,7 +104,7 @@ export namespace Call {
     type: "propose"
     threshold: types.Compact<types.u32>
     proposal: types.polkadot_runtime.RuntimeCall
-    length_bound: types.Compact<types.u32>
+    lengthBound: types.Compact<types.u32>
   }
   /**
    * Add an aye or nay vote for the sender to the given proposal.
@@ -163,12 +163,12 @@ export namespace Call {
    * - up to 3 events
    * # </weight>
    */
-  export interface close_old_weight {
-    type: "close_old_weight"
-    proposal_hash: types.primitive_types.H256
+  export interface closeOldWeight {
+    type: "closeOldWeight"
+    proposalHash: types.primitive_types.H256
     index: types.Compact<types.u32>
-    proposal_weight_bound: types.Compact<types.sp_weights.OldWeight>
-    length_bound: types.Compact<types.u32>
+    proposalWeightBound: types.Compact<types.sp_weights.OldWeight>
+    lengthBound: types.Compact<types.u32>
   }
   /**
    * Disapprove a proposal, close, and remove it from the system, regardless of its current
@@ -186,9 +186,9 @@ export namespace Call {
    * * Writes: Voting, Proposals, ProposalOf
    * # </weight>
    */
-  export interface disapprove_proposal {
-    type: "disapprove_proposal"
-    proposal_hash: types.primitive_types.H256
+  export interface disapproveProposal {
+    type: "disapproveProposal"
+    proposalHash: types.primitive_types.H256
   }
   /**
    * Close a vote that is either approved, disapproved or whose voting period has ended.
@@ -226,10 +226,10 @@ export namespace Call {
    */
   export interface close {
     type: "close"
-    proposal_hash: types.primitive_types.H256
+    proposalHash: types.primitive_types.H256
     index: types.Compact<types.u32>
-    proposal_weight_bound: types.sp_weights.weight_v2.Weight
-    length_bound: types.Compact<types.u32>
+    proposalWeightBound: types.sp_weights.weight_v2.Weight
+    lengthBound: types.Compact<types.u32>
   }
   /**
    * Set the collective's membership.
@@ -265,10 +265,10 @@ export namespace Call {
    *   - 1 storage write (codec `O(1)`) for deleting the old `prime` and setting the new one
    * # </weight>
    */
-  export function set_members(
-    value: Omit<types.pallet_collective.pallet.Call.set_members, "type">,
-  ): types.pallet_collective.pallet.Call.set_members {
-    return { type: "set_members", ...value }
+  export function setMembers(
+    value: Omit<types.pallet_collective.pallet.Call.setMembers, "type">,
+  ): types.pallet_collective.pallet.Call.setMembers {
+    return { type: "setMembers", ...value }
   }
   /**
    * Dispatch a proposal from a member using the `Member` origin.
@@ -378,10 +378,10 @@ export namespace Call {
    * - up to 3 events
    * # </weight>
    */
-  export function close_old_weight(
-    value: Omit<types.pallet_collective.pallet.Call.close_old_weight, "type">,
-  ): types.pallet_collective.pallet.Call.close_old_weight {
-    return { type: "close_old_weight", ...value }
+  export function closeOldWeight(
+    value: Omit<types.pallet_collective.pallet.Call.closeOldWeight, "type">,
+  ): types.pallet_collective.pallet.Call.closeOldWeight {
+    return { type: "closeOldWeight", ...value }
   }
   /**
    * Disapprove a proposal, close, and remove it from the system, regardless of its current
@@ -399,10 +399,10 @@ export namespace Call {
    * * Writes: Voting, Proposals, ProposalOf
    * # </weight>
    */
-  export function disapprove_proposal(
-    value: Omit<types.pallet_collective.pallet.Call.disapprove_proposal, "type">,
-  ): types.pallet_collective.pallet.Call.disapprove_proposal {
-    return { type: "disapprove_proposal", ...value }
+  export function disapproveProposal(
+    value: Omit<types.pallet_collective.pallet.Call.disapproveProposal, "type">,
+  ): types.pallet_collective.pallet.Call.disapproveProposal {
+    return { type: "disapproveProposal", ...value }
   }
   /**
    * Close a vote that is either approved, disapproved or whose voting period has ended.
@@ -475,8 +475,8 @@ export namespace Event {
   export interface Proposed {
     type: "Proposed"
     account: types.sp_core.crypto.AccountId32
-    proposal_index: types.u32
-    proposal_hash: types.primitive_types.H256
+    proposalIndex: types.u32
+    proposalHash: types.primitive_types.H256
     threshold: types.u32
   }
   /**
@@ -486,7 +486,7 @@ export namespace Event {
   export interface Voted {
     type: "Voted"
     account: types.sp_core.crypto.AccountId32
-    proposal_hash: types.primitive_types.H256
+    proposalHash: types.primitive_types.H256
     voted: boolean
     yes: types.u32
     no: types.u32
@@ -494,29 +494,29 @@ export namespace Event {
   /** A motion was approved by the required threshold. */
   export interface Approved {
     type: "Approved"
-    proposal_hash: types.primitive_types.H256
+    proposalHash: types.primitive_types.H256
   }
   /** A motion was not approved by the required threshold. */
   export interface Disapproved {
     type: "Disapproved"
-    proposal_hash: types.primitive_types.H256
+    proposalHash: types.primitive_types.H256
   }
   /** A motion was executed; result will be `Ok` if it returned without error. */
   export interface Executed {
     type: "Executed"
-    proposal_hash: types.primitive_types.H256
+    proposalHash: types.primitive_types.H256
     result: null | C.ChainError<types.sp_runtime.DispatchError>
   }
   /** A single member did some action; result will be `Ok` if it returned without error. */
   export interface MemberExecuted {
     type: "MemberExecuted"
-    proposal_hash: types.primitive_types.H256
+    proposalHash: types.primitive_types.H256
     result: null | C.ChainError<types.sp_runtime.DispatchError>
   }
   /** A proposal was closed because its threshold was reached or after its duration was up. */
   export interface Closed {
     type: "Closed"
-    proposal_hash: types.primitive_types.H256
+    proposalHash: types.primitive_types.H256
     yes: types.u32
     no: types.u32
   }

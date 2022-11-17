@@ -5,13 +5,13 @@ import type * as types from "../mod.ts"
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 
 export type Call =
-  | types.pallet_child_bounties.pallet.Call.add_child_bounty
-  | types.pallet_child_bounties.pallet.Call.propose_curator
-  | types.pallet_child_bounties.pallet.Call.accept_curator
-  | types.pallet_child_bounties.pallet.Call.unassign_curator
-  | types.pallet_child_bounties.pallet.Call.award_child_bounty
-  | types.pallet_child_bounties.pallet.Call.claim_child_bounty
-  | types.pallet_child_bounties.pallet.Call.close_child_bounty
+  | types.pallet_child_bounties.pallet.Call.addChildBounty
+  | types.pallet_child_bounties.pallet.Call.proposeCurator
+  | types.pallet_child_bounties.pallet.Call.acceptCurator
+  | types.pallet_child_bounties.pallet.Call.unassignCurator
+  | types.pallet_child_bounties.pallet.Call.awardChildBounty
+  | types.pallet_child_bounties.pallet.Call.claimChildBounty
+  | types.pallet_child_bounties.pallet.Call.closeChildBounty
 export namespace Call {
   /**
    * Add a new child-bounty.
@@ -34,9 +34,9 @@ export namespace Call {
    * - `value`: Value for executing the proposal.
    * - `description`: Text description for the child-bounty.
    */
-  export interface add_child_bounty {
-    type: "add_child_bounty"
-    parent_bounty_id: types.Compact<types.u32>
+  export interface addChildBounty {
+    type: "addChildBounty"
+    parentBountyId: types.Compact<types.u32>
     value: types.Compact<types.u128>
     description: Uint8Array
   }
@@ -57,10 +57,10 @@ export namespace Call {
    * - `curator`: Address of child-bounty curator.
    * - `fee`: payment fee to child-bounty curator for execution.
    */
-  export interface propose_curator {
-    type: "propose_curator"
-    parent_bounty_id: types.Compact<types.u32>
-    child_bounty_id: types.Compact<types.u32>
+  export interface proposeCurator {
+    type: "proposeCurator"
+    parentBountyId: types.Compact<types.u32>
+    childBountyId: types.Compact<types.u32>
     curator: types.sp_runtime.multiaddress.MultiAddress
     fee: types.Compact<types.u128>
   }
@@ -85,10 +85,10 @@ export namespace Call {
    * - `parent_bounty_id`: Index of parent bounty.
    * - `child_bounty_id`: Index of child bounty.
    */
-  export interface accept_curator {
-    type: "accept_curator"
-    parent_bounty_id: types.Compact<types.u32>
-    child_bounty_id: types.Compact<types.u32>
+  export interface acceptCurator {
+    type: "acceptCurator"
+    parentBountyId: types.Compact<types.u32>
+    childBountyId: types.Compact<types.u32>
   }
   /**
    * Unassign curator from a child-bounty.
@@ -126,10 +126,10 @@ export namespace Call {
    * - `parent_bounty_id`: Index of parent bounty.
    * - `child_bounty_id`: Index of child bounty.
    */
-  export interface unassign_curator {
-    type: "unassign_curator"
-    parent_bounty_id: types.Compact<types.u32>
-    child_bounty_id: types.Compact<types.u32>
+  export interface unassignCurator {
+    type: "unassignCurator"
+    parentBountyId: types.Compact<types.u32>
+    childBountyId: types.Compact<types.u32>
   }
   /**
    * Award child-bounty to a beneficiary.
@@ -150,10 +150,10 @@ export namespace Call {
    * - `child_bounty_id`: Index of child bounty.
    * - `beneficiary`: Beneficiary account.
    */
-  export interface award_child_bounty {
-    type: "award_child_bounty"
-    parent_bounty_id: types.Compact<types.u32>
-    child_bounty_id: types.Compact<types.u32>
+  export interface awardChildBounty {
+    type: "awardChildBounty"
+    parentBountyId: types.Compact<types.u32>
+    childBountyId: types.Compact<types.u32>
     beneficiary: types.sp_runtime.multiaddress.MultiAddress
   }
   /**
@@ -174,10 +174,10 @@ export namespace Call {
    * - `parent_bounty_id`: Index of parent bounty.
    * - `child_bounty_id`: Index of child bounty.
    */
-  export interface claim_child_bounty {
-    type: "claim_child_bounty"
-    parent_bounty_id: types.Compact<types.u32>
-    child_bounty_id: types.Compact<types.u32>
+  export interface claimChildBounty {
+    type: "claimChildBounty"
+    parentBountyId: types.Compact<types.u32>
+    childBountyId: types.Compact<types.u32>
   }
   /**
    * Cancel a proposed or active child-bounty. Child-bounty account funds
@@ -203,10 +203,10 @@ export namespace Call {
    * - `parent_bounty_id`: Index of parent bounty.
    * - `child_bounty_id`: Index of child bounty.
    */
-  export interface close_child_bounty {
-    type: "close_child_bounty"
-    parent_bounty_id: types.Compact<types.u32>
-    child_bounty_id: types.Compact<types.u32>
+  export interface closeChildBounty {
+    type: "closeChildBounty"
+    parentBountyId: types.Compact<types.u32>
+    childBountyId: types.Compact<types.u32>
   }
   /**
    * Add a new child-bounty.
@@ -229,10 +229,10 @@ export namespace Call {
    * - `value`: Value for executing the proposal.
    * - `description`: Text description for the child-bounty.
    */
-  export function add_child_bounty(
-    value: Omit<types.pallet_child_bounties.pallet.Call.add_child_bounty, "type">,
-  ): types.pallet_child_bounties.pallet.Call.add_child_bounty {
-    return { type: "add_child_bounty", ...value }
+  export function addChildBounty(
+    value: Omit<types.pallet_child_bounties.pallet.Call.addChildBounty, "type">,
+  ): types.pallet_child_bounties.pallet.Call.addChildBounty {
+    return { type: "addChildBounty", ...value }
   }
   /**
    * Propose curator for funded child-bounty.
@@ -251,10 +251,10 @@ export namespace Call {
    * - `curator`: Address of child-bounty curator.
    * - `fee`: payment fee to child-bounty curator for execution.
    */
-  export function propose_curator(
-    value: Omit<types.pallet_child_bounties.pallet.Call.propose_curator, "type">,
-  ): types.pallet_child_bounties.pallet.Call.propose_curator {
-    return { type: "propose_curator", ...value }
+  export function proposeCurator(
+    value: Omit<types.pallet_child_bounties.pallet.Call.proposeCurator, "type">,
+  ): types.pallet_child_bounties.pallet.Call.proposeCurator {
+    return { type: "proposeCurator", ...value }
   }
   /**
    * Accept the curator role for the child-bounty.
@@ -277,10 +277,10 @@ export namespace Call {
    * - `parent_bounty_id`: Index of parent bounty.
    * - `child_bounty_id`: Index of child bounty.
    */
-  export function accept_curator(
-    value: Omit<types.pallet_child_bounties.pallet.Call.accept_curator, "type">,
-  ): types.pallet_child_bounties.pallet.Call.accept_curator {
-    return { type: "accept_curator", ...value }
+  export function acceptCurator(
+    value: Omit<types.pallet_child_bounties.pallet.Call.acceptCurator, "type">,
+  ): types.pallet_child_bounties.pallet.Call.acceptCurator {
+    return { type: "acceptCurator", ...value }
   }
   /**
    * Unassign curator from a child-bounty.
@@ -318,10 +318,10 @@ export namespace Call {
    * - `parent_bounty_id`: Index of parent bounty.
    * - `child_bounty_id`: Index of child bounty.
    */
-  export function unassign_curator(
-    value: Omit<types.pallet_child_bounties.pallet.Call.unassign_curator, "type">,
-  ): types.pallet_child_bounties.pallet.Call.unassign_curator {
-    return { type: "unassign_curator", ...value }
+  export function unassignCurator(
+    value: Omit<types.pallet_child_bounties.pallet.Call.unassignCurator, "type">,
+  ): types.pallet_child_bounties.pallet.Call.unassignCurator {
+    return { type: "unassignCurator", ...value }
   }
   /**
    * Award child-bounty to a beneficiary.
@@ -342,10 +342,10 @@ export namespace Call {
    * - `child_bounty_id`: Index of child bounty.
    * - `beneficiary`: Beneficiary account.
    */
-  export function award_child_bounty(
-    value: Omit<types.pallet_child_bounties.pallet.Call.award_child_bounty, "type">,
-  ): types.pallet_child_bounties.pallet.Call.award_child_bounty {
-    return { type: "award_child_bounty", ...value }
+  export function awardChildBounty(
+    value: Omit<types.pallet_child_bounties.pallet.Call.awardChildBounty, "type">,
+  ): types.pallet_child_bounties.pallet.Call.awardChildBounty {
+    return { type: "awardChildBounty", ...value }
   }
   /**
    * Claim the payout from an awarded child-bounty after payout delay.
@@ -365,10 +365,10 @@ export namespace Call {
    * - `parent_bounty_id`: Index of parent bounty.
    * - `child_bounty_id`: Index of child bounty.
    */
-  export function claim_child_bounty(
-    value: Omit<types.pallet_child_bounties.pallet.Call.claim_child_bounty, "type">,
-  ): types.pallet_child_bounties.pallet.Call.claim_child_bounty {
-    return { type: "claim_child_bounty", ...value }
+  export function claimChildBounty(
+    value: Omit<types.pallet_child_bounties.pallet.Call.claimChildBounty, "type">,
+  ): types.pallet_child_bounties.pallet.Call.claimChildBounty {
+    return { type: "claimChildBounty", ...value }
   }
   /**
    * Cancel a proposed or active child-bounty. Child-bounty account funds
@@ -394,10 +394,10 @@ export namespace Call {
    * - `parent_bounty_id`: Index of parent bounty.
    * - `child_bounty_id`: Index of child bounty.
    */
-  export function close_child_bounty(
-    value: Omit<types.pallet_child_bounties.pallet.Call.close_child_bounty, "type">,
-  ): types.pallet_child_bounties.pallet.Call.close_child_bounty {
-    return { type: "close_child_bounty", ...value }
+  export function closeChildBounty(
+    value: Omit<types.pallet_child_bounties.pallet.Call.closeChildBounty, "type">,
+  ): types.pallet_child_bounties.pallet.Call.closeChildBounty {
+    return { type: "closeChildBounty", ...value }
   }
 }
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
@@ -415,20 +415,20 @@ export namespace Event {
   export interface Added {
     type: "Added"
     index: types.u32
-    child_index: types.u32
+    childIndex: types.u32
   }
   /** A child-bounty is awarded to a beneficiary. */
   export interface Awarded {
     type: "Awarded"
     index: types.u32
-    child_index: types.u32
+    childIndex: types.u32
     beneficiary: types.sp_core.crypto.AccountId32
   }
   /** A child-bounty is claimed by beneficiary. */
   export interface Claimed {
     type: "Claimed"
     index: types.u32
-    child_index: types.u32
+    childIndex: types.u32
     payout: types.u128
     beneficiary: types.sp_core.crypto.AccountId32
   }
@@ -436,7 +436,7 @@ export namespace Event {
   export interface Canceled {
     type: "Canceled"
     index: types.u32
-    child_index: types.u32
+    childIndex: types.u32
   }
   /** A child-bounty is added. */
   export function Added(

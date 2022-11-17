@@ -11,9 +11,9 @@ export type Call =
   | types.polkadot_runtime_common.crowdloan.pallet.Call.refund
   | types.polkadot_runtime_common.crowdloan.pallet.Call.dissolve
   | types.polkadot_runtime_common.crowdloan.pallet.Call.edit
-  | types.polkadot_runtime_common.crowdloan.pallet.Call.add_memo
+  | types.polkadot_runtime_common.crowdloan.pallet.Call.addMemo
   | types.polkadot_runtime_common.crowdloan.pallet.Call.poke
-  | types.polkadot_runtime_common.crowdloan.pallet.Call.contribute_all
+  | types.polkadot_runtime_common.crowdloan.pallet.Call.contributeAll
 export namespace Call {
   /**
    * Create a new crowdloaning campaign for a parachain slot with the given lease period range.
@@ -25,8 +25,8 @@ export namespace Call {
     type: "create"
     index: types.Compact<types.polkadot_parachain.primitives.Id>
     cap: types.Compact<types.u128>
-    first_period: types.Compact<types.u32>
-    last_period: types.Compact<types.u32>
+    firstPeriod: types.Compact<types.u32>
+    lastPeriod: types.Compact<types.u32>
     end: types.Compact<types.u32>
     verifier: types.sp_runtime.MultiSigner | undefined
   }
@@ -89,8 +89,8 @@ export namespace Call {
     type: "edit"
     index: types.Compact<types.polkadot_parachain.primitives.Id>
     cap: types.Compact<types.u128>
-    first_period: types.Compact<types.u32>
-    last_period: types.Compact<types.u32>
+    firstPeriod: types.Compact<types.u32>
+    lastPeriod: types.Compact<types.u32>
     end: types.Compact<types.u32>
     verifier: types.sp_runtime.MultiSigner | undefined
   }
@@ -99,8 +99,8 @@ export namespace Call {
    *
    * Origin must be Signed, and the user must have contributed to the crowdloan.
    */
-  export interface add_memo {
-    type: "add_memo"
+  export interface addMemo {
+    type: "addMemo"
     index: types.polkadot_parachain.primitives.Id
     memo: Uint8Array
   }
@@ -117,8 +117,8 @@ export namespace Call {
    * Contribute your entire balance to a crowd sale. This will transfer the entire balance of a user over to fund a parachain
    * slot. It will be withdrawable when the crowdloan has ended and the funds are unused.
    */
-  export interface contribute_all {
-    type: "contribute_all"
+  export interface contributeAll {
+    type: "contributeAll"
     index: types.Compact<types.polkadot_parachain.primitives.Id>
     signature: types.sp_runtime.MultiSignature | undefined
   }
@@ -199,10 +199,10 @@ export namespace Call {
    *
    * Origin must be Signed, and the user must have contributed to the crowdloan.
    */
-  export function add_memo(
-    value: Omit<types.polkadot_runtime_common.crowdloan.pallet.Call.add_memo, "type">,
-  ): types.polkadot_runtime_common.crowdloan.pallet.Call.add_memo {
-    return { type: "add_memo", ...value }
+  export function addMemo(
+    value: Omit<types.polkadot_runtime_common.crowdloan.pallet.Call.addMemo, "type">,
+  ): types.polkadot_runtime_common.crowdloan.pallet.Call.addMemo {
+    return { type: "addMemo", ...value }
   }
   /**
    * Poke the fund into `NewRaise`
@@ -218,10 +218,10 @@ export namespace Call {
    * Contribute your entire balance to a crowd sale. This will transfer the entire balance of a user over to fund a parachain
    * slot. It will be withdrawable when the crowdloan has ended and the funds are unused.
    */
-  export function contribute_all(
-    value: Omit<types.polkadot_runtime_common.crowdloan.pallet.Call.contribute_all, "type">,
-  ): types.polkadot_runtime_common.crowdloan.pallet.Call.contribute_all {
-    return { type: "contribute_all", ...value }
+  export function contributeAll(
+    value: Omit<types.polkadot_runtime_common.crowdloan.pallet.Call.contributeAll, "type">,
+  ): types.polkadot_runtime_common.crowdloan.pallet.Call.contributeAll {
+    return { type: "contributeAll", ...value }
   }
 }
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
@@ -267,20 +267,20 @@ export namespace Event {
   /** Create a new crowdloaning campaign. */
   export interface Created {
     type: "Created"
-    para_id: types.polkadot_parachain.primitives.Id
+    paraId: types.polkadot_parachain.primitives.Id
   }
   /** Contributed to a crowd sale. */
   export interface Contributed {
     type: "Contributed"
     who: types.sp_core.crypto.AccountId32
-    fund_index: types.polkadot_parachain.primitives.Id
+    fundIndex: types.polkadot_parachain.primitives.Id
     amount: types.u128
   }
   /** Withdrew full balance of a contributor. */
   export interface Withdrew {
     type: "Withdrew"
     who: types.sp_core.crypto.AccountId32
-    fund_index: types.polkadot_parachain.primitives.Id
+    fundIndex: types.polkadot_parachain.primitives.Id
     amount: types.u128
   }
   /**
@@ -289,40 +289,40 @@ export namespace Event {
    */
   export interface PartiallyRefunded {
     type: "PartiallyRefunded"
-    para_id: types.polkadot_parachain.primitives.Id
+    paraId: types.polkadot_parachain.primitives.Id
   }
   /** All loans in a fund have been refunded. */
   export interface AllRefunded {
     type: "AllRefunded"
-    para_id: types.polkadot_parachain.primitives.Id
+    paraId: types.polkadot_parachain.primitives.Id
   }
   /** Fund is dissolved. */
   export interface Dissolved {
     type: "Dissolved"
-    para_id: types.polkadot_parachain.primitives.Id
+    paraId: types.polkadot_parachain.primitives.Id
   }
   /** The result of trying to submit a new bid to the Slots pallet. */
   export interface HandleBidResult {
     type: "HandleBidResult"
-    para_id: types.polkadot_parachain.primitives.Id
+    paraId: types.polkadot_parachain.primitives.Id
     result: null | C.ChainError<types.sp_runtime.DispatchError>
   }
   /** The configuration to a crowdloan has been edited. */
   export interface Edited {
     type: "Edited"
-    para_id: types.polkadot_parachain.primitives.Id
+    paraId: types.polkadot_parachain.primitives.Id
   }
   /** A memo has been updated. */
   export interface MemoUpdated {
     type: "MemoUpdated"
     who: types.sp_core.crypto.AccountId32
-    para_id: types.polkadot_parachain.primitives.Id
+    paraId: types.polkadot_parachain.primitives.Id
     memo: Uint8Array
   }
   /** A parachain has been moved to `NewRaise` */
   export interface AddedToNewRaise {
     type: "AddedToNewRaise"
-    para_id: types.polkadot_parachain.primitives.Id
+    paraId: types.polkadot_parachain.primitives.Id
   }
   /** Create a new crowdloaning campaign. */
   export function Created(

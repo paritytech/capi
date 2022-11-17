@@ -7,16 +7,16 @@ import type * as types from "../mod.ts"
 export type Call =
   | types.pallet_scheduler.pallet.Call.schedule
   | types.pallet_scheduler.pallet.Call.cancel
-  | types.pallet_scheduler.pallet.Call.schedule_named
-  | types.pallet_scheduler.pallet.Call.cancel_named
-  | types.pallet_scheduler.pallet.Call.schedule_after
-  | types.pallet_scheduler.pallet.Call.schedule_named_after
+  | types.pallet_scheduler.pallet.Call.scheduleNamed
+  | types.pallet_scheduler.pallet.Call.cancelNamed
+  | types.pallet_scheduler.pallet.Call.scheduleAfter
+  | types.pallet_scheduler.pallet.Call.scheduleNamedAfter
 export namespace Call {
   /** Anonymously schedule a task. */
   export interface schedule {
     type: "schedule"
     when: types.u32
-    maybe_periodic: [types.u32, types.u32] | undefined
+    maybePeriodic: [types.u32, types.u32] | undefined
     priority: types.u8
     call: types.polkadot_runtime.RuntimeCall
   }
@@ -27,17 +27,17 @@ export namespace Call {
     index: types.u32
   }
   /** Schedule a named task. */
-  export interface schedule_named {
-    type: "schedule_named"
+  export interface scheduleNamed {
+    type: "scheduleNamed"
     id: Uint8Array
     when: types.u32
-    maybe_periodic: [types.u32, types.u32] | undefined
+    maybePeriodic: [types.u32, types.u32] | undefined
     priority: types.u8
     call: types.polkadot_runtime.RuntimeCall
   }
   /** Cancel a named scheduled task. */
-  export interface cancel_named {
-    type: "cancel_named"
+  export interface cancelNamed {
+    type: "cancelNamed"
     id: Uint8Array
   }
   /**
@@ -47,10 +47,10 @@ export namespace Call {
    * Same as [`schedule`].
    * # </weight>
    */
-  export interface schedule_after {
-    type: "schedule_after"
+  export interface scheduleAfter {
+    type: "scheduleAfter"
     after: types.u32
-    maybe_periodic: [types.u32, types.u32] | undefined
+    maybePeriodic: [types.u32, types.u32] | undefined
     priority: types.u8
     call: types.polkadot_runtime.RuntimeCall
   }
@@ -61,11 +61,11 @@ export namespace Call {
    * Same as [`schedule_named`](Self::schedule_named).
    * # </weight>
    */
-  export interface schedule_named_after {
-    type: "schedule_named_after"
+  export interface scheduleNamedAfter {
+    type: "scheduleNamedAfter"
     id: Uint8Array
     after: types.u32
-    maybe_periodic: [types.u32, types.u32] | undefined
+    maybePeriodic: [types.u32, types.u32] | undefined
     priority: types.u8
     call: types.polkadot_runtime.RuntimeCall
   }
@@ -82,16 +82,16 @@ export namespace Call {
     return { type: "cancel", ...value }
   }
   /** Schedule a named task. */
-  export function schedule_named(
-    value: Omit<types.pallet_scheduler.pallet.Call.schedule_named, "type">,
-  ): types.pallet_scheduler.pallet.Call.schedule_named {
-    return { type: "schedule_named", ...value }
+  export function scheduleNamed(
+    value: Omit<types.pallet_scheduler.pallet.Call.scheduleNamed, "type">,
+  ): types.pallet_scheduler.pallet.Call.scheduleNamed {
+    return { type: "scheduleNamed", ...value }
   }
   /** Cancel a named scheduled task. */
-  export function cancel_named(
-    value: Omit<types.pallet_scheduler.pallet.Call.cancel_named, "type">,
-  ): types.pallet_scheduler.pallet.Call.cancel_named {
-    return { type: "cancel_named", ...value }
+  export function cancelNamed(
+    value: Omit<types.pallet_scheduler.pallet.Call.cancelNamed, "type">,
+  ): types.pallet_scheduler.pallet.Call.cancelNamed {
+    return { type: "cancelNamed", ...value }
   }
   /**
    * Anonymously schedule a task after a delay.
@@ -100,10 +100,10 @@ export namespace Call {
    * Same as [`schedule`].
    * # </weight>
    */
-  export function schedule_after(
-    value: Omit<types.pallet_scheduler.pallet.Call.schedule_after, "type">,
-  ): types.pallet_scheduler.pallet.Call.schedule_after {
-    return { type: "schedule_after", ...value }
+  export function scheduleAfter(
+    value: Omit<types.pallet_scheduler.pallet.Call.scheduleAfter, "type">,
+  ): types.pallet_scheduler.pallet.Call.scheduleAfter {
+    return { type: "scheduleAfter", ...value }
   }
   /**
    * Schedule a named task after a delay.
@@ -112,10 +112,10 @@ export namespace Call {
    * Same as [`schedule_named`](Self::schedule_named).
    * # </weight>
    */
-  export function schedule_named_after(
-    value: Omit<types.pallet_scheduler.pallet.Call.schedule_named_after, "type">,
-  ): types.pallet_scheduler.pallet.Call.schedule_named_after {
-    return { type: "schedule_named_after", ...value }
+  export function scheduleNamedAfter(
+    value: Omit<types.pallet_scheduler.pallet.Call.scheduleNamedAfter, "type">,
+  ): types.pallet_scheduler.pallet.Call.scheduleNamedAfter {
+    return { type: "scheduleNamedAfter", ...value }
   }
 }
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */

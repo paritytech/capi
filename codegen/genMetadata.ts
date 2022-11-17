@@ -1,4 +1,5 @@
 import * as M from "../frame_metadata/mod.ts"
+import { normalizeCase } from "../util/case.ts"
 import { Files } from "./Files.ts"
 import { getRawCodecPath, makeDocComment, S } from "./utils.ts"
 
@@ -69,18 +70,19 @@ import { $, C, client } from "../capi.ts"
         const ty = pallet.calls as M.Ty & M.UnionTyDef
         const isStringUnion = ty.members.every((x) => !x.fields.length)
         for (const call of ty.members) {
-          const typeName = typeVisitor.visit(ty)! + "." + call.name
+          const type = normalizeCase(call.name)
+          const typeName = typeVisitor.visit(ty)! + "." + type
           const [params, data]: [string, string] = call.fields.length
             ? call.fields[0]!.name
-              ? [`value: Omit<${typeName}, "type">`, `{ ...value, type: ${S.string(call.name)} }`]
+              ? [`value: Omit<${typeName}, "type">`, `{ ...value, type: ${S.string(type)} }`]
               : [
                 `${call.fields.length > 1 ? "..." : ""}value: ${typeName}["value"]`,
-                `{ ...value, type: ${S.string(call.name)} }`,
+                `{ ...value, type: ${S.string(type)} }`,
               ]
-            : ["", isStringUnion ? S.string(call.name) : S.object(["type", S.string(call.name)])]
+            : ["", isStringUnion ? S.string(type) : S.object(["type", S.string(type)])]
           items.push(
             makeDocComment(call.docs)
-              + `export function ${call.name}(${params}): ${typeVisitor.visit(callTy!)}`
+              + `export function ${type}(${params}): ${typeVisitor.visit(callTy!)}`
               + `{ return { type: ${S.string(pallet.name)}, value: ${data} } }`,
           )
         }

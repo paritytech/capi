@@ -1,4 +1,5 @@
 import * as $ from "../deps/scale.ts"
+import { normalizeCase } from "../util/case.ts"
 import { $era } from "./Era.ts"
 import type * as M from "./mod.ts"
 import { TyVisitor } from "./TyVisitor.ts"
@@ -24,7 +25,9 @@ export function DeriveCodec(tys: M.Ty[]): DeriveCodec {
       return $.tuple(...members.map((x) => this.visit(x)))
     },
     objectStruct(ty) {
-      return $.object(...ty.fields.map((x): $.AnyField => [x.name!, this.visit(x.ty)]))
+      return $.object(
+        ...ty.fields.map((x): $.AnyField => [normalizeCase(x.name!), this.visit(x.ty)]),
+      )
     },
     option(_ty, some) {
       return $.option(this.visit(some))
@@ -38,14 +41,15 @@ export function DeriveCodec(tys: M.Ty[]): DeriveCodec {
     stringUnion(ty) {
       const members: Record<number, string> = {}
       for (const { index, name } of ty.members) {
-        members[index] = name
+        members[index] = normalizeCase(name)
       }
       return $.stringUnion(members)
     },
     taggedUnion(ty) {
       const members: Record<number, $.AnyTaggedUnionMember> = {}
-      for (const { fields, name: type, index } of ty.members) {
+      for (const { fields, name, index } of ty.members) {
         let member: $.AnyTaggedUnionMember
+        const type = normalizeCase(name)
         if (fields.length === 0) {
           member = [type]
         } else if (fields[0]!.name === undefined) {
@@ -56,9 +60,9 @@ export function DeriveCodec(tys: M.Ty[]): DeriveCodec {
           member = [type, ["value", $value]]
         } else {
           // Object variant
-          const memberFields = fields.map((field, i) => {
+          const memberFields = fields.map((field) => {
             return [
-              field.name || i,
+              normalizeCase(field.name!),
               this.visit(field.ty),
             ] as [string, $.Codec<unknown>]
           })

@@ -61,7 +61,7 @@ export namespace Xcm {
   }
   export interface QueryResponse {
     type: "QueryResponse"
-    query_id: types.Compact<types.u64>
+    queryId: types.Compact<types.u64>
     response: types.xcm.v1.Response
   }
   export interface TransferAsset {
@@ -77,15 +77,15 @@ export namespace Xcm {
   }
   export interface Transact {
     type: "Transact"
-    origin_type: types.xcm.v0.OriginKind
-    require_weight_at_most: types.u64
+    originType: types.xcm.v0.OriginKind
+    requireWeightAtMost: types.u64
     call: types.xcm.double_encoded.DoubleEncoded
   }
   export interface HrmpNewChannelOpenRequest {
     type: "HrmpNewChannelOpenRequest"
     sender: types.Compact<types.u32>
-    max_message_size: types.Compact<types.u32>
-    max_capacity: types.Compact<types.u32>
+    maxMessageSize: types.Compact<types.u32>
+    maxCapacity: types.Compact<types.u32>
   }
   export interface HrmpChannelAccepted {
     type: "HrmpChannelAccepted"
@@ -104,8 +104,8 @@ export namespace Xcm {
   }
   export interface SubscribeVersion {
     type: "SubscribeVersion"
-    query_id: types.Compact<types.u64>
-    max_response_weight: types.Compact<types.u64>
+    queryId: types.Compact<types.u64>
+    maxResponseWeight: types.Compact<types.u64>
   }
   export interface UnsubscribeVersion {
     type: "UnsubscribeVersion"

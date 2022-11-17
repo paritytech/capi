@@ -44,10 +44,10 @@ export function batch(
  *
  * The dispatch origin for this call must be _Signed_.
  */
-export function as_derivative(
-  value: Omit<types.pallet_utility.pallet.Call.as_derivative, "type">,
+export function asDerivative(
+  value: Omit<types.pallet_utility.pallet.Call.asDerivative, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Utility", value: { ...value, type: "as_derivative" } }
+  return { type: "Utility", value: { ...value, type: "asDerivative" } }
 }
 
 /**
@@ -66,10 +66,10 @@ export function as_derivative(
  * - Complexity: O(C) where C is the number of calls to be batched.
  * # </weight>
  */
-export function batch_all(
-  value: Omit<types.pallet_utility.pallet.Call.batch_all, "type">,
+export function batchAll(
+  value: Omit<types.pallet_utility.pallet.Call.batchAll, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Utility", value: { ...value, type: "batch_all" } }
+  return { type: "Utility", value: { ...value, type: "batchAll" } }
 }
 
 /**
@@ -84,10 +84,10 @@ export function batch_all(
  * - Weight of derivative `call` execution + T::WeightInfo::dispatch_as().
  * # </weight>
  */
-export function dispatch_as(
-  value: Omit<types.pallet_utility.pallet.Call.dispatch_as, "type">,
+export function dispatchAs(
+  value: Omit<types.pallet_utility.pallet.Call.dispatchAs, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Utility", value: { ...value, type: "dispatch_as" } }
+  return { type: "Utility", value: { ...value, type: "dispatchAs" } }
 }
 
 /**
@@ -106,8 +106,8 @@ export function dispatch_as(
  * - Complexity: O(C) where C is the number of calls to be batched.
  * # </weight>
  */
-export function force_batch(
-  value: Omit<types.pallet_utility.pallet.Call.force_batch, "type">,
+export function forceBatch(
+  value: Omit<types.pallet_utility.pallet.Call.forceBatch, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Utility", value: { ...value, type: "force_batch" } }
+  return { type: "Utility", value: { ...value, type: "forceBatch" } }
 }

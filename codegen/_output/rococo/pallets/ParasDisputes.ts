@@ -74,6 +74,6 @@ export const Frozen = new C.fluent.Storage(
   codecs.$236,
 )
 
-export function force_unfreeze(): types.polkadot_runtime.RuntimeCall {
-  return { type: "ParasDisputes", value: "force_unfreeze" }
+export function forceUnfreeze(): types.polkadot_runtime.RuntimeCall {
+  return { type: "ParasDisputes", value: "forceUnfreeze" }
 }

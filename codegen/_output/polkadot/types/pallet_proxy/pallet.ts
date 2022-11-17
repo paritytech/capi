@@ -6,15 +6,15 @@ import type * as types from "../mod.ts"
 
 export type Call =
   | types.pallet_proxy.pallet.Call.proxy
-  | types.pallet_proxy.pallet.Call.add_proxy
-  | types.pallet_proxy.pallet.Call.remove_proxy
-  | types.pallet_proxy.pallet.Call.remove_proxies
-  | types.pallet_proxy.pallet.Call.create_pure
-  | types.pallet_proxy.pallet.Call.kill_pure
+  | types.pallet_proxy.pallet.Call.addProxy
+  | types.pallet_proxy.pallet.Call.removeProxy
+  | types.pallet_proxy.pallet.Call.removeProxies
+  | types.pallet_proxy.pallet.Call.createPure
+  | types.pallet_proxy.pallet.Call.killPure
   | types.pallet_proxy.pallet.Call.announce
-  | types.pallet_proxy.pallet.Call.remove_announcement
-  | types.pallet_proxy.pallet.Call.reject_announcement
-  | types.pallet_proxy.pallet.Call.proxy_announced
+  | types.pallet_proxy.pallet.Call.removeAnnouncement
+  | types.pallet_proxy.pallet.Call.rejectAnnouncement
+  | types.pallet_proxy.pallet.Call.proxyAnnounced
 export namespace Call {
   /**
    * Dispatch the given `call` from an account that the sender is authorised for through
@@ -32,7 +32,7 @@ export namespace Call {
   export interface proxy {
     type: "proxy"
     real: types.sp_runtime.multiaddress.MultiAddress
-    force_proxy_type: types.polkadot_runtime.ProxyType | undefined
+    forceProxyType: types.polkadot_runtime.ProxyType | undefined
     call: types.polkadot_runtime.RuntimeCall
   }
   /**
@@ -46,10 +46,10 @@ export namespace Call {
    * - `delay`: The announcement period required of the initial proxy. Will generally be
    * zero.
    */
-  export interface add_proxy {
-    type: "add_proxy"
+  export interface addProxy {
+    type: "addProxy"
     delegate: types.sp_runtime.multiaddress.MultiAddress
-    proxy_type: types.polkadot_runtime.ProxyType
+    proxyType: types.polkadot_runtime.ProxyType
     delay: types.u32
   }
   /**
@@ -61,10 +61,10 @@ export namespace Call {
    * - `proxy`: The account that the `caller` would like to remove as a proxy.
    * - `proxy_type`: The permissions currently enabled for the removed proxy account.
    */
-  export interface remove_proxy {
-    type: "remove_proxy"
+  export interface removeProxy {
+    type: "removeProxy"
     delegate: types.sp_runtime.multiaddress.MultiAddress
-    proxy_type: types.polkadot_runtime.ProxyType
+    proxyType: types.polkadot_runtime.ProxyType
     delay: types.u32
   }
   /**
@@ -75,8 +75,8 @@ export namespace Call {
    * WARNING: This may be called on accounts created by `pure`, however if done, then
    * the unreserved fees will be inaccessible. **All access to this account will be lost.**
    */
-  export interface remove_proxies {
-    type: "remove_proxies"
+  export interface removeProxies {
+    type: "removeProxies"
   }
   /**
    * Spawn a fresh new account that is guaranteed to be otherwise inaccessible, and
@@ -98,9 +98,9 @@ export namespace Call {
    *
    * Fails if there are insufficient funds to pay for deposit.
    */
-  export interface create_pure {
-    type: "create_pure"
-    proxy_type: types.polkadot_runtime.ProxyType
+  export interface createPure {
+    type: "createPure"
+    proxyType: types.polkadot_runtime.ProxyType
     delay: types.u32
     index: types.u16
   }
@@ -122,13 +122,13 @@ export namespace Call {
    * Fails with `NoPermission` in case the caller is not a previously created pure
    * account whose `pure` call has corresponding parameters.
    */
-  export interface kill_pure {
-    type: "kill_pure"
+  export interface killPure {
+    type: "killPure"
     spawner: types.sp_runtime.multiaddress.MultiAddress
-    proxy_type: types.polkadot_runtime.ProxyType
+    proxyType: types.polkadot_runtime.ProxyType
     index: types.u16
     height: types.Compact<types.u32>
-    ext_index: types.Compact<types.u32>
+    extIndex: types.Compact<types.u32>
   }
   /**
    * Publish the hash of a proxy-call that will be made in the future.
@@ -150,7 +150,7 @@ export namespace Call {
   export interface announce {
     type: "announce"
     real: types.sp_runtime.multiaddress.MultiAddress
-    call_hash: types.primitive_types.H256
+    callHash: types.primitive_types.H256
   }
   /**
    * Remove a given announcement.
@@ -164,10 +164,10 @@ export namespace Call {
    * - `real`: The account that the proxy will make a call on behalf of.
    * - `call_hash`: The hash of the call to be made by the `real` account.
    */
-  export interface remove_announcement {
-    type: "remove_announcement"
+  export interface removeAnnouncement {
+    type: "removeAnnouncement"
     real: types.sp_runtime.multiaddress.MultiAddress
-    call_hash: types.primitive_types.H256
+    callHash: types.primitive_types.H256
   }
   /**
    * Remove the given announcement of a delegate.
@@ -181,10 +181,10 @@ export namespace Call {
    * - `delegate`: The account that previously announced the call.
    * - `call_hash`: The hash of the call to be made.
    */
-  export interface reject_announcement {
-    type: "reject_announcement"
+  export interface rejectAnnouncement {
+    type: "rejectAnnouncement"
     delegate: types.sp_runtime.multiaddress.MultiAddress
-    call_hash: types.primitive_types.H256
+    callHash: types.primitive_types.H256
   }
   /**
    * Dispatch the given `call` from an account that the sender is authorized for through
@@ -199,11 +199,11 @@ export namespace Call {
    * - `force_proxy_type`: Specify the exact proxy type to be used and checked for this call.
    * - `call`: The call to be made by the `real` account.
    */
-  export interface proxy_announced {
-    type: "proxy_announced"
+  export interface proxyAnnounced {
+    type: "proxyAnnounced"
     delegate: types.sp_runtime.multiaddress.MultiAddress
     real: types.sp_runtime.multiaddress.MultiAddress
-    force_proxy_type: types.polkadot_runtime.ProxyType | undefined
+    forceProxyType: types.polkadot_runtime.ProxyType | undefined
     call: types.polkadot_runtime.RuntimeCall
   }
   /**
@@ -235,10 +235,10 @@ export namespace Call {
    * - `delay`: The announcement period required of the initial proxy. Will generally be
    * zero.
    */
-  export function add_proxy(
-    value: Omit<types.pallet_proxy.pallet.Call.add_proxy, "type">,
-  ): types.pallet_proxy.pallet.Call.add_proxy {
-    return { type: "add_proxy", ...value }
+  export function addProxy(
+    value: Omit<types.pallet_proxy.pallet.Call.addProxy, "type">,
+  ): types.pallet_proxy.pallet.Call.addProxy {
+    return { type: "addProxy", ...value }
   }
   /**
    * Unregister a proxy account for the sender.
@@ -249,10 +249,10 @@ export namespace Call {
    * - `proxy`: The account that the `caller` would like to remove as a proxy.
    * - `proxy_type`: The permissions currently enabled for the removed proxy account.
    */
-  export function remove_proxy(
-    value: Omit<types.pallet_proxy.pallet.Call.remove_proxy, "type">,
-  ): types.pallet_proxy.pallet.Call.remove_proxy {
-    return { type: "remove_proxy", ...value }
+  export function removeProxy(
+    value: Omit<types.pallet_proxy.pallet.Call.removeProxy, "type">,
+  ): types.pallet_proxy.pallet.Call.removeProxy {
+    return { type: "removeProxy", ...value }
   }
   /**
    * Unregister all proxy accounts for the sender.
@@ -262,8 +262,8 @@ export namespace Call {
    * WARNING: This may be called on accounts created by `pure`, however if done, then
    * the unreserved fees will be inaccessible. **All access to this account will be lost.**
    */
-  export function remove_proxies(): types.pallet_proxy.pallet.Call.remove_proxies {
-    return { type: "remove_proxies" }
+  export function removeProxies(): types.pallet_proxy.pallet.Call.removeProxies {
+    return { type: "removeProxies" }
   }
   /**
    * Spawn a fresh new account that is guaranteed to be otherwise inaccessible, and
@@ -285,10 +285,10 @@ export namespace Call {
    *
    * Fails if there are insufficient funds to pay for deposit.
    */
-  export function create_pure(
-    value: Omit<types.pallet_proxy.pallet.Call.create_pure, "type">,
-  ): types.pallet_proxy.pallet.Call.create_pure {
-    return { type: "create_pure", ...value }
+  export function createPure(
+    value: Omit<types.pallet_proxy.pallet.Call.createPure, "type">,
+  ): types.pallet_proxy.pallet.Call.createPure {
+    return { type: "createPure", ...value }
   }
   /**
    * Removes a previously spawned pure proxy.
@@ -308,10 +308,10 @@ export namespace Call {
    * Fails with `NoPermission` in case the caller is not a previously created pure
    * account whose `pure` call has corresponding parameters.
    */
-  export function kill_pure(
-    value: Omit<types.pallet_proxy.pallet.Call.kill_pure, "type">,
-  ): types.pallet_proxy.pallet.Call.kill_pure {
-    return { type: "kill_pure", ...value }
+  export function killPure(
+    value: Omit<types.pallet_proxy.pallet.Call.killPure, "type">,
+  ): types.pallet_proxy.pallet.Call.killPure {
+    return { type: "killPure", ...value }
   }
   /**
    * Publish the hash of a proxy-call that will be made in the future.
@@ -347,10 +347,10 @@ export namespace Call {
    * - `real`: The account that the proxy will make a call on behalf of.
    * - `call_hash`: The hash of the call to be made by the `real` account.
    */
-  export function remove_announcement(
-    value: Omit<types.pallet_proxy.pallet.Call.remove_announcement, "type">,
-  ): types.pallet_proxy.pallet.Call.remove_announcement {
-    return { type: "remove_announcement", ...value }
+  export function removeAnnouncement(
+    value: Omit<types.pallet_proxy.pallet.Call.removeAnnouncement, "type">,
+  ): types.pallet_proxy.pallet.Call.removeAnnouncement {
+    return { type: "removeAnnouncement", ...value }
   }
   /**
    * Remove the given announcement of a delegate.
@@ -364,10 +364,10 @@ export namespace Call {
    * - `delegate`: The account that previously announced the call.
    * - `call_hash`: The hash of the call to be made.
    */
-  export function reject_announcement(
-    value: Omit<types.pallet_proxy.pallet.Call.reject_announcement, "type">,
-  ): types.pallet_proxy.pallet.Call.reject_announcement {
-    return { type: "reject_announcement", ...value }
+  export function rejectAnnouncement(
+    value: Omit<types.pallet_proxy.pallet.Call.rejectAnnouncement, "type">,
+  ): types.pallet_proxy.pallet.Call.rejectAnnouncement {
+    return { type: "rejectAnnouncement", ...value }
   }
   /**
    * Dispatch the given `call` from an account that the sender is authorized for through
@@ -382,10 +382,10 @@ export namespace Call {
    * - `force_proxy_type`: Specify the exact proxy type to be used and checked for this call.
    * - `call`: The call to be made by the `real` account.
    */
-  export function proxy_announced(
-    value: Omit<types.pallet_proxy.pallet.Call.proxy_announced, "type">,
-  ): types.pallet_proxy.pallet.Call.proxy_announced {
-    return { type: "proxy_announced", ...value }
+  export function proxyAnnounced(
+    value: Omit<types.pallet_proxy.pallet.Call.proxyAnnounced, "type">,
+  ): types.pallet_proxy.pallet.Call.proxyAnnounced {
+    return { type: "proxyAnnounced", ...value }
   }
 }
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
@@ -421,22 +421,22 @@ export namespace Event {
     type: "PureCreated"
     pure: types.sp_core.crypto.AccountId32
     who: types.sp_core.crypto.AccountId32
-    proxy_type: types.polkadot_runtime.ProxyType
-    disambiguation_index: types.u16
+    proxyType: types.polkadot_runtime.ProxyType
+    disambiguationIndex: types.u16
   }
   /** An announcement was placed to make a call in the future. */
   export interface Announced {
     type: "Announced"
     real: types.sp_core.crypto.AccountId32
     proxy: types.sp_core.crypto.AccountId32
-    call_hash: types.primitive_types.H256
+    callHash: types.primitive_types.H256
   }
   /** A proxy was added. */
   export interface ProxyAdded {
     type: "ProxyAdded"
     delegator: types.sp_core.crypto.AccountId32
     delegatee: types.sp_core.crypto.AccountId32
-    proxy_type: types.polkadot_runtime.ProxyType
+    proxyType: types.polkadot_runtime.ProxyType
     delay: types.u32
   }
   /** A proxy was removed. */
@@ -444,7 +444,7 @@ export namespace Event {
     type: "ProxyRemoved"
     delegator: types.sp_core.crypto.AccountId32
     delegatee: types.sp_core.crypto.AccountId32
-    proxy_type: types.polkadot_runtime.ProxyType
+    proxyType: types.polkadot_runtime.ProxyType
     delay: types.u32
   }
   /** A proxy was executed correctly, with the given. */

@@ -12,7 +12,7 @@ export type AllowedSlots =
 
 export interface BabeEpochConfiguration {
   c: [types.u64, types.u64]
-  allowed_slots: types.sp_consensus_babe.AllowedSlots
+  allowedSlots: types.sp_consensus_babe.AllowedSlots
 }
 
 export function BabeEpochConfiguration(value: types.sp_consensus_babe.BabeEpochConfiguration) {

@@ -29,8 +29,8 @@ export function EventRecord(value: types.frame_system.EventRecord) {
 }
 
 export interface LastRuntimeUpgradeInfo {
-  spec_version: types.Compact<types.u32>
-  spec_name: string
+  specVersion: types.Compact<types.u32>
+  specName: string
 }
 
 export function LastRuntimeUpgradeInfo(value: types.frame_system.LastRuntimeUpgradeInfo) {

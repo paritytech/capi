@@ -45,7 +45,7 @@ export namespace Order {
   }
   export interface QueryHolding {
     type: "QueryHolding"
-    query_id: types.Compact<types.u64>
+    queryId: types.Compact<types.u64>
     dest: types.xcm.v0.multi_location.MultiLocation
     assets: Array<types.xcm.v0.multi_asset.MultiAsset>
   }
@@ -54,7 +54,7 @@ export namespace Order {
     fees: types.xcm.v0.multi_asset.MultiAsset
     weight: types.u64
     debt: types.u64
-    halt_on_error: boolean
+    haltOnError: boolean
     xcm: Array<types.xcm.v0.Xcm>
   }
   export function Null(): types.xcm.v0.order.Order.Null {

@@ -9,7 +9,7 @@ export type DispatchClass = "Normal" | "Operational" | "Mandatory"
 export interface DispatchInfo {
   weight: types.sp_weights.weight_v2.Weight
   class: types.frame_support.dispatch.DispatchClass
-  pays_fee: types.frame_support.dispatch.Pays
+  paysFee: types.frame_support.dispatch.Pays
 }
 
 export function DispatchInfo(value: types.frame_support.dispatch.DispatchInfo) {

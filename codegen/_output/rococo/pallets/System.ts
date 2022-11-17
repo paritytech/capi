@@ -201,10 +201,10 @@ export const ExecutionPhase = new C.fluent.Storage(
 )
 
 /** A dispatch that will fill the block weight up to the given ratio. */
-export function fill_block(
-  value: Omit<types.frame_system.pallet.Call.fill_block, "type">,
+export function fillBlock(
+  value: Omit<types.frame_system.pallet.Call.fillBlock, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "System", value: { ...value, type: "fill_block" } }
+  return { type: "System", value: { ...value, type: "fillBlock" } }
 }
 
 /**
@@ -221,10 +221,10 @@ export function remark(
 }
 
 /** Set the number of pages in the WebAssembly environment's heap. */
-export function set_heap_pages(
-  value: Omit<types.frame_system.pallet.Call.set_heap_pages, "type">,
+export function setHeapPages(
+  value: Omit<types.frame_system.pallet.Call.setHeapPages, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "System", value: { ...value, type: "set_heap_pages" } }
+  return { type: "System", value: { ...value, type: "setHeapPages" } }
 }
 
 /**
@@ -241,10 +241,10 @@ export function set_heap_pages(
  * expensive. We will treat this as a full block.
  * # </weight>
  */
-export function set_code(
-  value: Omit<types.frame_system.pallet.Call.set_code, "type">,
+export function setCode(
+  value: Omit<types.frame_system.pallet.Call.setCode, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "System", value: { ...value, type: "set_code" } }
+  return { type: "System", value: { ...value, type: "setCode" } }
 }
 
 /**
@@ -258,24 +258,24 @@ export function set_code(
  * The weight of this function is dependent on the runtime. We will treat this as a full
  * block. # </weight>
  */
-export function set_code_without_checks(
-  value: Omit<types.frame_system.pallet.Call.set_code_without_checks, "type">,
+export function setCodeWithoutChecks(
+  value: Omit<types.frame_system.pallet.Call.setCodeWithoutChecks, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "System", value: { ...value, type: "set_code_without_checks" } }
+  return { type: "System", value: { ...value, type: "setCodeWithoutChecks" } }
 }
 
 /** Set some items of storage. */
-export function set_storage(
-  value: Omit<types.frame_system.pallet.Call.set_storage, "type">,
+export function setStorage(
+  value: Omit<types.frame_system.pallet.Call.setStorage, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "System", value: { ...value, type: "set_storage" } }
+  return { type: "System", value: { ...value, type: "setStorage" } }
 }
 
 /** Kill some items from storage. */
-export function kill_storage(
-  value: Omit<types.frame_system.pallet.Call.kill_storage, "type">,
+export function killStorage(
+  value: Omit<types.frame_system.pallet.Call.killStorage, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "System", value: { ...value, type: "kill_storage" } }
+  return { type: "System", value: { ...value, type: "killStorage" } }
 }
 
 /**
@@ -284,15 +284,15 @@ export function kill_storage(
  * **NOTE:** We rely on the Root origin to provide us the number of subkeys under
  * the prefix we are removing to accurately calculate the weight of this function.
  */
-export function kill_prefix(
-  value: Omit<types.frame_system.pallet.Call.kill_prefix, "type">,
+export function killPrefix(
+  value: Omit<types.frame_system.pallet.Call.killPrefix, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "System", value: { ...value, type: "kill_prefix" } }
+  return { type: "System", value: { ...value, type: "killPrefix" } }
 }
 
 /** Make some on-chain remark and emit event. */
-export function remark_with_event(
-  value: Omit<types.frame_system.pallet.Call.remark_with_event, "type">,
+export function remarkWithEvent(
+  value: Omit<types.frame_system.pallet.Call.remarkWithEvent, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "System", value: { ...value, type: "remark_with_event" } }
+  return { type: "System", value: { ...value, type: "remarkWithEvent" } }
 }

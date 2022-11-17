@@ -5,15 +5,15 @@ import type * as types from "../mod.ts"
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 
 export type Call =
-  | types.pallet_bounties.pallet.Call.propose_bounty
-  | types.pallet_bounties.pallet.Call.approve_bounty
-  | types.pallet_bounties.pallet.Call.propose_curator
-  | types.pallet_bounties.pallet.Call.unassign_curator
-  | types.pallet_bounties.pallet.Call.accept_curator
-  | types.pallet_bounties.pallet.Call.award_bounty
-  | types.pallet_bounties.pallet.Call.claim_bounty
-  | types.pallet_bounties.pallet.Call.close_bounty
-  | types.pallet_bounties.pallet.Call.extend_bounty_expiry
+  | types.pallet_bounties.pallet.Call.proposeBounty
+  | types.pallet_bounties.pallet.Call.approveBounty
+  | types.pallet_bounties.pallet.Call.proposeCurator
+  | types.pallet_bounties.pallet.Call.unassignCurator
+  | types.pallet_bounties.pallet.Call.acceptCurator
+  | types.pallet_bounties.pallet.Call.awardBounty
+  | types.pallet_bounties.pallet.Call.claimBounty
+  | types.pallet_bounties.pallet.Call.closeBounty
+  | types.pallet_bounties.pallet.Call.extendBountyExpiry
 export namespace Call {
   /**
    * Propose a new bounty.
@@ -29,8 +29,8 @@ export namespace Call {
    * - `value`: The total payment amount of this bounty, curator fee included.
    * - `description`: The description of this bounty.
    */
-  export interface propose_bounty {
-    type: "propose_bounty"
+  export interface proposeBounty {
+    type: "proposeBounty"
     value: types.Compact<types.u128>
     description: Uint8Array
   }
@@ -44,9 +44,9 @@ export namespace Call {
    * - O(1).
    * # </weight>
    */
-  export interface approve_bounty {
-    type: "approve_bounty"
-    bounty_id: types.Compact<types.u32>
+  export interface approveBounty {
+    type: "approveBounty"
+    bountyId: types.Compact<types.u32>
   }
   /**
    * Assign a curator to a funded bounty.
@@ -57,9 +57,9 @@ export namespace Call {
    * - O(1).
    * # </weight>
    */
-  export interface propose_curator {
-    type: "propose_curator"
-    bounty_id: types.Compact<types.u32>
+  export interface proposeCurator {
+    type: "proposeCurator"
+    bountyId: types.Compact<types.u32>
     curator: types.sp_runtime.multiaddress.MultiAddress
     fee: types.Compact<types.u128>
   }
@@ -83,9 +83,9 @@ export namespace Call {
    * - O(1).
    * # </weight>
    */
-  export interface unassign_curator {
-    type: "unassign_curator"
-    bounty_id: types.Compact<types.u32>
+  export interface unassignCurator {
+    type: "unassignCurator"
+    bountyId: types.Compact<types.u32>
   }
   /**
    * Accept the curator role for a bounty.
@@ -97,9 +97,9 @@ export namespace Call {
    * - O(1).
    * # </weight>
    */
-  export interface accept_curator {
-    type: "accept_curator"
-    bounty_id: types.Compact<types.u32>
+  export interface acceptCurator {
+    type: "acceptCurator"
+    bountyId: types.Compact<types.u32>
   }
   /**
    * Award bounty to a beneficiary account. The beneficiary will be able to claim the funds
@@ -114,9 +114,9 @@ export namespace Call {
    * - O(1).
    * # </weight>
    */
-  export interface award_bounty {
-    type: "award_bounty"
-    bounty_id: types.Compact<types.u32>
+  export interface awardBounty {
+    type: "awardBounty"
+    bountyId: types.Compact<types.u32>
     beneficiary: types.sp_runtime.multiaddress.MultiAddress
   }
   /**
@@ -130,9 +130,9 @@ export namespace Call {
    * - O(1).
    * # </weight>
    */
-  export interface claim_bounty {
-    type: "claim_bounty"
-    bounty_id: types.Compact<types.u32>
+  export interface claimBounty {
+    type: "claimBounty"
+    bountyId: types.Compact<types.u32>
   }
   /**
    * Cancel a proposed or active bounty. All the funds will be sent to treasury and
@@ -146,9 +146,9 @@ export namespace Call {
    * - O(1).
    * # </weight>
    */
-  export interface close_bounty {
-    type: "close_bounty"
-    bounty_id: types.Compact<types.u32>
+  export interface closeBounty {
+    type: "closeBounty"
+    bountyId: types.Compact<types.u32>
   }
   /**
    * Extend the expiry time of an active bounty.
@@ -162,9 +162,9 @@ export namespace Call {
    * - O(1).
    * # </weight>
    */
-  export interface extend_bounty_expiry {
-    type: "extend_bounty_expiry"
-    bounty_id: types.Compact<types.u32>
+  export interface extendBountyExpiry {
+    type: "extendBountyExpiry"
+    bountyId: types.Compact<types.u32>
     remark: Uint8Array
   }
   /**
@@ -181,10 +181,10 @@ export namespace Call {
    * - `value`: The total payment amount of this bounty, curator fee included.
    * - `description`: The description of this bounty.
    */
-  export function propose_bounty(
-    value: Omit<types.pallet_bounties.pallet.Call.propose_bounty, "type">,
-  ): types.pallet_bounties.pallet.Call.propose_bounty {
-    return { type: "propose_bounty", ...value }
+  export function proposeBounty(
+    value: Omit<types.pallet_bounties.pallet.Call.proposeBounty, "type">,
+  ): types.pallet_bounties.pallet.Call.proposeBounty {
+    return { type: "proposeBounty", ...value }
   }
   /**
    * Approve a bounty proposal. At a later time, the bounty will be funded and become active
@@ -196,10 +196,10 @@ export namespace Call {
    * - O(1).
    * # </weight>
    */
-  export function approve_bounty(
-    value: Omit<types.pallet_bounties.pallet.Call.approve_bounty, "type">,
-  ): types.pallet_bounties.pallet.Call.approve_bounty {
-    return { type: "approve_bounty", ...value }
+  export function approveBounty(
+    value: Omit<types.pallet_bounties.pallet.Call.approveBounty, "type">,
+  ): types.pallet_bounties.pallet.Call.approveBounty {
+    return { type: "approveBounty", ...value }
   }
   /**
    * Assign a curator to a funded bounty.
@@ -210,10 +210,10 @@ export namespace Call {
    * - O(1).
    * # </weight>
    */
-  export function propose_curator(
-    value: Omit<types.pallet_bounties.pallet.Call.propose_curator, "type">,
-  ): types.pallet_bounties.pallet.Call.propose_curator {
-    return { type: "propose_curator", ...value }
+  export function proposeCurator(
+    value: Omit<types.pallet_bounties.pallet.Call.proposeCurator, "type">,
+  ): types.pallet_bounties.pallet.Call.proposeCurator {
+    return { type: "proposeCurator", ...value }
   }
   /**
    * Unassign curator from a bounty.
@@ -235,10 +235,10 @@ export namespace Call {
    * - O(1).
    * # </weight>
    */
-  export function unassign_curator(
-    value: Omit<types.pallet_bounties.pallet.Call.unassign_curator, "type">,
-  ): types.pallet_bounties.pallet.Call.unassign_curator {
-    return { type: "unassign_curator", ...value }
+  export function unassignCurator(
+    value: Omit<types.pallet_bounties.pallet.Call.unassignCurator, "type">,
+  ): types.pallet_bounties.pallet.Call.unassignCurator {
+    return { type: "unassignCurator", ...value }
   }
   /**
    * Accept the curator role for a bounty.
@@ -250,10 +250,10 @@ export namespace Call {
    * - O(1).
    * # </weight>
    */
-  export function accept_curator(
-    value: Omit<types.pallet_bounties.pallet.Call.accept_curator, "type">,
-  ): types.pallet_bounties.pallet.Call.accept_curator {
-    return { type: "accept_curator", ...value }
+  export function acceptCurator(
+    value: Omit<types.pallet_bounties.pallet.Call.acceptCurator, "type">,
+  ): types.pallet_bounties.pallet.Call.acceptCurator {
+    return { type: "acceptCurator", ...value }
   }
   /**
    * Award bounty to a beneficiary account. The beneficiary will be able to claim the funds
@@ -268,10 +268,10 @@ export namespace Call {
    * - O(1).
    * # </weight>
    */
-  export function award_bounty(
-    value: Omit<types.pallet_bounties.pallet.Call.award_bounty, "type">,
-  ): types.pallet_bounties.pallet.Call.award_bounty {
-    return { type: "award_bounty", ...value }
+  export function awardBounty(
+    value: Omit<types.pallet_bounties.pallet.Call.awardBounty, "type">,
+  ): types.pallet_bounties.pallet.Call.awardBounty {
+    return { type: "awardBounty", ...value }
   }
   /**
    * Claim the payout from an awarded bounty after payout delay.
@@ -284,10 +284,10 @@ export namespace Call {
    * - O(1).
    * # </weight>
    */
-  export function claim_bounty(
-    value: Omit<types.pallet_bounties.pallet.Call.claim_bounty, "type">,
-  ): types.pallet_bounties.pallet.Call.claim_bounty {
-    return { type: "claim_bounty", ...value }
+  export function claimBounty(
+    value: Omit<types.pallet_bounties.pallet.Call.claimBounty, "type">,
+  ): types.pallet_bounties.pallet.Call.claimBounty {
+    return { type: "claimBounty", ...value }
   }
   /**
    * Cancel a proposed or active bounty. All the funds will be sent to treasury and
@@ -301,10 +301,10 @@ export namespace Call {
    * - O(1).
    * # </weight>
    */
-  export function close_bounty(
-    value: Omit<types.pallet_bounties.pallet.Call.close_bounty, "type">,
-  ): types.pallet_bounties.pallet.Call.close_bounty {
-    return { type: "close_bounty", ...value }
+  export function closeBounty(
+    value: Omit<types.pallet_bounties.pallet.Call.closeBounty, "type">,
+  ): types.pallet_bounties.pallet.Call.closeBounty {
+    return { type: "closeBounty", ...value }
   }
   /**
    * Extend the expiry time of an active bounty.
@@ -318,10 +318,10 @@ export namespace Call {
    * - O(1).
    * # </weight>
    */
-  export function extend_bounty_expiry(
-    value: Omit<types.pallet_bounties.pallet.Call.extend_bounty_expiry, "type">,
-  ): types.pallet_bounties.pallet.Call.extend_bounty_expiry {
-    return { type: "extend_bounty_expiry", ...value }
+  export function extendBountyExpiry(
+    value: Omit<types.pallet_bounties.pallet.Call.extendBountyExpiry, "type">,
+  ): types.pallet_bounties.pallet.Call.extendBountyExpiry {
+    return { type: "extendBountyExpiry", ...value }
   }
 }
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */

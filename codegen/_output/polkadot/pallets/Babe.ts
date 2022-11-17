@@ -234,10 +234,10 @@ export const NextEpochConfig = new C.fluent.Storage(
  * against the extracted offender. If both are valid, the offence will
  * be reported.
  */
-export function report_equivocation(
-  value: Omit<types.pallet_babe.pallet.Call.report_equivocation, "type">,
+export function reportEquivocation(
+  value: Omit<types.pallet_babe.pallet.Call.reportEquivocation, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Babe", value: { ...value, type: "report_equivocation" } }
+  return { type: "Babe", value: { ...value, type: "reportEquivocation" } }
 }
 
 /**
@@ -250,10 +250,10 @@ export function report_equivocation(
  * if the block author is defined it will be defined as the equivocation
  * reporter.
  */
-export function report_equivocation_unsigned(
-  value: Omit<types.pallet_babe.pallet.Call.report_equivocation_unsigned, "type">,
+export function reportEquivocationUnsigned(
+  value: Omit<types.pallet_babe.pallet.Call.reportEquivocationUnsigned, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Babe", value: { ...value, type: "report_equivocation_unsigned" } }
+  return { type: "Babe", value: { ...value, type: "reportEquivocationUnsigned" } }
 }
 
 /**
@@ -262,8 +262,8 @@ export function report_equivocation_unsigned(
  * Multiple calls to this method will replace any existing planned config change that had
  * not been enacted yet.
  */
-export function plan_config_change(
-  value: Omit<types.pallet_babe.pallet.Call.plan_config_change, "type">,
+export function planConfigChange(
+  value: Omit<types.pallet_babe.pallet.Call.planConfigChange, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Babe", value: { ...value, type: "plan_config_change" } }
+  return { type: "Babe", value: { ...value, type: "planConfigChange" } }
 }

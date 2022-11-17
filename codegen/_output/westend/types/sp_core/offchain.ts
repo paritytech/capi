@@ -9,8 +9,8 @@ export function OpaqueMultiaddr(value: types.sp_core.offchain.OpaqueMultiaddr) {
 }
 
 export interface OpaqueNetworkState {
-  peer_id: types.sp_core.OpaquePeerId
-  external_addresses: Array<types.sp_core.offchain.OpaqueMultiaddr>
+  peerId: types.sp_core.OpaquePeerId
+  externalAddresses: Array<types.sp_core.offchain.OpaqueMultiaddr>
 }
 
 export function OpaqueNetworkState(value: types.sp_core.offchain.OpaqueNetworkState) {

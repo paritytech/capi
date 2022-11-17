@@ -54,17 +54,17 @@ export function cancel(
 }
 
 /** Schedule a named task. */
-export function schedule_named(
-  value: Omit<types.pallet_scheduler.pallet.Call.schedule_named, "type">,
+export function scheduleNamed(
+  value: Omit<types.pallet_scheduler.pallet.Call.scheduleNamed, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Scheduler", value: { ...value, type: "schedule_named" } }
+  return { type: "Scheduler", value: { ...value, type: "scheduleNamed" } }
 }
 
 /** Cancel a named scheduled task. */
-export function cancel_named(
-  value: Omit<types.pallet_scheduler.pallet.Call.cancel_named, "type">,
+export function cancelNamed(
+  value: Omit<types.pallet_scheduler.pallet.Call.cancelNamed, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Scheduler", value: { ...value, type: "cancel_named" } }
+  return { type: "Scheduler", value: { ...value, type: "cancelNamed" } }
 }
 
 /**
@@ -74,10 +74,10 @@ export function cancel_named(
  * Same as [`schedule`].
  * # </weight>
  */
-export function schedule_after(
-  value: Omit<types.pallet_scheduler.pallet.Call.schedule_after, "type">,
+export function scheduleAfter(
+  value: Omit<types.pallet_scheduler.pallet.Call.scheduleAfter, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Scheduler", value: { ...value, type: "schedule_after" } }
+  return { type: "Scheduler", value: { ...value, type: "scheduleAfter" } }
 }
 
 /**
@@ -87,8 +87,8 @@ export function schedule_after(
  * Same as [`schedule_named`](Self::schedule_named).
  * # </weight>
  */
-export function schedule_named_after(
-  value: Omit<types.pallet_scheduler.pallet.Call.schedule_named_after, "type">,
+export function scheduleNamedAfter(
+  value: Omit<types.pallet_scheduler.pallet.Call.scheduleNamedAfter, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Scheduler", value: { ...value, type: "schedule_named_after" } }
+  return { type: "Scheduler", value: { ...value, type: "scheduleNamedAfter" } }
 }

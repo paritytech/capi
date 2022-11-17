@@ -115,8 +115,8 @@ export function vote(
  *
  * The dispatch origin of this call must be signed and be a voter.
  */
-export function remove_voter(): types.polkadot_runtime.RuntimeCall {
-  return { type: "PhragmenElection", value: { type: "remove_voter" } }
+export function removeVoter(): types.polkadot_runtime.RuntimeCall {
+  return { type: "PhragmenElection", value: { type: "removeVoter" } }
 }
 
 /**
@@ -136,10 +136,10 @@ export function remove_voter(): types.polkadot_runtime.RuntimeCall {
  * The number of current candidates must be provided as witness data.
  * # </weight>
  */
-export function submit_candidacy(
-  value: Omit<types.pallet_elections_phragmen.pallet.Call.submit_candidacy, "type">,
+export function submitCandidacy(
+  value: Omit<types.pallet_elections_phragmen.pallet.Call.submitCandidacy, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "PhragmenElection", value: { ...value, type: "submit_candidacy" } }
+  return { type: "PhragmenElection", value: { ...value, type: "submitCandidacy" } }
 }
 
 /**
@@ -162,10 +162,10 @@ export function submit_candidacy(
  * The type of renouncing must be provided as witness data.
  * # </weight>
  */
-export function renounce_candidacy(
-  value: Omit<types.pallet_elections_phragmen.pallet.Call.renounce_candidacy, "type">,
+export function renounceCandidacy(
+  value: Omit<types.pallet_elections_phragmen.pallet.Call.renounceCandidacy, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "PhragmenElection", value: { ...value, type: "renounce_candidacy" } }
+  return { type: "PhragmenElection", value: { ...value, type: "renounceCandidacy" } }
 }
 
 /**
@@ -188,10 +188,10 @@ export function renounce_candidacy(
  * will go into phragmen, we assume full block for now.
  * # </weight>
  */
-export function remove_member(
-  value: Omit<types.pallet_elections_phragmen.pallet.Call.remove_member, "type">,
+export function removeMember(
+  value: Omit<types.pallet_elections_phragmen.pallet.Call.removeMember, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "PhragmenElection", value: { ...value, type: "remove_member" } }
+  return { type: "PhragmenElection", value: { ...value, type: "removeMember" } }
 }
 
 /**
@@ -206,8 +206,8 @@ export function remove_member(
  * The total number of voters and those that are defunct must be provided as witness data.
  * # </weight>
  */
-export function clean_defunct_voters(
-  value: Omit<types.pallet_elections_phragmen.pallet.Call.clean_defunct_voters, "type">,
+export function cleanDefunctVoters(
+  value: Omit<types.pallet_elections_phragmen.pallet.Call.cleanDefunctVoters, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "PhragmenElection", value: { ...value, type: "clean_defunct_voters" } }
+  return { type: "PhragmenElection", value: { ...value, type: "cleanDefunctVoters" } }
 }

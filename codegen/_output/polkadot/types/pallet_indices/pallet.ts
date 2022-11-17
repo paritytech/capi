@@ -8,7 +8,7 @@ export type Call =
   | types.pallet_indices.pallet.Call.claim
   | types.pallet_indices.pallet.Call.transfer
   | types.pallet_indices.pallet.Call.free
-  | types.pallet_indices.pallet.Call.force_transfer
+  | types.pallet_indices.pallet.Call.forceTransfer
   | types.pallet_indices.pallet.Call.freeze
 export namespace Call {
   /**
@@ -109,8 +109,8 @@ export namespace Call {
    *    - Writes: Indices Accounts, System Account (original owner)
    * # </weight>
    */
-  export interface force_transfer {
-    type: "force_transfer"
+  export interface forceTransfer {
+    type: "forceTransfer"
     new: types.sp_runtime.multiaddress.MultiAddress
     index: types.u32
     freeze: boolean
@@ -239,10 +239,10 @@ export namespace Call {
    *    - Writes: Indices Accounts, System Account (original owner)
    * # </weight>
    */
-  export function force_transfer(
-    value: Omit<types.pallet_indices.pallet.Call.force_transfer, "type">,
-  ): types.pallet_indices.pallet.Call.force_transfer {
-    return { type: "force_transfer", ...value }
+  export function forceTransfer(
+    value: Omit<types.pallet_indices.pallet.Call.forceTransfer, "type">,
+  ): types.pallet_indices.pallet.Call.forceTransfer {
+    return { type: "forceTransfer", ...value }
   }
   /**
    * Freeze an index so it will always point to the sender account. This consumes the

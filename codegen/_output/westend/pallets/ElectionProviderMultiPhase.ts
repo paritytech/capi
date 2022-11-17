@@ -177,10 +177,10 @@ export const MinimumUntrustedScore = new C.fluent.Storage(
  *
  * No deposit or reward is associated with this submission.
  */
-export function submit_unsigned(
-  value: Omit<types.pallet_election_provider_multi_phase.pallet.Call.submit_unsigned, "type">,
+export function submitUnsigned(
+  value: Omit<types.pallet_election_provider_multi_phase.pallet.Call.submitUnsigned, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "ElectionProviderMultiPhase", value: { ...value, type: "submit_unsigned" } }
+  return { type: "ElectionProviderMultiPhase", value: { ...value, type: "submitUnsigned" } }
 }
 
 /**
@@ -190,15 +190,15 @@ export function submit_unsigned(
  *
  * This check can be turned off by setting the value to `None`.
  */
-export function set_minimum_untrusted_score(
+export function setMinimumUntrustedScore(
   value: Omit<
-    types.pallet_election_provider_multi_phase.pallet.Call.set_minimum_untrusted_score,
+    types.pallet_election_provider_multi_phase.pallet.Call.setMinimumUntrustedScore,
     "type"
   >,
 ): types.polkadot_runtime.RuntimeCall {
   return {
     type: "ElectionProviderMultiPhase",
-    value: { ...value, type: "set_minimum_untrusted_score" },
+    value: { ...value, type: "setMinimumUntrustedScore" },
   }
 }
 
@@ -212,15 +212,15 @@ export function set_minimum_untrusted_score(
  * feasibility check itself can in principle cause the election process to fail (due to
  * memory/weight constrains).
  */
-export function set_emergency_election_result(
+export function setEmergencyElectionResult(
   value: Omit<
-    types.pallet_election_provider_multi_phase.pallet.Call.set_emergency_election_result,
+    types.pallet_election_provider_multi_phase.pallet.Call.setEmergencyElectionResult,
     "type"
   >,
 ): types.polkadot_runtime.RuntimeCall {
   return {
     type: "ElectionProviderMultiPhase",
-    value: { ...value, type: "set_emergency_election_result" },
+    value: { ...value, type: "setEmergencyElectionResult" },
   }
 }
 
@@ -247,8 +247,8 @@ export function submit(
  * This can only be called when [`Phase::Emergency`] is enabled, as an alternative to
  * calling [`Call::set_emergency_election_result`].
  */
-export function governance_fallback(
-  value: Omit<types.pallet_election_provider_multi_phase.pallet.Call.governance_fallback, "type">,
+export function governanceFallback(
+  value: Omit<types.pallet_election_provider_multi_phase.pallet.Call.governanceFallback, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "ElectionProviderMultiPhase", value: { ...value, type: "governance_fallback" } }
+  return { type: "ElectionProviderMultiPhase", value: { ...value, type: "governanceFallback" } }
 }

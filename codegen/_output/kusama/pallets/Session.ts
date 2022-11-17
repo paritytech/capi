@@ -107,10 +107,10 @@ export const KeyOwner = new C.fluent.Storage(
  * - DbWrites per key id: `KeyOwner`
  * # </weight>
  */
-export function set_keys(
-  value: Omit<types.pallet_session.pallet.Call.set_keys, "type">,
+export function setKeys(
+  value: Omit<types.pallet_session.pallet.Call.setKeys, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Session", value: { ...value, type: "set_keys" } }
+  return { type: "Session", value: { ...value, type: "setKeys" } }
 }
 
 /**
@@ -131,6 +131,6 @@ export function set_keys(
  * - DbWrites per key id: `KeyOwner`
  * # </weight>
  */
-export function purge_keys(): types.polkadot_runtime.RuntimeCall {
-  return { type: "Session", value: { type: "purge_keys" } }
+export function purgeKeys(): types.polkadot_runtime.RuntimeCall {
+  return { type: "Session", value: { type: "purgeKeys" } }
 }

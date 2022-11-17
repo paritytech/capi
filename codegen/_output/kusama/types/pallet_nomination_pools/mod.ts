@@ -29,7 +29,7 @@ export namespace BondExtra {
 export interface BondedPoolInner {
   points: types.u128
   state: types.pallet_nomination_pools.PoolState
-  member_counter: types.u32
+  memberCounter: types.u32
   roles: types.pallet_nomination_pools.PoolRoles
 }
 
@@ -38,10 +38,10 @@ export function BondedPoolInner(value: types.pallet_nomination_pools.BondedPoolI
 }
 
 export interface PoolMember {
-  pool_id: types.u32
+  poolId: types.u32
   points: types.u128
-  last_recorded_reward_counter: types.sp_arithmetic.fixed_point.FixedU128
-  unbonding_eras: Map<types.u32, types.u128>
+  lastRecordedRewardCounter: types.sp_arithmetic.fixed_point.FixedU128
+  unbondingEras: Map<types.u32, types.u128>
 }
 
 export function PoolMember(value: types.pallet_nomination_pools.PoolMember) {
@@ -52,7 +52,7 @@ export interface PoolRoles {
   depositor: types.sp_core.crypto.AccountId32
   root: types.sp_core.crypto.AccountId32 | undefined
   nominator: types.sp_core.crypto.AccountId32 | undefined
-  state_toggler: types.sp_core.crypto.AccountId32 | undefined
+  stateToggler: types.sp_core.crypto.AccountId32 | undefined
 }
 
 export function PoolRoles(value: types.pallet_nomination_pools.PoolRoles) {
@@ -62,9 +62,9 @@ export function PoolRoles(value: types.pallet_nomination_pools.PoolRoles) {
 export type PoolState = "Open" | "Blocked" | "Destroying"
 
 export interface RewardPool {
-  last_recorded_reward_counter: types.sp_arithmetic.fixed_point.FixedU128
-  last_recorded_total_payouts: types.u128
-  total_rewards_claimed: types.u128
+  lastRecordedRewardCounter: types.sp_arithmetic.fixed_point.FixedU128
+  lastRecordedTotalPayouts: types.u128
+  totalRewardsClaimed: types.u128
 }
 
 export function RewardPool(value: types.pallet_nomination_pools.RewardPool) {
@@ -72,8 +72,8 @@ export function RewardPool(value: types.pallet_nomination_pools.RewardPool) {
 }
 
 export interface SubPools {
-  no_era: types.pallet_nomination_pools.UnbondPool
-  with_era: Map<types.u32, types.pallet_nomination_pools.UnbondPool>
+  noEra: types.pallet_nomination_pools.UnbondPool
+  withEra: Map<types.u32, types.pallet_nomination_pools.UnbondPool>
 }
 
 export function SubPools(value: types.pallet_nomination_pools.SubPools) {

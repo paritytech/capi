@@ -132,10 +132,10 @@ export function edit(
  *
  * Origin must be Signed, and the user must have contributed to the crowdloan.
  */
-export function add_memo(
-  value: Omit<types.polkadot_runtime_common.crowdloan.pallet.Call.add_memo, "type">,
+export function addMemo(
+  value: Omit<types.polkadot_runtime_common.crowdloan.pallet.Call.addMemo, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Crowdloan", value: { ...value, type: "add_memo" } }
+  return { type: "Crowdloan", value: { ...value, type: "addMemo" } }
 }
 
 /**
@@ -153,8 +153,8 @@ export function poke(
  * Contribute your entire balance to a crowd sale. This will transfer the entire balance of a user over to fund a parachain
  * slot. It will be withdrawable when the crowdloan has ended and the funds are unused.
  */
-export function contribute_all(
-  value: Omit<types.polkadot_runtime_common.crowdloan.pallet.Call.contribute_all, "type">,
+export function contributeAll(
+  value: Omit<types.polkadot_runtime_common.crowdloan.pallet.Call.contributeAll, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Crowdloan", value: { ...value, type: "contribute_all" } }
+  return { type: "Crowdloan", value: { ...value, type: "contributeAll" } }
 }

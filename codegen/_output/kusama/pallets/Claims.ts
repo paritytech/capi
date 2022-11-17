@@ -109,10 +109,10 @@ export function claim(
  * Total Complexity: O(1)
  * </weight>
  */
-export function mint_claim(
-  value: Omit<types.polkadot_runtime_common.claims.pallet.Call.mint_claim, "type">,
+export function mintClaim(
+  value: Omit<types.polkadot_runtime_common.claims.pallet.Call.mintClaim, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Claims", value: { ...value, type: "mint_claim" } }
+  return { type: "Claims", value: { ...value, type: "mintClaim" } }
 }
 
 /**
@@ -143,10 +143,10 @@ export function mint_claim(
  * Total Complexity: O(1)
  * </weight>
  */
-export function claim_attest(
-  value: Omit<types.polkadot_runtime_common.claims.pallet.Call.claim_attest, "type">,
+export function claimAttest(
+  value: Omit<types.polkadot_runtime_common.claims.pallet.Call.claimAttest, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Claims", value: { ...value, type: "claim_attest" } }
+  return { type: "Claims", value: { ...value, type: "claimAttest" } }
 }
 
 /**
@@ -174,8 +174,8 @@ export function attest(
   return { type: "Claims", value: { ...value, type: "attest" } }
 }
 
-export function move_claim(
-  value: Omit<types.polkadot_runtime_common.claims.pallet.Call.move_claim, "type">,
+export function moveClaim(
+  value: Omit<types.polkadot_runtime_common.claims.pallet.Call.moveClaim, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Claims", value: { ...value, type: "move_claim" } }
+  return { type: "Claims", value: { ...value, type: "moveClaim" } }
 }

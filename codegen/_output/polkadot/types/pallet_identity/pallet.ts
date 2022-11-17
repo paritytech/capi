@@ -5,21 +5,21 @@ import type * as types from "../mod.ts"
 /** Identity pallet declaration. */
 
 export type Call =
-  | types.pallet_identity.pallet.Call.add_registrar
-  | types.pallet_identity.pallet.Call.set_identity
-  | types.pallet_identity.pallet.Call.set_subs
-  | types.pallet_identity.pallet.Call.clear_identity
-  | types.pallet_identity.pallet.Call.request_judgement
-  | types.pallet_identity.pallet.Call.cancel_request
-  | types.pallet_identity.pallet.Call.set_fee
-  | types.pallet_identity.pallet.Call.set_account_id
-  | types.pallet_identity.pallet.Call.set_fields
-  | types.pallet_identity.pallet.Call.provide_judgement
-  | types.pallet_identity.pallet.Call.kill_identity
-  | types.pallet_identity.pallet.Call.add_sub
-  | types.pallet_identity.pallet.Call.rename_sub
-  | types.pallet_identity.pallet.Call.remove_sub
-  | types.pallet_identity.pallet.Call.quit_sub
+  | types.pallet_identity.pallet.Call.addRegistrar
+  | types.pallet_identity.pallet.Call.setIdentity
+  | types.pallet_identity.pallet.Call.setSubs
+  | types.pallet_identity.pallet.Call.clearIdentity
+  | types.pallet_identity.pallet.Call.requestJudgement
+  | types.pallet_identity.pallet.Call.cancelRequest
+  | types.pallet_identity.pallet.Call.setFee
+  | types.pallet_identity.pallet.Call.setAccountId
+  | types.pallet_identity.pallet.Call.setFields
+  | types.pallet_identity.pallet.Call.provideJudgement
+  | types.pallet_identity.pallet.Call.killIdentity
+  | types.pallet_identity.pallet.Call.addSub
+  | types.pallet_identity.pallet.Call.renameSub
+  | types.pallet_identity.pallet.Call.removeSub
+  | types.pallet_identity.pallet.Call.quitSub
 export namespace Call {
   /**
    * Add a registrar to the system.
@@ -36,8 +36,8 @@ export namespace Call {
    * - One event.
    * # </weight>
    */
-  export interface add_registrar {
-    type: "add_registrar"
+  export interface addRegistrar {
+    type: "addRegistrar"
     account: types.sp_runtime.multiaddress.MultiAddress
   }
   /**
@@ -61,8 +61,8 @@ export namespace Call {
    * - One event.
    * # </weight>
    */
-  export interface set_identity {
-    type: "set_identity"
+  export interface setIdentity {
+    type: "setIdentity"
     info: types.pallet_identity.types.IdentityInfo
   }
   /**
@@ -88,8 +88,8 @@ export namespace Call {
    *   - One storage-exists (`IdentityOf::contains_key`).
    * # </weight>
    */
-  export interface set_subs {
-    type: "set_subs"
+  export interface setSubs {
+    type: "setSubs"
     subs: Array<[types.sp_core.crypto.AccountId32, types.pallet_identity.types.Data]>
   }
   /**
@@ -112,8 +112,8 @@ export namespace Call {
    * - One event.
    * # </weight>
    */
-  export interface clear_identity {
-    type: "clear_identity"
+  export interface clearIdentity {
+    type: "clearIdentity"
   }
   /**
    * Request a judgement from a registrar.
@@ -140,10 +140,10 @@ export namespace Call {
    * - One event.
    * # </weight>
    */
-  export interface request_judgement {
-    type: "request_judgement"
-    reg_index: types.Compact<types.u32>
-    max_fee: types.Compact<types.u128>
+  export interface requestJudgement {
+    type: "requestJudgement"
+    regIndex: types.Compact<types.u32>
+    maxFee: types.Compact<types.u128>
   }
   /**
    * Cancel a previous request.
@@ -164,9 +164,9 @@ export namespace Call {
    * - One event
    * # </weight>
    */
-  export interface cancel_request {
-    type: "cancel_request"
-    reg_index: types.u32
+  export interface cancelRequest {
+    type: "cancelRequest"
+    regIndex: types.u32
   }
   /**
    * Set the fee required for a judgement to be requested from a registrar.
@@ -183,8 +183,8 @@ export namespace Call {
    * - Benchmark: 7.315 + R * 0.329 µs (min squares analysis)
    * # </weight>
    */
-  export interface set_fee {
-    type: "set_fee"
+  export interface setFee {
+    type: "setFee"
     index: types.Compact<types.u32>
     fee: types.Compact<types.u128>
   }
@@ -203,8 +203,8 @@ export namespace Call {
    * - Benchmark: 8.823 + R * 0.32 µs (min squares analysis)
    * # </weight>
    */
-  export interface set_account_id {
-    type: "set_account_id"
+  export interface setAccountId {
+    type: "setAccountId"
     index: types.Compact<types.u32>
     new: types.sp_runtime.multiaddress.MultiAddress
   }
@@ -223,8 +223,8 @@ export namespace Call {
    * - Benchmark: 7.464 + R * 0.325 µs (min squares analysis)
    * # </weight>
    */
-  export interface set_fields {
-    type: "set_fields"
+  export interface setFields {
+    type: "setFields"
     index: types.Compact<types.u32>
     fields: types.u64
   }
@@ -250,9 +250,9 @@ export namespace Call {
    * - One event.
    * # </weight>
    */
-  export interface provide_judgement {
-    type: "provide_judgement"
-    reg_index: types.Compact<types.u32>
+  export interface provideJudgement {
+    type: "provideJudgement"
+    regIndex: types.Compact<types.u32>
     target: types.sp_runtime.multiaddress.MultiAddress
     judgement: types.pallet_identity.types.Judgement
     identity: types.primitive_types.H256
@@ -278,8 +278,8 @@ export namespace Call {
    * - One event.
    * # </weight>
    */
-  export interface kill_identity {
-    type: "kill_identity"
+  export interface killIdentity {
+    type: "killIdentity"
     target: types.sp_runtime.multiaddress.MultiAddress
   }
   /**
@@ -291,8 +291,8 @@ export namespace Call {
    * The dispatch origin for this call must be _Signed_ and the sender must have a registered
    * sub identity of `sub`.
    */
-  export interface add_sub {
-    type: "add_sub"
+  export interface addSub {
+    type: "addSub"
     sub: types.sp_runtime.multiaddress.MultiAddress
     data: types.pallet_identity.types.Data
   }
@@ -302,8 +302,8 @@ export namespace Call {
    * The dispatch origin for this call must be _Signed_ and the sender must have a registered
    * sub identity of `sub`.
    */
-  export interface rename_sub {
-    type: "rename_sub"
+  export interface renameSub {
+    type: "renameSub"
     sub: types.sp_runtime.multiaddress.MultiAddress
     data: types.pallet_identity.types.Data
   }
@@ -316,8 +316,8 @@ export namespace Call {
    * The dispatch origin for this call must be _Signed_ and the sender must have a registered
    * sub identity of `sub`.
    */
-  export interface remove_sub {
-    type: "remove_sub"
+  export interface removeSub {
+    type: "removeSub"
     sub: types.sp_runtime.multiaddress.MultiAddress
   }
   /**
@@ -332,8 +332,8 @@ export namespace Call {
    * NOTE: This should not normally be used, but is provided in the case that the non-
    * controller of an account is maliciously registered as a sub-account.
    */
-  export interface quit_sub {
-    type: "quit_sub"
+  export interface quitSub {
+    type: "quitSub"
   }
   /**
    * Add a registrar to the system.
@@ -350,10 +350,10 @@ export namespace Call {
    * - One event.
    * # </weight>
    */
-  export function add_registrar(
-    value: Omit<types.pallet_identity.pallet.Call.add_registrar, "type">,
-  ): types.pallet_identity.pallet.Call.add_registrar {
-    return { type: "add_registrar", ...value }
+  export function addRegistrar(
+    value: Omit<types.pallet_identity.pallet.Call.addRegistrar, "type">,
+  ): types.pallet_identity.pallet.Call.addRegistrar {
+    return { type: "addRegistrar", ...value }
   }
   /**
    * Set an account's identity information and reserve the appropriate deposit.
@@ -376,10 +376,10 @@ export namespace Call {
    * - One event.
    * # </weight>
    */
-  export function set_identity(
-    value: Omit<types.pallet_identity.pallet.Call.set_identity, "type">,
-  ): types.pallet_identity.pallet.Call.set_identity {
-    return { type: "set_identity", ...value }
+  export function setIdentity(
+    value: Omit<types.pallet_identity.pallet.Call.setIdentity, "type">,
+  ): types.pallet_identity.pallet.Call.setIdentity {
+    return { type: "setIdentity", ...value }
   }
   /**
    * Set the sub-accounts of the sender.
@@ -404,10 +404,10 @@ export namespace Call {
    *   - One storage-exists (`IdentityOf::contains_key`).
    * # </weight>
    */
-  export function set_subs(
-    value: Omit<types.pallet_identity.pallet.Call.set_subs, "type">,
-  ): types.pallet_identity.pallet.Call.set_subs {
-    return { type: "set_subs", ...value }
+  export function setSubs(
+    value: Omit<types.pallet_identity.pallet.Call.setSubs, "type">,
+  ): types.pallet_identity.pallet.Call.setSubs {
+    return { type: "setSubs", ...value }
   }
   /**
    * Clear an account's identity info and all sub-accounts and return all deposits.
@@ -429,8 +429,8 @@ export namespace Call {
    * - One event.
    * # </weight>
    */
-  export function clear_identity(): types.pallet_identity.pallet.Call.clear_identity {
-    return { type: "clear_identity" }
+  export function clearIdentity(): types.pallet_identity.pallet.Call.clearIdentity {
+    return { type: "clearIdentity" }
   }
   /**
    * Request a judgement from a registrar.
@@ -457,10 +457,10 @@ export namespace Call {
    * - One event.
    * # </weight>
    */
-  export function request_judgement(
-    value: Omit<types.pallet_identity.pallet.Call.request_judgement, "type">,
-  ): types.pallet_identity.pallet.Call.request_judgement {
-    return { type: "request_judgement", ...value }
+  export function requestJudgement(
+    value: Omit<types.pallet_identity.pallet.Call.requestJudgement, "type">,
+  ): types.pallet_identity.pallet.Call.requestJudgement {
+    return { type: "requestJudgement", ...value }
   }
   /**
    * Cancel a previous request.
@@ -481,10 +481,10 @@ export namespace Call {
    * - One event
    * # </weight>
    */
-  export function cancel_request(
-    value: Omit<types.pallet_identity.pallet.Call.cancel_request, "type">,
-  ): types.pallet_identity.pallet.Call.cancel_request {
-    return { type: "cancel_request", ...value }
+  export function cancelRequest(
+    value: Omit<types.pallet_identity.pallet.Call.cancelRequest, "type">,
+  ): types.pallet_identity.pallet.Call.cancelRequest {
+    return { type: "cancelRequest", ...value }
   }
   /**
    * Set the fee required for a judgement to be requested from a registrar.
@@ -501,10 +501,10 @@ export namespace Call {
    * - Benchmark: 7.315 + R * 0.329 µs (min squares analysis)
    * # </weight>
    */
-  export function set_fee(
-    value: Omit<types.pallet_identity.pallet.Call.set_fee, "type">,
-  ): types.pallet_identity.pallet.Call.set_fee {
-    return { type: "set_fee", ...value }
+  export function setFee(
+    value: Omit<types.pallet_identity.pallet.Call.setFee, "type">,
+  ): types.pallet_identity.pallet.Call.setFee {
+    return { type: "setFee", ...value }
   }
   /**
    * Change the account associated with a registrar.
@@ -521,10 +521,10 @@ export namespace Call {
    * - Benchmark: 8.823 + R * 0.32 µs (min squares analysis)
    * # </weight>
    */
-  export function set_account_id(
-    value: Omit<types.pallet_identity.pallet.Call.set_account_id, "type">,
-  ): types.pallet_identity.pallet.Call.set_account_id {
-    return { type: "set_account_id", ...value }
+  export function setAccountId(
+    value: Omit<types.pallet_identity.pallet.Call.setAccountId, "type">,
+  ): types.pallet_identity.pallet.Call.setAccountId {
+    return { type: "setAccountId", ...value }
   }
   /**
    * Set the field information for a registrar.
@@ -541,10 +541,10 @@ export namespace Call {
    * - Benchmark: 7.464 + R * 0.325 µs (min squares analysis)
    * # </weight>
    */
-  export function set_fields(
-    value: Omit<types.pallet_identity.pallet.Call.set_fields, "type">,
-  ): types.pallet_identity.pallet.Call.set_fields {
-    return { type: "set_fields", ...value }
+  export function setFields(
+    value: Omit<types.pallet_identity.pallet.Call.setFields, "type">,
+  ): types.pallet_identity.pallet.Call.setFields {
+    return { type: "setFields", ...value }
   }
   /**
    * Provide a judgement for an account's identity.
@@ -568,10 +568,10 @@ export namespace Call {
    * - One event.
    * # </weight>
    */
-  export function provide_judgement(
-    value: Omit<types.pallet_identity.pallet.Call.provide_judgement, "type">,
-  ): types.pallet_identity.pallet.Call.provide_judgement {
-    return { type: "provide_judgement", ...value }
+  export function provideJudgement(
+    value: Omit<types.pallet_identity.pallet.Call.provideJudgement, "type">,
+  ): types.pallet_identity.pallet.Call.provideJudgement {
+    return { type: "provideJudgement", ...value }
   }
   /**
    * Remove an account's identity and sub-account information and slash the deposits.
@@ -594,10 +594,10 @@ export namespace Call {
    * - One event.
    * # </weight>
    */
-  export function kill_identity(
-    value: Omit<types.pallet_identity.pallet.Call.kill_identity, "type">,
-  ): types.pallet_identity.pallet.Call.kill_identity {
-    return { type: "kill_identity", ...value }
+  export function killIdentity(
+    value: Omit<types.pallet_identity.pallet.Call.killIdentity, "type">,
+  ): types.pallet_identity.pallet.Call.killIdentity {
+    return { type: "killIdentity", ...value }
   }
   /**
    * Add the given account to the sender's subs.
@@ -608,10 +608,10 @@ export namespace Call {
    * The dispatch origin for this call must be _Signed_ and the sender must have a registered
    * sub identity of `sub`.
    */
-  export function add_sub(
-    value: Omit<types.pallet_identity.pallet.Call.add_sub, "type">,
-  ): types.pallet_identity.pallet.Call.add_sub {
-    return { type: "add_sub", ...value }
+  export function addSub(
+    value: Omit<types.pallet_identity.pallet.Call.addSub, "type">,
+  ): types.pallet_identity.pallet.Call.addSub {
+    return { type: "addSub", ...value }
   }
   /**
    * Alter the associated name of the given sub-account.
@@ -619,10 +619,10 @@ export namespace Call {
    * The dispatch origin for this call must be _Signed_ and the sender must have a registered
    * sub identity of `sub`.
    */
-  export function rename_sub(
-    value: Omit<types.pallet_identity.pallet.Call.rename_sub, "type">,
-  ): types.pallet_identity.pallet.Call.rename_sub {
-    return { type: "rename_sub", ...value }
+  export function renameSub(
+    value: Omit<types.pallet_identity.pallet.Call.renameSub, "type">,
+  ): types.pallet_identity.pallet.Call.renameSub {
+    return { type: "renameSub", ...value }
   }
   /**
    * Remove the given account from the sender's subs.
@@ -633,10 +633,10 @@ export namespace Call {
    * The dispatch origin for this call must be _Signed_ and the sender must have a registered
    * sub identity of `sub`.
    */
-  export function remove_sub(
-    value: Omit<types.pallet_identity.pallet.Call.remove_sub, "type">,
-  ): types.pallet_identity.pallet.Call.remove_sub {
-    return { type: "remove_sub", ...value }
+  export function removeSub(
+    value: Omit<types.pallet_identity.pallet.Call.removeSub, "type">,
+  ): types.pallet_identity.pallet.Call.removeSub {
+    return { type: "removeSub", ...value }
   }
   /**
    * Remove the sender as a sub-account.
@@ -650,8 +650,8 @@ export namespace Call {
    * NOTE: This should not normally be used, but is provided in the case that the non-
    * controller of an account is maliciously registered as a sub-account.
    */
-  export function quit_sub(): types.pallet_identity.pallet.Call.quit_sub {
-    return { type: "quit_sub" }
+  export function quitSub(): types.pallet_identity.pallet.Call.quitSub {
+    return { type: "quitSub" }
   }
 }
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
@@ -709,24 +709,24 @@ export namespace Event {
   export interface JudgementRequested {
     type: "JudgementRequested"
     who: types.sp_core.crypto.AccountId32
-    registrar_index: types.u32
+    registrarIndex: types.u32
   }
   /** A judgement request was retracted. */
   export interface JudgementUnrequested {
     type: "JudgementUnrequested"
     who: types.sp_core.crypto.AccountId32
-    registrar_index: types.u32
+    registrarIndex: types.u32
   }
   /** A judgement was given by a registrar. */
   export interface JudgementGiven {
     type: "JudgementGiven"
     target: types.sp_core.crypto.AccountId32
-    registrar_index: types.u32
+    registrarIndex: types.u32
   }
   /** A registrar was added. */
   export interface RegistrarAdded {
     type: "RegistrarAdded"
-    registrar_index: types.u32
+    registrarIndex: types.u32
   }
   /** A sub-identity was added to an identity and the deposit paid. */
   export interface SubIdentityAdded {

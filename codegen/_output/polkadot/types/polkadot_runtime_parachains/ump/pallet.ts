@@ -4,7 +4,7 @@ import type * as types from "../../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 
-export type Call = types.polkadot_runtime_parachains.ump.pallet.Call.service_overweight
+export type Call = types.polkadot_runtime_parachains.ump.pallet.Call.serviceOverweight
 export namespace Call {
   /**
    * Service a single overweight upward message.
@@ -20,10 +20,10 @@ export namespace Call {
    * Events:
    * - `OverweightServiced`: On success.
    */
-  export interface service_overweight {
-    type: "service_overweight"
+  export interface serviceOverweight {
+    type: "serviceOverweight"
     index: types.u64
-    weight_limit: types.sp_weights.weight_v2.Weight
+    weightLimit: types.sp_weights.weight_v2.Weight
   }
   /**
    * Service a single overweight upward message.
@@ -39,10 +39,10 @@ export namespace Call {
    * Events:
    * - `OverweightServiced`: On success.
    */
-  export function service_overweight(
-    value: Omit<types.polkadot_runtime_parachains.ump.pallet.Call.service_overweight, "type">,
-  ): types.polkadot_runtime_parachains.ump.pallet.Call.service_overweight {
-    return { type: "service_overweight", ...value }
+  export function serviceOverweight(
+    value: Omit<types.polkadot_runtime_parachains.ump.pallet.Call.serviceOverweight, "type">,
+  ): types.polkadot_runtime_parachains.ump.pallet.Call.serviceOverweight {
+    return { type: "serviceOverweight", ...value }
   }
 }
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */

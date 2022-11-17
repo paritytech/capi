@@ -6,8 +6,8 @@ export * as pallet from "./pallet.ts"
 export * as sr25519 from "./sr25519/mod.ts"
 
 export interface BoundedOpaqueNetworkState {
-  peer_id: Uint8Array
-  external_addresses: Array<Uint8Array>
+  peerId: Uint8Array
+  externalAddresses: Array<Uint8Array>
 }
 
 export function BoundedOpaqueNetworkState(value: types.pallet_im_online.BoundedOpaqueNetworkState) {
@@ -15,11 +15,11 @@ export function BoundedOpaqueNetworkState(value: types.pallet_im_online.BoundedO
 }
 
 export interface Heartbeat {
-  block_number: types.u32
-  network_state: types.sp_core.offchain.OpaqueNetworkState
-  session_index: types.u32
-  authority_index: types.u32
-  validators_len: types.u32
+  blockNumber: types.u32
+  networkState: types.sp_core.offchain.OpaqueNetworkState
+  sessionIndex: types.u32
+  authorityIndex: types.u32
+  validatorsLen: types.u32
 }
 
 export function Heartbeat(value: types.pallet_im_online.Heartbeat) {

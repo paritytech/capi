@@ -5,11 +5,11 @@ import type * as types from "../mod.ts"
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 
 export type Call =
-  | types.pallet_election_provider_multi_phase.pallet.Call.submit_unsigned
-  | types.pallet_election_provider_multi_phase.pallet.Call.set_minimum_untrusted_score
-  | types.pallet_election_provider_multi_phase.pallet.Call.set_emergency_election_result
+  | types.pallet_election_provider_multi_phase.pallet.Call.submitUnsigned
+  | types.pallet_election_provider_multi_phase.pallet.Call.setMinimumUntrustedScore
+  | types.pallet_election_provider_multi_phase.pallet.Call.setEmergencyElectionResult
   | types.pallet_election_provider_multi_phase.pallet.Call.submit
-  | types.pallet_election_provider_multi_phase.pallet.Call.governance_fallback
+  | types.pallet_election_provider_multi_phase.pallet.Call.governanceFallback
 export namespace Call {
   /**
    * Submit a solution for the unsigned phase.
@@ -27,9 +27,9 @@ export namespace Call {
    *
    * No deposit or reward is associated with this submission.
    */
-  export interface submit_unsigned {
-    type: "submit_unsigned"
-    raw_solution: types.pallet_election_provider_multi_phase.RawSolution
+  export interface submitUnsigned {
+    type: "submitUnsigned"
+    rawSolution: types.pallet_election_provider_multi_phase.RawSolution
     witness: types.pallet_election_provider_multi_phase.SolutionOrSnapshotSize
   }
   /**
@@ -39,9 +39,9 @@ export namespace Call {
    *
    * This check can be turned off by setting the value to `None`.
    */
-  export interface set_minimum_untrusted_score {
-    type: "set_minimum_untrusted_score"
-    maybe_next_score: types.sp_npos_elections.ElectionScore | undefined
+  export interface setMinimumUntrustedScore {
+    type: "setMinimumUntrustedScore"
+    maybeNextScore: types.sp_npos_elections.ElectionScore | undefined
   }
   /**
    * Set a solution in the queue, to be handed out to the client of this pallet in the next
@@ -53,8 +53,8 @@ export namespace Call {
    * feasibility check itself can in principle cause the election process to fail (due to
    * memory/weight constrains).
    */
-  export interface set_emergency_election_result {
-    type: "set_emergency_election_result"
+  export interface setEmergencyElectionResult {
+    type: "setEmergencyElectionResult"
     supports: Array<[types.sp_core.crypto.AccountId32, types.sp_npos_elections.Support]>
   }
   /**
@@ -70,7 +70,7 @@ export namespace Call {
    */
   export interface submit {
     type: "submit"
-    raw_solution: types.pallet_election_provider_multi_phase.RawSolution
+    rawSolution: types.pallet_election_provider_multi_phase.RawSolution
   }
   /**
    * Trigger the governance fallback.
@@ -78,10 +78,10 @@ export namespace Call {
    * This can only be called when [`Phase::Emergency`] is enabled, as an alternative to
    * calling [`Call::set_emergency_election_result`].
    */
-  export interface governance_fallback {
-    type: "governance_fallback"
-    maybe_max_voters: types.u32 | undefined
-    maybe_max_targets: types.u32 | undefined
+  export interface governanceFallback {
+    type: "governanceFallback"
+    maybeMaxVoters: types.u32 | undefined
+    maybeMaxTargets: types.u32 | undefined
   }
   /**
    * Submit a solution for the unsigned phase.
@@ -99,10 +99,10 @@ export namespace Call {
    *
    * No deposit or reward is associated with this submission.
    */
-  export function submit_unsigned(
-    value: Omit<types.pallet_election_provider_multi_phase.pallet.Call.submit_unsigned, "type">,
-  ): types.pallet_election_provider_multi_phase.pallet.Call.submit_unsigned {
-    return { type: "submit_unsigned", ...value }
+  export function submitUnsigned(
+    value: Omit<types.pallet_election_provider_multi_phase.pallet.Call.submitUnsigned, "type">,
+  ): types.pallet_election_provider_multi_phase.pallet.Call.submitUnsigned {
+    return { type: "submitUnsigned", ...value }
   }
   /**
    * Set a new value for `MinimumUntrustedScore`.
@@ -111,13 +111,13 @@ export namespace Call {
    *
    * This check can be turned off by setting the value to `None`.
    */
-  export function set_minimum_untrusted_score(
+  export function setMinimumUntrustedScore(
     value: Omit<
-      types.pallet_election_provider_multi_phase.pallet.Call.set_minimum_untrusted_score,
+      types.pallet_election_provider_multi_phase.pallet.Call.setMinimumUntrustedScore,
       "type"
     >,
-  ): types.pallet_election_provider_multi_phase.pallet.Call.set_minimum_untrusted_score {
-    return { type: "set_minimum_untrusted_score", ...value }
+  ): types.pallet_election_provider_multi_phase.pallet.Call.setMinimumUntrustedScore {
+    return { type: "setMinimumUntrustedScore", ...value }
   }
   /**
    * Set a solution in the queue, to be handed out to the client of this pallet in the next
@@ -129,13 +129,13 @@ export namespace Call {
    * feasibility check itself can in principle cause the election process to fail (due to
    * memory/weight constrains).
    */
-  export function set_emergency_election_result(
+  export function setEmergencyElectionResult(
     value: Omit<
-      types.pallet_election_provider_multi_phase.pallet.Call.set_emergency_election_result,
+      types.pallet_election_provider_multi_phase.pallet.Call.setEmergencyElectionResult,
       "type"
     >,
-  ): types.pallet_election_provider_multi_phase.pallet.Call.set_emergency_election_result {
-    return { type: "set_emergency_election_result", ...value }
+  ): types.pallet_election_provider_multi_phase.pallet.Call.setEmergencyElectionResult {
+    return { type: "setEmergencyElectionResult", ...value }
   }
   /**
    * Submit a solution for the signed phase.
@@ -159,10 +159,10 @@ export namespace Call {
    * This can only be called when [`Phase::Emergency`] is enabled, as an alternative to
    * calling [`Call::set_emergency_election_result`].
    */
-  export function governance_fallback(
-    value: Omit<types.pallet_election_provider_multi_phase.pallet.Call.governance_fallback, "type">,
-  ): types.pallet_election_provider_multi_phase.pallet.Call.governance_fallback {
-    return { type: "governance_fallback", ...value }
+  export function governanceFallback(
+    value: Omit<types.pallet_election_provider_multi_phase.pallet.Call.governanceFallback, "type">,
+  ): types.pallet_election_provider_multi_phase.pallet.Call.governanceFallback {
+    return { type: "governanceFallback", ...value }
   }
 }
 /** Error of the pallet that can be returned in response to dispatches. */
@@ -202,7 +202,7 @@ export namespace Event {
   export interface SolutionStored {
     type: "SolutionStored"
     compute: types.pallet_election_provider_multi_phase.ElectionCompute
-    prev_ejected: boolean
+    prevEjected: boolean
   }
   /** The election has been finalized, with the given computation and score. */
   export interface ElectionFinalized {

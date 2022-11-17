@@ -1,4 +1,5 @@
 import * as M from "../frame_metadata/mod.ts"
+import { normalizeCase } from "../util/case.ts"
 import { CodegenProps } from "./mod.ts"
 import { S } from "./utils.ts"
 
@@ -26,7 +27,12 @@ import type * as types from "./types/mod.ts"
       return addCodecDecl(
         ty,
         `$.object(${
-          ty.fields.map((x) => S.array([S.string(x.name!), this.visit(x.ty)])).join(", ")
+          ty.fields.map((x) =>
+            S.array([
+              S.string(normalizeCase(x.name!)),
+              this.visit(x.ty),
+            ])
+          ).join(", ")
         })`,
       )
     },
@@ -48,7 +54,11 @@ import type * as types from "./types/mod.ts"
       return addCodecDecl(
         ty,
         `$.stringUnion(${
-          S.object(...ty.members.map((x): [string, string] => [`${x.index}`, S.string(x.name)]))
+          S.object(
+            ...ty.members.map((
+              x,
+            ): [string, string] => [`${x.index}`, S.string(normalizeCase(x.name))]),
+          )
         })`,
       )
     },
@@ -57,7 +67,8 @@ import type * as types from "./types/mod.ts"
         ty,
         `$.taggedUnion("type", ${
           S.object(
-            ...ty.members.map(({ fields, name: type, index }): [string, string] => {
+            ...ty.members.map(({ fields, name, index }): [string, string] => {
+              const type = normalizeCase(name)
               let props: string[]
               if (fields.length === 0) {
                 props = []
@@ -71,7 +82,7 @@ import type * as types from "./types/mod.ts"
                 // Object variant
                 props = fields.map((field) =>
                   S.array([
-                    S.string(field.name!),
+                    S.string(normalizeCase(field.name!)),
                     this.visit(field.ty),
                   ])
                 )

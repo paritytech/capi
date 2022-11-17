@@ -48,9 +48,9 @@ export namespace Instruction {
   }
   export interface QueryResponse {
     type: "QueryResponse"
-    query_id: types.Compact<types.u64>
+    queryId: types.Compact<types.u64>
     response: types.xcm.v2.Response
-    max_weight: types.Compact<types.u64>
+    maxWeight: types.Compact<types.u64>
   }
   export interface TransferAsset {
     type: "TransferAsset"
@@ -65,15 +65,15 @@ export namespace Instruction {
   }
   export interface Transact {
     type: "Transact"
-    origin_type: types.xcm.v0.OriginKind
-    require_weight_at_most: types.Compact<types.u64>
+    originType: types.xcm.v0.OriginKind
+    requireWeightAtMost: types.Compact<types.u64>
     call: types.xcm.double_encoded.DoubleEncoded
   }
   export interface HrmpNewChannelOpenRequest {
     type: "HrmpNewChannelOpenRequest"
     sender: types.Compact<types.u32>
-    max_message_size: types.Compact<types.u32>
-    max_capacity: types.Compact<types.u32>
+    maxMessageSize: types.Compact<types.u32>
+    maxCapacity: types.Compact<types.u32>
   }
   export interface HrmpChannelAccepted {
     type: "HrmpChannelAccepted"
@@ -94,20 +94,20 @@ export namespace Instruction {
   }
   export interface ReportError {
     type: "ReportError"
-    query_id: types.Compact<types.u64>
+    queryId: types.Compact<types.u64>
     dest: types.xcm.v1.multilocation.MultiLocation
-    max_response_weight: types.Compact<types.u64>
+    maxResponseWeight: types.Compact<types.u64>
   }
   export interface DepositAsset {
     type: "DepositAsset"
     assets: types.xcm.v1.multiasset.MultiAssetFilter
-    max_assets: types.Compact<types.u32>
+    maxAssets: types.Compact<types.u32>
     beneficiary: types.xcm.v1.multilocation.MultiLocation
   }
   export interface DepositReserveAsset {
     type: "DepositReserveAsset"
     assets: types.xcm.v1.multiasset.MultiAssetFilter
-    max_assets: types.Compact<types.u32>
+    maxAssets: types.Compact<types.u32>
     dest: types.xcm.v1.multilocation.MultiLocation
     xcm: types.xcm.v2.Xcm
   }
@@ -130,15 +130,15 @@ export namespace Instruction {
   }
   export interface QueryHolding {
     type: "QueryHolding"
-    query_id: types.Compact<types.u64>
+    queryId: types.Compact<types.u64>
     dest: types.xcm.v1.multilocation.MultiLocation
     assets: types.xcm.v1.multiasset.MultiAssetFilter
-    max_response_weight: types.Compact<types.u64>
+    maxResponseWeight: types.Compact<types.u64>
   }
   export interface BuyExecution {
     type: "BuyExecution"
     fees: types.xcm.v1.multiasset.MultiAsset
-    weight_limit: types.xcm.v2.WeightLimit
+    weightLimit: types.xcm.v2.WeightLimit
   }
   export interface RefundSurplus {
     type: "RefundSurplus"
@@ -165,8 +165,8 @@ export namespace Instruction {
   }
   export interface SubscribeVersion {
     type: "SubscribeVersion"
-    query_id: types.Compact<types.u64>
-    max_response_weight: types.Compact<types.u64>
+    queryId: types.Compact<types.u64>
+    maxResponseWeight: types.Compact<types.u64>
   }
   export interface UnsubscribeVersion {
     type: "UnsubscribeVersion"

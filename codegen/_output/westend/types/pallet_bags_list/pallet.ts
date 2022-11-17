@@ -6,7 +6,7 @@ import type * as types from "../mod.ts"
 
 export type Call =
   | types.pallet_bags_list.pallet.Call.rebag
-  | types.pallet_bags_list.pallet.Call.put_in_front_of
+  | types.pallet_bags_list.pallet.Call.putInFrontOf
 export namespace Call {
   /**
    * Declare that some `dislocated` account has, through rewards or penalties, sufficiently
@@ -34,8 +34,8 @@ export namespace Call {
    * - both nodes are within the same bag,
    * - and `origin` has a greater `Score` than `lighter`.
    */
-  export interface put_in_front_of {
-    type: "put_in_front_of"
+  export interface putInFrontOf {
+    type: "putInFrontOf"
     lighter: types.sp_runtime.multiaddress.MultiAddress
   }
   /**
@@ -65,10 +65,10 @@ export namespace Call {
    * - both nodes are within the same bag,
    * - and `origin` has a greater `Score` than `lighter`.
    */
-  export function put_in_front_of(
-    value: Omit<types.pallet_bags_list.pallet.Call.put_in_front_of, "type">,
-  ): types.pallet_bags_list.pallet.Call.put_in_front_of {
-    return { type: "put_in_front_of", ...value }
+  export function putInFrontOf(
+    value: Omit<types.pallet_bags_list.pallet.Call.putInFrontOf, "type">,
+  ): types.pallet_bags_list.pallet.Call.putInFrontOf {
+    return { type: "putInFrontOf", ...value }
   }
 }
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
@@ -104,7 +104,7 @@ export namespace Event {
   export interface ScoreUpdated {
     type: "ScoreUpdated"
     who: types.sp_core.crypto.AccountId32
-    new_score: types.u64
+    newScore: types.u64
   }
   /** Moved an account from one bag to another. */
   export function Rebagged(

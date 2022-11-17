@@ -77,8 +77,8 @@ export const ErasToCheckPerBlock = new C.fluent.Storage(
  * the normal staking system, but they lose part of their unbonding chunks due to consuming
  * the chain's resources.
  */
-export function register_fast_unstake(): types.polkadot_runtime.RuntimeCall {
-  return { type: "FastUnstake", value: { type: "register_fast_unstake" } }
+export function registerFastUnstake(): types.polkadot_runtime.RuntimeCall {
+  return { type: "FastUnstake", value: { type: "registerFastUnstake" } }
 }
 
 /**

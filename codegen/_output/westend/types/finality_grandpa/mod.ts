@@ -5,8 +5,8 @@ import type * as types from "../mod.ts"
 export * as Equivocation from "./Equivocation/mod.ts"
 
 export interface Precommit {
-  target_hash: types.primitive_types.H256
-  target_number: types.u32
+  targetHash: types.primitive_types.H256
+  targetNumber: types.u32
 }
 
 export function Precommit(value: types.finality_grandpa.Precommit) {
@@ -14,8 +14,8 @@ export function Precommit(value: types.finality_grandpa.Precommit) {
 }
 
 export interface Prevote {
-  target_hash: types.primitive_types.H256
-  target_number: types.u32
+  targetHash: types.primitive_types.H256
+  targetNumber: types.u32
 }
 
 export function Prevote(value: types.finality_grandpa.Prevote) {

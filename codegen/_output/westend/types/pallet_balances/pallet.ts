@@ -6,11 +6,11 @@ import type * as types from "../mod.ts"
 
 export type Call =
   | types.pallet_balances.pallet.Call.transfer
-  | types.pallet_balances.pallet.Call.set_balance
-  | types.pallet_balances.pallet.Call.force_transfer
-  | types.pallet_balances.pallet.Call.transfer_keep_alive
-  | types.pallet_balances.pallet.Call.transfer_all
-  | types.pallet_balances.pallet.Call.force_unreserve
+  | types.pallet_balances.pallet.Call.setBalance
+  | types.pallet_balances.pallet.Call.forceTransfer
+  | types.pallet_balances.pallet.Call.transferKeepAlive
+  | types.pallet_balances.pallet.Call.transferAll
+  | types.pallet_balances.pallet.Call.forceUnreserve
 export namespace Call {
   /**
    * Transfer some liquid free balance to another account.
@@ -54,11 +54,11 @@ export namespace Call {
    *
    * The dispatch origin for this call is `root`.
    */
-  export interface set_balance {
-    type: "set_balance"
+  export interface setBalance {
+    type: "setBalance"
     who: types.sp_runtime.multiaddress.MultiAddress
-    new_free: types.Compact<types.u128>
-    new_reserved: types.Compact<types.u128>
+    newFree: types.Compact<types.u128>
+    newReserved: types.Compact<types.u128>
   }
   /**
    * Exactly as `transfer`, except the origin must be root and the source account may be
@@ -68,8 +68,8 @@ export namespace Call {
    *   assumed to be in the overlay.
    * # </weight>
    */
-  export interface force_transfer {
-    type: "force_transfer"
+  export interface forceTransfer {
+    type: "forceTransfer"
     source: types.sp_runtime.multiaddress.MultiAddress
     dest: types.sp_runtime.multiaddress.MultiAddress
     value: types.Compact<types.u128>
@@ -82,8 +82,8 @@ export namespace Call {
    *
    * [`transfer`]: struct.Pallet.html#method.transfer
    */
-  export interface transfer_keep_alive {
-    type: "transfer_keep_alive"
+  export interface transferKeepAlive {
+    type: "transferKeepAlive"
     dest: types.sp_runtime.multiaddress.MultiAddress
     value: types.Compact<types.u128>
   }
@@ -106,18 +106,18 @@ export namespace Call {
    * - O(1). Just like transfer, but reading the user's transferable balance first.
    *   #</weight>
    */
-  export interface transfer_all {
-    type: "transfer_all"
+  export interface transferAll {
+    type: "transferAll"
     dest: types.sp_runtime.multiaddress.MultiAddress
-    keep_alive: boolean
+    keepAlive: boolean
   }
   /**
    * Unreserve some balance from a user by force.
    *
    * Can only be called by ROOT.
    */
-  export interface force_unreserve {
-    type: "force_unreserve"
+  export interface forceUnreserve {
+    type: "forceUnreserve"
     who: types.sp_runtime.multiaddress.MultiAddress
     amount: types.u128
   }
@@ -163,10 +163,10 @@ export namespace Call {
    *
    * The dispatch origin for this call is `root`.
    */
-  export function set_balance(
-    value: Omit<types.pallet_balances.pallet.Call.set_balance, "type">,
-  ): types.pallet_balances.pallet.Call.set_balance {
-    return { type: "set_balance", ...value }
+  export function setBalance(
+    value: Omit<types.pallet_balances.pallet.Call.setBalance, "type">,
+  ): types.pallet_balances.pallet.Call.setBalance {
+    return { type: "setBalance", ...value }
   }
   /**
    * Exactly as `transfer`, except the origin must be root and the source account may be
@@ -176,10 +176,10 @@ export namespace Call {
    *   assumed to be in the overlay.
    * # </weight>
    */
-  export function force_transfer(
-    value: Omit<types.pallet_balances.pallet.Call.force_transfer, "type">,
-  ): types.pallet_balances.pallet.Call.force_transfer {
-    return { type: "force_transfer", ...value }
+  export function forceTransfer(
+    value: Omit<types.pallet_balances.pallet.Call.forceTransfer, "type">,
+  ): types.pallet_balances.pallet.Call.forceTransfer {
+    return { type: "forceTransfer", ...value }
   }
   /**
    * Same as the [`transfer`] call, but with a check that the transfer will not kill the
@@ -189,10 +189,10 @@ export namespace Call {
    *
    * [`transfer`]: struct.Pallet.html#method.transfer
    */
-  export function transfer_keep_alive(
-    value: Omit<types.pallet_balances.pallet.Call.transfer_keep_alive, "type">,
-  ): types.pallet_balances.pallet.Call.transfer_keep_alive {
-    return { type: "transfer_keep_alive", ...value }
+  export function transferKeepAlive(
+    value: Omit<types.pallet_balances.pallet.Call.transferKeepAlive, "type">,
+  ): types.pallet_balances.pallet.Call.transferKeepAlive {
+    return { type: "transferKeepAlive", ...value }
   }
   /**
    * Transfer the entire transferable balance from the caller account.
@@ -213,20 +213,20 @@ export namespace Call {
    * - O(1). Just like transfer, but reading the user's transferable balance first.
    *   #</weight>
    */
-  export function transfer_all(
-    value: Omit<types.pallet_balances.pallet.Call.transfer_all, "type">,
-  ): types.pallet_balances.pallet.Call.transfer_all {
-    return { type: "transfer_all", ...value }
+  export function transferAll(
+    value: Omit<types.pallet_balances.pallet.Call.transferAll, "type">,
+  ): types.pallet_balances.pallet.Call.transferAll {
+    return { type: "transferAll", ...value }
   }
   /**
    * Unreserve some balance from a user by force.
    *
    * Can only be called by ROOT.
    */
-  export function force_unreserve(
-    value: Omit<types.pallet_balances.pallet.Call.force_unreserve, "type">,
-  ): types.pallet_balances.pallet.Call.force_unreserve {
-    return { type: "force_unreserve", ...value }
+  export function forceUnreserve(
+    value: Omit<types.pallet_balances.pallet.Call.forceUnreserve, "type">,
+  ): types.pallet_balances.pallet.Call.forceUnreserve {
+    return { type: "forceUnreserve", ...value }
   }
 }
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
@@ -258,7 +258,7 @@ export namespace Event {
   export interface Endowed {
     type: "Endowed"
     account: types.sp_core.crypto.AccountId32
-    free_balance: types.u128
+    freeBalance: types.u128
   }
   /**
    * An account was removed whose balance was non-zero but below ExistentialDeposit,
@@ -304,7 +304,7 @@ export namespace Event {
     from: types.sp_core.crypto.AccountId32
     to: types.sp_core.crypto.AccountId32
     amount: types.u128
-    destination_status: types.frame_support.traits.tokens.misc.BalanceStatus
+    destinationStatus: types.frame_support.traits.tokens.misc.BalanceStatus
   }
   /** Some amount was deposited (e.g. for transaction fees). */
   export interface Deposit {

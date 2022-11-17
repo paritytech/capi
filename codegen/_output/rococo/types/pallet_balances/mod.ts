@@ -7,8 +7,8 @@ export * as pallet from "./pallet.ts"
 export interface AccountData {
   free: types.u128
   reserved: types.u128
-  misc_frozen: types.u128
-  fee_frozen: types.u128
+  miscFrozen: types.u128
+  feeFrozen: types.u128
 }
 
 export function AccountData(value: types.pallet_balances.AccountData) {
@@ -27,7 +27,7 @@ export function BalanceLock(value: types.pallet_balances.BalanceLock) {
 
 export type Reasons = "Fee" | "Misc" | "All"
 
-export type Releases = "V1_0_0" | "V2_0_0"
+export type Releases = "V100" | "V200"
 
 export interface ReserveData {
   id: Uint8Array

@@ -6,15 +6,15 @@ import type * as types from "../mod.ts"
 
 export type Call =
   | types.pallet_xcm.pallet.Call.send
-  | types.pallet_xcm.pallet.Call.teleport_assets
-  | types.pallet_xcm.pallet.Call.reserve_transfer_assets
+  | types.pallet_xcm.pallet.Call.teleportAssets
+  | types.pallet_xcm.pallet.Call.reserveTransferAssets
   | types.pallet_xcm.pallet.Call.execute
-  | types.pallet_xcm.pallet.Call.force_xcm_version
-  | types.pallet_xcm.pallet.Call.force_default_xcm_version
-  | types.pallet_xcm.pallet.Call.force_subscribe_version_notify
-  | types.pallet_xcm.pallet.Call.force_unsubscribe_version_notify
-  | types.pallet_xcm.pallet.Call.limited_reserve_transfer_assets
-  | types.pallet_xcm.pallet.Call.limited_teleport_assets
+  | types.pallet_xcm.pallet.Call.forceXcmVersion
+  | types.pallet_xcm.pallet.Call.forceDefaultXcmVersion
+  | types.pallet_xcm.pallet.Call.forceSubscribeVersionNotify
+  | types.pallet_xcm.pallet.Call.forceUnsubscribeVersionNotify
+  | types.pallet_xcm.pallet.Call.limitedReserveTransferAssets
+  | types.pallet_xcm.pallet.Call.limitedTeleportAssets
 export namespace Call {
   export interface send {
     type: "send"
@@ -38,12 +38,12 @@ export namespace Call {
    * - `fee_asset_item`: The index into `assets` of the item which should be used to pay
    *   fees.
    */
-  export interface teleport_assets {
-    type: "teleport_assets"
+  export interface teleportAssets {
+    type: "teleportAssets"
     dest: types.xcm.VersionedMultiLocation
     beneficiary: types.xcm.VersionedMultiLocation
     assets: types.xcm.VersionedMultiAssets
-    fee_asset_item: types.u32
+    feeAssetItem: types.u32
   }
   /**
    * Transfer some assets from the local chain to the sovereign account of a destination
@@ -63,12 +63,12 @@ export namespace Call {
    * - `fee_asset_item`: The index into `assets` of the item which should be used to pay
    *   fees.
    */
-  export interface reserve_transfer_assets {
-    type: "reserve_transfer_assets"
+  export interface reserveTransferAssets {
+    type: "reserveTransferAssets"
     dest: types.xcm.VersionedMultiLocation
     beneficiary: types.xcm.VersionedMultiLocation
     assets: types.xcm.VersionedMultiAssets
-    fee_asset_item: types.u32
+    feeAssetItem: types.u32
   }
   /**
    * Execute an XCM message from a local, signed, origin.
@@ -86,7 +86,7 @@ export namespace Call {
   export interface execute {
     type: "execute"
     message: types.xcm.VersionedXcm
-    max_weight: types.u64
+    maxWeight: types.u64
   }
   /**
    * Extoll that a particular destination can be communicated with through a particular
@@ -96,10 +96,10 @@ export namespace Call {
    * - `location`: The destination that is being described.
    * - `xcm_version`: The latest version of XCM that `location` supports.
    */
-  export interface force_xcm_version {
-    type: "force_xcm_version"
+  export interface forceXcmVersion {
+    type: "forceXcmVersion"
     location: types.xcm.v1.multilocation.MultiLocation
-    xcm_version: types.u32
+    xcmVersion: types.u32
   }
   /**
    * Set a safe XCM version (the version that XCM should be encoded with if the most recent
@@ -108,9 +108,9 @@ export namespace Call {
    * - `origin`: Must be Root.
    * - `maybe_xcm_version`: The default XCM encoding version, or `None` to disable.
    */
-  export interface force_default_xcm_version {
-    type: "force_default_xcm_version"
-    maybe_xcm_version: types.u32 | undefined
+  export interface forceDefaultXcmVersion {
+    type: "forceDefaultXcmVersion"
+    maybeXcmVersion: types.u32 | undefined
   }
   /**
    * Ask a location to notify us regarding their XCM version and any changes to it.
@@ -118,8 +118,8 @@ export namespace Call {
    * - `origin`: Must be Root.
    * - `location`: The location to which we should subscribe for XCM version notifications.
    */
-  export interface force_subscribe_version_notify {
-    type: "force_subscribe_version_notify"
+  export interface forceSubscribeVersionNotify {
+    type: "forceSubscribeVersionNotify"
     location: types.xcm.VersionedMultiLocation
   }
   /**
@@ -130,8 +130,8 @@ export namespace Call {
    * - `location`: The location to which we are currently subscribed for XCM version
    *   notifications which we no longer desire.
    */
-  export interface force_unsubscribe_version_notify {
-    type: "force_unsubscribe_version_notify"
+  export interface forceUnsubscribeVersionNotify {
+    type: "forceUnsubscribeVersionNotify"
     location: types.xcm.VersionedMultiLocation
   }
   /**
@@ -154,13 +154,13 @@ export namespace Call {
    *   fees.
    * - `weight_limit`: The remote-side weight limit, if any, for the XCM fee purchase.
    */
-  export interface limited_reserve_transfer_assets {
-    type: "limited_reserve_transfer_assets"
+  export interface limitedReserveTransferAssets {
+    type: "limitedReserveTransferAssets"
     dest: types.xcm.VersionedMultiLocation
     beneficiary: types.xcm.VersionedMultiLocation
     assets: types.xcm.VersionedMultiAssets
-    fee_asset_item: types.u32
-    weight_limit: types.xcm.v2.WeightLimit
+    feeAssetItem: types.u32
+    weightLimit: types.xcm.v2.WeightLimit
   }
   /**
    * Teleport some assets from the local chain to some destination chain.
@@ -181,13 +181,13 @@ export namespace Call {
    *   fees.
    * - `weight_limit`: The remote-side weight limit, if any, for the XCM fee purchase.
    */
-  export interface limited_teleport_assets {
-    type: "limited_teleport_assets"
+  export interface limitedTeleportAssets {
+    type: "limitedTeleportAssets"
     dest: types.xcm.VersionedMultiLocation
     beneficiary: types.xcm.VersionedMultiLocation
     assets: types.xcm.VersionedMultiAssets
-    fee_asset_item: types.u32
-    weight_limit: types.xcm.v2.WeightLimit
+    feeAssetItem: types.u32
+    weightLimit: types.xcm.v2.WeightLimit
   }
   export function send(
     value: Omit<types.pallet_xcm.pallet.Call.send, "type">,
@@ -211,10 +211,10 @@ export namespace Call {
    * - `fee_asset_item`: The index into `assets` of the item which should be used to pay
    *   fees.
    */
-  export function teleport_assets(
-    value: Omit<types.pallet_xcm.pallet.Call.teleport_assets, "type">,
-  ): types.pallet_xcm.pallet.Call.teleport_assets {
-    return { type: "teleport_assets", ...value }
+  export function teleportAssets(
+    value: Omit<types.pallet_xcm.pallet.Call.teleportAssets, "type">,
+  ): types.pallet_xcm.pallet.Call.teleportAssets {
+    return { type: "teleportAssets", ...value }
   }
   /**
    * Transfer some assets from the local chain to the sovereign account of a destination
@@ -234,10 +234,10 @@ export namespace Call {
    * - `fee_asset_item`: The index into `assets` of the item which should be used to pay
    *   fees.
    */
-  export function reserve_transfer_assets(
-    value: Omit<types.pallet_xcm.pallet.Call.reserve_transfer_assets, "type">,
-  ): types.pallet_xcm.pallet.Call.reserve_transfer_assets {
-    return { type: "reserve_transfer_assets", ...value }
+  export function reserveTransferAssets(
+    value: Omit<types.pallet_xcm.pallet.Call.reserveTransferAssets, "type">,
+  ): types.pallet_xcm.pallet.Call.reserveTransferAssets {
+    return { type: "reserveTransferAssets", ...value }
   }
   /**
    * Execute an XCM message from a local, signed, origin.
@@ -265,10 +265,10 @@ export namespace Call {
    * - `location`: The destination that is being described.
    * - `xcm_version`: The latest version of XCM that `location` supports.
    */
-  export function force_xcm_version(
-    value: Omit<types.pallet_xcm.pallet.Call.force_xcm_version, "type">,
-  ): types.pallet_xcm.pallet.Call.force_xcm_version {
-    return { type: "force_xcm_version", ...value }
+  export function forceXcmVersion(
+    value: Omit<types.pallet_xcm.pallet.Call.forceXcmVersion, "type">,
+  ): types.pallet_xcm.pallet.Call.forceXcmVersion {
+    return { type: "forceXcmVersion", ...value }
   }
   /**
    * Set a safe XCM version (the version that XCM should be encoded with if the most recent
@@ -277,10 +277,10 @@ export namespace Call {
    * - `origin`: Must be Root.
    * - `maybe_xcm_version`: The default XCM encoding version, or `None` to disable.
    */
-  export function force_default_xcm_version(
-    value: Omit<types.pallet_xcm.pallet.Call.force_default_xcm_version, "type">,
-  ): types.pallet_xcm.pallet.Call.force_default_xcm_version {
-    return { type: "force_default_xcm_version", ...value }
+  export function forceDefaultXcmVersion(
+    value: Omit<types.pallet_xcm.pallet.Call.forceDefaultXcmVersion, "type">,
+  ): types.pallet_xcm.pallet.Call.forceDefaultXcmVersion {
+    return { type: "forceDefaultXcmVersion", ...value }
   }
   /**
    * Ask a location to notify us regarding their XCM version and any changes to it.
@@ -288,10 +288,10 @@ export namespace Call {
    * - `origin`: Must be Root.
    * - `location`: The location to which we should subscribe for XCM version notifications.
    */
-  export function force_subscribe_version_notify(
-    value: Omit<types.pallet_xcm.pallet.Call.force_subscribe_version_notify, "type">,
-  ): types.pallet_xcm.pallet.Call.force_subscribe_version_notify {
-    return { type: "force_subscribe_version_notify", ...value }
+  export function forceSubscribeVersionNotify(
+    value: Omit<types.pallet_xcm.pallet.Call.forceSubscribeVersionNotify, "type">,
+  ): types.pallet_xcm.pallet.Call.forceSubscribeVersionNotify {
+    return { type: "forceSubscribeVersionNotify", ...value }
   }
   /**
    * Require that a particular destination should no longer notify us regarding any XCM
@@ -301,10 +301,10 @@ export namespace Call {
    * - `location`: The location to which we are currently subscribed for XCM version
    *   notifications which we no longer desire.
    */
-  export function force_unsubscribe_version_notify(
-    value: Omit<types.pallet_xcm.pallet.Call.force_unsubscribe_version_notify, "type">,
-  ): types.pallet_xcm.pallet.Call.force_unsubscribe_version_notify {
-    return { type: "force_unsubscribe_version_notify", ...value }
+  export function forceUnsubscribeVersionNotify(
+    value: Omit<types.pallet_xcm.pallet.Call.forceUnsubscribeVersionNotify, "type">,
+  ): types.pallet_xcm.pallet.Call.forceUnsubscribeVersionNotify {
+    return { type: "forceUnsubscribeVersionNotify", ...value }
   }
   /**
    * Transfer some assets from the local chain to the sovereign account of a destination
@@ -326,10 +326,10 @@ export namespace Call {
    *   fees.
    * - `weight_limit`: The remote-side weight limit, if any, for the XCM fee purchase.
    */
-  export function limited_reserve_transfer_assets(
-    value: Omit<types.pallet_xcm.pallet.Call.limited_reserve_transfer_assets, "type">,
-  ): types.pallet_xcm.pallet.Call.limited_reserve_transfer_assets {
-    return { type: "limited_reserve_transfer_assets", ...value }
+  export function limitedReserveTransferAssets(
+    value: Omit<types.pallet_xcm.pallet.Call.limitedReserveTransferAssets, "type">,
+  ): types.pallet_xcm.pallet.Call.limitedReserveTransferAssets {
+    return { type: "limitedReserveTransferAssets", ...value }
   }
   /**
    * Teleport some assets from the local chain to some destination chain.
@@ -350,10 +350,10 @@ export namespace Call {
    *   fees.
    * - `weight_limit`: The remote-side weight limit, if any, for the XCM fee purchase.
    */
-  export function limited_teleport_assets(
-    value: Omit<types.pallet_xcm.pallet.Call.limited_teleport_assets, "type">,
-  ): types.pallet_xcm.pallet.Call.limited_teleport_assets {
-    return { type: "limited_teleport_assets", ...value }
+  export function limitedTeleportAssets(
+    value: Omit<types.pallet_xcm.pallet.Call.limitedTeleportAssets, "type">,
+  ): types.pallet_xcm.pallet.Call.limitedTeleportAssets {
+    return { type: "limitedTeleportAssets", ...value }
   }
 }
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
@@ -810,13 +810,13 @@ export namespace QueryStatus {
   export interface Pending {
     type: "Pending"
     responder: types.xcm.VersionedMultiLocation
-    maybe_notify: [types.u8, types.u8] | undefined
+    maybeNotify: [types.u8, types.u8] | undefined
     timeout: types.u32
   }
   export interface VersionNotifier {
     type: "VersionNotifier"
     origin: types.xcm.VersionedMultiLocation
-    is_active: boolean
+    isActive: boolean
   }
   export interface Ready {
     type: "Ready"

@@ -6,17 +6,17 @@ import type * as types from "../mod.ts"
 
 export type Call =
   | types.pallet_nomination_pools.pallet.Call.join
-  | types.pallet_nomination_pools.pallet.Call.bond_extra
-  | types.pallet_nomination_pools.pallet.Call.claim_payout
+  | types.pallet_nomination_pools.pallet.Call.bondExtra
+  | types.pallet_nomination_pools.pallet.Call.claimPayout
   | types.pallet_nomination_pools.pallet.Call.unbond
-  | types.pallet_nomination_pools.pallet.Call.pool_withdraw_unbonded
-  | types.pallet_nomination_pools.pallet.Call.withdraw_unbonded
+  | types.pallet_nomination_pools.pallet.Call.poolWithdrawUnbonded
+  | types.pallet_nomination_pools.pallet.Call.withdrawUnbonded
   | types.pallet_nomination_pools.pallet.Call.create
   | types.pallet_nomination_pools.pallet.Call.nominate
-  | types.pallet_nomination_pools.pallet.Call.set_state
-  | types.pallet_nomination_pools.pallet.Call.set_metadata
-  | types.pallet_nomination_pools.pallet.Call.set_configs
-  | types.pallet_nomination_pools.pallet.Call.update_roles
+  | types.pallet_nomination_pools.pallet.Call.setState
+  | types.pallet_nomination_pools.pallet.Call.setMetadata
+  | types.pallet_nomination_pools.pallet.Call.setConfigs
+  | types.pallet_nomination_pools.pallet.Call.updateRoles
   | types.pallet_nomination_pools.pallet.Call.chill
 export namespace Call {
   /**
@@ -34,7 +34,7 @@ export namespace Call {
   export interface join {
     type: "join"
     amount: types.Compact<types.u128>
-    pool_id: types.u32
+    poolId: types.u32
   }
   /**
    * Bond `extra` more funds from `origin` into the pool to which they already belong.
@@ -44,8 +44,8 @@ export namespace Call {
    *
    * Bonding extra funds implies an automatic payout of all pending rewards as well.
    */
-  export interface bond_extra {
-    type: "bond_extra"
+  export interface bondExtra {
+    type: "bondExtra"
     extra: types.pallet_nomination_pools.BondExtra
   }
   /**
@@ -56,8 +56,8 @@ export namespace Call {
    * The member will earn rewards pro rata based on the members stake vs the sum of the
    * members in the pools stake. Rewards do not "expire".
    */
-  export interface claim_payout {
-    type: "claim_payout"
+  export interface claimPayout {
+    type: "claimPayout"
   }
   /**
    * Unbond up to `unbonding_points` of the `member_account`'s funds from the pool. It
@@ -91,8 +91,8 @@ export namespace Call {
    */
   export interface unbond {
     type: "unbond"
-    member_account: types.sp_runtime.multiaddress.MultiAddress
-    unbonding_points: types.Compact<types.u128>
+    memberAccount: types.sp_runtime.multiaddress.MultiAddress
+    unbondingPoints: types.Compact<types.u128>
   }
   /**
    * Call `withdraw_unbonded` for the pools account. This call can be made by any account.
@@ -102,10 +102,10 @@ export namespace Call {
    * would probably see an error like `NoMoreChunks` emitted from the staking system when
    * they attempt to unbond.
    */
-  export interface pool_withdraw_unbonded {
-    type: "pool_withdraw_unbonded"
-    pool_id: types.u32
-    num_slashing_spans: types.u32
+  export interface poolWithdrawUnbonded {
+    type: "poolWithdrawUnbonded"
+    poolId: types.u32
+    numSlashingSpans: types.u32
   }
   /**
    * Withdraw unbonded funds from `member_account`. If no bonded funds can be unbonded, an
@@ -128,10 +128,10 @@ export namespace Call {
    *
    * If the target is the depositor, the pool will be destroyed.
    */
-  export interface withdraw_unbonded {
-    type: "withdraw_unbonded"
-    member_account: types.sp_runtime.multiaddress.MultiAddress
-    num_slashing_spans: types.u32
+  export interface withdrawUnbonded {
+    type: "withdrawUnbonded"
+    memberAccount: types.sp_runtime.multiaddress.MultiAddress
+    numSlashingSpans: types.u32
   }
   /**
    * Create a new delegation pool.
@@ -157,7 +157,7 @@ export namespace Call {
     amount: types.Compact<types.u128>
     root: types.sp_runtime.multiaddress.MultiAddress
     nominator: types.sp_runtime.multiaddress.MultiAddress
-    state_toggler: types.sp_runtime.multiaddress.MultiAddress
+    stateToggler: types.sp_runtime.multiaddress.MultiAddress
   }
   /**
    * Nominate on behalf of the pool.
@@ -170,7 +170,7 @@ export namespace Call {
    */
   export interface nominate {
     type: "nominate"
-    pool_id: types.u32
+    poolId: types.u32
     validators: Array<types.sp_core.crypto.AccountId32>
   }
   /**
@@ -185,9 +185,9 @@ export namespace Call {
    * 2. if the pool conditions to be open are NOT met (as described by `ok_to_be_open`), and
    *    then the state of the pool can be permissionlessly changed to `Destroying`.
    */
-  export interface set_state {
-    type: "set_state"
-    pool_id: types.u32
+  export interface setState {
+    type: "setState"
+    poolId: types.u32
     state: types.pallet_nomination_pools.PoolState
   }
   /**
@@ -196,9 +196,9 @@ export namespace Call {
    * The dispatch origin of this call must be signed by the state toggler, or the root role
    * of the pool.
    */
-  export interface set_metadata {
-    type: "set_metadata"
-    pool_id: types.u32
+  export interface setMetadata {
+    type: "setMetadata"
+    poolId: types.u32
     metadata: Uint8Array
   }
   /**
@@ -213,13 +213,13 @@ export namespace Call {
    * * `max_members` - Set [`MaxPoolMembers`].
    * * `max_members_per_pool` - Set [`MaxPoolMembersPerPool`].
    */
-  export interface set_configs {
-    type: "set_configs"
-    min_join_bond: types.pallet_nomination_pools.ConfigOp.$$u128
-    min_create_bond: types.pallet_nomination_pools.ConfigOp.$$u128
-    max_pools: types.pallet_nomination_pools.ConfigOp.$$u32
-    max_members: types.pallet_nomination_pools.ConfigOp.$$u32
-    max_members_per_pool: types.pallet_nomination_pools.ConfigOp.$$u32
+  export interface setConfigs {
+    type: "setConfigs"
+    minJoinBond: types.pallet_nomination_pools.ConfigOp.$$u128
+    minCreateBond: types.pallet_nomination_pools.ConfigOp.$$u128
+    maxPools: types.pallet_nomination_pools.ConfigOp.$$u32
+    maxMembers: types.pallet_nomination_pools.ConfigOp.$$u32
+    maxMembersPerPool: types.pallet_nomination_pools.ConfigOp.$$u32
   }
   /**
    * Update the roles of the pool.
@@ -230,12 +230,12 @@ export namespace Call {
    * It emits an event, notifying UIs of the role change. This event is quite relevant to
    * most pool members and they should be informed of changes to pool roles.
    */
-  export interface update_roles {
-    type: "update_roles"
-    pool_id: types.u32
-    new_root: types.pallet_nomination_pools.ConfigOp.$$sp_core.crypto.AccountId32
-    new_nominator: types.pallet_nomination_pools.ConfigOp.$$sp_core.crypto.AccountId32
-    new_state_toggler: types.pallet_nomination_pools.ConfigOp.$$sp_core.crypto.AccountId32
+  export interface updateRoles {
+    type: "updateRoles"
+    poolId: types.u32
+    newRoot: types.pallet_nomination_pools.ConfigOp.$$sp_core.crypto.AccountId32
+    newNominator: types.pallet_nomination_pools.ConfigOp.$$sp_core.crypto.AccountId32
+    newStateToggler: types.pallet_nomination_pools.ConfigOp.$$sp_core.crypto.AccountId32
   }
   /**
    * Chill on behalf of the pool.
@@ -248,7 +248,7 @@ export namespace Call {
    */
   export interface chill {
     type: "chill"
-    pool_id: types.u32
+    poolId: types.u32
   }
   /**
    * Stake funds with a pool. The amount to bond is transferred from the member to the
@@ -275,10 +275,10 @@ export namespace Call {
    *
    * Bonding extra funds implies an automatic payout of all pending rewards as well.
    */
-  export function bond_extra(
-    value: Omit<types.pallet_nomination_pools.pallet.Call.bond_extra, "type">,
-  ): types.pallet_nomination_pools.pallet.Call.bond_extra {
-    return { type: "bond_extra", ...value }
+  export function bondExtra(
+    value: Omit<types.pallet_nomination_pools.pallet.Call.bondExtra, "type">,
+  ): types.pallet_nomination_pools.pallet.Call.bondExtra {
+    return { type: "bondExtra", ...value }
   }
   /**
    * A bonded member can use this to claim their payout based on the rewards that the pool
@@ -288,8 +288,8 @@ export namespace Call {
    * The member will earn rewards pro rata based on the members stake vs the sum of the
    * members in the pools stake. Rewards do not "expire".
    */
-  export function claim_payout(): types.pallet_nomination_pools.pallet.Call.claim_payout {
-    return { type: "claim_payout" }
+  export function claimPayout(): types.pallet_nomination_pools.pallet.Call.claimPayout {
+    return { type: "claimPayout" }
   }
   /**
    * Unbond up to `unbonding_points` of the `member_account`'s funds from the pool. It
@@ -334,10 +334,10 @@ export namespace Call {
    * would probably see an error like `NoMoreChunks` emitted from the staking system when
    * they attempt to unbond.
    */
-  export function pool_withdraw_unbonded(
-    value: Omit<types.pallet_nomination_pools.pallet.Call.pool_withdraw_unbonded, "type">,
-  ): types.pallet_nomination_pools.pallet.Call.pool_withdraw_unbonded {
-    return { type: "pool_withdraw_unbonded", ...value }
+  export function poolWithdrawUnbonded(
+    value: Omit<types.pallet_nomination_pools.pallet.Call.poolWithdrawUnbonded, "type">,
+  ): types.pallet_nomination_pools.pallet.Call.poolWithdrawUnbonded {
+    return { type: "poolWithdrawUnbonded", ...value }
   }
   /**
    * Withdraw unbonded funds from `member_account`. If no bonded funds can be unbonded, an
@@ -360,10 +360,10 @@ export namespace Call {
    *
    * If the target is the depositor, the pool will be destroyed.
    */
-  export function withdraw_unbonded(
-    value: Omit<types.pallet_nomination_pools.pallet.Call.withdraw_unbonded, "type">,
-  ): types.pallet_nomination_pools.pallet.Call.withdraw_unbonded {
-    return { type: "withdraw_unbonded", ...value }
+  export function withdrawUnbonded(
+    value: Omit<types.pallet_nomination_pools.pallet.Call.withdrawUnbonded, "type">,
+  ): types.pallet_nomination_pools.pallet.Call.withdrawUnbonded {
+    return { type: "withdrawUnbonded", ...value }
   }
   /**
    * Create a new delegation pool.
@@ -415,10 +415,10 @@ export namespace Call {
    * 2. if the pool conditions to be open are NOT met (as described by `ok_to_be_open`), and
    *    then the state of the pool can be permissionlessly changed to `Destroying`.
    */
-  export function set_state(
-    value: Omit<types.pallet_nomination_pools.pallet.Call.set_state, "type">,
-  ): types.pallet_nomination_pools.pallet.Call.set_state {
-    return { type: "set_state", ...value }
+  export function setState(
+    value: Omit<types.pallet_nomination_pools.pallet.Call.setState, "type">,
+  ): types.pallet_nomination_pools.pallet.Call.setState {
+    return { type: "setState", ...value }
   }
   /**
    * Set a new metadata for the pool.
@@ -426,10 +426,10 @@ export namespace Call {
    * The dispatch origin of this call must be signed by the state toggler, or the root role
    * of the pool.
    */
-  export function set_metadata(
-    value: Omit<types.pallet_nomination_pools.pallet.Call.set_metadata, "type">,
-  ): types.pallet_nomination_pools.pallet.Call.set_metadata {
-    return { type: "set_metadata", ...value }
+  export function setMetadata(
+    value: Omit<types.pallet_nomination_pools.pallet.Call.setMetadata, "type">,
+  ): types.pallet_nomination_pools.pallet.Call.setMetadata {
+    return { type: "setMetadata", ...value }
   }
   /**
    * Update configurations for the nomination pools. The origin for this call must be
@@ -443,10 +443,10 @@ export namespace Call {
    * * `max_members` - Set [`MaxPoolMembers`].
    * * `max_members_per_pool` - Set [`MaxPoolMembersPerPool`].
    */
-  export function set_configs(
-    value: Omit<types.pallet_nomination_pools.pallet.Call.set_configs, "type">,
-  ): types.pallet_nomination_pools.pallet.Call.set_configs {
-    return { type: "set_configs", ...value }
+  export function setConfigs(
+    value: Omit<types.pallet_nomination_pools.pallet.Call.setConfigs, "type">,
+  ): types.pallet_nomination_pools.pallet.Call.setConfigs {
+    return { type: "setConfigs", ...value }
   }
   /**
    * Update the roles of the pool.
@@ -457,10 +457,10 @@ export namespace Call {
    * It emits an event, notifying UIs of the role change. This event is quite relevant to
    * most pool members and they should be informed of changes to pool roles.
    */
-  export function update_roles(
-    value: Omit<types.pallet_nomination_pools.pallet.Call.update_roles, "type">,
-  ): types.pallet_nomination_pools.pallet.Call.update_roles {
-    return { type: "update_roles", ...value }
+  export function updateRoles(
+    value: Omit<types.pallet_nomination_pools.pallet.Call.updateRoles, "type">,
+  ): types.pallet_nomination_pools.pallet.Call.updateRoles {
+    return { type: "updateRoles", ...value }
   }
   /**
    * Chill on behalf of the pool.
@@ -736,13 +736,13 @@ export namespace Event {
   export interface Created {
     type: "Created"
     depositor: types.sp_core.crypto.AccountId32
-    pool_id: types.u32
+    poolId: types.u32
   }
   /** A member has became bonded in a pool. */
   export interface Bonded {
     type: "Bonded"
     member: types.sp_core.crypto.AccountId32
-    pool_id: types.u32
+    poolId: types.u32
     bonded: types.u128
     joined: boolean
   }
@@ -750,7 +750,7 @@ export namespace Event {
   export interface PaidOut {
     type: "PaidOut"
     member: types.sp_core.crypto.AccountId32
-    pool_id: types.u32
+    poolId: types.u32
     payout: types.u128
   }
   /**
@@ -769,7 +769,7 @@ export namespace Event {
   export interface Unbonded {
     type: "Unbonded"
     member: types.sp_core.crypto.AccountId32
-    pool_id: types.u32
+    poolId: types.u32
     balance: types.u128
     points: types.u128
     era: types.u32
@@ -785,20 +785,20 @@ export namespace Event {
   export interface Withdrawn {
     type: "Withdrawn"
     member: types.sp_core.crypto.AccountId32
-    pool_id: types.u32
+    poolId: types.u32
     balance: types.u128
     points: types.u128
   }
   /** A pool has been destroyed. */
   export interface Destroyed {
     type: "Destroyed"
-    pool_id: types.u32
+    poolId: types.u32
   }
   /** The state of a pool has changed */
   export interface StateChanged {
     type: "StateChanged"
-    pool_id: types.u32
-    new_state: types.pallet_nomination_pools.PoolState
+    poolId: types.u32
+    newState: types.pallet_nomination_pools.PoolState
   }
   /**
    * A member has been removed from a pool.
@@ -807,7 +807,7 @@ export namespace Event {
    */
   export interface MemberRemoved {
     type: "MemberRemoved"
-    pool_id: types.u32
+    poolId: types.u32
     member: types.sp_core.crypto.AccountId32
   }
   /**
@@ -817,19 +817,19 @@ export namespace Event {
   export interface RolesUpdated {
     type: "RolesUpdated"
     root: types.sp_core.crypto.AccountId32 | undefined
-    state_toggler: types.sp_core.crypto.AccountId32 | undefined
+    stateToggler: types.sp_core.crypto.AccountId32 | undefined
     nominator: types.sp_core.crypto.AccountId32 | undefined
   }
   /** The active balance of pool `pool_id` has been slashed to `balance`. */
   export interface PoolSlashed {
     type: "PoolSlashed"
-    pool_id: types.u32
+    poolId: types.u32
     balance: types.u128
   }
   /** The unbond pool at `era` of pool `pool_id` has been slashed to `balance`. */
   export interface UnbondingPoolSlashed {
     type: "UnbondingPoolSlashed"
-    pool_id: types.u32
+    poolId: types.u32
     era: types.u32
     balance: types.u128
   }

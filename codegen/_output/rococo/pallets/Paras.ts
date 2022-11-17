@@ -288,34 +288,31 @@ export const CodeByHash = new C.fluent.Storage(
 )
 
 /** Set the storage for the parachain validation code immediately. */
-export function force_set_current_code(
-  value: Omit<types.polkadot_runtime_parachains.paras.pallet.Call.force_set_current_code, "type">,
+export function forceSetCurrentCode(
+  value: Omit<types.polkadot_runtime_parachains.paras.pallet.Call.forceSetCurrentCode, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Paras", value: { ...value, type: "force_set_current_code" } }
+  return { type: "Paras", value: { ...value, type: "forceSetCurrentCode" } }
 }
 
 /** Set the storage for the current parachain head data immediately. */
-export function force_set_current_head(
-  value: Omit<types.polkadot_runtime_parachains.paras.pallet.Call.force_set_current_head, "type">,
+export function forceSetCurrentHead(
+  value: Omit<types.polkadot_runtime_parachains.paras.pallet.Call.forceSetCurrentHead, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Paras", value: { ...value, type: "force_set_current_head" } }
+  return { type: "Paras", value: { ...value, type: "forceSetCurrentHead" } }
 }
 
 /** Schedule an upgrade as if it was scheduled in the given relay parent block. */
-export function force_schedule_code_upgrade(
-  value: Omit<
-    types.polkadot_runtime_parachains.paras.pallet.Call.force_schedule_code_upgrade,
-    "type"
-  >,
+export function forceScheduleCodeUpgrade(
+  value: Omit<types.polkadot_runtime_parachains.paras.pallet.Call.forceScheduleCodeUpgrade, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Paras", value: { ...value, type: "force_schedule_code_upgrade" } }
+  return { type: "Paras", value: { ...value, type: "forceScheduleCodeUpgrade" } }
 }
 
 /** Note a new block head for para within the context of the current block. */
-export function force_note_new_head(
-  value: Omit<types.polkadot_runtime_parachains.paras.pallet.Call.force_note_new_head, "type">,
+export function forceNoteNewHead(
+  value: Omit<types.polkadot_runtime_parachains.paras.pallet.Call.forceNoteNewHead, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Paras", value: { ...value, type: "force_note_new_head" } }
+  return { type: "Paras", value: { ...value, type: "forceNoteNewHead" } }
 }
 
 /**
@@ -323,10 +320,10 @@ export function force_note_new_head(
  * We can't queue it any sooner than this without going into the
  * initializer...
  */
-export function force_queue_action(
-  value: Omit<types.polkadot_runtime_parachains.paras.pallet.Call.force_queue_action, "type">,
+export function forceQueueAction(
+  value: Omit<types.polkadot_runtime_parachains.paras.pallet.Call.forceQueueAction, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Paras", value: { ...value, type: "force_queue_action" } }
+  return { type: "Paras", value: { ...value, type: "forceQueueAction" } }
 }
 
 /**
@@ -344,13 +341,10 @@ export function force_queue_action(
  * This function is mainly meant to be used for upgrading parachains that do not follow
  * the go-ahead signal while the PVF pre-checking feature is enabled.
  */
-export function add_trusted_validation_code(
-  value: Omit<
-    types.polkadot_runtime_parachains.paras.pallet.Call.add_trusted_validation_code,
-    "type"
-  >,
+export function addTrustedValidationCode(
+  value: Omit<types.polkadot_runtime_parachains.paras.pallet.Call.addTrustedValidationCode, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Paras", value: { ...value, type: "add_trusted_validation_code" } }
+  return { type: "Paras", value: { ...value, type: "addTrustedValidationCode" } }
 }
 
 /**
@@ -360,24 +354,18 @@ export function add_trusted_validation_code(
  * that was suddenly got used by some parachain while this dispatchable was pending
  * dispatching.
  */
-export function poke_unused_validation_code(
-  value: Omit<
-    types.polkadot_runtime_parachains.paras.pallet.Call.poke_unused_validation_code,
-    "type"
-  >,
+export function pokeUnusedValidationCode(
+  value: Omit<types.polkadot_runtime_parachains.paras.pallet.Call.pokeUnusedValidationCode, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Paras", value: { ...value, type: "poke_unused_validation_code" } }
+  return { type: "Paras", value: { ...value, type: "pokeUnusedValidationCode" } }
 }
 
 /**
  * Includes a statement for a PVF pre-checking vote. Potentially, finalizes the vote and
  * enacts the results if that was the last vote before achieving the supermajority.
  */
-export function include_pvf_check_statement(
-  value: Omit<
-    types.polkadot_runtime_parachains.paras.pallet.Call.include_pvf_check_statement,
-    "type"
-  >,
+export function includePvfCheckStatement(
+  value: Omit<types.polkadot_runtime_parachains.paras.pallet.Call.includePvfCheckStatement, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Paras", value: { ...value, type: "include_pvf_check_statement" } }
+  return { type: "Paras", value: { ...value, type: "includePvfCheckStatement" } }
 }

@@ -400,7 +400,7 @@ export interface IdentityInfo {
   web: types.pallet_identity.types.Data
   riot: types.pallet_identity.types.Data
   email: types.pallet_identity.types.Data
-  pgp_fingerprint: Uint8Array | undefined
+  pgpFingerprint: Uint8Array | undefined
   image: types.pallet_identity.types.Data
   twitter: types.pallet_identity.types.Data
 }

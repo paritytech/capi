@@ -5,7 +5,7 @@ import type * as types from "../mod.ts"
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 
 export type Call =
-  | types.pallet_fast_unstake.pallet.Call.register_fast_unstake
+  | types.pallet_fast_unstake.pallet.Call.registerFastUnstake
   | types.pallet_fast_unstake.pallet.Call.deregister
   | types.pallet_fast_unstake.pallet.Call.control
 export namespace Call {
@@ -29,8 +29,8 @@ export namespace Call {
    * the normal staking system, but they lose part of their unbonding chunks due to consuming
    * the chain's resources.
    */
-  export interface register_fast_unstake {
-    type: "register_fast_unstake"
+  export interface registerFastUnstake {
+    type: "registerFastUnstake"
   }
   /**
    * Deregister oneself from the fast-unstake.
@@ -51,7 +51,7 @@ export namespace Call {
    */
   export interface control {
     type: "control"
-    unchecked_eras_to_check: types.u32
+    uncheckedErasToCheck: types.u32
   }
   /**
    * Register oneself for fast-unstake.
@@ -73,8 +73,8 @@ export namespace Call {
    * the normal staking system, but they lose part of their unbonding chunks due to consuming
    * the chain's resources.
    */
-  export function register_fast_unstake(): types.pallet_fast_unstake.pallet.Call.register_fast_unstake {
-    return { type: "register_fast_unstake" }
+  export function registerFastUnstake(): types.pallet_fast_unstake.pallet.Call.registerFastUnstake {
+    return { type: "registerFastUnstake" }
   }
   /**
    * Deregister oneself from the fast-unstake.

@@ -7,7 +7,7 @@ export * as pallet from "./pallet.ts"
 export type RawOrigin =
   | types.pallet_collective.RawOrigin.Members
   | types.pallet_collective.RawOrigin.Member
-  | types.pallet_collective.RawOrigin._Phantom
+  | types.pallet_collective.RawOrigin.Phantom
 export namespace RawOrigin {
   export interface Members {
     type: "Members"
@@ -17,8 +17,8 @@ export namespace RawOrigin {
     type: "Member"
     value: types.sp_core.crypto.AccountId32
   }
-  export interface _Phantom {
-    type: "_Phantom"
+  export interface Phantom {
+    type: "Phantom"
   }
   export function Members(
     ...value: types.pallet_collective.RawOrigin.Members["value"]
@@ -30,8 +30,8 @@ export namespace RawOrigin {
   ): types.pallet_collective.RawOrigin.Member {
     return { type: "Member", value }
   }
-  export function _Phantom(): types.pallet_collective.RawOrigin._Phantom {
-    return { type: "_Phantom" }
+  export function Phantom(): types.pallet_collective.RawOrigin.Phantom {
+    return { type: "Phantom" }
   }
 }
 

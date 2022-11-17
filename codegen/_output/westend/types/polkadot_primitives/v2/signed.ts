@@ -4,7 +4,7 @@ import type * as types from "../../mod.ts"
 
 export interface UncheckedSigned {
   payload: types.polkadot_primitives.v2.AvailabilityBitfield
-  validator_index: types.polkadot_primitives.v2.ValidatorIndex
+  validatorIndex: types.polkadot_primitives.v2.ValidatorIndex
   signature: types.polkadot_primitives.v2.validator_app.Signature
 }
 

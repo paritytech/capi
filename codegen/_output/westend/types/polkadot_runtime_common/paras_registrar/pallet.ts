@@ -6,14 +6,14 @@ import type * as types from "../../mod.ts"
 
 export type Call =
   | types.polkadot_runtime_common.paras_registrar.pallet.Call.register
-  | types.polkadot_runtime_common.paras_registrar.pallet.Call.force_register
+  | types.polkadot_runtime_common.paras_registrar.pallet.Call.forceRegister
   | types.polkadot_runtime_common.paras_registrar.pallet.Call.deregister
   | types.polkadot_runtime_common.paras_registrar.pallet.Call.swap
-  | types.polkadot_runtime_common.paras_registrar.pallet.Call.remove_lock
+  | types.polkadot_runtime_common.paras_registrar.pallet.Call.removeLock
   | types.polkadot_runtime_common.paras_registrar.pallet.Call.reserve
-  | types.polkadot_runtime_common.paras_registrar.pallet.Call.add_lock
-  | types.polkadot_runtime_common.paras_registrar.pallet.Call.schedule_code_upgrade
-  | types.polkadot_runtime_common.paras_registrar.pallet.Call.set_current_head
+  | types.polkadot_runtime_common.paras_registrar.pallet.Call.addLock
+  | types.polkadot_runtime_common.paras_registrar.pallet.Call.scheduleCodeUpgrade
+  | types.polkadot_runtime_common.paras_registrar.pallet.Call.setCurrentHead
 export namespace Call {
   /**
    * Register head data and validation code for a reserved Para Id.
@@ -34,8 +34,8 @@ export namespace Call {
   export interface register {
     type: "register"
     id: types.polkadot_parachain.primitives.Id
-    genesis_head: types.polkadot_parachain.primitives.HeadData
-    validation_code: types.polkadot_parachain.primitives.ValidationCode
+    genesisHead: types.polkadot_parachain.primitives.HeadData
+    validationCode: types.polkadot_parachain.primitives.ValidationCode
   }
   /**
    * Force the registration of a Para Id on the relay chain.
@@ -45,13 +45,13 @@ export namespace Call {
    * The deposit taken can be specified for this registration. Any `ParaId`
    * can be registered, including sub-1000 IDs which are System Parachains.
    */
-  export interface force_register {
-    type: "force_register"
+  export interface forceRegister {
+    type: "forceRegister"
     who: types.sp_core.crypto.AccountId32
     deposit: types.u128
     id: types.polkadot_parachain.primitives.Id
-    genesis_head: types.polkadot_parachain.primitives.HeadData
-    validation_code: types.polkadot_parachain.primitives.ValidationCode
+    genesisHead: types.polkadot_parachain.primitives.HeadData
+    validationCode: types.polkadot_parachain.primitives.ValidationCode
   }
   /**
    * Deregister a Para Id, freeing all data and returning any deposit.
@@ -86,8 +86,8 @@ export namespace Call {
    *
    * Can only be called by the Root origin or the parachain.
    */
-  export interface remove_lock {
-    type: "remove_lock"
+  export interface removeLock {
+    type: "removeLock"
     para: types.polkadot_parachain.primitives.Id
   }
   /**
@@ -115,8 +115,8 @@ export namespace Call {
    *
    * Can be called by Root, the parachain, or the parachain manager if the parachain is unlocked.
    */
-  export interface add_lock {
-    type: "add_lock"
+  export interface addLock {
+    type: "addLock"
     para: types.polkadot_parachain.primitives.Id
   }
   /**
@@ -124,20 +124,20 @@ export namespace Call {
    *
    * Can be called by Root, the parachain, or the parachain manager if the parachain is unlocked.
    */
-  export interface schedule_code_upgrade {
-    type: "schedule_code_upgrade"
+  export interface scheduleCodeUpgrade {
+    type: "scheduleCodeUpgrade"
     para: types.polkadot_parachain.primitives.Id
-    new_code: types.polkadot_parachain.primitives.ValidationCode
+    newCode: types.polkadot_parachain.primitives.ValidationCode
   }
   /**
    * Set the parachain's current head.
    *
    * Can be called by Root, the parachain, or the parachain manager if the parachain is unlocked.
    */
-  export interface set_current_head {
-    type: "set_current_head"
+  export interface setCurrentHead {
+    type: "setCurrentHead"
     para: types.polkadot_parachain.primitives.Id
-    new_head: types.polkadot_parachain.primitives.HeadData
+    newHead: types.polkadot_parachain.primitives.HeadData
   }
   /**
    * Register head data and validation code for a reserved Para Id.
@@ -168,10 +168,10 @@ export namespace Call {
    * The deposit taken can be specified for this registration. Any `ParaId`
    * can be registered, including sub-1000 IDs which are System Parachains.
    */
-  export function force_register(
-    value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.force_register, "type">,
-  ): types.polkadot_runtime_common.paras_registrar.pallet.Call.force_register {
-    return { type: "force_register", ...value }
+  export function forceRegister(
+    value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.forceRegister, "type">,
+  ): types.polkadot_runtime_common.paras_registrar.pallet.Call.forceRegister {
+    return { type: "forceRegister", ...value }
   }
   /**
    * Deregister a Para Id, freeing all data and returning any deposit.
@@ -207,10 +207,10 @@ export namespace Call {
    *
    * Can only be called by the Root origin or the parachain.
    */
-  export function remove_lock(
-    value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.remove_lock, "type">,
-  ): types.polkadot_runtime_common.paras_registrar.pallet.Call.remove_lock {
-    return { type: "remove_lock", ...value }
+  export function removeLock(
+    value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.removeLock, "type">,
+  ): types.polkadot_runtime_common.paras_registrar.pallet.Call.removeLock {
+    return { type: "removeLock", ...value }
   }
   /**
    * Reserve a Para Id on the relay chain.
@@ -237,33 +237,33 @@ export namespace Call {
    *
    * Can be called by Root, the parachain, or the parachain manager if the parachain is unlocked.
    */
-  export function add_lock(
-    value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.add_lock, "type">,
-  ): types.polkadot_runtime_common.paras_registrar.pallet.Call.add_lock {
-    return { type: "add_lock", ...value }
+  export function addLock(
+    value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.addLock, "type">,
+  ): types.polkadot_runtime_common.paras_registrar.pallet.Call.addLock {
+    return { type: "addLock", ...value }
   }
   /**
    * Schedule a parachain upgrade.
    *
    * Can be called by Root, the parachain, or the parachain manager if the parachain is unlocked.
    */
-  export function schedule_code_upgrade(
+  export function scheduleCodeUpgrade(
     value: Omit<
-      types.polkadot_runtime_common.paras_registrar.pallet.Call.schedule_code_upgrade,
+      types.polkadot_runtime_common.paras_registrar.pallet.Call.scheduleCodeUpgrade,
       "type"
     >,
-  ): types.polkadot_runtime_common.paras_registrar.pallet.Call.schedule_code_upgrade {
-    return { type: "schedule_code_upgrade", ...value }
+  ): types.polkadot_runtime_common.paras_registrar.pallet.Call.scheduleCodeUpgrade {
+    return { type: "scheduleCodeUpgrade", ...value }
   }
   /**
    * Set the parachain's current head.
    *
    * Can be called by Root, the parachain, or the parachain manager if the parachain is unlocked.
    */
-  export function set_current_head(
-    value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.set_current_head, "type">,
-  ): types.polkadot_runtime_common.paras_registrar.pallet.Call.set_current_head {
-    return { type: "set_current_head", ...value }
+  export function setCurrentHead(
+    value: Omit<types.polkadot_runtime_common.paras_registrar.pallet.Call.setCurrentHead, "type">,
+  ): types.polkadot_runtime_common.paras_registrar.pallet.Call.setCurrentHead {
+    return { type: "setCurrentHead", ...value }
   }
 }
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
@@ -292,16 +292,16 @@ export type Event =
 export namespace Event {
   export interface Registered {
     type: "Registered"
-    para_id: types.polkadot_parachain.primitives.Id
+    paraId: types.polkadot_parachain.primitives.Id
     manager: types.sp_core.crypto.AccountId32
   }
   export interface Deregistered {
     type: "Deregistered"
-    para_id: types.polkadot_parachain.primitives.Id
+    paraId: types.polkadot_parachain.primitives.Id
   }
   export interface Reserved {
     type: "Reserved"
-    para_id: types.polkadot_parachain.primitives.Id
+    paraId: types.polkadot_parachain.primitives.Id
     who: types.sp_core.crypto.AccountId32
   }
   export function Registered(

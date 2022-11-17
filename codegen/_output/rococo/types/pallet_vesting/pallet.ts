@@ -6,10 +6,10 @@ import type * as types from "../mod.ts"
 
 export type Call =
   | types.pallet_vesting.pallet.Call.vest
-  | types.pallet_vesting.pallet.Call.vest_other
-  | types.pallet_vesting.pallet.Call.vested_transfer
-  | types.pallet_vesting.pallet.Call.force_vested_transfer
-  | types.pallet_vesting.pallet.Call.merge_schedules
+  | types.pallet_vesting.pallet.Call.vestOther
+  | types.pallet_vesting.pallet.Call.vestedTransfer
+  | types.pallet_vesting.pallet.Call.forceVestedTransfer
+  | types.pallet_vesting.pallet.Call.mergeSchedules
 export namespace Call {
   /**
    * Unlock any vested funds of the sender account.
@@ -46,8 +46,8 @@ export namespace Call {
    *     - Writes: Vesting Storage, Balances Locks, Target Account
    * # </weight>
    */
-  export interface vest_other {
-    type: "vest_other"
+  export interface vestOther {
+    type: "vestOther"
     target: types.sp_runtime.multiaddress.MultiAddress
   }
   /**
@@ -69,8 +69,8 @@ export namespace Call {
    *     - Writes: Vesting Storage, Balances Locks, Target Account, [Sender Account]
    * # </weight>
    */
-  export interface vested_transfer {
-    type: "vested_transfer"
+  export interface vestedTransfer {
+    type: "vestedTransfer"
     target: types.sp_runtime.multiaddress.MultiAddress
     schedule: types.pallet_vesting.vesting_info.VestingInfo
   }
@@ -94,8 +94,8 @@ export namespace Call {
    *     - Writes: Vesting Storage, Balances Locks, Target Account, Source Account
    * # </weight>
    */
-  export interface force_vested_transfer {
-    type: "force_vested_transfer"
+  export interface forceVestedTransfer {
+    type: "forceVestedTransfer"
     source: types.sp_runtime.multiaddress.MultiAddress
     target: types.sp_runtime.multiaddress.MultiAddress
     schedule: types.pallet_vesting.vesting_info.VestingInfo
@@ -123,10 +123,10 @@ export namespace Call {
    * - `schedule1_index`: index of the first schedule to merge.
    * - `schedule2_index`: index of the second schedule to merge.
    */
-  export interface merge_schedules {
-    type: "merge_schedules"
-    schedule1_index: types.u32
-    schedule2_index: types.u32
+  export interface mergeSchedules {
+    type: "mergeSchedules"
+    schedule1Index: types.u32
+    schedule2Index: types.u32
   }
   /**
    * Unlock any vested funds of the sender account.
@@ -163,10 +163,10 @@ export namespace Call {
    *     - Writes: Vesting Storage, Balances Locks, Target Account
    * # </weight>
    */
-  export function vest_other(
-    value: Omit<types.pallet_vesting.pallet.Call.vest_other, "type">,
-  ): types.pallet_vesting.pallet.Call.vest_other {
-    return { type: "vest_other", ...value }
+  export function vestOther(
+    value: Omit<types.pallet_vesting.pallet.Call.vestOther, "type">,
+  ): types.pallet_vesting.pallet.Call.vestOther {
+    return { type: "vestOther", ...value }
   }
   /**
    * Create a vested transfer.
@@ -187,10 +187,10 @@ export namespace Call {
    *     - Writes: Vesting Storage, Balances Locks, Target Account, [Sender Account]
    * # </weight>
    */
-  export function vested_transfer(
-    value: Omit<types.pallet_vesting.pallet.Call.vested_transfer, "type">,
-  ): types.pallet_vesting.pallet.Call.vested_transfer {
-    return { type: "vested_transfer", ...value }
+  export function vestedTransfer(
+    value: Omit<types.pallet_vesting.pallet.Call.vestedTransfer, "type">,
+  ): types.pallet_vesting.pallet.Call.vestedTransfer {
+    return { type: "vestedTransfer", ...value }
   }
   /**
    * Force a vested transfer.
@@ -212,10 +212,10 @@ export namespace Call {
    *     - Writes: Vesting Storage, Balances Locks, Target Account, Source Account
    * # </weight>
    */
-  export function force_vested_transfer(
-    value: Omit<types.pallet_vesting.pallet.Call.force_vested_transfer, "type">,
-  ): types.pallet_vesting.pallet.Call.force_vested_transfer {
-    return { type: "force_vested_transfer", ...value }
+  export function forceVestedTransfer(
+    value: Omit<types.pallet_vesting.pallet.Call.forceVestedTransfer, "type">,
+  ): types.pallet_vesting.pallet.Call.forceVestedTransfer {
+    return { type: "forceVestedTransfer", ...value }
   }
   /**
    * Merge two vesting schedules together, creating a new vesting schedule that unlocks over
@@ -240,10 +240,10 @@ export namespace Call {
    * - `schedule1_index`: index of the first schedule to merge.
    * - `schedule2_index`: index of the second schedule to merge.
    */
-  export function merge_schedules(
-    value: Omit<types.pallet_vesting.pallet.Call.merge_schedules, "type">,
-  ): types.pallet_vesting.pallet.Call.merge_schedules {
-    return { type: "merge_schedules", ...value }
+  export function mergeSchedules(
+    value: Omit<types.pallet_vesting.pallet.Call.mergeSchedules, "type">,
+  ): types.pallet_vesting.pallet.Call.mergeSchedules {
+    return { type: "mergeSchedules", ...value }
   }
 }
 /** Error for the vesting pallet. */

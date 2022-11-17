@@ -79,10 +79,10 @@ export const Registrars = new C.fluent.Storage(
  * - One event.
  * # </weight>
  */
-export function add_registrar(
-  value: Omit<types.pallet_identity.pallet.Call.add_registrar, "type">,
+export function addRegistrar(
+  value: Omit<types.pallet_identity.pallet.Call.addRegistrar, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Identity", value: { ...value, type: "add_registrar" } }
+  return { type: "Identity", value: { ...value, type: "addRegistrar" } }
 }
 
 /**
@@ -106,10 +106,10 @@ export function add_registrar(
  * - One event.
  * # </weight>
  */
-export function set_identity(
-  value: Omit<types.pallet_identity.pallet.Call.set_identity, "type">,
+export function setIdentity(
+  value: Omit<types.pallet_identity.pallet.Call.setIdentity, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Identity", value: { ...value, type: "set_identity" } }
+  return { type: "Identity", value: { ...value, type: "setIdentity" } }
 }
 
 /**
@@ -135,10 +135,10 @@ export function set_identity(
  *   - One storage-exists (`IdentityOf::contains_key`).
  * # </weight>
  */
-export function set_subs(
-  value: Omit<types.pallet_identity.pallet.Call.set_subs, "type">,
+export function setSubs(
+  value: Omit<types.pallet_identity.pallet.Call.setSubs, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Identity", value: { ...value, type: "set_subs" } }
+  return { type: "Identity", value: { ...value, type: "setSubs" } }
 }
 
 /**
@@ -161,8 +161,8 @@ export function set_subs(
  * - One event.
  * # </weight>
  */
-export function clear_identity(): types.polkadot_runtime.RuntimeCall {
-  return { type: "Identity", value: { type: "clear_identity" } }
+export function clearIdentity(): types.polkadot_runtime.RuntimeCall {
+  return { type: "Identity", value: { type: "clearIdentity" } }
 }
 
 /**
@@ -190,10 +190,10 @@ export function clear_identity(): types.polkadot_runtime.RuntimeCall {
  * - One event.
  * # </weight>
  */
-export function request_judgement(
-  value: Omit<types.pallet_identity.pallet.Call.request_judgement, "type">,
+export function requestJudgement(
+  value: Omit<types.pallet_identity.pallet.Call.requestJudgement, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Identity", value: { ...value, type: "request_judgement" } }
+  return { type: "Identity", value: { ...value, type: "requestJudgement" } }
 }
 
 /**
@@ -215,10 +215,10 @@ export function request_judgement(
  * - One event
  * # </weight>
  */
-export function cancel_request(
-  value: Omit<types.pallet_identity.pallet.Call.cancel_request, "type">,
+export function cancelRequest(
+  value: Omit<types.pallet_identity.pallet.Call.cancelRequest, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Identity", value: { ...value, type: "cancel_request" } }
+  return { type: "Identity", value: { ...value, type: "cancelRequest" } }
 }
 
 /**
@@ -236,10 +236,10 @@ export function cancel_request(
  * - Benchmark: 7.315 + R * 0.329 µs (min squares analysis)
  * # </weight>
  */
-export function set_fee(
-  value: Omit<types.pallet_identity.pallet.Call.set_fee, "type">,
+export function setFee(
+  value: Omit<types.pallet_identity.pallet.Call.setFee, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Identity", value: { ...value, type: "set_fee" } }
+  return { type: "Identity", value: { ...value, type: "setFee" } }
 }
 
 /**
@@ -257,10 +257,10 @@ export function set_fee(
  * - Benchmark: 8.823 + R * 0.32 µs (min squares analysis)
  * # </weight>
  */
-export function set_account_id(
-  value: Omit<types.pallet_identity.pallet.Call.set_account_id, "type">,
+export function setAccountId(
+  value: Omit<types.pallet_identity.pallet.Call.setAccountId, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Identity", value: { ...value, type: "set_account_id" } }
+  return { type: "Identity", value: { ...value, type: "setAccountId" } }
 }
 
 /**
@@ -278,10 +278,10 @@ export function set_account_id(
  * - Benchmark: 7.464 + R * 0.325 µs (min squares analysis)
  * # </weight>
  */
-export function set_fields(
-  value: Omit<types.pallet_identity.pallet.Call.set_fields, "type">,
+export function setFields(
+  value: Omit<types.pallet_identity.pallet.Call.setFields, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Identity", value: { ...value, type: "set_fields" } }
+  return { type: "Identity", value: { ...value, type: "setFields" } }
 }
 
 /**
@@ -306,10 +306,10 @@ export function set_fields(
  * - One event.
  * # </weight>
  */
-export function provide_judgement(
-  value: Omit<types.pallet_identity.pallet.Call.provide_judgement, "type">,
+export function provideJudgement(
+  value: Omit<types.pallet_identity.pallet.Call.provideJudgement, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Identity", value: { ...value, type: "provide_judgement" } }
+  return { type: "Identity", value: { ...value, type: "provideJudgement" } }
 }
 
 /**
@@ -333,10 +333,10 @@ export function provide_judgement(
  * - One event.
  * # </weight>
  */
-export function kill_identity(
-  value: Omit<types.pallet_identity.pallet.Call.kill_identity, "type">,
+export function killIdentity(
+  value: Omit<types.pallet_identity.pallet.Call.killIdentity, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Identity", value: { ...value, type: "kill_identity" } }
+  return { type: "Identity", value: { ...value, type: "killIdentity" } }
 }
 
 /**
@@ -348,10 +348,10 @@ export function kill_identity(
  * The dispatch origin for this call must be _Signed_ and the sender must have a registered
  * sub identity of `sub`.
  */
-export function add_sub(
-  value: Omit<types.pallet_identity.pallet.Call.add_sub, "type">,
+export function addSub(
+  value: Omit<types.pallet_identity.pallet.Call.addSub, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Identity", value: { ...value, type: "add_sub" } }
+  return { type: "Identity", value: { ...value, type: "addSub" } }
 }
 
 /**
@@ -360,10 +360,10 @@ export function add_sub(
  * The dispatch origin for this call must be _Signed_ and the sender must have a registered
  * sub identity of `sub`.
  */
-export function rename_sub(
-  value: Omit<types.pallet_identity.pallet.Call.rename_sub, "type">,
+export function renameSub(
+  value: Omit<types.pallet_identity.pallet.Call.renameSub, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Identity", value: { ...value, type: "rename_sub" } }
+  return { type: "Identity", value: { ...value, type: "renameSub" } }
 }
 
 /**
@@ -375,10 +375,10 @@ export function rename_sub(
  * The dispatch origin for this call must be _Signed_ and the sender must have a registered
  * sub identity of `sub`.
  */
-export function remove_sub(
-  value: Omit<types.pallet_identity.pallet.Call.remove_sub, "type">,
+export function removeSub(
+  value: Omit<types.pallet_identity.pallet.Call.removeSub, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Identity", value: { ...value, type: "remove_sub" } }
+  return { type: "Identity", value: { ...value, type: "removeSub" } }
 }
 
 /**
@@ -393,6 +393,6 @@ export function remove_sub(
  * NOTE: This should not normally be used, but is provided in the case that the non-
  * controller of an account is maliciously registered as a sub-account.
  */
-export function quit_sub(): types.polkadot_runtime.RuntimeCall {
-  return { type: "Identity", value: { type: "quit_sub" } }
+export function quitSub(): types.polkadot_runtime.RuntimeCall {
+  return { type: "Identity", value: { type: "quitSub" } }
 }

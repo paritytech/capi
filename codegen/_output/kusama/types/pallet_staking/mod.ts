@@ -46,7 +46,7 @@ export function IndividualExposure(value: types.pallet_staking.IndividualExposur
 
 export interface Nominations {
   targets: Array<types.sp_core.crypto.AccountId32>
-  submitted_in: types.u32
+  submittedIn: types.u32
   suppressed: boolean
 }
 
@@ -55,18 +55,18 @@ export function Nominations(value: types.pallet_staking.Nominations) {
 }
 
 export type Releases =
-  | "V1_0_0Ancient"
-  | "V2_0_0"
-  | "V3_0_0"
-  | "V4_0_0"
-  | "V5_0_0"
-  | "V6_0_0"
-  | "V7_0_0"
-  | "V8_0_0"
-  | "V9_0_0"
-  | "V10_0_0"
-  | "V11_0_0"
-  | "V12_0_0"
+  | "V100Ancient"
+  | "V200"
+  | "V300"
+  | "V400"
+  | "V500"
+  | "V600"
+  | "V700"
+  | "V800"
+  | "V900"
+  | "V1000"
+  | "V1100"
+  | "V1200"
 
 export type RewardDestination =
   | types.pallet_staking.RewardDestination.Staked
@@ -115,7 +115,7 @@ export interface StakingLedger {
   total: types.Compact<types.u128>
   active: types.Compact<types.u128>
   unlocking: Array<types.pallet_staking.UnlockChunk>
-  claimed_rewards: Array<types.u32>
+  claimedRewards: Array<types.u32>
 }
 
 export function StakingLedger(value: types.pallet_staking.StakingLedger) {
