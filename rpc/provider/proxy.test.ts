@@ -49,6 +49,7 @@ Deno.test({
 
     await t.step({
       name: "close WebSocket while listening",
+      ignore: true,
       async fn() {
         const server = createWebSocketServer()
         const stopped = deferred()
