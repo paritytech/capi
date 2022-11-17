@@ -25,9 +25,9 @@ export function codegen(props: CodegenProps): Files {
     "capi.ts",
     () =>
       `\
-export { $ } from ${S.string(props.importSpecifier)}
-export * as C from ${S.string(props.importSpecifier)}
-export { client } from ${S.string(props.clientFile)}
+export const C = await import("" + ${S.string(props.importSpecifier)})
+export const { $ } = C;
+export const { client } = await import("" + ${S.string(props.clientFile)})
 `,
   )
 
