@@ -66,7 +66,13 @@ export const smoldotProvider: Provider<
       })()
     },
     release: async () => {
-      const { cleanUp, listeners, inner } = await connection(props, listener)
+      let conn
+      try {
+        conn = await connection(props, listener)
+      } catch (_error) {
+        return
+      }
+      const { cleanUp, listeners, inner } = conn
       listeners.delete(listener)
       if (!listeners.size) {
         connections.delete(props)
