@@ -1,4 +1,4 @@
-import { deferred, delay } from "../../deps/std/async.ts"
+import { deferred } from "../../deps/std/async.ts"
 import * as A from "../../deps/std/testing/asserts.ts"
 import * as T from "../../test_util/mod.ts"
 import { proxyProvider } from "./proxy.ts"
@@ -49,25 +49,28 @@ Deno.test({
 
     await t.step({
       name: "close WebSocket while listening",
-      ignore: true,
       async fn() {
-        const server = createWebSocketServer()
-        const stopped = deferred()
-        const provider = proxyProvider(server.url, (message) => {
-          A.assertInstanceOf(message, Error)
-          stopped.resolve()
+        const server = createWebSocketServer(function() {
+          this.close()
         })
+        const stopped = deferred()
+        const provider = proxyProvider(
+          server.url,
+          (message) => {
+            A.assertInstanceOf(message, Error)
+            stopped.resolve()
+          },
+        )
         provider.send({
           jsonrpc: "2.0",
           id: provider.nextId(),
           method: "system_health",
           params: [],
         })
-        await delay(0)
-        server.close()
         await stopped
         const providerRelease = await provider.release()
         A.assertNotInstanceOf(providerRelease, Error)
+        server.close()
       },
     })
 

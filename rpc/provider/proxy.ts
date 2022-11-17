@@ -65,6 +65,9 @@ function connection(
     ws.addEventListener("error", (e) => {
       conn!.forEachListener(new ProviderHandlerError(e))
     }, controller)
+    ws.addEventListener("close", (e) => {
+      conn!.forEachListener(new ProviderHandlerError(e))
+    }, controller)
     return new ProviderConnection(ws, () => controller.abort())
   })
   conn.addListener(listener)
@@ -74,18 +77,21 @@ function connection(
 function ensureWsOpen(ws: WebSocket): Promise<undefined | Event> {
   if (ws.readyState === WebSocket.OPEN) {
     return Promise.resolve(undefined)
+  } else if (ws.readyState === WebSocket.CLOSING || ws.readyState === WebSocket.CLOSED) {
+    return Promise.resolve(new Event("error"))
+  } else {
+    return new Promise<undefined | Event>((resolve) => {
+      const controller = new AbortController()
+      ws.addEventListener("open", () => {
+        controller.abort()
+        resolve(undefined)
+      }, controller)
+      ws.addEventListener("error", (e) => {
+        controller.abort()
+        resolve(e)
+      }, controller)
+    })
   }
-  return new Promise<undefined | Event>((resolve) => {
-    const controller = new AbortController()
-    ws.addEventListener("open", () => {
-      controller.abort()
-      resolve(undefined)
-    }, controller)
-    ws.addEventListener("error", (e) => {
-      controller.abort()
-      resolve(e)
-    }, controller)
-  })
 }
 
 function closeWs(socket: WebSocket): Promise<undefined | ProviderCloseError<Event>> {
