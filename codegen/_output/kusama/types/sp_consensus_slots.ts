@@ -5,8 +5,8 @@ import type * as types from "./mod.ts"
 export interface EquivocationProof {
   offender: types.sp_consensus_babe.app.Public
   slot: types.sp_consensus_slots.Slot
-  first_header: types.sp_runtime.generic.header.Header
-  second_header: types.sp_runtime.generic.header.Header
+  firstHeader: types.sp_runtime.generic.header.Header
+  secondHeader: types.sp_runtime.generic.header.Header
 }
 
 export function EquivocationProof(value: types.sp_consensus_slots.EquivocationProof) {

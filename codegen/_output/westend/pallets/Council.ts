@@ -102,10 +102,10 @@ export const Prime = new C.fluent.Storage(
  *   - 1 storage write (codec `O(1)`) for deleting the old `prime` and setting the new one
  * # </weight>
  */
-export function set_members(
-  value: Omit<types.pallet_collective.pallet.Call.set_members, "type">,
+export function setMembers(
+  value: Omit<types.pallet_collective.pallet.Call.setMembers, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Council", value: { ...value, type: "set_members" } }
+  return { type: "Council", value: { ...value, type: "setMembers" } }
 }
 
 /**
@@ -219,10 +219,10 @@ export function vote(
  * - up to 3 events
  * # </weight>
  */
-export function close_old_weight(
-  value: Omit<types.pallet_collective.pallet.Call.close_old_weight, "type">,
+export function closeOldWeight(
+  value: Omit<types.pallet_collective.pallet.Call.closeOldWeight, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Council", value: { ...value, type: "close_old_weight" } }
+  return { type: "Council", value: { ...value, type: "closeOldWeight" } }
 }
 
 /**
@@ -241,10 +241,10 @@ export function close_old_weight(
  * * Writes: Voting, Proposals, ProposalOf
  * # </weight>
  */
-export function disapprove_proposal(
-  value: Omit<types.pallet_collective.pallet.Call.disapprove_proposal, "type">,
+export function disapproveProposal(
+  value: Omit<types.pallet_collective.pallet.Call.disapproveProposal, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Council", value: { ...value, type: "disapprove_proposal" } }
+  return { type: "Council", value: { ...value, type: "disapproveProposal" } }
 }
 
 /**

@@ -116,10 +116,10 @@ export function free(
  *    - Writes: Indices Accounts, System Account (original owner)
  * # </weight>
  */
-export function force_transfer(
-  value: Omit<types.pallet_indices.pallet.Call.force_transfer, "type">,
+export function forceTransfer(
+  value: Omit<types.pallet_indices.pallet.Call.forceTransfer, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Indices", value: { ...value, type: "force_transfer" } }
+  return { type: "Indices", value: { ...value, type: "forceTransfer" } }
 }
 
 /**

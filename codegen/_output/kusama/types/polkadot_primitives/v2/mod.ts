@@ -15,8 +15,8 @@ export function AvailabilityBitfield(value: types.polkadot_primitives.v2.Availab
 
 export interface BackedCandidate {
   candidate: types.polkadot_primitives.v2.CommittedCandidateReceipt
-  validity_votes: Array<types.polkadot_primitives.v2.ValidityAttestation>
-  validator_indices: $.BitSequence
+  validityVotes: Array<types.polkadot_primitives.v2.ValidityAttestation>
+  validatorIndices: $.BitSequence
 }
 
 export function BackedCandidate(value: types.polkadot_primitives.v2.BackedCandidate) {
@@ -24,12 +24,12 @@ export function BackedCandidate(value: types.polkadot_primitives.v2.BackedCandid
 }
 
 export interface CandidateCommitments {
-  upward_messages: Array<Uint8Array>
-  horizontal_messages: Array<types.polkadot_core_primitives.OutboundHrmpMessage>
-  new_validation_code: types.polkadot_parachain.primitives.ValidationCode | undefined
-  head_data: types.polkadot_parachain.primitives.HeadData
-  processed_downward_messages: types.u32
-  hrmp_watermark: types.u32
+  upwardMessages: Array<Uint8Array>
+  horizontalMessages: Array<types.polkadot_core_primitives.OutboundHrmpMessage>
+  newValidationCode: types.polkadot_parachain.primitives.ValidationCode | undefined
+  headData: types.polkadot_parachain.primitives.HeadData
+  processedDownwardMessages: types.u32
+  hrmpWatermark: types.u32
 }
 
 export function CandidateCommitments(value: types.polkadot_primitives.v2.CandidateCommitments) {
@@ -37,15 +37,15 @@ export function CandidateCommitments(value: types.polkadot_primitives.v2.Candida
 }
 
 export interface CandidateDescriptor {
-  para_id: types.polkadot_parachain.primitives.Id
-  relay_parent: types.primitive_types.H256
+  paraId: types.polkadot_parachain.primitives.Id
+  relayParent: types.primitive_types.H256
   collator: types.polkadot_primitives.v2.collator_app.Public
-  persisted_validation_data_hash: types.primitive_types.H256
-  pov_hash: types.primitive_types.H256
-  erasure_root: types.primitive_types.H256
+  persistedValidationDataHash: types.primitive_types.H256
+  povHash: types.primitive_types.H256
+  erasureRoot: types.primitive_types.H256
   signature: types.polkadot_primitives.v2.collator_app.Signature
-  para_head: types.primitive_types.H256
-  validation_code_hash: types.polkadot_parachain.primitives.ValidationCodeHash
+  paraHead: types.primitive_types.H256
+  validationCodeHash: types.polkadot_parachain.primitives.ValidationCodeHash
 }
 
 export function CandidateDescriptor(value: types.polkadot_primitives.v2.CandidateDescriptor) {
@@ -54,7 +54,7 @@ export function CandidateDescriptor(value: types.polkadot_primitives.v2.Candidat
 
 export interface CandidateReceipt {
   descriptor: types.polkadot_primitives.v2.CandidateDescriptor
-  commitments_hash: types.primitive_types.H256
+  commitmentsHash: types.primitive_types.H256
 }
 
 export function CandidateReceipt(value: types.polkadot_primitives.v2.CandidateReceipt) {
@@ -100,10 +100,10 @@ export namespace CoreOccupied {
 }
 
 export interface DisputeState {
-  validators_for: $.BitSequence
-  validators_against: $.BitSequence
+  validatorsFor: $.BitSequence
+  validatorsAgainst: $.BitSequence
   start: types.u32
-  concluded_at: types.u32 | undefined
+  concludedAt: types.u32 | undefined
 }
 
 export function DisputeState(value: types.polkadot_primitives.v2.DisputeState) {
@@ -135,7 +135,7 @@ export namespace DisputeStatement {
 }
 
 export interface DisputeStatementSet {
-  candidate_hash: types.polkadot_core_primitives.CandidateHash
+  candidateHash: types.polkadot_core_primitives.CandidateHash
   session: types.u32
   statements: Array<
     [
@@ -158,9 +158,9 @@ export function GroupIndex(value: types.polkadot_primitives.v2.GroupIndex) {
 
 export interface InherentData {
   bitfields: Array<types.polkadot_primitives.v2.signed.UncheckedSigned>
-  backed_candidates: Array<types.polkadot_primitives.v2.BackedCandidate>
+  backedCandidates: Array<types.polkadot_primitives.v2.BackedCandidate>
   disputes: Array<types.polkadot_primitives.v2.DisputeStatementSet>
-  parent_header: types.sp_runtime.generic.header.Header
+  parentHeader: types.sp_runtime.generic.header.Header
 }
 
 export function InherentData(value: types.polkadot_primitives.v2.InherentData) {
@@ -190,8 +190,8 @@ export function ParathreadEntry(value: types.polkadot_primitives.v2.ParathreadEn
 export interface PvfCheckStatement {
   accept: boolean
   subject: types.polkadot_parachain.primitives.ValidationCodeHash
-  session_index: types.u32
-  validator_index: types.polkadot_primitives.v2.ValidatorIndex
+  sessionIndex: types.u32
+  validatorIndex: types.polkadot_primitives.v2.ValidatorIndex
 }
 
 export function PvfCheckStatement(value: types.polkadot_primitives.v2.PvfCheckStatement) {
@@ -200,7 +200,7 @@ export function PvfCheckStatement(value: types.polkadot_primitives.v2.PvfCheckSt
 
 export interface ScrapedOnChainVotes {
   session: types.u32
-  backing_validators_per_candidate: Array<
+  backingValidatorsPerCandidate: Array<
     [
       types.polkadot_primitives.v2.CandidateReceipt,
       Array<
@@ -219,19 +219,19 @@ export function ScrapedOnChainVotes(value: types.polkadot_primitives.v2.ScrapedO
 }
 
 export interface SessionInfo {
-  active_validator_indices: Array<types.polkadot_primitives.v2.ValidatorIndex>
-  random_seed: Uint8Array
-  dispute_period: types.u32
+  activeValidatorIndices: Array<types.polkadot_primitives.v2.ValidatorIndex>
+  randomSeed: Uint8Array
+  disputePeriod: types.u32
   validators: Array<types.polkadot_primitives.v2.validator_app.Public>
-  discovery_keys: Array<types.sp_authority_discovery.app.Public>
-  assignment_keys: Array<types.polkadot_primitives.v2.assignment_app.Public>
-  validator_groups: Array<Array<types.polkadot_primitives.v2.ValidatorIndex>>
-  n_cores: types.u32
-  zeroth_delay_tranche_width: types.u32
-  relay_vrf_modulo_samples: types.u32
-  n_delay_tranches: types.u32
-  no_show_slots: types.u32
-  needed_approvals: types.u32
+  discoveryKeys: Array<types.sp_authority_discovery.app.Public>
+  assignmentKeys: Array<types.polkadot_primitives.v2.assignment_app.Public>
+  validatorGroups: Array<Array<types.polkadot_primitives.v2.ValidatorIndex>>
+  nCores: types.u32
+  zerothDelayTrancheWidth: types.u32
+  relayVrfModuloSamples: types.u32
+  nDelayTranches: types.u32
+  noShowSlots: types.u32
+  neededApprovals: types.u32
 }
 
 export function SessionInfo(value: types.polkadot_primitives.v2.SessionInfo) {

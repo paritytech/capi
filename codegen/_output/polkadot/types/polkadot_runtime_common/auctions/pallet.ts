@@ -5,9 +5,9 @@ import type * as types from "../../mod.ts"
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 
 export type Call =
-  | types.polkadot_runtime_common.auctions.pallet.Call.new_auction
+  | types.polkadot_runtime_common.auctions.pallet.Call.newAuction
   | types.polkadot_runtime_common.auctions.pallet.Call.bid
-  | types.polkadot_runtime_common.auctions.pallet.Call.cancel_auction
+  | types.polkadot_runtime_common.auctions.pallet.Call.cancelAuction
 export namespace Call {
   /**
    * Create a new auction.
@@ -16,10 +16,10 @@ export namespace Call {
    * called by the root origin. Accepts the `duration` of this auction and the
    * `lease_period_index` of the initial lease period of the four that are to be auctioned.
    */
-  export interface new_auction {
-    type: "new_auction"
+  export interface newAuction {
+    type: "newAuction"
     duration: types.Compact<types.u32>
-    lease_period_index: types.Compact<types.u32>
+    leasePeriodIndex: types.Compact<types.u32>
   }
   /**
    * Make a new bid from an account (including a parachain account) for deploying a new
@@ -42,9 +42,9 @@ export namespace Call {
   export interface bid {
     type: "bid"
     para: types.Compact<types.polkadot_parachain.primitives.Id>
-    auction_index: types.Compact<types.u32>
-    first_slot: types.Compact<types.u32>
-    last_slot: types.Compact<types.u32>
+    auctionIndex: types.Compact<types.u32>
+    firstSlot: types.Compact<types.u32>
+    lastSlot: types.Compact<types.u32>
     amount: types.Compact<types.u128>
   }
   /**
@@ -52,8 +52,8 @@ export namespace Call {
    *
    * Can only be called by Root origin.
    */
-  export interface cancel_auction {
-    type: "cancel_auction"
+  export interface cancelAuction {
+    type: "cancelAuction"
   }
   /**
    * Create a new auction.
@@ -62,10 +62,10 @@ export namespace Call {
    * called by the root origin. Accepts the `duration` of this auction and the
    * `lease_period_index` of the initial lease period of the four that are to be auctioned.
    */
-  export function new_auction(
-    value: Omit<types.polkadot_runtime_common.auctions.pallet.Call.new_auction, "type">,
-  ): types.polkadot_runtime_common.auctions.pallet.Call.new_auction {
-    return { type: "new_auction", ...value }
+  export function newAuction(
+    value: Omit<types.polkadot_runtime_common.auctions.pallet.Call.newAuction, "type">,
+  ): types.polkadot_runtime_common.auctions.pallet.Call.newAuction {
+    return { type: "newAuction", ...value }
   }
   /**
    * Make a new bid from an account (including a parachain account) for deploying a new
@@ -95,8 +95,8 @@ export namespace Call {
    *
    * Can only be called by Root origin.
    */
-  export function cancel_auction(): types.polkadot_runtime_common.auctions.pallet.Call.cancel_auction {
-    return { type: "cancel_auction" }
+  export function cancelAuction(): types.polkadot_runtime_common.auctions.pallet.Call.cancelAuction {
+    return { type: "cancelAuction" }
   }
 }
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
@@ -126,14 +126,14 @@ export namespace Event {
    */
   export interface AuctionStarted {
     type: "AuctionStarted"
-    auction_index: types.u32
-    lease_period: types.u32
+    auctionIndex: types.u32
+    leasePeriod: types.u32
     ending: types.u32
   }
   /** An auction ended. All funds become unreserved. */
   export interface AuctionClosed {
     type: "AuctionClosed"
-    auction_index: types.u32
+    auctionIndex: types.u32
   }
   /**
    * Funds were reserved for a winning bid. First balance is the extra amount reserved.
@@ -142,8 +142,8 @@ export namespace Event {
   export interface Reserved {
     type: "Reserved"
     bidder: types.sp_core.crypto.AccountId32
-    extra_reserved: types.u128
-    total_amount: types.u128
+    extraReserved: types.u128
+    totalAmount: types.u128
   }
   /** Funds were unreserved since bidder is no longer active. `[bidder, amount]` */
   export interface Unreserved {
@@ -157,7 +157,7 @@ export namespace Event {
    */
   export interface ReserveConfiscated {
     type: "ReserveConfiscated"
-    para_id: types.polkadot_parachain.primitives.Id
+    paraId: types.polkadot_parachain.primitives.Id
     leaser: types.sp_core.crypto.AccountId32
     amount: types.u128
   }
@@ -165,16 +165,16 @@ export namespace Event {
   export interface BidAccepted {
     type: "BidAccepted"
     bidder: types.sp_core.crypto.AccountId32
-    para_id: types.polkadot_parachain.primitives.Id
+    paraId: types.polkadot_parachain.primitives.Id
     amount: types.u128
-    first_slot: types.u32
-    last_slot: types.u32
+    firstSlot: types.u32
+    lastSlot: types.u32
   }
   /** The winning offset was chosen for an auction. This will map into the `Winning` storage map. */
   export interface WinningOffset {
     type: "WinningOffset"
-    auction_index: types.u32
-    block_number: types.u32
+    auctionIndex: types.u32
+    blockNumber: types.u32
   }
   /**
    * An auction started. Provides its index and the block number where it will begin to

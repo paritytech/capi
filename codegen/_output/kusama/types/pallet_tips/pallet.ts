@@ -5,12 +5,12 @@ import type * as types from "../mod.ts"
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 
 export type Call =
-  | types.pallet_tips.pallet.Call.report_awesome
-  | types.pallet_tips.pallet.Call.retract_tip
-  | types.pallet_tips.pallet.Call.tip_new
+  | types.pallet_tips.pallet.Call.reportAwesome
+  | types.pallet_tips.pallet.Call.retractTip
+  | types.pallet_tips.pallet.Call.tipNew
   | types.pallet_tips.pallet.Call.tip
-  | types.pallet_tips.pallet.Call.close_tip
-  | types.pallet_tips.pallet.Call.slash_tip
+  | types.pallet_tips.pallet.Call.closeTip
+  | types.pallet_tips.pallet.Call.slashTip
 export namespace Call {
   /**
    * Report something `reason` that deserves a tip and claim any eventual the finder's fee.
@@ -33,8 +33,8 @@ export namespace Call {
    * - DbWrites: `Reasons`, `Tips`
    * # </weight>
    */
-  export interface report_awesome {
-    type: "report_awesome"
+  export interface reportAwesome {
+    type: "reportAwesome"
     reason: Uint8Array
     who: types.sp_runtime.multiaddress.MultiAddress
   }
@@ -59,8 +59,8 @@ export namespace Call {
    * - DbWrites: `Reasons`, `Tips`, `origin account`
    * # </weight>
    */
-  export interface retract_tip {
-    type: "retract_tip"
+  export interface retractTip {
+    type: "retractTip"
     hash: types.primitive_types.H256
   }
   /**
@@ -87,11 +87,11 @@ export namespace Call {
    * - DbWrites: `Reasons`, `Tips`
    * # </weight>
    */
-  export interface tip_new {
-    type: "tip_new"
+  export interface tipNew {
+    type: "tipNew"
     reason: Uint8Array
     who: types.sp_runtime.multiaddress.MultiAddress
-    tip_value: types.Compact<types.u128>
+    tipValue: types.Compact<types.u128>
   }
   /**
    * Declare a tip value for an already-open tip.
@@ -122,7 +122,7 @@ export namespace Call {
   export interface tip {
     type: "tip"
     hash: types.primitive_types.H256
-    tip_value: types.Compact<types.u128>
+    tipValue: types.Compact<types.u128>
   }
   /**
    * Close and payout a tip.
@@ -142,8 +142,8 @@ export namespace Call {
    * - DbWrites: `Reasons`, `Tips`, `Tippers`, `tip finder`
    * # </weight>
    */
-  export interface close_tip {
-    type: "close_tip"
+  export interface closeTip {
+    type: "closeTip"
     hash: types.primitive_types.H256
   }
   /**
@@ -160,8 +160,8 @@ export namespace Call {
    *   The actual cost depends on the implementation of `T::Tippers`.
    * # </weight>
    */
-  export interface slash_tip {
-    type: "slash_tip"
+  export interface slashTip {
+    type: "slashTip"
     hash: types.primitive_types.H256
   }
   /**
@@ -185,10 +185,10 @@ export namespace Call {
    * - DbWrites: `Reasons`, `Tips`
    * # </weight>
    */
-  export function report_awesome(
-    value: Omit<types.pallet_tips.pallet.Call.report_awesome, "type">,
-  ): types.pallet_tips.pallet.Call.report_awesome {
-    return { type: "report_awesome", ...value }
+  export function reportAwesome(
+    value: Omit<types.pallet_tips.pallet.Call.reportAwesome, "type">,
+  ): types.pallet_tips.pallet.Call.reportAwesome {
+    return { type: "reportAwesome", ...value }
   }
   /**
    * Retract a prior tip-report from `report_awesome`, and cancel the process of tipping.
@@ -211,10 +211,10 @@ export namespace Call {
    * - DbWrites: `Reasons`, `Tips`, `origin account`
    * # </weight>
    */
-  export function retract_tip(
-    value: Omit<types.pallet_tips.pallet.Call.retract_tip, "type">,
-  ): types.pallet_tips.pallet.Call.retract_tip {
-    return { type: "retract_tip", ...value }
+  export function retractTip(
+    value: Omit<types.pallet_tips.pallet.Call.retractTip, "type">,
+  ): types.pallet_tips.pallet.Call.retractTip {
+    return { type: "retractTip", ...value }
   }
   /**
    * Give a tip for something new; no finder's fee will be taken.
@@ -240,10 +240,10 @@ export namespace Call {
    * - DbWrites: `Reasons`, `Tips`
    * # </weight>
    */
-  export function tip_new(
-    value: Omit<types.pallet_tips.pallet.Call.tip_new, "type">,
-  ): types.pallet_tips.pallet.Call.tip_new {
-    return { type: "tip_new", ...value }
+  export function tipNew(
+    value: Omit<types.pallet_tips.pallet.Call.tipNew, "type">,
+  ): types.pallet_tips.pallet.Call.tipNew {
+    return { type: "tipNew", ...value }
   }
   /**
    * Declare a tip value for an already-open tip.
@@ -294,10 +294,10 @@ export namespace Call {
    * - DbWrites: `Reasons`, `Tips`, `Tippers`, `tip finder`
    * # </weight>
    */
-  export function close_tip(
-    value: Omit<types.pallet_tips.pallet.Call.close_tip, "type">,
-  ): types.pallet_tips.pallet.Call.close_tip {
-    return { type: "close_tip", ...value }
+  export function closeTip(
+    value: Omit<types.pallet_tips.pallet.Call.closeTip, "type">,
+  ): types.pallet_tips.pallet.Call.closeTip {
+    return { type: "closeTip", ...value }
   }
   /**
    * Remove and slash an already-open tip.
@@ -313,10 +313,10 @@ export namespace Call {
    *   The actual cost depends on the implementation of `T::Tippers`.
    * # </weight>
    */
-  export function slash_tip(
-    value: Omit<types.pallet_tips.pallet.Call.slash_tip, "type">,
-  ): types.pallet_tips.pallet.Call.slash_tip {
-    return { type: "slash_tip", ...value }
+  export function slashTip(
+    value: Omit<types.pallet_tips.pallet.Call.slashTip, "type">,
+  ): types.pallet_tips.pallet.Call.slashTip {
+    return { type: "slashTip", ...value }
   }
 }
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
@@ -340,29 +340,29 @@ export namespace Event {
   /** A new tip suggestion has been opened. */
   export interface NewTip {
     type: "NewTip"
-    tip_hash: types.primitive_types.H256
+    tipHash: types.primitive_types.H256
   }
   /** A tip suggestion has reached threshold and is closing. */
   export interface TipClosing {
     type: "TipClosing"
-    tip_hash: types.primitive_types.H256
+    tipHash: types.primitive_types.H256
   }
   /** A tip suggestion has been closed. */
   export interface TipClosed {
     type: "TipClosed"
-    tip_hash: types.primitive_types.H256
+    tipHash: types.primitive_types.H256
     who: types.sp_core.crypto.AccountId32
     payout: types.u128
   }
   /** A tip suggestion has been retracted. */
   export interface TipRetracted {
     type: "TipRetracted"
-    tip_hash: types.primitive_types.H256
+    tipHash: types.primitive_types.H256
   }
   /** A tip suggestion has been slashed. */
   export interface TipSlashed {
     type: "TipSlashed"
-    tip_hash: types.primitive_types.H256
+    tipHash: types.primitive_types.H256
     finder: types.sp_core.crypto.AccountId32
     deposit: types.u128
   }

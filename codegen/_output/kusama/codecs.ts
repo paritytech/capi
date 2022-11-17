@@ -14,8 +14,8 @@ export const $6: $.Codec<types.u128> = $.u128
 export const $5: $.Codec<types.pallet_balances.AccountData> = $.object(
   ["free", $6],
   ["reserved", $6],
-  ["misc_frozen", $6],
-  ["fee_frozen", $6],
+  ["miscFrozen", $6],
+  ["feeFrozen", $6],
 )
 
 export const $3: $.Codec<types.frame_system.AccountInfo> = $.object(
@@ -30,8 +30,8 @@ export const $10: $.Codec<types.u64> = $.u64
 
 export const $9: $.Codec<types.Compact<types.u64>> = $.compact($10)
 
-export const $8: $.Codec<types.sp_weights.weight_v2.Weight> = $.object(["ref_time", $9], [
-  "proof_size",
+export const $8: $.Codec<types.sp_weights.weight_v2.Weight> = $.object(["refTime", $9], [
+  "proofSize",
   $9,
 ])
 
@@ -74,7 +74,7 @@ export const $23: $.Codec<types.frame_support.dispatch.Pays> = $.stringUnion({ 0
 export const $21: $.Codec<types.frame_support.dispatch.DispatchInfo> = $.object(["weight", $8], [
   "class",
   $22,
-], ["pays_fee", $23])
+], ["paysFee", $23])
 
 export const $25: $.Codec<types.sp_runtime.ModuleError> = $.object(["index", $2], ["error", $16])
 
@@ -116,8 +116,8 @@ export const $24: $.Codec<types.sp_runtime.DispatchError> = $.taggedUnion("type"
 })
 
 export const $20: $.Codec<types.frame_system.pallet.Event> = $.taggedUnion("type", {
-  0: ["ExtrinsicSuccess", ["dispatch_info", $21]],
-  1: ["ExtrinsicFailed", ["dispatch_error", $24], ["dispatch_info", $21]],
+  0: ["ExtrinsicSuccess", ["dispatchInfo", $21]],
+  1: ["ExtrinsicFailed", ["dispatchError", $24], ["dispatchInfo", $21]],
   2: ["CodeUpdated"],
   3: ["NewAccount", ["account", $0]],
   4: ["KilledAccount", ["account", $0]],
@@ -162,20 +162,20 @@ export const $37: $.Codec<types.frame_support.traits.tokens.misc.BalanceStatus> 
 })
 
 export const $36: $.Codec<types.pallet_balances.pallet.Event> = $.taggedUnion("type", {
-  0: ["Endowed", ["account", $0], ["free_balance", $6]],
+  0: ["Endowed", ["account", $0], ["freeBalance", $6]],
   1: ["DustLost", ["account", $0], ["amount", $6]],
   2: ["Transfer", ["from", $0], ["to", $0], ["amount", $6]],
   3: ["BalanceSet", ["who", $0], ["free", $6], ["reserved", $6]],
   4: ["Reserved", ["who", $0], ["amount", $6]],
   5: ["Unreserved", ["who", $0], ["amount", $6]],
-  6: ["ReserveRepatriated", ["from", $0], ["to", $0], ["amount", $6], ["destination_status", $37]],
+  6: ["ReserveRepatriated", ["from", $0], ["to", $0], ["amount", $6], ["destinationStatus", $37]],
   7: ["Deposit", ["who", $0], ["amount", $6]],
   8: ["Withdraw", ["who", $0], ["amount", $6]],
   9: ["Slashed", ["who", $0], ["amount", $6]],
 })
 
 export const $38: $.Codec<types.pallet_transaction_payment.pallet.Event> = $.taggedUnion("type", {
-  0: ["TransactionFeePaid", ["who", $0], ["actual_fee", $6], ["tip", $6]],
+  0: ["TransactionFeePaid", ["who", $0], ["actualFee", $6], ["tip", $6]],
 })
 
 export const $42: $.Codec<types.sp_arithmetic.per_things.Perbill> = $4
@@ -190,10 +190,10 @@ export const $40: $.Codec<types.pallet_staking.ValidatorPrefs> = $.object(["comm
 ])
 
 export const $39: $.Codec<types.pallet_staking.pallet.pallet.Event> = $.taggedUnion("type", {
-  0: ["EraPaid", ["era_index", $4], ["validator_payout", $6], ["remainder", $6]],
+  0: ["EraPaid", ["eraIndex", $4], ["validatorPayout", $6], ["remainder", $6]],
   1: ["Rewarded", ["stash", $0], ["amount", $6]],
   2: ["Slashed", ["staker", $0], ["amount", $6]],
-  3: ["OldSlashingReportDiscarded", ["session_index", $4]],
+  3: ["OldSlashingReportDiscarded", ["sessionIndex", $4]],
   4: ["StakersElected"],
   5: ["Bonded", ["stash", $0], ["amount", $6]],
   6: ["Unbonded", ["stash", $0], ["amount", $6]],
@@ -201,7 +201,7 @@ export const $39: $.Codec<types.pallet_staking.pallet.pallet.Event> = $.taggedUn
   8: ["Kicked", ["nominator", $0], ["stash", $0]],
   9: ["StakingElectionFailed"],
   10: ["Chilled", ["stash", $0]],
-  11: ["PayoutStarted", ["era_index", $4], ["validator_stash", $0]],
+  11: ["PayoutStarted", ["eraIndex", $4], ["validatorStash", $0]],
   12: ["ValidatorPrefsSet", ["stash", $0], ["prefs", $40]],
 })
 
@@ -212,7 +212,7 @@ export const $44: $.Codec<types.pallet_offences.pallet.Event> = $.taggedUnion("t
 })
 
 export const $46: $.Codec<types.pallet_session.pallet.Event> = $.taggedUnion("type", {
-  0: ["NewSession", ["session_index", $4]],
+  0: ["NewSession", ["sessionIndex", $4]],
 })
 
 export const $51: $.Codec<types.sp_core.ed25519.Public> = $1
@@ -224,7 +224,7 @@ export const $49: $.Codec<[types.sp_finality_grandpa.app.Public, types.u64]> = $
 export const $48: $.Codec<Array<[types.sp_finality_grandpa.app.Public, types.u64]>> = $.array($49)
 
 export const $47: $.Codec<types.pallet_grandpa.pallet.Event> = $.taggedUnion("type", {
-  0: ["NewAuthorities", ["authority_set", $48]],
+  0: ["NewAuthorities", ["authoritySet", $48]],
   1: ["Paused"],
   2: ["Resumed"],
 })
@@ -255,7 +255,7 @@ export const $55: $.Codec<
 > = $.array($56)
 
 export const $52: $.Codec<types.pallet_im_online.pallet.Event> = $.taggedUnion("type", {
-  0: ["HeartbeatReceived", ["authority_id", $53]],
+  0: ["HeartbeatReceived", ["authorityId", $53]],
   1: ["AllGood"],
   2: ["SomeOffline", ["offline", $55]],
 })
@@ -274,46 +274,40 @@ export const $63: $.Codec<types.pallet_democracy.vote.AccountVote> = $.taggedUni
 })
 
 export const $61: $.Codec<types.pallet_democracy.pallet.Event> = $.taggedUnion("type", {
-  0: ["Proposed", ["proposal_index", $4], ["deposit", $6]],
-  1: ["Tabled", ["proposal_index", $4], ["deposit", $6]],
+  0: ["Proposed", ["proposalIndex", $4], ["deposit", $6]],
+  1: ["Tabled", ["proposalIndex", $4], ["deposit", $6]],
   2: ["ExternalTabled"],
-  3: ["Started", ["ref_index", $4], ["threshold", $62]],
-  4: ["Passed", ["ref_index", $4]],
-  5: ["NotPassed", ["ref_index", $4]],
-  6: ["Cancelled", ["ref_index", $4]],
+  3: ["Started", ["refIndex", $4], ["threshold", $62]],
+  4: ["Passed", ["refIndex", $4]],
+  5: ["NotPassed", ["refIndex", $4]],
+  6: ["Cancelled", ["refIndex", $4]],
   7: ["Delegated", ["who", $0], ["target", $0]],
   8: ["Undelegated", ["account", $0]],
-  9: ["Vetoed", ["who", $0], ["proposal_hash", $11], ["until", $4]],
-  10: ["Blacklisted", ["proposal_hash", $11]],
-  11: ["Voted", ["voter", $0], ["ref_index", $4], ["vote", $63]],
-  12: ["Seconded", ["seconder", $0], ["prop_index", $4]],
-  13: ["ProposalCanceled", ["prop_index", $4]],
+  9: ["Vetoed", ["who", $0], ["proposalHash", $11], ["until", $4]],
+  10: ["Blacklisted", ["proposalHash", $11]],
+  11: ["Voted", ["voter", $0], ["refIndex", $4], ["vote", $63]],
+  12: ["Seconded", ["seconder", $0], ["propIndex", $4]],
+  13: ["ProposalCanceled", ["propIndex", $4]],
 })
 
 export const $65: $.Codec<types.pallet_collective.pallet.Event> = $.taggedUnion("type", {
-  0: ["Proposed", ["account", $0], ["proposal_index", $4], ["proposal_hash", $11], [
-    "threshold",
-    $4,
-  ]],
-  1: ["Voted", ["account", $0], ["proposal_hash", $11], ["voted", $43], ["yes", $4], ["no", $4]],
-  2: ["Approved", ["proposal_hash", $11]],
-  3: ["Disapproved", ["proposal_hash", $11]],
-  4: ["Executed", ["proposal_hash", $11], ["result", $32]],
-  5: ["MemberExecuted", ["proposal_hash", $11], ["result", $32]],
-  6: ["Closed", ["proposal_hash", $11], ["yes", $4], ["no", $4]],
+  0: ["Proposed", ["account", $0], ["proposalIndex", $4], ["proposalHash", $11], ["threshold", $4]],
+  1: ["Voted", ["account", $0], ["proposalHash", $11], ["voted", $43], ["yes", $4], ["no", $4]],
+  2: ["Approved", ["proposalHash", $11]],
+  3: ["Disapproved", ["proposalHash", $11]],
+  4: ["Executed", ["proposalHash", $11], ["result", $32]],
+  5: ["MemberExecuted", ["proposalHash", $11], ["result", $32]],
+  6: ["Closed", ["proposalHash", $11], ["yes", $4], ["no", $4]],
 })
 
 export const $66: $.Codec<types.pallet_collective.pallet.Event> = $.taggedUnion("type", {
-  0: ["Proposed", ["account", $0], ["proposal_index", $4], ["proposal_hash", $11], [
-    "threshold",
-    $4,
-  ]],
-  1: ["Voted", ["account", $0], ["proposal_hash", $11], ["voted", $43], ["yes", $4], ["no", $4]],
-  2: ["Approved", ["proposal_hash", $11]],
-  3: ["Disapproved", ["proposal_hash", $11]],
-  4: ["Executed", ["proposal_hash", $11], ["result", $32]],
-  5: ["MemberExecuted", ["proposal_hash", $11], ["result", $32]],
-  6: ["Closed", ["proposal_hash", $11], ["yes", $4], ["no", $4]],
+  0: ["Proposed", ["account", $0], ["proposalIndex", $4], ["proposalHash", $11], ["threshold", $4]],
+  1: ["Voted", ["account", $0], ["proposalHash", $11], ["voted", $43], ["yes", $4], ["no", $4]],
+  2: ["Approved", ["proposalHash", $11]],
+  3: ["Disapproved", ["proposalHash", $11]],
+  4: ["Executed", ["proposalHash", $11], ["result", $32]],
+  5: ["MemberExecuted", ["proposalHash", $11], ["result", $32]],
+  6: ["Closed", ["proposalHash", $11], ["yes", $4], ["no", $4]],
 })
 
 export const $69: $.Codec<[types.sp_core.crypto.AccountId32, types.u128]> = $.tuple($0, $6)
@@ -321,13 +315,13 @@ export const $69: $.Codec<[types.sp_core.crypto.AccountId32, types.u128]> = $.tu
 export const $68: $.Codec<Array<[types.sp_core.crypto.AccountId32, types.u128]>> = $.array($69)
 
 export const $67: $.Codec<types.pallet_elections_phragmen.pallet.Event> = $.taggedUnion("type", {
-  0: ["NewTerm", ["new_members", $68]],
+  0: ["NewTerm", ["newMembers", $68]],
   1: ["EmptyTerm"],
   2: ["ElectionError"],
   3: ["MemberKicked", ["member", $0]],
   4: ["Renounced", ["candidate", $0]],
   5: ["CandidateSlashed", ["candidate", $0], ["amount", $6]],
-  6: ["SeatHolderSlashed", ["seat_holder", $0], ["amount", $6]],
+  6: ["SeatHolderSlashed", ["seatHolder", $0], ["amount", $6]],
 })
 
 export const $70: $.Codec<types.pallet_membership.pallet.Event> = $.stringUnion({
@@ -340,14 +334,14 @@ export const $70: $.Codec<types.pallet_membership.pallet.Event> = $.stringUnion(
 })
 
 export const $71: $.Codec<types.pallet_treasury.pallet.Event> = $.taggedUnion("type", {
-  0: ["Proposed", ["proposal_index", $4]],
-  1: ["Spending", ["budget_remaining", $6]],
-  2: ["Awarded", ["proposal_index", $4], ["award", $6], ["account", $0]],
-  3: ["Rejected", ["proposal_index", $4], ["slashed", $6]],
-  4: ["Burnt", ["burnt_funds", $6]],
-  5: ["Rollover", ["rollover_balance", $6]],
+  0: ["Proposed", ["proposalIndex", $4]],
+  1: ["Spending", ["budgetRemaining", $6]],
+  2: ["Awarded", ["proposalIndex", $4], ["award", $6], ["account", $0]],
+  3: ["Rejected", ["proposalIndex", $4], ["slashed", $6]],
+  4: ["Burnt", ["burntFunds", $6]],
+  5: ["Rollover", ["rolloverBalance", $6]],
   6: ["Deposit", ["value", $6]],
-  7: ["SpendApproved", ["proposal_index", $4], ["amount", $6], ["beneficiary", $0]],
+  7: ["SpendApproved", ["proposalIndex", $4], ["amount", $6], ["beneficiary", $0]],
 })
 
 export const $74: $.Codec<Uint8Array> = $.sizedUint8Array(20)
@@ -356,7 +350,7 @@ export const $73: $.Codec<types.polkadot_runtime_common.claims.EthereumAddress> 
 
 export const $72: $.Codec<types.polkadot_runtime_common.claims.pallet.Event> = $.taggedUnion(
   "type",
-  { 0: ["Claimed", ["who", $0], ["ethereum_address", $73], ["amount", $6]] },
+  { 0: ["Claimed", ["who", $0], ["ethereumAddress", $73], ["amount", $6]] },
 )
 
 export const $75: $.Codec<types.pallet_vesting.pallet.Event> = $.taggedUnion("type", {
@@ -377,10 +371,10 @@ export const $77: $.Codec<types.pallet_identity.pallet.Event> = $.taggedUnion("t
   0: ["IdentitySet", ["who", $0]],
   1: ["IdentityCleared", ["who", $0], ["deposit", $6]],
   2: ["IdentityKilled", ["who", $0], ["deposit", $6]],
-  3: ["JudgementRequested", ["who", $0], ["registrar_index", $4]],
-  4: ["JudgementUnrequested", ["who", $0], ["registrar_index", $4]],
-  5: ["JudgementGiven", ["target", $0], ["registrar_index", $4]],
-  6: ["RegistrarAdded", ["registrar_index", $4]],
+  3: ["JudgementRequested", ["who", $0], ["registrarIndex", $4]],
+  4: ["JudgementUnrequested", ["who", $0], ["registrarIndex", $4]],
+  5: ["JudgementGiven", ["target", $0], ["registrarIndex", $4]],
+  6: ["RegistrarAdded", ["registrarIndex", $4]],
   7: ["SubIdentityAdded", ["sub", $0], ["main", $0], ["deposit", $6]],
   8: ["SubIdentityRemoved", ["sub", $0], ["main", $0], ["deposit", $6]],
   9: ["SubIdentityRevoked", ["sub", $0], ["main", $0], ["deposit", $6]],
@@ -400,26 +394,30 @@ export const $80: $.Codec<types.u16> = $.u16
 
 export const $78: $.Codec<types.pallet_proxy.pallet.Event> = $.taggedUnion("type", {
   0: ["ProxyExecuted", ["result", $32]],
-  1: ["PureCreated", ["pure", $0], ["who", $0], ["proxy_type", $79], ["disambiguation_index", $80]],
-  2: ["Announced", ["real", $0], ["proxy", $0], ["call_hash", $11]],
-  3: ["ProxyAdded", ["delegator", $0], ["delegatee", $0], ["proxy_type", $79], ["delay", $4]],
-  4: ["ProxyRemoved", ["delegator", $0], ["delegatee", $0], ["proxy_type", $79], ["delay", $4]],
+  1: ["PureCreated", ["pure", $0], ["who", $0], ["proxyType", $79], ["disambiguationIndex", $80]],
+  2: ["Announced", ["real", $0], ["proxy", $0], ["callHash", $11]],
+  3: ["ProxyAdded", ["delegator", $0], ["delegatee", $0], ["proxyType", $79], ["delay", $4]],
+  4: ["ProxyRemoved", ["delegator", $0], ["delegatee", $0], ["proxyType", $79], ["delay", $4]],
 })
 
 export const $82: $.Codec<types.pallet_multisig.Timepoint> = $.object(["height", $4], ["index", $4])
 
 export const $81: $.Codec<types.pallet_multisig.pallet.Event> = $.taggedUnion("type", {
-  0: ["NewMultisig", ["approving", $0], ["multisig", $0], ["call_hash", $1]],
+  0: ["NewMultisig", ["approving", $0], ["multisig", $0], ["callHash", $1]],
   1: ["MultisigApproval", ["approving", $0], ["timepoint", $82], ["multisig", $0], [
-    "call_hash",
+    "callHash",
     $1,
   ]],
-  2: ["MultisigExecuted", ["approving", $0], ["timepoint", $82], ["multisig", $0], [
-    "call_hash",
-    $1,
-  ], ["result", $32]],
+  2: [
+    "MultisigExecuted",
+    ["approving", $0],
+    ["timepoint", $82],
+    ["multisig", $0],
+    ["callHash", $1],
+    ["result", $32],
+  ],
   3: ["MultisigCancelled", ["cancelling", $0], ["timepoint", $82], ["multisig", $0], [
-    "call_hash",
+    "callHash",
     $1,
   ]],
 })
@@ -435,32 +433,32 @@ export const $83: $.Codec<types.pallet_bounties.pallet.Event> = $.taggedUnion("t
 })
 
 export const $84: $.Codec<types.pallet_child_bounties.pallet.Event> = $.taggedUnion("type", {
-  0: ["Added", ["index", $4], ["child_index", $4]],
-  1: ["Awarded", ["index", $4], ["child_index", $4], ["beneficiary", $0]],
-  2: ["Claimed", ["index", $4], ["child_index", $4], ["payout", $6], ["beneficiary", $0]],
-  3: ["Canceled", ["index", $4], ["child_index", $4]],
+  0: ["Added", ["index", $4], ["childIndex", $4]],
+  1: ["Awarded", ["index", $4], ["childIndex", $4], ["beneficiary", $0]],
+  2: ["Claimed", ["index", $4], ["childIndex", $4], ["payout", $6], ["beneficiary", $0]],
+  3: ["Canceled", ["index", $4], ["childIndex", $4]],
 })
 
 export const $85: $.Codec<types.pallet_tips.pallet.Event> = $.taggedUnion("type", {
-  0: ["NewTip", ["tip_hash", $11]],
-  1: ["TipClosing", ["tip_hash", $11]],
-  2: ["TipClosed", ["tip_hash", $11], ["who", $0], ["payout", $6]],
-  3: ["TipRetracted", ["tip_hash", $11]],
-  4: ["TipSlashed", ["tip_hash", $11], ["finder", $0], ["deposit", $6]],
+  0: ["NewTip", ["tipHash", $11]],
+  1: ["TipClosing", ["tipHash", $11]],
+  2: ["TipClosed", ["tipHash", $11], ["who", $0], ["payout", $6]],
+  3: ["TipRetracted", ["tipHash", $11]],
+  4: ["TipSlashed", ["tipHash", $11], ["finder", $0], ["deposit", $6]],
 })
 
 export const $87: $.Codec<types.pallet_election_provider_multi_phase.ElectionCompute> = $
   .stringUnion({ 0: "OnChain", 1: "Signed", 2: "Unsigned", 3: "Fallback", 4: "Emergency" })
 
-export const $88: $.Codec<types.sp_npos_elections.ElectionScore> = $.object(["minimal_stake", $6], [
-  "sum_stake",
+export const $88: $.Codec<types.sp_npos_elections.ElectionScore> = $.object(["minimalStake", $6], [
+  "sumStake",
   $6,
-], ["sum_stake_squared", $6])
+], ["sumStakeSquared", $6])
 
 export const $86: $.Codec<types.pallet_election_provider_multi_phase.pallet.Event> = $.taggedUnion(
   "type",
   {
-    0: ["SolutionStored", ["compute", $87], ["prev_ejected", $43]],
+    0: ["SolutionStored", ["compute", $87], ["prevEjected", $43]],
     1: ["ElectionFinalized", ["compute", $87], ["score", $88]],
     2: ["ElectionFailed"],
     3: ["Rewarded", ["account", $0], ["value", $6]],
@@ -472,7 +470,7 @@ export const $86: $.Codec<types.pallet_election_provider_multi_phase.pallet.Even
 
 export const $89: $.Codec<types.pallet_bags_list.pallet.Event> = $.taggedUnion("type", {
   0: ["Rebagged", ["who", $0], ["from", $10], ["to", $10]],
-  1: ["ScoreUpdated", ["who", $0], ["new_score", $10]],
+  1: ["ScoreUpdated", ["who", $0], ["newScore", $10]],
 })
 
 export const $91: $.Codec<types.pallet_nomination_pools.PoolState> = $.stringUnion({
@@ -484,17 +482,17 @@ export const $91: $.Codec<types.pallet_nomination_pools.PoolState> = $.stringUni
 export const $92: $.Codec<types.sp_core.crypto.AccountId32 | undefined> = $.option($0)
 
 export const $90: $.Codec<types.pallet_nomination_pools.pallet.Event> = $.taggedUnion("type", {
-  0: ["Created", ["depositor", $0], ["pool_id", $4]],
-  1: ["Bonded", ["member", $0], ["pool_id", $4], ["bonded", $6], ["joined", $43]],
-  2: ["PaidOut", ["member", $0], ["pool_id", $4], ["payout", $6]],
-  3: ["Unbonded", ["member", $0], ["pool_id", $4], ["balance", $6], ["points", $6], ["era", $4]],
-  4: ["Withdrawn", ["member", $0], ["pool_id", $4], ["balance", $6], ["points", $6]],
-  5: ["Destroyed", ["pool_id", $4]],
-  6: ["StateChanged", ["pool_id", $4], ["new_state", $91]],
-  7: ["MemberRemoved", ["pool_id", $4], ["member", $0]],
-  8: ["RolesUpdated", ["root", $92], ["state_toggler", $92], ["nominator", $92]],
-  9: ["PoolSlashed", ["pool_id", $4], ["balance", $6]],
-  10: ["UnbondingPoolSlashed", ["pool_id", $4], ["era", $4], ["balance", $6]],
+  0: ["Created", ["depositor", $0], ["poolId", $4]],
+  1: ["Bonded", ["member", $0], ["poolId", $4], ["bonded", $6], ["joined", $43]],
+  2: ["PaidOut", ["member", $0], ["poolId", $4], ["payout", $6]],
+  3: ["Unbonded", ["member", $0], ["poolId", $4], ["balance", $6], ["points", $6], ["era", $4]],
+  4: ["Withdrawn", ["member", $0], ["poolId", $4], ["balance", $6], ["points", $6]],
+  5: ["Destroyed", ["poolId", $4]],
+  6: ["StateChanged", ["poolId", $4], ["newState", $91]],
+  7: ["MemberRemoved", ["poolId", $4], ["member", $0]],
+  8: ["RolesUpdated", ["root", $92], ["stateToggler", $92], ["nominator", $92]],
+  9: ["PoolSlashed", ["poolId", $4], ["balance", $6]],
+  10: ["UnbondingPoolSlashed", ["poolId", $4], ["era", $4], ["balance", $6]],
 })
 
 export const $94: $.Codec<Array<types.u32>> = $.array($4)
@@ -520,21 +518,21 @@ export const $100: $.Codec<types.polkadot_primitives.v2.collator_app.Signature> 
 export const $103: $.Codec<types.polkadot_parachain.primitives.ValidationCodeHash> = $11
 
 export const $97: $.Codec<types.polkadot_primitives.v2.CandidateDescriptor> = $.object(
-  ["para_id", $98],
-  ["relay_parent", $11],
+  ["paraId", $98],
+  ["relayParent", $11],
   ["collator", $99],
-  ["persisted_validation_data_hash", $11],
-  ["pov_hash", $11],
-  ["erasure_root", $11],
+  ["persistedValidationDataHash", $11],
+  ["povHash", $11],
+  ["erasureRoot", $11],
   ["signature", $100],
-  ["para_head", $11],
-  ["validation_code_hash", $103],
+  ["paraHead", $11],
+  ["validationCodeHash", $103],
 )
 
 export const $96: $.Codec<types.polkadot_primitives.v2.CandidateReceipt> = $.object([
   "descriptor",
   $97,
-], ["commitments_hash", $11])
+], ["commitmentsHash", $11])
 
 export const $104: $.Codec<types.polkadot_parachain.primitives.HeadData> = $12
 
@@ -649,51 +647,51 @@ export const $113: $.Codec<types.polkadot_runtime_parachains.disputes.pallet.Eve
 
 export const $117: $.Codec<types.polkadot_runtime_common.paras_registrar.pallet.Event> = $
   .taggedUnion("type", {
-    0: ["Registered", ["para_id", $98], ["manager", $0]],
-    1: ["Deregistered", ["para_id", $98]],
-    2: ["Reserved", ["para_id", $98], ["who", $0]],
+    0: ["Registered", ["paraId", $98], ["manager", $0]],
+    1: ["Deregistered", ["paraId", $98]],
+    2: ["Reserved", ["paraId", $98], ["who", $0]],
   })
 
 export const $118: $.Codec<types.polkadot_runtime_common.slots.pallet.Event> = $.taggedUnion(
   "type",
   {
-    0: ["NewLeasePeriod", ["lease_period", $4]],
-    1: ["Leased", ["para_id", $98], ["leaser", $0], ["period_begin", $4], ["period_count", $4], [
-      "extra_reserved",
+    0: ["NewLeasePeriod", ["leasePeriod", $4]],
+    1: ["Leased", ["paraId", $98], ["leaser", $0], ["periodBegin", $4], ["periodCount", $4], [
+      "extraReserved",
       $6,
-    ], ["total_amount", $6]],
+    ], ["totalAmount", $6]],
   },
 )
 
 export const $119: $.Codec<types.polkadot_runtime_common.auctions.pallet.Event> = $.taggedUnion(
   "type",
   {
-    0: ["AuctionStarted", ["auction_index", $4], ["lease_period", $4], ["ending", $4]],
-    1: ["AuctionClosed", ["auction_index", $4]],
-    2: ["Reserved", ["bidder", $0], ["extra_reserved", $6], ["total_amount", $6]],
+    0: ["AuctionStarted", ["auctionIndex", $4], ["leasePeriod", $4], ["ending", $4]],
+    1: ["AuctionClosed", ["auctionIndex", $4]],
+    2: ["Reserved", ["bidder", $0], ["extraReserved", $6], ["totalAmount", $6]],
     3: ["Unreserved", ["bidder", $0], ["amount", $6]],
-    4: ["ReserveConfiscated", ["para_id", $98], ["leaser", $0], ["amount", $6]],
-    5: ["BidAccepted", ["bidder", $0], ["para_id", $98], ["amount", $6], ["first_slot", $4], [
-      "last_slot",
+    4: ["ReserveConfiscated", ["paraId", $98], ["leaser", $0], ["amount", $6]],
+    5: ["BidAccepted", ["bidder", $0], ["paraId", $98], ["amount", $6], ["firstSlot", $4], [
+      "lastSlot",
       $4,
     ]],
-    6: ["WinningOffset", ["auction_index", $4], ["block_number", $4]],
+    6: ["WinningOffset", ["auctionIndex", $4], ["blockNumber", $4]],
   },
 )
 
 export const $120: $.Codec<types.polkadot_runtime_common.crowdloan.pallet.Event> = $.taggedUnion(
   "type",
   {
-    0: ["Created", ["para_id", $98]],
-    1: ["Contributed", ["who", $0], ["fund_index", $98], ["amount", $6]],
-    2: ["Withdrew", ["who", $0], ["fund_index", $98], ["amount", $6]],
-    3: ["PartiallyRefunded", ["para_id", $98]],
-    4: ["AllRefunded", ["para_id", $98]],
-    5: ["Dissolved", ["para_id", $98]],
-    6: ["HandleBidResult", ["para_id", $98], ["result", $32]],
-    7: ["Edited", ["para_id", $98]],
-    8: ["MemoUpdated", ["who", $0], ["para_id", $98], ["memo", $12]],
-    9: ["AddedToNewRaise", ["para_id", $98]],
+    0: ["Created", ["paraId", $98]],
+    1: ["Contributed", ["who", $0], ["fundIndex", $98], ["amount", $6]],
+    2: ["Withdrew", ["who", $0], ["fundIndex", $98], ["amount", $6]],
+    3: ["PartiallyRefunded", ["paraId", $98]],
+    4: ["AllRefunded", ["paraId", $98]],
+    5: ["Dissolved", ["paraId", $98]],
+    6: ["HandleBidResult", ["paraId", $98], ["result", $32]],
+    7: ["Edited", ["paraId", $98]],
+    8: ["MemoUpdated", ["who", $0], ["paraId", $98], ["memo", $12]],
+    9: ["AddedToNewRaise", ["paraId", $98]],
   },
 )
 
@@ -830,21 +828,21 @@ export const $132: $.Codec<types.xcm.v2.Instruction> = $.taggedUnion("type", {
   0: ["WithdrawAsset", ["value", $133]],
   1: ["ReserveAssetDeposited", ["value", $133]],
   2: ["ReceiveTeleportedAsset", ["value", $133]],
-  3: ["QueryResponse", ["query_id", $9], ["response", $140], ["max_weight", $9]],
+  3: ["QueryResponse", ["queryId", $9], ["response", $140], ["maxWeight", $9]],
   4: ["TransferAsset", ["assets", $133], ["beneficiary", $122]],
   5: ["TransferReserveAsset", ["assets", $133], ["dest", $122], ["xcm", $.deferred(() => $130)]],
-  6: ["Transact", ["origin_type", $143], ["require_weight_at_most", $9], ["call", $144]],
-  7: ["HrmpNewChannelOpenRequest", ["sender", $125], ["max_message_size", $125], [
-    "max_capacity",
+  6: ["Transact", ["originType", $143], ["requireWeightAtMost", $9], ["call", $144]],
+  7: ["HrmpNewChannelOpenRequest", ["sender", $125], ["maxMessageSize", $125], [
+    "maxCapacity",
     $125,
   ]],
   8: ["HrmpChannelAccepted", ["recipient", $125]],
   9: ["HrmpChannelClosing", ["initiator", $125], ["sender", $125], ["recipient", $125]],
   10: ["ClearOrigin"],
   11: ["DescendOrigin", ["value", $123]],
-  12: ["ReportError", ["query_id", $9], ["dest", $122], ["max_response_weight", $9]],
-  13: ["DepositAsset", ["assets", $145], ["max_assets", $125], ["beneficiary", $122]],
-  14: ["DepositReserveAsset", ["assets", $145], ["max_assets", $125], ["dest", $122], [
+  12: ["ReportError", ["queryId", $9], ["dest", $122], ["maxResponseWeight", $9]],
+  13: ["DepositAsset", ["assets", $145], ["maxAssets", $125], ["beneficiary", $122]],
+  14: ["DepositReserveAsset", ["assets", $145], ["maxAssets", $125], ["dest", $122], [
     "xcm",
     $.deferred(() => $130),
   ]],
@@ -854,18 +852,18 @@ export const $132: $.Codec<types.xcm.v2.Instruction> = $.taggedUnion("type", {
     $.deferred(() => $130),
   ]],
   17: ["InitiateTeleport", ["assets", $145], ["dest", $122], ["xcm", $.deferred(() => $130)]],
-  18: ["QueryHolding", ["query_id", $9], ["dest", $122], ["assets", $145], [
-    "max_response_weight",
+  18: ["QueryHolding", ["queryId", $9], ["dest", $122], ["assets", $145], [
+    "maxResponseWeight",
     $9,
   ]],
-  19: ["BuyExecution", ["fees", $135], ["weight_limit", $148]],
+  19: ["BuyExecution", ["fees", $135], ["weightLimit", $148]],
   20: ["RefundSurplus"],
   21: ["SetErrorHandler", ["value", $.deferred(() => $130)]],
   22: ["SetAppendix", ["value", $.deferred(() => $130)]],
   23: ["ClearError"],
   24: ["ClaimAsset", ["assets", $133], ["ticket", $122]],
   25: ["Trap", ["value", $9]],
-  26: ["SubscribeVersion", ["query_id", $9], ["max_response_weight", $9]],
+  26: ["SubscribeVersion", ["queryId", $9], ["maxResponseWeight", $9]],
   27: ["UnsubscribeVersion"],
 })
 
@@ -1004,9 +1002,9 @@ export const $158: $.Codec<Array<[types.u32, types.u32]>> = $.array($30)
 export const $160: $.Codec<string> = $.str
 
 export const $159: $.Codec<types.frame_system.LastRuntimeUpgradeInfo> = $.object([
-  "spec_version",
+  "specVersion",
   $125,
-], ["spec_name", $160])
+], ["specName", $160])
 
 export const $163: $.Codec<[Uint8Array, Uint8Array]> = $.tuple($12, $12)
 
@@ -1015,23 +1013,23 @@ export const $162: $.Codec<Array<[Uint8Array, Uint8Array]>> = $.array($163)
 export const $164: $.Codec<Array<Uint8Array>> = $.array($12)
 
 export const $161: $.Codec<types.frame_system.pallet.Call> = $.taggedUnion("type", {
-  0: ["fill_block", ["ratio", $42]],
+  0: ["fillBlock", ["ratio", $42]],
   1: ["remark", ["remark", $12]],
-  2: ["set_heap_pages", ["pages", $10]],
-  3: ["set_code", ["code", $12]],
-  4: ["set_code_without_checks", ["code", $12]],
-  5: ["set_storage", ["items", $162]],
-  6: ["kill_storage", ["keys", $164]],
-  7: ["kill_prefix", ["prefix", $12], ["subkeys", $4]],
-  8: ["remark_with_event", ["remark", $12]],
+  2: ["setHeapPages", ["pages", $10]],
+  3: ["setCode", ["code", $12]],
+  4: ["setCodeWithoutChecks", ["code", $12]],
+  5: ["setStorage", ["items", $162]],
+  6: ["killStorage", ["keys", $164]],
+  7: ["killPrefix", ["prefix", $12], ["subkeys", $4]],
+  8: ["remarkWithEvent", ["remark", $12]],
 })
 
 export const $168: $.Codec<types.sp_weights.weight_v2.Weight | undefined> = $.option($8)
 
 export const $167: $.Codec<types.frame_system.limits.WeightsPerClass> = $.object(
-  ["base_extrinsic", $8],
-  ["max_extrinsic", $168],
-  ["max_total", $168],
+  ["baseExtrinsic", $8],
+  ["maxExtrinsic", $168],
+  ["maxTotal", $168],
   ["reserved", $168],
 )
 
@@ -1039,10 +1037,10 @@ export const $166: $.Codec<
   types.frame_support.dispatch.PerDispatchClass.$$frame_system.limits.WeightsPerClass
 > = $.object(["normal", $167], ["operational", $167], ["mandatory", $167])
 
-export const $165: $.Codec<types.frame_system.limits.BlockWeights> = $.object(["base_block", $8], [
-  "max_block",
+export const $165: $.Codec<types.frame_system.limits.BlockWeights> = $.object(["baseBlock", $8], [
+  "maxBlock",
   $8,
-], ["per_class", $166])
+], ["perClass", $166])
 
 export const $170: $.Codec<types.frame_support.dispatch.PerDispatchClass.$$u32> = $.object(
   ["normal", $4],
@@ -1064,14 +1062,14 @@ export const $174: $.Codec<Array<[Uint8Array, types.u32]>> = $.array($175)
 export const $173: $.Codec<Array<[Uint8Array, types.u32]>> = $174
 
 export const $172: $.Codec<types.sp_version.RuntimeVersion> = $.object(
-  ["spec_name", $160],
-  ["impl_name", $160],
-  ["authoring_version", $4],
-  ["spec_version", $4],
-  ["impl_version", $4],
+  ["specName", $160],
+  ["implName", $160],
+  ["authoringVersion", $4],
+  ["specVersion", $4],
+  ["implVersion", $4],
   ["apis", $173],
-  ["transaction_version", $4],
-  ["state_version", $2],
+  ["transactionVersion", $4],
+  ["stateVersion", $2],
 )
 
 export const $176: $.Codec<types.frame_system.pallet.Error> = $.stringUnion({
@@ -1102,13 +1100,13 @@ export const $257: $.Codec<types.frame_support.dispatch.RawOrigin> = $.taggedUni
 export const $258: $.Codec<types.pallet_collective.RawOrigin> = $.taggedUnion("type", {
   0: ["Members", ["value", $.tuple($4, $4)]],
   1: ["Member", ["value", $0]],
-  2: ["_Phantom"],
+  2: ["Phantom"],
 })
 
 export const $259: $.Codec<types.pallet_collective.RawOrigin> = $.taggedUnion("type", {
   0: ["Members", ["value", $.tuple($4, $4)]],
   1: ["Member", ["value", $0]],
-  2: ["_Phantom"],
+  2: ["Phantom"],
 })
 
 export const $260: $.Codec<types.polkadot_runtime_parachains.origin.pallet.Origin> = $.taggedUnion(
@@ -1133,10 +1131,10 @@ export const $256: $.Codec<types.polkadot_runtime.OriginCaller> = $.taggedUnion(
 })
 
 export const $179: $.Codec<types.pallet_scheduler.Scheduled> = $.object(
-  ["maybe_id", $31],
+  ["maybeId", $31],
   ["priority", $2],
   ["call", $180],
-  ["maybe_periodic", $183],
+  ["maybePeriodic", $183],
   ["origin", $256],
 )
 
@@ -1147,35 +1145,31 @@ export const $449: $.Codec<Array<types.pallet_scheduler.Scheduled | undefined>> 
 export const $177: $.Codec<Array<types.pallet_scheduler.Scheduled | undefined>> = $449
 
 export const $182: $.Codec<types.pallet_scheduler.pallet.Call> = $.taggedUnion("type", {
-  0: ["schedule", ["when", $4], ["maybe_periodic", $183], ["priority", $2], [
+  0: ["schedule", ["when", $4], ["maybePeriodic", $183], ["priority", $2], [
     "call",
     $.deferred(() => $181),
   ]],
   1: ["cancel", ["when", $4], ["index", $4]],
-  2: ["schedule_named", ["id", $1], ["when", $4], ["maybe_periodic", $183], ["priority", $2], [
+  2: ["scheduleNamed", ["id", $1], ["when", $4], ["maybePeriodic", $183], ["priority", $2], [
     "call",
     $.deferred(() => $181),
   ]],
-  3: ["cancel_named", ["id", $1]],
-  4: ["schedule_after", ["after", $4], ["maybe_periodic", $183], ["priority", $2], [
+  3: ["cancelNamed", ["id", $1]],
+  4: ["scheduleAfter", ["after", $4], ["maybePeriodic", $183], ["priority", $2], [
     "call",
     $.deferred(() => $181),
   ]],
-  5: [
-    "schedule_named_after",
-    ["id", $1],
-    ["after", $4],
-    ["maybe_periodic", $183],
-    ["priority", $2],
-    ["call", $.deferred(() => $181)],
-  ],
+  5: ["scheduleNamedAfter", ["id", $1], ["after", $4], ["maybePeriodic", $183], ["priority", $2], [
+    "call",
+    $.deferred(() => $181),
+  ]],
 })
 
 export const $184: $.Codec<types.pallet_preimage.pallet.Call> = $.taggedUnion("type", {
-  0: ["note_preimage", ["bytes", $12]],
-  1: ["unnote_preimage", ["hash", $11]],
-  2: ["request_preimage", ["hash", $11]],
-  3: ["unrequest_preimage", ["hash", $11]],
+  0: ["notePreimage", ["bytes", $12]],
+  1: ["unnotePreimage", ["hash", $11]],
+  2: ["requestPreimage", ["hash", $11]],
+  3: ["unrequestPreimage", ["hash", $11]],
 })
 
 export const $189: $.Codec<types.sp_consensus_babe.app.Public> = $54
@@ -1183,24 +1177,24 @@ export const $189: $.Codec<types.sp_consensus_babe.app.Public> = $54
 export const $190: $.Codec<types.sp_consensus_slots.Slot> = $10
 
 export const $187: $.Codec<types.sp_runtime.generic.header.Header> = $.object(
-  ["parent_hash", $11],
+  ["parentHash", $11],
   ["number", $125],
-  ["state_root", $11],
-  ["extrinsics_root", $11],
+  ["stateRoot", $11],
+  ["extrinsicsRoot", $11],
   ["digest", $13],
 )
 
 export const $186: $.Codec<types.sp_consensus_slots.EquivocationProof> = $.object(
   ["offender", $189],
   ["slot", $190],
-  ["first_header", $187],
-  ["second_header", $187],
+  ["firstHeader", $187],
+  ["secondHeader", $187],
 )
 
 export const $191: $.Codec<types.sp_session.MembershipProof> = $.object(["session", $4], [
-  "trie_nodes",
+  "trieNodes",
   $164,
-], ["validator_count", $4])
+], ["validatorCount", $4])
 
 export const $193: $.Codec<[types.u64, types.u64]> = $.tuple($10, $10)
 
@@ -1212,13 +1206,13 @@ export const $194: $.Codec<types.sp_consensus_babe.AllowedSlots> = $.stringUnion
 
 export const $192: $.Codec<types.sp_consensus_babe.digests.NextConfigDescriptor> = $.taggedUnion(
   "type",
-  { 1: ["V1", ["c", $193], ["allowed_slots", $194]] },
+  { 1: ["V1", ["c", $193], ["allowedSlots", $194]] },
 )
 
 export const $185: $.Codec<types.pallet_babe.pallet.Call> = $.taggedUnion("type", {
-  0: ["report_equivocation", ["equivocation_proof", $186], ["key_owner_proof", $191]],
-  1: ["report_equivocation_unsigned", ["equivocation_proof", $186], ["key_owner_proof", $191]],
-  2: ["plan_config_change", ["config", $192]],
+  0: ["reportEquivocation", ["equivocationProof", $186], ["keyOwnerProof", $191]],
+  1: ["reportEquivocationUnsigned", ["equivocationProof", $186], ["keyOwnerProof", $191]],
+  2: ["planConfigChange", ["config", $192]],
 })
 
 export const $195: $.Codec<types.pallet_timestamp.pallet.Call> = $.taggedUnion("type", {
@@ -1239,23 +1233,23 @@ export const $196: $.Codec<types.pallet_indices.pallet.Call> = $.taggedUnion("ty
   0: ["claim", ["index", $4]],
   1: ["transfer", ["new", $197], ["index", $4]],
   2: ["free", ["index", $4]],
-  3: ["force_transfer", ["new", $197], ["index", $4], ["freeze", $43]],
+  3: ["forceTransfer", ["new", $197], ["index", $4], ["freeze", $43]],
   4: ["freeze", ["index", $4]],
 })
 
 export const $199: $.Codec<types.pallet_balances.pallet.Call> = $.taggedUnion("type", {
   0: ["transfer", ["dest", $197], ["value", $58]],
-  1: ["set_balance", ["who", $197], ["new_free", $58], ["new_reserved", $58]],
-  2: ["force_transfer", ["source", $197], ["dest", $197], ["value", $58]],
-  3: ["transfer_keep_alive", ["dest", $197], ["value", $58]],
-  4: ["transfer_all", ["dest", $197], ["keep_alive", $43]],
-  5: ["force_unreserve", ["who", $197], ["amount", $6]],
+  1: ["setBalance", ["who", $197], ["newFree", $58], ["newReserved", $58]],
+  2: ["forceTransfer", ["source", $197], ["dest", $197], ["value", $58]],
+  3: ["transferKeepAlive", ["dest", $197], ["value", $58]],
+  4: ["transferAll", ["dest", $197], ["keepAlive", $43]],
+  5: ["forceUnreserve", ["who", $197], ["amount", $6]],
 })
 
 export const $201: $.Codec<Array<types.sp_runtime.generic.header.Header>> = $.array($187)
 
 export const $200: $.Codec<types.pallet_authorship.pallet.Call> = $.taggedUnion("type", {
-  0: ["set_uncles", ["new_uncles", $201]],
+  0: ["setUncles", ["newUncles", $201]],
 })
 
 export const $203: $.Codec<types.pallet_staking.RewardDestination> = $.taggedUnion("type", {
@@ -1292,38 +1286,38 @@ export const $210: $.Codec<
 
 export const $202: $.Codec<types.pallet_staking.pallet.pallet.Call> = $.taggedUnion("type", {
   0: ["bond", ["controller", $197], ["value", $58], ["payee", $203]],
-  1: ["bond_extra", ["max_additional", $58]],
+  1: ["bondExtra", ["maxAdditional", $58]],
   2: ["unbond", ["value", $58]],
-  3: ["withdraw_unbonded", ["num_slashing_spans", $4]],
+  3: ["withdrawUnbonded", ["numSlashingSpans", $4]],
   4: ["validate", ["prefs", $40]],
   5: ["nominate", ["targets", $204]],
   6: ["chill"],
-  7: ["set_payee", ["payee", $203]],
-  8: ["set_controller", ["controller", $197]],
-  9: ["set_validator_count", ["new", $125]],
-  10: ["increase_validator_count", ["additional", $125]],
-  11: ["scale_validator_count", ["factor", $205]],
-  12: ["force_no_eras"],
-  13: ["force_new_era"],
-  14: ["set_invulnerables", ["invulnerables", $206]],
-  15: ["force_unstake", ["stash", $0], ["num_slashing_spans", $4]],
-  16: ["force_new_era_always"],
-  17: ["cancel_deferred_slash", ["era", $4], ["slash_indices", $94]],
-  18: ["payout_stakers", ["validator_stash", $0], ["era", $4]],
+  7: ["setPayee", ["payee", $203]],
+  8: ["setController", ["controller", $197]],
+  9: ["setValidatorCount", ["new", $125]],
+  10: ["increaseValidatorCount", ["additional", $125]],
+  11: ["scaleValidatorCount", ["factor", $205]],
+  12: ["forceNoEras"],
+  13: ["forceNewEra"],
+  14: ["setInvulnerables", ["invulnerables", $206]],
+  15: ["forceUnstake", ["stash", $0], ["numSlashingSpans", $4]],
+  16: ["forceNewEraAlways"],
+  17: ["cancelDeferredSlash", ["era", $4], ["slashIndices", $94]],
+  18: ["payoutStakers", ["validatorStash", $0], ["era", $4]],
   19: ["rebond", ["value", $58]],
-  20: ["reap_stash", ["stash", $0], ["num_slashing_spans", $4]],
+  20: ["reapStash", ["stash", $0], ["numSlashingSpans", $4]],
   21: ["kick", ["who", $204]],
   22: [
-    "set_staking_configs",
-    ["min_nominator_bond", $207],
-    ["min_validator_bond", $207],
-    ["max_nominator_count", $208],
-    ["max_validator_count", $208],
-    ["chill_threshold", $209],
-    ["min_commission", $210],
+    "setStakingConfigs",
+    ["minNominatorBond", $207],
+    ["minValidatorBond", $207],
+    ["maxNominatorCount", $208],
+    ["maxValidatorCount", $208],
+    ["chillThreshold", $209],
+    ["minCommission", $210],
   ],
-  23: ["chill_other", ["controller", $0]],
-  24: ["force_apply_min_commission", ["validator_stash", $0]],
+  23: ["chillOther", ["controller", $0]],
+  24: ["forceApplyMinCommission", ["validatorStash", $0]],
 })
 
 export const $213: $.Codec<types.polkadot_primitives.v2.validator_app.Public> = $54
@@ -1335,19 +1329,19 @@ export const $215: $.Codec<types.sp_authority_discovery.app.Public> = $54
 export const $212: $.Codec<types.polkadot_runtime.SessionKeys> = $.object(
   ["grandpa", $50],
   ["babe", $189],
-  ["im_online", $53],
-  ["para_validator", $213],
-  ["para_assignment", $214],
-  ["authority_discovery", $215],
+  ["imOnline", $53],
+  ["paraValidator", $213],
+  ["paraAssignment", $214],
+  ["authorityDiscovery", $215],
 )
 
 export const $211: $.Codec<types.pallet_session.pallet.Call> = $.taggedUnion("type", {
-  0: ["set_keys", ["keys", $212], ["proof", $12]],
-  1: ["purge_keys"],
+  0: ["setKeys", ["keys", $212], ["proof", $12]],
+  1: ["purgeKeys"],
 })
 
-export const $220: $.Codec<types.finality_grandpa.Prevote> = $.object(["target_hash", $11], [
-  "target_number",
+export const $220: $.Codec<types.finality_grandpa.Prevote> = $.object(["targetHash", $11], [
+  "targetNumber",
   $4,
 ])
 
@@ -1360,10 +1354,10 @@ export const $223: $.Codec<
 > = $.tuple($220, $221)
 
 export const $219: $.Codec<types.finality_grandpa.Equivocation.$$finality_grandpa.Prevote> = $
-  .object(["round_number", $10], ["identity", $50], ["first", $223], ["second", $223])
+  .object(["roundNumber", $10], ["identity", $50], ["first", $223], ["second", $223])
 
-export const $225: $.Codec<types.finality_grandpa.Precommit> = $.object(["target_hash", $11], [
-  "target_number",
+export const $225: $.Codec<types.finality_grandpa.Precommit> = $.object(["targetHash", $11], [
+  "targetNumber",
   $4,
 ])
 
@@ -1372,22 +1366,22 @@ export const $226: $.Codec<
 > = $.tuple($225, $221)
 
 export const $224: $.Codec<types.finality_grandpa.Equivocation.$$finality_grandpa.Precommit> = $
-  .object(["round_number", $10], ["identity", $50], ["first", $226], ["second", $226])
+  .object(["roundNumber", $10], ["identity", $50], ["first", $226], ["second", $226])
 
 export const $218: $.Codec<types.sp_finality_grandpa.Equivocation> = $.taggedUnion("type", {
   0: ["Prevote", ["value", $219]],
   1: ["Precommit", ["value", $224]],
 })
 
-export const $217: $.Codec<types.sp_finality_grandpa.EquivocationProof> = $.object(
-  ["set_id", $10],
-  ["equivocation", $218],
-)
+export const $217: $.Codec<types.sp_finality_grandpa.EquivocationProof> = $.object(["setId", $10], [
+  "equivocation",
+  $218,
+])
 
 export const $216: $.Codec<types.pallet_grandpa.pallet.Call> = $.taggedUnion("type", {
-  0: ["report_equivocation", ["equivocation_proof", $217], ["key_owner_proof", $191]],
-  1: ["report_equivocation_unsigned", ["equivocation_proof", $217], ["key_owner_proof", $191]],
-  2: ["note_stalled", ["delay", $4], ["best_finalized_block_number", $4]],
+  0: ["reportEquivocation", ["equivocationProof", $217], ["keyOwnerProof", $191]],
+  1: ["reportEquivocationUnsigned", ["equivocationProof", $217], ["keyOwnerProof", $191]],
+  2: ["noteStalled", ["delay", $4], ["bestFinalizedBlockNumber", $4]],
 })
 
 export const $230: $.Codec<types.sp_core.OpaquePeerId> = $12
@@ -1396,17 +1390,17 @@ export const $232: $.Codec<types.sp_core.offchain.OpaqueMultiaddr> = $12
 
 export const $231: $.Codec<Array<types.sp_core.offchain.OpaqueMultiaddr>> = $.array($232)
 
-export const $229: $.Codec<types.sp_core.offchain.OpaqueNetworkState> = $.object(
-  ["peer_id", $230],
-  ["external_addresses", $231],
-)
+export const $229: $.Codec<types.sp_core.offchain.OpaqueNetworkState> = $.object(["peerId", $230], [
+  "externalAddresses",
+  $231,
+])
 
 export const $228: $.Codec<types.pallet_im_online.Heartbeat> = $.object(
-  ["block_number", $4],
-  ["network_state", $229],
-  ["session_index", $4],
-  ["authority_index", $4],
-  ["validators_len", $4],
+  ["blockNumber", $4],
+  ["networkState", $229],
+  ["sessionIndex", $4],
+  ["authorityIndex", $4],
+  ["validatorsLen", $4],
 )
 
 export const $233: $.Codec<types.pallet_im_online.sr25519.app_sr25519.Signature> = $101
@@ -1430,22 +1424,22 @@ export const $236: $.Codec<types.u32 | undefined> = $.option($4)
 export const $234: $.Codec<types.pallet_democracy.pallet.Call> = $.taggedUnion("type", {
   0: ["propose", ["proposal", $180], ["value", $58]],
   1: ["second", ["proposal", $125]],
-  2: ["vote", ["ref_index", $125], ["vote", $63]],
-  3: ["emergency_cancel", ["ref_index", $4]],
-  4: ["external_propose", ["proposal", $180]],
-  5: ["external_propose_majority", ["proposal", $180]],
-  6: ["external_propose_default", ["proposal", $180]],
-  7: ["fast_track", ["proposal_hash", $11], ["voting_period", $4], ["delay", $4]],
-  8: ["veto_external", ["proposal_hash", $11]],
-  9: ["cancel_referendum", ["ref_index", $125]],
+  2: ["vote", ["refIndex", $125], ["vote", $63]],
+  3: ["emergencyCancel", ["refIndex", $4]],
+  4: ["externalPropose", ["proposal", $180]],
+  5: ["externalProposeMajority", ["proposal", $180]],
+  6: ["externalProposeDefault", ["proposal", $180]],
+  7: ["fastTrack", ["proposalHash", $11], ["votingPeriod", $4], ["delay", $4]],
+  8: ["vetoExternal", ["proposalHash", $11]],
+  9: ["cancelReferendum", ["refIndex", $125]],
   10: ["delegate", ["to", $197], ["conviction", $235], ["balance", $6]],
   11: ["undelegate"],
-  12: ["clear_public_proposals"],
+  12: ["clearPublicProposals"],
   13: ["unlock", ["target", $197]],
-  14: ["remove_vote", ["index", $4]],
-  15: ["remove_other_vote", ["target", $197], ["index", $4]],
-  16: ["blacklist", ["proposal_hash", $11], ["maybe_ref_index", $236]],
-  17: ["cancel_proposal", ["prop_index", $125]],
+  14: ["removeVote", ["index", $4]],
+  15: ["removeOtherVote", ["target", $197], ["index", $4]],
+  16: ["blacklist", ["proposalHash", $11], ["maybeRefIndex", $236]],
+  17: ["cancelProposal", ["propIndex", $125]],
 })
 
 export const $239: $.Codec<types.sp_weights.OldWeight> = $10
@@ -1453,39 +1447,33 @@ export const $239: $.Codec<types.sp_weights.OldWeight> = $10
 export const $238: $.Codec<types.Compact<types.sp_weights.OldWeight>> = $.compact($239)
 
 export const $237: $.Codec<types.pallet_collective.pallet.Call> = $.taggedUnion("type", {
-  0: ["set_members", ["new_members", $206], ["prime", $92], ["old_count", $4]],
-  1: ["execute", ["proposal", $.deferred(() => $181)], ["length_bound", $125]],
-  2: ["propose", ["threshold", $125], ["proposal", $.deferred(() => $181)], ["length_bound", $125]],
+  0: ["setMembers", ["newMembers", $206], ["prime", $92], ["oldCount", $4]],
+  1: ["execute", ["proposal", $.deferred(() => $181)], ["lengthBound", $125]],
+  2: ["propose", ["threshold", $125], ["proposal", $.deferred(() => $181)], ["lengthBound", $125]],
   3: ["vote", ["proposal", $11], ["index", $125], ["approve", $43]],
-  4: [
-    "close_old_weight",
-    ["proposal_hash", $11],
-    ["index", $125],
-    ["proposal_weight_bound", $238],
-    ["length_bound", $125],
-  ],
-  5: ["disapprove_proposal", ["proposal_hash", $11]],
-  6: ["close", ["proposal_hash", $11], ["index", $125], ["proposal_weight_bound", $8], [
-    "length_bound",
+  4: ["closeOldWeight", ["proposalHash", $11], ["index", $125], ["proposalWeightBound", $238], [
+    "lengthBound",
+    $125,
+  ]],
+  5: ["disapproveProposal", ["proposalHash", $11]],
+  6: ["close", ["proposalHash", $11], ["index", $125], ["proposalWeightBound", $8], [
+    "lengthBound",
     $125,
   ]],
 })
 
 export const $240: $.Codec<types.pallet_collective.pallet.Call> = $.taggedUnion("type", {
-  0: ["set_members", ["new_members", $206], ["prime", $92], ["old_count", $4]],
-  1: ["execute", ["proposal", $.deferred(() => $181)], ["length_bound", $125]],
-  2: ["propose", ["threshold", $125], ["proposal", $.deferred(() => $181)], ["length_bound", $125]],
+  0: ["setMembers", ["newMembers", $206], ["prime", $92], ["oldCount", $4]],
+  1: ["execute", ["proposal", $.deferred(() => $181)], ["lengthBound", $125]],
+  2: ["propose", ["threshold", $125], ["proposal", $.deferred(() => $181)], ["lengthBound", $125]],
   3: ["vote", ["proposal", $11], ["index", $125], ["approve", $43]],
-  4: [
-    "close_old_weight",
-    ["proposal_hash", $11],
-    ["index", $125],
-    ["proposal_weight_bound", $238],
-    ["length_bound", $125],
-  ],
-  5: ["disapprove_proposal", ["proposal_hash", $11]],
-  6: ["close", ["proposal_hash", $11], ["index", $125], ["proposal_weight_bound", $8], [
-    "length_bound",
+  4: ["closeOldWeight", ["proposalHash", $11], ["index", $125], ["proposalWeightBound", $238], [
+    "lengthBound",
+    $125,
+  ]],
+  5: ["disapproveProposal", ["proposalHash", $11]],
+  6: ["close", ["proposalHash", $11], ["index", $125], ["proposalWeightBound", $8], [
+    "lengthBound",
     $125,
   ]],
 })
@@ -1498,29 +1486,29 @@ export const $242: $.Codec<types.pallet_elections_phragmen.Renouncing> = $.tagge
 
 export const $241: $.Codec<types.pallet_elections_phragmen.pallet.Call> = $.taggedUnion("type", {
   0: ["vote", ["votes", $206], ["value", $58]],
-  1: ["remove_voter"],
-  2: ["submit_candidacy", ["candidate_count", $125]],
-  3: ["renounce_candidacy", ["renouncing", $242]],
-  4: ["remove_member", ["who", $197], ["slash_bond", $43], ["rerun_election", $43]],
-  5: ["clean_defunct_voters", ["num_voters", $4], ["num_defunct", $4]],
+  1: ["removeVoter"],
+  2: ["submitCandidacy", ["candidateCount", $125]],
+  3: ["renounceCandidacy", ["renouncing", $242]],
+  4: ["removeMember", ["who", $197], ["slashBond", $43], ["rerunElection", $43]],
+  5: ["cleanDefunctVoters", ["numVoters", $4], ["numDefunct", $4]],
 })
 
 export const $243: $.Codec<types.pallet_membership.pallet.Call> = $.taggedUnion("type", {
-  0: ["add_member", ["who", $197]],
-  1: ["remove_member", ["who", $197]],
-  2: ["swap_member", ["remove", $197], ["add", $197]],
-  3: ["reset_members", ["members", $206]],
-  4: ["change_key", ["new", $197]],
-  5: ["set_prime", ["who", $197]],
-  6: ["clear_prime"],
+  0: ["addMember", ["who", $197]],
+  1: ["removeMember", ["who", $197]],
+  2: ["swapMember", ["remove", $197], ["add", $197]],
+  3: ["resetMembers", ["members", $206]],
+  4: ["changeKey", ["new", $197]],
+  5: ["setPrime", ["who", $197]],
+  6: ["clearPrime"],
 })
 
 export const $244: $.Codec<types.pallet_treasury.pallet.Call> = $.taggedUnion("type", {
-  0: ["propose_spend", ["value", $58], ["beneficiary", $197]],
-  1: ["reject_proposal", ["proposal_id", $125]],
-  2: ["approve_proposal", ["proposal_id", $125]],
+  0: ["proposeSpend", ["value", $58], ["beneficiary", $197]],
+  1: ["rejectProposal", ["proposalId", $125]],
+  2: ["approveProposal", ["proposalId", $125]],
   3: ["spend", ["amount", $58], ["beneficiary", $197]],
-  4: ["remove_approval", ["proposal_id", $125]],
+  4: ["removeApproval", ["proposalId", $125]],
 })
 
 export const $247: $.Codec<Uint8Array> = $.sizedUint8Array(65)
@@ -1542,26 +1530,26 @@ export const $250: $.Codec<types.polkadot_runtime_common.claims.StatementKind | 
 export const $245: $.Codec<types.polkadot_runtime_common.claims.pallet.Call> = $.taggedUnion(
   "type",
   {
-    0: ["claim", ["dest", $0], ["ethereum_signature", $246]],
-    1: ["mint_claim", ["who", $73], ["value", $6], ["vesting_schedule", $248], ["statement", $250]],
-    2: ["claim_attest", ["dest", $0], ["ethereum_signature", $246], ["statement", $12]],
+    0: ["claim", ["dest", $0], ["ethereumSignature", $246]],
+    1: ["mintClaim", ["who", $73], ["value", $6], ["vestingSchedule", $248], ["statement", $250]],
+    2: ["claimAttest", ["dest", $0], ["ethereumSignature", $246], ["statement", $12]],
     3: ["attest", ["statement", $12]],
-    4: ["move_claim", ["old", $73], ["new", $73], ["maybe_preclaim", $92]],
+    4: ["moveClaim", ["old", $73], ["new", $73], ["maybePreclaim", $92]],
   },
 )
 
 export const $253: $.Codec<types.pallet_vesting.vesting_info.VestingInfo> = $.object(
   ["locked", $6],
-  ["per_block", $6],
-  ["starting_block", $4],
+  ["perBlock", $6],
+  ["startingBlock", $4],
 )
 
 export const $252: $.Codec<types.pallet_vesting.pallet.Call> = $.taggedUnion("type", {
   0: ["vest"],
-  1: ["vest_other", ["target", $197]],
-  2: ["vested_transfer", ["target", $197], ["schedule", $253]],
-  3: ["force_vested_transfer", ["source", $197], ["target", $197], ["schedule", $253]],
-  4: ["merge_schedules", ["schedule1_index", $4], ["schedule2_index", $4]],
+  1: ["vestOther", ["target", $197]],
+  2: ["vestedTransfer", ["target", $197], ["schedule", $253]],
+  3: ["forceVestedTransfer", ["source", $197], ["target", $197], ["schedule", $253]],
+  4: ["mergeSchedules", ["schedule1Index", $4], ["schedule2Index", $4]],
 })
 
 export const $255: $.Codec<Array<types.polkadot_runtime.RuntimeCall>> = $.array(
@@ -1570,10 +1558,10 @@ export const $255: $.Codec<Array<types.polkadot_runtime.RuntimeCall>> = $.array(
 
 export const $254: $.Codec<types.pallet_utility.pallet.Call> = $.taggedUnion("type", {
   0: ["batch", ["calls", $255]],
-  1: ["as_derivative", ["index", $80], ["call", $.deferred(() => $181)]],
-  2: ["batch_all", ["calls", $255]],
-  3: ["dispatch_as", ["as_origin", $256], ["call", $.deferred(() => $181)]],
-  4: ["force_batch", ["calls", $255]],
+  1: ["asDerivative", ["index", $80], ["call", $.deferred(() => $181)]],
+  2: ["batchAll", ["calls", $255]],
+  3: ["dispatchAs", ["asOrigin", $256], ["call", $.deferred(() => $181)]],
+  4: ["forceBatch", ["calls", $255]],
 })
 
 export const $268: $.Codec<Uint8Array> = $.sizedUint8Array(0)
@@ -1693,7 +1681,7 @@ export const $264: $.Codec<types.pallet_identity.types.IdentityInfo> = $.object(
   ["web", $267],
   ["riot", $267],
   ["email", $267],
-  ["pgp_fingerprint", $297],
+  ["pgpFingerprint", $297],
   ["image", $267],
   ["twitter", $267],
 )
@@ -1718,42 +1706,42 @@ export const $302: $.Codec<types.pallet_identity.types.Judgement> = $.taggedUnio
 })
 
 export const $263: $.Codec<types.pallet_identity.pallet.Call> = $.taggedUnion("type", {
-  0: ["add_registrar", ["account", $197]],
-  1: ["set_identity", ["info", $264]],
-  2: ["set_subs", ["subs", $298]],
-  3: ["clear_identity"],
-  4: ["request_judgement", ["reg_index", $125], ["max_fee", $58]],
-  5: ["cancel_request", ["reg_index", $4]],
-  6: ["set_fee", ["index", $125], ["fee", $58]],
-  7: ["set_account_id", ["index", $125], ["new", $197]],
-  8: ["set_fields", ["index", $125], ["fields", $300]],
-  9: ["provide_judgement", ["reg_index", $125], ["target", $197], ["judgement", $302], [
+  0: ["addRegistrar", ["account", $197]],
+  1: ["setIdentity", ["info", $264]],
+  2: ["setSubs", ["subs", $298]],
+  3: ["clearIdentity"],
+  4: ["requestJudgement", ["regIndex", $125], ["maxFee", $58]],
+  5: ["cancelRequest", ["regIndex", $4]],
+  6: ["setFee", ["index", $125], ["fee", $58]],
+  7: ["setAccountId", ["index", $125], ["new", $197]],
+  8: ["setFields", ["index", $125], ["fields", $300]],
+  9: ["provideJudgement", ["regIndex", $125], ["target", $197], ["judgement", $302], [
     "identity",
     $11,
   ]],
-  10: ["kill_identity", ["target", $197]],
-  11: ["add_sub", ["sub", $197], ["data", $267]],
-  12: ["rename_sub", ["sub", $197], ["data", $267]],
-  13: ["remove_sub", ["sub", $197]],
-  14: ["quit_sub"],
+  10: ["killIdentity", ["target", $197]],
+  11: ["addSub", ["sub", $197], ["data", $267]],
+  12: ["renameSub", ["sub", $197], ["data", $267]],
+  13: ["removeSub", ["sub", $197]],
+  14: ["quitSub"],
 })
 
 export const $304: $.Codec<types.polkadot_runtime.ProxyType | undefined> = $.option($79)
 
 export const $303: $.Codec<types.pallet_proxy.pallet.Call> = $.taggedUnion("type", {
-  0: ["proxy", ["real", $197], ["force_proxy_type", $304], ["call", $.deferred(() => $181)]],
-  1: ["add_proxy", ["delegate", $197], ["proxy_type", $79], ["delay", $4]],
-  2: ["remove_proxy", ["delegate", $197], ["proxy_type", $79], ["delay", $4]],
-  3: ["remove_proxies"],
-  4: ["create_pure", ["proxy_type", $79], ["delay", $4], ["index", $80]],
-  5: ["kill_pure", ["spawner", $197], ["proxy_type", $79], ["index", $80], ["height", $125], [
-    "ext_index",
+  0: ["proxy", ["real", $197], ["forceProxyType", $304], ["call", $.deferred(() => $181)]],
+  1: ["addProxy", ["delegate", $197], ["proxyType", $79], ["delay", $4]],
+  2: ["removeProxy", ["delegate", $197], ["proxyType", $79], ["delay", $4]],
+  3: ["removeProxies"],
+  4: ["createPure", ["proxyType", $79], ["delay", $4], ["index", $80]],
+  5: ["killPure", ["spawner", $197], ["proxyType", $79], ["index", $80], ["height", $125], [
+    "extIndex",
     $125,
   ]],
-  6: ["announce", ["real", $197], ["call_hash", $11]],
-  7: ["remove_announcement", ["real", $197], ["call_hash", $11]],
-  8: ["reject_announcement", ["delegate", $197], ["call_hash", $11]],
-  9: ["proxy_announced", ["delegate", $197], ["real", $197], ["force_proxy_type", $304], [
+  6: ["announce", ["real", $197], ["callHash", $11]],
+  7: ["removeAnnouncement", ["real", $197], ["callHash", $11]],
+  8: ["rejectAnnouncement", ["delegate", $197], ["callHash", $11]],
+  9: ["proxyAnnounced", ["delegate", $197], ["real", $197], ["forceProxyType", $304], [
     "call",
     $.deferred(() => $181),
   ]],
@@ -1762,60 +1750,53 @@ export const $303: $.Codec<types.pallet_proxy.pallet.Call> = $.taggedUnion("type
 export const $306: $.Codec<types.pallet_multisig.Timepoint | undefined> = $.option($82)
 
 export const $305: $.Codec<types.pallet_multisig.pallet.Call> = $.taggedUnion("type", {
-  0: ["as_multi_threshold_1", ["other_signatories", $206], ["call", $.deferred(() => $181)]],
-  1: ["as_multi", ["threshold", $80], ["other_signatories", $206], ["maybe_timepoint", $306], [
+  0: ["asMultiThreshold1", ["otherSignatories", $206], ["call", $.deferred(() => $181)]],
+  1: ["asMulti", ["threshold", $80], ["otherSignatories", $206], ["maybeTimepoint", $306], [
     "call",
     $.deferred(() => $181),
-  ], ["max_weight", $8]],
-  2: [
-    "approve_as_multi",
-    ["threshold", $80],
-    ["other_signatories", $206],
-    ["maybe_timepoint", $306],
-    ["call_hash", $1],
-    ["max_weight", $8],
-  ],
-  3: ["cancel_as_multi", ["threshold", $80], ["other_signatories", $206], ["timepoint", $82], [
-    "call_hash",
+  ], ["maxWeight", $8]],
+  2: ["approveAsMulti", ["threshold", $80], ["otherSignatories", $206], ["maybeTimepoint", $306], [
+    "callHash",
+    $1,
+  ], ["maxWeight", $8]],
+  3: ["cancelAsMulti", ["threshold", $80], ["otherSignatories", $206], ["timepoint", $82], [
+    "callHash",
     $1,
   ]],
 })
 
 export const $307: $.Codec<types.pallet_bounties.pallet.Call> = $.taggedUnion("type", {
-  0: ["propose_bounty", ["value", $58], ["description", $12]],
-  1: ["approve_bounty", ["bounty_id", $125]],
-  2: ["propose_curator", ["bounty_id", $125], ["curator", $197], ["fee", $58]],
-  3: ["unassign_curator", ["bounty_id", $125]],
-  4: ["accept_curator", ["bounty_id", $125]],
-  5: ["award_bounty", ["bounty_id", $125], ["beneficiary", $197]],
-  6: ["claim_bounty", ["bounty_id", $125]],
-  7: ["close_bounty", ["bounty_id", $125]],
-  8: ["extend_bounty_expiry", ["bounty_id", $125], ["remark", $12]],
+  0: ["proposeBounty", ["value", $58], ["description", $12]],
+  1: ["approveBounty", ["bountyId", $125]],
+  2: ["proposeCurator", ["bountyId", $125], ["curator", $197], ["fee", $58]],
+  3: ["unassignCurator", ["bountyId", $125]],
+  4: ["acceptCurator", ["bountyId", $125]],
+  5: ["awardBounty", ["bountyId", $125], ["beneficiary", $197]],
+  6: ["claimBounty", ["bountyId", $125]],
+  7: ["closeBounty", ["bountyId", $125]],
+  8: ["extendBountyExpiry", ["bountyId", $125], ["remark", $12]],
 })
 
 export const $308: $.Codec<types.pallet_child_bounties.pallet.Call> = $.taggedUnion("type", {
-  0: ["add_child_bounty", ["parent_bounty_id", $125], ["value", $58], ["description", $12]],
-  1: ["propose_curator", ["parent_bounty_id", $125], ["child_bounty_id", $125], ["curator", $197], [
+  0: ["addChildBounty", ["parentBountyId", $125], ["value", $58], ["description", $12]],
+  1: ["proposeCurator", ["parentBountyId", $125], ["childBountyId", $125], ["curator", $197], [
     "fee",
     $58,
   ]],
-  2: ["accept_curator", ["parent_bounty_id", $125], ["child_bounty_id", $125]],
-  3: ["unassign_curator", ["parent_bounty_id", $125], ["child_bounty_id", $125]],
-  4: ["award_child_bounty", ["parent_bounty_id", $125], ["child_bounty_id", $125], [
-    "beneficiary",
-    $197,
-  ]],
-  5: ["claim_child_bounty", ["parent_bounty_id", $125], ["child_bounty_id", $125]],
-  6: ["close_child_bounty", ["parent_bounty_id", $125], ["child_bounty_id", $125]],
+  2: ["acceptCurator", ["parentBountyId", $125], ["childBountyId", $125]],
+  3: ["unassignCurator", ["parentBountyId", $125], ["childBountyId", $125]],
+  4: ["awardChildBounty", ["parentBountyId", $125], ["childBountyId", $125], ["beneficiary", $197]],
+  5: ["claimChildBounty", ["parentBountyId", $125], ["childBountyId", $125]],
+  6: ["closeChildBounty", ["parentBountyId", $125], ["childBountyId", $125]],
 })
 
 export const $309: $.Codec<types.pallet_tips.pallet.Call> = $.taggedUnion("type", {
-  0: ["report_awesome", ["reason", $12], ["who", $197]],
-  1: ["retract_tip", ["hash", $11]],
-  2: ["tip_new", ["reason", $12], ["who", $197], ["tip_value", $58]],
-  3: ["tip", ["hash", $11], ["tip_value", $58]],
-  4: ["close_tip", ["hash", $11]],
-  5: ["slash_tip", ["hash", $11]],
+  0: ["reportAwesome", ["reason", $12], ["who", $197]],
+  1: ["retractTip", ["hash", $11]],
+  2: ["tipNew", ["reason", $12], ["who", $197], ["tipValue", $58]],
+  3: ["tip", ["hash", $11], ["tipValue", $58]],
+  4: ["closeTip", ["hash", $11]],
+  5: ["slashTip", ["hash", $11]],
 })
 
 export const $315: $.Codec<types.Compact<types.u16>> = $.compact($80)
@@ -2607,17 +2588,17 @@ export const $365: $.Codec<
 export const $310: $.Codec<types.pallet_election_provider_multi_phase.pallet.Call> = $.taggedUnion(
   "type",
   {
-    0: ["submit_unsigned", ["raw_solution", $311], ["witness", $363]],
-    1: ["set_minimum_untrusted_score", ["maybe_next_score", $364]],
-    2: ["set_emergency_election_result", ["supports", $365]],
-    3: ["submit", ["raw_solution", $311]],
-    4: ["governance_fallback", ["maybe_max_voters", $236], ["maybe_max_targets", $236]],
+    0: ["submitUnsigned", ["rawSolution", $311], ["witness", $363]],
+    1: ["setMinimumUntrustedScore", ["maybeNextScore", $364]],
+    2: ["setEmergencyElectionResult", ["supports", $365]],
+    3: ["submit", ["rawSolution", $311]],
+    4: ["governanceFallback", ["maybeMaxVoters", $236], ["maybeMaxTargets", $236]],
   },
 )
 
 export const $368: $.Codec<types.pallet_bags_list.pallet.Call> = $.taggedUnion("type", {
   0: ["rebag", ["dislocated", $197]],
-  1: ["put_in_front_of", ["lighter", $197]],
+  1: ["putInFrontOf", ["lighter", $197]],
 })
 
 export const $370: $.Codec<types.pallet_nomination_pools.BondExtra> = $.taggedUnion("type", {
@@ -2641,80 +2622,80 @@ export const $373: $.Codec<types.pallet_nomination_pools.ConfigOp.$$sp_core.cryp
   .taggedUnion("type", { 0: ["Noop"], 1: ["Set", ["value", $0]], 2: ["Remove"] })
 
 export const $369: $.Codec<types.pallet_nomination_pools.pallet.Call> = $.taggedUnion("type", {
-  0: ["join", ["amount", $58], ["pool_id", $4]],
-  1: ["bond_extra", ["extra", $370]],
-  2: ["claim_payout"],
-  3: ["unbond", ["member_account", $197], ["unbonding_points", $58]],
-  4: ["pool_withdraw_unbonded", ["pool_id", $4], ["num_slashing_spans", $4]],
-  5: ["withdraw_unbonded", ["member_account", $197], ["num_slashing_spans", $4]],
-  6: ["create", ["amount", $58], ["root", $197], ["nominator", $197], ["state_toggler", $197]],
-  7: ["nominate", ["pool_id", $4], ["validators", $206]],
-  8: ["set_state", ["pool_id", $4], ["state", $91]],
-  9: ["set_metadata", ["pool_id", $4], ["metadata", $12]],
-  10: ["set_configs", ["min_join_bond", $371], ["min_create_bond", $371], ["max_pools", $372], [
-    "max_members",
+  0: ["join", ["amount", $58], ["poolId", $4]],
+  1: ["bondExtra", ["extra", $370]],
+  2: ["claimPayout"],
+  3: ["unbond", ["memberAccount", $197], ["unbondingPoints", $58]],
+  4: ["poolWithdrawUnbonded", ["poolId", $4], ["numSlashingSpans", $4]],
+  5: ["withdrawUnbonded", ["memberAccount", $197], ["numSlashingSpans", $4]],
+  6: ["create", ["amount", $58], ["root", $197], ["nominator", $197], ["stateToggler", $197]],
+  7: ["nominate", ["poolId", $4], ["validators", $206]],
+  8: ["setState", ["poolId", $4], ["state", $91]],
+  9: ["setMetadata", ["poolId", $4], ["metadata", $12]],
+  10: ["setConfigs", ["minJoinBond", $371], ["minCreateBond", $371], ["maxPools", $372], [
+    "maxMembers",
     $372,
-  ], ["max_members_per_pool", $372]],
-  11: ["update_roles", ["pool_id", $4], ["new_root", $373], ["new_nominator", $373], [
-    "new_state_toggler",
+  ], ["maxMembersPerPool", $372]],
+  11: ["updateRoles", ["poolId", $4], ["newRoot", $373], ["newNominator", $373], [
+    "newStateToggler",
     $373,
   ]],
-  12: ["chill", ["pool_id", $4]],
+  12: ["chill", ["poolId", $4]],
 })
 
 export const $374: $.Codec<types.pallet_fast_unstake.pallet.Call> = $.taggedUnion("type", {
-  0: ["register_fast_unstake"],
+  0: ["registerFastUnstake"],
   1: ["deregister"],
-  2: ["control", ["unchecked_eras_to_check", $4]],
+  2: ["control", ["uncheckedErasToCheck", $4]],
 })
 
 export const $375: $.Codec<types.polkadot_runtime_parachains.configuration.pallet.Call> = $
   .taggedUnion("type", {
-    0: ["set_validation_upgrade_cooldown", ["new", $4]],
-    1: ["set_validation_upgrade_delay", ["new", $4]],
-    2: ["set_code_retention_period", ["new", $4]],
-    3: ["set_max_code_size", ["new", $4]],
-    4: ["set_max_pov_size", ["new", $4]],
-    5: ["set_max_head_data_size", ["new", $4]],
-    6: ["set_parathread_cores", ["new", $4]],
-    7: ["set_parathread_retries", ["new", $4]],
-    8: ["set_group_rotation_frequency", ["new", $4]],
-    9: ["set_chain_availability_period", ["new", $4]],
-    10: ["set_thread_availability_period", ["new", $4]],
-    11: ["set_scheduling_lookahead", ["new", $4]],
-    12: ["set_max_validators_per_core", ["new", $236]],
-    13: ["set_max_validators", ["new", $236]],
-    14: ["set_dispute_period", ["new", $4]],
-    15: ["set_dispute_post_conclusion_acceptance_period", ["new", $4]],
-    16: ["set_dispute_max_spam_slots", ["new", $4]],
-    17: ["set_dispute_conclusion_by_time_out_period", ["new", $4]],
-    18: ["set_no_show_slots", ["new", $4]],
-    19: ["set_n_delay_tranches", ["new", $4]],
-    20: ["set_zeroth_delay_tranche_width", ["new", $4]],
-    21: ["set_needed_approvals", ["new", $4]],
-    22: ["set_relay_vrf_modulo_samples", ["new", $4]],
-    23: ["set_max_upward_queue_count", ["new", $4]],
-    24: ["set_max_upward_queue_size", ["new", $4]],
-    25: ["set_max_downward_message_size", ["new", $4]],
-    26: ["set_ump_service_total_weight", ["new", $8]],
-    27: ["set_max_upward_message_size", ["new", $4]],
-    28: ["set_max_upward_message_num_per_candidate", ["new", $4]],
-    29: ["set_hrmp_open_request_ttl", ["new", $4]],
-    30: ["set_hrmp_sender_deposit", ["new", $6]],
-    31: ["set_hrmp_recipient_deposit", ["new", $6]],
-    32: ["set_hrmp_channel_max_capacity", ["new", $4]],
-    33: ["set_hrmp_channel_max_total_size", ["new", $4]],
-    34: ["set_hrmp_max_parachain_inbound_channels", ["new", $4]],
-    35: ["set_hrmp_max_parathread_inbound_channels", ["new", $4]],
-    36: ["set_hrmp_channel_max_message_size", ["new", $4]],
-    37: ["set_hrmp_max_parachain_outbound_channels", ["new", $4]],
-    38: ["set_hrmp_max_parathread_outbound_channels", ["new", $4]],
-    39: ["set_hrmp_max_message_num_per_candidate", ["new", $4]],
-    40: ["set_ump_max_individual_weight", ["new", $8]],
-    41: ["set_pvf_checking_enabled", ["new", $43]],
-    42: ["set_pvf_voting_ttl", ["new", $4]],
-    43: ["set_minimum_validation_upgrade_delay", ["new", $4]],
-    44: ["set_bypass_consistency_check", ["new", $43]],
+    0: ["setValidationUpgradeCooldown", ["new", $4]],
+    1: ["setValidationUpgradeDelay", ["new", $4]],
+    2: ["setCodeRetentionPeriod", ["new", $4]],
+    3: ["setMaxCodeSize", ["new", $4]],
+    4: ["setMaxPovSize", ["new", $4]],
+    5: ["setMaxHeadDataSize", ["new", $4]],
+    6: ["setParathreadCores", ["new", $4]],
+    7: ["setParathreadRetries", ["new", $4]],
+    8: ["setGroupRotationFrequency", ["new", $4]],
+    9: ["setChainAvailabilityPeriod", ["new", $4]],
+    10: ["setThreadAvailabilityPeriod", ["new", $4]],
+    11: ["setSchedulingLookahead", ["new", $4]],
+    12: ["setMaxValidatorsPerCore", ["new", $236]],
+    13: ["setMaxValidators", ["new", $236]],
+    14: ["setDisputePeriod", ["new", $4]],
+    15: ["setDisputePostConclusionAcceptancePeriod", ["new", $4]],
+    16: ["setDisputeMaxSpamSlots", ["new", $4]],
+    17: ["setDisputeConclusionByTimeOutPeriod", ["new", $4]],
+    18: ["setNoShowSlots", ["new", $4]],
+    19: ["setNDelayTranches", ["new", $4]],
+    20: ["setZerothDelayTrancheWidth", ["new", $4]],
+    21: ["setNeededApprovals", ["new", $4]],
+    22: ["setRelayVrfModuloSamples", ["new", $4]],
+    23: ["setMaxUpwardQueueCount", ["new", $4]],
+    24: ["setMaxUpwardQueueSize", ["new", $4]],
+    25: ["setMaxDownwardMessageSize", ["new", $4]],
+    26: ["setUmpServiceTotalWeight", ["new", $8]],
+    27: ["setMaxUpwardMessageSize", ["new", $4]],
+    28: ["setMaxUpwardMessageNumPerCandidate", ["new", $4]],
+    29: ["setHrmpOpenRequestTtl", ["new", $4]],
+    30: ["setHrmpSenderDeposit", ["new", $6]],
+    31: ["setHrmpRecipientDeposit", ["new", $6]],
+    32: ["setHrmpChannelMaxCapacity", ["new", $4]],
+    33: ["setHrmpChannelMaxTotalSize", ["new", $4]],
+    34: ["setHrmpMaxParachainInboundChannels", ["new", $4]],
+    35: ["setHrmpMaxParathreadInboundChannels", ["new", $4]],
+    36: ["setHrmpChannelMaxMessageSize", ["new", $4]],
+    37: ["setHrmpMaxParachainOutboundChannels", ["new", $4]],
+    38: ["setHrmpMaxParathreadOutboundChannels", ["new", $4]],
+    39: ["setHrmpMaxMessageNumPerCandidate", ["new", $4]],
+    40: ["setUmpMaxIndividualWeight", ["new", $8]],
+    41: ["setPvfCheckingEnabled", ["new", $43]],
+    42: ["setPvfVotingTtl", ["new", $4]],
+    43: ["setMinimumValidationUpgradeDelay", ["new", $4]],
+    44: ["setBypassConsistencyCheck", ["new", $43]],
   })
 
 export const $376: $.Codec<types.polkadot_runtime_parachains.shared.pallet.Call> = $.never
@@ -2731,7 +2712,7 @@ export const $386: $.Codec<types.polkadot_primitives.v2.validator_app.Signature>
 
 export const $381: $.Codec<types.polkadot_primitives.v2.signed.UncheckedSigned> = $.object(
   ["payload", $382],
-  ["validator_index", $385],
+  ["validatorIndex", $385],
   ["signature", $386],
 )
 
@@ -2754,12 +2735,12 @@ export const $393: $.Codec<types.polkadot_parachain.primitives.ValidationCode | 
   .option($394)
 
 export const $390: $.Codec<types.polkadot_primitives.v2.CandidateCommitments> = $.object(
-  ["upward_messages", $164],
-  ["horizontal_messages", $391],
-  ["new_validation_code", $393],
-  ["head_data", $104],
-  ["processed_downward_messages", $4],
-  ["hrmp_watermark", $4],
+  ["upwardMessages", $164],
+  ["horizontalMessages", $391],
+  ["newValidationCode", $393],
+  ["headData", $104],
+  ["processedDownwardMessages", $4],
+  ["hrmpWatermark", $4],
 )
 
 export const $389: $.Codec<types.polkadot_primitives.v2.CommittedCandidateReceipt> = $.object([
@@ -2776,8 +2757,8 @@ export const $395: $.Codec<Array<types.polkadot_primitives.v2.ValidityAttestatio
 
 export const $388: $.Codec<types.polkadot_primitives.v2.BackedCandidate> = $.object(
   ["candidate", $389],
-  ["validity_votes", $395],
-  ["validator_indices", $383],
+  ["validityVotes", $395],
+  ["validatorIndices", $383],
 )
 
 export const $387: $.Codec<Array<types.polkadot_primitives.v2.BackedCandidate>> = $.array($388)
@@ -2819,7 +2800,7 @@ export const $399: $.Codec<
 > = $.array($400)
 
 export const $398: $.Codec<types.polkadot_primitives.v2.DisputeStatementSet> = $.object(
-  ["candidate_hash", $114],
+  ["candidateHash", $114],
   ["session", $4],
   ["statements", $399],
 )
@@ -2828,9 +2809,9 @@ export const $397: $.Codec<Array<types.polkadot_primitives.v2.DisputeStatementSe
 
 export const $379: $.Codec<types.polkadot_primitives.v2.InherentData> = $.object(
   ["bitfields", $380],
-  ["backed_candidates", $387],
+  ["backedCandidates", $387],
   ["disputes", $397],
-  ["parent_header", $187],
+  ["parentHeader", $187],
 )
 
 export const $378: $.Codec<types.polkadot_runtime_parachains.paras_inherent.pallet.Call> = $
@@ -2839,86 +2820,83 @@ export const $378: $.Codec<types.polkadot_runtime_parachains.paras_inherent.pall
 export const $405: $.Codec<types.polkadot_primitives.v2.PvfCheckStatement> = $.object(
   ["accept", $43],
   ["subject", $103],
-  ["session_index", $4],
-  ["validator_index", $385],
+  ["sessionIndex", $4],
+  ["validatorIndex", $385],
 )
 
 export const $404: $.Codec<types.polkadot_runtime_parachains.paras.pallet.Call> = $.taggedUnion(
   "type",
   {
-    0: ["force_set_current_code", ["para", $98], ["new_code", $394]],
-    1: ["force_set_current_head", ["para", $98], ["new_head", $104]],
-    2: ["force_schedule_code_upgrade", ["para", $98], ["new_code", $394], [
-      "relay_parent_number",
-      $4,
-    ]],
-    3: ["force_note_new_head", ["para", $98], ["new_head", $104]],
-    4: ["force_queue_action", ["para", $98]],
-    5: ["add_trusted_validation_code", ["validation_code", $394]],
-    6: ["poke_unused_validation_code", ["validation_code_hash", $103]],
-    7: ["include_pvf_check_statement", ["stmt", $405], ["signature", $386]],
+    0: ["forceSetCurrentCode", ["para", $98], ["newCode", $394]],
+    1: ["forceSetCurrentHead", ["para", $98], ["newHead", $104]],
+    2: ["forceScheduleCodeUpgrade", ["para", $98], ["newCode", $394], ["relayParentNumber", $4]],
+    3: ["forceNoteNewHead", ["para", $98], ["newHead", $104]],
+    4: ["forceQueueAction", ["para", $98]],
+    5: ["addTrustedValidationCode", ["validationCode", $394]],
+    6: ["pokeUnusedValidationCode", ["validationCodeHash", $103]],
+    7: ["includePvfCheckStatement", ["stmt", $405], ["signature", $386]],
   },
 )
 
 export const $406: $.Codec<types.polkadot_runtime_parachains.initializer.pallet.Call> = $
-  .taggedUnion("type", { 0: ["force_approve", ["up_to", $4]] })
+  .taggedUnion("type", { 0: ["forceApprove", ["upTo", $4]] })
 
 export const $407: $.Codec<types.polkadot_runtime_parachains.dmp.pallet.Call> = $.never
 
 export const $408: $.Codec<types.polkadot_runtime_parachains.ump.pallet.Call> = $.taggedUnion(
   "type",
-  { 0: ["service_overweight", ["index", $10], ["weight_limit", $8]] },
+  { 0: ["serviceOverweight", ["index", $10], ["weightLimit", $8]] },
 )
 
 export const $409: $.Codec<types.polkadot_runtime_parachains.hrmp.pallet.Call> = $.taggedUnion(
   "type",
   {
-    0: ["hrmp_init_open_channel", ["recipient", $98], ["proposed_max_capacity", $4], [
-      "proposed_max_message_size",
+    0: ["hrmpInitOpenChannel", ["recipient", $98], ["proposedMaxCapacity", $4], [
+      "proposedMaxMessageSize",
       $4,
     ]],
-    1: ["hrmp_accept_open_channel", ["sender", $98]],
-    2: ["hrmp_close_channel", ["channel_id", $112]],
-    3: ["force_clean_hrmp", ["para", $98], ["inbound", $4], ["outbound", $4]],
-    4: ["force_process_hrmp_open", ["channels", $4]],
-    5: ["force_process_hrmp_close", ["channels", $4]],
-    6: ["hrmp_cancel_open_request", ["channel_id", $112], ["open_requests", $4]],
-    7: ["force_open_hrmp_channel", ["sender", $98], ["recipient", $98], ["max_capacity", $4], [
-      "max_message_size",
+    1: ["hrmpAcceptOpenChannel", ["sender", $98]],
+    2: ["hrmpCloseChannel", ["channelId", $112]],
+    3: ["forceCleanHrmp", ["para", $98], ["inbound", $4], ["outbound", $4]],
+    4: ["forceProcessHrmpOpen", ["channels", $4]],
+    5: ["forceProcessHrmpClose", ["channels", $4]],
+    6: ["hrmpCancelOpenRequest", ["channelId", $112], ["openRequests", $4]],
+    7: ["forceOpenHrmpChannel", ["sender", $98], ["recipient", $98], ["maxCapacity", $4], [
+      "maxMessageSize",
       $4,
     ]],
   },
 )
 
 export const $410: $.Codec<types.polkadot_runtime_parachains.disputes.pallet.Call> = $.stringUnion({
-  0: "force_unfreeze",
+  0: "forceUnfreeze",
 })
 
 export const $411: $.Codec<types.polkadot_runtime_common.paras_registrar.pallet.Call> = $
   .taggedUnion("type", {
-    0: ["register", ["id", $98], ["genesis_head", $104], ["validation_code", $394]],
-    1: ["force_register", ["who", $0], ["deposit", $6], ["id", $98], ["genesis_head", $104], [
-      "validation_code",
+    0: ["register", ["id", $98], ["genesisHead", $104], ["validationCode", $394]],
+    1: ["forceRegister", ["who", $0], ["deposit", $6], ["id", $98], ["genesisHead", $104], [
+      "validationCode",
       $394,
     ]],
     2: ["deregister", ["id", $98]],
     3: ["swap", ["id", $98], ["other", $98]],
-    4: ["remove_lock", ["para", $98]],
+    4: ["removeLock", ["para", $98]],
     5: ["reserve"],
-    6: ["add_lock", ["para", $98]],
-    7: ["schedule_code_upgrade", ["para", $98], ["new_code", $394]],
-    8: ["set_current_head", ["para", $98], ["new_head", $104]],
+    6: ["addLock", ["para", $98]],
+    7: ["scheduleCodeUpgrade", ["para", $98], ["newCode", $394]],
+    8: ["setCurrentHead", ["para", $98], ["newHead", $104]],
   })
 
 export const $412: $.Codec<types.polkadot_runtime_common.slots.pallet.Call> = $.taggedUnion(
   "type",
   {
-    0: ["force_lease", ["para", $98], ["leaser", $0], ["amount", $6], ["period_begin", $4], [
-      "period_count",
+    0: ["forceLease", ["para", $98], ["leaser", $0], ["amount", $6], ["periodBegin", $4], [
+      "periodCount",
       $4,
     ]],
-    1: ["clear_all_leases", ["para", $98]],
-    2: ["trigger_onboard", ["para", $98]],
+    1: ["clearAllLeases", ["para", $98]],
+    2: ["triggerOnboard", ["para", $98]],
   },
 )
 
@@ -2927,12 +2905,12 @@ export const $414: $.Codec<types.Compact<types.polkadot_parachain.primitives.Id>
 export const $413: $.Codec<types.polkadot_runtime_common.auctions.pallet.Call> = $.taggedUnion(
   "type",
   {
-    0: ["new_auction", ["duration", $125], ["lease_period_index", $125]],
-    1: ["bid", ["para", $414], ["auction_index", $125], ["first_slot", $125], ["last_slot", $125], [
+    0: ["newAuction", ["duration", $125], ["leasePeriodIndex", $125]],
+    1: ["bid", ["para", $414], ["auctionIndex", $125], ["firstSlot", $125], ["lastSlot", $125], [
       "amount",
       $58,
     ]],
-    2: ["cancel_auction"],
+    2: ["cancelAuction"],
   },
 )
 
@@ -2961,7 +2939,7 @@ export const $420: $.Codec<types.sp_runtime.MultiSignature | undefined> = $.opti
 export const $415: $.Codec<types.polkadot_runtime_common.crowdloan.pallet.Call> = $.taggedUnion(
   "type",
   {
-    0: ["create", ["index", $414], ["cap", $58], ["first_period", $125], ["last_period", $125], [
+    0: ["create", ["index", $414], ["cap", $58], ["firstPeriod", $125], ["lastPeriod", $125], [
       "end",
       $125,
     ], ["verifier", $416]],
@@ -2969,13 +2947,13 @@ export const $415: $.Codec<types.polkadot_runtime_common.crowdloan.pallet.Call> 
     2: ["withdraw", ["who", $0], ["index", $414]],
     3: ["refund", ["index", $414]],
     4: ["dissolve", ["index", $414]],
-    5: ["edit", ["index", $414], ["cap", $58], ["first_period", $125], ["last_period", $125], [
+    5: ["edit", ["index", $414], ["cap", $58], ["firstPeriod", $125], ["lastPeriod", $125], [
       "end",
       $125,
     ], ["verifier", $416]],
-    6: ["add_memo", ["index", $98], ["memo", $12]],
+    6: ["addMemo", ["index", $98], ["memo", $12]],
     7: ["poke", ["index", $98]],
-    8: ["contribute_all", ["index", $414], ["signature", $420]],
+    8: ["contributeAll", ["index", $414], ["signature", $420]],
   },
 )
 
@@ -2991,8 +2969,8 @@ export const $427: $.Codec<types.xcm.v0.order.Order> = $.taggedUnion("type", {
     $.deferred(() => $426),
   ]],
   5: ["InitiateTeleport", ["assets", $151], ["dest", $153], ["effects", $.deferred(() => $426)]],
-  6: ["QueryHolding", ["query_id", $9], ["dest", $153], ["assets", $151]],
-  7: ["BuyExecution", ["fees", $152], ["weight", $10], ["debt", $10], ["halt_on_error", $43], [
+  6: ["QueryHolding", ["queryId", $9], ["dest", $153], ["assets", $151]],
+  7: ["BuyExecution", ["fees", $152], ["weight", $10], ["debt", $10], ["haltOnError", $43], [
     "xcm",
     $428,
   ]],
@@ -3008,12 +2986,12 @@ export const $425: $.Codec<types.xcm.v0.Xcm> = $.taggedUnion("type", {
   0: ["WithdrawAsset", ["assets", $151], ["effects", $426]],
   1: ["ReserveAssetDeposit", ["assets", $151], ["effects", $426]],
   2: ["TeleportAsset", ["assets", $151], ["effects", $426]],
-  3: ["QueryResponse", ["query_id", $9], ["response", $429]],
+  3: ["QueryResponse", ["queryId", $9], ["response", $429]],
   4: ["TransferAsset", ["assets", $151], ["dest", $153]],
   5: ["TransferReserveAsset", ["assets", $151], ["dest", $153], ["effects", $426]],
-  6: ["Transact", ["origin_type", $143], ["require_weight_at_most", $10], ["call", $144]],
-  7: ["HrmpNewChannelOpenRequest", ["sender", $125], ["max_message_size", $125], [
-    "max_capacity",
+  6: ["Transact", ["originType", $143], ["requireWeightAtMost", $10], ["call", $144]],
+  7: ["HrmpNewChannelOpenRequest", ["sender", $125], ["maxMessageSize", $125], [
+    "maxCapacity",
     $125,
   ]],
   8: ["HrmpChannelAccepted", ["recipient", $125]],
@@ -3025,8 +3003,8 @@ export const $433: $.Codec<Array<types.xcm.v1.Xcm>> = $.array($.deferred(() => $
 
 export const $432: $.Codec<types.xcm.v1.order.Order> = $.taggedUnion("type", {
   0: ["Noop"],
-  1: ["DepositAsset", ["assets", $145], ["max_assets", $4], ["beneficiary", $122]],
-  2: ["DepositReserveAsset", ["assets", $145], ["max_assets", $4], ["dest", $122], [
+  1: ["DepositAsset", ["assets", $145], ["maxAssets", $4], ["beneficiary", $122]],
+  2: ["DepositReserveAsset", ["assets", $145], ["maxAssets", $4], ["dest", $122], [
     "effects",
     $.deferred(() => $431),
   ]],
@@ -3036,8 +3014,8 @@ export const $432: $.Codec<types.xcm.v1.order.Order> = $.taggedUnion("type", {
     $.deferred(() => $431),
   ]],
   5: ["InitiateTeleport", ["assets", $145], ["dest", $122], ["effects", $.deferred(() => $431)]],
-  6: ["QueryHolding", ["query_id", $9], ["dest", $122], ["assets", $145]],
-  7: ["BuyExecution", ["fees", $135], ["weight", $10], ["debt", $10], ["halt_on_error", $43], [
+  6: ["QueryHolding", ["queryId", $9], ["dest", $122], ["assets", $145]],
+  7: ["BuyExecution", ["fees", $135], ["weight", $10], ["debt", $10], ["haltOnError", $43], [
     "instructions",
     $433,
   ]],
@@ -3054,18 +3032,18 @@ export const $430: $.Codec<types.xcm.v1.Xcm> = $.taggedUnion("type", {
   0: ["WithdrawAsset", ["assets", $133], ["effects", $431]],
   1: ["ReserveAssetDeposited", ["assets", $133], ["effects", $431]],
   2: ["ReceiveTeleportedAsset", ["assets", $133], ["effects", $431]],
-  3: ["QueryResponse", ["query_id", $9], ["response", $434]],
+  3: ["QueryResponse", ["queryId", $9], ["response", $434]],
   4: ["TransferAsset", ["assets", $133], ["beneficiary", $122]],
   5: ["TransferReserveAsset", ["assets", $133], ["dest", $122], ["effects", $431]],
-  6: ["Transact", ["origin_type", $143], ["require_weight_at_most", $10], ["call", $144]],
-  7: ["HrmpNewChannelOpenRequest", ["sender", $125], ["max_message_size", $125], [
-    "max_capacity",
+  6: ["Transact", ["originType", $143], ["requireWeightAtMost", $10], ["call", $144]],
+  7: ["HrmpNewChannelOpenRequest", ["sender", $125], ["maxMessageSize", $125], [
+    "maxCapacity",
     $125,
   ]],
   8: ["HrmpChannelAccepted", ["recipient", $125]],
   9: ["HrmpChannelClosing", ["initiator", $125], ["sender", $125], ["recipient", $125]],
   10: ["RelayedFrom", ["who", $123], ["message", $.deferred(() => $430)]],
-  11: ["SubscribeVersion", ["query_id", $9], ["max_response_weight", $9]],
+  11: ["SubscribeVersion", ["queryId", $9], ["maxResponseWeight", $9]],
   12: ["UnsubscribeVersion"],
 })
 
@@ -3084,8 +3062,8 @@ export const $438: $.Codec<types.xcm.v0.order.Order> = $.taggedUnion("type", {
   3: ["ExchangeAsset", ["give", $151], ["receive", $151]],
   4: ["InitiateReserveWithdraw", ["assets", $151], ["reserve", $153], ["effects", $426]],
   5: ["InitiateTeleport", ["assets", $151], ["dest", $153], ["effects", $426]],
-  6: ["QueryHolding", ["query_id", $9], ["dest", $153], ["assets", $151]],
-  7: ["BuyExecution", ["fees", $152], ["weight", $10], ["debt", $10], ["halt_on_error", $43], [
+  6: ["QueryHolding", ["queryId", $9], ["dest", $153], ["assets", $151]],
+  7: ["BuyExecution", ["fees", $152], ["weight", $10], ["debt", $10], ["haltOnError", $43], [
     "xcm",
     $439,
   ]],
@@ -3099,12 +3077,12 @@ export const $436: $.Codec<types.xcm.v0.Xcm> = $.taggedUnion("type", {
   0: ["WithdrawAsset", ["assets", $151], ["effects", $437]],
   1: ["ReserveAssetDeposit", ["assets", $151], ["effects", $437]],
   2: ["TeleportAsset", ["assets", $151], ["effects", $437]],
-  3: ["QueryResponse", ["query_id", $9], ["response", $429]],
+  3: ["QueryResponse", ["queryId", $9], ["response", $429]],
   4: ["TransferAsset", ["assets", $151], ["dest", $153]],
   5: ["TransferReserveAsset", ["assets", $151], ["dest", $153], ["effects", $426]],
-  6: ["Transact", ["origin_type", $143], ["require_weight_at_most", $10], ["call", $440]],
-  7: ["HrmpNewChannelOpenRequest", ["sender", $125], ["max_message_size", $125], [
-    "max_capacity",
+  6: ["Transact", ["originType", $143], ["requireWeightAtMost", $10], ["call", $440]],
+  7: ["HrmpNewChannelOpenRequest", ["sender", $125], ["maxMessageSize", $125], [
+    "maxCapacity",
     $125,
   ]],
   8: ["HrmpChannelAccepted", ["recipient", $125]],
@@ -3116,16 +3094,16 @@ export const $444: $.Codec<Array<types.xcm.v1.Xcm>> = $.array($.deferred(() => $
 
 export const $443: $.Codec<types.xcm.v1.order.Order> = $.taggedUnion("type", {
   0: ["Noop"],
-  1: ["DepositAsset", ["assets", $145], ["max_assets", $4], ["beneficiary", $122]],
-  2: ["DepositReserveAsset", ["assets", $145], ["max_assets", $4], ["dest", $122], [
+  1: ["DepositAsset", ["assets", $145], ["maxAssets", $4], ["beneficiary", $122]],
+  2: ["DepositReserveAsset", ["assets", $145], ["maxAssets", $4], ["dest", $122], [
     "effects",
     $431,
   ]],
   3: ["ExchangeAsset", ["give", $145], ["receive", $133]],
   4: ["InitiateReserveWithdraw", ["assets", $145], ["reserve", $122], ["effects", $431]],
   5: ["InitiateTeleport", ["assets", $145], ["dest", $122], ["effects", $431]],
-  6: ["QueryHolding", ["query_id", $9], ["dest", $122], ["assets", $145]],
-  7: ["BuyExecution", ["fees", $135], ["weight", $10], ["debt", $10], ["halt_on_error", $43], [
+  6: ["QueryHolding", ["queryId", $9], ["dest", $122], ["assets", $145]],
+  7: ["BuyExecution", ["fees", $135], ["weight", $10], ["debt", $10], ["haltOnError", $43], [
     "instructions",
     $444,
   ]],
@@ -3137,18 +3115,18 @@ export const $441: $.Codec<types.xcm.v1.Xcm> = $.taggedUnion("type", {
   0: ["WithdrawAsset", ["assets", $133], ["effects", $442]],
   1: ["ReserveAssetDeposited", ["assets", $133], ["effects", $442]],
   2: ["ReceiveTeleportedAsset", ["assets", $133], ["effects", $442]],
-  3: ["QueryResponse", ["query_id", $9], ["response", $434]],
+  3: ["QueryResponse", ["queryId", $9], ["response", $434]],
   4: ["TransferAsset", ["assets", $133], ["beneficiary", $122]],
   5: ["TransferReserveAsset", ["assets", $133], ["dest", $122], ["effects", $431]],
-  6: ["Transact", ["origin_type", $143], ["require_weight_at_most", $10], ["call", $440]],
-  7: ["HrmpNewChannelOpenRequest", ["sender", $125], ["max_message_size", $125], [
-    "max_capacity",
+  6: ["Transact", ["originType", $143], ["requireWeightAtMost", $10], ["call", $440]],
+  7: ["HrmpNewChannelOpenRequest", ["sender", $125], ["maxMessageSize", $125], [
+    "maxCapacity",
     $125,
   ]],
   8: ["HrmpChannelAccepted", ["recipient", $125]],
   9: ["HrmpChannelClosing", ["initiator", $125], ["sender", $125], ["recipient", $125]],
   10: ["RelayedFrom", ["who", $123], ["message", $.deferred(() => $441)]],
-  11: ["SubscribeVersion", ["query_id", $9], ["max_response_weight", $9]],
+  11: ["SubscribeVersion", ["queryId", $9], ["maxResponseWeight", $9]],
   12: ["UnsubscribeVersion"],
 })
 
@@ -3156,39 +3134,36 @@ export const $447: $.Codec<types.xcm.v2.Instruction> = $.taggedUnion("type", {
   0: ["WithdrawAsset", ["value", $133]],
   1: ["ReserveAssetDeposited", ["value", $133]],
   2: ["ReceiveTeleportedAsset", ["value", $133]],
-  3: ["QueryResponse", ["query_id", $9], ["response", $140], ["max_weight", $9]],
+  3: ["QueryResponse", ["queryId", $9], ["response", $140], ["maxWeight", $9]],
   4: ["TransferAsset", ["assets", $133], ["beneficiary", $122]],
   5: ["TransferReserveAsset", ["assets", $133], ["dest", $122], ["xcm", $130]],
-  6: ["Transact", ["origin_type", $143], ["require_weight_at_most", $9], ["call", $440]],
-  7: ["HrmpNewChannelOpenRequest", ["sender", $125], ["max_message_size", $125], [
-    "max_capacity",
+  6: ["Transact", ["originType", $143], ["requireWeightAtMost", $9], ["call", $440]],
+  7: ["HrmpNewChannelOpenRequest", ["sender", $125], ["maxMessageSize", $125], [
+    "maxCapacity",
     $125,
   ]],
   8: ["HrmpChannelAccepted", ["recipient", $125]],
   9: ["HrmpChannelClosing", ["initiator", $125], ["sender", $125], ["recipient", $125]],
   10: ["ClearOrigin"],
   11: ["DescendOrigin", ["value", $123]],
-  12: ["ReportError", ["query_id", $9], ["dest", $122], ["max_response_weight", $9]],
-  13: ["DepositAsset", ["assets", $145], ["max_assets", $125], ["beneficiary", $122]],
-  14: ["DepositReserveAsset", ["assets", $145], ["max_assets", $125], ["dest", $122], [
-    "xcm",
-    $130,
-  ]],
+  12: ["ReportError", ["queryId", $9], ["dest", $122], ["maxResponseWeight", $9]],
+  13: ["DepositAsset", ["assets", $145], ["maxAssets", $125], ["beneficiary", $122]],
+  14: ["DepositReserveAsset", ["assets", $145], ["maxAssets", $125], ["dest", $122], ["xcm", $130]],
   15: ["ExchangeAsset", ["give", $145], ["receive", $133]],
   16: ["InitiateReserveWithdraw", ["assets", $145], ["reserve", $122], ["xcm", $130]],
   17: ["InitiateTeleport", ["assets", $145], ["dest", $122], ["xcm", $130]],
-  18: ["QueryHolding", ["query_id", $9], ["dest", $122], ["assets", $145], [
-    "max_response_weight",
+  18: ["QueryHolding", ["queryId", $9], ["dest", $122], ["assets", $145], [
+    "maxResponseWeight",
     $9,
   ]],
-  19: ["BuyExecution", ["fees", $135], ["weight_limit", $148]],
+  19: ["BuyExecution", ["fees", $135], ["weightLimit", $148]],
   20: ["RefundSurplus"],
   21: ["SetErrorHandler", ["value", $.deferred(() => $445)]],
   22: ["SetAppendix", ["value", $.deferred(() => $445)]],
   23: ["ClearError"],
   24: ["ClaimAsset", ["assets", $133], ["ticket", $122]],
   25: ["Trap", ["value", $9]],
-  26: ["SubscribeVersion", ["query_id", $9], ["max_response_weight", $9]],
+  26: ["SubscribeVersion", ["queryId", $9], ["maxResponseWeight", $9]],
   27: ["UnsubscribeVersion"],
 })
 
@@ -3204,27 +3179,27 @@ export const $435: $.Codec<types.xcm.VersionedXcm> = $.taggedUnion("type", {
 
 export const $423: $.Codec<types.pallet_xcm.pallet.Call> = $.taggedUnion("type", {
   0: ["send", ["dest", $155], ["message", $424]],
-  1: ["teleport_assets", ["dest", $155], ["beneficiary", $155], ["assets", $150], [
-    "fee_asset_item",
+  1: ["teleportAssets", ["dest", $155], ["beneficiary", $155], ["assets", $150], [
+    "feeAssetItem",
     $4,
   ]],
-  2: ["reserve_transfer_assets", ["dest", $155], ["beneficiary", $155], ["assets", $150], [
-    "fee_asset_item",
+  2: ["reserveTransferAssets", ["dest", $155], ["beneficiary", $155], ["assets", $150], [
+    "feeAssetItem",
     $4,
   ]],
-  3: ["execute", ["message", $435], ["max_weight", $10]],
-  4: ["force_xcm_version", ["location", $122], ["xcm_version", $4]],
-  5: ["force_default_xcm_version", ["maybe_xcm_version", $236]],
-  6: ["force_subscribe_version_notify", ["location", $155]],
-  7: ["force_unsubscribe_version_notify", ["location", $155]],
-  8: ["limited_reserve_transfer_assets", ["dest", $155], ["beneficiary", $155], ["assets", $150], [
-    "fee_asset_item",
+  3: ["execute", ["message", $435], ["maxWeight", $10]],
+  4: ["forceXcmVersion", ["location", $122], ["xcmVersion", $4]],
+  5: ["forceDefaultXcmVersion", ["maybeXcmVersion", $236]],
+  6: ["forceSubscribeVersionNotify", ["location", $155]],
+  7: ["forceUnsubscribeVersionNotify", ["location", $155]],
+  8: ["limitedReserveTransferAssets", ["dest", $155], ["beneficiary", $155], ["assets", $150], [
+    "feeAssetItem",
     $4,
-  ], ["weight_limit", $148]],
-  9: ["limited_teleport_assets", ["dest", $155], ["beneficiary", $155], ["assets", $150], [
-    "fee_asset_item",
+  ], ["weightLimit", $148]],
+  9: ["limitedTeleportAssets", ["dest", $155], ["beneficiary", $155], ["assets", $150], [
+    "feeAssetItem",
     $4,
-  ], ["weight_limit", $148]],
+  ], ["weightLimit", $148]],
 })
 
 export const $181: $.Codec<types.polkadot_runtime.RuntimeCall> = $.taggedUnion("type", {
@@ -3332,22 +3307,22 @@ export const $460: $.Codec<Array<Uint8Array>> = $.array($1)
 export const $459: $.Codec<Array<Uint8Array>> = $460
 
 export const $463: $.Codec<types.sp_consensus_babe.digests.PrimaryPreDigest> = $.object(
-  ["authority_index", $4],
+  ["authorityIndex", $4],
   ["slot", $190],
-  ["vrf_output", $1],
-  ["vrf_proof", $102],
+  ["vrfOutput", $1],
+  ["vrfProof", $102],
 )
 
 export const $464: $.Codec<types.sp_consensus_babe.digests.SecondaryPlainPreDigest> = $.object([
-  "authority_index",
+  "authorityIndex",
   $4,
 ], ["slot", $190])
 
 export const $465: $.Codec<types.sp_consensus_babe.digests.SecondaryVRFPreDigest> = $.object(
-  ["authority_index", $4],
+  ["authorityIndex", $4],
   ["slot", $190],
-  ["vrf_output", $1],
-  ["vrf_proof", $102],
+  ["vrfOutput", $1],
+  ["vrfProof", $102],
 )
 
 export const $462: $.Codec<types.sp_consensus_babe.digests.PreDigest> = $.taggedUnion("type", {
@@ -3359,7 +3334,7 @@ export const $462: $.Codec<types.sp_consensus_babe.digests.PreDigest> = $.tagged
 export const $461: $.Codec<types.sp_consensus_babe.digests.PreDigest | undefined> = $.option($462)
 
 export const $466: $.Codec<types.sp_consensus_babe.BabeEpochConfiguration> = $.object(["c", $193], [
-  "allowed_slots",
+  "allowedSlots",
   $194,
 ])
 
@@ -3408,10 +3383,7 @@ export const $476: $.Codec<Array<types.pallet_balances.ReserveData>> = $.array($
 
 export const $474: $.Codec<Array<types.pallet_balances.ReserveData>> = $476
 
-export const $477: $.Codec<types.pallet_balances.Releases> = $.stringUnion({
-  0: "V1_0_0",
-  1: "V2_0_0",
-})
+export const $477: $.Codec<types.pallet_balances.Releases> = $.stringUnion({ 0: "V100", 1: "V200" })
 
 export const $478: $.Codec<types.pallet_balances.pallet.Error> = $.stringUnion({
   0: "VestingBalance",
@@ -3466,13 +3438,13 @@ export const $485: $.Codec<types.pallet_staking.StakingLedger> = $.object(
   ["total", $58],
   ["active", $58],
   ["unlocking", $486],
-  ["claimed_rewards", $489],
+  ["claimedRewards", $489],
 )
 
 export const $491: $.Codec<Array<types.sp_core.crypto.AccountId32>> = $206
 
 export const $490: $.Codec<types.pallet_staking.Nominations> = $.object(["targets", $491], [
-  "submitted_in",
+  "submittedIn",
   $4,
 ], ["suppressed", $43])
 
@@ -3516,14 +3488,14 @@ export const $500: $.Codec<Array<types.pallet_staking.UnappliedSlash>> = $.array
 export const $502: $.Codec<[types.sp_arithmetic.per_things.Perbill, types.u128]> = $.tuple($42, $6)
 
 export const $503: $.Codec<types.pallet_staking.slashing.SlashingSpans> = $.object(
-  ["span_index", $4],
-  ["last_start", $4],
-  ["last_nonzero_slash", $4],
+  ["spanIndex", $4],
+  ["lastStart", $4],
+  ["lastNonzeroSlash", $4],
   ["prior", $94],
 )
 
 export const $504: $.Codec<types.pallet_staking.slashing.SpanRecord> = $.object(["slashed", $6], [
-  "paid_out",
+  "paidOut",
   $6,
 ])
 
@@ -3532,18 +3504,18 @@ export const $506: $.Codec<[types.u32, boolean]> = $.tuple($4, $43)
 export const $505: $.Codec<Array<[types.u32, boolean]>> = $.array($506)
 
 export const $507: $.Codec<types.pallet_staking.Releases> = $.stringUnion({
-  0: "V1_0_0Ancient",
-  1: "V2_0_0",
-  2: "V3_0_0",
-  3: "V4_0_0",
-  4: "V5_0_0",
-  5: "V6_0_0",
-  6: "V7_0_0",
-  7: "V8_0_0",
-  8: "V9_0_0",
-  9: "V10_0_0",
-  10: "V11_0_0",
-  11: "V12_0_0",
+  0: "V100Ancient",
+  1: "V200",
+  2: "V300",
+  3: "V400",
+  4: "V500",
+  5: "V600",
+  6: "V700",
+  7: "V800",
+  8: "V900",
+  9: "V1000",
+  10: "V1100",
+  11: "V1200",
 })
 
 export const $508: $.Codec<types.pallet_staking.pallet.pallet.Error> = $.stringUnion({
@@ -3602,17 +3574,17 @@ export const $515: $.Codec<types.pallet_session.pallet.Error> = $.stringUnion({
 
 export const $516: $.Codec<types.pallet_grandpa.StoredState> = $.taggedUnion("type", {
   0: ["Live"],
-  1: ["PendingPause", ["scheduled_at", $4], ["delay", $4]],
+  1: ["PendingPause", ["scheduledAt", $4], ["delay", $4]],
   2: ["Paused"],
-  3: ["PendingResume", ["scheduled_at", $4], ["delay", $4]],
+  3: ["PendingResume", ["scheduledAt", $4], ["delay", $4]],
 })
 
 export const $518: $.Codec<Array<[types.sp_finality_grandpa.app.Public, types.u64]>> = $48
 
 export const $517: $.Codec<types.pallet_grandpa.StoredPendingChange> = $.object(
-  ["scheduled_at", $4],
+  ["scheduledAt", $4],
   ["delay", $4],
-  ["next_authorities", $518],
+  ["nextAuthorities", $518],
   ["forced", $236],
 )
 
@@ -3637,9 +3609,9 @@ export const $526: $.Codec<Array<Uint8Array>> = $.array($524)
 export const $525: $.Codec<Array<Uint8Array>> = $526
 
 export const $523: $.Codec<types.pallet_im_online.BoundedOpaqueNetworkState> = $.object([
-  "peer_id",
+  "peerId",
   $524,
-], ["external_addresses", $525])
+], ["externalAddresses", $525])
 
 export const $522: $.Codec<types.pallet_im_online.BoundedOpaqueNetworkState> = $.lenPrefixed($523)
 
@@ -3924,7 +3896,7 @@ export const $578: $.Codec<types.pallet_identity.pallet.Error> = $.stringUnion({
 })
 
 export const $581: $.Codec<types.pallet_proxy.ProxyDefinition> = $.object(["delegate", $0], [
-  "proxy_type",
+  "proxyType",
   $79,
 ], ["delay", $4])
 
@@ -3938,7 +3910,7 @@ export const $579: $.Codec<[Array<types.pallet_proxy.ProxyDefinition>, types.u12
 )
 
 export const $585: $.Codec<types.pallet_proxy.Announcement> = $.object(["real", $0], [
-  "call_hash",
+  "callHash",
   $11,
 ], ["height", $4])
 
@@ -3990,15 +3962,15 @@ export const $592: $.Codec<types.pallet_bounties.BountyStatus> = $.taggedUnion("
   1: ["Approved"],
   2: ["Funded"],
   3: ["CuratorProposed", ["curator", $0]],
-  4: ["Active", ["curator", $0], ["update_due", $4]],
-  5: ["PendingPayout", ["curator", $0], ["beneficiary", $0], ["unlock_at", $4]],
+  4: ["Active", ["curator", $0], ["updateDue", $4]],
+  5: ["PendingPayout", ["curator", $0], ["beneficiary", $0], ["unlockAt", $4]],
 })
 
 export const $591: $.Codec<types.pallet_bounties.Bounty> = $.object(
   ["proposer", $0],
   ["value", $6],
   ["fee", $6],
-  ["curator_deposit", $6],
+  ["curatorDeposit", $6],
   ["bond", $6],
   ["status", $592],
 )
@@ -4023,14 +3995,14 @@ export const $596: $.Codec<types.pallet_child_bounties.ChildBountyStatus> = $.ta
   0: ["Added"],
   1: ["CuratorProposed", ["curator", $0]],
   2: ["Active", ["curator", $0]],
-  3: ["PendingPayout", ["curator", $0], ["beneficiary", $0], ["unlock_at", $4]],
+  3: ["PendingPayout", ["curator", $0], ["beneficiary", $0], ["unlockAt", $4]],
 })
 
 export const $595: $.Codec<types.pallet_child_bounties.ChildBounty> = $.object(
-  ["parent_bounty", $4],
+  ["parentBounty", $4],
   ["value", $6],
   ["fee", $6],
-  ["curator_deposit", $6],
+  ["curatorDeposit", $6],
   ["status", $596],
 )
 
@@ -4047,7 +4019,7 @@ export const $598: $.Codec<types.pallet_tips.OpenTip> = $.object(
   ["deposit", $6],
   ["closes", $236],
   ["tips", $68],
-  ["finders_fee", $43],
+  ["findersFee", $43],
 )
 
 export const $599: $.Codec<types.pallet_tips.pallet.Error> = $.stringUnion({
@@ -4096,7 +4068,7 @@ export const $608: $.Codec<Array<[types.sp_npos_elections.ElectionScore, types.u
 )
 
 export const $610: $.Codec<types.pallet_election_provider_multi_phase.signed.SignedSubmission> = $
-  .object(["who", $0], ["deposit", $6], ["raw_solution", $311], ["call_fee", $6])
+  .object(["who", $0], ["deposit", $6], ["rawSolution", $311], ["callFee", $6])
 
 export const $611: $.Codec<types.pallet_election_provider_multi_phase.pallet.Error> = $.stringUnion(
   {
@@ -4119,7 +4091,7 @@ export const $612: $.Codec<types.pallet_bags_list.list.Node> = $.object(
   ["id", $0],
   ["prev", $92],
   ["next", $92],
-  ["bag_upper", $10],
+  ["bagUpper", $10],
   ["score", $10],
 )
 
@@ -4143,10 +4115,10 @@ export const $619: $.Codec<Map<types.u32, types.u128>> = $.map($4, $6)
 export const $618: $.Codec<Map<types.u32, types.u128>> = $619
 
 export const $617: $.Codec<types.pallet_nomination_pools.PoolMember> = $.object(
-  ["pool_id", $4],
+  ["poolId", $4],
   ["points", $6],
-  ["last_recorded_reward_counter", $479],
-  ["unbonding_eras", $618],
+  ["lastRecordedRewardCounter", $479],
+  ["unbondingEras", $618],
 )
 
 export const $621: $.Codec<[types.u32, types.u128]> = $.tuple($4, $6)
@@ -4157,20 +4129,20 @@ export const $623: $.Codec<types.pallet_nomination_pools.PoolRoles> = $.object(
   ["depositor", $0],
   ["root", $92],
   ["nominator", $92],
-  ["state_toggler", $92],
+  ["stateToggler", $92],
 )
 
 export const $622: $.Codec<types.pallet_nomination_pools.BondedPoolInner> = $.object(
   ["points", $6],
   ["state", $91],
-  ["member_counter", $4],
+  ["memberCounter", $4],
   ["roles", $623],
 )
 
 export const $624: $.Codec<types.pallet_nomination_pools.RewardPool> = $.object(
-  ["last_recorded_reward_counter", $479],
-  ["last_recorded_total_payouts", $6],
-  ["total_rewards_claimed", $6],
+  ["lastRecordedRewardCounter", $479],
+  ["lastRecordedTotalPayouts", $6],
+  ["totalRewardsClaimed", $6],
 )
 
 export const $626: $.Codec<types.pallet_nomination_pools.UnbondPool> = $.object(["points", $6], [
@@ -4185,8 +4157,8 @@ export const $628: $.Codec<Map<types.u32, types.pallet_nomination_pools.UnbondPo
 
 export const $627: $.Codec<Map<types.u32, types.pallet_nomination_pools.UnbondPool>> = $628
 
-export const $625: $.Codec<types.pallet_nomination_pools.SubPools> = $.object(["no_era", $626], [
-  "with_era",
+export const $625: $.Codec<types.pallet_nomination_pools.SubPools> = $.object(["noEra", $626], [
+  "withEra",
   $627,
 ])
 
@@ -4254,49 +4226,49 @@ export const $637: $.Codec<types.pallet_fast_unstake.pallet.Error> = $.stringUni
 
 export const $638: $.Codec<types.polkadot_runtime_parachains.configuration.HostConfiguration> = $
   .object(
-    ["max_code_size", $4],
-    ["max_head_data_size", $4],
-    ["max_upward_queue_count", $4],
-    ["max_upward_queue_size", $4],
-    ["max_upward_message_size", $4],
-    ["max_upward_message_num_per_candidate", $4],
-    ["hrmp_max_message_num_per_candidate", $4],
-    ["validation_upgrade_cooldown", $4],
-    ["validation_upgrade_delay", $4],
-    ["max_pov_size", $4],
-    ["max_downward_message_size", $4],
-    ["ump_service_total_weight", $8],
-    ["hrmp_max_parachain_outbound_channels", $4],
-    ["hrmp_max_parathread_outbound_channels", $4],
-    ["hrmp_sender_deposit", $6],
-    ["hrmp_recipient_deposit", $6],
-    ["hrmp_channel_max_capacity", $4],
-    ["hrmp_channel_max_total_size", $4],
-    ["hrmp_max_parachain_inbound_channels", $4],
-    ["hrmp_max_parathread_inbound_channels", $4],
-    ["hrmp_channel_max_message_size", $4],
-    ["code_retention_period", $4],
-    ["parathread_cores", $4],
-    ["parathread_retries", $4],
-    ["group_rotation_frequency", $4],
-    ["chain_availability_period", $4],
-    ["thread_availability_period", $4],
-    ["scheduling_lookahead", $4],
-    ["max_validators_per_core", $236],
-    ["max_validators", $236],
-    ["dispute_period", $4],
-    ["dispute_post_conclusion_acceptance_period", $4],
-    ["dispute_max_spam_slots", $4],
-    ["dispute_conclusion_by_time_out_period", $4],
-    ["no_show_slots", $4],
-    ["n_delay_tranches", $4],
-    ["zeroth_delay_tranche_width", $4],
-    ["needed_approvals", $4],
-    ["relay_vrf_modulo_samples", $4],
-    ["ump_max_individual_weight", $8],
-    ["pvf_checking_enabled", $43],
-    ["pvf_voting_ttl", $4],
-    ["minimum_validation_upgrade_delay", $4],
+    ["maxCodeSize", $4],
+    ["maxHeadDataSize", $4],
+    ["maxUpwardQueueCount", $4],
+    ["maxUpwardQueueSize", $4],
+    ["maxUpwardMessageSize", $4],
+    ["maxUpwardMessageNumPerCandidate", $4],
+    ["hrmpMaxMessageNumPerCandidate", $4],
+    ["validationUpgradeCooldown", $4],
+    ["validationUpgradeDelay", $4],
+    ["maxPovSize", $4],
+    ["maxDownwardMessageSize", $4],
+    ["umpServiceTotalWeight", $8],
+    ["hrmpMaxParachainOutboundChannels", $4],
+    ["hrmpMaxParathreadOutboundChannels", $4],
+    ["hrmpSenderDeposit", $6],
+    ["hrmpRecipientDeposit", $6],
+    ["hrmpChannelMaxCapacity", $4],
+    ["hrmpChannelMaxTotalSize", $4],
+    ["hrmpMaxParachainInboundChannels", $4],
+    ["hrmpMaxParathreadInboundChannels", $4],
+    ["hrmpChannelMaxMessageSize", $4],
+    ["codeRetentionPeriod", $4],
+    ["parathreadCores", $4],
+    ["parathreadRetries", $4],
+    ["groupRotationFrequency", $4],
+    ["chainAvailabilityPeriod", $4],
+    ["threadAvailabilityPeriod", $4],
+    ["schedulingLookahead", $4],
+    ["maxValidatorsPerCore", $236],
+    ["maxValidators", $236],
+    ["disputePeriod", $4],
+    ["disputePostConclusionAcceptancePeriod", $4],
+    ["disputeMaxSpamSlots", $4],
+    ["disputeConclusionByTimeOutPeriod", $4],
+    ["noShowSlots", $4],
+    ["nDelayTranches", $4],
+    ["zerothDelayTrancheWidth", $4],
+    ["neededApprovals", $4],
+    ["relayVrfModuloSamples", $4],
+    ["umpMaxIndividualWeight", $8],
+    ["pvfCheckingEnabled", $43],
+    ["pvfVotingTtl", $4],
+    ["minimumValidationUpgradeDelay", $4],
   )
 
 export const $640: $.Codec<
@@ -4315,7 +4287,7 @@ export const $642: $.Codec<Array<types.polkadot_primitives.v2.ValidatorIndex>> =
 export const $643: $.Codec<Array<types.polkadot_primitives.v2.validator_app.Public>> = $.array($213)
 
 export const $644: $.Codec<types.polkadot_runtime_parachains.inclusion.AvailabilityBitfieldRecord> =
-  $.object(["bitfield", $382], ["submitted_at", $4])
+  $.object(["bitfield", $382], ["submittedAt", $4])
 
 export const $645: $.Codec<
   types.polkadot_runtime_parachains.inclusion.CandidatePendingAvailability
@@ -4323,11 +4295,11 @@ export const $645: $.Codec<
   ["core", $105],
   ["hash", $114],
   ["descriptor", $97],
-  ["availability_votes", $383],
+  ["availabilityVotes", $383],
   ["backers", $383],
-  ["relay_parent_number", $4],
-  ["backed_in_number", $4],
-  ["backing_group", $106],
+  ["relayParentNumber", $4],
+  ["backedInNumber", $4],
+  ["backingGroup", $106],
 )
 
 export const $646: $.Codec<types.polkadot_runtime_parachains.inclusion.pallet.Error> = $
@@ -4401,7 +4373,7 @@ export const $648: $.Codec<
 
 export const $647: $.Codec<types.polkadot_primitives.v2.ScrapedOnChainVotes> = $.object(
   ["session", $4],
-  ["backing_validators_per_candidate", $648],
+  ["backingValidatorsPerCandidate", $648],
   ["disputes", $397],
 )
 
@@ -4428,14 +4400,14 @@ export const $657: $.Codec<types.polkadot_primitives.v2.ParathreadEntry> = $.obj
 
 export const $656: $.Codec<types.polkadot_runtime_parachains.scheduler.QueuedParathread> = $.object(
   ["claim", $657],
-  ["core_offset", $4],
+  ["coreOffset", $4],
 )
 
 export const $655: $.Codec<Array<types.polkadot_runtime_parachains.scheduler.QueuedParathread>> = $
   .array($656)
 
 export const $654: $.Codec<types.polkadot_runtime_parachains.scheduler.ParathreadClaimQueue> = $
-  .object(["queue", $655], ["next_core_offset", $4])
+  .object(["queue", $655], ["nextCoreOffset", $4])
 
 export const $661: $.Codec<types.polkadot_primitives.v2.CoreOccupied> = $.taggedUnion("type", {
   0: ["Parathread", ["value", $657]],
@@ -4455,9 +4427,9 @@ export const $665: $.Codec<types.polkadot_runtime_parachains.scheduler.Assignmen
 
 export const $664: $.Codec<types.polkadot_runtime_parachains.scheduler.CoreAssignment> = $.object(
   ["core", $105],
-  ["para_id", $98],
+  ["paraId", $98],
   ["kind", $665],
-  ["group_idx", $106],
+  ["groupIdx", $106],
 )
 
 export const $663: $.Codec<Array<types.polkadot_runtime_parachains.scheduler.CoreAssignment>> = $
@@ -4465,7 +4437,7 @@ export const $663: $.Codec<Array<types.polkadot_runtime_parachains.scheduler.Cor
 
 export const $668: $.Codec<types.polkadot_runtime_parachains.paras.PvfCheckCause> = $.taggedUnion(
   "type",
-  { 0: ["Onboarding", ["value", $98]], 1: ["Upgrade", ["id", $98], ["relay_parent_number", $4]] },
+  { 0: ["Onboarding", ["value", $98]], 1: ["Upgrade", ["id", $98], ["relayParentNumber", $4]] },
 )
 
 export const $667: $.Codec<Array<types.polkadot_runtime_parachains.paras.PvfCheckCause>> = $.array(
@@ -4473,7 +4445,7 @@ export const $667: $.Codec<Array<types.polkadot_runtime_parachains.paras.PvfChec
 )
 
 export const $666: $.Codec<types.polkadot_runtime_parachains.paras.PvfCheckActiveVoteState> = $
-  .object(["votes_accept", $383], ["votes_reject", $383], ["age", $4], ["created_at", $4], [
+  .object(["votesAccept", $383], ["votesReject", $383], ["age", $4], ["createdAt", $4], [
     "causes",
     $667,
   ])
@@ -4495,17 +4467,17 @@ export const $670: $.Codec<types.polkadot_runtime_parachains.paras.ParaLifecycle
 export const $671: $.Codec<[types.polkadot_parachain.primitives.Id, types.u32]> = $.tuple($98, $4)
 
 export const $674: $.Codec<types.polkadot_runtime_parachains.paras.ReplacementTimes> = $.object([
-  "expected_at",
+  "expectedAt",
   $4,
-], ["activated_at", $4])
+], ["activatedAt", $4])
 
 export const $673: $.Codec<Array<types.polkadot_runtime_parachains.paras.ReplacementTimes>> = $
   .array($674)
 
 export const $672: $.Codec<types.polkadot_runtime_parachains.paras.ParaPastCodeMeta> = $.object([
-  "upgrade_times",
+  "upgradeTimes",
   $673,
-], ["last_pruned", $236])
+], ["lastPruned", $236])
 
 export const $675: $.Codec<Array<[types.polkadot_parachain.primitives.Id, types.u32]>> = $.array(
   $671,
@@ -4521,8 +4493,8 @@ export const $677: $.Codec<types.polkadot_primitives.v2.UpgradeRestriction> = $.
 })
 
 export const $678: $.Codec<types.polkadot_runtime_parachains.paras.ParaGenesisArgs> = $.object(
-  ["genesis_head", $104],
-  ["validation_code", $394],
+  ["genesisHead", $104],
+  ["validationCode", $394],
   ["parachain", $43],
 )
 
@@ -4543,14 +4515,14 @@ export const $679: $.Codec<types.polkadot_runtime_parachains.paras.pallet.Error>
 })
 
 export const $681: $.Codec<types.polkadot_runtime_parachains.initializer.BufferedSessionChange> = $
-  .object(["validators", $643], ["queued", $643], ["session_index", $4])
+  .object(["validators", $643], ["queued", $643], ["sessionIndex", $4])
 
 export const $680: $.Codec<
   Array<types.polkadot_runtime_parachains.initializer.BufferedSessionChange>
 > = $.array($681)
 
 export const $683: $.Codec<types.polkadot_core_primitives.InboundDownwardMessage> = $.object([
-  "sent_at",
+  "sentAt",
   $4,
 ], ["msg", $12])
 
@@ -4566,28 +4538,28 @@ export const $685: $.Codec<types.polkadot_runtime_parachains.ump.pallet.Error> =
 })
 
 export const $686: $.Codec<types.polkadot_runtime_parachains.hrmp.HrmpOpenChannelRequest> = $
-  .object(["confirmed", $43], ["_age", $4], ["sender_deposit", $6], ["max_message_size", $4], [
-    "max_capacity",
+  .object(["confirmed", $43], ["Age", $4], ["senderDeposit", $6], ["maxMessageSize", $4], [
+    "maxCapacity",
     $4,
-  ], ["max_total_size", $4])
+  ], ["maxTotalSize", $4])
 
 export const $687: $.Codec<Array<types.polkadot_parachain.primitives.HrmpChannelId>> = $.array($112)
 
 export const $689: $.Codec<types.primitive_types.H256 | undefined> = $.option($11)
 
 export const $688: $.Codec<types.polkadot_runtime_parachains.hrmp.HrmpChannel> = $.object(
-  ["max_capacity", $4],
-  ["max_total_size", $4],
-  ["max_message_size", $4],
-  ["msg_count", $4],
-  ["total_size", $4],
-  ["mqc_head", $689],
-  ["sender_deposit", $6],
-  ["recipient_deposit", $6],
+  ["maxCapacity", $4],
+  ["maxTotalSize", $4],
+  ["maxMessageSize", $4],
+  ["msgCount", $4],
+  ["totalSize", $4],
+  ["mqcHead", $689],
+  ["senderDeposit", $6],
+  ["recipientDeposit", $6],
 )
 
 export const $691: $.Codec<types.polkadot_core_primitives.InboundHrmpMessage> = $.object([
-  "sent_at",
+  "sentAt",
   $4,
 ], ["data", $12])
 
@@ -4630,19 +4602,19 @@ export const $695: $.Codec<Array<types.polkadot_primitives.v2.assignment_app.Pub
 export const $697: $.Codec<Array<types.sp_authority_discovery.app.Public>> = $.array($215)
 
 export const $696: $.Codec<types.polkadot_primitives.v2.SessionInfo> = $.object(
-  ["active_validator_indices", $642],
-  ["random_seed", $1],
-  ["dispute_period", $4],
+  ["activeValidatorIndices", $642],
+  ["randomSeed", $1],
+  ["disputePeriod", $4],
   ["validators", $643],
-  ["discovery_keys", $697],
-  ["assignment_keys", $695],
-  ["validator_groups", $653],
-  ["n_cores", $4],
-  ["zeroth_delay_tranche_width", $4],
-  ["relay_vrf_modulo_samples", $4],
-  ["n_delay_tranches", $4],
-  ["no_show_slots", $4],
-  ["needed_approvals", $4],
+  ["discoveryKeys", $697],
+  ["assignmentKeys", $695],
+  ["validatorGroups", $653],
+  ["nCores", $4],
+  ["zerothDelayTrancheWidth", $4],
+  ["relayVrfModuloSamples", $4],
+  ["nDelayTranches", $4],
+  ["noShowSlots", $4],
+  ["neededApprovals", $4],
 )
 
 export const $698: $.Codec<[types.u32, types.polkadot_core_primitives.CandidateHash]> = $.tuple(
@@ -4651,10 +4623,10 @@ export const $698: $.Codec<[types.u32, types.polkadot_core_primitives.CandidateH
 )
 
 export const $699: $.Codec<types.polkadot_primitives.v2.DisputeState> = $.object(
-  ["validators_for", $383],
-  ["validators_against", $383],
+  ["validatorsFor", $383],
+  ["validatorsAgainst", $383],
   ["start", $4],
-  ["concluded_at", $236],
+  ["concludedAt", $236],
 )
 
 export const $700: $.Codec<types.polkadot_runtime_parachains.disputes.pallet.Error> = $.stringUnion(
@@ -4814,10 +4786,10 @@ export const $710: $.Codec<types.polkadot_runtime_common.crowdloan.FundInfo> = $
   ["raised", $6],
   ["end", $4],
   ["cap", $6],
-  ["last_contribution", $711],
-  ["first_period", $4],
-  ["last_period", $4],
-  ["fund_index", $4],
+  ["lastContribution", $711],
+  ["firstPeriod", $4],
+  ["lastPeriod", $4],
+  ["fundIndex", $4],
 )
 
 export const $712: $.Codec<types.polkadot_runtime_common.crowdloan.pallet.Error> = $.stringUnion({
@@ -4857,8 +4829,8 @@ export const $716: $.Codec<types.xcm.VersionedResponse> = $.taggedUnion("type", 
 })
 
 export const $713: $.Codec<types.pallet_xcm.pallet.QueryStatus> = $.taggedUnion("type", {
-  0: ["Pending", ["responder", $155], ["maybe_notify", $714], ["timeout", $4]],
-  1: ["VersionNotifier", ["origin", $155], ["is_active", $43]],
+  0: ["Pending", ["responder", $155], ["maybeNotify", $714], ["timeout", $4]],
+  1: ["VersionNotifier", ["origin", $155], ["isActive", $43]],
   2: ["Ready", ["response", $716], ["at", $4]],
 })
 

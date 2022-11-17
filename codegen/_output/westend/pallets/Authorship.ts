@@ -36,8 +36,8 @@ export const DidSetUncles = new C.fluent.Storage(
 )
 
 /** Provide a set of uncles. */
-export function set_uncles(
-  value: Omit<types.pallet_authorship.pallet.Call.set_uncles, "type">,
+export function setUncles(
+  value: Omit<types.pallet_authorship.pallet.Call.setUncles, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Authorship", value: { ...value, type: "set_uncles" } }
+  return { type: "Authorship", value: { ...value, type: "setUncles" } }
 }

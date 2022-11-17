@@ -5,10 +5,10 @@ import type * as types from "../mod.ts"
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 
 export type Call =
-  | types.pallet_preimage.pallet.Call.note_preimage
-  | types.pallet_preimage.pallet.Call.unnote_preimage
-  | types.pallet_preimage.pallet.Call.request_preimage
-  | types.pallet_preimage.pallet.Call.unrequest_preimage
+  | types.pallet_preimage.pallet.Call.notePreimage
+  | types.pallet_preimage.pallet.Call.unnotePreimage
+  | types.pallet_preimage.pallet.Call.requestPreimage
+  | types.pallet_preimage.pallet.Call.unrequestPreimage
 export namespace Call {
   /**
    * Register a preimage on-chain.
@@ -16,8 +16,8 @@ export namespace Call {
    * If the preimage was previously requested, no fees or deposits are taken for providing
    * the preimage. Otherwise, a deposit is taken proportional to the size of the preimage.
    */
-  export interface note_preimage {
-    type: "note_preimage"
+  export interface notePreimage {
+    type: "notePreimage"
     bytes: Uint8Array
   }
   /**
@@ -28,8 +28,8 @@ export namespace Call {
    * - `hash`: The hash of the preimage to be removed from the store.
    * - `len`: The length of the preimage of `hash`.
    */
-  export interface unnote_preimage {
-    type: "unnote_preimage"
+  export interface unnotePreimage {
+    type: "unnotePreimage"
     hash: types.primitive_types.H256
   }
   /**
@@ -38,8 +38,8 @@ export namespace Call {
    * If the preimage requests has already been provided on-chain, we unreserve any deposit
    * a user may have paid, and take the control of the preimage out of their hands.
    */
-  export interface request_preimage {
-    type: "request_preimage"
+  export interface requestPreimage {
+    type: "requestPreimage"
     hash: types.primitive_types.H256
   }
   /**
@@ -47,8 +47,8 @@ export namespace Call {
    *
    * NOTE: THIS MUST NOT BE CALLED ON `hash` MORE TIMES THAN `request_preimage`.
    */
-  export interface unrequest_preimage {
-    type: "unrequest_preimage"
+  export interface unrequestPreimage {
+    type: "unrequestPreimage"
     hash: types.primitive_types.H256
   }
   /**
@@ -57,10 +57,10 @@ export namespace Call {
    * If the preimage was previously requested, no fees or deposits are taken for providing
    * the preimage. Otherwise, a deposit is taken proportional to the size of the preimage.
    */
-  export function note_preimage(
-    value: Omit<types.pallet_preimage.pallet.Call.note_preimage, "type">,
-  ): types.pallet_preimage.pallet.Call.note_preimage {
-    return { type: "note_preimage", ...value }
+  export function notePreimage(
+    value: Omit<types.pallet_preimage.pallet.Call.notePreimage, "type">,
+  ): types.pallet_preimage.pallet.Call.notePreimage {
+    return { type: "notePreimage", ...value }
   }
   /**
    * Clear an unrequested preimage from the runtime storage.
@@ -70,10 +70,10 @@ export namespace Call {
    * - `hash`: The hash of the preimage to be removed from the store.
    * - `len`: The length of the preimage of `hash`.
    */
-  export function unnote_preimage(
-    value: Omit<types.pallet_preimage.pallet.Call.unnote_preimage, "type">,
-  ): types.pallet_preimage.pallet.Call.unnote_preimage {
-    return { type: "unnote_preimage", ...value }
+  export function unnotePreimage(
+    value: Omit<types.pallet_preimage.pallet.Call.unnotePreimage, "type">,
+  ): types.pallet_preimage.pallet.Call.unnotePreimage {
+    return { type: "unnotePreimage", ...value }
   }
   /**
    * Request a preimage be uploaded to the chain without paying any fees or deposits.
@@ -81,20 +81,20 @@ export namespace Call {
    * If the preimage requests has already been provided on-chain, we unreserve any deposit
    * a user may have paid, and take the control of the preimage out of their hands.
    */
-  export function request_preimage(
-    value: Omit<types.pallet_preimage.pallet.Call.request_preimage, "type">,
-  ): types.pallet_preimage.pallet.Call.request_preimage {
-    return { type: "request_preimage", ...value }
+  export function requestPreimage(
+    value: Omit<types.pallet_preimage.pallet.Call.requestPreimage, "type">,
+  ): types.pallet_preimage.pallet.Call.requestPreimage {
+    return { type: "requestPreimage", ...value }
   }
   /**
    * Clear a previously made request for a preimage.
    *
    * NOTE: THIS MUST NOT BE CALLED ON `hash` MORE TIMES THAN `request_preimage`.
    */
-  export function unrequest_preimage(
-    value: Omit<types.pallet_preimage.pallet.Call.unrequest_preimage, "type">,
-  ): types.pallet_preimage.pallet.Call.unrequest_preimage {
-    return { type: "unrequest_preimage", ...value }
+  export function unrequestPreimage(
+    value: Omit<types.pallet_preimage.pallet.Call.unrequestPreimage, "type">,
+  ): types.pallet_preimage.pallet.Call.unrequestPreimage {
+    return { type: "unrequestPreimage", ...value }
   }
 }
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */

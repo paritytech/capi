@@ -66,10 +66,10 @@ export const Winning = new C.fluent.Storage(
  * called by the root origin. Accepts the `duration` of this auction and the
  * `lease_period_index` of the initial lease period of the four that are to be auctioned.
  */
-export function new_auction(
-  value: Omit<types.polkadot_runtime_common.auctions.pallet.Call.new_auction, "type">,
+export function newAuction(
+  value: Omit<types.polkadot_runtime_common.auctions.pallet.Call.newAuction, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Auctions", value: { ...value, type: "new_auction" } }
+  return { type: "Auctions", value: { ...value, type: "newAuction" } }
 }
 
 /**
@@ -101,6 +101,6 @@ export function bid(
  *
  * Can only be called by Root origin.
  */
-export function cancel_auction(): types.polkadot_runtime.RuntimeCall {
-  return { type: "Auctions", value: { type: "cancel_auction" } }
+export function cancelAuction(): types.polkadot_runtime.RuntimeCall {
+  return { type: "Auctions", value: { type: "cancelAuction" } }
 }

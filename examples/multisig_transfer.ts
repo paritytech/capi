@@ -68,7 +68,7 @@ function createOrApproveMultisigProposal<
   pair: U.Sr25519,
   ...[maybeTimepoint]: Rest
 ) {
-  const call = Balances.transfer_keep_alive({
+  const call = Balances.transferKeepAlive({
     dest: T.dave.address,
     value: 1230000000000n,
   })
@@ -80,26 +80,19 @@ function createOrApproveMultisigProposal<
     .access("weight")
     .next((weight) => {
       return {
-        ref_time: BigInt(weight.ref_time),
-        proof_size: BigInt(weight.proof_size),
+        refTime: BigInt(weight.ref_time),
+        proofSize: BigInt(weight.proof_size),
       }
     })
   return extrinsic({
     sender: pair.address,
-    call: C.Z.call.fac(Multisig.as_multi, null!)(C.Z.rec({
+    call: C.Z.call.fac(Multisig.asMulti, null!)(C.Z.rec({
       threshold: THRESHOLD,
-      call: {
-        type: "Balances",
-        value: {
-          type: "transfer_keep_alive",
-          dest: T.dave.address,
-          value: 1_230_000_000_000n,
-        },
-      },
-      other_signatories: signatories.filter((value) => value !== pair.publicKey),
-      store_call: false,
-      max_weight: maxWeight,
-      maybe_timepoint: maybeTimepoint as Rest[0],
+      call,
+      otherSignatories: signatories.filter((value) => value !== pair.publicKey),
+      storeCall: false,
+      maxWeight,
+      maybeTimepoint: maybeTimepoint as Rest[0],
     })),
   })
     .signed(pair.sign)

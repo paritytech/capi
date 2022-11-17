@@ -31,10 +31,10 @@ export const Multisigs = new C.fluent.Storage(
  * - Plus Call Weight
  * # </weight>
  */
-export function as_multi_threshold_1(
-  value: Omit<types.pallet_multisig.pallet.Call.as_multi_threshold_1, "type">,
+export function asMultiThreshold1(
+  value: Omit<types.pallet_multisig.pallet.Call.asMultiThreshold1, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Multisig", value: { ...value, type: "as_multi_threshold_1" } }
+  return { type: "Multisig", value: { ...value, type: "asMultiThreshold1" } }
 }
 
 /**
@@ -84,10 +84,10 @@ export function as_multi_threshold_1(
  * - Plus Call Weight
  * # </weight>
  */
-export function as_multi(
-  value: Omit<types.pallet_multisig.pallet.Call.as_multi, "type">,
+export function asMulti(
+  value: Omit<types.pallet_multisig.pallet.Call.asMulti, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Multisig", value: { ...value, type: "as_multi" } }
+  return { type: "Multisig", value: { ...value, type: "asMulti" } }
 }
 
 /**
@@ -127,10 +127,10 @@ export function as_multi(
  *     - Write: Multisig Storage, [Caller Account]
  * # </weight>
  */
-export function approve_as_multi(
-  value: Omit<types.pallet_multisig.pallet.Call.approve_as_multi, "type">,
+export function approveAsMulti(
+  value: Omit<types.pallet_multisig.pallet.Call.approveAsMulti, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Multisig", value: { ...value, type: "approve_as_multi" } }
+  return { type: "Multisig", value: { ...value, type: "approveAsMulti" } }
 }
 
 /**
@@ -161,8 +161,8 @@ export function approve_as_multi(
  *     - Write: Multisig Storage, [Caller Account], Refund Account
  * # </weight>
  */
-export function cancel_as_multi(
-  value: Omit<types.pallet_multisig.pallet.Call.cancel_as_multi, "type">,
+export function cancelAsMulti(
+  value: Omit<types.pallet_multisig.pallet.Call.cancelAsMulti, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Multisig", value: { ...value, type: "cancel_as_multi" } }
+  return { type: "Multisig", value: { ...value, type: "cancelAsMulti" } }
 }

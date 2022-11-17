@@ -79,9 +79,9 @@ export class SignedExtrinsic<
     const versions = const_(this.client)("System", "Version")
       .access("value")
     const specVersion = versions
-      .access("spec_version").as<number>()
+      .access("specVersion").as<number>()
     const transactionVersion = versions
-      .access("transaction_version").as<number>()
+      .access("transactionVersion").as<number>()
     // TODO: create match effect in zones and use here
     // TODO: MultiAddress conversion utils
     const senderSs58 = Z.ls(addrPrefix, this.props.sender).next(([addrPrefix, sender]) => {

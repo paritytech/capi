@@ -1198,10 +1198,10 @@ export namespace RuntimeEvent {
 export interface SessionKeys {
   grandpa: types.sp_finality_grandpa.app.Public
   babe: types.sp_consensus_babe.app.Public
-  im_online: types.pallet_im_online.sr25519.app_sr25519.Public
-  para_validator: types.polkadot_primitives.v2.validator_app.Public
-  para_assignment: types.polkadot_primitives.v2.assignment_app.Public
-  authority_discovery: types.sp_authority_discovery.app.Public
+  imOnline: types.pallet_im_online.sr25519.app_sr25519.Public
+  paraValidator: types.polkadot_primitives.v2.validator_app.Public
+  paraAssignment: types.polkadot_primitives.v2.assignment_app.Public
+  authorityDiscovery: types.sp_authority_discovery.app.Public
 }
 
 export function SessionKeys(value: types.polkadot_runtime.SessionKeys) {

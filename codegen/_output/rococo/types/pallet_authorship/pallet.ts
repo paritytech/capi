@@ -4,18 +4,18 @@ import type * as types from "../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 
-export type Call = types.pallet_authorship.pallet.Call.set_uncles
+export type Call = types.pallet_authorship.pallet.Call.setUncles
 export namespace Call {
   /** Provide a set of uncles. */
-  export interface set_uncles {
-    type: "set_uncles"
-    new_uncles: Array<types.sp_runtime.generic.header.Header>
+  export interface setUncles {
+    type: "setUncles"
+    newUncles: Array<types.sp_runtime.generic.header.Header>
   }
   /** Provide a set of uncles. */
-  export function set_uncles(
-    value: Omit<types.pallet_authorship.pallet.Call.set_uncles, "type">,
-  ): types.pallet_authorship.pallet.Call.set_uncles {
-    return { type: "set_uncles", ...value }
+  export function setUncles(
+    value: Omit<types.pallet_authorship.pallet.Call.setUncles, "type">,
+  ): types.pallet_authorship.pallet.Call.setUncles {
+    return { type: "setUncles", ...value }
   }
 }
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */

@@ -11,9 +11,9 @@ export function BlockLength(value: types.frame_system.limits.BlockLength) {
 }
 
 export interface BlockWeights {
-  base_block: types.sp_weights.weight_v2.Weight
-  max_block: types.sp_weights.weight_v2.Weight
-  per_class: types.frame_support.dispatch.PerDispatchClass.$$frame_system.limits.WeightsPerClass
+  baseBlock: types.sp_weights.weight_v2.Weight
+  maxBlock: types.sp_weights.weight_v2.Weight
+  perClass: types.frame_support.dispatch.PerDispatchClass.$$frame_system.limits.WeightsPerClass
 }
 
 export function BlockWeights(value: types.frame_system.limits.BlockWeights) {
@@ -21,9 +21,9 @@ export function BlockWeights(value: types.frame_system.limits.BlockWeights) {
 }
 
 export interface WeightsPerClass {
-  base_extrinsic: types.sp_weights.weight_v2.Weight
-  max_extrinsic: types.sp_weights.weight_v2.Weight | undefined
-  max_total: types.sp_weights.weight_v2.Weight | undefined
+  baseExtrinsic: types.sp_weights.weight_v2.Weight
+  maxExtrinsic: types.sp_weights.weight_v2.Weight | undefined
+  maxTotal: types.sp_weights.weight_v2.Weight | undefined
   reserved: types.sp_weights.weight_v2.Weight | undefined
 }
 

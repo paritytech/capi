@@ -64,10 +64,10 @@ export function vest(): types.polkadot_runtime.RuntimeCall {
  *     - Writes: Vesting Storage, Balances Locks, Target Account
  * # </weight>
  */
-export function vest_other(
-  value: Omit<types.pallet_vesting.pallet.Call.vest_other, "type">,
+export function vestOther(
+  value: Omit<types.pallet_vesting.pallet.Call.vestOther, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Vesting", value: { ...value, type: "vest_other" } }
+  return { type: "Vesting", value: { ...value, type: "vestOther" } }
 }
 
 /**
@@ -89,10 +89,10 @@ export function vest_other(
  *     - Writes: Vesting Storage, Balances Locks, Target Account, [Sender Account]
  * # </weight>
  */
-export function vested_transfer(
-  value: Omit<types.pallet_vesting.pallet.Call.vested_transfer, "type">,
+export function vestedTransfer(
+  value: Omit<types.pallet_vesting.pallet.Call.vestedTransfer, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Vesting", value: { ...value, type: "vested_transfer" } }
+  return { type: "Vesting", value: { ...value, type: "vestedTransfer" } }
 }
 
 /**
@@ -115,10 +115,10 @@ export function vested_transfer(
  *     - Writes: Vesting Storage, Balances Locks, Target Account, Source Account
  * # </weight>
  */
-export function force_vested_transfer(
-  value: Omit<types.pallet_vesting.pallet.Call.force_vested_transfer, "type">,
+export function forceVestedTransfer(
+  value: Omit<types.pallet_vesting.pallet.Call.forceVestedTransfer, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Vesting", value: { ...value, type: "force_vested_transfer" } }
+  return { type: "Vesting", value: { ...value, type: "forceVestedTransfer" } }
 }
 
 /**
@@ -144,8 +144,8 @@ export function force_vested_transfer(
  * - `schedule1_index`: index of the first schedule to merge.
  * - `schedule2_index`: index of the second schedule to merge.
  */
-export function merge_schedules(
-  value: Omit<types.pallet_vesting.pallet.Call.merge_schedules, "type">,
+export function mergeSchedules(
+  value: Omit<types.pallet_vesting.pallet.Call.mergeSchedules, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Vesting", value: { ...value, type: "merge_schedules" } }
+  return { type: "Vesting", value: { ...value, type: "mergeSchedules" } }
 }

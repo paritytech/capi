@@ -1,5 +1,6 @@
 import { posix as pathPosix } from "../deps/std/path.ts"
 import * as M from "../frame_metadata/mod.ts"
+import { normalizeCase } from "../util/case.ts"
 import { getOrInit } from "../util/map.ts"
 import { Files } from "./Files.ts"
 import { CodegenProps } from "./mod.ts"
@@ -32,7 +33,7 @@ export function createTypeVisitor(props: CodegenProps, files: Files) {
     objectStruct(ty) {
       return S.object(
         ...ty.fields.map(
-          (x) => [makeDocComment(x.docs), x.name!, this.visit(x.ty)] as const,
+          (x) => [makeDocComment(x.docs), normalizeCase(x.name!), this.visit(x.ty)] as const,
         ),
       )
     },
@@ -46,7 +47,7 @@ export function createTypeVisitor(props: CodegenProps, files: Files) {
       return "never"
     },
     stringUnion(ty) {
-      return ty.members.map((x) => S.string(x.name)).join(" | ")
+      return ty.members.map((x) => S.string(normalizeCase(x.name))).join(" | ")
     },
     taggedUnion: undefined!,
     uint8Array() {
@@ -249,7 +250,8 @@ export function ${name}(value: ${path}){ return value }
         const factories: string[] = []
         const types: string[] = []
         const union: string[] = []
-        for (const { fields, name: type, docs } of ty.members) {
+        for (const { fields, name, docs } of ty.members) {
+          const type = normalizeCase(name)
           const memberPath = path + "." + type
           let props: [comment: string, name: string, type: string][]
           let factory: [params: string, result: string]
@@ -268,9 +270,9 @@ export function ${name}(value: ${path}){ return value }
             ]
           } else {
             // Object variant
-            props = fields.map((field, i) => [
+            props = fields.map((field) => [
               makeDocComment(field.docs),
-              `${field.name || i}`,
+              normalizeCase(field.name!),
               visitor.visit(field.ty),
             ])
             factory = [`value: Omit<${memberPath}, "type">`, "...value"]

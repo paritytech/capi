@@ -13,7 +13,7 @@ export namespace Event {
   export interface TransactionFeePaid {
     type: "TransactionFeePaid"
     who: types.sp_core.crypto.AccountId32
-    actual_fee: types.u128
+    actualFee: types.u128
     tip: types.u128
   }
   /**

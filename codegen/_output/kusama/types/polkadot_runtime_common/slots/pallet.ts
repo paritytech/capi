@@ -5,9 +5,9 @@ import type * as types from "../../mod.ts"
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 
 export type Call =
-  | types.polkadot_runtime_common.slots.pallet.Call.force_lease
-  | types.polkadot_runtime_common.slots.pallet.Call.clear_all_leases
-  | types.polkadot_runtime_common.slots.pallet.Call.trigger_onboard
+  | types.polkadot_runtime_common.slots.pallet.Call.forceLease
+  | types.polkadot_runtime_common.slots.pallet.Call.clearAllLeases
+  | types.polkadot_runtime_common.slots.pallet.Call.triggerOnboard
 export namespace Call {
   /**
    * Just a connect into the `lease_out` call, in case Root wants to force some lease to happen
@@ -15,21 +15,21 @@ export namespace Call {
    *
    * The dispatch origin for this call must match `T::ForceOrigin`.
    */
-  export interface force_lease {
-    type: "force_lease"
+  export interface forceLease {
+    type: "forceLease"
     para: types.polkadot_parachain.primitives.Id
     leaser: types.sp_core.crypto.AccountId32
     amount: types.u128
-    period_begin: types.u32
-    period_count: types.u32
+    periodBegin: types.u32
+    periodCount: types.u32
   }
   /**
    * Clear all leases for a Para Id, refunding any deposits back to the original owners.
    *
    * The dispatch origin for this call must match `T::ForceOrigin`.
    */
-  export interface clear_all_leases {
-    type: "clear_all_leases"
+  export interface clearAllLeases {
+    type: "clearAllLeases"
     para: types.polkadot_parachain.primitives.Id
   }
   /**
@@ -41,8 +41,8 @@ export namespace Call {
    *
    * Origin must be signed, but can be called by anyone.
    */
-  export interface trigger_onboard {
-    type: "trigger_onboard"
+  export interface triggerOnboard {
+    type: "triggerOnboard"
     para: types.polkadot_parachain.primitives.Id
   }
   /**
@@ -51,20 +51,20 @@ export namespace Call {
    *
    * The dispatch origin for this call must match `T::ForceOrigin`.
    */
-  export function force_lease(
-    value: Omit<types.polkadot_runtime_common.slots.pallet.Call.force_lease, "type">,
-  ): types.polkadot_runtime_common.slots.pallet.Call.force_lease {
-    return { type: "force_lease", ...value }
+  export function forceLease(
+    value: Omit<types.polkadot_runtime_common.slots.pallet.Call.forceLease, "type">,
+  ): types.polkadot_runtime_common.slots.pallet.Call.forceLease {
+    return { type: "forceLease", ...value }
   }
   /**
    * Clear all leases for a Para Id, refunding any deposits back to the original owners.
    *
    * The dispatch origin for this call must match `T::ForceOrigin`.
    */
-  export function clear_all_leases(
-    value: Omit<types.polkadot_runtime_common.slots.pallet.Call.clear_all_leases, "type">,
-  ): types.polkadot_runtime_common.slots.pallet.Call.clear_all_leases {
-    return { type: "clear_all_leases", ...value }
+  export function clearAllLeases(
+    value: Omit<types.polkadot_runtime_common.slots.pallet.Call.clearAllLeases, "type">,
+  ): types.polkadot_runtime_common.slots.pallet.Call.clearAllLeases {
+    return { type: "clearAllLeases", ...value }
   }
   /**
    * Try to onboard a parachain that has a lease for the current lease period.
@@ -75,10 +75,10 @@ export namespace Call {
    *
    * Origin must be signed, but can be called by anyone.
    */
-  export function trigger_onboard(
-    value: Omit<types.polkadot_runtime_common.slots.pallet.Call.trigger_onboard, "type">,
-  ): types.polkadot_runtime_common.slots.pallet.Call.trigger_onboard {
-    return { type: "trigger_onboard", ...value }
+  export function triggerOnboard(
+    value: Omit<types.polkadot_runtime_common.slots.pallet.Call.triggerOnboard, "type">,
+  ): types.polkadot_runtime_common.slots.pallet.Call.triggerOnboard {
+    return { type: "triggerOnboard", ...value }
   }
 }
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
@@ -93,7 +93,7 @@ export namespace Event {
   /** A new `[lease_period]` is beginning. */
   export interface NewLeasePeriod {
     type: "NewLeasePeriod"
-    lease_period: types.u32
+    leasePeriod: types.u32
   }
   /**
    * A para has won the right to a continuous set of lease periods as a parachain.
@@ -102,12 +102,12 @@ export namespace Event {
    */
   export interface Leased {
     type: "Leased"
-    para_id: types.polkadot_parachain.primitives.Id
+    paraId: types.polkadot_parachain.primitives.Id
     leaser: types.sp_core.crypto.AccountId32
-    period_begin: types.u32
-    period_count: types.u32
-    extra_reserved: types.u128
-    total_amount: types.u128
+    periodBegin: types.u32
+    periodCount: types.u32
+    extraReserved: types.u128
+    totalAmount: types.u128
   }
   /** A new `[lease_period]` is beginning. */
   export function NewLeasePeriod(

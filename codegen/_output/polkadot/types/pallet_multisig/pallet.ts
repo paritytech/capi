@@ -5,10 +5,10 @@ import type * as types from "../mod.ts"
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 
 export type Call =
-  | types.pallet_multisig.pallet.Call.as_multi_threshold_1
-  | types.pallet_multisig.pallet.Call.as_multi
-  | types.pallet_multisig.pallet.Call.approve_as_multi
-  | types.pallet_multisig.pallet.Call.cancel_as_multi
+  | types.pallet_multisig.pallet.Call.asMultiThreshold1
+  | types.pallet_multisig.pallet.Call.asMulti
+  | types.pallet_multisig.pallet.Call.approveAsMulti
+  | types.pallet_multisig.pallet.Call.cancelAsMulti
 export namespace Call {
   /**
    * Immediately dispatch a multi-signature call using a single approval from the caller.
@@ -28,9 +28,9 @@ export namespace Call {
    * - Plus Call Weight
    * # </weight>
    */
-  export interface as_multi_threshold_1 {
-    type: "as_multi_threshold_1"
-    other_signatories: Array<types.sp_core.crypto.AccountId32>
+  export interface asMultiThreshold1 {
+    type: "asMultiThreshold1"
+    otherSignatories: Array<types.sp_core.crypto.AccountId32>
     call: types.polkadot_runtime.RuntimeCall
   }
   /**
@@ -80,13 +80,13 @@ export namespace Call {
    * - Plus Call Weight
    * # </weight>
    */
-  export interface as_multi {
-    type: "as_multi"
+  export interface asMulti {
+    type: "asMulti"
     threshold: types.u16
-    other_signatories: Array<types.sp_core.crypto.AccountId32>
-    maybe_timepoint: types.pallet_multisig.Timepoint | undefined
+    otherSignatories: Array<types.sp_core.crypto.AccountId32>
+    maybeTimepoint: types.pallet_multisig.Timepoint | undefined
     call: types.polkadot_runtime.RuntimeCall
-    max_weight: types.sp_weights.weight_v2.Weight
+    maxWeight: types.sp_weights.weight_v2.Weight
   }
   /**
    * Register approval for a dispatch to be made from a deterministic composite account if
@@ -125,13 +125,13 @@ export namespace Call {
    *     - Write: Multisig Storage, [Caller Account]
    * # </weight>
    */
-  export interface approve_as_multi {
-    type: "approve_as_multi"
+  export interface approveAsMulti {
+    type: "approveAsMulti"
     threshold: types.u16
-    other_signatories: Array<types.sp_core.crypto.AccountId32>
-    maybe_timepoint: types.pallet_multisig.Timepoint | undefined
-    call_hash: Uint8Array
-    max_weight: types.sp_weights.weight_v2.Weight
+    otherSignatories: Array<types.sp_core.crypto.AccountId32>
+    maybeTimepoint: types.pallet_multisig.Timepoint | undefined
+    callHash: Uint8Array
+    maxWeight: types.sp_weights.weight_v2.Weight
   }
   /**
    * Cancel a pre-existing, on-going multisig transaction. Any deposit reserved previously
@@ -161,12 +161,12 @@ export namespace Call {
    *     - Write: Multisig Storage, [Caller Account], Refund Account
    * # </weight>
    */
-  export interface cancel_as_multi {
-    type: "cancel_as_multi"
+  export interface cancelAsMulti {
+    type: "cancelAsMulti"
     threshold: types.u16
-    other_signatories: Array<types.sp_core.crypto.AccountId32>
+    otherSignatories: Array<types.sp_core.crypto.AccountId32>
     timepoint: types.pallet_multisig.Timepoint
-    call_hash: Uint8Array
+    callHash: Uint8Array
   }
   /**
    * Immediately dispatch a multi-signature call using a single approval from the caller.
@@ -186,10 +186,10 @@ export namespace Call {
    * - Plus Call Weight
    * # </weight>
    */
-  export function as_multi_threshold_1(
-    value: Omit<types.pallet_multisig.pallet.Call.as_multi_threshold_1, "type">,
-  ): types.pallet_multisig.pallet.Call.as_multi_threshold_1 {
-    return { type: "as_multi_threshold_1", ...value }
+  export function asMultiThreshold1(
+    value: Omit<types.pallet_multisig.pallet.Call.asMultiThreshold1, "type">,
+  ): types.pallet_multisig.pallet.Call.asMultiThreshold1 {
+    return { type: "asMultiThreshold1", ...value }
   }
   /**
    * Register approval for a dispatch to be made from a deterministic composite account if
@@ -238,10 +238,10 @@ export namespace Call {
    * - Plus Call Weight
    * # </weight>
    */
-  export function as_multi(
-    value: Omit<types.pallet_multisig.pallet.Call.as_multi, "type">,
-  ): types.pallet_multisig.pallet.Call.as_multi {
-    return { type: "as_multi", ...value }
+  export function asMulti(
+    value: Omit<types.pallet_multisig.pallet.Call.asMulti, "type">,
+  ): types.pallet_multisig.pallet.Call.asMulti {
+    return { type: "asMulti", ...value }
   }
   /**
    * Register approval for a dispatch to be made from a deterministic composite account if
@@ -280,10 +280,10 @@ export namespace Call {
    *     - Write: Multisig Storage, [Caller Account]
    * # </weight>
    */
-  export function approve_as_multi(
-    value: Omit<types.pallet_multisig.pallet.Call.approve_as_multi, "type">,
-  ): types.pallet_multisig.pallet.Call.approve_as_multi {
-    return { type: "approve_as_multi", ...value }
+  export function approveAsMulti(
+    value: Omit<types.pallet_multisig.pallet.Call.approveAsMulti, "type">,
+  ): types.pallet_multisig.pallet.Call.approveAsMulti {
+    return { type: "approveAsMulti", ...value }
   }
   /**
    * Cancel a pre-existing, on-going multisig transaction. Any deposit reserved previously
@@ -313,10 +313,10 @@ export namespace Call {
    *     - Write: Multisig Storage, [Caller Account], Refund Account
    * # </weight>
    */
-  export function cancel_as_multi(
-    value: Omit<types.pallet_multisig.pallet.Call.cancel_as_multi, "type">,
-  ): types.pallet_multisig.pallet.Call.cancel_as_multi {
-    return { type: "cancel_as_multi", ...value }
+  export function cancelAsMulti(
+    value: Omit<types.pallet_multisig.pallet.Call.cancelAsMulti, "type">,
+  ): types.pallet_multisig.pallet.Call.cancelAsMulti {
+    return { type: "cancelAsMulti", ...value }
   }
 }
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
@@ -349,7 +349,7 @@ export namespace Event {
     type: "NewMultisig"
     approving: types.sp_core.crypto.AccountId32
     multisig: types.sp_core.crypto.AccountId32
-    call_hash: Uint8Array
+    callHash: Uint8Array
   }
   /** A multisig operation has been approved by someone. */
   export interface MultisigApproval {
@@ -357,7 +357,7 @@ export namespace Event {
     approving: types.sp_core.crypto.AccountId32
     timepoint: types.pallet_multisig.Timepoint
     multisig: types.sp_core.crypto.AccountId32
-    call_hash: Uint8Array
+    callHash: Uint8Array
   }
   /** A multisig operation has been executed. */
   export interface MultisigExecuted {
@@ -365,7 +365,7 @@ export namespace Event {
     approving: types.sp_core.crypto.AccountId32
     timepoint: types.pallet_multisig.Timepoint
     multisig: types.sp_core.crypto.AccountId32
-    call_hash: Uint8Array
+    callHash: Uint8Array
     result: null | C.ChainError<types.sp_runtime.DispatchError>
   }
   /** A multisig operation has been cancelled. */
@@ -374,7 +374,7 @@ export namespace Event {
     cancelling: types.sp_core.crypto.AccountId32
     timepoint: types.pallet_multisig.Timepoint
     multisig: types.sp_core.crypto.AccountId32
-    call_hash: Uint8Array
+    callHash: Uint8Array
   }
   /** A new multisig operation has begun. */
   export function NewMultisig(

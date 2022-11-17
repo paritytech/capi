@@ -18,13 +18,13 @@ export namespace Order {
   export interface DepositAsset {
     type: "DepositAsset"
     assets: types.xcm.v1.multiasset.MultiAssetFilter
-    max_assets: types.u32
+    maxAssets: types.u32
     beneficiary: types.xcm.v1.multilocation.MultiLocation
   }
   export interface DepositReserveAsset {
     type: "DepositReserveAsset"
     assets: types.xcm.v1.multiasset.MultiAssetFilter
-    max_assets: types.u32
+    maxAssets: types.u32
     dest: types.xcm.v1.multilocation.MultiLocation
     effects: Array<types.xcm.v1.order.Order>
   }
@@ -47,7 +47,7 @@ export namespace Order {
   }
   export interface QueryHolding {
     type: "QueryHolding"
-    query_id: types.Compact<types.u64>
+    queryId: types.Compact<types.u64>
     dest: types.xcm.v1.multilocation.MultiLocation
     assets: types.xcm.v1.multiasset.MultiAssetFilter
   }
@@ -56,7 +56,7 @@ export namespace Order {
     fees: types.xcm.v1.multiasset.MultiAsset
     weight: types.u64
     debt: types.u64
-    halt_on_error: boolean
+    haltOnError: boolean
     instructions: Array<types.xcm.v1.Xcm>
   }
   export function Noop(): types.xcm.v1.order.Order.Noop {

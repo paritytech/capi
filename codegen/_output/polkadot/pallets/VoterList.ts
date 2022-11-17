@@ -71,8 +71,8 @@ export function rebag(
  * - both nodes are within the same bag,
  * - and `origin` has a greater `Score` than `lighter`.
  */
-export function put_in_front_of(
-  value: Omit<types.pallet_bags_list.pallet.Call.put_in_front_of, "type">,
+export function putInFrontOf(
+  value: Omit<types.pallet_bags_list.pallet.Call.putInFrontOf, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "VoterList", value: { ...value, type: "put_in_front_of" } }
+  return { type: "VoterList", value: { ...value, type: "putInFrontOf" } }
 }

@@ -575,10 +575,10 @@ export function bond(
  * - O(1).
  * # </weight>
  */
-export function bond_extra(
-  value: Omit<types.pallet_staking.pallet.pallet.Call.bond_extra, "type">,
+export function bondExtra(
+  value: Omit<types.pallet_staking.pallet.pallet.Call.bondExtra, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Staking", value: { ...value, type: "bond_extra" } }
+  return { type: "Staking", value: { ...value, type: "bondExtra" } }
 }
 
 /**
@@ -625,10 +625,10 @@ export function unbond(
  * NOTE: Weight annotation is the kill scenario, we refund otherwise.
  * # </weight>
  */
-export function withdraw_unbonded(
-  value: Omit<types.pallet_staking.pallet.pallet.Call.withdraw_unbonded, "type">,
+export function withdrawUnbonded(
+  value: Omit<types.pallet_staking.pallet.pallet.Call.withdrawUnbonded, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Staking", value: { ...value, type: "withdraw_unbonded" } }
+  return { type: "Staking", value: { ...value, type: "withdrawUnbonded" } }
 }
 
 /**
@@ -698,10 +698,10 @@ export function chill(): types.polkadot_runtime.RuntimeCall {
  *     - Write: Payee
  * # </weight>
  */
-export function set_payee(
-  value: Omit<types.pallet_staking.pallet.pallet.Call.set_payee, "type">,
+export function setPayee(
+  value: Omit<types.pallet_staking.pallet.pallet.Call.setPayee, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Staking", value: { ...value, type: "set_payee" } }
+  return { type: "Staking", value: { ...value, type: "setPayee" } }
 }
 
 /**
@@ -722,10 +722,10 @@ export function set_payee(
  * - Write: Bonded, Ledger New Controller, Ledger Old Controller
  * # </weight>
  */
-export function set_controller(
-  value: Omit<types.pallet_staking.pallet.pallet.Call.set_controller, "type">,
+export function setController(
+  value: Omit<types.pallet_staking.pallet.pallet.Call.setController, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Staking", value: { ...value, type: "set_controller" } }
+  return { type: "Staking", value: { ...value, type: "setController" } }
 }
 
 /**
@@ -738,10 +738,10 @@ export function set_controller(
  * Write: Validator Count
  * # </weight>
  */
-export function set_validator_count(
-  value: Omit<types.pallet_staking.pallet.pallet.Call.set_validator_count, "type">,
+export function setValidatorCount(
+  value: Omit<types.pallet_staking.pallet.pallet.Call.setValidatorCount, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Staking", value: { ...value, type: "set_validator_count" } }
+  return { type: "Staking", value: { ...value, type: "setValidatorCount" } }
 }
 
 /**
@@ -753,10 +753,10 @@ export function set_validator_count(
  * Same as [`Self::set_validator_count`].
  * # </weight>
  */
-export function increase_validator_count(
-  value: Omit<types.pallet_staking.pallet.pallet.Call.increase_validator_count, "type">,
+export function increaseValidatorCount(
+  value: Omit<types.pallet_staking.pallet.pallet.Call.increaseValidatorCount, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Staking", value: { ...value, type: "increase_validator_count" } }
+  return { type: "Staking", value: { ...value, type: "increaseValidatorCount" } }
 }
 
 /**
@@ -768,10 +768,10 @@ export function increase_validator_count(
  * Same as [`Self::set_validator_count`].
  * # </weight>
  */
-export function scale_validator_count(
-  value: Omit<types.pallet_staking.pallet.pallet.Call.scale_validator_count, "type">,
+export function scaleValidatorCount(
+  value: Omit<types.pallet_staking.pallet.pallet.Call.scaleValidatorCount, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Staking", value: { ...value, type: "scale_validator_count" } }
+  return { type: "Staking", value: { ...value, type: "scaleValidatorCount" } }
 }
 
 /**
@@ -791,8 +791,8 @@ export function scale_validator_count(
  * - Write: ForceEra
  * # </weight>
  */
-export function force_no_eras(): types.polkadot_runtime.RuntimeCall {
-  return { type: "Staking", value: { type: "force_no_eras" } }
+export function forceNoEras(): types.polkadot_runtime.RuntimeCall {
+  return { type: "Staking", value: { type: "forceNoEras" } }
 }
 
 /**
@@ -813,8 +813,8 @@ export function force_no_eras(): types.polkadot_runtime.RuntimeCall {
  * - Write ForceEra
  * # </weight>
  */
-export function force_new_era(): types.polkadot_runtime.RuntimeCall {
-  return { type: "Staking", value: { type: "force_new_era" } }
+export function forceNewEra(): types.polkadot_runtime.RuntimeCall {
+  return { type: "Staking", value: { type: "forceNewEra" } }
 }
 
 /**
@@ -822,10 +822,10 @@ export function force_new_era(): types.polkadot_runtime.RuntimeCall {
  *
  * The dispatch origin must be Root.
  */
-export function set_invulnerables(
-  value: Omit<types.pallet_staking.pallet.pallet.Call.set_invulnerables, "type">,
+export function setInvulnerables(
+  value: Omit<types.pallet_staking.pallet.pallet.Call.setInvulnerables, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Staking", value: { ...value, type: "set_invulnerables" } }
+  return { type: "Staking", value: { ...value, type: "setInvulnerables" } }
 }
 
 /**
@@ -833,10 +833,10 @@ export function set_invulnerables(
  *
  * The dispatch origin must be Root.
  */
-export function force_unstake(
-  value: Omit<types.pallet_staking.pallet.pallet.Call.force_unstake, "type">,
+export function forceUnstake(
+  value: Omit<types.pallet_staking.pallet.pallet.Call.forceUnstake, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Staking", value: { ...value, type: "force_unstake" } }
+  return { type: "Staking", value: { ...value, type: "forceUnstake" } }
 }
 
 /**
@@ -850,8 +850,8 @@ export function force_unstake(
  * If this is called just before a new era is triggered, the election process may not
  * have enough blocks to get a result.
  */
-export function force_new_era_always(): types.polkadot_runtime.RuntimeCall {
-  return { type: "Staking", value: { type: "force_new_era_always" } }
+export function forceNewEraAlways(): types.polkadot_runtime.RuntimeCall {
+  return { type: "Staking", value: { type: "forceNewEraAlways" } }
 }
 
 /**
@@ -861,10 +861,10 @@ export function force_new_era_always(): types.polkadot_runtime.RuntimeCall {
  *
  * Parameters: era and indices of the slashes for that era to kill.
  */
-export function cancel_deferred_slash(
-  value: Omit<types.pallet_staking.pallet.pallet.Call.cancel_deferred_slash, "type">,
+export function cancelDeferredSlash(
+  value: Omit<types.pallet_staking.pallet.pallet.Call.cancelDeferredSlash, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Staking", value: { ...value, type: "cancel_deferred_slash" } }
+  return { type: "Staking", value: { ...value, type: "cancelDeferredSlash" } }
 }
 
 /**
@@ -890,10 +890,10 @@ export function cancel_deferred_slash(
  *   Paying even a dead controller is cheaper weight-wise. We don't do any refunds here.
  * # </weight>
  */
-export function payout_stakers(
-  value: Omit<types.pallet_staking.pallet.pallet.Call.payout_stakers, "type">,
+export function payoutStakers(
+  value: Omit<types.pallet_staking.pallet.pallet.Call.payoutStakers, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Staking", value: { ...value, type: "payout_stakers" } }
+  return { type: "Staking", value: { ...value, type: "payoutStakers" } }
 }
 
 /**
@@ -927,10 +927,10 @@ export function rebond(
  *
  * Refunds the transaction fees upon successful execution.
  */
-export function reap_stash(
-  value: Omit<types.pallet_staking.pallet.pallet.Call.reap_stash, "type">,
+export function reapStash(
+  value: Omit<types.pallet_staking.pallet.pallet.Call.reapStash, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Staking", value: { ...value, type: "reap_stash" } }
+  return { type: "Staking", value: { ...value, type: "reapStash" } }
 }
 
 /**
@@ -971,10 +971,10 @@ export function kick(
  * NOTE: Existing nominators and validators will not be affected by this update.
  * to kick people under the new limits, `chill_other` should be called.
  */
-export function set_staking_configs(
-  value: Omit<types.pallet_staking.pallet.pallet.Call.set_staking_configs, "type">,
+export function setStakingConfigs(
+  value: Omit<types.pallet_staking.pallet.pallet.Call.setStakingConfigs, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Staking", value: { ...value, type: "set_staking_configs" } }
+  return { type: "Staking", value: { ...value, type: "setStakingConfigs" } }
 }
 
 /**
@@ -1005,10 +1005,10 @@ export function set_staking_configs(
  * This can be helpful if bond requirements are updated, and we need to remove old users
  * who do not satisfy these requirements.
  */
-export function chill_other(
-  value: Omit<types.pallet_staking.pallet.pallet.Call.chill_other, "type">,
+export function chillOther(
+  value: Omit<types.pallet_staking.pallet.pallet.Call.chillOther, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Staking", value: { ...value, type: "chill_other" } }
+  return { type: "Staking", value: { ...value, type: "chillOther" } }
 }
 
 /**
@@ -1016,8 +1016,8 @@ export function chill_other(
  * validator who already has a commission greater than or equal to the minimum. Any account
  * can call this.
  */
-export function force_apply_min_commission(
-  value: Omit<types.pallet_staking.pallet.pallet.Call.force_apply_min_commission, "type">,
+export function forceApplyMinCommission(
+  value: Omit<types.pallet_staking.pallet.pallet.Call.forceApplyMinCommission, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Staking", value: { ...value, type: "force_apply_min_commission" } }
+  return { type: "Staking", value: { ...value, type: "forceApplyMinCommission" } }
 }

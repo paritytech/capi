@@ -8,7 +8,7 @@ export interface Bounty {
   proposer: types.sp_core.crypto.AccountId32
   value: types.u128
   fee: types.u128
-  curator_deposit: types.u128
+  curatorDeposit: types.u128
   bond: types.u128
   status: types.pallet_bounties.BountyStatus
 }
@@ -41,13 +41,13 @@ export namespace BountyStatus {
   export interface Active {
     type: "Active"
     curator: types.sp_core.crypto.AccountId32
-    update_due: types.u32
+    updateDue: types.u32
   }
   export interface PendingPayout {
     type: "PendingPayout"
     curator: types.sp_core.crypto.AccountId32
     beneficiary: types.sp_core.crypto.AccountId32
-    unlock_at: types.u32
+    unlockAt: types.u32
   }
   export function Proposed(): types.pallet_bounties.BountyStatus.Proposed {
     return { type: "Proposed" }

@@ -5,10 +5,10 @@ import type * as types from "../mod.ts"
 export * as pallet from "./pallet.ts"
 
 export interface Scheduled {
-  maybe_id: Uint8Array | undefined
+  maybeId: Uint8Array | undefined
   priority: types.u8
   call: types.frame_support.traits.preimages.Bounded
-  maybe_periodic: [types.u32, types.u32] | undefined
+  maybePeriodic: [types.u32, types.u32] | undefined
   origin: types.polkadot_runtime.OriginCaller
 }
 

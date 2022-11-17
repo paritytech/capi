@@ -3,9 +3,9 @@ import * as codecs from "../codecs.ts"
 import type * as types from "./mod.ts"
 
 export interface ElectionScore {
-  minimal_stake: types.u128
-  sum_stake: types.u128
-  sum_stake_squared: types.u128
+  minimalStake: types.u128
+  sumStake: types.u128
+  sumStakeSquared: types.u128
 }
 
 export function ElectionScore(value: types.sp_npos_elections.ElectionScore) {

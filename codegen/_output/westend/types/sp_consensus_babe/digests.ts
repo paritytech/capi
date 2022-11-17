@@ -7,7 +7,7 @@ export namespace NextConfigDescriptor {
   export interface V1 {
     type: "V1"
     c: [types.u64, types.u64]
-    allowed_slots: types.sp_consensus_babe.AllowedSlots
+    allowedSlots: types.sp_consensus_babe.AllowedSlots
   }
   export function V1(
     value: Omit<types.sp_consensus_babe.digests.NextConfigDescriptor.V1, "type">,
@@ -51,10 +51,10 @@ export namespace PreDigest {
 }
 
 export interface PrimaryPreDigest {
-  authority_index: types.u32
+  authorityIndex: types.u32
   slot: types.sp_consensus_slots.Slot
-  vrf_output: Uint8Array
-  vrf_proof: Uint8Array
+  vrfOutput: Uint8Array
+  vrfProof: Uint8Array
 }
 
 export function PrimaryPreDigest(value: types.sp_consensus_babe.digests.PrimaryPreDigest) {
@@ -62,7 +62,7 @@ export function PrimaryPreDigest(value: types.sp_consensus_babe.digests.PrimaryP
 }
 
 export interface SecondaryPlainPreDigest {
-  authority_index: types.u32
+  authorityIndex: types.u32
   slot: types.sp_consensus_slots.Slot
 }
 
@@ -73,10 +73,10 @@ export function SecondaryPlainPreDigest(
 }
 
 export interface SecondaryVRFPreDigest {
-  authority_index: types.u32
+  authorityIndex: types.u32
   slot: types.sp_consensus_slots.Slot
-  vrf_output: Uint8Array
-  vrf_proof: Uint8Array
+  vrfOutput: Uint8Array
+  vrfProof: Uint8Array
 }
 
 export function SecondaryVRFPreDigest(

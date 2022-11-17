@@ -6,7 +6,7 @@ export * as pallet from "./pallet.ts"
 
 export interface AvailabilityBitfieldRecord {
   bitfield: types.polkadot_primitives.v2.AvailabilityBitfield
-  submitted_at: types.u32
+  submittedAt: types.u32
 }
 
 export function AvailabilityBitfieldRecord(
@@ -19,11 +19,11 @@ export interface CandidatePendingAvailability {
   core: types.polkadot_primitives.v2.CoreIndex
   hash: types.polkadot_core_primitives.CandidateHash
   descriptor: types.polkadot_primitives.v2.CandidateDescriptor
-  availability_votes: $.BitSequence
+  availabilityVotes: $.BitSequence
   backers: $.BitSequence
-  relay_parent_number: types.u32
-  backed_in_number: types.u32
-  backing_group: types.polkadot_primitives.v2.GroupIndex
+  relayParentNumber: types.u32
+  backedInNumber: types.u32
+  backingGroup: types.polkadot_primitives.v2.GroupIndex
 }
 
 export function CandidatePendingAvailability(

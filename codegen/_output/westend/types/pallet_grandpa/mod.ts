@@ -5,9 +5,9 @@ import type * as types from "../mod.ts"
 export * as pallet from "./pallet.ts"
 
 export interface StoredPendingChange {
-  scheduled_at: types.u32
+  scheduledAt: types.u32
   delay: types.u32
-  next_authorities: Array<[types.sp_finality_grandpa.app.Public, types.u64]>
+  nextAuthorities: Array<[types.sp_finality_grandpa.app.Public, types.u64]>
   forced: types.u32 | undefined
 }
 
@@ -26,7 +26,7 @@ export namespace StoredState {
   }
   export interface PendingPause {
     type: "PendingPause"
-    scheduled_at: types.u32
+    scheduledAt: types.u32
     delay: types.u32
   }
   export interface Paused {
@@ -34,7 +34,7 @@ export namespace StoredState {
   }
   export interface PendingResume {
     type: "PendingResume"
-    scheduled_at: types.u32
+    scheduledAt: types.u32
     delay: types.u32
   }
   export function Live(): types.pallet_grandpa.StoredState.Live {

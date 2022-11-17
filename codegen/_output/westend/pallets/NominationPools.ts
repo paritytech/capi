@@ -254,10 +254,10 @@ export function join(
  *
  * Bonding extra funds implies an automatic payout of all pending rewards as well.
  */
-export function bond_extra(
-  value: Omit<types.pallet_nomination_pools.pallet.Call.bond_extra, "type">,
+export function bondExtra(
+  value: Omit<types.pallet_nomination_pools.pallet.Call.bondExtra, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "NominationPools", value: { ...value, type: "bond_extra" } }
+  return { type: "NominationPools", value: { ...value, type: "bondExtra" } }
 }
 
 /**
@@ -268,8 +268,8 @@ export function bond_extra(
  * The member will earn rewards pro rata based on the members stake vs the sum of the
  * members in the pools stake. Rewards do not "expire".
  */
-export function claim_payout(): types.polkadot_runtime.RuntimeCall {
-  return { type: "NominationPools", value: { type: "claim_payout" } }
+export function claimPayout(): types.polkadot_runtime.RuntimeCall {
+  return { type: "NominationPools", value: { type: "claimPayout" } }
 }
 
 /**
@@ -316,10 +316,10 @@ export function unbond(
  * would probably see an error like `NoMoreChunks` emitted from the staking system when
  * they attempt to unbond.
  */
-export function pool_withdraw_unbonded(
-  value: Omit<types.pallet_nomination_pools.pallet.Call.pool_withdraw_unbonded, "type">,
+export function poolWithdrawUnbonded(
+  value: Omit<types.pallet_nomination_pools.pallet.Call.poolWithdrawUnbonded, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "NominationPools", value: { ...value, type: "pool_withdraw_unbonded" } }
+  return { type: "NominationPools", value: { ...value, type: "poolWithdrawUnbonded" } }
 }
 
 /**
@@ -343,10 +343,10 @@ export function pool_withdraw_unbonded(
  *
  * If the target is the depositor, the pool will be destroyed.
  */
-export function withdraw_unbonded(
-  value: Omit<types.pallet_nomination_pools.pallet.Call.withdraw_unbonded, "type">,
+export function withdrawUnbonded(
+  value: Omit<types.pallet_nomination_pools.pallet.Call.withdrawUnbonded, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "NominationPools", value: { ...value, type: "withdraw_unbonded" } }
+  return { type: "NominationPools", value: { ...value, type: "withdrawUnbonded" } }
 }
 
 /**
@@ -401,10 +401,10 @@ export function nominate(
  * 2. if the pool conditions to be open are NOT met (as described by `ok_to_be_open`), and
  *    then the state of the pool can be permissionlessly changed to `Destroying`.
  */
-export function set_state(
-  value: Omit<types.pallet_nomination_pools.pallet.Call.set_state, "type">,
+export function setState(
+  value: Omit<types.pallet_nomination_pools.pallet.Call.setState, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "NominationPools", value: { ...value, type: "set_state" } }
+  return { type: "NominationPools", value: { ...value, type: "setState" } }
 }
 
 /**
@@ -413,10 +413,10 @@ export function set_state(
  * The dispatch origin of this call must be signed by the state toggler, or the root role
  * of the pool.
  */
-export function set_metadata(
-  value: Omit<types.pallet_nomination_pools.pallet.Call.set_metadata, "type">,
+export function setMetadata(
+  value: Omit<types.pallet_nomination_pools.pallet.Call.setMetadata, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "NominationPools", value: { ...value, type: "set_metadata" } }
+  return { type: "NominationPools", value: { ...value, type: "setMetadata" } }
 }
 
 /**
@@ -431,10 +431,10 @@ export function set_metadata(
  * * `max_members` - Set [`MaxPoolMembers`].
  * * `max_members_per_pool` - Set [`MaxPoolMembersPerPool`].
  */
-export function set_configs(
-  value: Omit<types.pallet_nomination_pools.pallet.Call.set_configs, "type">,
+export function setConfigs(
+  value: Omit<types.pallet_nomination_pools.pallet.Call.setConfigs, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "NominationPools", value: { ...value, type: "set_configs" } }
+  return { type: "NominationPools", value: { ...value, type: "setConfigs" } }
 }
 
 /**
@@ -446,10 +446,10 @@ export function set_configs(
  * It emits an event, notifying UIs of the role change. This event is quite relevant to
  * most pool members and they should be informed of changes to pool roles.
  */
-export function update_roles(
-  value: Omit<types.pallet_nomination_pools.pallet.Call.update_roles, "type">,
+export function updateRoles(
+  value: Omit<types.pallet_nomination_pools.pallet.Call.updateRoles, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "NominationPools", value: { ...value, type: "update_roles" } }
+  return { type: "NominationPools", value: { ...value, type: "updateRoles" } }
 }
 
 /**

@@ -5,10 +5,10 @@ import type * as types from "../mod.ts"
 export * as pallet from "./pallet.ts"
 
 export interface ChildBounty {
-  parent_bounty: types.u32
+  parentBounty: types.u32
   value: types.u128
   fee: types.u128
-  curator_deposit: types.u128
+  curatorDeposit: types.u128
   status: types.pallet_child_bounties.ChildBountyStatus
 }
 
@@ -37,7 +37,7 @@ export namespace ChildBountyStatus {
     type: "PendingPayout"
     curator: types.sp_core.crypto.AccountId32
     beneficiary: types.sp_core.crypto.AccountId32
-    unlock_at: types.u32
+    unlockAt: types.u32
   }
   export function Added(): types.pallet_child_bounties.ChildBountyStatus.Added {
     return { type: "Added" }

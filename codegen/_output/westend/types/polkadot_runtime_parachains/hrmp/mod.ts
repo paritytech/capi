@@ -5,14 +5,14 @@ import type * as types from "../../mod.ts"
 export * as pallet from "./pallet.ts"
 
 export interface HrmpChannel {
-  max_capacity: types.u32
-  max_total_size: types.u32
-  max_message_size: types.u32
-  msg_count: types.u32
-  total_size: types.u32
-  mqc_head: types.primitive_types.H256 | undefined
-  sender_deposit: types.u128
-  recipient_deposit: types.u128
+  maxCapacity: types.u32
+  maxTotalSize: types.u32
+  maxMessageSize: types.u32
+  msgCount: types.u32
+  totalSize: types.u32
+  mqcHead: types.primitive_types.H256 | undefined
+  senderDeposit: types.u128
+  recipientDeposit: types.u128
 }
 
 export function HrmpChannel(value: types.polkadot_runtime_parachains.hrmp.HrmpChannel) {
@@ -21,11 +21,11 @@ export function HrmpChannel(value: types.polkadot_runtime_parachains.hrmp.HrmpCh
 
 export interface HrmpOpenChannelRequest {
   confirmed: boolean
-  _age: types.u32
-  sender_deposit: types.u128
-  max_message_size: types.u32
-  max_capacity: types.u32
-  max_total_size: types.u32
+  Age: types.u32
+  senderDeposit: types.u128
+  maxMessageSize: types.u32
+  maxCapacity: types.u32
+  maxTotalSize: types.u32
 }
 
 export function HrmpOpenChannelRequest(

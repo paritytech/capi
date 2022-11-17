@@ -7,7 +7,7 @@ export * as pallet from "./pallet.ts"
 export interface BufferedSessionChange {
   validators: Array<types.polkadot_primitives.v2.validator_app.Public>
   queued: Array<types.polkadot_primitives.v2.validator_app.Public>
-  session_index: types.u32
+  sessionIndex: types.u32
 }
 
 export function BufferedSessionChange(

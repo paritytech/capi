@@ -29,7 +29,7 @@ export namespace Equivocation {
 }
 
 export interface EquivocationProof {
-  set_id: types.u64
+  setId: types.u64
   equivocation: types.sp_finality_grandpa.Equivocation
 }
 

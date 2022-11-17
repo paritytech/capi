@@ -46,10 +46,10 @@ export const Approvals = new C.fluent.Storage(
  * - DbWrites: `ProposalCount`, `Proposals`, `origin account`
  * # </weight>
  */
-export function propose_spend(
-  value: Omit<types.pallet_treasury.pallet.Call.propose_spend, "type">,
+export function proposeSpend(
+  value: Omit<types.pallet_treasury.pallet.Call.proposeSpend, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Treasury", value: { ...value, type: "propose_spend" } }
+  return { type: "Treasury", value: { ...value, type: "proposeSpend" } }
 }
 
 /**
@@ -63,10 +63,10 @@ export function propose_spend(
  * - DbWrites: `Proposals`, `rejected proposer account`
  * # </weight>
  */
-export function reject_proposal(
-  value: Omit<types.pallet_treasury.pallet.Call.reject_proposal, "type">,
+export function rejectProposal(
+  value: Omit<types.pallet_treasury.pallet.Call.rejectProposal, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Treasury", value: { ...value, type: "reject_proposal" } }
+  return { type: "Treasury", value: { ...value, type: "rejectProposal" } }
 }
 
 /**
@@ -81,10 +81,10 @@ export function reject_proposal(
  * - DbWrite: `Approvals`
  * # </weight>
  */
-export function approve_proposal(
-  value: Omit<types.pallet_treasury.pallet.Call.approve_proposal, "type">,
+export function approveProposal(
+  value: Omit<types.pallet_treasury.pallet.Call.approveProposal, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Treasury", value: { ...value, type: "approve_proposal" } }
+  return { type: "Treasury", value: { ...value, type: "approveProposal" } }
 }
 
 /**
@@ -120,8 +120,8 @@ export function spend(
  * i.e., the proposal has not been approved. This could also mean the proposal does not
  * exist altogether, thus there is no way it would have been approved in the first place.
  */
-export function remove_approval(
-  value: Omit<types.pallet_treasury.pallet.Call.remove_approval, "type">,
+export function removeApproval(
+  value: Omit<types.pallet_treasury.pallet.Call.removeApproval, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Treasury", value: { ...value, type: "remove_approval" } }
+  return { type: "Treasury", value: { ...value, type: "removeApproval" } }
 }

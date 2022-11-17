@@ -5,9 +5,9 @@ import type * as types from "../mod.ts"
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 
 export type Call =
-  | types.pallet_babe.pallet.Call.report_equivocation
-  | types.pallet_babe.pallet.Call.report_equivocation_unsigned
-  | types.pallet_babe.pallet.Call.plan_config_change
+  | types.pallet_babe.pallet.Call.reportEquivocation
+  | types.pallet_babe.pallet.Call.reportEquivocationUnsigned
+  | types.pallet_babe.pallet.Call.planConfigChange
 export namespace Call {
   /**
    * Report authority equivocation/misbehavior. This method will verify
@@ -15,10 +15,10 @@ export namespace Call {
    * against the extracted offender. If both are valid, the offence will
    * be reported.
    */
-  export interface report_equivocation {
-    type: "report_equivocation"
-    equivocation_proof: types.sp_consensus_slots.EquivocationProof
-    key_owner_proof: types.sp_session.MembershipProof
+  export interface reportEquivocation {
+    type: "reportEquivocation"
+    equivocationProof: types.sp_consensus_slots.EquivocationProof
+    keyOwnerProof: types.sp_session.MembershipProof
   }
   /**
    * Report authority equivocation/misbehavior. This method will verify
@@ -30,10 +30,10 @@ export namespace Call {
    * if the block author is defined it will be defined as the equivocation
    * reporter.
    */
-  export interface report_equivocation_unsigned {
-    type: "report_equivocation_unsigned"
-    equivocation_proof: types.sp_consensus_slots.EquivocationProof
-    key_owner_proof: types.sp_session.MembershipProof
+  export interface reportEquivocationUnsigned {
+    type: "reportEquivocationUnsigned"
+    equivocationProof: types.sp_consensus_slots.EquivocationProof
+    keyOwnerProof: types.sp_session.MembershipProof
   }
   /**
    * Plan an epoch config change. The epoch config change is recorded and will be enacted on
@@ -41,8 +41,8 @@ export namespace Call {
    * Multiple calls to this method will replace any existing planned config change that had
    * not been enacted yet.
    */
-  export interface plan_config_change {
-    type: "plan_config_change"
+  export interface planConfigChange {
+    type: "planConfigChange"
     config: types.sp_consensus_babe.digests.NextConfigDescriptor
   }
   /**
@@ -51,10 +51,10 @@ export namespace Call {
    * against the extracted offender. If both are valid, the offence will
    * be reported.
    */
-  export function report_equivocation(
-    value: Omit<types.pallet_babe.pallet.Call.report_equivocation, "type">,
-  ): types.pallet_babe.pallet.Call.report_equivocation {
-    return { type: "report_equivocation", ...value }
+  export function reportEquivocation(
+    value: Omit<types.pallet_babe.pallet.Call.reportEquivocation, "type">,
+  ): types.pallet_babe.pallet.Call.reportEquivocation {
+    return { type: "reportEquivocation", ...value }
   }
   /**
    * Report authority equivocation/misbehavior. This method will verify
@@ -66,10 +66,10 @@ export namespace Call {
    * if the block author is defined it will be defined as the equivocation
    * reporter.
    */
-  export function report_equivocation_unsigned(
-    value: Omit<types.pallet_babe.pallet.Call.report_equivocation_unsigned, "type">,
-  ): types.pallet_babe.pallet.Call.report_equivocation_unsigned {
-    return { type: "report_equivocation_unsigned", ...value }
+  export function reportEquivocationUnsigned(
+    value: Omit<types.pallet_babe.pallet.Call.reportEquivocationUnsigned, "type">,
+  ): types.pallet_babe.pallet.Call.reportEquivocationUnsigned {
+    return { type: "reportEquivocationUnsigned", ...value }
   }
   /**
    * Plan an epoch config change. The epoch config change is recorded and will be enacted on
@@ -77,10 +77,10 @@ export namespace Call {
    * Multiple calls to this method will replace any existing planned config change that had
    * not been enacted yet.
    */
-  export function plan_config_change(
-    value: Omit<types.pallet_babe.pallet.Call.plan_config_change, "type">,
-  ): types.pallet_babe.pallet.Call.plan_config_change {
-    return { type: "plan_config_change", ...value }
+  export function planConfigChange(
+    value: Omit<types.pallet_babe.pallet.Call.planConfigChange, "type">,
+  ): types.pallet_babe.pallet.Call.planConfigChange {
+    return { type: "planConfigChange", ...value }
   }
 }
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */

@@ -4,7 +4,7 @@ import type * as types from "../../mod.ts"
 
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 
-export type Call = "force_unfreeze"
+export type Call = "forceUnfreeze"
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
 
 export type Error =

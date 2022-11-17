@@ -17,7 +17,7 @@ export interface Node {
   id: types.sp_core.crypto.AccountId32
   prev: types.sp_core.crypto.AccountId32 | undefined
   next: types.sp_core.crypto.AccountId32 | undefined
-  bag_upper: types.u64
+  bagUpper: types.u64
   score: types.u64
 }
 

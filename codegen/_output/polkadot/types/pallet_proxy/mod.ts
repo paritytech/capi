@@ -6,7 +6,7 @@ export * as pallet from "./pallet.ts"
 
 export interface Announcement {
   real: types.sp_core.crypto.AccountId32
-  call_hash: types.primitive_types.H256
+  callHash: types.primitive_types.H256
   height: types.u32
 }
 
@@ -16,7 +16,7 @@ export function Announcement(value: types.pallet_proxy.Announcement) {
 
 export interface ProxyDefinition {
   delegate: types.sp_core.crypto.AccountId32
-  proxy_type: types.polkadot_runtime.ProxyType
+  proxyType: types.polkadot_runtime.ProxyType
   delay: types.u32
 }
 

@@ -5,271 +5,271 @@ import type * as types from "../../mod.ts"
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 
 export type Call =
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_validation_upgrade_cooldown
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_validation_upgrade_delay
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_code_retention_period
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_max_code_size
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_max_pov_size
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_max_head_data_size
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_parathread_cores
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_parathread_retries
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_group_rotation_frequency
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_chain_availability_period
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_thread_availability_period
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_scheduling_lookahead
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_max_validators_per_core
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_max_validators
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_dispute_period
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_dispute_post_conclusion_acceptance_period
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_dispute_max_spam_slots
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_dispute_conclusion_by_time_out_period
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_no_show_slots
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_n_delay_tranches
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_zeroth_delay_tranche_width
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_needed_approvals
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_relay_vrf_modulo_samples
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_max_upward_queue_count
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_max_upward_queue_size
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_max_downward_message_size
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_ump_service_total_weight
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_max_upward_message_size
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_max_upward_message_num_per_candidate
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_open_request_ttl
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_sender_deposit
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_recipient_deposit
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_channel_max_capacity
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_channel_max_total_size
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_max_parachain_inbound_channels
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_max_parathread_inbound_channels
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_channel_max_message_size
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_max_parachain_outbound_channels
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_max_parathread_outbound_channels
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_max_message_num_per_candidate
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_ump_max_individual_weight
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_pvf_checking_enabled
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_pvf_voting_ttl
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_minimum_validation_upgrade_delay
-  | types.polkadot_runtime_parachains.configuration.pallet.Call.set_bypass_consistency_check
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setValidationUpgradeCooldown
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setValidationUpgradeDelay
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setCodeRetentionPeriod
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setMaxCodeSize
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setMaxPovSize
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setMaxHeadDataSize
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setParathreadCores
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setParathreadRetries
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setGroupRotationFrequency
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setChainAvailabilityPeriod
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setThreadAvailabilityPeriod
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setSchedulingLookahead
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setMaxValidatorsPerCore
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setMaxValidators
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setDisputePeriod
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setDisputePostConclusionAcceptancePeriod
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setDisputeMaxSpamSlots
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setDisputeConclusionByTimeOutPeriod
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setNoShowSlots
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setNDelayTranches
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setZerothDelayTrancheWidth
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setNeededApprovals
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setRelayVrfModuloSamples
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setMaxUpwardQueueCount
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setMaxUpwardQueueSize
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setMaxDownwardMessageSize
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setUmpServiceTotalWeight
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setMaxUpwardMessageSize
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setMaxUpwardMessageNumPerCandidate
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpOpenRequestTtl
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpSenderDeposit
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpRecipientDeposit
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpChannelMaxCapacity
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpChannelMaxTotalSize
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpMaxParachainInboundChannels
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpMaxParathreadInboundChannels
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpChannelMaxMessageSize
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpMaxParachainOutboundChannels
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpMaxParathreadOutboundChannels
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpMaxMessageNumPerCandidate
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setUmpMaxIndividualWeight
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setPvfCheckingEnabled
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setPvfVotingTtl
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setMinimumValidationUpgradeDelay
+  | types.polkadot_runtime_parachains.configuration.pallet.Call.setBypassConsistencyCheck
 export namespace Call {
   /** Set the validation upgrade cooldown. */
-  export interface set_validation_upgrade_cooldown {
-    type: "set_validation_upgrade_cooldown"
+  export interface setValidationUpgradeCooldown {
+    type: "setValidationUpgradeCooldown"
     new: types.u32
   }
   /** Set the validation upgrade delay. */
-  export interface set_validation_upgrade_delay {
-    type: "set_validation_upgrade_delay"
+  export interface setValidationUpgradeDelay {
+    type: "setValidationUpgradeDelay"
     new: types.u32
   }
   /** Set the acceptance period for an included candidate. */
-  export interface set_code_retention_period {
-    type: "set_code_retention_period"
+  export interface setCodeRetentionPeriod {
+    type: "setCodeRetentionPeriod"
     new: types.u32
   }
   /** Set the max validation code size for incoming upgrades. */
-  export interface set_max_code_size {
-    type: "set_max_code_size"
+  export interface setMaxCodeSize {
+    type: "setMaxCodeSize"
     new: types.u32
   }
   /** Set the max POV block size for incoming upgrades. */
-  export interface set_max_pov_size {
-    type: "set_max_pov_size"
+  export interface setMaxPovSize {
+    type: "setMaxPovSize"
     new: types.u32
   }
   /** Set the max head data size for paras. */
-  export interface set_max_head_data_size {
-    type: "set_max_head_data_size"
+  export interface setMaxHeadDataSize {
+    type: "setMaxHeadDataSize"
     new: types.u32
   }
   /** Set the number of parathread execution cores. */
-  export interface set_parathread_cores {
-    type: "set_parathread_cores"
+  export interface setParathreadCores {
+    type: "setParathreadCores"
     new: types.u32
   }
   /** Set the number of retries for a particular parathread. */
-  export interface set_parathread_retries {
-    type: "set_parathread_retries"
+  export interface setParathreadRetries {
+    type: "setParathreadRetries"
     new: types.u32
   }
   /** Set the parachain validator-group rotation frequency */
-  export interface set_group_rotation_frequency {
-    type: "set_group_rotation_frequency"
+  export interface setGroupRotationFrequency {
+    type: "setGroupRotationFrequency"
     new: types.u32
   }
   /** Set the availability period for parachains. */
-  export interface set_chain_availability_period {
-    type: "set_chain_availability_period"
+  export interface setChainAvailabilityPeriod {
+    type: "setChainAvailabilityPeriod"
     new: types.u32
   }
   /** Set the availability period for parathreads. */
-  export interface set_thread_availability_period {
-    type: "set_thread_availability_period"
+  export interface setThreadAvailabilityPeriod {
+    type: "setThreadAvailabilityPeriod"
     new: types.u32
   }
   /** Set the scheduling lookahead, in expected number of blocks at peak throughput. */
-  export interface set_scheduling_lookahead {
-    type: "set_scheduling_lookahead"
+  export interface setSchedulingLookahead {
+    type: "setSchedulingLookahead"
     new: types.u32
   }
   /** Set the maximum number of validators to assign to any core. */
-  export interface set_max_validators_per_core {
-    type: "set_max_validators_per_core"
+  export interface setMaxValidatorsPerCore {
+    type: "setMaxValidatorsPerCore"
     new: types.u32 | undefined
   }
   /** Set the maximum number of validators to use in parachain consensus. */
-  export interface set_max_validators {
-    type: "set_max_validators"
+  export interface setMaxValidators {
+    type: "setMaxValidators"
     new: types.u32 | undefined
   }
   /** Set the dispute period, in number of sessions to keep for disputes. */
-  export interface set_dispute_period {
-    type: "set_dispute_period"
+  export interface setDisputePeriod {
+    type: "setDisputePeriod"
     new: types.u32
   }
   /** Set the dispute post conclusion acceptance period. */
-  export interface set_dispute_post_conclusion_acceptance_period {
-    type: "set_dispute_post_conclusion_acceptance_period"
+  export interface setDisputePostConclusionAcceptancePeriod {
+    type: "setDisputePostConclusionAcceptancePeriod"
     new: types.u32
   }
   /** Set the maximum number of dispute spam slots. */
-  export interface set_dispute_max_spam_slots {
-    type: "set_dispute_max_spam_slots"
+  export interface setDisputeMaxSpamSlots {
+    type: "setDisputeMaxSpamSlots"
     new: types.u32
   }
   /** Set the dispute conclusion by time out period. */
-  export interface set_dispute_conclusion_by_time_out_period {
-    type: "set_dispute_conclusion_by_time_out_period"
+  export interface setDisputeConclusionByTimeOutPeriod {
+    type: "setDisputeConclusionByTimeOutPeriod"
     new: types.u32
   }
   /**
    * Set the no show slots, in number of number of consensus slots.
    * Must be at least 1.
    */
-  export interface set_no_show_slots {
-    type: "set_no_show_slots"
+  export interface setNoShowSlots {
+    type: "setNoShowSlots"
     new: types.u32
   }
   /** Set the total number of delay tranches. */
-  export interface set_n_delay_tranches {
-    type: "set_n_delay_tranches"
+  export interface setNDelayTranches {
+    type: "setNDelayTranches"
     new: types.u32
   }
   /** Set the zeroth delay tranche width. */
-  export interface set_zeroth_delay_tranche_width {
-    type: "set_zeroth_delay_tranche_width"
+  export interface setZerothDelayTrancheWidth {
+    type: "setZerothDelayTrancheWidth"
     new: types.u32
   }
   /** Set the number of validators needed to approve a block. */
-  export interface set_needed_approvals {
-    type: "set_needed_approvals"
+  export interface setNeededApprovals {
+    type: "setNeededApprovals"
     new: types.u32
   }
   /** Set the number of samples to do of the `RelayVRFModulo` approval assignment criterion. */
-  export interface set_relay_vrf_modulo_samples {
-    type: "set_relay_vrf_modulo_samples"
+  export interface setRelayVrfModuloSamples {
+    type: "setRelayVrfModuloSamples"
     new: types.u32
   }
   /** Sets the maximum items that can present in a upward dispatch queue at once. */
-  export interface set_max_upward_queue_count {
-    type: "set_max_upward_queue_count"
+  export interface setMaxUpwardQueueCount {
+    type: "setMaxUpwardQueueCount"
     new: types.u32
   }
   /** Sets the maximum total size of items that can present in a upward dispatch queue at once. */
-  export interface set_max_upward_queue_size {
-    type: "set_max_upward_queue_size"
+  export interface setMaxUpwardQueueSize {
+    type: "setMaxUpwardQueueSize"
     new: types.u32
   }
   /** Set the critical downward message size. */
-  export interface set_max_downward_message_size {
-    type: "set_max_downward_message_size"
+  export interface setMaxDownwardMessageSize {
+    type: "setMaxDownwardMessageSize"
     new: types.u32
   }
   /** Sets the soft limit for the phase of dispatching dispatchable upward messages. */
-  export interface set_ump_service_total_weight {
-    type: "set_ump_service_total_weight"
+  export interface setUmpServiceTotalWeight {
+    type: "setUmpServiceTotalWeight"
     new: types.sp_weights.weight_v2.Weight
   }
   /** Sets the maximum size of an upward message that can be sent by a candidate. */
-  export interface set_max_upward_message_size {
-    type: "set_max_upward_message_size"
+  export interface setMaxUpwardMessageSize {
+    type: "setMaxUpwardMessageSize"
     new: types.u32
   }
   /** Sets the maximum number of messages that a candidate can contain. */
-  export interface set_max_upward_message_num_per_candidate {
-    type: "set_max_upward_message_num_per_candidate"
+  export interface setMaxUpwardMessageNumPerCandidate {
+    type: "setMaxUpwardMessageNumPerCandidate"
     new: types.u32
   }
   /** Sets the number of sessions after which an HRMP open channel request expires. */
-  export interface set_hrmp_open_request_ttl {
-    type: "set_hrmp_open_request_ttl"
+  export interface setHrmpOpenRequestTtl {
+    type: "setHrmpOpenRequestTtl"
     new: types.u32
   }
   /** Sets the amount of funds that the sender should provide for opening an HRMP channel. */
-  export interface set_hrmp_sender_deposit {
-    type: "set_hrmp_sender_deposit"
+  export interface setHrmpSenderDeposit {
+    type: "setHrmpSenderDeposit"
     new: types.u128
   }
   /**
    * Sets the amount of funds that the recipient should provide for accepting opening an HRMP
    * channel.
    */
-  export interface set_hrmp_recipient_deposit {
-    type: "set_hrmp_recipient_deposit"
+  export interface setHrmpRecipientDeposit {
+    type: "setHrmpRecipientDeposit"
     new: types.u128
   }
   /** Sets the maximum number of messages allowed in an HRMP channel at once. */
-  export interface set_hrmp_channel_max_capacity {
-    type: "set_hrmp_channel_max_capacity"
+  export interface setHrmpChannelMaxCapacity {
+    type: "setHrmpChannelMaxCapacity"
     new: types.u32
   }
   /** Sets the maximum total size of messages in bytes allowed in an HRMP channel at once. */
-  export interface set_hrmp_channel_max_total_size {
-    type: "set_hrmp_channel_max_total_size"
+  export interface setHrmpChannelMaxTotalSize {
+    type: "setHrmpChannelMaxTotalSize"
     new: types.u32
   }
   /** Sets the maximum number of inbound HRMP channels a parachain is allowed to accept. */
-  export interface set_hrmp_max_parachain_inbound_channels {
-    type: "set_hrmp_max_parachain_inbound_channels"
+  export interface setHrmpMaxParachainInboundChannels {
+    type: "setHrmpMaxParachainInboundChannels"
     new: types.u32
   }
   /** Sets the maximum number of inbound HRMP channels a parathread is allowed to accept. */
-  export interface set_hrmp_max_parathread_inbound_channels {
-    type: "set_hrmp_max_parathread_inbound_channels"
+  export interface setHrmpMaxParathreadInboundChannels {
+    type: "setHrmpMaxParathreadInboundChannels"
     new: types.u32
   }
   /** Sets the maximum size of a message that could ever be put into an HRMP channel. */
-  export interface set_hrmp_channel_max_message_size {
-    type: "set_hrmp_channel_max_message_size"
+  export interface setHrmpChannelMaxMessageSize {
+    type: "setHrmpChannelMaxMessageSize"
     new: types.u32
   }
   /** Sets the maximum number of outbound HRMP channels a parachain is allowed to open. */
-  export interface set_hrmp_max_parachain_outbound_channels {
-    type: "set_hrmp_max_parachain_outbound_channels"
+  export interface setHrmpMaxParachainOutboundChannels {
+    type: "setHrmpMaxParachainOutboundChannels"
     new: types.u32
   }
   /** Sets the maximum number of outbound HRMP channels a parathread is allowed to open. */
-  export interface set_hrmp_max_parathread_outbound_channels {
-    type: "set_hrmp_max_parathread_outbound_channels"
+  export interface setHrmpMaxParathreadOutboundChannels {
+    type: "setHrmpMaxParathreadOutboundChannels"
     new: types.u32
   }
   /** Sets the maximum number of outbound HRMP messages can be sent by a candidate. */
-  export interface set_hrmp_max_message_num_per_candidate {
-    type: "set_hrmp_max_message_num_per_candidate"
+  export interface setHrmpMaxMessageNumPerCandidate {
+    type: "setHrmpMaxMessageNumPerCandidate"
     new: types.u32
   }
   /** Sets the maximum amount of weight any individual upward message may consume. */
-  export interface set_ump_max_individual_weight {
-    type: "set_ump_max_individual_weight"
+  export interface setUmpMaxIndividualWeight {
+    type: "setUmpMaxIndividualWeight"
     new: types.sp_weights.weight_v2.Weight
   }
   /** Enable or disable PVF pre-checking. Consult the field documentation prior executing. */
-  export interface set_pvf_checking_enabled {
-    type: "set_pvf_checking_enabled"
+  export interface setPvfCheckingEnabled {
+    type: "setPvfCheckingEnabled"
     new: boolean
   }
   /** Set the number of session changes after which a PVF pre-checking voting is rejected. */
-  export interface set_pvf_voting_ttl {
-    type: "set_pvf_voting_ttl"
+  export interface setPvfVotingTtl {
+    type: "setPvfVotingTtl"
     new: types.u32
   }
   /**
@@ -278,410 +278,401 @@ export namespace Call {
    *
    * See the field documentation for information and constraints for the new value.
    */
-  export interface set_minimum_validation_upgrade_delay {
-    type: "set_minimum_validation_upgrade_delay"
+  export interface setMinimumValidationUpgradeDelay {
+    type: "setMinimumValidationUpgradeDelay"
     new: types.u32
   }
   /**
    * Setting this to true will disable consistency checks for the configuration setters.
    * Use with caution.
    */
-  export interface set_bypass_consistency_check {
-    type: "set_bypass_consistency_check"
+  export interface setBypassConsistencyCheck {
+    type: "setBypassConsistencyCheck"
     new: boolean
   }
   /** Set the validation upgrade cooldown. */
-  export function set_validation_upgrade_cooldown(
+  export function setValidationUpgradeCooldown(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_validation_upgrade_cooldown,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setValidationUpgradeCooldown,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_validation_upgrade_cooldown {
-    return { type: "set_validation_upgrade_cooldown", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setValidationUpgradeCooldown {
+    return { type: "setValidationUpgradeCooldown", ...value }
   }
   /** Set the validation upgrade delay. */
-  export function set_validation_upgrade_delay(
+  export function setValidationUpgradeDelay(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_validation_upgrade_delay,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setValidationUpgradeDelay,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_validation_upgrade_delay {
-    return { type: "set_validation_upgrade_delay", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setValidationUpgradeDelay {
+    return { type: "setValidationUpgradeDelay", ...value }
   }
   /** Set the acceptance period for an included candidate. */
-  export function set_code_retention_period(
+  export function setCodeRetentionPeriod(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_code_retention_period,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setCodeRetentionPeriod,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_code_retention_period {
-    return { type: "set_code_retention_period", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setCodeRetentionPeriod {
+    return { type: "setCodeRetentionPeriod", ...value }
   }
   /** Set the max validation code size for incoming upgrades. */
-  export function set_max_code_size(
-    value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_max_code_size,
-      "type"
-    >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_max_code_size {
-    return { type: "set_max_code_size", ...value }
+  export function setMaxCodeSize(
+    value: Omit<types.polkadot_runtime_parachains.configuration.pallet.Call.setMaxCodeSize, "type">,
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setMaxCodeSize {
+    return { type: "setMaxCodeSize", ...value }
   }
   /** Set the max POV block size for incoming upgrades. */
-  export function set_max_pov_size(
-    value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_max_pov_size,
-      "type"
-    >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_max_pov_size {
-    return { type: "set_max_pov_size", ...value }
+  export function setMaxPovSize(
+    value: Omit<types.polkadot_runtime_parachains.configuration.pallet.Call.setMaxPovSize, "type">,
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setMaxPovSize {
+    return { type: "setMaxPovSize", ...value }
   }
   /** Set the max head data size for paras. */
-  export function set_max_head_data_size(
+  export function setMaxHeadDataSize(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_max_head_data_size,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setMaxHeadDataSize,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_max_head_data_size {
-    return { type: "set_max_head_data_size", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setMaxHeadDataSize {
+    return { type: "setMaxHeadDataSize", ...value }
   }
   /** Set the number of parathread execution cores. */
-  export function set_parathread_cores(
+  export function setParathreadCores(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_parathread_cores,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setParathreadCores,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_parathread_cores {
-    return { type: "set_parathread_cores", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setParathreadCores {
+    return { type: "setParathreadCores", ...value }
   }
   /** Set the number of retries for a particular parathread. */
-  export function set_parathread_retries(
+  export function setParathreadRetries(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_parathread_retries,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setParathreadRetries,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_parathread_retries {
-    return { type: "set_parathread_retries", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setParathreadRetries {
+    return { type: "setParathreadRetries", ...value }
   }
   /** Set the parachain validator-group rotation frequency */
-  export function set_group_rotation_frequency(
+  export function setGroupRotationFrequency(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_group_rotation_frequency,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setGroupRotationFrequency,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_group_rotation_frequency {
-    return { type: "set_group_rotation_frequency", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setGroupRotationFrequency {
+    return { type: "setGroupRotationFrequency", ...value }
   }
   /** Set the availability period for parachains. */
-  export function set_chain_availability_period(
+  export function setChainAvailabilityPeriod(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_chain_availability_period,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setChainAvailabilityPeriod,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_chain_availability_period {
-    return { type: "set_chain_availability_period", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setChainAvailabilityPeriod {
+    return { type: "setChainAvailabilityPeriod", ...value }
   }
   /** Set the availability period for parathreads. */
-  export function set_thread_availability_period(
+  export function setThreadAvailabilityPeriod(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_thread_availability_period,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setThreadAvailabilityPeriod,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_thread_availability_period {
-    return { type: "set_thread_availability_period", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setThreadAvailabilityPeriod {
+    return { type: "setThreadAvailabilityPeriod", ...value }
   }
   /** Set the scheduling lookahead, in expected number of blocks at peak throughput. */
-  export function set_scheduling_lookahead(
+  export function setSchedulingLookahead(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_scheduling_lookahead,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setSchedulingLookahead,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_scheduling_lookahead {
-    return { type: "set_scheduling_lookahead", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setSchedulingLookahead {
+    return { type: "setSchedulingLookahead", ...value }
   }
   /** Set the maximum number of validators to assign to any core. */
-  export function set_max_validators_per_core(
+  export function setMaxValidatorsPerCore(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_max_validators_per_core,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setMaxValidatorsPerCore,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_max_validators_per_core {
-    return { type: "set_max_validators_per_core", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setMaxValidatorsPerCore {
+    return { type: "setMaxValidatorsPerCore", ...value }
   }
   /** Set the maximum number of validators to use in parachain consensus. */
-  export function set_max_validators(
+  export function setMaxValidators(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_max_validators,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setMaxValidators,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_max_validators {
-    return { type: "set_max_validators", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setMaxValidators {
+    return { type: "setMaxValidators", ...value }
   }
   /** Set the dispute period, in number of sessions to keep for disputes. */
-  export function set_dispute_period(
+  export function setDisputePeriod(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_dispute_period,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setDisputePeriod,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_dispute_period {
-    return { type: "set_dispute_period", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setDisputePeriod {
+    return { type: "setDisputePeriod", ...value }
   }
   /** Set the dispute post conclusion acceptance period. */
-  export function set_dispute_post_conclusion_acceptance_period(
+  export function setDisputePostConclusionAcceptancePeriod(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_dispute_post_conclusion_acceptance_period,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setDisputePostConclusionAcceptancePeriod,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_dispute_post_conclusion_acceptance_period {
-    return { type: "set_dispute_post_conclusion_acceptance_period", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setDisputePostConclusionAcceptancePeriod {
+    return { type: "setDisputePostConclusionAcceptancePeriod", ...value }
   }
   /** Set the maximum number of dispute spam slots. */
-  export function set_dispute_max_spam_slots(
+  export function setDisputeMaxSpamSlots(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_dispute_max_spam_slots,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setDisputeMaxSpamSlots,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_dispute_max_spam_slots {
-    return { type: "set_dispute_max_spam_slots", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setDisputeMaxSpamSlots {
+    return { type: "setDisputeMaxSpamSlots", ...value }
   }
   /** Set the dispute conclusion by time out period. */
-  export function set_dispute_conclusion_by_time_out_period(
+  export function setDisputeConclusionByTimeOutPeriod(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_dispute_conclusion_by_time_out_period,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setDisputeConclusionByTimeOutPeriod,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_dispute_conclusion_by_time_out_period {
-    return { type: "set_dispute_conclusion_by_time_out_period", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setDisputeConclusionByTimeOutPeriod {
+    return { type: "setDisputeConclusionByTimeOutPeriod", ...value }
   }
   /**
    * Set the no show slots, in number of number of consensus slots.
    * Must be at least 1.
    */
-  export function set_no_show_slots(
-    value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_no_show_slots,
-      "type"
-    >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_no_show_slots {
-    return { type: "set_no_show_slots", ...value }
+  export function setNoShowSlots(
+    value: Omit<types.polkadot_runtime_parachains.configuration.pallet.Call.setNoShowSlots, "type">,
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setNoShowSlots {
+    return { type: "setNoShowSlots", ...value }
   }
   /** Set the total number of delay tranches. */
-  export function set_n_delay_tranches(
+  export function setNDelayTranches(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_n_delay_tranches,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setNDelayTranches,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_n_delay_tranches {
-    return { type: "set_n_delay_tranches", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setNDelayTranches {
+    return { type: "setNDelayTranches", ...value }
   }
   /** Set the zeroth delay tranche width. */
-  export function set_zeroth_delay_tranche_width(
+  export function setZerothDelayTrancheWidth(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_zeroth_delay_tranche_width,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setZerothDelayTrancheWidth,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_zeroth_delay_tranche_width {
-    return { type: "set_zeroth_delay_tranche_width", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setZerothDelayTrancheWidth {
+    return { type: "setZerothDelayTrancheWidth", ...value }
   }
   /** Set the number of validators needed to approve a block. */
-  export function set_needed_approvals(
+  export function setNeededApprovals(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_needed_approvals,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setNeededApprovals,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_needed_approvals {
-    return { type: "set_needed_approvals", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setNeededApprovals {
+    return { type: "setNeededApprovals", ...value }
   }
   /** Set the number of samples to do of the `RelayVRFModulo` approval assignment criterion. */
-  export function set_relay_vrf_modulo_samples(
+  export function setRelayVrfModuloSamples(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_relay_vrf_modulo_samples,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setRelayVrfModuloSamples,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_relay_vrf_modulo_samples {
-    return { type: "set_relay_vrf_modulo_samples", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setRelayVrfModuloSamples {
+    return { type: "setRelayVrfModuloSamples", ...value }
   }
   /** Sets the maximum items that can present in a upward dispatch queue at once. */
-  export function set_max_upward_queue_count(
+  export function setMaxUpwardQueueCount(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_max_upward_queue_count,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setMaxUpwardQueueCount,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_max_upward_queue_count {
-    return { type: "set_max_upward_queue_count", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setMaxUpwardQueueCount {
+    return { type: "setMaxUpwardQueueCount", ...value }
   }
   /** Sets the maximum total size of items that can present in a upward dispatch queue at once. */
-  export function set_max_upward_queue_size(
+  export function setMaxUpwardQueueSize(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_max_upward_queue_size,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setMaxUpwardQueueSize,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_max_upward_queue_size {
-    return { type: "set_max_upward_queue_size", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setMaxUpwardQueueSize {
+    return { type: "setMaxUpwardQueueSize", ...value }
   }
   /** Set the critical downward message size. */
-  export function set_max_downward_message_size(
+  export function setMaxDownwardMessageSize(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_max_downward_message_size,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setMaxDownwardMessageSize,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_max_downward_message_size {
-    return { type: "set_max_downward_message_size", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setMaxDownwardMessageSize {
+    return { type: "setMaxDownwardMessageSize", ...value }
   }
   /** Sets the soft limit for the phase of dispatching dispatchable upward messages. */
-  export function set_ump_service_total_weight(
+  export function setUmpServiceTotalWeight(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_ump_service_total_weight,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setUmpServiceTotalWeight,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_ump_service_total_weight {
-    return { type: "set_ump_service_total_weight", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setUmpServiceTotalWeight {
+    return { type: "setUmpServiceTotalWeight", ...value }
   }
   /** Sets the maximum size of an upward message that can be sent by a candidate. */
-  export function set_max_upward_message_size(
+  export function setMaxUpwardMessageSize(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_max_upward_message_size,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setMaxUpwardMessageSize,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_max_upward_message_size {
-    return { type: "set_max_upward_message_size", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setMaxUpwardMessageSize {
+    return { type: "setMaxUpwardMessageSize", ...value }
   }
   /** Sets the maximum number of messages that a candidate can contain. */
-  export function set_max_upward_message_num_per_candidate(
+  export function setMaxUpwardMessageNumPerCandidate(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_max_upward_message_num_per_candidate,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setMaxUpwardMessageNumPerCandidate,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_max_upward_message_num_per_candidate {
-    return { type: "set_max_upward_message_num_per_candidate", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setMaxUpwardMessageNumPerCandidate {
+    return { type: "setMaxUpwardMessageNumPerCandidate", ...value }
   }
   /** Sets the number of sessions after which an HRMP open channel request expires. */
-  export function set_hrmp_open_request_ttl(
+  export function setHrmpOpenRequestTtl(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_open_request_ttl,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpOpenRequestTtl,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_open_request_ttl {
-    return { type: "set_hrmp_open_request_ttl", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpOpenRequestTtl {
+    return { type: "setHrmpOpenRequestTtl", ...value }
   }
   /** Sets the amount of funds that the sender should provide for opening an HRMP channel. */
-  export function set_hrmp_sender_deposit(
+  export function setHrmpSenderDeposit(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_sender_deposit,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpSenderDeposit,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_sender_deposit {
-    return { type: "set_hrmp_sender_deposit", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpSenderDeposit {
+    return { type: "setHrmpSenderDeposit", ...value }
   }
   /**
    * Sets the amount of funds that the recipient should provide for accepting opening an HRMP
    * channel.
    */
-  export function set_hrmp_recipient_deposit(
+  export function setHrmpRecipientDeposit(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_recipient_deposit,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpRecipientDeposit,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_recipient_deposit {
-    return { type: "set_hrmp_recipient_deposit", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpRecipientDeposit {
+    return { type: "setHrmpRecipientDeposit", ...value }
   }
   /** Sets the maximum number of messages allowed in an HRMP channel at once. */
-  export function set_hrmp_channel_max_capacity(
+  export function setHrmpChannelMaxCapacity(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_channel_max_capacity,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpChannelMaxCapacity,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_channel_max_capacity {
-    return { type: "set_hrmp_channel_max_capacity", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpChannelMaxCapacity {
+    return { type: "setHrmpChannelMaxCapacity", ...value }
   }
   /** Sets the maximum total size of messages in bytes allowed in an HRMP channel at once. */
-  export function set_hrmp_channel_max_total_size(
+  export function setHrmpChannelMaxTotalSize(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_channel_max_total_size,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpChannelMaxTotalSize,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_channel_max_total_size {
-    return { type: "set_hrmp_channel_max_total_size", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpChannelMaxTotalSize {
+    return { type: "setHrmpChannelMaxTotalSize", ...value }
   }
   /** Sets the maximum number of inbound HRMP channels a parachain is allowed to accept. */
-  export function set_hrmp_max_parachain_inbound_channels(
+  export function setHrmpMaxParachainInboundChannels(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_max_parachain_inbound_channels,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpMaxParachainInboundChannels,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_max_parachain_inbound_channels {
-    return { type: "set_hrmp_max_parachain_inbound_channels", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpMaxParachainInboundChannels {
+    return { type: "setHrmpMaxParachainInboundChannels", ...value }
   }
   /** Sets the maximum number of inbound HRMP channels a parathread is allowed to accept. */
-  export function set_hrmp_max_parathread_inbound_channels(
+  export function setHrmpMaxParathreadInboundChannels(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_max_parathread_inbound_channels,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpMaxParathreadInboundChannels,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_max_parathread_inbound_channels {
-    return { type: "set_hrmp_max_parathread_inbound_channels", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpMaxParathreadInboundChannels {
+    return { type: "setHrmpMaxParathreadInboundChannels", ...value }
   }
   /** Sets the maximum size of a message that could ever be put into an HRMP channel. */
-  export function set_hrmp_channel_max_message_size(
+  export function setHrmpChannelMaxMessageSize(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_channel_max_message_size,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpChannelMaxMessageSize,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_channel_max_message_size {
-    return { type: "set_hrmp_channel_max_message_size", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpChannelMaxMessageSize {
+    return { type: "setHrmpChannelMaxMessageSize", ...value }
   }
   /** Sets the maximum number of outbound HRMP channels a parachain is allowed to open. */
-  export function set_hrmp_max_parachain_outbound_channels(
+  export function setHrmpMaxParachainOutboundChannels(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_max_parachain_outbound_channels,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpMaxParachainOutboundChannels,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_max_parachain_outbound_channels {
-    return { type: "set_hrmp_max_parachain_outbound_channels", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpMaxParachainOutboundChannels {
+    return { type: "setHrmpMaxParachainOutboundChannels", ...value }
   }
   /** Sets the maximum number of outbound HRMP channels a parathread is allowed to open. */
-  export function set_hrmp_max_parathread_outbound_channels(
+  export function setHrmpMaxParathreadOutboundChannels(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_max_parathread_outbound_channels,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpMaxParathreadOutboundChannels,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_max_parathread_outbound_channels {
-    return { type: "set_hrmp_max_parathread_outbound_channels", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpMaxParathreadOutboundChannels {
+    return { type: "setHrmpMaxParathreadOutboundChannels", ...value }
   }
   /** Sets the maximum number of outbound HRMP messages can be sent by a candidate. */
-  export function set_hrmp_max_message_num_per_candidate(
+  export function setHrmpMaxMessageNumPerCandidate(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_max_message_num_per_candidate,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpMaxMessageNumPerCandidate,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_hrmp_max_message_num_per_candidate {
-    return { type: "set_hrmp_max_message_num_per_candidate", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setHrmpMaxMessageNumPerCandidate {
+    return { type: "setHrmpMaxMessageNumPerCandidate", ...value }
   }
   /** Sets the maximum amount of weight any individual upward message may consume. */
-  export function set_ump_max_individual_weight(
+  export function setUmpMaxIndividualWeight(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_ump_max_individual_weight,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setUmpMaxIndividualWeight,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_ump_max_individual_weight {
-    return { type: "set_ump_max_individual_weight", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setUmpMaxIndividualWeight {
+    return { type: "setUmpMaxIndividualWeight", ...value }
   }
   /** Enable or disable PVF pre-checking. Consult the field documentation prior executing. */
-  export function set_pvf_checking_enabled(
+  export function setPvfCheckingEnabled(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_pvf_checking_enabled,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setPvfCheckingEnabled,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_pvf_checking_enabled {
-    return { type: "set_pvf_checking_enabled", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setPvfCheckingEnabled {
+    return { type: "setPvfCheckingEnabled", ...value }
   }
   /** Set the number of session changes after which a PVF pre-checking voting is rejected. */
-  export function set_pvf_voting_ttl(
+  export function setPvfVotingTtl(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_pvf_voting_ttl,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setPvfVotingTtl,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_pvf_voting_ttl {
-    return { type: "set_pvf_voting_ttl", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setPvfVotingTtl {
+    return { type: "setPvfVotingTtl", ...value }
   }
   /**
    * Sets the minimum delay between announcing the upgrade block for a parachain until the
@@ -689,25 +680,25 @@ export namespace Call {
    *
    * See the field documentation for information and constraints for the new value.
    */
-  export function set_minimum_validation_upgrade_delay(
+  export function setMinimumValidationUpgradeDelay(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_minimum_validation_upgrade_delay,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setMinimumValidationUpgradeDelay,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_minimum_validation_upgrade_delay {
-    return { type: "set_minimum_validation_upgrade_delay", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setMinimumValidationUpgradeDelay {
+    return { type: "setMinimumValidationUpgradeDelay", ...value }
   }
   /**
    * Setting this to true will disable consistency checks for the configuration setters.
    * Use with caution.
    */
-  export function set_bypass_consistency_check(
+  export function setBypassConsistencyCheck(
     value: Omit<
-      types.polkadot_runtime_parachains.configuration.pallet.Call.set_bypass_consistency_check,
+      types.polkadot_runtime_parachains.configuration.pallet.Call.setBypassConsistencyCheck,
       "type"
     >,
-  ): types.polkadot_runtime_parachains.configuration.pallet.Call.set_bypass_consistency_check {
-    return { type: "set_bypass_consistency_check", ...value }
+  ): types.polkadot_runtime_parachains.configuration.pallet.Call.setBypassConsistencyCheck {
+    return { type: "setBypassConsistencyCheck", ...value }
   }
 }
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */

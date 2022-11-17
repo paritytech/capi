@@ -29,10 +29,10 @@ export const PreimageFor = new C.fluent.Storage(
  * If the preimage was previously requested, no fees or deposits are taken for providing
  * the preimage. Otherwise, a deposit is taken proportional to the size of the preimage.
  */
-export function note_preimage(
-  value: Omit<types.pallet_preimage.pallet.Call.note_preimage, "type">,
+export function notePreimage(
+  value: Omit<types.pallet_preimage.pallet.Call.notePreimage, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Preimage", value: { ...value, type: "note_preimage" } }
+  return { type: "Preimage", value: { ...value, type: "notePreimage" } }
 }
 
 /**
@@ -43,10 +43,10 @@ export function note_preimage(
  * - `hash`: The hash of the preimage to be removed from the store.
  * - `len`: The length of the preimage of `hash`.
  */
-export function unnote_preimage(
-  value: Omit<types.pallet_preimage.pallet.Call.unnote_preimage, "type">,
+export function unnotePreimage(
+  value: Omit<types.pallet_preimage.pallet.Call.unnotePreimage, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Preimage", value: { ...value, type: "unnote_preimage" } }
+  return { type: "Preimage", value: { ...value, type: "unnotePreimage" } }
 }
 
 /**
@@ -55,10 +55,10 @@ export function unnote_preimage(
  * If the preimage requests has already been provided on-chain, we unreserve any deposit
  * a user may have paid, and take the control of the preimage out of their hands.
  */
-export function request_preimage(
-  value: Omit<types.pallet_preimage.pallet.Call.request_preimage, "type">,
+export function requestPreimage(
+  value: Omit<types.pallet_preimage.pallet.Call.requestPreimage, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Preimage", value: { ...value, type: "request_preimage" } }
+  return { type: "Preimage", value: { ...value, type: "requestPreimage" } }
 }
 
 /**
@@ -66,8 +66,8 @@ export function request_preimage(
  *
  * NOTE: THIS MUST NOT BE CALLED ON `hash` MORE TIMES THAN `request_preimage`.
  */
-export function unrequest_preimage(
-  value: Omit<types.pallet_preimage.pallet.Call.unrequest_preimage, "type">,
+export function unrequestPreimage(
+  value: Omit<types.pallet_preimage.pallet.Call.unrequestPreimage, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Preimage", value: { ...value, type: "unrequest_preimage" } }
+  return { type: "Preimage", value: { ...value, type: "unrequestPreimage" } }
 }

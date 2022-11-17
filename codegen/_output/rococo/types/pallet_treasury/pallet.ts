@@ -5,11 +5,11 @@ import type * as types from "../mod.ts"
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 
 export type Call =
-  | types.pallet_treasury.pallet.Call.propose_spend
-  | types.pallet_treasury.pallet.Call.reject_proposal
-  | types.pallet_treasury.pallet.Call.approve_proposal
+  | types.pallet_treasury.pallet.Call.proposeSpend
+  | types.pallet_treasury.pallet.Call.rejectProposal
+  | types.pallet_treasury.pallet.Call.approveProposal
   | types.pallet_treasury.pallet.Call.spend
-  | types.pallet_treasury.pallet.Call.remove_approval
+  | types.pallet_treasury.pallet.Call.removeApproval
 export namespace Call {
   /**
    * Put forward a suggestion for spending. A deposit proportional to the value
@@ -22,8 +22,8 @@ export namespace Call {
    * - DbWrites: `ProposalCount`, `Proposals`, `origin account`
    * # </weight>
    */
-  export interface propose_spend {
-    type: "propose_spend"
+  export interface proposeSpend {
+    type: "proposeSpend"
     value: types.Compact<types.u128>
     beneficiary: types.sp_runtime.multiaddress.MultiAddress
   }
@@ -38,9 +38,9 @@ export namespace Call {
    * - DbWrites: `Proposals`, `rejected proposer account`
    * # </weight>
    */
-  export interface reject_proposal {
-    type: "reject_proposal"
-    proposal_id: types.Compact<types.u32>
+  export interface rejectProposal {
+    type: "rejectProposal"
+    proposalId: types.Compact<types.u32>
   }
   /**
    * Approve a proposal. At a later time, the proposal will be allocated to the beneficiary
@@ -54,9 +54,9 @@ export namespace Call {
    * - DbWrite: `Approvals`
    * # </weight>
    */
-  export interface approve_proposal {
-    type: "approve_proposal"
-    proposal_id: types.Compact<types.u32>
+  export interface approveProposal {
+    type: "approveProposal"
+    proposalId: types.Compact<types.u32>
   }
   /**
    * Propose and approve a spend of treasury funds.
@@ -90,9 +90,9 @@ export namespace Call {
    * i.e., the proposal has not been approved. This could also mean the proposal does not
    * exist altogether, thus there is no way it would have been approved in the first place.
    */
-  export interface remove_approval {
-    type: "remove_approval"
-    proposal_id: types.Compact<types.u32>
+  export interface removeApproval {
+    type: "removeApproval"
+    proposalId: types.Compact<types.u32>
   }
   /**
    * Put forward a suggestion for spending. A deposit proportional to the value
@@ -105,10 +105,10 @@ export namespace Call {
    * - DbWrites: `ProposalCount`, `Proposals`, `origin account`
    * # </weight>
    */
-  export function propose_spend(
-    value: Omit<types.pallet_treasury.pallet.Call.propose_spend, "type">,
-  ): types.pallet_treasury.pallet.Call.propose_spend {
-    return { type: "propose_spend", ...value }
+  export function proposeSpend(
+    value: Omit<types.pallet_treasury.pallet.Call.proposeSpend, "type">,
+  ): types.pallet_treasury.pallet.Call.proposeSpend {
+    return { type: "proposeSpend", ...value }
   }
   /**
    * Reject a proposed spend. The original deposit will be slashed.
@@ -121,10 +121,10 @@ export namespace Call {
    * - DbWrites: `Proposals`, `rejected proposer account`
    * # </weight>
    */
-  export function reject_proposal(
-    value: Omit<types.pallet_treasury.pallet.Call.reject_proposal, "type">,
-  ): types.pallet_treasury.pallet.Call.reject_proposal {
-    return { type: "reject_proposal", ...value }
+  export function rejectProposal(
+    value: Omit<types.pallet_treasury.pallet.Call.rejectProposal, "type">,
+  ): types.pallet_treasury.pallet.Call.rejectProposal {
+    return { type: "rejectProposal", ...value }
   }
   /**
    * Approve a proposal. At a later time, the proposal will be allocated to the beneficiary
@@ -138,10 +138,10 @@ export namespace Call {
    * - DbWrite: `Approvals`
    * # </weight>
    */
-  export function approve_proposal(
-    value: Omit<types.pallet_treasury.pallet.Call.approve_proposal, "type">,
-  ): types.pallet_treasury.pallet.Call.approve_proposal {
-    return { type: "approve_proposal", ...value }
+  export function approveProposal(
+    value: Omit<types.pallet_treasury.pallet.Call.approveProposal, "type">,
+  ): types.pallet_treasury.pallet.Call.approveProposal {
+    return { type: "approveProposal", ...value }
   }
   /**
    * Propose and approve a spend of treasury funds.
@@ -175,10 +175,10 @@ export namespace Call {
    * i.e., the proposal has not been approved. This could also mean the proposal does not
    * exist altogether, thus there is no way it would have been approved in the first place.
    */
-  export function remove_approval(
-    value: Omit<types.pallet_treasury.pallet.Call.remove_approval, "type">,
-  ): types.pallet_treasury.pallet.Call.remove_approval {
-    return { type: "remove_approval", ...value }
+  export function removeApproval(
+    value: Omit<types.pallet_treasury.pallet.Call.removeApproval, "type">,
+  ): types.pallet_treasury.pallet.Call.removeApproval {
+    return { type: "removeApproval", ...value }
   }
 }
 /** Error for the treasury pallet. */
@@ -204,35 +204,35 @@ export namespace Event {
   /** New proposal. */
   export interface Proposed {
     type: "Proposed"
-    proposal_index: types.u32
+    proposalIndex: types.u32
   }
   /** We have ended a spend period and will now allocate funds. */
   export interface Spending {
     type: "Spending"
-    budget_remaining: types.u128
+    budgetRemaining: types.u128
   }
   /** Some funds have been allocated. */
   export interface Awarded {
     type: "Awarded"
-    proposal_index: types.u32
+    proposalIndex: types.u32
     award: types.u128
     account: types.sp_core.crypto.AccountId32
   }
   /** A proposal was rejected; funds were slashed. */
   export interface Rejected {
     type: "Rejected"
-    proposal_index: types.u32
+    proposalIndex: types.u32
     slashed: types.u128
   }
   /** Some of our funds have been burnt. */
   export interface Burnt {
     type: "Burnt"
-    burnt_funds: types.u128
+    burntFunds: types.u128
   }
   /** Spending has finished; this is the amount that rolls over until next spend. */
   export interface Rollover {
     type: "Rollover"
-    rollover_balance: types.u128
+    rolloverBalance: types.u128
   }
   /** Some funds have been deposited. */
   export interface Deposit {
@@ -242,7 +242,7 @@ export namespace Event {
   /** A new spend proposal has been approved. */
   export interface SpendApproved {
     type: "SpendApproved"
-    proposal_index: types.u32
+    proposalIndex: types.u32
     amount: types.u128
     beneficiary: types.sp_core.crypto.AccountId32
   }

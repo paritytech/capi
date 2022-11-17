@@ -5,8 +5,8 @@ import type * as types from "../../mod.ts"
 export * as pallet from "./pallet.ts"
 
 export interface ParaGenesisArgs {
-  genesis_head: types.polkadot_parachain.primitives.HeadData
-  validation_code: types.polkadot_parachain.primitives.ValidationCode
+  genesisHead: types.polkadot_parachain.primitives.HeadData
+  validationCode: types.polkadot_parachain.primitives.ValidationCode
   parachain: boolean
 }
 
@@ -24,8 +24,8 @@ export type ParaLifecycle =
   | "OffboardingParachain"
 
 export interface ParaPastCodeMeta {
-  upgrade_times: Array<types.polkadot_runtime_parachains.paras.ReplacementTimes>
-  last_pruned: types.u32 | undefined
+  upgradeTimes: Array<types.polkadot_runtime_parachains.paras.ReplacementTimes>
+  lastPruned: types.u32 | undefined
 }
 
 export function ParaPastCodeMeta(value: types.polkadot_runtime_parachains.paras.ParaPastCodeMeta) {
@@ -33,10 +33,10 @@ export function ParaPastCodeMeta(value: types.polkadot_runtime_parachains.paras.
 }
 
 export interface PvfCheckActiveVoteState {
-  votes_accept: $.BitSequence
-  votes_reject: $.BitSequence
+  votesAccept: $.BitSequence
+  votesReject: $.BitSequence
   age: types.u32
-  created_at: types.u32
+  createdAt: types.u32
   causes: Array<types.polkadot_runtime_parachains.paras.PvfCheckCause>
 }
 
@@ -57,7 +57,7 @@ export namespace PvfCheckCause {
   export interface Upgrade {
     type: "Upgrade"
     id: types.polkadot_parachain.primitives.Id
-    relay_parent_number: types.u32
+    relayParentNumber: types.u32
   }
   export function Onboarding(
     value: types.polkadot_runtime_parachains.paras.PvfCheckCause.Onboarding["value"],
@@ -72,8 +72,8 @@ export namespace PvfCheckCause {
 }
 
 export interface ReplacementTimes {
-  expected_at: types.u32
-  activated_at: types.u32
+  expectedAt: types.u32
+  activatedAt: types.u32
 }
 
 export function ReplacementTimes(value: types.polkadot_runtime_parachains.paras.ReplacementTimes) {

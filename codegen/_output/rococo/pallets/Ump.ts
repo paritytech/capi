@@ -120,8 +120,8 @@ export const OverweightCount = new C.fluent.Storage(
  * Events:
  * - `OverweightServiced`: On success.
  */
-export function service_overweight(
-  value: Omit<types.polkadot_runtime_parachains.ump.pallet.Call.service_overweight, "type">,
+export function serviceOverweight(
+  value: Omit<types.polkadot_runtime_parachains.ump.pallet.Call.serviceOverweight, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Ump", value: { ...value, type: "service_overweight" } }
+  return { type: "Ump", value: { ...value, type: "serviceOverweight" } }
 }

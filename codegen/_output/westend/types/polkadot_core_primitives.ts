@@ -9,7 +9,7 @@ export function CandidateHash(value: types.polkadot_core_primitives.CandidateHas
 }
 
 export interface InboundDownwardMessage {
-  sent_at: types.u32
+  sentAt: types.u32
   msg: Uint8Array
 }
 
@@ -20,7 +20,7 @@ export function InboundDownwardMessage(
 }
 
 export interface InboundHrmpMessage {
-  sent_at: types.u32
+  sentAt: types.u32
   data: Uint8Array
 }
 

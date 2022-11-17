@@ -46,8 +46,8 @@ export const BufferedSessionChanges = new C.fluent.Storage(
  * blocks in all relay chain blocks up to and including the given number in the current
  * chain are valid and should be finalized.
  */
-export function force_approve(
-  value: Omit<types.polkadot_runtime_parachains.initializer.pallet.Call.force_approve, "type">,
+export function forceApprove(
+  value: Omit<types.polkadot_runtime_parachains.initializer.pallet.Call.forceApprove, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Initializer", value: { ...value, type: "force_approve" } }
+  return { type: "Initializer", value: { ...value, type: "forceApprove" } }
 }

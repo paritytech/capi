@@ -6,11 +6,11 @@ import type * as types from "../mod.ts"
 
 export type Call =
   | types.pallet_elections_phragmen.pallet.Call.vote
-  | types.pallet_elections_phragmen.pallet.Call.remove_voter
-  | types.pallet_elections_phragmen.pallet.Call.submit_candidacy
-  | types.pallet_elections_phragmen.pallet.Call.renounce_candidacy
-  | types.pallet_elections_phragmen.pallet.Call.remove_member
-  | types.pallet_elections_phragmen.pallet.Call.clean_defunct_voters
+  | types.pallet_elections_phragmen.pallet.Call.removeVoter
+  | types.pallet_elections_phragmen.pallet.Call.submitCandidacy
+  | types.pallet_elections_phragmen.pallet.Call.renounceCandidacy
+  | types.pallet_elections_phragmen.pallet.Call.removeMember
+  | types.pallet_elections_phragmen.pallet.Call.cleanDefunctVoters
 export namespace Call {
   /**
    * Vote for a set of candidates for the upcoming round of election. This can be called to
@@ -49,8 +49,8 @@ export namespace Call {
    *
    * The dispatch origin of this call must be signed and be a voter.
    */
-  export interface remove_voter {
-    type: "remove_voter"
+  export interface removeVoter {
+    type: "removeVoter"
   }
   /**
    * Submit oneself for candidacy. A fixed amount of deposit is recorded.
@@ -69,9 +69,9 @@ export namespace Call {
    * The number of current candidates must be provided as witness data.
    * # </weight>
    */
-  export interface submit_candidacy {
-    type: "submit_candidacy"
-    candidate_count: types.Compact<types.u32>
+  export interface submitCandidacy {
+    type: "submitCandidacy"
+    candidateCount: types.Compact<types.u32>
   }
   /**
    * Renounce one's intention to be a candidate for the next election round. 3 potential
@@ -93,8 +93,8 @@ export namespace Call {
    * The type of renouncing must be provided as witness data.
    * # </weight>
    */
-  export interface renounce_candidacy {
-    type: "renounce_candidacy"
+  export interface renounceCandidacy {
+    type: "renounceCandidacy"
     renouncing: types.pallet_elections_phragmen.Renouncing
   }
   /**
@@ -117,11 +117,11 @@ export namespace Call {
    * will go into phragmen, we assume full block for now.
    * # </weight>
    */
-  export interface remove_member {
-    type: "remove_member"
+  export interface removeMember {
+    type: "removeMember"
     who: types.sp_runtime.multiaddress.MultiAddress
-    slash_bond: boolean
-    rerun_election: boolean
+    slashBond: boolean
+    rerunElection: boolean
   }
   /**
    * Clean all voters who are defunct (i.e. they do not serve any purpose at all). The
@@ -135,10 +135,10 @@ export namespace Call {
    * The total number of voters and those that are defunct must be provided as witness data.
    * # </weight>
    */
-  export interface clean_defunct_voters {
-    type: "clean_defunct_voters"
-    num_voters: types.u32
-    num_defunct: types.u32
+  export interface cleanDefunctVoters {
+    type: "cleanDefunctVoters"
+    numVoters: types.u32
+    numDefunct: types.u32
   }
   /**
    * Vote for a set of candidates for the upcoming round of election. This can be called to
@@ -177,8 +177,8 @@ export namespace Call {
    *
    * The dispatch origin of this call must be signed and be a voter.
    */
-  export function remove_voter(): types.pallet_elections_phragmen.pallet.Call.remove_voter {
-    return { type: "remove_voter" }
+  export function removeVoter(): types.pallet_elections_phragmen.pallet.Call.removeVoter {
+    return { type: "removeVoter" }
   }
   /**
    * Submit oneself for candidacy. A fixed amount of deposit is recorded.
@@ -197,10 +197,10 @@ export namespace Call {
    * The number of current candidates must be provided as witness data.
    * # </weight>
    */
-  export function submit_candidacy(
-    value: Omit<types.pallet_elections_phragmen.pallet.Call.submit_candidacy, "type">,
-  ): types.pallet_elections_phragmen.pallet.Call.submit_candidacy {
-    return { type: "submit_candidacy", ...value }
+  export function submitCandidacy(
+    value: Omit<types.pallet_elections_phragmen.pallet.Call.submitCandidacy, "type">,
+  ): types.pallet_elections_phragmen.pallet.Call.submitCandidacy {
+    return { type: "submitCandidacy", ...value }
   }
   /**
    * Renounce one's intention to be a candidate for the next election round. 3 potential
@@ -222,10 +222,10 @@ export namespace Call {
    * The type of renouncing must be provided as witness data.
    * # </weight>
    */
-  export function renounce_candidacy(
-    value: Omit<types.pallet_elections_phragmen.pallet.Call.renounce_candidacy, "type">,
-  ): types.pallet_elections_phragmen.pallet.Call.renounce_candidacy {
-    return { type: "renounce_candidacy", ...value }
+  export function renounceCandidacy(
+    value: Omit<types.pallet_elections_phragmen.pallet.Call.renounceCandidacy, "type">,
+  ): types.pallet_elections_phragmen.pallet.Call.renounceCandidacy {
+    return { type: "renounceCandidacy", ...value }
   }
   /**
    * Remove a particular member from the set. This is effective immediately and the bond of
@@ -247,10 +247,10 @@ export namespace Call {
    * will go into phragmen, we assume full block for now.
    * # </weight>
    */
-  export function remove_member(
-    value: Omit<types.pallet_elections_phragmen.pallet.Call.remove_member, "type">,
-  ): types.pallet_elections_phragmen.pallet.Call.remove_member {
-    return { type: "remove_member", ...value }
+  export function removeMember(
+    value: Omit<types.pallet_elections_phragmen.pallet.Call.removeMember, "type">,
+  ): types.pallet_elections_phragmen.pallet.Call.removeMember {
+    return { type: "removeMember", ...value }
   }
   /**
    * Clean all voters who are defunct (i.e. they do not serve any purpose at all). The
@@ -264,10 +264,10 @@ export namespace Call {
    * The total number of voters and those that are defunct must be provided as witness data.
    * # </weight>
    */
-  export function clean_defunct_voters(
-    value: Omit<types.pallet_elections_phragmen.pallet.Call.clean_defunct_voters, "type">,
-  ): types.pallet_elections_phragmen.pallet.Call.clean_defunct_voters {
-    return { type: "clean_defunct_voters", ...value }
+  export function cleanDefunctVoters(
+    value: Omit<types.pallet_elections_phragmen.pallet.Call.cleanDefunctVoters, "type">,
+  ): types.pallet_elections_phragmen.pallet.Call.cleanDefunctVoters {
+    return { type: "cleanDefunctVoters", ...value }
   }
 }
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
@@ -310,7 +310,7 @@ export namespace Event {
    */
   export interface NewTerm {
     type: "NewTerm"
-    new_members: Array<[types.sp_core.crypto.AccountId32, types.u128]>
+    newMembers: Array<[types.sp_core.crypto.AccountId32, types.u128]>
   }
   /**
    * No (or not enough) candidates existed for this round. This is different from
@@ -350,7 +350,7 @@ export namespace Event {
   /** A seat holder was slashed by amount by being forcefully removed from the set. */
   export interface SeatHolderSlashed {
     type: "SeatHolderSlashed"
-    seat_holder: types.sp_core.crypto.AccountId32
+    seatHolder: types.sp_core.crypto.AccountId32
     amount: types.u128
   }
   /**

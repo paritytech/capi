@@ -11,7 +11,7 @@ export interface OpenTip {
   deposit: types.u128
   closes: types.u32 | undefined
   tips: Array<[types.sp_core.crypto.AccountId32, types.u128]>
-  finders_fee: boolean
+  findersFee: boolean
 }
 
 export function OpenTip(value: types.pallet_tips.OpenTip) {

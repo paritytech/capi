@@ -52,10 +52,10 @@ export const Reasons = new C.fluent.Storage(
  * - DbWrites: `Reasons`, `Tips`
  * # </weight>
  */
-export function report_awesome(
-  value: Omit<types.pallet_tips.pallet.Call.report_awesome, "type">,
+export function reportAwesome(
+  value: Omit<types.pallet_tips.pallet.Call.reportAwesome, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Tips", value: { ...value, type: "report_awesome" } }
+  return { type: "Tips", value: { ...value, type: "reportAwesome" } }
 }
 
 /**
@@ -79,10 +79,10 @@ export function report_awesome(
  * - DbWrites: `Reasons`, `Tips`, `origin account`
  * # </weight>
  */
-export function retract_tip(
-  value: Omit<types.pallet_tips.pallet.Call.retract_tip, "type">,
+export function retractTip(
+  value: Omit<types.pallet_tips.pallet.Call.retractTip, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Tips", value: { ...value, type: "retract_tip" } }
+  return { type: "Tips", value: { ...value, type: "retractTip" } }
 }
 
 /**
@@ -109,10 +109,10 @@ export function retract_tip(
  * - DbWrites: `Reasons`, `Tips`
  * # </weight>
  */
-export function tip_new(
-  value: Omit<types.pallet_tips.pallet.Call.tip_new, "type">,
+export function tipNew(
+  value: Omit<types.pallet_tips.pallet.Call.tipNew, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Tips", value: { ...value, type: "tip_new" } }
+  return { type: "Tips", value: { ...value, type: "tipNew" } }
 }
 
 /**
@@ -165,10 +165,10 @@ export function tip(
  * - DbWrites: `Reasons`, `Tips`, `Tippers`, `tip finder`
  * # </weight>
  */
-export function close_tip(
-  value: Omit<types.pallet_tips.pallet.Call.close_tip, "type">,
+export function closeTip(
+  value: Omit<types.pallet_tips.pallet.Call.closeTip, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Tips", value: { ...value, type: "close_tip" } }
+  return { type: "Tips", value: { ...value, type: "closeTip" } }
 }
 
 /**
@@ -185,8 +185,8 @@ export function close_tip(
  *   The actual cost depends on the implementation of `T::Tippers`.
  * # </weight>
  */
-export function slash_tip(
-  value: Omit<types.pallet_tips.pallet.Call.slash_tip, "type">,
+export function slashTip(
+  value: Omit<types.pallet_tips.pallet.Call.slashTip, "type">,
 ): types.polkadot_runtime.RuntimeCall {
-  return { type: "Tips", value: { ...value, type: "slash_tip" } }
+  return { type: "Tips", value: { ...value, type: "slashTip" } }
 }

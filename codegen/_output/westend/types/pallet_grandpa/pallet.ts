@@ -5,9 +5,9 @@ import type * as types from "../mod.ts"
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 
 export type Call =
-  | types.pallet_grandpa.pallet.Call.report_equivocation
-  | types.pallet_grandpa.pallet.Call.report_equivocation_unsigned
-  | types.pallet_grandpa.pallet.Call.note_stalled
+  | types.pallet_grandpa.pallet.Call.reportEquivocation
+  | types.pallet_grandpa.pallet.Call.reportEquivocationUnsigned
+  | types.pallet_grandpa.pallet.Call.noteStalled
 export namespace Call {
   /**
    * Report voter equivocation/misbehavior. This method will verify the
@@ -15,10 +15,10 @@ export namespace Call {
    * against the extracted offender. If both are valid, the offence
    * will be reported.
    */
-  export interface report_equivocation {
-    type: "report_equivocation"
-    equivocation_proof: types.sp_finality_grandpa.EquivocationProof
-    key_owner_proof: types.sp_session.MembershipProof
+  export interface reportEquivocation {
+    type: "reportEquivocation"
+    equivocationProof: types.sp_finality_grandpa.EquivocationProof
+    keyOwnerProof: types.sp_session.MembershipProof
   }
   /**
    * Report voter equivocation/misbehavior. This method will verify the
@@ -31,10 +31,10 @@ export namespace Call {
    * if the block author is defined it will be defined as the equivocation
    * reporter.
    */
-  export interface report_equivocation_unsigned {
-    type: "report_equivocation_unsigned"
-    equivocation_proof: types.sp_finality_grandpa.EquivocationProof
-    key_owner_proof: types.sp_session.MembershipProof
+  export interface reportEquivocationUnsigned {
+    type: "reportEquivocationUnsigned"
+    equivocationProof: types.sp_finality_grandpa.EquivocationProof
+    keyOwnerProof: types.sp_session.MembershipProof
   }
   /**
    * Note that the current authority set of the GRANDPA finality gadget has stalled.
@@ -50,10 +50,10 @@ export namespace Call {
    *
    * Only callable by root.
    */
-  export interface note_stalled {
-    type: "note_stalled"
+  export interface noteStalled {
+    type: "noteStalled"
     delay: types.u32
-    best_finalized_block_number: types.u32
+    bestFinalizedBlockNumber: types.u32
   }
   /**
    * Report voter equivocation/misbehavior. This method will verify the
@@ -61,10 +61,10 @@ export namespace Call {
    * against the extracted offender. If both are valid, the offence
    * will be reported.
    */
-  export function report_equivocation(
-    value: Omit<types.pallet_grandpa.pallet.Call.report_equivocation, "type">,
-  ): types.pallet_grandpa.pallet.Call.report_equivocation {
-    return { type: "report_equivocation", ...value }
+  export function reportEquivocation(
+    value: Omit<types.pallet_grandpa.pallet.Call.reportEquivocation, "type">,
+  ): types.pallet_grandpa.pallet.Call.reportEquivocation {
+    return { type: "reportEquivocation", ...value }
   }
   /**
    * Report voter equivocation/misbehavior. This method will verify the
@@ -77,10 +77,10 @@ export namespace Call {
    * if the block author is defined it will be defined as the equivocation
    * reporter.
    */
-  export function report_equivocation_unsigned(
-    value: Omit<types.pallet_grandpa.pallet.Call.report_equivocation_unsigned, "type">,
-  ): types.pallet_grandpa.pallet.Call.report_equivocation_unsigned {
-    return { type: "report_equivocation_unsigned", ...value }
+  export function reportEquivocationUnsigned(
+    value: Omit<types.pallet_grandpa.pallet.Call.reportEquivocationUnsigned, "type">,
+  ): types.pallet_grandpa.pallet.Call.reportEquivocationUnsigned {
+    return { type: "reportEquivocationUnsigned", ...value }
   }
   /**
    * Note that the current authority set of the GRANDPA finality gadget has stalled.
@@ -96,10 +96,10 @@ export namespace Call {
    *
    * Only callable by root.
    */
-  export function note_stalled(
-    value: Omit<types.pallet_grandpa.pallet.Call.note_stalled, "type">,
-  ): types.pallet_grandpa.pallet.Call.note_stalled {
-    return { type: "note_stalled", ...value }
+  export function noteStalled(
+    value: Omit<types.pallet_grandpa.pallet.Call.noteStalled, "type">,
+  ): types.pallet_grandpa.pallet.Call.noteStalled {
+    return { type: "noteStalled", ...value }
   }
 }
 /** Custom [dispatch errors](https://docs.substrate.io/main-docs/build/events-errors/) of this pallet. */
@@ -122,7 +122,7 @@ export namespace Event {
   /** New authority set has been applied. */
   export interface NewAuthorities {
     type: "NewAuthorities"
-    authority_set: Array<[types.sp_finality_grandpa.app.Public, types.u64]>
+    authoritySet: Array<[types.sp_finality_grandpa.app.Public, types.u64]>
   }
   /** Current authority set has been paused. */
   export interface Paused {

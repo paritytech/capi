@@ -5,8 +5,8 @@ import type * as types from "../mod.ts"
 /** Contains one variant per dispatchable that can be called by an extrinsic. */
 
 export type Call =
-  | types.pallet_session.pallet.Call.set_keys
-  | types.pallet_session.pallet.Call.purge_keys
+  | types.pallet_session.pallet.Call.setKeys
+  | types.pallet_session.pallet.Call.purgeKeys
 export namespace Call {
   /**
    * Sets the session key(s) of the function caller to `keys`.
@@ -24,8 +24,8 @@ export namespace Call {
    * - DbWrites per key id: `KeyOwner`
    * # </weight>
    */
-  export interface set_keys {
-    type: "set_keys"
+  export interface setKeys {
+    type: "setKeys"
     keys: types.polkadot_runtime.SessionKeys
     proof: Uint8Array
   }
@@ -47,8 +47,8 @@ export namespace Call {
    * - DbWrites per key id: `KeyOwner`
    * # </weight>
    */
-  export interface purge_keys {
-    type: "purge_keys"
+  export interface purgeKeys {
+    type: "purgeKeys"
   }
   /**
    * Sets the session key(s) of the function caller to `keys`.
@@ -66,10 +66,10 @@ export namespace Call {
    * - DbWrites per key id: `KeyOwner`
    * # </weight>
    */
-  export function set_keys(
-    value: Omit<types.pallet_session.pallet.Call.set_keys, "type">,
-  ): types.pallet_session.pallet.Call.set_keys {
-    return { type: "set_keys", ...value }
+  export function setKeys(
+    value: Omit<types.pallet_session.pallet.Call.setKeys, "type">,
+  ): types.pallet_session.pallet.Call.setKeys {
+    return { type: "setKeys", ...value }
   }
   /**
    * Removes any session key(s) of the function caller.
@@ -89,8 +89,8 @@ export namespace Call {
    * - DbWrites per key id: `KeyOwner`
    * # </weight>
    */
-  export function purge_keys(): types.pallet_session.pallet.Call.purge_keys {
-    return { type: "purge_keys" }
+  export function purgeKeys(): types.pallet_session.pallet.Call.purgeKeys {
+    return { type: "purgeKeys" }
   }
 }
 /** Error for the session pallet. */
@@ -111,7 +111,7 @@ export namespace Event {
    */
   export interface NewSession {
     type: "NewSession"
-    session_index: types.u32
+    sessionIndex: types.u32
   }
   /**
    * New session has happened. Note that the argument is the session index, not the
