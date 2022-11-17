@@ -1,9 +1,9 @@
 import { createTestPairs } from "https://deno.land/x/polkadot@0.0.8/keyring/mod.ts"
 import { TypeRegistry } from "https://deno.land/x/polkadot@0.0.8/types/mod.ts"
 
-import * as C from "../mod.ts"
-import * as T from "../test_util/mod.ts"
-import * as U from "../util/mod.ts"
+import * as C from "#capi/mod.ts"
+import * as T from "#capi/test_util/mod.ts"
+import * as U from "#capi/util/mod.ts"
 
 const root = C.extrinsic(T.westend)({
   sender: T.alice.address,

@@ -1,7 +1,7 @@
-import * as T from "../test_util/mod.ts"
-import * as U from "../util/mod.ts"
+import * as T from "#capi/test_util/mod.ts"
+import * as U from "#capi/util/mod.ts"
 
-import { System } from "../codegen/_output/polkadot/pallets/mod.ts"
+import { System } from "#capi/dev:polkadot/@v0.9.31/pallets/mod.ts"
 
 const root = System.Account.entry(T.alice.publicKey).read()
 

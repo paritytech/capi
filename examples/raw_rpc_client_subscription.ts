@@ -1,6 +1,6 @@
-import { assertNotInstanceOf } from "../deps/std/testing/asserts.ts"
-import * as T from "../test_util/mod.ts"
-import * as U from "../util/mod.ts"
+import { assertNotInstanceOf } from "#capi/deps/std/testing/asserts.ts"
+import * as T from "#capi/test_util/mod.ts"
+import * as U from "#capi/util/mod.ts"
 
 const client = await T.polkadot.client
 

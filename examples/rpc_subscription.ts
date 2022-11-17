@@ -1,6 +1,6 @@
-import * as C from "../mod.ts"
-import * as T from "../test_util/mod.ts"
-import * as U from "../util/mod.ts"
+import * as C from "#capi/mod.ts"
+import * as T from "#capi/test_util/mod.ts"
+import * as U from "#capi/util/mod.ts"
 
 const root = C.chain.unsubscribeNewHeads(T.polkadot)(
   C.chain.subscribeNewHeads(T.polkadot)([], function(header) {

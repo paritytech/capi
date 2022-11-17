@@ -31,4 +31,5 @@ jobs:
           key: ${{ runner.os }}-deno-${{ hashFiles('lock.json', 'deps/**/*.ts') }}
       - name: Setup Polkadot
         uses: ./.github/actions/setup-polkadot
+      - run: deno task codegen
       - run: deno task run ${{ matrix.example_path }}
