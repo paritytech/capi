@@ -1,0 +1,14 @@
+{
+  "scopes": {
+    "examples/": {
+      "#capi/": "./",
+      "#capi/dev:westend/": "./target/codegen/generated/@local/dev:westend/",
+      "#capi/dev:polkadot/": "./target/codegen/generated/@local/dev:polkadot/",
+      "#capi/dev:rococo/": "./target/codegen/generated/@local/dev:rococo/",
+      "#capi/dev:kusama/": "./target/codegen/generated/@local/dev:kusama/"
+    },
+    "target/codegen/generated/": {
+      "/@local/": "./"
+    }
+  }
+}

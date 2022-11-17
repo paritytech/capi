@@ -8,7 +8,7 @@ import { S } from "./utils.ts"
 export interface CodegenProps {
   metadata: M.Metadata
   importSpecifier: string
-  clientFile: string
+  clientDecl: string
 }
 
 export function codegen(props: CodegenProps): Files {
@@ -25,9 +25,9 @@ export function codegen(props: CodegenProps): Files {
     "capi.ts",
     () =>
       `\
-export const C = await import("" + ${S.string(props.importSpecifier)})
-export const { $ } = C;
-export const { client } = await import("" + ${S.string(props.clientFile)})
+export { $ } from ${S.string(props.importSpecifier)}
+export * as C from ${S.string(props.importSpecifier)}
+${props.clientDecl}
 `,
   )
 

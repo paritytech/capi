@@ -1,5 +1,5 @@
-import * as C from "../mod.ts"
-import * as U from "../util/mod.ts"
+import * as C from "#capi/mod.ts"
+import * as U from "#capi/util/mod.ts"
 
 const ids = C.entryRead(C.polkadot)("Paras", "Parachains", [])
   .access("value")

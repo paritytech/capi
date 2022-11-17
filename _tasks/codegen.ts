@@ -1,24 +1,24 @@
-import { codegen } from "../codegen/mod.ts"
+import { FsCache } from "../codegen/cache.ts"
+import { CodegenServer } from "../codegen/serve.ts"
+import * as fs from "../deps/std/fs.ts"
 import * as path from "../deps/std/path.ts"
-import * as C from "../mod.ts"
-import * as testClients from "../test_util/clients/mod.ts"
-import * as U from "../util/mod.ts"
 
-const currentDir = path.dirname(path.fromFileUrl(import.meta.url))
-const codegenDir = path.join(currentDir, "../codegen/_output")
+const cacheDir = "target/codegen"
+await fs.emptyDir(path.join(cacheDir, "generated"))
+const cache = new FsCache(cacheDir)
+const port = 5646
+console.log(`http://localhost:${port}/`)
+new CodegenServer(cache).listen(port)
 
-await Deno.remove(codegenDir, { recursive: true })
+await Deno.run({
+  cmd: [
+    "deno",
+    "cache",
+    "--import-map",
+    "import_map_localhost.json",
+    `--reload=http://localhost:${port}/`,
+    "examples/mod.ts",
+  ],
+}).status()
 
-await Promise.all(
-  Object.entries(testClients).map(async ([runtime, client]) => {
-    // if (runtime !== "polkadot") return
-    const metadata = U.throwIfError(await C.metadata(client)().run())
-    const outDir = path.join(codegenDir, runtime)
-    await codegen({
-      importSpecifier: "../../../mod.ts",
-      clientFile: `../../../test_util/clients/${runtime}.ts`,
-      metadata,
-    })
-      .write(outDir)
-  }),
-)
+Deno.exit(0)

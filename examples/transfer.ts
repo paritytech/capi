@@ -1,9 +1,9 @@
-import * as C from "../mod.ts"
-import * as T from "../test_util/mod.ts"
-import * as U from "../util/mod.ts"
+import * as C from "#capi/mod.ts"
+import * as T from "#capi/test_util/mod.ts"
+import * as U from "#capi/util/mod.ts"
 
-import { extrinsic } from "../codegen/_output/westend/mod.ts"
-import { Balances } from "../codegen/_output/westend/pallets/mod.ts"
+import { extrinsic } from "#capi/dev:westend/@v0.9.31/mod.ts"
+import { Balances } from "#capi/dev:westend/@v0.9.31/pallets/mod.ts"
 
 let hash: undefined | C.rpc.known.Hash
 
