@@ -1,13 +1,29 @@
 // deno-lint-ignore-file require-await
 
 import { tsFormatter } from "../deps/dprint.ts"
+import * as $ from "../deps/scale.ts"
 import * as C from "../mod.ts"
 import * as T from "../test_util/mod.ts"
 import * as U from "../util/mod.ts"
 import { TimedMemo } from "../util/mod.ts"
-import { Cache } from "./cache.ts"
+import { Cache, FsCache } from "./cache.ts"
 import { Files } from "./Files.ts"
 import { codegen } from "./mod.ts"
+
+const suggestedChainSpecs = [
+  "dev:polkadot",
+  "dev:westend",
+  "dev:rococo",
+  "dev:kusama",
+  "wss:rpc.polkadot.io",
+  "wss:kusama-rpc.polkadot.io",
+  // "wss://acala-polkadot.api.onfinality.io/public-ws/",
+  "wss:rococo-contracts-rpc.polkadot.io",
+  "wss:wss.api.moonbeam.network",
+  "wss:statemint-rpc.polkadot.io",
+  "wss:para.subsocial.network",
+  "wss:westend-rpc.polkadot.io",
+]
 
 export class CodegenServer {
   constructor(readonly cache: Cache) {}
@@ -28,24 +44,33 @@ capi@${this.version}
   }
 
   async serveHttp(conn: Deno.Conn) {
-    const httpConn = Deno.serveHttp(conn)
-    for await (const event of httpConn) {
-      event.respondWith(
-        this.handleRequest(event.request).then(async (r) => {
-          return r
-        }).catch((e) => {
-          if (e instanceof Response) return e
-          return new Response(Deno.inspect(e), { status: 500 })
-        }),
-      )
+    try {
+      const httpConn = Deno.serveHttp(conn)
+      for await (const event of httpConn) {
+        event.respondWith(
+          this.handleRequest(event.request).then(async (r) => {
+            return r
+          }).catch((e) => {
+            if (e instanceof Response) return e
+            return new Response(Deno.inspect(e), { status: 500 })
+          }),
+        )
+      }
+    } catch (e) {
+      console.error(e)
     }
   }
 
   static rWithCapiVersion = /^\/@([^\/]+)(\/.*)?$/
-  static rWithChainSpec = /^\/(dev:\w+|wss?:\/\/(?:[^\/]+\/)+)\/(?:@([^\/]+)\/)?(.*)$/
+  static rWithChainSpec = /^\/(dev:\w+|wss?:[^\/]+)\/(?:@([^\/]+)\/)?(.*)$/
+  static rImportIntellisense =
+    /^\/\.well-known\/deno-import-intellisense\.json$|^\/import-intellisense\/.*$/
   async handleRequest(request: Request): Promise<Response> {
     let path = new URL(request.url).pathname
     console.log(path)
+    if (path === "/.well-known/deno-import-intellisense.json") {
+      return this.handleImportIntellisenseRequest(request, path)
+    }
     let match = CodegenServer.rWithCapiVersion.exec(path)
     if (!match) {
       return this.redirect(`/@${this.version}${path}`)
@@ -62,6 +87,11 @@ capi@${this.version}
     if ((match = CodegenServer.rWithChainSpec.exec(path))) {
       const [, chainSpec, chainVersion, filePath] = match
       return this.handleChainRequest(request, chainSpec!, chainVersion, filePath!)
+    }
+    console.log(path)
+    if ((match = CodegenServer.rImportIntellisense.exec(path))) {
+      console.log("hi")
+      return this.handleImportIntellisenseRequest(request, path)
     }
     if (path.endsWith(".ts")) {
       const res = await fetch(this.capiFile("." + path))
@@ -91,27 +121,127 @@ capi@${this.version}
       await this.cache.getRaw(
         `generated/@${this.version}/${chainSpec}/@${chainVersion}/${filePath}`,
         async () => {
-          const metadata = await this.getMetadata(chainSpec, chainVersion)
-          const files = U.getOrInit(this.filesMemo, metadata, () => {
-            return codegen({
-              metadata,
-              clientDecl: chainSpec.startsWith("dev:")
-                ? `
-import { LocalClientEffect } from ${JSON.stringify(`/@${this.version}/test_util/local.ts`)}
-export const client = new LocalClientEffect(${JSON.stringify(chainSpec.slice(4))})
-                `
-                : `
-export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chainSpec)})
-                `,
-              importSpecifier: `/@${this.version}/mod.ts`,
-            })
-          })
+          const files = await this.getFiles(chainSpec, chainVersion)
           const file = files.get(filePath)
           if (!file) throw this.e404()
           return new TextEncoder().encode(tsFormatter.formatText(filePath, file()))
         },
       ),
     )
+  }
+
+  async getFiles(chainSpec: string, chainVersion: string) {
+    const metadata = await this.getMetadata(chainSpec, chainVersion)
+    return U.getOrInit(this.filesMemo, metadata, () => {
+      return codegen({
+        metadata,
+        clientDecl: chainSpec.startsWith("dev:")
+          ? `
+import { LocalClientEffect } from ${JSON.stringify(`/@${this.version}/test_util/local.ts`)}
+export const client = new LocalClientEffect(${JSON.stringify(chainSpec.slice(4))})
+          `
+          : `
+export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chainSpec)})
+          `,
+        importSpecifier: `/@${this.version}/mod.ts`,
+      })
+    })
+  }
+
+  static $fileIndex = $.array($.str)
+  async getFilesIndex(chainSpec: string, chainVersion: string) {
+    return await this.cache.get(
+      `generated/@${this.version}/${chainSpec}/@${chainVersion}/_index.json`,
+      CodegenServer.$fileIndex,
+      async () => {
+        const files = await this.getFiles(chainSpec, chainVersion)
+        return [...files.keys()]
+      },
+    )
+  }
+
+  async handleImportIntellisenseRequest(request: Request, path: string) {
+    if (path === "/.well-known/deno-import-intellisense.json") {
+      return this.json({
+        version: 2,
+        registries: [
+          {
+            schema:
+              "/:version(@[^/]+)?/:chainSpec(dev:\\w+|wss?:[^/]+)/:chainVersion(@[^/]+)?/:filePath*",
+            variables: [
+              { key: "version", url: "/import-intellisense/version" },
+              { key: "chainSpec", url: "/${version}/import-intellisense/chainSpec" },
+              {
+                key: "chainVersion",
+                url: "/${version}/import-intellisense/chainVersion/${chainSpec}/${chainVersion}",
+              },
+              {
+                key: "filePath",
+                url:
+                  "/${version}/import-intellisense/filePath/${chainSpec}/${chainVersion}/${filePath}",
+              },
+            ],
+          },
+        ],
+      })
+    }
+    const parts = path.slice(1).split("/")
+    console.log(parts)
+    if (parts[0] !== "import-intellisense") return this.e404()
+    if (parts[1] === "version") {
+      return this.json({
+        items: ["@" + this.version],
+        preselect: "@" + this.version,
+      })
+    }
+    if (parts[1] === "chainSpec") {
+      return this.json({
+        items: suggestedChainSpecs,
+      })
+    }
+    if (parts[1] === "chainVersion") {
+      const chainSpec = parts[2]!
+      const version = await this.getLatestChainVersion(chainSpec)
+      console.log(version)
+      return this.json({ items: ["@" + version], preselect: "@" + version })
+    }
+    if (parts[1] === "filePath") {
+      const chainSpec = parts[2]!
+      const chainVersion = parts[3]?.slice(1) ?? await this.getLatestChainVersion(chainSpec)
+      const filesIndex = await this.getFilesIndex(chainSpec, chainVersion)
+      let dir = parts.slice(4).join("/") + "/"
+      let result
+      while (true) {
+        if (dir === "/") dir = ""
+        result = [
+          ...new Set(
+            filesIndex.filter((x) => x.startsWith(dir)).map((x) =>
+              dir + x.slice(dir.length).replace(/\/.*$/, "/")
+            ),
+          ),
+        ].sort((a, b) =>
+          (+(b === dir + "mod.ts") - +(a === dir + "mod.ts"))
+          || (+b.endsWith("/") - +a.endsWith("/"))
+          || (a < b ? -1 : 1)
+        )
+        console.log(dir, result)
+        if (!result.length && dir) {
+          dir = dir.replace(/[^\/]+\/$/, "")
+          continue
+        }
+        break
+      }
+      return this.json({ items: result, isIncomplete: true, preselect: dir + "mod.ts" })
+    }
+    return this.e404()
+  }
+
+  json(body: unknown) {
+    return new Response(JSON.stringify(body), {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
   }
 
   ts(request: Request, body: string | Uint8Array) {
@@ -190,7 +320,7 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
       }
       return T[runtime]
     } else {
-      return C.rpcClient(C.rpc.proxyProvider, chainSpec)
+      return C.rpcClient(C.rpc.proxyProvider, chainSpec.replace(/:/, "://"))
     }
   }
 
@@ -203,4 +333,8 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
   capiFile(path: string) {
     return new URL(path, new URL("..", import.meta.url)).toString()
   }
+}
+
+if (import.meta.main) {
+  new CodegenServer(new FsCache("target/codegen")).listen(5646)
 }
