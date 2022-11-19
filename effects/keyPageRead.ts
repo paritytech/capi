@@ -41,6 +41,5 @@ export function keyPageRead<Client extends Z.$<rpc.Client>>(client: Client) {
           return $key.decode(U.hex.decode(keyEncoded))
         })
       }, k0_)
-      .zoned("KeyPageRead")
   }
 }

@@ -21,7 +21,6 @@ export function rpcClient<
     .next(([_, discoveryValue]) => {
       return new rpc.Client(provider, discoveryValue as DiscoveryValue)
     }, k0_)
-    .zoned("RpcClient")
 }
 
 export function rpcCall<Params extends unknown[], Result>(method: string, nonIdempotent?: boolean) {
@@ -44,13 +43,12 @@ export function rpcCall<Params extends unknown[], Result>(method: string, nonIde
           }
           return result.result
         }, k1_)
-        .zoned("RpcCall")
     }
   }
 }
 
 // TODO: why are leading type params unknown when `extends Z.$Client<any, SendErrorData, HandlerErrorData, CloseErrorData>`?
-export function rpcSubscription<Params extends unknown[], Result>() {
+export function rpcSubscription<Params extends unknown[], Event>() {
   return <SubscribeMethod extends string>(
     subscribeMethod: SubscribeMethod,
     unsubscribeMethod: string,
@@ -58,32 +56,30 @@ export function rpcSubscription<Params extends unknown[], Result>() {
     return <Client_ extends Z.$<rpc.Client>>(client: Client_) => {
       return <
         Params_ extends Z.Ls$<Params>,
-        EndResult,
-        Listener extends Z.$<U.Listener<Result, rpc.ClientSubscribeContext, EndResult>>,
-      >(params: [...Params_], listener: Listener) => {
+        CreateListener extends Z.$<U.CreateListener<rpc.ClientSubscriptionContext, Event>>,
+      >(params: [...Params_], createListener: CreateListener) => {
         return Z
-          .rc(client, listener, ...params)
-          .next(async ([[client, listener, ...params], counter]) => {
-            type ClientE = typeof client[rpc.ClientE_]
-            const id = client.providerRef.nextId()
-            const result = await client.subscribe<SubscribeMethod, Result>(
-              id,
-              subscribeMethod,
-              unsubscribeMethod,
-              ...params,
-              // TODO: fix this typing
-            )(function(e) {
-              if (e instanceof Error) {
-                return this.end(e)
-              } else if (e.error) {
-                return this.end(new RpcServerError(e))
+          .rc(client, createListener, ...params)
+          .next(async ([[client, createListener, ...params], counter]) => {
+            const result = await client.subscriptionFactory<
+              Params,
+              Event
+            >()(subscribeMethod, unsubscribeMethod, params as [...Params], (ctx) => {
+              const inner = createListener(ctx)
+              return (e) => {
+                if (e instanceof Error) {
+                  return ctx.end(e)
+                } else if (e.error) {
+                  return ctx.end(new RpcServerError(e))
+                }
+                return inner(e.params.result) as ReturnType<ReturnType<Z.T<CreateListener>>>
               }
-              return listener.apply(this, [e.params.result]) as U.End<EndResult>
             })
-            const discardCheckResult = await discardCheck<ClientE["close"]>(client, counter)
+            const discardCheckResult = await discardCheck<
+              typeof client[rpc.ClientE_]["close"]
+            >(client, counter)
             return discardCheckResult || result!
           }, k2_)
-          .zoned("RpcSubscription")
       }
     }
   }

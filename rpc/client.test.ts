@@ -36,23 +36,24 @@ Deno.test({
       async fn() {
         let subscriptionId: string
         const events: msg.NotificationMessage<"chain_subscribeAllHeads", known.Header>[] = []
-        const stoppedSubscriptionId = await client.subscribe<
+        const stoppedSubscriptionId = await client.subscriptionFactory<[], known.Header>()(
           "chain_subscribeAllHeads",
-          known.Header
-        >(client.providerRef.nextId(), "chain_subscribeAllHeads", "chain_unsubscribeNewHeads")(
-          function(event) {
-            const counter = this.state(U.Counter)
-            A.assertNotInstanceOf(event, Error)
-            A.assert(!event.error)
-            A.assertExists(event.params.result.parentHash)
-            subscriptionId = event.params.subscription
-            events.push(event)
-            if (counter.i === 2) {
-              return this.end("HELLO")
-            }
-            counter.inc()
-            return
-          },
+          "chain_unsubscribeNewHeads",
+          [],
+          (ctx) =>
+            (e) => {
+              const counter = ctx.state(U.Counter)
+              A.assertNotInstanceOf(e, Error)
+              A.assert(!e.error)
+              A.assertExists(e.params.result.parentHash)
+              subscriptionId = e.params.subscription
+              events.push(e)
+              if (counter.i === 2) {
+                return ctx.end("HELLO")
+              }
+              counter.inc()
+              return
+            },
         )
         A.assertEquals(events.length, 3)
         A.assertEquals(stoppedSubscriptionId, subscriptionId!)

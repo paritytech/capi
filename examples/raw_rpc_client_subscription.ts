@@ -4,20 +4,22 @@ import * as U from "#capi/util/mod.ts"
 
 const client = await T.polkadot.client
 
-const result = await client.subscribe(
-  client.providerRef.nextId(),
+const result = await client.subscriptionFactory()(
   "chain_subscribeAllHeads",
   "chain_unsubscribeNewHeads",
-)(function(e) {
-  assertNotInstanceOf(e, Error)
-  console.log(e)
-  const counter = this.state(U.Counter)
-  if (counter.i === 2) {
-    return this.end(true)
-  }
-  counter.inc()
-  return
-})
+  [],
+  (ctx) =>
+    (e) => {
+      assertNotInstanceOf(e, Error)
+      console.log(e)
+      const counter = ctx.state(U.Counter)
+      if (counter.i === 2) {
+        return ctx.end(true)
+      }
+      counter.inc()
+      return
+    },
+)
 
 // cspell:disable-next-line
 console.log(`${result ? "S" : "Uns"}uccessfully unsubscribed`)

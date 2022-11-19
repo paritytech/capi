@@ -120,11 +120,14 @@ export class SignedExtrinsic<
     this.extrinsicDecoded = scale.scaleDecoded($extrinsic_, this.extrinsicBytes, "extrinsic")
   }
 
-  watch<Listener extends Z.$<U.Listener<rpc.known.TransactionStatus, rpc.ClientSubscribeContext>>>(
+  watch<
+    Listener extends Z.$<
+      U.CreateListener<rpc.ClientSubscriptionContext, rpc.known.TransactionStatus>
+    >,
+  >(
     listener: Listener,
   ) {
     return author.submitAndWatchExtrinsic(this.client)([this.extrinsicHex], listener)
-      .zoned("ExtrinsicWatch")
   }
 
   get sent() {

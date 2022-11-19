@@ -25,13 +25,15 @@ const existentialDeposit = extrinsic({
   }),
 })
   .signed(T.alice.sign)
-  .watch(function(status) {
-    console.log(`Existential deposit:`, status)
-    if (C.rpc.known.TransactionStatus.isTerminal(status)) {
-      return this.end()
+  .watch(({ end }) =>
+    (status) => {
+      console.log(`Existential deposit:`, status)
+      if (C.rpc.known.TransactionStatus.isTerminal(status)) {
+        return end()
+      }
+      return
     }
-    return
-  })
+  )
 
 // First approval root
 const proposal = createOrApproveMultisigProposal("Proposal", T.alice)
@@ -79,12 +81,10 @@ function createOrApproveMultisigProposal<
   })
     .feeEstimate
     .access("weight")
-    .next((weight) => {
-      return {
-        refTime: BigInt(weight.ref_time),
-        proofSize: BigInt(weight.proof_size),
-      }
-    })
+    .next((weight) => ({
+      refTime: BigInt(weight.ref_time),
+      proofSize: BigInt(weight.proof_size),
+    }))
   return extrinsic({
     sender: pair.address,
     call: C.Z.call.fac(Multisig.asMulti, null!)(C.Z.rec({
@@ -97,11 +97,13 @@ function createOrApproveMultisigProposal<
     })),
   })
     .signed(pair.sign)
-    .watch(function(status) {
-      console.log(`${label}:`, status)
-      if (C.rpc.known.TransactionStatus.isTerminal(status)) {
-        return this.end("HELLO")
+    .watch(({ end }) =>
+      (status) => {
+        console.log(`${label}:`, status)
+        if (C.rpc.known.TransactionStatus.isTerminal(status)) {
+          return end("HELLO")
+        }
+        return
       }
-      return
-    })
+    )
 }
