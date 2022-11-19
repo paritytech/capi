@@ -1,5 +1,4 @@
 .DS_Store
 .env
-_star.ts
 benches.json
 target

@@ -8,9 +8,9 @@ for await (
     skip: [/^target\//],
   })
 ) {
-  generated += `import ${JSON.stringify(`./${entry.path}`)};\n`
+  generated += `import ${JSON.stringify(`../${entry.path}`)};\n`
 }
 
-const dest = path.join(Deno.cwd(), "_star.ts")
+const dest = path.join(Deno.cwd(), "target/star.ts")
 console.log(`Writing "${dest}".`)
 await Deno.writeTextFile(dest, generated)
