@@ -8,9 +8,11 @@ for await (
     skip: [/^target\//],
   })
 ) {
-  generated += `import ${JSON.stringify(`./${entry.path}`)};\n`
+  generated += `import ${JSON.stringify(`../${entry.path}`)};\n`
 }
 
-const dest = path.join(Deno.cwd(), "_star.ts")
+const dir = path.join(Deno.cwd(), "target")
+await fs.ensureDir(dir)
+const dest = path.join(dir, "star.ts")
 console.log(`Writing "${dest}".`)
 await Deno.writeTextFile(dest, generated)
