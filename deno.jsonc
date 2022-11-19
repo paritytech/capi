@@ -29,7 +29,7 @@
     "run:browser": "deno task run test_util/ctx.ts -- deno task run _tasks/run_browser.ts",
     "debug": "deno task run --inspect-brk",
     "download:frame_metadata": "deno task run _tasks/download_frame_metadata.ts",
-    "udd": "deno task star && deno task run https://deno.land/x/udd@0.5.0/main.ts star.ts",
+    "udd": "deno task star && deno task run https://deno.land/x/udd@0.5.0/main.ts target/star.ts",
     "dnt": "deno task run _tasks/dnt.ts",
     "star": "deno task run _tasks/star.ts && deno cache --check --no-lock target/star.ts",
     "lint": "deno lint",
