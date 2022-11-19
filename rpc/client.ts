@@ -55,7 +55,7 @@ export class Client<
         delete this.activeSubscriptions[id]
         this.subscriptionStates.delete(id)
       }
-    } else if (e.id) {
+    } else if (typeof e.id === "number") {
       const pendingCall = this.pendingCalls[e.id]
       pendingCall?.resolve(e)
       delete this.pendingCalls[e.id]
@@ -104,15 +104,14 @@ export class Client<
           delete this.activeSubscriptions[activeSubscriptionId]
         }
         delete this.activeSubscriptionByMessageId[id]
-        // TODO: utilize the error
-        const _maybeError = await this.call(
+        await this.call(
           this.providerRef.nextId(),
           unsubscribeMethod,
           activeSubscriptionId,
         )
         waiter.resolve(value)
       }
-      const listenerBound = createListener({
+      const listener = createListener({
         state: (ctor) => {
           const messageState = getOrInit(this.subscriptionStates, id, () => new WeakMap())
           return getOrInit(messageState, ctor, () => new ctor())
@@ -129,7 +128,7 @@ export class Client<
         }
       }
       this.pendingSubscriptions[id] = (event) => {
-        const result = listenerBound(event)
+        const result = listener(event)
         if (result instanceof Promise) {
           result.then(maybeStop)
         } else {
@@ -139,7 +138,7 @@ export class Client<
       ;(async () => {
         const maybeError = await this.call(id, subscribeMethod, ...params)
         if (maybeError instanceof Error || maybeError.error) {
-          listenerBound(maybeError)
+          listener(maybeError)
           stop()
         }
       })()

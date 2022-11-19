@@ -14,8 +14,8 @@ const ex = extrinsic({
 })
   .signed(T.alice.sign)
 
-const finalizedIn = ex.watch(({ end }) => {
-  return (status) => {
+const finalizedIn = ex.watch(({ end }) =>
+  (status) => {
     console.log(status)
     if (typeof status !== "string" && status.finalized) {
       return end(status.finalized)
@@ -24,7 +24,7 @@ const finalizedIn = ex.watch(({ end }) => {
     }
     return
   }
-})
+)
 
 console.log(U.throwIfError(await C.events(ex, finalizedIn).run()))
 
