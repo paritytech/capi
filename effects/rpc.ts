@@ -33,7 +33,7 @@ export function rpcCall<Params extends unknown[], Result>(method: string, nonIde
           // TODO: why do we need to explicitly type this / why is this not being inferred?
           const id = client.providerRef.nextId()
           const result: rpc.ClientCallEvent<ClientE["send"], ClientE["handler"], Result> =
-            await client.call<Result>(id, method, ...params)
+            await client.call<Result>(id, method, params)
           const discardCheckResult = await discardCheck<ClientE["close"]>(client, counter)
           if (discardCheckResult) return discardCheckResult
           if (result instanceof Error) {

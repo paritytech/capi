@@ -1,5 +1,4 @@
 import { Deferred, deferred } from "../deps/std/async.ts"
-import { getOrInit } from "../util/mod.ts"
 import * as U from "../util/mod.ts"
 import * as msg from "./messages.ts"
 import { Provider, ProviderListener } from "./provider/base.ts"
@@ -27,7 +26,6 @@ export class Client<
   pendingSubscriptions: SubscriptionListeners<SendErrorData, HandlerErrorData> = {}
   activeSubscriptions: SubscriptionListeners<SendErrorData, HandlerErrorData> = {}
   activeSubscriptionByMessageId: Record<string, string> = {}
-  subscriptionStates = new Map<string, WeakMap<new() => any, any>>()
 
   constructor(
     readonly provider: Provider<DiscoveryValue, SendErrorData, HandlerErrorData, CloseErrorData>,
@@ -53,7 +51,6 @@ export class Client<
       for (const id in this.activeSubscriptions) {
         this.activeSubscriptions[id]!(e)
         delete this.activeSubscriptions[id]
-        this.subscriptionStates.delete(id)
       }
     } else if (typeof e.id === "number") {
       const pendingCall = this.pendingCalls[e.id]
@@ -73,7 +70,7 @@ export class Client<
     }
   }
 
-  call: ClientCall<SendErrorData, HandlerErrorData> = (id, method, ...params) => {
+  call: ClientCall<SendErrorData, HandlerErrorData> = (id, method, params) => {
     const waiter = deferred<ClientCallEvent<SendErrorData, HandlerErrorData>>()
     this.pendingCalls[id] = waiter
     this.providerRef.send({
@@ -102,22 +99,21 @@ export class Client<
         const activeSubscriptionId = this.activeSubscriptionByMessageId[id]
         if (activeSubscriptionId) {
           delete this.activeSubscriptions[activeSubscriptionId]
+          await this.call(
+            this.providerRef.nextId(),
+            unsubscribeMethod,
+            [activeSubscriptionId],
+          )
         }
         delete this.activeSubscriptionByMessageId[id]
-        await this.call(
-          this.providerRef.nextId(),
-          unsubscribeMethod,
-          activeSubscriptionId,
-        )
         waiter.resolve(value)
       }
       const listener = createListener({
-        state: (ctor) => {
-          const messageState = getOrInit(this.subscriptionStates, id, () => new WeakMap())
-          return getOrInit(messageState, ctor, () => new ctor())
-        },
-        end<T = void>(value: T = undefined!): U.End<T> {
+        end(value = undefined!) {
           return new U.End(value)
+        },
+        endIfError(value) {
+          return (value instanceof Error ? new U.End(value) : undefined) as any
         },
       })
       const maybeStop = (maybeEnd: unknown) => {
@@ -136,7 +132,7 @@ export class Client<
         }
       }
       ;(async () => {
-        const maybeError = await this.call(id, subscribeMethod, ...params)
+        const maybeError = await this.call(id, subscribeMethod, params)
         if (maybeError instanceof Error || maybeError.error) {
           listener(maybeError)
           stop()
@@ -150,7 +146,6 @@ export class Client<
     this.pendingSubscriptions = {}
     this.activeSubscriptions = {}
     this.activeSubscriptionByMessageId = {}
-    this.subscriptionStates.clear()
     return this.providerRef.release()
   }
 }
@@ -164,7 +159,7 @@ export type ClientCallEvent<SendErrorData, HandlerErrorData, Result = any> =
 export type ClientCall<SendErrorData, HandlerErrorData> = <Result = any>(
   id: number | string,
   method: string,
-  ...params: unknown[]
+  params: unknown[],
 ) => Promise<ClientCallEvent<SendErrorData, HandlerErrorData, Result>>
 
 export type ClientSubscriptionEvent<
@@ -215,6 +210,6 @@ export type CreateClientSubscriptionListener<
 >
 
 export interface ClientSubscriptionContext {
-  state: <T>(ctor: new() => T) => T
   end: <T>(value?: T) => U.End<T>
+  endIfError<I>(value: I): U.End<Extract<I, Error>>
 }

@@ -1,6 +1,5 @@
 import { assertNotInstanceOf } from "#capi/deps/std/testing/asserts.ts"
 import * as T from "#capi/test_util/mod.ts"
-import * as U from "#capi/util/mod.ts"
 
 const client = await T.polkadot.client
 
@@ -8,17 +7,18 @@ const result = await client.subscriptionFactory()(
   "chain_subscribeAllHeads",
   "chain_unsubscribeNewHeads",
   [],
-  (ctx) =>
-    (e) => {
+  (ctx) => {
+    let i = 0
+    return (e) => {
       assertNotInstanceOf(e, Error)
       console.log(e)
-      const counter = ctx.state(U.Counter)
-      if (counter.i === 2) {
+      if (i === 2) {
         return ctx.end(true)
       }
-      counter.inc()
+      i++
       return
-    },
+    }
+  },
 )
 
 // cspell:disable-next-line

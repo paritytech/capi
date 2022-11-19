@@ -101,7 +101,7 @@ function createOrApproveMultisigProposal<
       (status) => {
         console.log(`${label}:`, status)
         if (C.rpc.known.TransactionStatus.isTerminal(status)) {
-          return end("HELLO")
+          return end()
         }
         return
       }

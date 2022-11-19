@@ -24,7 +24,7 @@ export type ProviderListener<SendErrorData, HandlerErrorData> = U.Listener<
 >
 
 export interface ProviderRef<CloseErrorData> {
-  nextId(): number | string
+  nextId(): number
   send(message: msg.EgressMessage): void
   release(): Promise<undefined | ProviderCloseError<CloseErrorData>>
 }
