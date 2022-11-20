@@ -14,4 +14,7 @@ export type ListenerResult<CreateListener_ extends CreateListener> = Exclude<
   void
 >["value"]
 
+export type InnerEnd<CreateListener_ extends CreateListener> =
+  [ListenerResult<CreateListener_>] extends [void] ? never : End<ListenerResult<CreateListener_>>
+
 // TODO: util for mapping over `CreateListener`

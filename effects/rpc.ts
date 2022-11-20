@@ -58,6 +58,7 @@ export function rpcSubscription<Params extends unknown[], Event>() {
         Params_ extends Z.Ls$<Params>,
         CreateListener extends Z.$<U.CreateListener<rpc.ClientSubscriptionContext, Event>>,
       >(params: [...Params_], createListener: CreateListener) => {
+        type ClientE = Z.T<Client_>[rpc.ClientE_]
         return Z
           .rc(client, createListener, ...params)
           .next(async ([[client, createListener, ...params], counter]) => {
@@ -66,19 +67,23 @@ export function rpcSubscription<Params extends unknown[], Event>() {
               Event
             >()(subscribeMethod, unsubscribeMethod, params as [...Params], (ctx) => {
               const inner = createListener(ctx)
-              return (e) => {
+              return (e_) => {
+                const e = e_ as rpc.ClientSubscriptionEvent<
+                  Z.T<SubscribeMethod>,
+                  Event,
+                  ClientE["send"],
+                  ClientE["handler"]
+                >
                 if (e instanceof Error) {
                   return ctx.end(e)
                 } else if (e.error) {
                   return ctx.end(new RpcServerError(e))
                 }
-                return inner(e.params.result) as ReturnType<ReturnType<Z.T<CreateListener>>>
+                return inner(e.params.result) as U.InnerEnd<Z.T<CreateListener>>
               }
             })
-            const discardCheckResult = await discardCheck<
-              typeof client[rpc.ClientE_]["close"]
-            >(client, counter)
-            return discardCheckResult || result!
+            const discardCheckResult = await discardCheck<ClientE["close"]>(client, counter)
+            return discardCheckResult || result
           }, k2_)
       }
     }

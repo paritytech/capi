@@ -136,15 +136,11 @@ export class SignedExtrinsic<
 }
 
 // TODO: attach to extrinsics sent.finalized result once zones-level method addition implemented
-export function extrinsicsDecoded<
-  Client extends Z.$<rpc.Client>,
-  Hexes extends Z.$<rpc.known.Hex[]>,
->(client: Client, hexes: Hexes) {
-  return Z
-    .ls($extrinsic(client), hexes)
-    .next(([$extrinsic, hexes]) => {
-      return hexes.map((hex) => $extrinsic.decode(U.hex.decode(hex)))
-    })
+export function extrinsicsDecoded<Client extends Z.$<rpc.Client>>(client: Client) {
+  return <Hexes extends Z.$<rpc.known.Hex[]>>(hexes: Hexes) =>
+    Z.ls($extrinsic(client), hexes).next(([$extrinsic, hexes]) =>
+      hexes.map((hex) => $extrinsic.decode(U.hex.decode(hex)))
+    )
 }
 
 function $extrinsic<

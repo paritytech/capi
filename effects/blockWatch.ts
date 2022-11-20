@@ -5,22 +5,25 @@ import { chain } from "./rpc_known_methods.ts"
 
 const k0_ = Symbol()
 
+// TODO: replace this once contramap util implemented
 export function blockWatch<Client extends Z.$<rpc.Client>>(client: Client) {
   return <
     CreateListener extends Z.$<U.CreateListener<BlockWatchListenerContext, rpc.known.SignedBlock>>,
   >(createListener: CreateListener) => {
     const createListenerMapped = Z
       .ls(createListener, Z.env)
-      .next(([createListener, env]) => {
-        return (ctx: rpc.ClientSubscriptionContext) => {
+      .next(([createListener, env]) =>
+        (ctx: rpc.ClientSubscriptionContext) => {
           const inner = createListener({ ...ctx, env })
           return async (header: rpc.known.Header) => {
             const blockHash = chain.getBlockHash(client)(header.number)
             const block = await chain.getBlock(client)(blockHash).bind(env)()
-            return block instanceof Error ? ctx.end(block) : inner(block)
+            if (block instanceof Error) {
+              return ctx.end(block)
+            }
+            return inner(block) as U.InnerEnd<Z.T<CreateListener>>
           }
-        }
-      }, k0_)
+        }, k0_)
     return chain.subscribeNewHeads(client)([], createListenerMapped)
   }
 }
