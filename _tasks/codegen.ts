@@ -1,14 +1,11 @@
-import { FsCache } from "../codegen/cache.ts"
-import { CodegenServer } from "../codegen/serve.ts"
+import { LocalCodegenServer } from "../codegen/serve.ts"
 import * as fs from "../deps/std/fs.ts"
-import * as path from "../deps/std/path.ts"
 
-const cacheDir = "target/codegen"
-await fs.emptyDir(path.join(cacheDir, "generated"))
-const cache = new FsCache(cacheDir)
+const server = new AbortController()
+await fs.emptyDir("target/codegen/generated")
 const port = 5646
 console.log(`http://localhost:${port}/`)
-new CodegenServer(cache, []).listen(port)
+new LocalCodegenServer().listen(port, server.signal)
 
 await Deno.run({
   cmd: [
@@ -21,4 +18,4 @@ await Deno.run({
   ],
 }).status()
 
-Deno.exit(0)
+server.abort()
