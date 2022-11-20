@@ -85,9 +85,7 @@ export abstract class CodegenServer {
     }
     if (!path) return this.redirect(`/@${version}/`)
     if (path === "/") {
-      return this.html(`<pre>
-      capi@${this.version}
-      </pre>`)
+      return this.html(`<pre>capi@${this.version}</pre>`)
     }
     if (path.startsWith("/proxy/")) {
       if (!(match = CodegenServer.rWithChainUrl.exec(path))) return this.e404()
