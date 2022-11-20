@@ -21,6 +21,13 @@ export abstract class Cache {
       return value
     })
   }
+
+  abstract _list(prefix: string): Promise<string[]>
+
+  listMemo = new WeakMemo<string, string[]>()
+  list(prefix: string) {
+    return this.listMemo.run(prefix, () => this._list(prefix))
+  }
 }
 
 export class FsCache extends Cache {
@@ -39,5 +46,13 @@ export class FsCache extends Cache {
       await Deno.writeFile(file, content)
       return content
     }
+  }
+
+  async _list(prefix: string): Promise<string[]> {
+    const result = []
+    for await (const entry of Deno.readDir(path.join(this.location, prefix))) {
+      result.push(path.posix.join(prefix, entry.name))
+    }
+    return result
   }
 }

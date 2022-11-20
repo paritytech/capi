@@ -147,54 +147,39 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
     if (path === "/.well-known/deno-import-intellisense.json") {
       return this.json({
         version: 2,
-        registries: [true].flatMap((hasVersion) => {
-          const versionSchema = hasVersion ? "/:version(@[^/]*)" : ""
-          const versionVariables = hasVersion
-            ? [{ key: "version", url: "/import-intellisense/version" }]
-            : []
-          const versionUrl = hasVersion ? "/${version}" : ""
-          return [
-            {
-              schema: (versionSchema ? versionSchema + "?" : "") + "/:filePath*",
-              variables: [
-                ...versionVariables,
-                {
-                  key: "filePath",
-                  url: versionUrl + "/import-intellisense/modFilePath/${filePath}",
-                },
-              ],
-            },
-            ...[true].map((hasChainVersion) => {
-              const chainVersionSchema = hasChainVersion ? "/:chainVersion(@[^/]+)" : ""
-              const chainVersionPlaceholder = hasChainVersion ? "${chainVersion}" : "_"
-              const chainVersionVariables = hasChainVersion
-                ? [{
-                  key: "chainVersion",
-                  url: versionUrl
-                    + "/import-intellisense/chainVersion/${chainUrl}/${chainVersion}",
-                }]
-                : []
-              return {
-                schema: versionSchema
-                  + `/:_proxy(proxy)/:chainUrl(dev:\\w*|wss?:[^/]*)${chainVersionSchema}/:filePath*`,
-                variables: [
-                  ...versionVariables,
-                  { key: "_proxy", url: "/import-intellisense/null" },
-                  {
-                    key: "chainUrl",
-                    url: versionUrl + "/import-intellisense/chainUrl/${chainUrl}",
-                  },
-                  ...chainVersionVariables,
-                  {
-                    key: "filePath",
-                    url: versionUrl
-                      + `/import-intellisense/genFilePath/\${chainUrl}/${chainVersionPlaceholder}/\${filePath}`,
-                  },
-                ],
-              }
-            }),
-          ]
-        }),
+        registries: [
+          {
+            schema: "/:version(@[^/]*)?/:filePath*",
+            variables: [
+              { key: "version", url: "/import-intellisense/version" },
+              {
+                key: "filePath",
+                url: "/${version}/import-intellisense/modFilePath/${filePath}",
+              },
+            ],
+          },
+          {
+            schema:
+              "/:version(@[^/]*)/:_proxy(proxy)/:chainUrl(dev:\\w*|wss?:[^/]*)/:chainVersion(@[^/]+)/:filePath*",
+            variables: [
+              { key: "version", url: "/import-intellisense/version" },
+              { key: "_proxy", url: "/import-intellisense/null" },
+              {
+                key: "chainUrl",
+                url: "/${version}/import-intellisense/chainUrl/${chainUrl}",
+              },
+              {
+                key: "chainVersion",
+                url: "/${version}/import-intellisense/chainVersion/${chainUrl}/${chainVersion}",
+              },
+              {
+                key: "filePath",
+                url:
+                  "/${version}/import-intellisense/genFilePath/${chainUrl}/${chainVersion}/${filePath}",
+              },
+            ],
+          },
+        ],
       })
     }
     const parts = path.slice(1).split("/")
@@ -220,8 +205,12 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
     }
     if (parts[1] === "chainVersion") {
       const chainUrl = parts[2]!
-      const version = await this.getLatestChainVersion(chainUrl)
-      return this.json({ items: ["@" + version], preselect: "@" + version })
+      const [latest, other] = await Promise.all([
+        this.getLatestChainVersion(chainUrl),
+        this.cache.list(`metadata/${chainUrl}/`).then((x) => x.map((x) => x.split("/").at(-1)!)),
+      ])
+      const versions = [...new Set([latest, ...other])]
+      return this.json({ items: versions.map((x) => "@" + x), preselect: "@" + versions[0] })
     }
     if (parts[1] === "modFilePath") {
       if (parts[2] === "proxy" || parts[2]?.startsWith("@")) return this.json({ items: [] })
@@ -267,7 +256,6 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
   }
 
   json(body: unknown) {
-    console.log(body)
     return new Response(JSON.stringify(body), {
       headers: {
         "Content-Type": "application/json",

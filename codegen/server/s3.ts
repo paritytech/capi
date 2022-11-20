@@ -7,6 +7,7 @@ export class S3Cache extends Cache {
     super()
     this.bucket = new S3Bucket(config)
   }
+
   async _getRaw(key: string, init: () => Promise<Uint8Array>) {
     const res = await this.bucket.getObject(key)
     if (res) {
@@ -15,5 +16,11 @@ export class S3Cache extends Cache {
     const value = await init()
     await this.bucket.putObject(key, value)
     return value
+  }
+
+  async _list(prefix: string): Promise<string[]> {
+    return (await this.bucket.listObjects({
+      prefix,
+    }))?.contents?.map((x) => x.key!).filter((x) => x) ?? []
   }
 }
