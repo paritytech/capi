@@ -21,9 +21,10 @@ export class ProdCodegenServer extends CodegenServer {
     this.modIndex = Promise.resolve(modIndex)
   }
 
-  async getDefaultVersion() {
-    // TODO: uncomment this before merging
-    // return (await this.tags())[0]!
+  async getDefaultVersion(request: Request) {
+    if (new URL(request.url).host === "capi.dev") {
+      return (await this.tags())[0]!
+    }
     return this.version
   }
 

@@ -29,7 +29,7 @@ const suggestedChainUrls = [
 ]
 
 export abstract class CodegenServer {
-  abstract getDefaultVersion(): Promise<string>
+  abstract getDefaultVersion(request: Request): Promise<string>
   abstract version: string
   abstract cache: Cache
   abstract modIndex: Promise<string[]>
@@ -77,7 +77,7 @@ export abstract class CodegenServer {
     }
     let match = CodegenServer.rWithCapiVersion.exec(path)
     if (!match) {
-      return this.redirect(`/@${await this.getDefaultVersion()}${path}`)
+      return this.redirect(`/@${await this.getDefaultVersion(request)}${path}`)
     }
     const version = match[1]!
     path = match[2] ?? "/"
