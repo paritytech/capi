@@ -158,6 +158,7 @@ schnorrkel
 secp
 serayuzgur
 serde
+shiki
 sibz
 smoldot
 spiritnet
