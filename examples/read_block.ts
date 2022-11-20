@@ -5,6 +5,6 @@ import * as U from "#capi/util/mod.ts"
 const extrinsicsRaw = C.chain.getBlock(C.polkadot)()
   .access("block")
   .access("extrinsics")
-const root = C.extrinsicsDecoded(T.polkadot, extrinsicsRaw)
+const root = C.extrinsicsDecoded(T.polkadot)(extrinsicsRaw)
 
 console.log(U.throwIfError(await root.run()))
