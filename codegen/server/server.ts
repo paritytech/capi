@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.165.0/http/server.ts"
+import { escapeHtml } from "https://deno.land/x/escape@1.4.2/mod.ts"
 import { tsFormatter } from "../../deps/dprint.ts"
 import * as $ from "../../deps/scale.ts"
 import * as C from "../../mod.ts"
@@ -301,7 +302,7 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
     if (request.headers.get("Accept")?.split(",").includes("text/html")) {
       if (typeof body !== "string") body = new TextDecoder().decode(body)
       return this.html(
-        `<h3><code>${new URL(request.url).pathname}</code></h3><pre>${body}</pre>`,
+        `<h3><code>${new URL(request.url).pathname}</code></h3><pre>${escapeHtml(body)}</pre>`,
       )
     }
     return new Response(body, {
