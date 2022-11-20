@@ -1,4 +1,5 @@
 import * as M from "../frame_metadata/mod.ts"
+import { hex } from "../mod.ts"
 import { normalizeCase } from "../util/case.ts"
 import { Files } from "./Files.ts"
 import { getRawCodecPath, makeDocComment, S } from "./utils.ts"
@@ -86,6 +87,17 @@ import { $, C, client } from "../capi.ts"
               + `{ return { type: ${S.string(pallet.name)}, value: ${data} } }`,
           )
         }
+      }
+      for (const constant of pallet.constants) {
+        items.push(
+          makeDocComment(constant.docs)
+            + `export const ${constant.name}: ${
+              typeVisitor.visit(constant.ty)
+            } = codecs.$${constant.ty.id}.decode(C.hex.decode(${
+              S.string(hex.encode(constant.value))
+            } as C.Hex))`,
+        )
+        constant.value
       }
       return items.join("\n\n")
     })
