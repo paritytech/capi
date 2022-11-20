@@ -8,7 +8,7 @@ await fs.emptyDir(path.join(cacheDir, "generated"))
 const cache = new FsCache(cacheDir)
 const port = 5646
 console.log(`http://localhost:${port}/`)
-new CodegenServer(cache).listen(port)
+new CodegenServer(cache, []).listen(port)
 
 await Deno.run({
   cmd: [

@@ -2,8 +2,8 @@ import * as C from "#capi/mod.ts"
 import * as T from "#capi/test_util/mod.ts"
 import * as U from "#capi/util/mod.ts"
 
-import { extrinsic } from "#capi/dev:polkadot/@v0.9.31/mod.ts"
-import { Balances, Multisig, System } from "#capi/dev:polkadot/@v0.9.31/pallets/mod.ts"
+import { extrinsic } from "#capi/proxy/dev:polkadot/@v0.9.31/mod.ts"
+import { Balances, Multisig, System } from "#capi/proxy/dev:polkadot/@v0.9.31/pallets/mod.ts"
 
 // FIXME: remove this check once the Zones .bind(env) fix is merged
 const hostname = Deno.env.get("TEST_CTX_HOSTNAME")
