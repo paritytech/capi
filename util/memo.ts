@@ -1,5 +1,3 @@
-// deno-lint-ignore-file require-await
-
 import { getOrInit } from "./map.ts"
 
 export class AsyncMemo<K, V> {

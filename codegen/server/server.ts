@@ -1,14 +1,13 @@
-// deno-lint-ignore-file require-await
-
-import { tsFormatter } from "../deps/dprint.ts"
-import * as $ from "../deps/scale.ts"
-import * as C from "../mod.ts"
-import * as T from "../test_util/mod.ts"
-import * as U from "../util/mod.ts"
-import { TimedMemo } from "../util/mod.ts"
-import { Cache, FsCache } from "./cache.ts"
-import { Files } from "./Files.ts"
-import { codegen } from "./mod.ts"
+import { serve } from "https://deno.land/std@0.165.0/http/server.ts"
+import { tsFormatter } from "../../deps/dprint.ts"
+import * as $ from "../../deps/scale.ts"
+import * as C from "../../mod.ts"
+import * as T from "../../test_util/mod.ts"
+import * as U from "../../util/mod.ts"
+import { TimedMemo } from "../../util/mod.ts"
+import { Files } from "../Files.ts"
+import { codegen } from "../mod.ts"
+import { Cache } from "./cache.ts"
 
 const suggestedChainUrls = [
   "dev:polkadot",
@@ -25,22 +24,24 @@ const suggestedChainUrls = [
   "wss:westend-rpc.polkadot.io",
 ]
 
-export class CodegenServer {
-  constructor(readonly cache: Cache, readonly modIndex: string[]) {}
-  version = "local"
+export abstract class CodegenServer {
+  abstract getDefaultVersion(): Promise<string>
+  abstract version: string
+  abstract cache: Cache
+  abstract modIndex: Promise<string[]>
+  abstract handleModRequest(request: Request, path: string): Promise<Response>
+  abstract delegateRequest(request: Request, version: string, path: string): Promise<Response>
+  abstract getVersionSuggestions(partial: string): Promise<string[]>
 
   metadataMemo = new Map<string, Promise<[string, C.M.Metadata]>>()
   filesMemo = new Map<C.M.Metadata, Files>()
 
-  landingHtml = `<pre>
-capi@${this.version}
-</pre>`
-
-  async listen(port: number) {
-    const server = Deno.listen({ port })
-    for await (const conn of server) {
-      this.serveHttp(conn)
-    }
+  listen(port: number, signal?: AbortSignal) {
+    return serve((req) =>
+      this.handleRequest(req).catch((e) => {
+        if (e instanceof Response) return e
+        return new Response(Deno.inspect(e), { status: 500 })
+      }), { port, signal })
   }
 
   async serveHttp(conn: Deno.Conn) {
@@ -63,8 +64,6 @@ capi@${this.version}
 
   static rWithCapiVersion = /^\/@([^\/]+)(\/.*)?$/
   static rWithChainUrl = /^\/proxy\/(dev:\w+|wss?:[^\/]+)\/(?:@([^\/]+)\/)?(.*)$/
-  static rImportIntellisense =
-    /^\/\.well-known\/deno-import-intellisense\.json$|^\/import-intellisense\/.*$/
   async handleRequest(request: Request): Promise<Response> {
     let path = new URL(request.url).pathname
     console.log(path)
@@ -73,30 +72,28 @@ capi@${this.version}
     }
     let match = CodegenServer.rWithCapiVersion.exec(path)
     if (!match) {
-      return this.redirect(`/@${this.version}${path}`)
+      return this.redirect(`/@${await this.getDefaultVersion()}${path}`)
     }
     const version = match[1]!
+    path = match[2] ?? "/"
     if (version !== this.version) {
-      return this.eUnimplemented()
+      return this.delegateRequest(request, version, path)
     }
-    path = match[2]!
     if (!path) return this.redirect(`/@${version}/`)
     if (path === "/") {
-      return this.html(this.landingHtml)
+      return this.html(`<pre>
+      capi@${this.version}
+      </pre>`)
     }
-    if ((match = CodegenServer.rWithChainUrl.exec(path))) {
+    if (path.startsWith("/proxy/")) {
+      if (!(match = CodegenServer.rWithChainUrl.exec(path))) return this.e404()
       const [, chainUrl, chainVersion, filePath] = match
       return this.handleChainRequest(request, chainUrl!, chainVersion, filePath!)
     }
-    if ((match = CodegenServer.rImportIntellisense.exec(path))) {
+    if (path.startsWith("/import-intellisense/")) {
       return this.handleImportIntellisenseRequest(path)
     }
-    if (path.endsWith(".ts")) {
-      const res = await fetch(this.capiFile("." + path))
-      if (!res.ok) return this.e404()
-      return this.ts(request, await res.text())
-    }
-    return this.e404()
+    return this.handleModRequest(request, path)
   }
 
   async handleChainRequest(
@@ -111,9 +108,11 @@ capi@${this.version}
         `/@${this.version}/proxy/${chainUrl}/@${latestChainVersion}/${filePath}`,
       )
     }
-    if (chainVersion !== this.normalizeVersion(chainVersion)) {
+    if (chainVersion !== this.normalizeChainVersion(chainVersion)) {
       return this.redirect(
-        `/@${this.version}/proxy/${chainUrl}/@${this.normalizeVersion(chainVersion)}/${filePath}`,
+        `/@${this.version}/proxy/${chainUrl}/@${
+          this.normalizeChainVersion(chainVersion)
+        }/${filePath}`,
       )
     }
     return this.ts(
@@ -164,8 +163,8 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
     if (path === "/.well-known/deno-import-intellisense.json") {
       return this.json({
         version: 2,
-        registries: [true, false].flatMap((hasVersion) => {
-          const versionSchema = hasVersion ? "/:version(@[^/]+)" : ""
+        registries: [true].flatMap((hasVersion) => {
+          const versionSchema = hasVersion ? "/:version(@[^/]*)" : ""
           const versionVariables = hasVersion
             ? [{ key: "version", url: "/import-intellisense/version" }]
             : []
@@ -181,7 +180,7 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
                 },
               ],
             },
-            ...[true, false].map((hasChainVersion) => {
+            ...[true].map((hasChainVersion) => {
               const chainVersionSchema = hasChainVersion ? "/:chainVersion(@[^/]+)" : ""
               const chainVersionPlaceholder = hasChainVersion ? "${chainVersion}" : "_"
               const chainVersionVariables = hasChainVersion
@@ -221,9 +220,12 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
       return this.json({ items: [] })
     }
     if (parts[1] === "version") {
+      const suggestions = await this.getVersionSuggestions(parts[2] ?? "")
+      console.log(suggestions)
       return this.json({
-        items: ["@" + this.version],
-        preselect: "@" + this.version,
+        items: suggestions.map((x) => "@" + x),
+        isIncomplete: true,
+        preselect: "@" + suggestions[0],
       })
     }
     if (parts[1] === "chainUrl") {
@@ -239,7 +241,7 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
     }
     if (parts[1] === "modFilePath") {
       if (parts[2] === "proxy" || parts[2]?.startsWith("@")) return this.json({ items: [] })
-      const result = this.filePathIntellisense(this.modIndex, parts.slice(2))
+      const result = this.filePathIntellisense(await this.modIndex, parts.slice(2))
       if (!parts[3]) {
         result.items.unshift("proxy/")
         result.preselect = "proxy/"
@@ -250,6 +252,7 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
       const chainUrl = parts[2]!
       const chainVersion = parts[3]?.slice(1) || await this.getLatestChainVersion(chainUrl)
       const filesIndex = await this.getFilesIndex(chainUrl, chainVersion)
+      console.log(filesIndex)
       return this.json(this.filePathIntellisense(filesIndex, parts.slice(4)))
     }
     return this.e404()
@@ -281,6 +284,7 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
   }
 
   json(body: unknown) {
+    console.log(body)
     return new Response(JSON.stringify(body), {
       headers: {
         "Content-Type": "application/json",
@@ -333,7 +337,8 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
     return this.getLatestChainVersionMemo.run(chainUrl, async () => {
       const client = this.getClient(chainUrl)
       const chainVersion = U.throwIfError(
-        await C.rpcCall("system_version")(client)().as<string>().next(this.normalizeVersion).run(),
+        await C.rpcCall("system_version")(client)().as<string>().next(this.normalizeChainVersion)
+          .run(),
       )
       return chainVersion
     })
@@ -344,11 +349,11 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
       const client = this.getClient(chainUrl)
       const [chainVersion, metadata] = U.throwIfError(
         await C.Z.ls(
-          C.rpcCall("system_version")(client)().as<string>().next(this.normalizeVersion),
+          C.rpcCall("system_version")(client)().as<string>().next(this.normalizeChainVersion),
           C.metadata(client)(),
         ).run(),
       )
-      if (this.normalizeVersion(version) !== chainVersion) {
+      if (this.normalizeChainVersion(version) !== chainVersion) {
         console.log(version, chainVersion)
         throw new Error("Outdated version")
       }
@@ -368,29 +373,9 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
     }
   }
 
-  normalizeVersion(version: string) {
+  normalizeChainVersion(version: string) {
     if (!version.startsWith("v")) version = "v" + version
     if (version.includes("-")) version = version.split("-")[0]!
     return version
   }
-
-  capiFile(path: string) {
-    return new URL(path, new URL("..", import.meta.url)).toString()
-  }
-}
-
-if (import.meta.main) {
-  const modIndex = await getModIndex()
-  console.log("listening")
-  new CodegenServer(new FsCache("target/codegen"), modIndex).listen(5646)
-}
-
-export async function getModIndex() {
-  const cmd = Deno.run({
-    cmd: ["git", "ls-files"],
-    stdout: "piped",
-  })
-  if (!(await cmd.status()).success) throw new Error("git ls-files failed")
-  const output = new TextDecoder().decode(await cmd.output())
-  return output.split("\n").filter((x) => x.endsWith(".ts"))
 }
