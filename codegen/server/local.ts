@@ -11,7 +11,7 @@ export class LocalCodegenServer extends CodegenServer {
     return this.version
   }
   async handleModRequest(request: Request, path: string): Promise<Response> {
-    const res = await fetch(new URL(".." + path, import.meta.url))
+    const res = await fetch(new URL("../.." + path, import.meta.url))
     if (!res.ok) return this.e404()
     return this.ts(request, await res.text())
   }

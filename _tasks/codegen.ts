@@ -1,4 +1,4 @@
-import { LocalCodegenServer } from "../codegen/serve.ts"
+import { LocalCodegenServer } from "../codegen/server/local.ts"
 import * as fs from "../deps/std/fs.ts"
 
 const server = new AbortController()
