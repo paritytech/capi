@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.165.0/http/server.ts"
-import { escapeHtml } from "https://deno.land/x/escape@1.4.2/mod.ts"
 import { tsFormatter } from "../../deps/dprint.ts"
 import * as $ from "../../deps/scale.ts"
 import * as C from "../../mod.ts"
@@ -9,6 +8,7 @@ import { TimedMemo } from "../../util/mod.ts"
 import { Files } from "../Files.ts"
 import { codegen } from "../mod.ts"
 import { Cache } from "./cache.ts"
+import { highlighter } from "./highlighter.ts"
 
 const suggestedDevChains = [
   "dev:polkadot",
@@ -302,7 +302,31 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
     if (request.headers.get("Accept")?.split(",").includes("text/html")) {
       if (typeof body !== "string") body = new TextDecoder().decode(body)
       return this.html(
-        `<h3><code>${new URL(request.url).pathname}</code></h3><pre>${escapeHtml(body)}</pre>`,
+        `\
+<style>
+  body {
+    color: ${highlighter.getForegroundColor()};
+    background-color: ${highlighter.getBackgroundColor()};
+  }
+  .shiki {
+    counter-reset: line;
+    counter-increment: line 0;
+  }
+  .shiki .line::before {
+    content: counter(line);
+    counter-increment: line;
+    width: 5ch;
+    margin-right: 2ch;
+    display: inline-block;
+    text-align: right;
+    color: rgba(115,138,148,.4)
+  }
+</style>
+<body>
+  <h3><code>${new URL(request.url).pathname}</code></h3>
+  ${highlighter.codeToHtml(body, { lang: "ts" })}
+</body>
+`,
       )
     }
     return new Response(body, {
