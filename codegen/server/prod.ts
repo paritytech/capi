@@ -22,7 +22,9 @@ export class ProdCodegenServer extends CodegenServer {
   }
 
   async getDefaultVersion() {
-    return (await this.tags())[0]!
+    // TODO: uncomment this before merging
+    // return (await this.tags())[0]!
+    return this.version
   }
 
   async handleModRequest(request: Request, path: string): Promise<Response> {
