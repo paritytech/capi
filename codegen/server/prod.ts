@@ -53,7 +53,9 @@ export class ProdCodegenServer extends CodegenServer {
       ? await this.getFullSha(version.slice("sha:".length))
       : await this.getTagSha(normalizedVersion)
     const url = await this.getDeploymentUrl(sha)
-    return await fetch(new URL(new URL(request.url).pathname, url))
+    return await fetch(new URL(new URL(request.url).pathname, url), {
+      headers: request.headers,
+    })
   }
 
   async getVersionSuggestions(): Promise<string[]> {
