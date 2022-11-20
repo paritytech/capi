@@ -14,6 +14,7 @@ export class ProdCodegenServer extends CodegenServer {
     region: Deno.env.get("S3_REGION")!,
     bucket: Deno.env.get("S3_BUCKET")!,
   })
+  devChains = false
 
   constructor(readonly version: string, modIndex: string[]) {
     super()
