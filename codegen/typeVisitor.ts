@@ -119,7 +119,7 @@ export function createTypeVisitor(props: CodegenProps, files: Files) {
           a[0] > b[0] ? 1 : a[0] < b[0] ? -1 : 0
         )
       ) {
-        file += createTypeDecl(path, ty)
+        file += createTypeDecl(path, ty) + "\n\n"
       }
       return file
     })
@@ -323,7 +323,7 @@ export namespace ${name} { ${
       era: null!,
       lenPrefixedWrapper: null!,
       circular: null!,
-    }).visit(ty)
+    }).visit(ty).trim()
   }
 }
 
