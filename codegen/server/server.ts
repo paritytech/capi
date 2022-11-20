@@ -49,29 +49,10 @@ export abstract class CodegenServer {
       }), { port, signal })
   }
 
-  async serveHttp(conn: Deno.Conn) {
-    try {
-      const httpConn = Deno.serveHttp(conn)
-      for await (const event of httpConn) {
-        event.respondWith(
-          this.handleRequest(event.request).then(async (r) => {
-            return r
-          }).catch((e) => {
-            if (e instanceof Response) return e
-            return new Response(Deno.inspect(e), { status: 500 })
-          }),
-        )
-      }
-    } catch (e) {
-      console.error(e)
-    }
-  }
-
   static rWithCapiVersion = /^\/@([^\/]+)(\/.*)?$/
   static rWithChainUrl = /^\/proxy\/(dev:\w+|wss?:[^\/]+)\/(?:@([^\/]+)\/)?(.*)$/
   async handleRequest(request: Request): Promise<Response> {
     let path = new URL(request.url).pathname
-    console.log(path)
     if (path === "/.well-known/deno-import-intellisense.json") {
       return this.handleImportIntellisenseRequest(path)
     }
@@ -217,14 +198,12 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
       })
     }
     const parts = path.slice(1).split("/")
-    console.log(parts)
     if (parts[0] !== "import-intellisense") return this.e404()
     if (parts[1] === "null") {
       return this.json({ items: [] })
     }
     if (parts[1] === "version") {
       const suggestions = await this.getVersionSuggestions(parts[2] ?? "")
-      console.log(suggestions)
       return this.json({
         items: suggestions.map((x) => "@" + x),
         isIncomplete: true,
@@ -242,7 +221,6 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
     if (parts[1] === "chainVersion") {
       const chainUrl = parts[2]!
       const version = await this.getLatestChainVersion(chainUrl)
-      console.log(version)
       return this.json({ items: ["@" + version], preselect: "@" + version })
     }
     if (parts[1] === "modFilePath") {
@@ -258,7 +236,6 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
       const chainUrl = parts[2]!
       const chainVersion = parts[3]?.slice(1) || await this.getLatestChainVersion(chainUrl)
       const filesIndex = await this.getFilesIndex(chainUrl, chainVersion)
-      console.log(filesIndex)
       return this.json(this.filePathIntellisense(filesIndex, parts.slice(4)))
     }
     return this.e404()
@@ -348,12 +325,7 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
     return new Response("404", { status: 404 })
   }
 
-  eUnimplemented() {
-    return new Response("unimplemented", { status: 500 })
-  }
-
   redirect(path: string) {
-    console.log("redirect", path)
     return new Response(null, {
       status: 302,
       headers: {

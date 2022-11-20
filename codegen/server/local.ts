@@ -19,7 +19,7 @@ export class LocalCodegenServer extends CodegenServer {
     return ["local"]
   }
   async delegateRequest(): Promise<Response> {
-    return this.eUnimplemented()
+    return this.e404()
   }
 }
 
