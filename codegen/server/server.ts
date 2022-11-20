@@ -9,11 +9,14 @@ import { Files } from "../Files.ts"
 import { codegen } from "../mod.ts"
 import { Cache } from "./cache.ts"
 
-const suggestedChainUrls = [
+const suggestedDevChains = [
   "dev:polkadot",
   "dev:westend",
   "dev:rococo",
   "dev:kusama",
+]
+
+const suggestedChainUrls = [
   "wss:rpc.polkadot.io",
   "wss:kusama-rpc.polkadot.io",
   // "wss://acala-polkadot.api.onfinality.io/public-ws/",
@@ -32,6 +35,7 @@ export abstract class CodegenServer {
   abstract handleModRequest(request: Request, path: string): Promise<Response>
   abstract delegateRequest(request: Request, version: string, path: string): Promise<Response>
   abstract getVersionSuggestions(partial: string): Promise<string[]>
+  abstract devChains: boolean
 
   metadataMemo = new Map<string, Promise<[string, C.M.Metadata]>>()
   filesMemo = new Map<C.M.Metadata, Files>()
@@ -230,7 +234,10 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
     }
     if (parts[1] === "chainUrl") {
       return this.json({
-        items: suggestedChainUrls,
+        items: [
+          ...(this.devChains ? suggestedDevChains : []),
+          ...suggestedChainUrls,
+        ],
       })
     }
     if (parts[1] === "chainVersion") {
@@ -363,6 +370,7 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
 
   getClient(chainUrl: string) {
     if (chainUrl.startsWith("dev:")) {
+      if (!this.devChains) throw new Error("Dev chains are not supported")
       const runtime = chainUrl.slice("dev:".length)
       if (!T.isRuntimeName(runtime)) {
         throw new T.InvalidRuntimeSpecifiedError(runtime)

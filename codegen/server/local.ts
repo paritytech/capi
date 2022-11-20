@@ -6,6 +6,7 @@ export class LocalCodegenServer extends CodegenServer {
   version = "local"
   cache = new FsCache("target/codegen")
   modIndex = getModIndex()
+  devChains = true
   async getDefaultVersion() {
     return this.version
   }
