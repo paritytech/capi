@@ -32,7 +32,9 @@ export class TimedMemo<K, V> extends AsyncMemo<K, V> {
           this.timers.delete(timer)
         }, ttl)
         this.timers.add(timer)
-        Deno.unrefTimer(timer)
+        if (Deno.unrefTimer) {
+          Deno.unrefTimer(timer)
+        }
         return value
       }))
   }
