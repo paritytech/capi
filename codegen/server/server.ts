@@ -109,17 +109,17 @@ export abstract class CodegenServer {
       )
     }
     const key = `generated/@${this.version}/${chainUrl}/@${chainVersion}/${filePath}`
-    const content = await this.cache.getString(
-      key,
-      chainFileTtl,
-      async () => {
-        const files = await this.files(chainUrl, chainVersion)
-        const content = files.getFormatted(filePath)
-        if (content == null) throw this.e404()
-        return content
-      },
-    )
-    return this.ts(request, key, content)
+    return this.ts(request, key, () =>
+      this.cache.getString(
+        key,
+        chainFileTtl,
+        async () => {
+          const files = await this.files(chainUrl, chainVersion)
+          const content = files.getFormatted(filePath)
+          if (content == null) throw this.e404()
+          return content
+        },
+      ))
   }
 
   filesMemo = new Map<C.M.Metadata, Files>()
@@ -267,9 +267,9 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
     return request.headers.get("Accept")?.split(",").includes("text/html") ?? false
   }
 
-  async ts(request: Request, key: string, body: string) {
+  async ts(request: Request, key: string, body: () => Promise<string>) {
     if (!this.acceptsHtml(request)) {
-      return new Response(body, {
+      return new Response(await body(), {
         headers: {
           "Content-Type": "application/typescript",
         },
@@ -279,8 +279,9 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
       `rendered/${key}.html`,
       renderedHtmlTtl,
       async () => {
+        const content = await body()
         const highlighter = await highlighterPromise
-        const tokens = highlighter.codeToThemedTokens(body, "ts")
+        const tokens = highlighter.codeToThemedTokens(content, "ts")
         let codeContent = ""
         for (const line of tokens) {
           codeContent += `<span class="line">`

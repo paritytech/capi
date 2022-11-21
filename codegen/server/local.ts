@@ -21,9 +21,11 @@ export class LocalCodegenServer extends CodegenServer {
 
   moduleIndex = getModuleIndex
   async moduleFile(request: Request, path: string, key: string): Promise<Response> {
-    const res = await fetch(new URL("../.." + path, import.meta.url))
-    if (!res.ok) return this.e404()
-    return this.ts(request, key, await res.text())
+    return this.ts(request, key, async () => {
+      const res = await fetch(new URL("../.." + path, import.meta.url))
+      if (!res.ok) throw this.e404()
+      return res.text()
+    })
   }
 }
 
