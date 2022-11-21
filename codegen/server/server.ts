@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.165.0/http/server.ts"
-import * as shiki from "https://esm.sh/shiki@0.11.1?bundle&dev"
+import { escapeHtml } from "https://deno.land/x/escape@1.4.2/mod.ts"
+import * as shiki from "https://esm.sh/shiki@0.11.1?bundle"
 import * as $ from "../../deps/scale.ts"
 import * as C from "../../mod.ts"
 import * as T from "../../test_util/mod.ts"
@@ -274,9 +275,36 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
         },
       })
     }
-    const html = await this.cache.getString(`rendered/${key}.html`, renderedHtmlTtl, async () => {
-      const highlighter = await highlighterPromise
-      return `\
+    const html = await this.cache.getString(
+      `rendered/${key}.html`,
+      renderedHtmlTtl,
+      async () => {
+        const highlighter = await highlighterPromise
+        const tokens = highlighter.codeToThemedTokens(body, "ts")
+        let codeContent = ""
+        for (const line of tokens) {
+          codeContent += `<span class="line">`
+          for (const token of line) {
+            if (
+              token.explanation?.every((value) =>
+                value.scopes.some((scope) =>
+                  scope.scopeName === "meta.export.ts" || scope.scopeName === "meta.import.ts"
+                )
+                && value.scopes.some((scope) => scope.scopeName === "string.quoted.double.ts")
+              )
+            ) {
+              codeContent += `<a style="color: ${token.color}" href="${
+                escapeHtml(JSON.parse(token.content))
+              }">${escapeHtml(token.content)}</a>`
+            } else {
+              codeContent += `<span style="color: ${token.color}">${
+                escapeHtml(token.content)
+              }</span>`
+            }
+          }
+          codeContent += "</span>\n"
+        }
+        return `\
 <style>
   body {
     color: ${highlighter.getForegroundColor()};
@@ -295,13 +323,22 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
     text-align: right;
     color: rgba(115,138,148,.4)
   }
+  a {
+    text-decoration-color: transparent;
+    transition: text-decoration-color .2s;
+    text-underline-offset: 2px;
+  }
+  a:hover {
+    text-decoration-color: currentColor;
+  }
 </style>
 <body>
   <h3><code>${new URL(request.url).pathname}</code></h3>
-  ${highlighter.codeToHtml(body, { lang: "ts" })}
+  <pre class="shiki"><code>${codeContent}</code></pre>
 </body>
 `
-    })
+      },
+    )
     return this.html(html)
   }
 
