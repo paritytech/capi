@@ -21,7 +21,7 @@ export class TimedMemo<K, V> extends AsyncMemo<K, V> {
     return super.run(key, () =>
       run().then((value) => {
         this.done.set(key, value)
-        setTimeout(() => this.done.delete(key), this.ttl)
+        setTimeout(() => this.done.delete(key), ttl)
         return value
       }))
   }
