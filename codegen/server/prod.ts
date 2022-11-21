@@ -38,7 +38,7 @@ export class ProdCodegenServer extends CodegenServer {
   async delegateRequest(request: Request, version: string, path: string): Promise<Response> {
     const normalizedVersion = await this.normalizeVersion(version)
     if (normalizedVersion !== version) {
-      return this.redirect(`/@${normalizedVersion}${path}`)
+      return this.redirect(request, `/@${normalizedVersion}${path}`)
     }
     const sha = await this.versionSha(version)
     const url = await this.deploymentUrl(sha)
@@ -75,11 +75,11 @@ export class ProdCodegenServer extends CodegenServer {
     throw this.e404()
   }
 
-  async moduleFile(request: Request, path: string, key: string) {
+  async moduleFile(request: Request, path: string) {
     if (ProdCodegenServer.rRefVersion.test(this.version)) {
-      return this.redirect(`https://deno.land/x/capi@${this.version}${path}`)
+      return this.redirect(request, `https://deno.land/x/capi@${this.version}${path}`)
     }
-    return this.ts(request, key, async () => {
+    return this.ts(request, async () => {
       const sha = await this.versionSha(this.version)
       const res = await fetch(`https://raw.githubusercontent.com/paritytech/capi/${sha}${path}`)
       if (!res.ok) throw this.e404()

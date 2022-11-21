@@ -39,7 +39,7 @@ export abstract class CodegenServer {
   abstract version: string
   abstract cache: Cache
   abstract localChainSupport: boolean
-  abstract moduleFile(request: Request, path: string, key: string): Promise<Response>
+  abstract moduleFile(request: Request, path: string): Promise<Response>
   abstract moduleIndex(): Promise<string[]>
   abstract delegateRequest(request: Request, version: string, path: string): Promise<Response>
   abstract versionSuggestions(): Promise<string[]>
@@ -71,13 +71,13 @@ export abstract class CodegenServer {
     const versionMatch = CodegenServer.rWithCapiVersion.exec(fullPath)
     if (!versionMatch) {
       const defaultVersion = await this.defaultVersion(request)
-      return this.redirect(`/@${defaultVersion}${fullPath}`)
+      return this.redirect(request, `/@${defaultVersion}${fullPath}`)
     }
     const [, version, path] = versionMatch
     if (version !== this.version) {
       return this.delegateRequest(request, version!, path ?? "/")
     }
-    if (!path) return this.redirect(`/@${version}/`)
+    if (!path) return this.redirect(request, `/@${version}/`)
     if (path === "/") {
       return this.landingPage()
     }
@@ -90,7 +90,7 @@ export abstract class CodegenServer {
     if (path.startsWith("/autocomplete/")) {
       return this.autocomplete(path)
     }
-    return this.moduleFile(request, path, `module/${this.version}/${path}`)
+    return this.moduleFile(request, path)
   }
 
   landingPage() {
@@ -106,20 +106,21 @@ export abstract class CodegenServer {
     if (!chainVersion) {
       const latestChainVersion = await this.latestChainVersion(chainUrl)
       return this.redirect(
+        request,
         `/@${this.version}/proxy/${chainUrl}/@${latestChainVersion}/${filePath}`,
       )
     }
     if (chainVersion !== this.normalizeChainVersion(chainVersion)) {
       return this.redirect(
+        request,
         `/@${this.version}/proxy/${chainUrl}/@${
           this.normalizeChainVersion(chainVersion)
         }/${filePath}`,
       )
     }
-    const key = `generated/@${this.version}/${chainUrl}/@${chainVersion}/${filePath}`
-    return this.ts(request, key, () =>
+    return this.ts(request, () =>
       this.cache.getString(
-        key,
+        `generated/@${this.version}/${chainUrl}/@${chainVersion}/${filePath}`,
         chainFileTtl,
         async () => {
           const files = await this.files(chainUrl, chainVersion)
@@ -276,7 +277,11 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
     return request.headers.get("Accept")?.split(",").includes("text/html") ?? false
   }
 
-  async ts(request: Request, key: string, body: () => Promise<string>) {
+  async ts(
+    request: Request,
+    body: () => Promise<string>,
+    path = new URL(request.url).pathname,
+  ) {
     if (!this.acceptsHtml(request)) {
       return new Response(await body(), {
         headers: {
@@ -285,7 +290,7 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
       })
     }
     const html = await this.cache.getString(
-      `rendered/${key}.html`,
+      `rendered/${this.version}/${path}.html`,
       renderedHtmlTtl,
       async () => {
         const content = await body()
@@ -343,7 +348,7 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
   }
 </style>
 <body>
-  <h3><code>${new URL(request.url).pathname}</code></h3>
+  <h3><code><a style="color:inherit" href="${escapeHtml(path)}">${path}</a></code></h3>
   <pre class="shiki"><code>${codeContent}</code></pre>
 </body>
 `
@@ -364,7 +369,17 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
     return new Response("404", { status: 404 })
   }
 
-  redirect(path: string) {
+  async redirect(request: Request, path: string) {
+    if (path.endsWith(".ts") && this.acceptsHtml(request)) {
+      if (path.startsWith("/")) {
+        return this.root(new Request(new URL(path, request.url), { headers: request.headers }))
+      }
+      return this.ts(request, async () => {
+        const response = await fetch(path)
+        if (!response.ok) throw response
+        return await response.text()
+      }, path)
+    }
     return new Response(null, {
       status: 302,
       headers: {
