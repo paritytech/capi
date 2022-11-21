@@ -48,10 +48,10 @@ export class ProdCodegenServer extends CodegenServer {
   }
 
   async versionSha(version: string) {
-    if (ProdCodegenServer.rRefVersion.test(this.version)) {
+    if (ProdCodegenServer.rRefVersion.test(version)) {
       return this.tagSha(version)
     }
-    const shaMatch = ProdCodegenServer.rShaVersion.exec(this.version)
+    const shaMatch = ProdCodegenServer.rShaVersion.exec(version)
     if (shaMatch) {
       return await this.fullSha(shaMatch[1]!)
     }
