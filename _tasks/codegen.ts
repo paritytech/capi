@@ -10,6 +10,7 @@ await Deno.run({
   cmd: [
     "deno",
     "cache",
+    "--no-lock",
     "--import-map",
     "import_map_localhost.json",
     `--reload=http://localhost:${port}/`,
