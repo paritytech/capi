@@ -1,7 +1,7 @@
 // This script runs all examples in sequence. We should ultimately delete this script...
 // ... but it's currently proving useful for local debugging.
 
-// moderate
+// moderate --exclude multisig_transfer.ts
 
 export * from "./balance.ts"
 export * from "./batch.ts"
