@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.165.0/http/server.ts"
+import * as shiki from "https://esm.sh/shiki@0.11.1?bundle&dev"
 import { tsFormatter } from "../../deps/dprint.ts"
 import * as $ from "../../deps/scale.ts"
 import * as C from "../../mod.ts"
@@ -8,9 +9,11 @@ import { TimedMemo } from "../../util/mod.ts"
 import { Files } from "../Files.ts"
 import { codegen } from "../mod.ts"
 import { Cache } from "./cache.ts"
-import { highlighter } from "./highlighter.ts"
 
-const suggestedDevChains = [
+shiki.setCDN("https://unpkg.com/shiki/")
+const highlighterPromise = shiki.getHighlighter({ theme: "github-dark", langs: ["ts"] })
+
+const localChains = [
   "dev:polkadot",
   "dev:westend",
   "dev:rococo",
@@ -28,22 +31,21 @@ const suggestedChainUrls = [
   "wss:westend-rpc.polkadot.io",
 ]
 
+const latestChainVersionTtl = 600_000 // 10 minutes
+
 export abstract class CodegenServer {
-  abstract getDefaultVersion(request: Request): Promise<string>
   abstract version: string
   abstract cache: Cache
-  abstract modIndex: Promise<string[]>
-  abstract handleModRequest(request: Request, path: string): Promise<Response>
+  abstract localChainSupport: boolean
+  abstract moduleFile(request: Request, path: string): Promise<Response>
+  abstract moduleIndex(): Promise<string[]>
   abstract delegateRequest(request: Request, version: string, path: string): Promise<Response>
-  abstract getVersionSuggestions(partial: string): Promise<string[]>
-  abstract devChains: boolean
-
-  metadataMemo = new Map<string, Promise<[string, C.M.Metadata]>>()
-  filesMemo = new Map<C.M.Metadata, Files>()
+  abstract versionSuggestions(): Promise<string[]>
+  abstract defaultVersion(request: Request): Promise<string>
 
   listen(port: number, signal?: AbortSignal) {
     return serve((req) =>
-      this.handleRequest(req).catch((e) => {
+      this.root(req).catch((e) => {
         if (e instanceof Response) return e
         return new Response(Deno.inspect(e), { status: 500 })
       }), { port, signal })
@@ -51,43 +53,48 @@ export abstract class CodegenServer {
 
   static rWithCapiVersion = /^\/@([^\/]+)(\/.*)?$/
   static rWithChainUrl = /^\/proxy\/(dev:\w+|wss?:[^\/]+)\/(?:@([^\/]+)\/)?(.*)$/
-  async handleRequest(request: Request): Promise<Response> {
-    let path = new URL(request.url).pathname
-    if (path === "/.well-known/deno-import-intellisense.json") {
-      return this.handleImportIntellisenseRequest(path)
+  async root(request: Request): Promise<Response> {
+    const fullPath = new URL(request.url).pathname
+    if (fullPath === "/.well-known/deno-import-intellisense.json") {
+      return this.autocomplete(fullPath)
     }
-    let match = CodegenServer.rWithCapiVersion.exec(path)
-    if (!match) {
-      return this.redirect(`/@${await this.getDefaultVersion(request)}${path}`)
+    const versionMatch = CodegenServer.rWithCapiVersion.exec(fullPath)
+    if (!versionMatch) {
+      const defaultVersion = await this.defaultVersion(request)
+      return this.redirect(`/@${defaultVersion}${fullPath}`)
     }
-    const version = match[1]!
-    path = match[2] ?? "/"
+    const [, version, path] = versionMatch
     if (version !== this.version) {
-      return this.delegateRequest(request, version, path)
+      return this.delegateRequest(request, version!, path ?? "/")
     }
     if (!path) return this.redirect(`/@${version}/`)
     if (path === "/") {
-      return this.html(`<pre>capi@${this.version}</pre>`)
+      return this.landingPage()
     }
     if (path.startsWith("/proxy/")) {
-      if (!(match = CodegenServer.rWithChainUrl.exec(path))) return this.e404()
-      const [, chainUrl, chainVersion, filePath] = match
-      return this.handleChainRequest(request, chainUrl!, chainVersion, filePath!)
+      const match = CodegenServer.rWithChainUrl.exec(path)
+      if (!match) return this.e404()
+      const [, chainUrl, chainVersion, file] = match
+      return this.chainFile(request, chainUrl!, chainVersion, file!)
     }
-    if (path.startsWith("/import-intellisense/")) {
-      return this.handleImportIntellisenseRequest(path)
+    if (path.startsWith("/autocomplete/")) {
+      return this.autocomplete(path)
     }
-    return this.handleModRequest(request, path)
+    return this.moduleFile(request, path)
   }
 
-  async handleChainRequest(
+  landingPage() {
+    return this.html(`<pre>capi@${this.version}</pre>`)
+  }
+
+  async chainFile(
     request: Request,
     chainUrl: string,
     chainVersion: string | undefined,
     filePath: string,
   ) {
     if (!chainVersion) {
-      const latestChainVersion = await this.getLatestChainVersion(chainUrl)
+      const latestChainVersion = await this.latestChainVersion(chainUrl)
       return this.redirect(
         `/@${this.version}/proxy/${chainUrl}/@${latestChainVersion}/${filePath}`,
       )
@@ -104,7 +111,7 @@ export abstract class CodegenServer {
       await this.cache.getRaw(
         `generated/@${this.version}/${chainUrl}/@${chainVersion}/${filePath}`,
         async () => {
-          const files = await this.getFiles(chainUrl, chainVersion)
+          const files = await this.files(chainUrl, chainVersion)
           const file = files.get(filePath)
           if (!file) throw this.e404()
           return new TextEncoder().encode(tsFormatter.formatText(filePath, file()))
@@ -113,8 +120,9 @@ export abstract class CodegenServer {
     )
   }
 
-  async getFiles(chainUrl: string, chainVersion: string) {
-    const metadata = await this.getMetadata(chainUrl, chainVersion)
+  filesMemo = new Map<C.M.Metadata, Files>()
+  async files(chainUrl: string, chainVersion: string) {
+    const metadata = await this.metadata(chainUrl, chainVersion)
     return U.getOrInit(this.filesMemo, metadata, () => {
       return codegen({
         metadata,
@@ -131,51 +139,44 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
     })
   }
 
-  static $fileIndex = $.array($.str)
-  async getFilesIndex(chainUrl: string, chainVersion: string) {
+  static $index = $.array($.str)
+  async chainIndex(chainUrl: string, chainVersion: string) {
     return await this.cache.get(
-      `generated/@${this.version}/${chainUrl}/@${chainVersion}/_index.json`,
-      CodegenServer.$fileIndex,
+      `generated/@${this.version}/${chainUrl}/@${chainVersion}/_index`,
+      CodegenServer.$index,
       async () => {
-        const files = await this.getFiles(chainUrl, chainVersion)
+        const files = await this.files(chainUrl, chainVersion)
         return [...files.keys()]
       },
     )
   }
 
-  async handleImportIntellisenseRequest(path: string) {
+  async autocomplete(path: string) {
     if (path === "/.well-known/deno-import-intellisense.json") {
       return this.json({
         version: 2,
         registries: [
           {
-            schema: "/:version(@[^/]*)?/:filePath*",
+            schema: "/:version(@[^/]*)?/:file*",
             variables: [
-              { key: "version", url: "/import-intellisense/version" },
-              {
-                key: "filePath",
-                url: "/${version}/import-intellisense/modFilePath/${filePath}",
-              },
+              { key: "version", url: "/autocomplete/version" },
+              { key: "file", url: "/${version}/autocomplete/moduleFile/${file}" },
             ],
           },
           {
             schema:
-              "/:version(@[^/]*)/:_proxy(proxy)/:chainUrl(dev:\\w*|wss?:[^/]*)/:chainVersion(@[^/]+)/:filePath*",
+              "/:version(@[^/]*)/:_proxy(proxy)/:chainUrl(dev:\\w*|wss?:[^/]*)/:chainVersion(@[^/]+)/:file*",
             variables: [
-              { key: "version", url: "/import-intellisense/version" },
-              { key: "_proxy", url: "/import-intellisense/null" },
-              {
-                key: "chainUrl",
-                url: "/${version}/import-intellisense/chainUrl/${chainUrl}",
-              },
+              { key: "version", url: "/autocomplete/version" },
+              { key: "_proxy", url: "/autocomplete/null" },
+              { key: "chainUrl", url: "/${version}/autocomplete/chainUrl/${chainUrl}" },
               {
                 key: "chainVersion",
-                url: "/${version}/import-intellisense/chainVersion/${chainUrl}/${chainVersion}",
+                url: "/${version}/autocomplete/chainVersion/${chainUrl}/${chainVersion}",
               },
               {
-                key: "filePath",
-                url:
-                  "/${version}/import-intellisense/genFilePath/${chainUrl}/${chainVersion}/${filePath}",
+                key: "file",
+                url: "/${version}/autocomplete/chainFile/${chainUrl}/${chainVersion}/${file}",
               },
             ],
           },
@@ -183,54 +184,51 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
       })
     }
     const parts = path.slice(1).split("/")
-    if (parts[0] !== "import-intellisense") return this.e404()
+    if (parts[0] !== "autocomplete") return this.e404()
     if (parts[1] === "null") {
       return this.json({ items: [] })
     }
     if (parts[1] === "version") {
-      const suggestions = await this.getVersionSuggestions(parts[2] ?? "")
-      return this.json({
-        items: suggestions.map((x) => "@" + x),
-        isIncomplete: true,
-        preselect: "@" + suggestions[0],
-      })
+      const versions = await this.versionSuggestions()
+      const items = versions.map((v) => "@" + v)
+      return this.json({ items, preselect: items[0] })
     }
     if (parts[1] === "chainUrl") {
       return this.json({
         items: [
-          ...(this.devChains ? suggestedDevChains : []),
+          ...(this.localChainSupport ? localChains : []),
           ...suggestedChainUrls,
         ],
       })
     }
     if (parts[1] === "chainVersion") {
       const chainUrl = parts[2]!
-      const [latest, other] = await Promise.all([
-        this.getLatestChainVersion(chainUrl),
-        this.cache.list(`metadata/${chainUrl}/`).then((x) => x.map((x) => x.split("/").at(-1)!)),
-      ])
+      const latest = await this.latestChainVersion(chainUrl)
+      const other = await this.cache.list(`metadata/${chainUrl}/`)
       const versions = [...new Set([latest, ...other])]
-      return this.json({ items: versions.map((x) => "@" + x), preselect: "@" + versions[0] })
+      const items = versions.map((v) => "@" + v)
+      return this.json({ items, preselect: items[0] })
     }
-    if (parts[1] === "modFilePath") {
+    if (parts[1] === "moduleFile") {
       if (parts[2] === "proxy" || parts[2]?.startsWith("@")) return this.json({ items: [] })
-      const result = this.filePathIntellisense(await this.modIndex, parts.slice(2))
+      const index = await this.moduleIndex()
+      const result = this.autocompleteIndex(index, parts.slice(2))
       if (!parts[3]) {
         result.items.unshift("proxy/")
         result.preselect = "proxy/"
       }
       return this.json(result)
     }
-    if (parts[1] === "genFilePath") {
+    if (parts[1] === "chainFile") {
       const chainUrl = parts[2]!
-      const chainVersion = parts[3]?.slice(1) || await this.getLatestChainVersion(chainUrl)
-      const filesIndex = await this.getFilesIndex(chainUrl, chainVersion)
-      return this.json(this.filePathIntellisense(filesIndex, parts.slice(4)))
+      const chainVersion = parts[3]?.slice(1) || await this.latestChainVersion(chainUrl)
+      const index = await this.chainIndex(chainUrl, chainVersion)
+      return this.json(this.autocompleteIndex(index, parts.slice(4)))
     }
     return this.e404()
   }
 
-  filePathIntellisense(index: string[], partial: string[]) {
+  autocompleteIndex(index: string[], partial: string[]) {
     let dir = partial.join("/") + "/"
     let result
     while (true) {
@@ -263,9 +261,10 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
     })
   }
 
-  ts(request: Request, body: string | Uint8Array) {
+  async ts(request: Request, body: string | Uint8Array) {
     if (request.headers.get("Accept")?.split(",").includes("text/html")) {
       if (typeof body !== "string") body = new TextDecoder().decode(body)
+      const highlighter = await highlighterPromise
       return this.html(
         `\
 <style>
@@ -322,10 +321,10 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
     })
   }
 
-  getLatestChainVersionMemo = new TimedMemo<string, string>(60000)
-  async getLatestChainVersion(chainUrl: string) {
-    return this.getLatestChainVersionMemo.run(chainUrl, async () => {
-      const client = this.getClient(chainUrl)
+  latestChainVersionMemo = new TimedMemo<string, string>(latestChainVersionTtl)
+  async latestChainVersion(chainUrl: string) {
+    return this.latestChainVersionMemo.run(chainUrl, async () => {
+      const client = this.client(chainUrl)
       const chainVersion = U.throwIfError(
         await C.rpcCall("system_version")(client)().as<string>().next(this.normalizeChainVersion)
           .run(),
@@ -334,9 +333,9 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
     })
   }
 
-  getMetadata(chainUrl: string, version: string) {
+  metadata(chainUrl: string, version: string) {
     return this.cache.get(`metadata/${chainUrl}/${version}`, C.M.$metadata, async () => {
-      const client = this.getClient(chainUrl)
+      const client = this.client(chainUrl)
       const [chainVersion, metadata] = U.throwIfError(
         await C.Z.ls(
           C.rpcCall("system_version")(client)().as<string>().next(this.normalizeChainVersion),
@@ -351,9 +350,9 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
     })
   }
 
-  getClient(chainUrl: string) {
+  client(chainUrl: string) {
     if (chainUrl.startsWith("dev:")) {
-      if (!this.devChains) throw new Error("Dev chains are not supported")
+      if (!this.localChainSupport) throw new Error("Dev chains are not supported")
       const runtime = chainUrl.slice("dev:".length)
       if (!T.isRuntimeName(runtime)) {
         throw new T.InvalidRuntimeSpecifiedError(runtime)

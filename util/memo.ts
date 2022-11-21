@@ -27,6 +27,20 @@ export class TimedMemo<K, V> extends AsyncMemo<K, V> {
   }
 }
 
+export class PermanentMemo<K, V> extends AsyncMemo<K, V> {
+  done = new Map<K, V>()
+
+  override async run(key: K, run: () => Promise<V>) {
+    const existing = this.done.get(key)
+    if (existing) return existing
+    return super.run(key, () =>
+      run().then((value) => {
+        this.done.set(key, value)
+        return value
+      }))
+  }
+}
+
 export class WeakMemo<K, V extends object> extends AsyncMemo<K, V> {
   done = new Map<K, WeakRef<V>>()
   finReg = new FinalizationRegistry<K>((key) => this.done.delete(key))

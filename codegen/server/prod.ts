@@ -1,138 +1,145 @@
-import { TimedMemo } from "../../util/memo.ts"
+import { PermanentMemo, TimedMemo } from "../../util/memo.ts"
 import { S3Cache } from "./s3.ts"
 import { CodegenServer } from "./server.ts"
 
-const shaAbbrevLength = 8
+export const shaAbbrevLength = 8
 
-const denoDeployId = 75045203
+const denoDeployUserId = 75045203
+
+const tagsTtl = 60_000 // 1 minute
+const branchesTtl = 60_000 // 1 minute
+
+const productionHost = "capi.dev"
+
+const githubApiRepo = "https://api.github.com/repos/paritytech/capi"
 
 export class ProdCodegenServer extends CodegenServer {
-  modIndex
+  moduleIndex
   cache = new S3Cache({
     accessKeyID: Deno.env.get("S3_ACCESS_KEY")!,
     secretKey: Deno.env.get("S3_SECRET_KEY")!,
     region: Deno.env.get("S3_REGION")!,
     bucket: Deno.env.get("S3_BUCKET")!,
   })
-  devChains = false
+  localChainSupport = false
 
-  constructor(readonly version: string, modIndex: string[]) {
+  constructor(readonly version: string, moduleIndex: string[]) {
     super()
-    this.modIndex = Promise.resolve(modIndex)
+    this.moduleIndex = async () => moduleIndex
   }
 
-  async getDefaultVersion(request: Request) {
-    if (new URL(request.url).host === "capi.dev") {
+  async defaultVersion(request: Request) {
+    if (new URL(request.url).host === productionHost) {
       return (await this.tags())[0]!
     }
     return this.version
   }
 
-  async handleModRequest(request: Request, path: string): Promise<Response> {
-    if (this.version.startsWith("v")) {
-      return this.redirect(`https://deno.land/x/capi@${this.version}${path}`)
-    } else if (this.version.startsWith("sha:")) {
-      const res = await fetch(
-        `https://raw.githubusercontent.com/paritytech/capi/${await this.getFullSha(
-          this.version.slice("sha:".length),
-        )}${path}`,
-      )
-      if (!res.ok) return this.e404()
-      return this.ts(request, await res.text())
-    }
-    throw new Error("invalid this.version")
-  }
-
   async delegateRequest(request: Request, version: string, path: string): Promise<Response> {
     const normalizedVersion = await this.normalizeVersion(version)
-    console.log(version, normalizedVersion)
-    if (!normalizedVersion) return this.e404()
     if (normalizedVersion !== version) {
       return this.redirect(`/@${normalizedVersion}${path}`)
     }
-    const sha = normalizedVersion.startsWith("sha:")
-      ? await this.getFullSha(version.slice("sha:".length))
-      : await this.getTagSha(normalizedVersion)
-    const url = await this.getDeploymentUrl(sha)
+    const sha = await this.versionSha(version)
+    const url = await this.deploymentUrl(sha)
     return await fetch(new URL(new URL(request.url).pathname, url), {
       headers: request.headers,
     })
   }
 
-  async getVersionSuggestions(): Promise<string[]> {
+  async versionSha(version: string) {
+    if (ProdCodegenServer.rRefVersion.test(this.version)) {
+      return this.tagSha(version)
+    }
+    const shaMatch = ProdCodegenServer.rShaVersion.exec(this.version)
+    if (shaMatch) {
+      return await this.fullSha(shaMatch[1]!)
+    }
+    throw new Error("expected normalized version")
+  }
+
+  static rTagVersion = /^v?(\d+\.\d+\.\d+[^\/]*)$/
+  static rRefVersion = /^ref:([^\/]*)$/
+  static rShaVersion = /^sha:([0-9a-f]+)$/
+  async normalizeVersion(version: string) {
+    const tagMatch = ProdCodegenServer.rTagVersion.exec(version)
+    if (tagMatch) return "v" + tagMatch[1]
+    if (ProdCodegenServer.rRefVersion.test(version)) {
+      return (await this.branches())[version]
+    }
+    const shaMatch = ProdCodegenServer.rShaVersion.exec(version)
+    if (shaMatch) {
+      const sha = await this.fullSha(shaMatch[1]!)
+      return `sha:${sha.slice(0, shaAbbrevLength)}`
+    }
+    throw this.e404()
+  }
+
+  async moduleFile(request: Request, path: string): Promise<Response> {
+    if (ProdCodegenServer.rRefVersion.test(this.version)) {
+      return this.redirect(`https://deno.land/x/capi@${this.version}${path}`)
+    }
+    const sha = await this.versionSha(this.version)
+    const res = await fetch(`https://raw.githubusercontent.com/paritytech/capi/${sha}${path}`)
+    if (!res.ok) return this.e404()
+    return this.ts(request, await res.text())
+  }
+
+  async versionSuggestions(): Promise<string[]> {
     return (await Promise.all([
       this.tags(),
-      this.branches().then((x) => x.map((x) => x[0])),
+      this.branches().then(Object.keys),
     ])).flat()
   }
 
-  tagsMemo = new TimedMemo<null, string[]>(60000)
+  tagsMemo = new TimedMemo<null, string[]>(tagsTtl)
   tags() {
     return this.tagsMemo.run(null, async () => {
-      return (await fetch("https://apiland.deno.dev/completions/items/capi/").then((r) => r.json()))
-        .items
+      return (await json("https://apiland.deno.dev/completions/items/capi/")).items
     })
   }
 
-  branchesMemo = new TimedMemo<null, [branch: string, sha: string][]>(60000)
+  branchesMemo = new TimedMemo<null, Record<string, string>>(branchesTtl)
   branches() {
     return this.branchesMemo.run(null, async () => {
-      const refs = await json(
-        "https://api.github.com/repos/paritytech/capi/git/matching-refs/heads",
+      const refs: GithubRef[] = await json(
+        `${githubApiRepo}/git/matching-refs/heads`,
       )
-      return refs.map((
-        ref: any,
-      ) => [
-        "ref:" + ref.ref.slice("refs/heads/".length).replace(/\//g, ":"),
+      return Object.fromEntries(refs.map((ref) => [
+        `ref:${ref.ref.slice("refs/heads/".length).replace(/\//g, ":")}`,
         `sha:${ref.object.sha.slice(0, shaAbbrevLength)}`,
-      ])
+      ]))
     })
   }
 
-  getTagShaMemo = new TimedMemo<string, string>(60000)
-  getTagSha(tag: string) {
-    return this.getFullShaMemo.run(tag, async () => {
-      const refs = await json(
-        `https://api.github.com/repos/paritytech/capi/git/matching-refs/tags/${tag}`,
+  tagShaMemo = new PermanentMemo<string, string>()
+  tagSha(tag: string) {
+    return this.fullShaMemo.run(tag, async () => {
+      const refs: GithubRef[] = await json(
+        `${githubApiRepo}/git/matching-refs/tags/${tag}`,
       )
+      if (!refs[0]) throw this.e404()
       return refs[0].object.sha
     })
   }
 
-  async normalizeVersion(version: string) {
-    if (/^\d+\.\d+\.\d+/.test(version)) return "v" + version
-    if (version.startsWith("ref:")) {
-      return (await this.branches()).find((b) => b[0] === version)?.[1]
-    }
-    if (/^sha:[0-9a-f]+$/.test(version)) {
-      const sha = version.slice("sha:".length)
-      if (sha.length > shaAbbrevLength) {
-        return version.slice(0, "sha:".length + shaAbbrevLength)
-      } else if (sha.length < shaAbbrevLength) {
-        return "sha:" + (await this.getFullSha(sha)).slice(0, shaAbbrevLength)
-      } else {
-        return version
-      }
-    }
-    return undefined
-  }
-
-  getFullShaMemo = new TimedMemo<string, string>(60000)
-  getFullSha(sha: string) {
-    return this.getFullShaMemo.run(sha, async () => {
-      return (await json(`https://api.github.com/repos/paritytech/capi/commits/${sha}`)).sha
+  fullShaMemo = new PermanentMemo<string, string>()
+  fullSha(sha: string) {
+    return this.fullShaMemo.run(sha, async () => {
+      return (await json(`${githubApiRepo}/commits/${sha}`)).sha
     })
   }
 
-  deploymentUrlMemo = new TimedMemo<string, string>(60000)
-  getDeploymentUrl(fullSha: string) {
+  deploymentUrlMemo = new PermanentMemo<string, string>()
+  deploymentUrl(fullSha: string) {
     return this.deploymentUrlMemo.run(fullSha, async () => {
-      const deployments = await json(
-        `https://api.github.com/repos/paritytech/capi/deployments?sha=${fullSha}`,
+      const deployments: GithubDeployment[] = await json(
+        `${githubApiRepo}/deployments?sha=${fullSha}`,
       )
-      const deployment = deployments.find((x: any) => x.creator.id === denoDeployId)
-      const statuses = await json(deployment.statuses_url)
-      const url = statuses.map((x: any) => x.environment_url).find((x: any) => x)
+      const deployment = deployments.find((x) => x.creator.id === denoDeployUserId)
+      if (!deployment) throw this.e404()
+      const statuses: GithubStatus[] = await json(deployment.statuses_url)
+      const url = statuses.map((x) => x.environment_url).find((x) => x)
       if (!url) throw this.e404()
       return url
     })
@@ -141,6 +148,20 @@ export class ProdCodegenServer extends CodegenServer {
 
 async function json(url: string) {
   const response = await fetch(url)
-  if (!response.ok) throw new Error("invalid response")
+  if (!response.ok) throw new Error(`${url}: invalid response`)
   return await response.json()
+}
+
+interface GithubRef {
+  ref: string
+  object: { sha: string }
+}
+
+interface GithubDeployment {
+  creator: { id: number }
+  statuses_url: string
+}
+
+interface GithubStatus {
+  environment_url?: string
 }

@@ -1,11 +1,10 @@
-import { getModIndex } from "../codegen/server/getModIndex.ts"
+import { getModuleIndex, getSha } from "../codegen/server/git_utils.ts"
+import { shaAbbrevLength } from "../codegen/server/prod.ts"
 import { ensureDir } from "../deps/std/fs.ts"
 
-const sha = new TextDecoder().decode(
-  await Deno.run({ cmd: ["git", "rev-parse", "@"], stdout: "piped" }).output(),
-)
+const sha = await getSha()
+const index = await getModuleIndex()
 
-const shaAbbrevLength = 8
 await ensureDir("target")
 await Deno.writeTextFile(
   "target/deploy.ts",
@@ -14,7 +13,7 @@ import { ProdCodegenServer } from "../codegen/server/prod.ts"
 
 new ProdCodegenServer(
   "sha:${sha.slice(0, shaAbbrevLength)}",
-  ${JSON.stringify(await getModIndex())},
+  ${JSON.stringify(index)},
 ).listen(80)
 `,
 )

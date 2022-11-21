@@ -9,9 +9,9 @@ export class S3Cache extends Cache {
   }
 
   async _getRaw(key: string, init: () => Promise<Uint8Array>) {
-    const res = await this.bucket.getObject(key)
-    if (res) {
-      return new Uint8Array(await new Response(res.body).arrayBuffer())
+    const result = await this.bucket.getObject(key)
+    if (result) {
+      return new Uint8Array(await new Response(result.body).arrayBuffer())
     }
     const value = await init()
     await this.bucket.putObject(key, value)
@@ -19,8 +19,7 @@ export class S3Cache extends Cache {
   }
 
   async _list(prefix: string): Promise<string[]> {
-    return (await this.bucket.listObjects({
-      prefix,
-    }))?.contents?.map((x) => x.key!).filter((x) => x) ?? []
+    const result = await this.bucket.listObjects({ prefix })
+    return result?.contents?.map((object) => object.key!.slice(prefix.length)) ?? []
   }
 }
