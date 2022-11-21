@@ -20,7 +20,7 @@ export class ProdCodegenServer extends CodegenServer {
     secretKey: Deno.env.get("S3_SECRET_KEY")!,
     region: Deno.env.get("S3_REGION")!,
     bucket: Deno.env.get("S3_BUCKET")!,
-  })
+  }, this.abortController.signal)
   localChainSupport = false
 
   constructor(readonly version: string, moduleIndex: string[]) {
@@ -94,14 +94,17 @@ export class ProdCodegenServer extends CodegenServer {
     ])).flat()
   }
 
-  tagsMemo = new TimedMemo<null, string[]>(tagsTtl)
+  tagsMemo = new TimedMemo<null, string[]>(tagsTtl, this.abortController.signal)
   tags() {
     return this.tagsMemo.run(null, async () => {
       return (await json("https://apiland.deno.dev/completions/items/capi/")).items
     })
   }
 
-  branchesMemo = new TimedMemo<null, Record<string, string>>(branchesTtl)
+  branchesMemo = new TimedMemo<null, Record<string, string>>(
+    branchesTtl,
+    this.abortController.signal,
+  )
   branches() {
     return this.branchesMemo.run(null, async () => {
       const refs: GithubRef[] = await json(

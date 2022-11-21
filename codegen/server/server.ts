@@ -11,7 +11,7 @@ import { codegen } from "../mod.ts"
 import { Cache } from "./cache.ts"
 
 shiki.setCDN("https://unpkg.com/shiki/")
-const highlighterPromise = shiki.getHighlighter({ theme: "github-dark", langs: ["ts"] })
+export const highlighterPromise = shiki.getHighlighter({ theme: "github-dark", langs: ["ts"] })
 
 const localChains = [
   "dev:polkadot",
@@ -45,12 +45,20 @@ export abstract class CodegenServer {
   abstract versionSuggestions(): Promise<string[]>
   abstract defaultVersion(request: Request): Promise<string>
 
-  listen(port: number, signal?: AbortSignal) {
+  abortController = new AbortController()
+
+  listen(
+    port: number,
+    onListen?: (params: {
+      hostname: string
+      port: number
+    }) => void,
+  ) {
     return serve((req) =>
       this.root(req).catch((e) => {
         if (e instanceof Response) return e
         return new Response(Deno.inspect(e), { status: 500 })
-      }), { port, signal })
+      }), { port, signal: this.abortController.signal, onListen })
   }
 
   static rWithCapiVersion = /^\/@([^\/]+)(\/.*)?$/
@@ -364,7 +372,10 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
     })
   }
 
-  latestChainVersionMemo = new TimedMemo<string, string>(latestChainVersionTtl)
+  latestChainVersionMemo = new TimedMemo<string, string>(
+    latestChainVersionTtl,
+    this.abortController.signal,
+  )
   async latestChainVersion(chainUrl: string) {
     return this.latestChainVersionMemo.run(chainUrl, async () => {
       const client = this.client(chainUrl)

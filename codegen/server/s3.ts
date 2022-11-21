@@ -3,8 +3,8 @@ import { Cache } from "./cache.ts"
 
 export class S3Cache extends Cache {
   bucket
-  constructor(config: S3BucketConfig) {
-    super()
+  constructor(config: S3BucketConfig, signal: AbortSignal) {
+    super(signal)
     this.bucket = new S3Bucket(config)
   }
 

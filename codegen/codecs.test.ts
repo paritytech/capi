@@ -1,25 +1,27 @@
 import { Codec } from "../deps/scale.ts"
-import * as path from "../deps/std/path.ts"
 import { assertEquals } from "../deps/std/testing/asserts.ts"
 import * as M from "../frame_metadata/mod.ts"
-import * as C from "../mod.ts"
 import * as testClients from "../test_util/clients/mod.ts"
-import * as U from "../util/mod.ts"
+import { LocalCodegenServer } from "./server/local.ts"
+import { highlighterPromise } from "./server/server.ts"
 
-const currentDir = path.dirname(path.fromFileUrl(import.meta.url))
-const codegenDir = path.join(currentDir, "_output")
+await highlighterPromise
 
-for (const [runtime, client] of Object.entries(testClients)) {
+for (const runtime of Object.keys(testClients)) {
   Deno.test(runtime, async () => {
-    // TODO: fix this test
-    if (1 as 0) return
-    const metadata = U.throwIfError(await C.metadata(client)().run())
+    let port: number
+    const server = new LocalCodegenServer()
+    server.listen(0, (x) => port = x.port)
+    const chainUrl = `dev:${runtime}`
+    const version = await server.latestChainVersion(chainUrl)
+    const metadata = await server.metadata(chainUrl, version)
     const codegened = await import(
-      path.toFileUrl(path.join(codegenDir, runtime, "mod.ts")).toString()
+      `http://localhost:${port!}/@local/proxy/${chainUrl}/@${version}/codecs.ts`
     )
+    server.abortController.abort()
     const deriveCodec = M.DeriveCodec(metadata.tys)
     const derivedCodecs = metadata.tys.map(deriveCodec)
-    const codegenCodecs = codegened.codecs._all
+    const codegenCodecs = codegened._all
     const origInspect = Codec.prototype["_inspect"]!
     let inspecting = 0
     Codec.prototype["_inspect"] = function(inspect) {

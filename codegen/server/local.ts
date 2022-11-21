@@ -1,10 +1,10 @@
-import { FsCache } from "./cache.ts"
+import { Cache, FsCache } from "./cache.ts"
 import { getModuleIndex } from "./git_utils.ts"
 import { CodegenServer } from "./server.ts"
 
 export class LocalCodegenServer extends CodegenServer {
   version = "local"
-  cache = new FsCache("target/codegen")
+  cache: Cache = new FsCache("target/codegen", this.abortController.signal)
   localChainSupport = true
 
   async defaultVersion() {

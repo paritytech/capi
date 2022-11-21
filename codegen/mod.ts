@@ -14,7 +14,6 @@ export interface CodegenProps {
 export function codegen(props: CodegenProps): Files {
   const files = new Files()
 
-  console.time("base")
   const typeVisitor = createTypeVisitor(props, files)
 
   files.set("codecs.ts", () => genCodecs(props, typeVisitor))
@@ -39,7 +38,6 @@ export * as codecs from "./codecs.ts"
 
 export * from "./extrinsic.ts"
 `)
-  console.timeEnd("base")
 
   return files
 }

@@ -10,9 +10,15 @@ export class AsyncMemo<K, V> {
 
 export class TimedMemo<K, V> extends AsyncMemo<K, V> {
   done = new Map<K, V>()
+  timers = new Set<number>()
 
-  constructor(readonly ttl: number) {
+  constructor(readonly ttl: number, readonly signal: AbortSignal) {
     super()
+    this.signal.addEventListener("abort", () => {
+      for (const timer of this.timers) {
+        clearTimeout(timer)
+      }
+    })
   }
 
   override async run(key: K, run: () => Promise<V>, ttl = this.ttl) {
@@ -21,7 +27,12 @@ export class TimedMemo<K, V> extends AsyncMemo<K, V> {
     return super.run(key, () =>
       run().then((value) => {
         this.done.set(key, value)
-        setTimeout(() => this.done.delete(key), ttl)
+        const timer = setTimeout(() => {
+          this.done.delete(key)
+          this.timers.delete(timer)
+        }, ttl)
+        this.timers.add(timer)
+        Deno.unrefTimer(timer)
         return value
       }))
   }

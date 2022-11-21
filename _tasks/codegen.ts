@@ -1,10 +1,10 @@
 import { LocalCodegenServer } from "../codegen/server/local.ts"
 import * as fs from "../deps/std/fs.ts"
 
-const server = new AbortController()
 await fs.emptyDir("target/codegen/generated")
 const port = 5646
-new LocalCodegenServer().listen(port, server.signal)
+const server = new LocalCodegenServer()
+server.listen(port)
 
 await Deno.run({
   cmd: [
@@ -17,4 +17,4 @@ await Deno.run({
   ],
 }).status()
 
-server.abort()
+server.abortController.abort()
