@@ -20,14 +20,13 @@ export class LocalCodegenServer extends CodegenServer {
   }
 
   moduleIndex = getModuleIndex
-  async moduleFile(request: Request, path: string): Promise<Response> {
+  async moduleFile(request: Request, path: string, key: string): Promise<Response> {
     const res = await fetch(new URL("../.." + path, import.meta.url))
     if (!res.ok) return this.e404()
-    return this.ts(request, await res.text())
+    return this.ts(request, key, await res.text())
   }
 }
 
 if (import.meta.main) {
-  console.log("http://localhost:5646/")
   new LocalCodegenServer().listen(5646)
 }

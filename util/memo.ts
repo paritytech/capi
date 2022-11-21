@@ -15,7 +15,7 @@ export class TimedMemo<K, V> extends AsyncMemo<K, V> {
     super()
   }
 
-  override async run(key: K, run: () => Promise<V>) {
+  override async run(key: K, run: () => Promise<V>, ttl = this.ttl) {
     const existing = this.done.get(key)
     if (existing) return existing
     return super.run(key, () =>

@@ -75,14 +75,14 @@ export class ProdCodegenServer extends CodegenServer {
     throw this.e404()
   }
 
-  async moduleFile(request: Request, path: string): Promise<Response> {
+  async moduleFile(request: Request, path: string, key: string) {
     if (ProdCodegenServer.rRefVersion.test(this.version)) {
       return this.redirect(`https://deno.land/x/capi@${this.version}${path}`)
     }
     const sha = await this.versionSha(this.version)
     const res = await fetch(`https://raw.githubusercontent.com/paritytech/capi/${sha}${path}`)
     if (!res.ok) return this.e404()
-    return this.ts(request, await res.text())
+    return this.ts(request, key, await res.text())
   }
 
   async versionSuggestions(): Promise<string[]> {

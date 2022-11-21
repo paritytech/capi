@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.165.0/http/server.ts"
 import * as shiki from "https://esm.sh/shiki@0.11.1?bundle&dev"
-import { tsFormatter } from "../../deps/dprint.ts"
 import * as $ from "../../deps/scale.ts"
 import * as C from "../../mod.ts"
 import * as T from "../../test_util/mod.ts"
@@ -32,12 +31,14 @@ const suggestedChainUrls = [
 ]
 
 const latestChainVersionTtl = 600_000 // 10 minutes
+const chainFileTtl = 60_000 // 1 minute
+const renderedHtmlTtl = 60_000 // 1 minute
 
 export abstract class CodegenServer {
   abstract version: string
   abstract cache: Cache
   abstract localChainSupport: boolean
-  abstract moduleFile(request: Request, path: string): Promise<Response>
+  abstract moduleFile(request: Request, path: string, key: string): Promise<Response>
   abstract moduleIndex(): Promise<string[]>
   abstract delegateRequest(request: Request, version: string, path: string): Promise<Response>
   abstract versionSuggestions(): Promise<string[]>
@@ -80,7 +81,7 @@ export abstract class CodegenServer {
     if (path.startsWith("/autocomplete/")) {
       return this.autocomplete(path)
     }
-    return this.moduleFile(request, path)
+    return this.moduleFile(request, path, `module/${this.version}/${path}`)
   }
 
   landingPage() {
@@ -106,18 +107,18 @@ export abstract class CodegenServer {
         }/${filePath}`,
       )
     }
-    return this.ts(
-      request,
-      await this.cache.getRaw(
-        `generated/@${this.version}/${chainUrl}/@${chainVersion}/${filePath}`,
-        async () => {
-          const files = await this.files(chainUrl, chainVersion)
-          const file = files.get(filePath)
-          if (!file) throw this.e404()
-          return new TextEncoder().encode(tsFormatter.formatText(filePath, file()))
-        },
-      ),
+    const key = `generated/@${this.version}/${chainUrl}/@${chainVersion}/${filePath}`
+    const content = await this.cache.getString(
+      key,
+      chainFileTtl,
+      async () => {
+        const files = await this.files(chainUrl, chainVersion)
+        const content = files.getFormatted(filePath)
+        if (content == null) throw this.e404()
+        return content
+      },
     )
+    return this.ts(request, key, content)
   }
 
   filesMemo = new Map<C.M.Metadata, Files>()
@@ -261,12 +262,21 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
     })
   }
 
-  async ts(request: Request, body: string | Uint8Array) {
-    if (request.headers.get("Accept")?.split(",").includes("text/html")) {
-      if (typeof body !== "string") body = new TextDecoder().decode(body)
+  acceptsHtml(request: Request) {
+    return request.headers.get("Accept")?.split(",").includes("text/html") ?? false
+  }
+
+  async ts(request: Request, key: string, body: string) {
+    if (!this.acceptsHtml(request)) {
+      return new Response(body, {
+        headers: {
+          "Content-Type": "application/typescript",
+        },
+      })
+    }
+    const html = await this.cache.getString(`rendered/${key}.html`, renderedHtmlTtl, async () => {
       const highlighter = await highlighterPromise
-      return this.html(
-        `\
+      return `\
 <style>
   body {
     color: ${highlighter.getForegroundColor()};
@@ -290,14 +300,9 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
   <h3><code>${new URL(request.url).pathname}</code></h3>
   ${highlighter.codeToHtml(body, { lang: "ts" })}
 </body>
-`,
-      )
-    }
-    return new Response(body, {
-      headers: {
-        "Content-Type": "application/typescript",
-      },
+`
     })
+    return this.html(html)
   }
 
   html(html: string) {
