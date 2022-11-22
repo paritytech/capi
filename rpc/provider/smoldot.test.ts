@@ -1,5 +1,9 @@
 import { deferred } from "../../deps/std/async.ts"
-import { assertExists, assertNotInstanceOf } from "../../deps/std/testing/asserts.ts"
+import {
+  assertExists,
+  assertInstanceOf,
+  assertNotInstanceOf,
+} from "../../deps/std/testing/asserts.ts"
 import { ProviderListener } from "./base.ts"
 import { smoldotProvider } from "./smoldot.ts"
 
@@ -11,7 +15,7 @@ Deno.test({
     await t.step({
       name: "relay chain connection",
       async fn() {
-        const relayChainSpec = await (
+        const relay = await (
           await fetch(
             "https://raw.githubusercontent.com/paritytech/substrate-connect/main/packages/connect/src/connector/specs/polkadot.json",
           )
@@ -43,7 +47,7 @@ Deno.test({
             }
           },
         ]
-        const provider = smoldotProvider({ relayChainSpec }, (message) => {
+        const provider = smoldotProvider({ chainSpec: { relay } }, (message) => {
           if (checks.length > 1) {
             checks.shift()!(message)
           } else {
@@ -72,13 +76,13 @@ Deno.test({
     await t.step({
       name: "parachain connection",
       async fn() {
-        const relayChainSpec = await (
+        const relay = await (
           await fetch(
             "https://raw.githubusercontent.com/paritytech/substrate-connect/main/packages/connect/src/connector/specs/westend2.json",
           )
         )
           .text()
-        const parachainSpec = await (
+        const para = await (
           await fetch(
             "https://raw.githubusercontent.com/paritytech/substrate-connect/main/projects/demo/src/assets/westend-westmint.json",
           )
@@ -111,7 +115,7 @@ Deno.test({
           },
         ]
         const provider = smoldotProvider(
-          { parachainSpec, relayChainSpec },
+          { chainSpec: { para, relay } },
           (message) => {
             if (checks.length > 1) {
               checks.shift()!(message)
@@ -135,6 +139,47 @@ Deno.test({
           params: [subscriptionId],
         })
         await unsubscribed
+        const providerRelease = await provider.release()
+        assertNotInstanceOf(providerRelease, Error)
+      },
+    })
+
+    await t.step({
+      name: "invalid chain spec",
+      async fn() {
+        const stopped = deferred()
+        const provider = smoldotProvider({ chainSpec: { relay: "" } }, (message) => {
+          assertInstanceOf(message, Error)
+          stopped.resolve()
+        })
+        provider.send({
+          jsonrpc: "2.0",
+          id: provider.nextId(),
+          method: "system_health",
+          params: [false],
+        })
+        await stopped
+        const providerRelease = await provider.release()
+        assertNotInstanceOf(providerRelease, Error)
+      },
+    })
+    await t.step({
+      name: "send non-JSON",
+      async fn() {
+        const relay = await (
+          await fetch(
+            "https://raw.githubusercontent.com/paritytech/substrate-connect/main/packages/connect/src/connector/specs/polkadot.json",
+          )
+        )
+          .text()
+        const stopped = deferred()
+        const provider = smoldotProvider({ chainSpec: { relay } }, (message) => {
+          assertInstanceOf(message, Error)
+          stopped.resolve()
+        })
+        // make JSON.stringify to throw
+        provider.send(1n as never)
+        await stopped
         const providerRelease = await provider.release()
         assertNotInstanceOf(providerRelease, Error)
       },
