@@ -71,72 +71,7 @@ export type TransactionWatchEventBlock = {
   index: string
 }
 
-export type RpcMethods = {
-  methods: string[]
-}
-
 export type SmoldotRpc = {
-  // account_nextIndex - not implemented in smoldot
-  // author_hasKey - not implemented in smoldot
-  // author_hasSessionKeys - not implemented in smoldot
-  // author_insertKey - not implemented in smoldot
-  // author_pendingExtrinsics - in rpc/known/author
-  // author_removeExtrinsic - not implemented in smoldot
-  // author_rotateKeys - not implemented in smoldot
-  // author_submitAndWatchExtrinsic - in rpc/known/author
-  // author_submitExtrinsic - in rpc/known/author
-  // author_unwatchExtrinsic - in rpc/known/author
-  // babe_epochAuthorship - in rpc/known/babe
-  // chain_getBlock - in rpc/known/chain
-  // chain_getBlockHash - in rpc/known/chain
-  // chain_getFinalizedHead - in rpc/known/chain
-  // chain_getHeader - in rpc/known/chain
-  // chain_subscribeAllHeads - in rpc/known/chain
-  // chain_subscribeFinalizedHeads - in rpc/known/chain
-  // chain_subscribeNewHeads - in rpc/known/chain
-  // chain_unsubscribeAllHeads - in rpc/known/chain
-  // chain_unsubscribeFinalizedHeads - in rpc/known/chain
-  // chain_unsubscribeNewHeads - in rpc/known/chain
-  // childstate_getKeys - not implemented in smoldot
-  // childstate_getStorage - not implemented in smoldot
-  // childstate_getStorageHash - not implemented in smoldot
-  // childstate_getStorageSize - not implemented in smoldot
-  // grandpa_roundState - not implemented in smoldot
-  // offchain_localStorageGet - not implemented in smoldot
-  // offchain_localStorageSet - not implemented in smoldot
-  // payment_queryInfo - in rpc/known/payment
-  rpc_methods(): RpcResult<RpcMethods>
-  // state_call - in rpc/known/state
-  // state_getKeys - in rpc/known/state
-  // state_getKeysPaged - in rpc/known/state
-  // state_getMetadata - in rpc/known/state
-  // state_getPairs - in rpc/known/state - not implemented in smoldot
-  // state_getReadProof - in rpc/known/state - not implemented in smoldot
-  // state_getRuntimeVersion - in rpc/known/state
-  // state_getStorage - in rpc/known/state
-  // state_getStorageHash - in rpc/known/state - not implemented in smoldot
-  // state_getStorageSize - in rpc/known/state - not implemented in smoldot
-  // state_queryStorage - in rpc/known/state - not implemented in smoldot
-  // state_queryStorageAt - in rpc/known/state
-  // state_subscribeRuntimeVersion - in rpc/known/state
-  // state_subscribeStorage - in rpc/known/state
-  // state_unsubscribeRuntimeVersion - in rpc/known/state
-  // state_unsubscribeStorage - in rpc/known/state
-  // system_addReservedPeer - in rpc/known/system - not implemented in smoldot
-  // system_chain - in rpc/known/system
-  // system_chainType - in rpc/known/system
-  // system_chainType - in rpc/known/system
-  // system_dryRun - in rpc/known/system - not implemented in smoldot
-  // system_health - in rpc/known/system
-  // system_localListenAddresses - in rpc/known/system
-  // system_localPeerId - in rpc/known/system
-  // system_name - in rpc/known/system
-  // system_networkState - in rpc/known/system - not implemented in smoldot
-  // system_nodeRoles - in rpc/known/system
-  // system_peers - in rpc/known/system
-  // system_properties - in rpc/known/system
-  // system_removeReservedPeer - in rpc/known/system - not implemented in smoldot
-  // system_version - in rpc/known/system
   chainHead_unstable_body(
     followSubscription: string,
     hash: Hash,
@@ -175,9 +110,6 @@ export type SmoldotRpc = {
     transaction: Hex,
   ): RpcResult<Subscription<"transaction_unstable_submitAndWatch", TransactionWatchEvent>>
   transaction_unstable_unwatch(subscription: string): RpcResult<void>
-  // not implemented in smoldot
-  // network_unstable_subscribeEvents(): RpcResult<string>
-  // network_unstable_unsubscribeEvents(subscription: string): RpcResult<void>
   chainHead_unstable_finalizedDatabase(maxSizeBytes?: bigint): RpcResult<string>
 }
 
