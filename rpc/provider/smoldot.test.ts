@@ -15,7 +15,7 @@ Deno.test({
     await t.step({
       name: "relay chain connection",
       async fn() {
-        const relayChainSpec = await (
+        const relay = await (
           await fetch(
             "https://raw.githubusercontent.com/paritytech/substrate-connect/main/packages/connect/src/connector/specs/polkadot.json",
           )
@@ -47,7 +47,7 @@ Deno.test({
             }
           },
         ]
-        const provider = smoldotProvider({ relayChainSpec }, (message) => {
+        const provider = smoldotProvider({ chainSpec: { relay } }, (message) => {
           if (checks.length > 1) {
             checks.shift()!(message)
           } else {
@@ -76,13 +76,13 @@ Deno.test({
     await t.step({
       name: "parachain connection",
       async fn() {
-        const relayChainSpec = await (
+        const relay = await (
           await fetch(
             "https://raw.githubusercontent.com/paritytech/substrate-connect/main/packages/connect/src/connector/specs/westend2.json",
           )
         )
           .text()
-        const parachainSpec = await (
+        const para = await (
           await fetch(
             "https://raw.githubusercontent.com/paritytech/substrate-connect/main/projects/demo/src/assets/westend-westmint.json",
           )
@@ -115,7 +115,7 @@ Deno.test({
           },
         ]
         const provider = smoldotProvider(
-          { parachainSpec, relayChainSpec },
+          { chainSpec: { para, relay } },
           (message) => {
             if (checks.length > 1) {
               checks.shift()!(message)
@@ -148,7 +148,7 @@ Deno.test({
       name: "invalid chain spec",
       async fn() {
         const stopped = deferred()
-        const provider = smoldotProvider({ relayChainSpec: "" }, (message) => {
+        const provider = smoldotProvider({ chainSpec: { relay: "" } }, (message) => {
           assertInstanceOf(message, Error)
           stopped.resolve()
         })
@@ -166,14 +166,14 @@ Deno.test({
     await t.step({
       name: "send non-JSON",
       async fn() {
-        const relayChainSpec = await (
+        const relay = await (
           await fetch(
             "https://raw.githubusercontent.com/paritytech/substrate-connect/main/packages/connect/src/connector/specs/polkadot.json",
           )
         )
           .text()
         const stopped = deferred()
-        const provider = smoldotProvider({ relayChainSpec }, (message) => {
+        const provider = smoldotProvider({ chainSpec: { relay } }, (message) => {
           assertInstanceOf(message, Error)
           stopped.resolve()
         })

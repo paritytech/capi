@@ -35,8 +35,10 @@ class SmoldotProviderConnection
 const nextId = nextIdFactory()
 
 export interface SmoldotProviderProps {
-  relayChainSpec: string
-  parachainSpec?: string
+  chainSpec: {
+    relay: string
+    para?: string
+  }
   // TODO: support deferring closing (how / what heuristic?)
   deferClosing?: boolean
 }
@@ -103,17 +105,17 @@ async function connection(
   let conn = connections.get(props)
   if (!conn) {
     let inner: Chain
-    if (props.parachainSpec) {
+    if (props.chainSpec.para) {
       const relayChainConnection = await client.addChain({
-        chainSpec: props.relayChainSpec,
+        chainSpec: props.chainSpec.relay,
         disableJsonRpc: true,
       })
       inner = await client.addChain({
-        chainSpec: props.parachainSpec,
+        chainSpec: props.chainSpec.para,
         potentialRelayChains: [relayChainConnection],
       })
     } else {
-      inner = await client.addChain({ chainSpec: props.relayChainSpec })
+      inner = await client.addChain({ chainSpec: props.chainSpec.relay })
     }
     const stopListening = deferred<undefined>()
     conn = new SmoldotProviderConnection(inner, () => stopListening.resolve())
