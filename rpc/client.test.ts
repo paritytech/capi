@@ -100,7 +100,6 @@ Deno.test({
 
     await t.step({
       name: "subscribe error after subscribing",
-      ignore: true,
       async fn() {
         const { client, emitEvent } = createMockClient()
         const pending = client
@@ -108,7 +107,8 @@ Deno.test({
         const result = "$$$"
         emitEvent({ id: 0, result } as unknown as msg.OkMessage)
         emitEvent(new ProviderHandlerError(null!))
-        A.assertEquals(U.throwIfError(await pending).result, result)
+        emitEvent({ id: 1, result: true } as unknown as msg.OkMessage)
+        A.assertInstanceOf(await pending, ProviderHandlerError)
         assertClientCleanup(client)
       },
     })
