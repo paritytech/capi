@@ -65,12 +65,10 @@ export const smoldotProvider: Provider<
         }
       })()
     },
-    release: async () => {
-      let conn
-      try {
-        conn = await connection(props, listener)
-      } catch (_error) {
-        return
+    release: () => {
+      const conn = connections.get(props)
+      if (!conn) {
+        return Promise.resolve(undefined)
       }
       const { cleanUp, listeners, inner } = conn
       listeners.delete(listener)
@@ -81,10 +79,10 @@ export const smoldotProvider: Provider<
           // TODO: utilize `deferClosing` prop once we flesh out approach
           inner.remove()
         } catch (e) {
-          return new ProviderCloseError(e as SmoldotCloseErrorData)
+          return Promise.resolve(new ProviderCloseError(e as SmoldotCloseErrorData))
         }
       }
-      return
+      return Promise.resolve(undefined)
     },
   }
 }

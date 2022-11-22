@@ -34,10 +34,8 @@ export const proxyProvider: Provider<string, Event, Event, Event> = (url, listen
       })()
     },
     release: () => {
-      let conn
-      try {
-        conn = connection(url, listener)
-      } catch (_error) {
+      const conn = connections.get(url)
+      if (!conn) {
         return Promise.resolve(undefined)
       }
       const { cleanUp, listeners, inner } = conn
