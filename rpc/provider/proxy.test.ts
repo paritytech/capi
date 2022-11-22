@@ -9,11 +9,11 @@ Deno.test({
     await t.step({
       name: "send/listen",
       async fn() {
-        const stopped = deferred()
+        const waiter = deferred()
         const provider = proxyProvider(await T.polkadot.url, (message) => {
           A.assertNotInstanceOf(message, Error)
           A.assertExists(message.result)
-          stopped.resolve()
+          waiter.resolve()
         })
         provider.send({
           jsonrpc: "2.0",
@@ -21,7 +21,7 @@ Deno.test({
           method: "system_health",
           params: [],
         })
-        await stopped
+        await waiter
         const providerRelease = await provider.release()
         A.assertNotInstanceOf(providerRelease, Error)
       },
@@ -30,10 +30,10 @@ Deno.test({
     await t.step({
       name: "create WebSocket error",
       async fn() {
-        const stopped = deferred()
+        const waiter = deferred()
         const provider = proxyProvider("invalid-endpoint-url", (message) => {
           A.assertInstanceOf(message, Error)
-          stopped.resolve()
+          waiter.resolve()
         })
         provider.send({
           jsonrpc: "2.0",
@@ -41,7 +41,7 @@ Deno.test({
           method: "system_health",
           params: [],
         })
-        await stopped
+        await waiter
         const providerRelease = await provider.release()
         A.assertNotInstanceOf(providerRelease, Error)
       },
@@ -53,12 +53,12 @@ Deno.test({
         const server = createWebSocketServer(function() {
           this.close()
         })
-        const stopped = deferred()
+        const waiter = deferred()
         const provider = proxyProvider(
           server.url,
           (message) => {
             A.assertInstanceOf(message, Error)
-            stopped.resolve()
+            waiter.resolve()
           },
         )
         provider.send({
@@ -67,7 +67,7 @@ Deno.test({
           method: "system_health",
           params: [],
         })
-        await stopped
+        await waiter
         const providerRelease = await provider.release()
         A.assertNotInstanceOf(providerRelease, Error)
         server.close()
@@ -78,14 +78,14 @@ Deno.test({
       name: "send non-JSON message",
       async fn() {
         const server = createWebSocketServer()
-        const stopped = deferred()
+        const waiter = deferred()
         const provider = proxyProvider(server.url, (message) => {
           A.assertInstanceOf(message, Error)
-          stopped.resolve()
+          waiter.resolve()
         })
-        // @ts-ignore make JSON.stringify to throw
-        provider.send(1n)
-        await stopped
+        // make JSON.stringify to throw
+        provider.send(1n as never)
+        await waiter
         const providerRelease = await provider.release()
         A.assertNotInstanceOf(providerRelease, Error)
         server.close()

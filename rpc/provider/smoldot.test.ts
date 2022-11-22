@@ -177,8 +177,8 @@ Deno.test({
           assertInstanceOf(message, Error)
           stopped.resolve()
         })
-        // @ts-ignore make JSON.stringify to throw
-        provider.send(1n)
+        // make JSON.stringify to throw
+        provider.send(1n as never)
         await stopped
         const providerRelease = await provider.release()
         assertNotInstanceOf(providerRelease, Error)
