@@ -1,4 +1,4 @@
-import { getOrInit } from "./map.ts"
+import { getOrInit } from "./state.ts"
 
 export class AsyncMemo<K, V> {
   running = new Map<K, Promise<V>>()

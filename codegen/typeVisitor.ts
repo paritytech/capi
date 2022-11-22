@@ -1,7 +1,7 @@
 import { posix as pathPosix } from "../deps/std/path.ts"
 import * as M from "../frame_metadata/mod.ts"
 import { normalizeCase } from "../util/case.ts"
-import { getOrInit } from "../util/map.ts"
+import { getOrInit } from "../util/mod.ts"
 import { Files } from "./Files.ts"
 import { CodegenProps } from "./mod.ts"
 import { makeDocComment, S } from "./utils.ts"
