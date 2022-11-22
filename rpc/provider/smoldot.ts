@@ -106,6 +106,7 @@ async function connection(
     if (props.parachainSpec) {
       const relayChainConnection = await client.addChain({
         chainSpec: props.relayChainSpec,
+        disableJsonRpc: true,
       })
       inner = await client.addChain({
         chainSpec: props.parachainSpec,
