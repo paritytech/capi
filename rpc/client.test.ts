@@ -89,7 +89,7 @@ Deno.test({
       name: "subscribe general error",
       async fn() {
         const { client, emitEvent } = createMockClient()
-        const message = { id: client.providerRef.nextId() } as msg.EgressMessage
+        const message = { id: 0 } as msg.EgressMessage
         const pending = client
           .subscriptionFactory()(null!, null!, null!, ({ end }) => () => end())
         emitEvent(new ProviderSendError(null!, message))
@@ -100,13 +100,13 @@ Deno.test({
 
     await t.step({
       name: "subscribe error after subscribing",
+      ignore: true,
       async fn() {
         const { client, emitEvent } = createMockClient()
-        const id = client.providerRef.nextId()
         const pending = client
           .subscriptionFactory()(null!, null!, null!, ({ end }) => (e) => end(e))
         const result = "$$$"
-        emitEvent({ id, result } as unknown as msg.OkMessage)
+        emitEvent({ id: 0, result } as unknown as msg.OkMessage)
         emitEvent(new ProviderHandlerError(null!))
         A.assertEquals(U.throwIfError(await pending).result, result)
         assertClientCleanup(client)
@@ -117,11 +117,10 @@ Deno.test({
       name: "subscribe error subscribing",
       async fn() {
         const { client, emitEvent } = createMockClient()
-        const id = client.providerRef.nextId()
         const pending = client
           .subscriptionFactory()(null!, null!, null!, ({ end }) => (e) => end(e))
         const toEmit = {
-          id,
+          id: 0,
           error: {
             message: "some error",
           },
