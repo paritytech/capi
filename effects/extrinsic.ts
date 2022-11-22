@@ -11,21 +11,16 @@ import * as scale from "./scale.ts"
 
 const k0_ = Symbol()
 
-export interface CallData {
-  palletName: string
-  methodName: string
-  args: Record<string, unknown>
-}
-
-export interface ExtrinsicProps extends CallData {
+export interface ExtrinsicProps<Call = unknown> {
   sender: M.MultiAddress
   checkpoint?: U.HexHash
   mortality?: [period: bigint, phase: bigint]
   nonce?: string
   tip?: bigint
+  call: Call
 }
 
-export function extrinsic<Client extends Z.$<rpc.Client>>(client: Client) {
+export function extrinsic<Client extends Z.$<rpc.Client>, Call = unknown>(client: Client) {
   return <Props extends Z.Rec$<ExtrinsicProps>>(props: Props): Extrinsic<Client, Props> => {
     return new Extrinsic(client, props)
   }
@@ -48,9 +43,7 @@ export class Extrinsic<
     const $extrinsic_ = $extrinsic(this.client)
     const $extrinsicProps = Z.rec({
       protocolVersion: 4,
-      palletName: this.props.palletName,
-      methodName: this.props.methodName,
-      args: this.props.args,
+      call: this.props.call,
     })
     const extrinsicBytes = scale.scaleEncoded($extrinsic_, $extrinsicProps, true)
     const extrinsicHex = extrinsicBytes.next(U.hex.encodePrefixed)
@@ -86,9 +79,9 @@ export class SignedExtrinsic<
     const versions = const_(this.client)("System", "Version")
       .access("value")
     const specVersion = versions
-      .access("spec_version").as<number>()
+      .access("specVersion").as<number>()
     const transactionVersion = versions
-      .access("transaction_version").as<number>()
+      .access("transactionVersion").as<number>()
     // TODO: create match effect in zones and use here
     // TODO: MultiAddress conversion utils
     const senderSs58 = Z.ls(addrPrefix, this.props.sender).next(([addrPrefix, sender]) => {
@@ -114,14 +107,12 @@ export class SignedExtrinsic<
           ? M.era.mortal(mortality[0], mortality[1])
           : M.era.immortal
       })
-    const extra = Z.ls(mortality, nonce, this.props.tip || 0)
+    const extra = Z.ls(mortality, nonce, this.props.tip || 0n)
     const additional = Z.ls(specVersion, transactionVersion, checkpointHash, genesisHash)
     const signature = Z.rec({ address: this.props.sender, extra, additional })
     const $extrinsicProps = Z.rec({
       protocolVersion: 4,
-      palletName: this.props.palletName,
-      methodName: this.props.methodName,
-      args: this.props.args,
+      call: this.props.call,
       signature,
     })
     this.extrinsicBytes = scale.scaleEncoded($extrinsic_, $extrinsicProps, true)

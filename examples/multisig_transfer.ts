@@ -1,8 +1,9 @@
-import { KeyringPair } from "../deps/polkadot/keyring/types.ts"
-import { createKeyMulti } from "../deps/polkadot/util-crypto.ts"
-import * as C from "../mod.ts"
-import * as T from "../test_util/mod.ts"
-import * as U from "../util/mod.ts"
+import * as C from "#capi/mod.ts"
+import * as T from "#capi/test_util/mod.ts"
+import * as U from "#capi/util/mod.ts"
+
+import { extrinsic } from "#capi/proxy/dev:polkadot/@v0.9.31/mod.ts"
+import { Balances, Multisig, System } from "#capi/proxy/dev:polkadot/@v0.9.31/pallets/mod.ts"
 
 // FIXME: remove this check once the Zones .bind(env) fix is merged
 const hostname = Deno.env.get("TEST_CTX_HOSTNAME")
@@ -11,27 +12,19 @@ if (!hostname || !portRaw) {
   throw new Error("Must be running inside a test ctx")
 }
 
-const entryRead = C.entryRead(T.polkadot)
-const extrinsic = C.extrinsic(T.polkadot)
-
-const signatories = T.users
-  .slice(0, 3)
-  .map(({ publicKey }) => publicKey)
-  .sort()
+const signatories = T.users.slice(0, 3).map((pair) => pair.publicKey)
 const THRESHOLD = 2
-const multisigPublicKey = createKeyMulti(signatories, THRESHOLD)
+const multisigAddress = U.multisigAddress(signatories, THRESHOLD)
 
 // Transfer initial balance (existential deposit) to multisig address
 const existentialDeposit = extrinsic({
-  sender: C.compat.multiAddressFromKeypair(T.alice),
-  palletName: "Balances",
-  methodName: "transfer",
-  args: {
+  sender: T.alice.address,
+  call: Balances.transfer({
     value: 2_000_000_000_000n,
-    dest: C.MultiAddress.fromId(multisigPublicKey),
-  },
+    dest: C.MultiAddress.Id(multisigAddress),
+  }),
 })
-  .signed(C.compat.signerFromKeypair(T.alice))
+  .signed(T.alice.sign)
   .watch(function(status) {
     console.log(`Existential deposit:`, status)
     if (C.rpc.known.TransactionStatus.isTerminal(status)) {
@@ -43,19 +36,19 @@ const existentialDeposit = extrinsic({
 const proposal = createOrApproveMultisigProposal("Proposal", T.alice)
 
 // Get the key of the timepoint
-const key = C.keyPageRead(T.polkadot)("Multisig", "Multisigs", 1, [multisigPublicKey])
+const key = Multisig.Multisigs.keys(multisigAddress).readPage(1)
   .access(0)
   .access(1)
 
 // Get the timepoint itself
-const maybeTimepoint = entryRead("Multisig", "Multisigs", [multisigPublicKey, key])
+const maybeTimepoint = Multisig.Multisigs.entry(multisigAddress, key).read()
   .access("value")
   .access("when")
 
 const approval = createOrApproveMultisigProposal("Approval", T.bob, maybeTimepoint)
 
 // check T.dave new balance
-const daveBalance = entryRead("System", "Account", [T.dave.publicKey])
+const daveBalance = System.Account.entry(T.dave.publicKey).read()
 
 // TODO: use common env
 U.throwIfError(await existentialDeposit.run())
@@ -72,47 +65,37 @@ function createOrApproveMultisigProposal<
   ],
 >(
   label: string,
-  pair: KeyringPair,
+  pair: U.Sr25519,
   ...[maybeTimepoint]: Rest
 ) {
+  const call = Balances.transferKeepAlive({
+    dest: T.dave.address,
+    value: 1230000000000n,
+  })
   const maxWeight = extrinsic({
-    sender: C.MultiAddress.fromId(multisigPublicKey),
-    palletName: "Balances",
-    methodName: "transfer_keep_alive",
-    args: {
-      dest: C.compat.multiAddressFromKeypair(T.dave),
-      value: 1_230_000_000_000n,
-    },
+    sender: C.MultiAddress.Id(multisigAddress),
+    call,
   })
     .feeEstimate
     .access("weight")
     .next((weight) => {
       return {
-        ref_time: BigInt(weight.ref_time),
-        proof_size: BigInt(weight.proof_size),
+        refTime: BigInt(weight.ref_time),
+        proofSize: BigInt(weight.proof_size),
       }
     })
   return extrinsic({
-    sender: C.compat.multiAddressFromKeypair(pair),
-    palletName: "Multisig",
-    methodName: "as_multi",
-    args: C.Z.rec({
+    sender: pair.address,
+    call: C.Z.call.fac(Multisig.asMulti, null!)(C.Z.rec({
       threshold: THRESHOLD,
-      call: {
-        type: "Balances",
-        value: {
-          type: "transfer_keep_alive",
-          dest: C.compat.multiAddressFromKeypair(T.dave),
-          value: 1_230_000_000_000n,
-        },
-      },
-      other_signatories: signatories.filter((value) => value !== pair.publicKey),
-      store_call: false,
-      max_weight: maxWeight,
-      maybe_timepoint: maybeTimepoint as Rest[0],
-    }),
+      call,
+      otherSignatories: signatories.filter((value) => value !== pair.publicKey),
+      storeCall: false,
+      maxWeight,
+      maybeTimepoint: maybeTimepoint as Rest[0],
+    })),
   })
-    .signed(C.compat.signerFromKeypair(pair))
+    .signed(pair.sign)
     .watch(function(status) {
       console.log(`${label}:`, status)
       if (C.rpc.known.TransactionStatus.isTerminal(status)) {

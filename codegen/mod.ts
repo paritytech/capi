@@ -1,39 +1,43 @@
 import * as M from "../frame_metadata/mod.ts"
-import { createCodecVisitor } from "./codecVisitor.ts"
 import { Files } from "./Files.ts"
+import { genCodecs } from "./genCodecs.ts"
 import { genMetadata } from "./genMetadata.ts"
 import { createTypeVisitor } from "./typeVisitor.ts"
-import { Decl, printDecls, S } from "./utils.ts"
+import { S } from "./utils.ts"
 
 export interface CodegenProps {
   metadata: M.Metadata
   importSpecifier: string
+  clientDecl: string
 }
 
 export function codegen(props: CodegenProps): Files {
-  const decls: Decl[] = []
   const files = new Files()
-  decls.push({
-    path: "_",
-    code: [
-      "\n",
-      [
-        "import { ChainError, BitSequence, Era, $ } from",
-        S.string(props.importSpecifier),
-      ],
-      [`import * as _codec from "./codecs.ts"`],
-      [`export { _metadata }`],
-    ],
-  })
-  const typeVisitor = createTypeVisitor(props, decls)
-  const codecVisitor = createCodecVisitor(props, decls, typeVisitor, files)
-  for (const ty of props.metadata.tys) {
-    typeVisitor.visit(ty)
-    codecVisitor.visit(ty)
-  }
-  genMetadata(props.metadata, decls)
-  files.set("mod.ts", {
-    getContent: () => printDecls(decls),
-  })
+
+  const typeVisitor = createTypeVisitor(props, files)
+
+  files.set("codecs.ts", () => genCodecs(props, typeVisitor))
+
+  genMetadata(props.metadata, typeVisitor, files)
+
+  files.set(
+    "capi.ts",
+    () =>
+      `\
+export { $ } from ${S.string(props.importSpecifier)}
+export * as C from ${S.string(props.importSpecifier)}
+${props.clientDecl}
+`,
+  )
+
+  files.set("mod.ts", () =>
+    `\
+export * as pallets from "./pallets/mod.ts"
+export * as types from "./types/mod.ts"
+export * as codecs from "./codecs.ts"
+
+export * from "./extrinsic.ts"
+`)
+
   return files
 }

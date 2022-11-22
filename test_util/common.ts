@@ -15,10 +15,7 @@ export const RUNTIME_NAMES: { [N in RuntimeName as RUNTIME_CODES[N]]: N } = {
 }
 
 export function isRuntimeName(inQuestion: string): inQuestion is RuntimeName {
-  return inQuestion === "polkadot"
-    || inQuestion === "kusama"
-    || inQuestion === "polkadot"
-    || inQuestion === "polkadot"
+  return Object.values(RUNTIME_NAMES).includes(inQuestion as never)
 }
 
 export class InvalidRuntimeSpecifiedError extends Error {

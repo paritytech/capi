@@ -5,27 +5,11 @@ import { hashers, Hex, hex } from "../util/mod.ts"
 import { $null, DeriveCodec } from "./Codec.ts"
 import { Metadata } from "./Metadata.ts"
 
-export interface MultiAddress {
-  type: "Id" | "Index" | "Raw" | "Address20" | "Address32"
-  value: Uint8Array
-}
-// TODO: delete upon common generated core types
-export namespace MultiAddress {
-  export function fromId(id: Uint8Array): MultiAddress {
-    return {
-      type: "Id",
-      value: id,
-    }
-  }
-}
-
-export interface Signature {
-  type: "Sr25519" | "Ed25519" | "Secp256k" // TODO: `"Ecdsa"`?;
-  value: Uint8Array
-}
+// TODO: revisit
+import { $multiAddress, $multiSignature, MultiAddress, MultiSignature } from "./primitives.ts"
 
 export type Signer =
-  | ((message: Uint8Array) => Signature | Promise<Signature>)
+  | ((message: Uint8Array) => MultiSignature | Promise<MultiSignature>)
   | PolkadotSigner
 export interface PolkadotSigner {
   signPayload(payload: any): Promise<{ signature: string }>
@@ -39,10 +23,8 @@ export interface Extrinsic {
       address: MultiAddress
       extra: unknown[]
     }
-    & ({ additional: unknown[] } | { sig: Signature })
-  palletName: string
-  methodName: string
-  args: Record<string, unknown>
+    & ({ additional: unknown[] } | { sig: MultiSignature })
+  call: unknown
 }
 
 interface ExtrinsicCodecProps {
@@ -55,9 +37,7 @@ interface ExtrinsicCodecProps {
 export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
   const { metadata, deriveCodec } = props
   const { signedExtensions } = metadata.extrinsic
-  const $sig = deriveCodec(findExtrinsicTypeParam("Signature")!) as $.Codec<Signature>
-  const $sigPromise = $.promise($sig)
-  const $address = deriveCodec(findExtrinsicTypeParam("Address")!)
+  const $multisigPromise = $.promise($multiSignature)
   const callTy = findExtrinsicTypeParam("Call")!
   assert(callTy?.type === "Union")
   const $call = deriveCodec(callTy)
@@ -69,7 +49,7 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
   const pjsInfo = [...extraPjsInfo, ...additionalPjsInfo]
 
   const toSignSize = $call._staticSize + $extra._staticSize + $additional._staticSize
-  const totalSize = 1 + $address._staticSize + $sig._staticSize + toSignSize
+  const totalSize = 1 + $multiAddress._staticSize + $multiSignature._staticSize + toSignSize
 
   const $baseExtrinsic: $.Codec<Extrinsic> = $.createCodec({
     _metadata: [],
@@ -77,16 +57,9 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
     _encode(buffer, extrinsic) {
       const firstByte = (+!!extrinsic.signature << 7) | extrinsic.protocolVersion
       buffer.array[buffer.index++] = firstByte
-      const call = {
-        type: extrinsic.palletName,
-        value: {
-          type: extrinsic.methodName,
-          ...extrinsic.args,
-        },
-      }
-      const { signature } = extrinsic
+      const { signature, call } = extrinsic
       if (signature) {
-        $address._encode(buffer, signature.address)
+        $multiAddress._encode(buffer, signature.address)
         if ("additional" in signature) {
           const toSignBuffer = new $.EncodeBuffer(buffer.stealAlloc(toSignSize))
           $call._encode(toSignBuffer, call)
@@ -139,15 +112,15 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
               : toSignEncoded
             const sig = props.sign(toSign)
             if (sig instanceof Promise) {
-              $sigPromise._encode(buffer, sig)
+              $multisigPromise._encode(buffer, sig)
             } else {
-              $sig._encode(buffer, sig)
+              $multiSignature._encode(buffer, sig)
             }
             buffer.insertArray(extraEncoded)
             buffer.insertArray(callEncoded)
           }
         } else {
-          $sig._encode(buffer, signature.sig)
+          $multiSignature._encode(buffer, signature.sig)
           $extra._encode(buffer, signature.extra)
           $call._encode(buffer, call)
         }
@@ -161,40 +134,27 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
       const protocolVersion = firstByte & ~(1 << 7)
       let signature: Extrinsic["signature"]
       if (hasSignature) {
-        const address = $address._decode(buffer) as MultiAddress
-        const sig = $sig._decode(buffer)
+        const address = $multiAddress._decode(buffer) as MultiAddress
+        const sig = $multiSignature._decode(buffer)
         const extra = $extra._decode(buffer)
         signature = { address, sig, extra }
       }
-      const call = $call._decode(buffer) as any
-      const { type: palletName, value: { type: methodName, ...args } } = call
-      return { protocolVersion, signature, palletName, methodName, args }
+      const call = $call._decode(buffer)
+      return { protocolVersion, signature, call }
     },
     _assert(assert) {
       assert.typeof(this, "object")
-      assert
-        .key(this, "protocolVersion")
-        .equals($.u8, 4)
+      assert.key(this, "protocolVersion").equals($.u8, 4)
       const value_ = assert.value as any
-      // TODO: use `assert.key(this, "call")` upon merging https://github.com/paritytech/capi/pull/368
-      $call._assert(
-        new $.AssertState({
-          type: value_.palletName,
-          value: {
-            type: value_.methodName,
-            ...value_.args,
-          },
-        }),
-      )
+      $call._assert(assert.key(this, "call"))
       if (value_.signature) {
         const signatureAssertState = assert.key(this, "signature")
-        signatureAssertState.key($address, "address")
-        signatureAssertState.key($extra, "extra")
-        if ("additional" in signatureAssertState) {
-          signatureAssertState.key($additional, "additional")
-        }
-        if ("sig" in signatureAssertState) {
-          signatureAssertState.key($sig, "sig")
+        $multiAddress._assert(signatureAssertState.key(this, "address"))
+        $extra._assert(signatureAssertState.key(this, "extra"))
+        if ("additional" in value_.signature) {
+          $additional._assert(signatureAssertState.key(this, "additional"))
+        } else {
+          $multiSignature._assert(signatureAssertState.key(this, "sig"))
         }
       }
     },

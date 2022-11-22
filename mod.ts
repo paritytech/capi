@@ -1,8 +1,8 @@
-export * as compat from "./compat/mod.ts"
 export * as $ from "./deps/scale.ts"
 export { BitSequence } from "./deps/scale.ts"
 export * as Z from "./deps/zones.ts"
 export * from "./effects/mod.ts"
+export * as fluent from "./fluent/mod.ts"
 export * as M from "./frame_metadata/mod.ts"
 export {
   $era,
@@ -13,4 +13,4 @@ export {
   type Signer,
 } from "./frame_metadata/mod.ts"
 export * as rpc from "./rpc/mod.ts"
-export { contramapListener, hex, type Listener } from "./util/mod.ts"
+export { contramapListener, type Hex, hex, type Listener } from "./util/mod.ts"

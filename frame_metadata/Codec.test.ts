@@ -32,8 +32,8 @@ Deno.test("Derive AccountInfo Codec", async () => {
     data: {
       free: 1340320999878n,
       reserved: 0n,
-      misc_frozen: 50000000000n,
-      fee_frozen: 0n,
+      miscFrozen: 50000000000n,
+      feeFrozen: 0n,
     },
   }
   const encoded = codec.encode(decoded)

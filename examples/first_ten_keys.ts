@@ -1,7 +1,7 @@
-import * as C from "../mod.ts"
-import * as T from "../test_util/mod.ts"
-import * as U from "../util/mod.ts"
+import * as U from "#capi/util/mod.ts"
 
-const root = C.keyPageRead(T.polkadot)("System", "Account", 10, [])
+import { System } from "#capi/proxy/dev:polkadot/@v0.9.31/pallets/mod.ts"
+
+const root = System.Account.keys().readPage(10)
 
 console.log(U.throwIfError(await root.run()))

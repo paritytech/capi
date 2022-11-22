@@ -1,0 +1,11 @@
+{
+  "scopes": {
+    "examples/": {
+      "#capi/": "./",
+      "#capi/proxy/": "./target/codegen/generated/@local/"
+    },
+    "target/codegen/generated/": {
+      "/@local/": "./"
+    }
+  }
+}

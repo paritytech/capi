@@ -1,6 +1,9 @@
-import * as C from "../mod.ts"
-import * as T from "../test_util/mod.ts"
-import * as U from "../util/mod.ts"
+import * as C from "#capi/mod.ts"
+import * as T from "#capi/test_util/mod.ts"
+import * as U from "#capi/util/mod.ts"
+
+import { extrinsic } from "#capi/proxy/dev:westend/@v0.9.31/mod.ts"
+import { Balances, Utility } from "#capi/proxy/dev:westend/@v0.9.31/pallets/mod.ts"
 
 // TODO: uncomment these lines / use env upon solving `count` in zones
 // const getBalances = C.Z.ls(
@@ -10,22 +13,18 @@ import * as U from "../util/mod.ts"
 //   }),
 // )
 
-const tx = C.extrinsic(T.westend)({
-  sender: C.compat.multiAddressFromKeypair(T.alice),
-  palletName: "Utility",
-  methodName: "batch_all",
-  args: {
-    calls: T.users.map((pair) => ({
-      type: "Balances",
-      value: {
-        type: "transfer",
-        dest: C.compat.multiAddressFromKeypair(pair),
+const tx = extrinsic({
+  sender: T.alice.address,
+  call: Utility.batchAll({
+    calls: T.users.map((pair) =>
+      Balances.transfer({
+        dest: pair.address,
         value: 12345n,
-      },
-    })),
-  },
+      })
+    ),
+  }),
 })
-  .signed(C.compat.signerFromKeypair(T.alice))
+  .signed(T.alice.sign)
   .watch(function(status) {
     console.log(status)
     if (C.rpc.known.TransactionStatus.isTerminal(status)) {

@@ -39,6 +39,8 @@ export interface TyVisitorMethods<T> {
 
   lenPrefixedWrapper(ty: Ty & StructTyDef, inner: Ty): T
 
+  all?(ty: Ty): T | undefined
+
   circular(ty: Ty): T
 }
 
@@ -71,6 +73,8 @@ export class TyVisitor<T> {
   }
 
   _visit(ty: Ty) {
+    const allResult = this.all?.(ty)
+    if (allResult) return allResult
     if (ty.type === "Struct") {
       if (this.map && ty.path[0] === "BTreeMap") {
         return this.map(ty, ty.params[0]!.ty!, ty.params[1]!.ty!)

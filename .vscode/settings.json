@@ -10,6 +10,14 @@
   },
   "deno.codeLens.testArgs": ["--no-check=remote", "-A", "-L=info"],
   "deno.config": "./deno.jsonc",
+  "deno.importMap": "./import_map_cache.json",
+  "deno.suggest.imports.hosts": {
+    "https://deno.land": true,
+    "https://x.nest.land": true,
+    "https://crux.land": true,
+    "http://localhost:5646": true,
+    "https://capi.dev": true
+  },
   "deno.enable": true,
   "deno.lint": true,
   "editor.defaultFormatter": "dprint.dprint",
