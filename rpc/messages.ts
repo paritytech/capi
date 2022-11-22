@@ -15,10 +15,13 @@ export interface OkMessage<Result = any> extends JsonRpcVersionBearer {
   error?: never
 }
 
-export interface ErrorMessage<Data = any> extends JsonRpcVersionBearer {
+export interface ErrorMessage<
+  Code extends number = number,
+  Data = any,
+> extends JsonRpcVersionBearer {
   id: string
   error: {
-    code: number
+    code: Code
     message: string
     data: Data
   }
