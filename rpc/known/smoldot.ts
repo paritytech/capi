@@ -113,25 +113,11 @@ export type SmoldotRpc = {
   chainHead_unstable_finalizedDatabase(maxSizeBytes?: bigint): RpcResult<string>
 }
 
-export type ErrorResponse =
-  | ParseError
-  | InvalidRequest
-  | MethodNotFound
-  | InvalidParams
-  | InternalError
-  | ServerError
-  | MethodError
-
-type ParseError = SerdeError<-32700>
-type InvalidRequest = SerdeError<-32600>
-type MethodNotFound = SerdeError<-32601>
-type InvalidParams = SerdeError<-32602>
-type InternalError = SerdeError<-32603>
-type ServerError = SerdeError<number /*[-32099..=-32000]*/>
-type MethodError = SerdeError<number /* [-32700..=-32000]*/>
-
-type SerdeError<code = number> = {
-  code: code
-  message: string
-  data?: unknown
-}
+// TODO: do we even care about narrowing error code?
+export type ParseErrorCode = -32700
+export type InvalidRequestCode = -32600
+export type MethodNotFoundCode = -32601
+export type InvalidParamsCode = -32602
+export type InternalErrorCode = -32603
+export type ServerErrorCode = number /*[-32099..=-32000]*/
+export type MethodErrorCode = number /* [-32700..=-32000]*/
