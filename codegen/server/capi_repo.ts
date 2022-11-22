@@ -44,11 +44,13 @@ export abstract class CapiCodegenServer extends CodegenServer {
   }
 
   async versionSuggestions(): Promise<string[]> {
-    return (await Promise.all([
-      this.local ? ["local"] : [],
-      this.tags(),
-      this.branches().then(Object.keys),
-    ])).flat()
+    return [
+      ...new Set((await Promise.all([
+        this.local ? [this.version] : [],
+        this.tags(),
+        this.branches().then(Object.keys),
+      ])).flat()),
+    ]
   }
 
   tagsMemo = new TimedMemo<null, string[]>(tagsTtl, this.abortController.signal)
