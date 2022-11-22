@@ -1,12 +1,17 @@
 import { PermanentMemo } from "../../util/memo.ts"
-import { CapiCodegenServer, githubApiRepo, GithubRef, json } from "./capi_repo.ts"
+import {
+  CapiCodegenServer,
+  GITHUB_API_REPO,
+  GithubRef,
+  json,
+  R_REF_VERSION,
+  R_SHA_VERSION,
+} from "./capi_repo.ts"
 import { S3Cache } from "./s3.ts"
 
-export const shaAbbrevLength = 8
+const DENO_DEPLOY_USER_ID = 75045203
 
-const denoDeployUserId = 75045203
-
-const productionHost = "capi.dev"
+const PRODUCTION_HOST = "capi.dev"
 
 export class DenoDeployCodegenServer extends CapiCodegenServer {
   moduleIndex
@@ -24,7 +29,7 @@ export class DenoDeployCodegenServer extends CapiCodegenServer {
   }
 
   async defaultVersion(request: Request) {
-    if (new URL(request.url).host === productionHost) {
+    if (new URL(request.url).host === PRODUCTION_HOST) {
       return (await this.tags())[0]!
     }
     return this.version
@@ -35,9 +40,9 @@ export class DenoDeployCodegenServer extends CapiCodegenServer {
     const fullSha = await this.versionSha(version)
     return this.deploymentUrlMemo.run(fullSha, async () => {
       const deployments: GithubDeployment[] = await json(
-        `${githubApiRepo}/deployments?sha=${fullSha}`,
+        `${GITHUB_API_REPO}/deployments?sha=${fullSha}`,
       )
-      const deployment = deployments.find((x) => x.creator.id === denoDeployUserId)
+      const deployment = deployments.find((x) => x.creator.id === DENO_DEPLOY_USER_ID)
       if (!deployment) throw this.e404()
       const statuses: GithubStatus[] = await json(deployment.statuses_url)
       const url = statuses.map((x) => x.environment_url).find((x) => x)
@@ -47,10 +52,10 @@ export class DenoDeployCodegenServer extends CapiCodegenServer {
   }
 
   async versionSha(version: string) {
-    if (this.rRefVersion.test(version)) {
+    if (R_REF_VERSION.test(version)) {
       return this.tagSha(version)
     }
-    const shaMatch = this.rShaVersion.exec(version)
+    const shaMatch = R_SHA_VERSION.exec(version)
     if (shaMatch) {
       return await this.fullSha(shaMatch[1]!)
     }
@@ -61,7 +66,7 @@ export class DenoDeployCodegenServer extends CapiCodegenServer {
   tagSha(tag: string) {
     return this.fullShaMemo.run(tag, async () => {
       const refs: GithubRef[] = await json(
-        `${githubApiRepo}/git/matching-refs/tags/${tag}`,
+        `${GITHUB_API_REPO}/git/matching-refs/tags/${tag}`,
       )
       if (!refs[0]) throw this.e404()
       return refs[0].object.sha

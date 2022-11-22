@@ -13,14 +13,14 @@ import { Cache } from "./cache.ts"
 shiki.setCDN("https://unpkg.com/shiki/")
 export const highlighterPromise = shiki.getHighlighter({ theme: "github-dark", langs: ["ts"] })
 
-const localChains = [
+const LOCAL_CHAINS = [
   "dev:polkadot",
   "dev:westend",
   "dev:rococo",
   "dev:kusama",
 ]
 
-const suggestedChainUrls = [
+const SUGGESTED_CHAIN_URLS = [
   "wss:rpc.polkadot.io",
   "wss:kusama-rpc.polkadot.io",
   // "wss://acala-polkadot.api.onfinality.io/public-ws/",
@@ -31,9 +31,14 @@ const suggestedChainUrls = [
   "wss:westend-rpc.polkadot.io",
 ]
 
-const latestChainVersionTtl = 600_000 // 10 minutes
-const chainFileTtl = 60_000 // 1 minute
-const renderedHtmlTtl = 60_000 // 1 minute
+const LATEST_CHAIN_VERSION_TTL = 600_000 // 10 minutes
+const CHAIN_FILE_TTL = 60_000 // 1 minute
+const RENDERED_HTML_TTL = 60_000 // 1 minute
+
+const R_WITH_CAPI_VERSION = /^\/@([^\/]+)(\/.*)?$/
+const R_WITH_CHAIN_URL = /^\/proxy\/(dev:\w+|wss?:[^\/]+)\/(?:@([^\/]+)\/)?(.*)$/
+
+const $index = $.array($.str)
 
 export abstract class CodegenServer {
   abstract version: string
@@ -62,14 +67,12 @@ export abstract class CodegenServer {
       }), { port, signal: this.abortController.signal, onListen })
   }
 
-  static rWithCapiVersion = /^\/@([^\/]+)(\/.*)?$/
-  static rWithChainUrl = /^\/proxy\/(dev:\w+|wss?:[^\/]+)\/(?:@([^\/]+)\/)?(.*)$/
   async root(request: Request): Promise<Response> {
     const fullPath = new URL(request.url).pathname
     if (fullPath === "/.well-known/deno-import-intellisense.json") {
       return this.autocomplete(fullPath)
     }
-    const versionMatch = CodegenServer.rWithCapiVersion.exec(fullPath)
+    const versionMatch = R_WITH_CAPI_VERSION.exec(fullPath)
     if (!versionMatch) {
       const defaultVersion = await this.defaultVersion(request)
       return this.redirect(request, `/@${defaultVersion}${fullPath}`)
@@ -83,7 +86,7 @@ export abstract class CodegenServer {
       return this.landingPage()
     }
     if (path.startsWith("/proxy/")) {
-      const match = CodegenServer.rWithChainUrl.exec(path)
+      const match = R_WITH_CHAIN_URL.exec(path)
       if (!match) return this.e404()
       const [, chainUrl, chainVersion, file] = match
       return this.chainFile(request, chainUrl!, chainVersion, file!)
@@ -122,7 +125,7 @@ export abstract class CodegenServer {
     return this.ts(request, () =>
       this.cache.getString(
         `generated/@${this.version}/${chainUrl}/@${chainVersion}/${filePath}`,
-        chainFileTtl,
+        CHAIN_FILE_TTL,
         async () => {
           const files = await this.files(chainUrl, chainVersion)
           const content = files.getFormatted(filePath)
@@ -152,11 +155,10 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
     })
   }
 
-  static $index = $.array($.str)
   async chainIndex(chainUrl: string, chainVersion: string) {
     return await this.cache.get(
       `generated/@${this.version}/${chainUrl}/@${chainVersion}/_index`,
-      CodegenServer.$index,
+      $index,
       async () => {
         const files = await this.files(chainUrl, chainVersion)
         return [...files.keys()]
@@ -209,8 +211,8 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
     if (parts[1] === "chainUrl") {
       return this.json({
         items: [
-          ...(this.local ? localChains : []),
-          ...suggestedChainUrls,
+          ...(this.local ? LOCAL_CHAINS : []),
+          ...SUGGESTED_CHAIN_URLS,
         ],
       })
     }
@@ -292,7 +294,7 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
     }
     const html = await this.cache.getString(
       `rendered/${this.version}/${path}.html`,
-      renderedHtmlTtl,
+      RENDERED_HTML_TTL,
       async () => {
         const content = await body()
         const highlighter = await highlighterPromise
@@ -393,7 +395,7 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
   }
 
   latestChainVersionMemo = new TimedMemo<string, string>(
-    latestChainVersionTtl,
+    LATEST_CHAIN_VERSION_TTL,
     this.abortController.signal,
   )
   async latestChainVersion(chainUrl: string) {

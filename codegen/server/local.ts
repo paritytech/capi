@@ -3,6 +3,9 @@ import { Cache, FsCache } from "./cache.ts"
 import { CapiCodegenServer } from "./capi_repo.ts"
 import { getModuleIndex } from "./git_utils.ts"
 
+const R_DENO_LAND_URL = /^https:\/\/deno\.land\/x\/capi@(v[^\/]+)\//
+const R_GITHUB_URL = /^https:\/\/raw\.githubusercontent\.com\/paritytech\/capi\/([0-9a-f]+)\//
+
 export class LocalCapiCodegenServer extends CapiCodegenServer {
   version
   cache: Cache = new FsCache("target/codegen", this.abortController.signal)
@@ -13,17 +16,15 @@ export class LocalCapiCodegenServer extends CapiCodegenServer {
     this.version = version ?? this.detectVersion()
   }
 
-  rDenoLandUrl = /^https:\/\/deno\.land\/x\/capi@(v[^\/]+)\//
-  rGithubUrl = /^https:\/\/raw\.githubusercontent\.com\/paritytech\/capi\/([0-9a-f]+)\//
   detectVersion() {
     const url = import.meta.url
     if (url.startsWith("file://")) return "local"
-    const denoMatch = this.rDenoLandUrl.exec(url)
+    const denoMatch = R_DENO_LAND_URL.exec(url)
     if (denoMatch) {
       const [, version] = denoMatch
       return version!
     }
-    const githubMatch = this.rGithubUrl.exec(url)
+    const githubMatch = R_GITHUB_URL.exec(url)
     if (githubMatch) {
       const [, sha] = githubMatch
       return `sha:${sha}`

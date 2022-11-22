@@ -1,29 +1,29 @@
 import { PermanentMemo, TimedMemo } from "../../util/memo.ts"
-import { shaAbbrevLength } from "./git_utils.ts"
+import { SHA_ABBREV_LENGTH } from "./git_utils.ts"
 import { CodegenServer } from "./server.ts"
 
-const tagsTtl = 60_000 // 1 minute
-const branchesTtl = 60_000 // 1 minute
+const TAGS_TTL = 60_000 // 1 minute
+const BRANCHES_TTL = 60_000 // 1 minute
 
-export const githubApiRepo = "https://api.github.com/repos/paritytech/capi"
+export const GITHUB_API_REPO = "https://api.github.com/repos/paritytech/capi"
+
+export const R_TAG_VERSION = /^v?(\d+\.\d+\.\d+[^\/]*)$/
+export const R_REF_VERSION = /^ref:([^\/]*)$/
+export const R_SHA_VERSION = /^sha:([0-9a-f]+)$/
 
 export abstract class CapiCodegenServer extends CodegenServer {
-  rTagVersion = /^v?(\d+\.\d+\.\d+[^\/]*)$/
-  rRefVersion = /^ref:([^\/]*)$/
-  rShaVersion = /^sha:([0-9a-f]+)$/
-
   async normalizeVersion(version: string) {
-    const tagMatch = this.rTagVersion.exec(version)
+    const tagMatch = R_TAG_VERSION.exec(version)
     if (tagMatch) return "v" + tagMatch[1]
-    if (this.rRefVersion.test(version)) {
+    if (R_REF_VERSION.test(version)) {
       const shaVersion = (await this.branches())[version]
       if (!shaVersion) throw this.e404()
       return shaVersion
     }
-    const shaMatch = this.rShaVersion.exec(version)
+    const shaMatch = R_SHA_VERSION.exec(version)
     if (shaMatch) {
       const sha = await this.fullSha(shaMatch[1]!)
-      return `sha:${sha.slice(0, shaAbbrevLength)}`
+      return `sha:${sha.slice(0, SHA_ABBREV_LENGTH)}`
     }
     throw this.e404()
   }
@@ -32,10 +32,10 @@ export abstract class CapiCodegenServer extends CodegenServer {
     if (this.local && version === this.version) {
       return new URL("../.." + path, import.meta.url).toString()
     }
-    if (this.rRefVersion.test(version)) {
+    if (R_REF_VERSION.test(version)) {
       return `https://deno.land/x/capi@${version}${path}`
     }
-    const shaMatch = this.rShaVersion.exec(version)
+    const shaMatch = R_SHA_VERSION.exec(version)
     if (shaMatch) {
       const [, sha] = shaMatch
       return `https://raw.githubusercontent.com/paritytech/capi/${sha}${path}`
@@ -53,7 +53,7 @@ export abstract class CapiCodegenServer extends CodegenServer {
     ]
   }
 
-  tagsMemo = new TimedMemo<null, string[]>(tagsTtl, this.abortController.signal)
+  tagsMemo = new TimedMemo<null, string[]>(TAGS_TTL, this.abortController.signal)
   tags() {
     return this.tagsMemo.run(null, async () => {
       return (await json("https://apiland.deno.dev/completions/items/capi/")).items
@@ -61,17 +61,17 @@ export abstract class CapiCodegenServer extends CodegenServer {
   }
 
   branchesMemo = new TimedMemo<null, Record<string, string>>(
-    branchesTtl,
+    BRANCHES_TTL,
     this.abortController.signal,
   )
   branches() {
     return this.branchesMemo.run(null, async () => {
       const refs: GithubRef[] = await json(
-        `${githubApiRepo}/git/matching-refs/heads`,
+        `${GITHUB_API_REPO}/git/matching-refs/heads`,
       )
       return Object.fromEntries(refs.map((ref) => [
         `ref:${ref.ref.slice("refs/heads/".length).replace(/\//g, ":")}`,
-        `sha:${ref.object.sha.slice(0, shaAbbrevLength)}`,
+        `sha:${ref.object.sha.slice(0, SHA_ABBREV_LENGTH)}`,
       ]))
     })
   }
@@ -79,7 +79,7 @@ export abstract class CapiCodegenServer extends CodegenServer {
   fullShaMemo = new PermanentMemo<string, string>()
   fullSha(sha: string) {
     return this.fullShaMemo.run(sha, async () => {
-      return (await json(`${githubApiRepo}/commits/${sha}`)).sha
+      return (await json(`${GITHUB_API_REPO}/commits/${sha}`)).sha
     })
   }
 }
