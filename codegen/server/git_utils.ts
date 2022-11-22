@@ -1,3 +1,5 @@
+export const shaAbbrevLength = 8
+
 export async function getModuleIndex() {
   const cmd = Deno.run({
     cmd: ["git", "ls-files"],
@@ -15,5 +17,5 @@ export async function getSha() {
   })
   if (!(await cmd.status()).success) throw new Error("git rev-parse failed")
   const output = new TextDecoder().decode(await cmd.output())
-  return output
+  return output.slice(0, shaAbbrevLength)
 }

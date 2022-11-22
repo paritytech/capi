@@ -38,12 +38,13 @@ const renderedHtmlTtl = 60_000 // 1 minute
 export abstract class CodegenServer {
   abstract version: string
   abstract cache: Cache
-  abstract localChainSupport: boolean
-  abstract moduleFile(request: Request, path: string): Promise<Response>
+  abstract local: boolean
   abstract moduleIndex(): Promise<string[]>
-  abstract delegateRequest(request: Request, version: string, path: string): Promise<Response>
-  abstract versionSuggestions(): Promise<string[]>
   abstract defaultVersion(request: Request): Promise<string>
+  abstract normalizeVersion(version: string): Promise<string>
+  abstract deploymentUrl(version: string): Promise<string>
+  abstract versionSuggestions(): Promise<string[]>
+  abstract moduleFileUrl(version: string, path: string): string
 
   abortController = new AbortController()
 
@@ -208,7 +209,7 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
     if (parts[1] === "chainUrl") {
       return this.json({
         items: [
-          ...(this.localChainSupport ? localChains : []),
+          ...(this.local ? localChains : []),
           ...suggestedChainUrls,
         ],
       })
@@ -422,7 +423,7 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
 
   client(chainUrl: string) {
     if (chainUrl.startsWith("dev:")) {
-      if (!this.localChainSupport) throw new Error("Dev chains are not supported")
+      if (!this.local) throw new Error("Dev chains are not supported")
       const runtime = chainUrl.slice("dev:".length)
       if (!T.isRuntimeName(runtime)) {
         throw new T.InvalidRuntimeSpecifiedError(runtime)
@@ -437,5 +438,18 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
     if (!version.startsWith("v")) version = "v" + version
     if (version.includes("-")) version = version.split("-")[0]!
     return version
+  }
+
+  async moduleFile(request: Request, path: string) {
+    return this.redirect(request, this.moduleFileUrl(this.version, path))
+  }
+
+  async delegateRequest(request: Request, version: string, path: string): Promise<Response> {
+    const normalizedVersion = await this.normalizeVersion(version)
+    if (normalizedVersion !== version) {
+      return this.redirect(request, `/@${normalizedVersion}${path}`)
+    }
+    const url = await this.deploymentUrl(version)
+    return await fetch(new URL(new URL(request.url).pathname, url), { headers: request.headers })
   }
 }
