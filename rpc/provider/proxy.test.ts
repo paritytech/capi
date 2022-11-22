@@ -1,6 +1,6 @@
-import { deferred } from "../../deps/std/async.ts"
 import * as A from "../../deps/std/testing/asserts.ts"
 import * as T from "../../test_util/mod.ts"
+import { Provider, ProviderRef } from "./base.ts"
 import { proxyProvider } from "./proxy.ts"
 
 Deno.test({
@@ -9,41 +9,24 @@ Deno.test({
     await t.step({
       name: "send/listen",
       async fn() {
-        const waiter = deferred()
-        const provider = proxyProvider(await T.polkadot.url, (message) => {
-          A.assertNotInstanceOf(message, Error)
-          A.assertExists(message.result)
-          waiter.resolve()
-        })
-        provider.send({
-          jsonrpc: "2.0",
-          id: provider.nextId(),
-          method: "system_health",
-          params: [],
-        })
-        await waiter
-        const providerRelease = await provider.release()
-        A.assertNotInstanceOf(providerRelease, Error)
+        const [ref, message] = await setup(proxyProvider, await T.polkadot.url, "system_health", [])
+        A.assertNotInstanceOf(message, Error)
+        A.assertExists(message.result)
+        A.assertNotInstanceOf(await ref.release(), Error)
       },
     })
 
     await t.step({
       name: "create WebSocket error",
       async fn() {
-        const waiter = deferred()
-        const provider = proxyProvider("invalid-endpoint-url", (message) => {
-          A.assertInstanceOf(message, Error)
-          waiter.resolve()
-        })
-        provider.send({
-          jsonrpc: "2.0",
-          id: provider.nextId(),
-          method: "system_health",
-          params: [],
-        })
-        await waiter
-        const providerRelease = await provider.release()
-        A.assertNotInstanceOf(providerRelease, Error)
+        const [ref, message] = await setup(
+          proxyProvider,
+          "invalid-endpoint-url",
+          "system_health",
+          [],
+        )
+        A.assertInstanceOf(message, Error)
+        A.assertNotInstanceOf(await ref.release(), Error)
       },
     })
 
@@ -53,23 +36,14 @@ Deno.test({
         const server = createWebSocketServer(function() {
           this.close()
         })
-        const waiter = deferred()
-        const provider = proxyProvider(
+        const [ref, message] = await setup(
+          proxyProvider,
           server.url,
-          (message) => {
-            A.assertInstanceOf(message, Error)
-            waiter.resolve()
-          },
+          "system_health",
+          [],
         )
-        provider.send({
-          jsonrpc: "2.0",
-          id: provider.nextId(),
-          method: "system_health",
-          params: [],
-        })
-        await waiter
-        const providerRelease = await provider.release()
-        A.assertNotInstanceOf(providerRelease, Error)
+        A.assertInstanceOf(message, Error)
+        A.assertNotInstanceOf(await ref.release(), Error)
         server.close()
       },
     })
@@ -78,28 +52,42 @@ Deno.test({
       name: "send non-JSON message",
       async fn() {
         const server = createWebSocketServer()
-        const waiter = deferred()
-        const provider = proxyProvider(server.url, (message) => {
-          A.assertInstanceOf(message, Error)
-          waiter.resolve()
-        })
-        // make JSON.stringify to throw
-        provider.send(1n as never)
-        await waiter
-        const providerRelease = await provider.release()
-        A.assertNotInstanceOf(providerRelease, Error)
+        const [ref, message] = await setup(
+          proxyProvider,
+          server.url,
+          "system_health",
+          // make JSON.stringify to throw
+          [1n],
+        )
+        A.assertInstanceOf(message, Error)
+        A.assertNotInstanceOf(await ref.release(), Error)
         server.close()
       },
     })
   },
 })
 
+function setup(
+  provider: Provider,
+  discoveryValue: any,
+  method: string,
+  params: unknown[],
+): Promise<[ProviderRef<any>, any]> {
+  return new Promise((resolve) => {
+    const providerRef = provider(discoveryValue, (message) => resolve([providerRef, message]))
+    providerRef.send({
+      jsonrpc: "2.0",
+      id: providerRef.nextId(),
+      method,
+      params,
+    })
+  })
+}
+
 function createWebSocketServer(onMessage?: WebSocket["onmessage"]) {
-  const onmessage: WebSocket["onmessage"] = onMessage
-    ?? (() => {})
+  const onmessage = onMessage ?? (() => {})
   const listener = Deno.listen({ port: 0 })
-  const { port } = listener.addr as Deno.NetAddr
-  const startServer = async () => {
+  ;(async () => {
     for await (const conn of listener) {
       for await (const e of Deno.serveHttp(conn)) {
         const { socket, response } = Deno.upgradeWebSocket(e.request)
@@ -107,11 +95,9 @@ function createWebSocketServer(onMessage?: WebSocket["onmessage"]) {
         e.respondWith(response)
       }
     }
-  }
-  const close = () => listener.close()
-  startServer()
+  })()
   return {
-    close,
-    url: `ws://localhost:${port}`,
+    close: () => listener.close(),
+    url: `ws://localhost:${(listener.addr as Deno.NetAddr).port}`,
   }
 }

@@ -1,26 +1,16 @@
 import * as A from "../deps/std/testing/asserts.ts"
-import * as C from "../mod.ts"
 import * as T from "../test_util/mod.ts"
 import * as U from "../util/mod.ts"
-import { known, msg, Provider } from "./mod.ts"
-import { ProviderHandlerError, ProviderSendError } from "./provider/errors.ts"
-
-const createMockClient = () => {
-  let listener: C.rpc.ProviderListener<Error, Error>
-  const providerMockFactory: Provider = (_discoveryValue, clientListener) => {
-    listener = clientListener
-    let i = 0
-    return {
-      nextId: () => (i++).toString(),
-      send: () => {},
-      release: async () => await undefined,
-    }
-  }
-  const client = new C.rpc.Client<string, Error, Error, Error>(providerMockFactory, "")
-
-  // @ts-ignore listener is assigned in the C.rpc.Client constructor
-  return { client, emitEvent: listener }
-}
+import {
+  Client,
+  known,
+  msg,
+  nextIdFactory,
+  Provider,
+  ProviderHandlerError,
+  ProviderListener,
+  ProviderSendError,
+} from "./mod.ts"
 
 Deno.test({
   name: "RPC Client",
@@ -83,16 +73,10 @@ Deno.test({
       name: "call general error",
       async fn() {
         const { client, emitEvent } = createMockClient()
-        const message: msg.EgressMessage = {
-          jsonrpc: "2.0",
-          id: client.providerRef.nextId(),
-          method: "some_method",
-          params: [],
-        }
+        const message = { id: client.providerRef.nextId() } as msg.EgressMessage
         const response = client.call(message)
-        emitEvent(new ProviderSendError(new Error(), message))
-        const result = await response
-        A.assertInstanceOf(result, Error)
+        emitEvent(new ProviderSendError(null!, message))
+        A.assertInstanceOf(await response, Error)
         assertClientCleanup(client)
       },
     })
@@ -101,16 +85,10 @@ Deno.test({
       name: "call error",
       async fn() {
         const { client, emitEvent } = createMockClient()
-        const message: msg.EgressMessage = {
-          jsonrpc: "2.0",
-          id: client.providerRef.nextId(),
-          method: "some_method",
-          params: [],
-        }
+        const message = { id: client.providerRef.nextId() } as msg.EgressMessage
         const response = client.call(message)
-        emitEvent(new ProviderSendError(new Error(), message))
-        const result = await response
-        A.assertInstanceOf(result, ProviderSendError)
+        emitEvent(new ProviderSendError(null!, message))
+        A.assertInstanceOf(await response, ProviderSendError)
         assertClientCleanup(client)
       },
     })
@@ -119,18 +97,10 @@ Deno.test({
       name: "subscribe general error",
       async fn() {
         const { client, emitEvent } = createMockClient()
-        const message: msg.EgressMessage = {
-          jsonrpc: "2.0",
-          id: client.providerRef.nextId(),
-          method: "some_method",
-          params: [],
-        }
-        const response = client.subscribe(message, (event) => {
-          A.assertInstanceOf(event, Error)
-        })
-        emitEvent(new ProviderSendError(new Error(), message))
-        const result = await response
-        A.assertEquals(result, undefined)
+        const message = { id: client.providerRef.nextId() } as msg.EgressMessage
+        const response = client.subscribe(message, (event) => A.assertInstanceOf(event, Error))
+        emitEvent(new ProviderSendError(null!, message))
+        A.assertEquals(await response, undefined)
         assertClientCleanup(client)
       },
     })
@@ -140,22 +110,11 @@ Deno.test({
       async fn() {
         const { client, emitEvent } = createMockClient()
         const id = client.providerRef.nextId()
-        const response = client.subscribe(
-          {
-            jsonrpc: "2.0",
-            id,
-            method: "some_method",
-            params: [],
-          },
-          (_event) => {},
-        )
-        emitEvent({
-          id,
-          result: "subId",
-        } as msg.OkMessage)
-        emitEvent(new ProviderHandlerError(new Error()))
-        const result = await response
-        A.assertEquals(result, "subId")
+        const response = client.subscribe({ id } as msg.EgressMessage, (_event) => {})
+        const result = "$$$"
+        emitEvent({ id, result } as msg.OkMessage)
+        emitEvent(new ProviderHandlerError(null!))
+        A.assertEquals(await response, result)
         assertClientCleanup(client)
       },
     })
@@ -165,29 +124,40 @@ Deno.test({
       async fn() {
         const { client, emitEvent } = createMockClient()
         const id = client.providerRef.nextId()
-        const response = client.subscribe({
-          jsonrpc: "2.0",
-          id,
-          method: "some_method",
-          params: [],
-        }, (_event) => {})
+        const response = client.subscribe({ id } as msg.EgressMessage, (_event) => {})
         emitEvent({
           id,
           error: {
             message: "some error",
           },
         } as msg.ErrorMessage)
-        const result = await response
-        A.assertEquals(result, undefined)
+        A.assertEquals(await response, undefined)
         assertClientCleanup(client)
       },
     })
   },
 })
 
-function assertClientCleanup(client: C.rpc.Client<string, Error, Error, Error>) {
+function assertClientCleanup(client: Client) {
   A.assertEquals(client.pendingCalls, {})
   A.assertEquals(client.pendingSubscriptions, {})
   A.assertEquals(client.activeSubscriptions, {})
   A.assertEquals(client.activeSubscriptionByMessageId, {})
+}
+
+function createMockClient() {
+  let listener: ProviderListener<Error, Error>
+  const nextId = nextIdFactory()
+  const providerMockFactory: Provider = (_discoveryValue, clientListener) => {
+    listener = clientListener
+    return {
+      nextId,
+      send: () => {},
+      release: () => Promise.resolve(undefined),
+    }
+  }
+  return {
+    client: new Client(providerMockFactory, null!),
+    emitEvent: listener!,
+  }
 }
