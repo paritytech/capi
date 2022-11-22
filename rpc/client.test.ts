@@ -37,7 +37,7 @@ Deno.test({
         const events: msg.NotificationMessage<"chain_subscribeAllHeads", known.Header>[] = []
         const stoppedSubscriptionId = await client.subscriptionFactory<[], known.Header>()(
           "chain_subscribeAllHeads",
-          "chain_unsubscribeNewHeads",
+          "chain_unsubscribeAllHeads",
           [],
           (ctx) => {
             let i = 0
