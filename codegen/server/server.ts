@@ -381,6 +381,9 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
         return await response.text()
       }, path)
     }
+    if (path.startsWith("file://")) {
+      return await fetch(path)
+    }
     return new Response(null, {
       status: 302,
       headers: {
