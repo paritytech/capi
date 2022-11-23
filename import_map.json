@@ -1,0 +1,12 @@
+{
+  "scopes": {
+    "examples/": {
+      "http://localhost:5646/@local/": "./",
+      "http://localhost:5646/@local/proxy/": "http://localhost:5646/@local/proxy/"
+    },
+    "http://localhost:5646/@local/": {
+      "http://localhost:5646/@local/": "./",
+      "http://localhost:5646/@local/proxy/": "http://localhost:5646/@local/proxy/"
+    }
+  }
+}

@@ -1,4 +1,4 @@
-import * as T from "#capi/test_util/mod.ts"
+import * as T from "http://localhost:5646/@local/test_util/mod.ts"
 
 const client = await T.westend.client
 

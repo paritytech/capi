@@ -1,5 +1,5 @@
-import * as C from "#capi/mod.ts"
-import * as U from "#capi/util/mod.ts"
+import * as C from "http://localhost:5646/@local/mod.ts"
+import * as U from "http://localhost:5646/@local/util/mod.ts"
 
 const idx = C.entryRead(C.westend)("Staking", "ActiveEra", [])
   .access("value")

@@ -10,7 +10,7 @@
   },
   "deno.codeLens.testArgs": ["--no-check=remote", "-A", "-L=info"],
   "deno.config": "./deno.jsonc",
-  "deno.importMap": "./import_map_cache.json",
+  "deno.importMap": "./import_map.json",
   "deno.suggest.imports.hosts": {
     "https://deno.land": true,
     "https://x.nest.land": true,

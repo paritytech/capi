@@ -7,6 +7,7 @@
     "noUncheckedIndexedAccess": true,
     "useUnknownInCatchVariables": true
   },
+  "importMap": "import_map.json",
   "lint": {
     "files": {
       "exclude": ["target", "codegen/_output"],
@@ -27,15 +28,15 @@
   },
   "include": ["."],
   "tasks": {
-    "run": "deno run -A --no-lock --import-map=import_map_cache.json",
+    "run": "deno run -A --no-lock",
     "run:browser": "deno task run test_util/ctx.ts -- deno task run _tasks/run_browser.ts",
     "debug": "deno task run --inspect-brk",
     "download:frame_metadata": "deno task run _tasks/download_frame_metadata.ts",
     "udd": "deno task star && deno task run https://deno.land/x/udd@0.5.0/main.ts target/star.ts",
     "dnt": "deno task run _tasks/dnt.ts",
-    "star": "deno task run _tasks/star.ts && deno cache --check --no-lock --import-map=import_map_cache.json target/star.ts",
+    "star": "deno task run _tasks/star.ts && deno cache --check --no-lock target/star.ts",
     "lint": "deno lint",
-    "codegen": "deno task run cache.ts --no-lock --import-map=import_map_localhost.json examples/mod.ts",
+    "codegen": "deno task run cache.ts --no-lock examples/mod.ts",
     "test": "deno task run test_util/ctx.ts -- deno test -A --no-lock -L=info --ignore=target --parallel",
     "test:update": "deno task test -- -- --update",
     "mdbook:watch": "mdbook watch -o",

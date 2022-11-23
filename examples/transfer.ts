@@ -1,9 +1,9 @@
-import * as C from "#capi/mod.ts"
-import * as T from "#capi/test_util/mod.ts"
-import * as U from "#capi/util/mod.ts"
+import * as C from "http://localhost:5646/@local/mod.ts"
+import * as T from "http://localhost:5646/@local/test_util/mod.ts"
+import * as U from "http://localhost:5646/@local/util/mod.ts"
 
-import { extrinsic } from "#capi/proxy/dev:westend/@v0.9.31/mod.ts"
-import { Balances } from "#capi/proxy/dev:westend/@v0.9.31/pallets/mod.ts"
+import { extrinsic } from "http://localhost:5646/@local/proxy/dev:westend/@v0.9.31/mod.ts"
+import { Balances } from "http://localhost:5646/@local/proxy/dev:westend/@v0.9.31/pallets/mod.ts"
 
 const tx = extrinsic({
   sender: T.alice.address,
