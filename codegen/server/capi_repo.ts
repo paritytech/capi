@@ -13,6 +13,7 @@ export const R_SHA_VERSION = /^sha:([0-9a-f]+)$/
 
 export abstract class CapiCodegenServer extends CodegenServer {
   async normalizeVersion(version: string) {
+    if (version === this.mainVersion) return version
     const tagMatch = R_TAG_VERSION.exec(version)
     if (tagMatch) return "v" + tagMatch[1]
     if (R_REF_VERSION.test(version)) {
@@ -29,7 +30,8 @@ export abstract class CapiCodegenServer extends CodegenServer {
   }
 
   async canHandleVersion(version: string): Promise<boolean> {
-    return (await this.versionSha(this.mainVersion)) === (await this.versionSha(version))
+    return version === this.mainVersion
+      || (await this.versionSha(version)) === (await this.versionSha(this.mainVersion))
   }
 
   async moduleFileUrl(version: string, path: string) {

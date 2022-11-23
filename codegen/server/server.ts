@@ -84,7 +84,7 @@ export abstract class CodegenServer {
       return this.redirect(request, `/@${normalizedVersion}${path}`)
     }
     if (!(await this.canHandleVersion(version!))) {
-      return this.delegateRequest(request, version!, path)
+      return this.delegateRequest(request, version!, path!)
     }
     if (!path) return this.redirect(request, `/@${version}/`)
     if (path === "/") {
