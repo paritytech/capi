@@ -456,6 +456,6 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
 
   async delegateRequest(request: Request, version: string, path: string): Promise<Response> {
     const url = await this.deploymentUrl(version)
-    return await fetch(new URL(path, url), { headers: request.headers })
+    return await fetch(new URL(`/@${version}${path}`, url), { headers: request.headers })
   }
 }
