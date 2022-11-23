@@ -37,7 +37,7 @@ const value = C.run(system.account.get(key))
 
 In a likely future of specialized, interoperable chains, developers will need to make use of on-chain programs to satisfy varying use cases; the expertise required to interact with these on-chain programs is currently greater than that which _should_ be expected of app developers. Does this mean that app developers must forgo integrating with this blossoming infrastructure? We think not; **the open source community can use Capi to abstract over the atomics of the on-chain world**. An interaction spanning several chains and dozens of methods can be described with a single effect.
 
-As you read through this documentation, please consider use cases over which you might like to abstract; if you wish to add your use case to [Capi's standard library](std), please [submit an issue](https://github.com/paritytech/capi/issues/new).
+As you read through this documentation, please consider use cases over which you might like to abstract; if you wish to add your use case to [Capi's standard library](deps/std), please [submit an issue](https://github.com/paritytech/capi/issues/new).
 
 ## Code of Conduct
 
