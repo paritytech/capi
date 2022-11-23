@@ -53,7 +53,3 @@ export class LocalCapiCodegenServer extends CapiCodegenServer {
 
   moduleIndex = getModuleIndex
 }
-
-if (import.meta.main) {
-  new LocalCapiCodegenServer().listen(5646)
-}
