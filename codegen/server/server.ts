@@ -152,7 +152,7 @@ export const client = new LocalClientEffect(${JSON.stringify(chainUrl.slice(4))}
           `
           : `
 import * as C from ${JSON.stringify(`/@${version}/mod.ts`)}
-export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chainUrl)})
+export const client = C.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chainUrl)})
           `,
         importSpecifier: `/@${version}/mod.ts`,
       })
