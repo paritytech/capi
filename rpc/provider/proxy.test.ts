@@ -1,7 +1,7 @@
 import * as A from "../../deps/std/testing/asserts.ts"
 import * as T from "../../test_util/mod.ts"
-import { Provider, ProviderRef } from "./base.ts"
 import { proxyProvider } from "./proxy.ts"
+import { setup } from "./test_util.ts"
 
 Deno.test({
   name: "Proxy Provider",
@@ -66,23 +66,6 @@ Deno.test({
     })
   },
 })
-
-function setup(
-  provider: Provider,
-  discoveryValue: any,
-  method: string,
-  params: unknown[],
-): Promise<[ProviderRef<any>, any]> {
-  return new Promise((resolve) => {
-    const providerRef = provider(discoveryValue, (message) => resolve([providerRef, message]))
-    providerRef.send({
-      jsonrpc: "2.0",
-      id: providerRef.nextId(),
-      method,
-      params,
-    })
-  })
-}
 
 function createWebSocketServer(onMessage?: WebSocket["onmessage"]) {
   const onmessage = onMessage ?? (() => {})
