@@ -35,7 +35,7 @@
     "dnt": "deno task run _tasks/dnt.ts",
     "star": "deno task run _tasks/star.ts && deno cache --check --no-lock --import-map=import_map_cache.json target/star.ts",
     "lint": "deno lint",
-    "codegen": "deno task run _tasks/codegen.ts",
+    "codegen": "deno task run cache.ts --no-lock --import-map=import_map_localhost.json examples/mod.ts",
     "test": "deno task run test_util/ctx.ts -- deno test -A --no-lock -L=info --ignore=target --parallel",
     "test:update": "deno task test -- -- --update",
     "mdbook:watch": "mdbook watch -o",
