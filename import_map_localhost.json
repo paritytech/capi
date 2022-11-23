@@ -1,7 +1,0 @@
-{
-  "scopes": {
-    "examples/": {
-      "#capi/": "http://localhost:5646/@local/"
-    }
-  }
-}
