@@ -10,12 +10,16 @@ export async function getModuleIndex() {
   return output.split("\n").filter((x) => x.endsWith(".ts"))
 }
 
-export async function getSha() {
+export async function getFullSha() {
   const cmd = Deno.run({
     cmd: ["git", "rev-parse", "@"],
     stdout: "piped",
   })
   if (!(await cmd.status()).success) throw new Error("git rev-parse failed")
   const output = new TextDecoder().decode(await cmd.output())
-  return output.slice(0, SHA_ABBREV_LENGTH)
+  return output
+}
+
+export async function getSha() {
+  return (await getFullSha()).slice(0, SHA_ABBREV_LENGTH)
 }
