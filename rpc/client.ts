@@ -116,19 +116,12 @@ export class Client<
           return (value instanceof Error ? new U.End(value) : undefined) as any
         },
       })
-      const maybeStop = (maybeEnd: unknown) => {
-        if (maybeEnd instanceof U.End) {
-          stop(maybeEnd.value)
-        } else if (maybeEnd instanceof Error) {
-          stop(maybeEnd)
-        }
-      }
       this.pendingSubscriptions[id] = (event) => {
         const result = listener(event)
         if (result instanceof Promise) {
-          result.then(maybeStop)
+          result.then((resultR) => maybeStop(resultR, event))
         } else {
-          maybeStop(result)
+          maybeStop(result, event)
         }
       }
       ;(async () => {
@@ -139,6 +132,17 @@ export class Client<
         }
       })()
       return waiter
+
+      function maybeStop(
+        maybeEnd: U.ListenerResult,
+        event: ClientSubscriptionEvent<any, any, SendErrorData, HandlerErrorData>,
+      ) {
+        if (maybeEnd instanceof U.End) {
+          stop(maybeEnd.value)
+        } else if (event instanceof Error) {
+          stop()
+        }
+      }
     }
 
   discard = () => {
@@ -196,7 +200,7 @@ export type SubscriptionFactory<
   unsubscribeMethod: string,
   params: [...Params],
   createListener: CreateListener_,
-) => Promise<U.ListenerResult<CreateListener_>>
+) => Promise<U.GetListenerResult<CreateListener_>>
 
 export type CreateClientSubscriptionListener<
   SubscribeMethod extends string,

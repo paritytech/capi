@@ -5,7 +5,7 @@ import * as U from "#capi/util/mod.ts"
 import { extrinsic } from "#capi/proxy/dev:westend/@v0.9.31/mod.ts"
 import { Balances } from "#capi/proxy/dev:westend/@v0.9.31/pallets/mod.ts"
 
-const ex = extrinsic({
+const tx = extrinsic({
   sender: T.alice.address,
   call: Balances.transfer({
     value: 12345n,
@@ -14,7 +14,7 @@ const ex = extrinsic({
 })
   .signed(T.alice.sign)
 
-const finalizedIn = ex.watch(({ end }) =>
+const finalizedIn = tx.watch(({ end }) =>
   (status) => {
     console.log(status)
     if (typeof status !== "string" && status.finalized) {
@@ -26,7 +26,7 @@ const finalizedIn = ex.watch(({ end }) =>
   }
 )
 
-console.log(U.throwIfError(await C.events(ex, finalizedIn).run()))
+console.log(U.throwIfError(await C.events(tx, finalizedIn).run()))
 
 class NeverFinalized extends Error {
   override readonly name = "NeverFinalizedError"
