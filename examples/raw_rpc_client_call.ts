@@ -2,13 +2,6 @@ import * as T from "#capi/test_util/mod.ts"
 
 const client = await T.westend.client
 
-console.log(
-  await client.call({
-    jsonrpc: "2.0",
-    id: client.providerRef.nextId(),
-    method: "state_getMetadata",
-    params: [],
-  }),
-)
+console.log(await client.call(client.providerRef.nextId(), "state_getMetadata", []))
 
 await client.discard()

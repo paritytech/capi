@@ -27,6 +27,6 @@ export function entryRead<Client extends Z.$<rpc.Client>>(client: Client) {
     const storageBytes = storageBytesHex.next(U.hex.decode)
     const entryValueTypeI = entryMetadata_.access("value")
     const $entry = scale.codec(deriveCodec_, entryValueTypeI)
-    return scale.scaleDecoded($entry, storageBytes, "value").zoned("EntryRead")
+    return scale.scaleDecoded($entry, storageBytes, "value")
   }
 }

@@ -21,7 +21,7 @@ export function const_<Client extends Z.$<rpc.Client>>(client: Client) {
     const entryValueTypeI = constMetadata_.access("ty").access("id")
     const constValue = constMetadata_.access("value")
     const $const = scale.codec(deriveCodec_, entryValueTypeI)
-    return scale.scaleDecoded($const, constValue, "value").zoned("Const")
+    return scale.scaleDecoded($const, constValue, "value")
   }
 }
 Object.defineProperty(const_, "name", {

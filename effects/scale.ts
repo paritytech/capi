@@ -34,7 +34,6 @@ export function scaleDecoded<
     .next(([codec, encoded, key]): Record<Z.T<Key>, any> => {
       return { [key]: codec.decode(encoded) } as any
     }, k2_)
-    .zoned("ScaleDecoded")
 }
 
 // TODO: eventually, utilize `V` to toggle runtime validation

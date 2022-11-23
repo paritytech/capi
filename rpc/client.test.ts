@@ -22,12 +22,7 @@ Deno.test({
       sanitizeOps: false,
       sanitizeResources: false,
       async fn() {
-        const metadata = await client.call({
-          jsonrpc: "2.0",
-          id: client.providerRef.nextId(),
-          method: "state_getMetadata",
-          params: [],
-        })
+        const metadata = await client.call(client.providerRef.nextId(), "state_getMetadata", [])
         A.assertNotInstanceOf(metadata, Error)
         A.assert(!metadata.error)
         A.assertExists(metadata.result)
@@ -39,31 +34,28 @@ Deno.test({
       sanitizeOps: false,
       sanitizeResources: false,
       async fn() {
-        let subscriptionId: string
         const events: msg.NotificationMessage<"chain_subscribeAllHeads", known.Header>[] = []
-        const stoppedSubscriptionId = await client.subscribe<
+        const stoppedSubscriptionId = await client.subscriptionFactory<[], known.Header>()(
           "chain_subscribeAllHeads",
-          known.Header
-        >({
-          jsonrpc: "2.0",
-          id: client.providerRef.nextId(),
-          method: "chain_subscribeAllHeads",
-          params: [],
-        }, function(event) {
-          const counter = this.state(U.Counter)
-          A.assertNotInstanceOf(event, Error)
-          A.assert(!event.error)
-          A.assertExists(event.params.result.parentHash)
-          subscriptionId = event.params.subscription
-          events.push(event)
-          if (counter.i === 2) {
-            this.stop()
-            return
-          }
-          counter.inc()
-        })
+          "chain_unsubscribeAllHeads",
+          [],
+          (ctx) => {
+            let i = 0
+            return (e) => {
+              A.assertNotInstanceOf(e, Error)
+              A.assert(!e.error)
+              A.assertExists(e.params.result.parentHash)
+              events.push(e)
+              if (i === 2) {
+                return ctx.end(e.params.subscription)
+              }
+              i++
+              return
+            }
+          },
+        )
         A.assertEquals(events.length, 3)
-        A.assertEquals(stoppedSubscriptionId, subscriptionId!)
+        A.assert(typeof stoppedSubscriptionId === "string")
       },
     })
 
@@ -73,10 +65,10 @@ Deno.test({
       name: "call general error",
       async fn() {
         const { client, emitEvent } = createMockClient()
-        const message = { id: client.providerRef.nextId() } as msg.EgressMessage
-        const response = client.call(message)
-        emitEvent(new ProviderSendError(null!, message))
-        A.assertInstanceOf(await response, Error)
+        const id = client.providerRef.nextId()
+        const pending = client.call(id, null!, null!)
+        emitEvent(new ProviderSendError(null!, dummy(id)))
+        A.assertInstanceOf(await pending, Error)
         assertClientCleanup(client)
       },
     })
@@ -85,10 +77,10 @@ Deno.test({
       name: "call error",
       async fn() {
         const { client, emitEvent } = createMockClient()
-        const message = { id: client.providerRef.nextId() } as msg.EgressMessage
-        const response = client.call(message)
-        emitEvent(new ProviderSendError(null!, message))
-        A.assertInstanceOf(await response, ProviderSendError)
+        const id = client.providerRef.nextId()
+        const pending = client.call(id, null!, null!)
+        emitEvent(new ProviderSendError(null!, dummy(id)))
+        A.assertInstanceOf(await pending, ProviderSendError)
         assertClientCleanup(client)
       },
     })
@@ -97,10 +89,11 @@ Deno.test({
       name: "subscribe general error",
       async fn() {
         const { client, emitEvent } = createMockClient()
-        const message = { id: client.providerRef.nextId() } as msg.EgressMessage
-        const response = client.subscribe(message, (event) => A.assertInstanceOf(event, Error))
+        const message = { id: 0 } as msg.EgressMessage
+        const pending = client
+          .subscriptionFactory()(null!, null!, null!, ({ end }) => () => end())
         emitEvent(new ProviderSendError(null!, message))
-        A.assertEquals(await response, undefined)
+        A.assertEquals(await pending, undefined)
         assertClientCleanup(client)
       },
     })
@@ -109,12 +102,13 @@ Deno.test({
       name: "subscribe error after subscribing",
       async fn() {
         const { client, emitEvent } = createMockClient()
-        const id = client.providerRef.nextId()
-        const response = client.subscribe({ id } as msg.EgressMessage, (_event) => {})
+        const pending = client
+          .subscriptionFactory()(null!, null!, null!, ({ end }) => (e) => end(e))
         const result = "$$$"
-        emitEvent({ id, result } as msg.OkMessage)
+        emitEvent({ id: 0, result } as unknown as msg.OkMessage)
         emitEvent(new ProviderHandlerError(null!))
-        A.assertEquals(await response, result)
+        emitEvent({ id: 1, result: true } as unknown as msg.OkMessage)
+        A.assertInstanceOf(await pending, ProviderHandlerError)
         assertClientCleanup(client)
       },
     })
@@ -123,15 +117,16 @@ Deno.test({
       name: "subscribe error subscribing",
       async fn() {
         const { client, emitEvent } = createMockClient()
-        const id = client.providerRef.nextId()
-        const response = client.subscribe({ id } as msg.EgressMessage, (_event) => {})
-        emitEvent({
-          id,
+        const pending = client
+          .subscriptionFactory()(null!, null!, null!, ({ end }) => (e) => end(e))
+        const toEmit = {
+          id: 0,
           error: {
             message: "some error",
           },
-        } as msg.ErrorMessage)
-        A.assertEquals(await response, undefined)
+        } as unknown as msg.ErrorMessage
+        emitEvent(toEmit)
+        A.assertEquals(U.throwIfError(await pending), toEmit)
         assertClientCleanup(client)
       },
     })
@@ -146,7 +141,7 @@ function assertClientCleanup(client: Client) {
 }
 
 function createMockClient() {
-  let listener: ProviderListener<Error, Error>
+  let listener: ProviderListener<any, any>
   const nextId = nextIdFactory()
   const providerMockFactory: Provider = (_discoveryValue, clientListener) => {
     listener = clientListener
@@ -160,4 +155,12 @@ function createMockClient() {
     client: new Client(providerMockFactory, null!),
     emitEvent: listener!,
   }
+}
+
+function dummy(id: number): msg.EgressMessage {
+  return {
+    id,
+    method: null!,
+    params: null!,
+  } as any
 }

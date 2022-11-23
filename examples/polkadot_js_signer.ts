@@ -27,11 +27,14 @@ const root = C.extrinsic(T.westend)({
       )
     },
   })
-  .watch(function(status) {
-    console.log(status)
-    if (C.rpc.known.TransactionStatus.isTerminal(status)) {
-      this.stop()
+  .watch((ctx) =>
+    (status) => {
+      console.log(status)
+      if (C.rpc.known.TransactionStatus.isTerminal(status)) {
+        return ctx.end()
+      }
+      return
     }
-  })
+  )
 
 U.throwIfError(await root.run())

@@ -19,11 +19,12 @@ export type Provider<
 export type ProviderListener<SendErrorData, HandlerErrorData> = U.Listener<
   | msg.IngressMessage
   | ProviderSendError<SendErrorData>
-  | ProviderHandlerError<HandlerErrorData>
+  | ProviderHandlerError<HandlerErrorData>,
+  any
 >
 
 export interface ProviderRef<CloseErrorData> {
-  nextId(): string
+  nextId(): number
   send(message: msg.EgressMessage): void
   release(): Promise<undefined | ProviderCloseError<CloseErrorData>>
 }
@@ -68,7 +69,5 @@ export class ProviderConnection<Inner, SendErrorData, HandlerErrorData> {
 
 export function nextIdFactory() {
   let i = 0
-  return () => {
-    return (i++).toString()
-  }
+  return () => i++
 }

@@ -18,7 +18,7 @@ export function entryWatch<Client extends Z.$<rpc.Client>>(client: Client) {
     palletName: PalletName,
     entryName: EntryName,
     keys: Keys,
-    listener: U.Listener<WatchEntryEvent[], rpc.ClientSubscribeContext>,
+    createListener: U.CreateListener<rpc.ClientSubscriptionContext, WatchEntryEvent[]>,
   ) => {
     const metadata_ = metadata(client)()
     const deriveCodec_ = scale.deriveCodec(metadata_)
@@ -31,25 +31,22 @@ export function entryWatch<Client extends Z.$<rpc.Client>>(client: Client) {
       .scaleEncoded($storageKey_, keys.length ? [keys] : [])
       .next(U.hex.encode)
       .next(U.tuple)
-    const listenerMapped = Z.ls($entry, listener).next(([$entry, listener]) => {
-      return function listenerMapped(
-        this: rpc.ClientSubscribeContext,
-        changeset: rpc.known.StorageChangeSet,
-      ) {
-        // TODO: in some cases there might be keys to decode
-        // key ? $storageKey.decode(U.hex.decode(key)) : undefined
-        const getKey = (key: rpc.known.Hex) => {
-          return key
+    const createListenerMapped = Z
+      .ls($entry, createListener)
+      .next(([$entry, createListener]) => {
+        return (ctx: rpc.ClientSubscriptionContext) => {
+          const inner = createListener(ctx)
+          return (changeset: rpc.known.StorageChangeSet) => {
+            // TODO: in some cases there might be keys to decode
+            // key ? $storageKey.decode(U.hex.decode(key)) : undefined
+            const getKey = (key: rpc.known.Hex) => key
+            const changes: WatchEntryEvent[] = changeset.changes.map(
+              ([key, val]) => [getKey(key), val ? $entry.decode(U.hex.decode(val)) : undefined],
+            )
+            return inner(changes)
+          }
         }
-        const changes: WatchEntryEvent[] = changeset.changes.map(([key, val]) => {
-          return [getKey(key), val ? $entry.decode(U.hex.decode(val)) : undefined]
-        })
-        listener.apply(this, [changes])
-      }
-    }, k0_)
-    const subscriptionId = state.subscribeStorage(client)([storageKeys], listenerMapped)
-    return state
-      .unsubscribeStorage(client)(subscriptionId)
-      .zoned("EntryWatch")
+      }, k0_)
+    return state.subscribeStorage(client)([storageKeys], createListenerMapped)
   }
 }
