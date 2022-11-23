@@ -7,13 +7,13 @@ const R_DENO_LAND_URL = /^https:\/\/deno\.land\/x\/capi@(v[^\/]+)\//
 const R_GITHUB_URL = /^https:\/\/raw\.githubusercontent\.com\/paritytech\/capi\/([0-9a-f]+)\//
 
 export class LocalCapiCodegenServer extends CapiCodegenServer {
-  version
+  mainVersion
   cache: Cache = new FsCache("target/codegen", this.abortController.signal)
   local = true
 
   constructor(version?: string) {
     super()
-    this.version = version ?? this.detectVersion()
+    this.mainVersion = version ?? this.detectVersion()
   }
 
   detectVersion() {
@@ -33,13 +33,13 @@ export class LocalCapiCodegenServer extends CapiCodegenServer {
   }
 
   async defaultVersion() {
-    return this.version
+    return this.mainVersion
   }
 
   deploymentUrlMemo = new PermanentMemo<string, string>()
   async deploymentUrl(version: string) {
     return this.deploymentUrlMemo.run(version, async () => {
-      const mod = await import(this.moduleFileUrl(version, "/codegen/server/local.ts"))
+      const mod = await import(await this.moduleFileUrl(version, "/codegen/server/local.ts"))
       const Server = mod.LocalCapiCodegenServer as typeof LocalCapiCodegenServer
       const server = new Server(version)
       this.abortController.signal.addEventListener("abort", () => {

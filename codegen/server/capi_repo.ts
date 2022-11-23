@@ -1,5 +1,5 @@
 import { PermanentMemo, TimedMemo } from "../../util/memo.ts"
-import { SHA_ABBREV_LENGTH } from "./git_utils.ts"
+import { getFullSha, getSha, SHA_ABBREV_LENGTH } from "./git_utils.ts"
 import { CodegenServer } from "./server.ts"
 
 const TAGS_TTL = 60_000 // 1 minute
@@ -28,11 +28,15 @@ export abstract class CapiCodegenServer extends CodegenServer {
     throw this.e404()
   }
 
-  moduleFileUrl(version: string, path: string) {
-    if (this.local && version === this.version) {
+  async canHandleVersion(version: string): Promise<boolean> {
+    return (await this.versionSha(this.mainVersion)) === (await this.versionSha(version))
+  }
+
+  async moduleFileUrl(version: string, path: string) {
+    if (this.local && (await this.canHandleVersion(version))) {
       return new URL("../.." + path, import.meta.url).toString()
     }
-    if (R_REF_VERSION.test(version)) {
+    if (R_TAG_VERSION.test(version)) {
       return `https://deno.land/x/capi@${version}${path}`
     }
     const shaMatch = R_SHA_VERSION.exec(version)
@@ -46,7 +50,7 @@ export abstract class CapiCodegenServer extends CodegenServer {
   async versionSuggestions(): Promise<string[]> {
     return [
       ...new Set((await Promise.all([
-        this.local ? [this.version] : [],
+        this.local ? [this.mainVersion] : [],
         this.tags(),
         this.branches().then(Object.keys),
       ])).flat()),
@@ -73,6 +77,45 @@ export abstract class CapiCodegenServer extends CodegenServer {
         `ref:${ref.ref.slice("refs/heads/".length).replace(/\//g, ":")}`,
         `sha:${ref.object.sha.slice(0, SHA_ABBREV_LENGTH)}`,
       ]))
+    })
+  }
+
+  async versionSha(version: string) {
+    if (version === "local") {
+      return getSha()
+    }
+    if (R_TAG_VERSION.test(version)) {
+      return (await this.tagSha(version)).slice(0, SHA_ABBREV_LENGTH)
+    }
+    const shaMatch = R_SHA_VERSION.exec(version)
+    if (shaMatch) {
+      return shaMatch[1]!
+    }
+    throw new Error("expected normalized version")
+  }
+
+  async versionFullSha(version: string) {
+    if (version === "local") {
+      return getFullSha()
+    }
+    if (R_TAG_VERSION.test(version)) {
+      return this.tagSha(version)
+    }
+    const shaMatch = R_SHA_VERSION.exec(version)
+    if (shaMatch) {
+      return await this.fullSha(shaMatch[1]!)
+    }
+    throw new Error("expected normalized version")
+  }
+
+  tagShaMemo = new PermanentMemo<string, string>()
+  tagSha(tag: string) {
+    return this.fullShaMemo.run(tag, async () => {
+      const refs: GithubRef[] = await json(
+        `${GITHUB_API_REPO}/git/matching-refs/tags/${tag}`,
+      )
+      if (!refs[0]) throw this.e404()
+      return refs[0].object.sha
     })
   }
 

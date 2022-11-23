@@ -41,15 +41,16 @@ const R_WITH_CHAIN_URL = /^\/proxy\/(dev:\w+|wss?:[^\/]+)\/(?:@([^\/]+)\/)?(.*)$
 const $index = $.array($.str)
 
 export abstract class CodegenServer {
-  abstract version: string
   abstract cache: Cache
   abstract local: boolean
+  abstract mainVersion: string
+  abstract canHandleVersion(version: string): Promise<boolean>
   abstract moduleIndex(): Promise<string[]>
   abstract defaultVersion(request: Request): Promise<string>
   abstract normalizeVersion(version: string): Promise<string>
   abstract deploymentUrl(version: string): Promise<string>
   abstract versionSuggestions(): Promise<string[]>
-  abstract moduleFileUrl(version: string, path: string): string
+  abstract moduleFileUrl(version: string, path: string): Promise<string>
 
   abortController = new AbortController()
 
@@ -70,7 +71,7 @@ export abstract class CodegenServer {
   async root(request: Request): Promise<Response> {
     const fullPath = new URL(request.url).pathname
     if (fullPath === "/.well-known/deno-import-intellisense.json") {
-      return this.autocomplete(fullPath)
+      return this.autocompleteSchema()
     }
     const versionMatch = R_WITH_CAPI_VERSION.exec(fullPath)
     if (!versionMatch) {
@@ -78,31 +79,36 @@ export abstract class CodegenServer {
       return this.redirect(request, `/@${defaultVersion}${fullPath}`)
     }
     const [, version, path] = versionMatch
-    if (version !== this.version) {
-      return this.delegateRequest(request, version!, path ?? "/")
+    const normalizedVersion = await this.normalizeVersion(version!)
+    if (normalizedVersion !== version) {
+      return this.redirect(request, `/@${normalizedVersion}${path}`)
+    }
+    if (!(await this.canHandleVersion(version!))) {
+      return this.delegateRequest(request, version!, path)
     }
     if (!path) return this.redirect(request, `/@${version}/`)
     if (path === "/") {
-      return this.landingPage()
+      return this.landingPage(version!)
     }
     if (path.startsWith("/proxy/")) {
       const match = R_WITH_CHAIN_URL.exec(path)
       if (!match) return this.e404()
       const [, chainUrl, chainVersion, file] = match
-      return this.chainFile(request, chainUrl!, chainVersion, file!)
+      return this.chainFile(request, version!, chainUrl!, chainVersion, file!)
     }
     if (path.startsWith("/autocomplete/")) {
-      return this.autocomplete(path)
+      return this.autocompleteApi(path, version!)
     }
-    return this.moduleFile(request, path)
+    return this.moduleFile(request, version!, path)
   }
 
-  landingPage() {
-    return this.html(`<pre>capi@${this.version}</pre>`)
+  landingPage(version: string) {
+    return this.html(`<pre>capi@${version}</pre>`)
   }
 
   async chainFile(
     request: Request,
+    version: string,
     chainUrl: string,
     chainVersion: string | undefined,
     filePath: string,
@@ -111,23 +117,21 @@ export abstract class CodegenServer {
       const latestChainVersion = await this.latestChainVersion(chainUrl)
       return this.redirect(
         request,
-        `/@${this.version}/proxy/${chainUrl}/@${latestChainVersion}/${filePath}`,
+        `/@${version}/proxy/${chainUrl}/@${latestChainVersion}/${filePath}`,
       )
     }
     if (chainVersion !== this.normalizeChainVersion(chainVersion)) {
       return this.redirect(
         request,
-        `/@${this.version}/proxy/${chainUrl}/@${
-          this.normalizeChainVersion(chainVersion)
-        }/${filePath}`,
+        `/@${version}/proxy/${chainUrl}/@${this.normalizeChainVersion(chainVersion)}/${filePath}`,
       )
     }
     return this.ts(request, () =>
       this.cache.getString(
-        `generated/@${this.version}/${chainUrl}/@${chainVersion}/${filePath}`,
+        `generated/@${version}/${chainUrl}/@${chainVersion}/${filePath}`,
         CHAIN_FILE_TTL,
         async () => {
-          const files = await this.files(chainUrl, chainVersion)
+          const files = await this.files(chainUrl, version, chainVersion)
           const content = files.getFormatted(filePath)
           if (content == null) throw this.e404()
           return content
@@ -136,68 +140,69 @@ export abstract class CodegenServer {
   }
 
   filesMemo = new Map<C.M.Metadata, Files>()
-  async files(chainUrl: string, chainVersion: string) {
+  async files(chainUrl: string, version: string, chainVersion: string) {
     const metadata = await this.metadata(chainUrl, chainVersion)
     return U.getOrInit(this.filesMemo, metadata, () => {
       return codegen({
         metadata,
         clientDecl: chainUrl.startsWith("dev:")
           ? `
-import { LocalClientEffect } from ${JSON.stringify(`/@${this.version}/test_util/local.ts`)}
+import { LocalClientEffect } from ${JSON.stringify(`/@${version}/test_util/local.ts`)}
 export const client = new LocalClientEffect(${JSON.stringify(chainUrl.slice(4))})
           `
           : `
-import * as C from ${JSON.stringify(`/@${this.version}/mod.ts`)}
+import * as C from ${JSON.stringify(`/@${version}/mod.ts`)}
 export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chainUrl)})
           `,
-        importSpecifier: `/@${this.version}/mod.ts`,
+        importSpecifier: `/@${version}/mod.ts`,
       })
     })
   }
 
-  async chainIndex(chainUrl: string, chainVersion: string) {
+  async chainIndex(chainUrl: string, version: string, chainVersion: string) {
     return await this.cache.get(
-      `generated/@${this.version}/${chainUrl}/@${chainVersion}/_index`,
+      `generated/@${version}/${chainUrl}/@${chainVersion}/_index`,
       $index,
       async () => {
-        const files = await this.files(chainUrl, chainVersion)
+        const files = await this.files(chainUrl, version, chainVersion)
         return [...files.keys()]
       },
     )
   }
 
-  async autocomplete(path: string) {
-    if (path === "/.well-known/deno-import-intellisense.json") {
-      return this.json({
-        version: 2,
-        registries: [
-          {
-            schema: "/:version(@[^/]*)?/:file*",
-            variables: [
-              { key: "version", url: "/autocomplete/version" },
-              { key: "file", url: "/${version}/autocomplete/moduleFile/${file}" },
-            ],
-          },
-          {
-            schema:
-              "/:version(@[^/]*)/:_proxy(proxy)/:chainUrl(dev:\\w*|wss?:[^/]*)/:chainVersion(@[^/]+)/:file*",
-            variables: [
-              { key: "version", url: "/autocomplete/version" },
-              { key: "_proxy", url: "/autocomplete/null" },
-              { key: "chainUrl", url: "/${version}/autocomplete/chainUrl/${chainUrl}" },
-              {
-                key: "chainVersion",
-                url: "/${version}/autocomplete/chainVersion/${chainUrl}/${chainVersion}",
-              },
-              {
-                key: "file",
-                url: "/${version}/autocomplete/chainFile/${chainUrl}/${chainVersion}/${file}",
-              },
-            ],
-          },
-        ],
-      })
-    }
+  async autocompleteSchema() {
+    return this.json({
+      version: 2,
+      registries: [
+        {
+          schema: "/:version(@[^/]*)?/:file*",
+          variables: [
+            { key: "version", url: "/autocomplete/version" },
+            { key: "file", url: "/${version}/autocomplete/moduleFile/${file}" },
+          ],
+        },
+        {
+          schema:
+            "/:version(@[^/]*)/:_proxy(proxy)/:chainUrl(dev:\\w*|wss?:[^/]*)/:chainVersion(@[^/]+)/:file*",
+          variables: [
+            { key: "version", url: "/autocomplete/version" },
+            { key: "_proxy", url: "/autocomplete/null" },
+            { key: "chainUrl", url: "/${version}/autocomplete/chainUrl/${chainUrl}" },
+            {
+              key: "chainVersion",
+              url: "/${version}/autocomplete/chainVersion/${chainUrl}/${chainVersion}",
+            },
+            {
+              key: "file",
+              url: "/${version}/autocomplete/chainFile/${chainUrl}/${chainVersion}/${file}",
+            },
+          ],
+        },
+      ],
+    })
+  }
+
+  async autocompleteApi(path: string, version: string) {
     const parts = path.slice(1).split("/")
     if (parts[0] !== "autocomplete") return this.e404()
     if (parts[1] === "null") {
@@ -237,7 +242,7 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
     if (parts[1] === "chainFile") {
       const chainUrl = parts[2]!
       const chainVersion = parts[3]?.slice(1) || await this.latestChainVersion(chainUrl)
-      const index = await this.chainIndex(chainUrl, chainVersion)
+      const index = await this.chainIndex(chainUrl, version, chainVersion)
       return this.json(this.autocompleteIndex(index, parts.slice(4)))
     }
     return this.e404()
@@ -293,7 +298,7 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
       })
     }
     const html = await this.cache.getString(
-      `rendered/${this.version}/${path}.html`,
+      `rendered/${this.mainVersion}/${path}.html`,
       RENDERED_HTML_TTL,
       async () => {
         const content = await body()
@@ -445,16 +450,12 @@ export const client = C.rpc.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chai
     return version
   }
 
-  async moduleFile(request: Request, path: string) {
-    return this.redirect(request, this.moduleFileUrl(this.version, path))
+  async moduleFile(request: Request, version: string, path: string) {
+    return this.redirect(request, await this.moduleFileUrl(version, path))
   }
 
   async delegateRequest(request: Request, version: string, path: string): Promise<Response> {
-    const normalizedVersion = await this.normalizeVersion(version)
-    if (normalizedVersion !== version) {
-      return this.redirect(request, `/@${normalizedVersion}${path}`)
-    }
     const url = await this.deploymentUrl(version)
-    return await fetch(new URL(new URL(request.url).pathname, url), { headers: request.headers })
+    return await fetch(new URL(path, url), { headers: request.headers })
   }
 }

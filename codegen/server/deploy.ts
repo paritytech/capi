@@ -1,12 +1,5 @@
 import { PermanentMemo } from "../../util/memo.ts"
-import {
-  CapiCodegenServer,
-  GITHUB_API_REPO,
-  GithubRef,
-  json,
-  R_REF_VERSION,
-  R_SHA_VERSION,
-} from "./capi_repo.ts"
+import { CapiCodegenServer, GITHUB_API_REPO, json } from "./capi_repo.ts"
 import { S3Cache } from "./s3.ts"
 
 const DENO_DEPLOY_USER_ID = 75045203
@@ -23,7 +16,7 @@ export class DenoDeployCodegenServer extends CapiCodegenServer {
   }, this.abortController.signal)
   local = false
 
-  constructor(readonly version: string, moduleIndex: string[]) {
+  constructor(readonly mainVersion: string, moduleIndex: string[]) {
     super()
     this.moduleIndex = async () => moduleIndex
   }
@@ -32,12 +25,12 @@ export class DenoDeployCodegenServer extends CapiCodegenServer {
     if (new URL(request.url).host === PRODUCTION_HOST) {
       return (await this.tags())[0]!
     }
-    return this.version
+    return this.mainVersion
   }
 
   deploymentUrlMemo = new PermanentMemo<string, string>()
   async deploymentUrl(version: string) {
-    const fullSha = await this.versionSha(version)
+    const fullSha = await this.versionFullSha(version)
     return this.deploymentUrlMemo.run(fullSha, async () => {
       const deployments: GithubDeployment[] = await json(
         `${GITHUB_API_REPO}/deployments?sha=${fullSha}`,
@@ -48,28 +41,6 @@ export class DenoDeployCodegenServer extends CapiCodegenServer {
       const url = statuses.map((x) => x.environment_url).find((x) => x)
       if (!url) throw this.e404()
       return url
-    })
-  }
-
-  async versionSha(version: string) {
-    if (R_REF_VERSION.test(version)) {
-      return this.tagSha(version)
-    }
-    const shaMatch = R_SHA_VERSION.exec(version)
-    if (shaMatch) {
-      return await this.fullSha(shaMatch[1]!)
-    }
-    throw new Error("expected normalized version")
-  }
-
-  tagShaMemo = new PermanentMemo<string, string>()
-  tagSha(tag: string) {
-    return this.fullShaMemo.run(tag, async () => {
-      const refs: GithubRef[] = await json(
-        `${GITHUB_API_REPO}/git/matching-refs/tags/${tag}`,
-      )
-      if (!refs[0]) throw this.e404()
-      return refs[0].object.sha
     })
   }
 }
