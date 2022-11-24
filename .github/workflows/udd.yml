@@ -15,7 +15,7 @@ jobs:
         run: |
           deno task star && deno task run https://deno.land/x/udd/main.ts target/star.ts
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@d7db273d6c7206ba99224e659c982ae34a1025e3 # v4.1.1
+        uses: peter-evans/create-pull-request@331d02c7e2104af23ad5974d4d5cbc58a3e6dc77 # v4.1.1
         with:
           commit-message: "update dependencies and regenerate lockfile"
           title: "chore: update dependencies"
