@@ -81,3 +81,22 @@ export class LocalClientEffect extends Z.Effect<LocalClient, common.PolkadotBinN
     return new LocalClient(port, close)
   }
 }
+
+export class CustomClientEffect extends Z.Effect<LocalClient, common.PolkadotBinNotFoundError> {
+  constructor(readonly port: number) {
+    super({
+      kind: "LocalClient",
+      impl: Z
+        .call(() => {
+          try {
+            return new LocalClient(port, () => {})
+          } catch (e) {
+            return e as common.PolkadotBinNotFoundError
+          }
+        })
+        .impl,
+      items: [port],
+      memoize: true,
+    })
+  }
+}
