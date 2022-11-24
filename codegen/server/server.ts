@@ -81,7 +81,7 @@ export abstract class CodegenServer {
     const [, version, path] = versionMatch
     const normalizedVersion = await this.normalizeVersion(version!)
     if (normalizedVersion !== version) {
-      return this.redirect(request, `/@${normalizedVersion}${path}`)
+      return this.redirect(request, `/@${normalizedVersion}${path ?? "/"}`)
     }
     if (!(await this.canHandleVersion(version!))) {
       return this.delegateRequest(request, version!, path!)
