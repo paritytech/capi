@@ -1,9 +1,22 @@
+import * as path from "http://localhost:5646/@local/deps/std/path.ts"
 import * as C from "http://localhost:5646/@local/mod.ts"
 import * as T from "http://localhost:5646/@local/test_util/mod.ts"
 import * as U from "http://localhost:5646/@local/util/mod.ts"
 
-const configFile = `${Deno.cwd()}/examples/xcm_teleport_assets.toml`
+const configFile = path.join(
+  path.dirname(path.fromFileUrl(import.meta.url)),
+  "xcm_teleport_assets.toml",
+)
 const zombienet = await T.zombienet.start(configFile)
+
+console.log(
+  "Alice node",
+  `https://polkadot.js.org/apps/?rpc=${zombienet.config.nodesByName["alice"].wsUri}#/explorer`,
+)
+console.log(
+  "collator01 node",
+  `https://polkadot.js.org/apps/?rpc=${zombienet.config.nodesByName["collator01"].wsUri}#/explorer`,
+)
 
 Deno.addSignalListener("SIGINT", async () => {
   try {
