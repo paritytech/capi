@@ -7,7 +7,6 @@ chain = "rococo-local"
 
   [[relaychain.nodes]]
   name = "alice"
-  ws_port = "{{RELAYCHAIN_WS_PORT}}"
   validator = true
 
   [[relaychain.nodes]]
@@ -24,4 +23,3 @@ chain = "statemine-local"
   image = "docker.io/parity/polkadot-parachain:latest"
   command = "polkadot-parachain"
   args = ["-lparachain=debug"]
-  ws_port = "{{PARACHAIN_WS_PORT}}"

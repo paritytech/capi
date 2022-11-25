@@ -1,12 +1,14 @@
+import * as Z from "../deps/zones.ts"
+import * as C from "../mod.ts"
+
 export const start = async (configFile: string, env?: Record<string, string>) => {
-  // TODO: change to Deno.makeTempDir
-  // const networkFilesPath = `${Deno.cwd()}/tmp`
+  const networkFilesPath = await Deno.makeTempDir({ prefix: "capi_zombienet" })
   const process = Deno.run({
     cmd: [
       // TODO: this is OS specific
       "zombienet-macos",
-      // "-d",
-      // networkFilesPath,
+      "-d",
+      networkFilesPath,
       "--provider",
       "native",
       "--force",
@@ -30,9 +32,46 @@ export const start = async (configFile: string, env?: Record<string, string>) =>
     process.kill("SIGINT")
     await process.status()
     process.close()
+    Deno.remove(networkFilesPath, { recursive: true })
   }
+  const config = JSON.parse(await Deno.readTextFile(`${networkFilesPath}/zombie.json`))
+  const clients = {
+    relay: config.relay.map((node: any) => new NodeClientEffect(node.wsUri)) as NodeClientEffect[],
+    paras: Object.entries(config.paras)
+      .reduce(
+        (acc, [name, { nodes }]: any) => {
+          acc[name] = nodes.map((node: any) => new NodeClientEffect(node.wsUri))
+          return acc
+        },
+        {} as Record<string, NodeClientEffect[]>,
+      ),
+    byName: Object.entries(config.nodesByName)
+      .reduce(
+        (acc, [name, node]: any) => {
+          acc[name] = new NodeClientEffect(node.wsUri)
+          return acc
+        },
+        {} as Record<string, NodeClientEffect>,
+      ),
+  }
+  return { close, config, clients }
+}
 
-  return { close, config: {} }
-  // const { relay, paras } = JSON.parse(await Deno.readTextFile(`${networkFilesPath}/zombie.json`))
-  // return { close, config: { relay, paras } }
+export class NodeClientEffect extends Z.Effect<C.rpc.Client<string, Event, Event, Event>, Error> {
+  constructor(readonly url: string) {
+    super({
+      kind: "Client",
+      impl: Z
+        .call(() => {
+          try {
+            return new C.rpc.Client(C.rpc.proxyProvider, url)
+          } catch (e) {
+            return e
+          }
+        })
+        .impl,
+      items: [url],
+      memoize: true,
+    })
+  }
 }
