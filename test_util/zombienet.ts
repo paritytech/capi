@@ -5,8 +5,7 @@ export const start = async (configFile: string, env?: Record<string, string>) =>
   const networkFilesPath = await Deno.makeTempDir({ prefix: "capi_zombienet" })
   const process = Deno.run({
     cmd: [
-      // TODO: this is OS specific
-      "zombienet-macos",
+      zombienetBinary(),
       "-d",
       networkFilesPath,
       "--provider",
@@ -19,6 +18,7 @@ export const start = async (configFile: string, env?: Record<string, string>) =>
     env,
   })
   // TODO: improve Network launched detection
+  // Deno.watchFs on `${networkFilesPath}/zombie.json` could be an alternative
   const buffer = new Uint8Array(1024)
   while (true) {
     await process.stdout?.read(buffer)
@@ -73,5 +73,16 @@ export class NodeClientEffect extends Z.Effect<C.rpc.Client<string, Event, Event
       items: [url],
       memoize: true,
     })
+  }
+}
+
+function zombienetBinary() {
+  switch (Deno.build.os) {
+    case "darwin":
+      return "zombienet-macos"
+    case "linux":
+      return "zombienet-linux"
+    default:
+      throw new Error(`zombienet does not support ${Deno.build.os} OS`)
   }
 }
