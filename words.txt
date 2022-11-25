@@ -206,3 +206,5 @@ xxnetwork
 zio
 zombienet
 relaychain
+paritypr
+lparachain

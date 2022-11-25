@@ -1,3 +1,5 @@
+// This example requires zombienet-macos/zombienet-linux, polkadot and polkadot-parachain binaries in the PATH
+
 import * as path from "http://localhost:5646/@local/deps/std/path.ts"
 import * as C from "http://localhost:5646/@local/mod.ts"
 import * as T from "http://localhost:5646/@local/test_util/mod.ts"
