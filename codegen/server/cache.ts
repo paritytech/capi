@@ -63,11 +63,18 @@ export class FsCache extends Cache {
   }
 
   async _list(prefix: string): Promise<string[]> {
-    const result = []
-    for await (const entry of Deno.readDir(path.join(this.location, prefix))) {
-      result.push(entry.name)
+    try {
+      const result = []
+      for await (const entry of Deno.readDir(path.join(this.location, prefix))) {
+        result.push(entry.name)
+      }
+      return result
+    } catch (e) {
+      if (e instanceof Deno.errors.NotFound) {
+        return []
+      }
+      throw e
     }
-    return result
   }
 }
 
