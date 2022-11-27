@@ -4,33 +4,37 @@
 
 Capi is a declarative, TypeScript-first toolkit for crafting interactions with Substrate-based chains. It consists of [FRAME](https://docs.substrate.io/v3/runtime/frame/) utilities and [a high-level functional effect system](https://github.com/paritytech/zones) and [effects](./effects), which facilitate multistep, multichain interactions without compromising either performance or safety.
 
-- [Documentation &rarr;](./docs/Readme.md)<br />Materials for learning about Capi
 - [Examples &rarr;](./examples)<br />SHOW ME THE CODE
 - [API Reference &rarr;](https://deno.land/x/capi/mod.ts)<br />A generated API reference, based on type signatures and in-source comments.
+- [Type Conversion Guide &rarr;](./docs/Types.md)<br />Guide for Capi's conversion of types from Rust to TypeScript
 
 ## At a Glance
 
-Generate chain-specific bindings.
+```ts
+import { System } from "https://capi.dev/proxy/wss:rpc.polkadot.io/pallets/mod.ts"
 
-```sh
-deno run -A -r https://deno.land/x/capi/codegen.ts \
-  --src="wss://rpc.polkadot.io" \
-  --out="polkadot"
+const key = System.Account.keys().first()
+
+const value = System.Account.entry(key)
+
+console.log(await value.run())
 ```
 
-> ... or use **the Node equivalent**––`npx capi`--with the same arguments.
+> Note: although the codegen server is hosted on https://capi.dev, we encourage you to run it locally with
+>
+> ```sh
+> deno run -A https://deno.land/x/capi/serve.ts
+> ```
 
-Make use of those bindings.
+## Examples
 
-```ts
-import * as C from "capi"
-import { system } from "./polkadot/frame.ts"
+See [the `examples/` directory](./examples).
 
-// bind to the last inserted key
-const key = system.account.keys.first
-
-// bind to the corresponding value
-const value = C.run(system.account.get(key))
+```sh
+git clone https://github.com/partitytech/capi
+cd capi
+deno task run codegen # host the server locally and cache all codegen
+deno task run examples/<example-name>.ts
 ```
 
 ## The Thesis
