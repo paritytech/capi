@@ -1,6 +1,6 @@
 import { assertEquals, assertInstanceOf } from "../deps/std/testing/asserts.ts"
 import * as T from "../test_util/mod.ts"
-import * as ss58 from "./mod.ts"
+import * as ss58 from "./ss58.ts"
 
 for (
   const [networkName, address, [prefix, publicKey]] of [

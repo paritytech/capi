@@ -1,7 +1,6 @@
 import * as $ from "../deps/scale.ts"
 import { assert } from "../deps/std/testing/asserts.ts"
-import * as ss58 from "../ss58/mod.ts"
-import { hashers, Hex, hex } from "../util/mod.ts"
+import { hashers, Hex, hex, ss58 } from "../util/mod.ts"
 import { $null, DeriveCodec } from "./Codec.ts"
 import { Metadata } from "./Metadata.ts"
 
