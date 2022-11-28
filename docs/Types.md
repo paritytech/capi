@@ -282,13 +282,12 @@ Let's look at the same example from before: reading some `AccountData`.
 ```ts
 const result = await C
   .entryRead(C.polkadot)("System", "Account", [key])
-  .access("value")
   .run()
 ```
 
-In this storage read example, `result` is typed as the successfully-retrieved value unioned with all possible errors.
+In this storage read example, `result` is typed as the successfully-retrieved value (container) unioned with all possible errors.
 
-There are several ways to unwrap the inner value. The recommended path is to first check for and handle all possible errors, which may encapsulate error specific data (as do SCALE validation errors).
+There are several ways to "unwrap" the inner `value`. The recommended path is to first check for and handle all possible errors, which may encapsulate error specific data (as do SCALE validation errors).
 
 ```ts
 if (account instanceof Error) {
