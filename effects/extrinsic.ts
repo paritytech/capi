@@ -1,3 +1,4 @@
+import { init } from "https://raw.githubusercontent.com/paritytech/capi-crypto-wrappers/14289c5/lib/async/capi_crypto_wrappers.generated.js"
 import { unimplemented } from "../deps/std/testing/asserts.ts"
 import * as Z from "../deps/zones.ts"
 import * as M from "../frame_metadata/mod.ts"
@@ -48,6 +49,13 @@ export class Extrinsic<
     const extrinsicBytes = scale.scaleEncoded($extrinsic_, $extrinsicProps, true)
     const extrinsicHex = extrinsicBytes.next(U.hex.encodePrefixed)
     return payment.queryInfo(this.client)(extrinsicHex)
+      .next(({ weight, ...rest }) => ({
+        ...rest,
+        weight: {
+          proofSize: BigInt(weight.proof_size),
+          refTime: BigInt(weight.ref_time),
+        },
+      }))
   }
 }
 
