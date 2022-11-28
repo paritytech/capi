@@ -48,6 +48,13 @@ export class Extrinsic<
     const extrinsicBytes = scale.scaleEncoded($extrinsic_, $extrinsicProps, true)
     const extrinsicHex = extrinsicBytes.next(U.hex.encodePrefixed)
     return payment.queryInfo(this.client)(extrinsicHex)
+      .next(({ weight, ...rest }) => ({
+        ...rest,
+        weight: {
+          proofSize: BigInt(weight.proof_size),
+          refTime: BigInt(weight.ref_time),
+        },
+      }))
   }
 }
 

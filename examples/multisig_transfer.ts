@@ -85,10 +85,6 @@ function createOrApproveMultisigProposal<
   })
     .feeEstimate
     .access("weight")
-    .next((weight) => ({
-      refTime: BigInt(weight.ref_time),
-      proofSize: BigInt(weight.proof_size),
-    }))
   return extrinsic({
     sender: pair.address,
     call: C.Z.call.fac(Multisig.asMulti, null!)(C.Z.rec({
