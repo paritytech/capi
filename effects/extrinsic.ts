@@ -1,4 +1,3 @@
-import { init } from "https://raw.githubusercontent.com/paritytech/capi-crypto-wrappers/14289c5/lib/async/capi_crypto_wrappers.generated.js"
 import { unimplemented } from "../deps/std/testing/asserts.ts"
 import * as Z from "../deps/zones.ts"
 import * as M from "../frame_metadata/mod.ts"
