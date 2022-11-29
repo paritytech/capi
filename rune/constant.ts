@@ -1,11 +1,11 @@
+import { _Future, Future, FutureCtx } from "./future.ts"
 import { Id } from "./id.ts"
-import { Invocation, PrimedRune, Rune } from "./rune.ts"
 
 export const constant = <T>(value: T) =>
-  new Rune<T, never>(Id.hash(Id.loc``, value), (ctx) => new ConstantPrimedRune(ctx, value))
+  new Future<T, never>(Id.hash(Id.loc``, value), (ctx) => new _ConstantFuture(ctx, value))
 
-class ConstantPrimedRune<T> extends PrimedRune<T> {
-  constructor(ctx: Invocation, readonly value: T) {
+class _ConstantFuture<T> extends _Future<T> {
+  constructor(ctx: FutureCtx, readonly value: T) {
     super(ctx)
   }
 

@@ -1,16 +1,11 @@
 import { deferred } from "../deps/std/async.ts"
 import { Id } from "./id.ts"
 
-export interface RuneProps {
-  id: Id
-  prime(ctx: Invocation): () => void
-}
+export class FutureCtx {}
 
-export class Invocation {}
-
-export abstract class PrimedRune<R> {
+export abstract class _Future<R> {
   abortController = new AbortController()
-  constructor(readonly ctx: Invocation) {
+  constructor(readonly ctx: FutureCtx) {
     this.abortController.signal.addEventListener("abort", () => this.cleanup())
   }
 
@@ -52,11 +47,11 @@ export abstract class PrimedRune<R> {
   }
 }
 
-export class Rune<T, E extends Error> {
-  constructor(readonly id: Id, readonly prime: (ctx: Invocation) => PrimedRune<T | E>) {}
+export class Future<T, E extends Error> {
+  constructor(readonly id: Id, readonly prime: (ctx: FutureCtx) => _Future<T | E>) {}
 
   async run(): Promise<T | E> {
-    const ctx = new Invocation()
+    const ctx = new FutureCtx()
     const primed = this.prime(ctx)
     const result = deferred<T | E>()
     let done = false
