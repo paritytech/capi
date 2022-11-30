@@ -78,7 +78,7 @@ export class Future<T, E extends Error> {
     }, primed.abortController.signal)
     primed.abortController.signal.addEventListener("abort", () => {
       if (!done) {
-        result.reject("Rune stopped without pushing any values")
+        result.reject(new Error("Future stopped without pushing any values"))
       }
     })
     primed.start()
