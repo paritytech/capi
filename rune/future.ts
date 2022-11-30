@@ -3,6 +3,9 @@ import { Id } from "./id.ts"
 
 export class FutureCtx {}
 
+export type _T<F> = F extends Future<infer T, any> ? T : Exclude<F, Error>
+export type _E<F> = F extends Future<any, infer E> ? E : Extract<F, Error>
+
 export abstract class _Future<T, E extends Error> {
   declare "": [T, E]
 
@@ -89,6 +92,10 @@ export class Future<T, E extends Error> {
     return Future.new(_ConstantFuture, value)
   }
 
+  static resolve<V>(value: V): Future<_T<V>, _E<V>> {
+    return (value instanceof Future ? value : Future.constant(value)) as any
+  }
+
   mapValue<R>(
     this: Future<T, E>,
     id: Id,
@@ -113,11 +120,11 @@ export class Future<T, E extends Error> {
     return this.take(1)
   }
 
-  static ls<F extends Future<any, any>[]>(futures: [...F]): Future<
-    { [K in keyof F]: F[K] extends Future<infer T, any> ? T : never },
-    { [K in keyof F]: F[K] extends Future<any, infer E> ? E : never }[number]
+  static ls<F extends unknown[]>(futures: [...F]): Future<
+    { [K in keyof F]: _T<F[K]> },
+    _E<F[number]>
   > {
-    return Future.new(_LsFuture, futures)
+    return Future.new(_LsFuture, futures.map(Future.resolve))
   }
 
   throttle(timeout = 0) {

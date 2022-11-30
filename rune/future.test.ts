@@ -1,4 +1,5 @@
 import { assertEquals } from "../deps/std/testing/asserts.ts"
+import { Args } from "./args.ts"
 import { Future } from "./future.ts"
 import { Id } from "./id.ts"
 
@@ -55,37 +56,26 @@ Deno.test("iter", async () => {
   )
 })
 
-const add = <AE extends Error, BE extends Error>(a: Future<number, AE>, b: Future<number, BE>) => {
+const add = <X>(...[a, b]: Args<X, [a: number, b: number]>) => {
   return Future.ls([a, b]).mapValue(Id.loc``, ([a, b]) => a + b)
 }
 
+const sum = <X>(...[...args]: Args<X, number[]>) => {
+  return Future.resolve(args.reduce(add, 0))
+}
+
 Deno.test("add", async () => {
+  assertEquals(await add(1, 2).run(), 3)
   assertEquals(
-    await add(
-      Future.constant(1),
-      Future.constant(2),
-    ).run(),
-    3,
-  )
-  assertEquals(
-    await add(
-      Future.constant(1),
-      Future.constant(new Error()),
-    ).run(),
+    await add(1, Future.constant(new Error())).run(),
     new Error(),
   )
   assertEquals(
-    await add(
-      Future.constant([1, 2, 3]).iter(),
-      Future.constant(10),
-    ).run(),
+    await add(Future.constant([1, 2, 3]).iter(), 10).run(),
     13,
   )
   assertEquals(
-    await add(
-      Future.constant([1, 2, 3]).iter().throttle(),
-      Future.constant(10),
-    ).collect().run(),
+    await add(Future.constant([1, 2, 3]).iter().throttle(), 10).collect().run(),
     [11, 12, 13],
   )
   assertEquals(
@@ -95,4 +85,26 @@ Deno.test("add", async () => {
     ).debounce().collect().run(),
     [11, 22, 33],
   )
+})
+
+Deno.test("sum", async () => {
+  const base = sum(1, 2, Future.constant([3, new Error(), 1003]).iter().throttle(), 4, 5)
+  assertEquals(await base.run(), 15)
+  assertEquals(await base.skip(1).run(), new Error())
+  assertEquals(await base.skip(2).run(), 1015)
+})
+
+const divide = <X>(
+  { numerator, denominator }: Args<X, { numerator: number; denominator: number }>,
+) => {
+  return Future.ls([numerator, denominator]).mapValue(
+    Id.loc``,
+    ([numerator, denominator]) => numerator / denominator,
+  )
+}
+
+Deno.test("divide", async () => {
+  assertEquals(await divide({ numerator: 3, denominator: 2 }).run(), 1.5)
+  // @ts-expect-error extra prop
+  divide({ numerator: 1, denominator: 1, x: 0 })
 })
