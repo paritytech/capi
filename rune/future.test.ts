@@ -55,20 +55,8 @@ Deno.test("iter", async () => {
   )
 })
 
-Deno.test("throttle", async () => {
-  assertEquals(
-    await Future
-      .constant([1, 2, 3])
-      .iter()
-      .throttle()
-      .collect()
-      .run(),
-    [1, 2, 3],
-  )
-})
-
 const add = <AE extends Error, BE extends Error>(a: Future<number, AE>, b: Future<number, BE>) => {
-  return Future.ls(a, b).mapValue(Id.loc``, ([a, b]) => a + b)
+  return Future.ls([a, b]).mapValue(Id.loc``, ([a, b]) => a + b)
 }
 
 Deno.test("add", async () => {
@@ -102,9 +90,9 @@ Deno.test("add", async () => {
   )
   assertEquals(
     await add(
-      Future.constant([1, 2, 3]).iter().throttle(),
-      Future.constant([10, 20, 30]).iter().throttle(),
-    ).collect().run(),
-    [11, 12, 22, 23, 33],
+      Future.constant([1, 2, 3]).iter().throttle(10),
+      Future.constant([10, 20, 30]).iter().throttle(10),
+    ).debounce().collect().run(),
+    [11, 22, 33],
   )
 })

@@ -113,9 +113,7 @@ export class Future<T, E extends Error> {
     return this.take(1)
   }
 
-  static ls<F extends Future<any, any>[]>(
-    ...futures: [...F]
-  ): Future<
+  static ls<F extends Future<any, any>[]>(futures: [...F]): Future<
     { [K in keyof F]: F[K] extends Future<infer T, any> ? T : never },
     { [K in keyof F]: F[K] extends Future<any, infer E> ? E : never }[number]
   > {
@@ -124,6 +122,10 @@ export class Future<T, E extends Error> {
 
   throttle(timeout = 0) {
     return Future.new(_ThrottleFuture, this, timeout)
+  }
+
+  debounce() {
+    return Future.new(_DebounceFuture, this)
   }
 
   collect() {
@@ -253,6 +255,25 @@ class _LsFuture extends _Future<any, any> {
     for (const base of this.bases) {
       base.start()
     }
+  }
+}
+
+class _DebounceFuture<T, E extends Error> extends _SingleWrapperFuture<T, E> {
+  timer: number | null = null
+  done = false
+
+  basePush(value: T | E) {
+    if (this.timer) clearTimeout(this.timer)
+    this.timer = setTimeout(() => {
+      this.timer = null
+      this.push(value)
+      if (this.done) this.stop()
+    }, 0)
+  }
+
+  override baseStop(): void {
+    this.done = true
+    if (!this.timer) this.stop()
   }
 }
 
