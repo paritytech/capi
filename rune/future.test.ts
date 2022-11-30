@@ -78,11 +78,9 @@ Deno.test("add", async () => {
     await add(Future.constant([1, 2, 3]).iter().throttle(), 10).collect().run(),
     [11, 12, 13],
   )
+  const x = Future.constant([1, 2, 3]).iter().throttle(10)
   assertEquals(
-    await add(
-      Future.constant([1, 2, 3]).iter().throttle(10),
-      Future.constant([10, 20, 30]).iter().throttle(10),
-    ).debounce().collect().run(),
+    await add(x, x.mapValue(Id.loc``, (x) => x * 10)).debounce().collect().run(),
     [11, 22, 33],
   )
 })

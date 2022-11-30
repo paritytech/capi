@@ -1,4 +1,5 @@
 import { deferred } from "../deps/std/async.ts"
+import { getOrInit } from "../util/state.ts"
 import { Id } from "./id.ts"
 
 export class FutureCtx {}
@@ -57,8 +58,11 @@ export abstract class _Future<T, E extends Error> {
 
 export class Future<T, E extends Error> {
   declare "": [T, E]
-
-  private constructor(readonly id: Id, readonly prime: (ctx: FutureCtx) => _Future<T, E>) {}
+  prime
+  private constructor(readonly id: Id, prime: (ctx: FutureCtx) => _Future<T, E>) {
+    const memo = new WeakMap<FutureCtx, _Future<T, E>>()
+    this.prime = (ctx: FutureCtx) => getOrInit(memo, ctx, () => prime(ctx))
+  }
 
   static new<T, E extends Error, A extends unknown[]>(
     ctor: new(ctx: FutureCtx, ...args: A) => _Future<T, E>,
