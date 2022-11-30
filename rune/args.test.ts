@@ -17,7 +17,7 @@ const e3 = Future.resolve(new E3())
 const e1n = Future.resolve(new E1() as E1 | number)
 
 const add = <X>(...[a, b]: Args<X, [a: number, b: number]>) => {
-  return Future.ls([a, b]).mapValue(Id.loc``, ([a, b]) => a + b)
+  return Future.ls([a, b]).pipe(Id.loc``, ([a, b]) => a + b)
 }
 
 assertExact(add(1, 2), null! as Future<number, never>)
@@ -44,7 +44,7 @@ assertExact(sum(e1, e2, e3, e2, e1), null! as Future<number, E1 | E2 | E3>)
 
 const box = <T, X>(...X: Args<X, [value: T]>) => {
   const [value] = resolveArgs(X)
-  return value.mapValue(Id.loc``, (value) => ({ value }))
+  return value.pipe(Id.loc``, (value) => ({ value }))
 }
 
 const boxBox = <T, X>(...X: Args<X, [value: T]>) => {

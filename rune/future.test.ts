@@ -12,18 +12,18 @@ Deno.test("constant", async () => {
   )
 })
 
-Deno.test("mapValue", async () => {
+Deno.test("pipe", async () => {
   assertEquals(
     await Future
       .constant(1)
-      .mapValue(Id.loc``, (x) => x + 1)
+      .pipe(Id.loc``, (x) => x + 1)
       .run(),
     2,
   )
   assertEquals(
     await Future
       .constant(new Error())
-      .mapValue(Id.loc``, () => 123)
+      .pipe(Id.loc``, () => 123)
       .run(),
     new Error(),
   )
@@ -49,7 +49,7 @@ Deno.test("iter", async () => {
     await Future
       .constant([1, 2, 3])
       .iter()
-      .mapValue(Id.loc``, (x) => x + "")
+      .pipe(Id.loc``, (x) => x + "")
       .collect()
       .run(),
     ["1", "2", "3"],
@@ -57,7 +57,7 @@ Deno.test("iter", async () => {
 })
 
 const add = <X>(...[a, b]: Args<X, [a: number, b: number]>) => {
-  return Future.ls([a, b]).mapValue(Id.loc``, ([a, b]) => a + b)
+  return Future.ls([a, b]).pipe(Id.loc``, ([a, b]) => a + b)
 }
 
 const sum = <X>(...[...args]: Args<X, number[]>) => {
@@ -80,7 +80,7 @@ Deno.test("add", async () => {
   )
   const x = Future.constant([1, 2, 3]).iter().throttle(10)
   assertEquals(
-    await add(x, x.mapValue(Id.loc``, (x) => x * 10)).debounce().collect().run(),
+    await add(x, x.pipe(Id.loc``, (x) => x * 10)).debounce().collect().run(),
     [11, 22, 33],
   )
 })
@@ -95,7 +95,7 @@ Deno.test("sum", async () => {
 const divide = <X>(
   { numerator, denominator }: Args<X, { numerator: number; denominator: number }>,
 ) => {
-  return Future.ls([numerator, denominator]).mapValue(
+  return Future.ls([numerator, denominator]).pipe(
     Id.loc``,
     ([numerator, denominator]) => numerator / denominator,
   )
@@ -105,4 +105,18 @@ Deno.test("divide", async () => {
   assertEquals(await divide({ numerator: 3, denominator: 2 }).run(), 1.5)
   // @ts-expect-error extra prop
   divide({ numerator: 1, denominator: 1, x: 0 })
+})
+
+const delay = <T>(time: number, value: T) => new Promise((r) => setTimeout(r, time, value))
+
+Deno.test("delay", async () => {
+  assertEquals(
+    await Future
+      .constant([1, 2, 3])
+      .iter()
+      .pipe(Id.loc``, (x) => delay(1000, x))
+      .collect()
+      .run(),
+    [1, 2, 3],
+  )
 })

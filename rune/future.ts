@@ -1,5 +1,6 @@
 import { deferred } from "../deps/std/async.ts"
 import { getOrInit } from "../util/state.ts"
+import { PromiseOr } from "../util/types.ts"
 import { Id } from "./id.ts"
 
 export class FutureCtx {}
@@ -100,12 +101,11 @@ export class Future<T, E extends Error> {
     return (value instanceof Future ? value : Future.constant(value)) as any
   }
 
-  mapValue<R>(
-    this: Future<T, E>,
+  pipe<R>(
     id: Id,
-    fn: (value: T) => R,
+    fn: (value: T) => PromiseOr<R>,
   ): Future<Exclude<R, Error>, E | Extract<R, Error>> {
-    return Future.new(_MapValueFuture, this, id, fn)
+    return Future.new(PipeFuture, this, id, fn)
   }
 
   iter<R>(this: Future<Iterable<R>, E>) {
@@ -181,16 +181,42 @@ class _ConstantFuture<T> extends _Future<Exclude<T, Error>, Extract<T, Error>> {
   }
 }
 
-class _MapValueFuture<T, E extends Error, R>
+class PipeFuture<T, E extends Error, R>
   extends _SingleWrapperFuture<T, E, Exclude<R, Error>, E | Extract<R, Error>>
 {
-  constructor(ctx: FutureCtx, base: Future<T, E>, _id: Id, readonly fn: (value: T) => R) {
+  queue: T[] = []
+  waiting = false
+  done = false
+  constructor(
+    ctx: FutureCtx,
+    base: Future<T, E>,
+    _id: Id,
+    readonly fn: (value: T) => PromiseOr<R>,
+  ) {
     super(ctx, base)
   }
 
   basePush(value: T | E): void {
-    if (value instanceof Error) this.push(value)
-    else this.push(this.fn(value) as Exclude<R, Error> | Extract<R, Error>)
+    if (value instanceof Error) return this.push(value)
+    this.queue.push(value)
+    this.flushQueue()
+  }
+
+  override baseStop(): void {
+    this.done = true
+    this.flushQueue()
+  }
+
+  async flushQueue() {
+    if (this.waiting) return
+    if (!this.queue.length) {
+      if (this.done) this.stop()
+      return
+    }
+    this.waiting = true
+    this.push(await this.fn(this.queue.shift()!) as Exclude<R, Error> | Extract<R, Error>)
+    this.waiting = false
+    this.flushQueue()
   }
 }
 
