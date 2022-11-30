@@ -48,7 +48,7 @@ export function entryMetadata<PalletMetadata extends Z.$<M.Pallet>, EntryName ex
     }, k2_)
 }
 
-export function constMetadata<
+export function constantMetadata<
   PalletMetadata extends Z.$<M.Pallet>,
   ConstName extends Z.$<string>,
 >(

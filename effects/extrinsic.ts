@@ -3,7 +3,7 @@ import * as Z from "../deps/zones.ts"
 import * as M from "../frame_metadata/mod.ts"
 import * as rpc from "../rpc/mod.ts"
 import * as U from "../util/mod.ts"
-import { const as const_ } from "./const.ts"
+import { constant } from "./constant.ts"
 import { metadata } from "./metadata.ts"
 import { author, chain, payment, system } from "./rpc_known_methods.ts"
 import * as scale from "./scale.ts"
@@ -78,11 +78,11 @@ export class SignedExtrinsic<
     this.props = props as Z.Rec$Access<Props>
     this.sign = sign as Sign
 
-    const addrPrefix = const_(this.client)("System", "SS58Prefix")
+    const addrPrefix = constant(this.client)("System", "SS58Prefix")
       .access("value")
       .as<number>()
     const $extrinsic_ = $extrinsic(this.client, this.sign)
-    const versions = const_(this.client)("System", "Version")
+    const versions = constant(this.client)("System", "Version")
       .access("value")
     const specVersion = versions
       .access("specVersion").as<number>()
@@ -155,7 +155,7 @@ function $extrinsic<
 >(client: Client, ...[sign]: Rest) {
   const metadata_ = metadata(client)()
   const deriveCodec_ = scale.deriveCodec(metadata_)
-  const addrPrefix = const_(client)("System", "SS58Prefix")
+  const addrPrefix = constant(client)("System", "SS58Prefix")
     .access("value")
     .as<number>()
   return scale.$extrinsic(deriveCodec_, metadata_, sign!, addrPrefix)
