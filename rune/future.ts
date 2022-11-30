@@ -94,7 +94,7 @@ export class Future<T, E extends Error> {
     id: Id,
     fn: (value: T) => R,
   ): Future<Exclude<R, Error>, E | Extract<R, Error>> {
-    return Future.new(_MapValueFuture, id, this, fn)
+    return Future.new(_MapValueFuture, this, id, fn)
   }
 
   iter<R>(this: Future<Iterable<R>, E>) {
@@ -112,6 +112,49 @@ export class Future<T, E extends Error> {
   first(): Future<T, E> {
     return this.take(1)
   }
+
+  static ls<F extends Future<any, any>[]>(
+    ...futures: [...F]
+  ): Future<
+    { [K in keyof F]: F[K] extends Future<infer T, any> ? T : never },
+    { [K in keyof F]: F[K] extends Future<any, infer E> ? E : never }[number]
+  > {
+    return Future.new(_LsFuture, futures)
+  }
+
+  throttle(timeout = 0) {
+    return Future.new(_ThrottleFuture, this, timeout)
+  }
+
+  collect() {
+    return Future.new(_CollectFuture, this)
+  }
+}
+
+export abstract class _SingleWrapperFuture<T1, E1 extends Error, T2 = T1, E2 extends Error = E1>
+  extends _Future<T2, E2>
+{
+  base
+  constructor(ctx: FutureCtx, base: Future<T1, E1>) {
+    super(ctx)
+    this.base = base.prime(ctx)
+    this.base.onPush((value) => {
+      this.basePush(value)
+    }, this.abortController.signal)
+    this.base.abortController.signal.addEventListener("abort", () => {
+      this.baseStop()
+    })
+  }
+
+  abstract basePush(value: T1 | E1): void
+
+  baseStop() {
+    this.stop()
+  }
+
+  start(): void {
+    this.base.start()
+  }
 }
 
 class _ConstantFuture<T> extends _Future<Exclude<T, Error>, Extract<T, Error>> {
@@ -126,85 +169,136 @@ class _ConstantFuture<T> extends _Future<Exclude<T, Error>, Extract<T, Error>> {
 }
 
 class _MapValueFuture<T, E extends Error, R>
-  extends _Future<Exclude<R, Error>, E | Extract<R, Error>>
+  extends _SingleWrapperFuture<T, E, Exclude<R, Error>, E | Extract<R, Error>>
 {
-  base
-  constructor(ctx: FutureCtx, _id: Id, base: Future<T, E>, readonly fn: (value: T) => R) {
-    super(ctx)
-    this.base = base.prime(ctx)
-    this.base.onPush((value) => {
-      if (value instanceof Error) this.push(value)
-      else this.push(this.fn(value) as Exclude<R, Error> | Extract<R, Error>)
-    }, this.abortController.signal)
-    this.base.abortController.signal.addEventListener("abort", () => {
-      this.stop()
-    })
+  constructor(ctx: FutureCtx, base: Future<T, E>, _id: Id, readonly fn: (value: T) => R) {
+    super(ctx, base)
   }
 
-  start(): void {
-    this.base.start()
+  basePush(value: T | E): void {
+    if (value instanceof Error) this.push(value)
+    else this.push(this.fn(value) as Exclude<R, Error> | Extract<R, Error>)
   }
 }
 
-class _IterFuture<R, E extends Error> extends _Future<Exclude<R, Error>, E | Extract<R, Error>> {
-  base
-  constructor(ctx: FutureCtx, base: Future<Iterable<R>, E>) {
-    super(ctx)
-    this.base = base.prime(ctx)
-    this.base.onPush((value) => {
-      if (value instanceof Error) return this.push(value)
-      for (const v of value) {
-        this.push(v as Exclude<R, Error> | Extract<R, Error>)
-      }
-    }, this.abortController.signal)
-    this.base.abortController.signal.addEventListener("abort", () => {
-      this.stop()
-    })
-  }
-
-  start(): void {
-    this.base.start()
+class _IterFuture<R, E extends Error>
+  extends _SingleWrapperFuture<Iterable<R>, E, Exclude<R, Error>, E | Extract<R, Error>>
+{
+  basePush(value: E | Iterable<R>): void {
+    if (value instanceof Error) return this.push(value)
+    for (const v of value) {
+      this.push(v as Exclude<R, Error> | Extract<R, Error>)
+    }
   }
 }
 
-class _SkipFuture<T, E extends Error> extends _Future<T, E> {
-  base
-  constructor(ctx: FutureCtx, base: Future<T, E>, public skip: number) {
-    super(ctx)
-    this.base = base.prime(ctx)
-    this.base.onPush((value) => {
-      if (this.base.i >= skip) {
-        this.push(value)
-      }
-    }, this.abortController.signal)
-    this.base.abortController.signal.addEventListener("abort", () => {
-      this.stop()
-    })
+class _SkipFuture<T, E extends Error> extends _SingleWrapperFuture<T, E> {
+  constructor(ctx: FutureCtx, base: Future<T, E>, readonly skip: number) {
+    super(ctx, base)
   }
 
-  start(): void {
-    this.base.start()
+  basePush(value: T | E): void {
+    if (this.base.i >= this.skip) {
+      this.push(value)
+    }
   }
 }
 
-class _TakeFuture<T, E extends Error> extends _Future<T, E> {
-  base
-  constructor(ctx: FutureCtx, base: Future<T, E>, public take: number) {
-    super(ctx)
-    this.base = base.prime(ctx)
-    this.base.onPush((value) => {
-      if (this.base.i < take) {
-        this.push(value)
-      } else {
-        this.stop()
-      }
-    }, this.abortController.signal)
-    this.base.abortController.signal.addEventListener("abort", () => {
+class _TakeFuture<T, E extends Error> extends _SingleWrapperFuture<T, E> {
+  constructor(ctx: FutureCtx, base: Future<T, E>, readonly take: number) {
+    super(ctx, base)
+  }
+
+  basePush(value: T | E): void {
+    if (this.base.i < this.take) {
+      this.push(value)
+    } else {
       this.stop()
-    })
+    }
+  }
+}
+
+class _LsFuture extends _Future<any, any> {
+  bases
+  constructor(ctx: FutureCtx, bases: Future<any, any>[]) {
+    super(ctx)
+    this.bases = bases.map((base) => base.prime(ctx))
+    const values: any[] = Array(bases.length)
+    let started = 0
+    let finished = 0
+    for (let i = 0; i < this.bases.length; i++) {
+      const base = this.bases[i]!
+      base.onPush((value) => {
+        if (value instanceof Error) {
+          return this.push(value)
+        }
+        if (!(i in values)) {
+          started++
+        }
+        values[i] = value
+        if (started === bases.length) {
+          this.push(values.slice())
+        }
+      }, this.abortController.signal)
+      base.abortController.signal.addEventListener("abort", () => {
+        finished++
+        if (finished === bases.length) {
+          this.stop()
+        }
+      })
+    }
   }
 
   start(): void {
-    this.base.start()
+    for (const base of this.bases) {
+      base.start()
+    }
+  }
+}
+
+class _ThrottleFuture<T, E extends Error> extends _SingleWrapperFuture<T, E> {
+  waiting = false
+  queue: (T | E)[] = []
+  done = false
+  constructor(ctx: FutureCtx, base: Future<T, E>, public timeout: number) {
+    super(ctx, base)
+  }
+
+  basePush(value: T | E) {
+    this.queue.push(value)
+    this.tryFlush()
+  }
+
+  override baseStop(): void {
+    this.done = true
+    this.tryFlush()
+  }
+
+  tryFlush() {
+    if (this.waiting) return
+    if (this.queue.length) {
+      this.push(this.queue.shift()!)
+      this.waiting = true
+      setTimeout(() => {
+        this.waiting = false
+        this.tryFlush()
+      }, this.timeout)
+    } else if (this.done) {
+      this.stop()
+    }
+  }
+}
+
+class _CollectFuture<T, E extends Error> extends _SingleWrapperFuture<T, E, T[], E> {
+  values: T[] = []
+
+  basePush(value: T | E): void {
+    if (value instanceof Error) return this.push(value)
+    this.values.push(value)
+  }
+
+  override baseStop(): void {
+    this.push(this.values)
+    this.stop()
   }
 }

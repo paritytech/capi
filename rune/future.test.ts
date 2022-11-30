@@ -49,8 +49,62 @@ Deno.test("iter", async () => {
       .constant([1, 2, 3])
       .iter()
       .mapValue(Id.loc``, (x) => x + "")
-      .skip(1)
+      .collect()
       .run(),
-    "2",
+    ["1", "2", "3"],
+  )
+})
+
+Deno.test("throttle", async () => {
+  assertEquals(
+    await Future
+      .constant([1, 2, 3])
+      .iter()
+      .throttle()
+      .collect()
+      .run(),
+    [1, 2, 3],
+  )
+})
+
+const add = <AE extends Error, BE extends Error>(a: Future<number, AE>, b: Future<number, BE>) => {
+  return Future.ls(a, b).mapValue(Id.loc``, ([a, b]) => a + b)
+}
+
+Deno.test("add", async () => {
+  assertEquals(
+    await add(
+      Future.constant(1),
+      Future.constant(2),
+    ).run(),
+    3,
+  )
+  assertEquals(
+    await add(
+      Future.constant(1),
+      Future.constant(new Error()),
+    ).run(),
+    new Error(),
+  )
+  assertEquals(
+    await add(
+      Future.constant([1, 2, 3]).iter(),
+      Future.constant(10),
+    ).run(),
+    13,
+  )
+  assertEquals(
+    await add(
+      Future.constant([1, 2, 3]).iter().throttle(),
+      Future.constant(10),
+    ).collect().run(),
+    [11, 12, 13],
+  )
+  assertEquals(
+    await add(
+      Future.constant([1, 2, 3]).iter().throttle(),
+      Future.constant([10, 20, 30]).iter().throttle(),
+    ).collect().run(),
+    [11, 12, 22, 23, 33],
   )
 })
