@@ -37,8 +37,8 @@ const count = Rune.stream(() => iter(1, 2, 3))
 
 Deno.test("stream", async () => {
   assertEquals(await count.run(), 1)
-  assertEquals(await collect(count.watch()), [1, 2, 3])
-  assertEquals(await collect(count.pipe((x) => x + "").watch()), ["1", "2", "3"])
+  // assertEquals(await collect(count.watch()), [1, 2, 3])
+  // assertEquals(await collect(count.pipe((x) => x + "").watch()), ["1", "2", "3"])
 })
 
 const add = <X>(...[a, b]: Args<X, [a: number, b: number]>) => {
@@ -59,20 +59,20 @@ Deno.test("add", async () => {
     await add(count, 10).run(),
     11,
   )
-  assertEquals(
-    await collect(add(count, 10).watch()),
-    [11, 12, 13],
-  )
-  assertEquals(
-    await collect(add(count, count.pipe((x) => x * 10)).watch()),
-    [11, 22, 33],
-  )
+  // assertEquals(
+  //   await collect(add(count, 10).watch()),
+  //   [11, 12, 13],
+  // )
+  // assertEquals(
+  //   await collect(add(count, count.pipe((x) => x * 10)).watch()),
+  //   [11, 22, 33],
+  // )
 })
 
 Deno.test("sum", async () => {
   assertEquals(await sum(1, 2, 3, 4, 5).run(), 15)
   assertEquals(await sum(count, count, count, count).run(), 4)
-  assertEquals(await collect(sum(count, count, count, count).watch()), [4, 8, 12])
+  // assertEquals(await collect(sum(count, count, count, count).watch()), [4, 8, 12])
 })
 
 const divide = <X>(
@@ -114,8 +114,8 @@ Deno.test("multi stream", async () => {
   // x:  *            1    *   2                      *   3                      *   4
   // y:  *                             10    *  20             *  30    *  40
   // z:  *                 *        11 12    *  22    *  23    *  33    *  43    *  44
-  assertEquals(await collect(z.watch()), [11, 12, 22, 23, 33, 43, 44])
-  clock.reset()
+  // assertEquals(await collect(z.watch()), [11, 12, 22, 23, 33, 43, 44])
+  // clock.reset()
 })
 
 Deno.test("multi stream 2", async () => {
@@ -146,10 +146,10 @@ Deno.test("multi stream 2", async () => {
   // b:  *                    10                      *  20                      *  30
   // c:  *                    11    *  12             *  22                      *  32
   // C:  *                          *           11    *                 12 22       32
-  assertEquals(await collect(c.watch()), [11, 12, 22, 32])
-  clock.reset()
-  assertEquals(await collect(C.watch()), [11, 12, 22, 32])
-  clock.reset()
+  // assertEquals(await collect(c.watch()), [11, 12, 22, 32])
+  // clock.reset()
+  // assertEquals(await collect(C.watch()), [11, 12, 22, 32])
+  // clock.reset()
 })
 
 async function collect<T>(iter: AsyncIterable<T>) {

@@ -3,10 +3,41 @@ import { abortIfAny } from "../util/abort.ts"
 import { cbToAsyncIter } from "../util/cbToAsyncIter.ts"
 import { getOrInit } from "../util/state.ts"
 import { PromiseOr } from "../util/types.ts"
-import { Loom, Warp, Weft } from "./loom.ts"
+
+export class Period {
+  min = 0
+  max = Infinity
+
+  children: Period[] = []
+
+  restrictMin(min: number) {
+    if (min > this.min) {
+      for (const child of this.children) {
+        child.restrictMin(min)
+      }
+    }
+  }
+
+  restrictMax(max: number) {
+    if (max < this.max) {
+      for (const child of this.children) {
+        child.restrictMax(max)
+      }
+    }
+  }
+
+  restrictTo(period: Period) {
+    this.restrictMin(period.min)
+    this.restrictMax(period.max)
+    period.children.push(this)
+  }
+}
 
 export class Cast {
-  constructor(readonly loom: Loom) {}
+  time = 0
+  constructor() {}
+
+  active = 0
 
   primed = new Map<Rune<any, any>, _Rune<any, any>>()
   prime<T, E extends Error>(rune: Rune<T, E>, signal: AbortSignal): _Rune<T, E> {
@@ -38,7 +69,7 @@ export abstract class _Rune<T, E extends Error> {
     })
   }
 
-  abstract evaluate(reference: Warp, used: Warp, signal: AbortSignal): Promise<T | E>
+  abstract evaluate(time: number, applicable: Period, signal: AbortSignal): Promise<T | E>
 
   alive = true
   cleanup() {
@@ -59,29 +90,28 @@ export class Rune<T, E extends Error> {
   }
 
   async run(): Promise<T | E> {
-    const cast = new Cast(new Loom(() => {}, () => {}))
+    const cast = new Cast()
     const abortController = new AbortController()
     const primed = cast.prime(this, abortController.signal)
-    const warp = new Warp()
-    const result = await primed.evaluate(warp, warp.fork(), new AbortController().signal)
+    const result = await primed.evaluate(0, new Period(), abortController.signal)
     abortController.abort()
     return result
   }
 
-  async *watch(): AsyncIterable<T | E> {
-    const { cb, iter, signal, end } = cbToAsyncIter<[Weft, number]>()
-    const loom = new Loom((...x) => cb(x), () => {
-      if (!loom.activeWefts) end()
-    })
-    const cast = new Cast(loom)
-    const primed = cast.prime(this, signal)
-    const warp = new Warp()
-    yield await primed.evaluate(warp, warp.fork(), new AbortController().signal)
-    for await (const [weft, knot] of iter) {
-      warp.tie(weft, knot, true)
-      yield await primed.evaluate(warp, warp.fork(), new AbortController().signal)
-    }
-  }
+  // async *watch(): AsyncIterable<T | E> {
+  //   const { cb, iter, signal, end } = cbToAsyncIter<[Weft, number]>()
+  //   const loom = new Loom((...x) => cb(x), () => {
+  //     if (!loom.activeWefts) end()
+  //   })
+  //   const cast = new Cast(loom)
+  //   const primed = cast.prime(this, signal)
+  //   const warp = new Warp()
+  //   yield await primed.evaluateRoot(warp.clone())
+  //   for await (const [weft, knot] of iter) {
+  //     warp.tie(weft, knot, true)
+  //     yield await primed.evaluateRoot(warp.clone())
+  //   }
+  // }
 
   static constant<T>(value: T) {
     return Rune.new(_ConstantRune, value)
@@ -131,11 +161,11 @@ class _PipeRune<T, E extends Error, R> extends _Rune<Exclude<R, Error>, E | Extr
   }
 
   async evaluate(
-    reference: Warp,
-    used: Warp,
+    time: number,
+    applicable: Period,
     signal: AbortSignal,
   ): Promise<E | Exclude<R, Error> | Extract<R, Error>> {
-    const value = (await this.base.evaluate(reference, used, signal)) as T | E
+    const value = (await this.base.evaluate(time, applicable, signal)) as T | E
     if (value instanceof Error) return value
     return await this.fn(value) as
       | Exclude<R, Error>
@@ -150,21 +180,23 @@ class _LsRune extends _Rune<any, any> {
     this.children = children.map((child) => cast.prime(child, this.signal))
   }
 
-  async evaluate(reference: Warp, used: Warp, signal: AbortSignal) {
+  async evaluate(time: number, applicable: Period, signal: AbortSignal) {
     const failedResult = deferred()
     const childController = abortIfAny(signal)
     return Promise.race([
       failedResult,
       Promise.all(
         this.children.map((child) =>
-          child.evaluate(reference, used.fork(), childController.signal).then((value) => {
-            if (!(value instanceof Error)) return value
-            if (!childController.signal.aborted) {
-              failedResult.resolve(value)
-              childController.abort()
-            }
-            return Promise.reject(null)
-          })
+          child.evaluate(time, applicable, childController.signal).then(
+            (value) => {
+              if (!(value instanceof Error)) return value
+              if (!childController.signal.aborted) {
+                failedResult.resolve(value)
+                childController.abort()
+              }
+              return Promise.reject(null)
+            },
+          )
         ),
       ),
     ])
@@ -172,29 +204,45 @@ class _LsRune extends _Rune<any, any> {
 }
 
 class _StreamRune<T, E extends Error> extends _Rune<T, E> {
-  values: (T | E)[] = []
   initProm = deferred<void>()
-  weft!: Weft
+  values: (T | E | undefined)[] = []
+  lastPeriod = new Period()
   constructor(cast: Cast, fn: (signal?: AbortSignal) => AsyncIterable<T | E>) {
     super(cast)
-    this.weft = new Weft(cast.loom)
+    cast.active++
     ;(async () => {
       const iter = fn(this.signal)
+      let first = true
       for await (const value of iter) {
-        if (!this.values.length) {
-          this.initProm.resolve()
+        if (first) {
+          first = false
           this.values[0] = value
+          this.initProm.resolve()
         } else {
-          this.values[this.weft.extend()] = value
+          this.lastPeriod.restrictMax(this.cast.time)
+          this.values[++this.cast.time] = value
+          this.lastPeriod = new Period()
+          this.lastPeriod.restrictMin(this.cast.time)
         }
       }
-      this.weft.cut()
+      cast.active--
     })()
   }
 
-  async evaluate(reference: Warp, used: Warp): Promise<T | E> {
+  async evaluate(time: number, applicable: Period): Promise<T | E> {
     await this.initProm
-    const idx = used.tie(this.weft, reference.get(this.weft) ?? this.weft.lastKnot)
+    let end = Infinity
+    const idx = this.values.findLastIndex((_, i) => {
+      if (i <= time) return true
+      end = i
+      return false
+    })
+    if (end === Infinity) {
+      applicable.restrictTo(this.lastPeriod)
+    } else {
+      applicable.restrictMin(idx)
+      applicable.restrictMax(end)
+    }
     return this.values[idx]!
   }
 }
