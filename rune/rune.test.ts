@@ -1,11 +1,11 @@
 import { assertEquals } from "../deps/std/testing/asserts.ts"
 import { Args } from "./args.ts"
-import { Future } from "./future.ts"
 import { Id } from "./id.ts"
+import { Rune } from "./rune.ts"
 
 Deno.test("constant", async () => {
   assertEquals(
-    await Future
+    await Rune
       .constant(123)
       .run(),
     123,
@@ -14,14 +14,14 @@ Deno.test("constant", async () => {
 
 Deno.test("pipe", async () => {
   assertEquals(
-    await Future
+    await Rune
       .constant(1)
       .pipe(Id.loc``, (x) => x + 1)
       .run(),
     2,
   )
   assertEquals(
-    await Future
+    await Rune
       .constant(new Error())
       .pipe(Id.loc``, () => 123)
       .run(),
@@ -31,14 +31,14 @@ Deno.test("pipe", async () => {
 
 Deno.test("iter", async () => {
   assertEquals(
-    await Future
+    await Rune
       .constant([1, 2, 3])
       .iter()
       .run(),
     1,
   )
   assertEquals(
-    await Future
+    await Rune
       .constant([1, 2, 3])
       .iter()
       .skip(2)
@@ -46,7 +46,7 @@ Deno.test("iter", async () => {
     3,
   )
   assertEquals(
-    await Future
+    await Rune
       .constant([1, 2, 3])
       .iter()
       .pipe(Id.loc``, (x) => x + "")
@@ -57,28 +57,28 @@ Deno.test("iter", async () => {
 })
 
 const add = <X>(...[a, b]: Args<X, [a: number, b: number]>) => {
-  return Future.ls([a, b]).pipe(Id.loc``, ([a, b]) => a + b)
+  return Rune.ls([a, b]).pipe(Id.loc``, ([a, b]) => a + b)
 }
 
 const sum = <X>(...[...args]: Args<X, number[]>) => {
-  return Future.resolve(args.reduce(add, 0))
+  return Rune.resolve(args.reduce(add, 0))
 }
 
 Deno.test("add", async () => {
   assertEquals(await add(1, 2).run(), 3)
   assertEquals(
-    await add(1, Future.constant(new Error())).run(),
+    await add(1, Rune.constant(new Error())).run(),
     new Error(),
   )
   assertEquals(
-    await add(Future.constant([1, 2, 3]).iter(), 10).run(),
+    await add(Rune.constant([1, 2, 3]).iter(), 10).run(),
     13,
   )
   assertEquals(
-    await add(Future.constant([1, 2, 3]).iter().throttle(), 10).collect().run(),
+    await add(Rune.constant([1, 2, 3]).iter().throttle(), 10).collect().run(),
     [11, 12, 13],
   )
-  const x = Future.constant([1, 2, 3]).iter().throttle(10)
+  const x = Rune.constant([1, 2, 3]).iter().throttle(10)
   assertEquals(
     await add(x, x.pipe(Id.loc``, (x) => x * 10)).debounce().collect().run(),
     [11, 22, 33],
@@ -86,7 +86,7 @@ Deno.test("add", async () => {
 })
 
 Deno.test("sum", async () => {
-  const base = sum(1, 2, Future.constant([3, new Error(), 1003]).iter().throttle(), 4, 5)
+  const base = sum(1, 2, Rune.constant([3, new Error(), 1003]).iter().throttle(), 4, 5)
   assertEquals(await base.run(), 15)
   assertEquals(await base.skip(1).run(), new Error())
   assertEquals(await base.skip(2).run(), 1015)
@@ -95,7 +95,7 @@ Deno.test("sum", async () => {
 const divide = <X>(
   { numerator, denominator }: Args<X, { numerator: number; denominator: number }>,
 ) => {
-  return Future.ls([numerator, denominator]).pipe(
+  return Rune.ls([numerator, denominator]).pipe(
     Id.loc``,
     ([numerator, denominator]) => numerator / denominator,
   )
@@ -111,7 +111,7 @@ const delay = <T>(time: number, value: T) => new Promise((r) => setTimeout(r, ti
 
 Deno.test("delay", async () => {
   assertEquals(
-    await Future
+    await Rune
       .constant([1, 2, 3])
       .iter()
       .pipe(Id.loc``, (x) => delay(1000, x))

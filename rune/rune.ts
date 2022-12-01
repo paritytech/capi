@@ -3,16 +3,16 @@ import { getOrInit } from "../util/state.ts"
 import { PromiseOr } from "../util/types.ts"
 import { Id } from "./id.ts"
 
-export class FutureCtx {}
+export class RuneCtx {}
 
-export type _T<F> = F extends Future<infer T, any> ? T : Exclude<F, Error>
-export type _E<F> = F extends Future<any, infer E> ? E : Extract<F, Error>
+export type _T<F> = F extends Rune<infer T, any> ? T : Exclude<F, Error>
+export type _E<F> = F extends Rune<any, infer E> ? E : Extract<F, Error>
 
-export abstract class _Future<T, E extends Error> {
+export abstract class _Rune<T, E extends Error> {
   declare "": [T, E]
 
   abortController = new AbortController()
-  constructor(readonly ctx: FutureCtx) {
+  constructor(readonly ctx: RuneCtx) {
     this.abortController.signal.addEventListener("abort", () => this.cleanup())
   }
 
@@ -57,23 +57,23 @@ export abstract class _Future<T, E extends Error> {
   }
 }
 
-export class Future<T, E extends Error> {
+export class Rune<T, E extends Error> {
   declare "": [T, E]
   prime
-  private constructor(readonly id: Id, prime: (ctx: FutureCtx) => _Future<T, E>) {
-    const memo = new WeakMap<FutureCtx, _Future<T, E>>()
-    this.prime = (ctx: FutureCtx) => getOrInit(memo, ctx, () => prime(ctx))
+  private constructor(readonly id: Id, prime: (ctx: RuneCtx) => _Rune<T, E>) {
+    const memo = new WeakMap<RuneCtx, _Rune<T, E>>()
+    this.prime = (ctx: RuneCtx) => getOrInit(memo, ctx, () => prime(ctx))
   }
 
   static new<T, E extends Error, A extends unknown[]>(
-    ctor: new(ctx: FutureCtx, ...args: A) => _Future<T, E>,
+    ctor: new(ctx: RuneCtx, ...args: A) => _Rune<T, E>,
     ...args: A
   ) {
-    return new Future(Id.hash(Id.loc``, ctor, ...args), (ctx) => new ctor(ctx, ...args))
+    return new Rune(Id.hash(Id.loc``, ctor, ...args), (ctx) => new ctor(ctx, ...args))
   }
 
   async run(): Promise<T | E> {
-    const ctx = new FutureCtx()
+    const ctx = new RuneCtx()
     const primed = this.prime(ctx)
     const result = deferred<T | E>()
     let done = false
@@ -86,7 +86,7 @@ export class Future<T, E extends Error> {
     }, primed.abortController.signal)
     primed.abortController.signal.addEventListener("abort", () => {
       if (!done) {
-        result.reject(new Error("Future stopped without pushing any values"))
+        result.reject(new Error("Rune stopped without pushing any values"))
       }
     })
     primed.start()
@@ -94,61 +94,61 @@ export class Future<T, E extends Error> {
   }
 
   static constant<T>(value: T) {
-    return Future.new(_ConstantFuture, value)
+    return Rune.new(_ConstantRune, value)
   }
 
-  static resolve<V>(value: V): Future<_T<V>, _E<V>> {
-    return (value instanceof Future ? value : Future.constant(value)) as any
+  static resolve<V>(value: V): Rune<_T<V>, _E<V>> {
+    return (value instanceof Rune ? value : Rune.constant(value)) as any
   }
 
   pipe<R>(
     id: Id,
     fn: (value: T) => PromiseOr<R>,
-  ): Future<Exclude<R, Error>, E | Extract<R, Error>> {
-    return Future.new(PipeFuture, this, id, fn)
+  ): Rune<Exclude<R, Error>, E | Extract<R, Error>> {
+    return Rune.new(PipeRune, this, id, fn)
   }
 
-  iter<R>(this: Future<Iterable<R>, E>) {
-    return Future.new(_IterFuture, this)
+  iter<R>(this: Rune<Iterable<R>, E>) {
+    return Rune.new(_IterRune, this)
   }
 
-  skip(skip: number): Future<T, E> {
-    return Future.new(_SkipFuture, this, skip)
+  skip(skip: number): Rune<T, E> {
+    return Rune.new(_SkipRune, this, skip)
   }
 
-  take(take: number): Future<T, E> {
-    return Future.new(_TakeFuture, this, take)
+  take(take: number): Rune<T, E> {
+    return Rune.new(_TakeRune, this, take)
   }
 
-  first(): Future<T, E> {
+  first(): Rune<T, E> {
     return this.take(1)
   }
 
-  static ls<F extends unknown[]>(futures: [...F]): Future<
+  static ls<F extends unknown[]>(Runes: [...F]): Rune<
     { [K in keyof F]: _T<F[K]> },
     _E<F[number]>
   > {
-    return Future.new(_LsFuture, futures.map(Future.resolve))
+    return Rune.new(_LsRune, Runes.map(Rune.resolve))
   }
 
   throttle(timeout = 0) {
-    return Future.new(_ThrottleFuture, this, timeout)
+    return Rune.new(_ThrottleRune, this, timeout)
   }
 
   debounce() {
-    return Future.new(_DebounceFuture, this)
+    return Rune.new(_DebounceRune, this)
   }
 
   collect() {
-    return Future.new(_CollectFuture, this)
+    return Rune.new(_CollectRune, this)
   }
 }
 
-export abstract class _SingleWrapperFuture<T1, E1 extends Error, T2 = T1, E2 extends Error = E1>
-  extends _Future<T2, E2>
+export abstract class _SingleWrapperRune<T1, E1 extends Error, T2 = T1, E2 extends Error = E1>
+  extends _Rune<T2, E2>
 {
   base
-  constructor(ctx: FutureCtx, base: Future<T1, E1>) {
+  constructor(ctx: RuneCtx, base: Rune<T1, E1>) {
     super(ctx)
     this.base = base.prime(ctx)
     this.base.onPush((value) => {
@@ -170,8 +170,8 @@ export abstract class _SingleWrapperFuture<T1, E1 extends Error, T2 = T1, E2 ext
   }
 }
 
-class _ConstantFuture<T> extends _Future<Exclude<T, Error>, Extract<T, Error>> {
-  constructor(ctx: FutureCtx, readonly value: T) {
+class _ConstantRune<T> extends _Rune<Exclude<T, Error>, Extract<T, Error>> {
+  constructor(ctx: RuneCtx, readonly value: T) {
     super(ctx)
   }
 
@@ -181,15 +181,15 @@ class _ConstantFuture<T> extends _Future<Exclude<T, Error>, Extract<T, Error>> {
   }
 }
 
-class PipeFuture<T, E extends Error, R>
-  extends _SingleWrapperFuture<T, E, Exclude<R, Error>, E | Extract<R, Error>>
+class PipeRune<T, E extends Error, R>
+  extends _SingleWrapperRune<T, E, Exclude<R, Error>, E | Extract<R, Error>>
 {
   queue: T[] = []
   waiting = false
   done = false
   constructor(
-    ctx: FutureCtx,
-    base: Future<T, E>,
+    ctx: RuneCtx,
+    base: Rune<T, E>,
     _id: Id,
     readonly fn: (value: T) => PromiseOr<R>,
   ) {
@@ -220,8 +220,8 @@ class PipeFuture<T, E extends Error, R>
   }
 }
 
-class _IterFuture<R, E extends Error>
-  extends _SingleWrapperFuture<Iterable<R>, E, Exclude<R, Error>, E | Extract<R, Error>>
+class _IterRune<R, E extends Error>
+  extends _SingleWrapperRune<Iterable<R>, E, Exclude<R, Error>, E | Extract<R, Error>>
 {
   basePush(value: E | Iterable<R>): void {
     if (value instanceof Error) return this.push(value)
@@ -231,8 +231,8 @@ class _IterFuture<R, E extends Error>
   }
 }
 
-class _SkipFuture<T, E extends Error> extends _SingleWrapperFuture<T, E> {
-  constructor(ctx: FutureCtx, base: Future<T, E>, readonly skip: number) {
+class _SkipRune<T, E extends Error> extends _SingleWrapperRune<T, E> {
+  constructor(ctx: RuneCtx, base: Rune<T, E>, readonly skip: number) {
     super(ctx, base)
   }
 
@@ -243,8 +243,8 @@ class _SkipFuture<T, E extends Error> extends _SingleWrapperFuture<T, E> {
   }
 }
 
-class _TakeFuture<T, E extends Error> extends _SingleWrapperFuture<T, E> {
-  constructor(ctx: FutureCtx, base: Future<T, E>, readonly take: number) {
+class _TakeRune<T, E extends Error> extends _SingleWrapperRune<T, E> {
+  constructor(ctx: RuneCtx, base: Rune<T, E>, readonly take: number) {
     super(ctx, base)
   }
 
@@ -257,9 +257,9 @@ class _TakeFuture<T, E extends Error> extends _SingleWrapperFuture<T, E> {
   }
 }
 
-class _LsFuture extends _Future<any, any> {
+class _LsRune extends _Rune<any, any> {
   bases
-  constructor(ctx: FutureCtx, bases: Future<any, any>[]) {
+  constructor(ctx: RuneCtx, bases: Rune<any, any>[]) {
     super(ctx)
     this.bases = bases.map((base) => base.prime(ctx))
     const values: any[] = Array(bases.length)
@@ -295,7 +295,7 @@ class _LsFuture extends _Future<any, any> {
   }
 }
 
-class _DebounceFuture<T, E extends Error> extends _SingleWrapperFuture<T, E> {
+class _DebounceRune<T, E extends Error> extends _SingleWrapperRune<T, E> {
   timer: number | null = null
   done = false
 
@@ -314,11 +314,11 @@ class _DebounceFuture<T, E extends Error> extends _SingleWrapperFuture<T, E> {
   }
 }
 
-class _ThrottleFuture<T, E extends Error> extends _SingleWrapperFuture<T, E> {
+class _ThrottleRune<T, E extends Error> extends _SingleWrapperRune<T, E> {
   waiting = false
   queue: (T | E)[] = []
   done = false
-  constructor(ctx: FutureCtx, base: Future<T, E>, public timeout: number) {
+  constructor(ctx: RuneCtx, base: Rune<T, E>, public timeout: number) {
     super(ctx, base)
   }
 
@@ -347,7 +347,7 @@ class _ThrottleFuture<T, E extends Error> extends _SingleWrapperFuture<T, E> {
   }
 }
 
-class _CollectFuture<T, E extends Error> extends _SingleWrapperFuture<T, E, T[], E> {
+class _CollectRune<T, E extends Error> extends _SingleWrapperRune<T, E, T[], E> {
   values: T[] = []
 
   basePush(value: T | E): void {
