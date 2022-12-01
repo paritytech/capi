@@ -21,6 +21,7 @@ export class Client<
     close: CloseErrorData
   }
 
+  controller
   providerRef
   pendingCalls: Record<string, Deferred<unknown>> = {}
   pendingSubscriptions: SubscriptionListeners<SendErrorData, HandlerErrorData> = {}
@@ -31,7 +32,8 @@ export class Client<
     readonly provider: Provider<DiscoveryValue, SendErrorData, HandlerErrorData, CloseErrorData>,
     readonly discoveryValue: DiscoveryValue,
   ) {
-    this.providerRef = provider(discoveryValue, this.#listener)
+    this.controller = new AbortController()
+    this.providerRef = provider(discoveryValue, this.#listener, this.controller.signal)
   }
 
   #listener: ProviderListener<SendErrorData, HandlerErrorData> = (e) => {
@@ -150,7 +152,9 @@ export class Client<
     this.pendingSubscriptions = {}
     this.activeSubscriptions = {}
     this.activeSubscriptionByMessageId = {}
-    return this.providerRef.release()
+    this.controller.abort()
+    // discard return type could be void
+    return Promise.resolve(undefined)
   }
 }
 

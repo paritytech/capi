@@ -14,26 +14,25 @@ import {
 
 Deno.test({
   name: "RPC Client",
+  sanitizeOps: false,
+  sanitizeResources: false,
   async fn(t) {
-    const client = await T.polkadot.client
-
     await t.step({
       name: "call",
-      sanitizeOps: false,
-      sanitizeResources: false,
       async fn() {
+        const client = await T.polkadot.client
         const metadata = await client.call(client.providerRef.nextId(), "state_getMetadata", [])
         A.assertNotInstanceOf(metadata, Error)
         A.assert(!metadata.error)
         A.assertExists(metadata.result)
+        await client.discard()
       },
     })
 
     await t.step({
       name: "subscribe",
-      sanitizeOps: false,
-      sanitizeResources: false,
       async fn() {
+        const client = await T.polkadot.client
         const events: msg.NotificationMessage<"chain_subscribeAllHeads", known.Header>[] = []
         const stoppedSubscriptionId = await client.subscriptionFactory<[], known.Header>()(
           "chain_subscribeAllHeads",
@@ -42,9 +41,9 @@ Deno.test({
           (ctx) => {
             let i = 0
             return (e) => {
-              A.assertNotInstanceOf(e, Error)
-              A.assert(!e.error)
-              A.assertExists(e.params.result.parentHash)
+              if (e instanceof Error || e.error) {
+                return ctx.end(e)
+              }
               events.push(e)
               if (i === 2) {
                 return ctx.end(e.params.subscription)
@@ -55,11 +54,15 @@ Deno.test({
           },
         )
         A.assertEquals(events.length, 3)
+        events.forEach((e) => {
+          A.assertNotInstanceOf(e, Error)
+          A.assert(!e.error)
+          A.assertExists(e.params.result.parentHash)
+        })
         A.assert(typeof stoppedSubscriptionId === "string")
+        await client.discard()
       },
     })
-
-    await client.discard()
 
     await t.step({
       name: "call general error",
@@ -148,7 +151,6 @@ function createMockClient() {
     return {
       nextId,
       send: () => {},
-      release: () => Promise.resolve(undefined),
     }
   }
   return {

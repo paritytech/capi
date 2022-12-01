@@ -46,13 +46,14 @@ Deno.test({
             }
           },
         ]
+        const controller = new AbortController()
         const provider = smoldotProvider({ chainSpec: { relay } }, (message) => {
           if (checks.length > 1) {
             checks.shift()!(message)
           } else {
             checks[0]!(message)
           }
-        })
+        }, controller.signal)
         provider.send({
           jsonrpc: "2.0",
           id: provider.nextId(),
@@ -68,8 +69,7 @@ Deno.test({
           params: [subscriptionId],
         })
         await unsubscribed
-        const providerRelease = await provider.release()
-        assertNotInstanceOf(providerRelease, Error)
+        controller.abort()
       },
     })
     await t.step({
@@ -108,6 +108,7 @@ Deno.test({
             }
           },
         ]
+        const controller = new AbortController()
         const provider = smoldotProvider(
           { chainSpec: { para, relay } },
           (message) => {
@@ -117,6 +118,7 @@ Deno.test({
               checks[0]!(message)
             }
           },
+          controller.signal,
         )
         provider.send({
           jsonrpc: "2.0",
@@ -133,22 +135,21 @@ Deno.test({
           params: [subscriptionId],
         })
         await unsubscribed
-        const providerRelease = await provider.release()
-        assertNotInstanceOf(providerRelease, Error)
+        controller.abort()
       },
     })
 
     await t.step({
       name: "invalid chain spec",
       async fn() {
-        const [ref, message] = await setup(
+        const [_ref, message, controller] = await setup(
           smoldotProvider,
           { chainSpec: { relay: "" } },
           "system_health",
           [false],
         )
         assertInstanceOf(message, Error)
-        assertNotInstanceOf(await ref.release(), Error)
+        controller.abort()
       },
     })
     await t.step({
@@ -157,7 +158,7 @@ Deno.test({
         const relay = await U.fetchText(
           "https://raw.githubusercontent.com/paritytech/substrate-connect/main/packages/connect/src/connector/specs/polkadot.json",
         )
-        const [ref, message] = await setup(
+        const [_ref, message, controller] = await setup(
           smoldotProvider,
           { chainSpec: { relay } },
           "system_health",
@@ -165,7 +166,7 @@ Deno.test({
           [1n],
         )
         assertInstanceOf(message, Error)
-        assertNotInstanceOf(await ref.release(), Error)
+        controller.abort()
       },
     })
   },

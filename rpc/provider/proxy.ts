@@ -9,13 +9,13 @@ type ProxyProviderConnection = ProviderConnection<WebSocket, Event, Event>
 
 const nextId = nextIdFactory()
 
-export const proxyProvider: Provider<string, Event, Event, Event> = (url, listener) => {
+export const proxyProvider: Provider<string, Event, Event, Event> = (url, listener, signal) => {
   return {
     nextId,
     send: (message) => {
       let conn
       try {
-        conn = connection(url, listener)
+        conn = connection(url, listener, signal)
       } catch (error) {
         listener(new ProviderHandlerError(error as Event))
         return
@@ -33,26 +33,13 @@ export const proxyProvider: Provider<string, Event, Event, Event> = (url, listen
         }
       })()
     },
-    release: () => {
-      const conn = connections.get(url)
-      if (!conn) {
-        return Promise.resolve(undefined)
-      }
-      const { cleanUp, listeners, inner } = conn
-      listeners.delete(listener)
-      if (!listeners.size) {
-        connections.delete(url)
-        cleanUp()
-        return closeWs(inner)
-      }
-      return Promise.resolve(undefined)
-    },
   }
 }
 
 function connection(
   url: string,
   listener: ProviderListener<Event, Event>,
+  signal: AbortSignal,
 ): ProxyProviderConnection {
   const conn = U.getOrInit(connections, url, () => {
     const controller = new AbortController()
@@ -66,7 +53,16 @@ function connection(
     ws.addEventListener("close", (e) => {
       conn!.forEachListener(new ProviderHandlerError(e))
     }, controller)
-    return new ProviderConnection(ws, () => controller.abort())
+    signal.addEventListener("abort", () => {
+      const { listeners } = conn!
+      listeners.delete(listener)
+      if (!listeners.size) {
+        connections.delete(url)
+        controller.abort()
+        closeWs(ws)
+      }
+    })
+    return new ProviderConnection(ws)
   })
   conn.addListener(listener)
   return conn

@@ -9,24 +9,29 @@ Deno.test({
     await t.step({
       name: "send/listen",
       async fn() {
-        const [ref, message] = await setup(proxyProvider, await T.polkadot.url, "system_health", [])
+        const [_ref, message, controller] = await setup(
+          proxyProvider,
+          await T.polkadot.url,
+          "system_health",
+          [],
+        )
         A.assertNotInstanceOf(message, Error)
         A.assertExists(message.result)
-        A.assertNotInstanceOf(await ref.release(), Error)
+        controller.abort()
       },
     })
 
     await t.step({
       name: "create WebSocket error",
       async fn() {
-        const [ref, message] = await setup(
+        const [_ref, message, controller] = await setup(
           proxyProvider,
           "invalid-endpoint-url",
           "system_health",
           [],
         )
         A.assertInstanceOf(message, Error)
-        A.assertNotInstanceOf(await ref.release(), Error)
+        controller.abort()
       },
     })
 
@@ -36,14 +41,14 @@ Deno.test({
         const server = createWebSocketServer(function() {
           this.close()
         })
-        const [ref, message] = await setup(
+        const [_ref, message, controller] = await setup(
           proxyProvider,
           server.url,
           "system_health",
           [],
         )
         A.assertInstanceOf(message, Error)
-        A.assertNotInstanceOf(await ref.release(), Error)
+        controller.abort()
         server.close()
       },
     })
@@ -52,7 +57,7 @@ Deno.test({
       name: "send non-JSON message",
       async fn() {
         const server = createWebSocketServer()
-        const [ref, message] = await setup(
+        const [_ref, message, controller] = await setup(
           proxyProvider,
           server.url,
           "system_health",
@@ -60,7 +65,7 @@ Deno.test({
           [1n],
         )
         A.assertInstanceOf(message, Error)
-        A.assertNotInstanceOf(await ref.release(), Error)
+        controller.abort()
         server.close()
       },
     })

@@ -5,9 +5,14 @@ export function setup(
   discoveryValue: any,
   method: string,
   params: unknown[],
-): Promise<[ProviderRef<any>, any]> {
+): Promise<[ProviderRef<any>, any, AbortController]> {
   return new Promise((resolve) => {
-    const providerRef = provider(discoveryValue, (message) => resolve([providerRef, message]))
+    const controller = new AbortController()
+    const providerRef = provider(
+      discoveryValue,
+      (message) => resolve([providerRef, message, controller]),
+      controller.signal,
+    )
     providerRef.send({
       jsonrpc: "2.0",
       id: providerRef.nextId(),

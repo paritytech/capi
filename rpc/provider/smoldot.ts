@@ -48,14 +48,14 @@ export const smoldotProvider: Provider<
   SmoldotSendErrorData,
   SmoldotHandlerErrorData,
   SmoldotCloseErrorData
-> = (props, listener) => {
+> = (props, listener, signal) => {
   return {
     nextId,
     send: (message) => {
       ;(async () => {
         let conn: SmoldotProviderConnection
         try {
-          conn = await connection(props, listener)
+          conn = await connection(props, listener, signal)
         } catch (error) {
           listener(new ProviderHandlerError(error as SmoldotHandlerErrorData))
           return
@@ -67,31 +67,13 @@ export const smoldotProvider: Provider<
         }
       })()
     },
-    release: () => {
-      const conn = connections.get(props)
-      if (!conn) {
-        return Promise.resolve(undefined)
-      }
-      const { cleanUp, listeners, inner } = conn
-      listeners.delete(listener)
-      if (!listeners.size) {
-        connections.delete(props)
-        cleanUp()
-        try {
-          // TODO: utilize `deferClosing` prop once we flesh out approach
-          inner.remove()
-        } catch (e) {
-          return Promise.resolve(new ProviderCloseError(e as SmoldotCloseErrorData))
-        }
-      }
-      return Promise.resolve(undefined)
-    },
   }
 }
 
 async function connection(
   props: SmoldotProviderProps,
   listener: ProviderListener<SmoldotSendErrorData, SmoldotHandlerErrorData>,
+  signal: AbortSignal,
 ): Promise<SmoldotProviderConnection> {
   if (!client) {
     client = start(
@@ -118,8 +100,23 @@ async function connection(
       inner = await client.addChain({ chainSpec: props.chainSpec.relay })
     }
     const stopListening = deferred<undefined>()
-    conn = new SmoldotProviderConnection(inner, () => stopListening.resolve())
+    conn = new SmoldotProviderConnection(inner)
     connections.set(props, conn)
+    signal.addEventListener("abort", () => {
+      const { listeners } = conn!
+      listeners.delete(listener)
+      if (!listeners.size) {
+        connections.delete(props)
+        stopListening.resolve()
+        try {
+          // TODO: utilize `deferClosing` prop once we flesh out approach
+          inner.remove()
+        } catch (e) {
+          return Promise.resolve(new ProviderCloseError(e as SmoldotCloseErrorData))
+        }
+      }
+      return Promise.resolve(undefined)
+    })
     ;(async () => {
       while (true) {
         try {

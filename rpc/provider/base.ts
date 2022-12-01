@@ -1,6 +1,10 @@
 import * as U from "../../util/mod.ts"
 import * as msg from "../messages.ts"
-import { ProviderCloseError, ProviderHandlerError, ProviderSendError } from "./errors.ts"
+import {
+  ProviderCloseError as _ProviderCloseError,
+  ProviderHandlerError,
+  ProviderSendError,
+} from "./errors.ts"
 
 /**
  * @param discoveryValue the value with which to discover the given chain
@@ -14,6 +18,7 @@ export type Provider<
 > = (
   discoveryValue: DiscoveryValue,
   listener: ProviderListener<SendErrorData, HandlerErrorData>,
+  signal: AbortSignal,
 ) => ProviderRef<CloseErrorData>
 
 export type ProviderListener<SendErrorData, HandlerErrorData> = U.Listener<
@@ -26,7 +31,7 @@ export type ProviderListener<SendErrorData, HandlerErrorData> = U.Listener<
 export interface ProviderRef<CloseErrorData> {
   nextId(): number
   send(message: msg.EgressMessage): void
-  release(): Promise<undefined | ProviderCloseError<CloseErrorData>>
+  // release(): Promise<undefined | ProviderCloseError<CloseErrorData>>
 }
 
 export class ProviderConnection<Inner, SendErrorData, HandlerErrorData> {
@@ -38,9 +43,8 @@ export class ProviderConnection<Inner, SendErrorData, HandlerErrorData> {
 
   /**
    * @param inner the underlying representation of the connection (such as a WebSocket or smoldot chain)
-   * @param cleanUp cb to close the connection (`inner`) and free up resources
    */
-  constructor(readonly inner: Inner, readonly cleanUp: () => void) {}
+  constructor(readonly inner: Inner) {}
 
   addListener = (listener: ProviderListener<SendErrorData, HandlerErrorData>) => {
     if (this.listeners.has(listener)) {
