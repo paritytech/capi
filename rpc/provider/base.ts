@@ -26,10 +26,10 @@ export type ProviderListener<SendErrorData, HandlerErrorData> = U.Listener<
 export interface ProviderRef<CloseErrorData> {
   nextId(): number
   send(message: msg.EgressMessage): void
-  release(): Promise<undefined | ProviderCloseError<CloseErrorData>>
+  release(): Promise<void | ProviderCloseError<CloseErrorData>>
 }
 
-export class ProviderConnection<Inner, SendErrorData, HandlerErrorData> {
+export class ProviderConnection<Inner, SendErrorData, HandlerErrorData, CloseErrorData> {
   /** The set of high-level listeners, which accept parsed messages and errors */
   listeners = new Map<
     ProviderListener<SendErrorData, HandlerErrorData>,
@@ -40,7 +40,10 @@ export class ProviderConnection<Inner, SendErrorData, HandlerErrorData> {
    * @param inner the underlying representation of the connection (such as a WebSocket or smoldot chain)
    * @param cleanUp cb to close the connection (`inner`) and free up resources
    */
-  constructor(readonly inner: Inner, readonly cleanUp: () => void) {}
+  constructor(
+    readonly inner: Inner,
+    readonly cleanUp: () => Promise<void | ProviderCloseError<CloseErrorData>>,
+  ) {}
 
   addListener = (listener: ProviderListener<SendErrorData, HandlerErrorData>) => {
     if (this.listeners.has(listener)) {

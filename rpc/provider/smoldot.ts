@@ -28,9 +28,12 @@ type SmoldotCloseErrorData = AlreadyDestroyedError | CrashError
 
 let client: undefined | Client
 const connections = new Map<SmoldotProviderProps, SmoldotProviderConnection>()
-class SmoldotProviderConnection
-  extends ProviderConnection<Chain, SmoldotSendErrorData, SmoldotHandlerErrorData>
-{}
+class SmoldotProviderConnection extends ProviderConnection<
+  Chain,
+  SmoldotSendErrorData,
+  SmoldotHandlerErrorData,
+  SmoldotCloseErrorData
+> {}
 
 const nextId = nextIdFactory()
 
@@ -67,25 +70,7 @@ export const smoldotProvider: Provider<
         }
       })()
     },
-    release: () => {
-      const conn = connections.get(props)
-      if (!conn) {
-        return Promise.resolve(undefined)
-      }
-      const { cleanUp, listeners, inner } = conn
-      listeners.delete(listener)
-      if (!listeners.size) {
-        connections.delete(props)
-        cleanUp()
-        try {
-          // TODO: utilize `deferClosing` prop once we flesh out approach
-          inner.remove()
-        } catch (e) {
-          return Promise.resolve(new ProviderCloseError(e as SmoldotCloseErrorData))
-        }
-      }
-      return Promise.resolve(undefined)
-    },
+    release: async () => await connections.get(props)?.cleanUp(),
   }
 }
 
@@ -118,7 +103,21 @@ async function connection(
       inner = await client.addChain({ chainSpec: props.chainSpec.relay })
     }
     const stopListening = deferred<undefined>()
-    conn = new SmoldotProviderConnection(inner, () => stopListening.resolve())
+    conn = new SmoldotProviderConnection(inner, () => {
+      stopListening.resolve()
+      const { listeners } = conn!
+      listeners.delete(listener)
+      if (!listeners.size) {
+        connections.delete(props)
+        try {
+          // TODO: utilize `deferClosing` prop once we flesh out approach
+          inner.remove()
+        } catch (e) {
+          return Promise.resolve(new ProviderCloseError(e as SmoldotCloseErrorData))
+        }
+      }
+      return Promise.resolve()
+    })
     connections.set(props, conn)
     ;(async () => {
       while (true) {
