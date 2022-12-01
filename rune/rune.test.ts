@@ -114,7 +114,10 @@ Deno.test("multi stream", async () => {
   // x:  *            1    *   2                      *   3                      *   4
   // y:  *                             10    *  20             *  30    *  40
   // z:  *                 *        11 12    *  22    *  23    *  33    *  43    *  44
-  assertEquals(await collect(z.watch()), [11, 12, 22, 23, 33, 43, 44])
+  assertEquals(
+    await collect(z.pipe((v) => [clock.time, v]).watch()),
+    [[3, 11], [3, 12], [4, 22], [5, 23], [6, 33], [7, 43], [8, 44]],
+  )
   clock.reset()
 })
 
@@ -128,6 +131,7 @@ Deno.test("multi stream 2", async () => {
   })
   const A = a.pipe(async (value) => {
     await clock.tick(clock.time + 3)
+    // console.log(clock.time, value)
     return value
   })
   const b = Rune.stream(async function*() {
@@ -140,16 +144,25 @@ Deno.test("multi stream 2", async () => {
   })
   const c = add(a, b)
   const C = add(A, b)
-  // t: [  0  ]--[  1  ]--[  2  ]--[  3  ]--[  4  ]--[  5  ]--[  6  ]--[  7  ]--[  8  ]
+  // t: [  0  ]--[  1  ]--[  2  ]--[  3  ]--[  4  ]--[  5  ]--[  6  ]--[  7  ]
   // a:  *            1             *   2
-  // A:  *                          *            1                          2
-  // b:  *                    10                      *  20                      *  30
-  // c:  *                    11    *  12             *  22                      *  32
-  // C:  *                          *           11    *                 12 22       32
-  assertEquals(await collect(c.watch()), [11, 12, 22, 32])
+  // A:  *                          *            1                 2
+  // b:  *                    10                      *  20             *  30
+  // c:  *                    11    *  12             *  22             *  32
+  // C:  *                          *           11    *        12 22       32
+  assertEquals(
+    await collect(c.pipe((v) => [clock.time, v]).watch()),
+    [[2, 11], [3, 12], [5, 22], [8, 32]],
+  )
   clock.reset()
   assertEquals(await collect(C.watch()), [11, 12, 22, 32])
   clock.reset()
+  // TODO: fix timing via caching
+  // assertEquals(
+  //   await collect(C.pipe((v) => [clock.time, v]).watch()),
+  //   [[4, 11], [6, 12], [6, 22], [7, 32]],
+  // )
+  // clock.reset()
 })
 
 async function collect<T>(iter: AsyncIterable<T>) {
