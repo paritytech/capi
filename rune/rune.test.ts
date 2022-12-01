@@ -23,7 +23,9 @@ Deno.test("pipe", async () => {
   assertEquals(
     await Rune
       .constant(new Error())
+      .unwrapError()
       .pipe(() => 123)
+      .catch()
       .run(),
     new Error(),
   )
@@ -52,7 +54,7 @@ const sum = <X>(...[...args]: Args<X, number[]>) => {
 Deno.test("add", async () => {
   assertEquals(await add(1, 2).run(), 3)
   assertEquals(
-    await add(1, Rune.constant(new Error())).run(),
+    await add(1, Rune.constant(new Error()).unwrapError()).catch().run(),
     new Error(),
   )
   assertEquals(

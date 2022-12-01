@@ -1,5 +1,4 @@
 import { Deferred, deferred } from "../deps/std/async.ts"
-import { abortIfAny } from "../util/abort.ts"
 import { getOrInit } from "../util/state.ts"
 import { PromiseOr } from "../util/types.ts"
 
@@ -70,18 +69,18 @@ export class Cast {
   active = 0
 
   primed = new Map<Rune<any, any>, _Rune<any, any>>()
-  prime<T, E extends Error>(rune: Rune<T, E>, signal: AbortSignal): _Rune<T, E> {
+  prime<T, E>(rune: Rune<T, E>, signal: AbortSignal): _Rune<T, E> {
     const primed = getOrInit(this.primed, rune, () => rune._prime(this))
     primed.reference(signal)
     return primed
   }
 }
 
-export type _T<F> = F extends Rune<infer T, any> ? T : Exclude<F, Error>
-export type _E<F> = F extends Rune<any, infer E> ? E : Extract<F, Error>
+export type _T<F> = F extends Rune<infer T, any> ? T : F
+export type _U<F> = F extends Rune<any, infer E> ? E : never
 
-export abstract class _Rune<T, E extends Error> {
-  declare "": [T, E]
+export abstract class _Rune<T, U> {
+  declare "": [T, U]
 
   abortController = new AbortController()
   signal = this.abortController.signal
@@ -99,7 +98,7 @@ export abstract class _Rune<T, E extends Error> {
     })
   }
 
-  abstract evaluate(time: number, applicable: Period, signal: AbortSignal): Promise<T | E>
+  abstract evaluate(time: number, applicable: Period, signal: AbortSignal): Promise<T>
 
   alive = true
   cleanup() {
@@ -107,19 +106,19 @@ export abstract class _Rune<T, E extends Error> {
   }
 }
 
-export class Rune<T, E extends Error> {
-  declare "": [T, E]
+export class Rune<T, U = never> {
+  declare "": [T, U]
 
-  private constructor(readonly _prime: (cast: Cast) => _Rune<T, E>) {}
+  private constructor(readonly _prime: (cast: Cast) => _Rune<T, U>) {}
 
-  static new<T, E extends Error, A extends unknown[]>(
+  static new<T, E, A extends unknown[]>(
     ctor: new(cast: Cast, ...args: A) => _Rune<T, E>,
     ...args: A
   ) {
     return new Rune((cast) => new ctor(cast, ...args))
   }
 
-  async run(): Promise<T | E> {
+  async run(): Promise<T | U> {
     const cast = new Cast()
     const abortController = new AbortController()
     const primed = cast.prime(this, abortController.signal)
@@ -128,7 +127,7 @@ export class Rune<T, E extends Error> {
     return result
   }
 
-  async *watch(): AsyncIterable<T | E> {
+  async *watch(): AsyncIterable<T | U> {
     const abortController = new AbortController()
     const cast = new Cast()
     const primed = cast.prime(this, abortController.signal)
@@ -151,97 +150,88 @@ export class Rune<T, E extends Error> {
     return Rune.new(_ConstantRune, value)
   }
 
-  static resolve<V>(value: V): Rune<_T<V>, _E<V>> {
+  static resolve<V>(value: V): Rune<_T<V>, _U<V>> {
     return (value instanceof Rune ? value : Rune.constant(value)) as any
   }
 
-  pipe<R>(
-    fn: (value: T) => PromiseOr<R>,
-  ): Rune<Exclude<R, Error>, E | Extract<R, Error>> {
+  pipe<T2>(
+    fn: (value: T) => PromiseOr<T2>,
+  ): Rune<T2, U> {
     return Rune.new(_PipeRune, this, fn)
   }
 
-  static ls<F extends unknown[]>(runes: [...F]): Rune<
-    { [K in keyof F]: _T<F[K]> },
-    _E<F[number]>
-  > {
+  static ls<F extends unknown[]>(runes: [...F]): Rune<{ [K in keyof F]: _T<F[K]> }, _U<F[number]>>
+  static ls<F extends unknown[]>(runes: [...F]): Rune<_T<F[number]>[], _U<F[number]>> {
     return Rune.new(_LsRune, runes.map(Rune.resolve))
   }
 
-  static stream<R>(fn: () => AsyncIterable<R>) {
+  static stream<T>(fn: () => AsyncIterable<T>) {
     return Rune.new(_StreamRune, fn)
+  }
+
+  unwrap<T2 extends T>(fn: (value: T) => value is T2): Rune<T2, U | Exclude<T, T2>> {
+    return Rune.new(_UnwrapRune, this, fn)
+  }
+
+  unwrapNot<T2 extends T>(fn: (value: T) => value is T2): Rune<Exclude<T, T2>, U | T2>
+  unwrapNot<T2 extends T>(
+    fn: (value: T) => value is T2,
+  ): Rune<Exclude<T, T2>, U | Exclude<T, Exclude<T, T2>>> {
+    return this.unwrap((value): value is Exclude<T, T2> => !fn(value))
+  }
+
+  unwrapError() {
+    return this.unwrapNot((x): x is T & Error => x instanceof Error)
+  }
+
+  unwrapOption() {
+    return this.unwrapNot((x): x is T & undefined => x === undefined)
+  }
+
+  catch() {
+    return Rune.new(_CatchRune, this)
   }
 }
 
-class _ConstantRune<T> extends _Rune<Exclude<T, Error>, Extract<T, Error>> {
+class _ConstantRune<T> extends _Rune<T, never> {
   constructor(cast: Cast, readonly value: T) {
     super(cast)
   }
 
   async evaluate() {
-    return this.value as Exclude<T, Error> | Extract<T, Error>
+    return this.value
   }
 }
 
-class _PipeRune<T, E extends Error, R> extends _Rune<Exclude<R, Error>, E | Extract<R, Error>> {
-  base
-  constructor(
-    cast: Cast,
-    base: Rune<T, E>,
-    readonly fn: (value: T) => PromiseOr<R>,
-  ) {
+class _PipeRune<T1, U, T2> extends _Rune<T2, U> {
+  child
+  constructor(cast: Cast, child: Rune<T1, U>, readonly fn: (value: T1) => PromiseOr<T2>) {
     super(cast)
-    this.base = cast.prime(base, this.signal)
+    this.child = cast.prime(child, this.signal)
   }
 
-  async evaluate(
-    time: number,
-    applicable: Period,
-    signal: AbortSignal,
-  ): Promise<E | Exclude<R, Error> | Extract<R, Error>> {
-    const value = (await this.base.evaluate(time, applicable, signal)) as T | E
-    if (value instanceof Error) return value
-    return await this.fn(value) as
-      | Exclude<R, Error>
-      | Extract<R, Error>
+  async evaluate(time: number, applicable: Period, signal: AbortSignal) {
+    return await this.fn(await this.child.evaluate(time, applicable, signal))
   }
 }
 
-class _LsRune extends _Rune<any, any> {
+class _LsRune<T, U> extends _Rune<T[], U> {
   children
-  constructor(cast: Cast, children: Rune<any, any>[]) {
+  constructor(cast: Cast, children: Rune<T, U>[]) {
     super(cast)
     this.children = children.map((child) => cast.prime(child, this.signal))
   }
 
   async evaluate(time: number, applicable: Period, signal: AbortSignal) {
-    const failedResult = deferred()
-    const childController = abortIfAny(signal)
-    return Promise.race([
-      failedResult,
-      Promise.all(
-        this.children.map((child) =>
-          child.evaluate(time, applicable, childController.signal).then(
-            (value) => {
-              if (!(value instanceof Error)) return value
-              if (!childController.signal.aborted) {
-                failedResult.resolve(value)
-                childController.abort()
-              }
-              return Promise.reject(null)
-            },
-          )
-        ),
-      ),
-    ])
+    return Promise.all(this.children.map((child) => child.evaluate(time, applicable, signal)))
   }
 }
 
-class _StreamRune<T, E extends Error> extends _Rune<T, E> {
+class _StreamRune<T> extends _Rune<T, never> {
   initProm = deferred<void>()
-  values: (T | E | undefined)[] = []
+  values: (T | undefined)[] = []
   lastPeriod = new Period()
-  constructor(cast: Cast, fn: (signal?: AbortSignal) => AsyncIterable<T | E>) {
+  constructor(cast: Cast, fn: (signal?: AbortSignal) => AsyncIterable<T>) {
     super(cast)
     cast.addActive()
     ;(async () => {
@@ -263,7 +253,7 @@ class _StreamRune<T, E extends Error> extends _Rune<T, E> {
     })()
   }
 
-  async evaluate(time: number, applicable: Period): Promise<T | E> {
+  async evaluate(time: number, applicable: Period): Promise<T> {
     await this.initProm
     let end = Infinity
     const idx = this.values.findLastIndex((_, i) => {
@@ -279,4 +269,41 @@ class _StreamRune<T, E extends Error> extends _Rune<T, E> {
     }
     return this.values[idx]!
   }
+}
+
+class _UnwrapRune<T1, U, T2 extends T1> extends _Rune<T2, U | Exclude<T1, T2>> {
+  child
+  constructor(cast: Cast, child: Rune<T1, U>, readonly fn: (value: T1) => value is T2) {
+    super(cast)
+    this.child = cast.prime(child, this.signal)
+  }
+
+  async evaluate(time: number, applicable: Period, signal: AbortSignal) {
+    const value = await this.child.evaluate(time, applicable, signal)
+    if (this.fn(value)) return value
+    throw new UnwrappedValue(value)
+  }
+}
+
+class _CatchRune<T, U> extends _Rune<T | U, never> {
+  child
+  constructor(cast: Cast, child: Rune<T, U>) {
+    super(cast)
+    this.child = cast.prime(child, this.signal)
+  }
+
+  async evaluate(time: number, applicable: Period, signal: AbortSignal) {
+    try {
+      return await this.child.evaluate(time, applicable, signal)
+    } catch (e) {
+      if (e instanceof UnwrappedValue) {
+        return e.value as U
+      }
+      throw e
+    }
+  }
+}
+
+export class UnwrappedValue {
+  constructor(readonly value: unknown) {}
 }
