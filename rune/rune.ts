@@ -1,12 +1,12 @@
 import { deferred } from "../deps/std/async.ts"
 import { abortIfAny } from "../util/abort.ts"
+import { cbToAsyncIter } from "../util/cbToAsyncIter.ts"
 import { getOrInit } from "../util/state.ts"
 import { PromiseOr } from "../util/types.ts"
-import { Id } from "./id.ts"
-import { Loom, Warp } from "./loom.ts"
+import { Loom, Warp, Weft } from "./loom.ts"
 
 export class Cast {
-  loom = new Loom()
+  constructor(readonly loom: Loom) {}
 
   primed = new Map<Rune<any, any>, _Rune<any, any>>()
   prime<T, E extends Error>(rune: Rune<T, E>, signal: AbortSignal): _Rune<T, E> {
@@ -49,22 +49,38 @@ export abstract class _Rune<T, E extends Error> {
 export class Rune<T, E extends Error> {
   declare "": [T, E]
 
-  private constructor(readonly id: Id, readonly _prime: (cast: Cast) => _Rune<T, E>) {}
+  private constructor(readonly _prime: (cast: Cast) => _Rune<T, E>) {}
 
   static new<T, E extends Error, A extends unknown[]>(
     ctor: new(cast: Cast, ...args: A) => _Rune<T, E>,
     ...args: A
   ) {
-    return new Rune(Id.hash(Id.loc``, ctor, ...args), (cast) => new ctor(cast, ...args))
+    return new Rune((cast) => new ctor(cast, ...args))
   }
 
   async run(): Promise<T | E> {
-    const cast = new Cast()
+    const cast = new Cast(new Loom(() => {}, () => {}))
     const abortController = new AbortController()
     const primed = cast.prime(this, abortController.signal)
-    const result = await primed.evaluate(new Warp(), new Warp(), new AbortController().signal)
+    const warp = new Warp()
+    const result = await primed.evaluate(warp, warp.fork(), new AbortController().signal)
     abortController.abort()
     return result
+  }
+
+  async *watch(): AsyncIterable<T | E> {
+    const { cb, iter, signal, end } = cbToAsyncIter<[Weft, number]>()
+    const loom = new Loom((...x) => cb(x), () => {
+      if (!loom.activeWefts) end()
+    })
+    const cast = new Cast(loom)
+    const primed = cast.prime(this, signal)
+    const warp = new Warp()
+    yield await primed.evaluate(warp, warp.fork(), new AbortController().signal)
+    for await (const [weft, knot] of iter) {
+      warp.tie(weft, knot, true)
+      yield await primed.evaluate(warp, warp.fork(), new AbortController().signal)
+    }
   }
 
   static constant<T>(value: T) {
@@ -76,10 +92,9 @@ export class Rune<T, E extends Error> {
   }
 
   pipe<R>(
-    id: Id,
     fn: (value: T) => PromiseOr<R>,
   ): Rune<Exclude<R, Error>, E | Extract<R, Error>> {
-    return Rune.new(_PipeRune, this, id, fn)
+    return Rune.new(_PipeRune, this, fn)
   }
 
   static ls<F extends unknown[]>(runes: [...F]): Rune<
@@ -87,6 +102,10 @@ export class Rune<T, E extends Error> {
     _E<F[number]>
   > {
     return Rune.new(_LsRune, runes.map(Rune.resolve))
+  }
+
+  static stream<R>(fn: () => AsyncIterable<R>) {
+    return Rune.new(_StreamRune, fn)
   }
 }
 
@@ -105,7 +124,6 @@ class _PipeRune<T, E extends Error, R> extends _Rune<Exclude<R, Error>, E | Extr
   constructor(
     cast: Cast,
     base: Rune<T, E>,
-    _id: Id,
     readonly fn: (value: T) => PromiseOr<R>,
   ) {
     super(cast)
@@ -150,5 +168,33 @@ class _LsRune extends _Rune<any, any> {
         ),
       ),
     ])
+  }
+}
+
+class _StreamRune<T, E extends Error> extends _Rune<T, E> {
+  values: (T | E)[] = []
+  initProm = deferred<void>()
+  weft!: Weft
+  constructor(cast: Cast, fn: (signal?: AbortSignal) => AsyncIterable<T | E>) {
+    super(cast)
+    this.weft = new Weft(cast.loom)
+    ;(async () => {
+      const iter = fn(this.signal)
+      for await (const value of iter) {
+        if (!this.values.length) {
+          this.initProm.resolve()
+          this.values[0] = value
+        } else {
+          this.values[this.weft.extend()] = value
+        }
+      }
+      this.weft.cut()
+    })()
+  }
+
+  async evaluate(reference: Warp, used: Warp): Promise<T | E> {
+    await this.initProm
+    const idx = used.tie(this.weft, reference.get(this.weft) ?? this.weft.lastKnot)
+    return this.values[idx]!
   }
 }

@@ -1,5 +1,4 @@
 import { Args, resolveArgs } from "./args.ts"
-import { Id } from "./id.ts"
 import { Rune } from "./rune.ts"
 
 class E1 extends Error {
@@ -17,7 +16,7 @@ const e3 = Rune.resolve(new E3())
 const e1n = Rune.resolve(new E1() as E1 | number)
 
 const add = <X>(...[a, b]: Args<X, [a: number, b: number]>) => {
-  return Rune.ls([a, b]).pipe(Id.loc``, ([a, b]) => a + b)
+  return Rune.ls([a, b]).pipe(([a, b]) => a + b)
 }
 
 assertExact(add(1, 2), null! as Rune<number, never>)
@@ -44,7 +43,7 @@ assertExact(sum(e1, e2, e3, e2, e1), null! as Rune<number, E1 | E2 | E3>)
 
 const box = <T, X>(...X: Args<X, [value: T]>) => {
   const [value] = resolveArgs(X)
-  return value.pipe(Id.loc``, (value) => ({ value }))
+  return value.pipe((value) => ({ value }))
 }
 
 const boxBox = <T, X>(...X: Args<X, [value: T]>) => {

@@ -1,23 +1,30 @@
 export class Loom {
-  height = 0n
+  constructor(
+    readonly onExtend: (weft: Weft, knot: number) => void,
+    readonly onCut: (weft: Weft) => void,
+  ) {}
 
-  extend() {
-    return new Weft(this)
-  }
+  activeWefts = 0
 }
 
 export class Weft {
-  times: bigint[] = []
+  lastKnot = 0
   done = false
 
-  constructor(readonly loom: Loom) {}
+  constructor(readonly loom: Loom) {
+    loom.activeWefts++
+  }
 
   extend(): number {
-    return this.times.push(++this.loom.height)
+    const knot = ++this.lastKnot
+    queueMicrotask(() => this.loom.onExtend(this, knot))
+    return knot
   }
 
   cut() {
+    this.loom.activeWefts--
     this.done = true
+    queueMicrotask(() => this.loom.onCut(this))
   }
 }
 
@@ -26,23 +33,26 @@ export class Warp {
 
   constructor(readonly parent?: Warp) {}
 
-  tie(weft: Weft, height: number) {
+  tie(weft: Weft, knot: number, override = false): number {
     const existing = this.knots.get(weft)
-    if (!existing) {
-      this.knots.set(weft, height)
-      this.parent?.tie(weft, height)
-    } else if (existing !== height) {
+    if (!existing || override) {
+      this.knots.set(weft, knot)
+      if (this.parent) {
+        return this.parent.tie(weft, knot, override)
+      }
+    } else if (existing !== knot) {
       throw new Error("Cannot tie Warp to Weft at two heights")
     }
+    return knot
   }
 
-  heightOn(weft: Weft) {
+  get(weft: Weft) {
     return this.knots.get(weft)
   }
 
   satisfies(warp: Warp) {
     for (const [weft, height] of this.knots) {
-      if ((warp.heightOn(weft) ?? height) !== height) {
+      if ((warp.get(weft) ?? height) !== height) {
         return false
       }
     }
