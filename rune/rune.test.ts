@@ -1,5 +1,5 @@
-import { deferred } from "../deps/std/async.ts"
 import { assertEquals } from "../deps/std/testing/asserts.ts"
+import { Clock } from "../util/clock.ts"
 import { Args } from "./args.ts"
 import { Rune } from "./rune.ts"
 
@@ -90,28 +90,24 @@ Deno.test("divide", async () => {
 Deno.test("multi stream", async () => {
   const clock = new Clock()
   const x = Rune.stream(async function*() {
-    await clock.start()
-    await clock.to(1)
+    await clock.tick(1)
     yield 1
-    await clock.to(2)
+    await clock.tick(2)
     yield 2
-    await clock.to(5)
+    await clock.tick(5)
     yield 3
-    await clock.to(8)
+    await clock.tick(8)
     yield 4
-    await clock.end()
   })
   const y = Rune.stream(async function*() {
-    await clock.start()
-    await clock.to(3)
+    await clock.tick(3)
     yield 10
-    await clock.to(4)
+    await clock.tick(4)
     yield 20
-    await clock.to(6)
+    await clock.tick(6)
     yield 30
-    await clock.to(7)
+    await clock.tick(7)
     yield 40
-    await clock.end()
   })
   const z = add(x, y)
   // t: [  0  ]--[  1  ]--[  2  ]--[  3  ]--[  4  ]--[  5  ]--[  6  ]--[  7  ]--[  8  ]
@@ -125,28 +121,22 @@ Deno.test("multi stream", async () => {
 Deno.test("multi stream 2", async () => {
   const clock = new Clock()
   const a = Rune.stream(async function*() {
-    await clock.start()
-    await clock.to(1)
+    await clock.tick(1)
     yield 1
-    await clock.to(3)
+    await clock.tick(3)
     yield 2
-    await clock.end()
   })
   const A = a.pipe(async (value) => {
-    await clock.start()
-    await clock.to(clock.time + 3)
-    await clock.end()
+    await clock.tick(clock.time + 3)
     return value
   })
   const b = Rune.stream(async function*() {
-    await clock.start()
-    await clock.to(2)
+    await clock.tick(2)
     yield 10
-    await clock.to(5)
+    await clock.tick(5)
     yield 20
-    await clock.to(8)
+    await clock.tick(8)
     yield 30
-    await clock.end()
   })
   const c = add(a, b)
   const C = add(A, b)
@@ -157,9 +147,9 @@ Deno.test("multi stream 2", async () => {
   // c:  *                    11    *  12             *  22                      *  32
   // C:  *                          *           11    *                 12 22       32
   assertEquals(await collect(c.watch()), [11, 12, 22, 32])
-  await clock.reset()
+  clock.reset()
   assertEquals(await collect(C.watch()), [11, 12, 22, 32])
-  await clock.reset()
+  clock.reset()
 })
 
 async function collect<T>(iter: AsyncIterable<T>) {
@@ -174,73 +164,5 @@ async function collect<T>(iter: AsyncIterable<T>) {
 async function* iter<T>(...values: T[]) {
   for (const value of values) {
     yield value
-  }
-}
-
-class Clock {
-  time = 0
-  running = 0
-  waiting = 0
-  next = deferred()
-  scheduled = false
-
-  async reset() {
-    if (this.scheduled) await this.next
-    assertEquals(this.running, 0)
-    assertEquals(this.waiting, 0)
-    this.time = 0
-  }
-
-  set(time: number) {
-    this.time = time
-    const old = this.next
-    this.next = deferred()
-    old.resolve()
-  }
-
-  async start() {
-    this.running++
-    // console.log("start", this.running)
-  }
-
-  async end() {
-    this.running--
-    // console.log("end", this.running)
-    this.tryTick()
-  }
-
-  async to(time: number) {
-    // console.log("to", time)
-    while (this.time < time) {
-      this.running--
-      this.waiting++
-      // console.log("waiting", this.waiting)
-      this.tryTick()
-      await this.next
-      // console.log("woke up")
-    }
-    // console.log("will run", time)
-  }
-
-  tryTick() {
-    // console.log("tryTick", this.running)
-    if (this.running || this.scheduled) return
-    // console.log("confirmed; scheduling")
-    this.scheduled = true
-    const old = this.next
-    setTimeout(() => {
-      this.scheduled = false
-      if (this.running) {
-        // console.log("abort tick", this.running)
-        return
-      }
-      this.time++
-      // console.log(`--- ${this.time} ---`)
-      this.next = deferred()
-      this.running = this.waiting
-      this.waiting = 0
-      // console.log(this.running, "to wake up")
-      old.resolve()
-    }, 0)
   }
 }
