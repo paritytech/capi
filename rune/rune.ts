@@ -2,30 +2,42 @@ import { Deferred, deferred } from "../deps/std/async.ts"
 import { getOrInit } from "../util/state.ts"
 import { PromiseOr } from "../util/types.ts"
 
+class Notification implements PromiseLike<void> {
+  private _next: Deferred<void> = null!
+  // dprint-ignore (doesn't respect instantiation expression)
+  then<T1 = void, T2 = never>(...args: Parameters<typeof this._next.then<T1, T2>>) {
+    return (this._next ??= deferred()).then(...args)
+  }
+  emit() {
+    this._next?.resolve()
+    this._next = null!
+  }
+}
+
 export class Period {
   min = 0
   max = Infinity
 
-  hasMax = deferred()
+  minChange = new Notification()
+  maxChange = new Notification()
 
   children: Period[] = []
 
   restrictMin(min: number) {
-    if (min > this.min) {
-      this.min = min
-      for (const child of this.children) {
-        child.restrictMin(min)
-      }
+    if (min <= this.min) return
+    this.min = min
+    this.minChange.emit()
+    for (const child of this.children) {
+      child.restrictMin(min)
     }
   }
 
   restrictMax(max: number) {
-    if (max < this.max) {
-      this.max = max
-      this.hasMax.resolve()
-      for (const child of this.children) {
-        child.restrictMax(max)
-      }
+    if (max >= this.max) return
+    this.max = max
+    this.maxChange.emit()
+    for (const child of this.children) {
+      child.restrictMax(max)
     }
   }
 
@@ -38,35 +50,22 @@ export class Period {
 
 export class Cast {
   time = 0
-
-  nextTick = deferred()
-
-  constructor() {
-    // @ts-ignore .
-    this.noActive.state = "fulfilled"
-  }
-
   tick() {
-    this.nextTick.resolve()
-    this.nextTick = deferred()
     return ++this.time
   }
 
+  active = 0
+  noActive = new Notification()
+
   addActive() {
-    if (this.noActive.state === "fulfilled") {
-      this.noActive = deferred()
-    }
     this.active++
   }
 
-  noActive = Promise.resolve() as Deferred<unknown>
   removeActive() {
     if (!--this.active) {
-      this.noActive.resolve()
+      this.noActive.emit()
     }
   }
-
-  active = 0
 
   primed = new Map<Rune<any, any>, _Rune<any, any>>()
   prime<T, E>(rune: Rune<T, E>, signal: AbortSignal): _Rune<T, E> {
@@ -76,8 +75,8 @@ export class Cast {
   }
 }
 
-export type _T<F> = F extends Rune<infer T, any> ? T : F
-export type _U<F> = F extends Rune<any, infer E> ? E : never
+export type _T<R> = R extends Rune<infer T, any> ? T : R
+export type _U<R> = R extends Rune<any, infer U> ? U : never
 
 export abstract class _Rune<T, U> {
   declare "": [T, U]
@@ -128,17 +127,20 @@ export class Rune<T, U = never> {
   }
 
   async *watch(): AsyncIterable<T | U> {
-    const abortController = new AbortController()
     const cast = new Cast()
+    const abortController = new AbortController()
     const primed = cast.prime(this, abortController.signal)
     let period = new Period()
     while (true) {
       yield await primed.evaluate(period.min, period, new AbortController().signal)
-      await Promise.race([
-        cast.noActive,
-        period.hasMax,
-      ])
-      if (period.max === Infinity) break
+      if (period.max === Infinity) {
+        if (!cast.active) return
+        await Promise.race([
+          cast.noActive,
+          period.maxChange,
+        ])
+        if (period.max === Infinity) break
+      }
       const start = period.max + 1
       period = new Period()
       period.restrictMin(start)
@@ -160,8 +162,8 @@ export class Rune<T, U = never> {
     return Rune.new(_PipeRune, this, fn)
   }
 
-  static ls<F extends unknown[]>(runes: [...F]): Rune<{ [K in keyof F]: _T<F[K]> }, _U<F[number]>>
-  static ls<F extends unknown[]>(runes: [...F]): Rune<_T<F[number]>[], _U<F[number]>> {
+  static ls<R extends unknown[]>(runes: [...R]): Rune<{ [K in keyof R]: _T<R[K]> }, _U<R[number]>>
+  static ls<R extends unknown[]>(runes: [...R]): Rune<_T<R[number]>[], _U<R[number]>> {
     return Rune.new(_LsRune, runes.map(Rune.resolve))
   }
 
@@ -271,6 +273,10 @@ class _StreamRune<T> extends _Rune<T, never> {
   }
 }
 
+export class UnwrappedValue {
+  constructor(readonly value: unknown) {}
+}
+
 class _UnwrapRune<T1, U, T2 extends T1> extends _Rune<T2, U | Exclude<T1, T2>> {
   child
   constructor(cast: Cast, child: Rune<T1, U>, readonly fn: (value: T1) => value is T2) {
@@ -302,8 +308,4 @@ class _CatchRune<T, U> extends _Rune<T | U, never> {
       throw e
     }
   }
-}
-
-export class UnwrappedValue {
-  constructor(readonly value: unknown) {}
 }
