@@ -61,20 +61,20 @@ Deno.test("add", async () => {
     await add(count, 10).run(),
     11,
   )
-  // assertEquals(
-  //   await collect(add(count, 10).watch()),
-  //   [11, 12, 13],
-  // )
-  // assertEquals(
-  //   await collect(add(count, count.pipe((x) => x * 10)).watch()),
-  //   [11, 22, 33],
-  // )
+  assertEquals(
+    await collect(add(count, 10).watch()),
+    [11, 12, 13],
+  )
+  assertEquals(
+    await collect(add(count, count.pipe((x) => x * 10)).watch()),
+    [11, 22, 33],
+  )
 })
 
 Deno.test("sum", async () => {
   assertEquals(await sum(1, 2, 3, 4, 5).run(), 15)
   assertEquals(await sum(count, count, count, count).run(), 4)
-  // assertEquals(await collect(sum(count, count, count, count).watch()), [4, 8, 12])
+  assertEquals(await collect(sum(count, count, count, count).watch()), [4, 8, 12])
 })
 
 const divide = <X>(
