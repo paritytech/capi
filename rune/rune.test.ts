@@ -37,8 +37,8 @@ const count = Rune.stream(() => iter(1, 2, 3))
 
 Deno.test("stream", async () => {
   assertEquals(await count.run(), 1)
-  // assertEquals(await collect(count.watch()), [1, 2, 3])
-  // assertEquals(await collect(count.pipe((x) => x + "").watch()), ["1", "2", "3"])
+  assertEquals(await collect(count.watch()), [1, 2, 3])
+  assertEquals(await collect(count.pipe((x) => x + "").watch()), ["1", "2", "3"])
 })
 
 const add = <X>(...[a, b]: Args<X, [a: number, b: number]>) => {
@@ -114,8 +114,8 @@ Deno.test("multi stream", async () => {
   // x:  *            1    *   2                      *   3                      *   4
   // y:  *                             10    *  20             *  30    *  40
   // z:  *                 *        11 12    *  22    *  23    *  33    *  43    *  44
-  // assertEquals(await collect(z.watch()), [11, 12, 22, 23, 33, 43, 44])
-  // clock.reset()
+  assertEquals(await collect(z.watch()), [11, 12, 22, 23, 33, 43, 44])
+  clock.reset()
 })
 
 Deno.test("multi stream 2", async () => {
@@ -146,10 +146,10 @@ Deno.test("multi stream 2", async () => {
   // b:  *                    10                      *  20                      *  30
   // c:  *                    11    *  12             *  22                      *  32
   // C:  *                          *           11    *                 12 22       32
-  // assertEquals(await collect(c.watch()), [11, 12, 22, 32])
-  // clock.reset()
-  // assertEquals(await collect(C.watch()), [11, 12, 22, 32])
-  // clock.reset()
+  assertEquals(await collect(c.watch()), [11, 12, 22, 32])
+  clock.reset()
+  assertEquals(await collect(C.watch()), [11, 12, 22, 32])
+  clock.reset()
 })
 
 async function collect<T>(iter: AsyncIterable<T>) {

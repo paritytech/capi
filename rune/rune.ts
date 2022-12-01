@@ -1,6 +1,5 @@
-import { deferred } from "../deps/std/async.ts"
+import { Deferred, deferred } from "../deps/std/async.ts"
 import { abortIfAny } from "../util/abort.ts"
-import { cbToAsyncIter } from "../util/cbToAsyncIter.ts"
 import { getOrInit } from "../util/state.ts"
 import { PromiseOr } from "../util/types.ts"
 
@@ -8,10 +7,13 @@ export class Period {
   min = 0
   max = Infinity
 
+  hasMax = deferred()
+
   children: Period[] = []
 
   restrictMin(min: number) {
     if (min > this.min) {
+      this.min = min
       for (const child of this.children) {
         child.restrictMin(min)
       }
@@ -20,6 +22,8 @@ export class Period {
 
   restrictMax(max: number) {
     if (max < this.max) {
+      this.max = max
+      this.hasMax.resolve()
       for (const child of this.children) {
         child.restrictMax(max)
       }
@@ -35,7 +39,33 @@ export class Period {
 
 export class Cast {
   time = 0
-  constructor() {}
+
+  nextTick = deferred()
+
+  constructor() {
+    // @ts-ignore .
+    this.noActive.state = "fulfilled"
+  }
+
+  tick() {
+    this.nextTick.resolve()
+    this.nextTick = deferred()
+    return ++this.time
+  }
+
+  addActive() {
+    if (this.noActive.state === "fulfilled") {
+      this.noActive = deferred()
+    }
+    this.active++
+  }
+
+  noActive = Promise.resolve() as Deferred<unknown>
+  removeActive() {
+    if (!--this.active) {
+      this.noActive.resolve()
+    }
+  }
 
   active = 0
 
@@ -93,25 +123,29 @@ export class Rune<T, E extends Error> {
     const cast = new Cast()
     const abortController = new AbortController()
     const primed = cast.prime(this, abortController.signal)
-    const result = await primed.evaluate(0, new Period(), abortController.signal)
+    const result = await primed.evaluate(0, new Period(), new AbortController().signal)
     abortController.abort()
     return result
   }
 
-  // async *watch(): AsyncIterable<T | E> {
-  //   const { cb, iter, signal, end } = cbToAsyncIter<[Weft, number]>()
-  //   const loom = new Loom((...x) => cb(x), () => {
-  //     if (!loom.activeWefts) end()
-  //   })
-  //   const cast = new Cast(loom)
-  //   const primed = cast.prime(this, signal)
-  //   const warp = new Warp()
-  //   yield await primed.evaluateRoot(warp.clone())
-  //   for await (const [weft, knot] of iter) {
-  //     warp.tie(weft, knot, true)
-  //     yield await primed.evaluateRoot(warp.clone())
-  //   }
-  // }
+  async *watch(): AsyncIterable<T | E> {
+    const abortController = new AbortController()
+    const cast = new Cast()
+    const primed = cast.prime(this, abortController.signal)
+    let period = new Period()
+    while (true) {
+      yield await primed.evaluate(period.min, period, new AbortController().signal)
+      await Promise.race([
+        cast.noActive,
+        period.hasMax,
+      ])
+      if (period.max === Infinity) break
+      const start = period.max + 1
+      period = new Period()
+      period.restrictMin(start)
+    }
+    abortController.abort()
+  }
 
   static constant<T>(value: T) {
     return Rune.new(_ConstantRune, value)
@@ -209,7 +243,7 @@ class _StreamRune<T, E extends Error> extends _Rune<T, E> {
   lastPeriod = new Period()
   constructor(cast: Cast, fn: (signal?: AbortSignal) => AsyncIterable<T | E>) {
     super(cast)
-    cast.active++
+    cast.addActive()
     ;(async () => {
       const iter = fn(this.signal)
       let first = true
@@ -225,7 +259,7 @@ class _StreamRune<T, E extends Error> extends _Rune<T, E> {
           this.lastPeriod.restrictMin(this.cast.time)
         }
       }
-      cast.active--
+      cast.removeActive()
     })()
   }
 
