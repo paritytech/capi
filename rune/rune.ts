@@ -177,6 +177,8 @@ export class Rune<T, U = never> {
     return Rune.new(_StreamRune, fn)
   }
 
+  // TODO: improve typing of unwrap* methods
+
   unwrap<T2 extends T>(fn: (value: T) => value is T2): Rune<T2, U | Exclude<T, T2>> {
     return Rune.new(_UnwrapRune, this, fn)
   }
@@ -189,7 +191,7 @@ export class Rune<T, U = never> {
   }
 
   unwrapError() {
-    return this.unwrapNot((x): x is T & Error => x instanceof Error)
+    return this.unwrapNot((x): x is Extract<T, Error> => x instanceof Error)
   }
 
   unwrapOption() {

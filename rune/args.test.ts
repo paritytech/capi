@@ -10,10 +10,11 @@ class E2 extends Error {
 class E3 extends Error {
   3 = 3
 }
-const e1 = Rune.resolve(new E1())
-const e2 = Rune.resolve(new E2())
-const e3 = Rune.resolve(new E3())
-const e1n = Rune.resolve(new E1() as E1 | number)
+
+const e1 = Rune.resolve(new E1()).unwrapError()
+const e2 = Rune.resolve(new E2()).unwrapError()
+const e3 = Rune.resolve(new E3()).unwrapError()
+const e1n = Rune.resolve(new E1() as E1 | number).unwrapError()
 
 const add = <X>(...[a, b]: Args<X, [a: number, b: number]>) => {
   return Rune.ls([a, b]).pipe(([a, b]) => a + b)
