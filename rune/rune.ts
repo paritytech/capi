@@ -193,6 +193,10 @@ export class Rune<T, U = never> {
   catch() {
     return Rune.new(_CatchRune, this)
   }
+
+  lazy() {
+    return Rune.new(_LazyRune, this)
+  }
 }
 
 class _ConstantRune<T> extends _Rune<T, never> {
@@ -307,5 +311,17 @@ class _CatchRune<T, U> extends _Rune<T | U, never> {
       }
       throw e
     }
+  }
+}
+
+class _LazyRune<T, U> extends _Rune<T, U> {
+  child
+  constructor(cast: Cast, child: Rune<T, U>) {
+    super(cast)
+    this.child = cast.prime(child, this.signal)
+  }
+
+  evaluate(time: number, _applicable: Period, signal: AbortSignal): Promise<T> {
+    return this.child.evaluate(time, new Period(), signal)
   }
 }

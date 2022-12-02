@@ -91,7 +91,7 @@ Deno.test("divide", async () => {
 
 Deno.test("multi stream", async () => {
   const clock = new Clock()
-  const x = Rune.stream(async function*() {
+  const a = Rune.stream(async function*() {
     await clock.tick(1)
     yield 1
     await clock.tick(2)
@@ -101,7 +101,7 @@ Deno.test("multi stream", async () => {
     await clock.tick(8)
     yield 4
   })
-  const y = Rune.stream(async function*() {
+  const b = Rune.stream(async function*() {
     await clock.tick(3)
     yield 10
     await clock.tick(4)
@@ -111,14 +111,28 @@ Deno.test("multi stream", async () => {
     await clock.tick(7)
     yield 40
   })
-  const z = add(x, y)
+  const c = add(a, b)
+  const d = add(a, b.lazy())
+  const e = add(a.lazy(), b)
   // t: [  0  ]--[  1  ]--[  2  ]--[  3  ]--[  4  ]--[  5  ]--[  6  ]--[  7  ]--[  8  ]
-  // x:  *            1    *   2                      *   3                      *   4
-  // y:  *                             10    *  20             *  30    *  40
-  // z:  *                 *        11 12    *  22    *  23    *  33    *  43    *  44
+  // a:  *            1    *   2                      *   3                      *   4
+  // b:  *                             10    *  20             *  30    *  40
+  // c:  *                 *        11 12    *  22    *  23    *  33    *  43    *  44
+  // d:  *                 *        11 12             *  23                      *  44
+  // e:  *                             11    *  22             *  33    *  43
   assertEquals(
-    await collect(z.pipe((v) => [clock.time, v]).watch()),
+    await collect(c.pipe((v) => [clock.time, v]).watch()),
     [[3, 11], [3, 12], [4, 22], [5, 23], [6, 33], [7, 43], [8, 44]],
+  )
+  clock.reset()
+  assertEquals(
+    await collect(d.pipe((v) => [clock.time, v]).watch()),
+    [[3, 11], [3, 12], [5, 23], [8, 44]],
+  )
+  clock.reset()
+  assertEquals(
+    await collect(e.pipe((v) => [clock.time, v]).watch()),
+    [[3, 11], [4, 22], [6, 33], [7, 43]],
   )
   clock.reset()
 })
