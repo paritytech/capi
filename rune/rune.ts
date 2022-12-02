@@ -168,12 +168,12 @@ export class Rune<T, U = never> {
   }
 }
 
-class _ConstantRune<T> extends _LinearRune<T, never> {
+class _ConstantRune<T> extends _Rune<T, never> {
   constructor(ctx: Context, readonly value: T) {
     super(ctx)
   }
 
-  async _evaluate() {
+  async evaluate() {
     return this.value
   }
 }
