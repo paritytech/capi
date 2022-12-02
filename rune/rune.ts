@@ -14,45 +14,54 @@ class Notification implements PromiseLike<void> {
   }
 }
 
-export class Period {
+export class Epoch {
+  constructor(readonly timeline: Timeline) {}
+
   min = 0
   max = Infinity
 
-  minChange = new Notification()
-  maxChange = new Notification()
+  termination = deferred()
 
-  children: Period[] = []
+  get finite() {
+    return this.max !== Infinity
+  }
 
   restrictMin(min: number) {
-    if (min <= this.min) return
-    this.min = min
-    this.minChange.emit()
-    for (const child of this.children) {
-      child.restrictMin(min)
-    }
+    this.min = Math.max(min, this.min)
   }
 
   restrictMax(max: number) {
     if (max >= this.max) return
     this.max = max
-    this.maxChange.emit()
-    for (const child of this.children) {
-      child.restrictMax(max)
-    }
+    this.termination.resolve()
   }
 
-  restrictTo(period: Period) {
-    this.restrictMin(period.min)
-    this.restrictMax(period.max)
-    period.children.push(this)
+  terminate() {
+    if (this.finite) throw new Error("Cannot terminate already finite epoch")
+    this.max = this.timeline.time++
+    this.termination.resolve()
+  }
+
+  restrictTo(epoch: Epoch) {
+    this.restrictMin(epoch.min)
+    this.restrictMax(epoch.max)
+    if (!this.finite) {
+      Promise.race([this.termination, epoch.termination])
+        .then(() => {
+          if (this.finite) return
+          this.max = epoch.max
+          this.termination.resolve()
+        }, () => {})
+    }
   }
 }
 
-export class Cast {
+export class Timeline {
   time = 0
-  tick() {
-    return ++this.time
-  }
+}
+
+export class Cast {
+  timeline = new Timeline()
 
   active = 0
   noActive = new Notification()
@@ -97,7 +106,7 @@ export abstract class _Rune<T, U> {
     })
   }
 
-  abstract evaluate(time: number, applicable: Period, signal: AbortSignal): Promise<T>
+  abstract evaluate(time: number, epoch: Epoch, signal: AbortSignal): Promise<T>
 
   alive = true
   cleanup() {
@@ -121,7 +130,7 @@ export class Rune<T, U = never> {
     const cast = new Cast()
     const abortController = new AbortController()
     const primed = cast.prime(this, abortController.signal)
-    const result = await primed.evaluate(0, new Period(), new AbortController().signal)
+    const result = await primed.evaluate(0, new Epoch(cast.timeline), new AbortController().signal)
     abortController.abort()
     return result
   }
@@ -130,20 +139,17 @@ export class Rune<T, U = never> {
     const cast = new Cast()
     const abortController = new AbortController()
     const primed = cast.prime(this, abortController.signal)
-    let period = new Period()
+    let epoch = new Epoch(cast.timeline)
     while (true) {
-      yield await primed.evaluate(period.min, period, new AbortController().signal)
-      if (period.max === Infinity) {
-        if (!cast.active) return
-        await Promise.race([
-          cast.noActive,
-          period.maxChange,
-        ])
-        if (period.max === Infinity) break
+      yield await primed.evaluate(epoch.min, epoch, new AbortController().signal)
+      if (!epoch.finite) {
+        if (!cast.active) break
+        await Promise.race([epoch.termination, cast.noActive])
+        if (!epoch.finite) break
       }
-      const start = period.max + 1
-      period = new Period()
-      period.restrictMin(start)
+      const start = epoch.max + 1
+      epoch = new Epoch(cast.timeline)
+      epoch.restrictMin(start)
     }
     abortController.abort()
   }
@@ -216,8 +222,8 @@ class _PipeRune<T1, U, T2> extends _Rune<T2, U> {
     this.child = cast.prime(child, this.signal)
   }
 
-  async evaluate(time: number, applicable: Period, signal: AbortSignal) {
-    return await this.fn(await this.child.evaluate(time, applicable, signal))
+  async evaluate(time: number, epoch: Epoch, signal: AbortSignal) {
+    return await this.fn(await this.child.evaluate(time, epoch, signal))
   }
 }
 
@@ -228,15 +234,15 @@ class _LsRune<T, U> extends _Rune<T[], U> {
     this.children = children.map((child) => cast.prime(child, this.signal))
   }
 
-  async evaluate(time: number, applicable: Period, signal: AbortSignal) {
-    return Promise.all(this.children.map((child) => child.evaluate(time, applicable, signal)))
+  async evaluate(time: number, epoch: Epoch, signal: AbortSignal) {
+    return Promise.all(this.children.map((child) => child.evaluate(time, epoch, signal)))
   }
 }
 
 class _StreamRune<T> extends _Rune<T, never> {
   initProm = deferred<void>()
   values: (T | undefined)[] = []
-  lastPeriod = new Period()
+  currentEpoch = new Epoch(this.cast.timeline)
   constructor(cast: Cast, fn: (signal?: AbortSignal) => AsyncIterable<T>) {
     super(cast)
     cast.addActive()
@@ -249,17 +255,17 @@ class _StreamRune<T> extends _Rune<T, never> {
           this.values[0] = value
           this.initProm.resolve()
         } else {
-          this.lastPeriod.restrictMax(this.cast.time)
-          this.values[++this.cast.time] = value
-          this.lastPeriod = new Period()
-          this.lastPeriod.restrictMin(this.cast.time)
+          this.currentEpoch.terminate()
+          this.values[this.cast.timeline.time] = value
+          this.currentEpoch = new Epoch(this.cast.timeline)
+          this.currentEpoch.restrictMin(this.cast.timeline.time)
         }
       }
       cast.removeActive()
     })()
   }
 
-  async evaluate(time: number, applicable: Period): Promise<T> {
+  async evaluate(time: number, epoch: Epoch): Promise<T> {
     await this.initProm
     let end = Infinity
     const idx = this.values.findLastIndex((_, i) => {
@@ -268,10 +274,10 @@ class _StreamRune<T> extends _Rune<T, never> {
       return false
     })
     if (end === Infinity) {
-      applicable.restrictTo(this.lastPeriod)
+      epoch.restrictTo(this.currentEpoch)
     } else {
-      applicable.restrictMin(idx)
-      applicable.restrictMax(end)
+      epoch.restrictMin(idx)
+      epoch.restrictMax(end)
     }
     return this.values[idx]!
   }
@@ -288,8 +294,8 @@ class _UnwrapRune<T1, U, T2 extends T1> extends _Rune<T2, U | Exclude<T1, T2>> {
     this.child = cast.prime(child, this.signal)
   }
 
-  async evaluate(time: number, applicable: Period, signal: AbortSignal) {
-    const value = await this.child.evaluate(time, applicable, signal)
+  async evaluate(time: number, epoch: Epoch, signal: AbortSignal) {
+    const value = await this.child.evaluate(time, epoch, signal)
     if (this.fn(value)) return value
     throw new UnwrappedValue(value)
   }
@@ -302,9 +308,9 @@ class _CatchRune<T, U> extends _Rune<T | U, never> {
     this.child = cast.prime(child, this.signal)
   }
 
-  async evaluate(time: number, applicable: Period, signal: AbortSignal) {
+  async evaluate(time: number, epoch: Epoch, signal: AbortSignal) {
     try {
-      return await this.child.evaluate(time, applicable, signal)
+      return await this.child.evaluate(time, epoch, signal)
     } catch (e) {
       if (e instanceof UnwrappedValue) {
         return e.value as U
@@ -321,7 +327,7 @@ class _LazyRune<T, U> extends _Rune<T, U> {
     this.child = cast.prime(child, this.signal)
   }
 
-  evaluate(time: number, _applicable: Period, signal: AbortSignal): Promise<T> {
-    return this.child.evaluate(time, new Period(), signal)
+  evaluate(time: number, _epoch: Epoch, signal: AbortSignal): Promise<T> {
+    return this.child.evaluate(time, new Epoch(this.cast.timeline), signal)
   }
 }
