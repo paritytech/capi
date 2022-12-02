@@ -41,6 +41,7 @@ Deno.test("stream", async () => {
   assertEquals(await count.run(), 1)
   assertEquals(await collect(count.watch()), [1, 2, 3])
   assertEquals(await collect(count.pipe((x) => x + "").watch()), ["1", "2", "3"])
+  assertEquals(await collect(count.latest().watch()), [3])
 })
 
 const add = <X>(...[a, b]: Args<X, [a: number, b: number]>) => {
@@ -145,11 +146,11 @@ Deno.test("multi stream 2", async () => {
     await clock.tick(3)
     yield 2
   })
-  const A = a.pipe(async (value) => {
+  const b = a.pipe(async (value) => {
     await clock.tick(clock.time + 3)
     return value
   })
-  const b = Rune.stream(async function*() {
+  const c = Rune.stream(async function*() {
     await clock.tick(2)
     yield 10
     await clock.tick(5)
@@ -157,24 +158,45 @@ Deno.test("multi stream 2", async () => {
     await clock.tick(8)
     yield 30
   })
-  const c = add(a, b)
-  const C = add(A, b)
+  const d = add(a, c)
+  const e = add(b, c)
+  const f = add(b, c.latest())
+  const g = add(b.latest(), c)
+  const h = add(b.latest(), c.latest())
   // t: [  0  ]--[  1  ]--[  2  ]--[  3  ]--[  4  ]--[  5  ]--[  6  ]--[  7  ]--[  8  ]
   // a:  *            1             *   2
-  // A:  *                          *            1                          2
-  // b:  *                    10                      *  20                      *  30
-  // c:  *                    11    *  12             *  22                      *  32
-  // C:  *                          *           11    *                 12 22       32
+  // b:  *                          *            1                          2
+  // c:  *                    10                      *  20                      *  30
+  // d:  *                    11    *  12             *  22                      *  32
+  // e:  *                          *           11    *                 12 22       32
+  // f:  *                          *           11    *                  ! 22       32
+  // g:  *                          *            !    *                 12 22       32
+  // h:  *                          *            !    *                  ! 22       32
   assertEquals(
-    await collect(c.pipe((v) => [clock.time, v]).watch()),
+    await collect(d.pipe((v) => [clock.time, v]).watch()),
     [[2, 11], [3, 12], [5, 22], [8, 32]],
   )
   clock.reset()
-  assertEquals(await collect(C.watch()), [11, 12, 22, 32])
+  assertEquals(await collect(e.watch()), [11, 12, 22, 32])
   clock.reset()
   assertEquals(
-    await collect(C.pipe((v) => [clock.time, v]).watch()),
+    await collect(e.pipe((v) => [clock.time, v]).watch()),
     [[4, 11], [7, 12], [7, 22], [8, 32]],
+  )
+  clock.reset()
+  assertEquals(
+    await collect(f.pipe((v) => [clock.time, v]).watch()),
+    [[4, 11], [7, 22], [8, 32]],
+  )
+  clock.reset()
+  assertEquals(
+    await collect(g.pipe((v) => [clock.time, v]).watch()),
+    [[7, 12], [7, 22], [8, 32]],
+  )
+  clock.reset()
+  assertEquals(
+    await collect(h.pipe((v) => [clock.time, v]).watch()),
+    [[7, 22], [8, 32]],
   )
   clock.reset()
 })

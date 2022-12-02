@@ -1,13 +1,14 @@
 import { deferred } from "../deps/std/async.ts"
-import { assertEquals } from "../deps/std/testing/asserts.ts"
 
 export class Clock {
   time = 0
   next = deferred()
   scheduled = false
+  timeout = -1
 
-  reset() {
-    assertEquals(this.scheduled, false)
+  async reset() {
+    if (this.scheduled) clearTimeout(this.timeout)
+    this.scheduled = false
     this.time = 0
   }
 
@@ -25,7 +26,7 @@ export class Clock {
     if (this.scheduled) return
     this.scheduled = true
     const old = this.next
-    setTimeout(() => {
+    this.timeout = setTimeout(() => {
       this.scheduled = false
       this.time++
       this.next = deferred()
