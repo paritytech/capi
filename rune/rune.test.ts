@@ -163,15 +163,21 @@ Deno.test("multi stream 2", async () => {
   const f = add(b, c.latest())
   const g = add(b.latest(), c)
   const h = add(b.latest(), c.latest())
+  const i = add(b, c.lazy())
+  const j = add(b.lazy(), c)
+  const k = add(b.lazy(), c.lazy())
   // t: [  0  ]--[  1  ]--[  2  ]--[  3  ]--[  4  ]--[  5  ]--[  6  ]--[  7  ]--[  8  ]
   // a:  *            1             *   2
   // b:  *                          *            1                          2
   // c:  *                    10                      *  20                      *  30
   // d:  *                    11    *  12             *  22                      *  32
-  // e:  *                          *           11    *                 12 22       32
-  // f:  *                          *           11    *                  ! 22       32
-  // g:  *                          *            !    *                 12 22       32
-  // h:  *                          *            !    *                  ! 22       32
+  // e:  *                          *           11    *                 12 22    *  32
+  // f:  *                          *           11    *                  ! 22    *  32
+  // g:  *                          *            !    *                 12 22    *  32
+  // h:  *                          *            !    *                  !  !    *  32
+  // i:  *                          *           11                         12
+  // j:  *                                      11    *                          22 32 (due to lazy, b is not triggered until 5, causing 2 to be pushed late at 8)
+  // k:  *                                      11
   assertEquals(
     await collect(d.pipe((v) => [clock.time, v]).watch()),
     [[2, 11], [3, 12], [5, 22], [8, 32]],
@@ -186,7 +192,7 @@ Deno.test("multi stream 2", async () => {
   clock.reset()
   assertEquals(
     await collect(f.pipe((v) => [clock.time, v]).watch()),
-    [[4, 11], [7, 22], [8, 32]],
+    [[4, 11], [8, 32]],
   )
   clock.reset()
   assertEquals(
@@ -196,7 +202,22 @@ Deno.test("multi stream 2", async () => {
   clock.reset()
   assertEquals(
     await collect(h.pipe((v) => [clock.time, v]).watch()),
-    [[7, 22], [8, 32]],
+    [[8, 32]],
+  )
+  clock.reset()
+  assertEquals(
+    await collect(i.pipe((v) => [clock.time, v]).watch()),
+    [[4, 11], [7, 12]],
+  )
+  clock.reset()
+  assertEquals(
+    await collect(j.pipe((v) => [clock.time, v]).watch()),
+    [[4, 11], [8, 22], [8, 32]],
+  )
+  clock.reset()
+  assertEquals(
+    await collect(k.pipe((v) => [clock.time, v]).watch()),
+    [[4, 11]],
   )
   clock.reset()
 })

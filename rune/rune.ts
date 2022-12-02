@@ -89,25 +89,20 @@ export class Rune<T, U = never> {
     const primed = ctx.prime(this, abortController.signal)
     let time = 0
     let lastValue: T = null!
-    let lastTime = -1
+    let lastTime = 0
     while (true) {
       const epoch = new Epoch(ctx.timeline)
       const promise = primed.evaluate(time, epoch)
-      if (lastTime !== -1 && !epoch.contains(lastTime)) yield lastValue
+      if (!epoch.contains(lastTime)) yield lastValue
       lastValue = await promise
       if (!epoch.finite) {
-        yield lastValue
-        lastTime = -1
         if (epoch.handles.size) await epoch.finalized
         if (!epoch.finite) break
-      } else {
-        lastTime = time
       }
+      lastTime = time
       time = epoch.max + 1
     }
-    if (lastTime !== -1) {
-      yield lastValue
-    }
+    yield lastValue
     abortController.abort()
   }
 
