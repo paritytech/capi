@@ -36,6 +36,10 @@ export class Epoch {
     this.termination.resolve()
   }
 
+  contains(time: number) {
+    return time >= this.min && time <= this.max
+  }
+
   terminate() {
     if (this.finite) throw new Error("Cannot terminate already finite epoch")
     this.max = this.timeline.time++
@@ -106,7 +110,22 @@ export abstract class _Rune<T, U> {
     })
   }
 
-  abstract evaluate(time: number, epoch: Epoch, signal: AbortSignal): Promise<T>
+  lastTime = -1
+  lastValue: Promise<T> = Promise.resolve(null!)
+  lastEpoch: Epoch | null = null
+  async evaluate(time: number, epoch: Epoch, signal: AbortSignal): Promise<T> {
+    if (time < this.lastTime) throw new Error("cannot regress")
+    await this.lastValue.catch(() => {})
+    if (!this.lastEpoch?.contains(time)) {
+      this.lastTime = time
+      this.lastEpoch = new Epoch(this.cast.timeline)
+      this.lastValue = this._evaluate(time, this.lastEpoch, signal)
+    }
+    epoch.restrictTo(this.lastEpoch)
+    return this.lastValue
+  }
+
+  abstract _evaluate(time: number, epoch: Epoch, signal: AbortSignal): Promise<T>
 
   alive = true
   cleanup() {
@@ -212,7 +231,7 @@ class _ConstantRune<T> extends _Rune<T, never> {
     super(cast)
   }
 
-  async evaluate() {
+  async _evaluate() {
     return this.value
   }
 }
@@ -224,7 +243,7 @@ class _PipeRune<T1, U, T2> extends _Rune<T2, U> {
     this.child = cast.prime(child, this.signal)
   }
 
-  async evaluate(time: number, epoch: Epoch, signal: AbortSignal) {
+  async _evaluate(time: number, epoch: Epoch, signal: AbortSignal) {
     return await this.fn(await this.child.evaluate(time, epoch, signal))
   }
 }
@@ -236,7 +255,7 @@ class _LsRune<T, U> extends _Rune<T[], U> {
     this.children = children.map((child) => cast.prime(child, this.signal))
   }
 
-  async evaluate(time: number, epoch: Epoch, signal: AbortSignal) {
+  async _evaluate(time: number, epoch: Epoch, signal: AbortSignal) {
     return Promise.all(this.children.map((child) => child.evaluate(time, epoch, signal)))
   }
 }
@@ -263,16 +282,16 @@ class _StreamRune<T> extends _Rune<T, never> {
           this.currentEpoch.restrictMin(this.cast.timeline.time)
         }
       }
-      cast.removeActive()
+      setTimeout(() => cast.removeActive(), 0)
     })()
   }
 
-  async evaluate(time: number, epoch: Epoch): Promise<T> {
+  async _evaluate(time: number, epoch: Epoch): Promise<T> {
     await this.initProm
     let end = Infinity
     const idx = this.values.findLastIndex((_, i) => {
       if (i <= time) return true
-      end = i
+      end = i - 1
       return false
     })
     if (end === Infinity) {
@@ -296,7 +315,7 @@ class _UnwrapRune<T1, U, T2 extends T1> extends _Rune<T2, U | Exclude<T1, T2>> {
     this.child = cast.prime(child, this.signal)
   }
 
-  async evaluate(time: number, epoch: Epoch, signal: AbortSignal) {
+  async _evaluate(time: number, epoch: Epoch, signal: AbortSignal) {
     const value = await this.child.evaluate(time, epoch, signal)
     if (this.fn(value)) return value
     throw new UnwrappedValue(value)
@@ -310,7 +329,7 @@ class _CatchRune<T, U> extends _Rune<T | U, never> {
     this.child = cast.prime(child, this.signal)
   }
 
-  async evaluate(time: number, epoch: Epoch, signal: AbortSignal) {
+  async _evaluate(time: number, epoch: Epoch, signal: AbortSignal) {
     try {
       return await this.child.evaluate(time, epoch, signal)
     } catch (e) {
@@ -329,7 +348,9 @@ class _LazyRune<T, U> extends _Rune<T, U> {
     this.child = cast.prime(child, this.signal)
   }
 
-  evaluate(time: number, _epoch: Epoch, signal: AbortSignal): Promise<T> {
+  override evaluate(time: number, _epoch: Epoch, signal: AbortSignal): Promise<T> {
     return this.child.evaluate(time, new Epoch(this.cast.timeline), signal)
   }
+
+  declare _evaluate: any
 }

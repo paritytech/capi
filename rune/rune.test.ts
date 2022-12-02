@@ -147,7 +147,6 @@ Deno.test("multi stream 2", async () => {
   })
   const A = a.pipe(async (value) => {
     await clock.tick(clock.time + 3)
-    // console.log(clock.time, value)
     return value
   })
   const b = Rune.stream(async function*() {
@@ -160,12 +159,12 @@ Deno.test("multi stream 2", async () => {
   })
   const c = add(a, b)
   const C = add(A, b)
-  // t: [  0  ]--[  1  ]--[  2  ]--[  3  ]--[  4  ]--[  5  ]--[  6  ]--[  7  ]
+  // t: [  0  ]--[  1  ]--[  2  ]--[  3  ]--[  4  ]--[  5  ]--[  6  ]--[  7  ]--[  8  ]
   // a:  *            1             *   2
-  // A:  *                          *            1                 2
-  // b:  *                    10                      *  20             *  30
-  // c:  *                    11    *  12             *  22             *  32
-  // C:  *                          *           11    *        12 22       32
+  // A:  *                          *            1                          2
+  // b:  *                    10                      *  20                      *  30
+  // c:  *                    11    *  12             *  22                      *  32
+  // C:  *                          *           11    *                 12 22       32
   assertEquals(
     await collect(c.pipe((v) => [clock.time, v]).watch()),
     [[2, 11], [3, 12], [5, 22], [8, 32]],
@@ -173,12 +172,11 @@ Deno.test("multi stream 2", async () => {
   clock.reset()
   assertEquals(await collect(C.watch()), [11, 12, 22, 32])
   clock.reset()
-  // TODO: fix timing via caching
-  // assertEquals(
-  //   await collect(C.pipe((v) => [clock.time, v]).watch()),
-  //   [[4, 11], [6, 12], [6, 22], [7, 32]],
-  // )
-  // clock.reset()
+  assertEquals(
+    await collect(C.pipe((v) => [clock.time, v]).watch()),
+    [[4, 11], [7, 12], [7, 22], [8, 32]],
+  )
+  clock.reset()
 })
 
 async function collect<T>(iter: AsyncIterable<T>) {
