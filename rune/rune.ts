@@ -286,8 +286,11 @@ class _LazyRune<T, U> extends _Rune<T, U> {
     this.child = ctx.prime(child, this.signal)
   }
 
-  evaluate(time: number, _epoch: Epoch): Promise<T> {
-    return this.child.evaluate(time, new Epoch(this.ctx.timeline))
+  evaluate(time: number, epoch: Epoch): Promise<T> {
+    const _epoch = new Epoch(this.ctx.timeline)
+    const promise = this.child.evaluate(time, _epoch)
+    epoch.restrictMin(_epoch.min)
+    return promise
   }
 }
 
