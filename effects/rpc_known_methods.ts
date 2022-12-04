@@ -52,3 +52,8 @@ export namespace payment {
     "payment_queryInfo",
   )
 }
+export namespace sync {
+  export namespace state {
+    export const genSyncSpec = rpcCall<[boolean], known.ChainSpec>("sync_state_genSyncSpec")
+  }
+}
