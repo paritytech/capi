@@ -1,6 +1,12 @@
 import { Hash, RpcResult, SerdeEnum } from "./utils.ts"
 
 // https://github.com/paritytech/substrate/blob/57e3486/client/chain-spec/src/lib.rs#L198
+/**
+ * The type of a chain.
+ *
+ * This can be used by tools to determine the type of a chain for displaying
+ * additional information or enabling additional features.
+ */
 export type ChainType = SerdeEnum<{
   /** A development chain that runs mainly on one node. */
   Development: void
