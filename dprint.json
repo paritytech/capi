@@ -8,7 +8,7 @@
     "semiColons": "asi"
   },
   "includes": [
-    "**.{dockerfile,json,md,ts,toml}"
+    "**.{dockerfile,json,md,toml,ts}"
   ],
   "excludes": [
     "frame_metadata/raw_erc20_metadata.json",
