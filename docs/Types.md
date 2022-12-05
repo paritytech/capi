@@ -282,7 +282,7 @@ const result = await C.entryRead(C.polkadot)("System", "Account", [key]).run()
 
 In this storage read example, `result` is typed as the successfully-retrieved value (container) unioned with all possible errors.
 
-There are several ways to "unwrap" the inner `value`. The recommended path is to first check for and handle all possible errors, which may encapsulate error specific data (as do [SCALE](https://docs.substrate.io/reference/scale-codec/) validation errors).
+There are several ways to "unwrap" the inner `value`. The recommended path is to first check for and handle all possible errors, which may encapsulate error specific data (as do [SCALE](https://github.com/paritytech/scale-ts) validation errors).
 
 ```ts
 if (account instanceof Error) {
