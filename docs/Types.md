@@ -1,6 +1,6 @@
 # Types
 
-The types of the on-chain world are declared in the given chain's Rust source code. While many types may remain consistent across chains, many may differ. On one chain, `AccountData` may be defined with fields describing fungible assets; on another (hypothetical) chain, perhaps `AccountData` references non-fungible assets, reputation, linked accounts or something else entirely. Although FRAME certainly helps to standardize chain properties, those properties can be customized to the extent that we cannot make assumptions regarding shapes of data across chains. Additionally, types can change upon runtime upgrades; your assumptions about the shape of a type may become invalid; to interact with these highly-dynamic on-chain environments––and to do so from a JavaScript environment––poses inherent difficulty. We JS developers must (A) think in terms of Rust data types and (B) keep a lookout for breaking changes to chain runtimes. This document does not provide a silver-bullet solution to this complexity. But it should provide the background necessary for you to address types for your specific use cases.
+The types of the on-chain world are declared in a given [Substrate](https://substrate.io/)-based chain's (Rust) source code. While many types may remain consistent across chains, many may differ. On one chain, `AccountData` may be defined with fields describing fungible assets; on another (hypothetical) chain, perhaps `AccountData` references non-fungible assets, reputation, linked accounts or something else entirely. Although [FRAME](https://docs.substrate.io/reference/glossary/#frame) certainly helps to standardize chain properties, those properties can be customized to the extent that we cannot make assumptions regarding shapes of data across chains. Additionally, types can change upon [runtime upgrades](https://docs.substrate.io/build/upgrade-the-runtime/); your assumptions about the shape of a type may become invalid; to interact with these highly-dynamic on-chain environments––and to do so from a JavaScript environment––poses inherent difficulty. We JS developers must (A) think in terms of Rust data types and (B) keep a lookout for breaking changes to chain runtimes. This document does not provide a silver-bullet solution to this complexity, but it should provide the background necessary for you to address types for your specific use cases.
 
 If you just want to see how Rust types are transformed by Capi, [skip to the conversion table](#rust-⬌-typescript).
 
@@ -20,7 +20,7 @@ As always, our first step is to bring Capi into scope.
 import * as C from "https://deno.land/x/capi/mod.ts"
 ```
 
-Now let's fetch the metadata.
+As an example, let's connect to Polkadot and fetch the chain's metadata for the present highest block.
 
 ```ts
 const client = C.rpcClient(C.rpc.smoldotProvider, {
@@ -48,7 +48,7 @@ const accountsStorage = C.entryMetadata(balancesPallet, "Account")
 console.log(await accountsStorage.run())
 ```
 
-On most chains, `accountsStorage` will look similar to the following.
+On chains using the `Balances` pallet, `accountsStorage` will look _similar_ to the following.
 
 ```ts
 {
@@ -128,9 +128,9 @@ Let's now utilize our `accountId32` definition to read a balance.
 ```ts
 // ...
 
-const key = C
-  .keyPageRead(C.polkadot)("System", "Account", 1, [])
-  .access(0).access(0)
+const key = C.keyPageRead(C.polkadot)("System", "Account", 1, [])
+  .access(0)
+  .access(0)
 
 const account = C.entryRead(C.polkadot)("System", "Account", [key])
 
@@ -238,10 +238,7 @@ type S1 = A
 type S2 = [A, B]
 type S3 = { a: A }
 
-type E0 =
-  | "A"
-  | "B"
-  | "C"
+type E0 = "A" | "B" | "C"
 
 type E1 =
   | { type: "A" }
@@ -280,14 +277,12 @@ Let's look at the same example from before: reading some `AccountData`.
 ## Discriminating "Ok" from "Error"
 
 ```ts
-const result = await C
-  .entryRead(C.polkadot)("System", "Account", [key])
-  .run()
+const result = await C.entryRead(C.polkadot)("System", "Account", [key]).run()
 ```
 
 In this storage read example, `result` is typed as the successfully-retrieved value (container) unioned with all possible errors.
 
-There are several ways to "unwrap" the inner `value`. The recommended path is to first check for and handle all possible errors, which may encapsulate error specific data (as do SCALE validation errors).
+There are several ways to "unwrap" the inner `value`. The recommended path is to first check for and handle all possible errors, which may encapsulate error specific data (as do [SCALE](https://github.com/paritytech/scale-ts) validation errors).
 
 ```ts
 if (account instanceof Error) {

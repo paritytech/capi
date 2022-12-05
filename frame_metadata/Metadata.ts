@@ -127,7 +127,7 @@ export const $extrinsicDef: $.Codec<ExtrinsicDef> = $.object(
   ["signedExtensions", $.array($signedExtensionMetadata)],
 )
 
-// https://docs.substrate.io/v3/runtime/metadata/#encoded-metadata-format
+// https://docs.substrate.io/build/application-development/#metadata-system
 export const magicNumber = 1635018093
 
 export interface Metadata {
