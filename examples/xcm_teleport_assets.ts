@@ -11,15 +11,6 @@ const configFile = path.join(
 )
 const zombienet = await T.zombienet.start(configFile)
 
-console.log(
-  "Alice node",
-  `https://polkadot.js.org/apps/?rpc=${zombienet.config.nodesByName["alice"].wsUri}#/explorer`,
-)
-console.log(
-  "collator01 node",
-  `https://polkadot.js.org/apps/?rpc=${zombienet.config.nodesByName["collator01"].wsUri}#/explorer`,
-)
-
 Deno.addSignalListener("SIGINT", async () => {
   try {
     await zombienet.close()
