@@ -19,13 +19,13 @@ await Promise.all([
         name: "scale-codec",
         version: "^0.9.1",
       },
-      "https://deno.land/x/zones@v0.1.0-beta.12/mod.ts": {
+      "https://deno.land/x/zones@v0.1.0-beta.13/mod.ts": {
         name: "zones",
-        version: "0.1.0-beta.12",
+        version: "0.1.0-beta.13",
       },
-      "https://deno.land/x/smoldot@light-js-deno-v0.7.3/index-deno.js": {
+      "https://deno.land/x/smoldot@light-js-deno-v0.7.6/index-deno.js": {
         name: "@substrate/smoldot-light",
-        version: "0.6.20",
+        version: "0.7.6",
       },
       "https://raw.githubusercontent.com/paritytech/capi-crypto-wrappers/14289c5/lib.ts":
         "https://raw.githubusercontent.com/paritytech/capi-crypto-wrappers/14289c5/lib.node.ts",
@@ -43,7 +43,7 @@ await Promise.all([
       sourceMap: true,
       target: "ES2021",
     },
-    scriptModule: "cjs",
+    scriptModule: false,
     shims: {
       deno: {
         test: true,

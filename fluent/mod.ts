@@ -66,4 +66,10 @@ export class StorageKeys<
       ...rest,
     ).as<K[]>()
   }
+
+  first<
+    Rest extends [start?: C.Z.Ls$<K>, blockHash?: C.Z.$<U.HexHash | undefined>],
+  >(...rest: Rest) {
+    return this.readPage(1, ...rest).access(0)
+  }
 }

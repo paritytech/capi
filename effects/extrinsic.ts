@@ -2,7 +2,6 @@ import { unimplemented } from "../deps/std/testing/asserts.ts"
 import * as Z from "../deps/zones.ts"
 import * as M from "../frame_metadata/mod.ts"
 import * as rpc from "../rpc/mod.ts"
-import * as ss58 from "../ss58/mod.ts"
 import * as U from "../util/mod.ts"
 import { const as const_ } from "./const.ts"
 import { metadata } from "./metadata.ts"
@@ -48,6 +47,13 @@ export class Extrinsic<
     const extrinsicBytes = scale.scaleEncoded($extrinsic_, $extrinsicProps, true)
     const extrinsicHex = extrinsicBytes.next(U.hex.encodePrefixed)
     return payment.queryInfo(this.client)(extrinsicHex)
+      .next(({ weight, ...rest }) => ({
+        ...rest,
+        weight: {
+          proofSize: BigInt(weight.proof_size),
+          refTime: BigInt(weight.ref_time),
+        },
+      }))
   }
 }
 
@@ -87,7 +93,7 @@ export class SignedExtrinsic<
     const senderSs58 = Z.ls(addrPrefix, this.props.sender).next(([addrPrefix, sender]) => {
       switch (sender.type) {
         case "Id": {
-          return ss58.encode(addrPrefix, sender.value)
+          return U.ss58.encode(addrPrefix, sender.value)
         }
         default: {
           unimplemented()

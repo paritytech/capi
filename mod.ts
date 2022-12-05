@@ -13,4 +13,13 @@ export {
   type Signer,
 } from "./frame_metadata/mod.ts"
 export * as rpc from "./rpc/mod.ts"
-export { End, type Hex, hex, type Listener } from "./util/mod.ts"
+export {
+  End,
+  getOrInit,
+  type Hex,
+  hex,
+  type Listener,
+  Sr25519,
+  ss58,
+  throwIfError,
+} from "./util/mod.ts"

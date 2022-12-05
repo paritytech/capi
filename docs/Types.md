@@ -2,6 +2,8 @@
 
 The types of the on-chain world are declared in the given chain's Rust source code. While many types may remain consistent across chains, many may differ. On one chain, `AccountData` may be defined with fields describing fungible assets; on another (hypothetical) chain, perhaps `AccountData` references non-fungible assets, reputation, linked accounts or something else entirely. Although FRAME certainly helps to standardize chain properties, those properties can be customized to the extent that we cannot make assumptions regarding shapes of data across chains. Additionally, types can change upon runtime upgrades; your assumptions about the shape of a type may become invalid; to interact with these highly-dynamic on-chain environments––and to do so from a JavaScript environment––poses inherent difficulty. We JS developers must (A) think in terms of Rust data types and (B) keep a lookout for breaking changes to chain runtimes. This document does not provide a silver-bullet solution to this complexity. But it should provide the background necessary for you to address types for your specific use cases.
 
+If you just want to see how Rust types are transformed by Capi, [skip to the conversion table](#rust-⬌-typescript).
+
 ## Learning About Types
 
 Let's cover how to learn about a chain's types/properties.
@@ -10,7 +12,7 @@ Let's cover how to learn about a chain's types/properties.
 
 ### FRAME Metadata
 
-Every FRAME chain exposes metadata about its types and properties. This metadata is called the "FRAME Metadata." Let's retrieve and inspect it.
+Every FRAME chain exposes metadata about its types and capabilities. This metadata is called the "FRAME Metadata." Let's retrieve and inspect it.
 
 As always, our first step is to bring Capi into scope.
 
@@ -21,9 +23,15 @@ import * as C from "https://deno.land/x/capi/mod.ts"
 Now let's fetch the metadata.
 
 ```ts
-// ...
+const client = C.rpcClient(C.rpc.smoldotProvider, {
+  chainSpec: {
+    relay: POLKADOT_CHAIN_SPEC,
+  },
+})
 
-const metadata = await C.chain(CHAIN_PROXY_WS_URL).metadata.read()
+const metadata = await C.metadata(client)()
+
+console.log(await metadata.run())
 ```
 
 If we index into `metadata.pallets`, we'll see a list of all pallet metadata. Each element of this list contains a complete description of the given pallet's storage entries, as well as constants, callables (for creating extrinsics), errors and events. Some fields––such as a pallet's `call` field––point to an index in `metadata.tys`, which contains a complete description of the chain's type-level context.
@@ -33,61 +41,52 @@ Let's say we want to learn about the types associated with the `Balances` pallet
 ```ts
 // ...
 
-const balancesPallet = metadata.pallets.find((pallet) => pallet.name === "Balances")
-const accountsStorage = balancesPallet?.storage?.entries.find((entry) => entry.name === "Account")
+const balancesPallet = C.palletMetadata(metadata, "Balances")
+
+const accountsStorage = C.entryMetadata(balancesPallet, "Account")
+
+console.log(await accountsStorage.run())
 ```
 
 On most chains, `accountsStorage` will look similar to the following.
 
-````ts
+```ts
 {
   name: "Account",
   modifier: "Default",
   type: "Map",
   hashers: [ "Blake2_128Concat" ],
-  key: 0,
-  value: 5,
-  default: [
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  ],
-  docs: [
-    " The Balances pallet example of storing the balance of an account.",
-    "",
-    " # Example",
-    "",
-    " ```nocompile",
-    "  impl pallet_balances::Config for Runtime {",
-    "    type AccountStore = StorageMapShim<Self::Account<Runtime>, frame_system::Provider<Runtime>, ...",
-    "  }",
-    " ```",
-    "",
-    " You can also store the balance of an account in the `System` pallet.",
-    "",
-    " # Example",
-    "",
-    " ```nocompile",
-    "  impl pallet_balances::Config for Runtime {",
-    "   type AccountStore = System",
-    "  }",
-    " ```",
-    "",
-    " But this comes with tradeoffs, storing account balances in the system pallet stores",
-    " `frame_system` data alongside the account data contrary to storing account balances in the",
-    " `Balances` pallet, which uses a `StorageMap` to store balances data only.",
-    " NOTE: This is only used in the case that this pallet is used to store balances."
-  ]
+  key: {
+    id: 0,
+    path: [ "sp_core", "crypto", "AccountId32" ],
+    params: [],
+    type: "Struct",
+    fields: [ { name: undefined, ty: [ ... ], typeName: "[u8; 32]", docs: [ ... ] } ],
+    docs: []
+  },
+  value: {
+    id: 5,
+    path: [ "pallet_balances", "AccountData" ],
+    params: [ { name: "Balance", ty: [ ... ] } ],
+    type: "Struct",
+    fields: [
+      { name: "free", ty: [ ... ], typeName: "Balance", docs: [ ... ] },
+      { name: "reserved", ty: [ ... ], typeName: "Balance", docs: [ ... ] },
+      { name: "misc_frozen", ty: [ ... ], typeName: "Balance", docs: [ ... ] },
+      { name: "fee_frozen", ty: [ ... ], typeName: "Balance", docs: [ ... ] }
+    ],
+    docs: []
+  },
+  default: Uint8Array(64) [ 0, 0, 0, ... ],
+  docs: [ ... ]
 }
-````
+```
 
-- `type` tells us that this storage is that of a map, not a plain entry (standalone value).
-- `key` tells us what type of value we need to use as the key for indexing into the map.
-- `value` tells us what we can expect to retrieve from the map.
+- `type` tells us that this storage is that of a map, not a plain entry (standalone value)
+- `key` tells us what type of value(s) we need to use in order to index into the map
+- `value` tells us what type of value we can expect to retrieve from the map
 
-Let's index into `metadata.tys` with the specified key (`0`).
+In this example, the `key`'s `id` is `0`. Let's take a look at this type (within the top-level `metadata`'s `tys`).
 
 ```ts
 const keyType = metadata.tys[accountsStorage.key]
@@ -111,7 +110,6 @@ If we index again into `metadata.tys` with `1` (as specified in the first field)
 ```ts
 namespace sp_core {
   export namespace crypto {
-    // Note: `Uint8Array` lengths are untyped in TypeScript
     export type AccountId32 = Uint8Array
   }
 }
@@ -130,14 +128,13 @@ Let's now utilize our `accountId32` definition to read a balance.
 ```ts
 // ...
 
-// Which storage map?
-const accounts = C.pallet("Balances").storageMap("Account")
+const key = C
+  .keyPageRead(C.polkadot)("System", "Account", 1, [])
+  .access(0).access(0)
 
-// Which key?
-const key = accounts.key(accountId32)
+const account = C.entryRead(C.polkadot)("System", "Account", [key])
 
-// Read the value.
-const account = await accounts.get(key).read()
+const account = await account.run()
 ```
 
 What value does this retrieve? How can we deduce this from the FRAME metadata?
@@ -173,8 +170,8 @@ namespace pallet_balances {
   export interface AccountData {
     free: bigint
     reserved: bigint
-    misc_frozen: bigint
-    fee_frozen: bigint
+    miscFrozen: bigint
+    feeFrozen: bigint
   }
 }
 ```
@@ -207,13 +204,13 @@ struct S0;
 struct S1(A);
 struct S2(A, B);
 struct S3 { a: A };
-                                                
+
 enum E0 {
   A,
   B,
   C,
 };
-  
+
 enum E1 {
   A,
   B(C),
@@ -259,17 +256,38 @@ type E1 =
 
 ## Runtime Validation
 
-TODO
+What happens if we ever specify an invalid value to an untyped effect? Capi will return a validation error with a detailed description of the type incompatibility.
+
+For instance, the aforementioned system accounts map is keyed with a `Uint8Array`. What happens if we try to key into it with `"HELLO T6"`?
+
+```ts
+const account = C.entryRead(C.polkadot)("System", "Account", ["HELLO T6"])
+
+console.log(await account.run())
+```
+
+This will produce the following error:
+
+```ts
+ScaleAssertError: !(value[0] instanceof Uint8Array)
+    < ... stacktrace ... >
+```
 
 ---
 
-Let's look at a concrete example: accessing a user's `AccountData`.
+Let's look at the same example from before: reading some `AccountData`.
 
-In this storage read example, `account` is a union of possible errors and the success value. If we take a look at the signature of `account`, we see that the non-error union member is of type `Read<unknown>`.
+## Discriminating "Ok" from "Error"
 
-## Access The "Ok" Value
+```ts
+const result = await C
+  .entryRead(C.polkadot)("System", "Account", [key])
+  .run()
+```
 
-There are several ways to unwrap the inner value. The recommended path is to first check for and handle all possible errors.
+In this storage read example, `result` is typed as the successfully-retrieved value (container) unioned with all possible errors.
+
+There are several ways to "unwrap" the inner `value`. The recommended path is to first check for and handle all possible errors, which may encapsulate error specific data (as do SCALE validation errors).
 
 ```ts
 if (account instanceof Error) {
@@ -278,11 +296,3 @@ if (account instanceof Error) {
   account.value // `unknown`
 }
 ```
-
-In situations where convenience is a priority (such as these very docs), we can simply call the `unwrap` method of the result.
-
-```ts
-const value = account.unwrap()
-```
-
-TODO
