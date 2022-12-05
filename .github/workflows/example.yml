@@ -30,6 +30,22 @@ jobs:
             ~/.cache/deno
           key: ${{ runner.os }}-deno-${{ hashFiles('lock.json', 'deps/**/*.ts') }}
       - name: Setup Polkadot
-        uses: ./.github/actions/setup-polkadot
+        uses: ./.github/actions/setup-binary
+        with:
+          binary-name: polkadot
+          binary-version: v0.9.31
+          binary-github: https://github.com/paritytech/polkadot
+      - name: Setup Cumulus
+        uses: ./.github/actions/setup-binary
+        with:
+          binary-name: polkadot-parachain
+          binary-version: v0.9.320
+          binary-github: https://github.com/paritytech/cumulus
+      - name: Setup Zombienet
+        uses: ./.github/actions/setup-binary
+        with:
+          binary-name: zombienet-linux
+          binary-version: v1.3.18
+          binary-github: https://github.com/paritytech/zombienet
       - run: deno task codegen
       - run: deno task run ${{ matrix.example_path }}

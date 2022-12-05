@@ -9,3 +9,4 @@ export {
 export * as extrinsic from "./extrinsic.ts"
 export * from "./local.ts"
 export * from "./pairs.ts"
+export * as zombienet from "./zombienet.ts"

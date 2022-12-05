@@ -1,0 +1,28 @@
+name: "Setup Binary"
+description: "Setup Binary"
+inputs:
+  binary-name:
+    description: "Binary name"
+    required: true
+  binary-version:
+    description: "Binary version"
+    required: true
+  binary-github:
+    description: "Binary github repository url"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Cache Binary
+      uses: actions/cache@v3
+      id: cache-binary
+      with:
+        path: |
+          /usr/local/bin/${{ inputs.binary-name }}
+        key: binary-${{ inputs.binary-name }}-${{ inputs.binary-version }}
+    - if: ${{ steps.cache-binary.outputs.cache-hit != 'true' }}
+      name: Download Binary
+      run: |
+        curl -L -o /usr/local/bin/${{ inputs.binary-name }} ${{ inputs.binary-github }}/releases/download/${{ inputs.binary-version }}/${{ inputs.binary-name }}
+        chmod +x /usr/local/bin/${{ inputs.binary-name }}
+      shell: bash
