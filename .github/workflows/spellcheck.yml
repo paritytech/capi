@@ -5,4 +5,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: streetsidesoftware/cspell-action@eaa2c2175a9f6dc2f8e0e58e666112ebffb85a4e # v2.7.0
+      - uses: streetsidesoftware/cspell-action@d7f4191619d5455523f0fd625ce1a983f9ce5ccb # v2.7.0
