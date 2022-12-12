@@ -24,7 +24,10 @@ export function events<Extrinsic extends SignedExtrinsic, FinalizedHash extends 
     }, k1_)
   const events = entryRead(client)("System", "Events", [], finalizedHash)
     .access("value")
-    .as<{ phase: { value: number } }[]>()
+    .as<{
+      event?: Record<string, any>
+      phase: { value: number }
+    }[]>()
   return Z
     .ls(idx, events)
     .next(([idx, events]) => {
