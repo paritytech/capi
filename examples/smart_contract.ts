@@ -1,12 +1,17 @@
+import * as path from "http://localhost:5646/@local/deps/std/path.ts"
 import * as C from "http://localhost:5646/@local/mod.ts"
 import * as T from "http://localhost:5646/@local/test_util/mod.ts"
 import * as U from "http://localhost:5646/@local/util/mod.ts"
 
 import { $contractsApiCallArgs, $contractsApiCallReturn } from "./smart_contract/codec.ts"
 
+const configFile = getFilePath("smart_contract.toml")
+const zombienet = await T.zombienet.start(configFile)
+const client = zombienet.clients.byName["collator01"]!
+
 const contract = await getContract(
-  "./examples/smart_contract/flipper.wasm",
-  "./examples/smart_contract/metadata.json",
+  getFilePath("smart_contract/flipper.wasm"),
+  getFilePath("smart_contract/metadata.json"),
 )
 
 const contractAddress = U.throwIfError(await instantiateContractTx().run())
@@ -15,9 +20,11 @@ console.log("get message", U.throwIfError(await sendGetMessage(contractAddress).
 console.log("flip message in block", U.throwIfError(await sendFlipMessage(contractAddress).run()))
 console.log("get message", U.throwIfError(await sendGetMessage(contractAddress).run()))
 
+await zombienet.close()
+
 function instantiateContractTx() {
   const constructor = findContractConstructorByLabel("default")!
-  const tx = C.extrinsic(C.local)({
+  const tx = C.extrinsic(client)({
     sender: T.alice.address,
     call: {
       type: "Contracts",
@@ -68,7 +75,7 @@ function sendMessageDryRunContractCall(
     undefined,
     U.hex.decode(message.selector),
   ]))
-  return C.state.call(C.local)(
+  return C.state.call(client)(
     "ContractsApi_call",
     key,
   )
@@ -87,7 +94,7 @@ function sendGetMessage(address: Uint8Array) {
     undefined,
     U.hex.decode(message.selector),
   ]))
-  return C.state.call(C.local)(
+  return C.state.call(client)(
     "ContractsApi_call",
     key,
   )
@@ -116,7 +123,7 @@ function sendFlipMessage(address: Uint8Array) {
         storageDepositLimit: undefined,
       }
     })
-  return C.extrinsic(C.local)({
+  return C.extrinsic(client)({
     sender: T.alice.address,
     call: C.Z.rec({
       type: "Contracts",
@@ -156,4 +163,11 @@ async function getContract(wasmFile: string, metadataFile: string) {
     metadata,
     deriveCodec,
   }
+}
+
+function getFilePath(relativeFilePath: string) {
+  return path.join(
+    path.dirname(path.fromFileUrl(import.meta.url)),
+    relativeFilePath,
+  )
 }
