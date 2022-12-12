@@ -17,6 +17,7 @@
     "frame_metadata/raw_erc20_metadata.json",
     "target",
     "**/__snapshots__/*.snap",
-    "codegen/_output"
+    "codegen/_output",
+    "examples/smart_contract"
   ]
 }
