@@ -2,10 +2,9 @@ import * as path from "http://localhost:5646/@local/deps/std/path.ts"
 import * as C from "http://localhost:5646/@local/mod.ts"
 import * as T from "http://localhost:5646/@local/test_util/mod.ts"
 import * as U from "http://localhost:5646/@local/util/mod.ts"
+import { $contractsApiCallArgs, $contractsApiCallReturn } from "../frame_metadata/Contract.ts"
 
-import { $contractsApiCallArgs, $contractsApiCallReturn } from "./smart_contract/codec.ts"
-
-const configFile = getFilePath("smart_contract.toml")
+const configFile = getFilePath("smart_contract/zombienet.toml")
 const zombienet = await T.zombienet.start(configFile)
 const client = zombienet.clients.byName["collator01"]!
 
@@ -110,15 +109,15 @@ function sendGetMessage(address: Uint8Array) {
 function sendFlipMessage(address: Uint8Array) {
   const message = findContractMessageByLabel("flip")!
   const value = sendMessageDryRunContractCall(address, message)
-    .next(({ gas_required }) => {
+    .next(({ gasRequired }) => {
       return {
         type: "call",
         dest: C.MultiAddress.Id(address),
         value: 0n,
         data: U.hex.decode(message.selector),
         gasLimit: {
-          refTime: gas_required.ref_time,
-          proofSize: gas_required.proof_size,
+          refTime: gasRequired.refTime,
+          proofSize: gasRequired.proofSize,
         },
         storageDepositLimit: undefined,
       }
@@ -158,11 +157,7 @@ async function getContract(wasmFile: string, metadataFile: string) {
     await Deno.readTextFile(metadataFile),
   ))
   const deriveCodec = C.M.DeriveCodec(metadata.V3.types)
-  return {
-    wasm,
-    metadata,
-    deriveCodec,
-  }
+  return { wasm, metadata, deriveCodec }
 }
 
 function getFilePath(relativeFilePath: string) {

@@ -1,3 +1,4 @@
+import * as $ from "../deps/scale.ts"
 import { unreachable } from "../deps/std/testing/asserts.ts"
 import { Ty, TyDef, UnionTyDefMember } from "./scale_info.ts"
 
@@ -182,3 +183,79 @@ export namespace ContractMetadata {
     return normalize(contractMetadata).V3.types
   }
 }
+
+const $balanceCodec = $.u128
+
+export interface Weight {
+  refTime: bigint
+  proofSize: bigint
+}
+const $weightCodec: $.Codec<Weight> = $.object(
+  ["refTime", $.compact($.u64)],
+  ["proofSize", $.compact($.u64)],
+)
+
+export type ContractsApiCallArgs = [
+  origin: Uint8Array,
+  dest: Uint8Array,
+  balance: bigint,
+  weight: Weight | undefined,
+  storageDepositLimit: bigint | undefined,
+  data: Uint8Array,
+]
+export const $contractsApiCallArgs: $.Codec<ContractsApiCallArgs> = $.tuple(
+  // origin
+  $.sizedUint8Array(32),
+  // dest
+  $.sizedUint8Array(32),
+  // balance
+  $balanceCodec,
+  // weight
+  $.option($weightCodec),
+  // storage_deposit_limit
+  $.option($balanceCodec),
+  // data
+  $.uint8Array,
+)
+
+export interface ContractsApiCallReturn {
+  gasConsumed: Weight
+  gasRequired: Weight
+  storageDeposit: {
+    type: "Refund"
+    value: bigint
+  } | {
+    type: "Charge"
+    value: bigint
+  }
+  debugMessage: string
+  result: {
+    flags: number
+    data: Uint8Array
+  }
+}
+export const $contractsApiCallReturn: $.Codec<ContractsApiCallReturn> = $.object(
+  // gas_consumed
+  ["gasConsumed", $weightCodec],
+  // gas_required
+  ["gasRequired", $weightCodec],
+  // storage_deposit
+  [
+    "storageDeposit",
+    $.taggedUnion("type", [
+      ["Refund", ["value", $balanceCodec]],
+      ["Charge", ["value", $balanceCodec]],
+    ]),
+  ],
+  // debug_message
+  ["debugMessage", $.str],
+  // result
+  [
+    "result",
+    $.object(
+      ["flags", $.u32],
+      // TODO: improve result error coded
+      ["data", $.result($.uint8Array, $.never)],
+    ),
+  ],
+)
