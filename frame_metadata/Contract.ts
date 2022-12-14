@@ -218,7 +218,7 @@ export const $contractsApiCallArgs: $.Codec<ContractsApiCallArgs> = $.tuple(
   $.uint8Array,
 )
 
-export interface ContractsApiCallReturn {
+export interface ContractsApiCallResult {
   gasConsumed: Weight
   gasRequired: Weight
   storageDeposit: {
@@ -234,7 +234,7 @@ export interface ContractsApiCallReturn {
     data: Uint8Array
   }
 }
-export const $contractsApiCallReturn: $.Codec<ContractsApiCallReturn> = $.object(
+export const $contractsApiCallResult: $.Codec<ContractsApiCallResult> = $.object(
   // gas_consumed
   ["gasConsumed", $weightCodec],
   // gas_required
@@ -256,6 +256,91 @@ export const $contractsApiCallReturn: $.Codec<ContractsApiCallReturn> = $.object
       ["flags", $.u32],
       // TODO: improve result error coded
       ["data", $.result($.uint8Array, $.never)],
+    ),
+  ],
+)
+
+export type ContractsApiInstantiateArgs = [
+  origin: Uint8Array,
+  balance: bigint,
+  gasLimit: Weight | undefined,
+  storageDepositLimit: bigint | undefined,
+  codeOrHash: {
+    type: "Upload" | "Existing"
+    value: Uint8Array
+  },
+  data: Uint8Array,
+  salt: Uint8Array,
+]
+export const $contractsApiInstantiateArgs: $.Codec<ContractsApiInstantiateArgs> = $.tuple(
+  // origin
+  $.sizedUint8Array(32),
+  // balance
+  $balanceCodec,
+  // gasLimit
+  $.option($weightCodec),
+  // storageDepositLimit
+  $.option($balanceCodec),
+  // codeOrHash
+  $.taggedUnion("type", [
+    // code
+    ["Upload", ["value", $.uint8Array]],
+    // hash
+    ["Existing", ["value", $.sizedUint8Array(32)]],
+  ]),
+  // data
+  $.uint8Array,
+  // salt
+  $.uint8Array,
+)
+
+export interface ContractsApiInstantiateResult {
+  gasConsumed: Weight
+  gasRequired: Weight
+  storageDeposit: {
+    type: "Refund"
+    value: bigint
+  } | {
+    type: "Charge"
+    value: bigint
+  }
+  debugMessage: string
+  result: {
+    result: {
+      flags: number
+      data: Uint8Array
+    }
+    accountId: Uint8Array
+  }
+}
+export const $contractsApiInstantiateResult: $.Codec<ContractsApiInstantiateResult> = $.object(
+  // gas_consumed
+  ["gasConsumed", $weightCodec],
+  // gas_required
+  ["gasRequired", $weightCodec],
+  // storage_deposit
+  [
+    "storageDeposit",
+    $.taggedUnion("type", [
+      ["Refund", ["value", $balanceCodec]],
+      ["Charge", ["value", $balanceCodec]],
+    ]),
+  ],
+  // debug_message
+  ["debugMessage", $.str],
+  // result
+  [
+    "result",
+    $.object(
+      [
+        "result",
+        $.object(
+          ["flags", $.u32],
+          // TODO: improve result error coded
+          ["data", $.result($.uint8Array, $.never)],
+        ),
+      ],
+      ["accountId", $.sizedUint8Array(32)],
     ),
   ],
 )
