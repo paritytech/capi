@@ -30,7 +30,9 @@ function instantiateContractTx() {
   const constructor = findContractConstructorByLabel("default")!
   const salt = Uint8Array.from(Array.from([0, 0, 0, 0]), () => Math.floor(Math.random() * 16))
   const value = preSubmitContractInstantiateDryRunGasEstimate(constructor, contract.wasm, salt)
-    .next(({ gasRequired }) => {
+    .next(({ gasRequired, result: { accountId } }) => {
+      // the contract address derived from the code hash and the salt
+      console.log("Derived contract address", U.ss58.encode(42, accountId))
       return {
         type: "instantiateWithCode",
         value: 0n,
