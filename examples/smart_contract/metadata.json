@@ -1,8 +1,8 @@
 {
   "source": {
-    "hash": "0x2345709e061bfa0d374eaf0c25f19c8dce43ac11362c55196e1ecf465781b750",
+    "hash": "0xa64fbd08bc40eb972efb18c71ac812bd8219e9fd16b975f9ec070ce96ab32156",
     "language": "ink! 3.4.0",
-    "compiler": "rustc 1.67.0-nightly"
+    "compiler": "rustc 1.68.0-nightly"
   },
   "contract": {
     "name": "flipper",
@@ -76,6 +76,133 @@
             "type": 0
           },
           "selector": "0x2f865bd9"
+        },
+        {
+          "args": [
+            {
+              "label": "a",
+              "type": {
+                "displayName": [
+                  "u32"
+                ],
+                "type": 2
+              }
+            },
+            {
+              "label": "b",
+              "type": {
+                "displayName": [
+                  "bool"
+                ],
+                "type": 0
+              }
+            }
+          ],
+          "docs": [
+            " multiple arg method1."
+          ],
+          "label": "m1",
+          "mutates": false,
+          "payable": false,
+          "returnType": {
+            "displayName": [],
+            "type": 3
+          },
+          "selector": "0xfa2cbe71"
+        },
+        {
+          "args": [
+            {
+              "label": "a",
+              "type": {
+                "displayName": [
+                  "u32"
+                ],
+                "type": 2
+              }
+            },
+            {
+              "label": "b",
+              "type": {
+                "displayName": [
+                  "bool"
+                ],
+                "type": 0
+              }
+            }
+          ],
+          "docs": [
+            " multiple arg method2."
+          ],
+          "label": "m2",
+          "mutates": false,
+          "payable": false,
+          "returnType": {
+            "displayName": [
+              "M2"
+            ],
+            "type": 4
+          },
+          "selector": "0x25f9a609"
+        },
+        {
+          "args": [],
+          "docs": [
+            " get the current count."
+          ],
+          "label": "get_count",
+          "mutates": false,
+          "payable": false,
+          "returnType": {
+            "displayName": [
+              "i32"
+            ],
+            "type": 1
+          },
+          "selector": "0xbb20003a"
+        },
+        {
+          "args": [],
+          "docs": [
+            " increment current count by 1"
+          ],
+          "label": "inc",
+          "mutates": true,
+          "payable": false,
+          "returnType": null,
+          "selector": "0x1d32619f"
+        },
+        {
+          "args": [],
+          "docs": [
+            " decrement current count by 1"
+          ],
+          "label": "dec",
+          "mutates": true,
+          "payable": false,
+          "returnType": null,
+          "selector": "0xb5d7b4f0"
+        },
+        {
+          "args": [
+            {
+              "label": "n",
+              "type": {
+                "displayName": [
+                  "i32"
+                ],
+                "type": 1
+              }
+            }
+          ],
+          "docs": [
+            " increment current count by n"
+          ],
+          "label": "inc_by",
+          "mutates": true,
+          "payable": false,
+          "returnType": null,
+          "selector": "0xfe5bd8ea"
         }
       ]
     },
@@ -90,6 +217,15 @@
               }
             },
             "name": "value"
+          },
+          {
+            "layout": {
+              "cell": {
+                "key": "0x0100000000000000000000000000000000000000000000000000000000000000",
+                "ty": 1
+              }
+            },
+            "name": "count"
           }
         ]
       }
@@ -101,6 +237,59 @@
           "def": {
             "primitive": "bool"
           }
+        }
+      },
+      {
+        "id": 1,
+        "type": {
+          "def": {
+            "primitive": "i32"
+          }
+        }
+      },
+      {
+        "id": 2,
+        "type": {
+          "def": {
+            "primitive": "u32"
+          }
+        }
+      },
+      {
+        "id": 3,
+        "type": {
+          "def": {
+            "tuple": [
+              2,
+              0
+            ]
+          }
+        }
+      },
+      {
+        "id": 4,
+        "type": {
+          "def": {
+            "composite": {
+              "fields": [
+                {
+                  "name": "a",
+                  "type": 2,
+                  "typeName": "u32"
+                },
+                {
+                  "name": "b",
+                  "type": 0,
+                  "typeName": "bool"
+                }
+              ]
+            }
+          },
+          "path": [
+            "flipper",
+            "flipper",
+            "M2"
+          ]
         }
       }
     ]

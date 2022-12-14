@@ -20,11 +20,6 @@ const contract = await getContract(
 
 const contractAddress = U.throwIfError(await instantiateContractTx().run())
 console.log("Deployed Contract address", U.ss58.encode(42, contractAddress))
-console.log("get message", U.throwIfError(await sendGetMessage(contractAddress).run()))
-console.log("flip message in block", U.throwIfError(await sendFlipMessage(contractAddress).run()))
-console.log("get message", U.throwIfError(await sendGetMessage(contractAddress).run()))
-
-await zombienet.close()
 
 function instantiateContractTx() {
   const constructor = findContractConstructorByLabel("default")!
@@ -101,101 +96,8 @@ function preSubmitContractInstantiateDryRunGasEstimate(
     })
 }
 
-function preSubmitContractCallDryRunGasEstimate(
-  address: Uint8Array,
-  message: C.M.ContractMetadata.Message | C.M.ContractMetadata.Constructor,
-) {
-  const key = U.hex.encode($contractsApiCallArgs.encode([
-    T.alice.publicKey,
-    address,
-    0n,
-    undefined,
-    undefined,
-    U.hex.decode(message.selector),
-  ]))
-  return C.state.call(client)(
-    "ContractsApi_call",
-    key,
-  )
-    .next((encodedResponse) => {
-      return $contractsApiCallResult.decode(U.hex.decode(encodedResponse))
-    })
-}
-
-function sendGetMessage(address: Uint8Array) {
-  const message = findContractMessageByLabel("get")!
-  const key = U.hex.encode($contractsApiCallArgs.encode([
-    T.alice.publicKey,
-    address,
-    0n,
-    undefined,
-    undefined,
-    U.hex.decode(message.selector),
-  ]))
-  return C.state.call(client)(
-    "ContractsApi_call",
-    key,
-  )
-    .next((encodedResponse) => {
-      const response = $contractsApiCallResult.decode(U.hex.decode(encodedResponse))
-      if (message.returnType.type === null) {
-        return undefined
-      }
-      return contract.deriveCodec(message.returnType.type).decode(response.result.data)
-    })
-}
-
-function sendFlipMessage(address: Uint8Array) {
-  const message = findContractMessageByLabel("flip")!
-  const value = preSubmitContractCallDryRunGasEstimate(address, message)
-    .next(({ gasRequired }) => {
-      return {
-        type: "call",
-        dest: C.MultiAddress.Id(address),
-        value: 0n,
-        data: U.hex.decode(message.selector),
-        gasLimit: {
-          refTime: gasRequired.refTime,
-          proofSize: gasRequired.proofSize,
-        },
-        storageDepositLimit: undefined,
-      }
-    })
-  const tx = C.extrinsic(client)({
-    sender: T.alice.address,
-    call: C.Z.rec({
-      type: "Contracts",
-      value,
-    }),
-  })
-    .signed(T.alice.sign)
-  const finalizedIn = tx.watch(({ end }) =>
-    (status) => {
-      if (typeof status !== "string" && (status.inBlock ?? status.finalized)) {
-        return end(status.inBlock ?? status.finalized)
-      } else if (C.rpc.known.TransactionStatus.isTerminal(status)) {
-        return end(new Error())
-      }
-      return
-    }
-  )
-  return C.Z.ls(finalizedIn, C.events(tx, finalizedIn)).next(([finalizedIn, events]) => {
-    const extrinsicFailed = events.some((e) =>
-      e.event?.type === "System" && e.event?.value?.type === "ExtrinsicFailed"
-    )
-    if (extrinsicFailed) {
-      return new Error("extrinsic failed")
-    }
-    return finalizedIn
-  })
-}
-
 function findContractConstructorByLabel(label: string) {
   return contract.metadata.V3.spec.constructors.find((c) => c.label === label)
-}
-
-function findContractMessageByLabel(label: string) {
-  return contract.metadata.V3.spec.messages.find((c) => c.label === label)
 }
 
 async function getContract(wasmFile: string, metadataFile: string) {
@@ -213,3 +115,163 @@ function getFilePath(relativeFilePath: string) {
     relativeFilePath,
   )
 }
+
+class SmartContract {
+  readonly deriveCodec
+
+  constructor(
+    readonly metadata: C.M.ContractMetadata,
+    readonly contractAddress: Uint8Array,
+  ) {
+    this.deriveCodec = C.M.DeriveCodec(metadata.V3.types)
+  }
+
+  call<Args extends any[]>(
+    origin: Uint8Array,
+    messageLabel: string,
+    args: Args,
+  ) {
+    const message = this.#getMessageByLabel(messageLabel)!
+    const [$args, $result] = this.#getMessageCodecs(message)
+    const data = $args.encode([U.hex.decode(message.selector), ...args])
+    const callData = U.hex.encode($contractsApiCallArgs.encode([
+      origin,
+      this.contractAddress,
+      0n,
+      undefined,
+      undefined,
+      data,
+    ]))
+    return C.state.call(client)(
+      "ContractsApi_call",
+      callData,
+    )
+      .next((encodedResponse) => {
+        const response = $contractsApiCallResult.decode(U.hex.decode(encodedResponse))
+        if (message.returnType === null) {
+          return undefined
+        }
+        return $result.decode(response.result.data)
+      })
+  }
+
+  tx<Args extends unknown[]>(
+    origin: Uint8Array,
+    messageLabel: string,
+    args: Args,
+    sign: C.Z.$<C.M.Signer>,
+  ) {
+    const message = this.#getMessageByLabel(messageLabel)!
+    const [$args, _] = this.#getMessageCodecs(message)
+    const data = $args.encode([U.hex.decode(message.selector), ...args])
+    const value = this.#preSubmitContractCallDryRunGasEstimate(origin, data)
+      .next(({ gasRequired }) => {
+        return {
+          type: "call",
+          dest: C.MultiAddress.Id(this.contractAddress),
+          value: 0n,
+          data,
+          gasLimit: {
+            refTime: gasRequired.refTime,
+            proofSize: gasRequired.proofSize,
+          },
+          storageDepositLimit: undefined,
+        }
+      })
+    const tx = C.extrinsic(client)({
+      sender: C.MultiAddress.Id(origin),
+      call: C.Z.rec({
+        type: "Contracts",
+        value,
+      }),
+    })
+      .signed(sign)
+    const finalizedIn = tx.watch(({ end }) =>
+      (status) => {
+        if (typeof status !== "string" && (status.inBlock ?? status.finalized)) {
+          return end(status.inBlock ?? status.finalized)
+        } else if (C.rpc.known.TransactionStatus.isTerminal(status)) {
+          return end(new Error())
+        }
+        return
+      }
+    )
+    return C.Z.ls(finalizedIn, C.events(tx, finalizedIn))
+  }
+
+  // TODO: codegen each contract message as a method
+
+  #getMessageByLabel(label: string) {
+    return this.metadata.V3.spec.messages.find((c) => c.label === label)
+  }
+
+  #getMessageCodecs(
+    message: C.M.ContractMetadata.Message,
+  ): [C.$.Codec<unknown[]>, C.$.Codec<any>] {
+    const argCodecs = [
+      // message selector
+      C.$.sizedUint8Array(U.hex.decode(message.selector).length),
+      // message args
+      ...message.args.map((arg) => this.deriveCodec(arg.type.type)),
+    ]
+    const $result = message.returnType !== null
+      ? this.deriveCodec(message.returnType.type)
+      : C.$.constant(null)
+    // @ts-ignore ...
+    return [C.$.tuple(...argCodecs), $result]
+  }
+
+  #preSubmitContractCallDryRunGasEstimate(
+    origin: Uint8Array,
+    data: Uint8Array,
+  ) {
+    const callData = U.hex.encode($contractsApiCallArgs.encode([
+      origin,
+      this.contractAddress,
+      0n,
+      undefined,
+      undefined,
+      data,
+    ]))
+    return C.state.call(client)(
+      "ContractsApi_call",
+      callData,
+    )
+      .next((encodedResponse) => {
+        return $contractsApiCallResult.decode(U.hex.decode(encodedResponse))
+      })
+  }
+}
+
+const flipperContract = new SmartContract(contract.metadata, contractAddress)
+console.log(".get", await flipperContract.call(T.alice.publicKey, "get", []).run())
+console.log(
+  "block hash and events",
+  U.throwIfError(await flipperContract.tx(T.alice.publicKey, "flip", [], T.alice.sign).run())[0],
+)
+console.log(".get", await flipperContract.call(T.alice.publicKey, "get", []).run())
+console.log(".get_count", await flipperContract.call(T.alice.publicKey, "get_count", []).run())
+console.log(
+  ".inc block hash",
+  U.throwIfError(await flipperContract.tx(T.alice.publicKey, "inc", [], T.alice.sign).run())[0],
+)
+console.log(
+  ".inc block hash",
+  U.throwIfError(await flipperContract.tx(T.alice.publicKey, "inc", [], T.alice.sign).run())[0],
+)
+console.log(".get_count", await flipperContract.call(T.alice.publicKey, "get_count", []).run())
+console.log(
+  ".inc_by(3) block hash",
+  U.throwIfError(await flipperContract.tx(T.alice.publicKey, "inc_by", [3], T.alice.sign).run())[0],
+)
+console.log(".get_count", await flipperContract.call(T.alice.publicKey, "get_count", []).run())
+console.log(
+  ".m1(2,true) (multiple args/results)",
+  await flipperContract.call(T.alice.publicKey, "m1", [2, true]).run(),
+)
+console.log(
+  ".m2(3,false) (multiple args/results)",
+  await flipperContract.call(T.alice.publicKey, "m1", [3, false]).run(),
+)
+
+await zombienet.close()
