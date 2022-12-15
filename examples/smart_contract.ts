@@ -18,23 +18,22 @@ const contract = await getContract(
   getFilePath("smart_contract/metadata.json"),
 )
 
-const contractAddress = U.throwIfError(await instantiateContractTx().run())
-console.log("Deployed Contract address", U.ss58.encode(42, contractAddress))
+const ss58Prefix = C.const(client)("System", "SS58Prefix").access("value")
 
 function instantiateContractTx() {
   const constructor = findContractConstructorByLabel("default")!
   const salt = Uint8Array.from(Array.from([0, 0, 0, 0]), () => Math.floor(Math.random() * 16))
-  const value = preSubmitContractInstantiateDryRunGasEstimate(constructor, contract.wasm, salt)
-    .next(({ gasRequired, result: { accountId } }) => {
+  const value = C.Z.ls(
+    preSubmitContractInstantiateDryRunGasEstimate(constructor, contract.wasm, salt),
+    ss58Prefix,
+  )
+    .next(([{ gasRequired, result: { accountId } }, prefix]) => {
       // the contract address derived from the code hash and the salt
-      console.log("Derived contract address", U.ss58.encode(42, accountId))
+      console.log("Derived contract address", U.ss58.encode(prefix, accountId))
       return {
         type: "instantiateWithCode",
         value: 0n,
-        gasLimit: {
-          refTime: gasRequired.refTime,
-          proofSize: gasRequired.proofSize,
-        },
+        gasLimit: gasRequired,
         storageDepositLimit: undefined,
         code: contract.wasm,
         data: U.hex.decode(constructor.selector),
@@ -60,17 +59,29 @@ function instantiateContractTx() {
     }
   )
   return C.events(tx, finalizedIn).next((events) => {
-    const extrinsicFailed = events.some((e) =>
+    const extrinsicFailedEvent = events.find((e) =>
       e.event?.type === "System" && e.event?.value?.type === "ExtrinsicFailed"
     )
-    if (extrinsicFailed) {
-      return new Error("extrinsic failed")
+    if (extrinsicFailedEvent) {
+      return new ExtrinsicFailed(extrinsicFailedEvent)
     }
     const event = events.find((e) =>
       e.event?.type === "Contracts" && e.event?.value?.type === "Instantiated"
     )
     return event?.event?.value.contract as Uint8Array
   })
+}
+
+class ExtrinsicFailed extends Error {
+  override readonly name = "ExtrinsicFailedError"
+  constructor(
+    override readonly cause: {
+      event?: Record<string, any>
+      phase: { value: number }
+    },
+  ) {
+    super()
+  }
 }
 
 function preSubmitContractInstantiateDryRunGasEstimate(
@@ -162,7 +173,7 @@ class SmartContract {
     sign: C.Z.$<C.M.Signer>,
   ) {
     const message = this.#getMessageByLabel(messageLabel)!
-    const [$args, _] = this.#getMessageCodecs(message)
+    const [$args, _, $events] = this.#getMessageCodecs(message)
     const data = $args.encode([U.hex.decode(message.selector), ...args])
     const value = this.#preSubmitContractCallDryRunGasEstimate(origin, data)
       .next(({ gasRequired }) => {
@@ -171,10 +182,7 @@ class SmartContract {
           dest: C.MultiAddress.Id(this.contractAddress),
           value: 0n,
           data,
-          gasLimit: {
-            refTime: gasRequired.refTime,
-            proofSize: gasRequired.proofSize,
-          },
+          gasLimit: gasRequired,
           storageDepositLimit: undefined,
         }
       })
@@ -197,6 +205,14 @@ class SmartContract {
       }
     )
     return C.Z.ls(finalizedIn, C.events(tx, finalizedIn))
+      .next(([finalizedIn, events]) => {
+        const contractEvents: any[] = events
+          .filter(
+            (e) => e.event?.type === "Contracts" && e.event?.value?.type === "ContractEmitted",
+          )
+          .map((e) => $events.decode(e.event?.value.data))
+        return [finalizedIn, events, contractEvents]
+      })
   }
 
   // TODO: codegen each contract message as a method
@@ -207,18 +223,33 @@ class SmartContract {
 
   #getMessageCodecs(
     message: C.M.ContractMetadata.Message,
-  ): [C.$.Codec<unknown[]>, C.$.Codec<any>] {
+  ): [C.$.Codec<unknown[]>, C.$.Codec<any>, C.$.Codec<any>] {
+    // TODO: cache on initialization
     const argCodecs = [
       // message selector
       C.$.sizedUint8Array(U.hex.decode(message.selector).length),
       // message args
       ...message.args.map((arg) => this.deriveCodec(arg.type.type)),
     ]
+    // TODO: cache on initialization
     const $result = message.returnType !== null
       ? this.deriveCodec(message.returnType.type)
       : C.$.constant(null)
+    // FIXME: this is not message specific
+    const $events = C.$.taggedUnion(
+      "type",
+      this.metadata.V3.spec.events
+        .map((e) => [
+          e.label,
+          [
+            "value",
+            C.$.tuple(...e.args
+              .map((a) => this.deriveCodec(a.type.type))),
+          ],
+        ]),
+    )
     // @ts-ignore ...
-    return [C.$.tuple(...argCodecs), $result]
+    return [C.$.tuple(...argCodecs), $result, $events]
   }
 
   #preSubmitContractCallDryRunGasEstimate(
@@ -243,6 +274,10 @@ class SmartContract {
   }
 }
 
+const prefix = U.throwIfError(await ss58Prefix.run())
+const contractAddress = U.throwIfError(await instantiateContractTx().run())
+console.log("Deployed Contract address", U.ss58.encode(prefix, contractAddress))
+
 const flipperContract = new SmartContract(contract.metadata, contractAddress)
 console.log(".get", await flipperContract.call(T.alice.publicKey, "get", []).run())
 console.log(
@@ -266,12 +301,18 @@ console.log(
 )
 console.log(".get_count", await flipperContract.call(T.alice.publicKey, "get_count", []).run())
 console.log(
-  ".m1(2,true) (multiple args/results)",
-  await flipperContract.call(T.alice.publicKey, "m1", [2, true]).run(),
+  ".inc_by_with_event(3) contract events",
+  U.throwIfError(
+    await flipperContract.tx(T.alice.publicKey, "inc_by_with_event", [3], T.alice.sign).run(),
+  )[2],
 )
 console.log(
-  ".m2(3,false) (multiple args/results)",
-  await flipperContract.call(T.alice.publicKey, "m1", [3, false]).run(),
+  ".method_returning_tuple(2,true)",
+  await flipperContract.call(T.alice.publicKey, "method_returning_tuple", [2, true]).run(),
+)
+console.log(
+  ".method_returning_struct(3,false)",
+  await flipperContract.call(T.alice.publicKey, "method_returning_struct", [3, false]).run(),
 )
 
 await zombienet.close()

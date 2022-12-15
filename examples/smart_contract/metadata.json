@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0xa64fbd08bc40eb972efb18c71ac812bd8219e9fd16b975f9ec070ce96ab32156",
+    "hash": "0x1e3986af05daee058d114887d78d251e7bad3700b7e5aa01741572162d7b3d85",
     "language": "ink! 3.4.0",
     "compiler": "rustc 1.68.0-nightly"
   },
@@ -46,7 +46,39 @@
         }
       ],
       "docs": [],
-      "events": [],
+      "events": [
+        {
+          "args": [
+            {
+              "docs": [],
+              "indexed": false,
+              "label": "from",
+              "type": {
+                "displayName": [
+                  "Option"
+                ],
+                "type": 5
+              }
+            },
+            {
+              "docs": [],
+              "indexed": false,
+              "label": "count",
+              "type": {
+                "displayName": [
+                  "i32"
+                ],
+                "type": 1
+              }
+            }
+          ],
+          "docs": [
+            " Defines an event that is emitted",
+            " every time inc is invoked."
+          ],
+          "label": "Incremented"
+        }
+      ],
       "messages": [
         {
           "args": [],
@@ -99,16 +131,16 @@
             }
           ],
           "docs": [
-            " multiple arg method1."
+            " multiple arg method returning a tuple."
           ],
-          "label": "m1",
+          "label": "method_returning_tuple",
           "mutates": false,
           "payable": false,
           "returnType": {
             "displayName": [],
             "type": 3
           },
-          "selector": "0xfa2cbe71"
+          "selector": "0xdb48790e"
         },
         {
           "args": [
@@ -132,9 +164,9 @@
             }
           ],
           "docs": [
-            " multiple arg method2."
+            " multiple arg method returning a struct."
           ],
-          "label": "m2",
+          "label": "method_returning_struct",
           "mutates": false,
           "payable": false,
           "returnType": {
@@ -143,7 +175,7 @@
             ],
             "type": 4
           },
-          "selector": "0x25f9a609"
+          "selector": "0x5cb3e2d0"
         },
         {
           "args": [],
@@ -203,6 +235,27 @@
           "payable": false,
           "returnType": null,
           "selector": "0xfe5bd8ea"
+        },
+        {
+          "args": [
+            {
+              "label": "n",
+              "type": {
+                "displayName": [
+                  "i32"
+                ],
+                "type": 1
+              }
+            }
+          ],
+          "docs": [
+            " increment current count by n and emit an event"
+          ],
+          "label": "inc_by_with_event",
+          "mutates": true,
+          "payable": false,
+          "returnType": null,
+          "selector": "0xd54ee71c"
         }
       ]
     },
@@ -290,6 +343,78 @@
             "flipper",
             "M2"
           ]
+        }
+      },
+      {
+        "id": 5,
+        "type": {
+          "def": {
+            "variant": {
+              "variants": [
+                {
+                  "index": 0,
+                  "name": "None"
+                },
+                {
+                  "fields": [
+                    {
+                      "type": 6
+                    }
+                  ],
+                  "index": 1,
+                  "name": "Some"
+                }
+              ]
+            }
+          },
+          "params": [
+            {
+              "name": "T",
+              "type": 6
+            }
+          ],
+          "path": [
+            "Option"
+          ]
+        }
+      },
+      {
+        "id": 6,
+        "type": {
+          "def": {
+            "composite": {
+              "fields": [
+                {
+                  "type": 7,
+                  "typeName": "[u8; 32]"
+                }
+              ]
+            }
+          },
+          "path": [
+            "ink_env",
+            "types",
+            "AccountId"
+          ]
+        }
+      },
+      {
+        "id": 7,
+        "type": {
+          "def": {
+            "array": {
+              "len": 32,
+              "type": 8
+            }
+          }
+        }
+      },
+      {
+        "id": 8,
+        "type": {
+          "def": {
+            "primitive": "u8"
+          }
         }
       }
     ]
