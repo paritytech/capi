@@ -10,14 +10,11 @@
   ],
   "dictionaries": ["project-words"],
   "ignorePaths": [
-    "**/mod.generated.js",
-    "**/mod_bg.wasm",
-    "Cargo.lock",
-    "deno.lock",
+    "**/*.wasm",
     "frame_metadata/raw_erc20_metadata.json",
     "target",
     "**/__snapshots__/*.snap",
-    "codegen/_output",
-    "examples/smart_contract"
+    "**/*.contract",
+    "examples/smart_contract/metadata.json"
   ]
 }

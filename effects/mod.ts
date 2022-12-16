@@ -1,5 +1,6 @@
 export * from "./blockWatch.ts"
 export * from "./const.ts"
+export * as contracts from "./contracts/mod.ts"
 export * from "./entryRead.ts"
 export * from "./entryWatch.ts"
 export * from "./events.ts"
