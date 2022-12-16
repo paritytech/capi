@@ -1,12 +1,21 @@
+// This example requires zombienet-macos/zombienet-linux, polkadot and polkadot-parachain binaries in the PATH
+
+import * as path from "http://localhost:5646/@local/deps/std/path.ts"
 import * as C from "http://localhost:5646/@local/mod.ts"
 import * as T from "http://localhost:5646/@local/test_util/mod.ts"
 import * as U from "http://localhost:5646/@local/util/mod.ts"
-import { $contractsApiCallArgs, $contractsApiCallResult } from "../frame_metadata/Contract.ts"
+import {
+  $contractsApiCallArgs,
+  $contractsApiCallResult,
+  ContractMetadata,
+} from "../frame_metadata/Contract.ts"
 
-// const configFile = getFilePath("smart_contract/zombienet.toml")
-// const zombienet = await T.zombienet.start(configFile)
-// const client = zombienet.clients.byName["collator01"]!
-const client = C.polkadot
+const configFile = path.join(
+  path.dirname(path.fromFileUrl(import.meta.url)),
+  "smart_contract/zombienet.toml",
+)
+const zombienet = await T.zombienet.start(configFile)
+const client = zombienet.clients.byName["collator01"]!
 
 const salt = Uint8Array.from(Array.from([0, 0, 0, 0]), () => Math.floor(Math.random() * 16))
 
@@ -63,8 +72,6 @@ const contractAddress = U.throwIfError(
     .run(),
 )
 
-// await zombienet.close()
-
 interface MessageCodecs {
   $args: C.$.Codec<[Uint8Array, ...unknown[]]>
   $result: C.$.Codec<any>
@@ -98,30 +105,16 @@ class Contract<Client extends C.Z.Effect<C.rpc.Client>> {
     )
   }
 
-  call<Args extends any[]>(
+  query<Args extends any[]>(
     origin: Uint8Array,
     messageLabel: string,
     args: Args,
   ) {
     const message = this.#getMessageByLabel(messageLabel)!
-    const { $args, $result } = this.#getMessageCodecByLabel(messageLabel)
-    const data = $args.encode([U.hex.decode(message.selector), ...args])
-    const callData = U.hex.encode($contractsApiCallArgs.encode([
-      origin,
-      this.contractAddress,
-      0n,
-      undefined,
-      undefined,
-      data,
-    ]))
-    return C.state.call(client)(
-      "ContractsApi_call",
-      callData,
+    const { $result } = this.#getMessageCodecByLabel(messageLabel)
+    return this.#call(origin, message, args).access("result").next((result) =>
+      $result.decode(result.data)
     )
-      .next((encodedResponse) => {
-        const response = $contractsApiCallResult.decode(U.hex.decode(encodedResponse))
-        return $result.decode(response.result.data)
-      })
   }
 
   tx<Args extends unknown[]>(
@@ -133,22 +126,8 @@ class Contract<Client extends C.Z.Effect<C.rpc.Client>> {
     const message = this.#getMessageByLabel(messageLabel)!
     const { $args } = this.#getMessageCodecByLabel(messageLabel)
     const data = $args.encode([U.hex.decode(message.selector), ...args])
-    const callData = U.hex.encode($contractsApiCallArgs.encode([
-      origin,
-      this.contractAddress,
-      0n,
-      undefined,
-      undefined,
-      data,
-    ]))
-    const estimate = C.state.call(client)(
-      "ContractsApi_call",
-      callData,
-    )
-      .next((encodedResponse) => {
-        return $contractsApiCallResult.decode(U.hex.decode(encodedResponse))
-      })
-    const value = estimate.next(({ gasRequired }) => {
+    const gasRequired = this.#call(origin, message, args).access("gasRequired")
+    const value = gasRequired.next((gasRequired) => {
       return {
         type: "call",
         dest: C.MultiAddress.Id(this.contractAddress),
@@ -176,15 +155,36 @@ class Contract<Client extends C.Z.Effect<C.rpc.Client>> {
         return
       }
     )
+    // FIXME: extract into a contract effect util
     return C.Z.ls(finalizedIn, C.events(tx, finalizedIn))
       .next(([finalizedIn, events]) => {
         const contractEvents: any[] = events
-          .filter(
-            (e) => e.event?.type === "Contracts" && e.event?.value?.type === "ContractEmitted",
+          .filter((e) =>
+            e.event?.type === "Contracts" && e.event?.value?.type === "ContractEmitted"
           )
           .map((e) => this.$events.decode(e.event?.value.data))
         return [finalizedIn, events, contractEvents]
       })
+  }
+
+  #call<Args extends any[]>(
+    origin: Uint8Array,
+    message: ContractMetadata.Message,
+    args: Args,
+  ) {
+    const { $args } = this.#getMessageCodecByLabel(message.label)
+    const data = $args.encode([U.hex.decode(message.selector), ...args])
+    const callData = U.hex.encode($contractsApiCallArgs.encode([
+      origin,
+      this.contractAddress,
+      0n,
+      undefined,
+      undefined,
+      data,
+    ]))
+    return C.state
+      .call(client)("ContractsApi_call", callData)
+      .next((encodedResponse) => $contractsApiCallResult.decode(U.hex.decode(encodedResponse)))
   }
 
   // TODO: codegen each contract message as a method
@@ -216,13 +216,13 @@ const prefix = U.throwIfError(await C.const(client)("System", "SS58Prefix").acce
 console.log("Deployed Contract address", U.ss58.encode(prefix, contractAddress))
 
 const flipperContract = new Contract(T.polkadot, metadata, contractAddress)
-console.log(".get", await flipperContract.call(T.alice.publicKey, "get", []).run())
+console.log(".get", await flipperContract.query(T.alice.publicKey, "get", []).run())
 console.log(
   "block hash and events",
   U.throwIfError(await flipperContract.tx(T.alice.publicKey, "flip", [], T.alice.sign).run())[0],
 )
-console.log(".get", await flipperContract.call(T.alice.publicKey, "get", []).run())
-console.log(".get_count", await flipperContract.call(T.alice.publicKey, "get_count", []).run())
+console.log(".get", await flipperContract.query(T.alice.publicKey, "get", []).run())
+console.log(".get_count", await flipperContract.query(T.alice.publicKey, "get_count", []).run())
 console.log(
   ".inc block hash",
   U.throwIfError(await flipperContract.tx(T.alice.publicKey, "inc", [], T.alice.sign).run())[0],
@@ -231,12 +231,12 @@ console.log(
   ".inc block hash",
   U.throwIfError(await flipperContract.tx(T.alice.publicKey, "inc", [], T.alice.sign).run())[0],
 )
-console.log(".get_count", await flipperContract.call(T.alice.publicKey, "get_count", []).run())
+console.log(".get_count", await flipperContract.query(T.alice.publicKey, "get_count", []).run())
 console.log(
   ".inc_by(3) block hash",
   U.throwIfError(await flipperContract.tx(T.alice.publicKey, "inc_by", [3], T.alice.sign).run())[0],
 )
-console.log(".get_count", await flipperContract.call(T.alice.publicKey, "get_count", []).run())
+console.log(".get_count", await flipperContract.query(T.alice.publicKey, "get_count", []).run())
 console.log(
   ".inc_by_with_event(3) contract events",
   U.throwIfError(
@@ -245,9 +245,11 @@ console.log(
 )
 console.log(
   ".method_returning_tuple(2,true)",
-  await flipperContract.call(T.alice.publicKey, "method_returning_tuple", [2, true]).run(),
+  await flipperContract.query(T.alice.publicKey, "method_returning_tuple", [2, true]).run(),
 )
 console.log(
   ".method_returning_struct(3,false)",
-  await flipperContract.call(T.alice.publicKey, "method_returning_struct", [3, false]).run(),
+  await flipperContract.query(T.alice.publicKey, "method_returning_struct", [3, false]).run(),
 )
+
+await zombienet.close()
