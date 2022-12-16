@@ -129,12 +129,17 @@ function getFilePath(relativeFilePath: string) {
 
 class SmartContract {
   readonly deriveCodec
+  readonly $events
+  readonly $messageByLabel
 
   constructor(
     readonly metadata: C.M.ContractMetadata,
     readonly contractAddress: Uint8Array,
   ) {
     this.deriveCodec = C.M.DeriveCodec(metadata.V3.types)
+    const [$messageByLabel, $events] = this.#getCodecs()
+    this.$events = $events
+    this.$messageByLabel = $messageByLabel
   }
 
   call<Args extends any[]>(
@@ -143,7 +148,7 @@ class SmartContract {
     args: Args,
   ) {
     const message = this.#getMessageByLabel(messageLabel)!
-    const [$args, $result] = this.#getMessageCodecs(message)
+    const [$args, $result] = this.#getMessageCodecByLabel(messageLabel)
     const data = $args.encode([U.hex.decode(message.selector), ...args])
     const callData = U.hex.encode($contractsApiCallArgs.encode([
       origin,
@@ -159,9 +164,6 @@ class SmartContract {
     )
       .next((encodedResponse) => {
         const response = $contractsApiCallResult.decode(U.hex.decode(encodedResponse))
-        if (message.returnType === null) {
-          return undefined
-        }
         return $result.decode(response.result.data)
       })
   }
@@ -173,7 +175,7 @@ class SmartContract {
     sign: C.Z.$<C.M.Signer>,
   ) {
     const message = this.#getMessageByLabel(messageLabel)!
-    const [$args, _, $events] = this.#getMessageCodecs(message)
+    const [$args, _] = this.#getMessageCodecByLabel(messageLabel)
     const data = $args.encode([U.hex.decode(message.selector), ...args])
     const value = this.#preSubmitContractCallDryRunGasEstimate(origin, data)
       .next(({ gasRequired }) => {
@@ -210,7 +212,7 @@ class SmartContract {
           .filter(
             (e) => e.event?.type === "Contracts" && e.event?.value?.type === "ContractEmitted",
           )
-          .map((e) => $events.decode(e.event?.value.data))
+          .map((e) => this.$events.decode(e.event?.value.data))
         return [finalizedIn, events, contractEvents]
       })
   }
@@ -219,37 +221,6 @@ class SmartContract {
 
   #getMessageByLabel(label: string) {
     return this.metadata.V3.spec.messages.find((c) => c.label === label)
-  }
-
-  #getMessageCodecs(
-    message: C.M.ContractMetadata.Message,
-  ): [C.$.Codec<unknown[]>, C.$.Codec<any>, C.$.Codec<any>] {
-    // TODO: cache on initialization
-    const argCodecs = [
-      // message selector
-      C.$.sizedUint8Array(U.hex.decode(message.selector).length),
-      // message args
-      ...message.args.map((arg) => this.deriveCodec(arg.type.type)),
-    ]
-    // TODO: cache on initialization
-    const $result = message.returnType !== null
-      ? this.deriveCodec(message.returnType.type)
-      : C.$.constant(null)
-    // FIXME: this is not message specific
-    const $events = C.$.taggedUnion(
-      "type",
-      this.metadata.V3.spec.events
-        .map((e) => [
-          e.label,
-          [
-            "value",
-            C.$.tuple(...e.args
-              .map((a) => this.deriveCodec(a.type.type))),
-          ],
-        ]),
-    )
-    // @ts-ignore ...
-    return [C.$.tuple(...argCodecs), $result, $events]
   }
 
   #preSubmitContractCallDryRunGasEstimate(
@@ -271,6 +242,52 @@ class SmartContract {
       .next((encodedResponse) => {
         return $contractsApiCallResult.decode(U.hex.decode(encodedResponse))
       })
+  }
+
+  #getCodecs() {
+    const $messageByLabel = this.metadata.V3.spec.messages.reduce(
+      (acc, message) => {
+        acc[message.label] = this.#getMessageCodecs(message)
+        return acc
+      },
+      {} as Record<string, [argsCodec: C.$.Codec<unknown[]>, resultCodec: C.$.Codec<any>]>,
+    )
+    const $events = C.$.taggedUnion(
+      "type",
+      this.metadata.V3.spec.events
+        .map((e) => [
+          e.label,
+          [
+            "value",
+            C.$.tuple(...e.args
+              .map((a) => this.deriveCodec(a.type.type))),
+          ],
+        ]),
+    )
+    return [$messageByLabel, $events] as [
+      Record<string, [argsCodec: C.$.Codec<unknown[]>, resultCodec: C.$.Codec<any>]>,
+      C.$.Codec<any>,
+    ]
+  }
+
+  #getMessageCodecs(
+    message: C.M.ContractMetadata.Message,
+  ): [argsCodec: C.$.Codec<unknown[]>, resultCodec: C.$.Codec<any>] {
+    const argCodecs = [
+      // message selector
+      C.$.sizedUint8Array(U.hex.decode(message.selector).length),
+      // message args
+      ...message.args.map((arg) => this.deriveCodec(arg.type.type)),
+    ]
+    const $result = message.returnType !== null
+      ? this.deriveCodec(message.returnType.type)
+      : C.$.constant(null)
+    // @ts-ignore ...
+    return [C.$.tuple(...argCodecs), $result]
+  }
+
+  #getMessageCodecByLabel(label: string) {
+    return this.$messageByLabel[label]!
   }
 }
 
