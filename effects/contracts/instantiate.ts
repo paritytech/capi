@@ -57,8 +57,6 @@ export function instantiateGasEstimate<Client_ extends Z.Effect<Client>>(client:
     )
     return state
       .call(client)("ContractsApi_instantiate", key)
-      .next((encodedResponse) => {
-        return $contractsApiInstantiateResult.decode(U.hex.decode(encodedResponse))
-      })
+      .next((result) => $contractsApiInstantiateResult.decode(U.hex.decode(result)))
   }
 }

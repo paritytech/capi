@@ -4,11 +4,6 @@ import * as path from "http://localhost:5646/@local/deps/std/path.ts"
 import * as C from "http://localhost:5646/@local/mod.ts"
 import * as T from "http://localhost:5646/@local/test_util/mod.ts"
 import * as U from "http://localhost:5646/@local/util/mod.ts"
-import {
-  $contractsApiCallArgs,
-  $contractsApiCallResult,
-  ContractMetadata,
-} from "../frame_metadata/Contract.ts"
 
 const configFile = path.join(
   path.dirname(path.fromFileUrl(import.meta.url)),
@@ -72,77 +67,53 @@ const contractAddress = U.throwIfError(
     .run(),
 )
 
-interface MessageCodecs {
-  $args: C.$.Codec<[Uint8Array, ...unknown[]]>
-  $result: C.$.Codec<any>
-}
-
 class Contract<Client extends C.Z.Effect<C.rpc.Client>> {
-  readonly deriveCodec
   readonly $events
-  readonly $messageByLabel
 
   constructor(
     readonly client: Client,
-    readonly metadata: C.M.ContractMetadata,
+    readonly contractMetadata: C.M.ContractMetadata,
     readonly contractAddress: Uint8Array,
   ) {
-    this.deriveCodec = C.M.DeriveCodec(metadata.V3.types)
-    this.$messageByLabel = metadata.V3.spec.messages.reduce<Record<string, MessageCodecs>>(
-      (acc, message) => {
-        acc[message.label] = this.#getMessageCodecs(message)
-        return acc
-      },
-      {},
-    )
+    const deriveCodec = C.M.DeriveCodec(contractMetadata.V3.types)
     this.$events = C.$.taggedUnion(
       "type",
-      metadata.V3.spec.events
+      contractMetadata.V3.spec.events
         .map((e) => [
           e.label,
-          ["value", C.$.tuple(...e.args.map((a) => this.deriveCodec(a.type.type)))],
+          ["value", C.$.tuple(...e.args.map((a) => deriveCodec(a.type.type)))],
         ]),
     )
   }
 
-  query<Args extends any[]>(
-    origin: Uint8Array,
+  call<Args extends any[]>(
+    sender: C.MultiAddress,
     messageLabel: string,
     args: Args,
   ) {
     const message = this.#getMessageByLabel(messageLabel)!
-    const { $result } = this.#getMessageCodecByLabel(messageLabel)
-    return this.#call(origin, message, args).access("result").next((result) =>
-      $result.decode(result.data)
-    )
+    return C.contracts.call(client)({
+      sender,
+      contractAddress: this.contractAddress,
+      contractMetadata: this.contractMetadata,
+      message,
+      args,
+    })
   }
 
-  tx<Args extends unknown[]>(
-    origin: Uint8Array,
+  callTx<Args extends unknown[]>(
+    sender: C.MultiAddress,
     messageLabel: string,
     args: Args,
     sign: C.Z.$<C.M.Signer>,
   ) {
     const message = this.#getMessageByLabel(messageLabel)!
-    const { $args } = this.#getMessageCodecByLabel(messageLabel)
-    const data = $args.encode([U.hex.decode(message.selector), ...args])
-    const gasRequired = this.#call(origin, message, args).access("gasRequired")
-    const value = gasRequired.next((gasRequired) => {
-      return {
-        type: "call",
-        dest: C.MultiAddress.Id(this.contractAddress),
-        value: 0n,
-        data,
-        gasLimit: gasRequired,
-        storageDepositLimit: undefined,
-      }
-    })
-    const tx = C.extrinsic(client)({
-      sender: C.MultiAddress.Id(origin),
-      call: C.Z.rec({
-        type: "Contracts",
-        value,
-      }),
+    const tx = C.contracts.callTx(client)({
+      sender,
+      contractAddress: this.contractAddress,
+      contractMetadata: this.contractMetadata,
+      message,
+      args,
     })
       .signed(sign)
     const finalizedIn = tx.watch(({ end }) =>
@@ -155,7 +126,6 @@ class Contract<Client extends C.Z.Effect<C.rpc.Client>> {
         return
       }
     )
-    // FIXME: extract into a contract effect util
     return C.Z.ls(finalizedIn, C.events(tx, finalizedIn))
       .next(([finalizedIn, events]) => {
         const contractEvents: any[] = events
@@ -167,48 +137,10 @@ class Contract<Client extends C.Z.Effect<C.rpc.Client>> {
       })
   }
 
-  #call<Args extends any[]>(
-    origin: Uint8Array,
-    message: ContractMetadata.Message,
-    args: Args,
-  ) {
-    const { $args } = this.#getMessageCodecByLabel(message.label)
-    const data = $args.encode([U.hex.decode(message.selector), ...args])
-    const callData = U.hex.encode($contractsApiCallArgs.encode([
-      origin,
-      this.contractAddress,
-      0n,
-      undefined,
-      undefined,
-      data,
-    ]))
-    return C.state
-      .call(client)("ContractsApi_call", callData)
-      .next((encodedResponse) => $contractsApiCallResult.decode(U.hex.decode(encodedResponse)))
-  }
-
   // TODO: codegen each contract message as a method
 
   #getMessageByLabel(label: string) {
-    return this.metadata.V3.spec.messages.find((c) => c.label === label)
-  }
-
-  #getMessageCodecs(message: C.M.ContractMetadata.Message): MessageCodecs {
-    return {
-      $args: C.$.tuple(
-        // message selector
-        C.$.sizedUint8Array(U.hex.decode(message.selector).length),
-        // message args
-        ...message.args.map((arg) => this.deriveCodec(arg.type.type)),
-      ),
-      $result: message.returnType !== null
-        ? this.deriveCodec(message.returnType.type)
-        : C.$.constant(null),
-    }
-  }
-
-  #getMessageCodecByLabel(label: string) {
-    return this.$messageByLabel[label]!
+    return this.contractMetadata.V3.spec.messages.find((c) => c.label === label)
   }
 }
 
@@ -216,40 +148,44 @@ const prefix = U.throwIfError(await C.const(client)("System", "SS58Prefix").acce
 console.log("Deployed Contract address", U.ss58.encode(prefix, contractAddress))
 
 const flipperContract = new Contract(T.polkadot, metadata, contractAddress)
-console.log(".get", await flipperContract.query(T.alice.publicKey, "get", []).run())
+console.log(".get", await flipperContract.call(T.alice.address, "get", []).run())
 console.log(
   "block hash and events",
-  U.throwIfError(await flipperContract.tx(T.alice.publicKey, "flip", [], T.alice.sign).run())[0],
+  U.throwIfError(
+    await flipperContract.callTx(T.alice.address, "flip", [], T.alice.sign).run(),
+  )[0],
 )
-console.log(".get", await flipperContract.query(T.alice.publicKey, "get", []).run())
-console.log(".get_count", await flipperContract.query(T.alice.publicKey, "get_count", []).run())
+console.log(".get", await flipperContract.call(T.alice.address, "get", []).run())
+console.log(".get_count", await flipperContract.call(T.alice.address, "get_count", []).run())
 console.log(
   ".inc block hash",
-  U.throwIfError(await flipperContract.tx(T.alice.publicKey, "inc", [], T.alice.sign).run())[0],
+  U.throwIfError(await flipperContract.callTx(T.alice.address, "inc", [], T.alice.sign).run())[0],
 )
 console.log(
   ".inc block hash",
-  U.throwIfError(await flipperContract.tx(T.alice.publicKey, "inc", [], T.alice.sign).run())[0],
+  U.throwIfError(await flipperContract.callTx(T.alice.address, "inc", [], T.alice.sign).run())[0],
 )
-console.log(".get_count", await flipperContract.query(T.alice.publicKey, "get_count", []).run())
+console.log(".get_count", await flipperContract.call(T.alice.address, "get_count", []).run())
 console.log(
   ".inc_by(3) block hash",
-  U.throwIfError(await flipperContract.tx(T.alice.publicKey, "inc_by", [3], T.alice.sign).run())[0],
+  U.throwIfError(
+    await flipperContract.callTx(T.alice.address, "inc_by", [3], T.alice.sign).run(),
+  )[0],
 )
-console.log(".get_count", await flipperContract.query(T.alice.publicKey, "get_count", []).run())
+console.log(".get_count", await flipperContract.call(T.alice.address, "get_count", []).run())
 console.log(
   ".inc_by_with_event(3) contract events",
   U.throwIfError(
-    await flipperContract.tx(T.alice.publicKey, "inc_by_with_event", [3], T.alice.sign).run(),
+    await flipperContract.callTx(T.alice.address, "inc_by_with_event", [3], T.alice.sign).run(),
   )[2],
 )
 console.log(
   ".method_returning_tuple(2,true)",
-  await flipperContract.query(T.alice.publicKey, "method_returning_tuple", [2, true]).run(),
+  await flipperContract.call(T.alice.address, "method_returning_tuple", [2, true]).run(),
 )
 console.log(
   ".method_returning_struct(3,false)",
-  await flipperContract.query(T.alice.publicKey, "method_returning_struct", [3, false]).run(),
+  await flipperContract.call(T.alice.address, "method_returning_struct", [3, false]).run(),
 )
 
 await zombienet.close()
