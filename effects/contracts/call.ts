@@ -29,9 +29,9 @@ export function call<Client_ extends Z.Effect<Client>>(client: Client_) {
       args,
     } = _props as Z.Rec$Access<Props>
     const $message_ = $message(contractMetadata, message)
-    const data = Z.ls($message_, message, args).next(([{ $args }, message, args]) => {
-      return $args.encode([U.hex.decode(message.selector), ...args])
-    })
+    const data = Z.ls($message_, message, args).next(([{ $args }, { selector }, args]) =>
+      $args.encode([U.hex.decode(selector), ...args])
+    )
     return Z.ls(
       stateContractsApiCall(client)({
         sender,
@@ -40,9 +40,7 @@ export function call<Client_ extends Z.Effect<Client>>(client: Client_) {
       }),
       $message_,
     )
-      .next(([result, { $result }]) => {
-        return $result.decode(result.result.data)
-      })
+      .next(([{ result: { data } }, { $result }]) => $result.decode(data))
   }
 }
 
@@ -66,9 +64,9 @@ export function callTx<Client_ extends Z.Effect<Client>>(client: Client_) {
       args,
     } = _props as Z.Rec$Access<Props>
     const $message_ = $message(contractMetadata, message)
-    const data = Z.ls($message_, message, args).next(([{ $args }, message, args]) => {
-      return $args.encode([U.hex.decode(message.selector), ...args])
-    })
+    const data = Z.ls($message_, message, args).next(([{ $args }, { selector }, args]) =>
+      $args.encode([U.hex.decode(selector), ...args])
+    )
     const txValue = Z.ls(
       stateContractsApiCall(client)({
         sender,
@@ -80,8 +78,8 @@ export function callTx<Client_ extends Z.Effect<Client>>(client: Client_) {
       value,
       data,
     )
-      .next(([{ gasRequired }, contractAddress, value, data]) => {
-        return {
+      .next(([{ gasRequired }, contractAddress, value, data]) => (
+        {
           type: "call",
           dest: MultiAddress.Id(contractAddress),
           value: value ?? 0n,
@@ -89,7 +87,7 @@ export function callTx<Client_ extends Z.Effect<Client>>(client: Client_) {
           gasLimit: gasRequired,
           storageDepositLimit: undefined,
         }
-      })
+      ))
     return extrinsic(client)({
       sender,
       call: Z.rec({ type: "Contracts", value: txValue }),
@@ -107,16 +105,15 @@ export interface ContractsApiCallProps {
 export function stateContractsApiCall<Client_ extends Z.Effect<Client>>(client: Client_) {
   return <Props extends Z.Rec$<ContractsApiCallProps>>(_props: Props) => {
     const key = Z.rec(_props as Z.Rec$Access<Props>).next(
-      ({ sender, contractAddress, value, data }) => {
-        return U.hex.encode($contractsApiCallArgs.encode([
+      ({ sender, contractAddress, value, data }) =>
+        U.hex.encode($contractsApiCallArgs.encode([
           sender.value!, // TODO: grab public key in cases where we're not accepting multi?
           contractAddress,
           value ?? 0n,
           undefined,
           undefined,
           data,
-        ]))
-      },
+        ])),
     )
     return state
       .call(client)("ContractsApi_call", key)

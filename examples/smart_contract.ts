@@ -68,23 +68,11 @@ const contractAddress = U.throwIfError(
 )
 
 class Contract<Client extends C.Z.Effect<C.rpc.Client>> {
-  readonly $events
-
   constructor(
     readonly client: Client,
     readonly contractMetadata: C.M.ContractMetadata,
     readonly contractAddress: Uint8Array,
-  ) {
-    const deriveCodec = C.M.DeriveCodec(contractMetadata.V3.types)
-    this.$events = C.$.taggedUnion(
-      "type",
-      contractMetadata.V3.spec.events
-        .map((e) => [
-          e.label,
-          ["value", C.$.tuple(...e.args.map((a) => deriveCodec(a.type.type)))],
-        ]),
-    )
-  }
+  ) {}
 
   call<Args extends any[]>(
     sender: C.MultiAddress,
@@ -126,15 +114,9 @@ class Contract<Client extends C.Z.Effect<C.rpc.Client>> {
         return
       }
     )
-    return C.Z.ls(finalizedIn, C.events(tx, finalizedIn))
-      .next(([finalizedIn, events]) => {
-        const contractEvents: any[] = events
-          .filter((e) =>
-            e.event?.type === "Contracts" && e.event?.value?.type === "ContractEmitted"
-          )
-          .map((e) => this.$events.decode(e.event?.value.data))
-        return [finalizedIn, events, contractEvents]
-      })
+    const events = C.events(tx, finalizedIn)
+    const contractEvents = C.contracts.events(this.contractMetadata, events)
+    return C.Z.ls(finalizedIn, events, contractEvents)
   }
 
   // TODO: codegen each contract message as a method
