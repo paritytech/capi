@@ -2,7 +2,7 @@ ARG DENO_VERSION=1.29.1
 
 FROM denoland/deno:${DENO_VERSION} as vscode
 
-ARG POLKADOT_VERSION=v0.9.25
+ARG POLKADOT_VERSION=v0.9.31
 
 RUN export DEBIAN_FRONTEND=noninteractive \
   && apt-get update \
