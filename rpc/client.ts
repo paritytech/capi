@@ -52,7 +52,7 @@ export class Client<
         this.activeSubscriptions[id]!(e)
         delete this.activeSubscriptions[id]
       }
-    } else if (typeof e.id === "number") {
+    } else if (e.id !== undefined) {
       const pendingCall = this.pendingCalls[e.id]
       pendingCall?.resolve(e)
       delete this.pendingCalls[e.id]
