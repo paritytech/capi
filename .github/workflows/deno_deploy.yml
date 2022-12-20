@@ -1,4 +1,6 @@
 name: Deno Deploy
+# Omitting pull requests here is intentional because it could be used as an
+# attack vector from an outside source
 on: push
 jobs:
   deploy:

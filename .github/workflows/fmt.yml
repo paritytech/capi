@@ -1,5 +1,7 @@
 name: Check Formatting
-on: push
+on:
+  - pull_request
+  - push
 jobs:
   check:
     name: Check Formatting
