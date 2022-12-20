@@ -1,6 +1,8 @@
 import * as C from "../mod.ts"
 import * as U from "../util/mod.ts"
 
+export * from "./Contract.ts"
+
 export class Storage<C extends C.Z.$<C.rpc.Client>, K extends unknown[], V> {
   constructor(
     readonly client: C,
