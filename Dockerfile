@@ -1,4 +1,4 @@
-ARG DENO_VERSION=1.25.2
+ARG DENO_VERSION=1.29.1
 
 FROM denoland/deno:${DENO_VERSION} as vscode
 
