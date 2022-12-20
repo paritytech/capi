@@ -17,6 +17,10 @@ RUN export DEBIAN_FRONTEND=noninteractive \
   && apt-get clean -y \
   && rm -rf /var/lib/apt/lists/*
 
+FROM vscode as dev
+RUN export DEBIAN_FRONTEND=noninteractive \
+  && apt-get update \
+  && apt-get install -y zsh
 
 FROM vscode as gitpod
 
