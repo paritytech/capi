@@ -70,7 +70,7 @@ const contractAddress = U.throwIfError(
 const prefix = U.throwIfError(await C.const(client)("System", "SS58Prefix").access("value").run())
 console.log("Deployed Contract address", U.ss58.encode(prefix, contractAddress))
 
-const flipperContract = new C.fluent.Contract(C.polkadot, metadata, contractAddress)
+const flipperContract = new C.fluent.Contract(client, metadata, contractAddress)
 console.log(
   ".get",
   await flipperContract.call({
