@@ -13,11 +13,11 @@ labels: bug
 
 <!-- TODO -->
 
-### Expected Behavior**
+### Expected Behavior
 
 <!-- TODO -->
 
-### Steps To Reproduce**
+### Steps To Reproduce
 
 <!--
 Example:
