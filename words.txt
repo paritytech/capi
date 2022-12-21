@@ -98,7 +98,6 @@ ltex
 Lxkf
 mathchain
 matklad
-mdbook
 merkle
 micnncim
 monomorphization

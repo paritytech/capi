@@ -32,12 +32,12 @@ export class LocalCapiCodegenServer extends CapiCodegenServer {
     throw new Error("Could not detect version from url " + url)
   }
 
-  async defaultVersion() {
-    return this.mainVersion
+  defaultVersion() {
+    return Promise.resolve(this.mainVersion)
   }
 
   deploymentUrlMemo = new PermanentMemo<string, string>()
-  async deploymentUrl(version: string) {
+  deploymentUrl(version: string) {
     return this.deploymentUrlMemo.run(version, async () => {
       const mod = await import(await this.moduleFileUrl(version, "/codegen/server/local.ts"))
       const Server = mod.LocalCapiCodegenServer as typeof LocalCapiCodegenServer
