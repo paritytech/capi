@@ -54,16 +54,8 @@ import { $, C, client } from "../capi.ts"
           makeDocComment(entry.docs)
             + `export const ${entry.name} = new C.fluent.Storage(${[
               "client",
-              S.string(entry.type),
-              S.string(entry.modifier),
               S.string(pallet.name),
               S.string(entry.name),
-              entry.type === "Map"
-                ? entry.hashers.length === 1
-                  ? `$.tuple(${getRawCodecPath(entry.key)})`
-                  : getRawCodecPath(entry.key)
-                : "$.tuple()",
-              getRawCodecPath(entry.value),
             ]})`,
         )
       }

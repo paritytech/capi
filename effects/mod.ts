@@ -1,6 +1,7 @@
 export * from "./blockWatch.ts"
 export * from "./const.ts"
 export * from "./entryRead.ts"
+export * from "./entryReadRaw.ts"
 export * from "./entryWatch.ts"
 export * from "./events.ts"
 export * from "./extrinsic.ts"
