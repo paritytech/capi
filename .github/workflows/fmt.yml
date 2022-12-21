@@ -1,7 +1,9 @@
 name: Check Formatting
 on:
-  - pull_request
-  - push
+  pull_request:
+  push:
+    branches:
+      - main
 jobs:
   check:
     name: Check Formatting
