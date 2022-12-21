@@ -80,10 +80,10 @@ export class FsCache extends Cache {
 
 export class InMemoryCache extends Cache {
   memo = new PermanentMemo<string, Uint8Array>()
-  async _getRaw(key: string, init: () => Promise<Uint8Array>): Promise<Uint8Array> {
-    return this.memo.run(key, init)
+  _getRaw(key: string, init: () => Promise<Uint8Array>): Promise<Uint8Array> {
+    return Promise.resolve(this.memo.run(key, init))
   }
-  async _list(): Promise<string[]> {
+  _list(): Promise<string[]> {
     throw new Error("unimplemented")
   }
 }
