@@ -8,6 +8,8 @@
     "useUnknownInCatchVariables": true
   },
   "importMap": "import_map.json",
+  "include": ["."],
+  "lock": false,
   "lint": {
     "files": {
       "exclude": ["target", "codegen/_output"],
@@ -26,21 +28,20 @@
       "tags": ["recommended"]
     }
   },
-  "include": ["."],
   "tasks": {
-    "run": "deno run -A --no-lock",
+    "run": "deno run -A",
     "run:browser": "deno task run test_util/ctx.ts -- deno task run _tasks/run_browser.ts",
     "debug": "deno task run --inspect-brk",
     "download:frame_metadata": "deno task run _tasks/download_frame_metadata.ts",
     "udd": "deno task star && deno task run https://deno.land/x/udd@0.5.0/main.ts target/star.ts",
     "dnt": "deno task run _tasks/dnt.ts",
-    "star": "deno task run _tasks/star.ts && deno cache --check --no-lock target/star.ts",
+    "star": "deno task run _tasks/star.ts && deno cache --check target/star.ts",
     "lint": "deno lint",
-    "codegen": "deno task run cache.ts --no-lock examples/mod.ts",
-    "test": "deno task run test_util/ctx.ts -- deno test -A --no-lock -L=info --ignore=target --parallel",
+    "codegen": "deno task run cache.ts examples/mod.ts",
+    "test": "deno task run test_util/ctx.ts -- deno test -A -L=info --ignore=target --parallel",
     "test:update": "deno task test -- -- --update",
     "mdbook:watch": "mdbook watch -o",
-    "bench": "deno bench -A --no-lock",
+    "bench": "deno bench -A",
     "moderate": "deno task run https://deno.land/x/moderate@0.0.5/mod.ts && dprint fmt",
     "polkagen": "deno task run codegen.ts -d=polkadot -o=target/polkagen --import=../../mod.ts"
   }
