@@ -2,9 +2,10 @@ import { assertEquals } from "../deps/std/testing/asserts.ts"
 import * as T from "../test_util/mod.ts"
 import * as U from "../util/mod.ts"
 import { ChainError } from "./Codec.ts"
-import { ContractMetadata } from "./Contract.ts"
-import { getPalletAndEntry } from "./Metadata.ts"
-import { setup } from "./test-common.ts"
+import * as frame from "./frame/mod.ts"
+import * as ink from "./ink/mod.ts"
+
+const polkadot = new URL("./frame/_downloaded", import.meta.url).pathname
 
 Deno.test("Derive all", async () => {
   const [metadata, deriveCodec] = await setup("polkadot")
@@ -43,7 +44,7 @@ Deno.test("Derive AccountInfo Codec", async () => {
 Deno.test("Derive Auctions AuctionInfo Storage Entry Codec", async () => {
   const [metadata, deriveCodec] = await setup("polkadot")
   const auctionInfoStorageEntry =
-    U.throwIfError(getPalletAndEntry(metadata, "Auctions", "AuctionInfo"))[1]
+    U.throwIfError(frame.getPalletAndEntry(metadata, "Auctions", "AuctionInfo"))[1]
   const codec = deriveCodec(auctionInfoStorageEntry.value)
   const decoded = [8, 9945400]
   const encoded = codec.encode(decoded)
@@ -53,7 +54,7 @@ Deno.test("Derive Auctions AuctionInfo Storage Entry Codec", async () => {
 Deno.test("Derive Auction Winning Storage Entry Codec", async () => {
   const [metadata, deriveCodec] = await setup("polkadot")
   const auctionWinningStorageEntry =
-    U.throwIfError(getPalletAndEntry(metadata, "Auctions", "Winning"))[1]
+    U.throwIfError(frame.getPalletAndEntry(metadata, "Auctions", "Winning"))[1]
   const codec = deriveCodec(auctionWinningStorageEntry.value)
   const decoded = [
     ...Array(7).fill(undefined),
@@ -99,7 +100,7 @@ Deno.test("Derive Result codec", async () => {
 Deno.test("Smart Contract codecs", async () => {
   const [_, deriveCodec] = await setup("polkadot")
   const raw = await Deno.readTextFile("frame_metadata/raw_erc20_metadata.json")
-  const normalized = ContractMetadata.normalize(JSON.parse(raw))
+  const normalized = ink.normalize(JSON.parse(raw))
   for (const ty of normalized.V3.types) {
     deriveCodec(ty.id)
   }

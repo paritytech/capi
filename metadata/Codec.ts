@@ -1,10 +1,10 @@
 import * as $ from "../deps/scale.ts"
 import { normalizeCase } from "../util/case.ts"
-import { $era } from "./Era.ts"
-import type * as M from "./mod.ts"
+import { $era } from "./primitives/mod.ts"
+import { Ty } from "./Ty.ts"
 import { TyVisitor } from "./TyVisitor.ts"
 
-export type DeriveCodec = (typeI: number | M.Ty) => $.Codec<unknown>
+export type DeriveCodec = (typeI: number | Ty) => $.Codec<unknown>
 
 /**
  * All derived codecs for ZSTs will use this exact codec,
@@ -13,7 +13,7 @@ export type DeriveCodec = (typeI: number | M.Ty) => $.Codec<unknown>
 export const $null = $.constant(null)
 
 // TODO: tuple/array element skip optimization
-export function DeriveCodec(tys: M.Ty[]): DeriveCodec {
+export function DeriveCodec(tys: Ty[]): DeriveCodec {
   const visitor = new TyVisitor<$.Codec<any>>(tys, {
     unitStruct() {
       return $null

@@ -8,7 +8,7 @@ import {
   TupleTyDef,
   Ty,
   UnionTyDef,
-} from "./scale_info.ts"
+} from "./Ty.ts"
 
 export interface TyVisitorMethods<T> {
   unitStruct(ty: Ty & (StructTyDef | TupleTyDef)): T

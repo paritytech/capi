@@ -1,7 +1,6 @@
 import { _format } from "https://deno.land/std@0.158.0/path/_util.ts"
-import { assertSnapshot } from "../deps/std/testing/snapshot.ts"
-import { Metadata } from "./Metadata.ts"
-import { setup } from "./test-common.ts"
+import { assertSnapshot } from "../../deps/std/testing/snapshot.ts"
+import { Metadata } from "./mod.ts"
 
 const kInspect = Symbol.for("Deno.customInspect")
 

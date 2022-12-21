@@ -1,6 +1,12 @@
-import * as $ from "../deps/scale.ts"
+import * as $ from "../../deps/scale.ts"
 
-export type Era = { type: "Immortal" } | { type: "Mortal"; period: bigint; phase: bigint }
+export type Era =
+  | { type: "Immortal" }
+  | {
+    type: "Mortal"
+    period: bigint
+    phase: bigint
+  }
 
 export namespace era {
   export const immortal: Era = { type: "Immortal" }

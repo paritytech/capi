@@ -1,11 +1,9 @@
-import * as $ from "../deps/scale.ts"
-import { assert } from "../deps/std/testing/asserts.ts"
-import { hashers, Hex, hex, ss58 } from "../util/mod.ts"
-import { $null, DeriveCodec } from "./Codec.ts"
+import * as $ from "../../deps/scale.ts"
+import { assert } from "../../deps/std/testing/asserts.ts"
+import { hashers, Hex, hex, ss58 } from "../../util/mod.ts"
+import { $null, DeriveCodec } from "../Codec.ts"
+import { $multiAddress, $multiSignature, MultiAddress, MultiSignature } from "../primitives/mod.ts"
 import { Metadata } from "./Metadata.ts"
-
-// TODO: revisit
-import { $multiAddress, $multiSignature, MultiAddress, MultiSignature } from "./primitives.ts"
 
 export type Signer =
   | ((message: Uint8Array) => MultiSignature | Promise<MultiSignature>)
@@ -14,9 +12,9 @@ export interface PolkadotSigner {
   signPayload(payload: any): Promise<{ signature: string }>
 }
 
+// TODO: make generic over chain
 export interface Extrinsic {
   protocolVersion: number
-  // TODO: make generic over chain
   signature?:
     & {
       address: MultiAddress
