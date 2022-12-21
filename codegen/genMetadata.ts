@@ -1,17 +1,18 @@
-import * as M from "../frame_metadata/mod.ts"
+import { Metadata } from "../frame_metadata/mod.ts"
 import { hex } from "../mod.ts"
+import { Ty, TyVisitor, UnionTyDef } from "../reflection/mod.ts"
 import { normalizeCase } from "../util/case.ts"
 import { Files } from "./Files.ts"
 import { getRawCodecPath, makeDocComment, S } from "./utils.ts"
 
 export function genMetadata(
-  metadata: M.Metadata,
-  typeVisitor: M.TyVisitor<string>,
+  metadata: Metadata,
+  typeVisitor: TyVisitor<string>,
   files: Files,
 ) {
   const { tys, extrinsic, pallets } = metadata
 
-  const isUnitVisitor = new M.TyVisitor<boolean>(tys, {
+  const isUnitVisitor = new TyVisitor<boolean>(tys, {
     unitStruct: () => true,
     wrapperStruct(_, inner) {
       return this.visit(inner)
@@ -68,7 +69,7 @@ import { $, C, client } from "../capi.ts"
         )
       }
       if (pallet.calls) {
-        const ty = pallet.calls as M.Ty & M.UnionTyDef
+        const ty = pallet.calls as Ty & UnionTyDef
         const isStringUnion = ty.members.every((x) => !x.fields.length)
         for (const call of ty.members) {
           const type = normalizeCase(call.name)
@@ -130,7 +131,7 @@ const _extrinsic = ${
 export const extrinsic = C.extrinsic<typeof client, ${typeVisitor.visit(callTy!)}>(client);
 `)
 
-  function getExtrasCodec(xs: [string, M.Ty][]) {
+  function getExtrasCodec(xs: [string, Ty][]) {
     return S.array(
       xs.filter((x) => !isUnitVisitor.visit(x[1])).map((x) => getRawCodecPath(x[1])),
     )

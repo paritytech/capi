@@ -1,4 +1,4 @@
-import * as M from "../frame_metadata/mod.ts"
+import { Ty } from "../reflection/mod.ts"
 
 export namespace S {
   export function array(items: string[]): string {
@@ -22,6 +22,6 @@ export function makeDocComment(docs: string[] = []) {
   return `/**\n  * ${docs.join("\n  * ")}\n  */\n`
 }
 
-export function getRawCodecPath(ty: M.Ty) {
+export function getRawCodecPath(ty: Ty) {
   return `codecs.$${ty.id}`
 }
