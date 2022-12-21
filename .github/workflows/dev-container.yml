@@ -1,0 +1,13 @@
+name: Dev Container Builds
+on:
+  - pull_request
+  - push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (GitHub)
+        uses: actions/checkout@v2
+
+      - name: Build and run Dev Container task
+        uses: devcontainers/ci@v0.2
