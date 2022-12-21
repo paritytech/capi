@@ -9,5 +9,5 @@ export {
 export * as extrinsic from "./extrinsic.ts"
 export * from "./local.ts"
 export * from "./pairs.ts"
-export * from "./sr25519.ts"
+export * from "./Sr25519.ts"
 export * as zombienet from "./zombienet.ts"
