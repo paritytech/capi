@@ -1,7 +1,9 @@
 name: Spellcheck
 on:
-  - pull_request
-  - push
+  pull_request:
+  push:
+    branches:
+      - main
 jobs:
   spellcheck:
     runs-on: ubuntu-latest

@@ -1,8 +1,10 @@
 name: Spawn Examples
 on:
-  - workflow_dispatch
-  - push
-  - pull_request
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
 jobs:
   generate_example_paths:
     name: Generate example paths
