@@ -1,7 +1,8 @@
 import { unimplemented } from "../deps/std/testing/asserts.ts"
 import * as Z from "../deps/zones.ts"
-import * as M from "../frame_metadata/mod.ts"
-import { era, MultiAddress } from "../primitives/mod.ts"
+import { Signer } from "../frame_metadata/mod.ts"
+import { MultiAddress } from "../primitives/mod.ts"
+import { era } from "../reflection/mod.ts"
 import * as rpc from "../rpc/mod.ts"
 import * as U from "../util/mod.ts"
 import { const as const_ } from "./const.ts"
@@ -35,7 +36,7 @@ export class Extrinsic<
     readonly props: Props,
   ) {}
 
-  signed<Sign extends Z.$<M.Signer>>(sign: Sign): SignedExtrinsic<Client, Props, Sign> {
+  signed<Sign extends Z.$<Signer>>(sign: Sign): SignedExtrinsic<Client, Props, Sign> {
     return new SignedExtrinsic(this.client, this.props, sign)
   }
 
@@ -61,7 +62,7 @@ export class Extrinsic<
 export class SignedExtrinsic<
   Client extends Z.$<rpc.Client> = Z.$<rpc.Client>,
   Props extends Z.Rec$<ExtrinsicProps> = Z.Rec$<ExtrinsicProps>,
-  Sign extends Z.$<M.Signer> = Z.$<M.Signer>,
+  Sign extends Z.$<Signer> = Z.$<Signer>,
 > {
   client
   props
@@ -152,7 +153,7 @@ export function extrinsicsDecoded<Client extends Z.$<rpc.Client>>(client: Client
 
 function $extrinsic<
   Client extends Z.$<rpc.Client> = Z.$<rpc.Client>,
-  Rest extends [sign?: Z.$<M.Signer>] = [sign?: Z.$<M.Signer>],
+  Rest extends [sign?: Z.$<Signer>] = [sign?: Z.$<Signer>],
 >(client: Client, ...[sign]: Rest) {
   const metadata_ = metadata(client)()
   const deriveCodec_ = scale.deriveCodec(metadata_)

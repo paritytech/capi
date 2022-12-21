@@ -1,6 +1,14 @@
 import * as $ from "../deps/scale.ts"
 import { $null } from "../reflection/Codec.ts"
 
+export const $multiAddress: $.Codec<MultiAddress> = $.taggedUnion("type", {
+  0: ["Id", ["value", $.sizedUint8Array(32)]],
+  1: ["Index", ["value", $null]],
+  2: ["Raw", ["value", $.uint8Array]],
+  3: ["Address32", ["value", $.sizedUint8Array(32)]],
+  4: ["Address20", ["value", $.sizedUint8Array(20)]],
+})
+
 export type MultiAddress =
   | MultiAddress.Id
   | MultiAddress.Index
@@ -54,11 +62,3 @@ export namespace MultiAddress {
     return { type: "Address20", value }
   }
 }
-
-export const $multiAddress: $.Codec<MultiAddress> = $.taggedUnion("type", {
-  0: ["Id", ["value", $.sizedUint8Array(32)]],
-  1: ["Index", ["value", $null]],
-  2: ["Raw", ["value", $.uint8Array]],
-  3: ["Address32", ["value", $.sizedUint8Array(32)]],
-  4: ["Address20", ["value", $.sizedUint8Array(20)]],
-})

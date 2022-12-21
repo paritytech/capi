@@ -1,37 +1,12 @@
 import { assertSnapshot } from "../deps/std/testing/snapshot.ts"
-import { $metadata, Metadata } from "./mod.ts"
-
-const kInspect = Symbol.for("Deno.customInspect")
-
-export const downloadedMetadata: {
-  acala: Metadata
-  kusama: Metadata
-  moonbeam: Metadata
-  polkadot: Metadata
-  statemint: Metadata
-  subsocial: Metadata
-  westend: Metadata
-} = {
-  acala: null!,
-  kusama: null!,
-  moonbeam: null!,
-  polkadot: null!,
-  statemint: null!,
-  subsocial: null!,
-  westend: null!,
-}
-
-for (const name in downloadedMetadata) {
-  Deno.test(`Loads downloaded ${name} metadata`, async () => {
-    downloadedMetadata[name as keyof typeof downloadedMetadata] = $metadata.decode(
-      (await Deno.readFile(new URL(`${name}.scale`, "frame_metadata/_download"))).slice(2),
-    )
-  })
-}
+import { downloadedMetadata } from "./_downloaded.ts"
+import { Metadata } from "./mod.ts"
 
 for (const [name, metadata] of Object.entries(downloadedMetadata)) {
   Deno.test(name, (t) => assertSnapshot(t, serializeMetadata(metadata)))
 }
+
+const kInspect = Symbol.for("Deno.customInspect")
 
 // Logging the metadata directly yields a finite but pathologically large string.
 // This inspect logic shows the expanded form of types only in the top level of the tys array.

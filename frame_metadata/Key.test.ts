@@ -2,8 +2,8 @@ import { assertEquals } from "../deps/std/testing/asserts.ts"
 import { DeriveCodec } from "../reflection/Codec.ts"
 import * as T from "../test_util/mod.ts"
 import * as U from "../util/mod.ts"
+import { downloadedMetadata } from "./_downloaded.ts"
 import { $storageKey } from "./Key.ts"
-import { downloadedMetadata } from "./Metadata.test.ts"
 import { getPalletAndEntry } from "./Metadata.ts"
 
 const metadata = downloadedMetadata.polkadot
