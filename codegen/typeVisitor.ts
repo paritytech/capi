@@ -201,13 +201,12 @@ export function createTypeVisitor(props: CodegenProps, files: Files) {
     const name = path.slice(path.lastIndexOf(".") + 1)
     const docs = makeDocComment(ty.docs)
 
-    const fallback = (key: keyof M.TyVisitorMethods<string>) =>
-      (...args: any) => {
-        return `\
+    const fallback = (key: keyof M.TyVisitorMethods<string>) => (...args: any) => {
+      return `\
 ${docs}
 export type ${name} = ${(visitor[key] as any)!(...args)}
 `
-      }
+    }
 
     const codec = ty.type === "Compact" ? "" : `\
 export const $${name[0]!.toLowerCase()}${name.slice(1)}: $.Codec<${

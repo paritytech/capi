@@ -14,17 +14,15 @@ const tx = extrinsic({
 })
   .signed(T.alice.sign)
 
-const finalizedIn = tx.watch(({ end }) =>
-  (status) => {
-    console.log(status)
-    if (typeof status !== "string" && status.finalized) {
-      return end(status.finalized)
-    } else if (C.rpc.known.TransactionStatus.isTerminal(status)) {
-      return end(new NeverFinalized())
-    }
-    return
+const finalizedIn = tx.watch(({ end }) => (status) => {
+  console.log(status)
+  if (typeof status !== "string" && status.finalized) {
+    return end(status.finalized)
+  } else if (C.rpc.known.TransactionStatus.isTerminal(status)) {
+    return end(new NeverFinalized())
   }
-)
+  return
+})
 
 console.log(U.throwIfError(await C.events(tx, finalizedIn).run()))
 

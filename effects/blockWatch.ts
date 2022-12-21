@@ -12,18 +12,17 @@ export function blockWatch<Client extends Z.$<rpc.Client>>(client: Client) {
   >(createListener: CreateListener) => {
     const createListenerMapped = Z
       .ls(createListener, Z.env)
-      .next(([createListener, env]) =>
-        (ctx: rpc.ClientSubscriptionContext) => {
-          const inner = createListener({ ...ctx, env })
-          return async (header: rpc.known.Header) => {
-            const blockHash = chain.getBlockHash(client)(header.number)
-            const block = await chain.getBlock(client)(blockHash).bind(env)()
-            if (block instanceof Error) {
-              return ctx.end(block)
-            }
-            return inner(block) as U.InnerEnd<Z.T<CreateListener>>
+      .next(([createListener, env]) => (ctx: rpc.ClientSubscriptionContext) => {
+        const inner = createListener({ ...ctx, env })
+        return async (header: rpc.known.Header) => {
+          const blockHash = chain.getBlockHash(client)(header.number)
+          const block = await chain.getBlock(client)(blockHash).bind(env)()
+          if (block instanceof Error) {
+            return ctx.end(block)
           }
-        }, k0_)
+          return inner(block) as U.InnerEnd<Z.T<CreateListener>>
+        }
+      }, k0_)
     return chain.subscribeNewHeads(client)([], createListenerMapped)
   }
 }

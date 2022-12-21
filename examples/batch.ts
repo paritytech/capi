@@ -28,14 +28,12 @@ const tx = extrinsic({
   }),
 })
   .signed(T.alice.sign)
-  .watch((ctx) =>
-    (status) => {
-      console.log(status)
-      if (C.rpc.known.TransactionStatus.isTerminal(status)) {
-        return ctx.end()
-      }
-      return
+  .watch((ctx) => (status) => {
+    console.log(status)
+    if (C.rpc.known.TransactionStatus.isTerminal(status)) {
+      return ctx.end()
     }
-  )
+    return
+  })
 
 U.throwIfError(await tx.run())

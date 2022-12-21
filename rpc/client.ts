@@ -86,64 +86,64 @@ export class Client<
     Params extends unknown[] = any[],
     NotificationData = any,
   >(): SubscriptionFactory<Params, NotificationData, SendErrorData, HandlerErrorData> =>
-    (
-      subscribeMethod,
-      unsubscribeMethod,
-      params,
-      createListener,
-    ) => {
-      const id = this.providerRef.nextId()
-      const waiter = deferred<any>() // TODO: type this narrowly
-      const stop = async (value?: unknown) => {
-        delete this.pendingSubscriptions[id]
-        const activeSubscriptionId = this.activeSubscriptionByMessageId[id]
-        if (activeSubscriptionId) {
-          delete this.activeSubscriptions[activeSubscriptionId]
-          await this.call(
-            this.providerRef.nextId(),
-            unsubscribeMethod,
-            [activeSubscriptionId],
-          )
-        }
-        delete this.activeSubscriptionByMessageId[id]
-        waiter.resolve(value)
+  (
+    subscribeMethod,
+    unsubscribeMethod,
+    params,
+    createListener,
+  ) => {
+    const id = this.providerRef.nextId()
+    const waiter = deferred<any>() // TODO: type this narrowly
+    const stop = async (value?: unknown) => {
+      delete this.pendingSubscriptions[id]
+      const activeSubscriptionId = this.activeSubscriptionByMessageId[id]
+      if (activeSubscriptionId) {
+        delete this.activeSubscriptions[activeSubscriptionId]
+        await this.call(
+          this.providerRef.nextId(),
+          unsubscribeMethod,
+          [activeSubscriptionId],
+        )
       }
-      const listener = createListener({
-        end(value = undefined!) {
-          return new U.End(value)
-        },
-        endIfError(value) {
-          return (value instanceof Error ? new U.End(value) : undefined) as any
-        },
-      })
-      this.pendingSubscriptions[id] = (event) => {
-        const result = listener(event)
-        if (result instanceof Promise) {
-          result.then((resultR) => maybeStop(resultR, event))
-        } else {
-          maybeStop(result, event)
-        }
-      }
-      ;(async () => {
-        const maybeError = await this.call(id, subscribeMethod, params)
-        if (maybeError instanceof Error || maybeError.error) {
-          listener(maybeError)
-          stop()
-        }
-      })()
-      return waiter
-
-      function maybeStop(
-        maybeEnd: U.ListenerResult,
-        event: ClientSubscriptionEvent<any, any, SendErrorData, HandlerErrorData>,
-      ) {
-        if (maybeEnd instanceof U.End) {
-          stop(maybeEnd.value)
-        } else if (event instanceof Error) {
-          stop()
-        }
+      delete this.activeSubscriptionByMessageId[id]
+      waiter.resolve(value)
+    }
+    const listener = createListener({
+      end(value = undefined!) {
+        return new U.End(value)
+      },
+      endIfError(value) {
+        return (value instanceof Error ? new U.End(value) : undefined) as any
+      },
+    })
+    this.pendingSubscriptions[id] = (event) => {
+      const result = listener(event)
+      if (result instanceof Promise) {
+        result.then((resultR) => maybeStop(resultR, event))
+      } else {
+        maybeStop(result, event)
       }
     }
+    ;(async () => {
+      const maybeError = await this.call(id, subscribeMethod, params)
+      if (maybeError instanceof Error || maybeError.error) {
+        listener(maybeError)
+        stop()
+      }
+    })()
+    return waiter
+
+    function maybeStop(
+      maybeEnd: U.ListenerResult,
+      event: ClientSubscriptionEvent<any, any, SendErrorData, HandlerErrorData>,
+    ) {
+      if (maybeEnd instanceof U.End) {
+        stop(maybeEnd.value)
+      } else if (event instanceof Error) {
+        stop()
+      }
+    }
+  }
 
   discard = () => {
     this.pendingCalls = {}

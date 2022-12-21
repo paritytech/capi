@@ -29,15 +29,13 @@ const existentialDeposit = extrinsic({
   }),
 })
   .signed(T.alice.sign)
-  .watch(({ end }) =>
-    (status) => {
-      console.log(`Existential deposit:`, status)
-      if (C.rpc.known.TransactionStatus.isTerminal(status)) {
-        return end()
-      }
-      return
+  .watch(({ end }) => (status) => {
+    console.log(`Existential deposit:`, status)
+    if (C.rpc.known.TransactionStatus.isTerminal(status)) {
+      return end()
     }
-  )
+    return
+  })
 
 // First approval root
 const proposal = createOrApproveMultisigProposal("Proposal", T.alice)
@@ -97,13 +95,11 @@ function createOrApproveMultisigProposal<
     })),
   })
     .signed(pair.sign)
-    .watch(({ end }) =>
-      (status) => {
-        console.log(`${label}:`, status)
-        if (C.rpc.known.TransactionStatus.isTerminal(status)) {
-          return end()
-        }
-        return
+    .watch(({ end }) => (status) => {
+      console.log(`${label}:`, status)
+      if (C.rpc.known.TransactionStatus.isTerminal(status)) {
+        return end()
       }
-    )
+      return
+    })
 }
