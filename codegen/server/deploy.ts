@@ -18,7 +18,7 @@ export class DenoDeployCodegenServer extends CapiCodegenServer {
 
   constructor(readonly mainVersion: string, moduleIndex: string[]) {
     super()
-    this.moduleIndex = async () => moduleIndex
+    this.moduleIndex = () => Promise.resolve(moduleIndex)
   }
 
   async defaultVersion(request: Request) {

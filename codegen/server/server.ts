@@ -170,7 +170,7 @@ export const client = C.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chainUrl
     )
   }
 
-  async autocompleteSchema() {
+  autocompleteSchema() {
     return this.json({
       version: 2,
       registries: [
@@ -403,7 +403,7 @@ export const client = C.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chainUrl
     LATEST_CHAIN_VERSION_TTL,
     this.abortController.signal,
   )
-  async latestChainVersion(chainUrl: string) {
+  latestChainVersion(chainUrl: string) {
     return this.latestChainVersionMemo.run(chainUrl, async () => {
       const client = this.client(chainUrl)
       const chainVersion = U.throwIfError(
