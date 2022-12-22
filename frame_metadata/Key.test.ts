@@ -1,5 +1,5 @@
 import { assertEquals } from "../deps/std/testing/asserts.ts"
-import { DeriveCodec } from "../reflection/Codec.ts"
+import { DeriveCodec } from "../scale_info/Codec.ts"
 import * as T from "../test_util/mod.ts"
 import * as U from "../util/mod.ts"
 import * as downloaded from "./_downloaded/mod.ts"

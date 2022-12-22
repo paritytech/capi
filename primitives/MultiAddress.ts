@@ -1,5 +1,5 @@
 import * as $ from "../deps/scale.ts"
-import { $null } from "../reflection/Codec.ts"
+import { $null } from "../scale_info/Codec.ts"
 
 export const $multiAddress: $.Codec<MultiAddress> = $.taggedUnion("type", {
   0: ["Id", ["value", $.sizedUint8Array(32)]],

@@ -1,7 +1,7 @@
 import * as $ from "../deps/scale.ts"
 import { assert } from "../deps/std/testing/asserts.ts"
 import { $multiAddress, $multiSignature, MultiAddress, MultiSignature } from "../primitives/mod.ts"
-import { $null, DeriveCodec } from "../reflection/Codec.ts"
+import { $null, DeriveCodec } from "../scale_info/Codec.ts"
 import { hashers, Hex, hex, ss58 } from "../util/mod.ts"
 import { Metadata } from "./Metadata.ts"
 

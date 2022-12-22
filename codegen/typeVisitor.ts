@@ -1,5 +1,5 @@
 import { posix as pathPosix } from "../deps/std/path.ts"
-import { Ty, TyVisitor, TyVisitorMethods } from "../reflection/mod.ts"
+import { Ty, TyVisitor, TyVisitorMethods } from "../scale_info/mod.ts"
 import { normalizeCase } from "../util/case.ts"
 import { getOrInit } from "../util/mod.ts"
 import { Files } from "./Files.ts"

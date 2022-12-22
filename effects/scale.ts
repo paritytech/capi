@@ -1,7 +1,7 @@
 import * as $ from "../deps/scale.ts"
 import * as Z from "../deps/zones.ts"
 import * as M from "../frame_metadata/mod.ts"
-import { DeriveCodec, Ty } from "../reflection/mod.ts"
+import { DeriveCodec, Ty } from "../scale_info/mod.ts"
 
 const k0_ = Symbol()
 const k1_ = Symbol()

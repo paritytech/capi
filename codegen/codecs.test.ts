@@ -1,6 +1,6 @@
 import { Codec } from "../deps/scale.ts"
 import { assertEquals } from "../deps/std/testing/asserts.ts"
-import { DeriveCodec } from "../reflection/mod.ts"
+import { DeriveCodec } from "../scale_info/mod.ts"
 import * as testClients from "../test_util/clients/mod.ts"
 import { InMemoryCache } from "./server/cache.ts"
 import { LocalCapiCodegenServer } from "./server/local.ts"
@@ -8,7 +8,7 @@ import { highlighterPromise } from "./server/server.ts"
 
 await highlighterPromise
 
-for (const runtime of ["polkadot"]) {
+for (const runtime of Object.keys(testClients)) {
   Deno.test(runtime, async () => {
     const server = new LocalCapiCodegenServer()
     server.cache = new InMemoryCache(server.abortController.signal)
@@ -21,7 +21,6 @@ for (const runtime of ["polkadot"]) {
     const codegened = await import(
       `http://localhost:${port!}/@local/proxy/${chainUrl}/@${version}/codecs.ts`
     )
-    console.log(codegened._all)
     server.abortController.abort()
     const deriveCodec = DeriveCodec(metadata.tys)
     const derivedCodecs = metadata.tys.map(deriveCodec)

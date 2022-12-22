@@ -1,4 +1,4 @@
-import { Ty, TyVisitor } from "../reflection/mod.ts"
+import { Ty, TyVisitor } from "../scale_info/mod.ts"
 import { normalizeCase } from "../util/case.ts"
 import { CodegenProps } from "./mod.ts"
 import { S } from "./utils.ts"

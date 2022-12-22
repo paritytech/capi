@@ -1,5 +1,5 @@
 import { unreachable } from "../deps/std/testing/asserts.ts"
-import { Ty, TyDef, UnionTyDefMember } from "../reflection/Ty.ts"
+import { Ty, TyDef, UnionTyDefMember } from "../scale_info/Ty.ts"
 
 export interface Metadata<Ty_ = Ty> {
   source: Source

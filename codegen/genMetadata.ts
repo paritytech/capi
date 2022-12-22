@@ -1,6 +1,6 @@
 import { Metadata } from "../frame_metadata/mod.ts"
 import { hex } from "../mod.ts"
-import { Ty, TyVisitor, UnionTyDef } from "../reflection/mod.ts"
+import { Ty, TyVisitor, UnionTyDef } from "../scale_info/mod.ts"
 import { normalizeCase } from "../util/case.ts"
 import { Files } from "./Files.ts"
 import { getRawCodecPath, makeDocComment, S } from "./utils.ts"
