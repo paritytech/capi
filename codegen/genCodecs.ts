@@ -1,9 +1,9 @@
-import * as M from "../frame_metadata/mod.ts"
+import { Ty, TyVisitor } from "../scale_info/mod.ts"
 import { normalizeCase } from "../util/case.ts"
 import { CodegenProps } from "./mod.ts"
 import { S } from "./utils.ts"
 
-export function genCodecs(props: CodegenProps, typeVisitor: M.TyVisitor<string>) {
+export function genCodecs(props: CodegenProps, typeVisitor: TyVisitor<string>) {
   const { tys } = props.metadata
   const namespaceImports = new Set<string>()
 
@@ -13,7 +13,7 @@ import type * as types from "./types/mod.ts"
 
 `
 
-  const visitor = new M.TyVisitor<string>(tys, {
+  const visitor = new TyVisitor<string>(tys, {
     unitStruct(ty) {
       return addCodecDecl(ty, "C.$null")
     },
@@ -141,7 +141,7 @@ import type * as types from "./types/mod.ts"
 
   return file
 
-  function addCodecDecl(ty: M.Ty, value: string) {
+  function addCodecDecl(ty: Ty, value: string) {
     if (ty.path.length > 1) {
       namespaceImports.add(ty.path[0]!)
     }

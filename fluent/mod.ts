@@ -6,8 +6,8 @@ export * from "./Contract.ts"
 export class Storage<C extends C.Z.$<C.rpc.Client>, K extends unknown[], V> {
   constructor(
     readonly client: C,
-    readonly type: C.M.StorageEntry["type"],
-    readonly modifier: C.M.StorageEntry["modifier"],
+    readonly type: C.frame.StorageEntry["type"],
+    readonly modifier: C.frame.StorageEntry["modifier"],
     readonly pallet: string,
     readonly name: string,
     readonly $key: C.$.Codec<K>,

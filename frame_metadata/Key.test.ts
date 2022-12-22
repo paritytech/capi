@@ -1,20 +1,19 @@
 import { assertEquals } from "../deps/std/testing/asserts.ts"
+import { DeriveCodec } from "../scale_info/Codec.ts"
 import * as T from "../test_util/mod.ts"
 import * as U from "../util/mod.ts"
+import * as downloaded from "./_downloaded/mod.ts"
 import { $storageKey } from "./Key.ts"
 import { getPalletAndEntry } from "./Metadata.ts"
-import { setup } from "./test-common.ts"
 
-Deno.test("System Accounts Key", async () => {
-  const [metadata, deriveCodec] = await setup("polkadot")
+const metadata = downloaded.polkadot
+const deriveCodec = DeriveCodec(metadata.tys)
+
+Deno.test("System Accounts Key", () => {
   const systemAccountPalletAndEntry = getPalletAndEntry(metadata, "System", "Account")
   if (systemAccountPalletAndEntry instanceof Error) throw systemAccountPalletAndEntry
   const [pallet, storageEntry] = systemAccountPalletAndEntry
-  const $key = $storageKey({
-    deriveCodec,
-    pallet,
-    storageEntry,
-  })
+  const $key = $storageKey({ deriveCodec, pallet, storageEntry })
   const partialKey: unknown[] = []
   assertEquals(
     U.hex.encode($key.encode(partialKey)),
@@ -30,14 +29,9 @@ Deno.test("System Accounts Key", async () => {
   assertEquals(decoded, key)
 })
 
-Deno.test("Auction Winning Key", async () => {
-  const [metadata, deriveCodec] = await setup("polkadot")
+Deno.test("Auction Winning Key", () => {
   const [pallet, storageEntry] = U.throwIfError(getPalletAndEntry(metadata, "Auctions", "Winning"))
-  const $key = $storageKey({
-    deriveCodec,
-    pallet,
-    storageEntry,
-  })
+  const $key = $storageKey({ deriveCodec, pallet, storageEntry })
   const key = [5]
   const encoded = $key.encode(key)
   assertEquals(
@@ -48,16 +42,11 @@ Deno.test("Auction Winning Key", async () => {
   assertEquals(key, decoded)
 })
 
-Deno.test("Multisig Multisigs partial storage Key", async () => {
-  const [metadata, deriveCodec] = await setup("polkadot")
+Deno.test("Multisig Multisigs partial storage Key", () => {
   const [pallet, storageEntry] = U.throwIfError(
     getPalletAndEntry(metadata, "Multisig", "Multisigs"),
   )
-  const $key = $storageKey({
-    deriveCodec,
-    pallet,
-    storageEntry,
-  })
+  const $key = $storageKey({ deriveCodec, pallet, storageEntry })
   const key = [T.alice.publicKey]
   const encoded = $key.encode(key)
   assertEquals(

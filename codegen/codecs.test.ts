@@ -1,6 +1,6 @@
 import { Codec } from "../deps/scale.ts"
 import { assertEquals } from "../deps/std/testing/asserts.ts"
-import * as M from "../frame_metadata/mod.ts"
+import { DeriveCodec } from "../scale_info/mod.ts"
 import * as testClients from "../test_util/clients/mod.ts"
 import { InMemoryCache } from "./server/cache.ts"
 import { LocalCapiCodegenServer } from "./server/local.ts"
@@ -21,7 +21,7 @@ for (const runtime of Object.keys(testClients)) {
       `http://localhost:${port!}/@local/proxy/${chainUrl}/@${version}/codecs.ts`
     )
     server.abortController.abort()
-    const deriveCodec = M.DeriveCodec(metadata.tys)
+    const deriveCodec = DeriveCodec(metadata.tys)
     const derivedCodecs = metadata.tys.map(deriveCodec)
     const codegenCodecs = codegened._all
     const origInspect = Codec.prototype["_inspect"]!

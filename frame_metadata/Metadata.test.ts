@@ -1,26 +1,12 @@
-import { _format } from "https://deno.land/std@0.158.0/path/_util.ts"
 import { assertSnapshot } from "../deps/std/testing/snapshot.ts"
-import { Metadata } from "./Metadata.ts"
-import { setup } from "./test-common.ts"
+import * as downloaded from "./_downloaded/mod.ts"
+import { Metadata } from "./mod.ts"
+
+for (const [name, metadata] of Object.entries(downloaded)) {
+  Deno.test(name, (t) => assertSnapshot(t, serializeMetadata(metadata)))
+}
 
 const kInspect = Symbol.for("Deno.customInspect")
-
-for (
-  const name of [
-    "polkadot",
-    "kusama",
-    "statemint",
-    "moonbeam",
-    "acala",
-    "subsocial",
-    "westend",
-  ] as const
-) {
-  Deno.test(name, async (t) => {
-    const [metadata] = await setup(name)
-    await assertSnapshot(t, serializeMetadata(metadata))
-  })
-}
 
 // Logging the metadata directly yields a finite but pathologically large string.
 // This inspect logic shows the expanded form of types only in the top level of the tys array.

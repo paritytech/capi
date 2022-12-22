@@ -1,7 +1,8 @@
 import { unimplemented } from "../deps/std/testing/asserts.ts"
 import * as Z from "../deps/zones.ts"
-import * as M from "../frame_metadata/mod.ts"
+import { MultiAddress, Signer } from "../primitives/mod.ts"
 import * as rpc from "../rpc/mod.ts"
+import { era } from "../scale_info/mod.ts"
 import * as U from "../util/mod.ts"
 import { const as const_ } from "./const.ts"
 import { metadata } from "./metadata.ts"
@@ -11,7 +12,7 @@ import * as scale from "./scale.ts"
 const k0_ = Symbol()
 
 export interface ExtrinsicProps<Call = unknown> {
-  sender: M.MultiAddress
+  sender: MultiAddress
   checkpoint?: U.HexHash
   mortality?: [period: bigint, phase: bigint]
   nonce?: string
@@ -19,7 +20,7 @@ export interface ExtrinsicProps<Call = unknown> {
   call: Call
 }
 
-export function extrinsic<Client extends Z.$<rpc.Client>, Call = unknown>(client: Client) {
+export function extrinsic<Client extends Z.$<rpc.Client>>(client: Client) {
   return <Props extends Z.Rec$<ExtrinsicProps>>(props: Props): Extrinsic<Client, Props> => {
     return new Extrinsic(client, props)
   }
@@ -34,7 +35,7 @@ export class Extrinsic<
     readonly props: Props,
   ) {}
 
-  signed<Sign extends Z.$<M.Signer>>(sign: Sign): SignedExtrinsic<Client, Props, Sign> {
+  signed<Sign extends Z.$<Signer>>(sign: Sign): SignedExtrinsic<Client, Props, Sign> {
     return new SignedExtrinsic(this.client, this.props, sign)
   }
 
@@ -60,7 +61,7 @@ export class Extrinsic<
 export class SignedExtrinsic<
   Client extends Z.$<rpc.Client> = Z.$<rpc.Client>,
   Props extends Z.Rec$<ExtrinsicProps> = Z.Rec$<ExtrinsicProps>,
-  Sign extends Z.$<M.Signer> = Z.$<M.Signer>,
+  Sign extends Z.$<Signer> = Z.$<Signer>,
 > {
   client
   props
@@ -110,8 +111,8 @@ export class SignedExtrinsic<
       .lift(this.props.mortality)
       .next((mortality) => {
         return mortality
-          ? M.era.mortal(mortality[0], mortality[1])
-          : M.era.immortal
+          ? era.mortal(mortality[0], mortality[1])
+          : era.immortal
       })
     const extra = Z.ls(mortality, nonce, this.props.tip || 0n)
     const additional = Z.ls(specVersion, transactionVersion, checkpointHash, genesisHash)
@@ -151,7 +152,7 @@ export function extrinsicsDecoded<Client extends Z.$<rpc.Client>>(client: Client
 
 function $extrinsic<
   Client extends Z.$<rpc.Client> = Z.$<rpc.Client>,
-  Rest extends [sign?: Z.$<M.Signer>] = [sign?: Z.$<M.Signer>],
+  Rest extends [sign?: Z.$<Signer>] = [sign?: Z.$<Signer>],
 >(client: Client, ...[sign]: Rest) {
   const metadata_ = metadata(client)()
   const deriveCodec_ = scale.deriveCodec(metadata_)

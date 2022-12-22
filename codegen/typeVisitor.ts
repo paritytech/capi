@@ -1,5 +1,5 @@
 import { posix as pathPosix } from "../deps/std/path.ts"
-import * as M from "../frame_metadata/mod.ts"
+import { Ty, TyVisitor, TyVisitorMethods } from "../scale_info/mod.ts"
 import { normalizeCase } from "../util/case.ts"
 import { getOrInit } from "../util/mod.ts"
 import { Files } from "./Files.ts"
@@ -8,7 +8,7 @@ import { makeDocComment, S } from "./utils.ts"
 
 class TypeFile {
   reexports = new Set<string>()
-  types = new Map<string, M.Ty>()
+  types = new Map<string, Ty>()
   get ext() {
     return this.reexports.size ? "/mod.ts" : ".ts"
   }
@@ -16,11 +16,11 @@ class TypeFile {
 
 export function createTypeVisitor(props: CodegenProps, files: Files) {
   const { tys } = props.metadata
-  const paths = new Map<M.Ty, string | null>()
+  const paths = new Map<Ty, string | null>()
   const typeFiles = new Map<string, TypeFile>()
-  addPath("types.Compact", { type: "Compact" } as M.Ty)
+  addPath("types.Compact", { type: "Compact" } as Ty)
 
-  const visitor = new M.TyVisitor<string>(tys, {
+  const visitor = new TyVisitor<string>(tys, {
     unitStruct(_ty) {
       return "null"
     },
@@ -127,7 +127,7 @@ export function createTypeVisitor(props: CodegenProps, files: Files) {
 
   return visitor
 
-  function getPath(ty: M.Ty): string | null {
+  function getPath(ty: Ty): string | null {
     return getOrInit(paths, ty, () => {
       if (
         ty.type === "Struct" && ty.fields.length === 1 && ty.params.some((x) => x.ty !== undefined)
@@ -142,7 +142,7 @@ export function createTypeVisitor(props: CodegenProps, files: Files) {
       return path
     })
 
-    function _getPath(ty: M.Ty): string | null {
+    function _getPath(ty: Ty): string | null {
       if (ty.type === "Primitive") {
         return (ty.kind === "bool" || ty.kind === "str" ? null : ty.kind)
       }
@@ -182,7 +182,7 @@ export function createTypeVisitor(props: CodegenProps, files: Files) {
     }
   }
 
-  function addPath(path: string, ty: M.Ty) {
+  function addPath(path: string, ty: Ty) {
     let pair = split(path.replace(/\./g, "/"))
     if (!pair) throw new Error("addPath called with orphan")
     getOrInit(typeFiles, pair[0], () => new TypeFile()).types.set(path, ty)
@@ -197,11 +197,11 @@ export function createTypeVisitor(props: CodegenProps, files: Files) {
     }
   }
 
-  function createTypeDecl(path: string, ty: M.Ty) {
+  function createTypeDecl(path: string, ty: Ty) {
     const name = path.slice(path.lastIndexOf(".") + 1)
     const docs = makeDocComment(ty.docs)
 
-    const fallback = (key: keyof M.TyVisitorMethods<string>) => (...args: any) => {
+    const fallback = (key: keyof TyVisitorMethods<string>) => (...args: any) => {
       return `\
 ${docs}
 export type ${name} = ${(visitor[key] as any)!(...args)}
@@ -214,7 +214,7 @@ export const $${name[0]!.toLowerCase()}${name.slice(1)}: $.Codec<${
     }> = codecs.$${ty.id}
 `
 
-    return codec + new M.TyVisitor<string>(tys, {
+    return codec + new TyVisitor<string>(tys, {
       unitStruct() {
         return `\
 ${docs}

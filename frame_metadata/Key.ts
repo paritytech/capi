@@ -1,14 +1,14 @@
 import * as $ from "../deps/scale.ts"
+import { DeriveCodec } from "../scale_info/Codec.ts"
 import { hashers } from "../util/mod.ts"
-import { DeriveCodec } from "./Codec.ts"
-import * as M from "./Metadata.ts"
+import { HasherKind, MapStorageEntryType, Pallet, StorageEntry } from "./Metadata.ts"
 
-export type HasherLookup = { [_ in M.HasherKind]: (input: Uint8Array) => Uint8Array }
+export type HasherLookup = { [_ in HasherKind]: (input: Uint8Array) => Uint8Array }
 
 export interface StorageKeyProps {
   deriveCodec: DeriveCodec
-  pallet: M.Pallet
-  storageEntry: M.StorageEntry
+  pallet: Pallet
+  storageEntry: StorageEntry
 }
 
 export function $storageKey(props: StorageKeyProps): $.Codec<unknown[]> {
@@ -32,7 +32,7 @@ export function $storageKey(props: StorageKeyProps): $.Codec<unknown[]> {
     (keys, i) => {
       keys[i] = $.tuple(
         ...keyCodecs.slice(0, i).map(($key, i) =>
-          hashers[(props.storageEntry as M.MapStorageEntryType).hashers[i]!].$hash($key)
+          hashers[(props.storageEntry as MapStorageEntryType).hashers[i]!].$hash($key)
         ),
       )
       return keys

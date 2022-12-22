@@ -2,9 +2,9 @@ import * as Z from "../../deps/zones.ts"
 import {
   $contractsApiInstantiateArgs,
   $contractsApiInstantiateResult,
-  ContractMetadata,
-} from "../../frame_metadata/Contract.ts"
-import { MultiAddress } from "../../frame_metadata/mod.ts"
+  Constructor as InkConstructor,
+} from "../../ink_metadata/mod.ts"
+import { MultiAddress } from "../../primitives/mod.ts"
 import { Client } from "../../rpc/mod.ts"
 import * as U from "../../util/mod.ts"
 import { extrinsic } from "../extrinsic.ts"
@@ -13,7 +13,7 @@ import { state } from "../rpc_known_methods.ts"
 export interface InstantiateProps {
   sender: MultiAddress
   code: Uint8Array
-  constructorMetadata: ContractMetadata.Constructor
+  constructorMetadata: InkConstructor
   salt: Uint8Array
 }
 

@@ -3,10 +3,12 @@ import * as Z from "../../deps/zones.ts"
 import {
   $contractsApiCallArgs,
   $contractsApiCallResult,
-  ContractMetadata,
-} from "../../frame_metadata/Contract.ts"
-import { DeriveCodec, MultiAddress } from "../../frame_metadata/mod.ts"
+  Message as InkMessage,
+  Metadata as InkMetadata,
+} from "../../ink_metadata/mod.ts"
+import { MultiAddress } from "../../primitives/mod.ts"
 import { Client } from "../../rpc/mod.ts"
+import { DeriveCodec } from "../../scale_info/mod.ts"
 import * as U from "../../util/mod.ts"
 import { extrinsic } from "../extrinsic.ts"
 import { state } from "../rpc_known_methods.ts"
@@ -14,8 +16,8 @@ import { state } from "../rpc_known_methods.ts"
 export interface CallProps {
   sender: MultiAddress
   contractAddress: Uint8Array
-  contractMetadata: ContractMetadata
-  message: ContractMetadata.Message
+  inkMetadata: InkMetadata
+  message: InkMessage
   args: any[]
 }
 
@@ -24,11 +26,11 @@ export function call<Client_ extends Z.Effect<Client>>(client: Client_) {
     const {
       sender,
       contractAddress,
-      contractMetadata,
+      inkMetadata,
       message,
       args,
     } = _props as Z.Rec$Access<Props>
-    const $message_ = $message(contractMetadata, message)
+    const $message_ = $message(inkMetadata, message)
     const data = Z.ls($message_, message, args).next(([{ $args }, { selector }, args]) =>
       $args.encode([U.hex.decode(selector), ...args])
     )
@@ -48,22 +50,17 @@ export interface CallTxProps {
   sender: MultiAddress
   contractAddress: Uint8Array
   value?: bigint
-  contractMetadata: ContractMetadata
-  message: ContractMetadata.Message
+  inkMetadata: InkMetadata
+  message: InkMessage
   args: any[]
 }
 
 export function callTx<Client_ extends Z.Effect<Client>>(client: Client_) {
   return <Props extends Z.Rec$<CallTxProps>>(_props: Props) => {
-    const {
-      sender,
-      contractAddress,
-      value,
-      contractMetadata,
-      message,
-      args,
-    } = _props as Z.Rec$Access<Props>
-    const $message_ = $message(contractMetadata, message)
+    const { sender, contractAddress, value, inkMetadata, message, args } = _props as Z.Rec$Access<
+      Props
+    >
+    const $message_ = $message(inkMetadata, message)
     const data = Z.ls($message_, message, args).next(([{ $args }, { selector }, args]) =>
       $args.encode([U.hex.decode(selector), ...args])
     )
@@ -128,10 +125,7 @@ interface MessageCodecs {
   $result: $.Codec<any>
 }
 
-function $message(
-  metadata: Z.$<ContractMetadata>,
-  message: Z.$<ContractMetadata.Message>,
-): Z.$<MessageCodecs> {
+function $message(metadata: Z.$<InkMetadata>, message: Z.$<InkMessage>): Z.$<MessageCodecs> {
   return Z.ls(metadata, message).next(([metadata, message]) => {
     const deriveCodec = DeriveCodec(metadata.V3.types)
     return {
