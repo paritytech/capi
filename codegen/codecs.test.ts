@@ -10,11 +10,10 @@ await highlighterPromise
 
 for (const runtime of Object.keys(testClients)) {
   Deno.test(runtime, async () => {
+    let port: number
     const server = new LocalCapiCodegenServer()
     server.cache = new InMemoryCache(server.abortController.signal)
-    const port = await new Promise<number>((resolve) =>
-      server.listen(0, ({ port }) => resolve(port))
-    )
+    server.listen(0, (x) => port = x.port)
     const chainUrl = `dev:${runtime}`
     const version = await server.latestChainVersion(chainUrl)
     const metadata = await server.metadata(chainUrl, version)
