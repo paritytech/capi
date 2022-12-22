@@ -9,7 +9,7 @@ export interface EgressMessage<Method extends string = string, Params extends un
 export type IngressMessage = OkMessage | ErrorMessage | NotificationMessage
 
 export interface OkMessage<Result = any> extends JsonRpcVersionBearer {
-  id: string
+  id: string | number
   result: Result
   params?: never
   error?: never
@@ -19,7 +19,7 @@ export interface ErrorMessage<
   Code extends number = number,
   Data = any,
 > extends JsonRpcVersionBearer {
-  id: string
+  id: string | number
   error: {
     code: Code
     message: string

@@ -1,0 +1,422 @@
+{
+  "source": {
+    "hash": "0x1e3986af05daee058d114887d78d251e7bad3700b7e5aa01741572162d7b3d85",
+    "language": "ink! 3.4.0",
+    "compiler": "rustc 1.68.0-nightly"
+  },
+  "contract": {
+    "name": "flipper",
+    "version": "0.1.0",
+    "authors": [
+      "[your_name] <[your_email]>"
+    ]
+  },
+  "V3": {
+    "spec": {
+      "constructors": [
+        {
+          "args": [
+            {
+              "label": "init_value",
+              "type": {
+                "displayName": [
+                  "bool"
+                ],
+                "type": 0
+              }
+            }
+          ],
+          "docs": [
+            "Constructor that initializes the `bool` value to the given `init_value`."
+          ],
+          "label": "new",
+          "payable": false,
+          "selector": "0x9bae9d5e"
+        },
+        {
+          "args": [],
+          "docs": [
+            "Constructor that initializes the `bool` value to `false`.",
+            "",
+            "Constructors can delegate to other constructors."
+          ],
+          "label": "default",
+          "payable": false,
+          "selector": "0xed4b9d1b"
+        }
+      ],
+      "docs": [],
+      "events": [
+        {
+          "args": [
+            {
+              "docs": [],
+              "indexed": false,
+              "label": "from",
+              "type": {
+                "displayName": [
+                  "Option"
+                ],
+                "type": 5
+              }
+            },
+            {
+              "docs": [],
+              "indexed": false,
+              "label": "count",
+              "type": {
+                "displayName": [
+                  "i32"
+                ],
+                "type": 1
+              }
+            }
+          ],
+          "docs": [
+            " Defines an event that is emitted",
+            " every time inc is invoked."
+          ],
+          "label": "Incremented"
+        }
+      ],
+      "messages": [
+        {
+          "args": [],
+          "docs": [
+            " A message that can be called on instantiated contracts.",
+            " This one flips the value of the stored `bool` from `true`",
+            " to `false` and vice versa."
+          ],
+          "label": "flip",
+          "mutates": true,
+          "payable": false,
+          "returnType": null,
+          "selector": "0x633aa551"
+        },
+        {
+          "args": [],
+          "docs": [
+            " Simply returns the current value of our `bool`."
+          ],
+          "label": "get",
+          "mutates": false,
+          "payable": false,
+          "returnType": {
+            "displayName": [
+              "bool"
+            ],
+            "type": 0
+          },
+          "selector": "0x2f865bd9"
+        },
+        {
+          "args": [
+            {
+              "label": "a",
+              "type": {
+                "displayName": [
+                  "u32"
+                ],
+                "type": 2
+              }
+            },
+            {
+              "label": "b",
+              "type": {
+                "displayName": [
+                  "bool"
+                ],
+                "type": 0
+              }
+            }
+          ],
+          "docs": [
+            " multiple arg method returning a tuple."
+          ],
+          "label": "method_returning_tuple",
+          "mutates": false,
+          "payable": false,
+          "returnType": {
+            "displayName": [],
+            "type": 3
+          },
+          "selector": "0xdb48790e"
+        },
+        {
+          "args": [
+            {
+              "label": "a",
+              "type": {
+                "displayName": [
+                  "u32"
+                ],
+                "type": 2
+              }
+            },
+            {
+              "label": "b",
+              "type": {
+                "displayName": [
+                  "bool"
+                ],
+                "type": 0
+              }
+            }
+          ],
+          "docs": [
+            " multiple arg method returning a struct."
+          ],
+          "label": "method_returning_struct",
+          "mutates": false,
+          "payable": false,
+          "returnType": {
+            "displayName": [
+              "M2"
+            ],
+            "type": 4
+          },
+          "selector": "0x5cb3e2d0"
+        },
+        {
+          "args": [],
+          "docs": [
+            " get the current count."
+          ],
+          "label": "get_count",
+          "mutates": false,
+          "payable": false,
+          "returnType": {
+            "displayName": [
+              "i32"
+            ],
+            "type": 1
+          },
+          "selector": "0xbb20003a"
+        },
+        {
+          "args": [],
+          "docs": [
+            " increment current count by 1"
+          ],
+          "label": "inc",
+          "mutates": true,
+          "payable": false,
+          "returnType": null,
+          "selector": "0x1d32619f"
+        },
+        {
+          "args": [],
+          "docs": [
+            " decrement current count by 1"
+          ],
+          "label": "dec",
+          "mutates": true,
+          "payable": false,
+          "returnType": null,
+          "selector": "0xb5d7b4f0"
+        },
+        {
+          "args": [
+            {
+              "label": "n",
+              "type": {
+                "displayName": [
+                  "i32"
+                ],
+                "type": 1
+              }
+            }
+          ],
+          "docs": [
+            " increment current count by n"
+          ],
+          "label": "inc_by",
+          "mutates": true,
+          "payable": false,
+          "returnType": null,
+          "selector": "0xfe5bd8ea"
+        },
+        {
+          "args": [
+            {
+              "label": "n",
+              "type": {
+                "displayName": [
+                  "i32"
+                ],
+                "type": 1
+              }
+            }
+          ],
+          "docs": [
+            " increment current count by n and emit an event"
+          ],
+          "label": "inc_by_with_event",
+          "mutates": true,
+          "payable": false,
+          "returnType": null,
+          "selector": "0xd54ee71c"
+        }
+      ]
+    },
+    "storage": {
+      "struct": {
+        "fields": [
+          {
+            "layout": {
+              "cell": {
+                "key": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "ty": 0
+              }
+            },
+            "name": "value"
+          },
+          {
+            "layout": {
+              "cell": {
+                "key": "0x0100000000000000000000000000000000000000000000000000000000000000",
+                "ty": 1
+              }
+            },
+            "name": "count"
+          }
+        ]
+      }
+    },
+    "types": [
+      {
+        "id": 0,
+        "type": {
+          "def": {
+            "primitive": "bool"
+          }
+        }
+      },
+      {
+        "id": 1,
+        "type": {
+          "def": {
+            "primitive": "i32"
+          }
+        }
+      },
+      {
+        "id": 2,
+        "type": {
+          "def": {
+            "primitive": "u32"
+          }
+        }
+      },
+      {
+        "id": 3,
+        "type": {
+          "def": {
+            "tuple": [
+              2,
+              0
+            ]
+          }
+        }
+      },
+      {
+        "id": 4,
+        "type": {
+          "def": {
+            "composite": {
+              "fields": [
+                {
+                  "name": "a",
+                  "type": 2,
+                  "typeName": "u32"
+                },
+                {
+                  "name": "b",
+                  "type": 0,
+                  "typeName": "bool"
+                }
+              ]
+            }
+          },
+          "path": [
+            "flipper",
+            "flipper",
+            "M2"
+          ]
+        }
+      },
+      {
+        "id": 5,
+        "type": {
+          "def": {
+            "variant": {
+              "variants": [
+                {
+                  "index": 0,
+                  "name": "None"
+                },
+                {
+                  "fields": [
+                    {
+                      "type": 6
+                    }
+                  ],
+                  "index": 1,
+                  "name": "Some"
+                }
+              ]
+            }
+          },
+          "params": [
+            {
+              "name": "T",
+              "type": 6
+            }
+          ],
+          "path": [
+            "Option"
+          ]
+        }
+      },
+      {
+        "id": 6,
+        "type": {
+          "def": {
+            "composite": {
+              "fields": [
+                {
+                  "type": 7,
+                  "typeName": "[u8; 32]"
+                }
+              ]
+            }
+          },
+          "path": [
+            "ink_env",
+            "types",
+            "AccountId"
+          ]
+        }
+      },
+      {
+        "id": 7,
+        "type": {
+          "def": {
+            "array": {
+              "len": 32,
+              "type": 8
+            }
+          }
+        }
+      },
+      {
+        "id": 8,
+        "type": {
+          "def": {
+            "primitive": "u8"
+          }
+        }
+      }
+    ]
+  }
+}

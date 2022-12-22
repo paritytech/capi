@@ -5,6 +5,7 @@ import { rpcCall, rpcSubscription } from "./rpc.ts"
 // TODO: generate the following?
 export namespace state {
   export const getMetadata = rpcCall<[at?: U.HexHash], U.HexHash>("state_getMetadata")
+  export const call = rpcCall<[method: string, data: U.Hex], U.HexHash>("state_call")
   export const getStorage = rpcCall<
     [key: known.StorageKey, at?: U.HexHash],
     known.StorageData
