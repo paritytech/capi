@@ -8,18 +8,20 @@ import { highlighterPromise } from "./server/server.ts"
 
 await highlighterPromise
 
-for (const runtime of Object.keys(testClients)) {
+for (const runtime of ["polkadot"]) {
   Deno.test(runtime, async () => {
-    let port: number
     const server = new LocalCapiCodegenServer()
     server.cache = new InMemoryCache(server.abortController.signal)
-    server.listen(0, (x) => port = x.port)
+    const port = await new Promise<number>((resolve) =>
+      server.listen(0, ({ port }) => resolve(port))
+    )
     const chainUrl = `dev:${runtime}`
     const version = await server.latestChainVersion(chainUrl)
     const metadata = await server.metadata(chainUrl, version)
     const codegened = await import(
       `http://localhost:${port!}/@local/proxy/${chainUrl}/@${version}/codecs.ts`
     )
+    console.log(codegened._all)
     server.abortController.abort()
     const deriveCodec = DeriveCodec(metadata.tys)
     const derivedCodecs = metadata.tys.map(deriveCodec)

@@ -70,7 +70,7 @@ function createOrApproveMultisigProposal<
   ],
 >(
   label: string,
-  pair: T.Sr25519,
+  pair: U.Sr25519,
   ...[maybeTimepoint]: Rest
 ) {
   const call = Balances.transferKeepAlive({

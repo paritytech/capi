@@ -1,6 +1,5 @@
 import * as A from "../deps/std/testing/asserts.ts"
 import * as T from "../test_util/mod.ts"
-import { Sr25519 } from "../test_util/mod.ts"
 import * as U from "../util/mod.ts"
 import { entryRead } from "./entryRead.ts"
 import { extrinsic } from "./extrinsic.ts"
@@ -92,7 +91,7 @@ Deno.test({
 
 interface AssertExtrinsicStatusOrderProps {
   orderExpectation: T.extrinsic.StatusOrderExpectation
-  keypair: Sr25519
+  keypair: U.Sr25519
   call: unknown
 }
 
