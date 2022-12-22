@@ -208,3 +208,4 @@ relaychain
 paritypr
 lparachain
 unioned
+rustc
