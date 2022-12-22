@@ -1,6 +1,7 @@
 import * as $ from "../deps/scale.ts"
 import * as Z from "../deps/zones.ts"
 import * as M from "../frame_metadata/mod.ts"
+import { Signer } from "../primitives/mod.ts"
 import { DeriveCodec, Ty } from "../scale_info/mod.ts"
 
 const k0_ = Symbol()
@@ -58,7 +59,7 @@ export function scaleEncoded<Codec extends Z.$<$.Codec<any>>, Decoded>(
 export const $extrinsic = Z.call.fac((
   deriveCodec: DeriveCodec,
   metadata: M.Metadata,
-  sign: M.Signer,
+  sign: Signer,
   prefix?: number,
 ) => {
   return M.$extrinsic({

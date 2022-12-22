@@ -1,7 +1,6 @@
 import { unimplemented } from "../deps/std/testing/asserts.ts"
 import * as Z from "../deps/zones.ts"
-import { Signer } from "../frame_metadata/mod.ts"
-import { MultiAddress } from "../primitives/mod.ts"
+import { MultiAddress, Signer } from "../primitives/mod.ts"
 import * as rpc from "../rpc/mod.ts"
 import { era } from "../scale_info/mod.ts"
 import * as U from "../util/mod.ts"

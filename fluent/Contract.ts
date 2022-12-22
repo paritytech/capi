@@ -1,8 +1,7 @@
 import * as Z from "../deps/zones.ts"
 import { contracts, events } from "../effects/mod.ts"
-import { Signer } from "../frame_metadata/mod.ts"
 import { Metadata as InkMetadata } from "../ink_metadata/mod.ts"
-import { MultiAddress } from "../primitives/mod.ts"
+import { MultiAddress, Signer } from "../primitives/mod.ts"
 import * as rpc from "../rpc/mod.ts"
 
 export interface ContractCallProps<Args extends unknown[] = any[]> {

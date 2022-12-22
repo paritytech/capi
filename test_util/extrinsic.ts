@@ -1,7 +1,7 @@
 import * as A from "../deps/std/testing/asserts.ts"
 import * as Z from "../deps/zones.ts"
 import { ExtrinsicProps, SignedExtrinsic } from "../effects/extrinsic.ts"
-import * as M from "../frame_metadata/mod.ts"
+import { Signer } from "../primitives/mod.ts"
 import * as rpc from "../rpc/mod.ts"
 
 const k0_ = Symbol()
@@ -11,7 +11,7 @@ const k0_ = Symbol()
 export function collectExtrinsicEvents<
   Client extends Z.$<rpc.Client>,
   Props extends Z.Rec$<ExtrinsicProps>,
-  Sign extends Z.$<M.Signer>,
+  Sign extends Z.$<Signer>,
 >(extrinsic: SignedExtrinsic<Client, Props, Sign>) {
   const events: rpc.known.TransactionStatus[] = []
   return extrinsic
