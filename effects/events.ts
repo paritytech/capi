@@ -34,7 +34,7 @@ export function events<Extrinsic extends SignedExtrinsic, FinalizedHash extends 
     }, k2_)
 }
 
-export type ExtrinsicEvent = {
+export interface ExtrinsicEvent {
   event?: Record<string, any>
   phase: { value: number }
 }
