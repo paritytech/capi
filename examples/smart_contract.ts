@@ -39,16 +39,14 @@ const tx = C.contracts.instantiate(client)({
   salt,
   sender: T.alice.address,
 }).signed(T.alice.sign)
-const finalizedIn = tx.watch(({ end }) =>
-  (status) => {
-    if (typeof status !== "string" && (status.inBlock ?? status.finalized)) {
-      return end(status.inBlock ?? status.finalized)
-    } else if (C.rpc.known.TransactionStatus.isTerminal(status)) {
-      return end(new Error())
-    }
-    return
+const finalizedIn = tx.watch(({ end }) => (status) => {
+  if (typeof status !== "string" && (status.inBlock ?? status.finalized)) {
+    return end(status.inBlock ?? status.finalized)
+  } else if (C.rpc.known.TransactionStatus.isTerminal(status)) {
+    return end(new Error())
   }
-)
+  return
+})
 const contractAddress = U.throwIfError(
   await C
     .events(tx, finalizedIn)

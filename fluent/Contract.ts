@@ -53,16 +53,14 @@ export class Contract<Client extends Z.Effect<rpc.Client>> {
       ...this.#basePayload(props.sender, props.messageLabel, props.args),
       value: props.value,
     }).signed(props.sign)
-    const finalizedIn = tx.watch(({ end }) =>
-      (status) => {
-        if (typeof status !== "string" && (status.inBlock ?? status.finalized)) {
-          return end(status.inBlock ?? status.finalized)
-        } else if (rpc.known.TransactionStatus.isTerminal(status)) {
-          return end(new Error())
-        }
-        return
+    const finalizedIn = tx.watch(({ end }) => (status) => {
+      if (typeof status !== "string" && (status.inBlock ?? status.finalized)) {
+        return end(status.inBlock ?? status.finalized)
+      } else if (rpc.known.TransactionStatus.isTerminal(status)) {
+        return end(new Error())
       }
-    )
+      return
+    })
     const events_ = events(tx, finalizedIn)
     const contractEvents = contracts.events(this.contractMetadata, events_)
     return Z.ls(finalizedIn, events_, contractEvents)
