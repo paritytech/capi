@@ -1,6 +1,6 @@
 import * as $ from "../deps/scale.ts"
 import { normalizeCase } from "../util/case.ts"
-import { $era } from "./redirects/mod.ts"
+import { $era } from "./overrides/mod.ts"
 import { Ty } from "./Ty.ts"
 import { TyVisitor } from "./TyVisitor.ts"
 
