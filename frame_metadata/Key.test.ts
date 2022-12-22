@@ -2,11 +2,11 @@ import { assertEquals } from "../deps/std/testing/asserts.ts"
 import { DeriveCodec } from "../reflection/Codec.ts"
 import * as T from "../test_util/mod.ts"
 import * as U from "../util/mod.ts"
-import { downloadedMetadata } from "./_downloaded.ts"
+import * as downloaded from "./_downloaded/mod.ts"
 import { $storageKey } from "./Key.ts"
 import { getPalletAndEntry } from "./Metadata.ts"
 
-const metadata = downloadedMetadata.polkadot
+const metadata = downloaded.polkadot
 const deriveCodec = DeriveCodec(metadata.tys)
 
 Deno.test("System Accounts Key", () => {

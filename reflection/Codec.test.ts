@@ -1,5 +1,5 @@
 import { assertEquals } from "../deps/std/testing/asserts.ts"
-import { downloadedMetadata } from "../frame_metadata/_downloaded.ts"
+import * as downloaded from "../frame_metadata/_downloaded/mod.ts"
 import { getPalletAndEntry } from "../frame_metadata/mod.ts"
 import * as ink from "../ink_metadata/mod.ts"
 import * as T from "../test_util/mod.ts"
@@ -8,7 +8,7 @@ import { ChainError } from "./Codec.ts"
 import { DeriveCodec } from "./Codec.ts"
 
 namespace polkadot {
-  export const metadata = downloadedMetadata.polkadot
+  export const metadata = downloaded.polkadot
   export const deriveCodec = DeriveCodec(metadata.tys)
 }
 

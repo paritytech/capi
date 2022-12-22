@@ -1,8 +1,8 @@
 import { assertSnapshot } from "../deps/std/testing/snapshot.ts"
-import { downloadedMetadata } from "./_downloaded.ts"
+import * as downloaded from "./_downloaded/mod.ts"
 import { Metadata } from "./mod.ts"
 
-for (const [name, metadata] of Object.entries(downloadedMetadata)) {
+for (const [name, metadata] of Object.entries(downloaded)) {
   Deno.test(name, (t) => assertSnapshot(t, serializeMetadata(metadata)))
 }
 
