@@ -1,6 +1,8 @@
 import * as Z from "../deps/zones.ts"
 import { contracts, events } from "../effects/mod.ts"
-import { ContractMetadata, MultiAddress, Signer } from "../frame_metadata/mod.ts"
+import { Signer } from "../frame_metadata/mod.ts"
+import { Metadata as InkMetadata } from "../ink_metadata/mod.ts"
+import { MultiAddress } from "../primitives/mod.ts"
 import * as rpc from "../rpc/mod.ts"
 
 export interface ContractCallProps<Args extends unknown[] = any[]> {
@@ -20,7 +22,7 @@ export interface ContractCallTxProps<Args extends unknown[] = any[]>
 export class Contract<Client extends Z.Effect<rpc.Client>> {
   constructor(
     readonly client: Client,
-    readonly contractMetadata: ContractMetadata,
+    readonly inkMetadata: InkMetadata,
     readonly contractAddress: Uint8Array,
   ) {}
 
@@ -36,7 +38,7 @@ export class Contract<Client extends Z.Effect<rpc.Client>> {
     return {
       sender,
       contractAddress: this.contractAddress,
-      contractMetadata: this.contractMetadata,
+      inkMetadata: this.inkMetadata,
       message: this.#getMessageByLabel(messageLabel)!,
       args,
     }
@@ -62,13 +64,13 @@ export class Contract<Client extends Z.Effect<rpc.Client>> {
       return
     })
     const events_ = events(tx, finalizedIn)
-    const contractEvents = contracts.events(this.contractMetadata, events_)
+    const contractEvents = contracts.events(this.inkMetadata, events_)
     return Z.ls(finalizedIn, events_, contractEvents)
   }
 
   #getMessageByLabel<Label extends Z.$<string>>(label: Label) {
     return Z.lift(label).next((label) =>
-      this.contractMetadata.V3.spec.messages.find((c) => c.label === label)!
+      this.inkMetadata.V3.spec.messages.find((c) => c.label === label)!
     )
   }
 }

@@ -18,7 +18,7 @@ const [code, metadataRaw] = await Promise.all([
   await Deno.readFile("examples/smart_contract/flipper.wasm"),
   await Deno.readTextFile("examples/smart_contract/metadata.json"),
 ])
-const metadata = C.M.ContractMetadata.normalize(JSON.parse(metadataRaw))
+const metadata = C.ink.normalizeTys(JSON.parse(metadataRaw))
 const constructorMetadata = metadata.V3.spec.constructors.find((c) => c.label === "default")!
 
 class ExtrinsicFailed extends Error {

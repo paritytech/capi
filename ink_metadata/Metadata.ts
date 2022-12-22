@@ -1,14 +1,10 @@
-import { unreachable } from "../deps/std/testing/asserts.ts"
-import { Ty, TyDef, UnionTyDefMember } from "../scale_info/Ty.ts"
+import { Ty } from "../scale_info/mod.ts"
 
-export interface Metadata<Ty_ = Ty> {
+export interface Metadata {
   source: Source
   contract: Contract
-  V3: Abi<Ty_>
+  V3: Abi
 }
-
-// TODO: serde `Value` type
-export type Value = unknown
 
 export interface Source {
   hash: string
@@ -29,13 +25,12 @@ export interface Contract {
 }
 
 export interface User {
-  json: Record<string, Value>
+  json: Record<string, unknown>
 }
 
-export interface Abi<Ty> {
+export interface Abi {
   spec: Spec
   storage: Storage
-  // TODO: type the raw serde-defined shape?
   types: Ty[]
 }
 
@@ -94,88 +89,4 @@ export interface Storage {
       name: string
     }[]
   }
-}
-
-// TODO: stricter typings? Not the most necessary atm.
-export function fromRawTy({ type: { def, params, path }, id }: any): Ty {
-  return {
-    id,
-    path,
-    params: params ? normalizeFields(params) : [],
-    // TODO: grab this from appropriate loc
-    docs: [],
-    ...((): TyDef => {
-      if (def.primitive) {
-        return {
-          type: "Primitive",
-          kind: def.primitive,
-        }
-      } else if (def.composite) {
-        return {
-          type: "Struct",
-          fields: normalizeFields(def.composite.fields),
-        }
-      } else if (def.variant) {
-        return {
-          type: "Union",
-          members: def.variant.variants.map((variant: any) => {
-            const { fields, ...rest } = variant
-            const member: UnionTyDefMember = {
-              fields: fields ? normalizeFields(fields) : [],
-              ...rest,
-            }
-            return member
-          }),
-        }
-      } else if (def.tuple) {
-        return {
-          type: "Tuple",
-          fields: def.tuple,
-        }
-      } else if (def.array) {
-        return {
-          type: "SizedArray",
-          len: def.array.len,
-          typeParam: def.array.type,
-        }
-      } else if (def.sequence) {
-        return {
-          type: "Sequence",
-          typeParam: def.sequence.type,
-        }
-      } else if (def.compact) {
-        return {
-          type: "Compact",
-          typeParam: def.compact.typeParam,
-        }
-      } else if (def.bitSequence) {
-        return {
-          type: "BitSequence",
-          bitOrderType: def.bitSequence.bitOrderType,
-          bitStoreType: def.bitSequence.bitStoreType,
-        }
-      }
-      unreachable()
-    })(),
-  }
-}
-
-function normalizeFields(fields: any[]) {
-  return fields.map(({ type: ty, ...rest }: any) => {
-    return { ty, ...rest }
-  })
-}
-
-export function normalize({ V3: { types, ...v3Rest }, ...topLevelRest }: Metadata): Metadata<Ty> {
-  return {
-    ...topLevelRest,
-    V3: {
-      ...v3Rest,
-      types: types.map(fromRawTy),
-    },
-  }
-}
-
-export function tys(Metadata: Metadata): Ty[] {
-  return normalize(Metadata).V3.types
 }

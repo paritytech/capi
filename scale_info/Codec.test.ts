@@ -91,7 +91,7 @@ Deno.test("Derive Result codec", () => {
 
 Deno.test("Smart Contract codecs", async () => {
   const raw = await Deno.readTextFile("ink_metadata/_downloaded/erc20.json")
-  const normalized = ink.normalize(JSON.parse(raw))
+  const normalized = ink.normalizeTys(JSON.parse(raw))
   const deriveCodec = DeriveCodec(normalized.V3.types)
   for (const ty of normalized.V3.types) {
     deriveCodec(ty.id)

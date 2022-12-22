@@ -139,7 +139,7 @@ export abstract class CodegenServer {
       ))
   }
 
-  filesMemo = new Map<C.M.Metadata, Files>()
+  filesMemo = new Map<C.frame.Metadata, Files>()
   async files(chainUrl: string, version: string, chainVersion: string) {
     const metadata = await this.metadata(chainUrl, chainVersion)
     return U.getOrInit(this.filesMemo, metadata, () => {
@@ -415,7 +415,7 @@ export const client = C.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chainUrl
   }
 
   metadata(chainUrl: string, version: string) {
-    return this.cache.get(`metadata/${chainUrl}/${version}`, C.M.$metadata, async () => {
+    return this.cache.get(`metadata/${chainUrl}/${version}`, C.frame.$metadata, async () => {
       const client = this.client(chainUrl)
       const [chainVersion, metadata] = U.throwIfError(
         await C.Z.ls(
