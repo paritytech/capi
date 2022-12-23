@@ -1,7 +1,7 @@
 import * as $ from "../../deps/scale.ts"
 import { getOrInit, TimedMemo, WeakMemo } from "../../util/mod.ts"
 
-export abstract class Cache {
+export abstract class CacheBase {
   constructor(readonly signal: AbortSignal) {
     this.stringMemo = new TimedMemo<string, string>(-1, this.signal)
   }

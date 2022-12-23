@@ -1,8 +1,8 @@
 import * as fs from "../../deps/std/fs.ts"
 import * as path from "../../deps/std/path.ts"
-import { Cache } from "./base.ts"
+import { CacheBase } from "./base.ts"
 
-export class FsCache extends Cache {
+export class FsCache extends CacheBase {
   constructor(readonly location: string, signal: AbortSignal) {
     super(signal)
   }

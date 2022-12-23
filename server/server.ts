@@ -9,7 +9,7 @@ import * as C from "../mod.ts"
 import * as T from "../test_util/mod.ts"
 import * as U from "../util/mod.ts"
 import { TimedMemo } from "../util/mod.ts"
-import { Cache } from "./cache/mod.ts"
+import { CacheBase } from "./cache/mod.ts"
 
 shiki.setCDN("https://unpkg.com/shiki/")
 export const highlighterPromise = shiki.getHighlighter({ theme: "github-dark", langs: ["ts"] })
@@ -40,7 +40,7 @@ const R_WITH_CAPI_VERSION = /^\/@([^\/]+)(\/.*)?$/
 const R_WITH_CHAIN_URL = /^\/proxy\/(dev:\w+|wss?:[^\/]+)\/(?:@([^\/]+)\/)?(.*)$/
 
 export abstract class Server {
-  abstract cache: Cache
+  abstract cache: CacheBase
   abstract local: boolean
   abstract mainVersion: string
   abstract canHandleVersion(version: string): Promise<boolean>

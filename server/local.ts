@@ -1,5 +1,5 @@
 import { PermanentMemo } from "../util/memo.ts"
-import { Cache, FsCache } from "./cache/mod.ts"
+import { CacheBase, FsCache } from "./cache/mod.ts"
 import { CapiCodegenServer } from "./capi_repo.ts"
 import { getModuleIndex } from "./git_utils.ts"
 
@@ -8,7 +8,7 @@ const R_GITHUB_URL = /^https:\/\/raw\.githubusercontent\.com\/paritytech\/capi\/
 
 export class LocalCapiCodegenServer extends CapiCodegenServer {
   mainVersion
-  cache: Cache = new FsCache("target/codegen", this.abortController.signal)
+  cache: CacheBase = new FsCache("target/codegen", this.abortController.signal)
   local = true
 
   constructor(version?: string) {

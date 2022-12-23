@@ -1,7 +1,7 @@
 import { S3Bucket, S3BucketConfig } from "../../deps/s3.ts"
-import { Cache } from "./base.ts"
+import { CacheBase } from "./base.ts"
 
-export class S3Cache extends Cache {
+export class S3Cache extends CacheBase {
   bucket
 
   constructor(config: S3BucketConfig, signal: AbortSignal) {
