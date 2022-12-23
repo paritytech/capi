@@ -1,4 +1,4 @@
-import { PermanentMemo } from "../../util/memo.ts"
+import { PermanentMemo } from "../util/memo.ts"
 import { Cache, FsCache } from "./cache.ts"
 import { CapiCodegenServer } from "./capi_repo.ts"
 import { getModuleIndex } from "./git_utils.ts"
