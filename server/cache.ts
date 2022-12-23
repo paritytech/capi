@@ -1,7 +1,7 @@
-import * as $ from "../../deps/scale.ts"
-import * as fs from "../../deps/std/fs.ts"
-import * as path from "../../deps/std/path.ts"
-import { getOrInit, PermanentMemo, TimedMemo, WeakMemo } from "../../util/mod.ts"
+import * as $ from "../deps/scale.ts"
+import * as fs from "../deps/std/fs.ts"
+import * as path from "../deps/std/path.ts"
+import { getOrInit, PermanentMemo, TimedMemo, WeakMemo } from "../util/mod.ts"
 
 export abstract class Cache {
   constructor(readonly signal: AbortSignal) {

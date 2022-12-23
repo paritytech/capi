@@ -1,4 +1,4 @@
-import { PermanentMemo } from "../../util/memo.ts"
+import { PermanentMemo } from "../util/memo.ts"
 import { CapiCodegenServer, GITHUB_API_REPO, json } from "./capi_repo.ts"
 import { S3Cache } from "./s3.ts"
 
