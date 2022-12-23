@@ -2,12 +2,13 @@ import * as C from "http://localhost:5646/@local/mod.ts"
 import * as T from "http://localhost:5646/@local/test_util/mod.ts"
 import * as U from "http://localhost:5646/@local/util/mod.ts"
 
+import { client } from "http://localhost:5646/@local/proxy/dev:polkadot/@v0.9.36/capi.ts"
 import { extrinsic } from "http://localhost:5646/@local/proxy/dev:polkadot/@v0.9.36/mod.ts"
 import {
   Balances,
-  Multisig,
   System,
 } from "http://localhost:5646/@local/proxy/dev:polkadot/@v0.9.36/pallets/mod.ts"
+import { SignedExtrinsic } from "../effects/extrinsic.ts"
 
 // FIXME: remove this check once the Zones .bind(env) fix is merged
 const hostname = Deno.env.get("TEST_CTX_HOSTNAME")
@@ -16,85 +17,76 @@ if (!hostname || !portRaw) {
   throw new Error("Must be running inside a test ctx")
 }
 
-const signatories = T.users.slice(0, 3).map((pair) => pair.publicKey)
-const THRESHOLD = 2
-const multisigAddress = U.multisigAddress(signatories, THRESHOLD)
+const multisig = new C.fluent.Multisig(
+  client,
+  T.users.slice(0, 3).map((pair) => pair.publicKey),
+  2,
+)
 
 // Transfer initial balance (existential deposit) to multisig address
 const existentialDeposit = extrinsic({
   sender: T.alice.address,
   call: Balances.transfer({
     value: 2_000_000_000_000n,
-    dest: C.MultiAddress.Id(multisigAddress),
+    dest: C.MultiAddress.Id(multisig.address),
   }),
 })
   .signed(T.alice.sign)
-  .watch(({ end }) => (status) => {
-    console.log(`Existential deposit:`, status)
-    if (C.rpc.known.TransactionStatus.isTerminal(status)) {
-      return end()
-    }
-    return
-  })
+
+// The proposal
+const call = Balances.transferKeepAlive({
+  dest: T.dave.address,
+  value: 1230000000000n,
+})
 
 // First approval root
-const proposal = createOrApproveMultisigProposal("Proposal", T.alice)
+const proposalByAlice = multisig.ratify({
+  sender: T.alice.address,
+  call,
+  maybeTimepoint: undefined,
+})
+  .signed(T.alice.sign)
 
-// Get the key of the timepoint
-const key = Multisig.Multisigs.keys(multisigAddress).readPage(1)
-  .access(0)
-  .access(1)
+// Get the proposal callHash
+// TODO: implement extrinsic().callHash
+const callHash = multisig.proposals(1).access(0).access(1).as<Uint8Array>()
 
-// Get the timepoint itself
-const maybeTimepoint = Multisig.Multisigs.entry(multisigAddress, key).read()
-  .access("value")
-  .access("when")
+// Get the timepoint
+const maybeTimepoint = multisig.proposal(callHash).access("value").access("when")
 
-const approval = createOrApproveMultisigProposal("Approval", T.bob, maybeTimepoint)
+// Approve without executing the proposal
+const voteByBob = multisig.vote({
+  sender: T.bob.address,
+  callHash,
+  maybeTimepoint,
+})
+  .signed(T.bob.sign)
+
+// Approve and execute the proposal
+const approvalByCharlie = multisig.ratify({
+  sender: T.charlie.address,
+  call,
+  maybeTimepoint,
+})
+  .signed(T.charlie.sign)
 
 // check T.dave new balance
 const daveBalance = System.Account.entry(T.dave.publicKey).read()
 
 // TODO: use common env
-U.throwIfError(await existentialDeposit.run())
-U.throwIfError(await proposal.run())
-U.throwIfError(await approval.run())
+U.throwIfError(await watchExtrinsic(existentialDeposit, "Existential deposit").run())
+U.throwIfError(await watchExtrinsic(proposalByAlice, "Proposal").run())
+console.log("Is proposed?", U.throwIfError(await multisig.isProposed(callHash).run()))
+U.throwIfError(await watchExtrinsic(voteByBob, "Vote").run())
+console.log(
+  "Existing approvals",
+  U.throwIfError(await multisig.proposal(callHash).access("value").access("approvals").run()),
+)
+U.throwIfError(await watchExtrinsic(approvalByCharlie, "Approval").run())
 console.log(U.throwIfError(await daveBalance.run()))
 
-function createOrApproveMultisigProposal<
-  Rest extends [
-    MaybeTimepoint?: C.Z.$<{
-      height: number
-      index: number
-    }>,
-  ],
->(
-  label: string,
-  pair: U.Sr25519,
-  ...[maybeTimepoint]: Rest
-) {
-  const call = Balances.transferKeepAlive({
-    dest: T.dave.address,
-    value: 1230000000000n,
-  })
-  const maxWeight = extrinsic({
-    sender: C.MultiAddress.Id(multisigAddress),
-    call,
-  })
-    .feeEstimate
-    .access("weight")
-  return extrinsic({
-    sender: pair.address,
-    call: C.Z.call.fac(Multisig.asMulti, null!)(C.Z.rec({
-      threshold: THRESHOLD,
-      call,
-      otherSignatories: signatories.filter((value) => value !== pair.publicKey),
-      storeCall: false,
-      maxWeight,
-      maybeTimepoint: maybeTimepoint as Rest[0],
-    })),
-  })
-    .signed(pair.sign)
+function watchExtrinsic(extrinsic: SignedExtrinsic, label: string) {
+  return extrinsic
     .watch(({ end }) => (status) => {
       console.log(`${label}:`, status)
       if (C.rpc.known.TransactionStatus.isTerminal(status)) {

@@ -56,6 +56,13 @@ export class Extrinsic<
         },
       }))
   }
+
+  get callHash() {
+    // TODO: compute call hash
+    // let call = RuntimeCall::Balances(BalancesCall::transfer { dest, value }))
+    // let hash = blake2_256(&call);
+    return unimplemented()
+  }
 }
 
 export class SignedExtrinsic<
