@@ -1,6 +1,6 @@
-import { contentType } from "https://deno.land/x/media_types@v2.11.1/mod.ts"
-import { Application, send } from "https://deno.land/x/oak@v10.1.0/mod.ts"
-import { babel, babelPresetTypeScript } from "https://escad.dev/deps/babel.ts"
+import { babel, babelPresetTypeScript } from "../deps/escad_babel.ts"
+import { contentType } from "../deps/media_types.ts"
+import { Application, send } from "../deps/oak.ts"
 import * as path from "../deps/std/path.ts"
 
 const dirname = path.dirname(path.fromFileUrl(import.meta.url))

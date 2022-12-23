@@ -1,4 +1,4 @@
-import { build } from "https://deno.land/x/dnt@0.26.0/mod.ts"
+import { build } from "../deps/dnt.ts"
 import * as fs from "../deps/std/fs.ts"
 import * as path from "../deps/std/path.ts"
 
