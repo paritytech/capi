@@ -36,7 +36,7 @@ export abstract class CapiCodegenServer extends CodegenServer {
 
   async moduleFileUrl(version: string, path: string) {
     if (this.local && (await this.canHandleVersion(version))) {
-      return new URL("../.." + path, import.meta.url).toString()
+      return new URL(".." + path, import.meta.url).toString()
     }
     if (R_TAG_VERSION.test(version)) {
       return `https://deno.land/x/capi@${version}${path}`

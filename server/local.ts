@@ -39,7 +39,7 @@ export class LocalCapiCodegenServer extends CapiCodegenServer {
   deploymentUrlMemo = new PermanentMemo<string, string>()
   deploymentUrl(version: string) {
     return this.deploymentUrlMemo.run(version, async () => {
-      const mod = await import(await this.moduleFileUrl(version, "/codegen/server/local.ts"))
+      const mod = await import(await this.moduleFileUrl(version, "/server/local.ts"))
       const Server = mod.LocalCapiCodegenServer as typeof LocalCapiCodegenServer
       const server = new Server(version)
       this.abortController.signal.addEventListener("abort", () => {
