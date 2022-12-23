@@ -2,7 +2,7 @@ import { Codec } from "../deps/scale.ts"
 import { assertEquals } from "../deps/std/testing/asserts.ts"
 import { DeriveCodec } from "../scale_info/mod.ts"
 import * as testClients from "../test_util/clients/mod.ts"
-import { InMemoryCache } from "./cache.ts"
+import { InMemoryCache } from "./cache/mod.ts"
 import { LocalCapiCodegenServer } from "./local.ts"
 import { highlighterPromise } from "./server.ts"
 

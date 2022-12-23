@@ -1,6 +1,6 @@
 import { PermanentMemo, TimedMemo } from "../util/memo.ts"
 import { getFullSha, getSha, SHA_ABBREV_LENGTH } from "./git_utils.ts"
-import { CodegenServer } from "./server.ts"
+import { Server } from "./server.ts"
 
 const TAGS_TTL = 60_000 // 1 minute
 const BRANCHES_TTL = 60_000 // 1 minute
@@ -11,7 +11,7 @@ export const R_TAG_VERSION = /^v?(\d+\.\d+\.\d+[^\/]*)$/
 export const R_REF_VERSION = /^ref:([^\/]*)$/
 export const R_SHA_VERSION = /^sha:([0-9a-f]+)$/
 
-export abstract class CapiCodegenServer extends CodegenServer {
+export abstract class CapiCodegenServer extends Server {
   async normalizeVersion(version: string) {
     if (version === this.mainVersion) return version
     const tagMatch = R_TAG_VERSION.exec(version)

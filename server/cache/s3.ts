@@ -1,8 +1,9 @@
-import { S3Bucket, S3BucketConfig } from "https://deno.land/x/s3@0.5.0/mod.ts"
-import { Cache } from "./cache.ts"
+import { S3Bucket, S3BucketConfig } from "../../deps/s3.ts"
+import { Cache } from "./base.ts"
 
 export class S3Cache extends Cache {
   bucket
+
   constructor(config: S3BucketConfig, signal: AbortSignal) {
     super(signal)
     this.bucket = new S3Bucket(config)

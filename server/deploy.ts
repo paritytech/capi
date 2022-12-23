@@ -1,6 +1,6 @@
 import { PermanentMemo } from "../util/memo.ts"
+import { S3Cache } from "./cache/mod.ts"
 import { CapiCodegenServer, GITHUB_API_REPO, json } from "./capi_repo.ts"
-import { S3Cache } from "./s3.ts"
 
 const DENO_DEPLOY_USER_ID = 75045203
 

@@ -1,3 +1,4 @@
+import { serveDir, serveFile } from "https://deno.land/std@0.165.0/http/file_server.ts"
 import { serve } from "https://deno.land/std@0.165.0/http/server.ts"
 import { escapeHtml } from "https://deno.land/x/escape@1.4.2/mod.ts"
 import * as shiki from "https://esm.sh/shiki@0.11.1?bundle"
@@ -8,7 +9,7 @@ import * as C from "../mod.ts"
 import * as T from "../test_util/mod.ts"
 import * as U from "../util/mod.ts"
 import { TimedMemo } from "../util/mod.ts"
-import { Cache } from "./cache.ts"
+import { Cache } from "./cache/mod.ts"
 
 shiki.setCDN("https://unpkg.com/shiki/")
 export const highlighterPromise = shiki.getHighlighter({ theme: "github-dark", langs: ["ts"] })
@@ -38,9 +39,7 @@ const RENDERED_HTML_TTL = 60_000 // 1 minute
 const R_WITH_CAPI_VERSION = /^\/@([^\/]+)(\/.*)?$/
 const R_WITH_CHAIN_URL = /^\/proxy\/(dev:\w+|wss?:[^\/]+)\/(?:@([^\/]+)\/)?(.*)$/
 
-const $index = $.array($.str)
-
-export abstract class CodegenServer {
+export abstract class Server {
   abstract cache: Cache
   abstract local: boolean
   abstract mainVersion: string
@@ -71,7 +70,7 @@ export abstract class CodegenServer {
   async root(request: Request): Promise<Response> {
     const fullPath = new URL(request.url).pathname
     if (fullPath === "/.well-known/deno-import-intellisense.json") {
-      return this.autocompleteSchema()
+      return await serveFile(request, new URL("completions.json", import.meta.url).pathname)
     }
     const versionMatch = R_WITH_CAPI_VERSION.exec(fullPath)
     if (!versionMatch) {
@@ -162,44 +161,12 @@ export const client = C.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chainUrl
   async chainIndex(chainUrl: string, version: string, chainVersion: string) {
     return await this.cache.get(
       `generated/@${version}/${chainUrl}/@${chainVersion}/_index`,
-      $index,
+      $.array($.str),
       async () => {
         const files = await this.files(chainUrl, version, chainVersion)
         return [...files.keys()]
       },
     )
-  }
-
-  autocompleteSchema() {
-    return this.json({
-      version: 2,
-      registries: [
-        {
-          schema: "/:version(@[^/]*)?/:file*",
-          variables: [
-            { key: "version", url: "/autocomplete/version" },
-            { key: "file", url: "/${version}/autocomplete/moduleFile/${file}" },
-          ],
-        },
-        {
-          schema:
-            "/:version(@[^/]*)/:_proxy(proxy)/:chainUrl(dev:\\w*|wss?:[^/]*)/:chainVersion(@[^/]+)/:file*",
-          variables: [
-            { key: "version", url: "/autocomplete/version" },
-            { key: "_proxy", url: "/autocomplete/null" },
-            { key: "chainUrl", url: "/${version}/autocomplete/chainUrl/${chainUrl}" },
-            {
-              key: "chainVersion",
-              url: "/${version}/autocomplete/chainVersion/${chainUrl}/${chainVersion}",
-            },
-            {
-              key: "file",
-              url: "/${version}/autocomplete/chainFile/${chainUrl}/${chainVersion}/${file}",
-            },
-          ],
-        },
-      ],
-    })
   }
 
   async autocompleteApi(path: string, version: string) {
