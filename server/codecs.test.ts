@@ -9,9 +9,6 @@ import { highlighterPromise } from "./server.ts"
 await highlighterPromise
 
 for (const runtime of Object.keys(testClients)) {
-  if (runtime === "polkadot") {
-    continue
-  }
   Deno.test(runtime, async () => {
     let port: number
     const server = new LocalCapiCodegenServer()
