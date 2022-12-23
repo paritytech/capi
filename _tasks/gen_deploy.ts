@@ -8,7 +8,7 @@ await ensureDir("target")
 await Deno.writeTextFile(
   "target/deploy.ts",
   `
-import { DenoDeployCodegenServer } from "../codegen/server/deploy.ts"
+import { DenoDeployCodegenServer } from "../server/deploy.ts"
 
 new DenoDeployCodegenServer(
   "sha:${sha}",
