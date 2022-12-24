@@ -1,4 +1,4 @@
-import { babel, babelPresetTypeScript } from "../deps/escad_babel.ts"
+import { babel, babelPresetTypeScript } from "../deps/babel.ts"
 import { contentType } from "../deps/media_types.ts"
 import { Application, send } from "../deps/oak.ts"
 import * as path from "../deps/std/path.ts"

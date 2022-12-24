@@ -39,6 +39,8 @@ const RENDERED_HTML_TTL = 60_000 // 1 minute
 const R_WITH_CAPI_VERSION = /^\/@([^\/]+)(\/.*)?$/
 const R_WITH_CHAIN_URL = /^\/proxy\/(dev:\w+|wss?:[^\/]+)\/(?:@([^\/]+)\/)?(.*)$/
 
+const $index = $.array($.str)
+
 export abstract class Server {
   abstract cache: CacheBase
   abstract local: boolean
@@ -70,7 +72,7 @@ export abstract class Server {
   async root(request: Request): Promise<Response> {
     const fullPath = new URL(request.url).pathname
     if (fullPath === "/.well-known/deno-import-intellisense.json") {
-      return await serveFile(request, new URL("completions.json", import.meta.url).pathname)
+      return await fetch(new URL("completions.json", import.meta.url))
     }
     const versionMatch = R_WITH_CAPI_VERSION.exec(fullPath)
     if (!versionMatch) {
@@ -161,7 +163,7 @@ export const client = C.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chainUrl
   async chainIndex(chainUrl: string, version: string, chainVersion: string) {
     return await this.cache.get(
       `generated/@${version}/${chainUrl}/@${chainVersion}/_index`,
-      $.array($.str),
+      $index,
       async () => {
         const files = await this.files(chainUrl, version, chainVersion)
         return [...files.keys()]
