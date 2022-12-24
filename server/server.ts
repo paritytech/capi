@@ -1,14 +1,14 @@
-import { serve } from "https://deno.land/std@0.165.0/http/server.ts"
-import { escapeHtml } from "https://deno.land/x/escape@1.4.2/mod.ts"
-import * as shiki from "https://esm.sh/shiki@0.11.1?bundle"
 import { Files } from "../codegen/Files.ts"
 import { codegen } from "../codegen/mod.ts"
+import { escapeHtml } from "../deps/escape.ts"
 import * as $ from "../deps/scale.ts"
+import * as shiki from "../deps/shiki.ts"
+import { serve } from "../deps/std/http/server.ts"
 import * as C from "../mod.ts"
 import * as T from "../test_util/mod.ts"
 import * as U from "../util/mod.ts"
 import { TimedMemo } from "../util/mod.ts"
-import { Cache } from "./cache.ts"
+import { CacheBase } from "./cache/mod.ts"
 
 shiki.setCDN("https://unpkg.com/shiki/")
 export const highlighterPromise = shiki.getHighlighter({ theme: "github-dark", langs: ["ts"] })
@@ -40,8 +40,8 @@ const R_WITH_CHAIN_URL = /^\/proxy\/(dev:\w+|wss?:[^\/]+)\/(?:@([^\/]+)\/)?(.*)$
 
 const $index = $.array($.str)
 
-export abstract class CodegenServer {
-  abstract cache: Cache
+export abstract class Server {
+  abstract cache: CacheBase
   abstract local: boolean
   abstract mainVersion: string
   abstract canHandleVersion(version: string): Promise<boolean>
@@ -71,7 +71,7 @@ export abstract class CodegenServer {
   async root(request: Request): Promise<Response> {
     const fullPath = new URL(request.url).pathname
     if (fullPath === "/.well-known/deno-import-intellisense.json") {
-      return this.autocompleteSchema()
+      return await fetch(new URL("completions.json", import.meta.url))
     }
     const versionMatch = R_WITH_CAPI_VERSION.exec(fullPath)
     if (!versionMatch) {
@@ -168,38 +168,6 @@ export const client = C.rpcClient(C.rpc.proxyProvider, ${JSON.stringify(chainUrl
         return [...files.keys()]
       },
     )
-  }
-
-  autocompleteSchema() {
-    return this.json({
-      version: 2,
-      registries: [
-        {
-          schema: "/:version(@[^/]*)?/:file*",
-          variables: [
-            { key: "version", url: "/autocomplete/version" },
-            { key: "file", url: "/${version}/autocomplete/moduleFile/${file}" },
-          ],
-        },
-        {
-          schema:
-            "/:version(@[^/]*)/:_proxy(proxy)/:chainUrl(dev:\\w*|wss?:[^/]*)/:chainVersion(@[^/]+)/:file*",
-          variables: [
-            { key: "version", url: "/autocomplete/version" },
-            { key: "_proxy", url: "/autocomplete/null" },
-            { key: "chainUrl", url: "/${version}/autocomplete/chainUrl/${chainUrl}" },
-            {
-              key: "chainVersion",
-              url: "/${version}/autocomplete/chainVersion/${chainUrl}/${chainVersion}",
-            },
-            {
-              key: "file",
-              url: "/${version}/autocomplete/chainFile/${chainUrl}/${chainVersion}/${file}",
-            },
-          ],
-        },
-      ],
-    })
   }
 
   async autocompleteApi(path: string, version: string) {

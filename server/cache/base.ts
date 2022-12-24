@@ -1,9 +1,7 @@
-import * as $ from "../deps/scale.ts"
-import * as fs from "../deps/std/fs.ts"
-import * as path from "../deps/std/path.ts"
-import { getOrInit, PermanentMemo, TimedMemo, WeakMemo } from "../util/mod.ts"
+import * as $ from "../../deps/scale.ts"
+import { getOrInit, TimedMemo, WeakMemo } from "../../util/mod.ts"
 
-export abstract class Cache {
+export abstract class CacheBase {
   constructor(readonly signal: AbortSignal) {
     this.stringMemo = new TimedMemo<string, string>(-1, this.signal)
   }
@@ -41,49 +39,5 @@ export abstract class Cache {
   listMemo = new WeakMemo<string, string[]>()
   list(prefix: string) {
     return this.listMemo.run(prefix, () => this._list(prefix))
-  }
-}
-
-export class FsCache extends Cache {
-  constructor(readonly location: string, signal: AbortSignal) {
-    super(signal)
-  }
-
-  async _getRaw(key: string, init: () => Promise<Uint8Array>) {
-    const file = path.join(this.location, key)
-    try {
-      return await Deno.readFile(file)
-    } catch (e) {
-      if (!(e instanceof Deno.errors.NotFound)) throw e
-      const content = await init()
-      await fs.ensureDir(path.dirname(file))
-      await Deno.writeFile(file, content)
-      return content
-    }
-  }
-
-  async _list(prefix: string): Promise<string[]> {
-    try {
-      const result = []
-      for await (const entry of Deno.readDir(path.join(this.location, prefix))) {
-        result.push(entry.name)
-      }
-      return result
-    } catch (e) {
-      if (e instanceof Deno.errors.NotFound) {
-        return []
-      }
-      throw e
-    }
-  }
-}
-
-export class InMemoryCache extends Cache {
-  memo = new PermanentMemo<string, Uint8Array>()
-  _getRaw(key: string, init: () => Promise<Uint8Array>): Promise<Uint8Array> {
-    return Promise.resolve(this.memo.run(key, init))
-  }
-  _list(): Promise<string[]> {
-    throw new Error("unimplemented")
   }
 }
