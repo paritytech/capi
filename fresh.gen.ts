@@ -7,9 +7,9 @@ import * as $0 from "./routes/[...path].tsx";
 import * as $1 from "./routes/_404.tsx";
 import * as $2 from "./routes/_500.tsx";
 import * as $3 from "./routes/_app.tsx";
-import * as $4 from "./routes/docs/[...path].tsx";
-import * as $5 from "./routes/index.tsx";
-import * as $$0 from "./islands/Counter.tsx";
+import * as $4 from "./routes/autocomplete/[...path].ts";
+import * as $5 from "./routes/docs/[...path].tsx";
+import * as $6 from "./routes/index.tsx";
 
 const manifest = {
   routes: {
@@ -17,12 +17,11 @@ const manifest = {
     "./routes/_404.tsx": $1,
     "./routes/_500.tsx": $2,
     "./routes/_app.tsx": $3,
-    "./routes/docs/[...path].tsx": $4,
-    "./routes/index.tsx": $5,
+    "./routes/autocomplete/[...path].ts": $4,
+    "./routes/docs/[...path].tsx": $5,
+    "./routes/index.tsx": $6,
   },
-  islands: {
-    "./islands/Counter.tsx": $$0,
-  },
+  islands: {},
   baseUrl: import.meta.url,
   config,
 };
