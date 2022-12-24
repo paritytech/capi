@@ -1,15 +1,12 @@
 {
-  "[jsonc]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
   "[yaml]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[typescript]": {
     "editor.defaultFormatter": "dprint.dprint"
   },
-  "deno.codeLens.testArgs": ["--no-check=remote", "-A", "-L=info"],
-  "deno.config": "./deno.jsonc",
+  "deno.codeLens.testArgs": ["-A", "-L=info"],
+  "deno.config": "./deno.json",
   "deno.importMap": "./import_map.json",
   "deno.suggest.imports.hosts": {
     "https://deno.land": true,

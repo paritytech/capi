@@ -10,17 +10,14 @@
       "**/.git/subtree-cache/**": true,
       "target/**": true
     },
-    "[jsonc]": {
-      "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
     "[yaml]": {
       "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "[typescript]": {
       "editor.defaultFormatter": "dprint.dprint"
     },
-    "deno.codeLens.testArgs": ["--no-check=remote", "-A", "-L=info"],
-    "deno.config": "./deno.jsonc",
+    "deno.codeLens.testArgs": ["-A", "-L=info"],
+    "deno.config": "./deno.json",
     "deno.enable": true,
     "deno.lint": true,
     "editor.defaultFormatter": "dprint.dprint",
@@ -34,6 +31,7 @@
     "dprint.dprint",
     "esbenp.prettier-vscode",
     "ms-azuretools.vscode-docker",
+    "sastan.twind-intellisense",
     "streetsidesoftware.code-spell-checker",
     "vadimcn.vscode-lldb",
     "bungcip.better-toml"

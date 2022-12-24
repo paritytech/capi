@@ -5,6 +5,7 @@
     "dprint.dprint",
     "esbenp.prettier-vscode",
     "ms-azuretools.vscode-docker",
+    "sastan.twind-intellisense",
     "streetsidesoftware.code-spell-checker",
     "vadimcn.vscode-lldb"
   ]
