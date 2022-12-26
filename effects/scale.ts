@@ -10,6 +10,7 @@ const k2_ = Symbol()
 const k3_ = Symbol()
 const k4_ = Symbol()
 const k5_ = Symbol()
+const k6_ = Symbol()
 
 export const deriveCodec = Z.call.fac((metadata: M.Metadata) => {
   return DeriveCodec(metadata.tys)
@@ -81,3 +82,13 @@ export const $storageKey = Z.call.fac((
     storageEntry,
   })
 }, k5_)
+
+export const $call = Z.call.fac((
+  deriveCodec: DeriveCodec,
+  metadata: M.Metadata,
+) => {
+  return M.$call({
+    deriveCodec,
+    metadata,
+  })
+}, k6_)

@@ -8,9 +8,8 @@ import {
   Balances,
   System,
 } from "http://localhost:5646/@local/proxy/dev:polkadot/@v0.9.36/pallets/mod.ts"
-import { SignedExtrinsic } from "../effects/extrinsic.ts"
 
-// FIXME: remove this check once the Zones .bind(env) fix is merged
+// FIXME: remove this check once the Zones .run() fix is merged
 const hostname = Deno.env.get("TEST_CTX_HOSTNAME")
 const portRaw = Deno.env.get("TEST_CTX_PORT")
 if (!hostname || !portRaw) {
@@ -48,8 +47,8 @@ const proposalByAlice = multisig.ratify({
   .signed(T.alice.sign)
 
 // Get the proposal callHash
-// TODO: implement extrinsic().callHash
-const callHash = multisig.proposals(1).access(0).access(1).as<Uint8Array>()
+const callHash = C.callHash(client)(call)
+// const callHash = multisig.proposals(1).access(0).access(1).as<Uint8Array>()
 
 // Get the timepoint
 const maybeTimepoint = multisig.proposal(callHash).access("value").access("when")
@@ -85,7 +84,7 @@ console.log(
 U.throwIfError(await watchExtrinsic(approvalByCharlie, "Approval").run())
 console.log(U.throwIfError(await daveBalance.run()))
 
-function watchExtrinsic(extrinsic: SignedExtrinsic, label: string) {
+function watchExtrinsic(extrinsic: C.SignedExtrinsic, label: string) {
   return extrinsic
     .watch(({ end }) => (status) => {
       console.log(`${label}:`, status)
