@@ -22,6 +22,12 @@ interface VoteProps {
   maybeTimepoint?: Timepoint
 }
 
+interface CancelProps {
+  sender: MultiAddress
+  callHash: Uint8Array
+  timepoint: Timepoint
+}
+
 export class Multisig<Client extends Z.Effect<rpc.Client>> {
   readonly address
   constructor(
@@ -84,6 +90,28 @@ export class Multisig<Client extends Z.Effect<rpc.Client>> {
             proofSize: 0n,
           },
           maybeTimepoint,
+        }),
+      }),
+    })
+  }
+
+  cancel<Props extends Z.Rec$<CancelProps>>({
+    sender,
+    callHash,
+    timepoint,
+  }: Props) {
+    return extrinsic(this.client)({
+      sender,
+      call: Z.rec({
+        type: "Multisig",
+        value: Z.rec({
+          type: "cancelAsMulti",
+          threshold: this.threshold,
+          callHash,
+          otherSignatories: Z.ls(sender).next(([sender]) =>
+            this.signatories.filter((value) => !u8a.isEqual(value, sender.value!))
+          ),
+          timepoint,
         }),
       }),
     })
