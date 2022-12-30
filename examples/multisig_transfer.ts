@@ -42,10 +42,10 @@ const call = Balances.transferKeepAlive({
 const proposalByAlice = multisig.ratify({
   sender: T.alice.address,
   call,
-  maybeTimepoint: undefined,
 })
   .signed(T.alice.sign)
 
+// TODO: upon fixing effect sys, move timepoint retrieval into ratify
 // Get the proposal callHash
 const callHash = C.callHash(client)(call)
 // const callHash = multisig.proposals(1).access(0).access(1).as<Uint8Array>()
