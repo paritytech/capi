@@ -1,7 +1,7 @@
 image:
   file: Dockerfile
 tasks:
-  - init: deno task star
+  - init: deno task codegen && deno task star
 vscode:
   extensions:
     - EditorConfig.EditorConfig
