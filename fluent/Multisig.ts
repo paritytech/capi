@@ -1,9 +1,10 @@
+import * as bytes from "../deps/std/bytes.ts"
 import * as Z from "../deps/zones.ts"
 import { entryRead, entryReadRaw, keyPageRead } from "../effects/mod.ts"
 import { extrinsic } from "../mod.ts"
 import { MultiAddress } from "../primitives/mod.ts"
 import * as rpc from "../rpc/mod.ts"
-import { multisigAddress, u8a } from "../util/mod.ts"
+import { multisigAddress } from "../util/mod.ts"
 
 interface Timepoint {
   height: number
@@ -58,7 +59,7 @@ export class Multisig<Client extends Z.Effect<rpc.Client>> {
           threshold: this.threshold,
           call,
           otherSignatories: Z.ls(sender).next(([sender]) =>
-            this.signatories.filter((value) => !u8a.isEqual(value, sender.value!))
+            this.signatories.filter((value) => !bytes.equals(value, sender.value!))
           ),
           storeCall: false,
           maxWeight,
@@ -82,7 +83,7 @@ export class Multisig<Client extends Z.Effect<rpc.Client>> {
           threshold: this.threshold,
           callHash,
           otherSignatories: Z.ls(sender).next(([sender]) =>
-            this.signatories.filter((value) => !u8a.isEqual(value, sender.value!))
+            this.signatories.filter((value) => !bytes.equals(value, sender.value!))
           ),
           storeCall: false,
           maxWeight: {
@@ -109,7 +110,7 @@ export class Multisig<Client extends Z.Effect<rpc.Client>> {
           threshold: this.threshold,
           callHash,
           otherSignatories: Z.ls(sender).next(([sender]) =>
-            this.signatories.filter((value) => !u8a.isEqual(value, sender.value!))
+            this.signatories.filter((value) => !bytes.equals(value, sender.value!))
           ),
           timepoint,
         }),
