@@ -3,6 +3,7 @@ import * as Z from "../deps/zones.ts"
 import { MultiAddress, Signer } from "../primitives/mod.ts"
 import * as rpc from "../rpc/mod.ts"
 import { era } from "../scale_info/mod.ts"
+import { Blake2_256 } from "../util/hashers.ts"
 import * as U from "../util/mod.ts"
 import { const as const_ } from "./const.ts"
 import { metadata } from "./metadata.ts"
@@ -51,10 +52,14 @@ export class Extrinsic<
       .next(({ weight, ...rest }) => ({
         ...rest,
         weight: {
-          proofSize: BigInt(weight.proof_size),
-          refTime: BigInt(weight.ref_time),
+          proofSize: BigInt(typeof weight === "number" ? 0 : weight.proof_size),
+          refTime: BigInt(typeof weight === "number" ? weight : weight.ref_time),
         },
       }))
+  }
+
+  get callHash() {
+    return callHash(this.client)(this.props.call)
   }
 }
 
@@ -160,4 +165,23 @@ function $extrinsic<
     .access("value")
     .as<number>()
   return scale.$extrinsic(deriveCodec_, metadata_, sign!, addrPrefix)
+}
+
+function $call<
+  Client extends Z.$<rpc.Client> = Z.$<rpc.Client>,
+>(client: Client) {
+  const metadata_ = metadata(client)()
+  const deriveCodec_ = scale.deriveCodec(metadata_)
+  return scale.$call(deriveCodec_, metadata_)
+}
+
+export function callHash<
+  Client extends Z.$<rpc.Client> = Z.$<rpc.Client>,
+  Call extends Z.$<unknown> = Z.$<unknown>,
+>(client: Client) {
+  return (call: Call) => {
+    return Z.ls($call(client), call).next(([codec, call]) => {
+      return Blake2_256.hash(codec.encode(call))
+    })
+  }
 }

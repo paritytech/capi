@@ -34,9 +34,7 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
   const { metadata, deriveCodec } = props
   const { signedExtensions } = metadata.extrinsic
   const $multisigPromise = $.promise($multiSignature)
-  const callTy = findExtrinsicTypeParam("Call")!
-  assert(callTy?.type === "Union")
-  const $call = deriveCodec(callTy)
+  const $call_ = $call(props)
   const [$extra, extraPjsInfo] = getExtensionInfo(pjsExtraKeyMap, "ty")
   const [$additional, additionalPjsInfo] = getExtensionInfo(
     pjsAdditionalKeyMap,
@@ -44,7 +42,7 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
   )
   const pjsInfo = [...extraPjsInfo, ...additionalPjsInfo]
 
-  const toSignSize = $call._staticSize + $extra._staticSize + $additional._staticSize
+  const toSignSize = $call_._staticSize + $extra._staticSize + $additional._staticSize
   const totalSize = 1 + $multiAddress._staticSize + $multiSignature._staticSize + toSignSize
 
   const $baseExtrinsic: $.Codec<Extrinsic> = $.createCodec({
@@ -58,7 +56,7 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
         $multiAddress._encode(buffer, signature.address)
         if ("additional" in signature) {
           const toSignBuffer = new $.EncodeBuffer(buffer.stealAlloc(toSignSize))
-          $call._encode(toSignBuffer, call)
+          $call_._encode(toSignBuffer, call)
           const callEnd = toSignBuffer.finishedSize + toSignBuffer.index
           if ("signPayload" in props.sign) {
             const exts = [...signature.extra, ...signature.additional]
@@ -118,10 +116,10 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
         } else {
           $multiSignature._encode(buffer, signature.sig)
           $extra._encode(buffer, signature.extra)
-          $call._encode(buffer, call)
+          $call_._encode(buffer, call)
         }
       } else {
-        $call._encode(buffer, call)
+        $call_._encode(buffer, call)
       }
     },
     _decode(buffer) {
@@ -135,14 +133,14 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
         const extra = $extra._decode(buffer)
         signature = { address, sig, extra }
       }
-      const call = $call._decode(buffer)
+      const call = $call_._decode(buffer)
       return { protocolVersion, signature, call }
     },
     _assert(assert) {
       assert.typeof(this, "object")
       assert.key(this, "protocolVersion").equals($.u8, 4)
       const value_ = assert.value as any
-      $call._assert(assert.key(this, "call"))
+      $call_._assert(assert.key(this, "call"))
       if (value_.signature) {
         const signatureAssertState = assert.key(this, "signature")
         $multiAddress._assert(signatureAssertState.key(this, "address"))
@@ -161,9 +159,6 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
     $.lenPrefixed($baseExtrinsic),
   )
 
-  function findExtrinsicTypeParam(name: string) {
-    return metadata.extrinsic.ty.params.find((x) => x.name === name)?.ty
-  }
   function getExtensionInfo(
     keyMap: Record<string, string | undefined>,
     key: "ty" | "additionalSigned",
@@ -173,6 +168,18 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
       .filter((x) => x.codec !== $null)
     return [$.tuple(...pjsInfo.map((x) => x.codec)), pjsInfo]
   }
+}
+
+interface CallCodecProps {
+  metadata: Metadata
+  deriveCodec: DeriveCodec
+}
+
+export function $call(props: CallCodecProps): $.Codec<unknown> {
+  const { metadata, deriveCodec } = props
+  const callTy = metadata.extrinsic.ty.params.find((x) => x.name === "Call")?.ty!
+  assert(callTy?.type === "Union")
+  return deriveCodec(callTy.id)
 }
 
 const pjsExtraKeyMap: Record<string, string> = {
