@@ -2,14 +2,14 @@ import { deadline, deferred, delay } from "../../deps/std/async.ts"
 import { assertEquals, assertInstanceOf } from "../../deps/std/testing/asserts.ts"
 import { getOpenPort } from "../../test_util/common.ts"
 import * as T from "../../test_util/mod.ts"
-import { reconnectableProxyProvider } from "./reconnectableProxy.ts"
+import { reconnectableProxyProviderFactory } from "./reconnectableProxy.ts"
 
 Deno.test({
   name: "Reconnectable Proxy Provider",
   async fn() {
     const port = getOpenPort()
     const { waiter, listener } = takeListenerEvents(3)
-    const provider = reconnectableProxyProvider(`ws://127.0.0.1:${port}`, listener)
+    const provider = reconnectableProxyProviderFactory(1)(`ws://127.0.0.1:${port}`, listener)
     const message = { id: 0, jsonrpc: "2.0" as const, method: "method", params: [] }
     // send without an active connection
     provider.send(message)
@@ -19,7 +19,7 @@ Deno.test({
         this.send(v.data)
       },
     })
-    await delay(1)
+    await delay(0)
     // send with an active connection
     provider.send(message)
     const events = await waiter
