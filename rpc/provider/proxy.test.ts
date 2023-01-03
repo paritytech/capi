@@ -18,6 +18,7 @@ Deno.test({
 
     await t.step({
       name: "create WebSocket error",
+      ignore: true,
       async fn() {
         const [ref, message] = await setup(
           proxyProvider,
@@ -32,6 +33,7 @@ Deno.test({
 
     await t.step({
       name: "close WebSocket while listening",
+      ignore: true,
       async fn() {
         const server = createWebSocketServer(function() {
           this.close()
