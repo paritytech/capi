@@ -98,7 +98,7 @@ function closeWs(socket: WebSocket): Promise<undefined | ProviderCloseError<Even
   }
   return new Promise<undefined | ProviderCloseError<Event>>((resolve) => {
     const controller = new AbortController()
-    socket.addEventListener("close", () => {
+    socket.addEventListener("close", (e) => {
       controller.abort()
       resolve(undefined)
     }, controller)

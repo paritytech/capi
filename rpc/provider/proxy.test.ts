@@ -33,8 +33,10 @@ Deno.test({
     await t.step({
       name: "close WebSocket while listening",
       async fn() {
-        const server = createWebSocketServer(function() {
-          this.close()
+        const server = T.createWebSocketServer({
+          onMessage: function() {
+            this.close()
+          },
         })
         const [ref, message] = await setup(
           proxyProvider,
@@ -51,7 +53,7 @@ Deno.test({
     await t.step({
       name: "send non-JSON message",
       async fn() {
-        const server = createWebSocketServer()
+        const server = T.createWebSocketServer()
         const [ref, message] = await setup(
           proxyProvider,
           server.url,
@@ -66,21 +68,3 @@ Deno.test({
     })
   },
 })
-
-function createWebSocketServer(onMessage?: WebSocket["onmessage"]) {
-  const onmessage = onMessage ?? (() => {})
-  const listener = Deno.listen({ port: 0 })
-  ;(async () => {
-    for await (const conn of listener) {
-      for await (const e of Deno.serveHttp(conn)) {
-        const { socket, response } = Deno.upgradeWebSocket(e.request)
-        socket.onmessage = onmessage
-        e.respondWith(response)
-      }
-    }
-  })()
-  return {
-    close: () => listener.close(),
-    url: `ws://localhost:${(listener.addr as Deno.NetAddr).port}`,
-  }
-}
