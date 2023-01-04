@@ -71,3 +71,54 @@ export function nextIdFactory() {
   let i = 0
   return () => i++
 }
+
+export class ListenersContainer<
+  DiscoveryValue,
+  SendErrorData,
+  HandlerErrorData,
+> {
+  #listeners = new Map<
+    DiscoveryValue,
+    Map<
+      ProviderListener<SendErrorData, HandlerErrorData>,
+      ProviderListener<SendErrorData, HandlerErrorData>
+    >
+  >()
+
+  set(discoveryValue: DiscoveryValue, listener: ProviderListener<SendErrorData, HandlerErrorData>) {
+    let map = this.#listeners.get(discoveryValue)
+    if (!map) {
+      map = new Map()
+      this.#listeners.set(discoveryValue, map)
+    }
+    if (map.has(listener)) return
+    map.set(
+      listener,
+      listener.bind({
+        stop: () => map!.delete(listener),
+      }),
+    )
+  }
+
+  delete(
+    discoveryValue: DiscoveryValue,
+    listener: ProviderListener<SendErrorData, HandlerErrorData>,
+  ) {
+    this.#listeners.get(discoveryValue)?.delete(listener)
+  }
+
+  count(discoveryValue: DiscoveryValue) {
+    return this.#listeners.get(discoveryValue)?.size ?? 0
+  }
+
+  forEachListener(
+    discoveryValue: DiscoveryValue,
+    message: Parameters<ProviderListener<SendErrorData, HandlerErrorData>>[0],
+  ) {
+    const map = this.#listeners.get(discoveryValue)
+    if (!map) return
+    for (const listener of map.values()) {
+      listener(message)
+    }
+  }
+}

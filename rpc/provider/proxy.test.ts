@@ -5,9 +5,14 @@ import { setup } from "./test_util.ts"
 
 Deno.test({
   name: "Proxy Provider",
+  sanitizeResources: false,
+  sanitizeOps: false,
   async fn(t) {
     await t.step({
       name: "send/listen",
+      // TODO: await T.polkadot initializes a 2nd proxyProvider
+      sanitizeResources: false,
+      sanitizeOps: false,
       async fn() {
         const [ref, message] = await setup(proxyProvider, await T.polkadot.url, "system_health", [])
         A.assertNotInstanceOf(message, Error)
@@ -18,7 +23,6 @@ Deno.test({
 
     await t.step({
       name: "create WebSocket error",
-      ignore: true,
       async fn() {
         const [ref, message] = await setup(
           proxyProvider,
@@ -33,7 +37,6 @@ Deno.test({
 
     await t.step({
       name: "close WebSocket while listening",
-      ignore: true,
       async fn() {
         const server = createWebSocketServer(function() {
           this.close()
