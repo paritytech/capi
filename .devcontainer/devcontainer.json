@@ -34,10 +34,9 @@
     "dprint.dprint",
     "esbenp.prettier-vscode",
     "ms-azuretools.vscode-docker",
-    "sastan.twind-intellisense",
     "streetsidesoftware.code-spell-checker",
     "vadimcn.vscode-lldb",
     "bungcip.better-toml"
   ],
-  "postCreateCommand": "deno task codegen && deno task star"
+  "postCreateCommand": "deno task cache && deno task star"
 }

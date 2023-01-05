@@ -1,17 +1,16 @@
 import * as flags from "./deps/std/flags.ts"
-import { serve } from "./server/mod.ts"
+import { serve } from "./server/local/serve.ts"
 
-const { cache, help, port: portRaw } = flags.parse(Deno.args, {
-  string: ["port", "cache"],
-  alias: {
-    p: "port",
-    c: "cache",
-    h: "help",
-  },
+const { help, port: portRaw, "--": cacheCmdRest } = flags.parse(Deno.args, {
+  string: ["port"],
   boolean: ["help"],
+  "--": true,
   default: {
-    cache: false,
     port: "8000",
+  },
+  alias: {
+    h: "help",
+    p: "port",
   },
 })
 
@@ -34,10 +33,10 @@ serve({
   signal: abortController.signal,
 })
 
-if (cache) {
+if (cacheCmdRest.length) {
   await Deno
     .run({
-      cmd: ["deno", "cache", `-r=http://localhost:${port}`, ...Deno.args],
+      cmd: ["deno", "cache", `-r=http://localhost:${port}`, ...cacheCmdRest],
       stderr: "inherit",
       stdout: "inherit",
     })

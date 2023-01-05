@@ -47,5 +47,5 @@ jobs:
           binary-name: zombienet-linux
           binary-version: v1.3.18
           binary-github: https://github.com/paritytech/zombienet
-      - run: deno task codegen
+      - run: deno task cache
       - run: deno task run ${{ matrix.example_path }}

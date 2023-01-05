@@ -37,7 +37,7 @@
     "udd": "deno task star && deno task run https://deno.land/x/udd@0.5.0/main.ts target/star.ts",
     "dnt": "deno task run _tasks/dnt.ts",
     "star": "deno task run _tasks/star.ts && deno cache --check target/star.ts",
-    "codegen": "deno task run cache.ts examples/mod.ts",
+    "cache": "deno task run main.ts -- examples/mod.ts",
     "test": "deno task run test_util/ctx.ts -- deno test -A -L=info --ignore=target --parallel",
     "test:examples": "deno task test _tasks/test_examples.ts -- examples",
     "test:update": "deno task test -- -- --update",
