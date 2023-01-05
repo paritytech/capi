@@ -17,7 +17,7 @@
       "editor.defaultFormatter": "dprint.dprint"
     },
     "deno.codeLens.testArgs": ["-A", "-L=info"],
-    "deno.config": "./deno.json",
+    "deno.config": "./deno.jsonc",
     "deno.enable": true,
     "deno.lint": true,
     "editor.defaultFormatter": "dprint.dprint",
