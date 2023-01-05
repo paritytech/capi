@@ -86,11 +86,11 @@ export class ListenersContainer<
   >()
 
   set(discoveryValue: DiscoveryValue, listener: ProviderListener<SendErrorData, HandlerErrorData>) {
-    let map = this.#listeners.get(discoveryValue)
-    if (!map) {
-      map = new Map()
-      this.#listeners.set(discoveryValue, map)
-    }
+    const map = U.getOrInit(this.#listeners, discoveryValue, () =>
+      new Map<
+        ProviderListener<SendErrorData, HandlerErrorData>,
+        ProviderListener<SendErrorData, HandlerErrorData>
+      >())
     if (map.has(listener)) return
     map.set(
       listener,

@@ -1,6 +1,6 @@
 import * as A from "../../deps/std/testing/asserts.ts"
 import * as T from "../../test_util/mod.ts"
-import { proxyProvider } from "./proxy.ts"
+import { proxyProviderFactory } from "./proxy.ts"
 import { setup } from "./test_util.ts"
 
 Deno.test({
@@ -14,7 +14,12 @@ Deno.test({
       sanitizeResources: false,
       sanitizeOps: false,
       async fn() {
-        const [ref, message] = await setup(proxyProvider, await T.polkadot.url, "system_health", [])
+        const [ref, message] = await setup(
+          proxyProviderFactory(),
+          await T.polkadot.url,
+          "system_health",
+          [],
+        )
         A.assertNotInstanceOf(message, Error)
         A.assertExists(message.result)
         A.assertNotInstanceOf(await ref.release(), Error)
@@ -25,7 +30,7 @@ Deno.test({
       name: "create WebSocket error",
       async fn() {
         const [ref, message] = await setup(
-          proxyProvider,
+          proxyProviderFactory({ retryOptions: { maxAttempts: 1 } }),
           "invalid-endpoint-url",
           "system_health",
           [],
@@ -42,7 +47,7 @@ Deno.test({
           this.close()
         })
         const [ref, message] = await setup(
-          proxyProvider,
+          proxyProviderFactory(),
           server.url,
           "system_health",
           [],
@@ -58,7 +63,7 @@ Deno.test({
       async fn() {
         const server = createWebSocketServer()
         const [ref, message] = await setup(
-          proxyProvider,
+          proxyProviderFactory(),
           server.url,
           "system_health",
           // make JSON.stringify to throw

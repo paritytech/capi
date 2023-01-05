@@ -1,48 +1,67 @@
-import { retry } from "../../deps/std/async.ts"
+import { retry, RetryOptions } from "../../deps/std/async.ts"
 import * as msg from "../messages.ts"
 import { ListenersContainer, nextIdFactory, Provider, ProviderListener } from "./base.ts"
 import { ProviderCloseError, ProviderHandlerError, ProviderSendError } from "./errors.ts"
 
-const nextId = nextIdFactory()
-
-const listenersContainer = new ListenersContainer<string, Event, Event>()
-const activeWs = new Map<string, WebSocket>()
-const connectingWs = new Map<string, Promise<WebSocket>>()
 const CUSTOM_WS_CLOSE_CODE = 4000
 
-export const proxyProvider: Provider<string, Event, Event, Event> = (url, listener) => {
-  listenersContainer.set(url, listener)
-  let ws: WebSocket | undefined
-  return {
-    nextId,
-    send: (message) => {
-      ;(async () => {
-        try {
-          ws = await openedWs(url, (e) => listenersContainer.forEachListener(url, e))
-        } catch (error) {
-          return listener(new ProviderHandlerError(error as Event))
+export interface ProxyProviderFactoryProps {
+  retryOptions?: RetryOptions
+}
+
+export const proxyProviderFactory = (
+  { retryOptions }: ProxyProviderFactoryProps = {},
+): Provider<string, Event, Event, Event> => {
+  const listenersContainer = new ListenersContainer<string, Event, Event>()
+  const activeWs = new Map()
+  const connectingWs = new Map()
+  return (url, listener) => {
+    listenersContainer.set(url, listener)
+    let ws: WebSocket | undefined
+    return {
+      nextId: nextIdFactory(),
+      send: (message) => {
+        ;(async () => {
+          try {
+            ws = await openedWs({
+              url,
+              activeWs,
+              connectingWs,
+              retryOptions,
+              listener: (e) => listenersContainer.forEachListener(url, e),
+            })
+          } catch (error) {
+            return listener(new ProviderHandlerError(error as Event))
+          }
+          try {
+            ws.send(JSON.stringify(message))
+          } catch (error) {
+            listener(new ProviderSendError(error as Event, message))
+          }
+        })()
+      },
+      release: () => {
+        listenersContainer.delete(url, listener)
+        if (!listenersContainer.count(url) && ws) {
+          return closeWs(ws)
         }
-        try {
-          ws.send(JSON.stringify(message))
-        } catch (error) {
-          listener(new ProviderSendError(error as Event, message))
-        }
-      })()
-    },
-    release: () => {
-      listenersContainer.delete(url, listener)
-      if (!listenersContainer.count(url) && ws) {
-        return closeWs(ws)
-      }
-      return Promise.resolve(undefined)
-    },
+        return Promise.resolve(undefined)
+      },
+    }
   }
 }
 
-function openedWs(
-  url: string,
-  listener: ProviderListener<Event, Event>,
-) {
+export const proxyProvider = proxyProviderFactory()
+
+interface OpenedWsProps {
+  url: string
+  activeWs: Map<string, WebSocket>
+  connectingWs: Map<string, Promise<WebSocket>>
+  retryOptions?: RetryOptions
+  listener: ProviderListener<Event, Event>
+}
+
+function openedWs({ url, activeWs, connectingWs, listener, retryOptions }: OpenedWsProps) {
   return retry(() => {
     if (activeWs.has(url)) {
       return Promise.resolve(activeWs.get(url)!)
@@ -101,7 +120,7 @@ function openedWs(
     })
     connectingWs.set(url, openedWs)
     return openedWs
-  })
+  }, retryOptions)
 }
 
 function closeWs(socket: WebSocket): Promise<undefined | ProviderCloseError<Event>> {
