@@ -35,7 +35,8 @@
     "esbenp.prettier-vscode",
     "ms-azuretools.vscode-docker",
     "streetsidesoftware.code-spell-checker",
-    "vadimcn.vscode-lldb"
+    "vadimcn.vscode-lldb",
+    "bungcip.better-toml"
   ],
   "postCreateCommand": "deno task codegen && deno task star"
 }
