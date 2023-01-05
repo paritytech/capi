@@ -1,5 +1,5 @@
 import * as flags from "./deps/std/flags.ts"
-import { serve } from "./server/local/serve.ts"
+import { local } from "./server/mod.ts"
 
 const { help, port: portRaw, "--": cacheCmdRest } = flags.parse(Deno.args, {
   string: ["port"],
@@ -28,10 +28,7 @@ try {
 
 const abortController = new AbortController()
 
-serve({
-  port,
-  signal: abortController.signal,
-})
+local.serve(port, abortController.signal)
 
 if (cacheCmdRest.length) {
   await Deno
