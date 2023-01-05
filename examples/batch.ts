@@ -1,12 +1,8 @@
-import * as T from "http://localhost:5646/@local/test_util/mod.ts"
-import * as U from "http://localhost:5646/@local/util/mod.ts"
+import * as C from "http://localhost:8000/mod.ts"
+import * as U from "http://localhost:8000/util/mod.ts"
 
-import { extrinsic } from "http://localhost:5646/@local/proxy/dev:westend/@v0.9.36/mod.ts"
-import {
-  Balances,
-  Utility,
-} from "http://localhost:5646/@local/proxy/dev:westend/@v0.9.36/pallets/mod.ts"
-import { collectExtrinsicEvents } from "http://localhost:5646/@local/test_util/extrinsic.ts"
+import { extrinsic } from "http://localhost:8000/dev/westend/@v0.9.36/mod.ts"
+import { Balances, Utility } from "http://localhost:8000/dev/westend/@v0.9.36/pallets/mod.ts"
 
 // TODO: uncomment these lines / use env upon solving `count` in zones
 // const getBalances = C.Z.ls(
@@ -16,18 +12,20 @@ import { collectExtrinsicEvents } from "http://localhost:5646/@local/test_util/e
 //   }),
 // )
 
-const root = collectExtrinsicEvents(
-  extrinsic({
-    sender: T.dave.address,
-    call: Utility.batchAll({
-      calls: T.users.map((pair) =>
-        Balances.transfer({
-          dest: pair.address,
-          value: 12345n,
-        })
-      ),
-    }),
-  }).signed(T.dave.sign),
-).next(console.log)
+const tx = extrinsic({
+  sender: U.alice.address,
+  call: Utility.batchAll({
+    calls: [U.alice, U.bob, U.charlie]
+      .map(({ address: dest }) => Balances.transfer({ dest, value: 12345n })),
+  }),
+})
+  .signed(U.alice.sign)
+  .watch((ctx) => (status) => {
+    console.log(status)
+    if (C.rpc.known.TransactionStatus.isTerminal(status)) {
+      return ctx.end()
+    }
+    return
+  })
 
 U.throwIfError(await root.run())

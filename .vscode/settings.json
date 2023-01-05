@@ -6,14 +6,15 @@
     "editor.defaultFormatter": "dprint.dprint"
   },
   "deno.codeLens.testArgs": ["-A", "-L=info"],
-  "deno.config": "./deno.json",
+  "deno.config": "./deno.jsonc",
   "deno.importMap": "./import_map.json",
   "deno.suggest.imports.hosts": {
     "https://deno.land": true,
     "https://x.nest.land": true,
     "https://crux.land": true,
     "http://localhost:5646": true,
-    "https://capi.dev": true
+    "https://capi.dev": true,
+    "http://localhost:8000": false
   },
   "deno.enable": true,
   "deno.lint": true,
