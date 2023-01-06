@@ -8,9 +8,10 @@ import {
   start,
 } from "../../deps/smoldot.ts"
 import { Chain, Client, ClientOptions } from "../../deps/smoldot/client.d.ts"
-import { deferred } from "../../deps/std/async.ts"
+import { abortable, retry, RetryOptions } from "../../deps/std/async.ts"
 import * as msg from "../messages.ts"
-import { nextIdFactory, Provider, ProviderConnection, ProviderListener } from "./base.ts"
+import { ListenersContainer } from "../mod.ts"
+import { nextIdFactory, Provider, ProviderListener } from "./base.ts"
 import { ProviderCloseError, ProviderHandlerError, ProviderSendError } from "./errors.ts"
 
 type SmoldotSendErrorData =
@@ -27,12 +28,10 @@ type SmoldotHandlerErrorData =
 type SmoldotCloseErrorData = AlreadyDestroyedError | CrashError
 
 let client: undefined | Client
-const connections = new Map<SmoldotProviderProps, SmoldotProviderConnection>()
-class SmoldotProviderConnection
-  extends ProviderConnection<Chain, SmoldotSendErrorData, SmoldotHandlerErrorData>
-{}
 
-const nextId = nextIdFactory()
+export interface SmoldotProviderFactoryProps {
+  retryOptions?: RetryOptions
+}
 
 export interface SmoldotProviderProps {
   chainSpec: {
@@ -43,102 +42,132 @@ export interface SmoldotProviderProps {
   deferClosing?: boolean
 }
 
-export const smoldotProvider: Provider<
+export const smoldotProviderFactory = (
+  { retryOptions }: SmoldotProviderFactoryProps = {},
+): Provider<
   SmoldotProviderProps,
   SmoldotSendErrorData,
   SmoldotHandlerErrorData,
   SmoldotCloseErrorData
-> = (props, listener) => {
-  return {
-    nextId,
-    send: (message) => {
-      ;(async () => {
-        let conn: SmoldotProviderConnection
-        try {
-          conn = await connection(props, listener)
-        } catch (error) {
-          listener(new ProviderHandlerError(error as SmoldotHandlerErrorData))
-          return
+> => {
+  const nextId = nextIdFactory()
+  const listenersContainer = new ListenersContainer<
+    SmoldotProviderProps,
+    SmoldotSendErrorData,
+    SmoldotHandlerErrorData
+  >()
+  return (providerProps, listener) => {
+    listenersContainer.set(providerProps, listener)
+    const stopListeningController = new AbortController()
+    let chain: Chain | undefined
+    return {
+      nextId,
+      send: (message) => {
+        ;(async () => {
+          try {
+            // FIXME: concurrent send may init the same chain multiple times
+            chain = await getChain({
+              providerProps,
+              listener: (e) => listenersContainer.forEachListener(providerProps, e),
+              stopListeningSignal: stopListeningController.signal,
+              retryOptions,
+            })
+          } catch (error) {
+            listener(new ProviderHandlerError(error as SmoldotHandlerErrorData))
+            return
+          }
+          try {
+            chain.sendJsonRpc(JSON.stringify(message))
+          } catch (error) {
+            listener(new ProviderSendError(error as SmoldotSendErrorData, message))
+          }
+        })()
+      },
+      release: () => {
+        listenersContainer.delete(providerProps, listener)
+        if (!listenersContainer.count(providerProps)) {
+          stopListeningController.abort()
+          try {
+            // TODO: utilize `deferClosing` prop once we flesh out approach
+            chain?.remove()
+          } catch (e) {
+            return Promise.resolve(new ProviderCloseError(e as SmoldotCloseErrorData))
+          }
         }
-        try {
-          conn.inner.sendJsonRpc(JSON.stringify(message))
-        } catch (error) {
-          listener(new ProviderSendError(error as SmoldotSendErrorData, message))
-        }
-      })()
-    },
-    release: () => {
-      const conn = connections.get(props)
-      if (!conn) {
         return Promise.resolve(undefined)
-      }
-      const { cleanUp, listeners, inner } = conn
-      listeners.delete(listener)
-      if (!listeners.size) {
-        connections.delete(props)
-        cleanUp()
-        try {
-          // TODO: utilize `deferClosing` prop once we flesh out approach
-          inner.remove()
-        } catch (e) {
-          return Promise.resolve(new ProviderCloseError(e as SmoldotCloseErrorData))
-        }
-      }
-      return Promise.resolve(undefined)
-    },
+      },
+    }
   }
 }
 
-async function connection(
-  props: SmoldotProviderProps,
-  listener: ProviderListener<SmoldotSendErrorData, SmoldotHandlerErrorData>,
-): Promise<SmoldotProviderConnection> {
-  if (!client) {
-    client = start(
-      {
-        forbidTcp: true,
-        forbidNonLocalWs: true,
-        cpuRateLimit: .25,
-      } as ClientOptions,
-    )
-  }
-  let conn = connections.get(props)
-  if (!conn) {
-    let inner: Chain
-    if (props.chainSpec.para) {
-      const relayChainConnection = await client.addChain({
-        chainSpec: props.chainSpec.relay,
-        disableJsonRpc: true,
-      })
-      inner = await client.addChain({
-        chainSpec: props.chainSpec.para,
-        potentialRelayChains: [relayChainConnection],
-      })
-    } else {
-      inner = await client.addChain({ chainSpec: props.chainSpec.relay })
+export const smoldotProvider = smoldotProviderFactory()
+
+interface GetChainProps {
+  providerProps: SmoldotProviderProps
+  listener: ProviderListener<SmoldotSendErrorData, SmoldotHandlerErrorData>
+  stopListeningSignal: AbortSignal
+  retryOptions?: RetryOptions
+}
+
+function getChain(
+  { providerProps, listener, stopListeningSignal, retryOptions }: GetChainProps,
+) {
+  return retry(async () => {
+    if (!client) {
+      client = getOrResetClient()
     }
-    const stopListening = deferred<undefined>()
-    conn = new SmoldotProviderConnection(inner, () => stopListening.resolve())
-    connections.set(props, conn)
+    let chain: Chain
+    try {
+      if (providerProps.chainSpec.para) {
+        const relayChainConnection = await client.addChain({
+          chainSpec: providerProps.chainSpec.relay,
+          disableJsonRpc: true,
+        })
+        // FIXME: smoldot returns a new chain ref on every client.addChain
+        chain = await client.addChain({
+          chainSpec: providerProps.chainSpec.para,
+          potentialRelayChains: [relayChainConnection],
+        })
+      } else {
+        chain = await client.addChain({ chainSpec: providerProps.chainSpec.relay })
+      }
+    } catch (e) {
+      if (e instanceof AlreadyDestroyedError || e instanceof CrashError) {
+        getOrResetClient()
+      }
+      throw e
+    }
     ;(async () => {
       while (true) {
         try {
-          const response = await Promise.race([
-            stopListening,
-            inner.nextJsonRpcResponse(),
-          ])
-          if (!response) {
-            break
-          }
-          const message = msg.parse(response)
-          conn!.forEachListener(message)
+          const response = await abortable(chain.nextJsonRpcResponse(), stopListeningSignal)
+          listener(msg.parse(response))
         } catch (e) {
-          conn!.forEachListener(new ProviderHandlerError(e as SmoldotHandlerErrorData))
+          if (e instanceof DOMException) {
+            break
+          } else if (e instanceof AlreadyDestroyedError || e instanceof CrashError) {
+            getOrResetClient()
+          }
+          listener(new ProviderHandlerError(e as SmoldotHandlerErrorData))
           break
         }
       }
     })()
-  }
-  conn.addListener(listener)
-  return conn
+    return chain
+  }, retryOptions)
+}
+
+function getOrResetClient() {
+  try {
+    // may throw AlreadyDestroyedError or CrashErrors
+    client?.terminate()
+  } catch (_error) {}
+  client = start(
+    {
+      forbidTcp: true,
+      forbidNonLocalWs: true,
+      cpuRateLimit: .25,
+    } as ClientOptions,
+  )
+  return client
 }
