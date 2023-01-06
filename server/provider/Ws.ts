@@ -8,7 +8,10 @@ export interface WsPathInfo {
 }
 
 export class WsProvider extends Provider<WsPathInfo> {
-  providerMatches = { ws: true, wss: true }
+  constructor() {
+    super({ ws: true, wss: true }, {})
+  }
+
   #client?: Client<string, Event, Event, Event>
 
   tryParsePathInfo(path: string): TryParsePathInfoResult<WsPathInfo> {
@@ -24,7 +27,7 @@ export class WsProvider extends Provider<WsPathInfo> {
 
   client(pathInfo: WsPathInfo): Promise<Client<any, any, any, any>> {
     if (!this.#client) {
-      this.#client = new Client(proxyProvider, `ws://${pathInfo.ws}`)
+      this.#client = new Client(proxyProvider, `wss://${pathInfo.ws}`)
     }
     return Promise.resolve(this.#client)
   }

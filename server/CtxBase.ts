@@ -1,14 +1,17 @@
 import { CacheBase } from "../util/cache/mod.ts"
 import { Provider } from "./provider/mod.ts"
 
-export class Ctx {
+export abstract class CtxBase<Provider_ extends Provider<unknown> = Provider<any>> {
   constructor(
     readonly cache: CacheBase,
-    readonly providers: Provider<unknown>[],
+    readonly providers: Provider_[],
     readonly signal: AbortSignal,
   ) {
     providers.forEach((provider) => (provider.ctx = this))
   }
+
+  abstract 404(req: Request): Response
+  abstract 500(req: Request, message?: string): Response
 
   intellisense() {
     return JSON.stringify({

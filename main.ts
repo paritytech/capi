@@ -1,10 +1,10 @@
 import * as flags from "./deps/std/flags.ts"
-import { local } from "./server/mod.ts"
+import { serve } from "./deps/std/http/server.ts"
+import { Ctx, handler } from "./server/local/mod.ts"
 
 const { help, port: portRaw, "--": cacheCmdRest } = flags.parse(Deno.args, {
-  string: ["port"],
+  string: ["port", "cache"],
   boolean: ["help"],
-  "--": true,
   default: {
     port: "8000",
   },
@@ -12,6 +12,7 @@ const { help, port: portRaw, "--": cacheCmdRest } = flags.parse(Deno.args, {
     h: "help",
     p: "port",
   },
+  "--": true,
 })
 
 if (help) {
@@ -26,9 +27,23 @@ try {
   Deno.exit(1)
 } catch (_e) {}
 
+const cacheDir = await Deno.makeTempDir({ prefix: "capi_server_" })
 const abortController = new AbortController()
+const { signal } = abortController
+const ctx = new Ctx(cacheDir, signal)
 
-local.serve(port, abortController.signal)
+serve(handler.bind(ctx), {
+  port,
+  signal,
+  onListen() {
+    console.log(`Capi server listening on http://localhost:${port}`)
+  },
+  onError(error) {
+    console.log(`Internal server error`)
+    console.log(error instanceof Error ? error.message : error)
+    Deno.exit(1)
+  },
+})
 
 if (cacheCmdRest.length) {
   await Deno

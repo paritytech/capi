@@ -14,37 +14,33 @@ export interface PolkadotDevProviderProps {
 }
 
 export class PolkadotDevProvider extends Provider<PolkadotDevPathInfo> {
-  providerMatches = { dev: true }
-
   #nets: Partial<Record<DevRuntimeName, Promise<Client>>> = {}
 
   constructor(readonly props?: PolkadotDevProviderProps) {
-    super()
+    super({ dev: true }, {})
   }
 
   tryParsePathInfo(path: string) {
-    const slashI0 = path.search("/")
-    const runtimeName = path.slice(0, slashI0)
+    const atI = path.search("@")
+    if (atI == -1) {
+      return { error: `Could not find "@" char in path` }
+    }
+    const runtimeName = path.slice(0, atI)
     if (!isDevRuntimeName(runtimeName)) {
       return {
         error:
-          `${runtimeName} is not a valid dev runtime name. Please specify one of the following: "${
+          `"${runtimeName}" is not a valid dev runtime name. Please specify one of the following: "${
             DEV_RUNTIME_NAMES.join(`", "`)
-          }."`,
+          }"`,
       }
     }
-    const slash0Trailing = path.slice(slashI0 + 1)
-    if (slash0Trailing[0] != "@") {
-      return {
-        error: `Expected "@" character and version to follow "${runtimeName}" but found "${
-          slash0Trailing[0]
-        }..." instead.`,
-      }
+    const atTrailing = path.slice(atI + 1)
+    const slashI0 = atTrailing.search("/")
+    if (slashI0 == -1) {
+      return { error: "Could not extract chain path" }
     }
-    const slashI1 = slash0Trailing.search("/")
-    if (slashI1 != 1) return { error: `Expected "/:path" after version, found none.` }
-    const runtimeVersion = slash0Trailing.slice(1, slashI1)
-    const tsFilePath = slash0Trailing.slice(slashI1 + 1)
+    const runtimeVersion = atTrailing.slice(0, slashI0)
+    const tsFilePath = atTrailing.slice(slashI0 + 1)
     return { runtimeName, runtimeVersion, tsFilePath }
   }
 
@@ -55,8 +51,8 @@ export class PolkadotDevProvider extends Provider<PolkadotDevPathInfo> {
       const polkadotPath = this.props?.polkadotPath ?? "polkadot"
       try {
         await Deno.lstat(polkadotPath)
-      } catch (e) {
-        console.log(e instanceof Deno.errors.NotFound ? POLKADOT_PATH_NOT_FOUND : e)
+      } catch (_e) {
+        console.log(POLKADOT_PATH_NOT_FOUND)
         Deno.exit(1)
       }
       const cmd: string[] = [
