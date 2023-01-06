@@ -42,16 +42,16 @@ export const $tyId: $.Codec<Ty> = $.createCodec({
 })
 
 export interface Field {
-  name: string | undefined
+  name?: string
   ty: Ty
-  typeName: string | undefined
+  typeName?: string
   docs: string[]
 }
 export const $field: $.Codec<Field> = $.object(
-  ["name", $.option($.str)],
-  ["ty", $tyId],
-  ["typeName", $.option($.str)],
-  ["docs", $.array($.str)],
+  $.optionalField("name", $.str),
+  $.field("ty", $tyId),
+  $.optionalField("typeName", $.str),
+  $.field("docs", $.array($.str)),
 )
 
 export type PrimitiveKind = $.Native<typeof $primitiveKind>
@@ -124,57 +124,34 @@ export type TyDef =
   | CompactTyDef
   | BitSequenceTyDef
 export const $tyDef: $.Codec<TyDef> = $.taggedUnion("type", [
-  [
-    "Struct",
-    ["fields", $.array($field)],
-  ],
-  [
+  $.variant("Struct", $.field("fields", $.array($field))),
+  $.variant(
     "Union",
-    [
+    $.field(
       "members",
       $.array($.object(
-        ["name", $.str],
-        ["fields", $.array($field)],
-        ["index", $.u8],
-        ["docs", $.array($.str)],
+        $.field("name", $.str),
+        $.field("fields", $.array($field)),
+        $.field("index", $.u8),
+        $.field("docs", $.array($.str)),
       )),
-    ],
-  ],
-  [
-    "Sequence",
-    ["typeParam", $tyId],
-  ],
-  [
-    "SizedArray",
-    ["len", $.u32],
-    ["typeParam", $tyId],
-  ],
-  [
-    "Tuple",
-    ["fields", $.array($tyId)],
-  ],
-  [
-    "Primitive",
-    ["kind", $primitiveKind],
-  ],
-  [
-    "Compact",
-    ["typeParam", $tyId],
-  ],
-  [
-    "BitSequence",
-    ["bitOrderType", $tyId],
-    ["bitStoreType", $tyId],
-  ],
+    ),
+  ),
+  $.variant("Sequence", $.field("typeParam", $tyId)),
+  $.variant("SizedArray", $.field("len", $.u32), $.field("typeParam", $tyId)),
+  $.variant("Tuple", $.field("fields", $.array($tyId))),
+  $.variant("Primitive", $.field("kind", $primitiveKind)),
+  $.variant("Compact", $.field("typeParam", $tyId)),
+  $.variant("BitSequence", $.field("bitOrderType", $tyId), $.field("bitStoreType", $tyId)),
 ])
 
 export interface Param {
   name: string
-  ty: Ty | undefined
+  ty?: Ty
 }
 export const $param: $.Codec<Param> = $.object(
-  ["name", $.str],
-  ["ty", $.option($tyId)],
+  $.field("name", $.str),
+  $.optionalField("ty", $tyId),
 )
 
 export type Ty = {
@@ -183,16 +160,16 @@ export type Ty = {
   params: Param[]
   docs: string[]
 } & TyDef
-export const $ty: $.Codec<Ty> = $.spread(
-  $.spread(
+export const $ty: $.Codec<Ty> = $.object(
+  $.object(
     $.object(
-      ["id", $.compact($.u32)],
-      ["path", $.array($.str)],
-      ["params", $.array($param)],
+      $.field("id", $.compact($.u32)),
+      $.field("path", $.array($.str)),
+      $.field("params", $.array($param)),
     ),
     $tyDef,
   ),
   $.object(
-    ["docs", $.array($.str)],
+    $.field("docs", $.array($.str)),
   ),
 )

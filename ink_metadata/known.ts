@@ -7,8 +7,8 @@ export interface Weight {
   proofSize: bigint
 }
 const $weightCodec: $.Codec<Weight> = $.object(
-  ["refTime", $.compact($.u64)],
-  ["proofSize", $.compact($.u64)],
+  $.field("refTime", $.compact($.u64)),
+  $.field("proofSize", $.compact($.u64)),
 )
 
 export type ContractsApiCallArgs = [
@@ -51,29 +51,24 @@ export interface ContractsApiCallResult {
   }
 }
 export const $contractsApiCallResult: $.Codec<ContractsApiCallResult> = $.object(
-  // gas_consumed
-  ["gasConsumed", $weightCodec],
-  // gas_required
-  ["gasRequired", $weightCodec],
-  // storage_deposit
-  [
+  $.field("gasConsumed", $weightCodec),
+  $.field("gasRequired", $weightCodec),
+  $.field(
     "storageDeposit",
     $.taggedUnion("type", [
-      ["Refund", ["value", $balanceCodec]],
-      ["Charge", ["value", $balanceCodec]],
+      $.variant("Refund", $.field("value", $balanceCodec)),
+      $.variant("Charge", $.field("value", $balanceCodec)),
     ]),
-  ],
-  // debug_message
-  ["debugMessage", $.str],
-  // result
-  [
+  ),
+  $.field("debugMessage", $.str),
+  $.field(
     "result",
     $.object(
-      ["flags", $.u32],
+      $.field("flags", $.u32),
       // TODO: improve result error coded
-      ["data", $.result($.uint8Array, $.never)],
+      $.field("data", $.result($.uint8Array, $.never)),
     ),
-  ],
+  ),
 )
 
 export type ContractsApiInstantiateArgs = [
@@ -89,24 +84,17 @@ export type ContractsApiInstantiateArgs = [
   salt: Uint8Array,
 ]
 export const $contractsApiInstantiateArgs: $.Codec<ContractsApiInstantiateArgs> = $.tuple(
-  // origin
   $.sizedUint8Array(32),
-  // balance
   $balanceCodec,
-  // gasLimit
   $.option($weightCodec),
-  // storageDepositLimit
   $.option($balanceCodec),
-  // codeOrHash
   $.taggedUnion("type", [
     // code
-    ["Upload", ["value", $.uint8Array]],
+    $.variant("Upload", $.field("value", $.uint8Array)),
     // hash
-    ["Existing", ["value", $.sizedUint8Array(32)]],
+    $.variant("Existing", $.field("value", $.sizedUint8Array(32))),
   ]),
-  // data
   $.uint8Array,
-  // salt
   $.uint8Array,
 )
 
@@ -130,33 +118,28 @@ export interface ContractsApiInstantiateResult {
   }
 }
 export const $contractsApiInstantiateResult: $.Codec<ContractsApiInstantiateResult> = $.object(
-  // gas_consumed
-  ["gasConsumed", $weightCodec],
-  // gas_required
-  ["gasRequired", $weightCodec],
-  // storage_deposit
-  [
+  $.field("gasConsumed", $weightCodec),
+  $.field("gasRequired", $weightCodec),
+  $.field(
     "storageDeposit",
     $.taggedUnion("type", [
-      ["Refund", ["value", $balanceCodec]],
-      ["Charge", ["value", $balanceCodec]],
+      $.variant("Refund", $.field("value", $balanceCodec)),
+      $.variant("Charge", $.field("value", $balanceCodec)),
     ]),
-  ],
-  // debug_message
-  ["debugMessage", $.str],
-  // result
-  [
+  ),
+  $.field("debugMessage", $.str),
+  $.field(
     "result",
     $.object(
-      [
+      $.field(
         "result",
         $.object(
-          ["flags", $.u32],
+          $.field("flags", $.u32),
           // TODO: improve result error coded
-          ["data", $.result($.uint8Array, $.never)],
+          $.field("data", $.result($.uint8Array, $.never)),
         ),
-      ],
-      ["accountId", $.sizedUint8Array(32)],
+      ),
+      $.field("accountId", $.sizedUint8Array(32)),
     ),
-  ],
+  ),
 )

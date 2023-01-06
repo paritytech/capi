@@ -34,13 +34,13 @@ export interface MapStorageEntryType {
 export type StorageEntryType = PlainStorageEntryType | MapStorageEntryType
 
 export const $storageEntryType: $.Codec<StorageEntryType> = $.taggedUnion("type", [
-  ["Plain", ["value", $tyId]],
-  [
+  $.variant("Plain", $.field("value", $tyId)),
+  $.variant(
     "Map",
-    ["hashers", $.array($hasherKind)],
-    ["key", $tyId],
-    ["value", $tyId],
-  ],
+    $.field("hashers", $.array($hasherKind)),
+    $.field("key", $tyId),
+    $.field("value", $tyId),
+  ),
 ])
 
 export type StorageEntry = {
@@ -50,17 +50,17 @@ export type StorageEntry = {
   docs: string[]
 } & StorageEntryType
 
-export const $storageEntry: $.Codec<StorageEntry> = $.spread(
-  $.spread(
+export const $storageEntry: $.Codec<StorageEntry> = $.object(
+  $.object(
     $.object(
-      ["name", $.str],
-      ["modifier", $storageEntryModifier],
+      $.field("name", $.str),
+      $.field("modifier", $storageEntryModifier),
     ),
     $storageEntryType,
   ),
   $.object(
-    ["default", $.uint8Array],
-    ["docs", $.array($.str)],
+    $.field("default", $.uint8Array),
+    $.field("docs", $.array($.str)),
   ),
 )
 
@@ -69,8 +69,8 @@ export interface Storage {
   entries: StorageEntry[]
 }
 export const $storage: $.Codec<Storage> = $.object(
-  ["prefix", $.str],
-  ["entries", $.array($storageEntry)],
+  $.field("prefix", $.str),
+  $.field("entries", $.array($storageEntry)),
 )
 
 export interface Constant {
@@ -80,29 +80,29 @@ export interface Constant {
   docs: string[]
 }
 export const $constant: $.Codec<Constant> = $.object(
-  ["name", $.str],
-  ["ty", $tyId],
-  ["value", $.uint8Array],
-  ["docs", $.array($.str)],
+  $.field("name", $.str),
+  $.field("ty", $tyId),
+  $.field("value", $.uint8Array),
+  $.field("docs", $.array($.str)),
 )
 
 export interface Pallet {
   name: string
-  storage: Storage | undefined
-  calls: Ty | undefined
-  event: Ty | undefined
+  storage?: Storage
+  calls?: Ty
+  event?: Ty
   constants: Constant[]
-  error: Ty | undefined
+  error?: Ty
   i: number
 }
 export const $pallet: $.Codec<Pallet> = $.object(
-  ["name", $.str],
-  ["storage", $.option($storage)],
-  ["calls", $.option($tyId)],
-  ["event", $.option($tyId)],
-  ["constants", $.array($constant)],
-  ["error", $.option($tyId)],
-  ["i", $.u8],
+  $.field("name", $.str),
+  $.optionalField("storage", $storage),
+  $.optionalField("calls", $tyId),
+  $.optionalField("event", $tyId),
+  $.field("constants", $.array($constant)),
+  $.optionalField("error", $tyId),
+  $.field("i", $.u8),
 )
 
 export interface SignedExtensionMetadata {
@@ -111,9 +111,9 @@ export interface SignedExtensionMetadata {
   additionalSigned: Ty
 }
 export const $signedExtensionMetadata: $.Codec<SignedExtensionMetadata> = $.object(
-  ["ident", $.str],
-  ["ty", $tyId],
-  ["additionalSigned", $tyId],
+  $.field("ident", $.str),
+  $.field("ty", $tyId),
+  $.field("additionalSigned", $tyId),
 )
 
 export interface ExtrinsicDef {
@@ -122,9 +122,9 @@ export interface ExtrinsicDef {
   signedExtensions: SignedExtensionMetadata[]
 }
 export const $extrinsicDef: $.Codec<ExtrinsicDef> = $.object(
-  ["ty", $tyId],
-  ["version", $.u8],
-  ["signedExtensions", $.array($signedExtensionMetadata)],
+  $.field("ty", $tyId),
+  $.field("version", $.u8),
+  $.field("signedExtensions", $.array($signedExtensionMetadata)),
 )
 
 // https://docs.substrate.io/build/application-development/#metadata-system
@@ -138,11 +138,11 @@ export interface Metadata {
   extrinsic: ExtrinsicDef
 }
 export const $metadata: $.Codec<Metadata> = $.object(
-  ["magicNumber", $.constant<typeof magicNumber>(magicNumber, $.u32)],
-  ["version", $.constant<14>(14, $.u8)],
-  ["tys", $tys],
-  ["pallets", $.array($pallet)],
-  ["extrinsic", $extrinsicDef],
+  $.field("magicNumber", $.constant<typeof magicNumber>(magicNumber, $.u32)),
+  $.field("version", $.constant<14>(14, $.u8)),
+  $.field("tys", $tys),
+  $.field("pallets", $.array($pallet)),
+  $.field("extrinsic", $extrinsicDef),
 )
 
 export function fromPrefixedHex(scaleEncoded: string): Metadata {

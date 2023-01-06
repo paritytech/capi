@@ -35,7 +35,7 @@ export namespace MultiSignature {
 }
 
 export const $multiSignature: $.Codec<MultiSignature> = $.taggedUnion("type", {
-  0: ["Ed25519", ["value", $.sizedUint8Array(64)]],
-  1: ["Sr25519", ["value", $.sizedUint8Array(64)]],
-  2: ["Ecdsa", ["value", $.sizedUint8Array(65)]],
+  0: $.variant("Ed25519", $.field("value", $.sizedUint8Array(64))),
+  1: $.variant("Sr25519", $.field("value", $.sizedUint8Array(64))),
+  2: $.variant("Ecdsa", $.field("value", $.sizedUint8Array(65))),
 })

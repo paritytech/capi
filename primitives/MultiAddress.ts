@@ -2,11 +2,11 @@ import * as $ from "../deps/scale.ts"
 import { $null } from "../scale_info/Codec.ts"
 
 export const $multiAddress: $.Codec<MultiAddress> = $.taggedUnion("type", {
-  0: ["Id", ["value", $.sizedUint8Array(32)]],
-  1: ["Index", ["value", $null]],
-  2: ["Raw", ["value", $.uint8Array]],
-  3: ["Address32", ["value", $.sizedUint8Array(32)]],
-  4: ["Address20", ["value", $.sizedUint8Array(20)]],
+  0: $.variant("Id", $.field("value", $.sizedUint8Array(32))),
+  1: $.variant("Index", $.field("value", $null)),
+  2: $.variant("Raw", $.field("value", $.uint8Array)),
+  3: $.variant("Address32", $.field("value", $.sizedUint8Array(32))),
+  4: $.variant("Address20", $.field("value", $.sizedUint8Array(20))),
 })
 
 export type MultiAddress =

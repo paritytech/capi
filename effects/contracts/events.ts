@@ -11,13 +11,15 @@ export function events(inkMetadata: Z.$<InkMetadata>, events: Z.$<ExtrinsicEvent
       $.taggedUnion(
         "type",
         inkMetadata.V3.spec.events
-          .map((e) => [
-            e.label,
-            [
-              "value",
-              $.tuple(...e.args.map((a) => DeriveCodec(inkMetadata.V3.types)(a.type.type))),
-            ],
-          ]),
+          .map((e) =>
+            $.variant(
+              e.label,
+              $.field(
+                "value",
+                $.tuple(...e.args.map((a) => DeriveCodec(inkMetadata.V3.types)(a.type.type))),
+              ),
+            )
+          ),
       )
     )
   return Z.ls(events, $events).next(([events, $events]) =>
