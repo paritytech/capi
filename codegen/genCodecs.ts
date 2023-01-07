@@ -8,8 +8,9 @@ export function genCodecs(props: CodegenProps, typeVisitor: TyVisitor<string>) {
   const namespaceImports = new Set<string>()
 
   let file = `\
-import { $, C } from "./capi.ts"
-import type * as types from "./types/mod.ts"
+import { $ } from "./capi.ts"
+import * as C from "./capi.ts"
+import type * as types from "../types/mod.ts"
 
 `
 
