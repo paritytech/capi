@@ -101,28 +101,24 @@ export function createTypeVisitor(props: CodegenProps, files: Files) {
 
   for (const [path, typeFile] of typeFiles) {
     const filePath = path + typeFile.ext
-    files.set(filePath, () => {
-      let file = ""
-      if (path !== "types") {
-        file += `import type * as types from ${S.string(importPath(filePath, "types/mod.ts"))}\n`
-      }
-      file += `import * as codecs from ${S.string(importPath(filePath, "codecs.ts"))}\n`
-      file += `import { $, C } from ${S.string(importPath(filePath, "capi.ts"))}\n`
-      file += "\n"
-      for (const reexport of [...typeFile.reexports].sort()) {
-        const otherFile = typeFiles.get(path + "/" + reexport)!
-        file += `export * as ${reexport} from "./${reexport}${otherFile.ext}"\n`
-      }
-      file += "\n"
-      for (
-        const [path, ty] of [...typeFile.types].sort((a, b) =>
-          a[0] > b[0] ? 1 : a[0] < b[0] ? -1 : 0
-        )
-      ) {
-        file += createTypeDecl(path, ty) + "\n\n"
-      }
-      return file
-    })
+    let file = ""
+    if (path !== "types") {
+      file += `import type * as types from ${S.string(importPath(filePath, "types/mod.ts"))}\n`
+    }
+    file += `import * as codecs from ${S.string(importPath(filePath, "codecs.ts"))}\n`
+    file += `import { $, C } from ${S.string(importPath(filePath, "capi.ts"))}\n`
+    file += "\n"
+    for (const reexport of [...typeFile.reexports].sort()) {
+      const otherFile = typeFiles.get(path + "/" + reexport)!
+      file += `export * as ${reexport} from "./${reexport}${otherFile.ext}"\n`
+    }
+    file += "\n"
+    for (
+      const [path, ty] of [...typeFile.types].sort((a, b) => a[0] > b[0] ? 1 : a[0] < b[0] ? -1 : 0)
+    ) {
+      file += createTypeDecl(path, ty) + "\n\n"
+    }
+    files.set(filePath, file)
   }
 
   return visitor
