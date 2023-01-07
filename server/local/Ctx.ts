@@ -10,14 +10,14 @@ export class Ctx extends CtxBase<LocalProvider> {
     super(new FsCache(cacheDir, signal), providers(), signal)
   }
 
-  async 404(req: Request) {
+  404(req: Request) {
     if (acceptsHtml(req)) {
       return page(_404Page({}))
     }
     return new Response("404", { status: Status.NotFound })
   }
 
-  async 500(req: Request, message?: string) {
+  500(req: Request, message?: string) {
     if (acceptsHtml(req)) {
       return page(_500Page({ message }))
     }
@@ -36,12 +36,12 @@ export class Ctx extends CtxBase<LocalProvider> {
     return await serveFile(req, url.pathname)
   }
 
-  async codegen(path: string) {
+  codegen(path: string) {
     return ""
   }
 
   completions() {
-    return Promise.resolve("")
+    return ""
   }
 }
 

@@ -80,7 +80,7 @@ export class PolkadotDevProvider extends Provider<PolkadotDevPathInfo> {
     return clientPending
   }
 
-  async code(path: string) {
+  async codegen(path: string) {
     return ""
   }
 }

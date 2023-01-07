@@ -1,12 +1,13 @@
 import { Client } from "../../rpc/mod.ts"
+import { PromiseOr } from "../../util/mod.ts"
 import { CtxBase } from "../CtxBase.ts"
 
 export abstract class Provider<PathInfo> {
   declare ctx: CtxBase
 
   abstract tryParsePathInfo(path: string): TryParsePathInfoResult<PathInfo>
-  abstract client(pathInfo: PathInfo): Promise<Client>
-  abstract codegen(path: string): Promise<string>
+  abstract client(pathInfo: PathInfo): PromiseOr<Client>
+  abstract codegen(path: string): PromiseOr<string>
 
   async run(path: string) {
     return new Response()

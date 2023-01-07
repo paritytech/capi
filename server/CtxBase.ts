@@ -1,4 +1,5 @@
 import { CacheBase } from "../util/cache/mod.ts"
+import { PromiseOr } from "../util/mod.ts"
 import { Provider } from "./provider/mod.ts"
 
 export abstract class CtxBase<Provider_ extends Provider<unknown> = Provider<any>> {
@@ -10,12 +11,11 @@ export abstract class CtxBase<Provider_ extends Provider<unknown> = Provider<any
     providers.forEach((provider) => (provider.ctx = this))
   }
 
-  abstract codegen(path: string): Promise<string>
-  abstract completions(path: string): Promise<string>
-
-  abstract staticFile(req: Request, url: URL): Promise<Response>
-  abstract 404(req: Request): Promise<Response>
-  abstract 500(req: Request, message?: string): Promise<Response>
+  abstract codegen(path: string): PromiseOr<string>
+  abstract completions(path: string): PromiseOr<string>
+  abstract staticFile(req: Request, url: URL): PromiseOr<Response>
+  abstract 404(req: Request): PromiseOr<Response>
+  abstract 500(req: Request, message?: string): PromiseOr<Response>
 
   intellisense() {
     return JSON.stringify({

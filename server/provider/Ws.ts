@@ -25,14 +25,14 @@ export class WsProvider extends Provider<WsPathInfo> {
     return { ws, runtimeVersion, tsFilePath }
   }
 
-  client(pathInfo: WsPathInfo): Promise<Client<any, any, any, any>> {
+  client(pathInfo: WsPathInfo) {
     if (!this.#client) {
       this.#client = new Client(proxyProvider, `wss://${pathInfo.ws}`)
     }
-    return Promise.resolve(this.#client)
+    return this.#client
   }
 
-  async codegen(path: string) {
+  codegen(path: string) {
     return ""
   }
 }
