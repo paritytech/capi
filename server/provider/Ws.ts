@@ -31,4 +31,8 @@ export class WsProvider extends Provider<WsPathInfo> {
     }
     return Promise.resolve(this.#client)
   }
+
+  async codegen(path: string) {
+    return ""
+  }
 }

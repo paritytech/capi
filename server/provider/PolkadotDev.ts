@@ -14,7 +14,7 @@ export interface PolkadotDevProviderProps {
 }
 
 export class PolkadotDevProvider extends Provider<PolkadotDevPathInfo> {
-  #nets: Partial<Record<DevRuntimeName, Promise<Client>>> = {}
+  #clients: Partial<Record<DevRuntimeName, Promise<Client>>> = {}
 
   constructor(readonly props?: PolkadotDevProviderProps) {
     super({ dev: true }, {})
@@ -45,7 +45,7 @@ export class PolkadotDevProvider extends Provider<PolkadotDevPathInfo> {
   }
 
   async client({ runtimeName }: PolkadotDevPathInfo) {
-    let clientPending = this.#nets[runtimeName]
+    let clientPending = this.#clients[runtimeName]
     if (!clientPending) {
       const port_ = port.getAvailable()
       const polkadotPath = this.props?.polkadotPath ?? "polkadot"
@@ -75,9 +75,13 @@ export class PolkadotDevProvider extends Provider<PolkadotDevPathInfo> {
       })
       clientPending = port.isReady(port_)
         .then(() => new Client(proxyProvider, `ws://${Deno.hostname()}:${port_}`))
-      this.#nets[runtimeName] = clientPending
+      this.#clients[runtimeName] = clientPending
     }
     return clientPending
+  }
+
+  async code(path: string) {
+    return ""
   }
 }
 

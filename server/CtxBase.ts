@@ -10,8 +10,12 @@ export abstract class CtxBase<Provider_ extends Provider<unknown> = Provider<any
     providers.forEach((provider) => (provider.ctx = this))
   }
 
-  abstract 404(req: Request): Response
-  abstract 500(req: Request, message?: string): Response
+  abstract codegen(path: string): Promise<string>
+  abstract completions(path: string): Promise<string>
+
+  abstract staticFile(req: Request, url: URL): Promise<Response>
+  abstract 404(req: Request): Promise<Response>
+  abstract 500(req: Request, message?: string): Promise<Response>
 
   intellisense() {
     return JSON.stringify({

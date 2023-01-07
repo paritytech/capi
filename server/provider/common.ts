@@ -6,23 +6,16 @@ export abstract class Provider<PathInfo> {
 
   abstract tryParsePathInfo(path: string): TryParsePathInfoResult<PathInfo>
   abstract client(pathInfo: PathInfo): Promise<Client>
+  abstract codegen(path: string): Promise<string>
+
+  async run(path: string) {
+    return new Response()
+  }
 
   constructor(
-    readonly providerMatches: Record<string, boolean>,
+    readonly match: Record<string, boolean>,
     readonly completionInfo: CompletionInfo,
   ) {}
-
-  run(path: string) {
-    const slashI0 = path.search("/")
-    const junction0 = path.slice(0, slashI0)
-    if (junction0 === "completions") {
-      const junction1 = path.slice(slashI0 + 1)
-      const slashI1 = junction1.search("/")
-      const completionType = junction1.slice(slashI1)
-      console.log({ completionType })
-    }
-    return this.tryParsePathInfo(path)
-  }
 }
 
 export type TryParsePathInfoResult<PathInfo> =
