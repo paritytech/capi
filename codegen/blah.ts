@@ -10,7 +10,9 @@ await fs.emptyDir(OUT_DIR)
 
 const files = codegen({
   metadata: polkadot,
-  capi: "../../../mod.ts",
+  baseDir: new URL(import.meta.resolve("../target/_tmp/")),
+  capiMod: new URL(import.meta.resolve("../mod.ts")),
+  clientMod: new URL(import.meta.resolve("./test_client.ts")),
 })
 for (const [name, contents] of files) {
   const url = new URL(`./${name}`, href)

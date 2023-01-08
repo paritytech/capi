@@ -1,20 +1,25 @@
-import * as M from "../frame_metadata/mod.ts"
-import { Files } from "./Files.ts"
-import { genCodecs } from "./genCodecs.ts"
-import { genMetadata } from "./genMetadata.ts"
+import { codecs } from "./codecs.ts"
+import { CodegenCtx, CodegenCtxProps } from "./Ctx.ts"
+import { extrinsic } from "./extrinsic.ts"
+import { pallet } from "./pallet.ts"
+import { type } from "./type.ts"
 import { createTypeVisitor } from "./typeVisitor.ts"
 
-export interface CodegenProps {
-  metadata: M.Metadata
-  capi: string
-}
-
-export function codegen(props: CodegenProps): Files {
-  const files = new Files()
-  const typeVisitor = createTypeVisitor(props, files)
-  files.set("_/codecs.ts", genCodecs(props, typeVisitor))
-  console.log(props.capi)
-  files.set("_/capi.ts", `export * from "${props.capi}"`)
-  genMetadata(props, typeVisitor, files)
-  return files
+export function codegen(props: CodegenCtxProps): CodegenCtx {
+  const ctx = new CodegenCtx(props)
+  const typeVisitor = createTypeVisitor(ctx)
+  for (const [path, typeFile] of ctx.typeFiles) {
+    const filePath = path + typeFile.ext
+    ctx.files.set(filePath, type(ctx, typeVisitor, path, filePath, typeFile))
+  }
+  ctx.files.set("_/codecs.ts", codecs(ctx, typeVisitor))
+  ctx.files.set("_/capi.ts", `export * from "${ctx.importSpecifier(props.capiMod)}"`)
+  ctx.files.set("_/client.ts", `export * from "${ctx.importSpecifier(props.clientMod)}"`)
+  ctx.files.set("_/extrinsic.ts", extrinsic(ctx, typeVisitor))
+  ctx.files.set("mod.ts", `export * from "./_/extrinsic.ts"`)
+  for (const p of props.metadata.pallets) {
+    if (!p.calls && !p.constants.length && !p.storage?.entries.length) continue
+    ctx.files.set(`${p.name}.ts`, pallet(p, typeVisitor))
+  }
+  return ctx
 }

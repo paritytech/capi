@@ -1,10 +1,10 @@
 import { Ty, TyVisitor } from "../scale_info/mod.ts"
 import { normalizeCase } from "../util/case.ts"
-import { CodegenProps } from "./mod.ts"
+import { CodegenCtx } from "./Ctx.ts"
 import { S } from "./utils.ts"
 
-export function genCodecs(props: CodegenProps, typeVisitor: TyVisitor<string>) {
-  const { tys } = props.metadata
+export function codecs(ctx: CodegenCtx, typeVisitor: TyVisitor<string>) {
+  const { tys } = ctx.metadata
   const namespaceImports = new Set<string>()
 
   let file = `\
@@ -127,13 +127,11 @@ import type * as types from "../types/mod.ts"
     },
   })
 
-  for (const ty of props.metadata.tys) {
+  for (const ty of ctx.metadata.tys) {
     visitor.visit(ty)
   }
 
-  file += `export const _all: $.AnyCodec[] = ${
-    S.array(props.metadata.tys.map((ty) => `$${ty.id}`))
-  }`
+  file += `export const _all: $.AnyCodec[] = ${S.array(ctx.metadata.tys.map((ty) => `$${ty.id}`))}`
 
   return file
 
