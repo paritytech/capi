@@ -12,8 +12,8 @@ export abstract class Provider<PathInfo> {
     if (pathInfo.error) {
       return await this.ctx[500](req, pathInfo.error)
     }
-    console.log({ pathInfo })
-    return new Response()
+    await this.code(pathInfo as PathInfo)
+    return new Response("TODO")
   }
 }
 

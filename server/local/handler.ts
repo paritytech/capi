@@ -17,7 +17,7 @@ export async function handler(
   const pieces = U.splitFirst("/")(path)
   if (pieces) {
     const [e0, e1] = pieces
-    const provider = this.match[e0]
+    const provider = U.widenIndexSignature(this.providers)[e0]
     if (provider) {
       return await provider.run(req, e1)
     }

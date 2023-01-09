@@ -5,8 +5,6 @@ import { Provider } from "./provider/mod.ts"
 export abstract class ServerCtxBase<
   Providers extends Record<string, Provider<unknown>> = Record<string, Provider<any>>,
 > {
-  match: Record<string, Provider<unknown>> = {}
-
   constructor(
     readonly cache: CacheBase,
     readonly providers: Providers,

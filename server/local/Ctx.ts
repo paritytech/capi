@@ -5,10 +5,7 @@ import { PolkadotDevProvider, ServerCtxBase, WssProvider } from "../mod.ts"
 import { acceptsHtml, page } from "./common.ts"
 import { _404Page, _500Page, CodePage } from "./pages/mod.ts"
 
-export class ServerCtx extends ServerCtxBase<{
-  dev: PolkadotDevProvider
-  wss: WssProvider
-}> {
+export class ServerCtx extends ServerCtxBase<{ dev: PolkadotDevProvider; wss: WssProvider }> {
   constructor(cacheDir: string, signal: AbortSignal) {
     super(new FsCache(cacheDir, signal), {
       dev: new PolkadotDevProvider(),
