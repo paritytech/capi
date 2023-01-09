@@ -15,8 +15,7 @@ const existentialDeposit = extrinsic({
     value: 2_000_000_000_000n,
     dest: C.MultiAddress.Id(multisig.address),
   }),
-})
-  .signed(C.alice.sign)
+}).signed(C.alice.sign)
 
 // The proposal
 const call = Balances.transferKeepAlive({
@@ -28,8 +27,7 @@ const call = Balances.transferKeepAlive({
 const proposalByAlice = multisig.ratify({
   sender: C.alice.address,
   call,
-})
-  .signed(C.alice.sign)
+}).signed(C.alice.sign)
 
 // TODO: upon fixing effect sys, move timepoint retrieval into ratify
 // Get the proposal callHash
@@ -44,16 +42,14 @@ const voteByBob = multisig.vote({
   sender: C.bob.address,
   callHash,
   maybeTimepoint,
-})
-  .signed(C.bob.sign)
+}).signed(C.bob.sign)
 
 // Approve and execute the proposal
 const approvalByCharlie = multisig.ratify({
   sender: C.charlie.address,
   call,
   maybeTimepoint,
-})
-  .signed(C.charlie.sign)
+}).signed(C.charlie.sign)
 
 // check T.dave new balance
 const daveBalance = System.Account.entry(C.dave.publicKey).read()
