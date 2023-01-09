@@ -25,9 +25,8 @@ export class WssProvider extends Provider<WssPathInfo> {
   }
 
   async code(pathInfo: WssPathInfo) {
-    const fileKey = pathInfo.tsFilePath.length - 3
     const codegenCtx = await this.codegenCtx(pathInfo)
-    return codegenCtx.files.get(pathInfo.tsFilePath.slice(0, fileKey))!
+    return codegenCtx.files.get(pathInfo.tsFilePath)!
   }
 
   codegenCtx({ key, wss, runtimeVersion }: WssPathInfo): Promise<CodegenCtx> {
@@ -35,16 +34,13 @@ export class WssProvider extends Provider<WssPathInfo> {
     if (!codegenCtxPending) {
       codegenCtxPending = (async () => {
         const client = C.rpcClient(C.rpc.proxyProvider, `wss://${wss}`)
-        const result = await C.Z.ls(C.metadata(client)(), C.rpcCall("system_version")(client)())
-          .run()
-        if (result instanceof Error) {
-          throw new Error()
-        }
-        const [metadata, version] = result
+        const [metadata, version] = C.throwIfError(
+          await C.Z.ls(C.metadata(client)(), C.rpcCall("system_version")(client)()).run(),
+        )
         if (typeof version !== "string") throw new Error()
         const versionWithoutChannel = version.split("-")[0]
         if (versionWithoutChannel !== runtimeVersion) throw new Error()
-        const baseDir = new URL("_/specific/")
+        const baseDir = new URL(import.meta.url)
         return new CodegenCtx({
           metadata,
           baseDir,
