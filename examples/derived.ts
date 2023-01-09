@@ -1,12 +1,10 @@
-import * as C from "http://localhost:5646/@local/mod.ts"
-import * as U from "http://localhost:5646/@local/util/mod.ts"
+import * as C from "capi/mod.ts"
 
-const ids = C.entryRead(C.polkadot)("Paras", "Parachains", [])
+import { client } from "polkadot_dev/_/client/raw.ts"
+
+const ids = C.entryRead(client)("Paras", "Parachains", [])
   .access("value")
   .as<number[]>()
+const root = C.Z.each(ids, (id) => C.entryRead(client)("Paras", "Heads", [id]))
 
-const root = C.Z.each(ids, (id) => {
-  return C.entryRead(C.polkadot)("Paras", "Heads", [id])
-})
-
-console.log(U.throwIfError(await root.run()))
+console.log(C.throwIfError(await root.run()))

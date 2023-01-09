@@ -5,12 +5,12 @@ import * as shiki from "../../../deps/shiki.ts"
 shiki.setCDN("https://unpkg.com/shiki/")
 export const highlighterPromise = shiki.getHighlighter({ theme: "github-dark", langs: ["ts"] })
 
-export async function CodePage({ path, code }: {
+export async function CodePage({ path, src }: {
   path: string
-  code: string
+  src: string
 }) {
   const highlighter = await highlighterPromise
-  const tokens = highlighter.codeToThemedTokens(code, "ts")
+  const tokens = highlighter.codeToThemedTokens(src, "ts")
   let codeContent = ""
   for (const line of tokens) {
     codeContent += `<span class="line">`

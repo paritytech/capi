@@ -1,57 +1,22 @@
-import { Client } from "../../rpc/mod.ts"
 import { PromiseOr } from "../../util/mod.ts"
-import { CtxBase } from "../CtxBase.ts"
+import { ServerCtxBase } from "../CtxBase.ts"
 
 export abstract class Provider<PathInfo> {
-  declare ctx: CtxBase
+  declare ctx: ServerCtxBase
 
   abstract tryParsePathInfo(path: string): TryParsePathInfoResult<PathInfo>
-  abstract client(pathInfo: PathInfo): PromiseOr<Client>
-  abstract codegen(path: string): PromiseOr<string>
+  abstract code(pathInfo: PathInfo): PromiseOr<string>
 
-  async run(path: string) {
+  async run(req: Request, path: string) {
+    const pathInfo = this.tryParsePathInfo(path)
+    if (pathInfo.error) {
+      return await this.ctx[500](req, pathInfo.error)
+    }
+    console.log({ pathInfo })
     return new Response()
   }
-
-  constructor(
-    readonly match: Record<string, boolean>,
-    readonly completionInfo: CompletionInfo,
-  ) {}
 }
 
 export type TryParsePathInfoResult<PathInfo> =
-  | (
-    & { [K in keyof PathInfo]+?: never }
-    & { error: string }
-  )
+  | { [K in keyof PathInfo]+?: never } & { error: string }
   | PathInfo & { error?: never }
-
-export interface CompletionInfo {}
-// export type CompletionInfo = ReturnType<ReturnType<typeof completionInfo>>
-export function completionInfo(key: string) {
-  return (constants: TemplateStringsArray, ...vars: string[]) => {
-    return {
-      key,
-      constants,
-      vars,
-    }
-  }
-}
-
-// {
-//   schema:
-//     "/:version(@[^/]*)/:_proxy(proxy)/:chainUrl(dev:\\w*|wss?:[^/]*)/:chainVersion(@[^/]+)/:file*",
-//   variables: [
-//     { key: "version", url: "/autocomplete/version" },
-//     { key: "_proxy", url: "/autocomplete/null" },
-//     { key: "chainUrl", url: "/${version}/autocomplete/chainUrl/${chainUrl}" },
-//     {
-//       key: "chainVersion",
-//       url: "/${version}/autocomplete/chainVersion/${chainUrl}/${chainVersion}",
-//     },
-//     {
-//       key: "file",
-//       url: "/${version}/autocomplete/chainFile/${chainUrl}/${chainVersion}/${file}",
-//     },
-//   ],
-// }

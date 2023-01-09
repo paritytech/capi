@@ -4,7 +4,7 @@ import { getOrInit } from "../util/mod.ts"
 import { CodegenCtx, TypeFile } from "./Ctx.ts"
 import { makeDocComment, S } from "./utils.ts"
 
-export function createTypeVisitor(ctx: CodegenCtx) {
+export function typeVisitor(ctx: CodegenCtx) {
   const { tys } = ctx.metadata
   const paths = new Map<Ty, string | null>()
   addPath("types.Compact", { type: "Compact" } as Ty)

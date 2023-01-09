@@ -1,7 +1,6 @@
 import { assertNotInstanceOf } from "http://localhost:5646/@local/deps/std/testing/asserts.ts"
-import * as T from "http://localhost:5646/@local/test_util/mod.ts"
 
-const client = await T.polkadot.client
+import { client } from "polkadot_dev/_/client/raw.ts"
 
 const result = await client.subscriptionFactory()(
   "chain_subscribeAllHeads",

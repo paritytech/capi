@@ -1,13 +1,13 @@
-import * as T from "http://localhost:5646/@local/test_util/mod.ts"
+import * as C from "capi/mod.ts"
 
-import { extrinsic } from "http://localhost:5646/@local/proxy/dev:westend/@v0.9.36/mod.ts"
-import { Balances } from "http://localhost:5646/@local/proxy/dev:westend/@v0.9.36/pallets/mod.ts"
+import * as Balances from "westend_dev/Balances.ts"
+import { extrinsic } from "westend_dev/mod.ts"
 
 const tx = extrinsic({
-  sender: T.alice.address,
+  sender: C.alice.address,
   call: Balances.transfer({
     value: 12345n,
-    dest: T.bob.address,
+    dest: C.bob.address,
   }),
 })
   .feeEstimate

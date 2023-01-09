@@ -21,6 +21,8 @@ export {
   type Hex,
   hex,
   type Listener,
+  multisigAddress,
+  Sr25519,
   ss58,
   throwIfError,
 } from "./util/mod.ts"

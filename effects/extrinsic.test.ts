@@ -1,4 +1,4 @@
-import { client as westend } from "westend_dev/mod.ts"
+import { client } from "westend_dev/mod.ts"
 import * as A from "../deps/std/testing/asserts.ts"
 import * as Z from "../deps/zones.ts"
 import { ExtrinsicProps, SignedExtrinsic } from "../effects/extrinsic.ts"
@@ -37,7 +37,7 @@ Deno.test({
     await ctx.step({
       name: "account balance updated",
       fn: async () => {
-        const state = await entryRead(westend)("System", "Account", [kp.publicKey]).run()
+        const state = await entryRead(client)("System", "Account", [kp.publicKey]).run()
         A.assertObjectMatch(state, {
           value: {
             data: { free: EXISTENTIAL_DEPOSIT_AMOUNT + 12345n },
@@ -111,7 +111,7 @@ export async function assertExtrinsicStatusOrder({
 }: AssertExtrinsicStatusOrderProps) {
   const extrinsicEvents = U.throwIfError(
     await collectExtrinsicEvents(
-      extrinsic(T.westend)({
+      extrinsic(client)({
         sender: keypair.address,
         call,
       })

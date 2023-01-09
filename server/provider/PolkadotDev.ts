@@ -14,10 +14,11 @@ export interface PolkadotDevProviderProps {
 }
 
 export class PolkadotDevProvider extends Provider<PolkadotDevPathInfo> {
-  #clients: Partial<Record<DevRuntimeName, Promise<Client>>> = {}
+  #devNets: Partial<Record<DevRuntimeName, number>> = {}
+  #clients: Record<number, Promise<Client>> = {}
 
   constructor(readonly props?: PolkadotDevProviderProps) {
-    super({ dev: true }, {})
+    super()
   }
 
   tryParsePathInfo(path: string) {
@@ -44,19 +45,19 @@ export class PolkadotDevProvider extends Provider<PolkadotDevPathInfo> {
     return { runtimeName, runtimeVersion, tsFilePath }
   }
 
-  async client({ runtimeName }: PolkadotDevPathInfo) {
-    let clientPending = this.#clients[runtimeName]
-    if (!clientPending) {
-      const port_ = port.getAvailable()
-      const polkadotPath = this.props?.polkadotPath ?? "polkadot"
+  devNet({ runtimeName }: PolkadotDevPathInfo) {
+    let port_ = this.#devNets[runtimeName]
+    if (!port_) {
+      port_ = port.getAvailable()
+      const polkadotPath_ = this.props?.polkadotPath ?? "polkadot"
       try {
-        await Deno.lstat(polkadotPath)
+        Deno.lstatSync(polkadotPath_)
       } catch (_e) {
         console.log(POLKADOT_PATH_NOT_FOUND)
         Deno.exit(1)
       }
       const cmd: string[] = [
-        this.props?.polkadotPath ?? "polkadot",
+        polkadotPath_ ?? "polkadot",
         "--dev",
         "--ws-port",
         port_.toString(),
@@ -73,14 +74,24 @@ export class PolkadotDevProvider extends Provider<PolkadotDevPathInfo> {
         await process.status()
         process.close()
       })
-      clientPending = port.isReady(port_)
-        .then(() => new Client(proxyProvider, `ws://${Deno.hostname()}:${port_}`))
-      this.#clients[runtimeName] = clientPending
+      this.#devNets[runtimeName] = port_
+    }
+    return port_
+  }
+
+  client(pathInfo: PolkadotDevPathInfo) {
+    const port_ = this.devNet(pathInfo)
+    let clientPending = this.#clients[port_]
+    if (!clientPending) {
+      clientPending = port.isReady(port_).then(() =>
+        new Client(proxyProvider, `ws://${Deno.hostname()}:${port_}`)
+      )
+      this.#clients[port_] = clientPending
     }
     return clientPending
   }
 
-  async codegen(path: string) {
+  code(pathInfo: PolkadotDevPathInfo) {
     return ""
   }
 }

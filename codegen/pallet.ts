@@ -1,10 +1,11 @@
 import { Pallet } from "../frame_metadata/mod.ts"
 import { hex } from "../mod.ts"
-import { Ty, TyVisitor, UnionTyDef } from "../scale_info/mod.ts"
+import { Ty, UnionTyDef } from "../scale_info/mod.ts"
 import { normalizeCase } from "../util/case.ts"
+import { CodegenCtx } from "./Ctx.ts"
 import { getRawCodecPath, makeDocComment, S } from "./utils.ts"
 
-export function pallet(pallet: Pallet, typeVisitor: TyVisitor<string>) {
+export function pallet(ctx: CodegenCtx, pallet: Pallet) {
   const items = [
     `\
 import type * as types from "./types/mod.ts"
@@ -37,7 +38,7 @@ import { client } from "./_/client.ts"
     const isStringUnion = ty.members.every((x) => !x.fields.length)
     for (const call of ty.members) {
       const type = normalizeCase(call.name)
-      const typeName = typeVisitor.visit(ty)! + "." + type
+      const typeName = ctx.typeVisitor.visit(ty)! + "." + type
       const [params, data]: [string, string] = call.fields.length
         ? call.fields[0]!.name
           ? [`value: Omit<${typeName}, "type">`, `{ ...value, type: ${S.string(type)} }`]
@@ -58,7 +59,7 @@ import { client } from "./_/client.ts"
     items.push(
       makeDocComment(constant.docs)
         + `export const ${constant.name}: ${
-          typeVisitor.visit(constant.ty)
+          ctx.typeVisitor.visit(constant.ty)
         } = codecs.$${constant.ty.id}.decode(C.hex.decode(${
           S.string(hex.encode(constant.value))
         } as C.Hex))`,

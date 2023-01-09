@@ -1,30 +1,12 @@
 // This example requires zombienet-macos/zombienet-linux, polkadot and polkadot-parachain binaries in the PATH
 
-import * as path from "http://localhost:5646/@local/deps/std/path.ts"
-import * as C from "http://localhost:5646/@local/mod.ts"
-import * as T from "http://localhost:5646/@local/test_util/mod.ts"
-import * as U from "http://localhost:5646/@local/util/mod.ts"
+import * as C from "capi/mod.ts"
 
-const configFile = path.join(
-  path.dirname(path.fromFileUrl(import.meta.url)),
-  "xcm_teleport_assets.toml",
-)
-const zombienet = await T.zombienet.start(configFile)
+import { client as relayChainClient } from "http://localhost:8000/zombienet/examples/xcm_teleport_assets.toml#alice/_/client.ts"
+import { client as parachainClient } from "http://localhost:8000/zombienet/examples/xcm_teleport_assets.toml#collator01/_/client.ts"
 
-Deno.addSignalListener("SIGINT", async () => {
-  try {
-    await zombienet.close()
-  } finally {
-    Deno.exit()
-  }
-})
-
-// see xcm_teleport_asset.toml for node names
-const relaychainClient = zombienet.clients.byName["alice"]!
-const parachainClient = zombienet.clients.byName["collator01"]!
-
-const teleportAssetsTx = C.extrinsic(relaychainClient)({
-  sender: T.alice.address,
+const teleportAssetsTx = C.extrinsic(relayChainClient)({
+  sender: C.alice.address,
   call: {
     type: "XcmPallet",
     value: {
@@ -50,7 +32,7 @@ const teleportAssetsTx = C.extrinsic(relaychainClient)({
             type: "X1",
             value: {
               type: "AccountId32",
-              id: T.alice.address.value,
+              id: C.alice.address.value,
               network: {
                 type: "Any",
               },
@@ -83,7 +65,7 @@ const teleportAssetsTx = C.extrinsic(relaychainClient)({
     },
   },
 })
-  .signed(T.alice.sign)
+  .signed(C.alice.sign)
   .watch(({ end }) => {
     return (status) => {
       console.log(status)
@@ -97,7 +79,7 @@ const teleportAssetsTx = C.extrinsic(relaychainClient)({
   })
 
 const aliceParachainBalance = () =>
-  C.entryRead(parachainClient)("System", "Account", [T.alice.publicKey])
+  C.entryRead(parachainClient)("System", "Account", [C.alice.publicKey])
     .access("value")
     .access("data")
     .access("free")
@@ -125,27 +107,23 @@ const watchForDownwardMessagesProcessed = C.entryWatch(parachainClient)(
 
 const watchForDownwardMessagesProcessedPending = watchForDownwardMessagesProcessed.run()
 
-const watchForParachainBlocksPending = C.blockWatch(parachainClient)(
-  ({ end }) => {
-    let i = 0
-    return () => {
-      if (i === 1) {
-        return end()
-      }
-      i++
-      return
+const watchForParachainBlocksPending = C.blockWatch(parachainClient)(({ end }) => {
+  let i = 0
+  return () => {
+    if (i === 1) {
+      return end()
     }
-  },
-).run()
+    i++
+    return
+  }
+}).run()
 
 console.log("Alice parachain balance before XcmPallet.limitedTeleportAssets")
-console.log(U.throwIfError(await aliceParachainBalance().run()))
-U.throwIfError(await teleportAssetsTx.run())
+console.log(C.throwIfError(await aliceParachainBalance().run()))
+C.throwIfError(await teleportAssetsTx.run())
 console.log("waiting for parachain ParachainSystem.DownwardMessagesProcessed event")
-console.log(U.throwIfError(await watchForDownwardMessagesProcessedPending))
+console.log(C.throwIfError(await watchForDownwardMessagesProcessedPending))
 console.log("waiting for parachain to start generating blocks")
-U.throwIfError(await watchForParachainBlocksPending)
+C.throwIfError(await watchForParachainBlocksPending)
 console.log("Alice parachain balance after XcmPallet.limitedTeleportAssets")
-console.log(U.throwIfError(await aliceParachainBalance().run()))
-
-await zombienet.close()
+console.log(C.throwIfError(await aliceParachainBalance().run()))

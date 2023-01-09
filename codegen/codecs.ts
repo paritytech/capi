@@ -3,7 +3,7 @@ import { normalizeCase } from "../util/case.ts"
 import { CodegenCtx } from "./Ctx.ts"
 import { S } from "./utils.ts"
 
-export function codecs(ctx: CodegenCtx, typeVisitor: TyVisitor<string>) {
+export function codecs(ctx: CodegenCtx) {
   const { tys } = ctx.metadata
   const namespaceImports = new Set<string>()
 
@@ -139,7 +139,7 @@ import type * as types from "../types/mod.ts"
     if (ty.path.length > 1) {
       namespaceImports.add(ty.path[0]!)
     }
-    file += `export const $${ty.id}: $.Codec<${typeVisitor.visit(ty)}> = ${value}\n\n`
+    file += `export const $${ty.id}: $.Codec<${ctx.typeVisitor.visit(ty)}> = ${value}\n\n`
     return `$${ty.id}`
   }
 }

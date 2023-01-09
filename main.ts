@@ -1,6 +1,6 @@
 import * as flags from "./deps/std/flags.ts"
 import { serve } from "./deps/std/http/server.ts"
-import { Ctx, handler } from "./server/local/mod.ts"
+import { handler, ServerCtx } from "./server/local/mod.ts"
 
 const { help, port: portRaw, "--": cacheCmdRest } = flags.parse(Deno.args, {
   string: ["port", "cache"],
@@ -30,7 +30,7 @@ try {
 const cacheDir = await Deno.makeTempDir({ prefix: "capi_server_" })
 const abortController = new AbortController()
 const { signal } = abortController
-const ctx = new Ctx(cacheDir, signal)
+const ctx = new ServerCtx(cacheDir, signal)
 
 serve(handler.bind(ctx), {
   port,

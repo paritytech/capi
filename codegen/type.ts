@@ -6,7 +6,6 @@ import { makeDocComment, S } from "./utils.ts"
 
 export function type(
   ctx: CodegenCtx,
-  visitor: TyVisitor<string>,
   path: string,
   filePath: string,
   typeFile: TypeFile,
@@ -27,7 +26,7 @@ export function type(
   for (
     const [path, ty] of [...typeFile.types].sort((a, b) => a[0] > b[0] ? 1 : a[0] < b[0] ? -1 : 0)
   ) {
-    file += createTypeDecl(ctx, visitor, path, ty) + "\n\n"
+    file += createTypeDecl(ctx, ctx.typeVisitor, path, ty) + "\n\n"
   }
   return file
 }

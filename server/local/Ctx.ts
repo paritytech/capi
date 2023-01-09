@@ -1,13 +1,41 @@
 import { serveFile } from "../../deps/std/http/file_server.ts"
 import { Status } from "../../deps/std/http/http_status.ts"
 import { FsCache } from "../../util/cache/mod.ts"
-import { CtxBase, PolkadotDevProvider, WsProvider } from "../mod.ts"
+import { PolkadotDevProvider, ServerCtxBase, WssProvider } from "../mod.ts"
 import { acceptsHtml, page } from "./common.ts"
 import { _404Page, _500Page, CodePage } from "./pages/mod.ts"
 
-export class Ctx extends CtxBase<LocalProvider> {
+export class ServerCtx extends ServerCtxBase<{
+  dev: PolkadotDevProvider
+  wss: WssProvider
+}> {
   constructor(cacheDir: string, signal: AbortSignal) {
-    super(new FsCache(cacheDir, signal), providers(), signal)
+    super(new FsCache(cacheDir, signal), {
+      dev: new PolkadotDevProvider(),
+      wss: new WssProvider(),
+    }, signal)
+  }
+
+  async staticFile(req: Request, url: URL) {
+    if (acceptsHtml(req)) {
+      return page(
+        await CodePage({
+          path: url.pathname,
+          src: await Deno.readTextFile(url),
+        }),
+      )
+    }
+    return await serveFile(req, url.pathname)
+  }
+
+  async code(req: Request, path: string, src: string) {
+    console.log({ staticFile: path })
+    if (acceptsHtml(req)) {
+      return page(await CodePage({ path, src }))
+    }
+    return new Response(src, {
+      headers: { "Content-Type": "application/typescript" },
+    })
   }
 
   404(req: Request) {
@@ -23,29 +51,4 @@ export class Ctx extends CtxBase<LocalProvider> {
     }
     return new Response("500", { status: Status.InternalServerError })
   }
-
-  async staticFile(req: Request, url: URL) {
-    if (acceptsHtml(req)) {
-      return page(
-        await CodePage({
-          path: url.pathname,
-          code: await Deno.readTextFile(url),
-        }),
-      )
-    }
-    return await serveFile(req, url.pathname)
-  }
-
-  codegen(path: string) {
-    return ""
-  }
-
-  completions() {
-    return ""
-  }
-}
-
-type LocalProvider = ReturnType<typeof providers>[number]
-function providers() {
-  return [new PolkadotDevProvider(), new WsProvider()]
 }

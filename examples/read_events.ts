@@ -1,6 +1,5 @@
-import * as C from "http://localhost:5646/@local/mod.ts"
-import * as U from "http://localhost:5646/@local/util/mod.ts"
+import * as C from "capi/mod.ts"
 
 const root = C.entryRead(C.polkadot)("System", "Events", [])
 
-console.log(U.throwIfError(await root.run()))
+console.log(C.throwIfError(await root.run()))

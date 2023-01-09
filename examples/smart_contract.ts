@@ -1,16 +1,8 @@
 // This example requires zombienet-macos/zombienet-linux, polkadot and polkadot-parachain binaries in the PATH
 
-import * as path from "http://localhost:5646/@local/deps/std/path.ts"
-import * as C from "http://localhost:5646/@local/mod.ts"
-import * as T from "http://localhost:5646/@local/test_util/mod.ts"
-import * as U from "http://localhost:5646/@local/util/mod.ts"
+import * as C from "capi/mod.ts"
 
-const configFile = path.join(
-  path.dirname(path.fromFileUrl(import.meta.url)),
-  "smart_contract/zombienet.toml",
-)
-const zombienet = await T.zombienet.start(configFile)
-const client = zombienet.clients.byName["collator01"]!
+import { client } from "http://localhost:8000/zombienet/smart_contract/zombienet.toml#collator01/_/client/raw.ts"
 
 const salt = Uint8Array.from(Array.from([0, 0, 0, 0]), () => Math.floor(Math.random() * 16))
 
@@ -37,8 +29,8 @@ const tx = C.contracts.instantiate(client)({
   code,
   constructorMetadata,
   salt,
-  sender: T.alice.address,
-}).signed(T.alice.sign)
+  sender: C.alice.address,
+}).signed(C.alice.sign)
 const finalizedIn = tx.watch(({ end }) => (status) => {
   if (typeof status !== "string" && (status.inBlock ?? status.finalized)) {
     return end(status.inBlock ?? status.finalized)
@@ -65,25 +57,25 @@ const contractAddress = U.throwIfError(
     .run(),
 )
 
-const prefix = U.throwIfError(await C.const(client)("System", "SS58Prefix").access("value").run())
-console.log("Deployed Contract address", U.ss58.encode(prefix, contractAddress))
+const prefix = C.throwIfError(await C.const(client)("System", "SS58Prefix").access("value").run())
+console.log("Deployed Contract address", C.ss58.encode(prefix, contractAddress))
 
 const flipperContract = new C.fluent.Contract(client, metadata, contractAddress)
 console.log(
   ".get",
   await flipperContract.call({
-    sender: T.alice.address,
+    sender: C.alice.address,
     messageLabel: "get",
     args: [],
   }).run(),
 )
 console.log(
   "block hash and events",
-  U.throwIfError(
+  C.throwIfError(
     await flipperContract.callTx({
-      sender: T.alice.address,
+      sender: C.alice.address,
       args: [],
-      sign: T.alice.sign,
+      sign: C.alice.sign,
       messageLabel: "flip",
     }).run(),
   )[0],
@@ -91,74 +83,74 @@ console.log(
 console.log(
   ".get",
   await flipperContract.call({
-    sender: T.alice.address,
+    sender: C.alice.address,
     messageLabel: "get",
     args: [],
   }).run(),
 )
 console.log(
   ".get_count",
-  await flipperContract.call({ sender: T.alice.address, messageLabel: "get_count", args: [] })
+  await flipperContract.call({ sender: C.alice.address, messageLabel: "get_count", args: [] })
     .run(),
 )
 console.log(
   ".inc block hash",
-  U.throwIfError(
+  C.throwIfError(
     await flipperContract.callTx({
-      sender: T.alice.address,
+      sender: C.alice.address,
       messageLabel: "inc",
       args: [],
-      sign: T.alice.sign,
+      sign: C.alice.sign,
     }).run(),
   )[0],
 )
 console.log(
   ".inc block hash",
-  U.throwIfError(
+  C.throwIfError(
     await flipperContract.callTx({
-      sender: T.alice.address,
+      sender: C.alice.address,
       messageLabel: "inc",
       args: [],
-      sign: T.alice.sign,
+      sign: C.alice.sign,
     }).run(),
   )[0],
 )
 console.log(
   ".get_count",
-  await flipperContract.call({ sender: T.alice.address, messageLabel: "get_count", args: [] })
+  await flipperContract.call({ sender: C.alice.address, messageLabel: "get_count", args: [] })
     .run(),
 )
 console.log(
   ".inc_by(3) block hash",
-  U.throwIfError(
+  C.throwIfError(
     await flipperContract.callTx({
-      sender: T.alice.address,
+      sender: C.alice.address,
       messageLabel: "inc_by",
       args: [3],
-      sign: T.alice.sign,
+      sign: C.alice.sign,
     }).run(),
   )[0],
 )
 console.log(
   ".get_count",
-  await flipperContract.call({ sender: T.alice.address, messageLabel: "get_count", args: [] })
+  await flipperContract.call({ sender: C.alice.address, messageLabel: "get_count", args: [] })
     .run(),
 )
 console.log(
   ".inc_by_with_event(3) contract events",
-  U.throwIfError(
+  C.throwIfError(
     await flipperContract.callTx({
-      sender: T.alice.address,
+      sender: C.alice.address,
       messageLabel: "inc_by_with_event",
       args: [3],
-      sign: T.alice.sign,
+      sign: C.alice.sign,
     }).run(),
   )[2],
 )
 console.log(
   ".method_returning_tuple(2,true)",
   await flipperContract.call({
-    sender: T.alice.address,
+    sender: C.alice.address,
     messageLabel: "method_returning_tuple",
     args: [2, true],
   }).run(),
@@ -166,10 +158,8 @@ console.log(
 console.log(
   ".method_returning_struct(3,false)",
   await flipperContract.call({
-    sender: T.alice.address,
+    sender: C.alice.address,
     messageLabel: "method_returning_struct",
     args: [3, false],
   }).run(),
 )
-
-await zombienet.close()

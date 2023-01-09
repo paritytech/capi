@@ -2,7 +2,7 @@ import { Ty, TyVisitor } from "../scale_info/mod.ts"
 import { CodegenCtx } from "./Ctx.ts"
 import { getRawCodecPath, S } from "./utils.ts"
 
-export function extrinsic(ctx: CodegenCtx, typeVisitor: TyVisitor<string>) {
+export function extrinsic(ctx: CodegenCtx) {
   const { tys, extrinsic } = ctx.metadata
   const {
     signature: signatureTy,
@@ -53,7 +53,7 @@ const _extrinsic = ${
       ["signature", getRawCodecPath(signatureTy!)],
     )
   }
-export const extrinsic = C.extrinsic<typeof client, ${typeVisitor.visit(callTy!)}>(client);
+export const extrinsic = C.extrinsic<typeof client, ${ctx.typeVisitor.visit(callTy!)}>(client);
 `
 
   function getExtrasCodec(xs: [string, Ty][]) {

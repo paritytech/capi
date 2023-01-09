@@ -1,5 +1,4 @@
-import * as C from "http://localhost:5646/@local/mod.ts"
-import * as U from "http://localhost:5646/@local/util/mod.ts"
+import * as C from "capi/mod.ts"
 
 const extrinsicsDecoded = C.extrinsicsDecoded(C.polkadot)
 
@@ -16,4 +15,4 @@ const root = C.blockWatch(C.polkadot)((ctx) => {
   }
 })
 
-U.throwIfError(await root.run())
+C.throwIfError(await root.run())
