@@ -35,19 +35,19 @@ export function nextIdFactory() {
 }
 
 export class ListenersContainer<
-  DiscoveryValue,
+  Key,
   SendErrorData,
   HandlerErrorData,
 > {
   #listeners = new Map<
-    DiscoveryValue,
+    Key,
     Map<
       ProviderListener<SendErrorData, HandlerErrorData>,
       ProviderListener<SendErrorData, HandlerErrorData>
     >
   >()
 
-  set(discoveryValue: DiscoveryValue, listener: ProviderListener<SendErrorData, HandlerErrorData>) {
+  set(discoveryValue: Key, listener: ProviderListener<SendErrorData, HandlerErrorData>) {
     const map = U.getOrInit(this.#listeners, discoveryValue, () =>
       new Map<
         ProviderListener<SendErrorData, HandlerErrorData>,
@@ -63,18 +63,18 @@ export class ListenersContainer<
   }
 
   delete(
-    discoveryValue: DiscoveryValue,
+    discoveryValue: Key,
     listener: ProviderListener<SendErrorData, HandlerErrorData>,
   ) {
     this.#listeners.get(discoveryValue)?.delete(listener)
   }
 
-  count(discoveryValue: DiscoveryValue) {
+  count(discoveryValue: Key) {
     return this.#listeners.get(discoveryValue)?.size ?? 0
   }
 
   forEachListener(
-    discoveryValue: DiscoveryValue,
+    discoveryValue: Key,
     message: Parameters<ProviderListener<SendErrorData, HandlerErrorData>>[0],
   ) {
     const map = this.#listeners.get(discoveryValue)
