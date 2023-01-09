@@ -13,8 +13,8 @@ export const proxyProviderFactory = (
   { retryOptions }: ProxyProviderFactoryProps = {},
 ): Provider<string, Event, Event, Event> => {
   const listenersContainer = new ListenersContainer<string, Event, Event>()
-  const activeWs = new Map()
-  const connectingWs = new Map()
+  const activeWs = new Map<string, WebSocket>()
+  const connectingWs = new Map<string, Promise<WebSocket>>()
   return (url, listener) => {
     listenersContainer.set(url, listener)
     let ws: WebSocket | undefined
@@ -61,14 +61,14 @@ interface OpenedWsProps {
   listener: ProviderListener<Event, Event>
 }
 
-function openedWs({ url, activeWs, connectingWs, listener, retryOptions }: OpenedWsProps) {
+function openedWs(
+  { url, activeWs, connectingWs, listener, retryOptions }: OpenedWsProps,
+): Promise<WebSocket> {
   return retry(() => {
-    if (activeWs.has(url)) {
-      return Promise.resolve(activeWs.get(url)!)
-    }
-    if (connectingWs.has(url)) {
-      return connectingWs.get(url)!
-    }
+    const activeWsValue = activeWs.get(url)
+    if (activeWsValue) return Promise.resolve(activeWsValue)
+    const connectingWsValue = connectingWs.get(url)
+    if (connectingWsValue) return connectingWsValue
     const openedWs = new Promise<WebSocket>((resolve, reject) => {
       const connectingWsController = new AbortController()
       const ws = new WebSocket(url)
