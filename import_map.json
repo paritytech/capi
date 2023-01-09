@@ -7,11 +7,6 @@
     "rococo_dev/": "http://locahost:8000/dev/rococo@v0.9.36/"
   },
   "scopes": {
-    "examples/": {
-      "capi/": "./"
-    },
-    "http://localhost:8000/": {
-      "http://localhost:8000/": "./"
-    }
+    "examples/": { "capi/": "./" }
   }
 }

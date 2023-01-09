@@ -17,19 +17,14 @@ export class ServerCtx extends ServerCtxBase<{
   }
 
   async staticFile(req: Request, url: URL) {
+    const { pathname: path } = url
     if (acceptsHtml(req)) {
-      return page(
-        await CodePage({
-          path: url.pathname,
-          src: await Deno.readTextFile(url),
-        }),
-      )
+      return page(await CodePage({ path, src: await Deno.readTextFile(url) }))
     }
-    return await serveFile(req, url.pathname)
+    return await serveFile(req, path)
   }
 
   async code(req: Request, path: string, src: string) {
-    console.log({ staticFile: path })
     if (acceptsHtml(req)) {
       return page(await CodePage({ path, src }))
     }
