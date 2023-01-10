@@ -3,7 +3,7 @@ import { PromiseOr } from "../util/mod.ts"
 import { Provider } from "./provider/mod.ts"
 
 export abstract class ServerCtxBase<
-  Providers extends Record<string, Provider<unknown>> = Record<string, Provider<any>>,
+  Providers extends Record<string, Provider> = Record<string, Provider>,
 > {
   constructor(
     readonly cache: CacheBase,

@@ -1,5 +1,5 @@
 import { Ty, TyVisitor } from "../scale_info/mod.ts"
-import { CodegenCtx } from "./Ctx.ts"
+import { CodegenCtx, File } from "./Ctx.ts"
 import { getRawCodecPath, S } from "./utils.ts"
 
 export function extrinsic(ctx: CodegenCtx) {
@@ -33,7 +33,8 @@ export function extrinsic(ctx: CodegenCtx) {
     circular: () => false,
   })
 
-  return `
+  const file = new File()
+  file.code = `
 import { $ } from "./capi.ts"
 import * as C from "./capi.ts"
 import { client } from "./client.ts"
@@ -55,6 +56,7 @@ const _extrinsic = ${
   }
 export const extrinsic = C.extrinsic<typeof client, ${ctx.typeVisitor.visit(callTy!)}>(client);
 `
+  return file
 
   function getExtrasCodec(xs: [string, Ty][]) {
     return S.array(

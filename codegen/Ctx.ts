@@ -1,4 +1,3 @@
-import * as path from "../deps/std/path.ts"
 import { Metadata } from "../frame_metadata/mod.ts"
 import { Ty } from "../scale_info/mod.ts"
 import { codecs } from "./codecs.ts"
@@ -9,30 +8,24 @@ import { typeVisitor } from "./typeVisitor.ts"
 
 export interface CodegenCtxProps {
   metadata: Metadata
-  capiMod: URL
-  clientMod: URL
-  clientRawMod: URL
-  baseDir: URL
+  capiUrl: URL
+  clientFile: File
+  rawClientFile?: File
 }
 
 export class CodegenCtx {
   metadata
-  baseDir
-  baseDirGhost
   capiMod
-  clientMod
-  clientRawMod
+  clientFile
+
   typeVisitor
-  files = new Map<string, string>()
+  files = new Map<string, File>()
   typeFiles = new Map<string, TypeFile>()
 
-  constructor({ metadata, baseDir, capiMod, clientMod, clientRawMod }: CodegenCtxProps) {
+  constructor({ metadata, capiUrl, clientFile, rawClientFile }: CodegenCtxProps) {
     this.metadata = metadata
-    this.baseDir = baseDir
-    this.baseDirGhost = path.join(this.baseDir.pathname, "_")
-    this.capiMod = capiMod
-    this.clientMod = clientMod
-    this.clientRawMod = clientRawMod
+    this.capiMod = capiUrl
+    this.clientFile = clientFile
 
     this.typeVisitor = typeVisitor(this)
 
@@ -42,20 +35,22 @@ export class CodegenCtx {
     }
 
     this.files.set("_/codecs.ts", codecs(this))
-    this.files.set("_/capi.ts", `export * from "${this.importSpecifier(this.capiMod)}"`)
-    this.files.set("_/client.ts", `export * from "${this.importSpecifier(this.clientMod)}"`)
-    this.files.set("_/client/raw.ts", `export * from "${this.importSpecifier(this.clientRawMod)}"`)
-    this.files.set("_/extrinsic.ts", extrinsic(this))
-    this.files.set("mod.ts", `export * from "./_/extrinsic.ts"`)
+
+    // TODO: deferred import formation system
+    const capiReexportFile = new File()
+    capiReexportFile.code = `export * from "${this.capiMod.href}"`
+    this.files.set("_/capi.ts", capiReexportFile)
+
+    // TODO: deferred import formation system
+    this.files.set("_/client.ts", clientFile)
+    if (rawClientFile) this.files.set("_/client/raw.ts", rawClientFile)
+
+    this.files.set("extrinsic.ts", extrinsic(this))
 
     for (const p of this.metadata.pallets) {
       if (!p.calls && !p.constants.length && !p.storage?.entries.length) continue
       this.files.set(`${p.name}.ts`, pallet(this, p))
     }
-  }
-
-  importSpecifier(url: URL) {
-    return path.relative(this.baseDirGhost, url.pathname)
   }
 
   [Symbol.iterator]() {
@@ -70,3 +65,9 @@ export class TypeFile {
     return this.reexports.size ? "/mod.ts" : ".ts"
   }
 }
+
+export class File {
+  code = ""
+}
+
+export type Ext = "" | ".js" | ".ts"

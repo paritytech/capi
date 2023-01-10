@@ -1,13 +1,14 @@
 import { Ty, TyVisitor } from "../scale_info/mod.ts"
 import { normalizeCase } from "../util/case.ts"
-import { CodegenCtx } from "./Ctx.ts"
+import { CodegenCtx, File } from "./Ctx.ts"
 import { S } from "./utils.ts"
 
 export function codecs(ctx: CodegenCtx) {
   const { tys } = ctx.metadata
   const namespaceImports = new Set<string>()
 
-  let file = `\
+  const file = new File()
+  file.code = `\
 import { $ } from "./capi.ts"
 import * as C from "./capi.ts"
 import type * as types from "../types/mod.ts"
@@ -131,7 +132,9 @@ import type * as types from "../types/mod.ts"
     visitor.visit(ty)
   }
 
-  file += `export const _all: $.AnyCodec[] = ${S.array(ctx.metadata.tys.map((ty) => `$${ty.id}`))}`
+  file.code += `export const _all: $.AnyCodec[] = ${
+    S.array(ctx.metadata.tys.map((ty) => `$${ty.id}`))
+  }`
 
   return file
 
@@ -139,7 +142,7 @@ import type * as types from "../types/mod.ts"
     if (ty.path.length > 1) {
       namespaceImports.add(ty.path[0]!)
     }
-    file += `export const $${ty.id}: $.Codec<${ctx.typeVisitor.visit(ty)}> = ${value}\n\n`
+    file.code += `export const $${ty.id}: $.Codec<${ctx.typeVisitor.visit(ty)}> = ${value}\n\n`
     return `$${ty.id}`
   }
 }

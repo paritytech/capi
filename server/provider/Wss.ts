@@ -1,64 +1,31 @@
-import { CodegenCtx } from "../../codegen/mod.ts"
-import * as C from "../../mod.ts"
-import { Provider, TryParsePathInfoResult } from "./common.ts"
+import { Ext, File } from "../../codegen/mod.ts"
+import { extname } from "../../deps/std/path.ts"
+import { Client, proxyProvider } from "../../rpc/mod.ts"
+import { FrameProvider, FrameProviderPathInfo } from "./common/mod.ts"
 
-export interface WssPathInfo {
-  wss: string
-  runtimeVersion: string
-  tsFilePath: string
-  key: string
+export class WssProvider extends FrameProvider<string> {
+  parsePathInfo = parseWssPathInfo
+
+  client({ discoveryValue }: FrameProviderPathInfo<string>) {
+    return new Client(proxyProvider, `wss://${discoveryValue}`)
+  }
+
+  clientFile() {
+    const clientFile = new File()
+    clientFile.code = `export const client = null!`
+    return clientFile
+  }
 }
 
-export class WssProvider extends Provider<WssPathInfo> {
-  codegenCtxPendings: Record<string, Promise<CodegenCtx>> = {}
-
-  tryParsePathInfo(path: string): TryParsePathInfoResult<WssPathInfo> {
-    const atI = path.search("@")
-    if (atI == -1) return { error: `Expected "@" character and version to appear in URL` }
-    const wss = path.slice(0, atI)
-    const atTrailing = path.slice(atI + 1)
-    const slashI = atTrailing.search("/")
-    const runtimeVersion = atTrailing.slice(0, slashI)
-    const tsFilePath = atTrailing.slice(slashI + 1)
-    const key = path.slice(0, atI + 1 + slashI)
-    return { wss, runtimeVersion, tsFilePath, key }
-  }
-
-  async code(pathInfo: WssPathInfo) {
-    const codegenCtx = await this.codegenCtx(pathInfo)
-    return codegenCtx.files.get(pathInfo.tsFilePath)!
-  }
-
-  codegenCtx({ key, wss, runtimeVersion }: WssPathInfo): Promise<CodegenCtx> {
-    let codegenCtxPending = this.codegenCtxPendings[key]
-    if (!codegenCtxPending) {
-      codegenCtxPending = (async () => {
-        const client = C.rpcClient(C.rpc.proxyProvider, `wss://${wss}`)
-        const [metadata, version] = C.throwIfError(
-          await C.Z.ls(C.metadata(client)(), C.rpcCall("system_version")(client)()).run(),
-        )
-        if (typeof version !== "string") throw new Error()
-        const versionWithoutChannel = version.split("-")[0]
-        if (versionWithoutChannel !== runtimeVersion) throw new Error()
-        const baseDir = new URL(import.meta.url)
-        return new CodegenCtx({
-          metadata,
-          baseDir,
-          capiMod: baseDir,
-          clientMod: baseDir,
-          clientRawMod: baseDir,
-        })
-      })()
-      this.codegenCtxPendings[key] = codegenCtxPending
-    }
-    return codegenCtxPending
-  }
-
-  // client(pathInfo: WssPathInfo) {
-  //   // let client =
-  //   if (!this.#client) {
-  //     this.#client = new Client(proxyProvider, `wss://${pathInfo.ws}`)
-  //   }
-  //   return this.#client
-  // }
+export function parseWssPathInfo(path: string): FrameProviderPathInfo<string> {
+  const atI = path.search("@")
+  if (atI == -1) throw new Error(`Expected "@" character and version to appear in URL`)
+  const discoveryValue = path.slice(0, atI)
+  const atTrailing = path.slice(atI + 1)
+  const slashI = atTrailing.search("/")
+  const version = atTrailing.slice(0, slashI)
+  const filePath = atTrailing.slice(slashI + 1)
+  const key = path.slice(0, atI + 1 + slashI)
+  const ext = extname(filePath) as Ext
+  return { key, discoveryValue, version, filePath, ext }
 }

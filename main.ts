@@ -40,7 +40,7 @@ serve(handler.bind(ctx), {
   },
   onError(error) {
     console.log(`Internal server error`)
-    console.log(error instanceof Error ? error.message : error)
+    console.log(error)
     Deno.exit(1)
   },
 })

@@ -1,10 +1,12 @@
 import { assertEquals } from "../../deps/std/testing/asserts.ts"
-import { PolkadotDevProvider } from "./PolkadotDev.ts"
+import { parsePolkadotDevPathInfo } from "./PolkadotDev.ts"
 
 Deno.test("Polkadot Dev Path Info Parsing", () => {
-  assertEquals(PolkadotDevProvider.prototype.tryParsePathInfo("polkadot@version/mod.ts"), {
-    runtimeName: "polkadot",
-    runtimeVersion: "version",
-    tsFilePath: "mod.ts",
+  assertEquals(parsePolkadotDevPathInfo("polkadot@version/mod.ts"), {
+    discoveryValue: "polkadot",
+    version: "version",
+    filePath: "mod.ts",
+    key: "polkadot@version",
+    ext: ".ts",
   })
 })

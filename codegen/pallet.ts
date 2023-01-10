@@ -2,10 +2,11 @@ import { Pallet } from "../frame_metadata/mod.ts"
 import { hex } from "../mod.ts"
 import { Ty, UnionTyDef } from "../scale_info/mod.ts"
 import { normalizeCase } from "../util/case.ts"
-import { CodegenCtx } from "./Ctx.ts"
+import { CodegenCtx, File } from "./Ctx.ts"
 import { getRawCodecPath, makeDocComment, S } from "./utils.ts"
 
 export function pallet(ctx: CodegenCtx, pallet: Pallet) {
+  const file = new File()
   const items = [
     `\
 import type * as types from "./types/mod.ts"
@@ -66,5 +67,6 @@ import { client } from "./_/client.ts"
     )
     constant.value
   }
-  return items.join("\n\n")
+  file.code = items.join("\n\n")
+  return file
 }

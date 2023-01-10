@@ -1,32 +1,27 @@
 import { posix as pathPosix } from "../deps/std/path.ts"
 import { Ty, TyVisitor, TyVisitorMethods } from "../scale_info/mod.ts"
 import { normalizeCase } from "../util/case.ts"
-import { CodegenCtx, TypeFile } from "./Ctx.ts"
+import { CodegenCtx, File, TypeFile } from "./Ctx.ts"
 import { makeDocComment, S } from "./utils.ts"
 
-export function type(
-  ctx: CodegenCtx,
-  path: string,
-  filePath: string,
-  typeFile: TypeFile,
-) {
-  let file = ""
+export function type(ctx: CodegenCtx, path: string, filePath: string, typeFile: TypeFile) {
+  const file = new File()
   if (path !== "types") {
-    file += `import type * as types from ${S.string(importPath(filePath, "types/mod.ts"))}\n`
+    file.code += `import type * as types from ${S.string(importPath(filePath, "types/mod.ts"))}\n`
   }
-  file += `import * as codecs from ${S.string(importPath(filePath, "_/codecs.ts"))}\n`
-  file += `import { $ } from ${S.string(importPath(filePath, "_/capi.ts"))}\n`
-  file += `import * as C from ${S.string(importPath(filePath, "_/capi.ts"))}\n`
-  file += "\n"
+  file.code += `import * as codecs from ${S.string(importPath(filePath, "_/codecs.ts"))}\n`
+  file.code += `import { $ } from ${S.string(importPath(filePath, "_/capi.ts"))}\n`
+  file.code += `import * as C from ${S.string(importPath(filePath, "_/capi.ts"))}\n`
+  file.code += "\n"
   for (const reexport of [...typeFile.reexports].sort()) {
     const otherFile = ctx.typeFiles.get(path + "/" + reexport)!
-    file += `export * as ${reexport} from "./${reexport}${otherFile.ext}"\n`
+    file.code += `export * as ${reexport} from "./${reexport}${otherFile.ext}"\n`
   }
-  file += "\n"
+  file.code += "\n"
   for (
     const [path, ty] of [...typeFile.types].sort((a, b) => a[0] > b[0] ? 1 : a[0] < b[0] ? -1 : 0)
   ) {
-    file += createTypeDecl(ctx, ctx.typeVisitor, path, ty) + "\n\n"
+    file.code += createTypeDecl(ctx, ctx.typeVisitor, path, ty) + "\n\n"
   }
   return file
 }
