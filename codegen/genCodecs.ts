@@ -35,7 +35,6 @@ import type * as types from "./types/mod.ts"
     option(ty, some) {
       return addCodecDecl(ty, `$.option(${this.visit(some)})`)
     },
-
     result(ty, ok, err) {
       return addCodecDecl(
         ty,
@@ -43,7 +42,7 @@ import type * as types from "./types/mod.ts"
           this.visit(ok)
         }, $.instance(C.ChainError<$.Native<typeof $${err.id}>>, $.tuple(${
           this.visit(err)
-        }), (x) => x.value))`,
+        }), (x) => [x.value]))`,
       )
     },
     never(ty) {

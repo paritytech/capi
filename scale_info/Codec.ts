@@ -35,7 +35,7 @@ export function DeriveCodec(tys: Ty[]): DeriveCodec {
     result(_ty, ok, err) {
       return $.result(
         this.visit(ok),
-        $.instance(ChainError, $.tuple(this.visit(err)), (x) => x.value),
+        $.instance(ChainError, $.tuple(this.visit(err)), (x) => [x.value]),
       )
     },
     never() {
