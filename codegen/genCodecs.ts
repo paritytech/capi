@@ -27,24 +27,25 @@ import type * as types from "./types/mod.ts"
       return addCodecDecl(
         ty,
         `$.object(${
-          ty.fields.map((x) =>
-            S.array([
-              S.string(normalizeCase(x.name!)),
-              this.visit(x.ty),
-            ])
-          ).join(", ")
+          ty.fields.map((x) => `$.field(${S.string(normalizeCase(x.name!))}, ${this.visit(x.ty)})`)
+            .join(", ")
         })`,
       )
     },
     option(ty, some) {
       return addCodecDecl(ty, `$.option(${this.visit(some)})`)
     },
+
+    //  $.instance(ChainError, $.tuple(this.visit(err)), (x) => x.value),
+
     result(ty, ok, err) {
       return addCodecDecl(
         ty,
         `$.result(${
           this.visit(ok)
-        }, $.instance(C.ChainError<$.Native<typeof $${err.id}>>, ["value", ${this.visit(err)}]))`,
+        }, $.instance(C.ChainError<$.Native<typeof $${err.id}>>, $.tuple(${
+          this.visit(err)
+        }), (x) => x.value))`,
       )
     },
     never(ty) {

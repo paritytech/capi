@@ -27,7 +27,6 @@ const foo: Foo = {
     a: new TextEncoder().encode("hello world"),
     b: [],
     c: Promise.resolve("abc"),
-    d: undefined,
   },
 }
 
