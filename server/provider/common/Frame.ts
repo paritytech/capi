@@ -42,14 +42,18 @@ export abstract class FrameProvider<DiscoveryValue> extends Provider {
         )
         if (metadataR.error) throw new Error(metadataR.error.message)
         const metadata = fromPrefixedHex(metadataR.result)
-        return new CodegenCtx({
+        const codegenCtx = new CodegenCtx({
           metadata,
           capiUrl: new URL(import.meta.resolve("../../mod.ts")),
           clientFile: this.clientFile(pathInfo),
         })
+        this.postInitCodegenCtx(codegenCtx, pathInfo)
+        return codegenCtx
       })()
       this.codegenCtxPendings[pathInfo.key] = codegenCtxPending
     }
     return codegenCtxPending
   }
+
+  postInitCodegenCtx(_codegenCtx: CodegenCtx, _pathInfo: FrameProviderPathInfo<DiscoveryValue>) {}
 }

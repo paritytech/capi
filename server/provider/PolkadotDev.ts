@@ -1,10 +1,10 @@
-import { Ext, File } from "../../codegen/Ctx.ts"
+import { CodegenCtx, Ext, File } from "../../codegen/Ctx.ts"
 import { extname } from "../../deps/std/path.ts"
 import { Client, proxyProvider } from "../../rpc/mod.ts"
 import * as port from "../../util/port.ts"
 import { FrameProvider, FrameProviderPathInfo } from "./common/mod.ts"
 
-export type PolkadotDevProviderPathInfo = FrameProviderPathInfo<DevRuntimeName>
+export type PolkadotDevPathInfo = FrameProviderPathInfo<DevRuntimeName>
 
 export interface PolkadotDevProviderProps {
   polkadotPath?: string
@@ -20,28 +20,36 @@ export class PolkadotDevProvider extends FrameProvider<DevRuntimeName> {
 
   parsePathInfo = parsePolkadotDevPathInfo
 
-  async client(pathInfo: PolkadotDevProviderPathInfo) {
+  async client(pathInfo: PolkadotDevPathInfo) {
     const port_ = this.devNet(pathInfo)
     await port.isReady(port_)
     return new Client(proxyProvider, this.url(pathInfo))
   }
 
-  clientFile(pathInfo: PolkadotDevProviderPathInfo) {
+  clientFile(pathInfo: PolkadotDevPathInfo) {
     const file = new File()
-    file.code = `
-import * as C from "./capi.ts"
+    file.code = `import * as C from "./capi.ts"
 
 export const client = C.rpcClient(C.rpc.proxyProvider, "${this.url(pathInfo)}")
 `
     return file
   }
 
-  url(pathInfo: PolkadotDevProviderPathInfo) {
+  override postInitCodegenCtx(codegenCtx: CodegenCtx, pathInfo: PolkadotDevPathInfo) {
+    const file = new File()
+    file.code = `import * as C from "./capi.ts"
+
+export const client = new C.rpc.Client(C.rpc.proxyProvider, "${this.url(pathInfo)}")
+`
+    codegenCtx.files.set("_/client/raw.ts", file)
+  }
+
+  url(pathInfo: PolkadotDevPathInfo) {
     const port_ = this.devNet(pathInfo)
     return `ws://localhost:${port_}`
   }
 
-  devNet({ discoveryValue }: PolkadotDevProviderPathInfo) {
+  devNet({ discoveryValue }: PolkadotDevPathInfo) {
     let port_ = this.#devNets[discoveryValue]
     if (!port_) {
       port_ = port.getAvailable()
@@ -79,7 +87,7 @@ const POLKADOT_PATH_NOT_FOUND =
   "The Polkadot CLI was not found. Please ensure Polkadot is installed and PATH is set for `polkadot`."
   + `For more information, visit the following link: "https://github.com/paritytech/polkadot".`
 
-export function parsePolkadotDevPathInfo(path: string): PolkadotDevProviderPathInfo {
+export function parsePolkadotDevPathInfo(path: string): PolkadotDevPathInfo {
   const atI = path.search("@")
   if (atI == -1) throw new Error(`Could not find "@" char in path`)
   const discoveryValue = path.slice(0, atI)
