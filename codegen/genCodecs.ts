@@ -37,8 +37,6 @@ import type * as types from "./types/mod.ts"
       return addCodecDecl(ty, `$.option(${this.visit(some)})`)
     },
 
-    //  $.instance(ChainError, $.tuple(this.visit(err)), (x) => x.value),
-
     result(ty, ok, err) {
       return addCodecDecl(
         ty,
