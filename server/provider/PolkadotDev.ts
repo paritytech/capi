@@ -3,19 +3,21 @@ import { outdent } from "../../deps/outdent.ts"
 import { extname } from "../../deps/std/path.ts"
 import { Client, proxyProvider } from "../../rpc/mod.ts"
 import * as port from "../../util/port.ts"
-import { FrameProvider, FrameProviderPathInfo } from "./common/mod.ts"
+import { FramePathInfo, FrameProvider } from "./common/mod.ts"
 
-export type PolkadotDevPathInfo = FrameProviderPathInfo<DevRuntimeName>
+export interface PolkadotDevPathInfo extends FramePathInfo {
+  runtimeName: DevRuntimeName
+}
 
 export interface PolkadotDevProviderProps {
   polkadotPath?: string
   additional?: string[]
 }
 
-export class PolkadotDevProvider extends FrameProvider<DevRuntimeName> {
-  #devNets: Partial<Record<DevRuntimeName, number>> = {}
+export class PolkadotDevProvider extends FrameProvider {
+  devNets: Partial<Record<DevRuntimeName, number>> = {}
 
-  constructor(readonly props: PolkadotDevProviderProps = {}) {
+  constructor(readonly props?: PolkadotDevProviderProps) {
     super()
   }
 
@@ -52,8 +54,8 @@ export class PolkadotDevProvider extends FrameProvider<DevRuntimeName> {
     return `ws://localhost:${port_}`
   }
 
-  devNet({ discoveryValue }: PolkadotDevPathInfo) {
-    let port_ = this.#devNets[discoveryValue]
+  devNet({ runtimeName }: PolkadotDevPathInfo) {
+    let port_ = this.devNets[runtimeName]
     if (!port_) {
       port_ = port.getAvailable()
       const polkadotPath_ = this.props?.polkadotPath ?? "polkadot"
@@ -64,7 +66,8 @@ export class PolkadotDevProvider extends FrameProvider<DevRuntimeName> {
         port_.toString(),
         ...this.props?.additional ?? [],
       ]
-      if (discoveryValue !== "polkadot") cmd.push(`--force-${discoveryValue}`)
+      if (runtimeName !== "polkadot") cmd.push(`--force-${runtimeName}`)
+      if (this.props?.additional) cmd.push(...this.props.additional)
       try {
         const process = Deno.run({
           cmd,
@@ -76,7 +79,7 @@ export class PolkadotDevProvider extends FrameProvider<DevRuntimeName> {
           await process.status()
           process.close()
         })
-        this.#devNets[discoveryValue] = port_
+        this.devNets[runtimeName] = port_
       } catch (_e) {
         console.log(POLKADOT_PATH_NOT_FOUND)
         Deno.exit(1)
@@ -86,17 +89,18 @@ export class PolkadotDevProvider extends FrameProvider<DevRuntimeName> {
   }
 }
 
+// TODO: auto installation prompt?
 const POLKADOT_PATH_NOT_FOUND =
   "The Polkadot CLI was not found. Please ensure Polkadot is installed and PATH is set for `polkadot`."
-  + `For more information, visit the following link: "https://github.com/paritytech/polkadot".`
+  + ` For more information, visit the following link: "https://github.com/paritytech/polkadot".`
 
 export function parsePolkadotDevPathInfo(path: string): PolkadotDevPathInfo {
   const atI = path.search("@")
   if (atI == -1) throw new Error(`Could not find "@" char in path`)
-  const discoveryValue = path.slice(0, atI)
-  if (!isDevRuntimeName(discoveryValue)) {
+  const runtimeName = path.slice(0, atI)
+  if (!isDevRuntimeName(runtimeName)) {
     throw new Error(
-      `"${discoveryValue}" is not a valid dev runtime name. Please specify one of the following: "${
+      `"${runtimeName}" is not a valid dev runtime name. Please specify one of the following: "${
         DEV_RUNTIME_NAMES.join(`", "`)
       }"`,
     )
@@ -105,10 +109,10 @@ export function parsePolkadotDevPathInfo(path: string): PolkadotDevPathInfo {
   const slashI0 = atTrailing.search("/")
   if (slashI0 == -1) throw new Error("Could not extract chain path")
   const version = atTrailing.slice(0, slashI0)
-  const key = path.slice(0, atI + 1 + slashI0)
+  const chainKey = path.slice(0, atI + 1 + slashI0)
   const filePath = atTrailing.slice(slashI0 + 1)
   const ext = extname(filePath) as Ext
-  return { key, discoveryValue, version, filePath, ext }
+  return { chainKey, runtimeName, version, filePath, ext }
 }
 
 export const DEV_RUNTIME_NAMES = ["polkadot", "kusama", "westend", "rococo"] as const

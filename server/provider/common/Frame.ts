@@ -4,20 +4,19 @@ import { Client } from "../../../rpc/mod.ts"
 import * as U from "../../../util/mod.ts"
 import { Provider } from "./Base.ts"
 
-export interface FrameProviderPathInfo<DiscoveryValue> {
-  key: string
-  discoveryValue: DiscoveryValue
+export interface FramePathInfo {
+  chainKey: string
   version: string
   filePath: string
   ext: Ext
 }
 
-export abstract class FrameProvider<DiscoveryValue> extends Provider {
+export abstract class FrameProvider extends Provider {
   codegenCtxPendings: Record<string, Promise<CodegenCtx>> = {}
 
-  abstract parsePathInfo(path: string): FrameProviderPathInfo<DiscoveryValue>
-  abstract client(pathInfo: FrameProviderPathInfo<DiscoveryValue>): U.PromiseOr<Client>
-  abstract clientFile(pathInfo: FrameProviderPathInfo<DiscoveryValue>): File
+  abstract parsePathInfo(path: string): FramePathInfo
+  abstract client(pathInfo: FramePathInfo): U.PromiseOr<Client>
+  abstract clientFile(pathInfo: FramePathInfo): File
 
   async run(req: Request, path: string) {
     const pathInfo = this.parsePathInfo(path)
@@ -27,8 +26,8 @@ export abstract class FrameProvider<DiscoveryValue> extends Provider {
     return this.ctx.code(req, pathInfo.filePath, file.code)
   }
 
-  codegenCtx(pathInfo: FrameProviderPathInfo<DiscoveryValue>) {
-    let codegenCtxPending = this.codegenCtxPendings[pathInfo.key]
+  codegenCtx(pathInfo: FramePathInfo) {
+    let codegenCtxPending = this.codegenCtxPendings[pathInfo.chainKey]
     if (!codegenCtxPending) {
       codegenCtxPending = (async () => {
         const client = await this.client(pathInfo)
@@ -50,10 +49,10 @@ export abstract class FrameProvider<DiscoveryValue> extends Provider {
         this.postInitCodegenCtx(codegenCtx, pathInfo)
         return codegenCtx
       })()
-      this.codegenCtxPendings[pathInfo.key] = codegenCtxPending
+      this.codegenCtxPendings[pathInfo.chainKey] = codegenCtxPending
     }
     return codegenCtxPending
   }
 
-  postInitCodegenCtx(_codegenCtx: CodegenCtx, _pathInfo: FrameProviderPathInfo<DiscoveryValue>) {}
+  postInitCodegenCtx(_codegenCtx: CodegenCtx, _pathInfo: FramePathInfo) {}
 }

@@ -1,9 +1,7 @@
-// This example requires zombienet-macos/zombienet-linux, polkadot and polkadot-parachain binaries in the PATH
-
 import * as C from "capi/mod.ts"
 
-import { client as relayChainClient } from "http://localhost:8000/zombienet/examples/xcm_teleport_assets.toml#alice/_/client.ts"
-import { client as parachainClient } from "http://localhost:8000/zombienet/examples/xcm_teleport_assets.toml#collator01/_/client.ts"
+import { client as relayChainClient } from "http://localhost:8000/zombienet/examples/xcm_teleport_assets.toml@v9.36.0#alice/_/client.ts"
+import { client as parachainClient } from "http://localhost:8000/zombienet/examples/xcm_teleport_assets.toml@v9.36.0#collator01/_/client.ts"
 
 const teleportAssetsTx = C.extrinsic(relayChainClient)({
   sender: C.alice.address,

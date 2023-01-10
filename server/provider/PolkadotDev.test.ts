@@ -3,10 +3,10 @@ import { parsePolkadotDevPathInfo } from "./PolkadotDev.ts"
 
 Deno.test("Polkadot Dev Path Info Parsing", () => {
   assertEquals(parsePolkadotDevPathInfo("polkadot@version/mod.ts"), {
-    discoveryValue: "polkadot",
+    chainKey: "polkadot@version",
+    runtimeName: "polkadot",
     version: "version",
     filePath: "mod.ts",
-    key: "polkadot@version",
     ext: ".ts",
   })
 })

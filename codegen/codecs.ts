@@ -139,9 +139,7 @@ export function codecs(ctx: CodegenCtx) {
   return file
 
   function addCodecDecl(ty: Ty, value: string) {
-    if (ty.path.length > 1) {
-      namespaceImports.add(ty.path[0]!)
-    }
+    if (ty.path.length > 1) namespaceImports.add(ty.path[0]!)
     file.code += `export const $${ty.id}: $.Codec<${ctx.typeVisitor.visit(ty)}> = ${value}\n\n`
     return `$${ty.id}`
   }
