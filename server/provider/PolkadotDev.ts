@@ -1,4 +1,5 @@
 import { CodegenCtx, Ext, File } from "../../codegen/Ctx.ts"
+import { outdent } from "../../deps/outdent.ts"
 import { extname } from "../../deps/std/path.ts"
 import { Client, proxyProvider } from "../../rpc/mod.ts"
 import * as port from "../../util/port.ts"
@@ -28,19 +29,21 @@ export class PolkadotDevProvider extends FrameProvider<DevRuntimeName> {
 
   clientFile(pathInfo: PolkadotDevPathInfo) {
     const file = new File()
-    file.code = `import * as C from "./capi.ts"
+    file.code = outdent`
+      import * as C from "./capi.ts"
 
-export const client = C.rpcClient(C.rpc.proxyProvider, "${this.url(pathInfo)}")
-`
+      export const client = C.rpcClient(C.rpc.proxyProvider, "${this.url(pathInfo)}")
+    `
     return file
   }
 
   override postInitCodegenCtx(codegenCtx: CodegenCtx, pathInfo: PolkadotDevPathInfo) {
     const file = new File()
-    file.code = `import * as C from "./capi.ts"
+    file.code = outdent`
+      import * as C from "./capi.ts"
 
-export const client = new C.rpc.Client(C.rpc.proxyProvider, "${this.url(pathInfo)}")
-`
+      export const client = new C.rpc.Client(C.rpc.proxyProvider, "${this.url(pathInfo)}")
+    `
     codegenCtx.files.set("_/client/raw.ts", file)
   }
 

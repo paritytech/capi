@@ -1,3 +1,4 @@
+import { outdent } from "../deps/outdent.ts"
 import { posix as pathPosix } from "../deps/std/path.ts"
 import { Ty, TyVisitor, TyVisitorMethods } from "../scale_info/mod.ts"
 import { normalizeCase } from "../util/case.ts"
@@ -31,50 +32,50 @@ function createTypeDecl(ctx: CodegenCtx, visitor: TyVisitor<string>, path: strin
   const docs = makeDocComment(ty.docs)
 
   const fallback = (key: keyof TyVisitorMethods<string>) => (...args: any) => {
-    return `\
-${docs}
-export type ${name} = ${(visitor[key] as any)!(...args)}
-`
+    return outdent`
+      ${docs}
+      export type ${name} = ${(visitor[key] as any)!(...args)}
+    `
   }
 
-  const codec = ty.type === "Compact" ? "" : `\
-export const $${name[0]!.toLowerCase()}${name.slice(1)}: $.Codec<${
+  const codec = ty.type === "Compact" ? "" : outdent`
+    export const $${name[0]!.toLowerCase()}${name.slice(1)}: $.Codec<${
     ty.type === "Primitive" ? name : path
   }> = codecs.$${ty.id}
-`
+  `
 
   return codec + new TyVisitor<string>(ctx.metadata.tys, {
     unitStruct() {
-      return `\
-${docs}
-export type ${name} = null
-${docs}
-export function ${name}(){ return null }
-`
+      return outdent`
+        ${docs}
+        export type ${name} = null
+        ${docs}
+        export function ${name}(){ return null }
+      `
     },
     wrapperStruct(ty, inner) {
-      return `\
-${docs}
-export type ${name} = ${visitor.wrapperStruct(ty, inner)}
-${docs}
-export function ${name}(value: ${path}){ return value }
-`
+      return outdent`
+        ${docs}
+        export type ${name} = ${visitor.wrapperStruct(ty, inner)}
+        ${docs}
+        export function ${name}(value: ${path}){ return value }
+      `
     },
     tupleStruct(ty, members) {
-      return `\
-${docs}
-export type ${name} = ${visitor.tupleStruct(ty, members)}
-${docs}
-export function ${name}(...value: ${path}){ return value }
-`
+      return outdent`
+        ${docs}
+        export type ${name} = ${visitor.tupleStruct(ty, members)}
+        ${docs}
+        export function ${name}(...value: ${path}){ return value }
+      `
     },
     objectStruct(ty) {
-      return `\
-${docs}
-export interface ${name} ${visitor.objectStruct(ty)}
-${docs}
-export function ${name}(value: ${path}){ return value }
-`
+      return outdent`
+        ${docs}
+        export interface ${name} ${visitor.objectStruct(ty)}
+        ${docs}
+        export function ${name}(value: ${path}){ return value }
+      `
     },
     option: null!,
     result: null!,
@@ -126,16 +127,16 @@ export function ${name}(value: ${path}){ return value }
         )
         union.push(`| ${memberPath}`)
       }
-      return `\
-${docs}
-export type ${name} = ${union.join(" ")}
-export namespace ${name} { ${
+      return outdent`
+        ${docs}
+        export type ${name} = ${union.join(" ")}
+        export namespace ${name} { ${
         [
           ...types,
           ...factories,
         ].join("\n")
       } }
-`
+      `
     },
     uint8Array: fallback("uint8Array"),
     array: fallback("array"),

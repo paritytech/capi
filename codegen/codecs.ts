@@ -1,3 +1,4 @@
+import { outdent } from "../deps/outdent.ts"
 import { Ty, TyVisitor } from "../scale_info/mod.ts"
 import { normalizeCase } from "../util/case.ts"
 import { CodegenCtx, File } from "./Ctx.ts"
@@ -8,12 +9,11 @@ export function codecs(ctx: CodegenCtx) {
   const namespaceImports = new Set<string>()
 
   const file = new File()
-  file.code = `\
-import { $ } from "./capi.ts"
-import * as C from "./capi.ts"
-import type * as types from "../types/mod.ts"
-
-`
+  file.code = outdent`
+    import { $ } from "./capi.ts"
+    import * as C from "./capi.ts"
+    import type * as types from "../types/mod.ts"
+  `
 
   const visitor = new TyVisitor<string>(tys, {
     unitStruct(ty) {

@@ -3,10 +3,12 @@ import { extname } from "../../deps/std/path.ts"
 import { Client, proxyProvider } from "../../rpc/mod.ts"
 import { FrameProvider, FrameProviderPathInfo } from "./common/mod.ts"
 
+export type WssPathInfo = FrameProviderPathInfo<string>
+
 export class WssProvider extends FrameProvider<string> {
   parsePathInfo = parseWssPathInfo
 
-  client({ discoveryValue }: FrameProviderPathInfo<string>) {
+  client({ discoveryValue }: WssPathInfo) {
     return new Client(proxyProvider, `wss://${discoveryValue}`)
   }
 

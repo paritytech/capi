@@ -1,3 +1,4 @@
+import { outdent } from "../deps/outdent.ts"
 import { Ty, TyVisitor } from "../scale_info/mod.ts"
 import { CodegenCtx, File } from "./Ctx.ts"
 import { getRawCodecPath, S } from "./utils.ts"
@@ -34,28 +35,27 @@ export function extrinsic(ctx: CodegenCtx) {
   })
 
   const file = new File()
-  file.code = `
-import { $ } from "./capi.ts"
-import * as C from "./capi.ts"
-import { client } from "./client.ts"
-import * as codecs from "./codecs.ts"
-import type * as types from "../types/mod.ts"
+  const fields = S.object(
+    ["version", `${extrinsic.version}`],
+    ["extras", getExtrasCodec(extrinsic.signedExtensions.map((x) => [x.ident, x.ty]))],
+    [
+      "additional",
+      getExtrasCodec(extrinsic.signedExtensions.map((x) => [x.ident, x.additionalSigned])),
+    ],
+    ["call", getRawCodecPath(callTy!)],
+    ["address", getRawCodecPath(addressTy!)],
+    ["signature", getRawCodecPath(signatureTy!)],
+  )
+  file.code = outdent`
+    import { $ } from "./capi.ts"
+    import * as C from "./capi.ts"
+    import { client } from "./client.ts"
+    import * as codecs from "./codecs.ts"
+    import type * as types from "../types/mod.ts"
 
-const _extrinsic = ${
-    S.object(
-      ["version", `${extrinsic.version}`],
-      ["extras", getExtrasCodec(extrinsic.signedExtensions.map((x) => [x.ident, x.ty]))],
-      [
-        "additional",
-        getExtrasCodec(extrinsic.signedExtensions.map((x) => [x.ident, x.additionalSigned])),
-      ],
-      ["call", getRawCodecPath(callTy!)],
-      ["address", getRawCodecPath(addressTy!)],
-      ["signature", getRawCodecPath(signatureTy!)],
-    )
-  }
-export const extrinsic = C.extrinsic<typeof client, ${ctx.typeVisitor.visit(callTy!)}>(client);
-`
+    const _extrinsic = ${fields}
+    export const extrinsic = C.extrinsic<typeof client, ${ctx.typeVisitor.visit(callTy!)}>(client);
+  `
   return file
 
   function getExtrasCodec(xs: [string, Ty][]) {
