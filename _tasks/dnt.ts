@@ -15,9 +15,9 @@ await Promise.all([
         name: "wat-the-crypto",
         version: "^0.0.1",
       },
-      "https://deno.land/x/scale@v0.9.1/mod.ts": {
+      "https://deno.land/x/scale@v0.10.0/mod.ts": {
         name: "scale-codec",
-        version: "^0.9.1",
+        version: "^0.10.0",
       },
       "https://deno.land/x/zones@v0.1.0-beta.13/mod.ts": {
         name: "zones",
