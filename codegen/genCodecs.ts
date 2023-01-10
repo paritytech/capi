@@ -1,3 +1,4 @@
+import { $ } from "../mod.ts"
 import { Ty, TyVisitor } from "../scale_info/mod.ts"
 import { normalizeCase } from "../util/case.ts"
 import { CodegenProps } from "./mod.ts"
@@ -78,17 +79,14 @@ import type * as types from "./types/mod.ts"
                 const value = fields.length === 1
                   ? this.visit(fields[0]!.ty)
                   : `$.tuple(${fields.map((f) => this.visit(f.ty)).join(", ")})`
-                props = [S.array([S.string("value"), value])]
+                props = [`$.field(${S.string("value")}, ${value})`]
               } else {
                 // Object variant
-                props = fields.map((field) =>
-                  S.array([
-                    S.string(normalizeCase(field.name!)),
-                    this.visit(field.ty),
-                  ])
-                )
+                props = fields.map((
+                  field,
+                ) => `$.field(${S.string(normalizeCase(field.name!))}, ${this.visit(field.ty)})`)
               }
-              return [`${index}`, S.array([S.string(type), ...props])]
+              return [`${index}`, `$.variant(${S.string(type)}, ${props.join(",")})`]
             }),
           )
         })`,
