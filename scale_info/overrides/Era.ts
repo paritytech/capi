@@ -50,8 +50,8 @@ export const $era: $.Codec<Era> = $.createCodec({
   },
   _assert: $
     .taggedUnion("type", [
-      ["Immortal"],
-      ["Mortal", ["period", $.u64], ["phase", $.u64]],
+      $.variant("Immortal"),
+      $.variant("Mortal", $.field("period", $.u64), $.field("phase", $.u64)),
     ])
     ._assert,
 })

@@ -7,14 +7,14 @@ interface Foo {
   a: Uint8Array
   b: boolean[]
   c: Promise<string>
-  d: Foo | undefined
+  d?: Foo
 }
 
 const $foo: $.Codec<Foo> = $.object(
-  ["a", $.uint8Array],
-  ["b", $.array($.bool)],
-  ["c", $.promise($.str)],
-  ["d", $.option($.deferred(() => $foo))],
+  $.field("a", $.uint8Array),
+  $.field("b", $.array($.bool)),
+  $.field("c", $.promise($.str)),
+  $.optionalField("d", $.deferred(() => $foo)),
 )
 
 const foo: Foo = {
@@ -27,7 +27,6 @@ const foo: Foo = {
     a: new TextEncoder().encode("hello world"),
     b: [],
     c: Promise.resolve("abc"),
-    d: undefined,
   },
 }
 

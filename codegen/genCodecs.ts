@@ -27,12 +27,8 @@ import type * as types from "./types/mod.ts"
       return addCodecDecl(
         ty,
         `$.object(${
-          ty.fields.map((x) =>
-            S.array([
-              S.string(normalizeCase(x.name!)),
-              this.visit(x.ty),
-            ])
-          ).join(", ")
+          ty.fields.map((x) => `$.field(${S.string(normalizeCase(x.name!))}, ${this.visit(x.ty)})`)
+            .join(", ")
         })`,
       )
     },
@@ -44,7 +40,9 @@ import type * as types from "./types/mod.ts"
         ty,
         `$.result(${
           this.visit(ok)
-        }, $.instance(C.ChainError<$.Native<typeof $${err.id}>>, ["value", ${this.visit(err)}]))`,
+        }, $.instance(C.ChainError<$.Native<typeof $${err.id}>>, $.tuple(${
+          this.visit(err)
+        }), (x) => [x.value]))`,
       )
     },
     never(ty) {
@@ -77,17 +75,14 @@ import type * as types from "./types/mod.ts"
                 const value = fields.length === 1
                   ? this.visit(fields[0]!.ty)
                   : `$.tuple(${fields.map((f) => this.visit(f.ty)).join(", ")})`
-                props = [S.array([S.string("value"), value])]
+                props = [`$.field(${S.string("value")}, ${value})`]
               } else {
                 // Object variant
-                props = fields.map((field) =>
-                  S.array([
-                    S.string(normalizeCase(field.name!)),
-                    this.visit(field.ty),
-                  ])
-                )
+                props = fields.map((
+                  field,
+                ) => `$.field(${S.string(normalizeCase(field.name!))}, ${this.visit(field.ty)})`)
               }
-              return [`${index}`, S.array([S.string(type), ...props])]
+              return [`${index}`, `$.variant(${S.string(type)}, ${props.join(",")})`]
             }),
           )
         })`,

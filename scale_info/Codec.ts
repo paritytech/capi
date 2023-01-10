@@ -26,14 +26,17 @@ export function DeriveCodec(tys: Ty[]): DeriveCodec {
     },
     objectStruct(ty) {
       return $.object(
-        ...ty.fields.map((x): $.AnyField => [normalizeCase(x.name!), this.visit(x.ty)]),
+        ...ty.fields.map((x) => $.field(normalizeCase(x.name!), this.visit(x.ty))),
       )
     },
     option(_ty, some) {
       return $.option(this.visit(some))
     },
     result(_ty, ok, err) {
-      return $.result(this.visit(ok), $.instance(ChainError, ["value", this.visit(err)]))
+      return $.result(
+        this.visit(ok),
+        $.instance(ChainError, $.tuple(this.visit(err)), (x) => [x.value]),
+      )
     },
     never() {
       return $.never as any
@@ -46,27 +49,24 @@ export function DeriveCodec(tys: Ty[]): DeriveCodec {
       return $.stringUnion(members)
     },
     taggedUnion(ty) {
-      const members: Record<number, $.AnyTaggedUnionMember> = {}
+      const members: Record<number, $.Variant<any, any>> = {}
       for (const { fields, name, index } of ty.members) {
-        let member: $.AnyTaggedUnionMember
+        let member: $.Variant<any, any>
         const type = normalizeCase(name)
         if (fields.length === 0) {
-          member = [type]
+          member = $.variant(type)
         } else if (fields[0]!.name === undefined) {
           // Tuple variant
           const $value = fields.length === 1
             ? this.visit(fields[0]!.ty)
             : $.tuple(...fields.map((f) => this.visit(f.ty)))
-          member = [type, ["value", $value]]
+          member = $.variant(type, $.field("value", $value))
         } else {
           // Object variant
           const memberFields = fields.map((field) => {
-            return [
-              normalizeCase(field.name!),
-              this.visit(field.ty),
-            ] as [string, $.Codec<unknown>]
+            return $.field(normalizeCase(field.name!), this.visit(field.ty))
           })
-          member = [type, ...memberFields]
+          member = $.variant(type, ...memberFields)
         }
         members[index] = member
       }
