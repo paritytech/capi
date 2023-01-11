@@ -1,4 +1,4 @@
-import * as C from "capi/mod.ts"
+import * as C from "../mod.ts"
 
 import * as System from "polkadot_dev/System.ts"
 

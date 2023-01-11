@@ -1,6 +1,6 @@
-import * as C from "capi/mod.ts"
+import * as C from "../mod.ts"
 
-import { client } from "polkadot_dev/_/client/raw.ts"
+import { client } from "polkadot_dev/_/client.ts"
 
 const root = C.metadata(client)()
 

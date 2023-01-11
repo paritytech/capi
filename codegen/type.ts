@@ -5,6 +5,12 @@ import { normalizeCase } from "../util/case.ts"
 import { CodegenCtx, File, TypeFile } from "./Ctx.ts"
 import { makeDocComment, S } from "./utils.ts"
 
+function importPath(from: string, to: string) {
+  let path = pathPosix.relative(pathPosix.dirname("/" + from), "/" + to)
+  if (!path.startsWith(".")) path = "./" + path
+  return path
+}
+
 export function type(ctx: CodegenCtx, path: string, filePath: string, typeFile: TypeFile) {
   const file = new File()
   if (path !== "types") {
@@ -153,10 +159,4 @@ function createTypeDecl(ctx: CodegenCtx, visitor: TyVisitor<string>, path: strin
     lenPrefixedWrapper: null!,
     circular: null!,
   }).visit(ty).trim()
-}
-
-function importPath(from: string, to: string) {
-  let path = pathPosix.relative(pathPosix.dirname("/" + from), "/" + to)
-  if (!path.startsWith(".")) path = "./" + path
-  return path
 }

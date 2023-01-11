@@ -1,3 +1,4 @@
+import { fromFileUrl } from "../deps/std/path.ts"
 import { Metadata } from "../frame_metadata/mod.ts"
 import { Ty } from "../scale_info/mod.ts"
 import { codecs } from "./codecs.ts"
@@ -38,7 +39,7 @@ export class CodegenCtx {
 
     // TODO: deferred import formation system
     const capiReexportFile = new File()
-    capiReexportFile.code = `export * from "${this.capiMod.href}"`
+    capiReexportFile.code = `export * from "../../../mod.ts"`
     this.files.set("_/capi.ts", capiReexportFile)
 
     // TODO: deferred import formation system

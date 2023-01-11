@@ -1,6 +1,6 @@
 // This example requires zombienet-macos/zombienet-linux, polkadot and polkadot-parachain binaries in the PATH
 
-import * as C from "capi/mod.ts"
+import * as C from "../mod.ts"
 
 import { client } from "http://localhost:8000/zombienet/smart_contract/zombienet.toml#collator01/_/client/raw.ts"
 

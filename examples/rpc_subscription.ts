@@ -1,4 +1,4 @@
-import * as C from "capi/mod.ts"
+import * as C from "../mod.ts"
 
 const root = C.chain.subscribeNewHeads(C.polkadot)([], (ctx) => {
   let i = 0

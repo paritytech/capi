@@ -47,11 +47,11 @@ export function extrinsic(ctx: CodegenCtx) {
     ["signature", getRawCodecPath(signatureTy!)],
   )
   file.code = outdent`
-    import { $ } from "./capi.ts"
-    import * as C from "./capi.ts"
-    import { client } from "./client.ts"
-    import * as codecs from "./codecs.ts"
-    import type * as types from "../types/mod.ts"
+    import { $ } from "./_/capi.ts"
+    import * as C from "./_/capi.ts"
+    import { client } from "./_/client.ts"
+    import * as codecs from "./_/codecs.ts"
+    import type * as types from "./types/mod.ts"
 
     const _extrinsic = ${fields}
     export const extrinsic = C.extrinsic<typeof client, ${ctx.typeVisitor.visit(callTy!)}>(client);

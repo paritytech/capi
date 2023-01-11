@@ -1,8 +1,9 @@
-import * as C from "capi/mod.ts"
+import * as C from "../mod.ts"
 
-const extrinsicsRaw = C.chain.getBlock(C.polkadot)()
-  .access("block")
-  .access("extrinsics")
-const root = C.extrinsicsDecoded(C.polkadot)(extrinsicsRaw)
+const root = C.extrinsicsDecoded(C.polkadot)(
+  C.chain.getBlock(C.polkadot)()
+    .access("block")
+    .access("extrinsics"),
+)
 
 console.log(C.throwIfError(await root.run()))

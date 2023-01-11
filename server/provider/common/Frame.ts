@@ -18,10 +18,11 @@ export abstract class FrameProvider extends Provider {
   abstract client(info: FrameSubpathInfo): U.PromiseOr<Client>
   abstract clientFile(info: FrameSubpathInfo): U.PromiseOr<File>
 
-  async run(req: Request, path: string) {
-    const pathInfo = this.parseSubpathInfo(path)
+  async run(req: Request, subpath: string) {
+    const pathInfo = this.parseSubpathInfo(subpath)
     const codegenCtx = await this.codegenCtx(pathInfo)
     const file = codegenCtx.files.get(pathInfo.filePath)
+    console.log({ subpath })
     if (!file) throw new Error()
     return this.ctx.code(req, pathInfo.filePath, file.code)
   }

@@ -1,7 +1,7 @@
-import * as C from "capi/mod.ts"
+import * as C from "../mod.ts"
 
-import { client } from "polkadot_dev/_/client/raw.ts"
+import { Bonded } from "polkadot_dev/Staking.ts"
 
-const aliceBonded = C.entryRead(client)("Staking", "Bonded", [C.aliceStash.publicKey])
+const aliceBonded = Bonded.entry(C.aliceStash.publicKey).read()
 
 console.log(C.throwIfError(await aliceBonded.run()))

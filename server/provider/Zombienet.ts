@@ -1,8 +1,9 @@
 import { Ext, File } from "../../codegen/mod.ts"
-import { Network } from "../../deps/@zombienet/orchestrator.ts"
 import { outdent } from "../../deps/outdent.ts"
 import * as path from "../../deps/std/path.ts"
+import { Network } from "../../deps/zombienet/orchestrator.ts"
 import { Client, proxyProvider } from "../../rpc/mod.ts"
+import * as U from "../../util/mod.ts"
 import { FrameProvider, FrameSubpathInfo } from "./common/mod.ts"
 
 export interface ZombienetSubpathInfo extends FrameSubpathInfo {
@@ -23,10 +24,10 @@ export class ZombienetProvider extends FrameProvider {
     super()
     this.bin = props?.zombienetPath
       ?? `zombienet-${
-        ({
+        U.widenIndexSignature({
           darwin: "macos",
           linux: "linux",
-        } as Record<string, string>)[Deno.build.os]
+        })[Deno.build.os]
       }`
       ?? (() => {
         throw new Error()

@@ -1,4 +1,4 @@
-import * as C from "capi/mod.ts"
+import * as C from "../mod.ts"
 
 const root = C.rpcCall<[], string[]>("rpc_methods")(C.polkadot)()
 

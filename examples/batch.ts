@@ -1,14 +1,6 @@
-import * as C from "capi/mod.ts"
+import * as C from "../mod.ts"
 
 import { Balances, extrinsic, Utility } from "westend_dev/mod.ts"
-
-// TODO: uncomment these lines / use env upon solving `count` in zones
-// const getBalances = C.Z.ls(
-//   ...recipients.map(({ publicKey }) => {
-//     return C.entryRead(T.westend)("System", "Account", [publicKey])
-//       .access("value").access("data").access("free");
-//   }),
-// )
 
 const tx = extrinsic({
   sender: C.alice.address,
@@ -26,4 +18,4 @@ const tx = extrinsic({
     return
   })
 
-U.throwIfError(await root.run())
+C.throwIfError(await tx.run())

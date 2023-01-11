@@ -2,6 +2,7 @@ import { CodegenCtx, Ext, File } from "../../codegen/Ctx.ts"
 import { outdent } from "../../deps/outdent.ts"
 import { extname } from "../../deps/std/path.ts"
 import { Client, proxyProvider } from "../../rpc/mod.ts"
+import * as U from "../../util/mod.ts"
 import * as port from "../../util/port.ts"
 import { FrameProvider, FrameSubpathInfo } from "./common/mod.ts"
 
@@ -42,7 +43,7 @@ export class PolkadotDevProvider extends FrameProvider {
   override postInitCodegenCtx(codegenCtx: CodegenCtx, info: PolkadotDevSubpathInfo) {
     const file = new File()
     file.code = outdent`
-      import * as C from "./capi.ts"
+      import * as C from "../../../../mod.ts"
 
       export const client = new C.rpc.Client(C.rpc.proxyProvider, "${this.url(info)}")
     `
@@ -50,8 +51,7 @@ export class PolkadotDevProvider extends FrameProvider {
   }
 
   url(info: PolkadotDevSubpathInfo) {
-    const port_ = this.devNet(info)
-    return `ws://localhost:${port_}`
+    return `ws://localhost:${this.devNet(info)}`
   }
 
   devNet({ runtimeName }: PolkadotDevSubpathInfo) {
@@ -119,7 +119,7 @@ export const DEV_RUNTIME_NAMES = ["polkadot", "kusama", "westend", "rococo"] as 
 export type DevRuntimeName = typeof DEV_RUNTIME_NAMES[number]
 
 export function isDevRuntimeName(inQuestion: string): inQuestion is DevRuntimeName {
-  return !!(DEV_RUNTIME_NAME_EXISTS as Record<string, true>)[inQuestion]
+  return !!U.widenIndexSignature(DEV_RUNTIME_NAME_EXISTS)[inQuestion]
 }
 const DEV_RUNTIME_NAME_EXISTS: Record<DevRuntimeName, true> = {
   polkadot: true,

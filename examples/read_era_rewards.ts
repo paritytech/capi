@@ -1,9 +1,9 @@
-import * as C from "capi/mod.ts"
+import * as C from "../mod.ts"
 
-const idx = C.entryRead(C.westend)("Staking", "ActiveEra", [])
-  .access("value")
-  .access("index")
+import { ActiveEra, ErasRewardPoints } from "westend/Staking.ts"
 
-const eraRewardPoints = C.entryRead(C.westend)("Staking", "ErasRewardPoints", [idx])
+const idx = ActiveEra.entry().read().access("value").access("index")
+
+const eraRewardPoints = ErasRewardPoints.entry(idx).read()
 
 console.log(C.throwIfError(await eraRewardPoints.run()))

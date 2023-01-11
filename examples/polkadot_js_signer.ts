@@ -1,6 +1,6 @@
-import * as C from "capi/mod.ts"
 import { createTestPairs } from "https://deno.land/x/polkadot@0.0.8/keyring/mod.ts"
 import { TypeRegistry } from "https://deno.land/x/polkadot@0.0.8/types/mod.ts"
+import * as C from "../mod.ts"
 
 import { extrinsic } from "westend_dev/mod.ts"
 

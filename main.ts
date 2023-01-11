@@ -1,9 +1,10 @@
 import * as flags from "./deps/std/flags.ts"
 import { serve } from "./deps/std/http/server.ts"
 import { handler, ServerCtx } from "./server/local/mod.ts"
+import { isReady } from "./util/port.ts"
 
-const { help, port: portRaw, "--": cacheCmdRest } = flags.parse(Deno.args, {
-  string: ["port", "cache"],
+const { help, port: portRaw, "--": cmd } = flags.parse(Deno.args, {
+  string: ["port"],
   boolean: ["help"],
   default: {
     port: "8000",
@@ -45,10 +46,11 @@ serve(handler.bind(ctx), {
   },
 })
 
-if (cacheCmdRest.length) {
+if (cmd.length) {
+  await isReady(port)
   await Deno
     .run({
-      cmd: ["deno", "cache", `-r=http://localhost:${port}`, ...cacheCmdRest],
+      cmd,
       stderr: "inherit",
       stdout: "inherit",
     })

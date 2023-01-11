@@ -1,8 +1,8 @@
-import * as C from "capi/mod.ts"
+import * as C from "../mod.ts"
 
 import { client } from "polkadot_dev/_/client.ts"
 import * as Balances from "polkadot_dev/Balances.ts"
-import { extrinsic } from "polkadot_dev/mod.ts"
+import { extrinsic } from "polkadot_dev/extrinsic.ts"
 import * as System from "polkadot_dev/System.ts"
 
 const signatories = [C.alice, C.bob, C.charlie].map(({ publicKey }) => publicKey)
