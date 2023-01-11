@@ -1,16 +1,25 @@
 import { serveFile } from "../../deps/std/http/file_server.ts"
 import { Status } from "../../deps/std/http/http_status.ts"
 import { FsCache } from "../../util/cache/mod.ts"
-import { PolkadotDevProvider, ServerCtxBase, WssProvider } from "../mod.ts"
+import { PolkadotDevProvider, ServerCtxBase, WssProvider, ZombienetProvider } from "../mod.ts"
 import { acceptsHtml, page } from "./common.ts"
 import { _404Page, _500Page, CodePage } from "./pages/mod.ts"
 
-export class ServerCtx extends ServerCtxBase<{ dev: PolkadotDevProvider; wss: WssProvider }> {
+export class ServerCtx extends ServerCtxBase<{
+  dev: PolkadotDevProvider
+  wss: WssProvider
+  zombienet: ZombienetProvider
+}> {
   constructor(cacheDir: string, signal: AbortSignal) {
-    super(new FsCache(cacheDir, signal), {
-      dev: new PolkadotDevProvider(),
-      wss: new WssProvider(),
-    }, signal)
+    super({
+      providers: {
+        dev: new PolkadotDevProvider(),
+        wss: new WssProvider(),
+        zombienet: new ZombienetProvider(),
+      },
+      cache: new FsCache(cacheDir, signal),
+      signal,
+    })
   }
 
   async staticFile(req: Request, url: URL) {

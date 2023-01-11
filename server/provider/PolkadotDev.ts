@@ -3,9 +3,9 @@ import { outdent } from "../../deps/outdent.ts"
 import { extname } from "../../deps/std/path.ts"
 import { Client, proxyProvider } from "../../rpc/mod.ts"
 import * as port from "../../util/port.ts"
-import { FramePathInfo, FrameProvider } from "./common/mod.ts"
+import { FrameProvider, FrameSubpathInfo } from "./common/mod.ts"
 
-export interface PolkadotDevPathInfo extends FramePathInfo {
+export interface PolkadotDevSubpathInfo extends FrameSubpathInfo {
   runtimeName: DevRuntimeName
 }
 
@@ -21,40 +21,40 @@ export class PolkadotDevProvider extends FrameProvider {
     super()
   }
 
-  parsePathInfo = parsePolkadotDevPathInfo
+  parseSubpathInfo = parsePolkadotDevPathInfo
 
-  async client(pathInfo: PolkadotDevPathInfo) {
-    const port_ = this.devNet(pathInfo)
+  async client(info: PolkadotDevSubpathInfo) {
+    const port_ = this.devNet(info)
     await port.isReady(port_)
-    return new Client(proxyProvider, this.url(pathInfo))
+    return new Client(proxyProvider, this.url(info))
   }
 
-  clientFile(pathInfo: PolkadotDevPathInfo) {
+  clientFile(info: PolkadotDevSubpathInfo) {
     const file = new File()
     file.code = outdent`
       import * as C from "./capi.ts"
 
-      export const client = C.rpcClient(C.rpc.proxyProvider, "${this.url(pathInfo)}")
+      export const client = C.rpcClient(C.rpc.proxyProvider, "${this.url(info)}")
     `
     return file
   }
 
-  override postInitCodegenCtx(codegenCtx: CodegenCtx, pathInfo: PolkadotDevPathInfo) {
+  override postInitCodegenCtx(codegenCtx: CodegenCtx, info: PolkadotDevSubpathInfo) {
     const file = new File()
     file.code = outdent`
       import * as C from "./capi.ts"
 
-      export const client = new C.rpc.Client(C.rpc.proxyProvider, "${this.url(pathInfo)}")
+      export const client = new C.rpc.Client(C.rpc.proxyProvider, "${this.url(info)}")
     `
     codegenCtx.files.set("_/client/raw.ts", file)
   }
 
-  url(pathInfo: PolkadotDevPathInfo) {
-    const port_ = this.devNet(pathInfo)
+  url(info: PolkadotDevSubpathInfo) {
+    const port_ = this.devNet(info)
     return `ws://localhost:${port_}`
   }
 
-  devNet({ runtimeName }: PolkadotDevPathInfo) {
+  devNet({ runtimeName }: PolkadotDevSubpathInfo) {
     let port_ = this.devNets[runtimeName]
     if (!port_) {
       port_ = port.getAvailable()
@@ -94,10 +94,10 @@ const POLKADOT_PATH_NOT_FOUND =
   "The Polkadot CLI was not found. Please ensure Polkadot is installed and PATH is set for `polkadot`."
   + ` For more information, visit the following link: "https://github.com/paritytech/polkadot".`
 
-export function parsePolkadotDevPathInfo(path: string): PolkadotDevPathInfo {
-  const atI = path.search("@")
-  if (atI == -1) throw new Error(`Could not find "@" char in path`)
-  const runtimeName = path.slice(0, atI)
+export function parsePolkadotDevPathInfo(subpath: string): PolkadotDevSubpathInfo {
+  const atI = subpath.indexOf("@")
+  if (atI === -1) throw new Error(`Could not find "@" char in path`)
+  const runtimeName = subpath.slice(0, atI)
   if (!isDevRuntimeName(runtimeName)) {
     throw new Error(
       `"${runtimeName}" is not a valid dev runtime name. Please specify one of the following: "${
@@ -105,11 +105,11 @@ export function parsePolkadotDevPathInfo(path: string): PolkadotDevPathInfo {
       }"`,
     )
   }
-  const atTrailing = path.slice(atI + 1)
-  const slashI0 = atTrailing.search("/")
-  if (slashI0 == -1) throw new Error("Could not extract chain path")
+  const atTrailing = subpath.slice(atI + 1)
+  const slashI0 = atTrailing.indexOf("/")
+  if (slashI0 === -1) throw new Error("Could not extract chain path")
   const version = atTrailing.slice(0, slashI0)
-  const chainKey = path.slice(0, atI + 1 + slashI0)
+  const chainKey = subpath.slice(0, atI + 1 + slashI0)
   const filePath = atTrailing.slice(slashI0 + 1)
   const ext = extname(filePath) as Ext
   return { chainKey, runtimeName, version, filePath, ext }

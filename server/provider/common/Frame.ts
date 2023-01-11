@@ -4,7 +4,7 @@ import { Client } from "../../../rpc/mod.ts"
 import * as U from "../../../util/mod.ts"
 import { Provider } from "./Base.ts"
 
-export interface FramePathInfo {
+export interface FrameSubpathInfo {
   chainKey: string
   version: string
   filePath: string
@@ -14,28 +14,28 @@ export interface FramePathInfo {
 export abstract class FrameProvider extends Provider {
   codegenCtxPendings: Record<string, Promise<CodegenCtx>> = {}
 
-  abstract parsePathInfo(path: string): FramePathInfo
-  abstract client(pathInfo: FramePathInfo): U.PromiseOr<Client>
-  abstract clientFile(pathInfo: FramePathInfo): File
+  abstract parseSubpathInfo(path: string): FrameSubpathInfo
+  abstract client(info: FrameSubpathInfo): U.PromiseOr<Client>
+  abstract clientFile(info: FrameSubpathInfo): U.PromiseOr<File>
 
   async run(req: Request, path: string) {
-    const pathInfo = this.parsePathInfo(path)
+    const pathInfo = this.parseSubpathInfo(path)
     const codegenCtx = await this.codegenCtx(pathInfo)
     const file = codegenCtx.files.get(pathInfo.filePath)
     if (!file) throw new Error()
     return this.ctx.code(req, pathInfo.filePath, file.code)
   }
 
-  codegenCtx(pathInfo: FramePathInfo) {
-    let codegenCtxPending = this.codegenCtxPendings[pathInfo.chainKey]
+  codegenCtx(info: FrameSubpathInfo) {
+    let codegenCtxPending = this.codegenCtxPendings[info.chainKey]
     if (!codegenCtxPending) {
       codegenCtxPending = (async () => {
-        const client = await this.client(pathInfo)
+        const client = await this.client(info)
         const versionR = U.throwIfError(
           await client.call<string>(client.providerRef.nextId(), "system_version", []),
         )
         if (versionR.error) throw new Error(versionR.error.message)
-        if (`v${versionR.result.split("-")[0]}` !== pathInfo.version) throw new Error()
+        if (`v${versionR.result.split("-")[0]}` !== info.version) throw new Error()
         const metadataR = U.throwIfError(
           await client.call<string>(client.providerRef.nextId(), "state_getMetadata", []),
         )
@@ -44,15 +44,15 @@ export abstract class FrameProvider extends Provider {
         const codegenCtx = new CodegenCtx({
           metadata,
           capiUrl: new URL(import.meta.resolve("../../mod.ts")),
-          clientFile: this.clientFile(pathInfo),
+          clientFile: await this.clientFile(info),
         })
-        this.postInitCodegenCtx(codegenCtx, pathInfo)
+        this.postInitCodegenCtx(codegenCtx, info)
         return codegenCtx
       })()
-      this.codegenCtxPendings[pathInfo.chainKey] = codegenCtxPending
+      this.codegenCtxPendings[info.chainKey] = codegenCtxPending
     }
     return codegenCtxPending
   }
 
-  postInitCodegenCtx(_codegenCtx: CodegenCtx, _pathInfo: FramePathInfo) {}
+  postInitCodegenCtx(_codegenCtx: CodegenCtx, _info: FrameSubpathInfo) {}
 }

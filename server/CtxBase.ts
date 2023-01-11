@@ -2,14 +2,24 @@ import { CacheBase } from "../util/cache/mod.ts"
 import { PromiseOr } from "../util/mod.ts"
 import { Provider } from "./provider/mod.ts"
 
+export interface ServerCtxBaseProps<Providers extends Record<string, Provider>> {
+  providers: Providers
+  cache: CacheBase
+  signal: AbortSignal
+}
+
 export abstract class ServerCtxBase<
   Providers extends Record<string, Provider> = Record<string, Provider>,
 > {
-  constructor(
-    readonly cache: CacheBase,
-    readonly providers: Providers,
-    readonly signal: AbortSignal,
-  ) {
+  providers
+  cache
+  signal
+
+  constructor({ providers, cache, signal }: ServerCtxBaseProps<Providers>) {
+    this.providers = providers
+    this.cache = cache
+    this.signal = signal
+
     for (const provider of Object.values(providers)) {
       provider.ctx = this
     }
