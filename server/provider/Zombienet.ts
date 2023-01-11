@@ -44,7 +44,7 @@ export class ZombienetProvider extends FrameProvider {
     clientFile.code = outdent`
       import * as C from "../capi.ts"
 
-      export const client = new C.Client(C.rpc.proxyProvider, "${await this.url(info)}")
+      export const client = new C.rpcClient(C.rpc.proxyProvider, "${await this.url(info)}")
     `
     return clientFile
   }
