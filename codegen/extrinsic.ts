@@ -1,9 +1,9 @@
 import { outdent } from "../deps/outdent.ts"
 import { Ty, TyVisitor } from "../scale_info/mod.ts"
-import { CodegenCtx, File } from "./Ctx.ts"
+import { Codegen, File } from "./Ctx.ts"
 import { getRawCodecPath, S } from "./utils.ts"
 
-export function extrinsic(ctx: CodegenCtx) {
+export function extrinsic(ctx: Codegen) {
   const { tys, extrinsic } = ctx.metadata
   const {
     signature: signatureTy,
@@ -53,7 +53,9 @@ export function extrinsic(ctx: CodegenCtx) {
     import * as codecs from "./_/codecs.ts"
     import type * as types from "./types/mod.ts"
 
+    // TODO: use this
     const _extrinsic = ${fields}
+
     export const extrinsic = C.extrinsic<typeof client, ${ctx.typeVisitor.visit(callTy!)}>(client);
   `
   return file

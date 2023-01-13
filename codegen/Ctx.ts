@@ -1,4 +1,3 @@
-import { fromFileUrl } from "../deps/std/path.ts"
 import { Metadata } from "../frame_metadata/mod.ts"
 import { Ty } from "../scale_info/mod.ts"
 import { codecs } from "./codecs.ts"
@@ -14,7 +13,7 @@ export interface CodegenCtxProps {
   rawClientFile?: File
 }
 
-export class CodegenCtx {
+export class Codegen {
   metadata
   capiMod
   clientFile
@@ -57,6 +56,11 @@ export class CodegenCtx {
   [Symbol.iterator]() {
     return this.files[Symbol.iterator]()
   }
+
+  async write(out: string) {
+    // TODO
+    return
+  }
 }
 
 export class TypeFile {
@@ -70,5 +74,3 @@ export class TypeFile {
 export class File {
   code = ""
 }
-
-export type Ext = "" | ".js" | ".ts"

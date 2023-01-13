@@ -1,0 +1,73 @@
+import { Codegen } from "../../codegen/Ctx.ts"
+import { File } from "../../codegen/mod.ts"
+import { outdent } from "../../deps/outdent.ts"
+import { fromPrefixedHex } from "../../frame_metadata/mod.ts"
+import { Client, proxyProvider } from "../../rpc/mod.ts"
+import * as U from "../../util/mod.ts"
+import { assertVRuntime } from "../PathInfo.ts"
+import { ProviderBase, ProviderRunBase } from "./Base.ts"
+
+export abstract class FrameProviderBase extends ProviderBase {
+  codegenCtxsPending: Record<string, Promise<Codegen>> = {}
+}
+
+export abstract class FrameTargetBase<Provider extends FrameProviderBase>
+  extends ProviderRunBase<Provider>
+{
+  abstract getClient(): U.PromiseOr<Client>
+  abstract getClientFile(): U.PromiseOr<File>
+  abstract getRawClientFile(): U.PromiseOr<File>
+
+  codegen() {
+    const { provider, pathInfo } = this
+    const { targetKey } = pathInfo
+    let codegenCtxPending = provider.codegenCtxsPending[targetKey]
+    if (!codegenCtxPending) {
+      codegenCtxPending = (async () => {
+        const client_ = await this.getClient()
+        const vRuntimeR = U.throwIfError(
+          await client_.call<string>(client_.providerRef.nextId(), "system_version", []),
+        )
+        if (vRuntimeR.error) throw new Error(vRuntimeR.error.message)
+        assertVRuntime(pathInfo, `v${vRuntimeR.result.split("-")[0]}`)
+        const metadataR = U.throwIfError(
+          await client_.call<string>(client_.providerRef.nextId(), "state_getMetadata", []),
+        )
+        if (metadataR.error) throw new Error(metadataR.error.message)
+        const metadata = fromPrefixedHex(metadataR.result)
+        const codegenCtx = new Codegen({
+          metadata,
+          capiUrl: new URL(import.meta.resolve("../../mod.ts")),
+          clientFile: await this.getClientFile(),
+        })
+        return codegenCtx
+      })()
+      provider.codegenCtxsPending[targetKey] = codegenCtxPending
+    }
+    return codegenCtxPending
+  }
+}
+
+export function getClient(this: { url: string }) {
+  return new Client(proxyProvider, this.url)
+}
+
+export function getClientFile(this: { url: string }) {
+  const file = new File()
+  file.code = outdent`
+    import * as C from "./capi.ts"
+
+    export const client = C.rpcClient(C.rpc.proxyProvider, "${this.url}")
+  `
+  return file
+}
+
+export function getRawClientFile(this: { url: string }) {
+  const file = new File()
+  file.code = outdent`
+    import * as C from "../capi.ts"
+
+    export const client = new C.rpc.Client(C.rpc.proxyProvider, "${this.url}")
+  `
+  return file
+}

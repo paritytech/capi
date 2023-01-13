@@ -2,7 +2,7 @@ import { outdent } from "../deps/outdent.ts"
 import { posix as pathPosix } from "../deps/std/path.ts"
 import { Ty, TyVisitor, TyVisitorMethods } from "../scale_info/mod.ts"
 import { normalizeCase } from "../util/case.ts"
-import { CodegenCtx, File, TypeFile } from "./Ctx.ts"
+import { Codegen, File, TypeFile } from "./Ctx.ts"
 import { makeDocComment, S } from "./utils.ts"
 
 function importPath(from: string, to: string) {
@@ -11,7 +11,7 @@ function importPath(from: string, to: string) {
   return path
 }
 
-export function type(ctx: CodegenCtx, path: string, filePath: string, typeFile: TypeFile) {
+export function type(ctx: Codegen, path: string, filePath: string, typeFile: TypeFile) {
   const file = new File()
   if (path !== "types") {
     file.code += `import type * as types from ${S.string(importPath(filePath, "types/mod.ts"))}\n`
@@ -33,7 +33,7 @@ export function type(ctx: CodegenCtx, path: string, filePath: string, typeFile: 
   return file
 }
 
-function createTypeDecl(ctx: CodegenCtx, visitor: TyVisitor<string>, path: string, ty: Ty) {
+function createTypeDecl(ctx: Codegen, visitor: TyVisitor<string>, path: string, ty: Ty) {
   const name = path.slice(path.lastIndexOf(".") + 1)
   const docs = makeDocComment(ty.docs)
 

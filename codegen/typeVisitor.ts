@@ -1,10 +1,10 @@
 import { Ty, TyVisitor } from "../scale_info/mod.ts"
 import { normalizeCase } from "../util/case.ts"
 import { getOrInit } from "../util/mod.ts"
-import { CodegenCtx, TypeFile } from "./Ctx.ts"
+import { Codegen, TypeFile } from "./Ctx.ts"
 import { makeDocComment, S } from "./utils.ts"
 
-export function typeVisitor(ctx: CodegenCtx) {
+export function typeVisitor(ctx: Codegen) {
   const { tys } = ctx.metadata
   const paths = new Map<Ty, string | null>()
   addPath("types.Compact", { type: "Compact" } as Ty)

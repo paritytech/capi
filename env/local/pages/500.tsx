@@ -1,11 +1,9 @@
 import { Fragment, h } from "../../../deps/preact.ts"
 
-export function _404Page({ message }: {
-  message?: string
-}) {
+export function FiveHundredPage({ message }: { message?: string }) {
   return (
     <>
-      <p>404 not found</p>
+      <p>500 internal error</p>
       {message && <span>{message}</span>}
     </>
   )

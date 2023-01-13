@@ -1,6 +1,5 @@
-export function splitFirst(substring: string) {
-  return (string: string): [string, string] | undefined => {
-    const slashI = string.search(substring)
-    return slashI === -1 ? undefined : [string.slice(0, slashI), string.slice(slashI + 1)]
-  }
+export function splitFirst(char: string, src: string): [string, string] | undefined {
+  const colonI = src.indexOf(char)
+  if (colonI === -1) return undefined
+  return [src.slice(0, colonI), src.slice(colonI + 1)]
 }
