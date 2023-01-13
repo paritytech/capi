@@ -21,7 +21,7 @@ export class WssTarget extends FrameTargetBase<WssProvider> {
     this.url = `wss://${pathInfo.target}`
   }
 
-  getClient = getClient
-  getClientFile = getClientFile
-  getRawClientFile = getRawClientFile
+  client = getClient
+  clientFile = getClientFile
+  rawClientFile = getRawClientFile
 }

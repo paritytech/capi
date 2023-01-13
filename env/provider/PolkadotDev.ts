@@ -10,14 +10,14 @@ export interface PolkadotDevProviderProps {
 }
 
 export class PolkadotDevProvider extends FrameProviderBase {
-  polkadotPath
+  bin
   additional
   ports: Partial<Record<DevRuntimeName, number>> = {}
 
   constructor(host: Host, { polkadotPath, additional }: PolkadotDevProviderProps = {}) {
     super(host)
-    this.polkadotPath = polkadotPath
-    this.additional = additional
+    this.bin = polkadotPath ?? "polkadot"
+    this.additional = additional ?? []
   }
 
   target(pathInfo: PathInfo) {
@@ -28,14 +28,7 @@ export class PolkadotDevProvider extends FrameProviderBase {
     let port_ = this.ports[runtimeName]
     if (!port_) {
       port_ = port.getAvailable()
-      const polkadotPath_ = this.polkadotPath ?? "polkadot"
-      const cmd: string[] = [
-        polkadotPath_ ?? "polkadot",
-        "--dev",
-        "--ws-port",
-        port_.toString(),
-        ...this.additional ?? [],
-      ]
+      const cmd: string[] = [this.bin, "--dev", "--ws-port", port_.toString(), ...this.additional]
       if (runtimeName !== "polkadot") cmd.push(`--force-${runtimeName}`)
       if (this.additional) cmd.push(...this.additional)
       try {
@@ -44,7 +37,7 @@ export class PolkadotDevProvider extends FrameProviderBase {
           stdout: "piped",
           stderr: "piped",
         })
-        this.host.signal.addEventListener("abort", async () => {
+        this.host.abortController.signal.addEventListener("abort", async () => {
           process.kill("SIGINT")
           await process.status()
           process.close()
@@ -74,13 +67,13 @@ export class PolkadotDevTarget extends FrameTargetBase<PolkadotDevProvider> {
     this.ready = port.isReady(this.port)
   }
 
-  async getClient() {
+  async client() {
     await this.ready
     return new Client(proxyProvider, this.url)
   }
 
-  getClientFile = getClientFile
-  getRawClientFile = getRawClientFile
+  clientFile = getClientFile
+  rawClientFile = getRawClientFile
 }
 
 export const DEV_RUNTIME_NAMES = ["polkadot", "kusama", "westend", "rococo"] as const

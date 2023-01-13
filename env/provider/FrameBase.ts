@@ -14,9 +14,9 @@ export abstract class FrameProviderBase extends ProviderBase {
 export abstract class FrameTargetBase<Provider extends FrameProviderBase>
   extends ProviderRunBase<Provider>
 {
-  abstract getClient(): U.PromiseOr<Client>
-  abstract getClientFile(): U.PromiseOr<File>
-  abstract getRawClientFile(): U.PromiseOr<File>
+  abstract client(): U.PromiseOr<Client>
+  abstract clientFile(): U.PromiseOr<File>
+  abstract rawClientFile(): U.PromiseOr<File>
 
   codegen() {
     const { provider, pathInfo } = this
@@ -24,12 +24,14 @@ export abstract class FrameTargetBase<Provider extends FrameProviderBase>
     let codegenCtxPending = provider.codegenCtxsPending[targetKey]
     if (!codegenCtxPending) {
       codegenCtxPending = (async () => {
-        const client_ = await this.getClient()
-        const vRuntimeR = U.throwIfError(
-          await client_.call<string>(client_.providerRef.nextId(), "system_version", []),
-        )
-        if (vRuntimeR.error) throw new Error(vRuntimeR.error.message)
-        assertVRuntime(pathInfo, `v${vRuntimeR.result.split("-")[0]}`)
+        const client_ = await this.client()
+        if (this.pathInfo.vRuntime) {
+          const vRuntimeR = U.throwIfError(
+            await client_.call<string>(client_.providerRef.nextId(), "system_version", []),
+          )
+          if (vRuntimeR.error) throw new Error(vRuntimeR.error.message)
+          assertVRuntime(pathInfo, `v${vRuntimeR.result.split("-")[0]}`)
+        }
         const metadataR = U.throwIfError(
           await client_.call<string>(client_.providerRef.nextId(), "state_getMetadata", []),
         )
@@ -38,7 +40,7 @@ export abstract class FrameTargetBase<Provider extends FrameProviderBase>
         const codegenCtx = new Codegen({
           metadata,
           capiUrl: new URL(import.meta.resolve("../../mod.ts")),
-          clientFile: await this.getClientFile(),
+          clientFile: await this.clientFile(),
         })
         return codegenCtx
       })()

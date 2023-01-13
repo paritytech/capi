@@ -51,7 +51,7 @@ export class ZombienetProvider extends FrameProviderBase {
           stdout: "piped",
           stderr: "piped",
         })
-        this.host.signal.addEventListener("abort", async () => {
+        this.host.abortController.signal.addEventListener("abort", async () => {
           process.kill("SIGINT")
           await process.status()
           process.close()
@@ -103,11 +103,11 @@ export class ZombienetTarget extends FrameTargetBase<ZombienetProvider> {
     })()
   }
 
-  async getClient() {
+  async client() {
     return new Client(proxyProvider, await this.urlPending)
   }
 
-  async getClientFile() {
+  async clientFile() {
     const clientFile = new File()
     clientFile.code = outdent`
       import * as C from "../capi.ts"
@@ -117,7 +117,7 @@ export class ZombienetTarget extends FrameTargetBase<ZombienetProvider> {
     return clientFile
   }
 
-  async getRawClientFile() {
+  async rawClientFile() {
     const file = new File()
     file.code = outdent`
       import * as C from "../capi.ts"

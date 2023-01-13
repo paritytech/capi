@@ -49,10 +49,10 @@ export function assertVRuntime(
   version?: string,
 ): asserts pathInfo is PathInfo & { vRuntime: string } {
   if (!pathInfo.vRuntime) throw new Error()
-  if (version !== pathInfo.vRuntime) throw new Error()
+  if (version && version !== pathInfo.vRuntime) throw new Error()
 }
 
-export function assertHasFilePath(
+export function assertFilePath(
   pathInfo: PathInfo,
 ): asserts pathInfo is PathInfo & { filePath: string } {
   if (!pathInfo.filePath) throw new Error()

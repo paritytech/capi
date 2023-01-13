@@ -25,14 +25,16 @@ if (help) {
 }
 
 const port = serve_ === "" ? 8000 : typeof serve_ === "string" ? parseInt(serve_) : undefined
+const shouldServe = typeof port === "number"
 
-const host = (port ? memoryHost : fsHost)()
+const host = (shouldServe ? memoryHost : fsHost)()
+
 const dev = new PolkadotDevProvider(host)
 const zombienet = new ZombienetProvider(host)
 const wss = new WssProvider(host)
-const providers: Record<string, ProviderBase> = { dev, zombienet, wss }
+const providers = { dev, zombienet, wss }
 
-if (port) {
+if (shouldServe) {
   try {
     await Deno.connect({ port })
     throw new Error(`Port ${port} already in use`)
@@ -57,15 +59,16 @@ if (port) {
         stdout: "inherit",
       })
       .status()
-    host.abortController.abort()
   }
-}
-
-if (src && out) {
+} else if (!(src && out)) throw new Error()
+else {
   const pathInfo = parsePathInfo(src)
-  const provider = providers[pathInfo.providerId]
+  const provider = (providers as Record<string, ProviderBase>)[pathInfo.providerId]
   if (!provider) throw new Error()
   const target = provider.target(pathInfo)
   const codegen = await target.codegen()
-  codegen.write(out)
+  console.log({ files: codegen.files })
+  if (true as boolean) Deno.exit()
+  await codegen.write(out)
 }
+host.abortController.abort()
