@@ -1,7 +1,7 @@
 import { Ty, TyVisitor } from "../scale_info/mod.ts"
 import { normalizeCase } from "../util/case.ts"
 import { getOrInit } from "../util/mod.ts"
-import { Codegen, TypeFile } from "./Ctx.ts"
+import { Codegen, TypeFile } from "./mod.ts"
 import { makeDocComment, S } from "./utils.ts"
 
 export function typeVisitor(ctx: Codegen) {

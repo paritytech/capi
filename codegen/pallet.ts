@@ -3,7 +3,7 @@ import { Pallet } from "../frame_metadata/mod.ts"
 import { hex } from "../mod.ts"
 import { Ty, UnionTyDef } from "../scale_info/mod.ts"
 import { normalizeCase } from "../util/case.ts"
-import { Codegen, File } from "./Ctx.ts"
+import { Codegen, File } from "./mod.ts"
 import { getRawCodecPath, makeDocComment, S } from "./utils.ts"
 
 export function pallet(ctx: Codegen, pallet: Pallet) {

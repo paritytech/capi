@@ -1,5 +1,4 @@
-import { Codegen } from "../../codegen/Ctx.ts"
-import { File } from "../../codegen/mod.ts"
+import { Codegen, File } from "../../codegen/mod.ts"
 import { outdent } from "../../deps/outdent.ts"
 import { fromPrefixedHex } from "../../frame_metadata/mod.ts"
 import { Client, proxyProvider } from "../../rpc/mod.ts"

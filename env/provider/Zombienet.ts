@@ -3,7 +3,6 @@ import { outdent } from "../../deps/outdent.ts"
 import * as path from "../../deps/std/path.ts"
 import { Network } from "../../deps/zombienet/orchestrator.ts"
 import { Client, proxyProvider } from "../../rpc/mod.ts"
-import { Host } from "../Host.ts"
 import { PathInfo } from "../PathInfo.ts"
 import { FrameProviderBase, FrameTargetBase } from "./FrameBase.ts"
 
@@ -18,8 +17,8 @@ export class ZombienetProvider extends FrameProviderBase {
   bin
   zombienets: Record<string, Network> = {}
 
-  constructor(host: Host, { zombienetPath, additional }: ZombienetProviderProps = {}) {
-    super(host)
+  constructor({ zombienetPath, additional }: ZombienetProviderProps = {}) {
+    super()
     this.zombienetPath = zombienetPath
     this.additional = additional
     this.bin = zombienetPath
@@ -51,7 +50,7 @@ export class ZombienetProvider extends FrameProviderBase {
           stdout: "piped",
           stderr: "piped",
         })
-        this.host.abortController.signal.addEventListener("abort", async () => {
+        this.env.signal.addEventListener("abort", async () => {
           process.kill("SIGINT")
           await process.status()
           process.close()

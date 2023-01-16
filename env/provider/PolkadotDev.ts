@@ -1,6 +1,5 @@
 import { Client, proxyProvider } from "../../rpc/mod.ts"
 import * as port from "../../util/port.ts"
-import { Host } from "../Host.ts"
 import { PathInfo } from "../PathInfo.ts"
 import { FrameProviderBase, FrameTargetBase, getClientFile, getRawClientFile } from "./FrameBase.ts"
 
@@ -14,8 +13,8 @@ export class PolkadotDevProvider extends FrameProviderBase {
   additional
   ports: Partial<Record<DevRuntimeName, number>> = {}
 
-  constructor(host: Host, { polkadotPath, additional }: PolkadotDevProviderProps = {}) {
-    super(host)
+  constructor({ polkadotPath, additional }: PolkadotDevProviderProps = {}) {
+    super()
     this.bin = polkadotPath ?? "polkadot"
     this.additional = additional ?? []
   }
@@ -37,7 +36,7 @@ export class PolkadotDevProvider extends FrameProviderBase {
           stdout: "piped",
           stderr: "piped",
         })
-        this.host.abortController.signal.addEventListener("abort", async () => {
+        this.env.signal.addEventListener("abort", async () => {
           process.kill("SIGINT")
           await process.status()
           process.close()

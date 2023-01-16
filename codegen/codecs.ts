@@ -1,7 +1,7 @@
 import { outdent } from "../deps/outdent.ts"
 import { Ty, TyVisitor } from "../scale_info/mod.ts"
 import { normalizeCase } from "../util/case.ts"
-import { Codegen, File } from "./Ctx.ts"
+import { Codegen, File } from "./mod.ts"
 import { S } from "./utils.ts"
 
 export function codecs(ctx: Codegen) {

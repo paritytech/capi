@@ -2,7 +2,7 @@ import { outdent } from "../deps/outdent.ts"
 import { posix as pathPosix } from "../deps/std/path.ts"
 import { Ty, TyVisitor, TyVisitorMethods } from "../scale_info/mod.ts"
 import { normalizeCase } from "../util/case.ts"
-import { Codegen, File, TypeFile } from "./Ctx.ts"
+import { Codegen, File, TypeFile } from "./mod.ts"
 import { makeDocComment, S } from "./utils.ts"
 
 function importPath(from: string, to: string) {

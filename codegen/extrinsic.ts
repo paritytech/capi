@@ -1,6 +1,6 @@
 import { outdent } from "../deps/outdent.ts"
 import { Ty, TyVisitor } from "../scale_info/mod.ts"
-import { Codegen, File } from "./Ctx.ts"
+import { Codegen, File } from "./mod.ts"
 import { getRawCodecPath, S } from "./utils.ts"
 
 export function extrinsic(ctx: Codegen) {

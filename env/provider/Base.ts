@@ -1,11 +1,10 @@
 import { Codegen } from "../../codegen/mod.ts"
 import * as U from "../../util/mod.ts"
-import { Host } from "../Host.ts"
+import { Env } from "../Env.ts"
 import { PathInfo } from "../PathInfo.ts"
 
 export abstract class ProviderBase {
-  constructor(readonly host: Host) {}
-
+  declare env: Env
   abstract target(pathInfo: PathInfo): ProviderTarget
 }
 
