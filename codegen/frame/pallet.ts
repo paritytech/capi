@@ -18,23 +18,19 @@ export function pallet(ctx: FrameCodegen, pallet: Pallet, callTySrc: string) {
   for (const entry of pallet.storage?.entries ?? []) {
     items.push(
       makeDocComment(entry.docs)
-        + `export const ${entry.name} = new C.fluent.Storage(${[
-          "client",
-          S.string(entry.type),
-          S.string(entry.modifier),
-          S.string(pallet.name),
-          S.string(entry.name),
+        + `export const ${entry.name} = client.metadata()`
+        + `.pallet(${S.string(pallet.name)})`
+        + `.storage(${S.string(entry.name)})`
+        + `["_asCodegenStorage"](${
           entry.type === "Map"
             ? entry.hashers.length === 1
               ? `$.tuple(${getRawCodecPath(entry.key)})`
               : getRawCodecPath(entry.key)
-            : "$.tuple()",
-          getRawCodecPath(entry.value),
-        ]})`,
+            : "$.tuple()"
+        }, ${getRawCodecPath(entry.value)})`,
     )
   }
   if (pallet.calls) {
-    // ctx.typeVisitor.visit(callTy!)
     const ty = pallet.calls as Ty & UnionTyDef
     const isStringUnion = ty.members.every((x) => !x.fields.length)
     for (const call of ty.members) {

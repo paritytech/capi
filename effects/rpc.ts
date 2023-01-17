@@ -1,5 +1,6 @@
 import * as rpc from "../rpc/mod.ts"
 import { _Rune, Args, Context, Rune } from "../rune/mod.ts"
+import { ClientRune } from "./fluent.ts"
 
 class _RpcClientRune<DV, SED, HED, CED> extends _Rune<rpc.Client<DV, SED, HED, CED>, never> {
   constructor(
@@ -30,28 +31,26 @@ export function rpcClient<
   provider: rpc.Provider<DiscoveryValue, SendErrorData, HandlerErrorData, CloseErrorData>,
   discoveryValue: DiscoveryValue,
 ) {
-  return Rune.new(_RpcClientRune, provider, discoveryValue)
+  return Rune.new(_RpcClientRune, provider, discoveryValue).subclass(ClientRune)
 }
 
 export function rpcCall<Params extends unknown[], Result>(
   method: string,
   _nonIdempotent?: boolean,
 ) {
-  return <X>(...[client]: Args<X, [client: rpc.Client]>) => {
-    return <X>(...params: Args<X, Params>) => {
-      return Rune.ls([client, ...params])
-        .pipe(async ([client, ...params]) => {
-          // TODO: why do we need to explicitly type this / why is this not being inferred?
-          const id = client.providerRef.nextId()
-          const result = await client.call<Result>(id, method, params)
-          if (result instanceof Error) {
-            return result
-          } else if (result.error) {
-            return new RpcServerError(result)
-          }
-          return result.result
-        })
-    }
+  return <X>(...args: Args<X, [client: rpc.Client, ...params: Params]>) => {
+    return Rune.ls(args)
+      .pipe(async ([client, ...params]) => {
+        // TODO: why do we need to explicitly type this / why is this not being inferred?
+        const id = client.providerRef.nextId()
+        const result = await client.call<Result>(id, method, params)
+        if (result instanceof Error) {
+          return result
+        } else if (result.error) {
+          return new RpcServerError(result)
+        }
+        return result.result
+      })
   }
 }
 

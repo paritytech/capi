@@ -1,7 +1,11 @@
 import * as C from "capi/mod.ts"
 
-import { System } from "polkadot_dev/mod.ts"
+import { client, System } from "polkadot_dev/mod.ts"
 
-const root = System.Account.entry(C.alice.publicKey).read()
+console.log(
+  await client.metadata().pallet("System").storage("Account").entry([C.alice.publicKey]).run(),
+)
 
-console.log(C.throwIfError(await root.run()))
+const root = System.Account.entry([C.alice.publicKey])
+
+console.log(await root.run())
