@@ -65,7 +65,7 @@ export abstract class _LinearRune<T, U> extends _Rune<T, U> {
 export class Rune<T, U = never> {
   declare "": [T, U]
 
-  private constructor(readonly _prime: (ctx: Context) => _Rune<T, U>) {}
+  constructor(readonly _prime: (ctx: Context) => _Rune<T, U>) {}
 
   static new<T, E, A extends unknown[]>(
     ctor: new(ctx: Context, ...args: A) => _Rune<T, E>,
@@ -74,7 +74,7 @@ export class Rune<T, U = never> {
     return new Rune((ctx) => new ctor(ctx, ...args))
   }
 
-  async run(): Promise<T | U> {
+  async run(): Promise<T> {
     const ctx = new Context()
     const abortController = new AbortController()
     const primed = ctx.prime(this, abortController.signal)
@@ -83,7 +83,7 @@ export class Rune<T, U = never> {
     return result
   }
 
-  async *watch(): AsyncIterable<T | U> {
+  async *watch(): AsyncIterable<T> {
     const ctx = new Context()
     const abortController = new AbortController()
     const primed = ctx.prime(this, abortController.signal)
@@ -125,6 +125,16 @@ export class Rune<T, U = never> {
     return Rune.new(_LsRune, runes.map(Rune.resolve))
   }
 
+  static rec<R extends {}>(
+    runes: R,
+  ): Rune<{ [K in keyof R]: _T<R[K]> }, _U<R[keyof R]>> {
+    const keys = Object.keys(runes)
+    const values = Object.values(runes)
+    return Rune.ls(values).pipe((values) => {
+      return Object.fromEntries(values.map((v, i) => [keys[i], v]))
+    })
+  }
+
   static stream<T>(fn: () => AsyncIterable<T>) {
     return Rune.new(_StreamRune, fn)
   }
@@ -154,12 +164,27 @@ export class Rune<T, U = never> {
     return Rune.new(_CatchRune, this)
   }
 
+  wrapU() {
+    return Rune.new(_WrapURune, this)
+  }
+
   lazy() {
     return Rune.new(_LazyRune, this)
   }
 
   latest() {
     return Rune.new(_LatestRune, this)
+  }
+
+  as<T2 extends T, U2 extends U = U>(): Rune<T2, U2> {
+    return new Rune(this._prime as any)
+  }
+
+  subclass<A extends unknown[], C>(
+    ctor: new(_prime: (ctx: Context) => _Rune<T, U>, ...args: A) => C,
+    ...args: A
+  ) {
+    return new ctor(this._prime, ...args)
   }
 }
 
@@ -242,8 +267,8 @@ class _StreamRune<T> extends _LinearRune<T, never> {
   }
 }
 
-export class UnwrappedValue {
-  constructor(readonly value: unknown) {}
+export class UnwrappedValue<T = unknown> {
+  constructor(readonly value: T) {}
 }
 
 class _UnwrapRune<T1, U, T2 extends T1> extends _LinearRune<T2, U | Exclude<T1, T2>> {
@@ -260,7 +285,10 @@ class _UnwrapRune<T1, U, T2 extends T1> extends _LinearRune<T2, U | Exclude<T1, 
   }
 }
 
-class _CatchRune<T, U> extends _LinearRune<T | U, never> {
+class _CatchRune<T, U> extends _LinearRune<
+  T | Exclude<U, UnwrappedValue<any>>,
+  U extends UnwrappedValue<infer X> ? X : never
+> {
   child
   constructor(ctx: Context, child: Rune<T, U>) {
     super(ctx)
@@ -272,7 +300,30 @@ class _CatchRune<T, U> extends _LinearRune<T | U, never> {
       return await this.child.evaluate(time, epoch)
     } catch (e) {
       if (e instanceof UnwrappedValue) {
-        return e.value as U
+        if (e.value instanceof UnwrappedValue) {
+          throw e.value
+        } else {
+          return e.value as Exclude<U, UnwrappedValue<any>>
+        }
+      }
+      throw e
+    }
+  }
+}
+
+class _WrapURune<T, U> extends _LinearRune<T, UnwrappedValue<U>> {
+  child
+  constructor(ctx: Context, child: Rune<T, U>) {
+    super(ctx)
+    this.child = ctx.prime(child, this.signal)
+  }
+
+  async _evaluate(time: number, epoch: Epoch) {
+    try {
+      return await this.child.evaluate(time, epoch)
+    } catch (e) {
+      if (e instanceof UnwrappedValue) {
+        throw new UnwrappedValue(e)
       }
       throw e
     }

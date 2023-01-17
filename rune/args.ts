@@ -1,8 +1,8 @@
 import { _U, Rune } from "./rune.ts"
 
-export type Args<X, A> = never extends X ? { [K in keyof A]: A[K] | Rune<A[K], ArgsU<X>> }
-  : X extends A ? X
-  : never
+export type Args<X, A> =
+  | (never extends X ? never : X extends A ? X : never)
+  | { [K in keyof A]: A[K] | Rune<A[K], ArgsU<X>> }
 
 export type ArgsU<X> = X extends unknown[] ? _U<X[number]> : _U<X[keyof X]>
 
