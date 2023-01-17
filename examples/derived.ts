@@ -8,5 +8,3 @@ const root = ids.mapArray((id) => {
 })
 
 console.log(await root.run())
-
-// TODO: terminate

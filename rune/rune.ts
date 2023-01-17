@@ -48,6 +48,7 @@ export abstract class _Rune<T, U> {
 
   referenceCount = 0
   reference(signal: AbortSignal) {
+    if (!this.alive) throw new Error("cannot reference a dead rune")
     this.referenceCount++
     signal.addEventListener("abort", () => {
       if (!--this.referenceCount) {
@@ -524,10 +525,9 @@ class _FlatRune<T, U1, U2> extends _Rune<T, U1 | U2> {
     if (!receipt.ready) return null!
     if (receipt.novel) {
       this.innerController.abort()
-      this.currentInner = new Batch(this.batch.timeline, this.batch).prime(
-        rune,
-        this.innerController.signal,
-      )
+      this.innerController = new AbortController()
+      const innerBatch = new Batch(this.batch.timeline, this.batch)
+      this.currentInner = innerBatch.prime(rune, this.innerController.signal)
     }
     const _receipt = new Receipt()
     try {
@@ -547,6 +547,7 @@ class _FlatRune<T, U1, U2> extends _Rune<T, U1 | U2> {
 
   override cleanup(): void {
     this.innerController.abort()
+    super.cleanup()
   }
 }
 
