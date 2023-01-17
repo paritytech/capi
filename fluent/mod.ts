@@ -1,12 +1,13 @@
 import * as C from "../mod.ts"
+import { Args, Rune } from "../rune/mod.ts"
 import * as U from "../util/mod.ts"
 
 export * from "./Contract.ts"
 export * from "./Multisig.ts"
 
-export class Storage<C extends C.Z.$<C.rpc.Client>, K extends unknown[], V> {
+export class Storage<K extends unknown[], V> {
   constructor(
-    readonly client: C,
+    readonly client: Rune<C.rpc.Client>,
     readonly type: C.frame.StorageEntry["type"],
     readonly modifier: C.frame.StorageEntry["modifier"],
     readonly pallet: string,
@@ -15,64 +16,52 @@ export class Storage<C extends C.Z.$<C.rpc.Client>, K extends unknown[], V> {
     readonly $value: C.$.Codec<V>,
   ) {}
 
-  entry<Key extends C.Z.Ls$<K>>(...key: Key): StorageEntry<C, K, V, Key> {
+  entry<X>(...key: Args<X, K>): StorageEntry<K, V, X> {
     return new StorageEntry(this, key)
   }
 
-  keys<PartialKey extends C.Z.Ls$<Partial<K>>>(
-    ...partialKey: PartialKey
-  ): StorageKeys<C, K, V, PartialKey> {
+  keys<X>(...partialKey: Args<X, Partial<K>>): StorageKeys<K, V, X> {
     return new StorageKeys(this, partialKey)
   }
 }
 
-export class StorageEntry<
-  C extends C.Z.$<C.rpc.Client>,
-  K extends unknown[],
-  V,
-  Key extends C.Z.Ls$<K>,
-> {
-  constructor(readonly storage: Storage<C, K, V>, readonly key: Key) {}
+export class StorageEntry<K extends unknown[], V, X> {
+  constructor(readonly storage: Storage<K, V>, readonly key: Args<X, K>) {}
 
-  read<MaybeHash extends [blockHash?: C.Z.$<U.HexHash | undefined>]>(...maybeHash: MaybeHash) {
+  read<X>(...[hash]: Args<X, [hash?: U.HexHash]>) {
     return C.entryRead(this.storage.client)(
       this.storage.pallet,
       this.storage.name,
       this.key,
-      ...maybeHash,
-    ).as<{ value: V }>()
+      hash,
+    ).pipe((x) => x as V)
   }
 }
-export class StorageKeys<
-  C extends C.Z.$<C.rpc.Client>,
-  K extends unknown[],
-  V,
-  PartialKey extends C.Z.Ls$<Partial<K>>,
-> {
-  constructor(readonly storage: Storage<C, K, V>, readonly partialKey: PartialKey) {}
+export class StorageKeys<K extends unknown[], V, X> {
+  constructor(readonly storage: Storage<K, V>, readonly partialKey: Args<X, Partial<K>>) {}
 
-  readPage<
-    Count extends C.Z.$<number>,
-    Rest extends [start?: C.Z.Ls$<K>, blockHash?: C.Z.$<U.HexHash | undefined>],
-  >(count: Count, ...rest: Rest) {
-    return C.keyPageRead(this.storage.client)<
-      string,
-      string,
-      Count,
-      PartialKey,
-      Rest
-    >(
-      this.storage.pallet,
-      this.storage.name,
-      count,
-      this.partialKey as [...PartialKey],
-      ...rest,
-    ).as<K[]>()
-  }
+  // readPage<
+  //   Count extends C.Z.$<number>,
+  //   Rest extends [start?: C.Z.Ls$<K>, blockHash?: C.Z.$<U.HexHash | undefined>],
+  // >(count: Count, ...rest: Rest) {
+  //   return C.keyPageRead(this.storage.client)<
+  //     string,
+  //     string,
+  //     Count,
+  //     PartialKey,
+  //     Rest
+  //   >(
+  //     this.storage.pallet,
+  //     this.storage.name,
+  //     count,
+  //     this.partialKey as [...PartialKey],
+  //     ...rest,
+  //   ).as<K[]>()
+  // }
 
-  first<
-    Rest extends [start?: C.Z.Ls$<K>, blockHash?: C.Z.$<U.HexHash | undefined>],
-  >(...rest: Rest) {
-    return this.readPage(1, ...rest).access(0)
-  }
+  //   first<
+  //     Rest extends [start?: C.Z.Ls$<K>, blockHash?: C.Z.$<U.HexHash | undefined>],
+  //   >(...rest: Rest) {
+  //     return this.readPage(1, ...rest).access(0)
+  //   }
 }

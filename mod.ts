@@ -7,6 +7,7 @@ export * as frame from "./frame_metadata/mod.ts"
 export * as ink from "./ink_metadata/mod.ts"
 export * from "./primitives/mod.ts"
 export * as rpc from "./rpc/mod.ts"
+export * from "./rune/mod.ts"
 export * from "./scale_info/mod.ts"
 export {
   alice,

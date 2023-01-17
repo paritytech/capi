@@ -38,7 +38,7 @@ export function keyPageRead<Client extends Z.$<rpc.Client>>(client: Client) {
       .ls($storageKey_, keysEncoded)
       .next(([$key, keysEncoded]) => {
         return keysEncoded.map((keyEncoded: U.Hex) => {
-          return $key.decode(U.hex.decode(keyEncoded))
+          return $key.decoded(U.hex.decode(keyEncoded))
         })
       }, k0_)
   }

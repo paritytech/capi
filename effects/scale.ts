@@ -1,94 +1,39 @@
 import * as $ from "../deps/scale.ts"
-import * as Z from "../deps/zones.ts"
 import * as M from "../frame_metadata/mod.ts"
-import { Signer } from "../primitives/mod.ts"
+import { Args } from "../rune/args.ts"
+import { Rune } from "../rune/rune.ts"
 import { DeriveCodec, Ty } from "../scale_info/mod.ts"
 
-const k0_ = Symbol()
-const k1_ = Symbol()
-const k2_ = Symbol()
-const k3_ = Symbol()
-const k4_ = Symbol()
-const k5_ = Symbol()
-const k6_ = Symbol()
-
-export const deriveCodec = Z.call.fac((metadata: M.Metadata) => {
-  return DeriveCodec(metadata.tys)
-}, k0_)
-
-export const codec = Z.call.fac((
-  deriveCodec: DeriveCodec,
-  ty: number | Ty,
-) => {
-  return deriveCodec(ty)
-}, k1_)
-
-export function scaleDecoded<
-  Codec extends Z.$<$.Codec<any>>,
-  Encoded extends Z.$<Uint8Array>,
-  Key extends Z.$<PropertyKey>,
->(
-  codec: Codec,
-  encoded: Encoded,
-  key: Key,
-) {
-  return Z
-    .ls(codec, encoded, key)
-    .next(([codec, encoded, key]): Record<Z.T<Key>, any> => {
-      return { [key]: codec.decode(encoded) } as any
-    }, k2_)
-}
-
-// TODO: eventually, utilize `V` to toggle runtime validation
-export function scaleEncoded<Codec extends Z.$<$.Codec<any>>, Decoded>(
-  codec: Codec,
-  decoded: Decoded,
-  isAsync?: boolean,
-) {
-  return Z
-    .ls(codec, decoded, isAsync)
-    .next(([codec, decoded]) => {
+export class CodecRune<T, U> extends Rune<$.Codec<T>, U> {
+  // TODO: eventually, utilize `V` to toggle runtime validation
+  encoded<X>(...[value]: Args<X, [value: T]>) {
+    return Rune.ls([this, value]).pipe(async ([codec, value]) => {
       try {
-        $.assert(codec, decoded)
+        $.assert(codec, value)
       } catch (e) {
         return e as $.ScaleAssertError
       }
-      return codec[isAsync ? "encodeAsync" : "encode"](decoded)
-    }, k3_)
+      return await codec.encodeAsync(value)
+    })
+  }
+
+  decoded<X>(...[value]: Args<X, [value: Uint8Array]>) {
+    return Rune.ls([this, value]).pipe(([codec, value]) => codec.decode(value))
+  }
 }
 
-export const $extrinsic = Z.call.fac((
-  deriveCodec: DeriveCodec,
-  metadata: M.Metadata,
-  sign: Signer,
-  prefix?: number,
-) => {
-  return M.$extrinsic({
-    deriveCodec,
-    metadata,
-    sign: sign!,
-    prefix: prefix!,
-  })
-}, k4_)
+export function deriveCodec<X>(...[metadata]: Args<X, [metadata: M.Metadata]>) {
+  return Rune.resolve(metadata).pipe((metadata) => DeriveCodec(metadata.tys))
+}
 
-export const $storageKey = Z.call.fac((
-  deriveCodec: DeriveCodec,
-  pallet: M.Pallet,
-  storageEntry: M.StorageEntry,
-) => {
-  return M.$storageKey({
-    deriveCodec,
-    pallet,
-    storageEntry,
-  })
-}, k5_)
+export function codec<X>(...args: Args<X, [deriveCodec: DeriveCodec, ty: number | Ty]>) {
+  return Rune.ls(args).pipe(([deriveCodec, ty]) => deriveCodec(ty)).subclass(CodecRune)
+}
 
-export const $call = Z.call.fac((
-  deriveCodec: DeriveCodec,
-  metadata: M.Metadata,
-) => {
-  return M.$call({
-    deriveCodec,
-    metadata,
-  })
-}, k6_)
+export function $extrinsic<X>(args: Args<X, M.ExtrinsicCodecProps>) {
+  return Rune.rec(args).pipe(M.$extrinsic).subclass(CodecRune)
+}
+
+export function $storageKey<X>(args: Args<X, M.StorageKeyProps>) {
+  return Rune.rec(args).pipe(M.$storageKey).subclass(CodecRune)
+}

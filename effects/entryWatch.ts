@@ -41,7 +41,7 @@ export function entryWatch<Client extends Z.$<rpc.Client>>(client: Client) {
             // key ? $storageKey.decode(U.hex.decode(key)) : undefined
             const getKey = (key: rpc.known.Hex) => key
             const changes: WatchEntryEvent[] = changeset.changes.map(
-              ([key, val]) => [getKey(key), val ? $entry.decode(U.hex.decode(val)) : undefined],
+              ([key, val]) => [getKey(key), val ? $entry.decoded(U.hex.decode(val)) : undefined],
             )
             return inner(changes)
           }

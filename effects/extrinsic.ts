@@ -151,7 +151,7 @@ export class SignedExtrinsic<
 export function extrinsicsDecoded<Client extends Z.$<rpc.Client>>(client: Client) {
   return <Hexes extends Z.$<rpc.known.Hex[]>>(hexes: Hexes) =>
     Z.ls($extrinsic(client), hexes).next(([$extrinsic, hexes]) =>
-      hexes.map((hex) => $extrinsic.decode(U.hex.decode(hex)))
+      hexes.map((hex) => $extrinsic.decoded(U.hex.decode(hex)))
     )
 }
 
