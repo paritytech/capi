@@ -9,6 +9,7 @@ export class Timeline {
 }
 
 export class Receipt {
+  ready = true
   novel = false
   nextTime = Infinity
   eventSources = new Set<EventSource>()
@@ -16,6 +17,10 @@ export class Receipt {
 
   async finalized() {
     if (this.eventSources.size) await this._finalized
+  }
+
+  setReady(ready: boolean) {
+    if (!ready) this.ready = false
   }
 
   setNovel(novel: boolean) {
@@ -45,6 +50,7 @@ export class Receipt {
   }
 
   setFrom(receipt: Receipt) {
+    this.setReady(receipt.ready)
     this.setNovel(receipt.novel)
     this.setNextTimeFrom(receipt)
   }
