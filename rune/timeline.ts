@@ -1,83 +1,80 @@
 import { Notifier } from "../util/notifier.ts"
 
 export class Timeline {
-  time = 0
+  current = 0
+
+  extend() {
+    return ++this.current
+  }
 }
 
-export class Epoch {
-  constructor(readonly timeline: Timeline) {}
+export class Receipt {
+  novel = false
+  nextTime = Infinity
+  eventSources = new Set<EventSource>()
+  _finalized = new Notifier()
 
-  min = 0
-  max = Infinity
-
-  get finite() {
-    return this.max !== Infinity
+  async finalized() {
+    if (this.eventSources.size) await this._finalized
   }
 
-  restrictMin(min: number) {
-    this.min = Math.max(min, this.min)
+  setNovel(novel: boolean) {
+    if (novel) this.novel = true
   }
 
-  restrictMax(max: number) {
-    if (max >= this.max) return
-    this.max = max
-    if (this.handles.size) {
-      for (const handle of this.handles) {
-        handle.epochs.delete(this)
-      }
-      this.handles.clear()
-      this.finalized.emit()
-    }
-  }
-
-  contains(time: number) {
-    return time >= this.min && time <= this.max
-  }
-
-  restrictMaxTo(epoch: Epoch) {
-    this.restrictMax(epoch.max)
-    if (!this.finite) {
-      for (const handle of epoch.handles) {
-        this.bind(handle)
+  setNextTimeFrom(receipt: Receipt) {
+    this.setNextTime(receipt.nextTime)
+    if (this.nextTime === Infinity) {
+      for (const source of receipt.eventSources) {
+        this.bind(source)
       }
     }
   }
 
-  restrictTo(epoch: Epoch) {
-    this.restrictMin(epoch.min)
-    this.restrictMaxTo(epoch)
+  setNextTime(time: number) {
+    if (time < this.nextTime) {
+      this.nextTime = time
+      if (this.eventSources.size) {
+        for (const source of this.eventSources) {
+          source.receipts.delete(this)
+        }
+        this.eventSources.clear()
+        this._finalized.emit()
+      }
+    }
   }
 
-  handles = new Set<EpochHandle>()
-
-  bind(handle: EpochHandle) {
-    if (this.finite) return
-    handle.epochs.add(this)
-    this.handles.add(handle)
+  setFrom(receipt: Receipt) {
+    this.setNovel(receipt.novel)
+    this.setNextTimeFrom(receipt)
   }
 
-  finalized = new Notifier()
+  bind(source: EventSource) {
+    if (this.nextTime !== Infinity) return
+    source.receipts.add(this)
+    this.eventSources.add(source)
+  }
 }
 
-export class EpochHandle {
-  epochs = new Set<Epoch>()
+export class EventSource {
+  receipts = new Set<Receipt>()
 
   constructor(readonly timeline: Timeline) {}
 
-  terminateEpochs() {
-    for (const epoch of this.epochs) {
-      epoch.handles.delete(this)
-      if (!epoch.handles.size) epoch.finalized.emit()
-      epoch.restrictMax(this.timeline.time)
+  push() {
+    const time = this.timeline.extend()
+    for (const receipt of this.receipts) {
+      receipt.setNextTime(time)
     }
-    this.epochs.clear()
+    this.receipts.clear()
+    return time
   }
 
-  release() {
-    for (const epoch of this.epochs) {
-      epoch.handles.delete(this)
-      if (!epoch.handles.size) epoch.finalized.emit()
+  finish() {
+    for (const receipt of this.receipts) {
+      receipt.eventSources.delete(this)
+      if (!receipt.eventSources.size) receipt._finalized.emit()
     }
-    this.epochs.clear()
+    this.receipts.clear()
   }
 }

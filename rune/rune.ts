@@ -1,16 +1,37 @@
 import { deferred } from "../deps/std/async.ts"
 import { getOrInit } from "../util/state.ts"
 import { PromiseOr } from "../util/types.ts"
-import { Epoch, EpochHandle, Timeline } from "./timeline.ts"
+import { EventSource, Receipt, Timeline } from "./timeline.ts"
 
-export class Context {
-  timeline = new Timeline()
+export class Batch {
+  constructor(
+    readonly timeline = new Timeline(),
+    readonly parent?: Batch,
+    readonly parentTime = 0,
+    readonly parentReceipt = new Receipt(),
+  ) {}
 
   primed = new Map<Rune<any, any>, _Rune<any, any>>()
   prime<T, E>(rune: Rune<T, E>, signal: AbortSignal): _Rune<T, E> {
-    const primed = getOrInit(this.primed, rune, () => rune._prime(this))
+    const primed = getOrInit(this.primed, rune, () => this.getPrimed(rune) ?? rune._prime(this))
     primed.reference(signal)
     return primed
+  }
+
+  getPrimed<T, E>(rune: Rune<T, E>): _Rune<T, E> | undefined {
+    const existing = this.primed.get(rune)
+    if (existing) return existing
+    const parent = this.parent?.getPrimed(rune)
+    if (parent) {
+      const proxy = new _ProxyRune(this, parent)
+      this.primed.set(rune, proxy)
+      return proxy
+    }
+    return undefined
+  }
+
+  spawn(time: number, receipt: Receipt) {
+    return new Batch(new Timeline(), this, time, receipt)
   }
 }
 
@@ -22,7 +43,7 @@ export abstract class _Rune<T, U> {
 
   abortController = new AbortController()
   signal = this.abortController.signal
-  constructor(readonly ctx: Context) {
+  constructor(readonly batch: Batch) {
     this.signal.addEventListener("abort", () => this.cleanup())
   }
 
@@ -36,7 +57,25 @@ export abstract class _Rune<T, U> {
     })
   }
 
-  abstract evaluate(time: number, epoch: Epoch): Promise<T>
+  _currentTime = -1
+  _currentPromise: Promise<T> = null!
+  _currentReceipt = new Receipt()
+  async evaluate(time: number, receipt: Receipt) {
+    if (this._currentTime > time) throw new Error("cannot regress")
+    if (this._currentTime < time) {
+      this._currentReceipt = new Receipt()
+      if (this._currentTime === -1) {
+        this._currentReceipt.novel = true
+      }
+      this._currentTime = time
+      this._currentPromise = this._evaluate(time, this._currentReceipt)
+    }
+    const _receipt = this._currentReceipt
+    const value = await this._currentPromise
+    receipt.setFrom(_receipt)
+    return value
+  }
+  abstract _evaluate(time: number, receipt: Receipt): Promise<T>
 
   alive = true
   cleanup() {
@@ -44,66 +83,52 @@ export abstract class _Rune<T, U> {
   }
 }
 
-export abstract class _LinearRune<T, U> extends _Rune<T, U> {
-  lastTime = -1
-  lastValue: Promise<T> = Promise.resolve(null!)
-  lastEpoch: Epoch | null = null
-  async evaluate(time: number, epoch: Epoch): Promise<T> {
-    if (time < this.lastTime) throw new Error("cannot regress")
-    if (!this.lastEpoch?.contains(time)) {
-      this.lastTime = time
-      this.lastEpoch = new Epoch(this.ctx.timeline)
-      this.lastValue = this._evaluate(time, this.lastEpoch)
-    }
-    epoch.restrictTo(this.lastEpoch)
-    return this.lastValue
+class _ProxyRune<T, E> extends _Rune<T, E> {
+  constructor(batch: Batch, readonly inner: _Rune<T, E>) {
+    super(batch)
   }
 
-  abstract _evaluate(time: number, epoch: Epoch): Promise<T>
+  _evaluate(): Promise<T> {
+    return this.inner.evaluate(this.batch.parentTime, this.batch.parentReceipt)
+  }
 }
 
 export class Rune<T, U = never> {
   declare "": [T, U]
 
-  constructor(readonly _prime: (ctx: Context) => _Rune<T, U>) {}
+  constructor(readonly _prime: (batch: Batch) => _Rune<T, U>) {}
 
   static new<T, E, A extends unknown[]>(
-    ctor: new(ctx: Context, ...args: A) => _Rune<T, E>,
+    ctor: new(batch: Batch, ...args: A) => _Rune<T, E>,
     ...args: A
   ) {
-    return new Rune((ctx) => new ctor(ctx, ...args))
+    return new Rune((batch) => new ctor(batch, ...args))
   }
 
-  async run(): Promise<T> {
-    const ctx = new Context()
-    const abortController = new AbortController()
-    const primed = ctx.prime(this, abortController.signal)
-    const result = await primed.evaluate(0, new Epoch(ctx.timeline))
-    abortController.abort()
-    return result
-  }
-
-  async *watch(): AsyncIterable<T> {
-    const ctx = new Context()
-    const abortController = new AbortController()
-    const primed = ctx.prime(this, abortController.signal)
-    let time = 0
-    let lastValue: T = null!
-    let lastTime = 0
-    while (true) {
-      const epoch = new Epoch(ctx.timeline)
-      const promise = primed.evaluate(time, epoch)
-      if (!epoch.contains(lastTime)) yield lastValue
-      lastValue = await promise
-      if (!epoch.finite) {
-        if (epoch.handles.size) await epoch.finalized
-        if (!epoch.finite) break
-      }
-      lastTime = time
-      time = epoch.max + 1
+  async run(batch = new Batch()): Promise<T> {
+    for await (const value of this.watch(batch)) {
+      return value
     }
-    yield lastValue
-    abortController.abort()
+    throw new Error("Rune did not yield any values")
+  }
+
+  async *watch(batch = new Batch()): AsyncIterable<T> {
+    const abortController = new AbortController()
+    const primed = batch.prime(this, abortController.signal)
+    let time = 0
+    try {
+      while (time !== Infinity) {
+        const receipt = new Receipt()
+        const value = await primed.evaluate(time, receipt)
+        if (receipt.novel) {
+          yield value
+        }
+        await receipt.finalized()
+        time = receipt.nextTime
+      }
+    } finally {
+      abortController.abort()
+    }
   }
 
   static constant<T>(value: T) {
@@ -115,7 +140,7 @@ export class Rune<T, U = never> {
   }
 
   pipe<T2>(
-    fn: (value: T) => PromiseOr<T2>,
+    fn: (value: T, batch: Batch) => PromiseOr<T2>,
   ): Rune<T2, U> {
     return Rune.new(_PipeRune, this, fn)
   }
@@ -135,7 +160,7 @@ export class Rune<T, U = never> {
     })
   }
 
-  static stream<T>(fn: () => AsyncIterable<T>) {
+  static stream<T>(fn: (signal: AbortSignal) => AsyncIterable<T>): Rune<T, never> {
     return Rune.new(_StreamRune, fn)
   }
 
@@ -160,7 +185,10 @@ export class Rune<T, U = never> {
     return this.unwrapNot((x): x is T & undefined => x === undefined)
   }
 
-  catch() {
+  catch(): Rune<
+    T | Exclude<U, UnwrappedValue<any>>,
+    U extends UnwrappedValue<infer X> ? X : never
+  > {
     return Rune.new(_CatchRune, this)
   }
 
@@ -172,16 +200,12 @@ export class Rune<T, U = never> {
     return Rune.new(_LazyRune, this)
   }
 
-  latest() {
-    return Rune.new(_LatestRune, this)
-  }
-
   as<T2 extends T, U2 extends U = U>(): Rune<T2, U2> {
     return new Rune(this._prime as any)
   }
 
   subclass<A extends unknown[], C>(
-    ctor: new(_prime: (ctx: Context) => _Rune<T, U>, ...args: A) => C,
+    ctor: new(_prime: (batch: Batch) => _Rune<T, U>, ...args: A) => C,
     ...args: A
   ) {
     return new ctor(this._prime, ...args)
@@ -189,81 +213,91 @@ export class Rune<T, U = never> {
 }
 
 class _ConstantRune<T> extends _Rune<T, never> {
-  constructor(ctx: Context, readonly value: T) {
-    super(ctx)
+  constructor(batch: Batch, readonly value: T) {
+    super(batch)
   }
 
-  async evaluate() {
+  async _evaluate() {
     return this.value
   }
 }
 
-class _PipeRune<T1, U, T2> extends _LinearRune<T2, U> {
+class _PipeRune<T1, U, T2> extends _Rune<T2, U> {
   child
-  constructor(ctx: Context, child: Rune<T1, U>, readonly fn: (value: T1) => PromiseOr<T2>) {
-    super(ctx)
-    this.child = ctx.prime(child, this.signal)
+  constructor(
+    batch: Batch,
+    child: Rune<T1, U>,
+    readonly fn: (value: T1, batch: Batch) => PromiseOr<T2>,
+  ) {
+    super(batch)
+    this.child = batch.prime(child, this.signal)
   }
 
-  async _evaluate(time: number, epoch: Epoch) {
-    return await this.fn(await this.child.evaluate(time, epoch))
+  lastValue: T2 = null!
+  async _evaluate(time: number, receipt: Receipt) {
+    const source = await this.child.evaluate(time, receipt)
+    if (!receipt.novel) return this.lastValue
+    return this.lastValue = await this.fn(
+      source,
+      this.fn.length === 1 ? null! : this.batch.spawn(time, receipt),
+    )
   }
 }
 
-class _LsRune<T, U> extends _LinearRune<T[], U> {
+class _LsRune<T, U> extends _Rune<T[], U> {
   children
-  constructor(ctx: Context, children: Rune<T, U>[]) {
-    super(ctx)
-    this.children = children.map((child) => ctx.prime(child, this.signal))
+  constructor(batch: Batch, children: Rune<T, U>[]) {
+    super(batch)
+    this.children = children.map((child) => batch.prime(child, this.signal))
   }
 
-  async _evaluate(time: number, epoch: Epoch) {
-    return Promise.all(this.children.map((child) => child.evaluate(time, epoch)))
+  async _evaluate(time: number, receipt: Receipt) {
+    return Promise.all(this.children.map((child) => child.evaluate(time, receipt)))
   }
 }
 
-class _StreamRune<T> extends _LinearRune<T, never> {
-  initProm = deferred<void>()
-  values: (T | undefined)[] = []
-  epochHandle = new EpochHandle(this.ctx.timeline)
+export class _StreamRune<T> extends _Rune<T, never> {
+  initPromise = deferred<void>()
+  valueQueue: [number, T][] = []
+  eventSource = new EventSource(this.batch.timeline)
+  first = true
   done = false
-  constructor(ctx: Context, fn: (signal?: AbortSignal) => AsyncIterable<T>) {
-    super(ctx)
+
+  curIter = new AbortController()
+
+  lastValue: T = null!
+  constructor(batch: Batch, fn: (signal: AbortSignal) => AsyncIterable<T>) {
+    super(batch)
     ;(async () => {
-      const iter = fn(this.signal)
-      let first = true
-      for await (const value of iter) {
-        if (first) {
-          first = false
-          this.values[0] = value
-          this.initProm.resolve()
+      for await (const value of fn(this.signal)) {
+        if (this.first) {
+          this.first = false
+          this.valueQueue.push([0, value])
+          this.initPromise.resolve()
         } else {
-          this.epochHandle.terminateEpochs()
-          this.values[++this.ctx.timeline.time] = value
+          this.valueQueue.push([this.eventSource.push(), value])
         }
       }
-      this.epochHandle.release()
       this.done = true
+      this.eventSource.finish()
     })()
   }
 
-  async _evaluate(time: number, epoch: Epoch): Promise<T> {
-    if (!this.values.length) {
-      epoch.bind(this.epochHandle)
-      await this.initProm
+  async _evaluate(time: number, receipt: Receipt): Promise<T> {
+    if (this.first) {
+      await this.initPromise
     }
-    let end = Infinity
-    const idx = this.values.findLastIndex((_, i) => {
-      if (i <= time) return true
-      end = i - 1
-      return false
-    })
-    epoch.restrictMin(idx)
-    epoch.restrictMax(end)
-    if (end === Infinity && !this.done) {
-      epoch.bind(this.epochHandle)
+    while (time >= this.valueQueue[0]?.[0]!) { // NaN comparisons are false
+      receipt.novel = true
+      this.lastValue = this.valueQueue.shift()![1]
     }
-    return this.values[idx]!
+    const value = this.lastValue
+    if (this.valueQueue.length) {
+      receipt.setNextTime(this.valueQueue[0]![0])
+    } else if (!this.done) {
+      receipt.bind(this.eventSource)
+    }
+    return value
   }
 }
 
@@ -271,33 +305,33 @@ export class UnwrappedValue<T = unknown> {
   constructor(readonly value: T) {}
 }
 
-class _UnwrapRune<T1, U, T2 extends T1> extends _LinearRune<T2, U | Exclude<T1, T2>> {
+class _UnwrapRune<T1, U, T2 extends T1> extends _Rune<T2, U | Exclude<T1, T2>> {
   child
-  constructor(ctx: Context, child: Rune<T1, U>, readonly fn: (value: T1) => value is T2) {
-    super(ctx)
-    this.child = ctx.prime(child, this.signal)
+  constructor(batch: Batch, child: Rune<T1, U>, readonly fn: (value: T1) => value is T2) {
+    super(batch)
+    this.child = batch.prime(child, this.signal)
   }
 
-  async _evaluate(time: number, epoch: Epoch) {
-    const value = await this.child.evaluate(time, epoch)
+  async _evaluate(time: number, receipt: Receipt) {
+    const value = await this.child.evaluate(time, receipt)
     if (this.fn(value)) return value
     throw new UnwrappedValue(value)
   }
 }
 
-class _CatchRune<T, U> extends _LinearRune<
+class _CatchRune<T, U> extends _Rune<
   T | Exclude<U, UnwrappedValue<any>>,
   U extends UnwrappedValue<infer X> ? X : never
 > {
   child
-  constructor(ctx: Context, child: Rune<T, U>) {
-    super(ctx)
-    this.child = ctx.prime(child, this.signal)
+  constructor(batch: Batch, child: Rune<T, U>) {
+    super(batch)
+    this.child = batch.prime(child, this.signal)
   }
 
-  async _evaluate(time: number, epoch: Epoch) {
+  async _evaluate(time: number, receipt: Receipt) {
     try {
-      return await this.child.evaluate(time, epoch)
+      return await this.child.evaluate(time, receipt)
     } catch (e) {
       if (e instanceof UnwrappedValue) {
         if (e.value instanceof UnwrappedValue) {
@@ -311,16 +345,16 @@ class _CatchRune<T, U> extends _LinearRune<
   }
 }
 
-class _WrapURune<T, U> extends _LinearRune<T, UnwrappedValue<U>> {
+class _WrapURune<T, U> extends _Rune<T, UnwrappedValue<U>> {
   child
-  constructor(ctx: Context, child: Rune<T, U>) {
-    super(ctx)
-    this.child = ctx.prime(child, this.signal)
+  constructor(batch: Batch, child: Rune<T, U>) {
+    super(batch)
+    this.child = batch.prime(child, this.signal)
   }
 
-  async _evaluate(time: number, epoch: Epoch) {
+  async _evaluate(time: number, receipt: Receipt) {
     try {
-      return await this.child.evaluate(time, epoch)
+      return await this.child.evaluate(time, receipt)
     } catch (e) {
       if (e instanceof UnwrappedValue) {
         throw new UnwrappedValue(e)
@@ -332,31 +366,12 @@ class _WrapURune<T, U> extends _LinearRune<T, UnwrappedValue<U>> {
 
 class _LazyRune<T, U> extends _Rune<T, U> {
   child
-  constructor(ctx: Context, child: Rune<T, U>) {
-    super(ctx)
-    this.child = ctx.prime(child, this.signal)
+  constructor(batch: Batch, child: Rune<T, U>) {
+    super(batch)
+    this.child = batch.prime(child, this.signal)
   }
 
-  evaluate(time: number, epoch: Epoch): Promise<T> {
-    const _epoch = new Epoch(this.ctx.timeline)
-    const promise = this.child.evaluate(time, _epoch)
-    epoch.restrictMin(_epoch.min)
-    return promise
-  }
-}
-
-// TODO: abort rather than just filtering
-class _LatestRune<T, U> extends _Rune<T, U> {
-  child
-  constructor(ctx: Context, child: Rune<T, U>) {
-    super(ctx)
-    this.child = ctx.prime(child, this.signal)
-  }
-
-  evaluate(time: number, epoch: Epoch): Promise<T> {
-    const _epoch = new Epoch(this.ctx.timeline)
-    const promise = this.child.evaluate(time, _epoch)
-    epoch.restrictMaxTo(_epoch)
-    return promise
+  async _evaluate(time: number, _receipt: Receipt): Promise<T> {
+    return await this.child.evaluate(time, new Receipt())
   }
 }
