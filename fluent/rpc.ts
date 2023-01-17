@@ -1,10 +1,10 @@
 import * as rpc from "../rpc/mod.ts"
-import { _Rune, Args, Context, Rune } from "../rune/mod.ts"
-import { ClientRune } from "./fluent.ts"
+import { _Rune, _StreamRune, Args, Batch, Rune } from "../rune/mod.ts"
+import { ClientRune } from "./client.ts"
 
 class _RpcClientRune<DV, SED, HED, CED> extends _Rune<rpc.Client<DV, SED, HED, CED>, never> {
   constructor(
-    ctx: Context,
+    ctx: Batch,
     readonly provider: rpc.Provider<DV, SED, HED, CED>,
     readonly discoveryValue: DV,
   ) {
@@ -12,7 +12,7 @@ class _RpcClientRune<DV, SED, HED, CED> extends _Rune<rpc.Client<DV, SED, HED, C
   }
 
   client?: rpc.Client<DV, SED, HED, CED>
-  async evaluate(): Promise<rpc.Client<DV, SED, HED, CED>> {
+  async _evaluate(): Promise<rpc.Client<DV, SED, HED, CED>> {
     return this.client ??= new rpc.Client(this.provider, this.discoveryValue)
   }
 
@@ -54,10 +54,45 @@ export function rpcCall<Params extends unknown[], Result>(
   }
 }
 
-// TODO: why are leading type params unknown when `extends Z.$Client<any, SendErrorData, HandlerErrorData, CloseErrorData>`?
-export function rpcSubscription<Params extends unknown[], Event>() {
-  return (..._: any) => (..._: any) => {
-    throw new Error("unimplemented")
+class _RpcSubscriptionRune extends _StreamRune<rpc.ClientSubscriptionEvent<string, any, any, any>> {
+  constructor(
+    ctx: Batch,
+    client: rpc.Client,
+    params: unknown[],
+    subscribeMethod: string,
+    unsubscribeMethod: string,
+  ) {
+    super(ctx)
+    client.subscriptionFactory()(
+      subscribeMethod,
+      unsubscribeMethod,
+      params,
+      (value) => this.push(value),
+      this.signal,
+    )
+  }
+}
+
+export function rpcSubscription<Params extends unknown[], Result>() {
+  return (
+    subscribeMethod: string,
+    unsubscribeMethod: string,
+  ) => {
+    return <X>(...args: Args<X, [client: rpc.Client, ...params: Params]>) => {
+      return Rune.ls(args)
+        .pipe(([client, ...params]) =>
+          Rune.new(_RpcSubscriptionRune, client, params, subscribeMethod, unsubscribeMethod)
+        )
+        .flat()
+        .pipe((event) => {
+          if (event instanceof Error) {
+            return event
+          } else if (event.error) {
+            return new RpcServerError(event)
+          }
+          return event.params.result as Result
+        })
+    }
   }
 }
 

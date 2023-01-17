@@ -22,6 +22,8 @@ export function extrinsic(ctx: FrameCodegen, { callTy }: ExtrinsicInfo) {
     import * as codecs from "./codecs.ts"
     import type * as types from "./types/mod.ts"
 
-    export const extrinsic = C.extrinsic<typeof client, ${ctx.typeVisitor.visit(callTy!)}>(client);
+    // export const extrinsic = C.extrinsic<typeof client, ${
+    ctx.typeVisitor.visit(callTy!)
+  }>(client);
   `)
 }

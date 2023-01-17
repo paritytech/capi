@@ -1,21 +1,15 @@
 import * as C from "capi/mod.ts"
 
-import { Balances, extrinsic } from "westend_dev/mod.ts"
+import { Balances } from "westend_dev/mod.ts"
 
-const tx = extrinsic({
-  sender: C.alice.address,
-  call: Balances.transfer({
-    value: 12345n,
-    dest: C.bob.address,
-  }),
-}).signed(C.alice.sign)
-
-const finalizedIn = tx.watch(({ end }) => (status) => {
-  console.log(status)
-  if (typeof status !== "string" && status.finalized) {
-    return end(status.finalized)
-  }
-  return
+const tx = Balances.transfer({
+  value: 12345n,
+  dest: C.bob.address,
 })
+  .signed({ sender: C.alice })
+  .sent
+  .finalizedHash
+  .unwrapError()
 
-console.log(C.throwIfError(await C.events(tx, finalizedIn).run()))
+console.log(await tx.run())
+// 4a7ad70 (update usage of rune in capi)

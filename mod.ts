@@ -19,6 +19,7 @@ export {
   End,
   eve,
   ferdie,
+  getOrInit,
   type Hex,
   hex,
   type Listener,

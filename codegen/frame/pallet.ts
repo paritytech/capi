@@ -38,17 +38,29 @@ export function pallet(ctx: FrameCodegen, pallet: Pallet, callTySrc: string) {
       const typeName = ctx.typeVisitor.visit(ty)! + "." + type
       const [params, data]: [string, string] = call.fields.length
         ? call.fields[0]!.name
-          ? [`value: Omit<${typeName}, "type">`, `{ ...value, type: ${S.string(type)} }`]
-          : [
-            `${call.fields.length > 1 ? "..." : ""}value: ${typeName}["value"]`,
-            `{ ...value, type: ${S.string(type)} }`,
+          ? [
+            `value: C.Args<X, Omit<${typeName}, "type">>`,
+            `{ type: ${S.string(type)}, ...value }`,
           ]
-        : ["", isStringUnion ? S.string(type) : S.object(["type", S.string(type)])]
+          : call.fields.length > 1
+          ? [
+            `...value: Args<X, ${typeName}["value"]>`,
+            `{ type: ${S.string(type)}, value: C.Rune.ls(value) }`,
+          ]
+          : [
+            `...[value]: Args<X, [value: ${typeName}["value"]]>`,
+            `{ type: ${S.string(type)}, value }`,
+          ]
+        : [
+          "",
+          isStringUnion ? S.string(type) : `C.Rune.rec(${S.object(["type", S.string(type)])})`,
+        ]
       items.push(
         makeDocComment(call.docs)
-          + `export function ${type}(${params}): ${callTySrc} { return { type: ${
+          + `export function ${type}<X>(${params}): C.ExtrinsicRune<${callTySrc}, C.ArgsU<X>>`
+          + `{ return client.extrinsic(C.Rune.rec({ type: ${
             S.string(pallet.name)
-          }, value: ${data} } }`,
+          }, value: C.Rune.rec(${data}) })) }`,
       )
     }
   }
