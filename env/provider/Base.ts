@@ -9,11 +9,14 @@ export abstract class ProviderBase {
 }
 
 export interface ProviderTarget {
+  junctions: string[]
   pathInfo: PathInfo
   codegen(): U.PromiseOr<Codegen>
 }
 
 export abstract class ProviderRunBase<ProviderState> implements ProviderTarget {
+  abstract junctions: string[]
+
   constructor(readonly provider: ProviderState, readonly pathInfo: PathInfo) {}
 
   abstract codegen(this: PathInfo): U.PromiseOr<Codegen>

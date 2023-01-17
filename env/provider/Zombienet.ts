@@ -15,7 +15,7 @@ export class ZombienetProvider extends FrameProviderBase {
   zombienetPath
   additional
   bin
-  zombienets: Record<string, Network> = {}
+  zombienets: Record<string, Promise<Network>> = {}
 
   constructor({ zombienetPath, additional }: ZombienetProviderProps = {}) {
     super()
@@ -37,43 +37,44 @@ export class ZombienetProvider extends FrameProviderBase {
     return new ZombienetTarget(this, pathInfo)
   }
 
-  async zombienet(configPath: string): Promise<Network> {
+  zombienet(configPath: string): Promise<Network> {
     let net = this.zombienets[configPath]
     if (!net) {
       console.log(`Initializing zombienet with "${path.join(Deno.cwd(), configPath)}"`)
-      const tmpDir = Deno.makeTempDirSync({ prefix: `capi_zombienet_` })
-      const cmd: string[] = [this.bin, "-p", "native", "-d", tmpDir, "-f", "spawn", configPath]
-      if (this.additional) cmd.push(...this.additional)
-      try {
-        const process = Deno.run({
-          cmd,
-          stdout: "piped",
-          stderr: "piped",
-        })
-        this.env.signal.addEventListener("abort", async () => {
-          process.kill("SIGINT")
-          await process.status()
-          process.close()
-          await Deno.remove(tmpDir, { recursive: true })
-        })
-        // Deno.watchFs on `${networkFilesPath}/zombie.json` could be an alternative
-        const buffer = new Uint8Array(1024)
-        while (true) {
-          await process.stdout.read(buffer)
-          const text = new TextDecoder().decode(buffer)
-          if (text.includes("Network launched")) {
-            process.stdout.close()
-            net = JSON.parse(await Deno.readTextFile(`${tmpDir}/zombie.json`)) as Network
-            this.zombienets[configPath] = net
-            break
+      net = (async () => {
+        const tmpDir = await Deno.makeTempDir({ prefix: `capi_zombienet_` })
+        const cmd: string[] = [this.bin, "-p", "native", "-d", tmpDir, "-f", "spawn", configPath]
+        if (this.additional) cmd.push(...this.additional)
+        try {
+          const process = Deno.run({
+            cmd,
+            stdout: "piped",
+            stderr: "piped",
+          })
+          this.env.signal.addEventListener("abort", async () => {
+            process.kill("SIGINT")
+            await process.status()
+            process.close()
+            await Deno.remove(tmpDir, { recursive: true })
+          })
+          // Deno.watchFs on `${networkFilesPath}/zombie.json` could be an alternative
+          const buffer = new Uint8Array(1024)
+          while (true) {
+            await process.stdout.read(buffer)
+            const text = new TextDecoder().decode(buffer)
+            if (text.includes("Network launched")) {
+              process.stdout.close()
+              return JSON.parse(await Deno.readTextFile(`${tmpDir}/zombie.json`)) as Network
+            }
           }
+        } catch (_e) {
+          throw new Error( // TODO: auto installation prompt?
+            "The Zombienet CLI was not found. Please ensure Zombienet is installed and PATH is set for `zombienet`."
+              + ` For more information, visit the following link: "https://github.com/paritytech/zombienet".`,
+          )
         }
-      } catch (_e) {
-        throw new Error( // TODO: auto installation prompt?
-          "The Zombienet CLI was not found. Please ensure Zombienet is installed and PATH is set for `zombienet`."
-            + ` For more information, visit the following link: "https://github.com/paritytech/zombienet".`,
-        )
-      }
+      })()
+      this.zombienets[configPath] = net
     }
     return net
   }
@@ -84,6 +85,7 @@ export class ZombienetTarget extends FrameTargetBase<ZombienetProvider> {
   nodeName
   networkPending
   urlPending
+  junctions
 
   constructor(provider: ZombienetProvider, pathInfo: PathInfo) {
     super(provider, pathInfo)
@@ -94,6 +96,7 @@ export class ZombienetTarget extends FrameTargetBase<ZombienetProvider> {
     this.nodeName = nodeName
     const networkPending = this.provider.zombienet(this.configPath)
     this.networkPending = networkPending
+    this.junctions = this.configPath.split("/")
     this.urlPending = (async () => {
       const config = await networkPending
       const node = config.nodesByName[nodeName]
@@ -109,9 +112,9 @@ export class ZombienetTarget extends FrameTargetBase<ZombienetProvider> {
   async clientFile() {
     const clientFile = new File()
     clientFile.code = outdent`
-      import * as C from "../capi.ts"
+      import * as C from "./capi.ts"
 
-      export const client = new C.rpcClient(C.rpc.proxyProvider, "${await this.urlPending}")
+      export const client = C.rpcClient(C.rpc.proxyProvider, "${await this.urlPending}")
     `
     return clientFile
   }

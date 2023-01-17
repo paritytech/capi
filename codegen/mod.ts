@@ -1,4 +1,3 @@
-import * as path from "../deps/std/path.ts"
 import { Metadata } from "../frame_metadata/mod.ts"
 import { Ty } from "../scale_info/mod.ts"
 import { codecs } from "./codecs.ts"
@@ -9,23 +8,20 @@ import { typeVisitor } from "./typeVisitor.ts"
 
 export interface CodegenCtxProps {
   metadata: Metadata
-  capiUrl: URL
   clientFile: File
   rawClientFile?: File
 }
 
 export class Codegen {
   metadata
-  capiMod
   clientFile
 
   typeVisitor
   files = new Map<string, File>()
   typeFiles = new Map<string, TypeFile>()
 
-  constructor({ metadata, capiUrl, clientFile, rawClientFile }: CodegenCtxProps) {
+  constructor({ metadata, clientFile, rawClientFile }: CodegenCtxProps) {
     this.metadata = metadata
-    this.capiMod = capiUrl
     this.clientFile = clientFile
 
     this.typeVisitor = typeVisitor(this)
@@ -36,11 +32,6 @@ export class Codegen {
     }
 
     this.files.set("_/codecs.ts", codecs(this))
-
-    // TODO: deferred import formation system
-    const capiReexportFile = new File()
-    capiReexportFile.code = `export * from "../../../mod.ts"`
-    this.files.set("_/capi.ts", capiReexportFile)
 
     // TODO: deferred import formation system
     this.files.set("_/client.ts", clientFile)

@@ -15,9 +15,11 @@ export class WssProvider extends FrameProviderBase {
 
 export class WssTarget extends FrameTargetBase<WssProvider> {
   url
+  junctions
 
   constructor(provider: WssProvider, pathInfo: PathInfo) {
     super(provider, pathInfo)
+    this.junctions = pathInfo.target.split("/")
     this.url = `wss://${pathInfo.target}`
   }
 

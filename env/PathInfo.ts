@@ -18,12 +18,12 @@ export function parsePathInfo(src: string): PathInfo {
   let vCapiTail = src
   if (src[0] === "@") {
     const vCapiAndTail = U.splitFirst("/", src.slice(1))
-    if (!vCapiAndTail) throw new Error()
+    if (!vCapiAndTail) throw new Error("Failed to separate `vCapi` and tail")
     vCapi = vCapiAndTail[0]
     vCapiTail = vCapiAndTail[1]
   }
   const providerIdAndTail = U.splitFirst(":", vCapiTail)
-  if (!providerIdAndTail) throw new Error()
+  if (!providerIdAndTail) throw new Error("Failed to separate `providerId` from tail")
   const providerId = providerIdAndTail[0]
   const [, providerIdTail] = providerIdAndTail
   const targetAndTail = U.splitFirst("@", providerIdTail)
@@ -48,12 +48,14 @@ export function assertVRuntime(
   pathInfo: PathInfo,
   version?: string,
 ): asserts pathInfo is PathInfo & { vRuntime: string } {
-  if (!pathInfo.vRuntime) throw new Error()
-  if (version && version !== pathInfo.vRuntime) throw new Error()
+  if (!pathInfo.vRuntime) throw new Error("No `vRuntime` in `pathInfo`")
+  if (version && version !== pathInfo.vRuntime) {
+    throw new Error("`vRuntime` different from expected")
+  }
 }
 
 export function assertFilePath(
   pathInfo: PathInfo,
 ): asserts pathInfo is PathInfo & { filePath: string } {
-  if (!pathInfo.filePath) throw new Error()
+  if (!pathInfo.filePath) throw new Error("No `filePath` in `pathInfo`")
 }

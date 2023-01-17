@@ -2,8 +2,8 @@ import * as flags from "../deps/std/flags.ts"
 import { parsePathInfo, PathInfo } from "../env/mod.ts"
 
 export async function parseCommand(args: string[]): Promise<Command> {
-  const { help, serve: serve_, src, out, "--": cmd } = flags.parse(args, {
-    string: ["serve", "src", "out"],
+  const { help, serve: serve_, src, out, capi, "--": cmd } = flags.parse(args, {
+    string: ["serve", "src", "out", "capi"],
     boolean: ["help"],
     alias: {
       h: "help",
@@ -21,18 +21,19 @@ export async function parseCommand(args: string[]): Promise<Command> {
       await Deno.connect({ port })
       throw new Error(`Port ${port} already in use`)
     } catch (_e) {}
-    if (src || out) throw new Error("Cannot simultaneously `serve` and write flags")
+    if (src || out || capi) throw new Error("Cannot simultaneously `serve` and write flags")
     return {
       type: "serve",
       port,
       ...cmd.length ? { user: cmd } : {},
     }
   }
-  if (!(src && out)) throw new Error("Must specify both `src` and `out`")
+  if (!(src && out && capi)) throw new Error("Must specify `src`, `out` and `capi`")
   return {
     type: "write",
     pathInfo: parsePathInfo(src),
     out,
+    capi,
   }
 }
 
@@ -46,4 +47,5 @@ export interface WriteCommand {
   type: "write"
   pathInfo: PathInfo
   out: string
+  capi: string
 }

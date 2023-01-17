@@ -29,19 +29,18 @@ export abstract class FrameTargetBase<Provider extends FrameProviderBase>
             await client_.call<string>(client_.providerRef.nextId(), "system_version", []),
           )
           if (vRuntimeR.error) throw new Error(vRuntimeR.error.message)
-          assertVRuntime(pathInfo, `v${vRuntimeR.result.split("-")[0]}`)
+          // assertVRuntime(pathInfo, `v${vRuntimeR.result.split("-")[0]}`)
         }
         const metadataR = U.throwIfError(
           await client_.call<string>(client_.providerRef.nextId(), "state_getMetadata", []),
         )
         if (metadataR.error) throw new Error(metadataR.error.message)
         const metadata = fromPrefixedHex(metadataR.result)
-        const codegenCtx = new Codegen({
-          metadata,
-          capiUrl: new URL(import.meta.resolve("../../mod.ts")),
-          clientFile: await this.clientFile(),
-        })
-        return codegenCtx
+        const [clientFile, rawClientFile] = await Promise.all([
+          this.clientFile(),
+          this.rawClientFile(),
+        ])
+        return new Codegen({ metadata, clientFile, rawClientFile })
       })()
       provider.codegenCtxsPending[targetKey] = codegenCtxPending
     }

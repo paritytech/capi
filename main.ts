@@ -1,4 +1,5 @@
 import { parseCommand } from "./cli/mod.ts"
+import { File } from "./codegen/mod.ts"
 import * as fs from "./deps/std/fs.ts"
 import { serve } from "./deps/std/http/server.ts"
 import * as path from "./deps/std/path.ts"
@@ -41,12 +42,16 @@ switch (command.type) {
     break
   }
   case "write": {
-    const { pathInfo, out } = command
+    const { pathInfo, out, capi } = command
     const provider = env.providers[pathInfo.providerId]
     if (!provider) throw new Error()
     const target = provider.target(pathInfo)
     const codegen = await target.codegen()
+    const reexportFile = new File()
+    reexportFile.code = `export * from "${capi}"\n`
+    codegen.files.set("_/capi.ts", reexportFile)
     const pending: Promise<void>[] = []
+    await fs.emptyDir(out)
     for (const [filePath, file] of codegen) {
       const dest = path.join(out, filePath)
       pending.push((async () => {

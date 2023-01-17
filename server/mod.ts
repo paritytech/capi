@@ -1,3 +1,4 @@
+import { File } from "../codegen/mod.ts"
 import { Handler } from "../deps/std/http/server.ts"
 import { assertFilePath, assertVRuntime, Env, parsePathInfo } from "../env/mod.ts"
 import * as f from "./factories.ts"
@@ -12,17 +13,32 @@ export function handler(env: Env): Handler {
     }
     try {
       const pathInfo = parsePathInfo(path)
-      if (pathInfo.vCapi) throw new Error()
-      assertVRuntime(pathInfo)
-      assertFilePath(pathInfo)
+      if (pathInfo.vCapi) {
+        return f.fiveHundred(
+          req,
+          "The local Capi sever assumes the same version as itself. Another cannot be specified.",
+        )
+      }
+      try {
+        assertVRuntime(pathInfo)
+        assertFilePath(pathInfo)
+      } catch (e) {
+        return f.fiveHundred(req, (e as Error).message)
+      }
       const provider = env.providers[pathInfo.providerId]
       if (provider) {
-        const codegen = await provider.target(pathInfo).codegen()
+        const target = provider.target(pathInfo)
+        if (target.pathInfo.filePath === "_/capi.ts") {
+          return f.staticFile(req, new URL(import.meta.resolve("../mod.ts")))
+        }
+        const codegen = await target.codegen()
         const file = codegen.files.get(pathInfo.filePath)
         if (file) return f.code(req, pathInfo.filePath, file.code)
       }
       return f.fiveHundred(req, `Unsupported provider "${pathInfo.providerId}"`)
-    } catch (_e) {}
+    } catch (_e) {
+      console.log({ _e })
+    }
     for (const dir of staticDirs) {
       try {
         const url = new URL(path, dir)

@@ -57,11 +57,14 @@ export class PolkadotDevTarget extends FrameTargetBase<PolkadotDevProvider> {
   port
   url
   ready
+  junctions
 
   constructor(provider: PolkadotDevProvider, pathInfo: PathInfo) {
     super(provider, pathInfo)
-    assertDevRuntimeName(pathInfo.target)
-    this.port = this.provider.ensureDevNet(pathInfo.target)
+    const { target } = pathInfo
+    assertDevRuntimeName(target)
+    this.junctions = [target]
+    this.port = this.provider.ensureDevNet(target)
     this.url = `ws://localhost:${this.port}`
     this.ready = port.isReady(this.port)
   }
