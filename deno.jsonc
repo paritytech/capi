@@ -40,6 +40,6 @@
     "test": "deno run -A main.ts -- deno test -A -L=info --ignore=target --parallel",
     "test:update": "deno task test -- --update",
     "moderate": "deno run -A https://deno.land/x/moderate@0.0.5/mod.ts && dprint fmt",
-    "dev": "deno run -A --watch=deno.jsonc,docs/ main.ts"
+    "dev": "deno run -A --watch=deno.jsonc,docs/ main.ts --serve"
   }
 }

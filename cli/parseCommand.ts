@@ -14,6 +14,7 @@ export async function parseCommand(args: string[]): Promise<Command> {
     console.log(Deno.readTextFileSync(new URL(import.meta.resolve("./help.txt"))))
     Deno.exit()
   }
+
   const port = serve_ === "" ? 8000 : typeof serve_ === "string" ? parseInt(serve_) : undefined
   if (typeof port === "number") {
     try {
@@ -21,14 +22,13 @@ export async function parseCommand(args: string[]): Promise<Command> {
       throw new Error(`Port ${port} already in use`)
     } catch (_e) {}
     if (src || out) throw new Error("Cannot simultaneously `serve` and write flags")
-    if (src || out) throw new Error()
     return {
       type: "serve",
       port,
       ...cmd.length ? { user: cmd } : {},
     }
   }
-  if (!(src && out)) throw new Error()
+  if (!(src && out)) throw new Error("Must specify both `src` and `out`")
   return {
     type: "write",
     pathInfo: parsePathInfo(src),

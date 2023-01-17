@@ -34,4 +34,4 @@ export function handler(env: Env): Handler {
   }
 }
 
-const staticDirs = ["../../", "./static/"].map((p) => import.meta.resolve(p))
+const staticDirs = ["../", "./static/"].map((p) => import.meta.resolve(p))

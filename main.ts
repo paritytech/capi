@@ -36,6 +36,7 @@ switch (command.type) {
           stdout: "inherit",
         })
         .status()
+      env.abortController.abort()
     }
     break
   }
@@ -54,7 +55,6 @@ switch (command.type) {
       })())
     }
     await Promise.all(pending)
+    env.abortController.abort()
   }
 }
-
-env.abortController.abort()
