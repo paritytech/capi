@@ -46,11 +46,11 @@ export function extrinsic(ctx: Codegen) {
     ["address", getRawCodecPath(addressTy!)],
     ["signature", getRawCodecPath(signatureTy!)],
   )
-  file.code = outdent`
-    import { $ } from "./_/capi.ts"
-    import * as C from "./_/capi.ts"
-    import { client } from "./_/client.ts"
-    import * as codecs from "./_/codecs.ts"
+  file.codeRaw = outdent`
+    import { $ } from "./capi.ts"
+    import * as C from "./capi.ts"
+    import { client } from "./client/mod.ts"
+    import * as codecs from "./codecs.ts"
     import type * as types from "./types/mod.ts"
 
     // TODO: use this

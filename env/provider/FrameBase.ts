@@ -54,8 +54,8 @@ export function getClient(this: { url: string }) {
 
 export function getClientFile(this: { url: string }) {
   const file = new File()
-  file.code = outdent`
-    import * as C from "./capi.ts"
+  file.codeRaw = outdent`
+    import * as C from "../capi.ts"
 
     export const client = C.rpcClient(C.rpc.proxyProvider, "${this.url}")
   `
@@ -64,7 +64,7 @@ export function getClientFile(this: { url: string }) {
 
 export function getRawClientFile(this: { url: string }) {
   const file = new File()
-  file.code = outdent`
+  file.codeRaw = outdent`
     import * as C from "../capi.ts"
 
     export const client = new C.rpc.Client(C.rpc.proxyProvider, "${this.url}")

@@ -14,21 +14,23 @@ function importPath(from: string, to: string) {
 export function type(ctx: Codegen, path: string, filePath: string, typeFile: TypeFile) {
   const file = new File()
   if (path !== "types") {
-    file.code += `import type * as types from ${S.string(importPath(filePath, "types/mod.ts"))}\n`
+    file.codeRaw += `import type * as types from ${
+      S.string(importPath(filePath, "types/mod.ts"))
+    }\n`
   }
-  file.code += `import * as codecs from ${S.string(importPath(filePath, "_/codecs.ts"))}\n`
-  file.code += `import { $ } from ${S.string(importPath(filePath, "_/capi.ts"))}\n`
-  file.code += `import * as C from ${S.string(importPath(filePath, "_/capi.ts"))}\n`
-  file.code += "\n"
+  file.codeRaw += `import * as codecs from ${S.string(importPath(filePath, "codecs.ts"))}\n`
+  file.codeRaw += `import { $ } from ${S.string(importPath(filePath, "capi.ts"))}\n`
+  file.codeRaw += `import * as C from ${S.string(importPath(filePath, "capi.ts"))}\n`
+  file.codeRaw += "\n"
   for (const reexport of [...typeFile.reexports].sort()) {
     const otherFile = ctx.typeFiles.get(path + "/" + reexport)!
-    file.code += `export * as ${reexport} from "./${reexport}${otherFile.ext}"\n`
+    file.codeRaw += `export * as ${reexport} from "./${reexport}${otherFile.ext}"\n`
   }
-  file.code += "\n"
+  file.codeRaw += "\n"
   for (
     const [path, ty] of [...typeFile.types].sort((a, b) => a[0] > b[0] ? 1 : a[0] < b[0] ? -1 : 0)
   ) {
-    file.code += createTypeDecl(ctx, ctx.typeVisitor, path, ty) + "\n\n"
+    file.codeRaw += createTypeDecl(ctx, ctx.typeVisitor, path, ty) + "\n\n"
   }
   return file
 }

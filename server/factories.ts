@@ -22,6 +22,16 @@ export async function code(req: Request, path: string, src: string): Promise<Res
   })
 }
 
+export async function redirect(path: string): Promise<Response> {
+  if (path.startsWith("file://")) {
+    return await fetch(path)
+  }
+  return new Response(null, {
+    status: Status.Found,
+    headers: { Location: path },
+  })
+}
+
 export function fourOFour(req: Request): U.PromiseOr<Response> {
   if (acceptsHtml(req)) {
     return page(FourOFourPage({}))

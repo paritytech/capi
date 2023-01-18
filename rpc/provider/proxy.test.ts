@@ -1,4 +1,4 @@
-// import { client } from "http://localhost:8000/dev/westend@v0.9.36/_/client/raw.ts"
+// import { client } from "http://localhost:8000/dev/westend@v0.9.36/client/raw.ts"
 import * as A from "../../deps/std/testing/asserts.ts"
 import { proxyProvider } from "./proxy.ts"
 import { setup } from "./test_util.ts"

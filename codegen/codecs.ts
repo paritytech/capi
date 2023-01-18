@@ -9,10 +9,10 @@ export function codecs(ctx: Codegen) {
   const namespaceImports = new Set<string>()
 
   const file = new File()
-  file.code = outdent`
+  file.codeRaw = outdent`
     import { $ } from "./capi.ts"
     import * as C from "./capi.ts"
-    import type * as types from "../types/mod.ts"
+    import type * as types from "./types/mod.ts"
   `
 
   const visitor = new TyVisitor<string>(tys, {
@@ -132,7 +132,7 @@ export function codecs(ctx: Codegen) {
     visitor.visit(ty)
   }
 
-  file.code += `export const _all: $.AnyCodec[] = ${
+  file.codeRaw += `export const _all: $.AnyCodec[] = ${
     S.array(ctx.metadata.tys.map((ty) => `$${ty.id}`))
   }`
 
@@ -140,7 +140,7 @@ export function codecs(ctx: Codegen) {
 
   function addCodecDecl(ty: Ty, value: string) {
     if (ty.path.length > 1) namespaceImports.add(ty.path[0]!)
-    file.code += `export const $${ty.id}: $.Codec<${ctx.typeVisitor.visit(ty)}> = ${value}\n\n`
+    file.codeRaw += `export const $${ty.id}: $.Codec<${ctx.typeVisitor.visit(ty)}> = ${value}\n\n`
     return `$${ty.id}`
   }
 }

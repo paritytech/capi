@@ -111,7 +111,7 @@ export class ZombienetTarget extends FrameTargetBase<ZombienetProvider> {
 
   async clientFile() {
     const clientFile = new File()
-    clientFile.code = outdent`
+    clientFile.codeRaw = outdent`
       import * as C from "./capi.ts"
 
       export const client = C.rpcClient(C.rpc.proxyProvider, "${await this.urlPending}")
@@ -121,7 +121,7 @@ export class ZombienetTarget extends FrameTargetBase<ZombienetProvider> {
 
   async rawClientFile() {
     const file = new File()
-    file.code = outdent`
+    file.codeRaw = outdent`
       import * as C from "../capi.ts"
 
       export const client = new C.rpc.Client(C.rpc.proxyProvider, "${await this.urlPending}")

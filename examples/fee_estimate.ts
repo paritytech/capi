@@ -1,7 +1,7 @@
 import * as C from "../mod.ts"
 
-import * as Balances from "westend_dev/Balances.ts"
 import { extrinsic } from "westend_dev/extrinsic.ts"
+import { Balances } from "westend_dev/mod.ts"
 
 const tx = extrinsic({
   sender: C.alice.address,

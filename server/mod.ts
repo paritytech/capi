@@ -1,4 +1,3 @@
-import { File } from "../codegen/mod.ts"
 import { Handler } from "../deps/std/http/server.ts"
 import { assertFilePath, assertVRuntime, Env, parsePathInfo } from "../env/mod.ts"
 import * as f from "./factories.ts"
@@ -20,7 +19,7 @@ export function handler(env: Env): Handler {
         )
       }
       try {
-        assertVRuntime(pathInfo)
+        // assertVRuntime(pathInfo)
         assertFilePath(pathInfo)
       } catch (e) {
         return f.fiveHundred(req, (e as Error).message)
@@ -28,17 +27,15 @@ export function handler(env: Env): Handler {
       const provider = env.providers[pathInfo.providerId]
       if (provider) {
         const target = provider.target(pathInfo)
-        if (target.pathInfo.filePath === "_/capi.ts") {
-          return f.staticFile(req, new URL(import.meta.resolve("../mod.ts")))
+        if (target.pathInfo.filePath === "capi.ts") {
+          return f.redirect(new Array(target.junctions.length + 2).fill("../").join("") + "mod.ts")
         }
         const codegen = await target.codegen()
         const file = codegen.files.get(pathInfo.filePath)
-        if (file) return f.code(req, pathInfo.filePath, file.code)
+        if (file) return f.code(req, pathInfo.filePath, file.code(pathInfo.filePath))
       }
       return f.fiveHundred(req, `Unsupported provider "${pathInfo.providerId}"`)
-    } catch (_e) {
-      console.log({ _e })
-    }
+    } catch (_e) {}
     for (const dir of staticDirs) {
       try {
         const url = new URL(path, dir)

@@ -11,10 +11,10 @@ export function pallet(ctx: Codegen, pallet: Pallet) {
   const items = [
     outdent`
       import type * as types from "./types/mod.ts"
-      import * as codecs from "./_/codecs.ts"
-      import { $ } from "./_/capi.ts"
-      import * as C from "./_/capi.ts"
-      import { client } from "./_/client.ts"
+      import * as codecs from "./codecs.ts"
+      import { $ } from "./capi.ts"
+      import * as C from "./capi.ts"
+      import { client } from "./client/mod.ts"
     `,
   ]
   for (const entry of pallet.storage?.entries ?? []) {
@@ -68,6 +68,6 @@ export function pallet(ctx: Codegen, pallet: Pallet) {
     )
     constant.value
   }
-  file.code = items.join("\n\n")
+  file.codeRaw = items.join("\n\n")
   return file
 }

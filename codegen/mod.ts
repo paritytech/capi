@@ -1,3 +1,4 @@
+import { tsFormatter } from "../deps/dprint.ts"
 import { Metadata } from "../frame_metadata/mod.ts"
 import { Ty } from "../scale_info/mod.ts"
 import { codecs } from "./codecs.ts"
@@ -31,18 +32,27 @@ export class Codegen {
       this.files.set(filePath, type(this, path, filePath, typeFile))
     }
 
-    this.files.set("_/codecs.ts", codecs(this))
+    this.files.set("codecs.ts", codecs(this))
 
-    // TODO: deferred import formation system
-    this.files.set("_/client.ts", clientFile)
-    if (rawClientFile) this.files.set("_/client/raw.ts", rawClientFile)
+    this.files.set("client/mod.ts", clientFile)
+    if (rawClientFile) this.files.set("client/raw.ts", rawClientFile)
 
     this.files.set("extrinsic.ts", extrinsic(this))
 
+    let palletNamespaceExports = ""
     for (const p of this.metadata.pallets) {
       if (!p.calls && !p.constants.length && !p.storage?.entries.length) continue
       this.files.set(`${p.name}.ts`, pallet(this, p))
+      palletNamespaceExports += `export * as ${p.name} from "./${p.name}.ts"\n`
     }
+
+    const mod = new File()
+    mod.codeRaw = `
+      export * from "./client/mod.ts"
+
+      ${palletNamespaceExports}
+    `
+    this.files.set("mod.ts", mod)
   }
 
   [Symbol.iterator]() {
@@ -59,5 +69,9 @@ export class TypeFile {
 }
 
 export class File {
-  code = ""
+  codeRaw = ""
+
+  code(filePath: string): string {
+    return tsFormatter.formatText(filePath, this.codeRaw)
+  }
 }

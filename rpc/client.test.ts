@@ -1,4 +1,4 @@
-// import { client } from "http://localhost:8000/dev/polkadot@v0.9.36/_/client/raw.ts"
+// import { client } from "http://localhost:8000/dev/polkadot@v0.9.36/client/raw.ts"
 import * as A from "../deps/std/testing/asserts.ts"
 import * as U from "../util/mod.ts"
 import {
