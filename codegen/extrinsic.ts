@@ -1,19 +1,21 @@
-import { outdent } from "../deps/outdent.ts"
 import { Ty, TyVisitor } from "../scale_info/mod.ts"
 import { Codegen, File } from "./mod.ts"
 import { getRawCodecPath, S } from "./utils.ts"
 
-export function extrinsic(ctx: Codegen) {
-  const { tys, extrinsic } = ctx.metadata
-  const {
-    signature: signatureTy,
-    call: callTy,
-    address: addressTy,
-  } = Object.fromEntries(
-    extrinsic.ty.params.map((x) => [x.name.toLowerCase(), x.ty]),
+export function extrinsicInfo(ctx: Codegen): ExtrinsicInfo {
+  const { signature: signatureTy, call: callTy, address: addressTy } = Object.fromEntries(
+    ctx.metadata.extrinsic.ty.params.map((x) => [x.name.toLowerCase(), x.ty]),
   )
+  return { signatureTy, callTy, addressTy } as ExtrinsicInfo
+}
+export interface ExtrinsicInfo {
+  signatureTy: Ty
+  callTy: Ty
+  addressTy: Ty
+}
 
-  const isUnitVisitor = new TyVisitor<boolean>(tys, {
+export function extrinsic(ctx: Codegen, { callTy, addressTy, signatureTy }: ExtrinsicInfo) {
+  const isUnitVisitor = new TyVisitor<boolean>(ctx.metadata.tys, {
     unitStruct: () => true,
     wrapperStruct(_, inner) {
       return this.visit(inner)
@@ -35,18 +37,19 @@ export function extrinsic(ctx: Codegen) {
   })
 
   const file = new File()
+  const { version, signedExtensions } = ctx.metadata.extrinsic
   const fields = S.object(
-    ["version", `${extrinsic.version}`],
-    ["extras", getExtrasCodec(extrinsic.signedExtensions.map((x) => [x.ident, x.ty]))],
+    ["version", `${version}`],
+    ["extras", getExtrasCodec(signedExtensions.map((x) => [x.ident, x.ty]))],
     [
       "additional",
-      getExtrasCodec(extrinsic.signedExtensions.map((x) => [x.ident, x.additionalSigned])),
+      getExtrasCodec(signedExtensions.map((x) => [x.ident, x.additionalSigned])),
     ],
-    ["call", getRawCodecPath(callTy!)],
-    ["address", getRawCodecPath(addressTy!)],
-    ["signature", getRawCodecPath(signatureTy!)],
+    ["call", getRawCodecPath(callTy)],
+    ["address", getRawCodecPath(addressTy)],
+    ["signature", getRawCodecPath(signatureTy)],
   )
-  file.codeRaw = outdent`
+  file.codeRaw = `
     import { $ } from "./capi.ts"
     import * as C from "./capi.ts"
     import { client } from "./client/mod.ts"

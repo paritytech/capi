@@ -1,7 +1,7 @@
 import * as C from "../mod.ts"
 
-import { client as relayChainClient } from "http://localhost:8000/zombienet:examples/xcm_teleport_assets.toml/alice@v0.9.360/_/client.ts"
-import { client as parachainClient } from "http://localhost:8000/zombienet:examples/xcm_teleport_assets.toml/collator01@v0.9.360/_/client.ts"
+import { client as relayChainClient } from "http://localhost:8000/zombienet:examples/xcm_teleport_assets.toml/alice@v0.9.360/client/mod.ts"
+import { client as parachainClient } from "http://localhost:8000/zombienet:examples/xcm_teleport_assets.toml/collator01@v0.9.360/client/mod.ts"
 
 const teleportAssetsTx = C.extrinsic(relayChainClient)({
   sender: C.alice.address,

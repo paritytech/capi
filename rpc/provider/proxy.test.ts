@@ -1,9 +1,7 @@
-// import { client } from "http://localhost:8000/dev/westend@v0.9.36/client/raw.ts"
+import { client } from "http://localhost:8000/dev:westend@v0.9.36/client/raw.ts"
 import * as A from "../../deps/std/testing/asserts.ts"
 import { proxyProvider } from "./proxy.ts"
 import { setup } from "./test_util.ts"
-
-const client = null! as any
 
 Deno.test({
   name: "Proxy Provider",
@@ -11,7 +9,13 @@ Deno.test({
     await t.step({
       name: "send/listen",
       async fn() {
-        const [ref, message] = await setup(proxyProvider, client, "system_health", [])
+        console.log({ client })
+        const [ref, message] = await setup(
+          proxyProvider,
+          client.discoveryValue,
+          "system_health",
+          [],
+        )
         A.assertNotInstanceOf(message, Error)
         A.assertExists(message.result)
         A.assertNotInstanceOf(await ref.release(), Error)

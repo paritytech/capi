@@ -37,7 +37,7 @@
     "udd": "deno task star && deno run -A https://deno.land/x/udd@0.5.0/main.ts target/star.ts",
     "dnt": "deno run -A _tasks/dnt.ts",
     "star": "deno run -A -r _tasks/star.ts && deno run -A -r main.ts --serve -- deno cache -r --check target/star.ts",
-    "test": "deno run -A main.ts -- deno test -A -L=info --ignore=target --parallel",
+    "test": "deno run -A main.ts --serve -- deno test -A -L=info --ignore=target --parallel",
     "test:update": "deno task test -- --update",
     "moderate": "deno run -A https://deno.land/x/moderate@0.0.5/mod.ts && dprint fmt",
     "dev": "deno run -A --watch=deno.jsonc,docs/ main.ts --serve"

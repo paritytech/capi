@@ -1,4 +1,3 @@
-import { outdent } from "../deps/outdent.ts"
 import { Pallet } from "../frame_metadata/mod.ts"
 import { hex } from "../mod.ts"
 import { Ty, UnionTyDef } from "../scale_info/mod.ts"
@@ -6,10 +5,10 @@ import { normalizeCase } from "../util/case.ts"
 import { Codegen, File } from "./mod.ts"
 import { getRawCodecPath, makeDocComment, S } from "./utils.ts"
 
-export function pallet(ctx: Codegen, pallet: Pallet) {
+export function pallet(ctx: Codegen, pallet: Pallet, callTySrc: string) {
   const file = new File()
   const items = [
-    outdent`
+    `
       import type * as types from "./types/mod.ts"
       import * as codecs from "./codecs.ts"
       import { $ } from "./capi.ts"
@@ -36,6 +35,7 @@ export function pallet(ctx: Codegen, pallet: Pallet) {
     )
   }
   if (pallet.calls) {
+    // ctx.typeVisitor.visit(callTy!)
     const ty = pallet.calls as Ty & UnionTyDef
     const isStringUnion = ty.members.every((x) => !x.fields.length)
     for (const call of ty.members) {
@@ -51,7 +51,7 @@ export function pallet(ctx: Codegen, pallet: Pallet) {
         : ["", isStringUnion ? S.string(type) : S.object(["type", S.string(type)])]
       items.push(
         makeDocComment(call.docs)
-          + `export function ${type}(${params}) { return { type: ${
+          + `export function ${type}(${params}): ${callTySrc} { return { type: ${
             S.string(pallet.name)
           }, value: ${data} } }`,
       )

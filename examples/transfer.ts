@@ -1,7 +1,7 @@
 import * as C from "../mod.ts"
 
-import * as Balances from "westend_dev/Balances.ts"
 import { extrinsic } from "westend_dev/extrinsic.ts"
+import { Balances } from "westend_dev/mod.ts"
 
 const tx = extrinsic({
   sender: C.alice.address,
@@ -9,8 +9,7 @@ const tx = extrinsic({
     value: 12345n,
     dest: C.bob.address,
   }),
-})
-  .signed(C.alice.sign)
+}).signed(C.alice.sign)
 
 const finalizedIn = tx.watch(({ end }) => (status) => {
   console.log(status)

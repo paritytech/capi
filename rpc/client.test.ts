@@ -1,4 +1,4 @@
-// import { client } from "http://localhost:8000/dev/polkadot@v0.9.36/client/raw.ts"
+import { discoveryValue } from "http://localhost:8000/dev:polkadot@v0.9.36/client/raw.ts"
 import * as A from "../deps/std/testing/asserts.ts"
 import * as U from "../util/mod.ts"
 import {
@@ -10,13 +10,14 @@ import {
   ProviderHandlerError,
   ProviderListener,
   ProviderSendError,
+  proxyProvider,
 } from "./mod.ts"
-
-const client = null! as any
 
 Deno.test({
   name: "RPC Client",
   async fn(t) {
+    const client = new Client(proxyProvider, discoveryValue)
+
     await t.step({
       name: "call",
       sanitizeOps: false,
@@ -35,15 +36,12 @@ Deno.test({
       sanitizeResources: false,
       async fn() {
         const events: msg.NotificationMessage<"chain_subscribeAllHeads", known.Header>[] = []
-        // @ts-ignore
         const stoppedSubscriptionId = await client.subscriptionFactory<[], known.Header>()(
           "chain_subscribeAllHeads",
           "chain_unsubscribeAllHeads",
           [],
-          // @ts-ignore
           (ctx) => {
             let i = 0
-            // @ts-ignore
             return (e) => {
               A.assertNotInstanceOf(e, Error)
               A.assert(!e.error)

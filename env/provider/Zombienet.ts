@@ -1,5 +1,4 @@
 import { File } from "../../codegen/mod.ts"
-import { outdent } from "../../deps/outdent.ts"
 import * as path from "../../deps/std/path.ts"
 import { Network } from "../../deps/zombienet/orchestrator.ts"
 import { Client, proxyProvider } from "../../rpc/mod.ts"
@@ -40,7 +39,6 @@ export class ZombienetProvider extends FrameProviderBase {
   zombienet(configPath: string): Promise<Network> {
     let net = this.zombienets[configPath]
     if (!net) {
-      console.log(`Initializing zombienet with "${path.join(Deno.cwd(), configPath)}"`)
       net = (async () => {
         const tmpDir = await Deno.makeTempDir({ prefix: `capi_zombienet_` })
         const cmd: string[] = [this.bin, "-p", "native", "-d", tmpDir, "-f", "spawn", configPath]
@@ -100,7 +98,13 @@ export class ZombienetTarget extends FrameTargetBase<ZombienetProvider> {
     this.urlPending = (async () => {
       const config = await networkPending
       const node = config.nodesByName[nodeName]
-      if (!node) throw new Error()
+      if (!node) {
+        throw new Error(
+          `No such node named "${nodeName}" in zombienet. Available names are "${
+            Object.keys(config.nodesByName).join(",")
+          }".`,
+        )
+      }
       return node.wsUri
     })()
   }
@@ -111,8 +115,8 @@ export class ZombienetTarget extends FrameTargetBase<ZombienetProvider> {
 
   async clientFile() {
     const clientFile = new File()
-    clientFile.codeRaw = outdent`
-      import * as C from "./capi.ts"
+    clientFile.codeRaw = `
+      import * as C from "../capi.ts"
 
       export const client = C.rpcClient(C.rpc.proxyProvider, "${await this.urlPending}")
     `
@@ -121,7 +125,7 @@ export class ZombienetTarget extends FrameTargetBase<ZombienetProvider> {
 
   async rawClientFile() {
     const file = new File()
-    file.codeRaw = outdent`
+    file.codeRaw = `
       import * as C from "../capi.ts"
 
       export const client = new C.rpc.Client(C.rpc.proxyProvider, "${await this.urlPending}")

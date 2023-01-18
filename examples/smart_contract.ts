@@ -2,7 +2,7 @@
 
 import * as C from "../mod.ts"
 
-import { client } from "http://localhost:8000/zombienet:examples/smart_contract/zombienet.toml/collator01@v0.9.360/_/client/raw.ts"
+import { client } from "http://localhost:8000/zombienet:examples/smart_contract/zombienet.toml/collator01@v0.9.360/client/mod.ts"
 
 const salt = Uint8Array.from(Array.from([0, 0, 0, 0]), () => Math.floor(Math.random() * 16))
 
@@ -39,7 +39,7 @@ const finalizedIn = tx.watch(({ end }) => (status) => {
   }
   return
 })
-const contractAddress = U.throwIfError(
+const contractAddress = C.throwIfError(
   await C
     .events(tx, finalizedIn)
     .next((events) => {

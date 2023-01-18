@@ -1,6 +1,6 @@
 import * as C from "../mod.ts"
 
-import * as System from "polkadot_dev/System.ts"
+import { System } from "polkadot_dev/mod.ts"
 
 const root = System.Account.entry(C.alice.publicKey).read()
 

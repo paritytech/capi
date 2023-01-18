@@ -1,5 +1,4 @@
 import { Codegen, File } from "../../codegen/mod.ts"
-import { outdent } from "../../deps/outdent.ts"
 import { fromPrefixedHex } from "../../frame_metadata/mod.ts"
 import { Client, proxyProvider } from "../../rpc/mod.ts"
 import * as U from "../../util/mod.ts"
@@ -54,7 +53,7 @@ export function getClient(this: { url: string }) {
 
 export function getClientFile(this: { url: string }) {
   const file = new File()
-  file.codeRaw = outdent`
+  file.codeRaw = `
     import * as C from "../capi.ts"
 
     export const client = C.rpcClient(C.rpc.proxyProvider, "${this.url}")
@@ -64,10 +63,12 @@ export function getClientFile(this: { url: string }) {
 
 export function getRawClientFile(this: { url: string }) {
   const file = new File()
-  file.codeRaw = outdent`
+  file.codeRaw = `
     import * as C from "../capi.ts"
 
     export const client = new C.rpc.Client(C.rpc.proxyProvider, "${this.url}")
+
+    export const discoveryValue = "${this.url}"
   `
   return file
 }

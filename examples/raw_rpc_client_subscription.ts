@@ -1,4 +1,4 @@
-import { assertNotInstanceOf } from "../deps/std/testing/asserts.ts"
+import * as C from "../mod.ts"
 
 import { client } from "polkadot_dev/client/raw.ts"
 
@@ -9,7 +9,7 @@ const result = await client.subscriptionFactory()(
   (ctx) => {
     let i = 0
     return (e) => {
-      assertNotInstanceOf(e, Error)
+      C.throwIfError(e)
       console.log(e)
       if (i === 2) return ctx.end(true)
       i++

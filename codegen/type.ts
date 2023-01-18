@@ -1,4 +1,3 @@
-import { outdent } from "../deps/outdent.ts"
 import { posix as pathPosix } from "../deps/std/path.ts"
 import { Ty, TyVisitor, TyVisitorMethods } from "../scale_info/mod.ts"
 import { normalizeCase } from "../util/case.ts"
@@ -40,13 +39,13 @@ function createTypeDecl(ctx: Codegen, visitor: TyVisitor<string>, path: string, 
   const docs = makeDocComment(ty.docs)
 
   const fallback = (key: keyof TyVisitorMethods<string>) => (...args: any) => {
-    return outdent`
+    return `
       ${docs}
       export type ${name} = ${(visitor[key] as any)!(...args)}
     `
   }
 
-  const codec = ty.type === "Compact" ? "" : outdent`
+  const codec = ty.type === "Compact" ? "" : `
     export const $${name[0]!.toLowerCase()}${name.slice(1)}: $.Codec<${
     ty.type === "Primitive" ? name : path
   }> = codecs.$${ty.id}
@@ -54,7 +53,7 @@ function createTypeDecl(ctx: Codegen, visitor: TyVisitor<string>, path: string, 
 
   return codec + new TyVisitor<string>(ctx.metadata.tys, {
     unitStruct() {
-      return outdent`
+      return `
         ${docs}
         export type ${name} = null
         ${docs}
@@ -62,7 +61,7 @@ function createTypeDecl(ctx: Codegen, visitor: TyVisitor<string>, path: string, 
       `
     },
     wrapperStruct(ty, inner) {
-      return outdent`
+      return `
         ${docs}
         export type ${name} = ${visitor.wrapperStruct(ty, inner)}
         ${docs}
@@ -70,7 +69,7 @@ function createTypeDecl(ctx: Codegen, visitor: TyVisitor<string>, path: string, 
       `
     },
     tupleStruct(ty, members) {
-      return outdent`
+      return `
         ${docs}
         export type ${name} = ${visitor.tupleStruct(ty, members)}
         ${docs}
@@ -78,7 +77,7 @@ function createTypeDecl(ctx: Codegen, visitor: TyVisitor<string>, path: string, 
       `
     },
     objectStruct(ty) {
-      return outdent`
+      return `
         ${docs}
         export interface ${name} ${visitor.objectStruct(ty)}
         ${docs}
@@ -135,7 +134,7 @@ function createTypeDecl(ctx: Codegen, visitor: TyVisitor<string>, path: string, 
         )
         union.push(`| ${memberPath}`)
       }
-      return outdent`
+      return `
         ${docs}
         export type ${name} = ${union.join(" ")}
         export namespace ${name} { ${
