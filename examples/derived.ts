@@ -1,8 +1,7 @@
-import * as C from "http://localhost:5646/@local/mod.ts"
-import { Rune } from "http://localhost:5646/@local/rune/rune.ts"
+import { ArrayRune, polkadot, Rune } from "http://localhost:5646/@local/mod.ts"
 
-const Paras = C.polkadot.metadata().pallet("Paras")
-const ids = Paras.storage("Parachains").entry([]).as<number[]>()
+const Paras = polkadot.metadata().pallet("Paras")
+const ids = Paras.storage("Parachains").entry([]).unsafeAs<number[]>().as(ArrayRune)
 const root = ids.mapArray((id) => {
   return Paras.storage("Heads").entry(Rune.ls([id]))
 })

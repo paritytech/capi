@@ -1,5 +1,5 @@
 import { assertEquals } from "../deps/std/testing/asserts.ts"
-import { Id } from "./id.ts"
+import { Id } from "./Id.ts"
 
 const a = {}
 const b = {}

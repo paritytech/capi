@@ -1,7 +1,8 @@
 import { assertEquals } from "../deps/std/testing/asserts.ts"
 import { Clock } from "../util/clock.ts"
-import { Args } from "./args.ts"
-import { Rune } from "./rune.ts"
+import { MetaRune } from "./MetaRune.ts"
+import { Rune } from "./Rune.ts"
+import { RunicArgs } from "./RunicArgs.ts"
 
 Deno.test("constant", async () => {
   assertEquals(
@@ -16,7 +17,7 @@ Deno.test("pipe", async () => {
   assertEquals(
     await Rune
       .constant(1)
-      .pipe((x) => x + 1)
+      .map((x) => x + 1)
       .run(),
     2,
   )
@@ -24,7 +25,7 @@ Deno.test("pipe", async () => {
     await Rune
       .constant(new Error())
       .unwrapError()
-      .pipe(() => 123)
+      .map(() => 123)
       .catch()
       .run(),
     new Error(),
@@ -41,7 +42,7 @@ Deno.test("stream", async () => {
   assertEquals(await count.run(), 1)
   assertEquals(await _collect(count.watch()), [1, 2, 3])
   assertEquals(await count.collect().run(), [1, 2, 3])
-  assertEquals(await count.pipe((x) => x + "").collect().run(), ["1", "2", "3"])
+  assertEquals(await count.map((x) => x + "").collect().run(), ["1", "2", "3"])
 
   async function _collect<T>(iter: AsyncIterable<T>) {
     const values = []
@@ -52,11 +53,11 @@ Deno.test("stream", async () => {
   }
 })
 
-const add = <X>(...[a, b]: Args<X, [a: number, b: number]>) => {
-  return Rune.ls([a, b]).pipe(([a, b]) => a + b)
+const add = <X>(...[a, b]: RunicArgs<X, [a: number, b: number]>) => {
+  return Rune.ls([a, b]).map(([a, b]) => a + b)
 }
 
-const sum = <X>(...[...args]: Args<X, number[]>) => {
+const sum = <X>(...[...args]: RunicArgs<X, number[]>) => {
   return Rune.resolve(args.reduce(add, 0))
 }
 
@@ -75,7 +76,7 @@ Deno.test("add", async () => {
     [11, 12, 13],
   )
   assertEquals(
-    await add(count, count.pipe((x) => x * 10)).collect().run(),
+    await add(count, count.map((x) => x * 10)).collect().run(),
     [11, 22, 33],
   )
 })
@@ -87,9 +88,9 @@ Deno.test("sum", async () => {
 })
 
 const divide = <X>(
-  { numerator, denominator }: Args<X, { numerator: number; denominator: number }>,
+  { numerator, denominator }: RunicArgs<X, { numerator: number; denominator: number }>,
 ) => {
-  return Rune.ls([numerator, denominator]).pipe(
+  return Rune.ls([numerator, denominator]).map(
     ([numerator, denominator]) => numerator / denominator,
   )
 }
@@ -130,27 +131,27 @@ Deno.test("multi stream", async () => {
   // d:  *                 *        11 12             *  23                      *  44
   // e:  *                             11    *  22             *  33    *  43
   assertEquals(
-    await a.pipe((v) => [clock.time, v]).collect().run(),
+    await a.map((v) => [clock.time, v]).collect().run(),
     [[1, 1], [2, 2], [5, 3], [8, 4]],
   )
   clock.reset()
   assertEquals(
-    await b.pipe((v) => [clock.time, v]).collect().run(),
+    await b.map((v) => [clock.time, v]).collect().run(),
     [[3, 10], [4, 20], [6, 30], [7, 40]],
   )
   clock.reset()
   assertEquals(
-    await c.pipe((v) => [clock.time, v]).collect().run(),
+    await c.map((v) => [clock.time, v]).collect().run(),
     [[3, 11], [3, 12], [4, 22], [5, 23], [6, 33], [7, 43], [8, 44]],
   )
   clock.reset()
   assertEquals(
-    await d.pipe((v) => [clock.time, v]).collect().run(),
+    await d.map((v) => [clock.time, v]).collect().run(),
     [[3, 11], [3, 12], [5, 23], [8, 44]],
   )
   clock.reset()
   assertEquals(
-    await e.pipe((v) => [clock.time, v]).collect().run(),
+    await e.map((v) => [clock.time, v]).collect().run(),
     [[3, 11], [4, 22], [6, 33], [7, 43]],
   )
   clock.reset()
@@ -164,7 +165,7 @@ Deno.test("multi stream 2", async () => {
     await clock.tick(3)
     yield 2
   })
-  const b = a.pipe(async (value) => {
+  const b = a.map(async (value) => {
     await clock.tick(clock.time + 3)
     return value
   })
@@ -178,63 +179,42 @@ Deno.test("multi stream 2", async () => {
   })
   const d = add(a, c)
   const e = add(b, c)
-  // const f = add(b, c.latest())
-  // const g = add(b.latest(), c)
-  // const h = add(b.latest(), c.latest())
-  const i = add(b, c.lazy())
-  const j = add(b.lazy(), c)
-  const k = add(b.lazy(), c.lazy())
+  const f = add(b, c.lazy())
+  const g = add(b.lazy(), c)
+  const h = add(b.lazy(), c.lazy())
   // t: [  0  ]--[  1  ]--[  2  ]--[  3  ]--[  4  ]--[  5  ]--[  6  ]--[  7  ]--[  8  ]
   // a:  *            1             *   2
   // b:  *                          *            1                          2
   // c:  *                    10                      *  20                      *  30
   // d:  *                    11    *  12             *  22                      *  32
   // e:  *                          *           11    *                 12 22    *  32
-  // f:  *                          *           11    *                  ! 22    *  32
-  // g:  *                          *            !    *                 12 22    *  32
-  // h:  *                          *            !    *                  !  !    *  32
-  // i:  *                          *           11                         12
-  // j:  *                                      11    *                          22 32 (due to lazy, b is not triggered until 5, causing 2 to be pushed late at 8)
-  // k:  *                                      11
+  // f:  *                          *           11                         12
+  // g:  *                                      11    *                          22 32 (due to lazy, b is not triggered until 5, causing 2 to be pushed late at 8)
+  // h:  *                                      11
   assertEquals(
-    await d.pipe((v) => [clock.time, v]).collect().run(),
+    await d.map((v) => [clock.time, v]).collect().run(),
     [[2, 11], [3, 12], [5, 22], [8, 32]],
   )
   clock.reset()
   assertEquals(await e.collect().run(), [11, 12, 22, 32])
   clock.reset()
   assertEquals(
-    await e.pipe((v) => [clock.time, v]).collect().run(),
+    await e.map((v) => [clock.time, v]).collect().run(),
     [[4, 11], [7, 12], [7, 22], [8, 32]],
   )
   clock.reset()
-  // assertEquals(
-  //   await collect(f.pipe((v) => [clock.time, v]).collect().run(),
-  //   [[4, 11], [8, 32]],
-  // )
-  // clock.reset()
-  // assertEquals(
-  //   await collect(g.pipe((v) => [clock.time, v]).collect().run(),
-  //   [[7, 12], [7, 22], [8, 32]],
-  // )
-  // clock.reset()
-  // assertEquals(
-  //   await collect(h.pipe((v) => [clock.time, v]).collect().run(),
-  //   [[8, 32]],
-  // )
-  // clock.reset()
   assertEquals(
-    await i.pipe((v) => [clock.time, v]).collect().run(),
+    await f.map((v) => [clock.time, v]).collect().run(),
     [[4, 11], [7, 12]],
   )
   clock.reset()
   assertEquals(
-    await j.pipe((v) => [clock.time, v]).collect().run(),
+    await g.map((v) => [clock.time, v]).collect().run(),
     [[4, 11], [8, 22], [8, 32]],
   )
   clock.reset()
   assertEquals(
-    await k.pipe((v) => [clock.time, v]).collect().run(),
+    await h.map((v) => [clock.time, v]).collect().run(),
     [[4, 11]],
   )
   clock.reset()
@@ -250,7 +230,7 @@ Deno.test("derived stream", async () => {
     await clock.tick(7)
     yield 3
   })
-  const b = a.pipe((value) =>
+  const b = a.map((value) =>
     Rune.asyncIter(async function*() {
       const time = clock.time
       await clock.tick(time + 1)
@@ -260,9 +240,9 @@ Deno.test("derived stream", async () => {
       await clock.tick(time + 4)
       yield value
     })
-  ).flat()
+  ).as(MetaRune).flat()
   assertEquals(
-    await b.pipe((v) => [clock.time, v]).collect().run(),
+    await b.map((v) => [clock.time, v]).collect().run(),
     [[2, 1], [3, 1], [5, 2], [6, 2], [8, 3], [9, 3], [11, 3]],
   )
 })

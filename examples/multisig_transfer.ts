@@ -1,75 +1,69 @@
 import * as C from "capi/mod.ts"
 
-import { Balances, client, extrinsic, System } from "polkadot_dev/mod.ts"
+import { Balances, Multisig, System } from "polkadot_dev/mod.ts"
 
-const signatories = [C.alice, C.bob, C.charlie].map(({ publicKey }) => publicKey)
-const multisig = new C.fluent.Multisig(client, signatories, 2)
+// FIXME: remove this check once the Zones .bind(env) fix is merged
+const hostname = Deno.env.get("TEST_CTX_HOSTNAME")
+const portRaw = Deno.env.get("TEST_CTX_PORT")
+if (!hostname || !portRaw) {
+  throw new Error("Must be running inside a test ctx")
+}
+
+const signatories = [C.alice, C.bob, C.charlie].map((pair) => pair.publicKey)
+const THRESHOLD = 2
+const multisigAddress = C.multisigAddress(signatories, THRESHOLD)
 
 // Transfer initial balance (existential deposit) to multisig address
-const existentialDeposit = extrinsic({
-  sender: C.alice.address,
-  call: Balances.transfer({
-    value: 2_000_000_000_000n,
-    dest: C.MultiAddress.Id(multisig.address),
-  }),
-}).signed(C.alice.sign)
-
-// The proposal
-const call = Balances.transferKeepAlive({
-  dest: C.dave.address,
-  value: 1230000000000n,
+const existentialDeposit = Balances.transfer({
+  value: 2_000_000_000_000n,
+  dest: C.MultiAddress.Id(multisigAddress),
 })
+  .signed({ sender: C.alice })
+  .sent
+  .logEvents("Existential deposit:")
+  .finalizedHash
 
 // First approval root
-const proposalByAlice = multisig.ratify({
-  sender: C.alice.address,
-  call,
-}).signed(C.alice.sign)
+const proposal = createOrApproveMultisigProposal("Proposal", C.alice)
 
-// TODO: upon fixing effect sys, move timepoint retrieval into ratify
-// Get the proposal callHash
-const callHash = C.callHash(client)(call)
-// const callHash = multisig.proposals(1).access(0).access(1).as<Uint8Array>()
+// Get the key of the timepoint
+const key = Multisig.Multisigs.keyPage(1, [multisigAddress]).access(0)
 
-// Get the timepoint
-const maybeTimepoint = multisig.proposal(callHash).access("value").access("when")
+// Get the timepoint itself
+const maybeTimepoint = Multisig.Multisigs.entry(key).access("when")
 
-// Approve without executing the proposal
-const voteByBob = multisig.vote({
-  sender: C.bob.address,
-  callHash,
-  maybeTimepoint,
-}).signed(C.bob.sign)
-
-// Approve and execute the proposal
-const approvalByCharlie = multisig.ratify({
-  sender: C.charlie.address,
-  call,
-  maybeTimepoint,
-}).signed(C.charlie.sign)
+const approval = createOrApproveMultisigProposal("Approval", C.bob, maybeTimepoint)
 
 // check dave new balance
-const daveBalance = System.Account.entry(C.dave.publicKey).read()
+const daveBalance = System.Account.entry([C.dave.publicKey])
 
-// TODO: use common env
-C.throwIfError(await watchExtrinsic(existentialDeposit, "Existential deposit").run())
-C.throwIfError(await watchExtrinsic(proposalByAlice, "Proposal").run())
-console.log("Is proposed?", C.throwIfError(await multisig.isProposed(callHash).run()))
-C.throwIfError(await watchExtrinsic(voteByBob, "Vote").run())
-console.log(
-  "Existing approvals",
-  C.throwIfError(await multisig.proposal(callHash).access("value").access("approvals").run()),
-)
-C.throwIfError(await watchExtrinsic(approvalByCharlie, "Approval").run())
-console.log(C.throwIfError(await daveBalance.run()))
+await existentialDeposit.run()
+await proposal.run()
+await approval.run()
+console.log(await daveBalance.run())
 
-function watchExtrinsic(extrinsic: C.SignedExtrinsic, label: string) {
-  return extrinsic
-    .watch(({ end }) => (status) => {
-      console.log(`${label}:`, status)
-      if (C.rpc.known.TransactionStatus.isTerminal(status)) {
-        return end()
-      }
-      return
-    })
+function createOrApproveMultisigProposal<X>(
+  label: string,
+  sender: C.Sr25519,
+  ...[maybeTimepoint]: C.RunicArgs<X, [
+    maybeTimepoint?: { height: number; index: number },
+  ]>
+) {
+  const call = Balances.transferKeepAlive({
+    dest: C.dave.address,
+    value: 1230000000000n,
+  })
+  const maxWeight = call.feeEstimate().access("weight")
+  return Multisig.asMulti({
+    threshold: THRESHOLD,
+    call,
+    otherSignatories: signatories.filter((value) => value !== sender.publicKey),
+    storeCall: false,
+    maxWeight,
+    maybeTimepoint,
+  })
+    .signed({ sender })
+    .sent
+    .logEvents(`${label}:`)
+    .finalizedHash
 }

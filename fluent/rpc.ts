@@ -1,8 +1,8 @@
 import * as rpc from "../rpc/mod.ts"
-import { _Rune, _StreamRune, Args, Batch, Rune } from "../rune/mod.ts"
+import { Batch, MetaRune, Run, Rune, RunicArgs, RunStream } from "../rune/mod.ts"
 import { ClientRune } from "./client.ts"
 
-class _RpcClientRune<DV, SED, HED, CED> extends _Rune<rpc.Client<DV, SED, HED, CED>, never> {
+class RunRpcClient<DV, SED, HED, CED> extends Run<rpc.Client<DV, SED, HED, CED>, never> {
   constructor(
     ctx: Batch,
     readonly provider: rpc.Provider<DV, SED, HED, CED>,
@@ -12,8 +12,8 @@ class _RpcClientRune<DV, SED, HED, CED> extends _Rune<rpc.Client<DV, SED, HED, C
   }
 
   client?: rpc.Client<DV, SED, HED, CED>
-  async _evaluate(): Promise<rpc.Client<DV, SED, HED, CED>> {
-    return this.client ??= new rpc.Client(this.provider, this.discoveryValue)
+  _evaluate(): Promise<rpc.Client<DV, SED, HED, CED>> {
+    return Promise.resolve(this.client ??= new rpc.Client(this.provider, this.discoveryValue))
   }
 
   override cleanup(): void {
@@ -31,16 +31,16 @@ export function rpcClient<
   provider: rpc.Provider<DiscoveryValue, SendErrorData, HandlerErrorData, CloseErrorData>,
   discoveryValue: DiscoveryValue,
 ) {
-  return Rune.new(_RpcClientRune, provider, discoveryValue).subclass(ClientRune)
+  return Rune.new(RunRpcClient, provider, discoveryValue).as(ClientRune)
 }
 
 export function rpcCall<Params extends unknown[], Result>(
   method: string,
   _nonIdempotent?: boolean,
 ) {
-  return <X>(...args: Args<X, [client: rpc.Client, ...params: Params]>) => {
+  return <X>(...args: RunicArgs<X, [client: rpc.Client, ...params: Params]>) => {
     return Rune.ls(args)
-      .pipe(async ([client, ...params]) => {
+      .map(async ([client, ...params]) => {
         // TODO: why do we need to explicitly type this / why is this not being inferred?
         const id = client.providerRef.nextId()
         const result = await client.call<Result>(id, method, params)
@@ -54,7 +54,7 @@ export function rpcCall<Params extends unknown[], Result>(
   }
 }
 
-class _RpcSubscriptionRune extends _StreamRune<rpc.ClientSubscriptionEvent<string, any, any, any>> {
+class RunRpcSubscription extends RunStream<rpc.ClientSubscriptionEvent<string, any, any, any>> {
   constructor(
     ctx: Batch,
     client: rpc.Client,
@@ -78,13 +78,14 @@ export function rpcSubscription<Params extends unknown[], Result>() {
     subscribeMethod: string,
     unsubscribeMethod: string,
   ) => {
-    return <X>(...args: Args<X, [client: rpc.Client, ...params: Params]>) => {
+    return <X>(...args: RunicArgs<X, [client: rpc.Client, ...params: Params]>) => {
       return Rune.ls(args)
-        .pipe(([client, ...params]) =>
-          Rune.new(_RpcSubscriptionRune, client, params, subscribeMethod, unsubscribeMethod)
+        .map(([client, ...params]) =>
+          Rune.new(RunRpcSubscription, client, params, subscribeMethod, unsubscribeMethod)
         )
+        .as(MetaRune)
         .flat()
-        .pipe((event) => {
+        .map((event) => {
           if (event instanceof Error) {
             return event
           } else if (event.error) {

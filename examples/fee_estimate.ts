@@ -1,13 +1,10 @@
-import * as C from "capi/mod.ts"
+import { bob } from "capi/mod.ts"
 
-import { Balances, extrinsic } from "westend_dev/mod.ts"
+import { Balances } from "westend_dev/mod.ts"
 
-const tx = extrinsic({
-  sender: C.alice.address,
-  call: Balances.transfer({
-    value: 12345n,
-    dest: C.bob.address,
-  }),
-}).feeEstimate
+const tx = Balances.transfer({
+  value: 12345n,
+  dest: bob.address,
+}).feeEstimate()
 
 console.log(await tx.run())

@@ -39,16 +39,16 @@ export function pallet(ctx: FrameCodegen, pallet: Pallet, callTySrc: string) {
       const [params, data]: [string, string] = call.fields.length
         ? call.fields[0]!.name
           ? [
-            `value: C.Args<X, Omit<${typeName}, "type">>`,
+            `value: C.RunicArgs<X, Omit<${typeName}, "type">>`,
             `{ type: ${S.string(type)}, ...value }`,
           ]
           : call.fields.length > 1
           ? [
-            `...value: Args<X, ${typeName}["value"]>`,
+            `...value: C.RunicArgs<X, ${typeName}["value"]>`,
             `{ type: ${S.string(type)}, value: C.Rune.ls(value) }`,
           ]
           : [
-            `...[value]: Args<X, [value: ${typeName}["value"]]>`,
+            `...[value]: C.RunicArgs<X, [value: ${typeName}["value"]]>`,
             `{ type: ${S.string(type)}, value }`,
           ]
         : [
@@ -57,7 +57,7 @@ export function pallet(ctx: FrameCodegen, pallet: Pallet, callTySrc: string) {
         ]
       items.push(
         makeDocComment(call.docs)
-          + `export function ${type}<X>(${params}): C.ExtrinsicRune<${callTySrc}, C.ArgsU<X>>`
+          + `export function ${type}<X>(${params}): C.ExtrinsicRune<${callTySrc}, C.RunicArgs.U<X>>`
           + `{ return client.extrinsic(C.Rune.rec({ type: ${
             S.string(pallet.name)
           }, value: C.Rune.rec(${data}) })) }`,

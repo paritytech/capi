@@ -1,5 +1,5 @@
 import * as M from "../frame_metadata/mod.ts"
-import { Args, Rune } from "../rune/mod.ts"
+import { Rune, RunicArgs } from "../rune/mod.ts"
 import { ConstRune } from "./const.ts"
 import { MetadataRune } from "./metadata.ts"
 import { StorageRune } from "./storage.ts"
@@ -9,19 +9,19 @@ export class PalletRune<out U> extends Rune<M.Pallet, U> {
     super(_prime)
   }
 
-  storage<X>(...[storageName]: Args<X, [storageName: string]>) {
+  storage<X>(...[storageName]: RunicArgs<X, [storageName: string]>) {
     return Rune
       .ls([this.as(), storageName])
-      .pipe(([metadata, palletName]) => M.getStorage(metadata, palletName))
+      .map(([metadata, palletName]) => M.getStorage(metadata, palletName))
       .unwrapError()
-      .subclass(StorageRune, this)
+      .as(StorageRune, this)
   }
 
-  const<X>(...[constName]: Args<X, [constantName: string]>) {
+  const<X>(...[constName]: RunicArgs<X, [constantName: string]>) {
     return Rune
       .ls([this.as(), constName])
-      .pipe(([metadata, constName]) => M.getConst(metadata, constName))
+      .map(([metadata, constName]) => M.getConst(metadata, constName))
       .unwrapError()
-      .subclass(ConstRune, this)
+      .as(ConstRune, this)
   }
 }
