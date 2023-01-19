@@ -16,4 +16,5 @@ jobs:
       - uses: denoland/setup-deno@9db7f66e8e16b5699a514448ce994936c63f0d54 # v1.1.0
         with:
           deno-version: v1.x
+      - run: npm install --prefix test_browser/puppeteer
       - run: deno task run:browser
