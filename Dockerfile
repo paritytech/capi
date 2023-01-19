@@ -1,10 +1,21 @@
-ARG DENO_VERSION=1.29.1
 
-FROM denoland/deno:${DENO_VERSION} as vscode
+ARG VARIANT=bullseye
+FROM --platform=linux/amd64 mcr.microsoft.com/devcontainers/base:0-${VARIANT} as vscode
 
+ARG DENO_VERSION=1.29.2
 ARG POLKADOT_VERSION=v0.9.36
 ARG POLKADOT_PARACHAIN_VERSION=v0.9.320
 ARG ZOMBIENET_VERSION=v1.3.18
+
+ENV DENO_INSTALL=/deno
+ENV DENO_INSTALL_ROOT=/usr/local
+
+RUN mkdir -p ${DENO_INSTALL} \
+    && curl -fsSL https://deno.land/x/install/install.sh | sh -s v${DENO_VERSION} \
+    && chown -R vscode /deno
+
+ENV PATH=${DENO_INSTALL}/bin:${PATH} \
+    DENO_DIR=/home/vscode/.cache/deno
 
 RUN export DEBIAN_FRONTEND=noninteractive \
   && apt-get update \
@@ -19,14 +30,6 @@ RUN export DEBIAN_FRONTEND=noninteractive \
   && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
   && apt-get install -y nodejs \
   && npm -g install cspell@latest \
-  && apt-get autoremove -y \
-  && apt-get clean -y \
-  && rm -rf /var/lib/apt/lists/*
-
-FROM vscode as dev
-RUN export DEBIAN_FRONTEND=noninteractive \
-  && apt-get update \
-  && apt-get install -y zsh \
   && apt-get autoremove -y \
   && apt-get clean -y \
   && rm -rf /var/lib/apt/lists/*
