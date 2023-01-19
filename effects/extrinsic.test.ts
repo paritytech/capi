@@ -72,8 +72,6 @@ Deno.test({
 })
 
 Deno.test({
-  // TODO update for new polkadot
-  ignore: true,
   name: "Democracy.propose",
   fn: async (ctx) => {
     await ctx.step("extrinsic events", async () => {

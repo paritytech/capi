@@ -9,7 +9,6 @@ Deno.test({
     await t.step({
       name: "send/listen",
       async fn() {
-        console.log({ client })
         const [ref, message] = await setup(
           proxyProvider,
           client.discoveryValue,
