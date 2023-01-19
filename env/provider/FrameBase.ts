@@ -2,7 +2,6 @@ import { Codegen, File } from "../../codegen/mod.ts"
 import { fromPrefixedHex } from "../../frame_metadata/mod.ts"
 import { Client, proxyProvider } from "../../rpc/mod.ts"
 import * as U from "../../util/mod.ts"
-import { assertVRuntime } from "../PathInfo.ts"
 import { ProviderBase, ProviderRunBase } from "./Base.ts"
 
 export abstract class FrameProviderBase extends ProviderBase {

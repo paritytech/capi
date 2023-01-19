@@ -1,5 +1,4 @@
 import { File } from "../../codegen/mod.ts"
-import * as path from "../../deps/std/path.ts"
 import { Network } from "../../deps/zombienet/orchestrator.ts"
 import { Client, proxyProvider } from "../../rpc/mod.ts"
 import { PathInfo } from "../PathInfo.ts"

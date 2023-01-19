@@ -1,5 +1,5 @@
 import { Handler } from "../deps/std/http/server.ts"
-import { assertFilePath, assertVRuntime, Env, parsePathInfo } from "../env/mod.ts"
+import { assertFilePath, Env, parsePathInfo } from "../env/mod.ts"
 import * as f from "./factories.ts"
 import { LandingPage } from "./pages/mod.ts"
 
