@@ -19,7 +19,7 @@ deno run -A https://deno.land/x/capi/main.ts
 Then, open your IDE and import pallet-corresponding modules from the local server.
 
 ```ts
-import * as System from "http://localhost:8000/wss/rpc.polkadot.io/System.ts"
+import { System } from "http://localhost:8000/frame/wss/rpc.polkadot.io/@<chain-version>/mod.ts"
 
 const key = System.Account.keys().first()
 
@@ -37,14 +37,14 @@ For simplicity, we recommend aliasing import specifiers via import maps.
 ```json
 {
   "imports": {
-    "#polkadot/": "http://localhost:8000/wss/rpc.polkadot.io/"
+    "#polkadot/": "http://localhost:8000/frame/wss/rpc.polkadot.io/@<chain-version>/"
   }
 }
 ```
 
 ```diff
-- import * as System from "http://localhost:8000/wss/rpc.polkadot.io/System.ts"
-+ import * as System from "#polkadot/System.ts"
+- import { System } from "http://localhost:8000/frame/wss/rpc.polkadot.io/@<chain-version>/mod.ts"
++ import { System } from "#polkadot/mod.ts"
 
 // ...
 ```

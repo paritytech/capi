@@ -1,6 +1,8 @@
 import * as C from "../mod.ts"
 
-const root = C.chain.subscribeNewHeads(C.polkadot)([], (ctx) => {
+import { client } from "polkadot/mod.ts"
+
+const root = C.chain.subscribeNewHeads(client)([], (ctx) => {
   let i = 0
   return (header) => {
     console.log(header)

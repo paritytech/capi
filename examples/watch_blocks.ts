@@ -1,8 +1,10 @@
 import * as C from "../mod.ts"
 
-const extrinsicsDecoded = C.extrinsicsDecoded(C.polkadot)
+import { client } from "polkadot/mod.ts"
 
-const root = C.blockWatch(C.polkadot)((ctx) => {
+const extrinsicsDecoded = C.extrinsicsDecoded(client)
+
+const root = C.blockWatch(client)((ctx) => {
   let i = 0
   return async ({ block }) => {
     const blockDecoded = await extrinsicsDecoded(block.extrinsics).bind(ctx.env)()

@@ -1,7 +1,6 @@
 import * as C from "../mod.ts"
 
-import { extrinsic } from "polkadot_dev/extrinsic.ts"
-import { Balances, client, System } from "polkadot_dev/mod.ts"
+import { Balances, client, extrinsic, System } from "polkadot_dev/mod.ts"
 
 const signatories = [C.alice, C.bob, C.charlie].map(({ publicKey }) => publicKey)
 const multisig = new C.fluent.Multisig(client, signatories, 2)

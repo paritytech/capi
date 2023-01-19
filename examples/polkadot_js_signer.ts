@@ -1,11 +1,11 @@
+import * as C from "capi/mod.ts"
 import { createTestPairs } from "https://deno.land/x/polkadot@0.0.8/keyring/mod.ts"
 import { TypeRegistry } from "https://deno.land/x/polkadot@0.0.8/types/mod.ts"
-import * as C from "../mod.ts"
 
-import { extrinsic } from "westend_dev/mod.ts"
+import { extrinsic } from "polkadot_dev/mod.ts"
 
 const root = extrinsic({
-  sender: C.dave.address,
+  sender: C.alice.address,
   call: {
     type: "Balances",
     value: {
@@ -25,6 +25,13 @@ const root = extrinsic({
           .sign(createTestPairs().dave!),
       )
     },
+  })
+  .watch((ctx) => (status) => {
+    console.log(status)
+    if (C.rpc.known.TransactionStatus.isTerminal(status)) {
+      return ctx.end()
+    }
+    return
   })
 
 C.throwIfError(await root.run())

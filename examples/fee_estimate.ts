@@ -1,7 +1,6 @@
 import * as C from "../mod.ts"
 
-import { extrinsic } from "westend_dev/extrinsic.ts"
-import { Balances } from "westend_dev/mod.ts"
+import { Balances, extrinsic } from "westend_dev/mod.ts"
 
 const tx = extrinsic({
   sender: C.alice.address,
@@ -9,7 +8,6 @@ const tx = extrinsic({
     value: 12345n,
     dest: C.bob.address,
   }),
-})
-  .feeEstimate
+}).feeEstimate
 
 console.log(await tx.run())

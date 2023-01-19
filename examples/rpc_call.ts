@@ -1,5 +1,7 @@
 import * as C from "../mod.ts"
 
-const root = C.rpcCall<[], string[]>("rpc_methods")(C.polkadot)()
+import { client } from "polkadot/mod.ts"
+
+const root = C.rpcCall<[], string[]>("rpc_methods")(client)()
 
 console.log(C.throwIfError(await root.run()))

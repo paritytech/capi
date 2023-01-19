@@ -14,20 +14,16 @@ Let's cover how to learn about a chain's types/properties.
 
 Every FRAME chain exposes metadata about its types and capabilities. This metadata is called the "FRAME Metadata." Let's retrieve and inspect it.
 
-As always, our first step is to bring Capi into scope.
-
 ```ts
-import * as C from "https://deno.land/x/capi/mod.ts"
+import { client } from "http://localhost:8000/frame/wss/rpc.polkadot.io/@v0.9.36/mod.ts"
 ```
 
-As an example, let's connect to Polkadot and fetch the chain's metadata for the present highest block.
+> To run the Capi dev server, run `deno run -A https://deno.land/x/capi/main.ts`
+
+Let's connect to Polkadot and fetch the chain's metadata for the present highest block.
 
 ```ts
-const client = C.rpcClient(C.rpc.smoldotProvider, {
-  chainSpec: {
-    relay: POLKADOT_CHAIN_SPEC,
-  },
-})
+// ...
 
 const metadata = await C.metadata(client)()
 
@@ -128,11 +124,11 @@ Let's now utilize our `accountId32` definition to read a balance.
 ```ts
 // ...
 
-const key = C.keyPageRead(C.polkadot)("System", "Account", 1, [])
+const key = C.keyPageRead(client)("System", "Account", 1, [])
   .access(0)
   .access(0)
 
-const account = C.entryRead(C.polkadot)("System", "Account", [key])
+const account = C.entryRead(client)("System", "Account", [key])
 
 const account = await account.run()
 ```
@@ -258,7 +254,7 @@ What happens if we ever specify an invalid value to an untyped effect? Capi will
 For instance, the aforementioned system accounts map is keyed with a `Uint8Array`. What happens if we try to key into it with `"HELLO T6"`?
 
 ```ts
-const account = C.entryRead(C.polkadot)("System", "Account", ["HELLO T6"])
+const account = C.entryRead(client)("System", "Account", ["HELLO T6"])
 
 console.log(await account.run())
 ```
@@ -277,7 +273,7 @@ Let's look at the same example from before: reading some `AccountData`.
 ## Discriminating "Ok" from "Error"
 
 ```ts
-const result = await C.entryRead(C.polkadot)("System", "Account", [key]).run()
+const result = await C.entryRead(client)("System", "Account", [key]).run()
 ```
 
 In this storage read example, `result` is typed as the successfully-retrieved value (container) unioned with all possible errors.

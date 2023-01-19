@@ -1,9 +1,14 @@
 import * as C from "../mod.ts"
 
-import { client as relayChainClient } from "http://localhost:8000/zombienet:examples/xcm_teleport_assets.toml/alice@v0.9.360/client/mod.ts"
-import { client as parachainClient } from "http://localhost:8000/zombienet:examples/xcm_teleport_assets.toml/collator01@v0.9.360/client/mod.ts"
+import {
+  extrinsic as relayChainExtrinsic,
+} from "http://localhost:8000/zombienet:examples/xcm_teleport_assets.toml/alice@v0.9.360/mod.ts"
+import {
+  client as parachainClient,
+  System,
+} from "http://localhost:8000/zombienet:examples/xcm_teleport_assets.toml/collator01@v0.9.360/mod.ts"
 
-const teleportAssetsTx = C.extrinsic(relayChainClient)({
+const teleportAssetsTx = relayChainExtrinsic({
   sender: C.alice.address,
   call: {
     type: "XcmPallet",
@@ -77,10 +82,7 @@ const teleportAssetsTx = C.extrinsic(relayChainClient)({
   })
 
 const aliceParachainBalance = () =>
-  C.entryRead(parachainClient)("System", "Account", [C.alice.publicKey])
-    .access("value")
-    .access("data")
-    .access("free")
+  System.Account.entry(C.alice.publicKey).read().access("value").access("data").access("free")
 
 const watchForDownwardMessagesProcessed = C.entryWatch(parachainClient)(
   "System",

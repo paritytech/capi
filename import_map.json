@@ -5,8 +5,6 @@
     "kusama/": "http://localhost:8000/wss:kusama-rpc.polkadot.io@v0.9.36/",
     "kusama_dev/": "http://localhost:8000/dev:kusama@v0.9.36/",
     "westend/": "http://localhost:8000/wss:westend-rpc.polkadot.io@v0.9.36/",
-    "westend_dev/": "http://localhost:8000/dev:westend@v0.9.36/",
-    "rococo/": "http://localhost:8000/wss:rococo@v0.9.36/",
-    "rococo_dev/": "http://localhost:8000/dev:rococo@v0.9.36/"
+    "westend_dev/": "http://localhost:8000/dev:westend@v0.9.36/"
   }
 }

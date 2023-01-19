@@ -1,5 +1,5 @@
-import * as C from "../mod.ts"
+import { System } from "polkadot/mod.ts"
 
-const root = C.entryRead(C.polkadot)("System", "Events", [])
+const root = System.Events.entry().read()
 
-console.log(C.throwIfError(await root.run()))
+console.log(await root.run())

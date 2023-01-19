@@ -51,8 +51,8 @@ export class Codegen {
 
     const mod = new File()
     mod.codeRaw = `
+      export * from "./extrinsic.ts"
       export * from "./client/mod.ts"
-
       ${palletNamespaceExports}
     `
     this.files.set("mod.ts", mod)
