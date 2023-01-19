@@ -2,3 +2,4 @@
 .env
 benches.json
 target
+node_modules

@@ -29,7 +29,7 @@
   },
   "tasks": {
     "run": "deno run -A",
-    "run:browser": "deno task run test_util/ctx.ts -- deno task run _tasks/run_browser.ts",
+    "run:browser": "deno task run test_browser/gen_tests.ts && deno task run test_browser/test_browser.ts & node test_browser/puppeteer/puppeteer.js",
     "debug": "deno task run --inspect-brk",
     "udd": "deno task star && deno task run https://deno.land/x/udd@0.5.0/main.ts target/star.ts",
     "dnt": "deno task run _tasks/dnt.ts",

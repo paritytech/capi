@@ -1,0 +1,19 @@
+name: Browser Test
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+jobs:
+  browser_test:
+    name: Run Browser Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - uses: denoland/setup-deno@9db7f66e8e16b5699a514448ce994936c63f0d54 # v1.1.0
+        with:
+          deno-version: v1.x
+      - run: deno task run:browser

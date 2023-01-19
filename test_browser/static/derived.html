@@ -1,0 +1,17 @@
+<script type="module">
+  // TODO: Generates this file dynamically. Now mocked. (generateTestHTMLFiles())
+  import * as C from "./capi.js"
+
+  ;(async function browserTest() {
+    const root = C.entryRead(C.polkadot)("Paras", "Parachains", [])
+    .access("value")
+
+    const result = await root.run()
+
+    await fetch('http://localhost:8000/derived', {
+      method: "POST",
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(result)
+    })
+  })()
+</script>
