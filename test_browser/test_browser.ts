@@ -8,13 +8,13 @@ import EXPECTED_RESULTS from "./expected_results.ts"
 const handler = async (req: Request): Promise<Response> => {
   const isPOST = req.method === "POST"
   const pattern = new URLPattern({ pathname: "/:file_path" })
-  const file_path = pattern.exec(req.url)?.pathname.groups.file_path
-  const isAllTestsFinished = file_path === "end_of_tests"
+  const filePath = pattern.exec(req.url)?.pathname.groups.file_path
+  const isFinished = filePath === "end_of_tests"
 
-  if (isAllTestsFinished) Deno.exit(0)
+  if (isFinished) Deno.exit(0)
 
   if (isPOST) {
-    const testName = file_path
+    const testName = filePath
     const testResult = await req.text()
 
     try {
@@ -28,7 +28,7 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response()
   }
 
-  return await serveFile(req, `${STATIC_DIR}/${file_path}`)
+  return await serveFile(req, `${STATIC_DIR}/${filePath}`)
 }
 
 await serve(handler, { port: PORT })

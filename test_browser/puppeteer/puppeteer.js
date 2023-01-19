@@ -1,7 +1,6 @@
 const puppeteer = require('puppeteer')
 
 // TODO: Make Dynamic (generatePuppeteerJS())
-const TO_TESTS = ["derived", "derived2"]
 
 ;(async () => {
   const browser = await puppeteer.launch();
@@ -10,8 +9,8 @@ const TO_TESTS = ["derived", "derived2"]
   const testA = await browser.newPage();
   const testB = await browser.newPage();
 
-  await testA.goto(`http://localhost:8000/${TO_TESTS[0]}.html`);
-  await testB.goto(`http://localhost:8000/${TO_TESTS[1]}.html`);
+  await testA.goto(`http://localhost:8000/derived.html`);
+  await testB.goto(`http://localhost:8000/derived2.html`);
 
   // Timeout to fetch POST on test pages
   await new Promise(r => setTimeout(r, 7000));
@@ -19,7 +18,7 @@ const TO_TESTS = ["derived", "derived2"]
   try {
     await finishTests.goto('http://localhost:8000/end_of_tests');
   } catch (_err) {
-    console.log('All tests finished. Served closed.')
+    console.log('Server closed.')
   }
 
   await browser.close()
