@@ -38,5 +38,5 @@
     "vadimcn.vscode-lldb",
     "bungcip.better-toml"
   ],
-  "postCreateCommand": "deno task cache && deno task star"
+  "postCreateCommand": "deno task star"
 }
