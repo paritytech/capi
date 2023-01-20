@@ -7,10 +7,8 @@
 
     const result = { value: "Derived 2 test results" }
 
-    await fetch('http://localhost:8000/derived2', {
-      method: "POST",
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(result)
-    })
+    // console.info('derived2')
+    // Mock an error case
+    throw Error('Derived 2 test throws an error')
   })()
 </script>

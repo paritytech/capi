@@ -7,8 +7,6 @@ export * from "./contracts.ts"
 export * from "./framesystem.ts"
 export * from "./grandpa.ts"
 export * from "./mmr.ts"
-// BUG: https://github.com/paritytech/capi/issues/328#issuecomment-1382020099
-// export * from "./mod.ts"
 export * from "./offchain.ts"
 export * from "./payment.ts"
 export * as smoldot from "./smoldot.ts"
