@@ -217,3 +217,5 @@ sastan
 zombienets
 placehold
 backchannel
+multilocation
+multiasset

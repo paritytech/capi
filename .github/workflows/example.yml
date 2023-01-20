@@ -5,6 +5,7 @@ on:
       example_paths:
         type: string
         required: true
+        description: "Paths to examples"
   workflow_call:
     inputs:
       example_paths:
