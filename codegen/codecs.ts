@@ -1,5 +1,5 @@
 import { Ty, TyVisitor } from "../scale_info/mod.ts"
-import { normalizeCase } from "../util/case.ts"
+import { normalizeCase, normalizeKey } from "../util/case.ts"
 import { Codegen, File } from "./mod.ts"
 import { S } from "./utils.ts"
 
@@ -28,7 +28,7 @@ export function codecs(ctx: Codegen) {
       return addCodecDecl(
         ty,
         `$.object(${
-          ty.fields.map((x) => `$.field(${S.string(normalizeCase(x.name!))}, ${this.visit(x.ty)})`)
+          ty.fields.map((x) => `$.field(${S.string(normalizeKey(x.name!))}, ${this.visit(x.ty)})`)
             .join(", ")
         })`,
       )

@@ -37,6 +37,6 @@
     "streetsidesoftware.code-spell-checker",
     "vadimcn.vscode-lldb",
     "bungcip.better-toml"
-  ]
-  // "postCreateCommand": "deno task star"
+  ],
+  "postCreateCommand": "deno task star"
 }

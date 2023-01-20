@@ -1,10 +1,23 @@
 {
   "imports": {
-    "polkadot/": "http://localhost:8000/wss:rpc.polkadot.io@v0.9.36/",
-    "polkadot_dev/": "http://localhost:8000/dev:polkadot@v0.9.36/",
-    "kusama/": "http://localhost:8000/wss:kusama-rpc.polkadot.io@v0.9.36/",
-    "kusama_dev/": "http://localhost:8000/dev:kusama@v0.9.36/",
-    "westend/": "http://localhost:8000/wss:westend-rpc.polkadot.io@v0.9.36/",
-    "westend_dev/": "http://localhost:8000/dev:westend@v0.9.36/"
+    "polkadot/": "http://localhost:8000/frame/wss/rpc.polkadot.io/@v0.9.36/",
+    "polkadot_dev/": "http://localhost:8000/frame/dev/polkadot/@v0.9.36/",
+    "kusama/": "http://localhost:8000/frame/wss/kusama-rpc.polkadot.io/@v0.9.36/",
+    "kusama_dev/": "http://localhost:8000/frame/dev/kusama/@v0.9.36/",
+    "westend/": "http://localhost:8000/frame/wss/westend-rpc.polkadot.io/@v0.9.36/",
+    "westend_dev/": "http://localhost:8000/frame/dev/westend/@v0.9.36/",
+    "rococo/": "http://localhost:8000/frame/wss/rococo-contracts-rpc.polkadot.io/@v0.9.37/",
+    "rococo_contracts/": "http://localhost:8000/frame/wss/rococo-contracts-rpc.polkadot.io/@v0.9.36/",
+    "rococo_dev": "http://localhost:8000/frame/dev/rococo/@v0.9.36/",
+    "acala/": "http://localhost:8000/frame/wss/acala-polkadot.api.onfinality.io/public-ws/@v2.12.0/",
+    "moonbeam/": "http://localhost:8000/frame/wss/wss.api.moonbeam.network/@v0.28.1/",
+    "statemint": "http://localhost:8000/frame/wss/statemint-rpc.polkadot.io/@v0.9.36/",
+    "phala": "http://localhost:8000/frame/wss/api.phala.network/ws#/rpc/@v0.1.20/",
+    "subsocial": "http://localhost:8000/frame/para.subsocial.network"
+  },
+  "scopes": {
+    "examples/": {
+      "capi/mod.ts": "http://localhost:8000/mod.ts"
+    }
   }
 }

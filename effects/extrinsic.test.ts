@@ -130,10 +130,10 @@ function collectExtrinsicEvents<
 >(extrinsic: SignedExtrinsic<Client, Props, Sign>) {
   const events: rpc.known.TransactionStatus[] = []
   return extrinsic
-    .watch(({ end }) => (status) => {
+    .watch((ctx) => (status) => {
       events.push(status)
-      if (rpc.known.TransactionStatus.isTerminal(status)) {
-        return end()
+      if (typeof status !== "string" && status.finalized) {
+        return ctx.end()
       }
       return
     })

@@ -1,8 +1,11 @@
-import * as Z from "../deps/zones.ts"
-import * as C from "../mod.ts"
-import * as U from "../util/mod.ts"
+import { client as kusama } from "kusama/client/raw.ts"
+import { client as polkadot } from "polkadot/client/raw.ts"
+import { client as rococo } from "rococo/client/raw.ts"
+import { client as westend } from "westend/client/raw.ts"
 
-const names = Object.keys(C.knownClients)
+const knownClients = { kusama, polkadot, westend, rococo }
+
+const names = Object.keys(knownClients)
 const outDir = new URL("../frame_metadata/_downloaded", import.meta.url)
 try {
   Deno.removeSync(outDir, { recursive: true })
@@ -26,30 +29,19 @@ async function download(name: string) {
   )
 }
 `
+
 Deno.writeTextFileSync(modFilePath, modFileContents, { create: true })
 
-U.throwIfError(await Z.ls(...Object.entries(C.knownClients).map(download)).run())
-
-function download<Name extends Z.$<string>, Client extends Z.$<C.rpc.Client>>(
-  entry: [name: Name, client: Client],
-) {
-  return Z.ls(...entry).next(async ([name, client]) => {
-    try {
-      const metadataHex = U.throwIfError(await C.state.getMetadata(client)().run())
-      const outPath = new URL(`_downloaded/${name}.scale`, outDir)
-      console.log(`Downloading ${name} metadata to "${outPath}".`)
-      await Deno.writeTextFile(outPath, metadataHex)
-      return
-    } catch (cause) {
-      return new MetadataDownloadError(name, { cause })
-    }
-  })
+const pending: Promise<void>[] = []
+for (const [name, client] of Object.entries(knownClients)) {
+  pending.push((async () => {
+    const r = await client.call(name, "state_getMetadata", [])
+    if (r instanceof Error) throw r
+    if (r.error) throw new Error(r.error.message)
+    const outPath = new URL(`_downloaded/${name}.scale`, outDir)
+    console.log(`Downloading ${name} metadata to "${outPath}".`)
+    await Deno.writeTextFile(outPath, r.result)
+    await client.discard()
+  })())
 }
-
-class MetadataDownloadError extends Error {
-  override readonly name = "MetadataDownloadError"
-
-  constructor(readonly chainName: string, options: ErrorOptions) {
-    super(undefined, options)
-  }
-}
+await Promise.all(pending)

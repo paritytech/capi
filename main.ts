@@ -30,6 +30,9 @@ if (help) {
   Deno.exit()
 }
 
+const abortController = new AbortController()
+const { signal } = abortController
+
 const port = serve_ === "" ? 8000 : typeof serve_ === "string" ? parseInt(serve_) : undefined
 await (typeof port === "number" ? runServe : runWrite)()
 
@@ -39,14 +42,14 @@ async function runServe() {
     throw new Error(`Port ${port} already in use`)
   } catch (_e) {}
   if (src || out) throw new Error("Cannot simultaneously `serve` and write flags")
-  const env = new Env({
+  const env = new Env(signal, {
     dev: new PolkadotDevProvider(),
     zombienet: new ZombienetProvider(),
     wss: new WssProvider(),
   })
   serve(handler(env), {
     port,
-    signal: env.signal,
+    signal,
     onError(error) {
       throw error
     },
@@ -63,18 +66,22 @@ async function runServe() {
         stdout: "inherit",
       })
       .status()
-    env.abortController.abort()
+    abortController.abort()
+    Deno.exit() // TODO: why no implicit exit?
   }
 }
 
 async function runWrite() {
   if (!(src && out)) throw new Error("Must specify `src`, `out` and `capi`")
-  const env = new Env({
+  const env = new Env(signal, {
     dev: new PolkadotDevProvider(),
     zombienet: new ZombienetProvider(),
     wss: new WssProvider(),
   })
   const pathInfo = parsePathInfo(src)
+  if (!pathInfo) {
+    throw new Error("Could not parse src")
+  }
   const provider = env.providers[pathInfo.providerId]
   if (!provider) throw new Error()
   const target = provider.target(pathInfo)
@@ -93,5 +100,5 @@ async function runWrite() {
     })())
   }
   await Promise.all(pending)
-  env.abortController.abort()
+  abortController.abort()
 }

@@ -1,6 +1,8 @@
-import * as C from "../mod.ts"
+import * as C from "capi/mod.ts"
 
-const root = C.entryWatch(C.rococo)("System", "Events", [], (ctx) => {
+import { client } from "rococo/mod.ts"
+
+const root = C.entryWatch(client)("System", "Events", [], (ctx) => {
   let i = 0
   return (entry) => {
     console.log(entry)

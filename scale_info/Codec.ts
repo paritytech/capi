@@ -1,5 +1,5 @@
 import * as $ from "../deps/scale.ts"
-import { normalizeCase } from "../util/case.ts"
+import { normalizeCase, normalizeKey } from "../util/case.ts"
 import { $era } from "./overrides/mod.ts"
 import { Ty } from "./Ty.ts"
 import { TyVisitor } from "./TyVisitor.ts"
@@ -26,7 +26,7 @@ export function DeriveCodec(tys: Ty[]): DeriveCodec {
     },
     objectStruct(ty) {
       return $.object(
-        ...ty.fields.map((x) => $.field(normalizeCase(x.name!), this.visit(x.ty))),
+        ...ty.fields.map((x) => $.field(normalizeKey(x.name!), this.visit(x.ty))),
       )
     },
     option(_ty, some) {
@@ -44,7 +44,7 @@ export function DeriveCodec(tys: Ty[]): DeriveCodec {
     stringUnion(ty) {
       const members: Record<number, string> = {}
       for (const { index, name } of ty.members) {
-        members[index] = normalizeCase(name)
+        members[index] = normalizeKey(name)
       }
       return $.stringUnion(members)
     },
@@ -64,7 +64,7 @@ export function DeriveCodec(tys: Ty[]): DeriveCodec {
         } else {
           // Object variant
           const memberFields = fields.map((field) => {
-            return $.field(normalizeCase(field.name!), this.visit(field.ty))
+            return $.field(normalizeKey(field.name!), this.visit(field.ty))
           })
           member = $.variant(type, ...memberFields)
         }

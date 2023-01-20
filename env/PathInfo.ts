@@ -2,46 +2,53 @@ import * as U from "../util/mod.ts"
 
 export interface PathInfo {
   vCapi?: string
+  generatorId: string
   providerId: string
   target: string
   vRuntime?: string
   filePath?: string
-  targetKey: string
+  cacheKey: string
 }
 
-export function parsePathInfo(src: string): PathInfo {
-  let vCapi: string | undefined
-  let target: string
-  let vRuntime: string | undefined
-  let filePath: string | undefined
-  let targetKey: string
-  let vCapiTail = src
+export function parsePathInfo(src: string): PathInfo | undefined {
+  const tmp: Partial<PathInfo> = {}
+  const tails: [string, string?, string?] = [src]
   if (src[0] === "@") {
-    const vCapiAndTail = U.splitFirst("/", src.slice(1))
-    if (!vCapiAndTail) throw new Error("Failed to separate `vCapi` and tail")
-    vCapi = vCapiAndTail[0]
-    vCapiTail = vCapiAndTail[1]
+    const a = U.splitFirst("/", src.slice(1))
+    if (a) [tmp.vCapi, tails[0]] = a
+    else return
   }
-  const providerIdAndTail = U.splitFirst(":", vCapiTail)
-  if (!providerIdAndTail) throw new Error("Failed to separate `providerId` from tail")
-  const providerId = providerIdAndTail[0]
-  const [, providerIdTail] = providerIdAndTail
-  const targetAndTail = U.splitFirst("@", providerIdTail)
-  if (targetAndTail) {
-    target = targetAndTail[0]
-    const [, targetTail] = targetAndTail
-    const versionAndFilePath = U.splitFirst("/", targetTail)
-    if (versionAndFilePath) {
-      ;[vRuntime, filePath] = versionAndFilePath
-    } else {
-      vRuntime = targetTail
+  const b = U.splitFirst("/", tails[0])
+  if (b) {
+    ;[tmp.generatorId, tails[1]] = b
+    const c = U.splitFirst("/", tails[1])
+    if (c) {
+      ;[tmp.providerId, tails[2]] = c
+      const d = U.splitFirst("@", tails[2])
+      if (d) {
+        tmp.target = d[0].slice(0, d[0].length - 1)
+        const e = U.splitFirst("/", d[1])
+        if (e) {
+          ;[tmp.vRuntime, tmp.filePath] = e
+          tmp.cacheKey = tails[1].slice(0, tails[1].length - tmp.filePath.length - 1)
+        } else {
+          tmp.vRuntime = d[1]
+          tmp.cacheKey = tails[1]
+        }
+      } else {
+        tmp.target = tails[2]
+        tmp.cacheKey = tails[1]
+      }
     }
-  } else {
-    target = providerIdTail
   }
-  targetKey = `${providerId}:${target}`
-  if (vRuntime) targetKey += `@${vRuntime}`
-  return { vCapi, providerId, target, vRuntime, filePath, targetKey }
+  return isPathInfo(tmp) ? tmp : undefined
+}
+
+export function isPathInfo(inQuestion: object): inQuestion is PathInfo {
+  return !!("generatorId" in inQuestion && typeof inQuestion.generatorId === "string"
+    && "providerId" in inQuestion && typeof inQuestion.providerId === "string"
+    && "target" in inQuestion && typeof inQuestion.target === "string"
+    && "cacheKey" in inQuestion && typeof inQuestion.cacheKey === "string")
 }
 
 export function assertVRuntime(

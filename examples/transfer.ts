@@ -1,4 +1,4 @@
-import * as C from "../mod.ts"
+import * as C from "capi/mod.ts"
 
 import { Balances, extrinsic } from "westend_dev/mod.ts"
 
@@ -14,8 +14,6 @@ const finalizedIn = tx.watch(({ end }) => (status) => {
   console.log(status)
   if (typeof status !== "string" && status.finalized) {
     return end(status.finalized)
-  } else if (C.rpc.known.TransactionStatus.isTerminal(status)) {
-    return end(new NeverFinalized())
   }
   return
 })

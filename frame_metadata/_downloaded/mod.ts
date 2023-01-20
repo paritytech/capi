@@ -3,23 +3,15 @@ import * as U from "../../util/mod.ts"
 import { $metadata } from "../mod.ts"
 
 export const [
-  acala,
   kusama,
-  moonbeam,
   polkadot,
-  rococo,
-  statemint,
-  subsocial,
   westend,
+  rococo,
 ] = await Promise.all([
-  download("acala"),
   download("kusama"),
-  download("moonbeam"),
   download("polkadot"),
-  download("rococo"),
-  download("statemint"),
-  download("subsocial"),
   download("westend"),
+  download("rococo"),
 ])
 
 async function download(name: string) {

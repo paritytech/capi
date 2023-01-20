@@ -17,8 +17,8 @@ export abstract class FrameTargetBase<Provider extends FrameProviderBase>
 
   codegen() {
     const { provider, pathInfo } = this
-    const { targetKey } = pathInfo
-    let codegenCtxPending = provider.codegenCtxsPending[targetKey]
+    const { cacheKey } = pathInfo
+    let codegenCtxPending = provider.codegenCtxsPending[cacheKey]
     if (!codegenCtxPending) {
       codegenCtxPending = (async () => {
         const client_ = await this.client()
@@ -40,7 +40,7 @@ export abstract class FrameTargetBase<Provider extends FrameProviderBase>
         ])
         return new Codegen({ metadata, clientFile, rawClientFile })
       })()
-      provider.codegenCtxsPending[targetKey] = codegenCtxPending
+      provider.codegenCtxsPending[cacheKey] = codegenCtxPending
     }
     return codegenCtxPending
   }
