@@ -19,7 +19,3 @@ const finalizedIn = tx.watch(({ end }) => (status) => {
 })
 
 console.log(C.throwIfError(await C.events(tx, finalizedIn).run()))
-
-class NeverFinalized extends Error {
-  override readonly name = "NeverFinalizedError"
-}
