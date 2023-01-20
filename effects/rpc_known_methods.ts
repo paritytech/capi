@@ -31,6 +31,7 @@ export namespace chain {
   export const getBlockHash = rpcCall<[height?: known.ListOrValue<known.NumberOrHex>], U.HexHash>(
     "chain_getBlockHash",
   )
+  export const getHeader = rpcCall<[hash?: U.HexHash], known.Header>("chain_getHeader")
 }
 export namespace system {
   export const accountNextIndex = rpcCall<[accountId: known.AccountId], number>(
