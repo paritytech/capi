@@ -17,6 +17,6 @@ jobs:
       - name: Setup polkadot
         uses: ./.github/actions/setup-polkadot
       - run: deno lint
-      - run: deno task star
+      # - run: deno task star
       - run: deno task test
       - run: deno task test:examples

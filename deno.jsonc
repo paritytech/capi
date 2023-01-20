@@ -34,7 +34,7 @@
   "tasks": {
     "run:browser": "deno run -A test_util/ctx.ts -- deno run -A _tasks/run_browser.ts",
     "debug": "deno run -A --inspect-brk",
-    "udd": "deno task star && deno run -A https://deno.land/x/udd@0.5.0/main.ts target/star.ts",
+    // "udd": "deno task star && deno run -A https://deno.land/x/udd@0.5.0/main.ts target/star.ts",
     "dnt": "deno run -A _tasks/dnt.ts",
     "star": "deno run -A _tasks/star.ts && deno run -A main.ts --serve -- deno cache -r --check target/star.ts",
     "test": "deno run -A main.ts --serve -- deno test -A -r -L=info --ignore=target --parallel",
