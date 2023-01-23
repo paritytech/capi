@@ -20,7 +20,7 @@ jobs:
           path: |
             ~/.deno
             ~/.cache/deno
-          key: ${{ runner.os }}-deno-${{ hashFiles('lock.json', 'deps/**/*.ts') }}
+          key: ${{ runner.os }}-deno-${{ hashFiles('deps/**/*.ts') }}
       - name: Setup Polkadot
         uses: ./.github/actions/setup-binary
         with:
