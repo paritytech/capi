@@ -16,5 +16,5 @@ jobs:
       - uses: denoland/setup-deno@9db7f66e8e16b5699a514448ce994936c63f0d54 # v1.1.0
         with:
           deno-version: v1.x
-      - run: deno task test:browser:init
-      - run: deno task test:browser
+      - run: PUPPETEER_PRODUCT=chrome deno run -A --unstable https://deno.land/x/puppeteer@16.2.0/install.ts
+      - run: deno task test:browser examples/derived.ts
