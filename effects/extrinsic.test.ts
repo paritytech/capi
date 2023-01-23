@@ -1,12 +1,17 @@
 import * as A from "../deps/std/testing/asserts.ts"
 import * as T from "../test_util/mod.ts"
 import * as U from "../util/mod.ts"
+import { Sr25519 } from "../util/mod.ts"
 import { entryRead } from "./entryRead.ts"
 import { extrinsic } from "./extrinsic.ts"
+
+const EXISTENTIAL_DEPOSIT_AMOUNT = 10_000_000_000n
 
 Deno.test({
   name: "Balances.transfer",
   fn: async (ctx) => {
+    const kp = Sr25519.fromSeed(crypto.getRandomValues(new Uint8Array(32)))
+
     await ctx.step("extrinsic events", async () => {
       await assertExtrinsicStatusOrder({
         keypair: T.alice,
@@ -14,10 +19,10 @@ Deno.test({
           type: "Balances",
           value: {
             type: "transfer",
-            value: 12345n,
+            value: EXISTENTIAL_DEPOSIT_AMOUNT + 12345n,
             dest: {
               type: "Id",
-              value: T.bob.publicKey,
+              value: kp.publicKey,
             },
           },
         },
@@ -28,10 +33,10 @@ Deno.test({
     await ctx.step({
       name: "account balance updated",
       fn: async () => {
-        const state = await entryRead(T.westend)("System", "Account", [T.bob.publicKey]).run()
+        const state = await entryRead(T.westend)("System", "Account", [kp.publicKey]).run()
         A.assertObjectMatch(state, {
           value: {
-            data: { free: 10000000000012345n },
+            data: { free: EXISTENTIAL_DEPOSIT_AMOUNT + 12345n },
           },
         })
       },
