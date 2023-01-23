@@ -1,21 +1,21 @@
-name: Deno Deploy
-# Omitting pull requests here is intentional because it could be used as an
-# attack vector from an outside source
-on: push
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
-    steps:
-      - uses: actions/checkout@v3
-      - uses: denoland/setup-deno@9db7f66e8e16b5699a514448ce994936c63f0d54 # v1.1.0
-        with:
-          deno-version: v1.x
-      - run: deno task run _tasks/gen_deploy.ts
-      - name: Deploy to Deno Deploy
-        uses: denoland/deployctl@v1
-        with:
-          project: capi-dev
-          entrypoint: target/deploy.ts
+# name: Deno Deploy
+# # Omitting pull requests here is intentional because it could be used as an
+# # attack vector from an outside source
+# on: push
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+#     permissions:
+#       id-token: write
+#       contents: read
+#     steps:
+#       - uses: actions/checkout@v3
+#       - uses: denoland/setup-deno@9db7f66e8e16b5699a514448ce994936c63f0d54 # v1.1.0
+#         with:
+#           deno-version: v1.x
+#       - run: deno task run _tasks/gen_deploy.ts
+#       - name: Deploy to Deno Deploy
+#         uses: denoland/deployctl@v1
+#         with:
+#           project: capi-dev
+#           entrypoint: target/deploy.ts
