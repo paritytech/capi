@@ -44,7 +44,7 @@ async function runServe() {
   if (src || out) throw new Error("Cannot simultaneously `serve` and write flags")
   const env = new Env(signal, {
     dev: new PolkadotDevProvider(),
-    zombienet: new ZombienetProvider(),
+    zombienet: new ZombienetProvider({ zombienetPath: "zombienet" }),
     wss: new WssProvider(),
   })
   serve(handler(env), {
@@ -75,7 +75,7 @@ async function runWrite() {
   if (!(src && out)) throw new Error("Must specify `src`, `out` and `capi`")
   const env = new Env(signal, {
     dev: new PolkadotDevProvider(),
-    zombienet: new ZombienetProvider(),
+    zombienet: new ZombienetProvider({ zombienetPath: "zombienet" }),
     wss: new WssProvider(),
   })
   const pathInfo = parsePathInfo(src)

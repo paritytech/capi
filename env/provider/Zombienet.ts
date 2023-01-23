@@ -54,7 +54,7 @@ export class ZombienetProvider extends FrameProviderBase {
             process.close()
             await Deno.remove(tmpDir, { recursive: true })
           })
-          // Deno.watchFs on `${networkFilesPath}/zombie.json` could be an alternative
+          // TODO: utilize Deno.watchFs to observe `${networkFilesPath}/zombie.json`
           const buffer = new Uint8Array(1024)
           while (true) {
             await process.stdout.read(buffer)
