@@ -1,1 +1,1 @@
-export * from "https://deno.land/std@0.168.0/encoding/base58.ts"
+export * from "https://deno.land/std@0.173.0/encoding/base58.ts"
