@@ -35,7 +35,7 @@
     "dnt": "deno task run _tasks/dnt.ts",
     "star": "deno task run _tasks/star.ts && deno cache --check target/star.ts",
     "codegen": "deno task run cache.ts examples/mod.ts",
-    "test": "deno task run test_util/ctx.ts -- deno test -A -L=info --ignore=target --parallel",
+    "test": "deno task run test_util/ctx.ts -- deno test -A -L=info --ignore=target --parallel --quiet",
     "test:update": "deno task test -- -- --update",
     "bench": "deno bench -A",
     "moderate": "deno task run https://deno.land/x/moderate@0.0.5/mod.ts && dprint fmt"
