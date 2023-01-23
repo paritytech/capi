@@ -65,6 +65,7 @@ export class ZombienetProvider extends FrameProviderBase {
             }
           }
         } catch (_e) {
+          console.log({ _e, bin: this.bin })
           throw new Error( // TODO: auto installation prompt?
             "The Zombienet CLI was not found. Please ensure Zombienet is installed and PATH is set for `zombienet`."
               + ` For more information, visit the following link: "https://github.com/paritytech/zombienet".`,
