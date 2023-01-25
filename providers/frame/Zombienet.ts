@@ -34,35 +34,36 @@ export class ZombienetProvider extends FrameProvider {
       })()
   }
 
-  parseTarget({ target }: PathInfo) {
-    return U.splitLast("/", target)
+  parseTarget(target: string): [string, string] {
+    const lI = target.lastIndexOf("/")
+    if (lI === -1) throw new Error("Failed to parse zombienet target")
+    return [target.slice(0, lI), target.slice(lI + 1)]
   }
 
   cacheKey(pathInfo: PathInfo) {
-    const parsedTarget = this.parseTarget(pathInfo)
-    if (!parsedTarget) throw new Error("UH OH AS WELL")
-    return parsedTarget[0]
+    return this.parseTarget(pathInfo.target)[0]
   }
 
   url(pathInfo: PathInfo) {
-    const parsedTarget = this.parseTarget(pathInfo)
-    if (!parsedTarget) throw new Error("UH OH!")
-    const urlPendingsKey = parsedTarget.join("-")
-    let urlPending = this.urlPendings[urlPendingsKey]
+    const { target } = pathInfo
+    const parsed = this.parseTarget(target)
+    if (!parsed) throw new Error()
+    const [configPath, nodeName] = parsed
+    let urlPending = this.urlPendings[target]
     if (!urlPending) {
       urlPending = (async () => {
-        const network = await this.zombienet(parsedTarget[0])
-        const node = network.nodesByName[parsedTarget[1]]
+        const network = await this.zombienet(configPath)
+        const node = network.nodesByName[nodeName]
         if (!node) {
           throw new Error(
-            `No such node named "${parsedTarget[1]}" in zombienet. Available names are "${
+            `No such node named "${nodeName}" in zombienet. Available names are "${
               Object.keys(network.nodesByName).join(",")
             }".`,
           )
         }
         return node.wsUri
       })()
-      this.urlPendings[urlPendingsKey] = urlPending
+      this.urlPendings[target] = urlPending
     }
     return urlPending
   }
@@ -109,22 +110,26 @@ export class ZombienetProvider extends FrameProvider {
   }
 
   async client(pathInfo: PathInfo) {
-    return new Client(proxyProvider, await this.url(pathInfo))
+    const client = new Client(proxyProvider, await this.url(pathInfo))
+    this.env.signal.addEventListener("abort", client.discard)
+    return client
   }
 
   async clientFile(pathInfo: PathInfo) {
+    const url = await this.url(pathInfo)
     return new File(`
       import * as C from "../capi.ts"
 
-      export const client = C.rpcClient(C.rpc.proxyProvider, "${await this.url(pathInfo)}")
+      export const client = C.rpcClient(C.rpc.proxyProvider, "${url}")
     `)
   }
 
   async rawClientFile(pathInfo: PathInfo) {
+    const url = await this.url(pathInfo)
     return new File(`
       import * as C from "../capi.ts"
 
-      export const client = new C.rpc.Client(C.rpc.proxyProvider, "${await this.url(pathInfo)}")
+      export const client = new C.rpc.Client(C.rpc.proxyProvider, "${url}")
     `)
   }
 }

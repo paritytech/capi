@@ -12,25 +12,28 @@ export abstract class FrameProxyProvider extends FrameProvider {
   }
 
   async client(pathInfo: PathInfo) {
-    return new Client(proxyProvider, await this.url(pathInfo))
+    const client = new Client(proxyProvider, await this.url(pathInfo))
+    this.env.signal.addEventListener("abort", client.discard)
+    return client
   }
 
   async clientFile(pathInfo: PathInfo) {
+    const url = await this.url(pathInfo)
     return new File(`
       import * as C from "../capi.ts"
 
-      export const client = C.rpcClient(C.rpc.proxyProvider, "${await this.url(pathInfo)}")
+      export const client = C.rpcClient(C.rpc.proxyProvider, "${url}")
     `)
   }
 
   async rawClientFile(pathInfo: PathInfo) {
     const url = await this.url(pathInfo)
     return new File(`
-        import * as C from "../capi.ts"
+      import * as C from "../capi.ts"
 
-        export const client = new C.rpc.Client(C.rpc.proxyProvider, "${url}")
+      export const client = new C.rpc.Client(C.rpc.proxyProvider, "${url}")
 
-        export const discoveryValue = "${url}"
-      `)
+      export const discoveryValue = "${url}"
+    `)
   }
 }
