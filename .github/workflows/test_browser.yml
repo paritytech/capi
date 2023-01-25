@@ -17,4 +17,5 @@ jobs:
         with:
           deno-version: v1.x
       - run: PUPPETEER_PRODUCT=chrome deno run -A --unstable https://deno.land/x/puppeteer@16.2.0/install.ts
-      - run: deno task test:browser examples/derived.ts
+      # - run: deno task test:browser # TODO: uncomment when all tests in example folder fixed
+      - run: deno task test:browser examples/derived.ts examples/read_events.ts examples/read_era_rewards.ts

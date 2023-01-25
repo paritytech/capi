@@ -6,97 +6,110 @@ import puppeteer, { Page } from "https://deno.land/x/puppeteer@16.2.0/mod.ts"
 import * as path from "../deps/std/path.ts"
 
 // ------- Constants -------
-
 const DIR_NAME = path.dirname(path.fromFileUrl(import.meta.url))
 const STATIC_DIR = path.join(DIR_NAME, "../target/static")
+const TESTS_DIR = "examples"
 const PORT = +(Deno.env.get("PORT") ?? "8000")
-const TEST_PATH = Deno.args[0]!
-const TEST_NAME = pathToName(TEST_PATH)
 const ac = new AbortController()
 
-// ------- Run -------
-
-// TODO:
-// [✓] - deno task test:browser examples/derived.ts # one example
-// [ ] - deno task test:browser examples/derived.ts examples/derived.ts # two examples, parallel
-// [ ] - deno task test:browser # all examples, parallel
-
-await runGenerateTests()
+// ------- Main -------
 startServer()
-const { testError } = await runBrowserTests()
+const testResults = await runTests([...Deno.args])
 ac.abort()
-
-// CI
-if (testError) throw testError
-
-// ------- Generate -------
-
-async function runGenerateTests() {
-  await Deno.mkdir(STATIC_DIR, { recursive: true })
-  await Promise.all([bundleTestJs(), generateTestHtml()])
-}
-
-async function bundleTestJs() {
-  if (
-    !(await Deno.run({ cmd: ["deno", "bundle", TEST_PATH, `${STATIC_DIR}/${TEST_NAME}.js`] })
-      .status()).success
-  ) {
-    throw 0
-  }
-}
-
-async function generateTestHtml() {
-  await Deno.writeTextFile(
-    `${STATIC_DIR}/${TEST_NAME}.html`,
-    `<script type="module" src="${TEST_NAME}.js"></script>
-    `.trim(),
-  )
-}
+if (hasFailedTest(testResults)) throw new Error("Browser tests FAILED.")
 
 // ------- Server -------
-
 function startServer() {
   serve(function handler(req: Request): Promise<Response> {
     return serveDir(req, { fsRoot: STATIC_DIR })
   }, { port: PORT, signal: ac.signal })
 }
 
-// ------- Browser -------
+// ------- Run -------
+async function runTests(tests: string[]) {
+  // Run all tests
+  if (tests.length === 0) {
+    for await (const { isFile, name } of Deno.readDir(TESTS_DIR)) {
+      if (!isFile || !hasTsExtension(name) || name === "mod.ts") continue
+      tests.push(`${TESTS_DIR}/${name}`)
+    }
+  }
 
-async function runBrowserTests() {
+  const processTests = tests.map(async (testPath) => {
+    await runGenerateTests(testPath)
+    const { isError } = await runBrowserTests(testPath)
+    return isError
+  })
+
+  return await Promise.all(processTests)
+}
+
+// ------- Generate -------
+async function runGenerateTests(testPath: string) {
+  await Deno.mkdir(STATIC_DIR, { recursive: true })
+  await Promise.all([bundleTestJs(testPath), generateTestHtml(testPath)])
+}
+
+async function bundleTestJs(testPath: string) {
+  if (
+    !(await Deno.run({
+      cmd: ["deno", "bundle", testPath, `${STATIC_DIR}/${pathToName(testPath)}.js`],
+    })
+      .status()).success
+  ) {
+    throw Error("deno bundle error")
+  }
+}
+
+async function generateTestHtml(testPath: string) {
+  await Deno.writeTextFile(
+    `${STATIC_DIR}/${pathToName(testPath)}.html`,
+    `<script type="module" src="${pathToName(testPath)}.js"></script>
+    `.trim(),
+  )
+}
+
+// ------- Browser -------
+async function runBrowserTests(testPath: string) {
+  const testName = pathToName(testPath)
   const browser = await puppeteer.launch()
   const testCase = await browser.newPage()
+  await testCase.goto(`http://localhost:${PORT}/${testName}.html`)
 
-  await testCase.goto(`http://localhost:${PORT}/${TEST_NAME}.html`)
-
-  let testError = null
+  let isError = false
   try {
-    await checkTest(testCase)
-  } catch (err) {
-    testError = err
+    await checkTest(testCase, testName!)
+  } catch (_err) {
+    isError = true
   }
 
   await browser.close()
-
-  return { testError }
+  return { isError }
 }
 
-function checkTest(testPage: Page) {
+function checkTest(testPage: Page, testName: string) {
   return new Promise((resolve, reject) => {
     testPage.on("pageerror", function(err: Error) {
-      console.error(`test "${TEST_NAME}" ... FAILED`)
+      console.error(`test "${testName}" ... FAILED \n ${err.toString()}`)
       reject(err)
     })
 
     testPage.on("console", (msg: any) => {
-      if (msg.type() === "log") console.log(`test "${TEST_NAME}" ... ok`)
+      if (msg.type() === "log") console.log(`test "${testName}" ... ok`)
       resolve("ok")
     })
   })
 }
 
 // ------- Utils -------
+function pathToName(p: string) {
+  return p.split("/").at(-1)?.split(".")[0]
+}
 
-function pathToName(path: string) {
-  return path.split("/").at(-1)?.split(".")[0]
+function hasTsExtension(s: string) {
+  return s.endsWith("ts")
+}
+
+function hasFailedTest(t: boolean[]) {
+  return t.some((x) => x === true)
 }
