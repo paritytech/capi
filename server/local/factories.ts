@@ -1,8 +1,8 @@
-import { JSX } from "../deps/preact.ts"
-import { renderToString } from "../deps/preact_render_to_string.ts"
-import { serveFile } from "../deps/std/http/file_server.ts"
-import { Status } from "../deps/std/http/http_status.ts"
-import * as U from "../util/mod.ts"
+import { JSX } from "../../deps/preact.ts"
+import { renderToString } from "../../deps/preact_render_to_string.ts"
+import { serveFile } from "../../deps/std/http/file_server.ts"
+import { Status } from "../../deps/std/http/http_status.ts"
+import * as U from "../../util/mod.ts"
 import { CodePage, FiveHundredPage, FourOFourPage } from "./pages/mod.ts"
 
 export async function staticFile(req: Request, url: URL): Promise<Response> {

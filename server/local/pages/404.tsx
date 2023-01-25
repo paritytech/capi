@@ -1,4 +1,4 @@
-import { Fragment, h } from "../../deps/preact.ts"
+import { Fragment, h } from "../../../deps/preact.ts"
 
 export function FourOFourPage({ message }: {
   message?: string

@@ -1,17 +1,17 @@
 import * as U from "../util/mod.ts"
 
 export interface PathInfo {
+  src: string
   vCapi?: string
   generatorId: string
   providerId: string
   target: string
   vRuntime?: string
   filePath?: string
-  cacheKey: string
 }
 
 export function parsePathInfo(src: string): PathInfo | undefined {
-  const tmp: Partial<PathInfo> = {}
+  const tmp: Partial<PathInfo> = { src }
   const tails: [string, string?, string?] = [src]
   if (src[0] === "@") {
     const a = U.splitFirst("/", src.slice(1))
@@ -30,14 +30,11 @@ export function parsePathInfo(src: string): PathInfo | undefined {
         const e = U.splitFirst("/", d[1])
         if (e) {
           ;[tmp.vRuntime, tmp.filePath] = e
-          tmp.cacheKey = tails[1].slice(0, tails[1].length - tmp.filePath.length - 1)
         } else {
           tmp.vRuntime = d[1]
-          tmp.cacheKey = tails[1]
         }
       } else {
         tmp.target = tails[2]
-        tmp.cacheKey = tails[1]
       }
     }
   }
@@ -47,22 +44,5 @@ export function parsePathInfo(src: string): PathInfo | undefined {
 export function isPathInfo(inQuestion: object): inQuestion is PathInfo {
   return !!("generatorId" in inQuestion && typeof inQuestion.generatorId === "string"
     && "providerId" in inQuestion && typeof inQuestion.providerId === "string"
-    && "target" in inQuestion && typeof inQuestion.target === "string"
-    && "cacheKey" in inQuestion && typeof inQuestion.cacheKey === "string")
-}
-
-export function assertVRuntime(
-  pathInfo: PathInfo,
-  version?: string,
-): asserts pathInfo is PathInfo & { vRuntime: string } {
-  if (!pathInfo.vRuntime) throw new Error("No `vRuntime` in `pathInfo`")
-  if (version && version !== pathInfo.vRuntime) {
-    throw new Error("`vRuntime` different from expected")
-  }
-}
-
-export function assertFilePath(
-  pathInfo: PathInfo,
-): asserts pathInfo is PathInfo & { filePath: string } {
-  if (!pathInfo.filePath) throw new Error("No `filePath` in `pathInfo`")
+    && "target" in inQuestion && typeof inQuestion.target === "string")
 }

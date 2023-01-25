@@ -1,8 +1,9 @@
-import { Ty, TyVisitor } from "../scale_info/mod.ts"
-import { Codegen, File } from "./mod.ts"
-import { getRawCodecPath, S } from "./utils.ts"
+import { Ty, TyVisitor } from "../../scale_info/mod.ts"
+import { File } from "../File.ts"
+import { getRawCodecPath, S } from "../util.ts"
+import { FrameCodegen } from "./mod.ts"
 
-export function extrinsicInfo(ctx: Codegen): ExtrinsicInfo {
+export function extrinsicInfo(ctx: FrameCodegen): ExtrinsicInfo {
   const { signature: signatureTy, call: callTy, address: addressTy } = Object.fromEntries(
     ctx.metadata.extrinsic.ty.params.map((x) => [x.name.toLowerCase(), x.ty]),
   )
@@ -14,7 +15,7 @@ export interface ExtrinsicInfo {
   addressTy: Ty
 }
 
-export function extrinsic(ctx: Codegen, { callTy, addressTy, signatureTy }: ExtrinsicInfo) {
+export function extrinsic(ctx: FrameCodegen, { callTy, addressTy, signatureTy }: ExtrinsicInfo) {
   const isUnitVisitor = new TyVisitor<boolean>(ctx.metadata.tys, {
     unitStruct: () => true,
     wrapperStruct(_, inner) {

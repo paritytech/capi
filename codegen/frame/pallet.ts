@@ -1,21 +1,20 @@
-import { Pallet } from "../frame_metadata/mod.ts"
-import { hex } from "../mod.ts"
-import { Ty, UnionTyDef } from "../scale_info/mod.ts"
-import { normalizeCase } from "../util/case.ts"
-import { Codegen, File } from "./mod.ts"
-import { getRawCodecPath, makeDocComment, S } from "./utils.ts"
+import { Pallet } from "../../frame_metadata/mod.ts"
+import { Ty, UnionTyDef } from "../../scale_info/mod.ts"
+import { normalizeCase } from "../../util/case.ts"
+import { hex } from "../../util/mod.ts"
+import { File } from "../File.ts"
+import { getRawCodecPath, makeDocComment, S } from "../util.ts"
+import { FrameCodegen } from "./mod.ts"
 
-export function pallet(ctx: Codegen, pallet: Pallet, callTySrc: string) {
+export function pallet(ctx: FrameCodegen, pallet: Pallet, callTySrc: string) {
   const file = new File()
-  const items = [
-    `
-      import type * as types from "./types/mod.ts"
-      import * as codecs from "./codecs.ts"
-      import { $ } from "./capi.ts"
-      import * as C from "./capi.ts"
-      import { client } from "./client/mod.ts"
-    `,
-  ]
+  const items = [`
+    import type * as types from "./types/mod.ts"
+    import * as codecs from "./codecs.ts"
+    import { $ } from "./capi.ts"
+    import * as C from "./capi.ts"
+    import { client } from "./client/mod.ts"
+  `]
   for (const entry of pallet.storage?.entries ?? []) {
     items.push(
       makeDocComment(entry.docs)

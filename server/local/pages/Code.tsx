@@ -1,6 +1,6 @@
-import { escapeHtml } from "../../deps/escape.ts"
-import { Fragment, h } from "../../deps/preact.ts"
-import * as shiki from "../../deps/shiki.ts"
+import { escapeHtml } from "../../../deps/escape.ts"
+import { Fragment, h } from "../../../deps/preact.ts"
+import * as shiki from "../../../deps/shiki.ts"
 
 shiki.setCDN("https://unpkg.com/shiki/")
 export const highlighterPromise = shiki.getHighlighter({ theme: "github-dark", langs: ["ts"] })

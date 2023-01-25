@@ -1,33 +1,45 @@
-import { Client, proxyProvider } from "../../rpc/mod.ts"
-import * as port from "../../util/port.ts"
-import { PathInfo } from "../PathInfo.ts"
-import { FrameProviderBase, FrameTargetBase, getClientFile, getRawClientFile } from "./FrameBase.ts"
+import { Env, PathInfo } from "../../server/mod.ts"
+import { getAvailable, isReady } from "../../util/port.ts"
+import { FrameProxyProvider } from "./ProxyBase.ts"
 
 export interface PolkadotDevProviderProps {
   polkadotPath?: string
   additional?: string[]
 }
 
-export class PolkadotDevProvider extends FrameProviderBase {
+export class PolkadotDevProvider extends FrameProxyProvider {
+  providerId = "dev"
   bin
   additional
   ports: Partial<Record<DevRuntimeName, number>> = {}
+  urlPendings: Partial<Record<DevRuntimeName, Promise<string>>> = {}
 
-  constructor({ polkadotPath, additional }: PolkadotDevProviderProps = {}) {
-    super()
+  constructor(env: Env, { polkadotPath, additional }: PolkadotDevProviderProps = {}) {
+    super(env)
     this.bin = polkadotPath ?? "polkadot"
     this.additional = additional ?? []
   }
 
-  target(pathInfo: PathInfo) {
-    return new PolkadotDevTarget(this, pathInfo)
+  url(pathInfo: PathInfo) {
+    const { target } = pathInfo
+    assertDevRuntimeName(target)
+    let urlPending = this.urlPendings[target]
+    if (!urlPending) {
+      urlPending = (async () => {
+        const port = this.ensureDevNet(target)
+        await isReady(port)
+        return `ws://localhost:${port}`
+      })()
+      this.urlPendings[target] = urlPending
+    }
+    return urlPending
   }
 
   ensureDevNet(runtimeName: DevRuntimeName) {
-    let port_ = this.ports[runtimeName]
-    if (!port_) {
-      port_ = port.getAvailable()
-      const cmd: string[] = [this.bin, "--dev", "--ws-port", port_.toString(), ...this.additional]
+    let port = this.ports[runtimeName]
+    if (!port) {
+      port = getAvailable()
+      const cmd: string[] = [this.bin, "--dev", "--ws-port", port.toString(), ...this.additional]
       if (runtimeName !== "polkadot") cmd.push(`--force-${runtimeName}`)
       if (this.additional) cmd.push(...this.additional)
       try {
@@ -41,7 +53,7 @@ export class PolkadotDevProvider extends FrameProviderBase {
           await process.status()
           process.close()
         })
-        this.ports[runtimeName] = port_
+        this.ports[runtimeName] = port
       } catch (_e) {
         throw new Error( // TODO: auto installation prompt?
           "The Polkadot CLI was not found. Please ensure Polkadot is installed and PATH is set for `polkadot`."
@@ -49,33 +61,8 @@ export class PolkadotDevProvider extends FrameProviderBase {
         )
       }
     }
-    return port_
+    return port
   }
-}
-
-export class PolkadotDevTarget extends FrameTargetBase<PolkadotDevProvider> {
-  port
-  url
-  ready
-  junctions
-
-  constructor(provider: PolkadotDevProvider, pathInfo: PathInfo) {
-    super(provider, pathInfo)
-    const { target } = pathInfo
-    assertDevRuntimeName(target)
-    this.junctions = [target]
-    this.port = this.provider.ensureDevNet(target)
-    this.url = `ws://localhost:${this.port}`
-    this.ready = port.isReady(this.port)
-  }
-
-  async client() {
-    await this.ready
-    return new Client(proxyProvider, this.url)
-  }
-
-  clientFile = getClientFile
-  rawClientFile = getRawClientFile
 }
 
 export const DEV_RUNTIME_NAMES = ["polkadot", "kusama", "westend", "rococo"] as const

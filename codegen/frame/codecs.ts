@@ -1,9 +1,10 @@
-import { Ty, TyVisitor } from "../scale_info/mod.ts"
-import { normalizeCase, normalizeKey } from "../util/case.ts"
-import { Codegen, File } from "./mod.ts"
-import { S } from "./utils.ts"
+import { Ty, TyVisitor } from "../../scale_info/mod.ts"
+import { normalizeCase, normalizeKey } from "../../util/case.ts"
+import { File } from "../File.ts"
+import { S } from "../util.ts"
+import { FrameCodegen } from "./mod.ts"
 
-export function codecs(ctx: Codegen) {
+export function codecs(ctx: FrameCodegen) {
   const { tys } = ctx.metadata
   const namespaceImports = new Set<string>()
 

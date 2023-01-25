@@ -13,7 +13,7 @@ export const proxyProvider: Provider<string, Event, Event, Event> = (url, listen
   return {
     nextId,
     send: (message) => {
-      let conn
+      let conn: ProxyProviderConnection
       try {
         conn = connection(url, listener)
       } catch (error) {

@@ -1,22 +1,25 @@
 import { File } from "../../codegen/mod.ts"
 import { Network } from "../../deps/zombienet/orchestrator.ts"
 import { Client, proxyProvider } from "../../rpc/mod.ts"
-import { PathInfo } from "../PathInfo.ts"
-import { FrameProviderBase, FrameTargetBase } from "./FrameBase.ts"
+import { Env, PathInfo } from "../../server/mod.ts"
+import * as U from "../../util/mod.ts"
+import { FrameProvider } from "./Base.ts"
 
 export interface ZombienetProviderProps {
   zombienetPath?: string
   additional?: string[]
 }
 
-export class ZombienetProvider extends FrameProviderBase {
+export class ZombienetProvider extends FrameProvider {
+  providerId = "zombienet"
   zombienetPath
   additional
   bin
   zombienets: Record<string, Promise<Network>> = {}
+  urlPendings: Record<string, Promise<string>> = {}
 
-  constructor({ zombienetPath, additional }: ZombienetProviderProps = {}) {
-    super()
+  constructor(env: Env, { zombienetPath, additional }: ZombienetProviderProps = {}) {
+    super(env)
     this.zombienetPath = zombienetPath
     this.additional = additional
     this.bin = zombienetPath
@@ -31,8 +34,37 @@ export class ZombienetProvider extends FrameProviderBase {
       })()
   }
 
-  target(pathInfo: PathInfo) {
-    return new ZombienetTarget(this, pathInfo)
+  parseTarget({ target }: PathInfo) {
+    return U.splitLast("/", target)
+  }
+
+  cacheKey(pathInfo: PathInfo) {
+    const parsedTarget = this.parseTarget(pathInfo)
+    if (!parsedTarget) throw new Error("UH OH AS WELL")
+    return parsedTarget[0]
+  }
+
+  url(pathInfo: PathInfo) {
+    const parsedTarget = this.parseTarget(pathInfo)
+    if (!parsedTarget) throw new Error("UH OH!")
+    const urlPendingsKey = parsedTarget.join("-")
+    let urlPending = this.urlPendings[urlPendingsKey]
+    if (!urlPending) {
+      urlPending = (async () => {
+        const network = await this.zombienet(parsedTarget[0])
+        const node = network.nodesByName[parsedTarget[1]]
+        if (!node) {
+          throw new Error(
+            `No such node named "${parsedTarget[1]}" in zombienet. Available names are "${
+              Object.keys(network.nodesByName).join(",")
+            }".`,
+          )
+        }
+        return node.wsUri
+      })()
+      this.urlPendings[urlPendingsKey] = urlPending
+    }
+    return urlPending
   }
 
   zombienet(configPath: string): Promise<Network> {
@@ -65,7 +97,6 @@ export class ZombienetProvider extends FrameProviderBase {
             }
           }
         } catch (_e) {
-          console.log({ _e, bin: this.bin })
           throw new Error( // TODO: auto installation prompt?
             "The Zombienet CLI was not found. Please ensure Zombienet is installed and PATH is set for `zombienet`."
               + ` For more information, visit the following link: "https://github.com/paritytech/zombienet".`,
@@ -76,60 +107,24 @@ export class ZombienetProvider extends FrameProviderBase {
     }
     return net
   }
-}
 
-export class ZombienetTarget extends FrameTargetBase<ZombienetProvider> {
-  configPath
-  nodeName
-  networkPending
-  urlPending
-  junctions
-
-  constructor(provider: ZombienetProvider, pathInfo: PathInfo) {
-    super(provider, pathInfo)
-    const { target } = pathInfo
-    const eL = target.lastIndexOf("/")
-    this.configPath = target.slice(0, eL)
-    const nodeName = target.slice(eL + 1)
-    this.nodeName = nodeName
-    const networkPending = this.provider.zombienet(this.configPath)
-    this.networkPending = networkPending
-    this.junctions = this.configPath.split("/")
-    this.urlPending = (async () => {
-      const config = await networkPending
-      const node = config.nodesByName[nodeName]
-      if (!node) {
-        throw new Error(
-          `No such node named "${nodeName}" in zombienet. Available names are "${
-            Object.keys(config.nodesByName).join(",")
-          }".`,
-        )
-      }
-      return node.wsUri
-    })()
+  async client(pathInfo: PathInfo) {
+    return new Client(proxyProvider, await this.url(pathInfo))
   }
 
-  async client() {
-    return new Client(proxyProvider, await this.urlPending)
-  }
-
-  async clientFile() {
-    const clientFile = new File()
-    clientFile.codeRaw = `
+  async clientFile(pathInfo: PathInfo) {
+    return new File(`
       import * as C from "../capi.ts"
 
-      export const client = C.rpcClient(C.rpc.proxyProvider, "${await this.urlPending}")
-    `
-    return clientFile
+      export const client = C.rpcClient(C.rpc.proxyProvider, "${await this.url(pathInfo)}")
+    `)
   }
 
-  async rawClientFile() {
-    const file = new File()
-    file.codeRaw = `
+  async rawClientFile(pathInfo: PathInfo) {
+    return new File(`
       import * as C from "../capi.ts"
 
-      export const client = new C.rpc.Client(C.rpc.proxyProvider, "${await this.urlPending}")
-    `
-    return file
+      export const client = new C.rpc.Client(C.rpc.proxyProvider, "${await this.url(pathInfo)}")
+    `)
   }
 }

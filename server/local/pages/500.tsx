@@ -1,4 +1,4 @@
-import { Fragment, h } from "../../deps/preact.ts"
+import { Fragment, h } from "../../../deps/preact.ts"
 
 export function FiveHundredPage({ message }: { message?: string }) {
   return (

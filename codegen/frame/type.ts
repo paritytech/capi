@@ -1,8 +1,9 @@
-import { posix as pathPosix } from "../deps/std/path.ts"
-import { Ty, TyVisitor, TyVisitorMethods } from "../scale_info/mod.ts"
-import { normalizeCase } from "../util/case.ts"
-import { Codegen, File, TypeFile } from "./mod.ts"
-import { makeDocComment, S } from "./utils.ts"
+import { posix as pathPosix } from "../../deps/std/path.ts"
+import { Ty, TyVisitor, TyVisitorMethods } from "../../scale_info/mod.ts"
+import { normalizeCase } from "../../util/case.ts"
+import { File } from "../File.ts"
+import { makeDocComment, S } from "../util.ts"
+import { FrameCodegen, TypeFile } from "./mod.ts"
 
 function importPath(from: string, to: string) {
   let path = pathPosix.relative(pathPosix.dirname("/" + from), "/" + to)
@@ -10,7 +11,7 @@ function importPath(from: string, to: string) {
   return path
 }
 
-export function type(ctx: Codegen, path: string, filePath: string, typeFile: TypeFile) {
+export function type(ctx: FrameCodegen, path: string, filePath: string, typeFile: TypeFile) {
   const file = new File()
   if (path !== "types") {
     file.codeRaw += `import type * as types from ${
@@ -34,7 +35,7 @@ export function type(ctx: Codegen, path: string, filePath: string, typeFile: Typ
   return file
 }
 
-function createTypeDecl(ctx: Codegen, visitor: TyVisitor<string>, path: string, ty: Ty) {
+function createTypeDecl(ctx: FrameCodegen, visitor: TyVisitor<string>, path: string, ty: Ty) {
   const name = path.slice(path.lastIndexOf(".") + 1)
   const docs = makeDocComment(ty.docs)
 

@@ -1,10 +1,10 @@
-import { Ty, TyVisitor } from "../scale_info/mod.ts"
-import { normalizeKey } from "../util/case.ts"
-import { getOrInit } from "../util/mod.ts"
-import { Codegen, TypeFile } from "./mod.ts"
-import { makeDocComment, S } from "./utils.ts"
+import { Ty, TyVisitor } from "../../scale_info/mod.ts"
+import { normalizeKey } from "../../util/case.ts"
+import { getOrInit } from "../../util/mod.ts"
+import { makeDocComment, S } from "../util.ts"
+import { FrameCodegen, TypeFile } from "./mod.ts"
 
-export function typeVisitor(ctx: Codegen) {
+export function typeVisitor(ctx: FrameCodegen) {
   const { tys } = ctx.metadata
   const paths = new Map<Ty, string | null>()
   addPath("types.Compact", { type: "Compact" } as Ty)
