@@ -10,4 +10,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: dprint/check@b8a69d368d232496f6e82dac8fb12044fe3147d6 # v2.1
+      - uses: dprint/check@2f1cf31537886c3bfb05591c031f7744e48ba8a1 # v2.2
