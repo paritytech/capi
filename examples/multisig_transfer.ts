@@ -48,7 +48,7 @@ const approvalByCharlie = multisig.ratify({
   maybeTimepoint,
 }).signed(C.charlie.sign)
 
-// check T.dave new balance
+// check dave new balance
 const daveBalance = System.Account.entry(C.dave.publicKey).read()
 
 // TODO: use common env

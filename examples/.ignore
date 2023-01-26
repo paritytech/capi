@@ -1,4 +1,4 @@
-derived
+derived.ts
 mod.ts
 multisig_transfer.ts
 smart_contract.ts

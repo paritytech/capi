@@ -21,7 +21,7 @@ Deno.test("examples", async (t) => {
       name: fileName,
       async fn() {
         const task = Deno.run({
-          cmd: ["deno", "task", "run", `${examplesDir}/${fileName}`],
+          cmd: ["deno", "run", "-A", "-r=http://localhost:4646/", `${examplesDir}/${fileName}`],
           stdout: "piped",
           stderr: "piped",
         })
@@ -55,10 +55,7 @@ Deno.test("examples", async (t) => {
   }))
 })
 
-async function pipeThrough(
-  reader: Deno.Reader,
-  writer: Deno.Writer,
-) {
+async function pipeThrough(reader: Deno.Reader, writer: Deno.Writer) {
   const encoder = new TextEncoder()
   for await (const line of readLines(reader)) {
     await writeAll(writer, encoder.encode(`${line}\n`))

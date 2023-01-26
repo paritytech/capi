@@ -16,15 +16,14 @@ const root = extrinsic({
       const tr = new TypeRegistry()
       tr.setSignedExtensions(payload.signedExtensions)
       return Promise.resolve(
-        tr
-          .createType("ExtrinsicPayload", payload, { version: payload.version })
-          .sign(createTestPairs().dave!),
+        tr.createType("ExtrinsicPayload", payload, { version: payload.version })
+          .sign(createTestPairs().alice!),
       )
     },
   })
   .watch((ctx) => (status) => {
     console.log(status)
-    if (typeof status !== "string" && status.finalized) {
+    if (C.rpc.known.TransactionStatus.isTerminal(status)) {
       return ctx.end()
     }
     return

@@ -12,7 +12,7 @@ const tx = extrinsic({
   .signed(C.alice.sign)
   .watch((ctx) => (status) => {
     console.log(status)
-    if (typeof status !== "string" && status.finalized) {
+    if (C.rpc.known.TransactionStatus.isTerminal(status)) {
       return ctx.end()
     }
     return
