@@ -33,7 +33,7 @@ const env = new Env(signal, [
   (env) => new ZombienetProvider(env),
 ])
 
-const port = serve_ === "" ? 8000 : typeof serve_ === "string" ? parseInt(serve_) : undefined
+const port = serve_ === "" ? 4646 : typeof serve_ === "string" ? parseInt(serve_) : undefined
 await (typeof port === "number" ? runServe : runWrite)()
 
 async function runServe() {

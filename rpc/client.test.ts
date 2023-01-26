@@ -1,4 +1,4 @@
-import { discoveryValue } from "http://localhost:8000/frame/dev/polkadot/@v0.9.36/client/raw.ts"
+import { discoveryValue } from "http://localhost:4646/frame/dev/polkadot/@v0.9.36/client/raw.ts"
 import * as A from "../deps/std/testing/asserts.ts"
 import * as U from "../util/mod.ts"
 import {

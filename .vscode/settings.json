@@ -17,7 +17,7 @@
     "https://crux.land": true,
     "http://localhost:5646": true,
     "https://capi.dev": true,
-    "http://localhost:8000": false
+    "http://localhost:4646": false
   },
   "deno.enable": true,
   "deno.lint": true,

@@ -26,7 +26,7 @@ export abstract class FrameProvider extends Provider {
             await client_.call<string>(client_.providerRef.nextId(), "system_version", []),
           )
           if (vRuntimeR.error) throw new Error(vRuntimeR.error.message)
-          const normalized = `v${vRuntimeR.result.split("-")[0]}`
+          const normalized = normalizeVRuntime(vRuntimeR.result)
           if (vRuntime !== normalized) {
             throw new Error(
               `\`vRuntime\` (${vRuntime}) of "${src}" different from live (${normalized})`,
@@ -47,4 +47,8 @@ export abstract class FrameProvider extends Provider {
     }
     return codegenCtxPending
   }
+}
+
+function normalizeVRuntime(src: string): string {
+  return `v${src.split("-")[0]}`
 }

@@ -15,7 +15,7 @@ Let's cover how to learn about a chain's types/properties.
 Every FRAME chain exposes metadata about its types and capabilities. This metadata is called the "FRAME Metadata." Let's retrieve and inspect it.
 
 ```ts
-import { client } from "http://localhost:8000/frame/wss/rpc.polkadot.io/@v0.9.36/mod.ts"
+import { client } from "http://localhost:4646/frame/wss/rpc.polkadot.io/@v0.9.36/mod.ts"
 ```
 
 > To run the Capi dev server, run `deno run -A https://deno.land/x/capi/main.ts`

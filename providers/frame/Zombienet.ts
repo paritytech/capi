@@ -17,6 +17,7 @@ export class ZombienetProvider extends FrameProvider {
   bin
   zombienets: Record<string, Promise<Network>> = {}
   urlPendings: Record<string, Promise<string>> = {}
+  clients: Record<string, Promise<Client>> = {}
 
   constructor(env: Env, { zombienetPath, additional }: ZombienetProviderProps = {}) {
     super(env)
@@ -34,25 +35,20 @@ export class ZombienetProvider extends FrameProvider {
       })()
   }
 
-  parseTarget(target: string): [string, string] {
-    const lI = target.lastIndexOf("/")
-    if (lI === -1) throw new Error("Failed to parse zombienet target")
-    return [target.slice(0, lI), target.slice(lI + 1)]
-  }
-
-  cacheKey(pathInfo: PathInfo) {
-    return this.parseTarget(pathInfo.target)[0]
+  cacheKey({ target }: PathInfo) {
+    return target
   }
 
   url(pathInfo: PathInfo) {
     const { target } = pathInfo
-    const parsed = this.parseTarget(target)
-    if (!parsed) throw new Error()
-    const [configPath, nodeName] = parsed
     let urlPending = this.urlPendings[target]
     if (!urlPending) {
+      const lI = target.lastIndexOf("/")
+      if (lI === -1) throw new Error("Failed to parse zombienet target")
+      const configPath = target.slice(0, lI)
       urlPending = (async () => {
         const network = await this.zombienet(configPath)
+        const nodeName = target.slice(lI + 1)
         const node = network.nodesByName[nodeName]
         if (!node) {
           throw new Error(
@@ -82,6 +78,7 @@ export class ZombienetProvider extends FrameProvider {
             stderr: "piped",
           })
           this.env.signal.addEventListener("abort", async () => {
+            closed = true
             process.kill("SIGINT")
             await process.status()
             process.close()
@@ -109,9 +106,17 @@ export class ZombienetProvider extends FrameProvider {
     return net
   }
 
-  async client(pathInfo: PathInfo) {
-    const client = new Client(proxyProvider, await this.url(pathInfo))
-    this.env.signal.addEventListener("abort", client.discard)
+  client(pathInfo: PathInfo) {
+    const { src } = pathInfo
+    let client = this.clients[src]
+    if (!client) {
+      client = (async () => {
+        const client = new Client(proxyProvider, await this.url(pathInfo))
+        this.env.signal.addEventListener("abort", client.discard)
+        return client
+      })()
+      this.clients[src] = client
+    }
     return client
   }
 
