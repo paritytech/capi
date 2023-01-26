@@ -15,7 +15,6 @@
     "https://deno.land": true,
     "https://x.nest.land": true,
     "https://crux.land": true,
-    "http://localhost:5646": true,
     "https://capi.dev": true,
     "http://localhost:4646": false
   },
