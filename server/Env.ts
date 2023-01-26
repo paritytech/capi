@@ -1,9 +1,24 @@
-import { ProviderFactory } from "./Provider.ts"
+import { Provider, ProviderFactory } from "./Provider.ts"
 
 export class Env {
-  providers
+  providers: Record<string, Record<string, Provider>> = {}
 
   constructor(readonly signal: AbortSignal, providersFactories: ProviderFactory[]) {
-    this.providers = providersFactories.map((f) => f(this))
+    providersFactories.forEach((f) => {
+      const provider = f(this)
+      const { generatorId, providerId } = provider
+      const generatorProviders = this.providers[generatorId]
+      if (generatorProviders) {
+        if (generatorProviders[providerId]) {
+          throw new Error(
+            `${generatorId} Provider with \`providerId\` of \`${providerId}\` already initialized`,
+          )
+        }
+        generatorProviders[providerId] = provider
+      } else {
+        this.providers[generatorId] = { [providerId]: provider }
+      }
+      return provider
+    })
   }
 }

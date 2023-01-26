@@ -1,8 +1,8 @@
 import { File } from "../../codegen/mod.ts"
+import * as path from "../../deps/std/path.ts"
 import { Network } from "../../deps/zombienet/orchestrator.ts"
 import { Client, proxyProvider } from "../../rpc/mod.ts"
 import { Env, PathInfo } from "../../server/mod.ts"
-import * as U from "../../util/mod.ts"
 import { FrameProvider } from "./Base.ts"
 
 export interface ZombienetProviderProps {
@@ -68,7 +68,7 @@ export class ZombienetProvider extends FrameProvider {
     let net = this.zombienets[configPath]
     if (!net) {
       net = (async () => {
-        const tmpDir = await Deno.makeTempDir({ prefix: `capi_zombienet_` })
+        const tmpDir = Deno.makeTempDirSync({ prefix: `capi_zombienet_` })
         const cmd: string[] = [this.bin, "-p", "native", "-d", tmpDir, "-f", "spawn", configPath]
         if (this.additional) cmd.push(...this.additional)
         try {

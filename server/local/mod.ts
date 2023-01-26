@@ -11,30 +11,31 @@ export function handler(env: Env): Handler {
     const pathInfo = parsePathInfo(path)
     if (pathInfo) {
       const { vCapi, vRuntime, providerId, generatorId, filePath } = pathInfo
-      if (vCapi) {
-        return await f.fiveHundred(
-          req,
-          "The local Capi sever assumes the same version as itself. Another cannot be specified.",
-        )
-      }
-      const provider = env.providers.find((p) =>
-        p.generatorId === generatorId && p.providerId === providerId
-      )
-      if (provider) {
-        if (typeof vRuntime !== "string") {
-          return await f.fiveHundred(req, "No `vRuntime` in `pathInfo`")
-        }
-        if (typeof filePath !== "string") {
-          return await f.fiveHundred(req, "No `filePath` in `pathInfo`")
-        }
-        switch (filePath) {
-          case "":
-            return await f.fiveHundred(req, "TODO: chain root page")
-          case "capi.ts":
-            return await f.redirect("/mod.ts")
-          default: {
-            const file = (await provider.codegen(pathInfo)).files[filePath]
-            if (file) return await f.code(req, filePath, file.code(filePath))
+      const generatorProviders = env.providers[generatorId]
+      if (generatorProviders) {
+        const provider = generatorProviders[providerId]
+        if (provider) {
+          if (vCapi) {
+            return await f.fiveHundred(
+              req,
+              "The local Capi sever assumes the same version as itself. Another cannot be specified.",
+            )
+          }
+          if (typeof vRuntime !== "string") {
+            return await f.fiveHundred(req, "No `vRuntime` in `pathInfo`")
+          }
+          if (typeof filePath !== "string") {
+            return await f.fiveHundred(req, "No `filePath` in `pathInfo`")
+          }
+          switch (filePath) {
+            case "":
+              return await f.fiveHundred(req, "TODO: chain root page")
+            case "capi.ts":
+              return await f.redirect("/mod.ts")
+            default: {
+              const file = (await provider.codegen(pathInfo)).files[filePath]
+              if (file) return await f.code(req, filePath, file.code(filePath))
+            }
           }
         }
       }

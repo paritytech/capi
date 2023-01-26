@@ -63,7 +63,6 @@ async function runServe() {
       })
       .status()
     abortController.abort()
-    Deno.exit() // TODO: why no implicit exit?
   }
 }
 
@@ -71,10 +70,15 @@ async function runWrite() {
   if (!(src && out)) throw new Error("Must specify `src`, `out` and `capi`")
   const pathInfo = parsePathInfo(src)
   if (!pathInfo) throw new Error("Could not parse src")
-  const provider = env.providers.find((provider) =>
-    provider.generatorId === "frame" && provider.providerId === pathInfo.providerId
-  )
-  if (!provider) throw new Error()
+  const { generatorId, providerId } = pathInfo
+  const generatorProviders = env.providers[generatorId]
+  if (!generatorProviders) {
+    throw new Error(`Could not match provider with generatorId of \`${generatorId}\``)
+  }
+  const provider = generatorProviders[providerId]
+  if (!provider) {
+    throw new Error(`Could not match ${generatorId} provider with providerId of \`${providerId}\``)
+  }
   const codegen = await provider.codegen(pathInfo)
   codegen.files["capi.ts"] = new File(`export * from "${capi}"`)
   const pending: Promise<void>[] = []
