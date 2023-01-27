@@ -1,6 +1,6 @@
 import { posix as pathPosix } from "../../deps/std/path.ts"
 import { Ty, TyVisitor, TyVisitorMethods } from "../../scale_info/mod.ts"
-import { normalizeCase } from "../../util/case.ts"
+import { normalizeIdent } from "../../util/case.ts"
 import { File } from "../File.ts"
 import { makeDocComment, S } from "../util.ts"
 import { FrameCodegen, TypeFile } from "./mod.ts"
@@ -94,7 +94,7 @@ function createTypeDecl(ctx: FrameCodegen, visitor: TyVisitor<string>, path: str
       const types: string[] = []
       const union: string[] = []
       for (const { fields, name, docs } of ty.members) {
-        const type = normalizeCase(name)
+        const type = normalizeIdent(name)
         const memberPath = path + "." + type
         let props: [comment: string, name: string, type: string][]
         let factory: [params: string, result: string]
@@ -115,7 +115,7 @@ function createTypeDecl(ctx: FrameCodegen, visitor: TyVisitor<string>, path: str
           // Object variant
           props = fields.map((field) => [
             makeDocComment(field.docs),
-            normalizeCase(field.name!),
+            normalizeIdent(field.name!),
             visitor.visit(field.ty),
           ])
           factory = [`value: Omit<${memberPath}, "type">`, "...value"]

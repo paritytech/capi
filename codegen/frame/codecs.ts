@@ -1,5 +1,5 @@
 import { Ty, TyVisitor } from "../../scale_info/mod.ts"
-import { normalizeCase, normalizeKey } from "../../util/case.ts"
+import { normalizeIdent } from "../../util/case.ts"
 import { File } from "../File.ts"
 import { S } from "../util.ts"
 import { FrameCodegen } from "./mod.ts"
@@ -29,7 +29,7 @@ export function codecs(ctx: FrameCodegen) {
       return addCodecDecl(
         ty,
         `$.object(${
-          ty.fields.map((x) => `$.field(${S.string(normalizeKey(x.name!))}, ${this.visit(x.ty)})`)
+          ty.fields.map((x) => `$.field(${S.string(normalizeIdent(x.name!))}, ${this.visit(x.ty)})`)
             .join(", ")
         })`,
       )
@@ -57,7 +57,7 @@ export function codecs(ctx: FrameCodegen) {
           S.object(
             ...ty.members.map((
               x,
-            ): [string, string] => [`${x.index}`, S.string(normalizeCase(x.name))]),
+            ): [string, string] => [`${x.index}`, S.string(normalizeIdent(x.name))]),
           )
         })`,
       )
@@ -68,7 +68,7 @@ export function codecs(ctx: FrameCodegen) {
         `$.taggedUnion("type", ${
           S.object(
             ...ty.members.map(({ fields, name, index }): [string, string] => {
-              const type = normalizeCase(name)
+              const type = normalizeIdent(name)
               let props: string[]
               if (fields.length === 0) {
                 props = []
@@ -82,7 +82,7 @@ export function codecs(ctx: FrameCodegen) {
                 // Object variant
                 props = fields.map((
                   field,
-                ) => `$.field(${S.string(normalizeCase(field.name!))}, ${this.visit(field.ty)})`)
+                ) => `$.field(${S.string(normalizeIdent(field.name!))}, ${this.visit(field.ty)})`)
               }
               return [`${index}`, `$.variant(${S.string(type)}, ${props.join(",")})`]
             }),

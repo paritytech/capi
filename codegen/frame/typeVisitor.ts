@@ -1,5 +1,5 @@
 import { Ty, TyVisitor } from "../../scale_info/mod.ts"
-import { normalizeKey } from "../../util/case.ts"
+import { normalizeIdent } from "../../util/case.ts"
 import { getOrInit } from "../../util/mod.ts"
 import { makeDocComment, S } from "../util.ts"
 import { FrameCodegen, TypeFile } from "./mod.ts"
@@ -22,7 +22,7 @@ export function typeVisitor(ctx: FrameCodegen) {
     objectStruct(ty) {
       return S.object(
         ...ty.fields.map(
-          (x) => [makeDocComment(x.docs), normalizeKey(x.name!), this.visit(x.ty)] as const,
+          (x) => [makeDocComment(x.docs), normalizeIdent(x.name!), this.visit(x.ty)] as const,
         ),
       )
     },
@@ -36,7 +36,7 @@ export function typeVisitor(ctx: FrameCodegen) {
       return "never"
     },
     stringUnion(ty) {
-      return ty.members.map((x) => S.string(normalizeKey(x.name))).join(" | ")
+      return ty.members.map((x) => S.string(normalizeIdent(x.name))).join(" | ")
     },
     taggedUnion: undefined!,
     uint8Array() {

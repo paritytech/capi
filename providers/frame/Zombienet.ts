@@ -2,6 +2,7 @@ import { readLines } from "../../deps/std/io.ts"
 import { Network } from "../../deps/zombienet/orchestrator.ts"
 import { Env, PathInfo } from "../../server/mod.ts"
 import { PermanentMemo, splitLast } from "../../util/mod.ts"
+import { isReady } from "../../util/port.ts"
 import { FrameProxyProvider } from "./ProxyBase.ts"
 
 export interface ZombienetProviderProps {
@@ -47,6 +48,7 @@ export class ZombienetProvider extends FrameProxyProvider {
           }".`,
         )
       }
+      await isReady(+new URL(node.wsUri).port)
       return node.wsUri
     })
   }
@@ -70,7 +72,6 @@ export class ZombienetProvider extends FrameProxyProvider {
         const process = Deno.run({
           cmd,
           stdout: "piped",
-          stderr: "piped",
         })
         this.env.signal.addEventListener("abort", async () => {
           process.kill("SIGINT")

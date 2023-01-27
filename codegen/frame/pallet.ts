@@ -1,6 +1,6 @@
 import { Pallet } from "../../frame_metadata/mod.ts"
 import { Ty, UnionTyDef } from "../../scale_info/mod.ts"
-import { normalizeCase } from "../../util/case.ts"
+import { normalizeIdent } from "../../util/case.ts"
 import { hex } from "../../util/mod.ts"
 import { File } from "../File.ts"
 import { getRawCodecPath, makeDocComment, S } from "../util.ts"
@@ -38,7 +38,7 @@ export function pallet(ctx: FrameCodegen, pallet: Pallet, callTySrc: string) {
     const ty = pallet.calls as Ty & UnionTyDef
     const isStringUnion = ty.members.every((x) => !x.fields.length)
     for (const call of ty.members) {
-      const type = normalizeCase(call.name)
+      const type = normalizeIdent(call.name)
       const typeName = ctx.typeVisitor.visit(ty)! + "." + type
       const [params, data]: [string, string] = call.fields.length
         ? call.fields[0]!.name
