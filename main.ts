@@ -50,7 +50,7 @@ function runServe(port: number) {
     async onListen() {
       console.log(`Capi server listening on http://localhost:${port}`)
       if (cmd.length) {
-        await Deno
+        const status = await Deno
           .run({
             cmd,
             stderr: "inherit",
@@ -58,6 +58,7 @@ function runServe(port: number) {
           })
           .status()
         abortController.abort()
+        self.addEventListener("unload", () => Deno.exit(status.code))
       }
     },
   })

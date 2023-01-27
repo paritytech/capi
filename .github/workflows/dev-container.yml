@@ -11,6 +11,5 @@ jobs:
     steps:
       - name: Checkout (GitHub)
         uses: actions/checkout@v2
-
       - name: Build and run Dev Container task
         uses: devcontainers/ci@v0.2

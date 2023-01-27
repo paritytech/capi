@@ -26,7 +26,7 @@ Deno.test({
             value: EXISTENTIAL_DEPOSIT_AMOUNT + 12345n,
             dest: {
               type: "Id",
-              value: U.bob.publicKey,
+              value: kp.publicKey,
             },
           },
         },
