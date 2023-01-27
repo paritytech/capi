@@ -23,6 +23,6 @@ runs:
     - if: ${{ steps.cache-binary.outputs.cache-hit != 'true' }}
       name: Download Binary
       run: |
-        curl -L -o /usr/local/bin/${{ inputs.binary-name }} ${{ inputs.binary-github }}/releases/download/${{ inputs.binary-version }}/${{ inputs.binary-name }}
+        curl -L --fail -o /usr/local/bin/${{ inputs.binary-name }} ${{ inputs.binary-github }}/releases/download/${{ inputs.binary-version }}/${{ inputs.binary-name }}
         chmod +x /usr/local/bin/${{ inputs.binary-name }}
       shell: bash
