@@ -52,7 +52,7 @@ Deno.test({
       name: "send non-JSON message",
       async fn() {
         const server = createWebSocketServer()
-        // make JSON.stringify to throw
+        // make JSON.stringify throw on bigint
         const [ref, message] = await setup(proxyProvider, server.url, "system_health", [1n])
         A.assertInstanceOf(message, Error)
         A.assertNotInstanceOf(await ref.release(), Error)
