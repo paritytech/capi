@@ -68,31 +68,24 @@ export class ZombienetProvider extends FrameProxyProvider {
         configPath,
         ...this.additional,
       ]
-      try {
-        const process = Deno.run({
-          cmd,
-          stdout: "piped",
-        })
-        this.env.signal.addEventListener("abort", async () => {
-          process.kill("SIGINT")
-          await process.status()
-          process.close()
-          await Deno.remove(tmpDir, { recursive: true })
-        })
-        // TODO: utilize Deno.watchFs to observe `${networkFilesPath}/zombie.json`
-        for await (const line of readLines(process.stdout)) {
-          if (line.includes("Network launched")) {
-            process.stdout.close()
-            return JSON.parse(await Deno.readTextFile(`${tmpDir}/zombie.json`)) as Network
-          }
+      const process = Deno.run({
+        cmd,
+        stdout: "piped",
+      })
+      this.env.signal.addEventListener("abort", async () => {
+        process.kill("SIGINT")
+        await process.status()
+        process.close()
+        await Deno.remove(tmpDir, { recursive: true })
+      })
+      // TODO: utilize Deno.watchFs to observe `${networkFilesPath}/zombie.json`
+      for await (const line of readLines(process.stdout)) {
+        if (line.includes("Network launched")) {
+          process.stdout.close()
+          return JSON.parse(await Deno.readTextFile(`${tmpDir}/zombie.json`)) as Network
         }
-        throw new Error("Zombienet exited without launching network")
-      } catch (_e) {
-        throw new Error( // TODO: auto installation prompt?
-          "The Zombienet CLI threw. Please ensure Zombienet, Polkadot and Cumulus are installed and their respective PATHs are set."
-            + ` For more information, visit the following link: "https://github.com/paritytech/zombienet".`,
-        )
       }
+      throw new Error("Zombienet exited without launching network")
     })
   }
 }
