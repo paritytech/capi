@@ -8,6 +8,7 @@ jobs:
   test:
     name: Run Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v3
       - uses: denoland/setup-deno@9db7f66e8e16b5699a514448ce994936c63f0d54 # v1.1.0
