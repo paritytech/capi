@@ -13,7 +13,6 @@ export abstract class FrameProxyProvider extends FrameProvider {
 
   async client(pathInfo: PathInfo) {
     const url = await this.url(pathInfo)
-    if (this.providerId === "zombienet") console.log(url)
     const client = new Client(proxyProvider, url)
     this.env.signal.addEventListener("abort", client.discard)
     return client
