@@ -33,9 +33,6 @@ export async function redirect(path: string): Promise<Response> {
 }
 
 export function fourOFour(req: Request): U.PromiseOr<Response> {
-  if (acceptsHtml(req)) {
-    return page(FourOFourPage({}))
-  }
   return new Response("404", { status: Status.NotFound })
 }
 
