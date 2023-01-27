@@ -3,7 +3,7 @@ import { renderToString } from "../../deps/preact_render_to_string.ts"
 import { serveFile } from "../../deps/std/http/file_server.ts"
 import { Status } from "../../deps/std/http/http_status.ts"
 import * as U from "../../util/mod.ts"
-import { CodePage, FiveHundredPage, FourOFourPage } from "./pages/mod.ts"
+import { CodePage } from "./pages/mod.ts"
 
 export async function staticFile(req: Request, url: URL): Promise<Response> {
   const { pathname: path } = url
@@ -32,11 +32,11 @@ export async function redirect(path: string): Promise<Response> {
   })
 }
 
-export function notFound(req: Request): U.PromiseOr<Response> {
+export function notFound(): U.PromiseOr<Response> {
   return new Response("404", { status: Status.NotFound })
 }
 
-export function serverError(req: Request, message?: string): U.PromiseOr<Response> {
+export function serverError(message?: string): U.PromiseOr<Response> {
   return new Response(message || "500", { status: Status.InternalServerError })
 }
 

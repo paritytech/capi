@@ -42,9 +42,10 @@ export class ZombienetProvider extends FrameProxyProvider {
       const network = await this.zombienet(configPath)
       const node = network.nodesByName[nodeName]
       if (!node) {
+        console.log({ pathInfo, configPath, nodeName, target, targetParts })
         throw new Error(
           `No such node named "${nodeName}" in zombienet. Available names are "${
-            Object.keys(network.nodesByName).join(",")
+            Object.keys(network.nodesByName).join(`", "`)
           }".`,
         )
       }
