@@ -72,7 +72,6 @@ Deno.test("vCapi + providerId + target", () => {
   })
 })
 
-// @t6... you were right about naming constants... let's break convention where fitting.
 const vCapi = "v0.1.0"
 const generatorId = "frame"
 const providerId = "dev"
