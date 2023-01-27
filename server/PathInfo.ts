@@ -1,5 +1,3 @@
-import * as U from "../util/mod.ts"
-
 export interface PathInfo {
   src: string
   vCapi?: string
