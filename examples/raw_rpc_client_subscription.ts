@@ -1,8 +1,8 @@
 import * as C from "capi/mod.ts"
 
-import { client } from "polkadot_dev/client/raw.ts"
+import { rawClient } from "polkadot_dev/mod.ts"
 
-const result = await client.subscriptionFactory()(
+const result = await rawClient.subscriptionFactory()(
   "chain_subscribeAllHeads",
   "chain_unsubscribeNewHeads",
   [],
@@ -21,4 +21,4 @@ const result = await client.subscriptionFactory()(
 // cspell:disable-next-line
 console.log(`${result ? "S" : "Uns"}uccessfully unsubscribed`)
 
-await client.discard()
+await rawClient.discard()

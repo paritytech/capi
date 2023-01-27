@@ -1,5 +1,5 @@
-import { client } from "westend_dev/client/raw.ts"
+import { rawClient } from "westend_dev/mod.ts"
 
-console.log(await client.call(client.providerRef.nextId(), "state_getMetadata", []))
+console.log(await rawClient.call(rawClient.providerRef.nextId(), "state_getMetadata", []))
 
-await client.discard()
+await rawClient.discard()

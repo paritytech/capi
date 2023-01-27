@@ -45,8 +45,6 @@ For simplicity, we recommend aliasing import specifiers via import maps.
 ```diff
 - import { System } from "http://localhost:4646/frame/wss/rpc.polkadot.io/@<chain-version>/mod.ts"
 + import { System } from "#polkadot/mod.ts"
-
-// ...
 ```
 
 ## Examples

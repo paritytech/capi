@@ -1,17 +1,12 @@
 import * as C from "capi/mod.ts"
 import { assert } from "../deps/std/testing/asserts.ts"
 
-import { client, Session, System, t } from "polkadot/mod.ts"
-
-const {
-  sp_consensus_babe: { digests: { $preDigest } },
-  sp_runtime: { generic: { digest: { $digestItem } } },
-} = t
+import { client, Session, System } from "polkadot/mod.ts"
+import { $preDigest } from "polkadot/types/sp_consensus_babe/digests.ts"
+import { $digestItem, DigestItem } from "polkadot/types/sp_runtime/generic/digest.ts"
 
 // TODO: codegen guards?
-type DigestItem = t.sp_runtime.generic.digest.DigestItem
-type PreRuntime = t.sp_runtime.generic.digest.DigestItem.PreRuntime
-function isPreRuntime(digestItem: DigestItem): digestItem is PreRuntime {
+function isPreRuntime(digestItem: DigestItem): digestItem is DigestItem.PreRuntime {
   return digestItem.type === "PreRuntime"
 }
 

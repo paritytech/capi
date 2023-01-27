@@ -11,7 +11,6 @@ import { typeVisitor } from "./typeVisitor.ts"
 export interface FrameCodegenProps {
   metadata: Metadata
   clientFile: File
-  rawClientFile?: File
 }
 
 export class FrameCodegen extends Codegen {
@@ -21,7 +20,7 @@ export class FrameCodegen extends Codegen {
   typeVisitor
   typeFiles = new Map<string, TypeFile>()
 
-  constructor({ metadata, clientFile, rawClientFile }: FrameCodegenProps) {
+  constructor({ metadata, clientFile }: FrameCodegenProps) {
     super()
     this.metadata = metadata
     this.clientFile = clientFile
@@ -30,33 +29,35 @@ export class FrameCodegen extends Codegen {
 
     for (const [path, typeFile] of this.typeFiles) {
       const filePath = path + typeFile.ext
-      this.files[filePath] = type(this, path, filePath, typeFile)
+      this.files.set(filePath, type(this, path, filePath, typeFile))
     }
 
-    this.files["codecs.ts"] = codecs(this)
+    this.files.set("codecs.ts", codecs(this))
 
-    this.files["client/mod.ts"] = clientFile
-    if (rawClientFile) this.files["client/raw.ts"] = rawClientFile
+    this.files.set("client/mod.ts", clientFile)
 
     const extrinsicInfo_ = extrinsicInfo(this)
-    this.files["extrinsic.ts"] = extrinsic(this, extrinsicInfo_)
+    this.files.set("extrinsic.ts", extrinsic(this, extrinsicInfo_))
 
     const callTySrcPath = this.typeVisitor.visit(extrinsicInfo_.callTy)
 
     let palletNamespaceExports = ""
     for (const p of this.metadata.pallets) {
       if (!p.calls && !p.constants.length && !p.storage?.entries.length) continue
-      this.files[`${p.name}.ts`] = pallet(this, p, callTySrcPath)
+      this.files.set(`${p.name}.ts`, pallet(this, p, callTySrcPath))
       palletNamespaceExports += `export * as ${p.name} from "./${p.name}.ts"\n`
     }
 
-    this.files["mod.ts"] = new File(`
+    this.files.set(
+      "mod.ts",
+      new File(`
       export * from "./extrinsic.ts"
       export * from "./client/mod.ts"
-      export * as t from "./types/mod.ts"
+      export * as types from "./types/mod.ts"
 
       ${palletNamespaceExports}
-    `)
+    `),
+    )
   }
 
   [Symbol.iterator]() {

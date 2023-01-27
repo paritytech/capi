@@ -6,12 +6,11 @@ import * as path from "./deps/std/path.ts"
 import { PolkadotDevProvider, WssProvider, ZombienetProvider } from "./providers/frame/mod.ts"
 import { handler } from "./server/local/mod.ts"
 import { Env, parsePathInfo } from "./server/mod.ts"
-import { isReady } from "./util/port.ts"
 
 const { help, serve: serve_, src, out, capi, "--": cmd } = flags.parse(Deno.args, {
   string: ["serve", "src", "out", "capi"],
   default: {
-    capi: "https://deno.land/x/capi/mod.ts",
+    capi: import.meta.resolve("./mod.ts"),
   },
   boolean: ["help"],
   alias: {
@@ -33,15 +32,14 @@ const env = new Env(signal, [
   (env) => new ZombienetProvider(env),
 ])
 
-const port = serve_ === "" ? 4646 : typeof serve_ === "string" ? parseInt(serve_) : undefined
-await (typeof port === "number" ? runServe : runWrite)()
+if (typeof serve_ === "string") {
+  runServe(+(serve_ || 4646))
+} else {
+  runWrite()
+}
 
-async function runServe() {
-  try {
-    await Deno.connect({ port: port! })
-    throw new Error(`Port ${port} already in use`)
-  } catch (_e) {}
-  if (src || out) throw new Error("Cannot simultaneously `serve` and write flags")
+function runServe(port: number) {
+  if (src || out) throw new Error("Cannot simultaneously specify serve and write args")
 
   serve(handler(env), {
     port,
@@ -49,21 +47,20 @@ async function runServe() {
     onError(error) {
       throw error
     },
-    onListen() {
+    async onListen() {
       console.log(`Capi server listening on http://localhost:${port}`)
+      if (cmd.length) {
+        await Deno
+          .run({
+            cmd,
+            stderr: "inherit",
+            stdout: "inherit",
+          })
+          .status()
+        abortController.abort()
+      }
     },
   })
-  if (cmd.length) {
-    await isReady(port!)
-    await Deno
-      .run({
-        cmd,
-        stderr: "inherit",
-        stdout: "inherit",
-      })
-      .status()
-    abortController.abort()
-  }
 }
 
 async function runWrite() {
@@ -80,17 +77,13 @@ async function runWrite() {
     throw new Error(`Could not match ${generatorId} provider with providerId of \`${providerId}\``)
   }
   const codegen = await provider.codegen(pathInfo)
-  codegen.files["capi.ts"] = new File(`export * from "${capi}"`)
-  const pending: Promise<void>[] = []
+  codegen.files.set("capi.ts", new File(`export * from "${capi}"`))
   await fs.emptyDir(out)
-  for (const [filePath, file] of codegen) {
+  await Promise.all([...codegen.files.entries()].map(async ([filePath, file]) => {
     const dest = path.join(out, filePath)
     console.log(`Writing "${dest}"`)
-    pending.push((async () => {
-      await fs.ensureFile(dest)
-      await Deno.writeTextFile(dest, file.code(dest))
-    })())
-  }
-  await Promise.all(pending)
+    await fs.ensureFile(dest)
+    await Deno.writeTextFile(dest, file.code(dest))
+  }))
   abortController.abort()
 }

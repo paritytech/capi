@@ -1,4 +1,4 @@
-import { client } from "westend/client/raw.ts"
+import { discoveryValue } from "westend/mod.ts"
 import * as A from "../../deps/std/testing/asserts.ts"
 import { proxyProvider } from "./proxy.ts"
 import { setup } from "./test_util.ts"
@@ -9,12 +9,7 @@ Deno.test({
     await t.step({
       name: "send/listen",
       async fn() {
-        const [ref, message] = await setup(
-          proxyProvider,
-          client.discoveryValue,
-          "system_health",
-          [],
-        )
+        const [ref, message] = await setup(proxyProvider, discoveryValue, "system_health", [])
         A.assertNotInstanceOf(message, Error)
         A.assertExists(message.result)
         A.assertNotInstanceOf(await ref.release(), Error)
@@ -57,13 +52,8 @@ Deno.test({
       name: "send non-JSON message",
       async fn() {
         const server = createWebSocketServer()
-        const [ref, message] = await setup(
-          proxyProvider,
-          server.url,
-          "system_health",
-          // make JSON.stringify to throw
-          [1n],
-        )
+        // make JSON.stringify to throw
+        const [ref, message] = await setup(proxyProvider, server.url, "system_health", [1n])
         A.assertInstanceOf(message, Error)
         A.assertNotInstanceOf(await ref.release(), Error)
         server.close()

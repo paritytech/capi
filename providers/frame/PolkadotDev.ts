@@ -1,4 +1,5 @@
 import { Env, PathInfo } from "../../server/mod.ts"
+import { PermanentMemo } from "../../util/mod.ts"
 import { getAvailable, isReady } from "../../util/port.ts"
 import { FrameProxyProvider } from "./ProxyBase.ts"
 
@@ -11,8 +12,6 @@ export class PolkadotDevProvider extends FrameProxyProvider {
   providerId = "dev"
   bin
   additional
-  ports: Partial<Record<DevRuntimeName, number>> = {}
-  urlPendings: Partial<Record<DevRuntimeName, Promise<string>>> = {}
 
   constructor(env: Env, { polkadotPath, additional }: PolkadotDevProviderProps = {}) {
     super(env)
@@ -20,47 +19,39 @@ export class PolkadotDevProvider extends FrameProxyProvider {
     this.additional = additional ?? []
   }
 
+  urlMemo = new PermanentMemo<DevRuntimeName, string>()
   url(pathInfo: PathInfo) {
     const { target } = pathInfo
     assertDevRuntimeName(target)
-    let urlPending = this.urlPendings[target]
-    if (!urlPending) {
-      urlPending = (async () => {
-        const port = this.ensureDevNet(target)
-        await isReady(port)
-        return `ws://localhost:${port}`
-      })()
-      this.urlPendings[target] = urlPending
-    }
-    return urlPending
+    return this.urlMemo.run(target, async () => {
+      const port = await this.spawnDevNet(target)
+      return `ws://localhost:${port}`
+    })
   }
 
-  ensureDevNet(runtimeName: DevRuntimeName) {
-    let port = this.ports[runtimeName]
-    if (!port) {
-      port = getAvailable()
-      const cmd: string[] = [this.bin, "--dev", "--ws-port", port.toString(), ...this.additional]
-      if (runtimeName !== "polkadot") cmd.push(`--force-${runtimeName}`)
-      if (this.additional) cmd.push(...this.additional)
-      try {
-        const process = Deno.run({
-          cmd,
-          stdout: "piped",
-          stderr: "piped",
-        })
-        this.env.signal.addEventListener("abort", async () => {
-          process.kill("SIGINT")
-          await process.status()
-          process.close()
-        })
-        this.ports[runtimeName] = port
-      } catch (_e) {
-        throw new Error( // TODO: auto installation prompt?
-          "The Polkadot CLI was not found. Please ensure Polkadot is installed and PATH is set for `polkadot`."
-            + ` For more information, visit the following link: "https://github.com/paritytech/polkadot".`,
-        )
-      }
+  async spawnDevNet(runtimeName: DevRuntimeName) {
+    const port = getAvailable()
+    const cmd: string[] = [this.bin, "--dev", "--ws-port", port.toString(), ...this.additional]
+    if (runtimeName !== "polkadot") cmd.push(`--force-${runtimeName}`)
+    if (this.additional) cmd.push(...this.additional)
+    try {
+      const process = Deno.run({
+        cmd,
+        stdout: "piped",
+        stderr: "piped",
+      })
+      this.env.signal.addEventListener("abort", async () => {
+        process.kill("SIGINT")
+        await process.status()
+        process.close()
+      })
+    } catch (_e) {
+      throw new Error( // TODO: auto installation prompt?
+        "The Polkadot CLI was not found. Please ensure Polkadot is installed and PATH is set for `polkadot`."
+          + ` For more information, visit the following link: "https://github.com/paritytech/polkadot".`,
+      )
     }
+    await isReady(port)
     return port
   }
 }

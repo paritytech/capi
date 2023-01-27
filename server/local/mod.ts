@@ -33,7 +33,7 @@ export function handler(env: Env): Handler {
             case "capi.ts":
               return await f.redirect("/mod.ts")
             default: {
-              const file = (await provider.codegen(pathInfo)).files[filePath]
+              const file = (await provider.codegen(pathInfo)).files.get(filePath)
               if (file) return await f.code(req, filePath, file.code(filePath))
             }
           }

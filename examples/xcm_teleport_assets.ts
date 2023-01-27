@@ -2,13 +2,13 @@ import * as C from "capi/mod.ts"
 
 import {
   extrinsic,
-  t,
+  types,
   XcmPallet,
-} from "http://localhost:4646/frame/zombienet/examples/xcm_teleport_assets.toml/alice/@v0.9.36/mod.ts"
+} from "capi/frame/zombienet/examples/xcm_teleport_assets.toml/alice/@v0.9.36/mod.ts"
 import {
   client as parachainClient,
   System,
-} from "http://localhost:4646/frame/zombienet/examples/xcm_teleport_assets.toml/collator01/@v0.9.360/mod.ts"
+} from "capi/frame/zombienet/examples/xcm_teleport_assets.toml/collator01/@v0.9.360/mod.ts"
 
 const {
   VersionedMultiAssets,
@@ -20,7 +20,7 @@ const {
   },
   v0: { junction: { NetworkId } },
   v2: { WeightLimit },
-} = t.xcm
+} = types.xcm
 
 const teleportAssetsTx = extrinsic({
   sender: C.alice.address,

@@ -23,15 +23,8 @@ export abstract class FrameProxyProvider extends FrameProvider {
       import * as C from "../capi.ts"
 
       export const client = C.rpcClient(C.rpc.proxyProvider, "${url}")
-    `)
-  }
 
-  async rawClientFile(pathInfo: PathInfo) {
-    const url = await this.url(pathInfo)
-    return new File(`
-      import * as C from "../capi.ts"
-
-      export const client = new C.rpc.Client(C.rpc.proxyProvider, "${url}")
+      export const rawClient = new C.rpc.Client(C.rpc.proxyProvider, "${url}")
 
       export const discoveryValue = "${url}"
     `)

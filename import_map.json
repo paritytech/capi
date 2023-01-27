@@ -11,13 +11,13 @@
     "rococo_dev": "http://localhost:4646/frame/dev/rococo/@v0.9.36/",
     "acala/": "http://localhost:4646/frame/wss/acala-polkadot.api.onfinality.io/public-ws/@v2.12.0/",
     "moonbeam/": "http://localhost:4646/frame/wss/wss.api.moonbeam.network/@v0.28.1/",
-    "statemint": "http://localhost:4646/frame/wss/statemint-rpc.polkadot.io/@v0.9.36/",
-    "phala": "http://localhost:4646/frame/wss/api.phala.network/ws#/rpc/@v0.1.20/",
-    "subsocial": "http://localhost:4646/frame/para.subsocial.network"
+    "statemint/": "http://localhost:4646/frame/wss/statemint-rpc.polkadot.io/@v0.9.36/",
+    "phala/": "http://localhost:4646/frame/wss/api.phala.network/ws#/rpc/@v0.1.20/",
+    "subsocial/": "http://localhost:4646/frame/para.subsocial.network/"
   },
   "scopes": {
     "examples/": {
-      "capi/mod.ts": "http://localhost:4646/mod.ts"
+      "capi/": "http://localhost:4646/"
     }
   }
 }

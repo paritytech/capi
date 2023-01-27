@@ -1,7 +1,7 @@
-import { client as kusama } from "kusama/client/raw.ts"
-import { client as polkadot } from "polkadot/client/raw.ts"
-import { client as rococo } from "rococo/client/raw.ts"
-import { client as westend } from "westend/client/raw.ts"
+import { rawClient as kusama } from "kusama/mod.ts"
+import { rawClient as polkadot } from "polkadot/mod.ts"
+import { rawClient as rococo } from "rococo/mod.ts"
+import { rawClient as westend } from "westend/mod.ts"
 
 const knownClients = { kusama, polkadot, westend, rococo }
 
@@ -32,9 +32,8 @@ async function download(name: string) {
 
 Deno.writeTextFileSync(modFilePath, modFileContents, { create: true })
 
-const pending: Promise<void>[] = []
-for (const [name, client] of Object.entries(knownClients)) {
-  pending.push((async () => {
+await Promise.all(
+  Object.entries(knownClients).map(async ([name, client]) => {
     const r = await client.call(name, "state_getMetadata", [])
     if (r instanceof Error) throw r
     if (r.error) throw new Error(r.error.message)
@@ -42,6 +41,5 @@ for (const [name, client] of Object.entries(knownClients)) {
     console.log(`Downloading ${name} metadata to "${outPath}".`)
     await Deno.writeTextFile(outPath, r.result)
     await client.discard()
-  })())
-}
-await Promise.all(pending)
+  }),
+)
