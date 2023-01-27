@@ -1,6 +1,5 @@
-import { Ty, TyVisitor } from "../../scale_info/mod.ts"
+import { Ty } from "../../scale_info/mod.ts"
 import { File } from "../File.ts"
-import { getRawCodecPath, S } from "../util.ts"
 import { FrameCodegen } from "./mod.ts"
 
 export function extrinsicInfo(ctx: FrameCodegen): ExtrinsicInfo {
@@ -15,42 +14,8 @@ export interface ExtrinsicInfo {
   addressTy: Ty
 }
 
-export function extrinsic(ctx: FrameCodegen, { callTy, addressTy, signatureTy }: ExtrinsicInfo) {
-  const isUnitVisitor = new TyVisitor<boolean>(ctx.metadata.tys, {
-    unitStruct: () => true,
-    wrapperStruct(_, inner) {
-      return this.visit(inner)
-    },
-    tupleStruct: () => false,
-    objectStruct: () => false,
-    option: () => false,
-    result: () => false,
-    never: () => false,
-    stringUnion: () => false,
-    taggedUnion: () => false,
-    array: () => false,
-    sizedArray: () => false,
-    primitive: () => false,
-    compact: () => false,
-    bitSequence: () => false,
-    lenPrefixedWrapper: () => false,
-    circular: () => false,
-  })
-
-  const file = new File()
-  const { version, signedExtensions } = ctx.metadata.extrinsic
-  const fields = S.object(
-    ["version", `${version}`],
-    ["extras", getExtrasCodec(signedExtensions.map((x) => [x.ident, x.ty]))],
-    [
-      "additional",
-      getExtrasCodec(signedExtensions.map((x) => [x.ident, x.additionalSigned])),
-    ],
-    ["call", getRawCodecPath(callTy)],
-    ["address", getRawCodecPath(addressTy)],
-    ["signature", getRawCodecPath(signatureTy)],
-  )
-  file.codeRaw = `
+export function extrinsic(ctx: FrameCodegen, { callTy }: ExtrinsicInfo) {
+  return new File(`
     import { $ } from "./capi.ts"
     import * as C from "./capi.ts"
     import { client } from "./client/mod.ts"
@@ -58,12 +23,5 @@ export function extrinsic(ctx: FrameCodegen, { callTy, addressTy, signatureTy }:
     import type * as types from "./types/mod.ts"
 
     export const extrinsic = C.extrinsic<typeof client, ${ctx.typeVisitor.visit(callTy!)}>(client);
-  `
-  return file
-
-  function getExtrasCodec(xs: [string, Ty][]) {
-    return S.array(
-      xs.filter((x) => !isUnitVisitor.visit(x[1])).map((x) => getRawCodecPath(x[1])),
-    )
-  }
+  `)
 }
