@@ -37,10 +37,7 @@ export function notFound(req: Request): U.PromiseOr<Response> {
 }
 
 export function serverError(req: Request, message?: string): U.PromiseOr<Response> {
-  if (acceptsHtml(req)) {
-    return page(FiveHundredPage({ message }))
-  }
-  return new Response("500", { status: Status.InternalServerError })
+  return new Response(message || "500", { status: Status.InternalServerError })
 }
 
 export function page(element: JSX.Element): Response {
