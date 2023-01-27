@@ -32,7 +32,7 @@ export async function redirect(path: string): Promise<Response> {
   })
 }
 
-export function fourOFour(req: Request): U.PromiseOr<Response> {
+export function notFound(req: Request): U.PromiseOr<Response> {
   return new Response("404", { status: Status.NotFound })
 }
 
