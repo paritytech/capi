@@ -1,9 +1,9 @@
-export type Splitter = (char: string, src: string) => undefined | [string, string]
+export function splitFirst(char: string, src: string) {
+  const i = src.indexOf(char)
+  return i === -1 ? undefined : [src.slice(0, i), src.slice(i, 1)]
+}
 
-export const [splitFirst, splitLast] = (["indexOf", "lastIndexOf"] as const).map((m) => {
-  return (char, src) => {
-    const i = src[m](char)
-    if (i === -1) return undefined
-    return [src.slice(0, i), src.slice(i + 1)]
-  }
-}) as [Splitter, Splitter]
+export function splitLast(char: string, src: string) {
+  const i = src.lastIndexOf(char)
+  return i === -1 ? undefined : [src.slice(0, i), src.slice(i, 1)]
+}
