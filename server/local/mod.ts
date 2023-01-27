@@ -16,7 +16,7 @@ export function handler(env: Env): Handler {
         const provider = generatorProviders[providerId]
         if (provider) {
           if (vCapi) {
-            return await f.fiveHundred(
+            return f.fiveHundred(
               req,
               "The local Capi sever assumes the same version as itself. Another cannot be specified.",
             )
