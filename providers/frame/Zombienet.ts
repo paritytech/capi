@@ -89,7 +89,7 @@ export class ZombienetProvider extends FrameProxyProvider {
         throw new Error("Zombienet exited without launching network")
       } catch (_e) {
         throw new Error( // TODO: auto installation prompt?
-          "The Zombienet CLI was not found. Please ensure Zombienet is installed and PATH is set for `zombienet`."
+          "The Zombienet CLI threw. Please ensure Zombienet, Polkadot and Cumulus are installed and their respective PATHs are set."
             + ` For more information, visit the following link: "https://github.com/paritytech/zombienet".`,
         )
       }
