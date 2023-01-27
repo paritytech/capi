@@ -4,7 +4,6 @@ import dprintConfig from "../dprint.json" assert { type: "json" }
 
 const { indentWidth, lineWidth, typescript: config, plugins } = dprintConfig
 
-// TODO: regularly check https://plugins.dprint.dev/ for latest plugin versions
 export const tsFormatter = await createStreaming(
   fetch(plugins.find((v) => v.startsWith("https://plugins.dprint.dev/typescript-"))!),
 )
