@@ -40,6 +40,5 @@ jobs:
           binary-version: v1.3.18
           binary-github: https://github.com/paritytech/zombienet
       - run: deno lint
-      - run: deno task star
-      - run: deno task test:ci
-      - run: deno task test:ci _tasks/test_examples.ts -- examples
+      - run: deno task test -r=http://localhost:4646
+      - run: deno task test -r=http://localhost:4646 _tasks/test_examples.ts
