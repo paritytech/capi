@@ -36,7 +36,7 @@ export function notFound(req: Request): U.PromiseOr<Response> {
   return new Response("404", { status: Status.NotFound })
 }
 
-export function fiveHundred(req: Request, message?: string): U.PromiseOr<Response> {
+export function serverError(req: Request, message?: string): U.PromiseOr<Response> {
   if (acceptsHtml(req)) {
     return page(FiveHundredPage({ message }))
   }
