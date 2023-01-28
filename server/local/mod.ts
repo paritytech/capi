@@ -6,7 +6,7 @@ export function handler(env: Env): Handler {
   return async (req) => {
     const url = new URL(req.url)
     const path = url.pathname.slice(1)
-    if (path === "") return f.notFound()
+    if (path === "") return new Response("capi dev server active")
     const pathInfo = parsePathInfo(path)
     if (pathInfo) {
       const { vCapi, vRuntime, providerId, generatorId, filePath } = pathInfo
