@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "checkJs": false,
-    "lib": ["deno.ns", "dom"],
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
     "noImplicitReturns": true,
