@@ -21,12 +21,12 @@ const exampleFileNames = Array.from(Deno.readDirSync(dir))
   .map((f) => f.name)
 
 Deno.test("examples", async (t) => {
-  await Promise.all(exampleFileNames.map((fileName) => {
+  await Promise.all(exampleFileNames.map((name) => {
     return t.step({
-      name: fileName,
+      name: name,
       async fn() {
         const task = Deno.run({
-          cmd: ["deno", "run", "-A", "-r=http://localhost:4646/", `${dir}/${fileName}`],
+          cmd: ["deno", "run", "-A", "-r=http://localhost:4646/", `${dir}/${name}`],
           stdout: "piped",
           stderr: "piped",
         })

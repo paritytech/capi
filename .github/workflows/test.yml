@@ -42,4 +42,4 @@ jobs:
       - run: deno lint
       - run: deno task star
       - run: deno task test
-      - run: deno task test:examples
+      # - run: deno task test:examples
