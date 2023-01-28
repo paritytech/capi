@@ -4,23 +4,12 @@ import * as msg from "./messages.ts"
 import { Provider, ProviderListener } from "./provider/base.ts"
 import { ProviderHandlerError, ProviderSendError } from "./provider/errors.ts"
 
-// TODO: delete this upon solving inner-type-access problem of RPC effects
-export declare const ClientE_: unique symbol
-export type ClientE_ = typeof ClientE_
-
 export class Client<
   DiscoveryValue = any,
   SendErrorData = any,
   HandlerErrorData = any,
   CloseErrorData = any,
 > {
-  // TODO: delete this as well pending the above `TODO` ^
-  declare [ClientE_]: {
-    send: SendErrorData
-    handler: HandlerErrorData
-    close: CloseErrorData
-  }
-
   providerRef
   pendingCalls: Record<string, Deferred<unknown>> = {}
   pendingSubscriptions: SubscriptionListeners<SendErrorData, HandlerErrorData> = {}
@@ -31,10 +20,10 @@ export class Client<
     readonly provider: Provider<DiscoveryValue, SendErrorData, HandlerErrorData, CloseErrorData>,
     readonly discoveryValue: DiscoveryValue,
   ) {
-    this.providerRef = provider(discoveryValue, this.#listener)
+    this.providerRef = provider(discoveryValue, this.listener)
   }
 
-  #listener: ProviderListener<SendErrorData, HandlerErrorData> = (e) => {
+  listener: ProviderListener<SendErrorData, HandlerErrorData> = (e) => {
     if (e instanceof ProviderSendError) {
       const egressMessageId = e.egressMessage.id
       const pendingCall = this.pendingCalls[egressMessageId]

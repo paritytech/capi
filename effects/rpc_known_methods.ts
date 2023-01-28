@@ -37,6 +37,7 @@ export namespace system {
   export const accountNextIndex = rpcCall<[accountId: known.AccountId], number>(
     "system_accountNextIndex",
   )
+  export const version = rpcCall<[hash?: U.HexHash], string>("system_version")
 }
 export namespace author {
   export const submitAndWatchExtrinsic = rpcSubscription<

@@ -29,12 +29,10 @@ export function rpcCall<Params extends unknown[], Result>(method: string, nonIde
       return Z
         .rc(client, method, nonIdempotent, ...params)
         .next(async ([[client, method, _2, ...params], counter]) => {
-          type ClientE = typeof client[rpc.ClientE_]
           // TODO: why do we need to explicitly type this / why is this not being inferred?
           const id = client.providerRef.nextId()
-          const result: rpc.ClientCallEvent<ClientE["send"], ClientE["handler"], Result> =
-            await client.call<Result>(id, method, params)
-          const discardCheckResult = await discardCheck<ClientE["close"]>(client, counter)
+          const result = await client.call<Result>(id, method, params)
+          const discardCheckResult = await discardCheck<typeof client>(client, counter)
           if (discardCheckResult) return discardCheckResult
           if (result instanceof Error) {
             return result
@@ -58,7 +56,6 @@ export function rpcSubscription<Params extends unknown[], Event>() {
         Params_ extends Z.Ls$<Params>,
         CreateListener extends Z.$<U.CreateListener<rpc.ClientSubscriptionContext, Event>>,
       >(params: [...Params_], createListener: CreateListener) => {
-        type ClientE = Z.T<Client_>[rpc.ClientE_]
         return Z
           .rc(client, createListener, ...params)
           .next(async ([[client, createListener, ...params], counter]) => {
@@ -67,13 +64,7 @@ export function rpcSubscription<Params extends unknown[], Event>() {
               Event
             >()(subscribeMethod, unsubscribeMethod, params as [...Params], (ctx) => {
               const inner = createListener(ctx)
-              return (e_) => {
-                const e = e_ as rpc.ClientSubscriptionEvent<
-                  Z.T<SubscribeMethod>,
-                  Event,
-                  ClientE["send"],
-                  ClientE["handler"]
-                >
+              return (e) => {
                 if (e instanceof Error) {
                   return ctx.end(e)
                 } else if (e.error) {
@@ -82,7 +73,7 @@ export function rpcSubscription<Params extends unknown[], Event>() {
                 return inner(e.params.result) as U.InnerEnd<Z.T<CreateListener>>
               }
             })
-            const discardCheckResult = await discardCheck<ClientE["close"]>(client, counter)
+            const discardCheckResult = await discardCheck<typeof client>(client, counter)
             return discardCheckResult || result
           }, k2_)
       }
@@ -90,10 +81,7 @@ export function rpcSubscription<Params extends unknown[], Event>() {
   }
 }
 
-async function discardCheck<CloseErrorData>(
-  client: rpc.Client<any, any, any, CloseErrorData>,
-  counter: Z.RcCounter,
-) {
+async function discardCheck<Client_ extends rpc.Client>(client: Client_, counter: Z.RcCounter) {
   counter.i--
   if (!counter.i) {
     return await client.discard()

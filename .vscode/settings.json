@@ -8,15 +8,15 @@
   "[typescript]": {
     "editor.defaultFormatter": "dprint.dprint"
   },
-  "deno.codeLens.testArgs": ["--no-check=remote", "-A", "-L=info"],
+  "deno.codeLens.testArgs": ["-A", "-L=info"],
   "deno.config": "./deno.jsonc",
   "deno.importMap": "./import_map.json",
   "deno.suggest.imports.hosts": {
     "https://deno.land": true,
     "https://x.nest.land": true,
     "https://crux.land": true,
-    "http://localhost:5646": true,
-    "https://capi.dev": true
+    "https://capi.dev": true,
+    "http://localhost:4646": false
   },
   "deno.enable": true,
   "deno.lint": true,
@@ -26,5 +26,9 @@
   "prettier.printWidth": 100,
   "ltex.disabledRules": {
     "en-US": ["MORFOLOGIK_RULE_EN_US"]
+  },
+  "markdownlint.config": {
+    "MD013": false,
+    "MD033": false
   }
 }

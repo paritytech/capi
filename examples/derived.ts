@@ -1,12 +1,9 @@
-import * as C from "http://localhost:5646/@local/mod.ts"
-import * as U from "http://localhost:5646/@local/util/mod.ts"
+import * as C from "capi/mod.ts"
 
-const ids = C.entryRead(C.polkadot)("Paras", "Parachains", [])
-  .access("value")
-  .as<number[]>()
+import { Paras } from "polkadot_dev/mod.ts"
 
-const root = C.Z.each(ids, (id) => {
-  return C.entryRead(C.polkadot)("Paras", "Heads", [id])
-})
+// TODO: fix with Rune
+const ids = Paras.Parachains.entry().read().access("value")
+const heads = C.Z.each(ids, (id) => Paras.Heads.entry(id).read())
 
-console.log(U.throwIfError(await root.run()))
+console.log(C.throwIfError(await heads.run()))

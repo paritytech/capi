@@ -1,5 +1,5 @@
+import { discoveryValue } from "polkadot_dev/mod.ts"
 import * as A from "../deps/std/testing/asserts.ts"
-import * as T from "../test_util/mod.ts"
 import * as U from "../util/mod.ts"
 import {
   Client,
@@ -10,12 +10,13 @@ import {
   ProviderHandlerError,
   ProviderListener,
   ProviderSendError,
+  proxyProvider,
 } from "./mod.ts"
 
 Deno.test({
   name: "RPC Client",
   async fn(t) {
-    const client = await T.polkadot.client
+    const client = new Client(proxyProvider, discoveryValue)
 
     await t.step({
       name: "call",

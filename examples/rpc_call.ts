@@ -1,6 +1,7 @@
-import * as C from "http://localhost:5646/@local/mod.ts"
-import * as U from "http://localhost:5646/@local/util/mod.ts"
+import * as C from "capi/mod.ts"
 
-const root = C.rpcCall<[], string[]>("rpc_methods")(C.polkadot)()
+import { client } from "polkadot/mod.ts"
 
-console.log(U.throwIfError(await root.run()))
+const root = C.rpcCall<[], string[]>("rpc_methods")(client)()
+
+console.log(C.throwIfError(await root.run()))

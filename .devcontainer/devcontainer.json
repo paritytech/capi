@@ -19,7 +19,7 @@
     "[typescript]": {
       "editor.defaultFormatter": "dprint.dprint"
     },
-    "deno.codeLens.testArgs": ["--no-check=remote", "-A", "-L=info"],
+    "deno.codeLens.testArgs": ["-A", "-L=info"],
     "deno.config": "./deno.jsonc",
     "deno.enable": true,
     "deno.lint": true,
@@ -38,5 +38,5 @@
     "vadimcn.vscode-lldb",
     "bungcip.better-toml"
   ],
-  "postCreateCommand": "deno task codegen && deno task star"
+  "postCreateCommand": "deno task star"
 }

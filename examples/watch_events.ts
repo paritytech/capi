@@ -1,7 +1,8 @@
-import * as C from "http://localhost:5646/@local/mod.ts"
-import * as U from "http://localhost:5646/@local/util/mod.ts"
+import * as C from "capi/mod.ts"
 
-const root = C.entryWatch(C.rococo)("System", "Events", [], (ctx) => {
+import { client } from "rococo/mod.ts"
+
+const root = C.entryWatch(client)("System", "Events", [], (ctx) => {
   let i = 0
   return (entry) => {
     console.log(entry)
@@ -13,4 +14,4 @@ const root = C.entryWatch(C.rococo)("System", "Events", [], (ctx) => {
   }
 })
 
-U.throwIfError(await root.run())
+C.throwIfError(await root.run())

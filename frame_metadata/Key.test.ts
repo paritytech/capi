@@ -1,6 +1,5 @@
 import { assertEquals } from "../deps/std/testing/asserts.ts"
 import { DeriveCodec } from "../scale_info/Codec.ts"
-import * as T from "../test_util/mod.ts"
 import * as U from "../util/mod.ts"
 import * as downloaded from "./_downloaded/mod.ts"
 import { $storageKey } from "./Key.ts"
@@ -19,7 +18,7 @@ Deno.test("System Accounts Key", () => {
     U.hex.encode($key.encode(partialKey)),
     "26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da9",
   )
-  const key = [T.alice.publicKey]
+  const key = [U.alice.publicKey]
   const encoded = $key.encode(key)
   assertEquals(
     U.hex.encode(encoded),
@@ -47,7 +46,7 @@ Deno.test("Multisig Multisigs partial storage Key", () => {
     getPalletAndEntry(metadata, "Multisig", "Multisigs"),
   )
   const $key = $storageKey({ deriveCodec, pallet, storageEntry })
-  const key = [T.alice.publicKey]
+  const key = [U.alice.publicKey]
   const encoded = $key.encode(key)
   assertEquals(
     U.hex.encode(encoded),

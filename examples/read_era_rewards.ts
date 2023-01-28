@@ -1,10 +1,9 @@
-import * as C from "http://localhost:5646/@local/mod.ts"
-import * as U from "http://localhost:5646/@local/util/mod.ts"
+import * as C from "capi/mod.ts"
 
-const idx = C.entryRead(C.westend)("Staking", "ActiveEra", [])
-  .access("value")
-  .access("index")
+import { Staking } from "westend/mod.ts"
 
-const eraRewardPoints = C.entryRead(C.westend)("Staking", "ErasRewardPoints", [idx])
+const idx = Staking.ActiveEra.entry().read().access("value").access("index")
 
-console.log(U.throwIfError(await eraRewardPoints.run()))
+const eraRewardPoints = Staking.ErasRewardPoints.entry(idx).read()
+
+console.log(C.throwIfError(await eraRewardPoints.run()))

@@ -13,7 +13,7 @@ export const proxyProvider: Provider<string, Event, Event, Event> = (url, listen
   return {
     nextId,
     send: (message) => {
-      let conn
+      let conn: ProxyProviderConnection
       try {
         conn = connection(url, listener)
       } catch (error) {
@@ -58,13 +58,13 @@ function connection(
     const controller = new AbortController()
     const ws = new WebSocket(url)
     ws.addEventListener("message", (e) => {
-      conn!.forEachListener(msg.parse(e.data))
+      conn.forEachListener(msg.parse(e.data))
     }, controller)
     ws.addEventListener("error", (e) => {
-      conn!.forEachListener(new ProviderHandlerError(e))
+      conn.forEachListener(new ProviderHandlerError(e))
     }, controller)
     ws.addEventListener("close", (e) => {
-      conn!.forEachListener(new ProviderHandlerError(e))
+      conn.forEachListener(new ProviderHandlerError(e))
     }, controller)
     return new ProviderConnection(ws, () => controller.abort())
   })

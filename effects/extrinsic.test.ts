@@ -1,5 +1,9 @@
+import { client } from "westend_dev/mod.ts"
 import * as A from "../deps/std/testing/asserts.ts"
-import * as T from "../test_util/mod.ts"
+import * as Z from "../deps/zones.ts"
+import { ExtrinsicProps, SignedExtrinsic } from "../effects/extrinsic.ts"
+import { Signer } from "../primitives/mod.ts"
+import * as rpc from "../rpc/mod.ts"
 import * as U from "../util/mod.ts"
 import { Sr25519 } from "../util/mod.ts"
 import { entryRead } from "./entryRead.ts"
@@ -14,7 +18,7 @@ Deno.test({
 
     await ctx.step("extrinsic events", async () => {
       await assertExtrinsicStatusOrder({
-        keypair: T.alice,
+        keypair: U.alice,
         call: {
           type: "Balances",
           value: {
@@ -33,7 +37,7 @@ Deno.test({
     await ctx.step({
       name: "account balance updated",
       fn: async () => {
-        const state = await entryRead(T.westend)("System", "Account", [kp.publicKey]).run()
+        const state = await entryRead(client)("System", "Account", [kp.publicKey]).run()
         A.assertObjectMatch(state, {
           value: {
             data: { free: EXISTENTIAL_DEPOSIT_AMOUNT + 12345n },
@@ -49,7 +53,7 @@ Deno.test({
   fn: async (ctx) => {
     await ctx.step("extrinsic events", async () => {
       await assertExtrinsicStatusOrder({
-        keypair: T.alice,
+        keypair: U.alice,
         call: {
           type: "Treasury",
           value: {
@@ -57,7 +61,7 @@ Deno.test({
             value: 200n,
             beneficiary: {
               type: "Id",
-              value: T.bob.publicKey,
+              value: U.bob.publicKey,
             },
           },
         },
@@ -68,13 +72,11 @@ Deno.test({
 })
 
 Deno.test({
-  // TODO update for new polkadot
-  ignore: true,
   name: "Democracy.propose",
   fn: async (ctx) => {
     await ctx.step("extrinsic events", async () => {
       await assertExtrinsicStatusOrder({
-        keypair: T.alice,
+        keypair: U.alice,
         call: {
           type: "Democracy",
           value: {
@@ -95,7 +97,7 @@ Deno.test({
 })
 
 interface AssertExtrinsicStatusOrderProps {
-  orderExpectation: T.extrinsic.StatusOrderExpectation
+  orderExpectation: StatusOrderExpectation
   keypair: U.Sr25519
   call: unknown
 }
@@ -106,13 +108,67 @@ export async function assertExtrinsicStatusOrder({
   call,
 }: AssertExtrinsicStatusOrderProps) {
   const extrinsicEvents = U.throwIfError(
-    await T.extrinsic.collectExtrinsicEvents(
-      extrinsic(T.westend)({
+    await collectExtrinsicEvents(
+      extrinsic(client)({
         sender: keypair.address,
         call,
       })
         .signed(keypair.sign),
     ).run(),
   )
-  T.extrinsic.assertStatusOrder(extrinsicEvents, orderExpectation)
+  assertStatusOrder(extrinsicEvents, orderExpectation)
 }
+
+const k0_ = Symbol()
+
+// TODO: use context / properly scope context / make it accessible outside of subscription lifecycle
+// TODO: better zones-level way to share context between effects
+function collectExtrinsicEvents<
+  Client extends Z.$<rpc.Client>,
+  Props extends Z.Rec$<ExtrinsicProps>,
+  Sign extends Z.$<Signer>,
+>(extrinsic: SignedExtrinsic<Client, Props, Sign>) {
+  const events: rpc.known.TransactionStatus[] = []
+  return extrinsic
+    .watch((ctx) => (status) => {
+      events.push(status)
+      if (typeof status !== "string" && status.finalized) {
+        return ctx.end()
+      }
+      return
+    })
+    .next(() => events, k0_)
+}
+
+// TODO: is this a common-enough test to merit existence in `test_util`?
+// TODO: means of specifying some variability?
+function assertStatusOrder(
+  statuses: rpc.known.TransactionStatus[],
+  statusOrderExpectation: StatusOrderExpectation,
+) {
+  A.assertEquals(statuses.length, statusOrderExpectation.length)
+  for (let i = 0; i < statusOrderExpectation.length; i++) {
+    const expected = statusOrderExpectation[i]!
+    const actualStatus = statuses[i]!
+    if (typeof actualStatus === "string") {
+      A.assertEquals(actualStatus, expected)
+    } else if (actualStatus.broadcast) {
+      A.assert(actualStatus[expected])
+    }
+  }
+}
+// TODO: Is it worth narrowing this with some valid assumptions?
+//       For instance, we'll never get a `finalized` before `inBlock`.
+//       Should we make this a more case-specific tuple with spreads & whatnot?
+type StatusOrderExpectation = (
+  | "future"
+  | "ready"
+  | "broadcast"
+  | "inBlock"
+  | "retracted"
+  | "finalityTimeout"
+  | "finalized"
+  | "usurped"
+  | "dropped"
+  | "invalid"
+)[]

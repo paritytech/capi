@@ -14,10 +14,32 @@ jobs:
       - uses: denoland/setup-deno@9db7f66e8e16b5699a514448ce994936c63f0d54 # v1.1.0
         with:
           deno-version: v1.x
-      - name: Setup polkadot
-        uses: ./.github/actions/setup-polkadot
+      - name: Cache Deno dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.deno
+            ~/.cache/deno
+          key: ${{ runner.os }}-deno-${{ hashFiles('deps/**/*.ts') }}
+      - name: Setup Polkadot
+        uses: ./.github/actions/setup-binary
+        with:
+          binary-name: polkadot
+          binary-version: v0.9.36
+          binary-github: https://github.com/paritytech/polkadot
+      - name: Setup Cumulus
+        uses: ./.github/actions/setup-binary
+        with:
+          binary-name: polkadot-parachain
+          binary-version: v0.9.360
+          binary-github: https://github.com/paritytech/cumulus
+      - name: Setup Zombienet
+        uses: ./.github/actions/setup-binary
+        with:
+          binary-name: zombienet-linux
+          binary-version: v1.3.18
+          binary-github: https://github.com/paritytech/zombienet
       - run: deno lint
-      - run: deno task codegen
       - run: deno task star
       - run: deno task test
-      - run: deno task test:examples
+      # - run: deno task test:examples

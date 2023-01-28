@@ -1,7 +1,7 @@
-import * as C from "http://localhost:5646/@local/mod.ts"
-import * as T from "http://localhost:5646/@local/test_util/mod.ts"
-import * as U from "http://localhost:5646/@local/util/mod.ts"
+import * as C from "capi/mod.ts"
 
-const aliceBonded = C.entryRead(T.polkadot)("Staking", "Bonded", [T.aliceStash.publicKey])
+import { Staking } from "polkadot_dev/mod.ts"
 
-console.log(U.throwIfError(await aliceBonded.run()))
+const aliceBonded = Staking.Bonded.entry(C.aliceStash.publicKey).read()
+
+console.log(C.throwIfError(await aliceBonded.run()))

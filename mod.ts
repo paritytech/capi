@@ -8,4 +8,21 @@ export * as ink from "./ink_metadata/mod.ts"
 export * from "./primitives/mod.ts"
 export * as rpc from "./rpc/mod.ts"
 export * from "./scale_info/mod.ts"
-export { End, getOrInit, type Hex, hex, type Listener, ss58, throwIfError } from "./util/mod.ts"
+export {
+  alice,
+  aliceStash,
+  bob,
+  bobStash,
+  charlie,
+  dave,
+  End,
+  eve,
+  ferdie,
+  type Hex,
+  hex,
+  type Listener,
+  multisigAddress,
+  Sr25519,
+  ss58,
+  throwIfError,
+} from "./util/mod.ts"

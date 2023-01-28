@@ -1,20 +1,17 @@
-import { assertNotInstanceOf } from "http://localhost:5646/@local/deps/std/testing/asserts.ts"
-import * as T from "http://localhost:5646/@local/test_util/mod.ts"
+import * as C from "capi/mod.ts"
 
-const client = await T.polkadot.client
+import { rawClient } from "polkadot_dev/mod.ts"
 
-const result = await client.subscriptionFactory()(
+const result = await rawClient.subscriptionFactory()(
   "chain_subscribeAllHeads",
   "chain_unsubscribeNewHeads",
   [],
   (ctx) => {
     let i = 0
     return (e) => {
-      assertNotInstanceOf(e, Error)
+      C.throwIfError(e)
       console.log(e)
-      if (i === 2) {
-        return ctx.end(true)
-      }
+      if (i === 2) return ctx.end(true)
       i++
       return
     }
@@ -24,4 +21,4 @@ const result = await client.subscriptionFactory()(
 // cspell:disable-next-line
 console.log(`${result ? "S" : "Uns"}uccessfully unsubscribed`)
 
-await client.discard()
+await rawClient.discard()

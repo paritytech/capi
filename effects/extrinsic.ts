@@ -21,8 +21,8 @@ export interface ExtrinsicProps<Call = unknown> {
   call: Call
 }
 
-export function extrinsic<Client extends Z.$<rpc.Client>>(client: Client) {
-  return <Props extends Z.Rec$<ExtrinsicProps>>(props: Props): Extrinsic<Client, Props> => {
+export function extrinsic<Client extends Z.$<rpc.Client>, Call = unknown>(client: Client) {
+  return <Props extends Z.Rec$<ExtrinsicProps<Call>>>(props: Props): Extrinsic<Client, Props> => {
     return new Extrinsic(client, props)
   }
 }

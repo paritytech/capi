@@ -10,8 +10,16 @@ Capi is a declarative, TypeScript-first toolkit for crafting interactions with S
 
 ## At a Glance
 
+Run the local server.
+
+```sh
+deno run -A https://deno.land/x/capi/main.ts
+```
+
+Then, open your IDE and import pallet-corresponding modules from the local server.
+
 ```ts
-import { System } from "https://capi.dev/proxy/wss:rpc.polkadot.io/pallets/mod.ts"
+import { System } from "http://localhost:4646/frame/wss/rpc.polkadot.io/@<chain-version>/mod.ts"
 
 const key = System.Account.keys().first()
 
@@ -20,11 +28,24 @@ const value = System.Account.entry(key)
 console.log(await value.run())
 ```
 
-> Note: although the codegen server is hosted on https://capi.dev, we encourage you to run it locally with
->
-> ```sh
-> deno run -A https://deno.land/x/capi/serve.ts
-> ```
+### Import Mapping
+
+For simplicity, we recommend aliasing import specifiers via import maps.
+
+`import_map.json`
+
+```json
+{
+  "imports": {
+    "#polkadot/": "http://localhost:4646/frame/wss/rpc.polkadot.io/@<chain-version>/"
+  }
+}
+```
+
+```diff
+- import { System } from "http://localhost:4646/frame/wss/rpc.polkadot.io/@<chain-version>/mod.ts"
++ import { System } from "#polkadot/mod.ts"
+```
 
 ## Examples
 

@@ -1,8 +1,7 @@
-import * as T from "http://localhost:5646/@local/test_util/mod.ts"
-import * as U from "http://localhost:5646/@local/util/mod.ts"
+import * as C from "capi/mod.ts"
 
-import { System } from "http://localhost:5646/@local/proxy/dev:polkadot/@v0.9.36/pallets/mod.ts"
+import { System } from "polkadot_dev/mod.ts"
 
-const root = System.Account.entry(T.alice.publicKey).read()
+const root = System.Account.entry(C.alice.publicKey).read()
 
-console.log(U.throwIfError(await root.run()))
+console.log(C.throwIfError(await root.run()))
