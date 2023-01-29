@@ -39,11 +39,21 @@ export class PolkadotDevProvider extends FrameProxyProvider {
     const chainSpecProcess = Deno.run({ cmd, stdout: "piped", stderr: "piped" })
     const chainSpec = JSON.parse(new TextDecoder().decode(await chainSpecProcess.output()))
     const testUsers = Array.from({ length: TEST_USER_COUNT }, (_, i) => testUser(i))
-    const balances = chainSpec.genesis.runtime.balances
-    if (!balances.balances) balances.balances = []
-    balances.balances.push(...testUsers.map((
-      { publicKey },
-    ) => [ss58.encode(42, publicKey), TEST_USER_INITIAL_FUNDS]))
+    const runtime = chainSpec.genesis.runtime
+    let balancesPallet = runtime.balances
+    if (!balancesPallet) {
+      balancesPallet = {}
+      runtime.balances = balancesPallet
+    }
+    let balances = balancesPallet.balances
+    if (!balances) {
+      balances = []
+      balancesPallet.balances = balances
+    }
+    balances.push(...testUsers.map(({ publicKey }) => [
+      ss58.encode(DEV_RUNTIME_PREFIXES[runtimeName], publicKey),
+      TEST_USER_INITIAL_FUNDS,
+    ]))
     return chainSpec
   }
 
@@ -112,13 +122,15 @@ export const DEV_RUNTIME_NAMES = ["polkadot", "kusama", "westend", "rococo"] as 
 export type DevRuntimeName = typeof DEV_RUNTIME_NAMES[number]
 
 export function assertDevRuntimeName(inQuestion: string): asserts inQuestion is DevRuntimeName {
-  if (!(DEV_RUNTIME_NAME_EXISTS as Record<string, true>)[inQuestion]) throw new Error()
+  if (typeof (DEV_RUNTIME_PREFIXES as Record<string, number>)[inQuestion] !== "number") {
+    throw new Error()
+  }
 }
-const DEV_RUNTIME_NAME_EXISTS: Record<DevRuntimeName, true> = {
-  polkadot: true,
-  kusama: true,
-  westend: true,
-  rococo: true,
+const DEV_RUNTIME_PREFIXES: Record<DevRuntimeName, number> = {
+  polkadot: 0,
+  kusama: 2,
+  westend: 42,
+  rococo: 42,
 }
 
 const TEST_USER_COUNT = 100
