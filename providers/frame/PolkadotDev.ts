@@ -31,15 +31,19 @@ export class PolkadotDevProvider extends FrameProxyProvider {
   }
 
   async chainSpec(runtimeName: DevRuntimeName) {
-    const cmd: string[] = ["polkadot", "build-spec", "--dev"]
-    if (runtimeName !== "polkadot") cmd.push(`--force-${runtimeName}`)
+    const cmd: string[] = [
+      "polkadot",
+      "build-spec",
+      ...runtimeName === "polkadot" ? ["--dev"] : [`--chain=${runtimeName}-local`],
+    ]
     const chainSpecProcess = Deno.run({ cmd, stdout: "piped", stderr: "piped" })
     const chainSpec = JSON.parse(new TextDecoder().decode(await chainSpecProcess.output()))
     const testUsers = Array.from({ length: TEST_USER_COUNT }, (_, i) => testUser(i))
-    chainSpec.genesis.runtime.balances.balances = testUsers.map(({ publicKey }) => [
-      ss58.encode(42, publicKey),
-      TEST_USER_INITIAL_FUNDS,
-    ])
+    const balances = chainSpec.genesis.runtime.balances
+    if (!balances.balances) balances.balances = []
+    balances.balances.push(...testUsers.map((
+      { publicKey },
+    ) => [ss58.encode(42, publicKey), TEST_USER_INITIAL_FUNDS]))
     return chainSpec
   }
 
@@ -81,7 +85,6 @@ export class PolkadotDevProvider extends FrameProxyProvider {
       port.toString(),
       ...this.additional,
     ]
-    if (runtimeName !== "polkadot") cmd.push(`--force-${runtimeName}`)
     if (this.additional) cmd.push(...this.additional)
     try {
       const process = Deno.run({
@@ -119,4 +122,4 @@ const DEV_RUNTIME_NAME_EXISTS: Record<DevRuntimeName, true> = {
 }
 
 const TEST_USER_COUNT = 100
-const TEST_USER_INITIAL_FUNDS = 10_000_000_000_000
+const TEST_USER_INITIAL_FUNDS = 1_000_000_000_000_000
