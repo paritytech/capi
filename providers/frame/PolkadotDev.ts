@@ -123,7 +123,7 @@ export type DevRuntimeName = typeof DEV_RUNTIME_NAMES[number]
 
 export function assertDevRuntimeName(inQuestion: string): asserts inQuestion is DevRuntimeName {
   if (typeof (DEV_RUNTIME_PREFIXES as Record<string, number>)[inQuestion] !== "number") {
-    throw new Error()
+    throw new Error(`"${inQuestion}" is not a valid Polkadot CLI dev runtime name`)
   }
 }
 const DEV_RUNTIME_PREFIXES: Record<DevRuntimeName, number> = {
