@@ -14,6 +14,8 @@ export abstract class FrameProvider extends Provider {
   abstract clientFile(pathInfo: PathInfo): U.PromiseOr<File>
   abstract cacheKey(pathInfo: PathInfo): string
 
+  onCodegenInit(_codegen: FrameCodegen): U.PromiseOr<void> {}
+
   codegenMemo = new WeakMemo<string, FrameCodegen>()
   codegen(pathInfo: PathInfo) {
     return this.codegenMemo.run(this.cacheKey(pathInfo), async () => {
@@ -37,7 +39,9 @@ export abstract class FrameProvider extends Provider {
       if (metadataR.error) throw new Error(metadataR.error.message)
       const metadata = fromPrefixedHex(metadataR.result)
       const clientFile = await this.clientFile(pathInfo)
-      return new FrameCodegen({ metadata, clientFile })
+      const codegen = new FrameCodegen({ metadata, clientFile })
+      await this.onCodegenInit(codegen)
+      return codegen
     })
   }
 }

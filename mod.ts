@@ -24,5 +24,6 @@ export {
   multisigAddress,
   Sr25519,
   ss58,
+  testUser,
   throwIfError,
 } from "./util/mod.ts"

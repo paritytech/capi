@@ -1,3 +1,4 @@
+import { Blake2b } from "../deps/wat_the_crypto.ts"
 import { decode } from "./hex.ts"
 import { Sr25519 } from "./Sr25519.ts"
 
@@ -29,4 +30,17 @@ export const bobStash = pair(
 
 function pair(secret: string) {
   return Sr25519.fromSecret(decode(secret))
+}
+
+// Not using `PermanentMemo` bc this can be sync
+const testUsers: Record<number, Sr25519> = {}
+export function testUser(i: number) {
+  let user = testUsers[i]
+  if (!user) {
+    const hasher = new Blake2b(32)
+    hasher.update(new TextEncoder().encode(`capi-test-user-${i}`))
+    const seed = hasher.digest()
+    user = Sr25519.fromSeed(seed)
+  }
+  return user
 }
