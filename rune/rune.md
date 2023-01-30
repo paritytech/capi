@@ -4,7 +4,7 @@
 
 Runes are the fundamental unit of composition in Rune, Capi's effect system.
 Runes can be compared to many things, and they are, in a sense, a combination of
-effects, futures, observables, and signals. But they are not exactly any one of
+effects, futures, observables, and signals. But they are not simply any one of
 these things, and so calling a rune instead an effect or an observable would
 ultimately do little more than confuse.
 
@@ -236,15 +236,15 @@ allTogetherNow1.subscribe((value) => {
 // Again, `zip` makes some of these lag. In this case, it also gives b inconsistent values.
 /*
   3 [ [ "a0", "b0" ], [ "b0", "c0" ] ]
-  1504 [ [ "a1", "b0" ], [ "b1", "c0" ] ]
+  1504 [ [ "a1", "b0" ], [ "b1", "c0" ] ] // b has inconsistent values
   2506 [ [ "a1", "b1" ], [ "b1", "c1" ] ]
-  3007 [ [ "a2", "b1" ], [ "b2", "c1" ] ]
+  3007 [ [ "a2", "b1" ], [ "b2", "c1" ] ] // again
   4509 [ [ "a2", "b2" ], [ "b3", "c1" ] ]
   5008 [ [ "a3", "b2" ], [ "b3", "c2" ] ]
-  6011 [ [ "a4", "b2" ], [ "b4", "c2" ] ]
+  6011 [ [ "a4", "b2" ], [ "b4", "c2" ] ] // now it's inconsistent by 2 ticks
   7510 [ [ "a4", "b3" ], [ "b4", "c3" ] ]
   7512 [ [ "a5", "b3" ], [ "b5", "c3" ] ]
-  9016 [ [ "a5", "b4" ], [ "b6", "c3" ] ] // a should be at 9; b has inconsistent values
+  9016 [ [ "a5", "b4" ], [ "b6", "c3" ] ] // a should be at 9
 */
 
 // Alternatively, would could use `combineLatest`...
@@ -264,19 +264,19 @@ ab2.subscribe((value) => {
 /*
   3 [ [ "a0", "b0" ], [ "b0", "c0" ] ]
   1006 [ [ "a1", "b0" ], [ "b0", "c0" ] ]
-  1505 [ [ "a1", "b1" ], [ "b0", "c0" ] ] // b has inconsistent values at times
+  1505 [ [ "a1", "b1" ], [ "b0", "c0" ] ] // b has inconsistent values
   1506 [ [ "a1", "b1" ], [ "b1", "c0" ] ]
   2008 [ [ "a2", "b1" ], [ "b1", "c0" ] ]
   2506 [ [ "a2", "b1" ], [ "b1", "c1" ] ]
-  3007 [ [ "a2", "b2" ], [ "b1", "c1" ] ]
+  3007 [ [ "a2", "b2" ], [ "b1", "c1" ] ] // another inconsistency
   3007 [ [ "a2", "b2" ], [ "b2", "c1" ] ]
   3010 [ [ "a3", "b2" ], [ "b2", "c1" ] ]
   4012 [ [ "a4", "b2" ], [ "b2", "c1" ] ]
-  4510 [ [ "a4", "b3" ], [ "b2", "c1" ] ]
+  4510 [ [ "a4", "b3" ], [ "b2", "c1" ] ] // and another
   4510 [ [ "a4", "b3" ], [ "b3", "c1" ] ]
   5007 [ [ "a4", "b3" ], [ "b3", "c2" ] ]
   5014 [ [ "a5", "b3" ], [ "b3", "c2" ] ]
-  6013 [ [ "a5", "b4" ], [ "b3", "c2" ] ]
+  6013 [ [ "a5", "b4" ], [ "b3", "c2" ] ] // etc.
   6013 [ [ "a5", "b4" ], [ "b4", "c2" ] ]
   6015 [ [ "a6", "b4" ], [ "b4", "c2" ] ]
   7017 [ [ "a7", "b4" ], [ "b4", "c2" ] ]
@@ -286,7 +286,7 @@ ab2.subscribe((value) => {
   8025 [ [ "a8", "b5" ], [ "b5", "c3" ] ]
   9022 [ [ "a8", "b6" ], [ "b5", "c3" ] ]
   9022 [ [ "a8", "b6" ], [ "b6", "c3" ] ]
-  9027 [ [ "a9", "b6" ], [ "b6", "c3" ] ] // but at least a is at the right speed
+  9027 [ [ "a9", "b6" ], [ "b6", "c3" ] ]
   ...
 */
 ```
