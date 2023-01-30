@@ -23,7 +23,7 @@ export abstract class FrameProxyProvider extends FrameProvider {
     return new File(`
       import * as C from "../capi.ts"
 
-      export const client = C.rpcClient(C.rpc.proxyProvider, "${url}")
+      export const client = C.fluent.rpcClient(C.rpc.proxyProvider, "${url}")
 
       export const rawClient = new C.rpc.Client(C.rpc.proxyProvider, "${url}")
 
