@@ -33,7 +33,7 @@ Deno.test("pipe", async () => {
 })
 
 Deno.test("ls", async () => {
-  assertEquals(await Rune.ls([1, 2]).run(), [1, 2])
+  assertEquals(await Rune.tuple([1, 2]).run(), [1, 2])
 })
 
 const count = Rune.asyncIter(() => iter([1, 2, 3]))
@@ -54,7 +54,7 @@ Deno.test("stream", async () => {
 })
 
 const add = <X>(...[a, b]: RunicArgs<X, [a: number, b: number]>) => {
-  return Rune.ls([a, b]).map(([a, b]) => a + b)
+  return Rune.tuple([a, b]).map(([a, b]) => a + b)
 }
 
 const sum = <X>(...[...args]: RunicArgs<X, number[]>) => {
@@ -90,7 +90,7 @@ Deno.test("sum", async () => {
 const divide = <X>(
   { numerator, denominator }: RunicArgs<X, { numerator: number; denominator: number }>,
 ) => {
-  return Rune.ls([numerator, denominator]).map(
+  return Rune.tuple([numerator, denominator]).map(
     ([numerator, denominator]) => numerator / denominator,
   )
 }

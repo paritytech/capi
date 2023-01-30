@@ -12,7 +12,7 @@ export class MetadataRune<out U> extends Rune<M.Metadata, U> {
 
   pallet<X>(...[palletName]: RunicArgs<X, [palletName: string]>) {
     return Rune
-      .ls([this.as(), palletName])
+      .tuple([this.as(), palletName])
       .map(([metadata, palletName]) => M.getPallet(metadata, palletName))
       .unwrapError()
       .as(PalletRune, this)
@@ -21,6 +21,6 @@ export class MetadataRune<out U> extends Rune<M.Metadata, U> {
   deriveCodec = this.as(ValueRune).map((x) => DeriveCodec(x.tys))
 
   codec<X>(...[ty]: RunicArgs<X, [ty: number | Ty]>) {
-    return Rune.ls([this.deriveCodec, ty]).map(([derive, ty]) => derive(ty)).as(CodecRune)
+    return Rune.tuple([this.deriveCodec, ty]).map(([derive, ty]) => derive(ty)).as(CodecRune)
   }
 }

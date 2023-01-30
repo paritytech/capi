@@ -53,8 +53,12 @@ export class ValueRune<out T, out U = never> extends Rune<T, U> {
     return this.unwrapNot((x): x is Extract<T, Error> => x instanceof Error)
   }
 
-  unwrapOption<T, U>(this: ValueRune<T, U>) {
+  unwrapUndefined<T, U>(this: ValueRune<T, U>) {
     return this.unwrapNot((x): x is T & undefined => x === undefined)
+  }
+
+  unwrapNull<T, U>(this: ValueRune<T, U>) {
+    return this.unwrapNot((x): x is T & null => x === null)
   }
 
   catch(): ValueRune<
@@ -95,6 +99,13 @@ export class ValueRune<out T, out U = never> extends Rune<T, U> {
 
   singular() {
     return ValueRune.new(RunSingular, this)
+  }
+
+  dbg(...prefix: unknown[]) {
+    return this.map((value) => {
+      console.log(...prefix, value)
+      return value
+    })
   }
 }
 

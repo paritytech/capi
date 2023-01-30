@@ -1,5 +1,5 @@
 import { System } from "polkadot_dev/mod.ts"
 
-const root = System.Account.keyPage(10, [])
+const result = await System.Account.keyPage(10).run()
 
-console.log(await root.run())
+console.log(result)

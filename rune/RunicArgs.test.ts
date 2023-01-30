@@ -18,7 +18,7 @@ const e3 = Rune.constant(new E3()).unwrapError()
 const e1n = Rune.constant(new E1() as E1 | number).unwrapError()
 
 const add = <X>(...[a, b]: RunicArgs<X, [a: number, b: number]>) => {
-  return Rune.ls([a, b]).map(([a, b]) => a + b)
+  return Rune.tuple([a, b]).map(([a, b]) => a + b)
 }
 
 assertExact(add(1, 2), null! as ValueRune<number, never>)
@@ -59,7 +59,7 @@ assertExact(boxBox(0), null! as ValueRune<{ value: { value: number } }, never>)
 assertExact(boxBox(e1n), null! as ValueRune<{ value: { value: number } }, E1>)
 
 const boxEach = <T, X>(...X: RunicArgs<X, T[]>) => {
-  return Rune.ls(RunicArgs.resolve(X).map((x) => box(x)))
+  return Rune.tuple(RunicArgs.resolve(X).map((x) => box(x)))
 }
 
 assertExact(boxEach(1, 2, 3), null! as ValueRune<{ value: number }[], never>)

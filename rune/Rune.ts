@@ -1,6 +1,6 @@
 import { deferred } from "../deps/std/async.ts"
 import { getOrInit } from "../util/state.ts"
-import { ValueRune } from "./mod.ts"
+import { ArrayRune, RunicArgs, ValueRune } from "./mod.ts"
 import { EventSource, Receipt, Timeline } from "./Timeline.ts"
 
 export class Batch {
@@ -40,6 +40,7 @@ export namespace Rune {
 }
 
 export class Rune<out T, out U = never> {
+  declare private _
   declare "": [T, U]
 
   constructor(readonly _prime: (batch: Batch) => Run<T, U>) {}
@@ -85,13 +86,17 @@ export class Rune<out T, out U = never> {
     return value instanceof Rune ? value.as(ValueRune) : Rune.constant(value)
   }
 
-  static ls<R extends unknown[]>(
+  static tuple<R extends unknown[]>(
     runes: [...R],
   ): ValueRune<{ [K in keyof R]: Rune.T<R[K]> }, Rune.U<R[number]>>
-  static ls<R extends unknown[]>(
+  static tuple<R extends unknown[]>(
     runes: [...R],
   ): ValueRune<Rune.T<R[number]>[], Rune.U<R[number]>> {
     return ValueRune.new(RunLs, runes.map(Rune.resolve))
+  }
+
+  static array<T, X>(runes: RunicArgs<X, T[]>) {
+    return ValueRune.new(RunLs, RunicArgs.resolve(runes)).as(ArrayRune)
   }
 
   static rec<R extends {}>(
@@ -99,7 +104,7 @@ export class Rune<out T, out U = never> {
   ): ValueRune<{ [K in keyof R]: Rune.T<R[K]> }, Rune.U<R[keyof R]>> {
     const keys = Object.keys(runes)
     const values = Object.values(runes)
-    return Rune.ls(values).map((values) => {
+    return Rune.tuple(values).map((values) => {
       return Object.fromEntries(values.map((v, i) => [keys[i], v]))
     })
   }

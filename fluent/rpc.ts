@@ -39,7 +39,7 @@ export function rpcCall<Params extends unknown[], Result>(
   _nonIdempotent?: boolean,
 ) {
   return <X>(...args: RunicArgs<X, [client: rpc.Client, ...params: Params]>) => {
-    return Rune.ls(args)
+    return Rune.tuple(args)
       .map(async ([client, ...params]) => {
         // TODO: why do we need to explicitly type this / why is this not being inferred?
         const id = client.providerRef.nextId()
@@ -79,7 +79,7 @@ export function rpcSubscription<Params extends unknown[], Result>() {
     unsubscribeMethod: string,
   ) => {
     return <X>(...args: RunicArgs<X, [client: rpc.Client, ...params: Params]>) => {
-      return Rune.ls(args)
+      return Rune.tuple(args)
         .map(([client, ...params]) =>
           Rune.new(RunRpcSubscription, client, params, subscribeMethod, unsubscribeMethod)
         )

@@ -45,7 +45,7 @@ export function pallet(ctx: FrameCodegen, pallet: Pallet, callTySrc: string) {
           : call.fields.length > 1
           ? [
             `...value: C.RunicArgs<X, ${typeName}["value"]>`,
-            `{ type: ${S.string(type)}, value: C.Rune.ls(value) }`,
+            `{ type: ${S.string(type)}, value: C.Rune.tuple(value) }`,
           ]
           : [
             `...[value]: C.RunicArgs<X, [value: ${typeName}["value"]]>`,

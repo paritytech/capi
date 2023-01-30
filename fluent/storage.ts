@@ -20,24 +20,35 @@ export class StorageRune<K extends unknown[], V, out U> extends Rune<M.StorageEn
   $key
   $value
 
-  entry<X>(...[key, blockHash]: RunicArgs<X, [key: K, blockHash?: U.HexHash]>) {
+  entryRaw<X>(...[key, blockHash]: RunicArgs<X, [key: K, blockHash?: U.HexHash]>) {
     const storageKey = this.$key.encoded(key).unwrapError().map(U.hex.encode)
-    const valueHex = state.getStorage(this.pallet.metadata.client.as(), storageKey, blockHash)
+    return state.getStorage(
+      this.pallet.metadata.client.as(),
+      storageKey,
+      blockHash,
+    )
       .unwrapError()
+      .unwrapNull()
+  }
+
+  entry<X>(...[key, blockHash]: RunicArgs<X, [key: K, blockHash?: U.HexHash]>) {
+    const valueHex = this.entryRaw(key, blockHash)
     return this.$value.decoded(valueHex.map(U.hex.decode)).unsafeAs<V>().as(ValueRune)
   }
 
   keyPage<X>(
     ...[count, partialKey, start, blockHash]: RunicArgs<X, [
       count: number,
-      partialKey: unknown[],
+      partialKey?: unknown[],
       start?: unknown[],
       blockHash?: U.HexHash,
     ]>
   ) {
-    const storageKey = this.$key.encoded(partialKey).unwrapError().map(U.hex.encode)
+    const storageKey = this.$key.encoded(
+      Rune.resolve(partialKey).map((x) => x ?? []),
+    ).unwrapError().map(U.hex.encode)
     const startKey = this.$key.as(ValueRune).wrapU().as(CodecRune).encoded(
-      Rune.resolve(start).wrapU().unwrapOption(),
+      Rune.resolve(start).wrapU().unwrapUndefined(),
     ).unwrapError().map(U.hex.encode).catch().unwrapError()
     const keysEncoded = state.getKeysPaged(
       this.pallet.metadata.client.as(),
@@ -47,7 +58,7 @@ export class StorageRune<K extends unknown[], V, out U> extends Rune<M.StorageEn
       blockHash,
     )
       .unwrapError()
-    return Rune.ls([this.$key, keysEncoded])
+    return Rune.tuple([this.$key, keysEncoded])
       .map(([$key, keysEncoded]) => {
         return keysEncoded.map((keyEncoded: U.Hex) => {
           return $key.decode(U.hex.decode(keyEncoded))

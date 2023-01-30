@@ -1,7 +1,10 @@
 import { ValueRune } from "capi/mod.ts"
-
 import { client } from "polkadot_dev/mod.ts"
 
-const root = client.metadata().as(ValueRune).unwrapError()
+const result = await client
+  .metadata()
+  .as(ValueRune)
+  .unwrapError()
+  .run()
 
-console.log(await root.run())
+console.log(result)

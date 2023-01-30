@@ -83,7 +83,7 @@ const ax = a.map((value) => delay(500).then(() => `${value}.x`)) // a0.x, a1.x, 
 const ay = a.map((value) => delay(500).then(() => `${value}.y`)) // a0.y, a1.y, a2.y, ...
 
 // Combine the results from each to process in some way
-const az = Rune.ls([ax, ay])
+const az = Rune.tuple([ax, ay])
 
 const start = Date.now()
 for await (const value of az.watch()) {
@@ -180,7 +180,7 @@ const a = timer(1000).map((n) => `a${n}`) // a0, a1, a2, ...
 const b = timer(1500).map((n) => `b${n}`) // b0, b1, b2, ...
 
 // Combine them with `ls` like before:
-const ab = Rune.ls([a, b])
+const ab = Rune.tuple([a, b])
 
 const start = Date.now()
 for await (const value of ab.watch()) {
@@ -305,11 +305,11 @@ const a = timer(1000).map((n) => `a${n}`) // a0, a1, a2, ...
 const b = timer(1500).map((n) => `b${n}`) // b0, b1, b2, ...
 const c = timer(2500).map((n) => `c${n}`) // c0, c1, c2, ...
 
-const ab = Rune.ls([a, b])
-const bc = Rune.ls([b, c])
+const ab = Rune.tuple([a, b])
+const bc = Rune.tuple([b, c])
 
 // The combinator is the same as always
-const allTogetherNow = Rune.ls([ab, bc])
+const allTogetherNow = Rune.tuple([ab, bc])
 
 const start = Date.now()
 for await (const value of allTogetherNow.watch()) {

@@ -1,15 +1,17 @@
-import { alice, ArrayRune, bob, charlie, dave, Rune } from "capi/mod.ts"
+import { alice, bob, charlie, dave, Rune } from "capi/mod.ts"
+import { Balances, System, Utility } from "westend_dev/mod.ts"
 
-import { Balances, Utility } from "westend_dev/mod.ts"
+const recipients = Rune.array([bob, charlie, dave])
 
-const recipients = Rune.ls([bob, charlie, dave]).as(ArrayRune)
+const balances = recipients.mapArray((recipient) =>
+  System.Account
+    .entry(recipient.map((x) => [x.publicKey]))
+    .access("data", "free")
+)
 
-// TODO: check balances after sending transaction
-// const balances = recipients.mapArray((recipient) =>
-//   System.Account.entry(recipient.map((x) => [x.publicKey])).access("data", "free")
-// )
+console.log(await balances.run())
 
-const tx = Utility.batchAll({
+await Utility.batchAll({
   calls: recipients.mapArray((recipient) =>
     Balances.transfer({
       dest: recipient.access("address"),
@@ -18,9 +20,10 @@ const tx = Utility.batchAll({
   ),
 })
   .signed({ sender: alice })
-  .sent
+  .sent()
   .logEvents()
-  .finalizedHash
+  .finalizedHash()
   .unwrapError()
+  .run()
 
-await tx.run()
+console.log(await balances.run())

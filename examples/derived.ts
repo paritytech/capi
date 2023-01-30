@@ -1,9 +1,7 @@
-import { ArrayRune, polkadot, Rune } from "http://localhost:5646/@local/mod.ts"
+import { ArrayRune, Rune } from "capi/mod.ts"
+import { Paras } from "polkadot/mod.ts"
 
-const Paras = polkadot.metadata().pallet("Paras")
-const ids = Paras.storage("Parachains").entry([]).unsafeAs<number[]>().as(ArrayRune)
-const root = ids.mapArray((id) => {
-  return Paras.storage("Heads").entry(Rune.ls([id]))
-})
+const ids = Paras.Parachains.entry([]).as(ArrayRune)
+const result = await ids.mapArray((id) => Paras.Heads.entry(Rune.tuple([id]))).run()
 
-console.log(await root.run())
+console.log(result)

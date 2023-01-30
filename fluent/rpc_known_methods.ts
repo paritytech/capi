@@ -8,7 +8,7 @@ export namespace state {
   export const call = rpcCall<[method: string, data: U.Hex], U.HexHash>("state_call")
   export const getStorage = rpcCall<
     [key: known.StorageKey, at?: U.HexHash],
-    known.StorageData
+    known.StorageData | null
   >("state_getStorage", true)
   export const subscribeStorage = rpcSubscription<
     [keys: known.StorageKey[]],

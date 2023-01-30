@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "checkJs": false,
+    "noErrorTruncation": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
     "noImplicitReturns": true,

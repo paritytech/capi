@@ -1,7 +1,7 @@
 export * as $ from "./deps/scale.ts"
 export { BitSequence } from "./deps/scale.ts"
 export * as Z from "./deps/zones.ts"
-export * as fluent from "./fluent/mod.ts"
+export * from "./fluent/mod.ts"
 export * as frame from "./frame_metadata/mod.ts"
 export * as ink from "./ink_metadata/mod.ts"
 export * from "./primitives/mod.ts"

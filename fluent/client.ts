@@ -5,6 +5,7 @@ import { Rune, RunicArgs } from "../rune/mod.ts"
 import { HexHash } from "../util/mod.ts"
 import { ExtrinsicRune } from "./extrinsic.ts"
 import { MetadataRune } from "./metadata.ts"
+import { Multisig, MultisigRune } from "./multisig.ts"
 import { rpcCall } from "./rpc.ts"
 import { state } from "./rpc_known_methods.ts"
 
@@ -27,6 +28,11 @@ export class ClientRune<out U, out Call = unknown> extends Rune<rpc.Client, U> {
   extrinsic<X>(...args: RunicArgs<X, [call: Call]>) {
     const [call] = RunicArgs.resolve(args)
     return call.as(ExtrinsicRune<Call, RunicArgs.U<X> | U>, this)
+  }
+
+  multisig<X>(...args: RunicArgs<X, [multisig: Multisig]>) {
+    const [multisig] = RunicArgs.resolve(args)
+    return multisig.as(MultisigRune<RunicArgs.U<X> | U>, this)
   }
 
   chainVersion = rpcCall<[], string>("system_version")(this.as()).unwrapError()

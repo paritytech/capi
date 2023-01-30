@@ -8,7 +8,7 @@ export class ArrayRune<T, U> extends Rune<T[], U> {
   ): ArrayRune<T2, U | U2> {
     return this
       .as(ValueRune)
-      .map((arr) => Rune.ls(arr.map((val) => fn(Rune.constant(val)))))
+      .map((arr) => Rune.tuple(arr.map((val) => fn(Rune.constant(val)))))
       .as(MetaRune)
       .flat(fn(Rune._placeholder().as(ValueRune)))
       .as(ArrayRune)
