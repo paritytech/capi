@@ -1,6 +1,6 @@
 import * as C from "capi/mod.ts"
 
-import { client } from "capi/frame/zombienet/examples/smart_contract/zombienet.toml/collator01/@v0.9.360/mod.ts"
+import { client } from "http://localhost:4646/frame/zombienet/examples/smart_contract/zombienet.toml/collator01/@v0.9.360/mod.ts"
 
 const salt = Uint8Array.from(Array.from([0, 0, 0, 0]), () => Math.floor(Math.random() * 16))
 
