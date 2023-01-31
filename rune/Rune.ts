@@ -10,20 +10,24 @@ export class Batch {
     readonly wrapParent: <T, U>(rune: Run<T, U>) => Run<T, U> = (x) => x,
   ) {}
 
-  primed = new Map<Rune<any, any>, Run<any, any>>()
+  primed = new Map<Rune<any, any>["_prime"], Run<any, any>>()
   prime<T, E>(rune: Rune<T, E>, signal: AbortSignal): Run<T, E> {
-    const primed = getOrInit(this.primed, rune, () => this.getPrimed(rune) ?? rune._prime(this))
+    const primed = getOrInit(
+      this.primed,
+      rune._prime,
+      () => this.getPrimed(rune) ?? rune._prime(this),
+    )
     primed.reference(signal)
     return primed
   }
 
   getPrimed<T, E>(rune: Rune<T, E>): Run<T, E> | undefined {
-    const existing = this.primed.get(rune)
+    const existing = this.primed.get(rune._prime)
     if (existing) return existing
     const parent = this.parent?.getPrimed(rune)
     if (parent) {
       const wrapped = this.wrapParent(parent)
-      this.primed.set(rune, wrapped)
+      this.primed.set(rune._prime, wrapped)
       return wrapped
     }
     return undefined
@@ -139,6 +143,10 @@ export class Rune<out T, out U = never> {
     ...args: A
   ) {
     return new ctor(this._prime as any, ...args)
+  }
+
+  pipe<R extends Rune<any, any>>(fn: (rune: this) => R): R {
+    return fn(this)
   }
 }
 

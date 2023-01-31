@@ -24,6 +24,6 @@ await Balances
     },
   })
   .sent()
-  .logEvents()
+  .logStatus()
   .finalized()
   .run()

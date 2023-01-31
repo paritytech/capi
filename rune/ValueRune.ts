@@ -18,10 +18,6 @@ export class ValueRune<out T, out U = never> extends Rune<T, U> {
     return new ValueRune((batch) => new ctor(batch, ...args))
   }
 
-  pipe<R extends Rune<any, any>>(fn: (rune: this) => R): R {
-    return fn(this)
-  }
-
   map<T2>(fn: (value: T) => PromiseOr<T2>): ValueRune<T2, U> {
     return ValueRune.new(RunMap, this, fn)
   }

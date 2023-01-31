@@ -49,6 +49,10 @@ export class InkContractRune<out U> extends Rune<InkContract, U> {
       .unwrapError()
   }
 
+  salt() {
+    return crypto.getRandomValues(new Uint8Array(4))
+  }
+
   // TODO: create instantiation-specific rune so that we can `.address()` from it
   instantiate<X>(props: RunicArgs<X, InkContractInstantiateProps>) {
     const ctor = this.ctor(props.ctor)
@@ -61,7 +65,7 @@ export class InkContractRune<out U> extends Rune<InkContract, U> {
           undefined,
           { type: "Upload", value: code },
           U.hex.decode(ctor.selector),
-          SALT,
+          this.salt(),
         ]))
       )
     const gasRequired = state
@@ -73,9 +77,6 @@ export class InkContractRune<out U> extends Rune<InkContract, U> {
     return this.client.extrinsic(
       Rune
         .tuple([props.code, ctor, gasRequired])
-        .unwrapError()
-        .unwrapNull()
-        .unwrapUndefined()
         .map(([code, ctor, gasRequired]) => ({
           type: "Contracts",
           value: {
@@ -85,7 +86,7 @@ export class InkContractRune<out U> extends Rune<InkContract, U> {
             storageDepositLimit: undefined,
             code,
             data: U.hex.decode(ctor.selector),
-            salt: SALT,
+            salt: this.salt(),
           },
         })),
     )
@@ -132,6 +133,3 @@ export class InkContractMsgSigned<out U> extends Rune<Uint8Array, U> {
 export class InkContractMetadataInvalidError extends Error {
   override readonly name = "InkContractMetadataInvalidError"
 }
-
-// TODO: how is this determined?
-const SALT = Uint8Array.from(Array.from([0, 0, 0, 0]), () => Math.floor(Math.random() * 16))

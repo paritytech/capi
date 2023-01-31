@@ -5,7 +5,8 @@ import { MetaRune, Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { Era, era } from "../scale_info/mod.ts"
 import { Blake2_256 } from "../util/hashers.ts"
 import * as U from "../util/mod.ts"
-import { ClientRune } from "./client.ts"
+import { Hex } from "../util/mod.ts"
+import { Chain, ClientRune } from "./client.ts"
 import { CodecRune } from "./codec.ts"
 import { author, chain, payment, system } from "./rpc_known_methods.ts"
 
@@ -22,8 +23,8 @@ export interface SignedExtrinsicProps {
   tip?: bigint
 }
 
-export class ExtrinsicRune<out Call, out U> extends Rune<Call, U> {
-  constructor(_prime: ExtrinsicRune<Call, U>["_prime"], readonly client: ClientRune<U>) {
+export class ExtrinsicRune<out U, out C extends Chain = Chain> extends Rune<C["call"], U> {
+  constructor(_prime: ExtrinsicRune<U, C>["_prime"], readonly client: ClientRune<U, Chain>) {
     super(_prime)
   }
 
@@ -116,7 +117,7 @@ export class ExtrinsicRune<out Call, out U> extends Rune<Call, U> {
   }
 }
 
-export class SignedExtrinsicRune<out U> extends Rune<Uint8Array, U> {
+export class SignedExtrinsicRune<out U, out C extends Chain = Chain> extends Rune<Uint8Array, U> {
   constructor(_prime: SignedExtrinsicRune<U>["_prime"], readonly client: ClientRune<U>) {
     super(_prime)
   }
@@ -129,22 +130,27 @@ export class SignedExtrinsicRune<out U> extends Rune<Uint8Array, U> {
     return this.hex().map((hex) =>
       author.submitAndWatchExtrinsic(this.client as ClientRune<never>, hex)
         .unwrapError()
-    ).as(ExtrinsicStatusRune)
+    ).as(ExtrinsicStatusRune, this)
   }
 }
 
-export class ExtrinsicStatusRune<out U1, out U2> extends Rune<Rune<TransactionStatus, U1>, U2> {
-  constructor(_prime: ExtrinsicStatusRune<U1, U2>["_prime"]) {
+export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
+  extends Rune<Rune<TransactionStatus, U1>, U2>
+{
+  constructor(
+    _prime: ExtrinsicStatusRune<U1, U2, C>["_prime"],
+    readonly extrinsic: SignedExtrinsicRune<U2>,
+  ) {
     super(_prime)
   }
 
-  logEvents(...prefix: unknown[]): ExtrinsicStatusRune<U1, U2> {
+  logStatus(...prefix: unknown[]): ExtrinsicStatusRune<U1, U2, C> {
     return this.as(ValueRune).map((rune) =>
       rune.as(ValueRune).map((value) => {
         console.log(...prefix, value)
         return value
       })
-    ).as(ExtrinsicStatusRune)
+    ).as(ExtrinsicStatusRune<U1, U2, C>, this.extrinsic)
   }
 
   // TODO: extract common logic to be shared between `inBlock` and `finalized`
@@ -175,6 +181,50 @@ export class ExtrinsicStatusRune<out U1, out U2> extends Rune<Rune<TransactionSt
         )
         .singular()
     ).unwrapError()
+  }
+
+  events() {
+    const finalizedHash = this.finalized()
+    const extrinsics = chain
+      .getBlock(this.extrinsic.client, finalizedHash)
+      .unwrapError()
+      .access("block", "extrinsics")
+    const idx = Rune.tuple([extrinsics, this.extrinsic.hex()])
+      .map(([extrinsics, extrinsicHex]) => extrinsics.indexOf(("0x" + extrinsicHex) as Hex))
+    const events = this.extrinsic.client
+      .metadata()
+      .pallet("System")
+      .storage("Events")
+      .entry([], finalizedHash)
+      .unsafeAs<Events<C["event"]>>()
+      .as(ValueRune)
+    return Rune.tuple([idx, events])
+      .map(([idx, events]) =>
+        events.filter((event) => event.phase.type === "ApplyExtrinsic" && event.phase.value === idx)
+      )
+  }
+}
+
+export type Events<RuntimeEvent = unknown> = EventRecord<RuntimeEvent>[]
+export interface EventRecord<RuntimeEvent> {
+  phase: EventPhase
+  event: RuntimeEvent
+  topics: Uint8Array[]
+}
+export type EventPhase =
+  | EventPhase.ApplyExtrinsic
+  | EventPhase.Finalization
+  | EventPhase.Initialization
+export namespace EventPhase {
+  export interface ApplyExtrinsic {
+    type: "ApplyExtrinsic"
+    value: number
+  }
+  export interface Finalization {
+    type: "Finalization"
+  }
+  export interface Initialization {
+    type: "Initialization"
   }
 }
 

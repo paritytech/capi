@@ -21,7 +21,7 @@ await Utility.batchAll({
 })
   .signed({ sender: alice })
   .sent()
-  .logEvents()
+  .logStatus()
   .finalized()
   .unwrapError()
   .run()

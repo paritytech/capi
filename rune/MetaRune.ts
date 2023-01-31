@@ -31,8 +31,8 @@ class RunFlat<T, U1, U2> extends Run<T, U1 | U2> {
     if (receipt.novel) {
       this.innerController.abort()
       this.innerController = new AbortController()
-      const innerBatch = new Batch(this.batch.timeline, this.batch)
-      this.currentInner = innerBatch.prime(rune, this.innerController.signal)
+      // const innerBatch = new Batch(this.batch.timeline, this.batch)
+      this.currentInner = this.batch.prime(rune, this.innerController.signal)
     }
     const _receipt = new Receipt()
     try {
