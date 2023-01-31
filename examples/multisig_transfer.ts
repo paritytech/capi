@@ -5,8 +5,14 @@ import { MultiAddress } from "polkadot_dev/types/sp_runtime/multiaddress.ts"
 
 const daveBalance = System.Account.entry([C.dave.publicKey])
 
-const signatories = [C.alice, C.bob, C.charlie].map(({ publicKey }) => publicKey)
-const multisig = client.multisig({ signatories, threshold: 2 })
+const multisig = client.multisig({
+  signatories: [
+    C.alice.publicKey,
+    C.bob.publicKey,
+    C.charlie.publicKey,
+  ],
+  threshold: 2,
+})
 
 // Transfer initial balance (existential deposit) to multisig address
 const existentialDeposit = Balances
@@ -51,19 +57,19 @@ const approvalByCharlie = multisig
 
 console.log(await daveBalance.run())
 
-await existentialDeposit.sent().logEvents("Existential deposit:").finalizedHash().run()
+await existentialDeposit.sent().logEvents("Existential deposit:").finalized().run()
 
-await proposalByAlice.sent().logEvents("Proposal:").finalizedHash().run()
+await proposalByAlice.sent().logEvents("Proposal:").finalized().run()
 
 console.log("Is proposed?", await multisig.isProposed(callHash).run())
 
-await voteByBob.sent().logEvents("Vote:").finalizedHash().run()
+await voteByBob.sent().logEvents("Vote:").finalized().run()
 
 console.log(
   "Existing approvals",
   await multisig.proposal(callHash).unsafeAs<any>().as(ValueRune).access("approvals").run(),
 )
 
-await approvalByCharlie.sent().logEvents("Approval:").finalizedHash().run()
+await approvalByCharlie.sent().logEvents("Approval:").finalized().run()
 
 console.log(await daveBalance.run())

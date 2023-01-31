@@ -2,7 +2,7 @@ import { unreachable } from "../deps/std/testing/asserts.ts"
 import { Ty, TyDef, UnionTyDefMember } from "../scale_info/mod.ts"
 import { Metadata } from "./Metadata.ts"
 
-export function normalizeTys({ V3: { types, ...v3Rest }, ...topLevelRest }: Metadata): Metadata {
+export function normalize({ V3: { types, ...v3Rest }, ...topLevelRest }: Metadata): Metadata {
   return {
     ...topLevelRest,
     V3: {

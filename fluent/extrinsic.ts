@@ -9,12 +9,12 @@ import { ClientRune } from "./client.ts"
 import { CodecRune } from "./codec.ts"
 import { author, chain, payment, system } from "./rpc_known_methods.ts"
 
-interface ExtrinsicSender {
+export interface ExtrinsicSender {
   address: MultiAddress
   sign: Signer
 }
 
-interface SignedExtrinsicProps {
+export interface SignedExtrinsicProps {
   sender: ExtrinsicSender
   checkpoint?: U.HexHash
   mortality?: Era
@@ -147,7 +147,7 @@ export class ExtrinsicStatusRune<out U1, out U2> extends Rune<Rune<TransactionSt
     ).as(ExtrinsicStatusRune)
   }
 
-  finalizedHash() {
+  finalized() {
     return this.as(MetaRune).flatMap((events) =>
       events
         .as(ValueRune)
@@ -158,7 +158,7 @@ export class ExtrinsicStatusRune<out U1, out U2> extends Rune<Rune<TransactionSt
             : new NeverFinalizedError()
         )
         .singular()
-    )
+    ).unwrapError()
   }
 }
 

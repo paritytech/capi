@@ -22,7 +22,7 @@ await Utility.batchAll({
   .signed({ sender: alice })
   .sent()
   .logEvents()
-  .finalizedHash()
+  .finalized()
   .unwrapError()
   .run()
 
