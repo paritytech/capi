@@ -8,14 +8,14 @@ import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { DeriveCodec } from "../scale_info/mod.ts"
 import * as U from "../util/mod.ts"
 import { ClientRune } from "./client.ts"
-import { ExtrinsicRune } from "./extrinsic.ts"
+import { ExtrinsicRune, SignedExtrinsicProps } from "./extrinsic.ts"
 import { state } from "./rpc_known_methods.ts"
 
 export interface InkContract {
   metadataRaw: string
 }
 
-export interface InstantiateProps {
+export interface InkContractInstantiateProps {
   initiator: Uint8Array
   code: Uint8Array
   ctor?: string
@@ -49,7 +49,8 @@ export class InkContractRune<out U> extends Rune<InkContract, U> {
       .unwrapError()
   }
 
-  instantiate<X>(props: RunicArgs<X, InstantiateProps>) {
+  // TODO: create instantiation-specific rune so that we can `.address()` from it
+  instantiate<X>(props: RunicArgs<X, InkContractInstantiateProps>) {
     const ctor = this.ctor(props.ctor)
     const key = Rune.tuple([Rune.rec(props), ctor])
       .map(([{ code, initiator }, ctor]) =>
@@ -90,11 +91,43 @@ export class InkContractRune<out U> extends Rune<InkContract, U> {
     )
   }
 
-  // call<X>(props: RunicArgs<X, {}>) {}
-  // callTx<X>(props: RunicArgs<X, {}>) {}
+  declare fromAddress: <X>(
+    ...[address]: RunicArgs<X, [address: Uint8Array]>
+  ) => InkContractInstanceRune<U>
 }
 
-export class InkContractInstanceRune<out U> extends Rune<Uint8Array, U> {}
+export class InkContractInstanceRune<out U> extends Rune<Uint8Array, U> {
+  pallet
+
+  constructor(_prime: InkContractInstanceRune<U>["_prime"], readonly client: ClientRune<U>) {
+    super(_prime)
+    this.pallet = this.client.metadata().pallet("Contracts")
+  }
+
+  declare msg: <X>(
+    ...[method, ...args]: RunicArgs<X, [method: string, ...args: unknown[]]>
+  ) => InkContractMsg<U>
+}
+
+export class InkContractMsg<out U> extends Rune<Uint8Array, U> {
+  pallet
+
+  constructor(_prime: InkContractMsg<U>["_prime"], readonly client: ClientRune<U>) {
+    super(_prime)
+    this.pallet = this.client.metadata().pallet("Contracts")
+  }
+
+  declare signed: <X>(props: RunicArgs<X, SignedExtrinsicProps>) => InkContractMsgSigned<U>
+}
+
+export class InkContractMsgSigned<out U> extends Rune<Uint8Array, U> {
+  pallet
+
+  constructor(_prime: InkContractMsgSigned<U>["_prime"], readonly client: ClientRune<U>) {
+    super(_prime)
+    this.pallet = this.client.metadata().pallet("Contracts")
+  }
+}
 
 export class InkContractMetadataInvalidError extends Error {
   override readonly name = "InkContractMetadataInvalidError"

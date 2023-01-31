@@ -147,6 +147,22 @@ export class ExtrinsicStatusRune<out U1, out U2> extends Rune<Rune<TransactionSt
     ).as(ExtrinsicStatusRune)
   }
 
+  // TODO: extract common logic to be shared between `inBlock` and `finalized`
+  // TODO: confirm this is correct / finalization is negligible
+  inBlock() {
+    return this.as(MetaRune).flatMap((events) =>
+      events
+        .as(ValueRune)
+        .filter(TransactionStatus.isTerminal)
+        .map((status) =>
+          typeof status !== "string" && (status.inBlock ?? status.finalized)
+            ? (status.inBlock ?? status.finalized)
+            : new NeverInBlockError()
+        )
+        .singular()
+    ).unwrapError()
+  }
+
   finalized() {
     return this.as(MetaRune).flatMap((events) =>
       events
@@ -162,4 +178,5 @@ export class ExtrinsicStatusRune<out U1, out U2> extends Rune<Rune<TransactionSt
   }
 }
 
+export class NeverInBlockError extends Error {}
 export class NeverFinalizedError extends Error {}
