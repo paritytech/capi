@@ -1,4 +1,3 @@
-import { HexEncoded } from "../../util/branded.ts"
 import { Hash, Hex, ListOrValue, NumberOrHex, RpcResult, Subscription } from "./utils.ts"
 
 // https://github.com/paritytech/substrate/blob/0ba251c/primitives/runtime/src/generic/digest.rs
@@ -14,7 +13,7 @@ export interface Header {
   /** The parent hash. */
   parentHash: Hash
   /** The block number. */
-  number: HexEncoded<bigint>
+  number: Hex
   /** The state trie merkle root */
   stateRoot: Hash
   /** The merkle root of the extrinsics. */
