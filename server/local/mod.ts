@@ -7,6 +7,7 @@ export function handler(env: Env): Handler {
     const url = new URL(req.url)
     const path = url.pathname.slice(1)
     if (path === "") return new Response("capi dev server active")
+    if (path === "capi_cwd") return new Response(Deno.cwd())
     const pathInfo = parsePathInfo(path)
     if (pathInfo) {
       const { vCapi, vRuntime, providerId, generatorId, filePath } = pathInfo

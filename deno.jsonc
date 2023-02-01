@@ -35,8 +35,8 @@
     "test:examples": "deno task test _tasks/test_examples.ts",
     "test:update": "deno task test -- --update",
     "moderate": "deno run -A https://deno.land/x/moderate@0.0.5/mod.ts && dprint fmt",
-    "dev": "deno run -A --watch=deno.jsonc,docs/ main.ts --serve",
-    "ctx": "deno run -A main.ts --serve",
+    "dev": "deno run -A --watch=deno.jsonc,docs/ main.ts",
+    "ctx": "deno run -A main.ts",
     "cache": "deno task ctx -- deno cache -r=http://localhost:4646/",
     "star": "deno task run _tasks/star.ts && deno task cache --check target/star.ts",
     "run": "deno task ctx -- deno run -A -r=http://localhost:4646/"
