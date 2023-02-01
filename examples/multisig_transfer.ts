@@ -1,75 +1,79 @@
-import * as C from "capi/mod.ts"
+import { alice, bob, charlie, dave, MultisigRune, Rune } from "capi/mod.ts"
 import { ValueRune } from "capi/mod.ts"
 import { Balances, client, System } from "polkadot_dev/mod.ts"
 import { MultiAddress } from "polkadot_dev/types/sp_runtime/multiaddress.ts"
 
-const daveBalance = System.Account.entry([C.dave.publicKey])
+const multisig = Rune
+  .resolve({
+    signatories: [alice.publicKey, bob.publicKey, charlie.publicKey],
+    threshold: 2,
+  })
+  .as(MultisigRune, client)
 
-const multisig = client.multisig({
-  signatories: [
-    C.alice.publicKey,
-    C.bob.publicKey,
-    C.charlie.publicKey,
-  ],
-  threshold: 2,
+// The to-be proposed and approved call
+const call = Balances.transferKeepAlive({
+  dest: dave.address,
+  value: 1_230_000_000_000n,
 })
 
-// Transfer initial balance (existential deposit) to multisig address
-const existentialDeposit = Balances
+// Read dave's initial balance (to-be changed by the call)
+console.log("Dave initial balance:", await System.Account.entry([dave.publicKey]).run())
+
+// Transfer some funds into the multisig account
+await Balances
   .transfer({
     value: 2_000_000_000_000n,
     dest: MultiAddress.Id(multisig.address),
   })
-  .signed({ sender: C.alice })
+  .signed({ sender: alice })
+  .sent()
+  .logStatus("Existential deposit:")
+  .finalized()
+  .run()
 
-// The proposal
-const call = Balances.transferKeepAlive({
-  dest: C.dave.address,
-  value: 1230000000000n,
-})
+// Submit a proposal to dispatch the call
+await multisig
+  .ratify({ call, sender: alice.address })
+  .signed({ sender: alice })
+  .sent()
+  .logStatus("Proposal:")
+  .finalized()
+  .run()
 
-// First approval root
-const proposalByAlice = multisig
-  .ratify({
-    sender: C.alice.address,
-    call,
-  })
-  .signed({ sender: C.alice })
+// Check if the call has been proposed
+console.log("Is proposed?:", await multisig.isProposed(call.hash).run())
 
-// Get the proposal callHash
-const callHash = call.hash()
-
-// Approve without executing the proposal
-const voteByBob = multisig
+// Send a non-executing approval
+await multisig
   .approve({
-    sender: C.bob.address,
-    callHash,
+    callHash: call.hash,
+    sender: bob.address,
   })
-  .signed({ sender: C.bob })
+  .signed({ sender: bob })
+  .sent()
+  .logStatus("Vote:")
+  .finalized()
+  .run()
 
-// Approve and execute the proposal
-const approvalByCharlie = multisig
-  .ratify({
-    sender: C.charlie.address,
-    call,
-  })
-  .signed({ sender: C.charlie })
-
-console.log(await daveBalance.run())
-
-await existentialDeposit.sent().logEvents("Existential deposit:").finalized().run()
-
-await proposalByAlice.sent().logEvents("Proposal:").finalized().run()
-
-console.log("Is proposed?", await multisig.isProposed(callHash).run())
-
-await voteByBob.sent().logEvents("Vote:").finalized().run()
-
+// Check for existing approval(s)
 console.log(
-  "Existing approvals",
-  await multisig.proposal(callHash).unsafeAs<any>().as(ValueRune).access("approvals").run(),
+  "Existing approvals:",
+  await multisig
+    .proposal(call.hash)
+    .unsafeAs<any>()
+    .as(ValueRune)
+    .access("approvals")
+    .run(),
 )
 
-await approvalByCharlie.sent().logEvents("Approval:").finalized().run()
+// Send the executing (final) approval
+await multisig
+  .ratify({ call, sender: charlie.address })
+  .signed({ sender: charlie })
+  .sent()
+  .logStatus("Approval:")
+  .finalized()
+  .run()
 
-console.log(await daveBalance.run())
+// Check to see whether Dave's balance has in fact changed
+console.log("Dave final balance:", await System.Account.entry([dave.publicKey]).run())

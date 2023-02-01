@@ -24,8 +24,16 @@ export interface SignedExtrinsicProps {
 }
 
 export class ExtrinsicRune<out U, out C extends Chain = Chain> extends Rune<C["call"], U> {
+  hash
+
   constructor(_prime: ExtrinsicRune<U, C>["_prime"], readonly client: ClientRune<U, C>) {
     super(_prime)
+    const metadata = this.client.metadata()
+    this.hash = Rune.rec({ metadata, deriveCodec: metadata.deriveCodec })
+      .map((x) => Blake2_256.$hash(M.$call(x)))
+      .as(CodecRune)
+      .encoded(this)
+      .unwrapError()
   }
 
   signed<X>(_props: RunicArgs<X, SignedExtrinsicProps>) {
@@ -105,15 +113,6 @@ export class ExtrinsicRune<out U, out C extends Chain = Chain> extends Rune<C["c
           refTime: BigInt(typeof weight === "number" ? weight : weight.ref_time),
         },
       }))
-  }
-
-  hash() {
-    const metadata = this.client.metadata()
-    const $callHash = Rune.rec({
-      metadata,
-      deriveCodec: metadata.deriveCodec,
-    }).map((x) => Blake2_256.$hash(M.$call(x))).as(CodecRune)
-    return $callHash.encoded(this).unwrapError()
   }
 }
 

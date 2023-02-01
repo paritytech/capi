@@ -54,7 +54,7 @@ export class MultisigRune<out U, out C extends Chain = Chain> extends Rune<Multi
         otherSignatories: this.otherSignatories(sender),
         storeCall: false,
         maxWeight,
-        maybeTimepoint: this.maybeTimepoint(call.hash()),
+        maybeTimepoint: this.maybeTimepoint(call.hash),
       }),
     }))
   }

@@ -1,13 +1,11 @@
 import {
   client,
 } from "capi/frame/zombienet/examples/ink_contract/zombienet.toml/collator01/@v0.9.360/mod.ts"
-import { alice, InkContractRune } from "capi/mod.ts"
+import { alice, InkContractRune, Rune } from "capi/mod.ts"
 
-client.as(InkContractRune)
-
-// const contract = new InkContract({
-//   metadataRaw: Deno.readTextFileSync("examples/ink_contract/metadata.json"),
-// })
+const contract = Rune
+  .resolve(Deno.readTextFileSync("examples/ink_contract/metadata.json"))
+  .as(InkContractRune, client)
 
 // await contract
 //   .instantiate({

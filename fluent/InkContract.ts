@@ -11,25 +11,21 @@ import { Chain, ClientRune } from "./client.ts"
 import { ExtrinsicRune, SignedExtrinsicProps } from "./extrinsic.ts"
 import { state } from "./rpc_known_methods.ts"
 
-export interface InkContract {
-  metadataRaw: string
-}
-
 export interface InkContractInstantiateProps {
   initiator: Uint8Array
   code: Uint8Array
   ctor?: string
 }
 
-export class InkContractRune<out U, out C extends Chain = Chain> extends Rune<InkContract, U> {
-  private pallet
+export class InkContractRune<out U, out C extends Chain = Chain> extends Rune<string, U> {
   metadata
   ctors
 
   constructor(_prime: InkContractRune<U>["_prime"], readonly client: ClientRune<U, C>) {
     super(_prime)
-    this.pallet = this.client.metadata().pallet("Contracts")
-    this.metadata = this.as(ValueRune).map((x) => ink.normalize(JSON.parse(x.metadataRaw)))
+    this.metadata = this
+      .as(ValueRune)
+      .map((metadataRaw) => ink.normalize(JSON.parse(metadataRaw)))
     this.ctors = this.metadata.map(({ V3: { spec: { constructors } } }) =>
       constructors.reduce<Record<string, ink.Constructor | undefined>>(
         (acc, cur) => ({ ...acc, [cur.label]: cur }),
