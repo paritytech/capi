@@ -32,36 +32,24 @@ for (
 }
 
 Deno.test("ss58.encode invalid public key length", () => {
-  assertThrows(
-    () => ss58.encode(0, alice.publicKey.slice(0, 30)),
-    ss58.InvalidPublicKeyLengthError.prototype.message,
-  )
+  assertThrows(() => ss58.encode(0, alice.publicKey.slice(0, 30)), ss58.InvalidPublicKeyLengthError)
 })
 
 Deno.test("ss58.encode invalid network prefix", () => {
-  assertThrows(
-    () => ss58.encode(46, alice.publicKey, [0]),
-    ss58.InvalidNetworkPrefixError.prototype.message,
-  )
+  assertThrows(() => ss58.encode(46, alice.publicKey, [0]), ss58.InvalidNetworkPrefixError)
 })
 
 Deno.test("ss58.decodeRaw long address", () => {
-  assertThrows(
-    () => ss58.decodeRaw(new Uint8Array(40)),
-    ss58.InvalidAddressLengthError.prototype.message,
-  )
+  assertThrows(() => ss58.decodeRaw(new Uint8Array(40)), ss58.InvalidAddressLengthError)
 })
 
 Deno.test("ss58.decodeRaw short address", () => {
-  assertThrows(
-    () => ss58.decodeRaw(new Uint8Array(30)),
-    ss58.InvalidAddressLengthError.prototype.message,
-  )
+  assertThrows(() => ss58.decodeRaw(new Uint8Array(30)), ss58.InvalidAddressLengthError)
 })
 
 Deno.test("ss58.decodeRaw invalid checksum", () => {
   assertThrows(
     () => ss58.decodeRaw(Uint8Array.of(0, ...alice.publicKey, 255, 255)),
-    ss58.InvalidAddressChecksumError.prototype.message,
+    ss58.InvalidAddressChecksumError,
   )
 })
