@@ -109,7 +109,10 @@ export class ContractInstantiationSignedExtrinsicRune<out U, out C extends Chain
   extends SignedExtrinsicRune<U, C>
 {
   override sent() {
-    return super.sent().as(ContractInstantiationExtrinsicStatusRune, this)
+    return super.sent().as(
+      ContractInstantiationExtrinsicStatusRune,
+      this.as(SignedExtrinsicRune, this.client),
+    )
   }
 }
 
