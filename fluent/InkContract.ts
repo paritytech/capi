@@ -8,7 +8,12 @@ import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { DeriveCodec } from "../scale_info/mod.ts"
 import * as U from "../util/mod.ts"
 import { Chain, ClientRune } from "./client.ts"
-import { ExtrinsicRune, SignedExtrinsicProps } from "./extrinsic.ts"
+import {
+  ExtrinsicRune,
+  ExtrinsicStatusRune,
+  SignedExtrinsicProps,
+  SignedExtrinsicRune,
+} from "./extrinsic.ts"
 import { state } from "./rpc_known_methods.ts"
 
 export interface InkContractInstantiateProps {
@@ -70,54 +75,77 @@ export class InkContractRune<out U, out C extends Chain = Chain> extends Rune<st
       .unwrapNull()
       .map((result) => ink.$contractsApiInstantiateResult.decode(U.hex.decode(result)))
       .access("gasRequired")
-    return this.client.extrinsic(
-      Rune
-        .tuple([props.code, ctor, gasRequired])
-        .map(([code, ctor, gasRequired]) => ({
-          type: "Contracts",
-          value: {
-            type: "instantiateWithCode",
-            value: 0n,
-            gasLimit: gasRequired,
-            storageDepositLimit: undefined,
-            code,
-            data: U.hex.decode(ctor.selector),
-            salt: this.salt(),
-          },
-        })),
-    )
+    return Rune
+      .tuple([props.code, ctor, gasRequired])
+      .map(([code, ctor, gasRequired]) => ({
+        type: "Contracts",
+        value: {
+          type: "instantiateWithCode",
+          value: 0n,
+          gasLimit: gasRequired,
+          storageDepositLimit: undefined,
+          code,
+          data: U.hex.decode(ctor.selector),
+          salt: this.salt(),
+        },
+      }))
+      .as(ContractInstantiationExtrinsicRune, this.client)
   }
 
-  declare fromAddress: <X>(
-    ...[address]: RunicArgs<X, [address: Uint8Array]>
-  ) => InkContractInstanceRune<U>
+  // declare fromAddress: <X>(
+  //   ...[address]: RunicArgs<X, [address: Uint8Array]>
+  // ) => InkContractInstanceRune<U>
 }
 
-export class InkContractInstanceRune<out U, out C extends Chain = Chain>
-  extends Rune<Uint8Array, U>
+export class ContractInstantiationExtrinsicRune<out U, out C extends Chain = Chain>
+  extends ExtrinsicRune<U, C>
 {
-  constructor(_prime: InkContractInstanceRune<U>["_prime"], readonly client: ClientRune<U, C>) {
-    super(_prime)
-  }
-
-  declare msg: <X>(
-    ...[method, ...args]: RunicArgs<X, [method: string, ...args: unknown[]]>
-  ) => InkContractMsg<U>
-}
-
-export class InkContractMsg<out U, out C extends Chain = Chain> extends Rune<Uint8Array, U> {
-  constructor(_prime: InkContractMsg<U>["_prime"], readonly client: ClientRune<U, C>) {
-    super(_prime)
-  }
-
-  declare signed: <X>(props: RunicArgs<X, SignedExtrinsicProps>) => InkContractMsgSigned<U>
-}
-
-export class InkContractMsgSigned<out U, out C extends Chain = Chain> extends Rune<Uint8Array, U> {
-  constructor(_prime: InkContractMsgSigned<U>["_prime"], readonly client: ClientRune<U, C>) {
-    super(_prime)
+  override signed<X>(props: RunicArgs<X, SignedExtrinsicProps>) {
+    return super.signed(props).as(SignedExtrinsicRune, this.client)
   }
 }
+
+export class ContractInstantiationSignedExtrinsicRune<out U, out C extends Chain = Chain>
+  extends SignedExtrinsicRune<U, C>
+{
+  override sent() {
+    return super.sent().as(ContractInstantiationExtrinsicStatusRune, this)
+  }
+}
+
+export class ContractInstantiationExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
+  extends ExtrinsicStatusRune<U1, U2, C>
+{
+  address() {
+    // TODO
+  }
+}
+
+// export class InkContractInstanceRune<out U, out C extends Chain = Chain>
+//   extends Rune<Uint8Array, U>
+// {
+//   constructor(_prime: InkContractInstanceRune<U>["_prime"], readonly client: ClientRune<U, C>) {
+//     super(_prime)
+//   }
+
+//   declare msg: <X>(
+//     ...[method, ...args]: RunicArgs<X, [method: string, ...args: unknown[]]>
+//   ) => InkContractMsg<U>
+// }
+
+// export class InkContractMsg<out U, out C extends Chain = Chain> extends Rune<Uint8Array, U> {
+//   constructor(_prime: InkContractMsg<U>["_prime"], readonly client: ClientRune<U, C>) {
+//     super(_prime)
+//   }
+
+//   declare signed: <X>(props: RunicArgs<X, SignedExtrinsicProps>) => InkContractMsgSigned<U>
+// }
+
+// export class InkContractMsgSigned<out U, out C extends Chain = Chain> extends Rune<Uint8Array, U> {
+//   constructor(_prime: InkContractMsgSigned<U>["_prime"], readonly client: ClientRune<U, C>) {
+//     super(_prime)
+//   }
+// }
 
 export class InkContractMetadataInvalidError extends Error {
   override readonly name = "InkContractMetadataInvalidError"

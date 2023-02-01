@@ -152,22 +152,6 @@ export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
     ).as(ExtrinsicStatusRune<U1, U2, C>, this.extrinsic)
   }
 
-  // TODO: extract common logic to be shared between `inBlock` and `finalized`
-  // TODO: confirm this is correct / finalization is negligible
-  inBlock() {
-    return this.as(MetaRune).flatMap((events) =>
-      events
-        .as(ValueRune)
-        .filter(TransactionStatus.isTerminal)
-        .map((status) =>
-          typeof status !== "string" && (status.inBlock ?? status.finalized)
-            ? (status.inBlock ?? status.finalized)
-            : new NeverInBlockError()
-        )
-        .singular()
-    ).unwrapError()
-  }
-
   finalized() {
     return this.as(MetaRune).flatMap((events) =>
       events
