@@ -9,11 +9,11 @@ export function encode(
   return base58.encode(encodeRaw(prefix, pubKey, validNetworkPrefixes))
 }
 
-export const encodeRaw = (
+export function encodeRaw(
   prefix: number,
   pubKey: Uint8Array,
   validNetworkPrefixes?: readonly number[],
-): Uint8Array => {
+): Uint8Array {
   const isValidPublicKeyLength = !!VALID_PUBLIC_KEY_LENGTHS[pubKey.length]
 
   if (!isValidPublicKeyLength) {
