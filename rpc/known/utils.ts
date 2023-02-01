@@ -11,6 +11,6 @@ export type Hash = U.HexHash
 export type SubId = string
 export type AccountId = string
 export type Subscription<T, U> = string & { _subscription: [T, U] }
-export type NumberOrHex = U.HexEncoded<bigint> | number
+export type NumberOrHex = U.Hex | number
 export type ListOrValue<T> = T | T[]
 export type RpcResult<T> = T
