@@ -4,7 +4,6 @@ import {
   assertInstanceOf,
   assertNotInstanceOf,
 } from "../../deps/std/testing/asserts.ts"
-import * as U from "../../util/mod.ts"
 import { ProviderListener } from "./base.ts"
 import { smoldotProvider } from "./smoldot.ts"
 import { setup } from "./test_util.ts"
@@ -17,7 +16,7 @@ Deno.test({
     await t.step({
       name: "relay chain connection",
       async fn() {
-        const relay = await U.fetchText(
+        const relay = await fetchText(
           "https://raw.githubusercontent.com/paritytech/substrate-connect/main/packages/connect/src/connector/specs/polkadot.json",
         )
         const pendingSubscriptionId = deferred<string>()
@@ -75,10 +74,10 @@ Deno.test({
     await t.step({
       name: "parachain connection",
       async fn() {
-        const relay = await U.fetchText(
+        const relay = await fetchText(
           "https://raw.githubusercontent.com/paritytech/substrate-connect/main/packages/connect/src/connector/specs/westend2.json",
         )
-        const para = await U.fetchText(
+        const para = await fetchText(
           "https://raw.githubusercontent.com/paritytech/substrate-connect/main/projects/demo/src/assets/westend-westmint.json",
         )
 
@@ -154,7 +153,7 @@ Deno.test({
     await t.step({
       name: "send non-JSON",
       async fn() {
-        const relay = await U.fetchText(
+        const relay = await fetchText(
           "https://raw.githubusercontent.com/paritytech/substrate-connect/main/packages/connect/src/connector/specs/polkadot.json",
         )
         const [ref, message] = await setup(
@@ -170,3 +169,7 @@ Deno.test({
     })
   },
 })
+
+async function fetchText(url: string) {
+  return (await fetch(url)).text()
+}
