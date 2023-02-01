@@ -99,7 +99,7 @@ export class SignedExtrinsic<
     const senderSs58 = Z.ls(addrPrefix, this.props.sender).next(([addrPrefix, sender]) => {
       switch (sender.type) {
         case "Id": {
-          return U.ss58.encode(addrPrefix, sender.value)
+          return U.returnThrows<U.ss58.EncodeError>()(() => U.ss58.encode(addrPrefix, sender.value))
         }
         default: {
           unimplemented()
@@ -155,6 +155,7 @@ export function extrinsicsDecoded<Client extends Z.$<rpc.Client>>(client: Client
     )
 }
 
+// TODO: ensure that ss58 encoding failure is represented in `U` of to-be `ExtrinsicRune`
 function $extrinsic<
   Client extends Z.$<rpc.Client> = Z.$<rpc.Client>,
   Rest extends [sign?: Z.$<Signer>] = [sign?: Z.$<Signer>],
