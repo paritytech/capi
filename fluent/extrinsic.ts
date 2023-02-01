@@ -24,7 +24,7 @@ export interface SignedExtrinsicProps {
 }
 
 export class ExtrinsicRune<out U, out C extends Chain = Chain> extends Rune<C["call"], U> {
-  constructor(_prime: ExtrinsicRune<U, C>["_prime"], readonly client: ClientRune<U, Chain>) {
+  constructor(_prime: ExtrinsicRune<U, C>["_prime"], readonly client: ClientRune<U, C>) {
     super(_prime)
   }
 
@@ -118,7 +118,7 @@ export class ExtrinsicRune<out U, out C extends Chain = Chain> extends Rune<C["c
 }
 
 export class SignedExtrinsicRune<out U, out C extends Chain = Chain> extends Rune<Uint8Array, U> {
-  constructor(_prime: SignedExtrinsicRune<U>["_prime"], readonly client: ClientRune<U>) {
+  constructor(_prime: SignedExtrinsicRune<U>["_prime"], readonly client: ClientRune<U, C>) {
     super(_prime)
   }
 
@@ -128,7 +128,7 @@ export class SignedExtrinsicRune<out U, out C extends Chain = Chain> extends Run
 
   sent() {
     return this.hex().map((hex) =>
-      author.submitAndWatchExtrinsic(this.client as ClientRune<never>, hex)
+      author.submitAndWatchExtrinsic(this.client as ClientRune<never, C>, hex)
         .unwrapError()
     ).as(ExtrinsicStatusRune, this)
   }

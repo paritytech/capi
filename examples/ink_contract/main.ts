@@ -1,22 +1,24 @@
 import {
   client,
 } from "capi/frame/zombienet/examples/ink_contract/zombienet.toml/collator01/@v0.9.360/mod.ts"
-import { alice } from "capi/mod.ts"
+import { alice, InkContractRune } from "capi/mod.ts"
 
-const contract = client.inkContract({
-  metadataRaw: Deno.readTextFileSync("examples/ink_contract/metadata.json"),
-})
+client.as(InkContractRune)
 
-await contract
-  .instantiate({
-    code: Deno.readFileSync("examples/ink_contract/flipper.wasm"),
-    initiator: alice.publicKey,
-  })
-  .signed({ sender: alice })
-  .sent()
-  .logStatus()
-  .inBlock()
-  .run()
+// const contract = new InkContract({
+//   metadataRaw: Deno.readTextFileSync("examples/ink_contract/metadata.json"),
+// })
+
+// await contract
+//   .instantiate({
+//     code: Deno.readFileSync("examples/ink_contract/flipper.wasm"),
+//     initiator: alice.publicKey,
+//   })
+//   .signed({ sender: alice })
+//   .sent()
+//   .logStatus()
+//   .inBlock()
+//   .run()
 
 // TODO: what values do we want?
 // console.log(".get", await instance.msg("get").run())

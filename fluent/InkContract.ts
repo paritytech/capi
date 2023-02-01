@@ -7,7 +7,7 @@ import * as rpc from "../rpc/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { DeriveCodec } from "../scale_info/mod.ts"
 import * as U from "../util/mod.ts"
-import { ClientRune } from "./client.ts"
+import { Chain, ClientRune } from "./client.ts"
 import { ExtrinsicRune, SignedExtrinsicProps } from "./extrinsic.ts"
 import { state } from "./rpc_known_methods.ts"
 
@@ -21,12 +21,12 @@ export interface InkContractInstantiateProps {
   ctor?: string
 }
 
-export class InkContractRune<out U> extends Rune<InkContract, U> {
+export class InkContractRune<out U, out C extends Chain = Chain> extends Rune<InkContract, U> {
   private pallet
   metadata
   ctors
 
-  constructor(_prime: InkContractRune<U>["_prime"], readonly client: ClientRune<U>) {
+  constructor(_prime: InkContractRune<U>["_prime"], readonly client: ClientRune<U, C>) {
     super(_prime)
     this.pallet = this.client.metadata().pallet("Contracts")
     this.metadata = this.as(ValueRune).map((x) => ink.normalize(JSON.parse(x.metadataRaw)))
@@ -97,12 +97,11 @@ export class InkContractRune<out U> extends Rune<InkContract, U> {
   ) => InkContractInstanceRune<U>
 }
 
-export class InkContractInstanceRune<out U> extends Rune<Uint8Array, U> {
-  pallet
-
-  constructor(_prime: InkContractInstanceRune<U>["_prime"], readonly client: ClientRune<U>) {
+export class InkContractInstanceRune<out U, out C extends Chain = Chain>
+  extends Rune<Uint8Array, U>
+{
+  constructor(_prime: InkContractInstanceRune<U>["_prime"], readonly client: ClientRune<U, C>) {
     super(_prime)
-    this.pallet = this.client.metadata().pallet("Contracts")
   }
 
   declare msg: <X>(
@@ -110,23 +109,17 @@ export class InkContractInstanceRune<out U> extends Rune<Uint8Array, U> {
   ) => InkContractMsg<U>
 }
 
-export class InkContractMsg<out U> extends Rune<Uint8Array, U> {
-  pallet
-
-  constructor(_prime: InkContractMsg<U>["_prime"], readonly client: ClientRune<U>) {
+export class InkContractMsg<out U, out C extends Chain = Chain> extends Rune<Uint8Array, U> {
+  constructor(_prime: InkContractMsg<U>["_prime"], readonly client: ClientRune<U, C>) {
     super(_prime)
-    this.pallet = this.client.metadata().pallet("Contracts")
   }
 
   declare signed: <X>(props: RunicArgs<X, SignedExtrinsicProps>) => InkContractMsgSigned<U>
 }
 
-export class InkContractMsgSigned<out U> extends Rune<Uint8Array, U> {
-  pallet
-
-  constructor(_prime: InkContractMsgSigned<U>["_prime"], readonly client: ClientRune<U>) {
+export class InkContractMsgSigned<out U, out C extends Chain = Chain> extends Rune<Uint8Array, U> {
+  constructor(_prime: InkContractMsgSigned<U>["_prime"], readonly client: ClientRune<U, C>) {
     super(_prime)
-    this.pallet = this.client.metadata().pallet("Contracts")
   }
 }
 

@@ -2,7 +2,7 @@ import * as bytes from "../deps/std/bytes.ts"
 import { MultiAddress } from "../primitives/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { multisigAddress } from "../util/mod.ts"
-import { ClientRune } from "./client.ts"
+import { Chain, ClientRune } from "./client.ts"
 
 export interface MultisigRatifyProps {
   sender: MultiAddress
@@ -19,7 +19,7 @@ export interface Multisig {
   threshold: number
 }
 
-export class MultisigRune<out U> extends Rune<Multisig, U> {
+export class MultisigRune<out U, out C extends Chain = Chain> extends Rune<Multisig, U> {
   threshold = this.as(ValueRune).access("threshold")
   address = this.as(ValueRune).map(({ signatories, threshold }) =>
     multisigAddress(signatories, threshold)
@@ -28,7 +28,7 @@ export class MultisigRune<out U> extends Rune<Multisig, U> {
   private pallet
   private storage
 
-  constructor(_prime: MultisigRune<U>["_prime"], readonly client: ClientRune<U>) {
+  constructor(_prime: MultisigRune<U>["_prime"], readonly client: ClientRune<U, C>) {
     super(_prime)
     this.pallet = this.client.metadata().pallet("Multisig")
     this.storage = this.pallet.storage("Multisigs")
