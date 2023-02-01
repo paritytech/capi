@@ -4,11 +4,11 @@ import {
   extrinsic,
   types,
   XcmPallet,
-} from "capi/frame/zombienet/examples/xcm_teleport_assets.toml/alice/@v0.9.36/mod.ts"
+} from "zombienet/examples/xcm_teleport_assets.toml/alice/@v0.9.36/mod.ts"
 import {
   client as parachainClient,
   System,
-} from "capi/frame/zombienet/examples/xcm_teleport_assets.toml/collator01/@v0.9.360/mod.ts"
+} from "zombienet/examples/xcm_teleport_assets.toml/collator01/@v0.9.360/mod.ts"
 
 const {
   VersionedMultiAssets,
