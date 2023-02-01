@@ -30,7 +30,7 @@ export function entryWatch<Client extends Z.$<rpc.Client>>(client: Client) {
     const storageKeys = scale
       .scaleEncoded($storageKey_, keys.length ? [keys] : [])
       .next(U.hex.encode)
-      .next(U.tuple)
+      .next((...x) => x)
     const createListenerMapped = Z
       .ls($entry, createListener)
       .next(([$entry, createListener]) => {
