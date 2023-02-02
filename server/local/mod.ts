@@ -54,8 +54,12 @@ export function handler(env: Env): Handler {
     for (const dir of staticDirs) {
       try {
         const url = new URL(path, dir)
-        await Deno.lstat(url)
-        return await f.staticFile(req, url)
+        const res = await fetch(url)
+        if (!res.ok) continue
+        if (f.acceptsHtml(req)) {
+          return f.page(await f.codePage({ path: url.toString(), src: await res.text() }))
+        }
+        return res
       } catch (_e) {}
     }
     return f.notFound()

@@ -1,17 +1,10 @@
 import { escapeHtml } from "../../deps/escape.ts"
 import * as shiki from "../../deps/shiki.ts"
-import { serveFile } from "../../deps/std/http/file_server.ts"
 import { Status } from "../../deps/std/http/http_status.ts"
 import * as U from "../../util/mod.ts"
 
 shiki.setCDN("https://unpkg.com/shiki/")
 export const highlighterPromise = shiki.getHighlighter({ theme: "github-dark", langs: ["ts"] })
-
-export async function staticFile(req: Request, url: URL): Promise<Response> {
-  const { pathname: path } = url
-  if (acceptsHtml(req)) return page(await codePage({ path, src: await Deno.readTextFile(url) }))
-  return await serveFile(req, path)
-}
 
 export async function code(req: Request, path: string, src: string): Promise<Response> {
   if (acceptsHtml(req)) return page(await codePage({ path, src }))
