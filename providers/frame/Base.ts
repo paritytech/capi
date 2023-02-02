@@ -26,22 +26,27 @@ export abstract class FrameProvider extends Provider {
       const { vRuntime } = pathInfo
       const client_ = await this.client(pathInfo)
       let version = await this.version(client_)
-      let blockI = parseInt((await this.call<known.Header>(client_, "chain_getHeader")).number, 16)
+      let blockI = parseInt(
+        (await this.clientCall<known.Header>(client_, "chain_getHeader")).number,
+        16,
+      )
       if (version !== vRuntime) {
-        // TODO: improve search with slice-narrowing strategy
+        // TODO(tjjfvi): improve search with slice-narrowing strategy
         while (version !== vRuntime) {
           blockI -= 100
           version = await this.version(client_, blockI)
         }
       }
-      const blockHash = await this.call<string>(client_, "chain_getBlockHash", [blockI])
-      const metadata = fromPrefixedHex(await this.call(client_, "state_getMetadata", [blockHash]))
+      const blockHash = await this.clientCall<string>(client_, "chain_getBlockHash", [blockI])
+      const metadata = fromPrefixedHex(
+        await this.clientCall(client_, "state_getMetadata", [blockHash]),
+      )
       const clientFile = await this.clientFile(pathInfo)
       return new FrameCodegen({ metadata, clientFile })
     })
   }
 
-  async call<R>(client: Client, method: string, params: unknown[] = []): Promise<R> {
+  async clientCall<R>(client: Client, method: string, params: unknown[] = []): Promise<R> {
     const result = throwIfError(await client.call(client.providerRef.nextId(), method, params))
     if (result.error) throw new Error(result.error.message)
     return result.result as R
@@ -49,9 +54,9 @@ export abstract class FrameProvider extends Provider {
 
   version = async (client: Client, blockNum?: number) => {
     const blockHash = typeof blockNum === "number"
-      ? await this.call(client, "chain_getBlockHash", [blockNum])
+      ? await this.clientCall(client, "chain_getBlockHash", [blockNum])
       : undefined
     return "v"
-      + (await this.call<string>(client, "system_version", [blockHash])).split("-")[0]!
+      + (await this.clientCall<string>(client, "system_version", [blockHash])).split("-")[0]!
   }
 }

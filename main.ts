@@ -44,7 +44,7 @@ if (src) {
     await Deno.remove(codegenDest, { recursive: true })
   } catch (_e) {}
   const depPath = path.join(codegenDest, "capi.ts")
-  const capi_ = capi.startsWith("file:///")
+  const capi_ = capi.startsWith("file://")
     ? capi
     : path.relative(path.join("..", depPath), path.join(Deno.cwd(), capi))
   await Promise.all([
@@ -52,7 +52,7 @@ if (src) {
       await fs.ensureFile(depPath)
       await Deno.writeTextFile(depPath, `export * from "${capi_}"`)
     })(),
-    [...codegen.files.entries()].map(async ([subpath, file]) => {
+    ...[...codegen.files.entries()].map(async ([subpath, file]) => {
       const dest_ = path.join(codegenDest, subpath)
       await fs.ensureFile(dest_)
       return await Deno.writeTextFile(dest_, file.code(dest_))
