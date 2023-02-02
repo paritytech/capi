@@ -40,8 +40,9 @@ export function handler(env: Env): Handler {
           switch (filePath) {
             case "":
               return await f.serverError("TODO: chain root page")
-            case "capi.ts":
-              return await f.redirect("/mod.ts")
+            case "capi.ts": {
+              return f.code(req, "capi.ts", `export * from "/mod.ts"`)
+            }
             default: {
               const file = (await provider.codegen(pathInfo)).files.get(filePath)
               if (file) return await f.code(req, filePath, file.code(filePath))

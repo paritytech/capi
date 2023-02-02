@@ -3,11 +3,9 @@ import { Ty } from "../../scale_info/mod.ts"
 import { Codegen } from "../Codegen.ts"
 import { File } from "../File.ts"
 import { codecs } from "./codecs.ts"
-import { extrinsic, extrinsicInfo } from "./extrinsic.ts"
 import { pallet } from "./pallet.ts"
 import { type } from "./type.ts"
 import { typeVisitor } from "./typeVisitor.ts"
-
 export interface FrameCodegenProps {
   metadata: Metadata
   clientFile: File
@@ -36,10 +34,11 @@ export class FrameCodegen extends Codegen {
 
     this.files.set("client/mod.ts", clientFile)
 
-    const extrinsicInfo_ = extrinsicInfo(this)
-    this.files.set("extrinsic.ts", extrinsic(this, extrinsicInfo_))
+    const callTy = Object
+      .fromEntries(this.metadata.extrinsic.ty.params.map((x) => [x.name.toLowerCase(), x.ty]))
+      .call!
 
-    const callTySrcPath = this.typeVisitor.visit(extrinsicInfo_.callTy)
+    const callTySrcPath = this.typeVisitor.visit(callTy)
 
     let palletNamespaceExports = ""
     for (const p of this.metadata.pallets) {

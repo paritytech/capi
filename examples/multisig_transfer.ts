@@ -1,5 +1,4 @@
-import { alice, bob, charlie, dave, MultisigRune, Rune } from "capi/mod.ts"
-import { ValueRune } from "capi/mod.ts"
+import { alice, bob, charlie, dave, MultisigRune, Rune, ValueRune } from "capi/mod.ts"
 import { Balances, client, System } from "polkadot_dev/mod.ts"
 import { MultiAddress } from "polkadot_dev/types/sp_runtime/multiaddress.ts"
 

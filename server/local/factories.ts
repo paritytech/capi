@@ -9,25 +9,19 @@ export const highlighterPromise = shiki.getHighlighter({ theme: "github-dark", l
 
 export async function staticFile(req: Request, url: URL): Promise<Response> {
   const { pathname: path } = url
-  if (acceptsHtml(req)) {
-    return page(await codePage({ path, src: await Deno.readTextFile(url) }))
-  }
+  if (acceptsHtml(req)) return page(await codePage({ path, src: await Deno.readTextFile(url) }))
   return await serveFile(req, path)
 }
 
 export async function code(req: Request, path: string, src: string): Promise<Response> {
-  if (acceptsHtml(req)) {
-    return page(await codePage({ path, src }))
-  }
+  if (acceptsHtml(req)) return page(await codePage({ path, src }))
   return new Response(src, {
     headers: { "Content-Type": "application/typescript" },
   })
 }
 
 export async function redirect(path: string): Promise<Response> {
-  if (path.startsWith("file://")) {
-    return await fetch(path)
-  }
+  if (path.startsWith("file://")) return await fetch(path)
   return new Response(null, {
     status: Status.Found,
     headers: { Location: path },
