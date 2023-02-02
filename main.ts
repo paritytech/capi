@@ -44,7 +44,7 @@ if (src) {
     await Deno.remove(codegenDest, { recursive: true })
   } catch (_e) {}
   const depPath = path.join(codegenDest, "capi.ts")
-  const capi_ = capi.startsWith("file://")
+  const capi_ = /^\w+:\/\//.test(capi)
     ? capi
     : path.relative(path.join("..", depPath), path.join(Deno.cwd(), capi))
   await Promise.all([
