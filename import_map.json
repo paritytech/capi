@@ -1,7 +1,7 @@
 {
   "imports": {
     "polkadot/": "http://localhost:4646/frame/wss/rpc.polkadot.io/@v0.9.37/",
-    "polkadot_dev/": "http://localhost:4646/frame/dev/polkadot/@v0.9.36/",
+    "polkadot_dev/": "http://localhost:4646/frame/dev/polkadot/@v0.9.36-dc25abc712e/",
     "kusama/": "http://localhost:4646/frame/wss/kusama-rpc.polkadot.io/@v0.9.37/",
     "kusama_dev/": "http://localhost:4646/frame/dev/kusama/@v0.9.36/",
     "westend/": "http://localhost:4646/frame/wss/westend-rpc.polkadot.io/@v0.9.37/",

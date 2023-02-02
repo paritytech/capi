@@ -12,24 +12,34 @@ export abstract class FrameProvider extends Provider {
 
   abstract client(pathInfo: PathInfo): U.PromiseOr<Client>
   abstract clientFile(pathInfo: PathInfo): U.PromiseOr<File>
-  abstract cacheKey(pathInfo: PathInfo): string
 
   codegenMemo = new WeakMemo<string, FrameCodegen>()
   codegen(pathInfo: PathInfo) {
     return this.codegenMemo.run(this.cacheKey(pathInfo), async () => {
       const { vRuntime, src } = pathInfo
       const client_ = await this.client(pathInfo)
-      if (vRuntime) {
+      const vRuntime_ = vRuntime ?? await (async () => {
         const vRuntimeR = U.throwIfError(
           await client_.call<string>(client_.providerRef.nextId(), "system_version", []),
         )
         if (vRuntimeR.error) throw new Error(vRuntimeR.error.message)
-        const normalized = normalizeVRuntime(vRuntimeR.result)
-        if (vRuntime !== normalized) {
-          throw new Error(
-            `\`vRuntime\` (${vRuntime}) of "${src}" different from live (${normalized})`,
-          )
+        const split = vRuntimeR.result.split("-")
+        if (split.length !== 2) {
+          throw new Error(`Failed to retrieve latest runtime info from "${src}"`)
         }
+        return split[1]!
+      })()
+      const blockNum = vRuntime_.split("-")[1]
+      if (!blockNum) {
+        throw new Error(`Failed to parse block number from version runtime version ${vRuntime_}`)
+      }
+      const blockHash = U.throwIfError(
+        await client_.call(client_.providerRef.nextId(), "chain_getBlockHash", [blockNum]),
+      )
+      if (blockHash.error) throw new Error(blockHash.error.message)
+      console.log(blockHash.result)
+      if (true as boolean) {
+        Deno.exit()
       }
       const metadataR = U.throwIfError(
         await client_.call<string>(client_.providerRef.nextId(), "state_getMetadata", []),

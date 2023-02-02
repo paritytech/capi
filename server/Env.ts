@@ -18,20 +18,19 @@ export class Env {
     }
   }
 
-  codegen(src: string) {
+  async digest(src: string) {
     const pathInfo = parsePathInfo(src)
     if (!pathInfo) throw new Error("Could not parse src")
     const { generatorId, providerId } = pathInfo
-    const generatorProviders = this.providers[generatorId]
-    if (!generatorProviders) {
-      throw new Error(`Could not match provider with generatorId of \`${generatorId}\``)
+    const provider = this.providers[generatorId]?.[providerId]
+    if (!provider) throw new Error(`Could not match ${generatorId}/${providerId} provider`)
+    return {
+      generatorId,
+      providerId,
+      cacheKey: provider.cacheKey(pathInfo),
+      codegen: await provider.codegen(pathInfo),
     }
-    const provider = generatorProviders[providerId]
-    if (!provider) {
-      throw new Error(
-        `Could not match ${generatorId} provider with providerId of \`${providerId}\``,
-      )
-    }
-    return provider.codegen(pathInfo)
   }
 }
+
+interface ProviderDigest {}

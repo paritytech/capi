@@ -9,6 +9,7 @@ export abstract class Provider {
 
   constructor(readonly env: Env) {}
 
+  abstract cacheKey(pathInfo: PathInfo): string
   abstract codegen(pathInfo: PathInfo): U.PromiseOr<Codegen>
 }
 

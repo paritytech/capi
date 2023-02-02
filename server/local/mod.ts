@@ -1,5 +1,5 @@
 import { Handler } from "../../deps/std/http/server.ts"
-import { Env, parsePathInfo } from "../mod.ts"
+import { Env, fromPathInfo, parsePathInfo } from "../mod.ts"
 import * as f from "./factories.ts"
 
 export function handler(env: Env): Handler {
@@ -21,7 +21,7 @@ export function handler(env: Env): Handler {
             )
           }
           if (typeof vRuntime !== "string") {
-            return await f.serverError("No `vRuntime` in `pathInfo`")
+            return await f.redirect(fromPathInfo(pathInfo))
           }
           if (typeof filePath !== "string") {
             return await f.serverError("No `filePath` in `pathInfo`")
