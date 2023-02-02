@@ -65,34 +65,40 @@ if (typeof serve_ === "string") {
   const port = +(serve_ || 4646)
   const href = `http://localhost:${port}`
 
-  let portErr: string | undefined
-  try {
-    if (await (await fetch(`${href}/capi_cwd`)).text() === Deno.cwd()) {
-      portErr = `Capi server already running on port ${port}`
-    }
-    portErr = `Port ${port} is already in use`
-  } catch (_e) {}
-  if (portErr) throw new Error(portErr)
-
-  await serve(handler(env), {
-    port,
-    signal,
-    onError(error) {
-      throw error
-    },
-    async onListen() {
-      console.log(`Capi server listening on ${href}`)
-      if (cmd.length) {
-        const status = await Deno
-          .run({
-            cmd,
-            stderr: "inherit",
-            stdout: "inherit",
-          })
-          .status()
-        self.addEventListener("unload", () => Deno.exit(status.code))
-        controller.abort()
+  const alreadyRunning = await (async () => {
+    try {
+      if (await (await fetch(`${href}/capi_cwd`)).text() === Deno.cwd()) {
+        return true
       }
-    },
-  })
+    } catch (_e) {}
+    return false
+  })()
+
+  if (!alreadyRunning) {
+    await serve(handler(env), {
+      port,
+      signal,
+      onError(error) {
+        throw error
+      },
+      async onListen() {
+        console.log(`Capi server listening on ${href}`)
+        await after()
+      },
+    })
+  } else await after()
+}
+
+async function after() {
+  if (cmd.length) {
+    const status = await Deno
+      .run({
+        cmd,
+        stderr: "inherit",
+        stdout: "inherit",
+      })
+      .status()
+    self.addEventListener("unload", () => Deno.exit(status.code))
+    controller.abort()
+  }
 }

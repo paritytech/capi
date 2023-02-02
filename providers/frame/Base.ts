@@ -33,7 +33,7 @@ export abstract class FrameProvider extends Provider {
       if (version !== vRuntime) {
         // TODO(tjjfvi): improve search with slice-narrowing strategy
         while (version !== vRuntime) {
-          blockI -= 100
+          blockI -= 2048
           version = await this.version(client_, blockI)
         }
       }
