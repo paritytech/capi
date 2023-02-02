@@ -1,6 +1,6 @@
 import {
   client,
-} from "capi/frame/zombienet/examples/ink_contract/zombienet.toml/collator01/@v0.9.360/mod.ts"
+} from "capi/frame/zombienet/examples/ink_contract/zombienet.toml/collator01/@v0.9.370/mod.ts"
 import { alice, InkContractRune, Rune } from "capi/mod.ts"
 
 const contract = Rune

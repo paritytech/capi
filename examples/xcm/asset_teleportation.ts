@@ -5,7 +5,7 @@ import {
 import {
   client as parachainClient,
   System,
-} from "capi/frame/zombienet/examples/xcm/zombienet.toml/collator01/@v0.9.360/mod.ts"
+} from "capi/frame/zombienet/examples/xcm/zombienet.toml/collator01/@v0.9.370/mod.ts"
 import { alice, Rune } from "capi/mod.ts"
 
 const {
