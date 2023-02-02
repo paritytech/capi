@@ -51,7 +51,6 @@ export class FrameCodegen extends Codegen {
     this.files.set(
       "mod.ts",
       new File(`
-      export * from "./extrinsic.ts"
       export * from "./client/mod.ts"
       export * as types from "./types/mod.ts"
 
