@@ -14,5 +14,3 @@ const rPathInfo =
 export function parsePathInfo(src: string): PathInfo | undefined {
   return rPathInfo.exec(src)?.groups as PathInfo | undefined
 }
-
-export function fromPathInfo(pathInfo: PathInfo): string {}

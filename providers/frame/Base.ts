@@ -29,10 +29,8 @@ export abstract class FrameProvider extends Provider {
         }
         return split[1]!
       })()
-      const blockNum = vRuntime_.split("-")[1]
-      if (!blockNum) {
-        throw new Error(`Failed to parse block number from version runtime version ${vRuntime_}`)
-      }
+      const [semver, blockNum] = vRuntime_.split("-")
+      if (!semver) throw new Error(`Failed to parse version \`${vRuntime_}\``)
       const blockHash = U.throwIfError(
         await client_.call(client_.providerRef.nextId(), "chain_getBlockHash", [blockNum]),
       )
@@ -52,6 +50,16 @@ export abstract class FrameProvider extends Provider {
   }
 }
 
-function normalizeVRuntime(src: string): string {
-  return `v${src.split("-")[0]}`
+async function versionInfo(client: Client) {
+  const [systemVersionRaw, blockNum] = await Promise.all([
+    handleError(client.call<string>(client.providerRef.nextId(), "system_version", [])),
+    handleError(client.call<string>(client.providerRef.nextId(), "chain_getBlock", [])),
+  ])
+  return { semver: systemVersionRaw.split("-"), blockNum }
+}
+
+async function handleError<R extends ReturnType<Client["call"]>>(r: R): Promise<string> {
+  const result = U.throwIfError(await r)
+  if (result.error) throw new Error(result.error.message)
+  return result.result as string
 }
