@@ -101,7 +101,7 @@ export class ContractInstantiationExtrinsicRune<out U, out C extends Chain = Cha
   extends ExtrinsicRune<U, C>
 {
   override signed<X>(props: RunicArgs<X, SignedExtrinsicProps>) {
-    return super.signed(props).as(SignedExtrinsicRune, this.client)
+    return super.signed(props).as(ContractInstantiationSignedExtrinsicRune, this.client)
   }
 }
 

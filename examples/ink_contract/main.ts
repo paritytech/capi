@@ -15,7 +15,7 @@ await contract
   .signed({ sender: alice })
   .sent()
   .logStatus()
-  .inBlock()
+  .address()
   .run()
 
 // TODO: what values do we want?
