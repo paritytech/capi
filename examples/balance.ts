@@ -1,7 +1,10 @@
 import * as C from "capi/mod.ts"
 
-import { nextUser, System } from "westend_dev/mod.ts"
+import { System } from "rococo_dev/mod.ts"
 
-const root = System.Account.entry(nextUser().publicKey).read()
+console.log({ ss58Prefix: System.SS58Prefix })
 
-console.log(C.throwIfError(await root.run()))
+const root = System.Account.keys().readPage(200)
+
+// should be 112 when working
+console.log(C.throwIfError(await root.run()).length)

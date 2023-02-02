@@ -54,7 +54,19 @@ export class PolkadotDevProvider extends FrameProxyProvider {
       ss58.encode(DEV_RUNTIME_PREFIXES[runtimeName], publicKey),
       TEST_USER_INITIAL_FUNDS,
     ]))
-    return chainSpec
+    const chainSpecPath = await Deno.makeTempFile()
+    await Deno.writeTextFile(chainSpecPath, JSON.stringify(chainSpec))
+    const chainSpecRawProcess = Deno.run({
+      cmd: ["polkadot", "build-spec", "--raw", `--chain=${chainSpecPath}`],
+      stdout: "piped",
+      stderr: "piped",
+    })
+    const [chainSpecRawPath, chainSpecRaw] = await Promise.all([
+      Deno.makeTempFile(),
+      chainSpecRawProcess.output(),
+    ])
+    await Deno.writeFile(chainSpecRawPath, chainSpecRaw)
+    return chainSpecRawPath
   }
 
   override onCodegenInit(codegen: FrameCodegen) {
@@ -84,8 +96,7 @@ export class PolkadotDevProvider extends FrameProxyProvider {
   }
 
   async spawnDevNet(runtimeName: DevRuntimeName) {
-    const chainSpecPath = await Deno.makeTempFile()
-    await Deno.writeTextFile(chainSpecPath, JSON.stringify(await this.chainSpec(runtimeName)))
+    const chainSpecPath = await this.chainSpec(runtimeName)
     const port = getAvailable()
     const cmd: string[] = [
       this.bin,
