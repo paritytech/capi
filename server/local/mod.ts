@@ -1,5 +1,5 @@
 import { Handler } from "../../deps/std/http/server.ts"
-import { Env, parsePathInfo } from "../mod.ts"
+import { Env, fromPathInfo, parsePathInfo } from "../mod.ts"
 import * as f from "./factories.ts"
 
 export function handler(env: Env): Handler {
@@ -10,7 +10,7 @@ export function handler(env: Env): Handler {
     if (path === "capi_cwd") return new Response(Deno.cwd())
     const pathInfo = parsePathInfo(path)
     if (pathInfo) {
-      const { vCapi, vRuntime, providerId, generatorId, filePath } = pathInfo
+      const { vCapi, vRuntime, providerId, generatorId, filePath, target } = pathInfo
       const generatorProviders = env.providers[generatorId]
       if (generatorProviders) {
         const provider = generatorProviders[providerId]
@@ -21,8 +21,18 @@ export function handler(env: Env): Handler {
             )
           }
           if (typeof vRuntime !== "string") {
-            throw new Error("TODO")
-            // return await f.redirect(fromPathInfo(pathInfo))
+            return await f.serverError("No `vRuntime` in `pathInfo`")
+          } else if (vRuntime === "latest") {
+            return await f.redirect(
+              "/" + fromPathInfo(
+                vCapi,
+                generatorId,
+                providerId,
+                target,
+                await provider.vRuntime(pathInfo),
+                filePath,
+              ),
+            )
           }
           if (typeof filePath !== "string") {
             return await f.serverError("No `filePath` in `pathInfo`")

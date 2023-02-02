@@ -1,65 +1,57 @@
 import { File, FrameCodegen } from "../../codegen/mod.ts"
 import { fromPrefixedHex } from "../../frame_metadata/mod.ts"
-import { Client } from "../../rpc/mod.ts"
+import { Client, known } from "../../rpc/mod.ts"
 import { PathInfo, Provider } from "../../server/mod.ts"
-import * as U from "../../util/mod.ts"
-import { WeakMemo } from "../../util/mod.ts"
+import { PromiseOr, throwIfError, TimedMemo, WeakMemo } from "../../util/mod.ts"
 
 export abstract class FrameProvider extends Provider {
   generatorId = "frame"
 
   codegenCtxsPending: Record<string, Promise<FrameCodegen>> = {}
 
-  abstract client(pathInfo: PathInfo): U.PromiseOr<Client>
-  abstract clientFile(pathInfo: PathInfo): U.PromiseOr<File>
+  abstract client(pathInfo: PathInfo): PromiseOr<Client>
+  abstract clientFile(pathInfo: PathInfo): PromiseOr<File>
+
+  vRuntimeMemo = new TimedMemo<string, string>(2 * 60 * 1000, this.env.signal)
+  vRuntime(pathInfo: PathInfo) {
+    return this.vRuntimeMemo.run(
+      this.cacheKey(pathInfo),
+      async () => await this.version(await this.client(pathInfo)),
+    )
+  }
 
   codegenMemo = new WeakMemo<string, FrameCodegen>()
   codegen(pathInfo: PathInfo) {
     return this.codegenMemo.run(this.cacheKey(pathInfo), async () => {
-      const { vRuntime, src } = pathInfo
+      const { vRuntime } = pathInfo
       const client_ = await this.client(pathInfo)
-      const vRuntime_ = vRuntime ?? await (async () => {
-        const vRuntimeR = U.throwIfError(
-          await client_.call<string>(client_.providerRef.nextId(), "system_version", []),
-        )
-        if (vRuntimeR.error) throw new Error(vRuntimeR.error.message)
-        const split = vRuntimeR.result.split("-")
-        if (split.length !== 2) {
-          throw new Error(`Failed to retrieve latest runtime info from "${src}"`)
+      let version = await this.version(client_)
+      let blockI = parseInt((await this.call<known.Header>(client_, "chain_getHeader")).number, 16)
+      if (version !== vRuntime) {
+        // TODO: improve search with slice-narrowing strategy
+        while (version !== vRuntime) {
+          blockI -= 100
+          version = await this.version(client_, blockI)
         }
-        return split[1]!
-      })()
-      const [semver, blockNum] = vRuntime_.split("-")
-      if (!semver) throw new Error(`Failed to parse version \`${vRuntime_}\``)
-      const blockHash = U.throwIfError(
-        await client_.call(client_.providerRef.nextId(), "chain_getBlockHash", [blockNum]),
-      )
-      if (blockHash.error) throw new Error(blockHash.error.message)
-      console.log(blockHash.result)
-      if (true as boolean) {
-        Deno.exit()
       }
-      const metadataR = U.throwIfError(
-        await client_.call<string>(client_.providerRef.nextId(), "state_getMetadata", []),
-      )
-      if (metadataR.error) throw new Error(metadataR.error.message)
-      const metadata = fromPrefixedHex(metadataR.result)
+      const blockHash = await this.call<string>(client_, "chain_getBlockHash", [blockI])
+      const metadata = fromPrefixedHex(await this.call(client_, "state_getMetadata", [blockHash]))
       const clientFile = await this.clientFile(pathInfo)
       return new FrameCodegen({ metadata, clientFile })
     })
   }
-}
 
-async function versionInfo(client: Client) {
-  const [systemVersionRaw, blockNum] = await Promise.all([
-    handleError(client.call<string>(client.providerRef.nextId(), "system_version", [])),
-    handleError(client.call<string>(client.providerRef.nextId(), "chain_getBlock", [])),
-  ])
-  return { semver: systemVersionRaw.split("-"), blockNum }
-}
+  async call<R>(client: Client, method: string, params: unknown[] = []): Promise<R> {
+    const result = throwIfError(await client.call(client.providerRef.nextId(), method, params))
+    if (result.error) throw new Error(result.error.message)
+    return result.result as R
+  }
 
-async function handleError<R extends ReturnType<Client["call"]>>(r: R): Promise<string> {
-  const result = U.throwIfError(await r)
-  if (result.error) throw new Error(result.error.message)
-  return result.result as string
+  version = async (client: Client, blockNum?: number) => {
+    const blockHash = typeof blockNum === "number"
+      ? await this.call(client, "chain_getBlockHash", [blockNum])
+      : undefined
+    return "v"
+      + (await this.call<string>(client, "system_version", [blockHash])).split("-")[0]!
+  }
 }
