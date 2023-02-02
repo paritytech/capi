@@ -1,13 +1,5 @@
-import { Codegen } from "../codegen/mod.ts"
 import { parsePathInfo } from "./PathInfo.ts"
-import { Provider, ProviderFactory } from "./Provider.ts"
-
-export interface ProviderDigest {
-  generatorId: string
-  providerId: string
-  cacheKey: string
-  codegen: Codegen
-}
+import { Provider, ProviderDigest, ProviderFactory } from "./Provider.ts"
 
 export class Env {
   providers: Record<string, Record<string, Provider>> = {}
