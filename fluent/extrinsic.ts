@@ -138,7 +138,7 @@ export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
 {
   constructor(
     _prime: ExtrinsicStatusRune<U1, U2, C>["_prime"],
-    readonly extrinsic: SignedExtrinsicRune<U2>,
+    readonly extrinsic: SignedExtrinsicRune<U2, C>,
   ) {
     super(_prime)
   }

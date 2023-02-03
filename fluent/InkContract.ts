@@ -119,6 +119,10 @@ export class ContractInstantiationSignedExtrinsicRune<out U, out C extends Chain
 export class ContractInstantiationExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
   extends ExtrinsicStatusRune<U1, U2, C>
 {
+  override logStatus(...prefix: unknown[]) {
+    return super.logStatus(...prefix).as(ContractInstantiationExtrinsicStatusRune, this.extrinsic)
+  }
+
   address() {
     // TODO
   }

@@ -1,12 +1,9 @@
-import {
-  types,
-  XcmPallet,
-} from "capi/frame/zombienet/examples/xcm/zombienet.toml/alice/@v0.9.36/mod.ts"
+import { alice, Rune } from "capi/mod.ts"
+import { types, XcmPallet } from "zombienet/examples/xcm/zombienet.toml/alice/@v0.9.36/mod.ts"
 import {
   client as parachainClient,
   System,
-} from "capi/frame/zombienet/examples/xcm/zombienet.toml/collator01/@v0.9.370/mod.ts"
-import { alice, Rune } from "capi/mod.ts"
+} from "zombienet/examples/xcm/zombienet.toml/collator01/@v0.9.370/mod.ts"
 
 const {
   VersionedMultiAssets,
