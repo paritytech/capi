@@ -31,9 +31,8 @@ export class ExtrinsicRune<out U, out C extends Chain = Chain> extends Rune<C["c
     const metadata = this.client.metadata()
     this.hash = Rune.rec({ metadata, deriveCodec: metadata.deriveCodec })
       .map((x) => Blake2_256.$hash(M.$call(x)))
-      .as(CodecRune)
+      .into(CodecRune)
       .encoded(this)
-      .unwrapError()
   }
 
   signed<X>(_props: RunicArgs<X, SignedExtrinsicProps>) {
@@ -46,10 +45,10 @@ export class ExtrinsicRune<out U, out C extends Chain = Chain> extends Rune<C["c
       deriveCodec: metadata.deriveCodec,
       sign: props.sender.access("sign"),
       prefix: addrPrefix,
-    }).map(M.$extrinsic).as(CodecRune)
+    }).map(M.$extrinsic).into(CodecRune)
     const versions = System.const("Version").decoded.unsafeAs<
       { specVersion: number; transactionVersion: number }
-    >().as(ValueRune)
+    >().into(ValueRune)
     const specVersion = versions.access("specVersion")
     const transactionVersion = versions.access("transactionVersion")
     // TODO: create match effect in zones and use here
@@ -63,9 +62,9 @@ export class ExtrinsicRune<out U, out C extends Chain = Chain> extends Rune<C["c
           throw new Error("unimplemented")
         }
       }
-    }).unwrapError()
-    const nonce = system.accountNextIndex(this.client.as(), senderSs58)
-    const genesisHashHex = chain.getBlockHash(this.client.as(), 0).unwrapError()
+    }).throws(U.ss58.InvalidPublicKeyLengthError, U.ss58.InvalidNetworkPrefixError)
+    const nonce = system.accountNextIndex(this.client.into(), senderSs58)
+    const genesisHashHex = chain.getBlockHash(this.client.into(), 0)
     const genesisHash = genesisHashHex.map(U.hex.decode)
     const checkpointHash = Rune.tuple([props.checkpoint, genesisHashHex]).map(([a, b]) => a ?? b)
       .map(U.hex.decode)
@@ -83,8 +82,8 @@ export class ExtrinsicRune<out U, out C extends Chain = Chain> extends Rune<C["c
       call: this,
       signature,
     })
-    const extrinsic = $extrinsic.encoded(extrinsicProps).unwrapError()
-    return extrinsic.as(SignedExtrinsicRune, this.client)
+    const extrinsic = $extrinsic.encoded(extrinsicProps)
+    return extrinsic.into(SignedExtrinsicRune, this.client)
   }
 
   encoded() {
@@ -94,18 +93,17 @@ export class ExtrinsicRune<out U, out C extends Chain = Chain> extends Rune<C["c
       deriveCodec: metadata.deriveCodec,
       sign: null!,
       prefix: null!,
-    }).map(M.$extrinsic).as(CodecRune)
+    }).map(M.$extrinsic).into(CodecRune)
     const $extrinsicProps = Rune.rec({
       protocolVersion: 4,
       call: this,
     })
-    return $extrinsic.encoded($extrinsicProps).unwrapError()
+    return $extrinsic.encoded($extrinsicProps)
   }
 
   feeEstimate() {
     const extrinsicHex = this.encoded().map(U.hex.encodePrefixed)
     return payment.queryInfo(this.client, extrinsicHex)
-      .unwrapError()
       .map(({ weight, ...rest }) => ({
         ...rest,
         weight: {
@@ -122,14 +120,13 @@ export class SignedExtrinsicRune<out U, out C extends Chain = Chain> extends Run
   }
 
   hex() {
-    return this.as(ValueRune).map(U.hex.encode)
+    return this.into(ValueRune).map(U.hex.encode)
   }
 
   sent() {
     return this.hex().map((hex) =>
       author.submitAndWatchExtrinsic(this.client as ClientRune<never, C>, hex)
-        .unwrapError()
-    ).as(ExtrinsicStatusRune, this)
+    ).into(ExtrinsicStatusRune, this)
   }
 }
 
@@ -144,18 +141,18 @@ export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
   }
 
   logStatus(...prefix: unknown[]): ExtrinsicStatusRune<U1, U2, C> {
-    return this.as(ValueRune).map((rune) =>
-      rune.as(ValueRune).map((value) => {
+    return this.into(ValueRune).map((rune) =>
+      rune.into(ValueRune).map((value) => {
         console.log(...prefix, value)
         return value
       })
-    ).as(ExtrinsicStatusRune<U1, U2, C>, this.extrinsic)
+    ).into(ExtrinsicStatusRune<U1, U2, C>, this.extrinsic)
   }
 
   finalized() {
-    return this.as(MetaRune).flatMap((events) =>
+    return this.into(MetaRune).flatMap((events) =>
       events
-        .as(ValueRune)
+        .into(ValueRune)
         .filter(TransactionStatus.isTerminal)
         .map((status) =>
           typeof status !== "string" && status.finalized
@@ -163,14 +160,13 @@ export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
             : new NeverFinalizedError()
         )
         .singular()
-    ).unwrapError()
+    ).unhandle(NeverFinalizedError)
   }
 
   events() {
     const finalizedHash = this.finalized()
     const extrinsics = chain
       .getBlock(this.extrinsic.client, finalizedHash)
-      .unwrapError()
       .access("block", "extrinsics")
     const idx = Rune.tuple([extrinsics, this.extrinsic.hex()])
       .map(([extrinsics, extrinsicHex]) => extrinsics.indexOf(("0x" + extrinsicHex) as Hex))
@@ -180,7 +176,7 @@ export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
       .storage("Events")
       .entry([], finalizedHash)
       .unsafeAs<Events<C["event"]>>()
-      .as(ValueRune)
+      .into(ValueRune)
     return Rune.tuple([idx, events])
       .map(([idx, events]) =>
         events.filter((event) => event.phase.type === "ApplyExtrinsic" && event.phase.value === idx)

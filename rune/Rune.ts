@@ -87,7 +87,7 @@ export class Rune<out T, out U = never> {
   }
 
   static resolve<V>(value: V): ValueRune<Rune.T<V>, Rune.U<V>> {
-    return value instanceof Rune ? value.as(ValueRune) : Rune.constant(value)
+    return value instanceof Rune ? value.into(ValueRune) : Rune.constant(value)
   }
 
   static tuple<R extends unknown[]>(
@@ -100,7 +100,7 @@ export class Rune<out T, out U = never> {
   }
 
   static array<T, X>(runes: RunicArgs<X, T[]>) {
-    return ValueRune.new(RunLs, RunicArgs.resolve(runes)).as(ArrayRune)
+    return ValueRune.new(RunLs, RunicArgs.resolve(runes)).into(ArrayRune)
   }
 
   static rec<R extends {}>(
@@ -113,6 +113,26 @@ export class Rune<out T, out U = never> {
     })
   }
 
+  static captureUnhandled<R extends unknown[], T2, U2>(
+    sources: [...R],
+    fn: (
+      ...runes: { [K in keyof R]: ValueRune<Rune.T<R[K]>, never> }
+    ) => Rune<T2, U2>,
+  ): ValueRune<T2, Rune.U<R[number]> | U2>
+  static captureUnhandled<R, T2, U2>(
+    sources: any[],
+    fn: (...runes: ValueRune<Rune.T<R>, never>[]) => Rune<T2, U2>,
+  ): ValueRune<T2, Rune.U<R> | U2> {
+    const symbol = Symbol()
+    return ValueRune.new(
+      RunCaptureUnhandled<T2, U2, Rune.U<R>>,
+      fn(
+        ...sources.map((source) => ValueRune.new(RunBubbleUnhandled, Rune.resolve(source), symbol)),
+      ),
+      symbol,
+    )
+  }
+
   static asyncIter<T>(fn: (signal: AbortSignal) => AsyncIterable<T>): ValueRune<T, never> {
     return ValueRune.new(RunAsyncIter, fn)
   }
@@ -121,12 +141,12 @@ export class Rune<out T, out U = never> {
     return Rune.new(RunPlaceholder)
   }
 
-  as<T, U>(this: Rune<T, U>): Rune<T, U>
-  as<A extends unknown[], C>(
+  into<T, U>(this: Rune<T, U>): Rune<T, U>
+  into<A extends unknown[], C>(
     ctor: new(_prime: (batch: Batch) => Run<T, U>, ...args: A) => C,
     ...args: A
   ): C
-  as<A extends unknown[], C>(
+  into<A extends unknown[], C>(
     ctor: new(_prime: (batch: Batch) => Run<T, U>, ...args: A) => C = Rune as any,
     ...args: A
   ) {
@@ -301,7 +321,49 @@ class RunPlaceholder extends Run<never, never> {
   }
 }
 
-export class UnwrappedValue<U = unknown> {
+class RunBubbleUnhandled<T, U> extends Run<T, never> {
+  child
+  constructor(batch: Batch, child: Rune<T, U>, readonly symbol: symbol) {
+    super(batch)
+    this.child = batch.prime(child, this.signal)
+  }
+
+  async _evaluate(time: number, receipt: Receipt) {
+    try {
+      return await this.child.evaluate(time, receipt)
+    } catch (e) {
+      if (e instanceof Unhandled) {
+        throw new BubbleUnhandled(this.symbol, e.value)
+      }
+      throw e
+    }
+  }
+}
+
+class RunCaptureUnhandled<T, U1, U2> extends Run<T, U1 | U2> {
+  child
+  constructor(batch: Batch, child: Rune<T, U1>, readonly symbol: symbol) {
+    super(batch)
+    this.child = batch.prime(child, this.signal)
+  }
+
+  async _evaluate(time: number, receipt: Receipt) {
+    try {
+      return await this.child.evaluate(time, receipt)
+    } catch (e) {
+      if (e instanceof BubbleUnhandled && e.symbol === this.symbol) {
+        throw new Unhandled(e.value)
+      }
+      throw e
+    }
+  }
+}
+
+class BubbleUnhandled<U> {
+  constructor(readonly symbol: symbol, readonly value: U) {}
+}
+
+export class Unhandled<U = unknown> {
   declare private _
   constructor(readonly value: U) {}
 }

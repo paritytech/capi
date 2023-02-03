@@ -20,8 +20,8 @@ export interface Multisig {
 }
 
 export class MultisigRune<out U, out C extends Chain = Chain> extends Rune<Multisig, U> {
-  threshold = this.as(ValueRune).access("threshold")
-  address = this.as(ValueRune).map(({ signatories, threshold }) =>
+  threshold = this.into(ValueRune).access("threshold")
+  address = this.into(ValueRune).map(({ signatories, threshold }) =>
     multisigAddress(signatories, threshold)
   )
 
@@ -36,7 +36,7 @@ export class MultisigRune<out U, out C extends Chain = Chain> extends Rune<Multi
 
   otherSignatories<X>(...[sender]: RunicArgs<X, [sender: MultiAddress]>) {
     return Rune
-      .tuple([this.as(ValueRune).access("signatories"), sender])
+      .tuple([this.into(ValueRune).access("signatories"), sender])
       .map(([signatories, sender]) =>
         signatories.filter((value) => !bytes.equals(value, sender.value!))
       )
@@ -86,25 +86,22 @@ export class MultisigRune<out U, out C extends Chain = Chain> extends Rune<Multi
         threshold: this.threshold,
         callHash,
         otherSignatories: this.otherSignatories(sender),
-        timepoint: this.maybeTimepoint(callHash).map((x) => x ?? new NoProposalError())
-          .unwrapError(),
+        timepoint: this.maybeTimepoint(callHash).map((x) => x ?? new NoProposalError()),
       }),
     }))
   }
 
   private maybeTimepoint<X>(...[callHash]: RunicArgs<X, [callHash: Uint8Array]>) {
-    // TODO: improve this
-    return this.as().as(ValueRune).wrapU().as(
-      MultisigRune,
-      this.client.as(ValueRune).wrapU().as(ClientRune),
+    return Rune.captureUnhandled(
+      [this, this.client, callHash],
+      (multisig, client, callHash) =>
+        multisig.into(MultisigRune, client.into(ClientRune))
+          .proposal(callHash)
+          .unsafeAs<{ when: unknown }>()
+          .into(ValueRune)
+          .access("when")
+          .handle(null, () => Rune.resolve(undefined)),
     )
-      .proposal(Rune.resolve(callHash).wrapU())
-      .unsafeAs<{ when: unknown }>()
-      .as(ValueRune)
-      .access("when")
-      .catch()
-      .unwrapError()
-      .map((x) => x ?? undefined)
   }
 
   proposals<X>(...[count]: RunicArgs<X, [count: number]>) {

@@ -11,17 +11,17 @@ export class PalletRune<out U> extends Rune<M.Pallet, U> {
 
   storage<X>(...[storageName]: RunicArgs<X, [storageName: string]>) {
     return Rune
-      .tuple([this.as(), storageName])
+      .tuple([this.into(), storageName])
       .map(([metadata, palletName]) => M.getStorage(metadata, palletName))
-      .unwrapError()
-      .as(StorageRune, this)
+      .unhandle(M.StorageNotFoundError)
+      .into(StorageRune, this)
   }
 
   const<X>(...[constName]: RunicArgs<X, [constantName: string]>) {
     return Rune
-      .tuple([this.as(), constName])
+      .tuple([this.into(), constName])
       .map(([metadata, constName]) => M.getConst(metadata, constName))
-      .unwrapError()
-      .as(ConstRune, this)
+      .unhandle(M.ConstNotFoundError)
+      .into(ConstRune, this)
   }
 }

@@ -23,7 +23,6 @@ await Utility.batchAll({
   .sent()
   .logStatus()
   .finalized()
-  .unwrapError()
   .run()
 
 console.log(await balances.run())

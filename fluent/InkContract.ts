@@ -29,7 +29,7 @@ export class InkContractRune<out U, out C extends Chain = Chain> extends Rune<st
   constructor(_prime: InkContractRune<U>["_prime"], readonly client: ClientRune<U, C>) {
     super(_prime)
     this.metadata = this
-      .as(ValueRune)
+      .into(ValueRune)
       .map((metadataRaw) => ink.normalize(JSON.parse(metadataRaw)))
     this.ctors = this.metadata.map(({ V3: { spec: { constructors } } }) =>
       constructors.reduce<Record<string, ink.Constructor | undefined>>(
@@ -89,7 +89,7 @@ export class InkContractRune<out U, out C extends Chain = Chain> extends Rune<st
           salt: this.salt(),
         },
       }))
-      .as(ContractInstantiationExtrinsicRune, this.client)
+      .into(ContractInstantiationExtrinsicRune, this.client)
   }
 
   // declare fromAddress: <X>(
@@ -101,7 +101,7 @@ export class ContractInstantiationExtrinsicRune<out U, out C extends Chain = Cha
   extends ExtrinsicRune<U, C>
 {
   override signed<X>(props: RunicArgs<X, SignedExtrinsicProps>) {
-    return super.signed(props).as(ContractInstantiationSignedExtrinsicRune, this.client)
+    return super.signed(props).into(ContractInstantiationSignedExtrinsicRune, this.client)
   }
 }
 
@@ -109,9 +109,9 @@ export class ContractInstantiationSignedExtrinsicRune<out U, out C extends Chain
   extends SignedExtrinsicRune<U, C>
 {
   override sent() {
-    return super.sent().as(
+    return super.sent().into(
       ContractInstantiationExtrinsicStatusRune,
-      this.as(SignedExtrinsicRune, this.client),
+      this.into(SignedExtrinsicRune, this.client),
     )
   }
 }

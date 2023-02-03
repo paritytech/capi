@@ -7,10 +7,10 @@ export class ArrayRune<T, U> extends Rune<T[], U> {
     fn: (value: ValueRune<T, never>) => Rune<T2, U2>,
   ): ArrayRune<T2, U | U2> {
     return this
-      .as(ValueRune)
+      .into(ValueRune)
       .map((arr) => Rune.tuple(arr.map((val) => fn(Rune.constant(val)))))
-      .as(MetaRune)
-      .flat(fn(Rune._placeholder().as(ValueRune)))
-      .as(ArrayRune)
+      .into(MetaRune)
+      .flat(fn(Rune._placeholder().into(ValueRune)))
+      .into(ArrayRune)
   }
 }

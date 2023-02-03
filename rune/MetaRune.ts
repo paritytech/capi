@@ -8,7 +8,7 @@ export class MetaRune<T, U1, U2> extends Rune<Rune<T, U1>, U2> {
   }
 
   flatMap<T2, U3>(fn: (rune: Rune<T, U1>) => Rune<T2, U3>): ValueRune<T2, U1 | U2 | U3> {
-    return this.as(ValueRune).map(fn).as(MetaRune).flat(fn(Rune._placeholder()))
+    return this.into(ValueRune).map(fn).into(MetaRune).flat(fn(Rune._placeholder()))
   }
 }
 

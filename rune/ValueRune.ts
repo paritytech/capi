@@ -1,14 +1,31 @@
 import { PromiseOr } from "../util/types.ts"
-import { Batch, Run, Rune, UnwrappedValue } from "./Rune.ts"
+import { Batch, Run, Rune, Unhandled } from "./Rune.ts"
 import { Receipt } from "./Timeline.ts"
 
-type GetPath<T, P> = P extends [infer K, ...infer Q] ? K extends keyof T ? GetPath<T[K], Q> : never
+type NonIndexSignatureKeys<T> = T extends T ? keyof {
+    [K in keyof T as {} extends Record<K, never> ? never : K]: T[K]
+  }
+  : never
+type Access<T, K extends keyof T, _K = NonIndexSignatureKeys<T>> = [
+  | T[K]
+  | Exclude<
+    undefined,
+    _K extends keyof any ? Record<K, never> extends Record<_K, never> ? undefined
+      : never
+      : never
+  >,
+][0]
+
+type GetPath<T, P> = P extends [infer K, ...infer Q]
+  ? T extends {} ? K extends keyof T ? GetPath<Access<T, K>, Q> : never : T
   : T
-type EnsurePath<T, P> = never extends P
-  ? P extends [infer K, ...infer Q]
-    ? [K] extends [keyof T] ? [K, ...EnsurePath<T[K], Q>] : [keyof T, ...PropertyKey[]]
-  : [(keyof T)?]
+type EnsurePath<T, P> = T extends {}
+  ? never extends P
+    ? P extends [infer K, ...infer Q] ? [K] extends [keyof T] ? [K, ...EnsurePath<T[K], Q>]
+      : [keyof T, ...PropertyKey[]]
+    : [(keyof T)?]
   : P
+  : []
 
 export class ValueRune<out T, out U = never> extends Rune<T, U> {
   static override new<T, U, A extends unknown[]>(
@@ -22,50 +39,51 @@ export class ValueRune<out T, out U = never> extends Rune<T, U> {
     return ValueRune.new(RunMap, this, fn)
   }
 
-  access<T, U, P extends PropertyKey[]>(
+  access<P extends PropertyKey[], T, U>(
     this: ValueRune<T, U>,
     ...keys: EnsurePath<T, P>
   ): ValueRune<GetPath<T, P>, U> {
     return this.map((value: any) => {
       for (const key of keys) {
-        value = value[key]
+        value = value?.[key]
       }
       return value
     })
   }
 
-  unwrap<T2 extends T>(fn: (value: T) => value is T2): ValueRune<T2, U | Exclude<T, T2>> {
-    return ValueRune.new(RunUnwrap, this, fn)
+  unhandle<U2 extends T>(fn: Guard<T, U2>): ValueRune<Unguard<T, U2>, U | U2>
+  unhandle(fn: Guard<T, T>): ValueRune<T, U | T> {
+    return ValueRune.new(RunUnhandle, this, fn)
   }
 
-  unwrapNot<T2 extends T>(fn: (value: T) => value is T2): ValueRune<Exclude<T, T2>, U | T2>
-  unwrapNot<T2 extends T>(
-    fn: (value: T) => value is T2,
-  ): ValueRune<Exclude<T, T2>, U | Exclude<T, Exclude<T, T2>>> {
-    return this.unwrap((value): value is Exclude<T, T2> => !fn(value))
+  throws<U2 extends unknown[]>(
+    ...guards: { [K in keyof U2]: Guard<unknown, U2[K]> }
+  ): ValueRune<T, U | U2[number]>
+  throws<U2>(...guards: Array<abstract new(...args: any[]) => U2>): ValueRune<T, U | U2> {
+    return ValueRune.new(RunThrows, this, guards)
   }
 
-  unwrapError<T, U>(this: ValueRune<T, U>) {
-    return this.unwrapNot((x): x is Extract<T, Error> => x instanceof Error)
-  }
-
-  unwrapUndefined<T, U>(this: ValueRune<T, U>) {
-    return this.unwrapNot((x): x is T & undefined => x === undefined)
-  }
-
-  unwrapNull<T, U>(this: ValueRune<T, U>) {
-    return this.unwrapNot((x): x is T & null => x === null)
-  }
-
-  catch(): ValueRune<
-    T | Exclude<U, UnwrappedValue<any>>,
-    U extends UnwrappedValue<infer X> ? X : never
-  > {
-    return ValueRune.new(RunCatch, this)
-  }
-
-  wrapU() {
-    return ValueRune.new(RunWrapU, this)
+  handle<U2 extends U>(
+    guard: Guard<U, U2>,
+  ): ValueRune<T | U2, Exclude<U, U2>>
+  handle<U2 extends U, T3, U3>(
+    guard: Guard<U, U2>,
+    alt: (rune: ValueRune<U2, never>) => Rune<T3, U3>,
+  ): ValueRune<T | T3, Exclude<U, U2> | U3>
+  handle<U2 extends U, T3, U3>(
+    guard: Guard<U, U2>,
+    alt: (rune: ValueRune<U2, never>) => Rune<T3, U3> = (x) => x as any,
+  ): ValueRune<T | T3, Exclude<U, U2> | U3> {
+    return ValueRune.new(
+      RunHandle,
+      this,
+      (x: U): x is U2 => checkGuard(x, guard),
+      alt(
+        ValueRune.new(RunGetUnhandled, this)
+          .filter((x) => x !== null && checkGuard(x.value, guard))
+          .map((x) => x!.value),
+      ),
+    )
   }
 
   lazy() {
@@ -125,26 +143,27 @@ class RunMap<T1, U, T2> extends Run<T2, U> {
   }
 }
 
-class RunUnwrap<T1, U, T2 extends T1> extends Run<T2, U | Exclude<T1, T2>> {
+class RunUnhandle<T, U> extends Run<T, U | T> {
   child
-  constructor(batch: Batch, child: Rune<T1, U>, readonly fn: (value: T1) => value is T2) {
+  constructor(batch: Batch, child: Rune<T, U>, readonly guard: Guard<T, T>) {
     super(batch)
     this.child = batch.prime(child, this.signal)
   }
 
   async _evaluate(time: number, receipt: Receipt) {
-    const value = await this.child.evaluate(time, receipt)
-    if (this.fn(value)) return value
-    throw new UnwrappedValue(value)
+    const value = (await this.child.evaluate(time, receipt)) as T
+    if (checkGuard(value, this.guard)) throw new Unhandled(value)
+    return value
   }
 }
 
-class RunCatch<T, U> extends Run<
-  T | Exclude<U, UnwrappedValue<any>>,
-  U extends UnwrappedValue<infer X> ? X : never
-> {
+class RunThrows<T, U1, U2> extends Run<T, U1 | U2> {
   child
-  constructor(batch: Batch, child: Rune<T, U>) {
+  constructor(
+    batch: Batch,
+    child: Rune<T, U1>,
+    readonly guards: Array<Guard<unknown, U2>>,
+  ) {
     super(batch)
     this.child = batch.prime(child, this.signal)
   }
@@ -153,19 +172,15 @@ class RunCatch<T, U> extends Run<
     try {
       return await this.child.evaluate(time, receipt)
     } catch (e) {
-      if (e instanceof UnwrappedValue) {
-        if (e.value instanceof UnwrappedValue) {
-          throw e.value
-        } else {
-          return e.value as Exclude<U, UnwrappedValue<any>>
-        }
+      for (const guard of this.guards) {
+        if (checkGuard(e, guard)) throw new Unhandled(e)
       }
       throw e
     }
   }
 }
 
-class RunWrapU<T, U> extends Run<T, UnwrappedValue<U>> {
+class RunGetUnhandled<T, U> extends Run<Unhandled<U> | null, never> {
   child
   constructor(batch: Batch, child: Rune<T, U>) {
     super(batch)
@@ -174,10 +189,37 @@ class RunWrapU<T, U> extends Run<T, UnwrappedValue<U>> {
 
   async _evaluate(time: number, receipt: Receipt) {
     try {
+      await this.child.evaluate(time, receipt)
+      return null
+    } catch (e) {
+      if (e instanceof Unhandled) {
+        return e
+      }
+      throw e
+    }
+  }
+}
+
+class RunHandle<T1, U1, U2 extends U1, T3, U3> extends Run<T1 | T3, Exclude<U1, U2> | U3> {
+  child
+  alt
+  constructor(
+    batch: Batch,
+    child: Rune<T1, U1>,
+    readonly fn: (value: U1) => value is U2,
+    alt: Rune<T3, U3>,
+  ) {
+    super(batch)
+    this.child = batch.prime(child, this.signal)
+    this.alt = batch.prime(alt, this.signal)
+  }
+
+  async _evaluate(time: number, receipt: Receipt) {
+    try {
       return await this.child.evaluate(time, receipt)
     } catch (e) {
-      if (e instanceof UnwrappedValue) {
-        throw new UnwrappedValue(e)
+      if (e instanceof Unhandled && this.fn(e.value)) {
+        return await this.alt.evaluate(time, receipt)
       }
       throw e
     }
@@ -269,4 +311,25 @@ class RunSingular<T, U> extends Run<T, U> {
   _evaluate(time: number, receipt: Receipt): Promise<T> {
     return this.result ??= this.child.run(this.batch.spawn(time, receipt))
   }
+}
+
+export type Guard<T1, T2 extends T1> =
+  | (abstract new(...args: any) => T2)
+  | ((value: T1) => value is T2)
+  | Extract<T2, null | undefined>
+
+// en garde!
+export type Unguard<T1, T2 extends T1> = T2 extends null | undefined
+  ? T1 & Exclude<{} | null | undefined, T2>
+  : Exclude<T1, T2>
+
+export function checkGuard<T1, T2 extends T1>(value: T1, guard: Guard<T1, T2>): value is T2 {
+  if (guard == null) return value === guard
+  try {
+    if (value instanceof guard) return true
+  } catch {}
+  try {
+    if ((guard as any)(value)) return true
+  } catch {}
+  return false
 }

@@ -12,10 +12,10 @@ class E3 extends Error {
   3 = 3
 }
 
-const e1 = Rune.constant(new E1()).unwrapError()
-const e2 = Rune.constant(new E2()).unwrapError()
-const e3 = Rune.constant(new E3()).unwrapError()
-const e1n = Rune.constant(new E1() as E1 | number).unwrapError()
+const e1 = Rune.constant(new E1()).unhandle(E1)
+const e2 = Rune.constant(new E2()).unhandle(E2)
+const e3 = Rune.constant(new E3()).unhandle(E3)
+const e1n = Rune.constant(new E1() as E1 | number).unhandle(E1)
 
 const add = <X>(...[a, b]: RunicArgs<X, [a: number, b: number]>) => {
   return Rune.tuple([a, b]).map(([a, b]) => a + b)

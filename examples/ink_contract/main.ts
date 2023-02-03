@@ -3,7 +3,7 @@ import { client } from "zombienet/examples/ink_contract/zombienet.toml/collator0
 
 const contract = Rune
   .resolve(Deno.readTextFileSync("examples/ink_contract/metadata.json"))
-  .as(InkContractRune, client)
+  .into(InkContractRune, client)
 
 await contract
   .instantiate({

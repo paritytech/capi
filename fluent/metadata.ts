@@ -12,15 +12,15 @@ export class MetadataRune<out U, out C extends Chain = Chain> extends Rune<M.Met
 
   pallet<X>(...[palletName]: RunicArgs<X, [palletName: string]>) {
     return Rune
-      .tuple([this.as(), palletName])
+      .tuple([this.into(), palletName])
       .map(([metadata, palletName]) => M.getPallet(metadata, palletName))
-      .unwrapError()
-      .as(PalletRune, this)
+      .unhandle(M.PalletNotFoundError)
+      .into(PalletRune, this)
   }
 
-  deriveCodec = this.as(ValueRune).map((x) => DeriveCodec(x.tys))
+  deriveCodec = this.into(ValueRune).map((x) => DeriveCodec(x.tys))
 
   codec<X>(...[ty]: RunicArgs<X, [ty: number | Ty]>) {
-    return Rune.tuple([this.deriveCodec, ty]).map(([derive, ty]) => derive(ty)).as(CodecRune)
+    return Rune.tuple([this.deriveCodec, ty]).map(([derive, ty]) => derive(ty)).into(CodecRune)
   }
 }

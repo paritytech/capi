@@ -1,7 +1,7 @@
 import * as C from "capi/mod.ts"
 import { Balances } from "westend_dev/mod.ts"
 
-const x = await Balances.transfer({
+const events = await Balances.transfer({
   value: 12345n,
   dest: C.bob.address,
 })
@@ -11,4 +11,4 @@ const x = await Balances.transfer({
   .events()
   .run()
 
-console.log(x)
+console.log(events)

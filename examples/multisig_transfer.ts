@@ -7,7 +7,7 @@ const multisig = Rune
     signatories: [alice.publicKey, bob.publicKey, charlie.publicKey],
     threshold: 2,
   })
-  .as(MultisigRune, client)
+  .into(MultisigRune, client)
 
 // The to-be proposed and approved call
 const call = Balances.transferKeepAlive({
@@ -60,7 +60,7 @@ console.log(
   await multisig
     .proposal(call.hash)
     .unsafeAs<any>()
-    .as(ValueRune)
+    .into(ValueRune)
     .access("approvals")
     .run(),
 )

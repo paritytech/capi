@@ -31,7 +31,7 @@ export function rpcClient<
   provider: rpc.Provider<DiscoveryValue, SendErrorData, HandlerErrorData, CloseErrorData>,
   discoveryValue: DiscoveryValue,
 ) {
-  return Rune.new(RunRpcClient, provider, discoveryValue).as(ClientRune)
+  return Rune.new(RunRpcClient, provider, discoveryValue).into(ClientRune)
 }
 
 export function rpcCall<Params extends unknown[], Result>(
@@ -45,12 +45,12 @@ export function rpcCall<Params extends unknown[], Result>(
         const id = client.providerRef.nextId()
         const result = await client.call<Result>(id, method, params)
         if (result instanceof Error) {
-          return result
+          throw result
         } else if (result.error) {
-          return new RpcServerError(result)
+          throw new RpcServerError(result)
         }
         return result.result
-      })
+      }).throws(rpc.ProviderSendError, rpc.ProviderHandlerError, RpcServerError)
   }
 }
 
@@ -83,16 +83,16 @@ export function rpcSubscription<Params extends unknown[], Result>() {
         .map(([client, ...params]) =>
           Rune.new(RunRpcSubscription, client, params, subscribeMethod, unsubscribeMethod)
         )
-        .as(MetaRune)
+        .into(MetaRune)
         .flat()
         .map((event) => {
           if (event instanceof Error) {
-            return event
+            throw event
           } else if (event.error) {
-            return new RpcServerError(event)
+            throw new RpcServerError(event)
           }
           return event.params.result as Result
-        })
+        }).throws(rpc.ProviderSendError, rpc.ProviderHandlerError, RpcServerError)
     }
   }
 }

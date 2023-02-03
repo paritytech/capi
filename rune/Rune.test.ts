@@ -240,7 +240,7 @@ Deno.test("derived stream", async () => {
       await clock.tick(time + 4)
       yield value
     })
-  ).as(MetaRune).flat()
+  ).into(MetaRune).flat()
   assertEquals(
     await b.map((v) => [clock.time, v]).collect().run(),
     [[2, 1], [3, 1], [5, 2], [6, 2], [8, 3], [9, 3], [11, 3]],
