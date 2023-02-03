@@ -10,6 +10,6 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Checkout (GitHub)
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Build and run Dev Container task
         uses: devcontainers/ci@v0.2
