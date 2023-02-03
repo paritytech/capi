@@ -9,7 +9,7 @@ export class FinalizedBlockHashRune<out U, out C extends Chain = Chain>
     super(_prime, client)
   }
 
-  override block(): FinalizedBlockRune<U, C> {
-    return super.block().as(FinalizedBlockRune, this.client)
+  override block() {
+    return super.block().into(FinalizedBlockRune, this.client)
   }
 }

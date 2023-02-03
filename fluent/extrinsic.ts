@@ -8,6 +8,7 @@ import * as U from "../util/mod.ts"
 import { Hex } from "../util/mod.ts"
 import { Chain, ClientRune } from "./client.ts"
 import { CodecRune } from "./codec.ts"
+import { EventsRune } from "./EventsRune.ts"
 import { FinalizedBlockHashRune } from "./FinalizedBlockHashRune.ts"
 import { InBlockBlockHashRune } from "./InBlockBlockHashRune.ts"
 import { author, chain, payment, system } from "./rpc_known_methods.ts"
@@ -126,9 +127,10 @@ export class SignedExtrinsicRune<out U, out C extends Chain = Chain> extends Run
   }
 
   sent() {
-    return this.hex().map((hex) =>
-      author.submitAndWatchExtrinsic(this.client as ClientRune<never, C>, hex)
-    ).into(ExtrinsicStatusRune, this)
+    return this
+      .hex()
+      .map((hex) => author.submitAndWatchExtrinsic(this.client as ClientRune<never, C>, hex))
+      .into(ExtrinsicStatusRune, this)
   }
 }
 
@@ -184,15 +186,15 @@ export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
   events() {
     const block = this.finalized().block()
     const events = block.events()
-    const extrinsics = chain
-      .getBlock(this.extrinsic.client, finalizedHash)
-      .access("block", "extrinsics")
-    const idx = Rune.tuple([extrinsics, this.extrinsic.hex()])
+    const extrinsics = block.extrinsics()
+    const idx = Rune
+      .tuple([extrinsics, this.extrinsic.hex()])
       .map(([extrinsics, extrinsicHex]) => extrinsics.indexOf(("0x" + extrinsicHex) as Hex))
     return Rune.tuple([idx, events])
       .map(([idx, events]) =>
         events.filter((event) => event.phase.type === "ApplyExtrinsic" && event.phase.value === idx)
       )
+      .into(EventsRune, this.extrinsic.client)
   }
 }
 

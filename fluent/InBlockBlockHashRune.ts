@@ -8,6 +8,6 @@ export class InBlockBlockHashRune<out U, out C extends Chain = Chain> extends Bl
   }
 
   override block() {
-    return super.block().as(InBlockBlockRune, this.client)
+    return super.block().into(InBlockBlockRune, this.client)
   }
 }

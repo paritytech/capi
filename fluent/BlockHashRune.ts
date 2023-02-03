@@ -13,8 +13,7 @@ export class BlockHashRune<out U, out C extends Chain = Chain> extends Rune<HexH
   block() {
     return chain
       .getBlock(this.client, this)
-      .unwrapError()
-      .as(BlockRune, this.client)
+      .into(BlockRune, this.client)
   }
 
   events() {
@@ -22,8 +21,8 @@ export class BlockHashRune<out U, out C extends Chain = Chain> extends Rune<HexH
       .metadata()
       .pallet("System")
       .storage("Events")
-      .entry([], this.as(ValueRune))
+      .entry([], this.into(ValueRune))
       .unsafeAs<Events<C["runtimeEvent"]>>()
-      .as(EventsRune, this.client)
+      .into(EventsRune, this.client)
   }
 }

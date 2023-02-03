@@ -4,6 +4,7 @@ import * as ink from "../ink_metadata/mod.ts"
 import { MultiAddress, Signer } from "../primitives/mod.ts"
 import { Client } from "../rpc/mod.ts"
 import * as rpc from "../rpc/mod.ts"
+import { ArrayRune } from "../rune/ArrayRune.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { DeriveCodec } from "../scale_info/mod.ts"
 import * as U from "../util/mod.ts"
@@ -47,7 +48,7 @@ export class InkContractRune<out U, out C extends Chain = Chain> extends Rune<st
         if (!maybeCtor) return new InkContractMetadataInvalidError()
         return maybeCtor
       })
-      .unwrapError()
+      .unhandle(InkContractMetadataInvalidError)
   }
 
   salt() {
@@ -71,8 +72,6 @@ export class InkContractRune<out U, out C extends Chain = Chain> extends Rune<st
       )
     const gasRequired = state
       .call(this.client, "ContractsApi_instantiate", key)
-      .unwrapError()
-      .unwrapNull()
       .map((result) => ink.$contractsApiInstantiateResult.decode(U.hex.decode(result)))
       .access("gasRequired")
     return Rune
@@ -91,10 +90,6 @@ export class InkContractRune<out U, out C extends Chain = Chain> extends Rune<st
       }))
       .into(ContractInstantiationExtrinsicRune, this.client)
   }
-
-  // declare fromAddress: <X>(
-  //   ...[address]: RunicArgs<X, [address: Uint8Array]>
-  // ) => InkContractInstanceRune<U>
 }
 
 export class ContractInstantiationExtrinsicRune<out U, out C extends Chain = Chain>
@@ -120,11 +115,18 @@ export class ContractInstantiationExtrinsicStatusRune<out U1, out U2, out C exte
   extends ExtrinsicStatusRune<U1, U2, C>
 {
   override logStatus(...prefix: unknown[]) {
-    return super.logStatus(...prefix).as(ContractInstantiationExtrinsicStatusRune, this.extrinsic)
+    return super
+      .logStatus(...prefix)
+      .into(ContractInstantiationExtrinsicStatusRune, this.extrinsic)
   }
 
   address() {
-    return this.events()
+    return this
+      .events()
+      .into(ValueRune)
+      .map((a) =>
+        a.find(({ event }) => event.type === "Contracts" && event.value.type === "Instantiated")
+      )
   }
 }
 
