@@ -8,6 +8,8 @@ import * as U from "../util/mod.ts"
 import { Hex } from "../util/mod.ts"
 import { Chain, ClientRune } from "./client.ts"
 import { CodecRune } from "./codec.ts"
+import { FinalizedBlockHashRune } from "./FinalizedBlockHashRune.ts"
+import { InBlockBlockHashRune } from "./InBlockBlockHashRune.ts"
 import { author, chain, payment, system } from "./rpc_known_methods.ts"
 
 export interface ExtrinsicSender {
@@ -149,34 +151,44 @@ export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
     ).into(ExtrinsicStatusRune<U1, U2, C>, this.extrinsic)
   }
 
-  finalized() {
+  terminalTransactionStatuses() {
     return this.into(MetaRune).flatMap((events) =>
       events
         .into(ValueRune)
         .filter(TransactionStatus.isTerminal)
-        .map((status) =>
-          typeof status !== "string" && status.finalized
-            ? status.finalized
-            : new NeverFinalizedError()
-        )
-        .singular()
-    ).unhandle(NeverFinalizedError)
+    )
+  }
+
+  inBlock() {
+    return this.terminalTransactionStatuses()
+      .map((status) =>
+        typeof status !== "string" && status.inBlock ? status.inBlock : new NeverInBlockError()
+      )
+      .singular()
+      .unhandle(NeverInBlockError)
+      .into(InBlockBlockHashRune, this.extrinsic.client)
+  }
+
+  finalized() {
+    return this.terminalTransactionStatuses()
+      .map((status) =>
+        typeof status !== "string" && status.finalized
+          ? status.finalized
+          : new NeverFinalizedError()
+      )
+      .singular()
+      .unhandle(NeverFinalizedError)
+      .into(FinalizedBlockHashRune, this.extrinsic.client)
   }
 
   events() {
-    const finalizedHash = this.finalized()
+    const block = this.finalized().block()
+    const events = block.events()
     const extrinsics = chain
       .getBlock(this.extrinsic.client, finalizedHash)
       .access("block", "extrinsics")
     const idx = Rune.tuple([extrinsics, this.extrinsic.hex()])
       .map(([extrinsics, extrinsicHex]) => extrinsics.indexOf(("0x" + extrinsicHex) as Hex))
-    const events = this.extrinsic.client
-      .metadata()
-      .pallet("System")
-      .storage("Events")
-      .entry([], finalizedHash)
-      .unsafeAs<Events<C["event"]>>()
-      .into(ValueRune)
     return Rune.tuple([idx, events])
       .map(([idx, events]) =>
         events.filter((event) => event.phase.type === "ApplyExtrinsic" && event.phase.value === idx)
@@ -184,28 +196,5 @@ export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
   }
 }
 
-export type Events<RuntimeEvent = unknown> = EventRecord<RuntimeEvent>[]
-export interface EventRecord<RuntimeEvent> {
-  phase: EventPhase
-  event: RuntimeEvent
-  topics: Uint8Array[]
-}
-export type EventPhase =
-  | EventPhase.ApplyExtrinsic
-  | EventPhase.Finalization
-  | EventPhase.Initialization
-export namespace EventPhase {
-  export interface ApplyExtrinsic {
-    type: "ApplyExtrinsic"
-    value: number
-  }
-  export interface Finalization {
-    type: "Finalization"
-  }
-  export interface Initialization {
-    type: "Initialization"
-  }
-}
-
-export class NeverInBlockError extends Error {}
 export class NeverFinalizedError extends Error {}
+export class NeverInBlockError extends Error {}

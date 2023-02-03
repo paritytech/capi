@@ -5,16 +5,18 @@ const contract = Rune
   .resolve(Deno.readTextFileSync("examples/ink_contract/metadata.json"))
   .into(InkContractRune, client)
 
-await contract
-  .instantiate({
-    code: Deno.readFileSync("examples/ink_contract/flipper.wasm"),
-    initiator: alice.publicKey,
-  })
-  .signed({ sender: alice })
-  .sent()
-  .logStatus()
-  .address()
-// .run()
+console.log(
+  await contract
+    .instantiate({
+      code: Deno.readFileSync("examples/ink_contract/flipper.wasm"),
+      initiator: alice.publicKey,
+    })
+    .signed({ sender: alice })
+    .sent()
+    .logStatus()
+    .address()
+    .run(),
+)
 
 // TODO: what values do we want?
 // console.log(".get", await instance.msg("get").run())

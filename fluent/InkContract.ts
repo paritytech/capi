@@ -124,9 +124,15 @@ export class ContractInstantiationExtrinsicStatusRune<out U1, out U2, out C exte
   }
 
   address() {
-    // TODO
+    return this.events()
   }
 }
+
+// function isEvent(event: unknown, pallet: string, name: string) {
+//   return typeof event === "object" && event !== null && "type" in event && event.type === "System"
+//     && "value" in event && typeof event.value === "object" && event.value !== null
+//     && "type" in event.value
+// }
 
 // export class InkContractInstanceRune<out U, out C extends Chain = Chain>
 //   extends Rune<Uint8Array, U>
