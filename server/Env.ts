@@ -1,4 +1,5 @@
-import { Provider, ProviderFactory } from "./Provider.ts"
+import { parsePathInfo } from "./PathInfo.ts"
+import { Provider, ProviderDigest, ProviderFactory } from "./Provider.ts"
 
 export class Env {
   providers: Record<string, Record<string, Provider>> = {}
@@ -15,5 +16,14 @@ export class Env {
       }
       generatorProviders[providerId] = provider
     }
+  }
+
+  digest(src: string): Promise<ProviderDigest> {
+    const pathInfo = parsePathInfo(src)
+    if (!pathInfo) throw new Error(`Could not parse src \`${src}\``)
+    const { generatorId, providerId } = pathInfo
+    const provider = this.providers[generatorId]?.[providerId]
+    if (!provider) throw new Error(`Could not match ${generatorId}/${providerId} provider`)
+    return provider.digest(pathInfo)
   }
 }

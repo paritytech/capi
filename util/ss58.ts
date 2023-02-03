@@ -15,10 +15,7 @@ export function encodeRaw(
   validNetworkPrefixes?: readonly number[],
 ): Uint8Array {
   const isValidPublicKeyLength = !!VALID_PUBLIC_KEY_LENGTHS[pubKey.length]
-
-  if (!isValidPublicKeyLength) {
-    throw new InvalidPublicKeyLengthError()
-  }
+  if (!isValidPublicKeyLength) throw new InvalidPublicKeyLengthError()
 
   const isValidNetworkPrefix = !validNetworkPrefixes || validNetworkPrefixes.includes(prefix)
   if (!isValidNetworkPrefix) throw new InvalidNetworkPrefixError()
