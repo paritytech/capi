@@ -1,8 +1,8 @@
 import * as M from "../frame_metadata/mod.ts"
 import { Rune, RunicArgs } from "../rune/mod.ts"
-import { ConstRune } from "./const.ts"
-import { MetadataRune } from "./metadata.ts"
-import { StorageRune } from "./storage.ts"
+import { ConstRune } from "./ConstRune.ts"
+import { MetadataRune } from "./MetadataRune.ts"
+import { StorageRune } from "./StorageRune.ts"
 
 export class PalletRune<out U> extends Rune<M.Pallet, U> {
   constructor(_prime: PalletRune<U>["_prime"], readonly metadata: MetadataRune<U>) {

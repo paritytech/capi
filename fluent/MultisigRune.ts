@@ -2,7 +2,7 @@ import * as bytes from "../deps/std/bytes.ts"
 import { MultiAddress } from "../primitives/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { multisigAddress } from "../util/mod.ts"
-import { Chain, ClientRune } from "./client.ts"
+import { Chain, ClientRune } from "./ClientRune.ts"
 
 export interface MultisigRatifyProps {
   sender: MultiAddress

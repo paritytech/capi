@@ -1,6 +1,6 @@
 import { known } from "../rpc/mod.ts"
 import { Rune } from "../rune/mod.ts"
-import { Chain, ClientRune } from "./client.ts"
+import { Chain, ClientRune } from "./ClientRune.ts"
 
 // TODO: extract from extrinsic
 export class TransactionStatusesRune<out U, out C extends Chain = Chain>

@@ -2,10 +2,10 @@ import { Rune, ValueRune } from "../rune/mod.ts"
 import { RunicArgs } from "../rune/RunicArgs.ts"
 import { Hex, HexHash } from "../util/branded.ts"
 import { BlockRune } from "./BlockRune.ts"
-import { Chain, ClientRune } from "./client.ts"
+import { Chain, ClientRune } from "./ClientRune.ts"
 import { Events, EventsRune } from "./EventsRune.ts"
 import { HeaderRune } from "./HeaderRune.ts"
-import { chain } from "./rpc_known_methods.ts"
+import { chain } from "./rpc_method_runes.ts"
 
 export class BlockHashRune<out U, out C extends Chain = Chain>
   extends Rune<HexHash | undefined, U>

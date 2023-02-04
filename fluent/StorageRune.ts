@@ -2,9 +2,9 @@ import * as $ from "../deps/scale.ts"
 import * as M from "../frame_metadata/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import * as U from "../util/mod.ts"
-import { CodecRune } from "./codec.ts"
-import { PalletRune } from "./pallet.ts"
-import { state } from "./rpc_known_methods.ts"
+import { CodecRune } from "./CodecRune.ts"
+import { PalletRune } from "./PalletRune.ts"
+import { state } from "./rpc_method_runes.ts"
 
 export class StorageRune<K extends unknown[], V, out U> extends Rune<M.StorageEntry, U> {
   constructor(_prime: StorageRune<K, V, U>["_prime"], readonly pallet: PalletRune<U>) {

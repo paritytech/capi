@@ -1,5 +1,5 @@
 import { Rune } from "../rune/mod.ts"
-import { Chain, ClientRune } from "./client.ts"
+import { Chain, ClientRune } from "./ClientRune.ts"
 
 export type Events<RuntimeEvent extends RuntimeEventBase = RuntimeEventBase> = EventRecord<
   RuntimeEvent

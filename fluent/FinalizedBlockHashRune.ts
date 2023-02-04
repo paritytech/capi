@@ -1,5 +1,5 @@
 import { BlockHashRune } from "./BlockHashRune.ts"
-import { Chain, ClientRune } from "./client.ts"
+import { Chain, ClientRune } from "./ClientRune.ts"
 import { FinalizedBlockRune } from "./FinalizedBlockRune.ts"
 
 export class FinalizedBlockHashRune<out U, out C extends Chain = Chain>

@@ -1,6 +1,6 @@
 import * as rpc from "../rpc/mod.ts"
 import { Batch, MetaRune, Run, Rune, RunicArgs, RunStream } from "../rune/mod.ts"
-import { ClientRune } from "./client.ts"
+import { ClientRune } from "./ClientRune.ts"
 
 class RunRpcClient<DV, SED, HED, CED> extends Run<rpc.Client<DV, SED, HED, CED>, never> {
   constructor(

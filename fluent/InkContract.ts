@@ -1,24 +1,13 @@
 // TODO: remove
 // deno-lint-ignore-file
-
-import * as $ from "../deps/scale.ts"
-import * as bytes from "../deps/std/bytes.ts"
 import * as ink from "../ink_metadata/mod.ts"
-import { MultiAddress, Signer } from "../primitives/mod.ts"
-import { Client } from "../rpc/mod.ts"
-import * as rpc from "../rpc/mod.ts"
-import { ArrayRune } from "../rune/ArrayRune.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
-import { DeriveCodec } from "../scale_info/mod.ts"
 import * as U from "../util/mod.ts"
-import { Chain, ClientRune } from "./client.ts"
-import {
-  ExtrinsicRune,
-  ExtrinsicStatusRune,
-  SignedExtrinsicProps,
-  SignedExtrinsicRune,
-} from "./extrinsic.ts"
-import { state } from "./rpc_known_methods.ts"
+import { Chain, ClientRune } from "./ClientRune.ts"
+import { ExtrinsicRune, SignedExtrinsicProps } from "./ExtrinsicRune.ts"
+import { ExtrinsicStatusRune } from "./ExtrinsicStatusRune.ts"
+import { state } from "./rpc_method_runes.ts"
+import { SignedExtrinsicRune } from "./SignedExtrinsicRune.ts"
 
 export interface InkContractInstantiateProps {
   initiator: Uint8Array

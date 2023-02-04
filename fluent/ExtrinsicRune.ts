@@ -1,15 +1,13 @@
 import * as M from "../frame_metadata/mod.ts"
 import { MultiAddress, Signer } from "../primitives/mod.ts"
-import { TransactionStatus } from "../rpc/known/mod.ts"
-import { MetaRune, Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
+import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { Era, era } from "../scale_info/mod.ts"
 import { Blake2_256 } from "../util/hashers.ts"
 import * as U from "../util/mod.ts"
-import { Chain, ClientRune } from "./client.ts"
-import { CodecRune } from "./codec.ts"
-import { FinalizedBlockHashRune } from "./FinalizedBlockHashRune.ts"
-import { InBlockBlockHashRune } from "./InBlockBlockHashRune.ts"
-import { author, chain, payment, system } from "./rpc_known_methods.ts"
+import { Chain, ClientRune } from "./ClientRune.ts"
+import { CodecRune } from "./CodecRune.ts"
+import { chain, payment, system } from "./rpc_method_runes.ts"
+import { SignedExtrinsicRune } from "./SignedExtrinsicRune.ts"
 
 export interface ExtrinsicSender {
   address: MultiAddress
@@ -114,73 +112,3 @@ export class ExtrinsicRune<out U, out C extends Chain = Chain> extends Rune<C["c
       }))
   }
 }
-
-export class SignedExtrinsicRune<out U, out C extends Chain = Chain> extends Rune<Uint8Array, U> {
-  constructor(_prime: SignedExtrinsicRune<U>["_prime"], readonly client: ClientRune<U, C>) {
-    super(_prime)
-  }
-
-  hex() {
-    return this.into(ValueRune).map(U.hex.encode)
-  }
-
-  sent() {
-    return this
-      .hex()
-      .map((hex) => author.submitAndWatchExtrinsic(this.client as ClientRune<never, C>, hex))
-      .into(ExtrinsicStatusRune, this)
-  }
-}
-
-export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
-  extends Rune<Rune<TransactionStatus, U1>, U2>
-{
-  constructor(
-    _prime: ExtrinsicStatusRune<U1, U2, C>["_prime"],
-    readonly extrinsic: SignedExtrinsicRune<U2, C>,
-  ) {
-    super(_prime)
-  }
-
-  logStatus(...prefix: unknown[]): ExtrinsicStatusRune<U1, U2, C> {
-    return this.into(ValueRune).map((rune) =>
-      rune.into(ValueRune).map((value) => {
-        console.log(...prefix, value)
-        return value
-      })
-    ).into(ExtrinsicStatusRune<U1, U2, C>, this.extrinsic)
-  }
-
-  terminalTransactionStatuses() {
-    return this.into(MetaRune).flatMap((events) =>
-      events
-        .into(ValueRune)
-        .filter(TransactionStatus.isTerminal)
-    )
-  }
-
-  inBlock() {
-    return this.terminalTransactionStatuses()
-      .map((status) =>
-        typeof status !== "string" && status.inBlock ? status.inBlock : new NeverInBlockError()
-      )
-      .singular()
-      .unhandle(NeverInBlockError)
-      .into(InBlockBlockHashRune, this.extrinsic.client)
-  }
-
-  finalized() {
-    return this.terminalTransactionStatuses()
-      .map((status) =>
-        typeof status !== "string" && status.finalized
-          ? status.finalized
-          : new NeverFinalizedError()
-      )
-      .singular()
-      .unhandle(NeverFinalizedError)
-      .into(FinalizedBlockHashRune, this.extrinsic.client)
-  }
-}
-
-export class NeverFinalizedError extends Error {}
-export class NeverInBlockError extends Error {}
