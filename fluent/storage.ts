@@ -22,11 +22,9 @@ export class StorageRune<K extends unknown[], V, out U> extends Rune<M.StorageEn
 
   entryRaw<X>(...[key, blockHash]: RunicArgs<X, [key: K, blockHash?: U.HexHash]>) {
     const storageKey = this.$key.encoded(key).map(U.hex.encode)
-    return state.getStorage(
-      this.pallet.metadata.client.into(),
-      storageKey,
-      blockHash,
-    ).unhandle(null)
+    return state
+      .getStorage(this.pallet.metadata.client, storageKey, blockHash)
+      .unhandle(null)
   }
 
   entry<X>(...[key, blockHash]: RunicArgs<X, [key: K, blockHash?: U.HexHash]>) {
@@ -55,7 +53,7 @@ export class StorageRune<K extends unknown[], V, out U> extends Rune<M.StorageEn
     )
     Rune.tuple([this.$key, start]).map(([codec, key]) => key && U.hex.encode(codec.encode(key)))
     const keysEncoded = state.getKeysPaged(
-      this.pallet.metadata.client.into(),
+      this.pallet.metadata.client,
       storageKey,
       count,
       startKey,
