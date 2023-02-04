@@ -1,12 +1,12 @@
-import * as C from "capi"
+import { alice, bob } from "capi"
 import { Balances } from "westend_dev/mod.ts"
 
 const tx = Balances
   .transfer({
     value: 12345n,
-    dest: C.bob.address,
+    dest: bob.address,
   })
-  .signed({ sender: C.alice })
+  .signed({ sender: alice })
 
 const txFinalizedBlock = tx
   .sent()
