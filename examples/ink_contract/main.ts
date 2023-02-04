@@ -1,8 +1,8 @@
 import { alice, InkContractRune, Rune } from "capi/mod.ts"
-import { client } from "zombienet/examples/ink_contract/zombienet.toml/collator01/@latest/mod.ts"
+import { client } from "zombienet/examples/ink_contract/zombienet.toml/collator/@latest/mod.ts"
 
 const contract = Rune
-  .resolve(Deno.readTextFileSync("examples/ink_contract/metadata.json"))
+  .constant(Deno.readTextFileSync("examples/ink_contract/metadata.json"))
   .into(InkContractRune, client)
 
 console.log(
@@ -14,8 +14,13 @@ console.log(
     .signed({ sender: alice })
     .sent()
     .logStatus()
-    .address()
-    .run(),
+    .events(),
+  // .finalized()
+  // .block()
+  // .extrinsics()
+  // .run(),
+  // .address()
+  // .run(),
 )
 
 // TODO: what values do we want?

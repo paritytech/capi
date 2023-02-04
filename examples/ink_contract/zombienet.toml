@@ -5,11 +5,7 @@ default_args = ["-lparachain=debug"]
 chain = "rococo-local"
 
 [[relaychain.nodes]]
-name = "alice"
-validator = true
-
-[[relaychain.nodes]]
-name = "bob"
+name = "relay"
 validator = true
 
 [[parachains]]
@@ -18,7 +14,7 @@ cumulus_based = true
 chain = "contracts-rococo-local"
 
 [parachains.collator]
-name = "collator01"
+name = "collator"
 image = "docker.io/parity/polkadot-parachain:latest"
 command = "polkadot-parachain"
 args = ["-lparachain=debug"]
