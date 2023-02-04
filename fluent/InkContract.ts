@@ -1,3 +1,6 @@
+// TODO: remove
+// deno-lint-ignore-file
+
 import * as $ from "../deps/scale.ts"
 import * as bytes from "../deps/std/bytes.ts"
 import * as ink from "../ink_metadata/mod.ts"

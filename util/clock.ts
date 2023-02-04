@@ -6,7 +6,7 @@ export class Clock {
   scheduled = false
   timeout = -1
 
-  async reset() {
+  reset() {
     if (this.scheduled) clearTimeout(this.timeout)
     this.scheduled = false
     this.time = 0

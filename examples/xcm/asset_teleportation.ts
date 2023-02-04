@@ -1,3 +1,6 @@
+// TODO: remove
+// deno-lint-ignore-file
+
 import { alice, Rune } from "capi/mod.ts"
 import { types, XcmPallet } from "zombienet/examples/xcm/zombienet.toml/alice/@v0.9.36/mod.ts"
 import {
