@@ -14,7 +14,9 @@ console.log(
     .signed({ sender: alice })
     .sent()
     .logStatus()
-    .events(),
+    .finalized()
+    .events()
+    .run(),
   // .finalized()
   // .block()
   // .extrinsics()

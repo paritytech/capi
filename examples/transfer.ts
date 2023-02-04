@@ -1,14 +1,18 @@
 import * as C from "capi/mod.ts"
 import { Balances } from "westend_dev/mod.ts"
 
-const events = await Balances.transfer({
-  value: 12345n,
-  dest: C.bob.address,
-})
+const tx = Balances
+  .transfer({
+    value: 12345n,
+    dest: C.bob.address,
+  })
   .signed({ sender: C.alice })
+
+const txFinalizedBlockHash = tx
   .sent()
   .logStatus()
-  .events()
-  .run()
+  .finalized()
 
-console.log(events)
+const result = await txFinalizedBlockHash.txEvents(tx.hex()).run()
+
+console.log(result)

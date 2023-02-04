@@ -1,31 +1,39 @@
-import * as C from "capi/mod.ts"
-import { assert } from "../deps/std/testing/asserts.ts"
-
+import { FinalizedBlockHashRune, hex, Rune, ss58, ValueRune } from "capi/mod.ts"
 import { client, Session, System } from "polkadot/mod.ts"
 import { $preDigest } from "polkadot/types/sp_consensus_babe/digests.ts"
 import { $digestItem, DigestItem } from "polkadot/types/sp_runtime/generic/digest.ts"
 
-// TODO: codegen guards?
-function isPreRuntime(digestItem: DigestItem): digestItem is DigestItem.PreRuntime {
-  return digestItem.type === "PreRuntime"
+export class AuthorRetrievalNotSupportedError extends Error {
+  override readonly name = "AuthorRetrievalNotSupportedError"
 }
 
-const header = await C.chain.getHeader(client).run()
-const digestLogs = header.digest.logs.map((log) => $digestItem.decode(C.hex.decode(log)))
+const finalizedBlockHash = Rune
+  .constant(undefined)
+  .into(FinalizedBlockHashRune, client)
 
-const preRuntimeLog = digestLogs.find(isPreRuntime)
-assert(preRuntimeLog, "Missing PreRuntime log")
+const preDigest = finalizedBlockHash
+  .header()
+  .into(ValueRune)
+  .access("digest", "logs")
+  .map((logs) =>
+    logs
+      .map((log) => $digestItem.decode(hex.decode(log)))
+      .find((digestItem): digestItem is DigestItem.PreRuntime => digestItem.type === "PreRuntime")
+  )
+  .unhandle(undefined)
+  .map(({ value: [consensusIdBytes, preDigestBytes] }) => {
+    if (new TextDecoder().decode(consensusIdBytes) === "BABE") {
+      return $preDigest.decode(preDigestBytes)
+    }
+    return new AuthorRetrievalNotSupportedError()
+  })
+  .unhandle(AuthorRetrievalNotSupportedError)
 
-const consensusEngineId = new TextDecoder().decode(preRuntimeLog.value[0])
-assert(
-  consensusEngineId === "BABE",
-  `Unsupported consensus engine id: ${consensusEngineId}. Only BABE is supported.`,
-)
+const result = await Session.Validators
+  .entry([], finalizedBlockHash)
+  .access(await preDigest.access("value", "authorityIndex").run())
+  .unhandle(undefined)
+  .map((pubKey) => ss58.encode(System.SS58Prefix, pubKey))
+  .run()
 
-const preDigest = $preDigest.decode(preRuntimeLog.value[1])
-const validators = await Session.Validators.entry([]).run()
-const pubKey = validators[preDigest.value.authorityIndex]
-assert(pubKey)
-
-const ss58EncodedPubKey = C.ss58.encode(System.SS58Prefix, pubKey)
-console.log(ss58EncodedPubKey)
+console.log(result)

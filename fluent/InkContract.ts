@@ -124,12 +124,12 @@ export class ContractInstantiationExtrinsicStatusRune<out U1, out U2, out C exte
   }
 
   address() {
-    return this
-      .events()
-      .into(ValueRune)
-      .map((a) =>
-        a.find(({ event }) => event.type === "Contracts" && event.value.type === "Instantiated")
-      )
+    // return this
+    //   .events()
+    //   .into(ValueRune)
+    //   .map((a) =>
+    //     a.find(({ event }) => event.type === "Contracts" && event.value.type === "Instantiated")
+    //   )
   }
 }
 

@@ -182,25 +182,6 @@ export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
       .unhandle(NeverFinalizedError)
       .into(FinalizedBlockHashRune, this.extrinsic.client)
   }
-
-  events() {
-    const block = this.finalized().block()
-    const events = block.events()
-    const extrinsics = block.extrinsics()
-    const idx = Rune
-      .tuple([extrinsics, this.extrinsic.hex()])
-      .map(([extrinsics, extrinsicHex]) => extrinsics.indexOf(("0x" + extrinsicHex) as Hex))
-    return Rune.tuple([this.extrinsic.hex(), events, extrinsics]).map(([hex, a, b]) => {
-      a.forEach((e) => console.log(e))
-      b.forEach((e) => console.log(e))
-      console.log({ hex })
-    })
-    // return Rune.tuple([idx, events])
-    //   .map(([idx, events]) =>
-    //     events.filter((event) => event.phase.type === "ApplyExtrinsic" && event.phase.value === idx)
-    //   )
-    //   .into(EventsRune, this.extrinsic.client)
-  }
 }
 
 export class NeverFinalizedError extends Error {}
