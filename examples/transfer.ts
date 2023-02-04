@@ -1,4 +1,4 @@
-import * as C from "capi/mod.ts"
+import * as C from "capi"
 import { Balances } from "westend_dev/mod.ts"
 
 const tx = Balances

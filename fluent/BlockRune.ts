@@ -40,8 +40,6 @@ export class BlockRune<out U, out C extends Chain = Chain> extends Rune<known.Si
     return this
       .extrinsicsRaw()
       .into(ArrayRune)
-      .mapArray((h) =>
-        $extrinsic.decoded(h.map(hex.decode).dbg("hex decode:")).dbg("extrinsic decode:")
-      )
+      .mapArray((h) => $extrinsic.decoded(h.map(hex.decode)))
   }
 }

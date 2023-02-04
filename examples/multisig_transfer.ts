@@ -1,4 +1,4 @@
-import { alice, bob, charlie, dave, MultisigRune, Rune, ValueRune } from "capi/mod.ts"
+import { alice, bob, charlie, dave, MultisigRune, Rune, ValueRune } from "capi"
 import { Balances, client, System } from "polkadot_dev/mod.ts"
 import { MultiAddress } from "polkadot_dev/types/sp_runtime/multiaddress.ts"
 
@@ -8,12 +8,6 @@ const multisig = Rune
     threshold: 2,
   })
   .into(MultisigRune, client)
-
-// The to-be proposed and approved call
-const call = Balances.transferKeepAlive({
-  dest: dave.address,
-  value: 1_230_000_000_000n,
-})
 
 // Read dave's initial balance (to-be changed by the call)
 console.log("Dave initial balance:", await System.Account.entry([dave.publicKey]).run())
@@ -29,6 +23,12 @@ await Balances
   .logStatus("Existential deposit:")
   .finalized()
   .run()
+
+// The to-be proposed and approved call
+const call = Balances.transferKeepAlive({
+  dest: dave.address,
+  value: 1_230_000_000_000n,
+})
 
 // Submit a proposal to dispatch the call
 await multisig

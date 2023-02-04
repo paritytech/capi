@@ -1,4 +1,4 @@
-import { alice, bob, charlie, dave, Rune } from "capi/mod.ts"
+import { alice, bob, charlie, dave, Rune } from "capi"
 import { Balances, System, Utility } from "westend_dev/mod.ts"
 
 const recipients = Rune.array([bob, charlie, dave])

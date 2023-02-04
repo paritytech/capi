@@ -1,4 +1,4 @@
-import { alice, InkContractRune, Rune } from "capi/mod.ts"
+import { alice, InkContractRune, Rune } from "capi"
 import { client } from "zombienet/examples/ink_contract/zombienet.toml/collator/@latest/mod.ts"
 
 const contract = Rune

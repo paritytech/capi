@@ -1,4 +1,4 @@
-import { FinalizedBlockHashRune, hex, Rune, ss58, ValueRune } from "capi/mod.ts"
+import { FinalizedBlockHashRune, hex, Rune, ss58, ValueRune } from "capi"
 import { client, Session, System } from "polkadot/mod.ts"
 import { $preDigest } from "polkadot/types/sp_consensus_babe/digests.ts"
 import { $digestItem, DigestItem } from "polkadot/types/sp_runtime/generic/digest.ts"

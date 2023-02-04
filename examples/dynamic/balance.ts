@@ -1,4 +1,4 @@
-import * as C from "capi/mod.ts"
+import { alice } from "capi"
 import { client } from "polkadot_dev/mod.ts"
 
 console.log(
@@ -6,6 +6,6 @@ console.log(
     .metadata()
     .pallet("System")
     .storage("Account")
-    .entry([C.alice.publicKey])
+    .entry([alice.publicKey])
     .run(),
 )

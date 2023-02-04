@@ -1,7 +1,12 @@
-import { Rune } from "capi/mod.ts"
+import { Rune } from "capi"
 import { Staking } from "westend/mod.ts"
 
-const idx = Staking.ActiveEra.entry([]).access("index")
-const eraRewardPoints = Staking.ErasRewardPoints.entry(Rune.tuple([idx]))
+const idx = Staking.ActiveEra
+  .entry([])
+  .access("index")
 
-console.log(await eraRewardPoints.run())
+const result = await Staking.ErasRewardPoints
+  .entry(Rune.tuple([idx]))
+  .run()
+
+console.log(result)

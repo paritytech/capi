@@ -1,4 +1,4 @@
-import { bob } from "capi/mod.ts"
+import { bob } from "capi"
 import { Balances } from "westend_dev/mod.ts"
 
 const result = await Balances
