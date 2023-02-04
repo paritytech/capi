@@ -6,6 +6,7 @@ import { codecs } from "./codecs.ts"
 import { pallet } from "./pallet.ts"
 import { type } from "./type.ts"
 import { typeVisitor } from "./typeVisitor.ts"
+
 export interface FrameCodegenProps {
   metadata: Metadata
   clientFile: File

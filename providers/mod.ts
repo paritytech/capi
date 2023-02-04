@@ -1,3 +1,3 @@
 // moderate
 
-export * from "./frame/mod.ts";
+export * from "./frame/mod.ts"
