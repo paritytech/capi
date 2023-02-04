@@ -6,7 +6,7 @@ import { CodecRune } from "./CodecRune.ts"
 import { PalletRune } from "./PalletRune.ts"
 import { state } from "./rpc_method_runes.ts"
 
-export class StorageRune<K extends unknown[], V, out U> extends Rune<M.StorageEntry, U> {
+export class StorageRune<in out K extends unknown[], out V, out U> extends Rune<M.StorageEntry, U> {
   constructor(_prime: StorageRune<K, V, U>["_prime"], readonly pallet: PalletRune<U>) {
     super(_prime)
     this.$key = Rune.rec({
