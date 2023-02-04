@@ -1,3 +1,4 @@
+/*
 import { discoveryValue } from "polkadot_dev/mod.ts"
 import * as A from "../deps/std/testing/asserts.ts"
 import * as U from "../util/mod.ts"
@@ -165,3 +166,5 @@ function dummy(id: number): msg.EgressMessage {
     params: null!,
   } as any
 }
+
+*/

@@ -1,8 +1,6 @@
 import { assertEquals } from "../deps/std/testing/asserts.ts"
 import { Clock } from "../util/clock.ts"
-import { MetaRune } from "./MetaRune.ts"
-import { Rune } from "./Rune.ts"
-import { RunicArgs } from "./RunicArgs.ts"
+import { MetaRune, Rune, RunicArgs } from "./mod.ts"
 
 Deno.test("constant", async () => {
   assertEquals(
@@ -24,9 +22,9 @@ Deno.test("pipe", async () => {
   assertEquals(
     await Rune
       .constant(new Error())
-      .unwrapError()
+      .unhandle(Error)
       .map(() => 123)
-      .catch()
+      .handle(Error, (x) => x)
       .run(),
     new Error(),
   )
@@ -64,7 +62,7 @@ const sum = <X>(...[...args]: RunicArgs<X, number[]>) => {
 Deno.test("add", async () => {
   assertEquals(await add(1, 2).run(), 3)
   assertEquals(
-    await add(1, Rune.constant(new Error()).unwrapError()).catch().run(),
+    await add(1, Rune.constant(new Error()).unhandle(Error)).handle(Error, (x) => x).run(),
     new Error(),
   )
   assertEquals(

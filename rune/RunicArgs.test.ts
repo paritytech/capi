@@ -1,6 +1,4 @@
-import { Rune } from "./Rune.ts"
-import { RunicArgs } from "./RunicArgs.ts"
-import { ValueRune } from "./ValueRune.ts"
+import { Rune, RunicArgs, ValueRune } from "./mod.ts"
 
 class E1 extends Error {
   1 = 1

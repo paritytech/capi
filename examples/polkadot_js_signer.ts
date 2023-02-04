@@ -1,7 +1,9 @@
 import * as C from "capi/mod.ts"
-import { createTestPairs } from "https://deno.land/x/polkadot@0.0.8/keyring/mod.ts"
-import { TypeRegistry } from "https://deno.land/x/polkadot@0.0.8/types/mod.ts"
 import { Balances } from "polkadot_dev/mod.ts"
+
+// Dynamic import because type-checking polkadot-js causes OOM
+const { createTestPairs } = await import(`https://deno.land/x/polkadot@0.2.25/keyring/mod.ts`)
+const { TypeRegistry } = await import(`https://deno.land/x/polkadot@0.2.25/types/mod.ts`)
 
 await Balances
   .transfer({
