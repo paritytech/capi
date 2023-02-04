@@ -38,8 +38,8 @@
     "moderate": "deno run -A https://deno.land/x/moderate@0.0.5/mod.ts && dprint fmt",
     "dev": "deno run -A --watch=deno.jsonc,docs/ main.ts --serve",
     "ctx": "deno run -A main.ts --serve",
-    "cache": "deno task ctx -- deno cache -r=http://localhost:4646/",
-    "star": "deno task run _tasks/star.ts && deno task cache --check target/star.ts",
+    "cache": "deno task ctx -- deno cache",
+    "star": "deno task run _tasks/star.ts",
     "run": "deno task ctx -- deno run -A -r=http://localhost:4646/"
   }
 }
