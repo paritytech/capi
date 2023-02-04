@@ -1,9 +1,7 @@
-import { FinalizedBlockHashRune, Rune } from "capi"
 import { client } from "polkadot/mod.ts"
 
-const result = await Rune
-  .constant(undefined)
-  .into(FinalizedBlockHashRune, client)
+const result = await client
+  .finalizedBlock()
   .events()
   .run()
 

@@ -1,4 +1,5 @@
 import { known } from "../rpc/mod.ts"
+import { HexHash } from "../util/branded.ts"
 import * as U from "../util/mod.ts"
 import { rpcCall, rpcSubscription } from "./rpc_runes.ts"
 
@@ -32,6 +33,7 @@ export namespace chain {
     "chain_getBlockHash",
   )
   export const getHeader = rpcCall<[hash?: U.HexHash], known.Header>("chain_getHeader")
+  export const getFinalizedHead = rpcCall<[], HexHash>("chain_getFinalizedHead")
 }
 export namespace system {
   export const accountNextIndex = rpcCall<[accountId: known.AccountId], number>(

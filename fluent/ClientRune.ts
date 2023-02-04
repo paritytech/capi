@@ -3,10 +3,12 @@ import * as M from "../frame_metadata/mod.ts"
 import * as rpc from "../rpc/mod.ts"
 import { Rune, RunicArgs } from "../rune/mod.ts"
 import { HexHash } from "../util/mod.ts"
+import { BlockRune } from "./BlockRune.ts"
 import { RuntimeEventBase } from "./EventsRune.ts"
 import { ExtrinsicRune } from "./ExtrinsicRune.ts"
+import { FinalizedBlockRune } from "./FinalizedBlockRune.ts"
 import { MetadataRune } from "./MetadataRune.ts"
-import { state } from "./rpc_method_runes.ts"
+import { chain, state } from "./rpc_method_runes.ts"
 import { rpcCall } from "./rpc_runes.ts"
 
 export interface Chain {
@@ -15,6 +17,21 @@ export interface Chain {
 }
 
 export class ClientRune<out U, out C extends Chain = Chain> extends Rune<rpc.Client, U> {
+  block<X>(...args: RunicArgs<X, [blockHash?: HexHash]>) {
+    const [blockHash] = RunicArgs.resolve(args)
+    return chain
+      .getBlock(this.into(), blockHash)
+      .into(BlockRune, this, blockHash)
+  }
+
+  finalizedBlock<X>(...args: RunicArgs<X, [blockHash?: HexHash]>) {
+    const [blockHash] = RunicArgs.resolve(args)
+    const head = chain.getFinalizedHead(this.into())
+    return chain
+      .getBlock(this.into(), head)
+      .into(FinalizedBlockRune, this, blockHash)
+  }
+
   metadata<X>(...[blockHash]: RunicArgs<X, [blockHash?: HexHash]>) {
     return state
       .getMetadata(this.into(), blockHash)

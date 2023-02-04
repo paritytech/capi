@@ -1,8 +1,7 @@
 import { known } from "../rpc/mod.ts"
 import { MetaRune, Rune, ValueRune } from "../rune/mod.ts"
 import { Chain } from "./ClientRune.ts"
-import { FinalizedBlockHashRune } from "./FinalizedBlockHashRune.ts"
-import { InBlockBlockHashRune } from "./InBlockBlockHashRune.ts"
+import { InBlockBlockRune } from "./InBlockBlockRune.ts"
 import { SignedExtrinsicRune } from "./SignedExtrinsicRune.ts"
 
 export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
@@ -33,17 +32,19 @@ export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
   }
 
   inBlock() {
-    return this.terminalTransactionStatuses()
+    const hash = this.terminalTransactionStatuses()
       .map((status) =>
         typeof status !== "string" && status.inBlock ? status.inBlock : new NeverInBlockError()
       )
       .singular()
       .unhandle(NeverInBlockError)
-      .into(InBlockBlockHashRune, this.extrinsic.client)
+    return this.extrinsic.client
+      .block(hash)
+      .into(InBlockBlockRune, this.extrinsic.client, hash)
   }
 
   finalized() {
-    return this.terminalTransactionStatuses()
+    const hash = this.terminalTransactionStatuses()
       .map((status) =>
         typeof status !== "string" && status.finalized
           ? status.finalized
@@ -51,7 +52,7 @@ export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
       )
       .singular()
       .unhandle(NeverFinalizedError)
-      .into(FinalizedBlockHashRune, this.extrinsic.client)
+    return this.extrinsic.client.finalizedBlock(hash)
   }
 }
 

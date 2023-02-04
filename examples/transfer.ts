@@ -8,11 +8,13 @@ const tx = Balances
   })
   .signed({ sender: C.alice })
 
-const txFinalizedBlockHash = tx
+const txFinalizedBlock = tx
   .sent()
   .logStatus()
   .finalized()
 
-const result = await txFinalizedBlockHash.txEvents(tx.hex()).run()
+const result = await txFinalizedBlock
+  .txEvents(tx.hex())
+  .run()
 
 console.log(result)
