@@ -6,18 +6,12 @@ import { $contractsApiInstantiateArgs, $contractsApiInstantiateResult } from "./
 import { ContractInstantiationExtrinsicRune } from "./ContractInstantiationExtrinsicRune.ts"
 import { Constructor, normalize } from "./ContractMetadata.ts"
 
-export interface InstantiateProps {
-  initiator: Uint8Array
-  code: Uint8Array
-  ctor?: string
-}
-
 export class ContractRune<out U, out C extends Chain = Chain> extends Rune<string, U> {
   constructor(_prime: ContractRune<U>["_prime"], readonly client: ClientRune<U, C>) {
     super(_prime)
   }
 
-  static fromMetadata<X>(...[client, jsonText]: RunicArgs<X, [client: Client, jsonText: string]>) {
+  static from<X>(...[client, jsonText]: RunicArgs<X, [client: Client, jsonText: string]>) {
     return Rune
       .resolve(jsonText)
       .into(ContractRune, Rune.resolve(client).into(ClientRune))
@@ -53,10 +47,13 @@ export class ContractRune<out U, out C extends Chain = Chain> extends Rune<strin
     return crypto.getRandomValues(new Uint8Array(4))
   }
 
-  instantiate<X>(props: RunicArgs<X, InstantiateProps>) {
-    const ctor = this.ctor(props.ctor)
-    const key = Rune.tuple([Rune.rec(props), ctor])
-      .map(([{ code, initiator }, ctor]) =>
+  instantiate<X>(
+    ...args: RunicArgs<X, [code: Uint8Array, initiator: Uint8Array, ctorLabel?: string]>
+  ) {
+    const [code, initiator, ctorLabel] = args
+    const ctor = this.ctor(ctorLabel)
+    const key = Rune.tuple([code, initiator, ctor])
+      .map(([code, initiator, ctor]) =>
         hex.encode($contractsApiInstantiateArgs.encode([
           initiator,
           0n,
@@ -72,7 +69,7 @@ export class ContractRune<out U, out C extends Chain = Chain> extends Rune<strin
       .map((result) => $contractsApiInstantiateResult.decode(hex.decode(result)))
       .access("gasRequired")
     return Rune
-      .tuple([props.code, ctor, gasRequired])
+      .tuple([code, ctor, gasRequired])
       .map(([code, ctor, gasRequired]) => ({
         type: "Contracts",
         value: {

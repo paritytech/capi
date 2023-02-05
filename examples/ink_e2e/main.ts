@@ -7,10 +7,7 @@ const contract = ink.ContractRune.from(
 )
 
 const address = await contract
-  .instantiate({
-    code: Deno.readFileSync("examples/ink_e2e/code.wasm"),
-    initiator: alice.publicKey,
-  })
+  .instantiate(Deno.readFileSync("examples/ink_e2e/code.wasm"), alice.publicKey)
   .signed({ sender: alice })
   .sent()
   .logStatus()
