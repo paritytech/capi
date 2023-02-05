@@ -5,8 +5,8 @@ import { alice, throwIfError } from "../util/mod.ts"
 import { ChainError } from "./Codec.ts"
 import { DeriveCodec } from "./Codec.ts"
 
-export const metadata = downloaded.polkadot
-export const deriveCodec = DeriveCodec(metadata.tys)
+const metadata = downloaded.polkadot
+const deriveCodec = DeriveCodec(metadata.tys)
 
 Deno.test("Derive all", () => {
   for (const ty of metadata.tys) deriveCodec(ty.id)
