@@ -62,8 +62,8 @@ export class ExtrinsicRune<out U, out C extends Chain = Chain> extends Rune<C["c
         }
       }
     }).throws(U.ss58.InvalidPublicKeyLengthError, U.ss58.InvalidNetworkPrefixError)
-    const nonce = system.accountNextIndex(this.client.into(), senderSs58)
-    const genesisHashHex = chain.getBlockHash(this.client.into(), 0)
+    const nonce = system.accountNextIndex(this.client, senderSs58)
+    const genesisHashHex = chain.getBlockHash(this.client, 0)
     const genesisHash = genesisHashHex.map(U.hex.decode)
     const checkpointHash = Rune.tuple([props.checkpoint, genesisHashHex]).map(([a, b]) => a ?? b)
       .map(U.hex.decode)

@@ -38,14 +38,18 @@ export class Batch {
   }
 }
 
+declare const _T: unique symbol
+declare const _U: unique symbol
+
 export namespace Rune {
-  export type T<R> = R extends Rune<any, any> ? R[""][0] : R
-  export type U<R> = R extends Rune<any, any> ? R[""][1] : never
+  export type T<R> = R extends { [_T]: infer T } ? T : R
+  export type U<R> = R extends { [_U]: infer U } ? U : never
 }
 
 export class Rune<out T, out U = never> {
   declare private _
-  declare "": [T, U]
+  declare [_T]: T
+  declare [_U]: U
 
   constructor(readonly _prime: (batch: Batch) => Run<T, U>) {}
 

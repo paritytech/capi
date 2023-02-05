@@ -6,22 +6,19 @@ import { Hex, hex, HexHash } from "../util/mod.ts"
 import { Chain, ClientRune } from "./ClientRune.ts"
 import { CodecRune } from "./CodecRune.ts"
 import { Events, EventsRune } from "./EventsRune.ts"
-import { HeaderRune } from "./HeaderRune.ts"
 import { chain } from "./rpc_method_runes.ts"
 
 export class BlockRune<out U, out C extends Chain = Chain> extends Rune<known.SignedBlock, U> {
   constructor(
     _prime: BlockRune<U, C>["_prime"],
     readonly client: ClientRune<U, C>,
-    readonly hash?: Rune<HexHash | undefined, U>,
+    readonly hash: Rune<HexHash, U>,
   ) {
     super(_prime)
   }
 
   header() {
-    return chain
-      .getHeader(this.client, this.hash)
-      .into(HeaderRune, this.client)
+    return chain.getHeader(this.client, this.hash)
   }
 
   extrinsicsRaw() {

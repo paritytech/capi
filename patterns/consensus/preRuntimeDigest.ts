@@ -9,7 +9,7 @@ export function preRuntimeDigest<X>(...args: RunicArgs<X, [client: Client, at?: 
   const [client, at] = RunicArgs.resolve(args)
   return client
     .into(ClientRune)
-    .finalizedBlock(at)
+    .block(at)
     .header()
     .into(ValueRune)
     .access("digest", "logs")

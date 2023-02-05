@@ -1,7 +1,7 @@
 import { known } from "../rpc/mod.ts"
 import { MetaRune, Rune, ValueRune } from "../rune/mod.ts"
+import { BlockRune } from "./BlockRune.ts"
 import { Chain } from "./ClientRune.ts"
-import { InBlockBlockRune } from "./InBlockBlockRune.ts"
 import { SignedExtrinsicRune } from "./SignedExtrinsicRune.ts"
 
 export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
@@ -40,7 +40,7 @@ export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
       .unhandle(NeverInBlockError)
     return this.extrinsic.client
       .block(hash)
-      .into(InBlockBlockRune, this.extrinsic.client, hash)
+      .into(BlockRune, this.extrinsic.client, hash)
   }
 
   finalized() {
