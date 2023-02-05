@@ -2,8 +2,8 @@
 // deno-lint-ignore-file
 
 import { alice, Rune } from "capi"
+import { types, XcmPallet } from "zombienet/examples/xcm/zombienet.toml/alice/@latest/mod.ts"
 import { client, System } from "zombienet/examples/xcm/zombienet.toml/collator/@latest/mod.ts"
-import { types, XcmPallet } from "zombienet/examples/xcm/zombienet.toml/relay/@latest/mod.ts"
 
 const {
   VersionedMultiAssets,

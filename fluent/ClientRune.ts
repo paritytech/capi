@@ -45,6 +45,15 @@ export class ClientRune<out U, out C extends Chain = Chain> extends Rune<rpc.Cli
     return call.into(ExtrinsicRune<RunicArgs.U<X> | U, C>, this)
   }
 
+  addressPrefix() {
+    return this
+      .metadata()
+      .pallet("System")
+      .const("SS58Prefix")
+      .decoded
+      .unsafeAs<number>()
+  }
+
   chainVersion = rpcCall<[], string>("system_version")(this.into())
 
   private _asCodegen<C extends Chain>() {

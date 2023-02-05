@@ -5,7 +5,11 @@ default_args = ["-lparachain=debug"]
 chain = "rococo-local"
 
 [[relaychain.nodes]]
-name = "relay"
+name = "alice"
+validator = true
+
+[[relaychain.nodes]]
+name = "bob"
 validator = true
 
 [[parachains]]
