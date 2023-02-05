@@ -23,7 +23,7 @@ console.log(
     .signed({ sender: alice })
     .sent()
     .logStatus()
-    .finalized()
+    .events()
     .run(),
 )
 
