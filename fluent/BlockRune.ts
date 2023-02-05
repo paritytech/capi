@@ -1,8 +1,8 @@
 import * as M from "../frame_metadata/mod.ts"
 import { known } from "../rpc/mod.ts"
-import { ArrayRune, Rune, RunicArgs } from "../rune/mod.ts"
+import { ArrayRune, Rune } from "../rune/mod.ts"
 import { ValueRune } from "../rune/ValueRune.ts"
-import { Hex, hex, HexHash } from "../util/mod.ts"
+import { hex, HexHash } from "../util/mod.ts"
 import { Chain, ClientRune } from "./ClientRune.ts"
 import { CodecRune } from "./CodecRune.ts"
 import { Events, EventsRune } from "./EventsRune.ts"
@@ -49,26 +49,6 @@ export class BlockRune<out U, out C extends Chain = Chain> extends Rune<known.Si
       .storage("Events")
       .entry([], this.hash)
       .unsafeAs<Events<C["runtimeEvent"]>>()
-      .into(EventsRune, this.client)
-  }
-
-  eventI<X>(...[extrinsicHex]: RunicArgs<X, [Hex]>) {
-    const extrinsics = this
-      .into(ValueRune)
-      .access("block", "extrinsics")
-    return Rune
-      .tuple([extrinsics, extrinsicHex])
-      .map(([extrinsics, extrinsicHex]) => {
-        const i = extrinsics.indexOf(("0x" + extrinsicHex) as Hex)
-        return i === -1 ? undefined : i
-      })
-  }
-
-  txEvents<X>(...[hex]: RunicArgs<X, [Hex]>) {
-    return Rune
-      .tuple([this.events(), this.eventI(hex)])
-      .map(([events, i]) =>
-        events.filter((event) => event.phase.type === "ApplyExtrinsic" && event.phase.value === i)
-      )
+      .into(EventsRune, this.client, this)
   }
 }

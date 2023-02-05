@@ -56,7 +56,10 @@ export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
   }
 
   events() {
-    return this.finalized().txEvents(this.extrinsic.hex())
+    return this
+      .finalized()
+      .events()
+      .filterTx(this.extrinsic.hex())
   }
 }
 
