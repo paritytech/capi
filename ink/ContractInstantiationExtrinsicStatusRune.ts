@@ -1,5 +1,6 @@
 import { Chain, ExtrinsicStatusRune, PublicKeyRune } from "../fluent/mod.ts"
 import { ValueRune } from "../rune/mod.ts"
+import { ContractInstanceRune } from "./ContractInstanceRune.ts"
 
 export class ContractInstantiationExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
   extends ExtrinsicStatusRune<U1, U2, C>
@@ -30,6 +31,10 @@ export class ContractInstantiationExtrinsicStatusRune<out U1, out U2, out C exte
 
   address() {
     return this.publicKey().address(this.extrinsic.client)
+  }
+
+  instance() {
+    return this.publicKey().into(ContractInstanceRune, this.extrinsic.client)
   }
 }
 

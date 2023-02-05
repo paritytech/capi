@@ -1,4 +1,5 @@
-import { readLines } from "../../deps/std/io.ts"
+import { Buffer, readLines } from "../../deps/std/io.ts"
+import { copy, writeAll } from "../../deps/std/streams.ts"
 import { Network } from "../../deps/zombienet/orchestrator.ts"
 import { Env, PathInfo } from "../../server/mod.ts"
 import { PermanentMemo, splitLast } from "../../util/mod.ts"
@@ -71,6 +72,7 @@ export class ZombienetProvider extends FrameProxyProvider {
       const process = Deno.run({
         cmd,
         stdout: "piped",
+        stderr: "piped",
       })
       this.env.signal.addEventListener("abort", async () => {
         process.kill("SIGINT")
@@ -78,14 +80,29 @@ export class ZombienetProvider extends FrameProxyProvider {
         process.close()
         await Deno.remove(tmpDir, { recursive: true })
       })
-      // TODO: utilize Deno.watchFs to observe `${networkFilesPath}/zombie.json`
-      for await (const line of readLines(process.stdout)) {
-        if (line.includes("Network launched")) {
-          process.stdout.close()
-          return JSON.parse(await Deno.readTextFile(`${tmpDir}/zombie.json`)) as Network
+      const out = new Buffer()
+      const maybeConfig = await Promise.race([
+        (async () => {
+          const encoder = new TextEncoder()
+          // TODO: utilize Deno.watchFs to observe `${networkFilesPath}/zombie.json`
+          for await (const line of readLines(process.stdout)) {
+            await writeAll(out, encoder.encode(line))
+            if (line.includes("Network launched")) {
+              process.stdout.close()
+              return JSON.parse(await Deno.readTextFile(`${tmpDir}/zombie.json`)) as Network
+            }
+          }
+          return 0
+        })(),
+        copy(process.stderr, out),
+      ])
+      if (typeof maybeConfig === "number") {
+        for await (const line of readLines(out)) {
+          console.log(line)
         }
+        throw new Error("Zombienet exited without launching network")
       }
-      throw new Error("Zombienet exited without launching network")
+      return maybeConfig
     })
   }
 }

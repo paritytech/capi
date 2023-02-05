@@ -1,13 +1,13 @@
 import { alice, ink, Rune } from "capi"
-import { client } from "zombienet/examples/ink_contract/zombienet.toml/collator/@latest/mod.ts"
+import { client } from "zombienet/examples/ink_e2e/zombienet.toml/collator/@latest/mod.ts"
 
 const contract = Rune
-  .constant(Deno.readTextFileSync("examples/ink_contract/metadata.json"))
+  .constant(Deno.readTextFileSync("examples/ink_e2e/metadata.json"))
   .into(ink.ContractRune, client)
 
 const address = await contract
   .instantiate({
-    code: Deno.readFileSync("examples/ink_contract/flipper.wasm"),
+    code: Deno.readFileSync("examples/ink_e2e/code.wasm"),
     initiator: alice.publicKey,
   })
   .signed({ sender: alice })
