@@ -10,7 +10,6 @@ import {
 } from "../../fluent/mod.ts"
 import { ValueRune } from "../../rune/mod.ts"
 import { ContractInstanceRune } from "./ContractInstanceRune.ts"
-import { Contract } from "./ContractMetadata.ts"
 import { ContractRune } from "./ContractRune.ts"
 
 export class ContractInstantiationExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>

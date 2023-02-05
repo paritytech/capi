@@ -15,10 +15,16 @@ const address = await contract
   .signed({ sender: alice })
   .sent()
   .logStatus()
-  .resultEvent()
+  .address()
   .run()
 
 console.log(address)
+
+// if (resultEvent.event.type === "System") {
+//   console.log((await ink.decodeError(client, resultEvent as any).run()).event.value.dispatchError)
+// }
+
+// console.log(resultEvent)
 
 // TODO: what values do we want?
 // console.log(".get", await instance.msg("get").run())

@@ -1,7 +1,7 @@
 import * as $ from "../../deps/scale.ts"
 import { Chain, ClientRune, CodecRune, state } from "../../fluent/mod.ts"
 import { Client } from "../../rpc/client.ts"
-import { ArrayRune, Rune, RunicArgs } from "../../rune/mod.ts"
+import { ArrayRune, FnRune, Rune, RunicArgs } from "../../rune/mod.ts"
 import { hex } from "../../util/mod.ts"
 import { $contractsApiInstantiateArgs, $contractsApiInstantiateResult, Weight } from "./codecs.ts"
 import { ContractInstantiationExtrinsicRune } from "./ContractInstantiationExtrinsicRune.ts"
@@ -73,7 +73,9 @@ export class ContractRune<out U, out C extends Chain = Chain> extends Rune<Metad
           .map(([selector, args]) => [selector, ...args ?? []]),
       )
     const data = Rune
-      .tuple([
+      .constant($contractsApiInstantiateArgs.encode)
+      .into(FnRune)
+      .call(Rune.tuple([
         props.origin,
         value,
         undefined,
@@ -81,8 +83,7 @@ export class ContractRune<out U, out C extends Chain = Chain> extends Rune<Metad
         Rune.rec({ type: "Upload" as const, value: code }),
         $data,
         salt,
-      ])
-      .map((b) => $contractsApiInstantiateArgs.encode(b))
+      ]))
     const gasLimit = props.gasLimit ?? state
       .call(this.client, "ContractsApi_instantiate", data.map(hex.encode))
       .map((result) => $contractsApiInstantiateResult.decode(hex.decode(result)))
