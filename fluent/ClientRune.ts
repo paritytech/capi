@@ -4,15 +4,15 @@ import * as rpc from "../rpc/mod.ts"
 import { Rune, RunicArgs } from "../rune/mod.ts"
 import { HexHash } from "../util/mod.ts"
 import { BlockRune } from "./BlockRune.ts"
-import { RuntimeEventBase } from "./EventsRune.ts"
+import { RuntimeEvent } from "./EventsRune.ts"
 import { ExtrinsicRune } from "./ExtrinsicRune.ts"
 import { MetadataRune } from "./MetadataRune.ts"
 import { chain, state } from "./rpc_method_runes.ts"
 import { rpcCall } from "./rpc_runes.ts"
 
-export interface Chain {
-  call: unknown
-  runtimeEvent: RuntimeEventBase
+export interface Chain<Call = unknown, Event extends RuntimeEvent = RuntimeEvent> {
+  call: Call
+  event: Event
 }
 
 export class ClientRune<out U, out C extends Chain = Chain> extends Rune<rpc.Client, U> {

@@ -34,6 +34,7 @@ export const $contractsApiCallArgs: $.Codec<ContractsApiCallArgs> = $.tuple(
   $.uint8Array,
 )
 
+// TODO: clean this up
 export interface ContractsApiCallResult {
   gasConsumed: Weight
   gasRequired: Weight

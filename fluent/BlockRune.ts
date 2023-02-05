@@ -48,7 +48,7 @@ export class BlockRune<out U, out C extends Chain = Chain> extends Rune<known.Si
       .pallet("System")
       .storage("Events")
       .entry([], this.hash)
-      .unsafeAs<Events<C["runtimeEvent"]>>()
+      .unsafeAs<Events<C["event"]>>()
       .into(EventsRune, this.client, this)
   }
 }

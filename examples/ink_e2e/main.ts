@@ -8,11 +8,14 @@ const contract = ink.ContractRune.from(
 )
 
 const address = await contract
-  .instantiate(Deno.readFileSync("examples/ink_e2e/code.wasm"), alice.publicKey)
+  .instantiate({
+    origin: alice.publicKey,
+    code: Deno.readFileSync("examples/ink_e2e/code.wasm"),
+  })
   .signed({ sender: alice })
   .sent()
   .logStatus()
-  .address()
+  .resultEvent()
   .run()
 
 console.log(address)
