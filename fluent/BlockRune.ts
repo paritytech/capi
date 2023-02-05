@@ -69,7 +69,7 @@ export class BlockRune<out U, out C extends Chain = Chain> extends Rune<known.Si
 
   txEvents<X>(...[hex]: RunicArgs<X, [Hex]>) {
     return Rune
-      .tuple([this.events(), this.eventI(hex).unhandle(undefined)])
+      .tuple([this.events(), this.eventI(hex)])
       .map(([events, i]) =>
         events.filter((event) => event.phase.type === "ApplyExtrinsic" && event.phase.value === i)
       )

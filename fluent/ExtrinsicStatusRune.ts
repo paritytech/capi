@@ -52,7 +52,7 @@ export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
       )
       .singular()
       .unhandle(NeverFinalizedError)
-    return this.extrinsic.client.finalizedBlock(hash)
+    return this.extrinsic.client.block(hash)
   }
 }
 

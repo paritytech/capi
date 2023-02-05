@@ -11,18 +11,20 @@ const balances = recipients.mapArray((recipient) =>
 
 console.log(await balances.run())
 
-await Utility.batchAll({
-  calls: recipients.mapArray((recipient) =>
-    Balances.transfer({
-      dest: recipient.access("address"),
-      value: 12345n,
-    })
-  ),
-})
-  .signed({ sender: alice })
-  .sent()
-  .logStatus()
-  .finalized()
-  .run()
+console.log(
+  await Utility.batchAll({
+    calls: recipients.mapArray((recipient) =>
+      Balances.transfer({
+        dest: recipient.access("address"),
+        value: 12345n,
+      })
+    ),
+  })
+    .signed({ sender: alice })
+    .sent()
+    .logStatus()
+    .finalized()
+    .run(),
+)
 
 console.log(await balances.run())
