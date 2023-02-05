@@ -1,13 +1,11 @@
-import { alice, bob, charlie, dave, MultisigRune, Rune, ValueRune } from "capi"
+import { alice, bob, charlie, dave, MultisigRune, ValueRune } from "capi"
 import { Balances, client, System } from "polkadot_dev/mod.ts"
 import { MultiAddress } from "polkadot_dev/types/sp_runtime/multiaddress.ts"
 
-const multisig = Rune
-  .resolve({
-    signatories: [alice.publicKey, bob.publicKey, charlie.publicKey],
-    threshold: 2,
-  })
-  .into(MultisigRune, client)
+const multisig = MultisigRune.from(client, {
+  signatories: [alice.publicKey, bob.publicKey, charlie.publicKey],
+  threshold: 2,
+})
 
 // Read dave's initial balance (to-be changed by the call)
 console.log("Dave initial balance:", await System.Account.entry([dave.publicKey]).run())

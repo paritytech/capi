@@ -1,4 +1,4 @@
-import { Chain, SignedExtrinsicRune } from "../fluent/mod.ts"
+import { Chain, SignedExtrinsicRune } from "../../fluent/mod.ts"
 import { ContractInstantiationExtrinsicStatusRune } from "./ContractInstantiationExtrinsicStatusRune.ts"
 
 export class ContractInstantiationSignedExtrinsicRune<out U, out C extends Chain = Chain>

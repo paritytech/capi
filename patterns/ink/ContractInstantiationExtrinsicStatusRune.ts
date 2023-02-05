@@ -1,5 +1,5 @@
-import { Chain, ExtrinsicStatusRune, PublicKeyRune } from "../fluent/mod.ts"
-import { ValueRune } from "../rune/mod.ts"
+import { Chain, ExtrinsicStatusRune, PublicKeyRune } from "../../fluent/mod.ts"
+import { ValueRune } from "../../rune/mod.ts"
 import { ContractInstanceRune } from "./ContractInstanceRune.ts"
 
 export class ContractInstantiationExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>

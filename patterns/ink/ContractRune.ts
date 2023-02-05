@@ -1,6 +1,7 @@
-import { Chain, ClientRune, state } from "../fluent/mod.ts"
-import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
-import { hex } from "../util/mod.ts"
+import { Chain, ClientRune, state } from "../../fluent/mod.ts"
+import { Client } from "../../rpc/client.ts"
+import { Rune, RunicArgs, ValueRune } from "../../rune/mod.ts"
+import { hex } from "../../util/mod.ts"
 import { $contractsApiInstantiateArgs, $contractsApiInstantiateResult } from "./codecs.ts"
 import { ContractInstantiationExtrinsicRune } from "./ContractInstantiationExtrinsicRune.ts"
 import { Constructor, normalize } from "./ContractMetadata.ts"
@@ -14,6 +15,12 @@ export interface InstantiateProps {
 export class ContractRune<out U, out C extends Chain = Chain> extends Rune<string, U> {
   constructor(_prime: ContractRune<U>["_prime"], readonly client: ClientRune<U, C>) {
     super(_prime)
+  }
+
+  static fromMetadata<X>(...[client, jsonText]: RunicArgs<X, [client: Client, jsonText: string]>) {
+    return Rune
+      .resolve(jsonText)
+      .into(ContractRune, Rune.resolve(client).into(ClientRune))
   }
 
   metadata() {

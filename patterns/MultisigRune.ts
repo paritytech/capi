@@ -1,8 +1,9 @@
 import * as bytes from "../deps/std/bytes.ts"
+import { Chain, ClientRune } from "../fluent/ClientRune.ts"
 import { MultiAddress } from "../primitives/mod.ts"
+import { Client } from "../rpc/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { multisigAddress } from "../util/mod.ts"
-import { Chain, ClientRune } from "./ClientRune.ts"
 
 export interface MultisigRatifyProps {
   sender: MultiAddress
@@ -32,6 +33,12 @@ export class MultisigRune<out U, out C extends Chain = Chain> extends Rune<Multi
     super(_prime)
     this.pallet = this.client.metadata().pallet("Multisig")
     this.storage = this.pallet.storage("Multisigs")
+  }
+
+  static from<X>(...[client, multisig]: RunicArgs<X, [client: Client, multisig: Multisig]>) {
+    return Rune
+      .resolve(multisig)
+      .into(MultisigRune, Rune.resolve(client).into(ClientRune))
   }
 
   otherSignatories<X>(...[sender]: RunicArgs<X, [sender: MultiAddress]>) {

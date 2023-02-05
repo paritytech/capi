@@ -1,5 +1,5 @@
-import { Chain, ClientRune } from "../fluent/mod.ts"
-import { Rune, RunicArgs } from "../rune/mod.ts"
+import { Chain, ClientRune } from "../../fluent/mod.ts"
+import { Rune, RunicArgs } from "../../rune/mod.ts"
 import { ContractMsgRune } from "./ContractMsgRune.ts"
 
 export class ContractInstanceRune<out U, out C extends Chain = Chain> extends Rune<Uint8Array, U> {

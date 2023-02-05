@@ -1,9 +1,10 @@
-import { alice, ink, Rune } from "capi"
+import { alice, ink } from "capi"
 import { client } from "zombienet/examples/ink_e2e/zombienet.toml/collator/@latest/mod.ts"
 
-const contract = Rune
-  .constant(Deno.readTextFileSync("examples/ink_e2e/metadata.json"))
-  .into(ink.ContractRune, client)
+const contract = ink.ContractRune.from(
+  client,
+  Deno.readTextFileSync("examples/ink_e2e/metadata.json"),
+)
 
 const address = await contract
   .instantiate({
