@@ -1,7 +1,7 @@
 import { unreachable } from "../../deps/std/testing/asserts.ts"
 import { Ty, TyDef, UnionTyDefMember } from "../../scale_info/mod.ts"
 
-export interface Metadata {
+export interface InkMetadata {
   source: Source
   contract: Contract
   V3: Abi
@@ -92,7 +92,7 @@ export interface Storage {
   }
 }
 
-export function normalize({ V3: { types, ...v3Rest }, ...topLevelRest }: Metadata): Metadata {
+export function normalize({ V3: { types, ...v3Rest }, ...topLevelRest }: InkMetadata): InkMetadata {
   return {
     ...topLevelRest,
     V3: {

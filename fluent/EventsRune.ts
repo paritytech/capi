@@ -37,12 +37,14 @@ export class EventsRune<out U, out C extends Chain = Chain> extends Rune<Events<
 // TODO: clean up this file
 // The following types are loosely modeled after those of sp-core
 
-export type Events<Event extends RuntimeEvent = RuntimeEvent> = EventRecord<Event>[]
-export interface EventRecord<Event extends RuntimeEvent = RuntimeEvent> {
+export type Events<E extends RuntimeEvent = RuntimeEvent> = EventRecord<E>[]
+
+export interface EventRecord<E extends RuntimeEvent = RuntimeEvent> {
   phase: EventPhase
-  event: Event
+  event: E
   topics: Uint8Array[]
 }
+
 export interface RuntimeEvent<
   Pallet extends string = string,
   Value extends RuntimeEventData = RuntimeEventData,
@@ -50,9 +52,11 @@ export interface RuntimeEvent<
   type: Pallet
   value: Value
 }
+
 export interface RuntimeEventData<Type extends string = string> {
   type: Type
 }
+
 export type EventPhase =
   | ApplyExtrinsicEventPhase
   | FinalizationEventPhase
@@ -69,18 +73,18 @@ export interface InitializationEventPhase {
 }
 
 // TODO: generate the below?
-export function isExtrinsicFailEvent<C extends Chain>(
-  event_: EventRecord<C["event"]>,
-): event_ is EventRecord<RuntimeEvent<"System", ExtrinsicFailedEvent>> {
-  const { event } = event_
+export function isExtrinsicFailEvent(
+  e: EventRecord,
+): e is EventRecord<ExtrinsicFailedRuntimeEvent> {
+  const { event } = e
   return event.type === "System" && event.value.type === "ExtrinsicFailed"
 }
 
-export interface ExtrinsicFailedEvent {
+export type ExtrinsicFailedRuntimeEvent = RuntimeEvent<"System", {
   type: "ExtrinsicFailed"
   dispatchError: DispatchError
   dispatchInfo: DispatchInfo
-}
+}>
 
 export type DispatchError =
   | DispatchError.Other

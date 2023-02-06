@@ -1,5 +1,5 @@
 import { DeriveCodec } from "../../scale_info/mod.ts"
-import { normalize } from "./ContractMetadata.ts"
+import { normalize } from "./InkMetadata.ts"
 
 Deno.test("Ink Contract Metadata Normalization and Codec Derivation", async () => {
   const raw = await Deno.readTextFile("patterns/ink/_downloaded/erc20.json")

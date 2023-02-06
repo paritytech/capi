@@ -47,6 +47,7 @@ export function rpcCall<Params extends unknown[], Result>(
         if (result instanceof Error) {
           throw result
         } else if (result.error) {
+          console.log(result)
           throw new RpcServerError(result)
         }
         return result.result

@@ -1,13 +1,9 @@
 import { alice } from "capi"
 import { ink } from "capi/patterns"
 import { client } from "zombienet/examples/ink_e2e/zombienet.toml/collator/@latest/mod.ts"
+import { contract } from "./common.ts"
 
-const contract = ink.ContractRune.from(
-  client,
-  Deno.readTextFileSync("examples/ink_e2e/metadata.json"),
-)
-
-const address = await contract
+export const address = await contract
   .instantiate({
     origin: alice.publicKey,
     code: Deno.readFileSync("examples/ink_e2e/code.wasm"),
@@ -15,16 +11,13 @@ const address = await contract
   .signed({ sender: alice })
   .sent()
   .logStatus()
-  .address()
+  .events()
+  .pipe(ink.resultEvent)
+  .pipe(ink.publicKeyFromResultEvent)
+  .address(client)
   .run()
 
 console.log(address)
-
-// if (resultEvent.event.type === "System") {
-//   console.log((await ink.decodeError(client, resultEvent as any).run()).event.value.dispatchError)
-// }
-
-// console.log(resultEvent)
 
 // TODO: what values do we want?
 // console.log(".get", await instance.msg("get").run())
