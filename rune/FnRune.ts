@@ -1,5 +1,4 @@
-import { Rune } from "./Rune.ts"
-import { RunicArgs } from "./RunicArgs.ts"
+import { Rune, RunicArgs } from "./Rune.ts"
 
 export class FnRune<F extends (...args: any[]) => any, U> extends Rune<F, U> {
   call<A extends any[], T, X>(

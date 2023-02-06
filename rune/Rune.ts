@@ -1,6 +1,6 @@
 import { deferred } from "../deps/std/async.ts"
 import { getOrInit } from "../util/state.ts"
-import { ArrayRune, RunicArgs, ValueRune } from "./mod.ts"
+import { ArrayRune, ValueRune } from "./mod.ts"
 import { EventSource, Receipt, Timeline } from "./Timeline.ts"
 
 export class Batch {
@@ -372,4 +372,20 @@ class BubbleUnhandled<U> {
 export class Unhandled<U = unknown> {
   declare private _
   constructor(readonly value: U) {}
+}
+
+export type RunicArgs<X, A> =
+  | (never extends X ? never : X extends A ? X : never)
+  | { [K in keyof A]: A[K] | Rune<A[K], RunicArgs.U<X>> }
+
+export namespace RunicArgs {
+  export type U<X> = X extends unknown[] ? Rune.U<X[number]> : Rune.U<X[keyof X]>
+  export function resolve<X, A>(
+    args: RunicArgs<X, A>,
+  ): { [K in keyof A]: ValueRune<A[K], RunicArgs.U<X>> }
+  export function resolve(args: any): any {
+    return args instanceof Array
+      ? args.map(Rune.resolve)
+      : Object.fromEntries(Object.entries(args).map(([k, v]) => [k, Rune.resolve(v)]))
+  }
 }
