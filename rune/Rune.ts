@@ -46,10 +46,12 @@ export namespace Rune {
   export type U<R> = R extends { [_U]: infer U } ? U : never
 }
 
+export interface Rune<out T, out U = never> {
+  [_T]: T
+  [_U]: U
+}
 export class Rune<out T, out U = never> {
   declare private _
-  declare [_T]: T
-  declare [_U]: U
 
   constructor(readonly _prime: (batch: Batch) => Run<T, U>) {}
 
