@@ -13,13 +13,12 @@ export function preRuntimeDigest<X>(...args: RunicArgs<X, [client: Client, at?: 
     .header()
     .into(ValueRune)
     .access("digest", "logs")
-    .map((logs) => {
-      const preRuntimeDigestItem = logs
+    .map((logs) =>
+      logs
         .map((log) => $digestItem.decode(hex.decode(log)))
         .find((digestItem): digestItem is DigestItem.PreRuntime => digestItem.type === "PreRuntime")
-      if (!preRuntimeDigestItem) return new CouldNotRetrievePreRuntimeDigestError()
-      return preRuntimeDigestItem
-    })
+        ?? new CouldNotRetrievePreRuntimeDigestError()
+    )
     .unhandle(CouldNotRetrievePreRuntimeDigestError)
     .map(({ value: [typeEncoded, value] }) => ({
       type: new TextDecoder().decode(typeEncoded),
