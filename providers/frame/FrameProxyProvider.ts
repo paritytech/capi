@@ -57,7 +57,7 @@ export abstract class FrameProxyProvider extends FrameProvider {
         filePath: "",
       }),
       this.env.href.replace(/^http/, "ws"),
-    )
+    ).toString()
   }
 
   async client(pathInfo: PathInfo) {

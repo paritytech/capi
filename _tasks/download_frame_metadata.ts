@@ -1,7 +1,7 @@
-import { rawClient as kusama } from "kusama/mod.ts"
-import { rawClient as polkadot } from "polkadot/mod.ts"
-import { rawClient as rococo } from "rococo/mod.ts"
-import { rawClient as westend } from "westend/mod.ts"
+import { rawClient as kusama } from "kusama/client.ts"
+import { rawClient as polkadot } from "polkadot/client.ts"
+import { rawClient as rococo } from "rococo/client.ts"
+import { rawClient as westend } from "westend/client.ts"
 
 const knownClients = { kusama, polkadot, westend, rococo }
 

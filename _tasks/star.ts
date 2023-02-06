@@ -75,6 +75,7 @@ const entries = [...dependencies.entries()].sort((a, b) => b[1].size - a[1].size
 const done = new Set()
 for (const [file, deps] of entries.slice(1)) {
   if (done.has(file)) continue
+  console.log(file)
   const status = await Deno.run({ cmd: ["deno", "cache", "--check", file] })
     .status()
   if (!status.success) Deno.exit(status.code)
