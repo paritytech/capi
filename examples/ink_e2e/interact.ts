@@ -1,5 +1,5 @@
-import { address } from "./deploy.ts"
+// import { address } from "./deploy.ts"
 
-const instance = ink.InkContractRune.fromAddress(address)
+// const instance = ink.InkContractRune.fromAddress(address)
 
-instance.call(...)
+// instance.call(...)
