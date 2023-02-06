@@ -1,12 +1,12 @@
-name: Test
+name: Star
 on:
   pull_request:
   push:
     branches:
       - main
 jobs:
-  test:
-    name: Run Tests
+  star:
+    name: Star
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -39,5 +39,4 @@ jobs:
           binary-name: zombienet-linux
           binary-version: v1.3.18
           binary-github: https://github.com/paritytech/zombienet
-      - run: deno task test
-      # - run: deno task test:examples
+      - run: deno task star
