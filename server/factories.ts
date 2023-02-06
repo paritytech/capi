@@ -1,14 +1,25 @@
-import { escapeHtml } from "../../deps/escape.ts"
-import * as shiki from "../../deps/shiki.ts"
-import { Status } from "../../deps/std/http/http_status.ts"
-import * as U from "../../util/mod.ts"
+import { escapeHtml } from "../deps/escape.ts"
+import * as shiki from "../deps/shiki.ts"
+import { Status } from "../deps/std/http/http_status.ts"
+import { CacheBase } from "../util/cache/base.ts"
 
 shiki.setCDN("https://unpkg.com/shiki/")
 export const highlighterPromise = shiki.getHighlighter({ theme: "github-dark", langs: ["ts"] })
 
-export async function code(req: Request, path: string, src: string): Promise<Response> {
-  if (acceptsHtml(req)) return page(await codePage({ path, src }))
-  return new Response(src, {
+const codeTtl = 60_000
+
+export async function code(cache: CacheBase, request: Request, genCode: () => Promise<string>) {
+  const path = new URL(request.url).pathname
+  if (acceptsHtml(request)) {
+    return html(
+      await cache.getString(path + ".html", codeTtl, async () => {
+        const code = await cache.getString(path, codeTtl, genCode)
+        return renderCode(code)
+      }),
+    )
+  }
+  const code = await cache.getString(path, codeTtl, genCode)
+  return new Response(code, {
     headers: { "Content-Type": "application/typescript" },
   })
 }
@@ -21,15 +32,15 @@ export async function redirect(path: string): Promise<Response> {
   })
 }
 
-export function notFound(): U.PromiseOr<Response> {
+export function notFound() {
   return new Response("404", { status: Status.NotFound })
 }
 
-export function serverError(message?: string): U.PromiseOr<Response> {
+export function serverError(message?: string) {
   return new Response(message || "500", { status: Status.InternalServerError })
 }
 
-export function page(html: string): Response {
+export function html(html: string): Response {
   return new Response(html, {
     headers: { "Content-Type": "text/html" },
   })
@@ -39,12 +50,9 @@ export function acceptsHtml(request: Request): boolean {
   return request.headers.get("Accept")?.split(",").includes("text/html") ?? false
 }
 
-export async function codePage({ path, src }: {
-  path: string
-  src: string
-}) {
+export async function renderCode(code: string) {
   const highlighter = await highlighterPromise
-  const tokens = highlighter.codeToThemedTokens(src, "ts")
+  const tokens = highlighter.codeToThemedTokens(code, "ts")
   let codeContent = ""
   for (const line of tokens) {
     codeContent += `<span class="line">`
@@ -95,11 +103,6 @@ a:hover {
   return `
     <style>${STYLE}</style>
     <body>
-      <h3>
-        <code>
-          <a style="color:inherit" href="${escapeHtml(path)}">${path}</a>
-        </code>
-      </h3>
       <pre class="shiki"><code>${codeContent}</code></pre>
     </body>
   `

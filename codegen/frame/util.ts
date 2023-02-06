@@ -1,4 +1,4 @@
-import { Ty } from "../scale_info/mod.ts"
+import { Ty } from "../../scale_info/mod.ts"
 
 export namespace S {
   export function array(items: string[]): string {

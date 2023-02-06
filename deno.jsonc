@@ -23,7 +23,8 @@
         "no-namespace",
         "no-empty",
         "no-extra-semi",
-        "ban-types"
+        "ban-types",
+        "require-await"
       ],
       "tags": ["recommended"]
     }

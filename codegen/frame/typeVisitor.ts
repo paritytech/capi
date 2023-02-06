@@ -1,8 +1,8 @@
 import { Ty, TyVisitor } from "../../scale_info/mod.ts"
 import { normalizeIdent } from "../../util/case.ts"
 import { getOrInit } from "../../util/mod.ts"
-import { makeDocComment, S } from "../util.ts"
-import { FrameCodegen, TypeFile } from "./mod.ts"
+import { FrameCodegen, TypeFile } from "./FrameCodegen.ts"
+import { makeDocComment, S } from "./util.ts"
 
 export function typeVisitor(ctx: FrameCodegen) {
   const { tys } = ctx.metadata

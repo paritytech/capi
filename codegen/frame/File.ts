@@ -1,4 +1,4 @@
-import { tsFormatter } from "../deps/dprint.ts"
+import { tsFormatter } from "../../deps/dprint.ts"
 
 export class File {
   constructor(public codeRaw = "") {}

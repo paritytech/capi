@@ -1,7 +1,7 @@
 import { Env, PathInfo } from "../../server/mod.ts"
 import { PermanentMemo } from "../../util/mod.ts"
 import { getAvailable, isReady } from "../../util/port.ts"
-import { FrameProxyProvider } from "./ProxyBase.ts"
+import { FrameProxyProvider } from "./FrameProxyProvider.ts"
 
 export interface PolkadotDevProviderProps {
   polkadotPath?: string
@@ -20,7 +20,7 @@ export class PolkadotDevProvider extends FrameProxyProvider {
   }
 
   urlMemo = new PermanentMemo<DevRuntimeName, string>()
-  url(pathInfo: PathInfo) {
+  dynamicUrl(pathInfo: PathInfo) {
     const { target } = pathInfo
     assertDevRuntimeName(target)
     return this.urlMemo.run(target, async () => {

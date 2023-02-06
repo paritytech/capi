@@ -4,7 +4,7 @@ import { Network } from "../../deps/zombienet/orchestrator.ts"
 import { Env, PathInfo } from "../../server/mod.ts"
 import { PermanentMemo, splitLast } from "../../util/mod.ts"
 import { isReady } from "../../util/port.ts"
-import { FrameProxyProvider } from "./ProxyBase.ts"
+import { FrameProxyProvider } from "./FrameProxyProvider.ts"
 
 export interface ZombienetProviderProps {
   zombienetPath?: string
@@ -34,7 +34,7 @@ export class ZombienetProvider extends FrameProxyProvider {
   }
 
   urlMemo = new PermanentMemo<string, string>()
-  url(pathInfo: PathInfo) {
+  dynamicUrl(pathInfo: PathInfo) {
     const { target } = pathInfo
     return this.urlMemo.run(target, async () => {
       const targetParts = splitLast("/", target)
