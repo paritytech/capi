@@ -1,3 +1,4 @@
+import * as $ from "../../deps/scale.ts"
 import { equals } from "../../deps/std/bytes/mod.ts"
 import {
   Chain,
@@ -10,7 +11,7 @@ import {
 import { Event, ExtrinsicFailEvent } from "../../primitives/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../../rune/mod.ts"
 import { hex } from "../../util/mod.ts"
-import { ContractEvent } from "./events.ts"
+import { ContractEvent, isContractEmittedEvent } from "./events.ts"
 import { InkMetadataRune } from "./InkMetadataRune.ts"
 import { $contractsApiCallArgs, $contractsApiCallResult, Weight } from "./known.ts"
 
@@ -136,6 +137,18 @@ export class InkRune<out U, out C extends Chain = Chain> extends Rune<Uint8Array
         return $error.decode(dispatchError.value.error)
       })
       .unhandle(FailedToDecodeErrorError)
+  }
+
+  // TODO: finish this
+  emissions<X>(...[events]: RunicArgs<X, [events: Event[]]>) {
+    const $event: $.Codec<unknown> = null!
+    return Rune
+      .tuple([Rune.resolve(events), $event])
+      .map(([events, $event]) =>
+        events
+          .filter(isContractEmittedEvent)
+          .map((event) => $event.decode(event.event.value.data))
+      )
   }
 }
 
