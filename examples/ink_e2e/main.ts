@@ -1,4 +1,4 @@
-import { AddressRune, alice, ArrayRune } from "capi"
+import { AddressRune, alice } from "capi"
 import { ink } from "capi/patterns"
 import { client } from "zombienet/examples/ink_e2e/zombienet.toml/collator/@latest/mod.ts"
 import { parse } from "../../deps/std/flags.ts"
