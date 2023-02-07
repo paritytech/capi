@@ -42,9 +42,9 @@ export class StorageRune<in out K extends unknown[], out V, out U> extends Rune<
       blockHash?: U.HexHash,
     ]>
   ) {
-    const storageKey = this.$key.encoded(
-      Rune.resolve(partialKey).map((x) => x ?? []),
-    ).map(U.hex.encode)
+    const storageKey = this.$key
+      .encoded(Rune.resolve(partialKey).map((x) => x ?? []))
+      .map(U.hex.encode)
     const startKey = Rune.captureUnhandled(
       [this.$key, start],
       (codec, start) =>
@@ -53,7 +53,6 @@ export class StorageRune<in out K extends unknown[], out V, out U> extends Rune<
           .map(U.hex.encode)
           .rehandle(undefined),
     )
-    Rune.tuple([this.$key, start]).map(([codec, key]) => key && U.hex.encode(codec.encode(key)))
     const keysEncoded = state.getKeysPaged(
       this.pallet.metadata.client,
       storageKey,
