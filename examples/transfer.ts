@@ -9,7 +9,7 @@ const result = await Balances
   .signed({ sender: alice })
   .sent()
   .logStatus()
-  .events()
+  .txEvents()
   .run()
 
 console.log(result)

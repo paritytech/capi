@@ -1,5 +1,6 @@
 import { deferred } from "../deps/std/async.ts"
 import { getOrInit } from "../util/state.ts"
+import { FnRune } from "./FnRune.ts"
 import { ArrayRune, ValueRune } from "./mod.ts"
 import { EventSource, Receipt, Timeline } from "./Timeline.ts"
 
@@ -107,6 +108,10 @@ export class Rune<out T, out U = never> {
 
   static array<T, X>(runes: RunicArgs<X, T[]>) {
     return ValueRune.new(RunLs, RunicArgs.resolve(runes)).into(ArrayRune)
+  }
+
+  static fn<A extends any[], T, X>(...[fn]: RunicArgs<X, [(...args: A) => T]>) {
+    return Rune.resolve(fn).into(FnRune)
   }
 
   static rec<R extends {}>(

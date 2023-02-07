@@ -1,12 +1,5 @@
 import * as $ from "../../deps/scale.ts"
-import {
-  Chain,
-  ClientRune,
-  CodecRune,
-  ExtrinsicFailedRuntimeEvent,
-  ExtrinsicRune,
-  state,
-} from "../../fluent/mod.ts"
+import { Chain, ClientRune, CodecRune, ExtrinsicRune, state } from "../../fluent/mod.ts"
 import { Client } from "../../rpc/client.ts"
 import { ArrayRune, Rune, RunicArgs, ValueRune } from "../../rune/mod.ts"
 import { DeriveCodec } from "../../scale_info/mod.ts"
@@ -140,33 +133,8 @@ export class InkMetadataRune<out U, out C extends Chain = Chain> extends Rune<In
       .resolve(publicKey)
       .into(InkRune, Rune.resolve(client).into(ClientRune), this.as(InkMetadataRune))
   }
-
-  decodeError<X>(...[failRuntimeEvent]: RunicArgs<X, [ExtrinsicFailedRuntimeEvent]>) {
-    const metadata = this.client.metadata()
-    const $error = metadata.codec(
-      metadata
-        .pallet("Contracts")
-        .into(ValueRune).dbg("pallet:")
-        .access("error").dbg("error:")
-        .unhandle(undefined)
-        .rehandle(undefined, () => Rune.constant(new FailedToDecodeErrorError()))
-        .unhandle(FailedToDecodeErrorError),
-    )
-    return Rune
-      .tuple([Rune.resolve(failRuntimeEvent), $error])
-      .map(([failEvent, $error]) => {
-        const { dispatchError } = failEvent.value
-        if (dispatchError.type !== "Module") return new FailedToDecodeErrorError()
-        return $error.decode(dispatchError.value.error)
-      })
-      .unhandle(FailedToDecodeErrorError)
-  }
 }
 
 export class CtorNotFoundError extends Error {
   override readonly name = "CtorNotFoundError"
-}
-
-export class FailedToDecodeErrorError extends Error {
-  override readonly name = "FailedToDecodeErrorError"
 }

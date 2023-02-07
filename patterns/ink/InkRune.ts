@@ -1,3 +1,4 @@
+import { equals } from "../../deps/std/bytes/mod.ts"
 import {
   Chain,
   ClientRune,
@@ -6,8 +7,10 @@ import {
   MultiAddressRune,
   state,
 } from "../../fluent/mod.ts"
+import { Event, ExtrinsicFailEvent } from "../../primitives/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../../rune/mod.ts"
 import { hex } from "../../util/mod.ts"
+import { ContractEvent } from "./events.ts"
 import { InkMetadataRune } from "./InkMetadataRune.ts"
 import { $contractsApiCallArgs, $contractsApiCallResult, Weight } from "./known.ts"
 
@@ -89,8 +92,57 @@ export class InkRune<out U, out C extends Chain = Chain> extends Rune<Uint8Array
       })
       .into(ExtrinsicRune, this.client)
   }
+
+  filterContractEvents = <X>(...[events]: RunicArgs<X, [events: Event[]]>) => {
+    return Rune
+      .tuple([Rune.resolve(events), this])
+      .map(([events, publicKey]) =>
+        events.filter((e) => {
+          console.log(e)
+          if (e.event.type !== "Contracts") return false
+          const { event } = e as ContractEvent
+          switch (event.value.type) {
+            case "Called":
+            case "ContractCodeUpdated":
+            case "ContractEmitted":
+            case "DelegateCalled":
+            case "Terminated":
+            case "Instantiated":
+              return equals(event.value.contract, publicKey)
+            case "CodeRemoved":
+            case "CodeStored":
+              return false
+          }
+        })
+      )
+  }
+
+  decodeErrorEvent = <X>(...[failRuntimeEvent]: RunicArgs<X, [ExtrinsicFailEvent]>) => {
+    const metadata = this.client.metadata()
+    const $error = metadata.codec(
+      metadata
+        .pallet("Contracts")
+        .into(ValueRune)
+        .access("error")
+        .unhandle(undefined)
+        .rehandle(undefined, () => Rune.constant(new FailedToDecodeErrorError()))
+        .unhandle(FailedToDecodeErrorError),
+    )
+    return Rune
+      .tuple([Rune.resolve(failRuntimeEvent), $error])
+      .map(([failEvent, $error]) => {
+        const { dispatchError } = failEvent.event.value
+        if (dispatchError.type !== "Module") return new FailedToDecodeErrorError()
+        return $error.decode(dispatchError.value.error)
+      })
+      .unhandle(FailedToDecodeErrorError)
+  }
 }
 
 export class MethodNotFoundError extends Error {
   override readonly name = "MethodNotFoundError"
+}
+
+export class FailedToDecodeErrorError extends Error {
+  override readonly name = "FailedToDecodeErrorError"
 }

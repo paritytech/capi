@@ -55,7 +55,7 @@ export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
     return this.extrinsic.client.block(hash)
   }
 
-  events() {
+  txEvents() {
     return this
       .finalized()
       .events()
@@ -63,5 +63,5 @@ export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
   }
 }
 
-export class NeverFinalizedError extends Error {}
 export class NeverInBlockError extends Error {}
+export class NeverFinalizedError extends Error {}
