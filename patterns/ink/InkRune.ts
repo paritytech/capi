@@ -1,12 +1,18 @@
-import * as $ from "../../deps/scale.ts"
-import { Chain, ClientRune, CodecRune, state } from "../../fluent/mod.ts"
-import { ArrayRune, Rune, RunicArgs, ValueRune } from "../../rune/mod.ts"
+import {
+  Chain,
+  ClientRune,
+  CodecRune,
+  ExtrinsicRune,
+  MultiAddressRune,
+  state,
+} from "../../fluent/mod.ts"
+import { Rune, RunicArgs, ValueRune } from "../../rune/mod.ts"
 import { hex } from "../../util/mod.ts"
 import { InkMetadataRune } from "./InkMetadataRune.ts"
 import { $contractsApiCallArgs, $contractsApiCallResult, Weight } from "./known.ts"
 
 export interface MsgProps {
-  sender: Uint8Array
+  origin: Uint8Array
   method: string
   args?: unknown[]
   value?: bigint
@@ -22,11 +28,18 @@ export class InkRune<out U, out C extends Chain = Chain> extends Rune<Uint8Array
     super(_prime)
   }
 
-  msg<X>(props: RunicArgs<X, MsgProps>) {
-    const value = Rune
-      .resolve(props.value)
-      .unhandle(undefined)
-      .rehandle(undefined, () => Rune.constant(0n))
+  innerCall<X>(...args_: RunicArgs<X, [sender: Uint8Array, value: bigint, data: Uint8Array]>) {
+    const [sender, value, data] = RunicArgs.resolve(args_)
+    const instantiateArgs = Rune
+      .constant($contractsApiCallArgs)
+      .into(CodecRune)
+      .encoded(Rune.tuple([sender, this, value, undefined, undefined, data]))
+    return state
+      .call(this.client, "ContractsApi_call", instantiateArgs.map(hex.encode))
+      .map((result) => $contractsApiCallResult.decode(hex.decode(result)))
+  }
+
+  common<X>(props: RunicArgs<X, MsgProps>) {
     const msgMetadata = Rune.tuple([
       this.contract
         .into(ValueRune)
@@ -37,36 +50,44 @@ export class InkRune<out U, out C extends Chain = Chain> extends Rune<Uint8Array
       .unhandle(undefined)
       .rehandle(undefined, () => Rune.constant(new MethodNotFoundError()))
       .unhandle(MethodNotFoundError)
-    const selector = msgMetadata
-      .access("selector")
-      .map(hex.decode)
-    const selectorLength = selector.access("length")
-    const argCodecs = msgMetadata
-      .access("args")
-      .into(ArrayRune)
-      .mapArray((arg) =>
-        Rune
-          .tuple([this.contract.deriveCodec, arg.access("type").access("type")])
-          .map(([deriveCodec, i]) => deriveCodec(i))
-      )
-    const data = Rune
-      .tuple([selectorLength, argCodecs])
-      .map(([selectorLength, argCodecs]) =>
-        $.tuple($.sizedUint8Array(selectorLength), ...argCodecs)
-      )
+    const data = this.contract.encodeData(msgMetadata, props.args)
+    const value = Rune
+      .resolve(props.value)
+      .unhandle(undefined)
+      .rehandle(undefined, () => Rune.constant(0n))
+    const innerResult = this.innerCall(props.origin, value, data)
+    return { msgMetadata, data, value, innerResult }
+  }
+
+  call<X>(props: RunicArgs<X, MsgProps>) {
+    const { msgMetadata, innerResult } = this.common(props)
+    const $result = Rune
+      .tuple([
+        this.contract.deriveCodec,
+        msgMetadata.access("returnType", "type"),
+      ])
+      .map(([deriveCodec, i]) => deriveCodec(i))
       .into(CodecRune)
-      .encoded(
-        Rune
-          .tuple([selector, props.args])
-          .map(([selector, args]) => [selector, ...args ?? []]),
-      )
-    const instantiateArgs = Rune
-      .constant($contractsApiCallArgs)
-      .into(CodecRune)
-      .encoded(Rune.tuple([props.sender, this, value, undefined, undefined, data]))
-    return state
-      .call(this.client, "ContractsApi_call", instantiateArgs.map(hex.encode))
-      .map((result) => $contractsApiCallResult.decode(hex.decode(result)))
+    return $result.decoded(innerResult.access("result", "data"))
+  }
+
+  tx<X>(props: RunicArgs<X, MsgProps>) {
+    const { value, data, innerResult } = this.common(props)
+    const gasLimit = innerResult.access("gasRequired") // TODO: make explicitly configurable?
+    const storageDepositLimit = innerResult.access("storageDeposit", "value")
+    return Rune
+      .rec({
+        type: "Contracts",
+        value: Rune.rec({
+          type: "call",
+          dest: MultiAddressRune.id(this.as(InkRune)),
+          value,
+          data,
+          gasLimit,
+          storageDepositLimit,
+        }),
+      })
+      .into(ExtrinsicRune, this.client)
   }
 }
 

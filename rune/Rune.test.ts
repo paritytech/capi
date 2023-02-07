@@ -24,7 +24,7 @@ Deno.test("pipe", async () => {
       .constant(new Error())
       .unhandle(Error)
       .map(() => 123)
-      .handle(Error, (x) => x)
+      .rehandle(Error, (x) => x)
       .run(),
     new Error(),
   )
@@ -62,7 +62,7 @@ const sum = <X>(...[...args]: RunicArgs<X, number[]>) => {
 Deno.test("add", async () => {
   assertEquals(await add(1, 2).run(), 3)
   assertEquals(
-    await add(1, Rune.constant(new Error()).unhandle(Error)).handle(Error, (x) => x).run(),
+    await add(1, Rune.constant(new Error()).unhandle(Error)).rehandle(Error, (x) => x).run(),
     new Error(),
   )
   assertEquals(
