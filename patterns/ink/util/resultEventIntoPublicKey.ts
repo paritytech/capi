@@ -5,9 +5,9 @@ import {
   PublicKeyRune,
 } from "../../../fluent/mod.ts"
 import { Rune, RunicArgs } from "../../../rune/mod.ts"
-import { FailedToFindContractAddressError, ResultEvent } from "./resultEvent.ts"
+import { FailedToFindContractAddressError, ResultEvent } from "./ResultEvent.ts"
 
-export function publicKeyFromResultEvent<X>(...[event]: RunicArgs<X, [ResultEvent]>) {
+export function resultEventIntoPublicKey<X>(...[event]: RunicArgs<X, [ResultEvent]>) {
   return Rune
     .resolve(event)
     .map((event) => {

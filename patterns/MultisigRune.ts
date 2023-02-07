@@ -107,7 +107,7 @@ export class MultisigRune<out U, out C extends Chain = Chain> extends Rune<Multi
           .unsafeAs<{ when: unknown }>()
           .into(ValueRune)
           .access("when")
-          .handle(null, () => Rune.resolve(undefined)),
+          .rehandle(null, () => Rune.resolve(undefined)),
     )
   }
 

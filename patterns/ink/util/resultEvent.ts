@@ -7,7 +7,7 @@ import {
 } from "../../../fluent/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../../../rune/mod.ts"
 
-export function resultEvent<X>(...[events]: RunicArgs<X, [Events]>) {
+export function findResultEvent<X>(...[events]: RunicArgs<X, [Events]>) {
   return Rune
     .resolve(events)
     .into(ValueRune)
@@ -19,7 +19,6 @@ export function resultEvent<X>(...[events]: RunicArgs<X, [Events]>) {
       return successEvent
     })
     .unhandle(FailedToFindContractAddressError)
-    .dbg("result event:")
 }
 
 export type ResultEvent = EventRecord<

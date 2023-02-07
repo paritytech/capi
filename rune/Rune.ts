@@ -147,28 +147,19 @@ export class Rune<out T, out U = never> {
     return Rune.new(RunPlaceholder)
   }
 
-  into<T, U>(this: Rune<T, U>): Rune<T, U>
   into<A extends unknown[], C>(
-    ctor: new(_prime: (batch: Batch) => Run<T, U>, ...args: A) => C,
+    ctor: new(_prime: (batch: Batch) => Run<T, U | RunicArgs.U<A>>, ...args: A) => C,
     ...args: A
-  ): C
-  into<A extends unknown[], C>(
-    ctor: new(_prime: (batch: Batch) => Run<T, U>, ...args: A) => C = Rune as any,
-    ...args: A
-  ) {
+  ): C {
     return new ctor(this._prime, ...args)
   }
 
-  unsafeAs<T2 extends T, U2 extends U = U>(): Rune<T2, U2>
-  unsafeAs<T2 extends T, U2 extends U, A extends unknown[], C>(
-    ctor: new(_prime: (batch: Batch) => Run<T2, U2>, ...args: A) => C,
-    ...args: A
-  ): C
-  unsafeAs<T2 extends T, U2 extends U, A extends unknown[], C>(
-    ctor: new(_prime: (batch: Batch) => Run<T2, U2>, ...args: A) => C = Rune as any,
-    ...args: A
-  ) {
-    return new ctor(this._prime as any, ...args)
+  as<R>(this: R, _ctor: new(_prime: (batch: Batch) => Run<T, U>, ...args: any) => R): R {
+    return this
+  }
+
+  unsafeAs<T2 extends T, U2 extends U = U>(): Rune<T2, U2> {
+    return this as never
   }
 
   pipe<R extends Rune<any, any>>(fn: (rune: this) => R): R {

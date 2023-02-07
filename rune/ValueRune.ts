@@ -63,14 +63,14 @@ export class ValueRune<out T, out U = never> extends Rune<T, U> {
     return ValueRune.new(RunThrows, this, guards)
   }
 
-  handle<U2 extends U>(
+  rehandle<U2 extends U>(
     guard: Guard<U, U2>,
   ): ValueRune<T | U2, Exclude<U, U2>>
-  handle<U2 extends U, T3, U3>(
+  rehandle<U2 extends U, T3, U3>(
     guard: Guard<U, U2>,
     alt: (rune: ValueRune<U2, never>) => Rune<T3, U3>,
   ): ValueRune<T | T3, Exclude<U, U2> | U3>
-  handle<U2 extends U, T3, U3>(
+  rehandle<U2 extends U, T3, U3>(
     guard: Guard<U, U2>,
     alt: (rune: ValueRune<U2, never>) => Rune<T3, U3> = (x) => x as any,
   ): ValueRune<T | T3, Exclude<U, U2> | U3> {

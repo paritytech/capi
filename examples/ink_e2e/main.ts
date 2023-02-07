@@ -1,23 +1,43 @@
-import { alice } from "capi"
+import { AddressRune, alice } from "capi"
 import { ink } from "capi/patterns"
 import { client } from "zombienet/examples/ink_e2e/zombienet.toml/collator/@latest/mod.ts"
-import { contract } from "./common.ts"
+import { parse } from "../../deps/std/flags.ts"
 
-export const address = await contract
-  .instantiate({
-    origin: alice.publicKey,
-    code: Deno.readFileSync("examples/ink_e2e/code.wasm"),
+export const contract = ink.InkMetadataRune.from(
+  client,
+  Deno.readTextFileSync("examples/ink_e2e/metadata.json"),
+)
+
+let { address } = parse(Deno.args, { string: ["address"] })
+if (!address) {
+  address = await contract
+    .instantiate({
+      origin: alice.publicKey,
+      code: Deno.readFileSync("examples/ink_e2e/code.wasm"),
+    })
+    .signed({ sender: alice })
+    .sent()
+    .logStatus("Contract deployment status:")
+    .events()
+    .pipe(ink.findResultEvent)
+    .pipe(ink.resultEventIntoPublicKey)
+    .address(client)
+    .run()
+}
+console.log(`Contract address: ${address}`)
+
+const publicKey = AddressRune.from(address, client).publicKey()
+console.log("Contract public key:", await publicKey.run())
+
+const instance = contract.instance(client, publicKey)
+
+const read0 = instance
+  .msg({
+    sender: alice.publicKey,
+    method: "get",
   })
-  .signed({ sender: alice })
-  .sent()
-  .logStatus()
-  .events()
-  .pipe(ink.resultEvent)
-  .pipe(ink.publicKeyFromResultEvent)
-  .address(client)
   .run()
-
-console.log(address)
+console.log(await read0)
 
 // TODO: what values do we want?
 // console.log(".get", await instance.msg("get").run())

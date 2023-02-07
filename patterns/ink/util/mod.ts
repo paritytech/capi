@@ -1,4 +1,4 @@
 // moderate
 
-export * from "./publicKey.ts"
-export * from "./resultEvent.ts"
+export * from "./ResultEvent.ts"
+export * from "./resultEventIntoPublicKey.ts"

@@ -5,6 +5,6 @@ export class FnRune<F extends (...args: any[]) => any, U> extends Rune<F, U> {
     this: FnRune<(...args: A) => T, U>,
     ...args: RunicArgs<X, A>
   ) {
-    return Rune.tuple([this.into(), ...args]).map(([fn, ...args]) => fn(...args))
+    return Rune.tuple([this.as(Rune), ...args]).map(([fn, ...args]) => fn(...args))
   }
 }

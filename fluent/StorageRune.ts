@@ -12,7 +12,7 @@ export class StorageRune<in out K extends unknown[], out V, out U> extends Rune<
     this.$key = Rune.rec({
       deriveCodec: this.pallet.metadata.deriveCodec,
       pallet: this.pallet,
-      storageEntry: this.into(),
+      storageEntry: this.as(Rune),
     }).map(M.$storageKey).into(CodecRune)
     this.$value = this.pallet.metadata.codec(this.into(ValueRune).access("value"))
   }
@@ -51,7 +51,7 @@ export class StorageRune<in out K extends unknown[], out V, out U> extends Rune<
         codec.into(CodecRune)
           .encoded(start.unhandle(undefined))
           .map(U.hex.encode)
-          .handle(undefined),
+          .rehandle(undefined),
     )
     Rune.tuple([this.$key, start]).map(([codec, key]) => key && U.hex.encode(codec.encode(key)))
     const keysEncoded = state.getKeysPaged(

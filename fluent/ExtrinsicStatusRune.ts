@@ -20,7 +20,7 @@ export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
         console.log(...prefix, value)
         return value
       })
-    ).into(ExtrinsicStatusRune<U1, U2, C>, this.extrinsic)
+    ).into(ExtrinsicStatusRune, this.extrinsic)
   }
 
   terminalTransactionStatuses() {

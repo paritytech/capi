@@ -18,18 +18,17 @@ export interface Chain<Call = unknown, Event extends RuntimeEvent = RuntimeEvent
 export class ClientRune<out U, out C extends Chain = Chain> extends Rune<rpc.Client, U> {
   block<X>(...[_maybeHash]: RunicArgs<X, [blockHash?: HexHash]>) {
     const maybeHash = Rune.resolve(_maybeHash)
-    const blockHash = maybeHash.unhandle(undefined).handle(
-      undefined,
-      () => chain.getFinalizedHead(this.into()),
-    )
+    const blockHash = maybeHash
+      .unhandle(undefined)
+      .rehandle(undefined, () => chain.getFinalizedHead(this.as(Rune)))
     return chain
-      .getBlock(this.into(), blockHash)
+      .getBlock(this.as(Rune), blockHash)
       .into(BlockRune, this, blockHash)
   }
 
   metadata<X>(...[blockHash]: RunicArgs<X, [blockHash?: HexHash]>) {
     return state
-      .getMetadata(this.into(), blockHash)
+      .getMetadata(this.as(Rune), blockHash)
       .map(M.fromPrefixedHex)
       .throws($.ScaleError)
       .into(MetadataRune, this)
@@ -37,7 +36,7 @@ export class ClientRune<out U, out C extends Chain = Chain> extends Rune<rpc.Cli
 
   extrinsic<X>(...args: RunicArgs<X, [call: C["call"]]>) {
     const [call] = RunicArgs.resolve(args)
-    return call.into(ExtrinsicRune<RunicArgs.U<X> | U, C>, this)
+    return call.into(ExtrinsicRune, this.as(ClientRune))
   }
 
   addressPrefix() {
@@ -49,7 +48,7 @@ export class ClientRune<out U, out C extends Chain = Chain> extends Rune<rpc.Cli
       .unsafeAs<number>()
   }
 
-  chainVersion = rpcCall<[], string>("system_version")(this.into())
+  chainVersion = rpcCall<[], string>("system_version")(this.as(Rune))
 
   private _asCodegen<C extends Chain>() {
     return this as any as ClientRune<U, C>

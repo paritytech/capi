@@ -11,7 +11,8 @@ import { Client } from "../../rpc/client.ts"
 import { ArrayRune, Rune, RunicArgs, ValueRune } from "../../rune/mod.ts"
 import { DeriveCodec } from "../../scale_info/mod.ts"
 import { hex } from "../../util/mod.ts"
-import { InkMetadata, normalize } from "./InkMetadata.ts"
+import { Callable, InkMetadata, normalize } from "./InkMetadata.ts"
+import { InkRune } from "./InkRune.ts"
 import { $contractsApiInstantiateArgs, $contractsApiInstantiateResult, Weight } from "./known.ts"
 
 // TODO: `onInstantiated`
@@ -48,21 +49,11 @@ export class InkMetadataRune<out U, out C extends Chain = Chain> extends Rune<In
     return Rune.constant(crypto.getRandomValues(new Uint8Array(4)))
   }
 
-  instantiate<X>(props: RunicArgs<X, InstantiateProps>) {
-    const { code } = props
-    const salt = Rune
-      .resolve(props.salt)
-      .unhandle(undefined)
-      .handle(undefined, this.salt)
-    const storageDepositLimit = Rune.resolve(props.storageDepositLimit)
-    const value = Rune
-      .resolve(props.value)
-      .unhandle(undefined)
-      .handle(undefined, () => Rune.constant(0n))
-    const ctor = this.ctorMetadata(props.ctor)
-    const selector = ctor.access("selector").map(hex.decode)
+  encodeData<X>(...args_: RunicArgs<X, [metadata: Callable, args?: unknown[]]>) {
+    const [metadata, args] = RunicArgs.resolve(args_)
+    const selector = metadata.access("selector").map(hex.decode)
     const selectorLength = selector.access("length")
-    const argCodecs = ctor
+    const argCodecs = metadata
       .access("args")
       .into(ArrayRune)
       .mapArray((arg) =>
@@ -70,7 +61,7 @@ export class InkMetadataRune<out U, out C extends Chain = Chain> extends Rune<In
           .tuple([this.deriveCodec, arg.access("type").access("type")])
           .map(([deriveCodec, i]) => deriveCodec(i))
       )
-    const data = Rune
+    return Rune
       .tuple([selectorLength, argCodecs])
       .map(([selectorLength, argCodecs]) =>
         $.tuple($.sizedUint8Array(selectorLength), ...argCodecs)
@@ -78,9 +69,36 @@ export class InkMetadataRune<out U, out C extends Chain = Chain> extends Rune<In
       .into(CodecRune)
       .encoded(
         Rune
-          .tuple([selector, props.args])
+          .tuple([selector, args])
           .map(([selector, args]) => [selector, ...args ?? []]),
       )
+  }
+
+  instantiate<X>(props: RunicArgs<X, InstantiateProps>) {
+    const { code } = props
+    const salt = Rune
+      .resolve(props.salt)
+      .unhandle(undefined)
+      .rehandle(undefined, this.salt)
+    const storageDepositLimit = Rune.resolve(props.storageDepositLimit)
+    const value = Rune
+      .resolve(props.value)
+      .unhandle(undefined)
+      .rehandle(undefined, () => Rune.constant(0n))
+    const ctorMetadata = Rune.tuple([
+      this
+        .into(ValueRune)
+        .access("V3", "spec", "constructors"),
+      Rune
+        .resolve(props.ctor)
+        .unhandle(undefined)
+        .rehandle(undefined, () => Rune.resolve("default")),
+    ])
+      .map(([ctors, label]) => ctors.find((ctor) => ctor.label === label))
+      .unhandle(undefined)
+      .rehandle(undefined, () => Rune.constant(new CtorNotFoundError()))
+      .unhandle(CtorNotFoundError)
+    const data = this.encodeData(ctorMetadata, props.args)
     const instantiateArgs = Rune
       .constant($contractsApiInstantiateArgs)
       .into(CodecRune)
@@ -93,10 +111,14 @@ export class InkMetadataRune<out U, out C extends Chain = Chain> extends Rune<In
         data,
         salt,
       ]))
-    const gasLimit = props.gasLimit ?? state
-      .call(this.client, "ContractsApi_instantiate", instantiateArgs.map(hex.encode))
-      .map((result) => $contractsApiInstantiateResult.decode(hex.decode(result)))
-      .access("gasRequired")
+    const gasLimit = Rune
+      .resolve(props.gasLimit)
+      .unhandle(undefined)
+      .rehandle(undefined, () =>
+        state
+          .call(this.client, "ContractsApi_instantiate", instantiateArgs.map(hex.encode))
+          .map((result) => $contractsApiInstantiateResult.decode(hex.decode(result)))
+          .access("gasRequired"))
     return Rune
       .rec({
         type: "Contracts" as const,
@@ -110,34 +132,13 @@ export class InkMetadataRune<out U, out C extends Chain = Chain> extends Rune<In
           salt,
         }),
       })
-      .dbg()
       .into(ExtrinsicRune, this.client)
   }
 
-  ctorMetadata<X>(...[name]: RunicArgs<X, [name?: string]>) {
-    return Rune.tuple([
-      this
-        .into(ValueRune)
-        .access("V3", "spec", "constructors"),
-      Rune
-        .resolve(name)
-        .unhandle(undefined)
-        .handle(undefined, () => Rune.resolve("default")),
-    ])
-      .map(([ctors, label]) => ctors.find((ctor) => ctor.label === label))
-      .unhandle(undefined)
-      .handle(undefined, () => Rune.constant(new InvalidMetadataError()))
-      .unhandle(InvalidMetadataError)
-  }
-
-  msgMetadata<X>(...[name]: RunicArgs<X, [name?: string]>) {
-    return this
-      .into(ValueRune)
-      .access("V3", "spec", "messages")
-      .map((msgs) => msgs.find((msgs) => msgs.label === name))
-      .unhandle(undefined)
-      .handle(undefined, () => Rune.constant(new InvalidMsgError()))
-      .unhandle(InvalidMsgError)
+  instance<X>(...[client, publicKey]: RunicArgs<X, [client: Client, publicKey: Uint8Array]>) {
+    return Rune
+      .resolve(publicKey)
+      .into(InkRune, Rune.resolve(client).into(ClientRune), this.as(InkMetadataRune))
   }
 
   decodeError<X>(...[failRuntimeEvent]: RunicArgs<X, [ExtrinsicFailedRuntimeEvent]>) {
@@ -148,7 +149,7 @@ export class InkMetadataRune<out U, out C extends Chain = Chain> extends Rune<In
         .into(ValueRune).dbg("pallet:")
         .access("error").dbg("error:")
         .unhandle(undefined)
-        .handle(undefined, () => Rune.constant(new FailedToDecodeErrorError()))
+        .rehandle(undefined, () => Rune.constant(new FailedToDecodeErrorError()))
         .unhandle(FailedToDecodeErrorError),
     )
     return Rune
@@ -162,12 +163,8 @@ export class InkMetadataRune<out U, out C extends Chain = Chain> extends Rune<In
   }
 }
 
-export class InvalidMetadataError extends Error {
-  override readonly name = "InvalidMetadataError"
-}
-
-export class InvalidMsgError extends Error {
-  override readonly name = "InvalidMsgError"
+export class CtorNotFoundError extends Error {
+  override readonly name = "CtorNotFoundError"
 }
 
 export class FailedToDecodeErrorError extends Error {

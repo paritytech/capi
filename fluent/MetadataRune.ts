@@ -12,7 +12,7 @@ export class MetadataRune<out U, out C extends Chain = Chain> extends Rune<M.Met
 
   pallet<X>(...[palletName]: RunicArgs<X, [palletName: string]>) {
     return Rune
-      .tuple([this.into(), palletName])
+      .tuple([this.as(Rune), palletName])
       .map(([metadata, palletName]) => M.getPallet(metadata, palletName))
       .unhandle(M.PalletNotFoundError)
       .into(PalletRune, this)

@@ -36,18 +36,21 @@ export interface Abi {
 }
 
 export interface Spec {
-  constructors: Constructor[]
+  constructors: Ctor[]
   docs: string[]
   events: Event[]
   messages: Message[]
 }
 
-export interface Constructor {
-  args: Arg[]
-  docs: string[]
-  label: string
-  payable: boolean
+export interface Callable {
   selector: string
+  args: Arg[]
+  label: string
+}
+
+export interface Ctor extends Callable {
+  docs: string[]
+  payable: boolean
 }
 
 export interface Arg {
@@ -68,14 +71,11 @@ export interface TypeRef {
   type: number
 }
 
-export interface Message {
-  args: Arg[]
+export interface Message extends Callable {
   docs: string[]
-  label: string
   mutates: boolean
   payable: boolean
   returnType: TypeRef
-  selector: string
 }
 
 export interface Storage {
