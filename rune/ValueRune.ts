@@ -121,6 +121,10 @@ export class ValueRune<out T, out U = never> extends Rune<T, U> {
       return value
     })
   }
+
+  chain<T2, U2>(fn: (result: ValueRune<T, never>) => Rune<T2, U2>): ValueRune<T2, U | U2> {
+    return ValueRune.new(RunChain, this, fn(this as never))
+  }
 }
 
 class RunMap<T1, U, T2> extends Run<T2, U> {
@@ -310,6 +314,28 @@ class RunSingular<T, U> extends Run<T, U> {
   result?: Promise<T>
   _evaluate(time: number, receipt: Receipt): Promise<T> {
     return this.result ??= this.child.run(this.batch.spawn(time, receipt))
+  }
+}
+
+class RunChain<T1, U1, T2, U2> extends Run<T2, U1 | U2> {
+  first
+  second
+  constructor(
+    batch: Batch,
+    first: Rune<T1, U1>,
+    second: Rune<T2, U2>,
+  ) {
+    super(batch)
+    this.first = batch.prime(first, this.signal)
+    this.second = batch.prime(second, this.signal)
+  }
+
+  lastValue: T2 = null!
+  async _evaluate(time: number, receipt: Receipt) {
+    // TODO: improve
+    await this.first.evaluate(time, receipt)
+    if (!receipt.ready || !receipt.novel) return this.lastValue
+    return this.lastValue = await this.second.evaluate(time, receipt)
   }
 }
 
