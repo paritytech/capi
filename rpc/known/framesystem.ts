@@ -12,6 +12,6 @@ export type FrameSystemRpc = {
   system_accountNextIndex(account: AccountId): RpcResult<number>
   account_nextIndex: FrameSystemRpc["system_accountNextIndex"]
   /** Dry run an extrinsic at a given block. Return SCALE encoded ApplyExtrinsicResult. */
-  Runsystem_dry(extrinsic: Hex, at?: Hash): RpcResult<Hex>
-  system_dryRunAt: FrameSystemRpc["Runsystem_dry"]
+  system_dryRun(extrinsic: Hex, at?: Hash): RpcResult<Hex>
+  system_dryRunAt: FrameSystemRpc["system_dryRun"]
 }
