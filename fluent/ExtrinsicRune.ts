@@ -18,7 +18,7 @@ export interface SignedExtrinsicProps {
   sender: ExtrinsicSender
   checkpoint?: U.HexHash
   mortality?: Era
-  nonce?: string
+  nonce?: number
   tip?: bigint
 }
 
@@ -62,7 +62,8 @@ export class ExtrinsicRune<out U, out C extends Chain = Chain> extends Rune<C["c
         }
       }
     }).throws(U.ss58.InvalidPublicKeyLengthError, U.ss58.InvalidNetworkPrefixError)
-    const nonce = system.accountNextIndex(this.client, senderSs58)
+    // TODO: handle props.nonce resolving to undefined
+    const nonce = props.nonce ?? system.accountNextIndex(this.client, senderSs58)
     const genesisHashHex = chain.getBlockHash(this.client, 0)
     const genesisHash = genesisHashHex.map(U.hex.decode)
     const checkpointHash = Rune.tuple([props.checkpoint, genesisHashHex]).map(([a, b]) => a ?? b)
