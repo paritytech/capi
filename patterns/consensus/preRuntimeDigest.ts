@@ -5,7 +5,7 @@ import { RunicArgs, ValueRune } from "../../rune/mod.ts"
 import { HexHash } from "../../util/branded.ts"
 import { hex } from "../../util/mod.ts"
 
-export function preRuntimeDigest<X>(...args: RunicArgs<X, [client: Client, at?: HexHash]>) {
+export function preRuntimeDigest<X>(...args: RunicArgs<X, [client: Client, at: HexHash]>) {
   const [client, at] = RunicArgs.resolve(args)
   return client
     .into(ClientRune)

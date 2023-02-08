@@ -83,3 +83,5 @@ for (const [file, deps] of entries.slice(1)) {
     done.add(d)
   }
 }
+
+console.log("Checked successfully")

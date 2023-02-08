@@ -135,6 +135,11 @@ function createTypeDecl(ctx: FrameCodegen, visitor: TyVisitor<string>, path: str
             }): C.ValueRune<${memberPath}, C.RunicArgs.U<X>>`
             + `{ return C.Rune.rec({ type: ${S.string(type)}, ${factory[1]} }) }`,
         )
+        factories.push(
+          `export function is${type}(value: ${path}): value is ${memberPath} { return value.type === ${
+            S.string(type)
+          } }`,
+        )
         types.push(
           makeDocComment(docs)
             + `export interface ${type}`

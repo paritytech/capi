@@ -16,7 +16,7 @@ export class SignedExtrinsicRune<out U, out C extends Chain = Chain> extends Run
   sent() {
     return this
       .hex()
-      .map((hex) => author.submitAndWatchExtrinsic(this.client, hex))
+      .map((hex) => author.submitAndWatchExtrinsic(this.client as ClientRune<never, C>, hex))
       .into(ExtrinsicStatusRune, this)
   }
 }

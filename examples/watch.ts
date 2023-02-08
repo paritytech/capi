@@ -1,25 +1,21 @@
-import { Rune, ValueRune } from "capi"
+import { Rune } from "capi"
 import { client, Timestamp } from "polkadot/mod.ts"
 
-const { blockHash } = client
-
-const block = client.block(blockHash)
+const block = client.latestBlock
 const extrinsics = block.extrinsics()
 const events = block.events()
-const now = Timestamp.Now.entry([], blockHash)
+const now = Timestamp.Now.entry([], block.hash)
 
-await Rune
-  .rec({
-    blockHash,
-    block,
-    extrinsics,
-    events,
-    now,
-  })
-  .into(ValueRune)
-  .reduce(0, (i, values) => {
-    console.log(i, values)
-    return i + 1
-  })
-  .filter((i) => i === 3)
-  .run()
+const root = Rune.rec({
+  hash: block.hash,
+  block,
+  extrinsics,
+  events,
+  now,
+})
+
+let i = 0
+for await (const values of root.watch()) {
+  console.log(values)
+  if (++i === 3) break
+}

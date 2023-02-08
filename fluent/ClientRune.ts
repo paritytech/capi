@@ -16,7 +16,7 @@ export interface Chain<C = unknown, E extends Event = Event> {
 }
 
 export class ClientRune<out U, out C extends Chain = Chain> extends Rune<rpc.Client, U> {
-  blockHash = chain.getBlockHash(
+  latestBlock = this.block(chain.getBlockHash(
     this,
     chain
       .subscribeNewHeads(this.as(ClientRune))
@@ -24,16 +24,12 @@ export class ClientRune<out U, out C extends Chain = Chain> extends Rune<rpc.Cli
       .into(MetaRune)
       .flatMap((headers) => headers.into(ValueRune))
       .access("number"),
-  )
+  ))
 
-  block<X>(...[_maybeHash]: RunicArgs<X, [blockHash?: HexHash]>) {
-    const maybeHash = Rune.resolve(_maybeHash)
-    const blockHash = maybeHash
-      .unhandle(undefined)
-      .rehandle(undefined, () => chain.getFinalizedHead(this.as(Rune)))
+  block<X>(...[blockHash]: RunicArgs<X, [blockHash: HexHash]>) {
     return chain
       .getBlock(this.as(Rune), blockHash)
-      .into(BlockRune, this, blockHash)
+      .into(BlockRune, this, Rune.resolve(blockHash))
   }
 
   metadata<X>(...[blockHash]: RunicArgs<X, [blockHash?: HexHash]>) {
@@ -46,7 +42,7 @@ export class ClientRune<out U, out C extends Chain = Chain> extends Rune<rpc.Cli
 
   extrinsic<X>(...args: RunicArgs<X, [call: C["call"]]>) {
     const [call] = RunicArgs.resolve(args)
-    return call.into(ExtrinsicRune, this.as(ClientRune))
+    return call.into(ExtrinsicRune, this.as(ClientRune<U, C>))
   }
 
   addressPrefix() {

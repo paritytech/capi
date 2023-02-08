@@ -6,7 +6,7 @@ import { Rune, RunicArgs, ValueRune } from "../../rune/mod.ts"
 import { HexHash } from "../../util/branded.ts"
 import { preRuntimeDigest } from "./preRuntimeDigest.ts"
 
-export function babeBlockAuthor<X>(...args: RunicArgs<X, [client: Client, at?: HexHash]>) {
+export function babeBlockAuthor<X>(...args: RunicArgs<X, [client: Client, at: HexHash]>) {
   const [client, at] = RunicArgs.resolve(args)
   const validators = client
     .into(ClientRune)

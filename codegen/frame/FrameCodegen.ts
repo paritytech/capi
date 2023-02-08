@@ -1,5 +1,5 @@
 import { Metadata } from "../../frame_metadata/mod.ts"
-import { Ty } from "../../scale_info/mod.ts"
+import { SequenceTyDef, Ty } from "../../scale_info/mod.ts"
 import { codecs } from "./codecs.ts"
 import { File } from "./File.ts"
 import { pallet } from "./pallet.ts"
@@ -39,7 +39,10 @@ export class FrameCodegen {
       .fromEntries(this.metadata.extrinsic.ty.params.map((x) => [x.name.toLowerCase(), x.ty]))
       .call!
 
-    const callTySrcPath = this.typeVisitor.visit(callTy)
+    const eventTy = (this.metadata
+      .pallets.find((x) => x.name === "System")
+      ?.storage?.entries.find((x) => x.name === "Events")
+      ?.value! as SequenceTyDef).typeParam
 
     let palletNamespaceExports = ""
     for (const p of this.metadata.pallets) {
@@ -53,7 +56,9 @@ export class FrameCodegen {
       new File(`
       import * as C from "./capi.ts"
       import * as types from "./types/mod.ts"
-      export type Chain = C.Chain<${callTySrcPath}>
+      export type Chain = C.Chain<${this.typeVisitor.visit(callTy)}, ${
+        this.typeVisitor.visit(eventTy)
+      }>
 
       export * from "./client.ts"
       export * as types from "./types/mod.ts"

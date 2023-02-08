@@ -1,27 +1,16 @@
 import { Weight } from "./Weight.ts"
 
-export interface Event<P extends EventPhase = EventPhase, E extends RuntimeEvent = RuntimeEvent> {
-  phase: P
-  event: E
+export interface Event {
+  phase: EventPhase
+  event: RuntimeEvent
   topics: Uint8Array[]
 }
-export function applyExtrinsicGuard<E extends Event>(
-  pallet: E["event"]["type"],
-  label: E["event"]["value"]["type"],
-) {
-  return (event: Event): event is E =>
-    event.event.type === pallet && event.event.value.type === label
-}
-
-export type ApplyExtrinsicEvent<
-  Pallet extends string = string,
-  Value extends RuntimeEventData = RuntimeEventData,
-> = Event<ApplyExtrinsicEventPhase, RuntimeEvent<Pallet, Value>>
 
 export type EventPhase =
   | ApplyExtrinsicEventPhase
   | FinalizationEventPhase
   | InitializationEventPhase
+
 export interface ApplyExtrinsicEventPhase {
   type: "ApplyExtrinsic"
   value: number
@@ -33,43 +22,9 @@ export interface InitializationEventPhase {
   type: "Initialization"
 }
 
-export interface RuntimeEvent<
-  Pallet extends string = string,
-  Value extends RuntimeEventData = RuntimeEventData,
-> {
-  type: Pallet
-  value: Value
-}
-
-export interface RuntimeEventData<Type extends string = string> {
-  type: Type
-}
-
-export type ExtrinsicSuccessEvent = Event<
-  ApplyExtrinsicEventPhase,
-  RuntimeEvent<"System", {
-    type: "ExtrinsicSuccess"
-    dispatchInfo: DispatchInfo
-  }>
->
-export function isExtrinsicSuccessEvent(e: Event): e is ExtrinsicSuccessEvent {
-  const { event } = e
-  return event.type === "System" && event.value.type === "ExtrinsicSuccess"
-}
-
-export type ExtrinsicFailEvent = Event<
-  ApplyExtrinsicEventPhase,
-  RuntimeEvent<"System", {
-    type: "ExtrinsicFailed"
-    dispatchInfo: DispatchInfo
-    dispatchError: DispatchError
-  }>
->
-export function isExtrinsicFailEvent(
-  e: Event,
-): e is ExtrinsicFailEvent {
-  const { event } = e
-  return event.type === "System" && event.value.type === "ExtrinsicFailed"
+export interface RuntimeEvent {
+  type: string
+  value: unknown
 }
 
 export interface DispatchInfo {
@@ -92,6 +47,7 @@ export type DispatchError =
   | ExhaustedDispatchError
   | CorruptionDispatchError
   | UnavailableDispatchError
+
 export interface OtherDispatchError {
   type: "Other"
 }

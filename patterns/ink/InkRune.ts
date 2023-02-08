@@ -1,4 +1,3 @@
-import * as $ from "../../deps/scale.ts"
 import { equals } from "../../deps/std/bytes/mod.ts"
 import {
   Chain,
@@ -8,10 +7,10 @@ import {
   MultiAddressRune,
   state,
 } from "../../fluent/mod.ts"
-import { Event, ExtrinsicFailEvent } from "../../primitives/mod.ts"
+import { Event } from "../../primitives/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../../rune/mod.ts"
 import { hex } from "../../util/mod.ts"
-import { ContractEvent, isContractEmittedEvent } from "./events.ts"
+import { isInstantiatedEvent } from "./events.ts"
 import { InkMetadataRune } from "./InkMetadataRune.ts"
 import { $contractsApiCallArgs, $contractsApiCallResult, Weight } from "./known.ts"
 
@@ -95,30 +94,18 @@ export class InkRune<out U, out C extends Chain = Chain> extends Rune<Uint8Array
   }
 
   filterContractEvents = <X>(...[events]: RunicArgs<X, [events: Event[]]>) => {
+    // TODO: return all relevant events, not just instantiated
     return Rune
       .tuple([Rune.resolve(events), this])
       .map(([events, publicKey]) =>
         events.filter((e) => {
-          console.log(e)
-          if (e.event.type !== "Contracts") return false
-          const { event } = e as ContractEvent
-          switch (event.value.type) {
-            case "Called":
-            case "ContractCodeUpdated":
-            case "ContractEmitted":
-            case "DelegateCalled":
-            case "Terminated":
-            case "Instantiated":
-              return equals(event.value.contract, publicKey)
-            case "CodeRemoved":
-            case "CodeStored":
-              return false
-          }
+          return isInstantiatedEvent(e) && equals(e.event.value.contract, publicKey)
         })
       )
   }
 
-  decodeErrorEvent = <X>(...[failRuntimeEvent]: RunicArgs<X, [ExtrinsicFailEvent]>) => {
+  // TODO: improve
+  decodeErrorEvent = <X>(...[failRuntimeEvent]: RunicArgs<X, [any]>) => {
     const metadata = this.client.metadata()
     const $error = metadata.codec(
       metadata
@@ -139,17 +126,17 @@ export class InkRune<out U, out C extends Chain = Chain> extends Rune<Uint8Array
       .unhandle(FailedToDecodeErrorError)
   }
 
-  // TODO: finish this
-  emissions<X>(...[events]: RunicArgs<X, [events: Event[]]>) {
-    const $event: $.Codec<unknown> = null!
-    return Rune
-      .tuple([Rune.resolve(events), $event])
-      .map(([events, $event]) =>
-        events
-          .filter(isContractEmittedEvent)
-          .map((event) => $event.decode(event.event.value.data))
-      )
-  }
+  // // TODO: finish this
+  // emissions<X>(...[events]: RunicArgs<X, [events: Event[]]>) {
+  //   const $event: $.Codec<unknown> = null!
+  //   return Rune
+  //     .tuple([Rune.resolve(events), $event])
+  //     .map(([events, $event]) =>
+  //       events
+  //         .filter(isContractEmittedEvent)
+  //         .map((event) => $event.decode(event.event.value.data))
+  //     )
+  // }
 }
 
 export class MethodNotFoundError extends Error {

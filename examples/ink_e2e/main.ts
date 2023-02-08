@@ -3,7 +3,7 @@ import { ink } from "capi/patterns"
 import { client } from "zombienet/examples/ink_e2e/zombienet.toml/collator/@latest/mod.ts"
 import { parse } from "../../deps/std/flags.ts"
 
-export const contract = ink.InkMetadataRune.from(
+export const metadata = ink.InkMetadataRune.from(
   client,
   Deno.readTextFileSync("examples/ink_e2e/metadata.json"),
 )
@@ -13,10 +13,10 @@ const sender = alice.publicKey
 let { address } = parse(Deno.args, { string: ["address"] })
 if (!address) {
   class FailedToFindContractInstantiatedError extends Error {
-    override readonly name = "FailedToFindContractAddressError"
+    override readonly name = "FailedToFindContractInstantiatedError"
   }
 
-  address = await contract
+  address = await metadata
     .instantiate({
       sender,
       code: Deno.readFileSync("examples/ink_e2e/code.wasm"),
@@ -38,19 +38,19 @@ console.log(`Contract address: ${address}`)
 const publicKey = AddressRune.from(address, client).publicKey()
 console.log("Contract public key:", await publicKey.run())
 
-const instance = contract.instance(client, publicKey)
+const contract = metadata.instance(client, publicKey)
 
-console.log("Get:", await instance.call({ sender, method: "get" }).run())
+console.log("Get:", await contract.call({ sender, method: "get" }).run())
 
 console.log(
-  await instance
+  await contract
     .tx({ sender, method: "flip" })
     .signed({ sender: alice })
     .sent()
     .logStatus("Flip status:")
     .txEvents()
-    .pipe(instance.filterContractEvents)
+    .pipe(contract.filterContractEvents)
     .run(),
 )
 
-console.log("Get:", await instance.call({ sender, method: "get" }).run())
+console.log("Get:", await contract.call({ sender, method: "get" }).run())
