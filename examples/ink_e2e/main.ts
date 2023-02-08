@@ -8,20 +8,27 @@ export const contract = ink.InkMetadataRune.from(
   Deno.readTextFileSync("examples/ink_e2e/metadata.json"),
 )
 
-const origin = alice.publicKey
+const sender = alice.publicKey
 
 let { address } = parse(Deno.args, { string: ["address"] })
 if (!address) {
+  class FailedToFindContractInstantiatedError extends Error {
+    override readonly name = "FailedToFindContractAddressError"
+  }
+
   address = await contract
     .instantiate({
-      origin,
+      sender,
       code: Deno.readFileSync("examples/ink_e2e/code.wasm"),
     })
     .signed({ sender: alice })
     .sent()
     .logStatus("Contract deployment status:")
     .txEvents()
-    .pipe(ink.instantiationEvent)
+    .map((events) =>
+      events.find(ink.isInstantiatedEvent) ?? new FailedToFindContractInstantiatedError()
+    )
+    .unhandle(FailedToFindContractInstantiatedError)
     .pipe(ink.instantiationEventIntoPublicKey)
     .address(client)
     .run()
@@ -33,11 +40,11 @@ console.log("Contract public key:", await publicKey.run())
 
 const instance = contract.instance(client, publicKey)
 
-console.log("Get:", await instance.call({ origin, method: "get" }).run())
+console.log("Get:", await instance.call({ sender, method: "get" }).run())
 
 console.log(
   await instance
-    .tx({ origin, method: "flip" })
+    .tx({ sender, method: "flip" })
     .signed({ sender: alice })
     .sent()
     .logStatus("Flip status:")
@@ -46,4 +53,4 @@ console.log(
     .run(),
 )
 
-console.log("Get:", await instance.call({ origin, method: "get" }).run())
+console.log("Get:", await instance.call({ sender, method: "get" }).run())

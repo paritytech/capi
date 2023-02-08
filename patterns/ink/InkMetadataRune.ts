@@ -11,7 +11,7 @@ import { $contractsApiInstantiateArgs, $contractsApiInstantiateResult, Weight } 
 // TODO: `onInstantiated`
 export interface InstantiateProps {
   code: Uint8Array
-  origin: Uint8Array
+  sender: Uint8Array
   value?: bigint
   ctor?: string
   args?: unknown[]
@@ -96,7 +96,7 @@ export class InkMetadataRune<out U, out C extends Chain = Chain> extends Rune<In
       .constant($contractsApiInstantiateArgs)
       .into(CodecRune)
       .encoded(Rune.tuple([
-        props.origin,
+        props.sender,
         value,
         undefined,
         storageDepositLimit,

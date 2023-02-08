@@ -5,6 +5,18 @@ export interface Event<P extends EventPhase = EventPhase, E extends RuntimeEvent
   event: E
   topics: Uint8Array[]
 }
+export function applyExtrinsicGuard<E extends Event>(
+  pallet: E["event"]["type"],
+  label: E["event"]["value"]["type"],
+) {
+  return (event: Event): event is E =>
+    event.event.type === pallet && event.event.value.type === label
+}
+
+export type ApplyExtrinsicEvent<
+  Pallet extends string = string,
+  Value extends RuntimeEventData = RuntimeEventData,
+> = Event<ApplyExtrinsicEventPhase, RuntimeEvent<Pallet, Value>>
 
 export type EventPhase =
   | ApplyExtrinsicEventPhase

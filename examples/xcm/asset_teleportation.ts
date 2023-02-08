@@ -1,4 +1,4 @@
-import { alice, ApplyExtrinsicEventPhase, Event, Rune, RuntimeEvent, ValueRune } from "capi"
+import { alice, ApplyExtrinsicEvent, applyExtrinsicGuard, Rune, ValueRune } from "capi"
 import { types, XcmPallet } from "zombienet/examples/xcm/zombienet.toml/alice/@latest/mod.ts"
 import { Event as XcmPalletEvent } from "zombienet/examples/xcm/zombienet.toml/alice/@latest/types/pallet_xcm/pallet.ts"
 import { client, System } from "zombienet/examples/xcm/zombienet.toml/collator/@latest/mod.ts"
@@ -71,19 +71,19 @@ console.log(
 )
 console.log("Final balance:", await aliceFree.run())
 
-function isXcmPalletAttemptedEvent(
-  e: Event,
-): e is Event<ApplyExtrinsicEventPhase, RuntimeEvent<"XcmPallet", XcmPalletEvent.Attempted>> {
-  const { event } = e
-  return event.type === "XcmPallet" && event.value.type === "Attempted"
-}
+const isXcmPalletAttemptedEvent = applyExtrinsicGuard<AttemptedXcmPalletEvent>(
+  "XcmPallet",
+  "Attempted",
+)
+type AttemptedXcmPalletEvent = ApplyExtrinsicEvent<"XcmPallet", XcmPalletEvent.Attempted>
 
-function isParachainSystemDownwardMessageProcessedEvent(
-  e: Event,
-): e is Event<
-  ApplyExtrinsicEventPhase,
-  RuntimeEvent<"ParachainSystem", ParachainSystemEvent.DownwardMessagesProcessed>
-> {
-  const { event } = e
-  return event.type === "ParachainSystem" && event.value.type === "DownwardMessagesProcessed"
-}
+const isParachainSystemDownwardMessageProcessedEvent = applyExtrinsicGuard<
+  ParachainSystemDownwardMessageProcessedEvent
+>(
+  "ParachainSystem",
+  "DownwardMessagesProcessed",
+)
+type ParachainSystemDownwardMessageProcessedEvent = ApplyExtrinsicEvent<
+  "ParachainSystem",
+  ParachainSystemEvent.DownwardMessagesProcessed
+>

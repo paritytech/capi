@@ -16,7 +16,7 @@ import { InkMetadataRune } from "./InkMetadataRune.ts"
 import { $contractsApiCallArgs, $contractsApiCallResult, Weight } from "./known.ts"
 
 export interface MsgProps {
-  origin: Uint8Array
+  sender: Uint8Array
   method: string
   args?: unknown[]
   value?: bigint
@@ -59,7 +59,7 @@ export class InkRune<out U, out C extends Chain = Chain> extends Rune<Uint8Array
       .resolve(props.value)
       .unhandle(undefined)
       .rehandle(undefined, () => Rune.constant(0n))
-    const innerResult = this.innerCall(props.origin, value, data)
+    const innerResult = this.innerCall(props.sender, value, data)
     return { msgMetadata, data, value, innerResult }
   }
 
