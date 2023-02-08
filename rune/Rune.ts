@@ -1,7 +1,6 @@
 import { deferred } from "../deps/std/async.ts"
 import { getOrInit } from "../util/state.ts"
-import { FnRune } from "./FnRune.ts"
-import { ArrayRune, ValueRune } from "./mod.ts"
+import { ArrayRune, FnRune, ValueRune } from "./mod.ts"
 import { EventSource, Receipt, Timeline } from "./Timeline.ts"
 
 export class Batch {
