@@ -1,7 +1,7 @@
 // moderate
 
-export * from "./Base.ts"
-export * from "./PolkadotDev.ts"
-export * from "./ProxyBase.ts"
-export * from "./Wss.ts"
-export * from "./Zombienet.ts"
+export * from "./dev.ts"
+export * from "./FrameProvider.ts"
+export * from "./FrameProxyProvider.ts"
+export * from "./wss.ts"
+export * from "./zombienet.ts"

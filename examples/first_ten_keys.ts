@@ -1,7 +1,5 @@
-import * as C from "capi/mod.ts"
-
 import { System } from "polkadot_dev/mod.ts"
 
-const root = System.Account.keys().readPage(10)
+const result = await System.Account.keyPage(10).run()
 
-console.log(C.throwIfError(await root.run()))
+console.log(result)

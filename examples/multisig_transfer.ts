@@ -1,75 +1,78 @@
-import * as C from "capi/mod.ts"
+import { alice, bob, charlie, dave, ValueRune } from "capi"
+import { MultisigRune } from "capi/patterns"
+import { Balances, client, System } from "polkadot_dev/mod.ts"
+// TODO: utilize type exposed from capi/patterns/MultisigRune.ts (when we enable client env specificity)
+import { MultiAddress } from "polkadot_dev/types/sp_runtime/multiaddress.ts"
 
-import { Balances, client, extrinsic, System } from "polkadot_dev/mod.ts"
-
-const signatories = [C.alice, C.bob, C.charlie].map(({ publicKey }) => publicKey)
-const multisig = new C.fluent.Multisig(client, signatories, 2)
-
-// Transfer initial balance (existential deposit) to multisig address
-const existentialDeposit = extrinsic({
-  sender: C.alice.address,
-  call: Balances.transfer({
-    value: 2_000_000_000_000n,
-    dest: C.MultiAddress.Id(multisig.address),
-  }),
-}).signed(C.alice.sign)
-
-// The proposal
-const call = Balances.transferKeepAlive({
-  dest: C.dave.address,
-  value: 1230000000000n,
+const multisig = MultisigRune.from(client, {
+  signatories: [alice.publicKey, bob.publicKey, charlie.publicKey],
+  threshold: 2,
 })
 
-// First approval root
-const proposalByAlice = multisig.ratify({
-  sender: C.alice.address,
-  call,
-}).signed(C.alice.sign)
+// Read dave's initial balance (to-be changed by the call)
+console.log("Dave initial balance:", await System.Account.entry([dave.publicKey]).run())
 
-// TODO: upon fixing effect sys, move timepoint retrieval into ratify
-// Get the proposal callHash
-const callHash = C.callHash(client)(call)
-// const callHash = multisig.proposals(1).access(0).access(1).as<Uint8Array>()
+// Transfer some funds into the multisig account
+await Balances
+  .transfer({
+    value: 2_000_000_000_000n,
+    dest: MultiAddress.Id(multisig.address),
+  })
+  .signed({ sender: alice })
+  .sent()
+  .logStatus("Existential deposit:")
+  .finalized()
+  .run()
 
-// Get the timepoint
-const maybeTimepoint = multisig.proposal(callHash).access("value").access("when")
+// The to-be proposed and approved call
+const call = Balances.transferKeepAlive({
+  dest: dave.address,
+  value: 1_230_000_000_000n,
+})
 
-// Approve without executing the proposal
-const voteByBob = multisig.vote({
-  sender: C.bob.address,
-  callHash,
-  maybeTimepoint,
-}).signed(C.bob.sign)
+// Submit a proposal to dispatch the call
+await multisig
+  .ratify({ call, sender: alice.address })
+  .signed({ sender: alice })
+  .sent()
+  .logStatus("Proposal:")
+  .finalized()
+  .run()
 
-// Approve and execute the proposal
-const approvalByCharlie = multisig.ratify({
-  sender: C.charlie.address,
-  call,
-  maybeTimepoint,
-}).signed(C.charlie.sign)
+// Check if the call has been proposed
+console.log("Is proposed?:", await multisig.isProposed(call.hash).run())
 
-// check dave new balance
-const daveBalance = System.Account.entry(C.dave.publicKey).read()
+// Send a non-executing approval
+await multisig
+  .approve({
+    callHash: call.hash,
+    sender: bob.address,
+  })
+  .signed({ sender: bob })
+  .sent()
+  .logStatus("Vote:")
+  .finalized()
+  .run()
 
-// TODO: use common env
-C.throwIfError(await watchExtrinsic(existentialDeposit, "Existential deposit").run())
-C.throwIfError(await watchExtrinsic(proposalByAlice, "Proposal").run())
-console.log("Is proposed?", C.throwIfError(await multisig.isProposed(callHash).run()))
-C.throwIfError(await watchExtrinsic(voteByBob, "Vote").run())
+// Check for existing approval(s)
 console.log(
-  "Existing approvals",
-  C.throwIfError(await multisig.proposal(callHash).access("value").access("approvals").run()),
+  "Existing approvals:",
+  await multisig
+    .proposal(call.hash)
+    .unsafeAs<any>()
+    .into(ValueRune)
+    .access("approvals")
+    .run(),
 )
-C.throwIfError(await watchExtrinsic(approvalByCharlie, "Approval").run())
-console.log(C.throwIfError(await daveBalance.run()))
 
-function watchExtrinsic(extrinsic: C.SignedExtrinsic, label: string) {
-  return extrinsic
-    .watch(({ end }) => (status) => {
-      console.log(`${label}:`, status)
-      if (C.rpc.known.TransactionStatus.isTerminal(status)) {
-        return end()
-      }
-      return
-    })
-}
+// Send the executing (final) approval
+await multisig
+  .ratify({ call, sender: charlie.address })
+  .signed({ sender: charlie })
+  .sent()
+  .logStatus("Approval:")
+  .finalized()
+  .run()
+
+// Check to see whether Dave's balance has in fact changed
+console.log("Dave final balance:", await System.Account.entry([dave.publicKey]).run())

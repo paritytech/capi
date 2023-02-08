@@ -12,6 +12,7 @@ autoremove
 aventus
 azuretools
 backchannel
+backronym
 baju
 bajun
 binaryen
@@ -31,6 +32,7 @@ codegen
 codegened
 codespaces
 combinators
+concat
 contextfree
 contramap
 creds
@@ -62,6 +64,7 @@ esbenp
 esque
 extrinsics
 ferdie
+ffect
 finalised
 fragnova
 framesystem
@@ -207,6 +210,8 @@ typeof
 uart
 uink
 unfollow
+unguard
+unhandle
 uniarts
 unioned
 unsanitized

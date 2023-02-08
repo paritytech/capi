@@ -1,9 +1,11 @@
-import * as C from "capi/mod.ts"
+import { ArrayRune, Rune } from "capi"
+import { Paras } from "polkadot/mod.ts"
 
-import { Paras } from "polkadot_dev/mod.ts"
+const result = await Paras
+  .Parachains
+  .entry([])
+  .into(ArrayRune)
+  .mapArray((id) => Paras.Heads.entry(Rune.tuple([id])))
+  .run()
 
-// TODO: fix with Rune
-const ids = Paras.Parachains.entry().read().access("value")
-const heads = C.Z.each(ids, (id) => Paras.Heads.entry(id).read())
-
-console.log(C.throwIfError(await heads.run()))
+console.log(result)

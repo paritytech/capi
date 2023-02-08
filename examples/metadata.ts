@@ -1,7 +1,5 @@
-import * as C from "capi/mod.ts"
-
 import { client } from "polkadot_dev/mod.ts"
 
-const root = C.metadata(client)()
+const result = await client.metadata().run()
 
-console.log(C.throwIfError(await root.run()))
+console.log(result)

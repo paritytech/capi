@@ -23,7 +23,7 @@ export interface Extrinsic {
   call: unknown
 }
 
-interface ExtrinsicCodecProps {
+export interface ExtrinsicCodecProps {
   metadata: Metadata
   deriveCodec: DeriveCodec
   sign: Signer

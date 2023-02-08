@@ -1,9 +1,9 @@
 import { posix as pathPosix } from "../../deps/std/path.ts"
 import { Ty, TyVisitor, TyVisitorMethods } from "../../scale_info/mod.ts"
 import { normalizeIdent } from "../../util/case.ts"
-import { File } from "../File.ts"
-import { makeDocComment, S } from "../util.ts"
-import { FrameCodegen, TypeFile } from "./mod.ts"
+import { File } from "./File.ts"
+import { FrameCodegen, TypeFile } from "./FrameCodegen.ts"
+import { makeDocComment, S } from "./util.ts"
 
 function importPath(from: string, to: string) {
   let path = pathPosix.relative(pathPosix.dirname("/" + from), "/" + to)
@@ -102,15 +102,20 @@ function createTypeDecl(ctx: FrameCodegen, visitor: TyVisitor<string>, path: str
           props = []
           factory = ["", ""]
         } else if (fields[0]!.name === undefined) {
-          // Tuple variant
-          const value = fields.length === 1
-            ? visitor.visit(fields[0]!.ty)
-            : S.array(fields.map((f) => visitor.visit(f.ty)))
-          props = [["", "value", value]]
-          factory = [
-            `${fields.length === 1 ? "" : "..."}value: ${memberPath}["value"]`,
-            "value",
-          ]
+          if (fields.length === 1) {
+            props = [["", "value", visitor.visit(fields[0]!.ty)]]
+            factory = [
+              `...[value]: C.RunicArgs<X, [value: ${memberPath}["value"]]>`,
+              "value",
+            ]
+          } else {
+            const value = S.array(fields.map((f) => visitor.visit(f.ty)))
+            props = [["", "value", value]]
+            factory = [
+              `...value: C.RunicArgs<X, ${memberPath}["value"]>`,
+              "value: C.Rune.tuple(value)",
+            ]
+          }
         } else {
           // Object variant
           props = fields.map((field) => [
@@ -118,12 +123,22 @@ function createTypeDecl(ctx: FrameCodegen, visitor: TyVisitor<string>, path: str
             normalizeIdent(field.name!),
             visitor.visit(field.ty),
           ])
-          factory = [`value: Omit<${memberPath}, "type">`, "...value"]
+          factory = [
+            `value: C.RunicArgs<X, Omit<${memberPath}, "type">>`,
+            "...C.RunicArgs.resolve(value)",
+          ]
         }
         factories.push(
           makeDocComment(docs)
-            + `export function ${type} (${factory[0]}): ${memberPath}`
-            + `{ return { type: ${S.string(type)}, ${factory[1]} } }`,
+            + `export function ${type}<X>(${
+              factory[0]
+            }): C.ValueRune<${memberPath}, C.RunicArgs.U<X>>`
+            + `{ return C.Rune.rec({ type: ${S.string(type)}, ${factory[1]} }) }`,
+        )
+        factories.push(
+          `export function is${type}(value: ${path}): value is ${memberPath} { return value.type === ${
+            S.string(type)
+          } }`,
         )
         types.push(
           makeDocComment(docs)

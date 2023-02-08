@@ -3,7 +3,7 @@ import { parsePathInfo } from "./PathInfo.ts"
 
 Deno.test("vCapi + providerId + target + vRuntime + filePath", () => {
   const r = parsePathInfo(
-    `@${vCapi}/${generatorId}/${providerId}/${target}/@${vRuntime}/${filePath}`,
+    `/@${vCapi}/${generatorId}/${providerId}/${target}/@${vRuntime}/${filePath}`,
   )
   assertExists(r)
   assertObjectMatch(r, {
@@ -17,7 +17,7 @@ Deno.test("vCapi + providerId + target + vRuntime + filePath", () => {
 })
 
 Deno.test("providerId + target + vRuntime + filePath", () => {
-  const r = parsePathInfo(`${generatorId}/${providerId}/${target}/@${vRuntime}/${filePath}`)
+  const r = parsePathInfo(`/${generatorId}/${providerId}/${target}/@${vRuntime}/${filePath}`)
   assertExists(r)
   assertObjectMatch(r, {
     generatorId,
@@ -29,7 +29,7 @@ Deno.test("providerId + target + vRuntime + filePath", () => {
 })
 
 Deno.test("providerId + target + vRuntime", () => {
-  const r = parsePathInfo(`${generatorId}/${providerId}/${target}/@${vRuntime}`)
+  const r = parsePathInfo(`/${generatorId}/${providerId}/${target}/@${vRuntime}`)
   assertExists(r)
   assertObjectMatch(r, {
     generatorId,
@@ -40,7 +40,7 @@ Deno.test("providerId + target + vRuntime", () => {
 })
 
 Deno.test("providerId + target", () => {
-  const r = parsePathInfo(`${generatorId}/${providerId}/${target}`)
+  const r = parsePathInfo(`/${generatorId}/${providerId}/${target}`)
   assertExists(r)
   assertObjectMatch(r, {
     generatorId,
@@ -50,7 +50,7 @@ Deno.test("providerId + target", () => {
 })
 
 Deno.test("vCapi + providerId + target + vRuntime", () => {
-  const r = parsePathInfo(`@${vCapi}/${generatorId}/${providerId}/${target}/@${vRuntime}`)
+  const r = parsePathInfo(`/@${vCapi}/${generatorId}/${providerId}/${target}/@${vRuntime}`)
   assertExists(r)
   assertObjectMatch(r, {
     vCapi,
@@ -62,7 +62,7 @@ Deno.test("vCapi + providerId + target + vRuntime", () => {
 })
 
 Deno.test("vCapi + providerId + target", () => {
-  const r = parsePathInfo(`@${vCapi}/${generatorId}/${providerId}/${target}`)
+  const r = parsePathInfo(`/@${vCapi}/${generatorId}/${providerId}/${target}`)
   assertExists(r)
   assertObjectMatch(r, {
     vCapi,

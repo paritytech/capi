@@ -9,22 +9,18 @@ export interface PathInfo {
 }
 
 const rPathInfo =
-  /^(@(?<vCapi>.+?)\/)?(?<generatorId>.+?)\/(?<providerId>.+?)\/(?<target>.+?)(\/@(?<vRuntime>.+?)(\/(?<filePath>.+))?)?$/
+  /^\/(@(?<vCapi>.+?)\/)?(?<generatorId>.+?)\/(?<providerId>.+?)\/(?<target>.+?)(\/@(?<vRuntime>.+?)(\/(?<filePath>.*))?)?$/
 
 export function parsePathInfo(src: string): PathInfo | undefined {
   return rPathInfo.exec(src)?.groups as PathInfo | undefined
 }
 
 export function fromPathInfo(
-  vCapi: string | undefined,
-  generatorId: string,
-  providerId: string,
-  target: string,
-  vRuntime?: string,
-  filePath?: string,
+  { vCapi, generatorId, providerId, target, vRuntime, filePath }: PathInfo,
 ): string {
-  let src = [...vCapi ? [vCapi] : [], generatorId, providerId, target].join("/")
-  vRuntime && (src += "/@" + vRuntime)
-  filePath && (src += "/" + filePath)
+  let src = vCapi ? `/@${vCapi}/` : "/"
+  src += [generatorId, providerId, target].join("/")
+  if (vRuntime) src += `/@${vRuntime}`
+  if (filePath) src += `/${filePath}`
   return src
 }

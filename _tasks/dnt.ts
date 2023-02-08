@@ -19,10 +19,6 @@ await Promise.all([
         name: "scale-codec",
         version: "^0.10.0",
       },
-      "https://deno.land/x/zones@v0.1.0-beta.13/mod.ts": {
-        name: "zones",
-        version: "0.1.0-beta.13",
-      },
       "https://deno.land/x/smoldot@light-js-deno-v0.7.6/index-deno.js": {
         name: "@substrate/smoldot-light",
         version: "0.7.6",

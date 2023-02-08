@@ -1,21 +1,30 @@
-import * as C from "capi/mod.ts"
+import { alice, bob, charlie, dave, Rune } from "capi"
+import { Balances, System, Utility } from "westend_dev/mod.ts"
 
-import { Balances, extrinsic, Utility } from "westend_dev/mod.ts"
+const recipients = Rune.array([bob, charlie, dave])
 
-const tx = extrinsic({
-  sender: C.alice.address,
-  call: Utility.batchAll({
-    calls: [C.alice, C.bob, C.charlie]
-      .map(({ address: dest }) => Balances.transfer({ dest, value: 12345n })),
-  }),
-})
-  .signed(C.alice.sign)
-  .watch((ctx) => (status) => {
-    console.log(status)
-    if (C.rpc.known.TransactionStatus.isTerminal(status)) {
-      return ctx.end()
-    }
-    return
+const balances = recipients.mapArray((recipient) =>
+  System.Account
+    .entry(recipient.map((x) => [x.publicKey]))
+    .access("data", "free")
+)
+
+console.log(await balances.run())
+
+console.log(
+  await Utility.batchAll({
+    calls: recipients.mapArray((recipient) =>
+      Balances.transfer({
+        dest: recipient.access("address"),
+        value: 12345n,
+      })
+    ),
   })
+    .signed({ sender: alice })
+    .sent()
+    .logStatus()
+    .txEvents()
+    .run(),
+)
 
-C.throwIfError(await tx.run())
+console.log(await balances.run())

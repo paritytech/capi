@@ -1,8 +1,8 @@
 import { Ty, TyVisitor } from "../../scale_info/mod.ts"
 import { normalizeIdent } from "../../util/case.ts"
-import { File } from "../File.ts"
-import { S } from "../util.ts"
-import { FrameCodegen } from "./mod.ts"
+import { File } from "./File.ts"
+import { FrameCodegen } from "./FrameCodegen.ts"
+import { S } from "./util.ts"
 
 export function codecs(ctx: FrameCodegen) {
   const { tys } = ctx.metadata

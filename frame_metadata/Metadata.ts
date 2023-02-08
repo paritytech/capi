@@ -150,21 +150,23 @@ export function fromPrefixedHex(scaleEncoded: string): Metadata {
 }
 
 export function getPallet(metadata: Metadata, name: string): Pallet | PalletNotFoundError {
-  return metadata.pallets.find((pallet) => pallet.name === name) || new PalletNotFoundError()
+  return metadata.pallets.find((pallet) => pallet.name === name) || new PalletNotFoundError(name)
 }
 export class PalletNotFoundError extends Error {
   override readonly name = "PalletNotFoundError"
 }
 
-export function getEntry(pallet: Pallet, name: string): StorageEntry | EntryNotFoundError {
-  return pallet.storage?.entries.find((entry) => entry.name === name) || new EntryNotFoundError()
+export function getStorage(pallet: Pallet, name: string): StorageEntry | StorageNotFoundError {
+  return pallet.storage?.entries.find((entry) => entry.name === name)
+    || new StorageNotFoundError(name)
 }
-export class EntryNotFoundError extends Error {
-  override readonly name = "EntryNotFoundError"
+export class StorageNotFoundError extends Error {
+  override readonly name = "StorageNotFoundError"
 }
 
 export function getConst(pallet: Pallet, name: string): Constant | ConstNotFoundError {
-  return pallet.constants?.find((constant) => constant.name === name) || new ConstNotFoundError()
+  return pallet.constants?.find((constant) => constant.name === name)
+    || new ConstNotFoundError(name)
 }
 export class ConstNotFoundError extends Error {
   override readonly name = "ConstNotFoundError"
@@ -174,12 +176,12 @@ export function getPalletAndEntry(
   metadata: Metadata,
   palletName: string,
   entryName: string,
-): [Pallet, StorageEntry] | PalletNotFoundError | EntryNotFoundError {
+): [Pallet, StorageEntry] | PalletNotFoundError | StorageNotFoundError {
   const pallet = getPallet(metadata, palletName)
   if (pallet instanceof Error) {
     return pallet
   }
-  const entry = getEntry(pallet, entryName)
+  const entry = getStorage(pallet, entryName)
   if (entry instanceof Error) {
     return entry
   }

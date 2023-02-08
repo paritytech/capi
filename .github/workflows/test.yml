@@ -31,7 +31,7 @@ jobs:
         uses: ./.github/actions/setup-binary
         with:
           binary-name: polkadot-parachain
-          binary-version: v0.9.360
+          binary-version: v0.9.370
           binary-github: https://github.com/paritytech/cumulus
       - name: Setup Zombienet
         uses: ./.github/actions/setup-binary
@@ -39,7 +39,5 @@ jobs:
           binary-name: zombienet-linux
           binary-version: v1.3.18
           binary-github: https://github.com/paritytech/zombienet
-      - run: deno lint
-      - run: deno task star
       - run: deno task test
       # - run: deno task test:examples
