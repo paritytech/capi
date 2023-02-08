@@ -19,17 +19,16 @@ connotations as well as an amusing backronym of sorts – "**run e**ffect".
 
 ## It's Super `Effect`ive!
 
-Rune can be seen as an effect system – an implementation of algebraic effects –
-and the natural name for the primary type in such a system is an "effect".
-However, the term "effect" is loaded with much connotation but little concrete
-meaning. The best definition for "effect" that I know of is that an effect is an
-instance of a particular monad[^2]. Which monad, though, varies greatly. Most
-effect systems use a variation on a `Future` for this monad. Rune, however, uses
-a variation on a `Stream` – in particular, a rune can asynchronously resolve to
-multiple values. As such, runes have rather different semantics from futures and
-therefore most effects. Thus, even though calling a rune an effect would not be
-inaccurate, it would mislead those already familiar with effects – and be of no
-use to those unfamiliar.
+Rune can be seen as an effect system and the natural name for the primary type
+in such a system is an "effect". However, the term "effect" is loaded with much
+connotation but little concrete meaning. The best definition for "effect" that I
+know of is that an effect is an instance of a particular monad[^2]. Which monad,
+though, varies greatly. Most effect systems use a variation on a `Future` for
+this monad. Rune, however, uses a variation on a `Stream` – in particular, a
+rune can asynchronously resolve to multiple values. As such, runes have rather
+different semantics from futures and therefore most effects. Thus, even though
+calling a rune an effect would not be inaccurate, it would mislead those already
+familiar with effects – and be of no use to those unfamiliar.
 
 ## Runes of a Feather Update Together
 
