@@ -71,7 +71,9 @@ async function after() {
         stdout: "inherit",
       })
       .status()
-    self.addEventListener("unload", () => Deno.exit(status.code))
-    controller.abort()
+    // TODO: exit gracefully
+    Deno.exit(status.code)
+    // self.addEventListener("unload", () => Deno.exit(status.code))
+    // controller.abort()
   }
 }
