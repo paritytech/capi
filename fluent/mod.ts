@@ -1,5 +1,3 @@
-import "../rune/mod.ts"
-
 // moderate
 
 export * from "./AddressRune.ts"
