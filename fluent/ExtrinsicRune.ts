@@ -50,7 +50,7 @@ export class ExtrinsicRune<out U, out C extends Chain = Chain> extends Rune<C["c
     >().into(ValueRune)
     const specVersion = versions.access("specVersion")
     const transactionVersion = versions.access("transactionVersion")
-    // TODO: create match effect in zones and use here
+    // TODO: create union rune (with `matchTag` method) and utilize here
     // TODO: MultiAddress conversion utils
     const senderSs58 = Rune.tuple([addrPrefix, props.sender]).map(([addrPrefix, sender]) => {
       switch (sender.address.type) {

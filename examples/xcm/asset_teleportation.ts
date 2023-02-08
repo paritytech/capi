@@ -1,9 +1,16 @@
-// TODO: remove
-// deno-lint-ignore-file
-
-import { alice, Rune } from "capi"
+import { alice, ApplyExtrinsicEventPhase, Event, Rune, RuntimeEvent, ValueRune } from "capi"
 import { types, XcmPallet } from "zombienet/examples/xcm/zombienet.toml/alice/@latest/mod.ts"
+import { Event as XcmPalletEvent } from "zombienet/examples/xcm/zombienet.toml/alice/@latest/types/pallet_xcm/pallet.ts"
 import { client, System } from "zombienet/examples/xcm/zombienet.toml/collator/@latest/mod.ts"
+import { Event as ParachainSystemEvent } from "zombienet/examples/xcm/zombienet.toml/collator/@latest/types/cumulus_pallet_parachain_system/pallet.ts"
+
+// TODO: have the recipient associate the downward message with the sender
+
+const aliceFree = System.Account
+  .entry([alice.publicKey])
+  .access("data", "free")
+
+console.log("Initial balance:", await aliceFree.run())
 
 const {
   VersionedMultiAssets,
@@ -17,75 +24,66 @@ const {
   v2: { WeightLimit },
 } = types.xcm
 
-const teleportAssetsTx = XcmPallet.limitedTeleportAssets({
-  dest: VersionedMultiLocation.V1(Rune.rec({
-    parents: 0,
-    interior: Junctions.X1(Junction.Parachain(1000)),
-  })),
-  beneficiary: VersionedMultiLocation.V1(Rune.rec({
-    parents: 0,
-    interior: Junctions.X1(Junction.AccountId32({
-      id: alice.publicKey,
-      network: NetworkId.Any(),
-    })),
-  })),
-  assets: VersionedMultiAssets.V1(Rune.array([Rune.rec({
-    id: AssetId.Concrete(Rune.rec({
+class CannotFindAttemptError extends Error {
+  override readonly name = "CannotFindAttemptError"
+}
+
+const initiatedEvent = XcmPallet
+  .limitedTeleportAssets({
+    dest: VersionedMultiLocation.V1(Rune.rec({
       parents: 0,
-      interior: Junctions.Here(),
+      interior: Junctions.X1(Junction.Parachain(1000)),
     })),
-    fun: Fungibility.Fungible(500_000_000_000_000n),
-  })])),
-  feeAssetItem: 0,
-  weightLimit: WeightLimit.Unlimited(),
-})
+    beneficiary: VersionedMultiLocation.V1(Rune.rec({
+      parents: 0,
+      interior: Junctions.X1(Junction.AccountId32({
+        id: alice.publicKey,
+        network: NetworkId.Any(),
+      })),
+    })),
+    assets: VersionedMultiAssets.V1(Rune.array([Rune.rec({
+      id: AssetId.Concrete(Rune.rec({
+        parents: 0,
+        interior: Junctions.Here(),
+      })),
+      fun: Fungibility.Fungible(500_000_000_000_000n),
+    })])),
+    feeAssetItem: 0,
+    weightLimit: WeightLimit.Unlimited(),
+  })
   .signed({ sender: alice })
   .sent()
-  .finalized()
+  .logStatus("Teleportation status:")
+  .txEvents()
+  .map((events) => events.find(isXcmPalletAttemptedEvent) ?? new CannotFindAttemptError())
+  .unhandle(CannotFindAttemptError)
 
-// const aliceParachainBalance = () =>
-//   System.Account.entry(alice.publicKey).read().access("value").access("data").access("free")
+const processedEvent = System.Events
+  .entry([], client.blockHash)
+  .into(ValueRune)
+  .map((events) => events.find(isParachainSystemDownwardMessageProcessedEvent))
+  .filter((event) => !!event)
 
-// const watchForDownwardMessagesProcessed = C.entryWatch(parachainClient)(
-//   "System",
-//   "Events",
-//   [],
-//   ({ end }) => {
-//     return (entry: any) => {
-//       for (const [_hash, events] of entry) {
-//         if (!events) return
-//         for (const { event } of events) {
-//           if (
-//             event.type === "ParachainSystem" && event.value.type === "DownwardMessagesProcessed"
-//           ) {
-//             return end(event)
-//           }
-//         }
-//       }
-//       return
-//     }
-//   },
-// )
+console.log(
+  await Rune
+    .rec({ initiatedEvent, processedEvent })
+    .run(),
+)
+console.log("Final balance:", await aliceFree.run())
 
-// const watchForDownwardMessagesProcessedPending = watchForDownwardMessagesProcessed.run()
+function isXcmPalletAttemptedEvent(
+  e: Event,
+): e is Event<ApplyExtrinsicEventPhase, RuntimeEvent<"XcmPallet", XcmPalletEvent.Attempted>> {
+  const { event } = e
+  return event.type === "XcmPallet" && event.value.type === "Attempted"
+}
 
-// const watchForParachainBlocksPending = C.blockWatch(parachainClient)(({ end }) => {
-//   let i = 0
-//   return () => {
-//     if (i === 1) {
-//       return end()
-//     }
-//     i++
-//     return
-//   }
-// }).run()
-
-// console.log("Alice parachain balance before XcmPallet.limitedTeleportAssets")
-// console.log(C.throwIfError(await aliceParachainBalance().run()))
-// C.throwIfError(await teleportAssetsTx.run())
-// console.log("waiting for parachain ParachainSystem.DownwardMessagesProcessed event")
-// console.log(C.throwIfError(await watchForDownwardMessagesProcessedPending))
-// console.log("waiting for parachain to start generating blocks")
-// C.throwIfError(await watchForParachainBlocksPending)
-// console.log("Alice parachain balance after XcmPallet.limitedTeleportAssets")
-// console.log(C.throwIfError(await aliceParachainBalance().run()))
+function isParachainSystemDownwardMessageProcessedEvent(
+  e: Event,
+): e is Event<
+  ApplyExtrinsicEventPhase,
+  RuntimeEvent<"ParachainSystem", ParachainSystemEvent.DownwardMessagesProcessed>
+> {
+  const { event } = e
+  return event.type === "ParachainSystem" && event.value.type === "DownwardMessagesProcessed"
+}

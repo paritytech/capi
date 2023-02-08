@@ -2,7 +2,7 @@ import * as $ from "../deps/scale.ts"
 import * as M from "../frame_metadata/mod.ts"
 import { Event } from "../primitives/mod.ts"
 import * as rpc from "../rpc/mod.ts"
-import { Rune, RunicArgs } from "../rune/mod.ts"
+import { MetaRune, Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { HexHash } from "../util/mod.ts"
 import { BlockRune } from "./BlockRune.ts"
 import { ExtrinsicRune } from "./ExtrinsicRune.ts"
@@ -16,6 +16,16 @@ export interface Chain<C = unknown, E extends Event = Event> {
 }
 
 export class ClientRune<out U, out C extends Chain = Chain> extends Rune<rpc.Client, U> {
+  blockHash = chain.getBlockHash(
+    this,
+    chain
+      .subscribeNewHeads(this.as(ClientRune))
+      .map((header) => Rune.constant(header))
+      .into(MetaRune)
+      .flatMap((headers) => headers.into(ValueRune))
+      .access("number"),
+  )
+
   block<X>(...[_maybeHash]: RunicArgs<X, [blockHash?: HexHash]>) {
     const maybeHash = Rune.resolve(_maybeHash)
     const blockHash = maybeHash
