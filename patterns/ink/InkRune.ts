@@ -1,12 +1,5 @@
 import { equals } from "../../deps/std/bytes/mod.ts"
-import {
-  Chain,
-  ClientRune,
-  CodecRune,
-  ExtrinsicRune,
-  MultiAddressRune,
-  state,
-} from "../../fluent/mod.ts"
+import { Chain, ClientRune, CodecRune, ExtrinsicRune, state } from "../../fluent/mod.ts"
 import { Event } from "../../primitives/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../../rune/mod.ts"
 import { hex } from "../../util/mod.ts"
@@ -83,7 +76,10 @@ export class InkRune<out U, out C extends Chain = Chain> extends Rune<Uint8Array
         type: "Contracts",
         value: Rune.rec({
           type: "call",
-          dest: MultiAddressRune.id(this.as(InkRune)),
+          dest: Rune.rec({
+            type: "Id",
+            value: this.as(InkRune),
+          }),
           value,
           data,
           gasLimit,
