@@ -20,11 +20,11 @@ ENV PATH=${DENO_INSTALL}/bin:${PATH} \
 RUN export DEBIAN_FRONTEND=noninteractive \
   && apt-get update \
   && apt-get install -y unzip curl git procps \
-  && curl -L -o /usr/local/bin/polkadot https://github.com/paritytech/polkadot/releases/download/${POLKADOT_VERSION}/polkadot \
+  && curl -fsSL -o /usr/local/bin/polkadot https://github.com/paritytech/polkadot/releases/download/${POLKADOT_VERSION}/polkadot \
   && chmod +x /usr/local/bin/polkadot \
-  && curl -L -o /usr/local/bin/polkadot-parachain https://github.com/paritytech/cumulus/releases/download/${POLKADOT_PARACHAIN_VERSION}/polkadot-parachain \
+  && curl -fsSL -o /usr/local/bin/polkadot-parachain https://github.com/paritytech/cumulus/releases/download/${POLKADOT_PARACHAIN_VERSION}/polkadot-parachain \
   && chmod +x /usr/local/bin/polkadot-parachain \
-  && curl -L -o /usr/local/bin/zombienet-linux https://github.com/paritytech/zombienet/releases/download/${ZOMBIENET_VERSION}/zombienet-linux \
+  && curl -fsSL -o /usr/local/bin/zombienet-linux https://github.com/paritytech/zombienet/releases/download/${ZOMBIENET_VERSION}/zombienet-linux-x64 \
   && chmod +x /usr/local/bin/zombienet-linux \
   && curl -fsSL https://dprint.dev/install.sh | DPRINT_INSTALL=/usr/local sh \
   && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
