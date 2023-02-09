@@ -1,5 +1,5 @@
 import { deadline } from "../../deps/std/async.ts"
-import { Buffer, readLines } from "../../deps/std/io.ts"
+import { Buffer } from "../../deps/std/io.ts"
 import * as path from "../../deps/std/path.ts"
 import { copy } from "../../deps/std/streams.ts"
 import { Network } from "../../deps/zombienet/orchestrator.ts"
