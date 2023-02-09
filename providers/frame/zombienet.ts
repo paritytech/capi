@@ -1,7 +1,7 @@
 import { deadline } from "../../deps/std/async.ts"
 import { Buffer, readLines } from "../../deps/std/io.ts"
 import * as path from "../../deps/std/path.ts"
-import { copy, writeAll } from "../../deps/std/streams.ts"
+import { copy } from "../../deps/std/streams.ts"
 import { Network } from "../../deps/zombienet/orchestrator.ts"
 import { Env, PathInfo } from "../../server/mod.ts"
 import { PermanentMemo, splitLast } from "../../util/mod.ts"
@@ -63,20 +63,23 @@ export class ZombienetProvider extends FrameProxyProvider {
   zombienet(configPath: string): Promise<Network> {
     return this.zombienetMemo.run(configPath, async () => {
       const tmpDir = Deno.makeTempDirSync({ prefix: `capi_zombienet_` })
-      const watcher = Deno.watchFs([tmpDir])
+      const watcher = Deno.watchFs(tmpDir)
+      const closeWatcher = () => {
+        if (typeof Deno.resources()[watcher.rid] === "number") watcher.close()
+      }
       const networkManifestPath = path.join(tmpDir, "zombie.json")
       const configPending = deadline(
         (async () => {
           for await (const e of watcher) {
             if (e.kind === "create" && e.paths.some((path) => path.endsWith(networkManifestPath))) {
-              watcher.close()
+              closeWatcher()
               return JSON.parse(await Deno.readTextFile(networkManifestPath)) as Network
             }
           }
           return
         })(),
         this.timeout,
-      )
+      ).catch(closeWatcher)
       const cmd: string[] = [
         this.zombienetPath,
         "-p",
@@ -94,10 +97,11 @@ export class ZombienetProvider extends FrameProxyProvider {
         stderr: "piped",
       })
       this.env.signal.addEventListener("abort", async () => {
-        process.kill("SIGINT")
-        await process.status()
+        closeWatcher()
+        await process.status() // TODO: is this necessary?
         process.close()
         await Deno.remove(tmpDir, { recursive: true })
+        process.kill("SIGINT")
       })
       const out = new Buffer()
       const maybeConfig = await Promise.race([
