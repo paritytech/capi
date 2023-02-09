@@ -1,6 +1,6 @@
 import { AddressRune, alice } from "capi"
 import { ink } from "capi/patterns"
-import { client } from "zombienet/examples/ink_e2e/zombienet.toml/collator/@latest/mod.ts"
+import { client } from "zombienet/rococo_contracts.toml/collator/@latest/mod.ts"
 import { parse } from "../../deps/std/flags.ts"
 
 export const metadata = ink.InkMetadataRune.from(
