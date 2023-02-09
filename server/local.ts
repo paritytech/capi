@@ -1,14 +1,15 @@
+import { Handler } from "../deps/std/http/server.ts"
 import { Env } from "./Env.ts"
 import * as f from "./factories.ts"
 import { parsePathInfo } from "./PathInfo.ts"
 
-export function handler(env: Env) {
-  return async (request: Request) => {
+export function handler(env: Env): Handler {
+  return async (request) => {
     const url = new URL(request.url)
-    const path = url.pathname
-    if (path === "/") return new Response("capi dev server active")
-    if (path === "/capi_cwd") return new Response(Deno.cwd())
-    const pathInfo = parsePathInfo(path)
+    const { pathname } = url
+    if (pathname === "/") return new Response("capi dev server active")
+    if (pathname === "/capi_cwd") return new Response(Deno.cwd())
+    const pathInfo = parsePathInfo(pathname)
     if (pathInfo) {
       const { vCapi, providerId, generatorId } = pathInfo
       if (vCapi) {
@@ -28,7 +29,7 @@ export function handler(env: Env) {
     }
     for (const dir of staticDirs) {
       try {
-        const url = new URL(path.slice(1), dir)
+        const url = new URL(pathname.slice(1), dir)
         const res = await fetch(url)
         if (!res.ok) continue
         if (f.acceptsHtml(request)) {
