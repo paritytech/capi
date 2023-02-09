@@ -3,11 +3,11 @@ import { serve } from "./deps/std/http.ts"
 import { PolkadotDevProvider, WssProvider, ZombienetProvider } from "./providers/frame/mod.ts"
 import { handler } from "./server/local.ts"
 import { Env } from "./server/mod.ts"
-import { FsCache } from "./util/cache/fs.ts"
+import { FsCache, InMemoryCache } from "./util/cache/mod.ts"
 
-const { help, port, "--": cmd } = flags.parse(Deno.args, {
+const { help, port, "--": cmd, cache: cachePath } = flags.parse(Deno.args, {
   boolean: ["help"],
-  string: ["port"],
+  string: ["port", "cache"],
   default: {
     port: "4646",
   },
@@ -27,7 +27,11 @@ const { signal } = controller
 
 const href = `http://localhost:${port}`
 
-const env = new Env(href, signal, new FsCache("target/capi", signal), [
+const cache = typeof cachePath === "string"
+  ? new FsCache(cachePath === "" ? "target/capi" : cachePath, signal)
+  : new InMemoryCache(signal)
+
+const env = new Env(href, signal, cache, [
   (env) => new WssProvider(env),
   (env) => new PolkadotDevProvider(env),
   (env) => new ZombienetProvider(env),

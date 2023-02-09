@@ -66,9 +66,11 @@ export abstract class FrameProxyProvider extends FrameProvider {
   }
 
   async clientFile(pathInfo: PathInfo) {
-    const url = this.staticUrl(pathInfo)
+    // TODO: utilize `staticUrl` upon fixing RPC error
+    const url = await this.dynamicUrl(pathInfo)
     return new File(`
       import * as C from "./capi.ts"
+
       import type { Chain } from "./mod.ts"
 
       export const discoveryValue = "${url}"
