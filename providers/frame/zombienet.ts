@@ -95,11 +95,16 @@ export class ZombienetProvider extends FrameProxyProvider {
         stdout: "piped",
         stderr: "piped",
       })
+      const closeProcess = () => {
+        if (typeof Deno.resources()[process.rid] === "number") {
+          process.kill("SIGINT")
+          process.close()
+        }
+      }
       this.env.signal.addEventListener("abort", async () => {
         closeWatcher()
-        process.close()
+        closeProcess()
         await Deno.remove(tmpDir, { recursive: true })
-        process.kill("SIGINT")
       })
       const maybeConfig = await Promise.race([
         configPending,
