@@ -35,7 +35,7 @@ export class ZombienetProvider extends FrameProxyProvider {
     }
     this.zombienetPath = zombienetPath
     this.additional = additional ?? []
-    this.timeout = timeout ?? 60 * 1000
+    this.timeout = timeout ?? 5 * 60 * 1000
   }
 
   urlMemo = new PermanentMemo<string, string>()
