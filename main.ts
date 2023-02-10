@@ -67,11 +67,7 @@ if (!alreadyRunning) {
 async function after() {
   if (cmd.length) {
     const status = await Deno
-      .run({
-        cmd,
-        stderr: "inherit",
-        stdout: "inherit",
-      })
+      .run({ cmd })
       .status()
     // TODO: exit gracefully
     Deno.exit(status.code)

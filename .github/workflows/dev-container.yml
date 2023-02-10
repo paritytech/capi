@@ -15,4 +15,3 @@ jobs:
         uses: devcontainers/ci@v0.2
         with:
           push: never
-          runCmd: deno task star

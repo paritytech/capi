@@ -1,5 +1,4 @@
 import { deadline } from "../../deps/std/async.ts"
-import { Buffer } from "../../deps/std/io.ts"
 import * as path from "../../deps/std/path.ts"
 import { copy } from "../../deps/std/streams.ts"
 import { Network } from "../../deps/zombienet/orchestrator.ts"
@@ -103,13 +102,12 @@ export class ZombienetProvider extends FrameProxyProvider {
         await Deno.remove(tmpDir, { recursive: true })
         process.kill("SIGINT")
       })
-      const out = new Buffer()
       const maybeConfig = await Promise.race([
         configPending,
-        copy(process.stderr, out),
+        process.status().then(() => undefined),
       ])
       if (typeof maybeConfig === "object") return maybeConfig
-      await copy(out, Deno.stderr)
+      await copy(process.stderr, Deno.stderr)
       throw new Error("Zombienet exited without launching network")
     })
   }
