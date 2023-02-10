@@ -33,14 +33,14 @@
     "debug": "deno run -A --inspect-brk",
     "udd": "deno task star && deno run -A https://deno.land/x/udd@0.5.0/main.ts target/star.ts",
     "dnt": "deno run -A _tasks/dnt.ts",
-    "test": "deno task ctx -- deno test -A -L=info --ignore=target --parallel -r=http://localhost:4646/",
+    "test": "deno task capi -- deno test -A -L=info --ignore=target --parallel -r=http://localhost:4646/",
     "test:examples": "deno task test _tasks/test_examples.ts",
     "test:update": "deno task test -- --update",
     "moderate": "deno run -A https://deno.land/x/moderate@0.0.5/mod.ts --exclude '*.test.ts' && dprint fmt",
     "dev": "deno run -A --watch=deno.jsonc,docs/ main.ts --serve",
-    "ctx": "deno run -A main.ts --serve",
-    "cache": "deno task ctx -- deno cache -r=http://localhost:4646/",
+    "capi": "deno run -A main.ts",
+    "cache": "deno task capi -- deno cache -r=http://localhost:4646/",
     "star": "deno task run _tasks/star.ts",
-    "run": "deno task ctx -- deno run -A -r=http://localhost:4646/"
+    "run": "deno task capi -- deno run -A -r=http://localhost:4646/"
   }
 }
