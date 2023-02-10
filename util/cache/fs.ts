@@ -34,8 +34,4 @@ export class FsCache extends CacheBase {
       throw e
     }
   }
-
-  clear() {
-    return fs.emptyDir(this.location)
-  }
 }
