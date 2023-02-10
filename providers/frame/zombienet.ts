@@ -109,7 +109,7 @@ export class ZombienetProvider extends FrameProxyProvider {
         copy(process.stderr, out),
       ])
       if (typeof maybeConfig === "object") return maybeConfig
-      await copy(out, Deno.stderr)
+      await copy(out, Deno.stdout)
       throw new Error("Zombienet exited without launching network")
     })
   }
