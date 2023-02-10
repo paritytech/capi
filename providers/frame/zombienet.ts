@@ -78,7 +78,7 @@ export class ZombienetProvider extends FrameProxyProvider {
           return
         })(),
         this.timeout,
-      ).catch(closeWatcher)
+      ).finally(closeWatcher)
       const cmd: string[] = [
         this.zombienetPath,
         "-p",
