@@ -98,7 +98,6 @@ export class ZombienetProvider extends FrameProxyProvider {
       this.env.signal.addEventListener("abort", async () => {
         closeWatcher()
         process.close()
-        await process.status()
         await Deno.remove(tmpDir, { recursive: true })
         process.kill("SIGINT")
       })
