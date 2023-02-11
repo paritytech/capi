@@ -1,4 +1,4 @@
-import * as M from "../frame_metadata/mod.ts"
+import { $extrinsic } from "../frame_metadata/mod.ts"
 import { known } from "../rpc/mod.ts"
 import { ArrayRune, Rune } from "../rune/mod.ts"
 import { ValueRune } from "../rune/ValueRune.ts"
@@ -26,19 +26,19 @@ export class BlockRune<out U, out C extends Chain = Chain> extends Rune<known.Si
 
   extrinsics() {
     const metadata = this.client.metadata()
-    const $extrinsic = Rune
+    const $extrinsic_ = Rune
       .rec({
         metadata,
         deriveCodec: metadata.deriveCodec,
         sign: null!,
         prefix: null!,
       })
-      .map(M.$extrinsic)
+      .map($extrinsic)
       .into(CodecRune)
     return this
       .extrinsicsRaw()
       .into(ArrayRune)
-      .mapArray((h) => $extrinsic.decoded(h.map(hex.decode)))
+      .mapArray((h) => $extrinsic_.decoded(h.map(hex.decode)))
   }
 
   events() {

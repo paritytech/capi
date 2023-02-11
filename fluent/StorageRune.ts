@@ -1,24 +1,27 @@
 import * as $ from "../deps/scale.ts"
-import * as M from "../frame_metadata/mod.ts"
+import { $storageKey, StorageEntry } from "../frame_metadata/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import * as U from "../util/mod.ts"
 import { CodecRune } from "./CodecRune.ts"
 import { PalletRune } from "./PalletRune.ts"
 import { state } from "./rpc_method_runes.ts"
 
-export class StorageRune<in out K extends unknown[], out V, out U> extends Rune<M.StorageEntry, U> {
-  constructor(_prime: StorageRune<K, V, U>["_prime"], readonly pallet: PalletRune<U>) {
-    super(_prime)
-    this.$key = Rune.rec({
-      deriveCodec: this.pallet.metadata.deriveCodec,
-      pallet: this.pallet,
-      storageEntry: this.as(Rune),
-    }).map(M.$storageKey).into(CodecRune)
-    this.$value = this.pallet.metadata.codec(this.into(ValueRune).access("value"))
-  }
-
+export class StorageRune<in out K extends unknown[], out V, out U> extends Rune<StorageEntry, U> {
   $key
   $value
+
+  constructor(_prime: StorageRune<K, V, U>["_prime"], readonly pallet: PalletRune<U>) {
+    super(_prime)
+    this.$key = Rune
+      .rec({
+        deriveCodec: this.pallet.metadata.deriveCodec,
+        pallet: this.pallet,
+        storageEntry: this.as(Rune),
+      })
+      .map($storageKey)
+      .into(CodecRune)
+    this.$value = this.pallet.metadata.codec(this.into(ValueRune).access("value"))
+  }
 
   entryRaw<X>(...[key, blockHash]: RunicArgs<X, [key: K, blockHash?: U.HexHash]>) {
     const storageKey = this.$key.encoded(key).map(U.hex.encode)

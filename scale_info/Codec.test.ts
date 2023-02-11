@@ -1,12 +1,9 @@
+import * as $ from "../deps/scale.ts"
 import { assertEquals } from "../deps/std/testing/asserts.ts"
 import * as downloaded from "../frame_metadata/_downloaded/mod.ts"
-import { getPalletAndEntry } from "../frame_metadata/mod.ts"
-import { alice, throwIfError } from "../util/mod.ts"
-import { ChainError } from "./Codec.ts"
-import { DeriveCodec } from "./Codec.ts"
-
-const metadata = downloaded.polkadot
-const deriveCodec = DeriveCodec(metadata.tys)
+import { getPalletConstruct, getStorage } from "../frame_metadata/mod.ts"
+import { alice, throwIfUndefined } from "../util/mod.ts"
+import { ChainError, DeriveCodec } from "./Codec.ts"
 
 Deno.test("Derive all", () => {
   for (const ty of metadata.tys) deriveCodec(ty.id)
@@ -38,25 +35,21 @@ Deno.test("Derive AccountInfo Codec", () => {
 })
 
 Deno.test("Derive Auctions AuctionInfo Storage Entry Codec", () => {
-  const auctionInfoStorageEntry =
-    throwIfError(getPalletAndEntry(metadata, "Auctions", "AuctionInfo"))[1]
-  const codec = deriveCodec(auctionInfoStorageEntry.value)
+  const $value = storageValueCodec("Auctions", "AuctionInfo")
   const decoded = [8, 9945400]
-  const encoded = codec.encode(decoded)
-  assertEquals(codec.decode(encoded), decoded)
+  const encoded = $value.encode(decoded)
+  assertEquals($value.decode(encoded), decoded)
 })
 
 Deno.test("Derive Auction Winning Storage Entry Codec", () => {
-  const auctionWinningStorageEntry =
-    throwIfError(getPalletAndEntry(metadata, "Auctions", "Winning"))[1]
-  const codec = deriveCodec(auctionWinningStorageEntry.value)
+  const $value = storageValueCodec("Auctions", "Winning")
   const decoded = [
     ...Array(7).fill(undefined),
     [alice.publicKey, 2013, 8672334557167609n],
     ...Array(28).fill(undefined),
   ]
-  const encoded = codec.encode(decoded)
-  assertEquals(codec.decode(encoded), decoded)
+  const encoded = $value.encode(decoded)
+  assertEquals($value.decode(encoded), decoded)
 })
 
 Deno.test("Derive pallet_xcm::pallet::Error codec", () => {
@@ -82,3 +75,12 @@ Deno.test("Derive Result codec", () => {
   assertEquals(errEncoded, new Uint8Array([1, 0]))
   assertEquals(codec.decode(errEncoded), err)
 })
+
+const metadata = downloaded.polkadot
+const deriveCodec = DeriveCodec(metadata.tys)
+
+function storageValueCodec(palletName: string, storageName: string): $.Codec<unknown> {
+  return deriveCodec(
+    throwIfUndefined(getPalletConstruct(getStorage, metadata, palletName, storageName)).value,
+  )
+}

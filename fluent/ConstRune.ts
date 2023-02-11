@@ -1,8 +1,8 @@
-import * as M from "../frame_metadata/mod.ts"
+import { Constant } from "../frame_metadata/mod.ts"
 import { Rune, ValueRune } from "../rune/mod.ts"
 import { PalletRune } from "./PalletRune.ts"
 
-export class ConstRune<out U> extends Rune<M.Constant, U> {
+export class ConstRune<out U> extends Rune<Constant, U> {
   $value
   decoded
 

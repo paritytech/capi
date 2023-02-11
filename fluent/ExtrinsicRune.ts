@@ -1,4 +1,4 @@
-import * as M from "../frame_metadata/mod.ts"
+import { $call, $extrinsic } from "../frame_metadata/mod.ts"
 import { MultiAddress, Signer } from "../primitives/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { Era, era } from "../scale_info/mod.ts"
@@ -29,7 +29,7 @@ export class ExtrinsicRune<out U, out C extends Chain = Chain> extends Rune<C["c
     super(_prime)
     const metadata = this.client.metadata()
     this.hash = Rune.rec({ metadata, deriveCodec: metadata.deriveCodec })
-      .map((x) => Blake2_256.$hash(M.$call(x)))
+      .map((x) => Blake2_256.$hash($call(x)))
       .into(CodecRune)
       .encoded(this)
   }
@@ -39,12 +39,12 @@ export class ExtrinsicRune<out U, out C extends Chain = Chain> extends Rune<C["c
     const metadata = this.client.metadata()
     const System = metadata.pallet("System")
     const addrPrefix = System.const("SS58Prefix").decoded.unsafeAs<number>()
-    const $extrinsic = Rune.rec({
+    const $extrinsic_ = Rune.rec({
       metadata,
       deriveCodec: metadata.deriveCodec,
       sign: props.sender.access("sign"),
       prefix: addrPrefix,
-    }).map(M.$extrinsic).into(CodecRune)
+    }).map($extrinsic).into(CodecRune)
     const versions = System.const("Version").decoded.unsafeAs<
       { specVersion: number; transactionVersion: number }
     >().into(ValueRune)
@@ -82,23 +82,23 @@ export class ExtrinsicRune<out U, out C extends Chain = Chain> extends Rune<C["c
       call: this,
       signature,
     })
-    const extrinsic = $extrinsic.encoded(extrinsicProps)
+    const extrinsic = $extrinsic_.encoded(extrinsicProps)
     return extrinsic.into(SignedExtrinsicRune, this.client)
   }
 
   encoded() {
     const metadata = this.client.metadata()
-    const $extrinsic = Rune.rec({
+    const $extrinsic_ = Rune.rec({
       metadata,
       deriveCodec: metadata.deriveCodec,
       sign: null!,
       prefix: null!,
-    }).map(M.$extrinsic).into(CodecRune)
+    }).map($extrinsic).into(CodecRune)
     const $extrinsicProps = Rune.rec({
       protocolVersion: 4,
       call: this,
     })
-    return $extrinsic.encoded($extrinsicProps)
+    return $extrinsic_.encoded($extrinsicProps)
   }
 
   feeEstimate() {

@@ -149,41 +149,31 @@ export function fromPrefixedHex(scaleEncoded: string): Metadata {
   return $metadata.decode(U.hex.decode(scaleEncoded as U.Hex))
 }
 
-export function getPallet(metadata: Metadata, name: string): Pallet | PalletNotFoundError {
-  return metadata.pallets.find((pallet) => pallet.name === name) || new PalletNotFoundError(name)
-}
-export class PalletNotFoundError extends Error {
-  override readonly name = "PalletNotFoundError"
+export function getPallet(metadata: Metadata, name: string): Pallet | undefined {
+  return metadata.pallets.find((pallet) => pallet.name === name)
 }
 
-export function getStorage(pallet: Pallet, name: string): StorageEntry | StorageNotFoundError {
+export function getStorage(pallet: Pallet, name: string): StorageEntry | undefined {
   return pallet.storage?.entries.find((entry) => entry.name === name)
-    || new StorageNotFoundError(name)
-}
-export class StorageNotFoundError extends Error {
-  override readonly name = "StorageNotFoundError"
 }
 
-export function getConst(pallet: Pallet, name: string): Constant | ConstNotFoundError {
+export function getConst(pallet: Pallet, name: string): Constant | undefined {
   return pallet.constants?.find((constant) => constant.name === name)
-    || new ConstNotFoundError(name)
-}
-export class ConstNotFoundError extends Error {
-  override readonly name = "ConstNotFoundError"
 }
 
-export function getPalletAndEntry(
+export function getType(metadata: Metadata, path: string[]): Ty | undefined {
+  return metadata.tys.find((ty) =>
+    ty.path.length === path.length && ty.path.every((val, index) => val === path[index])
+  )
+}
+
+export function getPalletConstruct<M>(
+  getConstruct: (pallet: Pallet, constructName: string) => M,
   metadata: Metadata,
   palletName: string,
-  entryName: string,
-): [Pallet, StorageEntry] | PalletNotFoundError | StorageNotFoundError {
+  constructName: string,
+): M | undefined {
   const pallet = getPallet(metadata, palletName)
-  if (pallet instanceof Error) {
-    return pallet
-  }
-  const entry = getStorage(pallet, entryName)
-  if (entry instanceof Error) {
-    return entry
-  }
-  return [pallet, entry]
+  if (pallet) return getConstruct(pallet, constructName)
+  return
 }

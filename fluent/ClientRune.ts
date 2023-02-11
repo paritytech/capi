@@ -1,5 +1,5 @@
 import * as $ from "../deps/scale.ts"
-import * as M from "../frame_metadata/mod.ts"
+import { fromPrefixedHex } from "../frame_metadata/mod.ts"
 import { Event } from "../primitives/mod.ts"
 import * as rpc from "../rpc/mod.ts"
 import { MetaRune, Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
@@ -35,7 +35,7 @@ export class ClientRune<out U, out C extends Chain = Chain> extends Rune<rpc.Cli
   metadata<X>(...[blockHash]: RunicArgs<X, [blockHash?: HexHash]>) {
     return state
       .getMetadata(this.as(Rune), blockHash)
-      .map(M.fromPrefixedHex)
+      .map(fromPrefixedHex)
       .throws($.ScaleError)
       .into(MetadataRune, this)
   }
@@ -54,7 +54,7 @@ export class ClientRune<out U, out C extends Chain = Chain> extends Rune<rpc.Cli
       .unsafeAs<number>()
   }
 
-  chainVersion = rpcCall<[], string>("system_version")(this.as(Rune))
+  chainVersion = rpcCall<[], string>("system_version")(this.as(ClientRune))
 
   private _asCodegen<C extends Chain>() {
     return this as any as ClientRune<U, C>
