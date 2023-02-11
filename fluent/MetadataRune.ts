@@ -1,4 +1,4 @@
-import { getPallet, Metadata } from "../frame_metadata/mod.ts"
+import { getPallet, getType, Metadata } from "../frame_metadata/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { DeriveCodec, Ty } from "../scale_info/mod.ts"
 import { Chain, ClientRune } from "./ClientRune.ts"
@@ -12,12 +12,21 @@ export class MetadataRune<out U, out C extends Chain = Chain> extends Rune<Metad
 
   pallet<X>(...[palletName]: RunicArgs<X, [palletName: string]>) {
     return Rune
-      .tuple([this.as(Rune), palletName])
-      .map(([metadata, palletName]) => getPallet(metadata, palletName))
+      .fn(getPallet)
+      .call(this.as(MetadataRune), palletName)
       .unhandle(undefined)
       .rehandle(undefined, () => Rune.constant(new PalletNotFoundError()))
       .unhandle(PalletNotFoundError)
       .into(PalletRune, this.as(MetadataRune))
+  }
+
+  type<X>(...[path]: RunicArgs<X, [string[]]>) {
+    return Rune
+      .fn(getType)
+      .call(this.as(MetadataRune), path)
+      .unhandle(undefined)
+      .rehandle(undefined, () => Rune.constant(new TypeNotFoundError()))
+      .unhandle(TypeNotFoundError)
   }
 
   deriveCodec = this.into(ValueRune).map((x) => DeriveCodec(x.tys))
@@ -31,6 +40,6 @@ export class PalletNotFoundError extends Error {
   override readonly name = "PalletNotFoundError"
 }
 
-// export class TypeNotFoundError extends Error {
-//   override readonly name = "TypeNotFoundError"
-// }
+export class TypeNotFoundError extends Error {
+  override readonly name = "TypeNotFoundError"
+}

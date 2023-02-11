@@ -11,8 +11,8 @@ export class PalletRune<out U> extends Rune<Pallet, U> {
 
   storage<X>(...[storageName]: RunicArgs<X, [storageName: string]>) {
     return Rune
-      .tuple([this.as(Rune), storageName])
-      .map(([metadata, palletName]) => getStorage(metadata, palletName))
+      .fn(getStorage)
+      .call(this.as(PalletRune), storageName)
       .unhandle(undefined)
       .rehandle(undefined, () => Rune.constant(new StorageNotFoundError()))
       .unhandle(StorageNotFoundError)
@@ -21,8 +21,8 @@ export class PalletRune<out U> extends Rune<Pallet, U> {
 
   const<X>(...[constName]: RunicArgs<X, [constantName: string]>) {
     return Rune
-      .tuple([this.as(Rune), constName])
-      .map(([metadata, constName]) => getConst(metadata, constName))
+      .fn(getConst)
+      .call(this.as(PalletRune), constName)
       .unhandle(undefined)
       .rehandle(undefined, () => Rune.constant(new ConstNotFoundError()))
       .unhandle(ConstNotFoundError)
