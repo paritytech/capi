@@ -11,7 +11,7 @@ export class ProviderSendError<Data> extends Error {
 }
 
 export class ProviderHandlerError<Data> extends Error {
-  override readonly name = "ProviderInternalError"
+  override readonly name = "ProviderHandlerError"
   constructor(override readonly cause: Data) {
     super()
   }

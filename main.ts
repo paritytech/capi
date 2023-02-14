@@ -1,5 +1,5 @@
 import * as flags from "./deps/std/flags.ts"
-import { serve } from "./deps/std/http/server.ts"
+import { serve } from "./deps/std/http.ts"
 import { PolkadotDevProvider, WssProvider, ZombienetProvider } from "./providers/frame/mod.ts"
 import { handler } from "./server/local.ts"
 import { Env } from "./server/mod.ts"

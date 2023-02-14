@@ -66,7 +66,9 @@ function connection(
     ws.addEventListener("close", (e) => {
       conn.forEachListener(new ProviderHandlerError(e))
     }, controller)
-    return new ProviderConnection(ws, () => controller.abort())
+    return new ProviderConnection(ws, () => {
+      controller.abort()
+    })
   })
   conn.addListener(listener)
   return conn
