@@ -12,12 +12,12 @@ class RunRpcClient<DV, SED, HED, CED> extends Run<rpc.Client<DV, SED, HED, CED>,
   }
 
   client?: rpc.Client<DV, SED, HED, CED>
-  _evaluate(): Promise<rpc.Client<DV, SED, HED, CED>> {
-    return Promise.resolve(this.client ??= new rpc.Client(this.provider, this.discoveryValue))
+  async _evaluate(): Promise<rpc.Client<DV, SED, HED, CED>> {
+    return this.client ??= new rpc.Client(this.provider, this.discoveryValue)
   }
 
-  override cleanup(): void {
-    this.client?.discard()
+  override async cleanup(): Promise<void> {
+    await this.client?.discard()
     super.cleanup()
   }
 }

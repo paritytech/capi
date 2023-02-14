@@ -1,6 +1,6 @@
 import { escapeHtml } from "../deps/escape.ts"
 import * as shiki from "../deps/shiki.ts"
-import { Status } from "../deps/std/http/http_status.ts"
+import { Status } from "../deps/std/http.ts"
 import { CacheBase } from "../util/cache/base.ts"
 
 shiki.setCDN("https://unpkg.com/shiki/")

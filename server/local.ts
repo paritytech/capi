@@ -18,10 +18,12 @@ export function handler(env: Env) {
       }
       const provider = env.providers[generatorId]?.[providerId]
       if (provider) {
-        return await provider.handle(request, pathInfo).catch((e) => {
+        try {
+          return await provider.handle(request, pathInfo)
+        } catch (e) {
           if (e instanceof Response) return e
           return f.serverError(Deno.inspect(e))
-        })
+        }
       }
     }
     for (const dir of staticDirs) {

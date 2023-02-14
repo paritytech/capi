@@ -1,11 +1,12 @@
 import { File } from "../../codegen/frame/mod.ts"
+import { deferred } from "../../deps/std/async.ts"
 import { Client, proxyProvider } from "../../rpc/mod.ts"
 import { PathInfo } from "../../server/mod.ts"
 import { fromPathInfo } from "../../server/PathInfo.ts"
 import { FrameProvider } from "./FrameProvider.ts"
 
 export abstract class FrameProxyProvider extends FrameProvider {
-  override handle(request: Request, pathInfo: PathInfo): Promise<Response> {
+  override async handle(request: Request, pathInfo: PathInfo): Promise<Response> {
     if (
       pathInfo.vRuntime && pathInfo.vRuntime !== "latest" && !pathInfo.filePath
       && request.headers.get("upgrade") === "websocket"
@@ -19,33 +20,30 @@ export abstract class FrameProxyProvider extends FrameProvider {
     const url = await this.dynamicUrl(pathInfo)
     const server = new WebSocket(url)
     const { socket: client, response } = Deno.upgradeWebSocket(request)
-    server.addEventListener("close", () => {
-      try {
-        client.close()
-      } catch {}
-    })
-    server.addEventListener("message", (event) => {
-      try {
-        client.send(event.data)
-      } catch {
-        client.close()
-        server.close()
-      }
-    })
-    client.addEventListener("close", async () => {
-      try {
-        server.close()
-      } catch {}
-    })
-    client.addEventListener("message", async (event) => {
-      try {
-        server.send(event.data)
-      } catch {
-        client.close()
-        server.close()
-      }
-    })
+    setup(client, server)
+    setup(server, client)
     return response
+
+    function setup(a: WebSocket, b: WebSocket) {
+      const ready = deferred()
+      b.addEventListener("open", () => {
+        ready.resolve()
+      })
+      a.addEventListener("close", async () => {
+        try {
+          b.close()
+        } catch {}
+      })
+      a.addEventListener("message", async (event) => {
+        try {
+          await ready
+          b.send(event.data)
+        } catch {
+          a.close()
+          b.close()
+        }
+      })
+    }
   }
 
   abstract dynamicUrl(pathInfo: PathInfo): Promise<string>
@@ -73,11 +71,11 @@ export abstract class FrameProxyProvider extends FrameProvider {
       import * as C from "./capi.ts"
       import type { Chain } from "./mod.ts"
 
-      export const client = C.rpcClient(C.rpc.proxyProvider, "${url}")["_asCodegen"]<Chain>()
-
-      export const rawClient = new C.rpc.Client(C.rpc.proxyProvider, "${url}")
-
       export const discoveryValue = "${url}"
+
+      export const client = C.rpcClient(C.rpc.proxyProvider, discoveryValue)["_asCodegen"]<Chain>()
+
+      export const rawClient = new C.rpc.Client(C.rpc.proxyProvider, discoveryValue)
     `)
   }
 }

@@ -1,4 +1,4 @@
-import { equals } from "../../deps/std/bytes/mod.ts"
+import { equals } from "../../deps/std/bytes.ts"
 import { Chain, ClientRune, CodecRune, ExtrinsicRune, state } from "../../fluent/mod.ts"
 import { Event } from "../../primitives/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../../rune/mod.ts"
