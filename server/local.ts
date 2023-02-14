@@ -22,7 +22,7 @@ export function handler(env: Env) {
           return await provider.handle(request, pathInfo)
         } catch (e) {
           if (e instanceof Response) return e
-          return f.serverError(e instanceof Error ? e.message : Deno.inspect(e))
+          return f.serverError(Deno.inspect(e))
         }
       }
     }
