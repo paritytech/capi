@@ -44,7 +44,7 @@ const dependencies = new Map<string, Set<string>>()
 
 function visit(specifier: string) {
   while (specifier in data.redirects) specifier = data.redirects[specifier]!
-  if (specifier.startsWith("npm:")) return new Set<string>()
+  if (specifier.startsWith("npm:") || specifier.startsWith("http")) return new Set<string>()
   return getOrInit(dependencies, specifier, () => {
     const module = data.modules.find((x) => x.specifier === specifier)
     if (!module) throw new Error("module not found " + specifier)
