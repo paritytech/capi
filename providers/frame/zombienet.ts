@@ -63,8 +63,11 @@ export class ZombienetProvider extends FrameProxyProvider {
     return this.zombienetMemo.run(configPath, async () => {
       const tmpDir = Deno.makeTempDirSync({ prefix: `capi_zombienet_` })
       const watcher = Deno.watchFs(tmpDir)
+      let closed = false
       const closeWatcher = () => {
-        if (typeof Deno.resources()[watcher.rid] === "number") watcher.close()
+        if (closed) return
+        closed = true
+        watcher.close()
       }
       const networkManifestPath = path.join(tmpDir, "zombie.json")
       const configPending = deadline(
