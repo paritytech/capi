@@ -75,9 +75,7 @@ if (!alreadyRunning) {
 async function after() {
   if (cmd.length) {
     const status = await Deno.run({ cmd }).status()
-    // TODO: exit gracefully
-    Deno.exit(status.code)
-    // self.addEventListener("unload", () => Deno.exit(status.code))
-    // controller.abort()
+    self.addEventListener("unload", () => Deno.exit(status.code))
+    controller.abort()
   }
 }
