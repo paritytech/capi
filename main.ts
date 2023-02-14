@@ -5,14 +5,16 @@ import { handler } from "./server/local.ts"
 import { Env } from "./server/mod.ts"
 import { FsCache } from "./util/cache/mod.ts"
 
-const { help, port, "--": cmd, out } = flags.parse(Deno.args, {
-  boolean: ["help"],
+const { help, dbg, port, "--": cmd, out } = flags.parse(Deno.args, {
+  boolean: ["help", "dbg"],
   string: ["port", "out"],
   default: {
+    dbg: false,
     port: "4646",
     out: "target/capi",
   },
   alias: {
+    v: "verbose",
     h: "help",
   },
   "--": true,
@@ -29,11 +31,17 @@ const { signal } = controller
 const href = `http://localhost:${port}`
 
 const cache = new FsCache(out, signal)
-const env = new Env(href, signal, cache, [
-  (env) => new WssProvider(env),
-  (env) => new PolkadotDevProvider(env),
-  (env) => new ZombienetProvider(env),
-])
+const env = new Env({
+  href,
+  signal,
+  cache,
+  dbg,
+  providerFactories: [
+    (env) => new WssProvider(env),
+    (env) => new PolkadotDevProvider(env),
+    (env) => new ZombienetProvider(env),
+  ],
+})
 
 cache.getString(
   "mod.ts",
@@ -66,13 +74,7 @@ if (!alreadyRunning) {
 
 async function after() {
   if (cmd.length) {
-    const status = await Deno
-      .run({
-        cmd,
-        stderr: "inherit",
-        stdout: "inherit",
-      })
-      .status()
+    const status = await Deno.run({ cmd }).status()
     // TODO: exit gracefully
     Deno.exit(status.code)
     // self.addEventListener("unload", () => Deno.exit(status.code))

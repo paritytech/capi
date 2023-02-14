@@ -1,4 +1,4 @@
-import { Handler } from "../deps/std/http/server.ts"
+import { Handler } from "../deps/std/http.ts"
 import { Env } from "./Env.ts"
 import * as f from "./factories.ts"
 import { parsePathInfo } from "./PathInfo.ts"
@@ -23,7 +23,9 @@ export function handler(env: Env): Handler {
           return await provider.handle(request, pathInfo)
         } catch (e) {
           if (e instanceof Response) return e
-          return f.serverError(Deno.inspect(e))
+          const eText = Deno.inspect(e)
+          env.dbg && console.error(eText)
+          return f.serverError(eText)
         }
       }
     }
