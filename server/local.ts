@@ -23,9 +23,8 @@ export function handler(env: Env): Handler {
           return await provider.handle(request, pathInfo)
         } catch (e) {
           if (e instanceof Response) return e
-          const eText = Deno.inspect(e)
-          if (env.dbg) console.error(eText)
-          return f.serverError(eText)
+          if (env.dbg) console.error(e)
+          return f.serverError(Deno.inspect(e))
         }
       }
     }
