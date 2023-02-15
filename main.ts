@@ -3,13 +3,15 @@ import { serve } from "./deps/std/http.ts"
 import { PolkadotDevProvider, WssProvider, ZombienetProvider } from "./providers/frame/mod.ts"
 import { handler } from "./server/local.ts"
 import { Env } from "./server/mod.ts"
-import { FsCache } from "./util/cache/fs.ts"
+import { FsCache } from "./util/cache/mod.ts"
 
-const { help, port, "--": cmd } = flags.parse(Deno.args, {
-  boolean: ["help"],
-  string: ["port"],
+const { help, dbg, port, "--": cmd, out } = flags.parse(Deno.args, {
+  boolean: ["help", "dbg"],
+  string: ["port", "out"],
   default: {
+    dbg: false,
     port: "4646",
+    out: "target/capi",
   },
   alias: {
     h: "help",
@@ -27,13 +29,20 @@ const { signal } = controller
 
 const href = `http://localhost:${port}`
 
-const env = new Env(href, signal, new FsCache("target/capi", signal), [
-  (env) => new WssProvider(env),
-  (env) => new PolkadotDevProvider(env),
-  (env) => new ZombienetProvider(env),
-])
+const cache = new FsCache(out, signal)
+const env = new Env({
+  href,
+  signal,
+  cache,
+  dbg,
+  providerFactories: [
+    (env) => new WssProvider(env),
+    (env) => new PolkadotDevProvider(env),
+    (env) => new ZombienetProvider(env),
+  ],
+})
 
-env.cache.getString(
+cache.getString(
   "mod.ts",
   0,
   async () => `export * from ${JSON.stringify(import.meta.resolve("./mod.ts"))}`,
@@ -64,16 +73,9 @@ if (!alreadyRunning) {
 
 async function after() {
   if (cmd.length) {
-    const status = await Deno
-      .run({
-        cmd,
-        stderr: "inherit",
-        stdout: "inherit",
-      })
-      .status()
-    // TODO: exit gracefully
-    Deno.exit(status.code)
-    // self.addEventListener("unload", () => Deno.exit(status.code))
-    // controller.abort()
+    const process = Deno.run({ cmd })
+    const status = await process.status()
+    self.addEventListener("unload", () => Deno.exit(status.code))
+    controller.abort()
   }
 }

@@ -5,18 +5,15 @@ import { FrameProxyProvider } from "./FrameProxyProvider.ts"
 
 export interface PolkadotDevProviderProps {
   polkadotPath?: string
-  additional?: string[]
 }
 
 export class PolkadotDevProvider extends FrameProxyProvider {
   providerId = "dev"
   bin
-  additional
 
-  constructor(env: Env, { polkadotPath, additional }: PolkadotDevProviderProps = {}) {
+  constructor(env: Env, { polkadotPath }: PolkadotDevProviderProps = {}) {
     super(env)
     this.bin = polkadotPath ?? "polkadot"
-    this.additional = additional ?? []
   }
 
   urlMemo = new PermanentMemo<DevRuntimeName, string>()
@@ -31,18 +28,16 @@ export class PolkadotDevProvider extends FrameProxyProvider {
 
   async spawnDevNet(runtimeName: DevRuntimeName) {
     const port = getAvailable()
-    const cmd: string[] = [this.bin, "--dev", "--ws-port", port.toString(), ...this.additional]
+    const cmd: string[] = [this.bin, "--dev", "--ws-port", port.toString()]
     if (runtimeName !== "polkadot") cmd.push(`--force-${runtimeName}`)
-    if (this.additional) cmd.push(...this.additional)
     try {
       const process = Deno.run({
         cmd,
         stdout: "piped",
         stderr: "piped",
       })
-      this.env.signal.addEventListener("abort", async () => {
-        process.kill("SIGINT")
-        await process.status()
+      this.env.signal.addEventListener("abort", () => {
+        process.kill()
         process.close()
       })
     } catch (_e) {

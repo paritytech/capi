@@ -1,9 +1,13 @@
 import { AddressRune, alice } from "capi"
-import { ink } from "capi/patterns"
-import { client } from "zombienet/examples/ink_e2e/zombienet.toml/collator/@latest/mod.ts"
+import {
+  InkMetadataRune,
+  instantiationEventIntoPublicKey,
+  isInstantiatedEvent,
+} from "capi/patterns/ink/mod.ts"
+import { client } from "zombienet/rococo_contracts.toml/collator/@latest/mod.ts"
 import { parse } from "../../deps/std/flags.ts"
 
-export const metadata = ink.InkMetadataRune.from(
+export const metadata = InkMetadataRune.from(
   client,
   Deno.readTextFileSync("examples/ink_e2e/metadata.json"),
 )
@@ -26,10 +30,10 @@ if (!address) {
     .logStatus("Contract deployment status:")
     .txEvents()
     .map((events) =>
-      events.find(ink.isInstantiatedEvent) ?? new FailedToFindContractInstantiatedError()
+      events.find(isInstantiatedEvent) ?? new FailedToFindContractInstantiatedError()
     )
     .unhandle(FailedToFindContractInstantiatedError)
-    .pipe(ink.instantiationEventIntoPublicKey)
+    .pipe(instantiationEventIntoPublicKey)
     .address(client)
     .run()
 }

@@ -1,5 +1,6 @@
-import { Buffer, readLines } from "../../deps/std/io.ts"
-import { copy, writeAll } from "../../deps/std/streams.ts"
+import { deadline } from "../../deps/std/async.ts"
+import * as path from "../../deps/std/path.ts"
+import { copy } from "../../deps/std/streams.ts"
 import { Network } from "../../deps/zombienet/orchestrator.ts"
 import { Env, PathInfo } from "../../server/mod.ts"
 import { PermanentMemo, splitLast } from "../../util/mod.ts"
@@ -8,7 +9,7 @@ import { FrameProxyProvider } from "./FrameProxyProvider.ts"
 
 export interface ZombienetProviderProps {
   zombienetPath?: string
-  additional?: string[]
+  timeout?: number
 }
 
 const defaultZombienetPaths: Record<string, string | undefined> = {
@@ -19,9 +20,9 @@ const defaultZombienetPaths: Record<string, string | undefined> = {
 export class ZombienetProvider extends FrameProxyProvider {
   providerId = "zombienet"
   zombienetPath
-  additional
+  timeout
 
-  constructor(env: Env, { zombienetPath, additional }: ZombienetProviderProps = {}) {
+  constructor(env: Env, { zombienetPath, timeout }: ZombienetProviderProps = {}) {
     super(env)
     zombienetPath ??= defaultZombienetPaths[Deno.build.os]
     if (!zombienetPath) {
@@ -30,7 +31,7 @@ export class ZombienetProvider extends FrameProxyProvider {
       )
     }
     this.zombienetPath = zombienetPath
-    this.additional = additional ?? []
+    this.timeout = timeout ?? 2 * 60 * 1000
   }
 
   urlMemo = new PermanentMemo<string, string>()
@@ -57,7 +58,26 @@ export class ZombienetProvider extends FrameProxyProvider {
   zombienetMemo = new PermanentMemo<string, Network>()
   zombienet(configPath: string): Promise<Network> {
     return this.zombienetMemo.run(configPath, async () => {
-      const tmpDir = Deno.makeTempDirSync({ prefix: `capi_zombienet_` })
+      const tmpDir = await Deno.realPath(await Deno.makeTempDir({ prefix: `capi_zombienet_` }))
+      const watcher = Deno.watchFs(tmpDir)
+      let watcherClosed = false
+      const closeWatcher = () => {
+        if (!watcherClosed) return
+        watcherClosed = true
+        watcher.close()
+      }
+      const networkManifestPath = path.join(tmpDir, "zombie.json")
+      const configPending = deadline(
+        (async () => {
+          for await (const e of watcher) {
+            if (e.kind === "create" && e.paths.includes(networkManifestPath)) {
+              return JSON.parse(await Deno.readTextFile(networkManifestPath)) as Network
+            }
+          }
+          return
+        })(),
+        this.timeout,
+      ).finally(closeWatcher)
       const cmd: string[] = [
         this.zombienetPath,
         "-p",
@@ -67,42 +87,30 @@ export class ZombienetProvider extends FrameProxyProvider {
         "-f",
         "spawn",
         configPath,
-        ...this.additional,
       ]
       const process = Deno.run({
         cmd,
         stdout: "piped",
         stderr: "piped",
       })
-      this.env.signal.addEventListener("abort", async () => {
-        process.kill("SIGINT")
-        await process.status()
+      let closeProcess = () => {
+        closeProcess = () => {}
+        process.kill()
         process.close()
+      }
+      this.env.signal.addEventListener("abort", async () => {
+        closeWatcher()
+        closeProcess()
         await Deno.remove(tmpDir, { recursive: true })
       })
-      const out = new Buffer()
       const maybeConfig = await Promise.race([
-        (async () => {
-          const encoder = new TextEncoder()
-          // TODO: utilize Deno.watchFs to observe `${networkFilesPath}/zombie.json`
-          for await (const line of readLines(process.stdout)) {
-            await writeAll(out, encoder.encode(line))
-            if (line.includes("Network launched")) {
-              process.stdout.close()
-              return JSON.parse(await Deno.readTextFile(`${tmpDir}/zombie.json`)) as Network
-            }
-          }
-          return 0
-        })(),
-        copy(process.stderr, out),
+        configPending,
+        process.status().then(() => undefined),
       ])
-      if (typeof maybeConfig === "number") {
-        for await (const line of readLines(out)) {
-          console.log(line)
-        }
-        throw new Error("Zombienet exited without launching network")
-      }
-      return maybeConfig
+      if (maybeConfig) return maybeConfig
+      await copy(process.stderr, Deno.stderr)
+      closeProcess()
+      throw new Error("Zombienet exited without launching network")
     })
   }
 }
