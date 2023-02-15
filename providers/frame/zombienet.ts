@@ -68,7 +68,7 @@ export class ZombienetProvider extends FrameProxyProvider {
       const configPending = deadline(
         (async () => {
           for await (const e of watcher) {
-            if (e.kind === "create" && e.paths.some((path) => path.endsWith(networkManifestPath))) {
+            if (e.kind === "create" && e.paths.includes(networkManifestPath)) {
               return JSON.parse(await Deno.readTextFile(networkManifestPath)) as Network
             }
           }
