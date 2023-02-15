@@ -21,7 +21,7 @@ await Deno.writeTextFile(dest, generated)
 
 const data: Data = JSON.parse(
   new TextDecoder().decode(
-    await Deno.run({ cmd: ["deno", "info", "-r", "--json", "target/star.ts"], stdout: "piped" })
+    await Deno.run({ cmd: ["deno", "info", "--json", "target/star.ts"], stdout: "piped" })
       .output(),
   ),
 )

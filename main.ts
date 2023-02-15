@@ -78,6 +78,5 @@ async function after() {
     const status = await process.status()
     self.addEventListener("unload", () => Deno.exit(status.code))
     controller.abort()
-    console.log({ resources: Deno.resources() })
   }
 }
