@@ -15,7 +15,7 @@ const root = Rune.rec({
 })
 
 let i = 0
-for await (const values of root.watch()) {
+for await (const values of root.iter()) {
   console.log(values)
   if (++i === 3) break
 }
