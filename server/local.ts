@@ -24,7 +24,7 @@ export function handler(env: Env): Handler {
         } catch (e) {
           if (e instanceof Response) return e
           const eText = Deno.inspect(e)
-          env.dbg && console.error(eText)
+          if (env.dbg) console.error(eText)
           return f.serverError(eText)
         }
       }
