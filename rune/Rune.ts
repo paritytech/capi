@@ -63,13 +63,13 @@ export class Rune<out T, out U = never> {
   }
 
   async run(batch = new Batch()): Promise<T> {
-    for await (const value of this.watch(batch)) {
+    for await (const value of this.iter(batch)) {
       return value
     }
     throw new Error("Rune did not yield any values")
   }
 
-  async *watch(batch = new Batch()) {
+  async *iter(batch = new Batch()) {
     const abortController = new AbortController()
     const primed = batch.prime(this, abortController.signal)
     let time = 0

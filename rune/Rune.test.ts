@@ -38,7 +38,7 @@ const count = Rune.asyncIter(() => iter([1, 2, 3]))
 
 Deno.test("stream", async () => {
   assertEquals(await count.run(), 1)
-  assertEquals(await _collect(count.watch()), [1, 2, 3])
+  assertEquals(await _collect(count.iter()), [1, 2, 3])
   assertEquals(await count.collect().run(), [1, 2, 3])
   assertEquals(await count.map((x) => x + "").collect().run(), ["1", "2", "3"])
 

@@ -85,7 +85,7 @@ const ay = a.map((value) => delay(500).then(() => `${value}.y`)) // a0.y, a1.y, 
 const az = Rune.tuple([ax, ay])
 
 const start = Date.now()
-for await (const value of az.watch()) {
+for await (const value of az.iter()) {
   console.log(Date.now() - start, value)
 }
 
@@ -311,7 +311,7 @@ const bc = Rune.tuple([b, c])
 const allTogetherNow = Rune.tuple([ab, bc])
 
 const start = Date.now()
-for await (const value of allTogetherNow.watch()) {
+for await (const value of allTogetherNow.iter()) {
   console.log(Date.now() - start, value)
 }
 
