@@ -93,10 +93,8 @@ export class ZombienetProvider extends FrameProxyProvider {
         stdout: "piped",
         stderr: "piped",
       })
-      let processClosed = false
-      const closeProcess = () => {
-        if (processClosed) return
-        processClosed = true
+      let closeProcess = () => {
+        closeProcess = () => {}
         process.kill()
         process.close()
       }
