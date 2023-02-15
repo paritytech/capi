@@ -104,8 +104,7 @@ export class Rune<out T, out U = never> {
       .map(([strings, ...values]) =>
         strings
           .map((templateString, i) => {
-            const value = values[i]
-            return value !== undefined ? `${templateString}${value}` : templateString
+            return i < values.length ? `${templateString}${values[i]}` : templateString
           })
           .join("")
       )
