@@ -15,14 +15,9 @@ export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
   }
 
   logStatus<X>(...prefix: RunicArgs<X, unknown[]>): ExtrinsicStatusRune<U1, U2, C> {
-    return Rune
-      .tuple([this.into(ValueRune), Rune.tuple(prefix).lazy()])
-      .map(([rune, prefix]) =>
-        rune.into(ValueRune).map((value) => {
-          console.log(...prefix, value)
-          return value
-        })
-      )
+    return this
+      .into(ValueRune)
+      .map((rune) => rune.into(ValueRune).log(...prefix))
       .into(ExtrinsicStatusRune, this.extrinsic)
   }
 
