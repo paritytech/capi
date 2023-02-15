@@ -66,7 +66,7 @@ export class ZombienetProvider extends FrameProxyProvider {
         watcherClosed = true
         watcher.close()
       }
-      const networkManifestPath = path.join(tmpDir, "zombie.json")
+      const networkManifestPath = await Deno.realPath(path.join(tmpDir, "zombie.json"))
       const configPending = deadline(
         (async () => {
           for await (const e of watcher) {
