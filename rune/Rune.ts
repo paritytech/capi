@@ -123,6 +123,21 @@ export class Rune<out T, out U = never> {
     })
   }
 
+  static str<X, T extends TemplateStringsArray, R extends unknown[]>(
+    ...args: RunicArgs<X, [T, ...R]>
+  ) {
+    return Rune
+      .tuple(args)
+      .map(([strings, ...values]) =>
+        strings
+          .map((templateString, i) => {
+            const value = values[i]
+            return value !== undefined ? `${templateString}${value}` : templateString
+          })
+          .join("")
+      )
+  }
+
   static captureUnhandled<R extends unknown[], T2, U2>(
     sources: [...R],
     fn: (

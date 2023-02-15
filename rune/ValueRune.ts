@@ -1,5 +1,5 @@
 import { PromiseOr } from "../util/types.ts"
-import { Batch, Run, Rune, Unhandled } from "./Rune.ts"
+import { Batch, Run, Rune, RunicArgs, Unhandled } from "./Rune.ts"
 import { Receipt } from "./Timeline.ts"
 
 type NonIndexSignatureKeys<T> = T extends T ? keyof {
@@ -115,8 +115,15 @@ export class ValueRune<out T, out U = never> extends Rune<T, U> {
     return ValueRune.new(RunSingular, this)
   }
 
-  dbg(...prefix: unknown[]) {
-    return this.map((value) => {
+  dbg<X>(...prefix: RunicArgs<X, unknown[]>) {
+    return Rune.tuple([this, ...prefix]).map(([value, ...prefix]) => {
+      console.log(...prefix, value)
+      return value
+    })
+  }
+
+  log<X>(...prefix: RunicArgs<X, unknown[]>) {
+    return Rune.tuple([this, ...prefix]).map(([value, ...prefix]) => {
       console.log(...prefix, value)
       return value
     })
