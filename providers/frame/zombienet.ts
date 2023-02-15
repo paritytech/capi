@@ -9,7 +9,6 @@ import { FrameProxyProvider } from "./FrameProxyProvider.ts"
 
 export interface ZombienetProviderProps {
   zombienetPath?: string
-  additional?: string[]
   timeout?: number
 }
 
@@ -21,10 +20,9 @@ const defaultZombienetPaths: Record<string, string | undefined> = {
 export class ZombienetProvider extends FrameProxyProvider {
   providerId = "zombienet"
   zombienetPath
-  additional
   timeout
 
-  constructor(env: Env, { zombienetPath, additional, timeout }: ZombienetProviderProps = {}) {
+  constructor(env: Env, { zombienetPath, timeout }: ZombienetProviderProps = {}) {
     super(env)
     zombienetPath ??= defaultZombienetPaths[Deno.build.os]
     if (!zombienetPath) {
@@ -33,7 +31,6 @@ export class ZombienetProvider extends FrameProxyProvider {
       )
     }
     this.zombienetPath = zombienetPath
-    this.additional = additional ?? []
     this.timeout = timeout ?? 2 * 60 * 1000
   }
 
@@ -90,7 +87,6 @@ export class ZombienetProvider extends FrameProxyProvider {
         "-f",
         "spawn",
         configPath,
-        ...this.additional,
       ]
       const process = Deno.run({
         cmd,
@@ -115,6 +111,7 @@ export class ZombienetProvider extends FrameProxyProvider {
       ])
       if (maybeConfig) return maybeConfig
       await copy(process.stderr, Deno.stderr)
+      closeProcess()
       throw new Error("Zombienet exited without launching network")
     })
   }
