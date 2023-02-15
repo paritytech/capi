@@ -40,9 +40,8 @@ export class PolkadotDevProvider extends FrameProxyProvider {
         stdout: "piped",
         stderr: "piped",
       })
-      this.env.signal.addEventListener("abort", async () => {
-        process.kill("SIGINT")
-        await process.status()
+      this.env.signal.addEventListener("abort", () => {
+        process.kill()
         process.close()
       })
     } catch (_e) {

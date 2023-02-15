@@ -63,15 +63,17 @@ export class ZombienetProvider extends FrameProxyProvider {
     return this.zombienetMemo.run(configPath, async () => {
       const tmpDir = Deno.makeTempDirSync({ prefix: `capi_zombienet_` })
       const watcher = Deno.watchFs(tmpDir)
+      let watcherClosed = false
       const closeWatcher = () => {
-        if (typeof Deno.resources()[watcher.rid] === "number") watcher.close()
+        if (!watcherClosed) return
+        watcherClosed = true
+        watcher.close()
       }
       const networkManifestPath = path.join(tmpDir, "zombie.json")
       const configPending = deadline(
         (async () => {
           for await (const e of watcher) {
             if (e.kind === "create" && e.paths.some((path) => path.endsWith(networkManifestPath))) {
-              closeWatcher()
               return JSON.parse(await Deno.readTextFile(networkManifestPath)) as Network
             }
           }
@@ -95,10 +97,16 @@ export class ZombienetProvider extends FrameProxyProvider {
         stdout: "piped",
         stderr: "piped",
       })
+      let processClosed = false
+      const closeProcess = () => {
+        if (processClosed) return
+        processClosed = true
+        process.kill()
+        process.close()
+      }
       this.env.signal.addEventListener("abort", async () => {
         closeWatcher()
-        process.kill("SIGINT")
-        process.close()
+        closeProcess()
         await Deno.remove(tmpDir, { recursive: true })
       })
       const maybeConfig = await Promise.race([
