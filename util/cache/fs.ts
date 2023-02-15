@@ -14,7 +14,7 @@ export class FsCache extends CacheBase {
     } catch (e) {
       if (!(e instanceof Deno.errors.NotFound)) throw e
       const content = await init()
-      await fs.ensureFile(file)
+      await fs.ensureDir(path.dirname(file))
       await Deno.writeFile(file, content)
       return content
     }
