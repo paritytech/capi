@@ -1,5 +1,5 @@
 import { known } from "../rpc/mod.ts"
-import { MetaRune, Rune, ValueRune } from "../rune/mod.ts"
+import { MetaRune, Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { BlockRune } from "./BlockRune.ts"
 import { Chain } from "./ClientRune.ts"
 import { SignedExtrinsicRune } from "./SignedExtrinsicRune.ts"
@@ -14,10 +14,10 @@ export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
     super(_prime)
   }
 
-  logStatus(...prefix: unknown[]): ExtrinsicStatusRune<U1, U2, C> {
+  logStatus<X>(...prefix: RunicArgs<X, unknown[]>): ExtrinsicStatusRune<U1, U2, C> {
     return Rune
-      .tuple([this.into(ValueRune), ...prefix])
-      .map(([rune, ...prefix]) =>
+      .tuple([this.into(ValueRune), Rune.tuple(prefix).lazy()])
+      .map(([rune, prefix]) =>
         rune.into(ValueRune).map((value) => {
           console.log(...prefix, value)
           return value
