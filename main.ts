@@ -14,7 +14,6 @@ const { help, dbg, port, "--": cmd, out } = flags.parse(Deno.args, {
     out: "target/capi",
   },
   alias: {
-    v: "verbose",
     h: "help",
   },
   "--": true,
