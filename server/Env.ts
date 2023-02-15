@@ -20,7 +20,7 @@ export class Env {
     this.href = href
     this.signal = signal
     this.cache = cache
-    this.dbg = dbg
+    this.dbg = dbg ?? false
     for (const factory of providerFactories) {
       const provider = factory(this)
       const { generatorId, providerId } = provider
