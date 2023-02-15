@@ -69,7 +69,6 @@ export abstract class FrameProxyProvider extends FrameProvider {
     const url = this.staticUrl(pathInfo)
     return new File(`
       import * as C from "./capi.ts"
-
       import type { Chain } from "./mod.ts"
 
       export const discoveryValue = "${url}"
