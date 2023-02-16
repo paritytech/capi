@@ -1,5 +1,5 @@
-import { getOrInit, SignalBearer } from "../util/mod.ts"
-import { RpcHandler, RpcMessageId } from "./rpc_messages.ts"
+import { getOrInit, SignalBearer } from "../../util/mod.ts"
+import { RpcHandler, RpcMessageId } from "../rpc_messages.ts"
 
 export class RpcProvider<D, I = any> {
   conns = new Map<D, RpcConn<I>>()

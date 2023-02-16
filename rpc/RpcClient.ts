@@ -1,5 +1,6 @@
 import { Deferred, deferred } from "../deps/std/async.ts"
 import { SignalBearer } from "../util/mod.ts"
+import { RpcProvider } from "./provider/base.ts"
 import {
   RpcErrorMessage,
   RpcErrorMessageData,
@@ -9,7 +10,6 @@ import {
   RpcNotificationMessage,
   RpcOkMessage,
 } from "./rpc_messages.ts"
-import { RpcProvider } from "./RpcProvider.ts"
 
 export class RpcClient<D> {
   conn
@@ -66,6 +66,7 @@ export class RpcClient<D> {
     conn.send(subscribeId, subscribe, params)
   }
 
+  // TODO: error handling
   handler = (message: RpcIngressMessage) => {
     if (typeof message.id === "number") {
       const callResultPending = this.callResultPendings[message.id]

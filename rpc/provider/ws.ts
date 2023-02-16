@@ -1,6 +1,6 @@
-import { RpcClientError } from "./errors.ts"
-import { RpcEgressMessage, RpcMessageId } from "./rpc_messages.ts"
-import { RpcConn, RpcProvider } from "./RpcProvider.ts"
+import { RpcClientError } from "../errors.ts"
+import { RpcEgressMessage, RpcMessageId } from "../rpc_messages.ts"
+import { RpcConn, RpcProvider } from "./base.ts"
 
 export const wsRpcProvider = new RpcProvider((discovery: string) => new WsRpcConn(discovery))
 

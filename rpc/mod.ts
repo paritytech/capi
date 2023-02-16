@@ -1,6 +1,8 @@
-export * from "./errors.ts"
 export * as known from "./known/mod.ts"
+
+// moderate --exclude known
+
+export * from "./errors.ts"
+export * from "./provider/mod.ts"
 export * from "./rpc_messages.ts"
 export * from "./RpcClient.ts"
-export * from "./RpcProvider.ts"
-export * from "./wsRpcProvider.ts"
