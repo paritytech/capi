@@ -1,12 +1,13 @@
 import { getOrInit, SignalBearer } from "../util/mod.ts"
-import { RpcEgressMessage, RpcHandler, RpcMessageId } from "./rpc_messages.ts"
-import { RpcClientError } from "./RpcClientError.ts"
+import { RpcHandler, RpcMessageId } from "./rpc_messages.ts"
 
-export class WsRpcProvider {
-  conns = new Map<string, WsRpcConn>()
+export class RpcProvider<D, I = any> {
+  conns = new Map<D, RpcConn<I>>()
 
-  ref(discovery: string, handler: RpcHandler, { signal }: SignalBearer) {
-    const conn = getOrInit(this.conns, discovery, () => new WsRpcConn(discovery))
+  constructor(readonly init: (discovery: D) => RpcConn<I>) {}
+
+  ref(discovery: D, handler: RpcHandler, { signal }: SignalBearer) {
+    const conn = getOrInit(this.conns, discovery, () => this.init(discovery))
     const references = conn.references.get(handler)
     if (!references) conn.references.set(handler, 1)
     else conn.references.set(handler, references + 1)
@@ -25,64 +26,13 @@ export class WsRpcProvider {
   }
 }
 
-export const wsRpcProvider = new WsRpcProvider()
-
-export class WsRpcConn {
+export abstract class RpcConn<I> {
   currentId = 0
   references = new Map<RpcHandler, number>()
-  inner
 
-  constructor(readonly discovery: string) {
-    this.inner = new WebSocket(discovery)
-    this.inner.addEventListener("message", (e) => {
-      const message = JSON.parse(e.data)
-      for (const reference of this.references.keys()) reference(message)
-    })
-  }
+  abstract inner: I
 
-  close() {
-    this.inner.close()
-  }
-
-  send(id: RpcMessageId, method: string, params: unknown[]) {
-    const message: RpcEgressMessage = {
-      jsonrpc: "2.0",
-      id,
-      method,
-      params,
-    }
-    this.inner.send(JSON.stringify(message))
-  }
-
-  async ready() {
-    switch (this.inner.readyState) {
-      case WebSocket.OPEN:
-        return
-      case WebSocket.CONNECTING: {
-        try {
-          return await new Promise<void>((resolve, reject) => {
-            const controller = new AbortController()
-            this.inner.addEventListener("open", () => {
-              controller.abort()
-              resolve()
-            }, controller)
-            this.inner.addEventListener("close", () => {
-              controller.abort()
-              reject()
-            }, controller)
-            this.inner.addEventListener("error", () => {
-              controller.abort()
-              reject()
-            }, controller)
-          })
-        } catch (_e) {
-          throw new RpcClientError()
-        }
-      }
-      case WebSocket.CLOSING:
-      case WebSocket.CLOSED: {
-        throw new RpcClientError()
-      }
-    }
-  }
+  abstract close(): void
+  abstract send(id: RpcMessageId, method: string, params: unknown): void
+  abstract ready(): Promise<void>
 }

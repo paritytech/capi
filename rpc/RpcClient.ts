@@ -9,12 +9,12 @@ import {
   RpcNotificationMessage,
   RpcOkMessage,
 } from "./rpc_messages.ts"
-import { WsRpcProvider } from "./RpcProvider.ts"
+import { RpcProvider } from "./RpcProvider.ts"
 
-export class RpcClient {
+export class RpcClient<D> {
   conn
 
-  constructor(readonly provider: WsRpcProvider, readonly discovery: string) {
+  constructor(readonly provider: RpcProvider<D>, readonly discovery: D) {
     this.conn = (controller: AbortController) =>
       this.provider.ref(discovery, this.handler, controller)
   }

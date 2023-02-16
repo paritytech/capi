@@ -1,37 +1,38 @@
 import {
   RpcClient,
   RpcClientError,
-  RpcErrorMessage,
+  RpcProvider,
+  RpcServerError,
   RpcSubscriptionMessage,
-  WsRpcProvider,
 } from "../rpc/mod.ts"
 import { Batch, MetaRune, Run, Rune, RunicArgs, RunStream } from "../rune/mod.ts"
 import { ClientRune } from "./ClientRune.ts"
 
-class RunRpcClient extends Run<RpcClient, never> {
+class RunRpcClient<D> extends Run<RpcClient<D>, never> {
   constructor(
     ctx: Batch,
-    readonly provider: WsRpcProvider,
-    readonly discoveryValue: string,
+    readonly provider: RpcProvider<D>,
+    readonly discoveryValue: D,
   ) {
     super(ctx)
   }
 
-  client?: RpcClient
-  async _evaluate(): Promise<RpcClient> {
+  client?: RpcClient<D>
+  async _evaluate(): Promise<RpcClient<D>> {
     return this.client ??= new RpcClient(this.provider, this.discoveryValue)
   }
 }
 
-export function rpcClient(provider: WsRpcProvider, discoveryValue: string) {
-  return Rune.new(RunRpcClient, provider, discoveryValue).into(ClientRune)
+export function rpcClient<D>(provider: RpcProvider<D>, discoveryValue: D) {
+  return Rune.new(RunRpcClient<D>, provider, discoveryValue).into(ClientRune)
 }
 
-export function rpcCall<Params extends unknown[], Result>(method: string) {
-  return <X>(...args: RunicArgs<X, [client: RpcClient, ...params: Params]>) => {
-    return Rune.tuple(args)
+export function rpcCall<Params extends unknown[], OkData>(method: string) {
+  return <X>(...args: RunicArgs<X, [client: RpcClient<any>, ...params: Params]>) => {
+    return Rune
+      .tuple(args)
       .map(async ([client, ...params]) => {
-        const result = await client.call<Result>(method, params)
+        const result = await client.call<OkData>(method, params)
         if (result.error) throw new RpcServerError(result)
         return result.result
       })
@@ -39,16 +40,18 @@ export function rpcCall<Params extends unknown[], Result>(method: string) {
   }
 }
 
-class RunRpcSubscription extends RunStream<RpcSubscriptionMessage> {
+class RunRpcSubscription<NotificationData>
+  extends RunStream<RpcSubscriptionMessage<NotificationData>>
+{
   constructor(
     ctx: Batch,
-    client: RpcClient,
+    client: RpcClient<any>,
     params: unknown[],
     subscribeMethod: string,
     unsubscribeMethod: string,
   ) {
     super(ctx)
-    client.subscription(
+    client.subscription<NotificationData>(
       subscribeMethod,
       unsubscribeMethod,
       params,
@@ -58,36 +61,26 @@ class RunRpcSubscription extends RunStream<RpcSubscriptionMessage> {
   }
 }
 
-export function rpcSubscription<Params extends unknown[], Result>() {
+export function rpcSubscription<Params extends unknown[], NotificationData>() {
   return (subscribeMethod: string, unsubscribeMethod: string) => {
-    return <X>(...args: RunicArgs<X, [client: RpcClient, ...params: Params]>) => {
+    return <X>(...args: RunicArgs<X, [client: RpcClient<any>, ...params: Params]>) => {
       return Rune.tuple(args)
         .map(([client, ...params]) =>
-          Rune.new(RunRpcSubscription, client, params, subscribeMethod, unsubscribeMethod)
+          Rune.new(
+            RunRpcSubscription<NotificationData>,
+            client,
+            params,
+            subscribeMethod,
+            unsubscribeMethod,
+          )
         )
         .into(MetaRune)
         .flat()
         .map((event) => {
-          if (event instanceof Error) {
-            throw event
-          } else if (event.error) {
-            throw new RpcServerError(event)
-          }
-          return event.params.result as Result
+          if (event.error) throw new RpcServerError(event)
+          return event.params.result
         })
         .throws(RpcClientError, RpcServerError)
     }
-  }
-}
-
-export class RpcServerError extends Error {
-  override readonly name = "RpcServerError"
-  code
-  data
-
-  constructor({ error: { code, data, message } }: RpcErrorMessage) {
-    super(message)
-    this.code = code
-    this.data = data
   }
 }

@@ -15,7 +15,7 @@ export interface Chain<C = unknown, E extends Event = Event> {
   event: E
 }
 
-export class ClientRune<out U, out C extends Chain = Chain> extends Rune<RpcClient, U> {
+export class ClientRune<out U, out C extends Chain = Chain> extends Rune<RpcClient<any>, U> {
   latestBlock = this.block(chain.getBlockHash(
     this,
     chain

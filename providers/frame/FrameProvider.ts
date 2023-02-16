@@ -2,17 +2,17 @@ import { File, FrameCodegen } from "../../codegen/frame/mod.ts"
 import { posix as path } from "../../deps/std/path.ts"
 import { $metadata } from "../../frame_metadata/Metadata.ts"
 import { fromPrefixedHex } from "../../frame_metadata/mod.ts"
-import { RpcClient } from "../../rpc/mod.ts"
+import { RpcClient, RpcServerError } from "../../rpc/mod.ts"
 import { f, PathInfo, Provider } from "../../server/mod.ts"
 import { fromPathInfo } from "../../server/PathInfo.ts"
-import { throwIfError, WeakMemo } from "../../util/mod.ts"
+import { WeakMemo } from "../../util/mod.ts"
 
 export abstract class FrameProvider extends Provider {
   generatorId = "frame"
 
   codegenCtxsPending: Record<string, Promise<FrameCodegen>> = {}
 
-  abstract client(pathInfo: PathInfo): Promise<RpcClient>
+  abstract client(pathInfo: PathInfo): Promise<RpcClient<any>>
   abstract clientFile(pathInfo: PathInfo): Promise<File>
 
   async handle(request: Request, pathInfo: PathInfo): Promise<Response> {
@@ -83,9 +83,13 @@ export abstract class FrameProvider extends Provider {
     })
   }
 
-  async clientCall<R>(client: RpcClient, method: string, params: unknown[] = []): Promise<R> {
-    const result = throwIfError(await client.call(method, params))
-    if (result.error) throw new Error(result.error.message)
-    return result.result as R
+  async clientCall<OkData>(
+    client: RpcClient<any>,
+    method: string,
+    params: unknown[] = [],
+  ): Promise<OkData> {
+    const result = await client.call<OkData>(method, params)
+    if (result.error) throw new RpcServerError(result)
+    return result.result
   }
 }
