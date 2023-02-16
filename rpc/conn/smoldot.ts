@@ -1,8 +1,8 @@
 import { start } from "../../deps/smoldot.ts"
-import { Chain, Client, ClientOptions } from "../../deps/smoldot/client.d.ts"
+import { Client, ClientOptions } from "../../deps/smoldot/client.d.ts"
 import { deferred } from "../../deps/std/async.ts"
 import { RpcEgressMessage, RpcMessageId } from "../messages.ts"
-import { RpcConn, RpcProvider } from "./base.ts"
+import { RpcConn } from "./base.ts"
 
 // TODO: fix the many possible race conditions
 
@@ -11,14 +11,10 @@ export interface SmoldotDiscovery {
   parachainSpec?: string
 }
 
-export const smoldotRpcProvider = new RpcProvider((discovery: SmoldotDiscovery) =>
-  new SmoldotRpcConn(discovery)
-)
-
 let client: undefined | Client
 
-export class SmoldotRpcConn extends RpcConn<Promise<Chain>> {
-  inner
+export class SmoldotRpcConn extends RpcConn {
+  chainPending
   listening
   stopListening
 
@@ -37,14 +33,14 @@ export class SmoldotRpcConn extends RpcConn<Promise<Chain>> {
         chainSpec: discovery.relayChainSpec,
         disableJsonRpc: true,
       })
-      this.inner = (async () => {
+      this.chainPending = (async () => {
         return client.addChain({
           chainSpec: parachainSpec,
           potentialRelayChains: [await relayChain],
         })
       })()
     } else {
-      this.inner = client.addChain({ chainSpec: discovery.relayChainSpec })
+      this.chainPending = client.addChain({ chainSpec: discovery.relayChainSpec })
     }
     this.listening = deferred<void>()
     this.stopListening = () => this.listening.resolve()
@@ -52,7 +48,7 @@ export class SmoldotRpcConn extends RpcConn<Promise<Chain>> {
   }
 
   async startListening() {
-    const inner = await this.inner
+    const inner = await this.chainPending
     while (true) {
       try {
         const response = await Promise.race([
@@ -68,21 +64,14 @@ export class SmoldotRpcConn extends RpcConn<Promise<Chain>> {
 
   async close() {
     this.stopListening()
-    ;(await this.inner).remove()
+    ;(await this.chainPending).remove()
   }
 
   async send(id: RpcMessageId, method: string, params: unknown[]) {
-    const inner = await this.inner
-    const message: RpcEgressMessage = {
-      jsonrpc: "2.0",
-      id,
-      method,
-      params,
-    }
-    inner.sendJsonRpc(JSON.stringify(message))
+    ;(await this.chainPending).sendJsonRpc(RpcEgressMessage.fmt(id, method, params))
   }
 
   async ready() {
-    await this.inner
+    await this.chainPending
   }
 }

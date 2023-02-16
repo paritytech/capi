@@ -1,13 +1,14 @@
-import { getOrInit } from "../../util/mod.ts"
-import { RpcHandler, RpcMessageId } from "../messages.ts"
+import { getOrInit } from "../util/mod.ts"
+import { RpcConn, RpcConnCtor } from "./conn/mod.ts"
+import { RpcHandler } from "./messages.ts"
 
-export class RpcProvider<D, I = any> {
-  conns = new Map<D, RpcConn<I>>()
+export class ConnRefCounter<D> {
+  conns = new Map<D, RpcConn>()
 
-  constructor(readonly init: (discovery: D) => RpcConn<I>) {}
+  constructor(readonly connCtor: RpcConnCtor<D>) {}
 
   ref(discovery: D, handler: RpcHandler, signal: AbortSignal) {
-    const conn = getOrInit(this.conns, discovery, () => this.init(discovery))
+    const conn = getOrInit(this.conns, discovery, () => new this.connCtor(discovery))
     const references = conn.references.get(handler)
     if (!references) conn.references.set(handler, 1)
     else conn.references.set(handler, references + 1)
@@ -24,15 +25,4 @@ export class RpcProvider<D, I = any> {
     })
     return conn
   }
-}
-
-export abstract class RpcConn<I> {
-  currentId = 0
-  references = new Map<RpcHandler, number>()
-
-  abstract inner: I
-
-  abstract close(): void
-  abstract send(id: RpcMessageId, method: string, params: unknown): void
-  abstract ready(): Promise<void>
 }

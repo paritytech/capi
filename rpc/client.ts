@@ -1,4 +1,7 @@
 import { Deferred, deferred } from "../deps/std/async.ts"
+import { getOrInit } from "../util/mod.ts"
+import { RpcConnCtor } from "./conn/mod.ts"
+import { ConnRefCounter } from "./ConnRefCounter.ts"
 import {
   RpcErrorMessage,
   RpcErrorMessageData,
@@ -8,13 +11,15 @@ import {
   RpcNotificationMessage,
   RpcOkMessage,
 } from "./messages.ts"
-import { RpcProvider } from "./provider/base.ts"
+
+const connRefCounters = new WeakMap<RpcConnCtor<any>, ConnRefCounter<any>>()
 
 export class RpcClient<D> {
   conn
 
-  constructor(readonly provider: RpcProvider<D>, readonly discovery: D) {
-    this.conn = (signal: AbortSignal) => this.provider.ref(discovery, this.handler, signal)
+  constructor(readonly connCtor: RpcConnCtor<D>, readonly discovery: D) {
+    const connRefCounter = getOrInit(connRefCounters, connCtor, () => new ConnRefCounter(connCtor))
+    this.conn = (signal: AbortSignal) => connRefCounter.ref(discovery, this.handler, signal)
   }
 
   callResultPendings: Record<RpcMessageId, Deferred<RpcCallMessage>> = {}

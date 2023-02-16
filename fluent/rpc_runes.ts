@@ -1,7 +1,7 @@
 import {
   RpcClient,
   RpcClientError,
-  RpcProvider,
+  RpcConnCtor,
   RpcServerError,
   RpcSubscriptionMessage,
 } from "../rpc/mod.ts"
@@ -11,7 +11,7 @@ import { ClientRune } from "./ClientRune.ts"
 class RunRpcClient<D> extends Run<RpcClient<D>, never> {
   constructor(
     ctx: Batch,
-    readonly provider: RpcProvider<D>,
+    readonly connCtor: RpcConnCtor<D>,
     readonly discoveryValue: D,
   ) {
     super(ctx)
@@ -19,12 +19,12 @@ class RunRpcClient<D> extends Run<RpcClient<D>, never> {
 
   client?: RpcClient<D>
   async _evaluate(): Promise<RpcClient<D>> {
-    return this.client ??= new RpcClient(this.provider, this.discoveryValue)
+    return this.client ??= new RpcClient(this.connCtor, this.discoveryValue)
   }
 }
 
-export function rpcClient<D>(provider: RpcProvider<D>, discoveryValue: D) {
-  return Rune.new(RunRpcClient<D>, provider, discoveryValue).into(ClientRune)
+export function rpcClient<D>(connCtor: RpcConnCtor<D>, discoveryValue: D) {
+  return Rune.new(RunRpcClient<D>, connCtor, discoveryValue).into(ClientRune)
 }
 
 export function rpcCall<Params extends unknown[], OkData>(method: string) {

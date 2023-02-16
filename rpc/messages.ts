@@ -2,6 +2,17 @@ export interface RpcEgressMessage extends RpcVersionBearer, RpcMessageIdBearer {
   method: string
   params: any[]
 }
+export namespace RpcEgressMessage {
+  export function fmt(id: RpcMessageId, method: string, params: unknown[]) {
+    const message: RpcEgressMessage = {
+      jsonrpc: "2.0",
+      id,
+      method,
+      params,
+    }
+    return JSON.stringify(message)
+  }
+}
 
 export type RpcHandler<Message extends RpcIngressMessage = RpcIngressMessage> = (
   message: Message,

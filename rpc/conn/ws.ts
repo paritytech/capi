@@ -1,10 +1,8 @@
 import { RpcClientError } from "../errors.ts"
 import { RpcEgressMessage, RpcMessageId } from "../messages.ts"
-import { RpcConn, RpcProvider } from "./base.ts"
+import { RpcConn } from "./base.ts"
 
-export const wsRpcProvider = new RpcProvider((discovery: string) => new WsRpcConn(discovery))
-
-export class WsRpcConn extends RpcConn<WebSocket> {
+export class WsRpcConn extends RpcConn {
   inner
 
   constructor(readonly discovery: string) {
@@ -21,13 +19,7 @@ export class WsRpcConn extends RpcConn<WebSocket> {
   }
 
   send(id: RpcMessageId, method: string, params: unknown[]) {
-    const message: RpcEgressMessage = {
-      jsonrpc: "2.0",
-      id,
-      method,
-      params,
-    }
-    this.inner.send(JSON.stringify(message))
+    this.inner.send(RpcEgressMessage.fmt(id, method, params))
   }
 
   async ready() {

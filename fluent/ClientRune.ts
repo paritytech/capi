@@ -15,6 +15,7 @@ export interface Chain<C = unknown, E extends Event = Event> {
   event: E
 }
 
+// TODO: do we want to represent the discovery value and conn type within the type system?
 export class ClientRune<out U, out C extends Chain = Chain> extends Rune<RpcClient<any>, U> {
   latestBlock = this.block(chain.getBlockHash(
     this,
