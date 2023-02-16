@@ -1,7 +1,7 @@
 import { start } from "../../deps/smoldot.ts"
 import { Chain, Client, ClientOptions } from "../../deps/smoldot/client.d.ts"
 import { deferred } from "../../deps/std/async.ts"
-import { RpcEgressMessage, RpcMessageId } from "../rpc_messages.ts"
+import { RpcEgressMessage, RpcMessageId } from "../messages.ts"
 import { RpcConn, RpcProvider } from "./base.ts"
 
 // TODO: fix the many possible race conditions
@@ -67,6 +67,7 @@ export class SmoldotRpcConn extends RpcConn<Promise<Chain>> {
   }
 
   async close() {
+    this.stopListening()
     ;(await this.inner).remove()
   }
 

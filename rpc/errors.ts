@@ -1,4 +1,4 @@
-import { RpcErrorMessage } from "./rpc_messages.ts"
+import { RpcErrorMessage } from "./messages.ts"
 
 export class RpcClientError extends Error {
   override readonly name = "RpcClientError"

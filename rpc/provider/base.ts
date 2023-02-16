@@ -1,12 +1,12 @@
-import { getOrInit, SignalBearer } from "../../util/mod.ts"
-import { RpcHandler, RpcMessageId } from "../rpc_messages.ts"
+import { getOrInit } from "../../util/mod.ts"
+import { RpcHandler, RpcMessageId } from "../messages.ts"
 
 export class RpcProvider<D, I = any> {
   conns = new Map<D, RpcConn<I>>()
 
   constructor(readonly init: (discovery: D) => RpcConn<I>) {}
 
-  ref(discovery: D, handler: RpcHandler, { signal }: SignalBearer) {
+  ref(discovery: D, handler: RpcHandler, signal: AbortSignal) {
     const conn = getOrInit(this.conns, discovery, () => this.init(discovery))
     const references = conn.references.get(handler)
     if (!references) conn.references.set(handler, 1)

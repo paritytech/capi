@@ -56,7 +56,7 @@ class RunRpcSubscription<NotificationData>
       unsubscribeMethod,
       params,
       (value) => this.push(value),
-      this,
+      this.signal,
     )
   }
 }

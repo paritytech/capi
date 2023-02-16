@@ -1,6 +1,4 @@
 import { Deferred, deferred } from "../deps/std/async.ts"
-import { SignalBearer } from "../util/mod.ts"
-import { RpcProvider } from "./provider/base.ts"
 import {
   RpcErrorMessage,
   RpcErrorMessageData,
@@ -9,14 +7,14 @@ import {
   RpcMessageId,
   RpcNotificationMessage,
   RpcOkMessage,
-} from "./rpc_messages.ts"
+} from "./messages.ts"
+import { RpcProvider } from "./provider/base.ts"
 
 export class RpcClient<D> {
   conn
 
   constructor(readonly provider: RpcProvider<D>, readonly discovery: D) {
-    this.conn = (controller: AbortController) =>
-      this.provider.ref(discovery, this.handler, controller)
+    this.conn = (signal: AbortSignal) => this.provider.ref(discovery, this.handler, signal)
   }
 
   callResultPendings: Record<RpcMessageId, Deferred<RpcCallMessage>> = {}
@@ -25,7 +23,7 @@ export class RpcClient<D> {
     params: unknown[],
   ) {
     const controller = new AbortController()
-    const conn = this.conn(controller)
+    const conn = this.conn(controller.signal)
     await conn.ready()
     const id = conn.currentId++
     const pending = deferred<RpcCallMessage<OkData, ErrorData>>()
@@ -47,10 +45,10 @@ export class RpcClient<D> {
     unsubscribe: string,
     params: unknown[],
     handler: RpcSubscriptionHandler<NotificationData, ErrorData>,
-    { signal }: SignalBearer,
+    signal: AbortSignal,
   ) {
     const providerController = new AbortController()
-    const conn = this.conn(providerController)
+    const conn = this.conn(providerController.signal)
     await conn.ready()
     const subscribeId = conn.currentId++
     this.subscriptionInitPendings[subscribeId] = handler as RpcSubscriptionHandler
