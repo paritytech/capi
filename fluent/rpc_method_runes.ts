@@ -10,7 +10,7 @@ export namespace state {
   export const getStorage = rpcCall<
     [key: known.StorageKey, at?: U.HexHash],
     known.StorageData | null
-  >("state_getStorage", true)
+  >("state_getStorage")
   export const subscribeStorage = rpcSubscription<
     [keys: known.StorageKey[]],
     known.StorageChangeSet

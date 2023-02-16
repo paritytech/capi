@@ -1,6 +1,6 @@
 import { File } from "../../codegen/frame/mod.ts"
 import { deferred } from "../../deps/std/async.ts"
-import { Client, proxyProvider } from "../../rpc/mod.ts"
+import { RpcClient, wsRpcProvider } from "../../rpc/mod.ts"
 import { PathInfo } from "../../server/mod.ts"
 import { fromPathInfo } from "../../server/PathInfo.ts"
 import { FrameProvider } from "./FrameProvider.ts"
@@ -60,10 +60,7 @@ export abstract class FrameProxyProvider extends FrameProvider {
   }
 
   async client(pathInfo: PathInfo) {
-    const url = await this.dynamicUrl(pathInfo)
-    const client = new Client(proxyProvider, url)
-    this.env.signal.addEventListener("abort", client.discard)
-    return client
+    return new RpcClient(wsRpcProvider, await this.dynamicUrl(pathInfo))
   }
 
   async clientFile(pathInfo: PathInfo) {
@@ -74,9 +71,9 @@ export abstract class FrameProxyProvider extends FrameProvider {
 
       export const discoveryValue = "${url}"
 
-      export const client = C.rpcClient(C.rpc.proxyProvider, discoveryValue)["_asCodegen"]<Chain>()
+      export const client = C.rpcClient(C.wsRpcProvider, discoveryValue)["_asCodegen"]<Chain>()
 
-      export const rawClient = new C.rpc.Client(C.rpc.proxyProvider, discoveryValue)
+      export const rawClient = new C.RpcClient(C.wsRpcProvider, discoveryValue)
     `)
   }
 }

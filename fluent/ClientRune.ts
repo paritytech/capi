@@ -1,7 +1,7 @@
 import * as $ from "../deps/scale.ts"
 import * as M from "../frame_metadata/mod.ts"
 import { Event } from "../primitives/mod.ts"
-import * as rpc from "../rpc/mod.ts"
+import { RpcClient } from "../rpc/mod.ts"
 import { MetaRune, Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { HexHash } from "../util/mod.ts"
 import { BlockRune } from "./BlockRune.ts"
@@ -15,7 +15,7 @@ export interface Chain<C = unknown, E extends Event = Event> {
   event: E
 }
 
-export class ClientRune<out U, out C extends Chain = Chain> extends Rune<rpc.Client, U> {
+export class ClientRune<out U, out C extends Chain = Chain> extends Rune<RpcClient, U> {
   latestBlock = this.block(chain.getBlockHash(
     this,
     chain

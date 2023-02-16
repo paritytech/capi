@@ -1,85 +1,66 @@
-import * as rpc from "../rpc/mod.ts"
+import {
+  RpcClient,
+  RpcClientError,
+  RpcErrorMessage,
+  RpcSubscriptionMessage,
+  WsRpcProvider,
+} from "../rpc/mod.ts"
 import { Batch, MetaRune, Run, Rune, RunicArgs, RunStream } from "../rune/mod.ts"
 import { ClientRune } from "./ClientRune.ts"
 
-class RunRpcClient<DV, SED, HED, CED> extends Run<rpc.Client<DV, SED, HED, CED>, never> {
+class RunRpcClient extends Run<RpcClient, never> {
   constructor(
     ctx: Batch,
-    readonly provider: rpc.Provider<DV, SED, HED, CED>,
-    readonly discoveryValue: DV,
+    readonly provider: WsRpcProvider,
+    readonly discoveryValue: string,
   ) {
     super(ctx)
   }
 
-  client?: rpc.Client<DV, SED, HED, CED>
-  async _evaluate(): Promise<rpc.Client<DV, SED, HED, CED>> {
-    return this.client ??= new rpc.Client(this.provider, this.discoveryValue)
-  }
-
-  override async cleanup(): Promise<void> {
-    await this.client?.discard()
-    super.cleanup()
+  client?: RpcClient
+  async _evaluate(): Promise<RpcClient> {
+    return this.client ??= new RpcClient(this.provider, this.discoveryValue)
   }
 }
 
-export function rpcClient<
-  DiscoveryValue,
-  SendErrorData,
-  HandlerErrorData,
-  CloseErrorData,
->(
-  provider: rpc.Provider<DiscoveryValue, SendErrorData, HandlerErrorData, CloseErrorData>,
-  discoveryValue: DiscoveryValue,
-) {
+export function rpcClient(provider: WsRpcProvider, discoveryValue: string) {
   return Rune.new(RunRpcClient, provider, discoveryValue).into(ClientRune)
 }
 
-export function rpcCall<Params extends unknown[], Result>(
-  method: string,
-  _nonIdempotent?: boolean,
-) {
-  return <X>(...args: RunicArgs<X, [client: rpc.Client, ...params: Params]>) => {
+export function rpcCall<Params extends unknown[], Result>(method: string) {
+  return <X>(...args: RunicArgs<X, [client: RpcClient, ...params: Params]>) => {
     return Rune.tuple(args)
       .map(async ([client, ...params]) => {
-        // TODO: why do we need to explicitly type this / why is this not being inferred?
-        const id = client.providerRef.nextId()
-        const result = await client.call<Result>(id, method, params)
-        if (result instanceof Error) {
-          throw result
-        } else if (result.error) {
-          console.log(result)
-          throw new RpcServerError(result)
-        }
+        const result = await client.call<Result>(method, params)
+        if (result.error) throw new RpcServerError(result)
         return result.result
-      }).throws(rpc.ProviderSendError, rpc.ProviderHandlerError, RpcServerError)
+      })
+      .throws(RpcClientError, RpcServerError)
   }
 }
 
-class RunRpcSubscription extends RunStream<rpc.ClientSubscriptionEvent<string, any, any, any>> {
+class RunRpcSubscription extends RunStream<RpcSubscriptionMessage> {
   constructor(
     ctx: Batch,
-    client: rpc.Client,
+    client: RpcClient,
     params: unknown[],
     subscribeMethod: string,
     unsubscribeMethod: string,
   ) {
     super(ctx)
-    client.subscriptionFactory()(
+    client.subscription(
       subscribeMethod,
       unsubscribeMethod,
       params,
       (value) => this.push(value),
-      this.signal,
+      this,
     )
   }
 }
 
 export function rpcSubscription<Params extends unknown[], Result>() {
-  return (
-    subscribeMethod: string,
-    unsubscribeMethod: string,
-  ) => {
-    return <X>(...args: RunicArgs<X, [client: rpc.Client, ...params: Params]>) => {
+  return (subscribeMethod: string, unsubscribeMethod: string) => {
+    return <X>(...args: RunicArgs<X, [client: RpcClient, ...params: Params]>) => {
       return Rune.tuple(args)
         .map(([client, ...params]) =>
           Rune.new(RunRpcSubscription, client, params, subscribeMethod, unsubscribeMethod)
@@ -93,15 +74,20 @@ export function rpcSubscription<Params extends unknown[], Result>() {
             throw new RpcServerError(event)
           }
           return event.params.result as Result
-        }).throws(rpc.ProviderSendError, rpc.ProviderHandlerError, RpcServerError)
+        })
+        .throws(RpcClientError, RpcServerError)
     }
   }
 }
 
 export class RpcServerError extends Error {
   override readonly name = "RpcServerError"
+  code
+  data
 
-  constructor(readonly inner: rpc.msg.ErrorMessage) {
-    super()
+  constructor({ error: { code, data, message } }: RpcErrorMessage) {
+    super(message)
+    this.code = code
+    this.data = data
   }
 }

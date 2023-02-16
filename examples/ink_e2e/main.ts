@@ -39,7 +39,7 @@ if (!address) {
 }
 console.log(`Contract address: ${address}`)
 
-const publicKey = AddressRune.from(address, client).publicKey()
+const publicKey = AddressRune.from(client, address).publicKey()
 console.log("Contract public key:", await publicKey.run())
 
 const contract = metadata.instance(client, publicKey)

@@ -1,4 +1,3 @@
-import { Client } from "../rpc/mod.ts"
 import { Rune, RunicArgs } from "../rune/mod.ts"
 import { ValueRune } from "../rune/ValueRune.ts"
 import { ss58 } from "../util/mod.ts"
@@ -10,7 +9,10 @@ export class AddressRune<out U, out C extends Chain = Chain> extends Rune<string
     super(_prime)
   }
 
-  static from<X>(...[address, client]: RunicArgs<X, [address: string, client: Client]>) {
+  static from<U, C extends Chain, X>(
+    client: ClientRune<U, C>,
+    ...[address]: RunicArgs<X, [address: string]>
+  ) {
     return Rune.resolve(address).into(AddressRune, Rune.resolve(client).into(ClientRune))
   }
 

@@ -34,12 +34,10 @@ Deno.writeTextFileSync(modFilePath, modFileContents, { create: true })
 
 await Promise.all(
   Object.entries(knownClients).map(async ([name, client]) => {
-    const r = await client.call(name, "state_getMetadata", [])
-    if (r instanceof Error) throw r
+    const r = await client.call<string>("state_getMetadata", [])
     if (r.error) throw new Error(r.error.message)
     const outPath = new URL(`_downloaded/${name}.scale`, outDir)
     console.log(`Downloading ${name} metadata to "${outPath}".`)
     await Deno.writeTextFile(outPath, r.result)
-    await client.discard()
   }),
 )
