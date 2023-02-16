@@ -96,6 +96,19 @@ export class Rune<out T, out U = never> {
     return value instanceof Rune ? value.into(ValueRune) : Rune.constant(value)
   }
 
+  static str<X>(strings: TemplateStringsArray, ..._values: RunicArgs<X, unknown[]>) {
+    const values = RunicArgs.resolve(_values)
+    return Rune
+      .tuple(values)
+      .map((values) =>
+        strings
+          .map((templateString, i) => {
+            return i < values.length ? `${templateString}${values[i]}` : templateString
+          })
+          .join("")
+      )
+  }
+
   static tuple<R extends unknown[]>(
     runes: [...R],
   ): ValueRune<{ [K in keyof R]: Rune.T<R[K]> }, Rune.U<R[number]>>
