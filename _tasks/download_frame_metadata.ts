@@ -2,6 +2,7 @@ import { rawClient as kusama } from "kusama/client.ts"
 import { rawClient as polkadot } from "polkadot/client.ts"
 import { rawClient as rococo } from "rococo/client.ts"
 import { rawClient as westend } from "westend/client.ts"
+import { RpcServerError } from "../rpc/mod.ts"
 
 const knownClients = { kusama, polkadot, westend, rococo }
 
@@ -34,10 +35,10 @@ Deno.writeTextFileSync(modFilePath, modFileContents, { create: true })
 
 await Promise.all(
   Object.entries(knownClients).map(async ([name, client]) => {
-    const r = await client.call<string>("state_getMetadata", [])
-    if (r.error) throw new Error(r.error.message)
+    const result = await client.call<string>("state_getMetadata", [])
+    if (result.error) throw new RpcServerError(result)
     const outPath = new URL(`_downloaded/${name}.scale`, outDir)
     console.log(`Downloading ${name} metadata to "${outPath}".`)
-    await Deno.writeTextFile(outPath, r.result)
+    await Deno.writeTextFile(outPath, result.result)
   }),
 )
