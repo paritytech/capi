@@ -1,3 +1,5 @@
+lxkf
+Tpeyg
 abortable
 acala
 ajun
@@ -36,9 +38,7 @@ codespaces
 combinators
 concat
 contextfree
-curto
 contramap
-counteds
 creds
 cummon
 curto
@@ -104,7 +104,6 @@ litentry
 lldb
 lparachain
 ltex
-Lxkf
 mathchain
 matklad
 merkle
@@ -201,7 +200,6 @@ tnkr
 todos
 tomaka
 tostring
-Tpeyg
 transcoders
 trufflehog
 trufflesecurity
