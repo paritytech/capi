@@ -14,11 +14,11 @@ export namespace RpcEgressMessage {
   }
 }
 
-export type RpcHandler<Message extends RpcIngressMessage = RpcIngressMessage> = (
-  message: Message,
-) => void
-
 export type RpcIngressMessage = RpcOkMessage | RpcErrorMessage | RpcNotificationMessage
+
+export type RpcHandler<Message extends RpcIngressMessage = RpcIngressMessage> = (
+  e: Message,
+) => void
 
 export interface RpcOkMessage<OkData = any> extends RpcVersionBearer, RpcMessageIdBearer {
   result: OkData
@@ -39,8 +39,10 @@ export interface RpcErrorMessageData<Code extends number = number, Data = any> {
   data: Data
 }
 
-export interface RpcNotificationMessage<NotificationData = any> extends RpcVersionBearer {
-  method: string // we could narrow, but it's not all that useful
+export interface RpcNotificationMessage<Method extends string = string, NotificationData = any>
+  extends RpcVersionBearer
+{
+  method: Method
   id?: never
   params: {
     subscription: string
@@ -58,4 +60,21 @@ interface RpcVersionBearer {
 export type RpcMessageId = number | string
 export interface RpcMessageIdBearer {
   id: RpcMessageId
+}
+
+export class RpcClientError extends Error {
+  override readonly name = "RpcClientError"
+}
+
+export class RpcServerError extends Error {
+  override readonly name = "RpcServerError"
+  code
+  data
+
+  // TODO: accept init `EgressMessage`?
+  constructor({ error: { code, data, message } }: RpcErrorMessage) {
+    super(message, { cause: message })
+    this.code = code
+    this.data = data
+  }
 }

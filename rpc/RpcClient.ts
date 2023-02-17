@@ -1,7 +1,7 @@
 import { Deferred, deferred } from "../deps/std/async.ts"
 import { getOrInit } from "../util/mod.ts"
 import { RpcConnCtor } from "./conn/mod.ts"
-import { ConnRefCounter } from "./ConnRefCounter.ts"
+import { ConnsRefCounter } from "./ConnsRefCounter.ts"
 import {
   RpcErrorMessage,
   RpcErrorMessageData,
@@ -10,16 +10,20 @@ import {
   RpcMessageId,
   RpcNotificationMessage,
   RpcOkMessage,
-} from "./messages.ts"
+} from "./rpc_common.ts"
 
-const connRefCounters = new WeakMap<RpcConnCtor<any>, ConnRefCounter<any>>()
+const connRefCounters = new WeakMap<RpcConnCtor<any>, ConnsRefCounter<any>>()
 
 export class RpcClient<D> {
   conn
 
-  constructor(readonly connCtor: RpcConnCtor<D>, readonly discovery: D) {
-    const connRefCounter = getOrInit(connRefCounters, connCtor, () => new ConnRefCounter(connCtor))
-    this.conn = (signal: AbortSignal) => connRefCounter.ref(discovery, this.handler, signal)
+  constructor(readonly connCtor: RpcConnCtor<D>, readonly discoveryValue: D) {
+    const connRefCounter = getOrInit(
+      connRefCounters,
+      connCtor,
+      () => new ConnsRefCounter(connCtor),
+    )
+    this.conn = (signal: AbortSignal) => connRefCounter.ref(discoveryValue, this.handler, signal)
   }
 
   callResultPendings: Record<RpcMessageId, Deferred<RpcCallMessage>> = {}
@@ -40,9 +44,9 @@ export class RpcClient<D> {
   }
 
   subscriptionInitPendings: Record<RpcMessageId, RpcSubscriptionHandler> = {}
-  subscriptions: Record<RpcMessageId, RpcSubscriptionHandler> = {}
+  subscriptionHandlers: Record<RpcMessageId, RpcSubscriptionHandler> = {}
   subscriptionIdByRpcMessageId: Record<RpcMessageId, string> = {}
-  async subscription<
+  subscription<
     NotificationData = unknown,
     ErrorData extends RpcErrorMessageData = RpcErrorMessageData,
   >(
@@ -52,21 +56,23 @@ export class RpcClient<D> {
     handler: RpcSubscriptionHandler<NotificationData, ErrorData>,
     signal: AbortSignal,
   ) {
-    const providerController = new AbortController()
-    const conn = this.conn(providerController.signal)
-    await conn.ready()
-    const subscribeId = conn.currentId++
-    this.subscriptionInitPendings[subscribeId] = handler as RpcSubscriptionHandler
-    signal.addEventListener("abort", () => {
-      delete this.subscriptionInitPendings[subscribeId]
-      const subscriptionId = this.subscriptionIdByRpcMessageId[subscribeId]
-      if (subscriptionId) {
-        delete this.subscriptionIdByRpcMessageId[subscribeId]
-        conn.send(conn.currentId++, unsubscribe, [subscriptionId])
-        providerController.abort()
-      }
-    })
-    conn.send(subscribeId, subscribe, params)
+    const controller = new AbortController()
+    const conn = this.conn(controller.signal)
+    ;(async () => {
+      await conn.ready()
+      const subscribeId = conn.currentId++
+      this.subscriptionInitPendings[subscribeId] = handler as RpcSubscriptionHandler
+      signal.addEventListener("abort", () => {
+        delete this.subscriptionInitPendings[subscribeId]
+        const subscriptionId = this.subscriptionIdByRpcMessageId[subscribeId]
+        if (subscriptionId) {
+          delete this.subscriptionIdByRpcMessageId[subscribeId]
+          conn.send(conn.currentId++, unsubscribe, [subscriptionId])
+          controller.abort()
+        }
+      })
+      conn.send(subscribeId, subscribe, params)
+    })()
   }
 
   // TODO: error handling
@@ -82,12 +88,13 @@ export class RpcClient<D> {
       if (subscriptionPending) {
         if (message.error) subscriptionPending(message)
         else {
-          this.subscriptions[message.result] = subscriptionPending
+          this.subscriptionHandlers[message.result] = subscriptionPending
           this.subscriptionIdByRpcMessageId[message.id] = message.result
         }
         delete this.subscriptionInitPendings[message.id]
       }
-    } else if (message.params) this.subscriptions[message.params.subscription]?.(message)
+    } else if (message.params) this.subscriptionHandlers[message.params.subscription]?.(message)
+    // TODO: log message about fallthrough if in `--dbg`
   }
 }
 
@@ -99,7 +106,7 @@ export type RpcCallMessage<
 export type RpcSubscriptionMessage<
   NotificationData = any,
   ErrorData extends RpcErrorMessageData = RpcErrorMessageData,
-> = RpcNotificationMessage<NotificationData> | RpcErrorMessage<ErrorData>
+> = RpcNotificationMessage<string, NotificationData> | RpcErrorMessage<ErrorData>
 
 export type RpcSubscriptionHandler<
   NotificationData = any,

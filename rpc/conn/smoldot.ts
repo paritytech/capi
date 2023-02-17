@@ -1,12 +1,12 @@
 import { start } from "../../deps/smoldot.ts"
 import { Client, ClientOptions } from "../../deps/smoldot/client.d.ts"
 import { deferred } from "../../deps/std/async.ts"
-import { RpcEgressMessage, RpcMessageId } from "../messages.ts"
+import { RpcEgressMessage, RpcMessageId } from "../rpc_common.ts"
 import { RpcConn } from "./base.ts"
 
 // TODO: fix the many possible race conditions
 
-export interface SmoldotDiscovery {
+export interface SmoldotRpcConnProps {
   relayChainSpec: string
   parachainSpec?: string
 }
@@ -18,7 +18,7 @@ export class SmoldotRpcConn extends RpcConn {
   listening
   stopListening
 
-  constructor(readonly discovery: SmoldotDiscovery) {
+  constructor(readonly props: SmoldotRpcConnProps) {
     super()
     if (!client) {
       client = start({
@@ -27,51 +27,50 @@ export class SmoldotRpcConn extends RpcConn {
         cpuRateLimit: .25,
       } as ClientOptions)
     }
-    if (discovery.parachainSpec) {
-      const { parachainSpec } = discovery
+    if (props.parachainSpec) {
       const relayChain = client.addChain({
-        chainSpec: discovery.relayChainSpec,
+        chainSpec: props.relayChainSpec,
         disableJsonRpc: true,
       })
+      const { parachainSpec } = props
       this.chainPending = (async () => {
         return client.addChain({
           chainSpec: parachainSpec,
           potentialRelayChains: [await relayChain],
         })
       })()
-    } else {
-      this.chainPending = client.addChain({ chainSpec: discovery.relayChainSpec })
-    }
+    } else this.chainPending = client.addChain({ chainSpec: props.relayChainSpec })
     this.listening = deferred<void>()
     this.stopListening = () => this.listening.resolve()
     this.startListening()
   }
 
   async startListening() {
-    const inner = await this.chainPending
+    const chain = await this.chainPending
     while (true) {
       try {
         const response = await Promise.race([
           this.listening,
-          inner.nextJsonRpcResponse(),
+          chain.nextJsonRpcResponse(),
         ])
         if (!response) break
         const message = JSON.parse(response)
-        for (const reference of this.references.keys()) reference(message)
+        for (const handler of this.handlerReferenceCount.keys()) handler(message)
       } catch (_e) {}
     }
   }
 
-  async close() {
-    this.stopListening()
-    ;(await this.chainPending).remove()
-  }
-
-  async send(id: RpcMessageId, method: string, params: unknown[]) {
-    ;(await this.chainPending).sendJsonRpc(RpcEgressMessage.fmt(id, method, params))
-  }
-
   async ready() {
     await this.chainPending
+  }
+
+  send(id: RpcMessageId, method: string, params: unknown[]) {
+    this.chainPending
+      .then((chain) => chain.sendJsonRpc(RpcEgressMessage.fmt(id, method, params)))
+  }
+
+  close() {
+    this.stopListening()
+    this.chainPending.then((chain) => chain.remove())
   }
 }

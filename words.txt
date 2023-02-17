@@ -36,11 +36,12 @@ codespaces
 combinators
 concat
 contextfree
+curto
 contramap
+counteds
 creds
 cummon
 curto
-Curto
 darwinia
 datahighway
 datetime

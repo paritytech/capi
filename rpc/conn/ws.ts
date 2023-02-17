@@ -1,44 +1,35 @@
-import { RpcClientError } from "../errors.ts"
-import { RpcEgressMessage, RpcMessageId } from "../messages.ts"
+import { RpcClientError, RpcEgressMessage, RpcMessageId } from "../rpc_common.ts"
 import { RpcConn } from "./base.ts"
 
 export class WsRpcConn extends RpcConn {
-  inner
+  chain
 
-  constructor(readonly discovery: string) {
+  constructor(readonly url: string) {
     super()
-    this.inner = new WebSocket(discovery)
-    this.inner.addEventListener("message", (e) => {
+    this.chain = new WebSocket(url)
+    this.chain.addEventListener("message", (e) => {
       const message = JSON.parse(e.data)
-      for (const reference of this.references.keys()) reference(message)
+      for (const handler of this.handlerReferenceCount.keys()) handler(message)
     })
   }
 
-  close() {
-    this.inner.close()
-  }
-
-  send(id: RpcMessageId, method: string, params: unknown[]) {
-    this.inner.send(RpcEgressMessage.fmt(id, method, params))
-  }
-
   async ready() {
-    switch (this.inner.readyState) {
+    switch (this.chain.readyState) {
       case WebSocket.OPEN:
         return
       case WebSocket.CONNECTING: {
         try {
           return await new Promise<void>((resolve, reject) => {
             const controller = new AbortController()
-            this.inner.addEventListener("open", () => {
+            this.chain.addEventListener("open", () => {
               controller.abort()
               resolve()
             }, controller)
-            this.inner.addEventListener("close", () => {
+            this.chain.addEventListener("close", () => {
               controller.abort()
               reject()
             }, controller)
-            this.inner.addEventListener("error", () => {
+            this.chain.addEventListener("error", () => {
               controller.abort()
               reject()
             }, controller)
@@ -52,5 +43,13 @@ export class WsRpcConn extends RpcConn {
         throw new RpcClientError()
       }
     }
+  }
+
+  send(id: RpcMessageId, method: string, params: unknown[]) {
+    this.chain.send(RpcEgressMessage.fmt(id, method, params))
+  }
+
+  close() {
+    this.chain.close()
   }
 }
