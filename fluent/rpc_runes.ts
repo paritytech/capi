@@ -40,8 +40,8 @@ export function rpcCall<Params extends unknown[], OkData>(method: string) {
   }
 }
 
-class RunRpcSubscription<NotificationData>
-  extends RunStream<RpcSubscriptionMessage<NotificationData>>
+class RunRpcSubscription<Method extends string, NotificationData>
+  extends RunStream<RpcSubscriptionMessage<Method, NotificationData>>
 {
   constructor(
     ctx: Batch,
@@ -51,7 +51,7 @@ class RunRpcSubscription<NotificationData>
     unsubscribeMethod: string,
   ) {
     super(ctx)
-    client.subscription<NotificationData>(
+    client.subscription<Method, NotificationData>(
       subscribeMethod,
       unsubscribeMethod,
       params,
@@ -62,12 +62,12 @@ class RunRpcSubscription<NotificationData>
 }
 
 export function rpcSubscription<Params extends unknown[], NotificationData>() {
-  return (subscribeMethod: string, unsubscribeMethod: string) => {
+  return <Method extends string>(subscribeMethod: Method, unsubscribeMethod: string) => {
     return <X>(...args: RunicArgs<X, [client: RpcClient<any>, ...params: Params]>) => {
       return Rune.tuple(args)
         .map(([client, ...params]) =>
           Rune.new(
-            RunRpcSubscription<NotificationData>,
+            RunRpcSubscription<Method, NotificationData>,
             client,
             params,
             subscribeMethod,

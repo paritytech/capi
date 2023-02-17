@@ -47,13 +47,14 @@ export class RpcClient<D> {
   subscriptionHandlers: Record<RpcMessageId, RpcSubscriptionHandler> = {}
   subscriptionIdByRpcMessageId: Record<RpcMessageId, string> = {}
   subscription<
+    Method extends string = string,
     NotificationData = unknown,
     ErrorData extends RpcErrorMessageData = RpcErrorMessageData,
   >(
     subscribe: string,
     unsubscribe: string,
     params: unknown[],
-    handler: RpcSubscriptionHandler<NotificationData, ErrorData>,
+    handler: RpcSubscriptionHandler<Method, NotificationData, ErrorData>,
     signal: AbortSignal,
   ) {
     const controller = new AbortController()
@@ -104,11 +105,13 @@ export type RpcCallMessage<
 > = RpcOkMessage<OkData> | RpcErrorMessage<ErrorData>
 
 export type RpcSubscriptionMessage<
+  Method extends string = string,
   NotificationData = any,
   ErrorData extends RpcErrorMessageData = RpcErrorMessageData,
-> = RpcNotificationMessage<string, NotificationData> | RpcErrorMessage<ErrorData>
+> = RpcNotificationMessage<Method, NotificationData> | RpcErrorMessage<ErrorData>
 
 export type RpcSubscriptionHandler<
+  Method extends string = string,
   NotificationData = any,
   ErrorData extends RpcErrorMessageData = RpcErrorMessageData,
-> = RpcHandler<RpcSubscriptionMessage<NotificationData, ErrorData>>
+> = RpcHandler<RpcSubscriptionMessage<Method, NotificationData, ErrorData>>
