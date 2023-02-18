@@ -22,9 +22,8 @@ await logBalances()
   .run()
 
 function logBalances() {
-  return Rune
-    .tuple(recipients.map(([name, { publicKey }]) => {
-      const free = System.Account.entry([publicKey]).access("data", "free")
-      return free.log(Rune.str`${name} balance:`)
-    }))
+  return Rune.tuple(recipients.map(([name, { publicKey }]) => {
+    const free = System.Account.entry([publicKey]).access("data", "free")
+    return free.log(Rune.str`${name} balance:`)
+  }))
 }
