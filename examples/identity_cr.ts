@@ -8,9 +8,7 @@ await Identity
   .setIdentity({
     info: transcoders.encode({
       display: "Chev Chelios",
-      additional: {
-        stars: 5,
-      },
+      additional: { stars: 5 },
     }),
   })
   .signed({ sender: alice })
