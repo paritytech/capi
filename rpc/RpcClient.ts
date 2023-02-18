@@ -23,7 +23,8 @@ export class RpcClient<D> {
       connCtor,
       () => new ConnsRefCounter(connCtor),
     )
-    this.conn = (signal: AbortSignal) => connRefCounter.ref(discoveryValue, this.handler, signal)
+    this.conn = (signal: AbortSignal) =>
+      connRefCounter.ref(discoveryValue, (e) => this.handler(e), signal)
   }
 
   callResultPendings: Record<RpcMessageId, Deferred<RpcCallMessage>> = {}
@@ -76,8 +77,7 @@ export class RpcClient<D> {
     })()
   }
 
-  // TODO: error handling
-  handler = (message: RpcIngressMessage) => {
+  handler(message: RpcIngressMessage) {
     if (typeof message.id === "number") {
       const callResultPending = this.callResultPendings[message.id]
       if (callResultPending) {
@@ -95,7 +95,7 @@ export class RpcClient<D> {
         delete this.subscriptionInitPendings[message.id]
       }
     } else if (message.params) this.subscriptionHandlers[message.params.subscription]?.(message)
-    // TODO: log message about fallthrough if in `--dbg`
+    else throw new Error(Deno.inspect(message)) // ... for now
   }
 }
 

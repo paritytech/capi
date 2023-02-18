@@ -7,9 +7,10 @@ export class WsRpcConn extends RpcConn {
   constructor(readonly url: string) {
     super()
     this.chain = new WebSocket(url)
-    this.chain.addEventListener("message", (e) => {
-      const message = JSON.parse(e.data)
-      for (const handler of this.handlerReferenceCount.keys()) handler(message)
+    this.chain.addEventListener("message", (e) => this.push(JSON.parse(e.data)))
+    this.chain.addEventListener("error", (e) => { // TODO: recovery
+      console.log(e)
+      Deno.exit(1)
     })
   }
 
@@ -25,14 +26,13 @@ export class WsRpcConn extends RpcConn {
               controller.abort()
               resolve()
             }, controller)
-            this.chain.addEventListener("close", () => {
+            this.chain.addEventListener("close", throw_, controller)
+            this.chain.addEventListener("error", throw_, controller)
+
+            function throw_() {
               controller.abort()
               reject()
-            }, controller)
-            this.chain.addEventListener("error", () => {
-              controller.abort()
-              reject()
-            }, controller)
+            }
           })
         } catch (_e) {
           throw new RpcClientError()

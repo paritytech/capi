@@ -17,7 +17,7 @@ export namespace RpcEgressMessage {
 export type RpcIngressMessage = RpcOkMessage | RpcErrorMessage | RpcNotificationMessage
 
 export type RpcHandler<Message extends RpcIngressMessage = RpcIngressMessage> = (
-  e: Message,
+  message: Message,
 ) => void
 
 export interface RpcOkMessage<OkData = any> extends RpcVersionBearer, RpcMessageIdBearer {

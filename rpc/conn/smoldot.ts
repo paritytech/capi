@@ -54,8 +54,7 @@ export class SmoldotRpcConn extends RpcConn {
           chain.nextJsonRpcResponse(),
         ])
         if (!response) break
-        const message = JSON.parse(response)
-        for (const handler of this.handlerReferenceCount.keys()) handler(message)
+        this.push(JSON.parse(response))
       } catch (_e) {}
     }
   }

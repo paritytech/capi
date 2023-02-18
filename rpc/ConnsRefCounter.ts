@@ -9,15 +9,15 @@ export class ConnsRefCounter<D> {
 
   ref(discoveryValue: D, handler: RpcHandler, signal: AbortSignal) {
     const conn = getOrInit(this.conns, discoveryValue, () => new this.connCtor(discoveryValue))
-    const references = conn.handlerReferenceCount.get(handler)
-    if (!references) conn.handlerReferenceCount.set(handler, 1)
-    else conn.handlerReferenceCount.set(handler, references + 1)
+    const references = conn.handlerReferenceCounts.get(handler)
+    if (!references) conn.handlerReferenceCounts.set(handler, 1)
+    else conn.handlerReferenceCounts.set(handler, references + 1)
     signal.addEventListener("abort", () => {
-      const references = conn.handlerReferenceCount.get(handler)!
-      conn.handlerReferenceCount.set(handler, references - 1)
+      const references = conn.handlerReferenceCounts.get(handler)!
+      conn.handlerReferenceCounts.set(handler, references - 1)
       if (references === 1) {
-        conn.handlerReferenceCount.delete(handler)
-        if (!conn.handlerReferenceCount.size) {
+        conn.handlerReferenceCounts.delete(handler)
+        if (!conn.handlerReferenceCounts.size) {
           this.conns.delete(discoveryValue)
           conn.close()
         }
