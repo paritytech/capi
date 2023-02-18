@@ -15,7 +15,7 @@ await aliceFree()
   .chain(() => aliceFree().log(msg("Alice", "after")))
   .run()
 
-function msg<X>(...[name, stage]: RunicArgs<X, [name: string, stage: "before" | "after"]>) {
+function msg<X>(...[name, stage]: RunicArgs<X, [name: string, when: "before" | "after"]>) {
   return Rune.str`${name} balance ${stage}:`
 }
 
