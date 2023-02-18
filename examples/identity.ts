@@ -1,4 +1,4 @@
-import { alice, Rune } from "capi"
+import { alice, CodecRune, Rune } from "capi"
 import { Identity } from "polkadot_dev/mod.ts"
 import { Data, IdentityInfo } from "polkadot_dev/types/pallet_identity/types.ts"
 import * as $ from "../deps/scale.ts"
@@ -25,13 +25,12 @@ await Identity
   .signed({ sender: alice })
   .sent()
   .logStatus()
-  .txEvents()
-  .log()
+  .finalized()
   .run()
 
-await Identity.IdentityOf
-  .entry([alice.publicKey])
-  .access("info", "display", "value")
-  .map((value) => $.str.decode(value))
+await Rune
+  .constant($.str)
+  .into(CodecRune)
+  .decoded(Identity.IdentityOf.entry([alice.publicKey]).access("info", "display", "value"))
   .log()
   .run()
