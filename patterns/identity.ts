@@ -14,7 +14,7 @@ export interface IdentityInfo<A extends Record<string, unknown>> {
   twitter?: string
 }
 
-export class IdentityInfoUtil<A extends Record<string, any>> {
+export class IdentityInfoTranscoders<A extends Record<string, any>> {
   constructor(readonly additionalCodecs?: { [K in keyof A]: $.Codec<A[K]> }) {}
 
   encode<X>(props: RunicArgs<X, IdentityInfo<A>>) {

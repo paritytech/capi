@@ -1,12 +1,12 @@
 import { $, alice } from "capi"
-import { IdentityInfoUtil } from "capi/patterns/identity.ts"
+import { IdentityInfoTranscoders } from "capi/patterns/identity.ts"
 import { Identity } from "polkadot_dev/mod.ts"
 
-const info = new IdentityInfoUtil({ stars: $.u8 })
+const t = new IdentityInfoTranscoders({ stars: $.u8 })
 
 await Identity
   .setIdentity({
-    info: info.encode({
+    info: t.encode({
       display: "Chev Chelios",
       additional: {
         stars: 5,
@@ -19,7 +19,7 @@ await Identity
   .finalized()
   .run()
 
-await info
+await t
   .decode(Identity.IdentityOf.entry([alice.publicKey]).access("info"))
   .log()
   .run()
