@@ -1,7 +1,6 @@
-import { alice } from "capi"
+import { $, alice } from "capi"
+import { IdentityInfoUtil } from "capi/patterns/identity.ts"
 import { Identity } from "polkadot_dev/mod.ts"
-import * as $ from "../deps/scale.ts"
-import { IdentityInfoUtil } from "../patterns/identity.ts"
 
 const info = new IdentityInfoUtil({ stars: $.u8 })
 
