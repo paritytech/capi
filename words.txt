@@ -26,6 +26,8 @@ cdylib
 chainspec
 chainspecs
 chainx
+chelios
+chev
 childstate
 cmds
 codegen
