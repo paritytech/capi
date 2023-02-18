@@ -1,6 +1,11 @@
 import * as flags from "./deps/std/flags.ts"
 import { serve } from "./deps/std/http.ts"
-import { PolkadotDevProvider, WssProvider, ZombienetProvider } from "./providers/frame/mod.ts"
+import {
+  PolkadotDevProvider,
+  ProjectProvider,
+  WssProvider,
+  ZombienetProvider,
+} from "./providers/frame/mod.ts"
 import { handler } from "./server/local.ts"
 import { Env } from "./server/mod.ts"
 import { FsCache } from "./util/cache/mod.ts"
@@ -39,6 +44,7 @@ const env = new Env({
     (env) => new WssProvider(env),
     (env) => new PolkadotDevProvider(env),
     (env) => new ZombienetProvider(env),
+    (env) => new ProjectProvider(env),
   ],
 })
 

@@ -19,7 +19,8 @@
     "examples/": {
       "capi": "http://localhost:4646/mod.ts",
       "capi/patterns/": "http://localhost:4646/patterns/",
-      "zombienet/": "http://localhost:4646/frame/zombienet/zombienets/"
+      "zombienet/": "http://localhost:4646/frame/zombienet/zombienets/",
+      "project/": "http://localhost:4646/frame/project/"
     }
   }
 }
