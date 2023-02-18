@@ -25,12 +25,7 @@ export class IdentityInfoTranscoders<A extends Record<string, any>> {
         .map((additional) =>
           Object
             .entries(additionalCodecs)
-            .map(([k, $v]) =>
-              [
-                encodeStr(k),
-                encoder($v)(additional[k]),
-              ] as [Data, Data]
-            )
+            .map(([k, $v]) => [encodeStr(k), encoder($v)(additional[k])] as [Data, Data])
         )
         .throws(IdentityDataTooLargeError)
       : []
