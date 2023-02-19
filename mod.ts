@@ -21,7 +21,6 @@ export {
   hex,
   type HexHash,
   type Listener,
-  multisigAddress,
   Sr25519,
   ss58,
   throwIfError,
