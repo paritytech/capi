@@ -1,4 +1,5 @@
 import * as $ from "../deps/scale.ts"
+import { gt } from "../deps/std/semver.ts"
 import * as M from "../frame_metadata/mod.ts"
 import { Event } from "../primitives/mod.ts"
 import * as rpc from "../rpc/mod.ts"
@@ -55,6 +56,24 @@ export class ClientRune<out U, out C extends Chain = Chain> extends Rune<rpc.Cli
   }
 
   chainVersion = rpcCall<[], string>("system_version")(this.as(Rune))
+
+  ifRuntimeGt<X, A, B>(
+    ...[threshold, ifCurrentVersion, ifNextVersion]: RunicArgs<
+      X,
+      [currentSemver: string, ifCurrentVersion: A, ifNextVersion: B]
+    >
+  ) {
+    return Rune
+      .tuple([this.chainVersion, threshold])
+      .map(([chainVersion, threshold]) =>
+        Rune.resolve(gt(chainVersion.split("-")[0]!, threshold) ? ifCurrentVersion : ifNextVersion)
+      )
+      .into(MetaRune)
+      .flatMap((e) => e)
+      .filter(() => true)
+      .into(ValueRune)
+      .singular()
+  }
 
   private _asCodegen<C extends Chain>() {
     return this as any as ClientRune<U, C>
