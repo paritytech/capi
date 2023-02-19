@@ -31,7 +31,7 @@
   },
   "tasks": {
     "debug": "deno run -A --inspect-brk",
-    "udd": "deno task star && deno run -A https://deno.land/x/udd@0.5.0/main.ts target/star.ts",
+    "udd": "deno run -A _tasks/udd.ts",
     "dnt": "deno run -A _tasks/dnt.ts",
     "test": "deno task capi -- deno test -A -L=info --ignore=target --parallel -r=http://localhost:4646/",
     "test:examples": "deno task test _tasks/test_examples.ts",

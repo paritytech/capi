@@ -19,6 +19,7 @@ export {
   getOrInit,
   type Hex,
   hex,
+  type HexHash,
   type Listener,
   multisigAddress,
   Sr25519,
