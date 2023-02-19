@@ -2,7 +2,7 @@ name: Update Dependencies
 on:
   workflow_dispatch:
   schedule:
-    - cron: "42 19 * * *"
+    - cron: 0 0 * * 0
 jobs:
   update-dependencies:
     runs-on: ubuntu-latest
