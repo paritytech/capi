@@ -70,7 +70,7 @@ export class ClientRune<out U, out C extends Chain = Chain> extends Rune<rpc.Cli
         Rune.resolve(gt(chainVersion.split("-")[0]!, threshold) ? ifCurrentVersion : ifNextVersion)
       )
       .into(MetaRune)
-      .flatMap((e) => e)
+      .flat()
       .filter(() => true)
       .into(ValueRune)
       .singular()
