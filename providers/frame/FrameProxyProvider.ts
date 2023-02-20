@@ -8,7 +8,7 @@ import { FrameProvider } from "./FrameProvider.ts"
 export abstract class FrameProxyProvider extends FrameProvider {
   override async handle(request: Request, pathInfo: PathInfo): Promise<Response> {
     if (
-      pathInfo.vRuntime && pathInfo.vRuntime !== "latest" && !pathInfo.filePath
+      !pathInfo.vRuntime && !pathInfo.filePath
       && request.headers.get("upgrade") === "websocket"
     ) {
       return this.proxyWs(request, pathInfo)
@@ -52,6 +52,7 @@ export abstract class FrameProxyProvider extends FrameProvider {
     return new URL(
       fromPathInfo({
         ...pathInfo,
+        vRuntime: "",
         filePath: "",
       }),
       this.env.href.replace(/^http/, "ws"),
