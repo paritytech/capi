@@ -3,7 +3,7 @@ import { Chain, ClientRune } from "../fluent/ClientRune.ts"
 import { MultiAddress } from "../primitives/mod.ts"
 import { Client } from "../rpc/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
-import { multisigAddress } from "../util/mod.ts"
+import { multisigAccountId } from "./multisigAccountId.ts"
 
 export interface MultisigRatifyProps {
   sender: MultiAddress
@@ -23,7 +23,7 @@ export interface Multisig {
 export class MultisigRune<out U, out C extends Chain = Chain> extends Rune<Multisig, U> {
   threshold = this.into(ValueRune).access("threshold")
   address = this.into(ValueRune).map(({ signatories, threshold }) =>
-    multisigAddress(signatories, threshold)
+    multisigAccountId(signatories, threshold)
   )
 
   private pallet

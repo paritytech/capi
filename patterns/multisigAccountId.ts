@@ -1,5 +1,5 @@
 import * as $ from "../deps/scale.ts"
-import { Blake2_256 } from "./hashers.ts"
+import { Blake2_256 } from "../util/hashers.ts"
 
 const seed = "modlpy/utilisuba" // cspell:disable-line
 
@@ -9,7 +9,7 @@ const codec = Blake2_256.$hash($.tuple(
   $.u16,
 ))
 
-export function multisigAddress(signatories: Uint8Array[], threshold: number) {
+export function multisigAccountId(signatories: Uint8Array[], threshold: number) {
   return codec.encode(
     [null, signatories.sort(sortUint8Array), threshold],
   )
