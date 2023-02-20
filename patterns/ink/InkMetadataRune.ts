@@ -1,5 +1,5 @@
 import * as $ from "../../deps/scale.ts"
-import { Chain, ClientRune, CodecRune, ExtrinsicRune, state } from "../../fluent/mod.ts"
+import { Chain, ChainRune, CodecRune, ExtrinsicRune, state } from "../../fluent/mod.ts"
 import { ArrayRune, Rune, RunicArgs, ValueRune } from "../../rune/mod.ts"
 import { DeriveCodec } from "../../scale_info/mod.ts"
 import { hex } from "../../util/mod.ts"
@@ -22,7 +22,7 @@ export interface InstantiateProps {
 export class InkMetadataRune<out U, out C extends Chain = Chain> extends Rune<InkMetadata, U> {
   deriveCodec
 
-  constructor(_prime: InkMetadataRune<U>["_prime"], readonly client: ClientRune<U, C>) {
+  constructor(_prime: InkMetadataRune<U>["_prime"], readonly chain: ChainRune<U, C>) {
     super(_prime)
     this.deriveCodec = this
       .into(ValueRune)
@@ -31,13 +31,13 @@ export class InkMetadataRune<out U, out C extends Chain = Chain> extends Rune<In
   }
 
   static from<U, C extends Chain, X>(
-    client: ClientRune<U, C>,
+    chain: ChainRune<U, C>,
     ...[jsonText]: RunicArgs<X, [jsonText: string]>
   ) {
     return Rune
       .resolve(jsonText)
       .map((jsonText) => normalize(JSON.parse(jsonText)))
-      .into(InkMetadataRune, Rune.resolve(client).into(ClientRune))
+      .into(InkMetadataRune, Rune.resolve(client).into(ChainRune))
   }
 
   salt() {
@@ -131,7 +131,7 @@ export class InkMetadataRune<out U, out C extends Chain = Chain> extends Rune<In
   }
 
   instance<U, C extends Chain, X>(
-    client: ClientRune<U, C>,
+    chain: ChainRune<U, C>,
     ...[publicKey]: RunicArgs<X, [Uint8Array]>
   ) {
     return Rune

@@ -1,4 +1,4 @@
-import { Hash, Hex, RpcResult, Subscription } from "./utils.ts"
+import { Hash, Hex, Subscription } from "./utils.ts"
 
 export type NetworkConfig = {
   totalAttempts: number
@@ -76,41 +76,41 @@ export type SmoldotRpc = {
     followSubscription: string,
     hash: Hash,
     networkConfig?: NetworkConfig,
-  ): RpcResult<string>
+  ): string
   chainHead_unstable_call(
     followSubscription: string,
     hash: Hash,
     fn: string,
     callParameters: Hex,
     networkConfig?: NetworkConfig,
-  ): RpcResult<string>
+  ): string
   chainHead_unstable_follow(
     runtimeUpdates: boolean,
-  ): RpcResult<Subscription<"chainHead_unstable_follow", ChainHeadUnstableFollowEvent>>
-  chainHead_unstable_genesisHash(): RpcResult<Hash>
-  chainHead_unstable_header(followSubscription: string, hash: Hash): RpcResult<Hex>
-  chainHead_unstable_stopBody(subscription: string): RpcResult<void>
-  chainHead_unstable_stopCall(subscription: string): RpcResult<void>
-  chainHead_unstable_stopStorage(subscription: string): RpcResult<void>
+  ): Subscription<"chainHead_unstable_follow", ChainHeadUnstableFollowEvent>
+  chainHead_unstable_genesisHash(): Hash
+  chainHead_unstable_header(followSubscription: string, hash: Hash): Hex
+  chainHead_unstable_stopBody(subscription: string): void
+  chainHead_unstable_stopCall(subscription: string): void
+  chainHead_unstable_stopStorage(subscription: string): void
   chainHead_unstable_storage(
     followSubscription: string,
     hash: Hash,
     key: Hex,
     childKey?: Hex,
     networkConfig?: NetworkConfig,
-  ): RpcResult<string>
-  chainHead_unstable_unfollow(followSubscription: string): RpcResult<void>
-  chainHead_unstable_unpin(followSubscription: string, hash: Hash): RpcResult<void>
-  chainSpec_unstable_chainName(): RpcResult<string>
-  chainSpec_unstable_genesisHash(): RpcResult<Hash>
-  chainSpec_unstable_properties(): RpcResult<Record<string, unknown>>
-  sudo_unstable_p2pDiscover(multiaddr: string): RpcResult<void>
-  sudo_unstable_version(): RpcResult<string>
+  ): string
+  chainHead_unstable_unfollow(followSubscription: string): void
+  chainHead_unstable_unpin(followSubscription: string, hash: Hash): void
+  chainSpec_unstable_chainName(): string
+  chainSpec_unstable_genesisHash(): Hash
+  chainSpec_unstable_properties(): Record<string, unknown>
+  sudo_unstable_p2pDiscover(multiaddr: string): void
+  sudo_unstable_version(): string
   transaction_unstable_submitAndWatch(
     transaction: Hex,
-  ): RpcResult<Subscription<"transaction_unstable_submitAndWatch", TransactionWatchEvent>>
-  transaction_unstable_unwatch(subscription: string): RpcResult<void>
-  chainHead_unstable_finalizedDatabase(maxSizeBytes?: bigint): RpcResult<string>
+  ): Subscription<"transaction_unstable_submitAndWatch", TransactionWatchEvent>
+  transaction_unstable_unwatch(subscription: string): void
+  chainHead_unstable_finalizedDatabase(maxSizeBytes?: bigint): string
 }
 
 // TODO: do we even care about narrowing error code?

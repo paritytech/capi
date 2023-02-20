@@ -1,5 +1,5 @@
 import { equals } from "../../deps/std/bytes.ts"
-import { Chain, ClientRune, CodecRune, ExtrinsicRune, state } from "../../fluent/mod.ts"
+import { Chain, ChainRune, CodecRune, ExtrinsicRune, state } from "../../fluent/mod.ts"
 import { Event } from "../../primitives/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../../rune/mod.ts"
 import { hex } from "../../util/mod.ts"
@@ -18,7 +18,7 @@ export interface MsgProps {
 export class InkRune<out U, out C extends Chain = Chain> extends Rune<Uint8Array, U> {
   constructor(
     _prime: InkRune<U>["_prime"],
-    readonly client: ClientRune<U, C>,
+    readonly chain: ChainRune<U, C>,
     readonly contract: InkMetadataRune<U, C>,
   ) {
     super(_prime)

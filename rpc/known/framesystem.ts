@@ -1,7 +1,7 @@
-import { AccountId, Hash, Hex, RpcResult } from "./utils.ts"
+import { AccountId, Hash, Hex } from "./utils.ts"
 
 // https://github.com/paritytech/substrate/blob/eddf888/utils/frame/rpc/system/src/lib.rs#L41
-export type FrameSystemRpc = {
+export type FrameSystemCalls = {
   /**
    * Returns the next valid index (aka nonce) for given account.
    *
@@ -9,9 +9,9 @@ export type FrameSystemRpc = {
    * currently in the pool and if no transactions are found in the pool
    * it fallbacks to query the index from the runtime (aka. state nonce).
    */
-  system_accountNextIndex(account: AccountId): RpcResult<number>
-  account_nextIndex: FrameSystemRpc["system_accountNextIndex"]
+  system_accountNextIndex(account: AccountId): number
+  account_nextIndex: FrameSystemCalls["system_accountNextIndex"]
   /** Dry run an extrinsic at a given block. Return SCALE encoded ApplyExtrinsicResult. */
-  system_dryRun(extrinsic: Hex, at?: Hash): RpcResult<Hex>
-  system_dryRunAt: FrameSystemRpc["system_dryRun"]
+  system_dryRun(extrinsic: Hex, at?: Hash): Hex
+  system_dryRunAt: FrameSystemCalls["system_dryRun"]
 }

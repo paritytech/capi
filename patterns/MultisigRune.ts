@@ -1,5 +1,5 @@
 import * as bytes from "../deps/std/bytes.ts"
-import { Chain, ClientRune } from "../fluent/ClientRune.ts"
+import { Chain, ChainRune } from "../fluent/ChainRune.ts"
 import { MultiAddress } from "../primitives/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { multisigAccountId } from "./multisigAccountId.ts"
@@ -28,14 +28,14 @@ export class MultisigRune<out U, out C extends Chain = Chain> extends Rune<Multi
   private pallet
   private storage
 
-  constructor(_prime: MultisigRune<U>["_prime"], readonly client: ClientRune<U, C>) {
+  constructor(_prime: MultisigRune<U>["_prime"], readonly chain: ChainRune<U, C>) {
     super(_prime)
     this.pallet = this.client.metadata().pallet("Multisig")
     this.storage = this.pallet.storage("Multisigs")
   }
 
   static from<U, C extends Chain, X>(
-    client: ClientRune<U, C>,
+    chain: ChainRune<U, C>,
     ...[multisig]: RunicArgs<X, [multisig: Multisig]>
   ) {
     return Rune.resolve(multisig).into(MultisigRune, client)
@@ -102,7 +102,7 @@ export class MultisigRune<out U, out C extends Chain = Chain> extends Rune<Multi
     return Rune.captureUnhandled(
       [this, this.client, callHash],
       (multisig, client, callHash) =>
-        multisig.into(MultisigRune, client.into(ClientRune))
+        multisig.into(MultisigRune, client.into(ChainRune))
           .proposal(callHash)
           .unsafeAs<{ when: unknown }>()
           .into(ValueRune)

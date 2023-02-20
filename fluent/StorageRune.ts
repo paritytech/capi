@@ -4,7 +4,6 @@ import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import * as U from "../util/mod.ts"
 import { CodecRune } from "./CodecRune.ts"
 import { PalletRune } from "./PalletRune.ts"
-import { state } from "./rpc_method_runes.ts"
 
 export class StorageRune<in out K extends unknown[], out V, out U> extends Rune<M.StorageEntry, U> {
   $key
@@ -22,8 +21,8 @@ export class StorageRune<in out K extends unknown[], out V, out U> extends Rune<
 
   entryRaw<X>(...[key, blockHash]: RunicArgs<X, [key: K, blockHash?: U.HexHash]>) {
     const storageKey = this.$key.encoded(key).map(U.hex.encode)
-    return state
-      .getStorage(this.pallet.metadata.client, storageKey, blockHash)
+    return this.pallet.metadata.chain.connection
+      .call("state_getStorage", storageKey, blockHash)
       .unhandle(null)
       .rehandle(null, () => Rune.constant(undefined))
   }
@@ -55,8 +54,8 @@ export class StorageRune<in out K extends unknown[], out V, out U> extends Rune<
           .map(U.hex.encode)
           .rehandle(undefined),
     )
-    const keysEncoded = state.getKeysPaged(
-      this.pallet.metadata.client,
+    const keysEncoded = this.pallet.metadata.chain.connection.call(
+      "state_getKeysPaged",
       storageKey,
       count,
       startKey,

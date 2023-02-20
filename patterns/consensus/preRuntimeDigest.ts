@@ -1,15 +1,15 @@
 import { $digestItem, DigestItem } from "polkadot_dev/types/sp_runtime/generic/digest.ts"
-import { Chain, ClientRune } from "../../fluent/mod.ts"
+import { Chain, ChainRune } from "../../fluent/mod.ts"
 import { RunicArgs, ValueRune } from "../../rune/mod.ts"
 import { HexHash } from "../../util/branded.ts"
 import { hex } from "../../util/mod.ts"
 
 export function preRuntimeDigest<U, C extends Chain, X>(
-  client: ClientRune<U, C>,
+  chain: ChainRune<U, C>,
   ...[blockHash]: RunicArgs<X, [HexHash]>
 ) {
   return client
-    .into(ClientRune)
+    .into(ChainRune)
     .block(blockHash)
     .header()
     .into(ValueRune)

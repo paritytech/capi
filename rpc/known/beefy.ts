@@ -1,11 +1,7 @@
-import { Hash, Hex, RpcResult, Subscription } from "./utils.ts"
+import { Hash, Hex, Subscription } from "./utils.ts"
 
 // https://github.com/paritytech/substrate/blob/317808a/client/beefy/rpc/src/lib.rs#L84
-export type BeefyRpc = {
-  /** Returns the block most recently finalized by BEEFY, alongside side its justification. */
-  beefy_subscribeJustifications(): RpcResult<
-    Subscription<"beefy_subscribeJustifications", Hex>
-  >
+export type BeefyCalls = {
   /**
    * Returns hash of the latest BEEFY finalized block as seen by this client.
    *
@@ -13,5 +9,10 @@ export type BeefyRpc = {
    * in the network or if the client is still initializing or syncing with the network.
    * In such case an error would be returned.
    */
-  beefy_getFinalizedHead(): RpcResult<Hash>
+  beefy_getFinalizedHead(): Hash
+}
+
+export type BeefySubscriptions = {
+  /** Returns the block most recently finalized by BEEFY, alongside side its justification. */
+  beefy_subscribeJustifications(): Subscription<"beefy_unsubscribeJustifications", Hex>
 }

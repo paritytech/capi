@@ -83,7 +83,7 @@ export interface InclusionFee {
 }
 
 // https://github.com/paritytech/substrate/blob/eddf888/frame/transaction-payment/rpc/src/lib.rs#L41
-export type TransactionPaymentApi = {
+export type TransactionPaymentCalls = {
   payment_queryInfo(extrinsic: Hex, at?: Hash): RuntimeDispatchInfo
   payment_queryFeeDetails(extrinsic: Hex, at?: Hash): FeeDetails
 }
