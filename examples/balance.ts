@@ -1,3 +1,5 @@
+#!/usr/bin/env deno run -A
+
 import { alice } from "capi"
 import { System } from "polkadot_dev/mod.ts"
 

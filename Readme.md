@@ -49,9 +49,12 @@ console.log(await value.run())
 
 ## Running Examples
 
+<!-- TODO: track https://github.com/denoland/dotland/issues/2650#issuecomment-1437015262 -->
+
 ```sh
 deno run -A https://deno.land/x/capi/main.ts -- \
-  https://deno.land/x/capi/examples/<example-name>.ts
+  https://deno.land/x/capi/examples/<example-name>.ts \
+  --import-map=https://deno.land/x/capi/import_map.json
 ```
 
 ## The Thesis

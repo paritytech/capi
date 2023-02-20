@@ -1,3 +1,4 @@
+#!/usr/bin/env deno run -A
 import * as flags from "./deps/std/flags.ts"
 import { serve } from "./deps/std/http.ts"
 import {
