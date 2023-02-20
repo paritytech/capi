@@ -2,7 +2,7 @@ name: Update Dependencies
 on:
   workflow_dispatch:
   schedule:
-    - cron: "42 19 * * *"
+    - cron: 0 0 * * 0
 jobs:
   update-dependencies:
     runs-on: ubuntu-latest
@@ -12,12 +12,11 @@ jobs:
         with:
           deno-version: 1.x
       - name: Update dependencies
-        run: |
-          deno task star && deno task run https://deno.land/x/udd/main.ts target/star.ts
+        run: deno task udd
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@2b011faafdcbc9ceb11414d64d0573f37c774b04 # v4.1.1
         with:
-          commit-message: "update dependencies and regenerate lockfile"
+          commit-message: "update dependencies"
           title: "chore: update dependencies"
           body: >
             Dependencies updated by [udd](https://github.com/hayd/deno-udd).

@@ -8,16 +8,19 @@ await fs.emptyDir(outDir)
 
 await Promise.all([
   build({
-    entryPoints: ["mod.ts"],
+    entryPoints: [{
+      name: ".",
+      path: "./mod.ts",
+    }],
     outDir,
     mappings: {
       "https://deno.land/x/wat_the_crypto@v0.0.1/mod.ts": {
         name: "wat-the-crypto",
         version: "^0.0.1",
       },
-      "https://deno.land/x/scale@v0.10.0/mod.ts": {
+      "https://deno.land/x/scale@v0.10.2/mod.ts": {
         name: "scale-codec",
-        version: "^0.10.0",
+        version: "^0.10.2",
       },
       "https://deno.land/x/smoldot@light-js-deno-v0.7.6/index-deno.js": {
         name: "@substrate/smoldot-light",
@@ -34,7 +37,6 @@ await Promise.all([
       repository: "github:paritytech/capi",
     },
     compilerOptions: {
-      lib: ["dom", "esnext"],
       importHelpers: true,
       sourceMap: true,
       target: "ES2021",
@@ -51,4 +53,5 @@ await Promise.all([
   }),
   fs.copy("LICENSE", path.join(outDir, "LICENSE")),
   fs.copy("Readme.md", path.join(outDir, "Readme.md")),
+  fs.copy("help.txt", path.join(outDir, "help.txt")),
 ])

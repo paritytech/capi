@@ -1,5 +1,5 @@
+import * as shiki from "npm:shiki"
 import { escapeHtml } from "../deps/escape.ts"
-import * as shiki from "../deps/shiki.ts"
 import { Status } from "../deps/std/http.ts"
 import { CacheBase } from "../util/cache/base.ts"
 
