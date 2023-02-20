@@ -60,13 +60,11 @@ const initiatedEvent = XcmPallet
 
 const processedEvent = System.Events
   .entry([], chain.latestBlock.hash)
-  .into(ValueRune)
   .map((events) =>
-    events
-      ?.find((e) =>
-        CollatorRuntimeEvent.isParachainSystem(e.event)
-        && ParachainSystemEvent.isDownwardMessagesProcessed(e.event.value)
-      )
+    events?.find((e) =>
+      CollatorRuntimeEvent.isParachainSystem(e.event)
+      && ParachainSystemEvent.isDownwardMessagesProcessed(e.event.value)
+    )
   )
   .filter((event) => !!event)
   .log("Processed events:")

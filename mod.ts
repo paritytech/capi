@@ -20,7 +20,7 @@ export {
   ss58,
 } from "./util/mod.ts"
 
-// moderate --exclude deps frame_metadata main.ts patterns providers server util
+// moderate --exclude frame_metadata main.ts providers server util
 
 export * from "./fluent/mod.ts"
 export * from "./primitives/mod.ts"
