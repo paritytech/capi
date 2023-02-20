@@ -3,7 +3,7 @@ import { Chain, ChainRune, CodecRune, ExtrinsicRune } from "../../fluent/mod.ts"
 import { ArrayRune, Rune, RunicArgs, ValueRune } from "../../rune/mod.ts"
 import { DeriveCodec } from "../../scale_info/mod.ts"
 import { hex } from "../../util/mod.ts"
-import { Callable, InkMetadata, normalize } from "./InkMetadata.ts"
+import { Callable, InkMetadata } from "./InkMetadata.ts"
 import { InkRune } from "./InkRune.ts"
 import { $contractsApiInstantiateArgs, $contractsApiInstantiateResult, Weight } from "./known.ts"
 
