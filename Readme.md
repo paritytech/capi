@@ -40,14 +40,14 @@ import { System } from "polkadot/mod.ts"
 const key = System.Account
   .keyPage(1) // we want one key in the key page
   .access(0) // let's take the first
-  .unhandle(undefined) // we know it's not undefined
+  .unhandle(undefined) // we know it's not `undefined`
 
 const value = System.Account.entry(key)
 
 console.log(await value.run())
 ```
 
-## Examples
+## Running Examples
 
 ```sh
 deno run -A https://deno.land/x/capi/main.ts -- \
@@ -58,7 +58,7 @@ deno run -A https://deno.land/x/capi/main.ts -- \
 
 In a likely future of specialized, interoperable chains, developers will need to make use of on-chain programs to satisfy varying use cases; the expertise required to interact with these on-chain programs is currently greater than that which _should_ be expected of app developers. Does this mean that app developers must forgo integrating with this blossoming infrastructure? We think not; **the open source community can use Capi to abstract over the atomics of the on-chain world**. An interaction spanning several chains and dozens of methods can be described with a single Rune[^1].
 
-As you read through this documentation, please consider use cases over which you might like to abstract; if you wish to add your use case to [Capi's standard library](effects), please [submit an issue](https://github.com/paritytech/capi/issues/new).
+As you read through this documentation, please consider use cases over which you might like to abstract; if you wish to add your use case to [Capi's standard library](patterns), please [submit an issue](https://github.com/paritytech/capi/issues/new?title=pattern%20idea:%20).
 
 ## Code of Conduct
 
