@@ -1,0 +1,10 @@
+[
+  "chain",
+  "storage_&_constants",
+  "extrinsics",
+  "blocks",
+  "events",
+  "accounts",
+  "rpc_methods",
+  "metadata"
+]
