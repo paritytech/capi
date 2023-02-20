@@ -74,7 +74,7 @@ function createTypeDecl(ctx: FrameCodegen, visitor: TyVisitor<string>, path: str
         ${docs}
         export type ${name} = ${visitor.tupleStruct(ty, members)}
         ${docs}
-        export function ${name}(...value: ${path}){ return value }
+        export function ${name}<X>(...value: C.RunicArgs<X, ${path}>): C.ValueRune<${path}, C.RunicArgs.U<X>> { return C.Rune.tuple(value) }
       `
     },
     objectStruct(ty) {
@@ -82,7 +82,7 @@ function createTypeDecl(ctx: FrameCodegen, visitor: TyVisitor<string>, path: str
         ${docs}
         export interface ${name} ${visitor.objectStruct(ty)}
         ${docs}
-        export function ${name}(value: ${path}){ return value }
+        export function ${name}<X>(value: C.RunicArgs<X, ${path}>): C.ValueRune<${path}, C.RunicArgs.U<X>> { return C.Rune.rec(value) }
       `
     },
     option: null!,
