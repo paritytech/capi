@@ -1,13 +1,13 @@
-import { RpcClientError, RpcEgressMessage, RpcMessageId } from "../rpc_common.ts"
-import { RpcConn } from "./base.ts"
+import { Connection } from "./Connection.ts"
+import { RpcClientError, RpcEgressMessage, RpcMessageId } from "./rpc_common.ts"
 
-export class WsRpcConn extends RpcConn {
+export class WsConnection extends Connection {
   chain
 
   constructor(readonly url: string) {
     super()
     this.chain = new WebSocket(url)
-    this.chain.addEventListener("message", (e) => this.push(JSON.parse(e.data)))
+    this.chain.addEventListener("message", (e) => this.handle(JSON.parse(e.data)))
     this.chain.addEventListener("error", (e) => { // TODO: recovery
       console.log(e)
       Deno.exit(1)

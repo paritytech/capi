@@ -2,17 +2,18 @@ import { File, FrameCodegen } from "../../codegen/frame/mod.ts"
 import { posix as path } from "../../deps/std/path.ts"
 import { $metadata } from "../../frame_metadata/Metadata.ts"
 import { fromPrefixedHex } from "../../frame_metadata/mod.ts"
-import { RpcClient, RpcServerError } from "../../rpc/mod.ts"
+import { Connection, RpcServerError } from "../../rpc/mod.ts"
 import { f, PathInfo, Provider } from "../../server/mod.ts"
 import { fromPathInfo } from "../../server/PathInfo.ts"
 import { WeakMemo } from "../../util/mod.ts"
+import { withSignal } from "../../util/withSignal.ts"
 
 export abstract class FrameProvider extends Provider {
   generatorId = "frame"
 
   codegenCtxsPending: Record<string, Promise<FrameCodegen>> = {}
 
-  abstract client(pathInfo: PathInfo): Promise<RpcClient<any>>
+  abstract client(pathInfo: PathInfo, signal: AbortSignal): Promise<Connection>
   abstract clientFile(pathInfo: PathInfo): Promise<File>
 
   async handle(request: Request, pathInfo: PathInfo): Promise<Response> {
@@ -48,9 +49,11 @@ export abstract class FrameProvider extends Provider {
 
   // TODO: memo
   async latestVersion(pathInfo: PathInfo) {
-    const client = await this.client(pathInfo)
-    const version = await this.clientCall<string>(client, "system_version", [])
-    return this.normalizeRuntimeVersion(version)
+    return await withSignal(async (signal) => {
+      const client = await this.client(pathInfo, signal)
+      const version = await this.clientCall<string>(client, "system_version", [])
+      return this.normalizeRuntimeVersion(version)
+    })
   }
 
   normalizeRuntimeVersion(version: string) {
@@ -71,20 +74,25 @@ export abstract class FrameProvider extends Provider {
   }
 
   async getMetadata(pathInfo: PathInfo) {
-    return this.env.cache.get(`${this.cacheKey(pathInfo)}/metadata`, $metadata, async () => {
-      if (pathInfo.vRuntime !== await this.latestVersion(pathInfo)) {
-        throw f.serverError("Cannot get metadata for old runtime version")
-      }
-      const client = await this.client(pathInfo)
-      const metadata = fromPrefixedHex(
-        await this.clientCall(client, "state_getMetadata", []),
-      )
-      return metadata
-    })
+    return this.env.cache.get(
+      `${this.cacheKey(pathInfo)}/metadata`,
+      $metadata,
+      () =>
+        withSignal(async (signal) => {
+          if (pathInfo.vRuntime !== await this.latestVersion(pathInfo)) {
+            throw f.serverError("Cannot get metadata for old runtime version")
+          }
+          const client = await this.client(pathInfo, signal)
+          const metadata = fromPrefixedHex(
+            await this.clientCall(client, "state_getMetadata", []),
+          )
+          return metadata
+        }),
+    )
   }
 
   async clientCall<OkData>(
-    client: RpcClient<any>,
+    client: Connection,
     method: string,
     params: unknown[] = [],
   ): Promise<OkData> {

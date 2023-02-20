@@ -1,8 +1,8 @@
-import { start } from "../../deps/smoldot.ts"
-import { Client, ClientOptions } from "../../deps/smoldot/client.d.ts"
-import { deferred } from "../../deps/std/async.ts"
-import { RpcEgressMessage, RpcMessageId } from "../rpc_common.ts"
-import { RpcConn } from "./base.ts"
+import { start } from "../deps/smoldot.ts"
+import { Client, ClientOptions } from "../deps/smoldot/client.d.ts"
+import { deferred } from "../deps/std/async.ts"
+import { Connection } from "./Connection.ts"
+import { RpcEgressMessage, RpcMessageId } from "./rpc_common.ts"
 
 // TODO: fix the many possible race conditions
 
@@ -13,7 +13,7 @@ export interface SmoldotRpcConnProps {
 
 let client: undefined | Client
 
-export class SmoldotRpcConn extends RpcConn {
+export class SmoldotConnection extends Connection {
   chainPending
   listening
   stopListening
@@ -54,7 +54,7 @@ export class SmoldotRpcConn extends RpcConn {
           chain.nextJsonRpcResponse(),
         ])
         if (!response) break
-        this.push(JSON.parse(response))
+        this.handle(JSON.parse(response))
       } catch (_e) {}
     }
   }

@@ -1,7 +1,5 @@
 import { Deferred, deferred } from "../deps/std/async.ts"
 import { getOrInit } from "../util/mod.ts"
-import { RpcConnCtor } from "./conn/mod.ts"
-import { ConnsRefCounter } from "./ConnsRefCounter.ts"
 import {
   RpcErrorMessage,
   RpcErrorMessageData,
@@ -12,20 +10,50 @@ import {
   RpcOkMessage,
 } from "./rpc_common.ts"
 
-const connRefCounters = new WeakMap<RpcConnCtor<any>, ConnsRefCounter<any>>()
+const connectionMemos = new Map<new(discovery: any) => Connection, Map<unknown, Connection>>()
 
-export class RpcClient<D> {
-  conn
+export abstract class Connection {
+  currentId = 0
+  references = 0
 
-  constructor(readonly connCtor: RpcConnCtor<D>, readonly discoveryValue: D) {
-    const connRefCounter = getOrInit(
-      connRefCounters,
-      connCtor,
-      () => new ConnsRefCounter(connCtor),
-    )
-    this.conn = (signal: AbortSignal) =>
-      connRefCounter.ref(discoveryValue, (e) => this.handler(e), signal)
+  signal
+  #controller
+  constructor() {
+    this.#controller = new AbortController()
+    this.signal = this.#controller.signal
   }
+
+  static connect<D>(
+    this: new(discovery: D) => Connection,
+    discovery: D,
+    signal: AbortSignal,
+  ) {
+    const memo = getOrInit(connectionMemos, this, () => new Map())
+    return getOrInit(memo, discovery, () => {
+      const connection = new this(discovery)
+      connection.ref(signal)
+      connection.signal.addEventListener("abort", () => {
+        memo.delete(connection)
+      })
+      return connection
+    })
+  }
+
+  ref(signal: AbortSignal) {
+    this.references++
+    signal.addEventListener("abort", () => {
+      if (!--this.references) {
+        this.#controller.abort()
+        this.close()
+      }
+    })
+  }
+
+  abstract ready(): Promise<void>
+
+  abstract send(id: RpcMessageId, method: string, params: unknown): void
+
+  protected abstract close(): void
 
   callResultPendings: Record<RpcMessageId, Deferred<RpcCallMessage>> = {}
   async call<OkData = unknown, ErrorData extends RpcErrorMessageData = RpcErrorMessageData>(
@@ -33,12 +61,11 @@ export class RpcClient<D> {
     params: unknown[],
   ) {
     const controller = new AbortController()
-    const conn = this.conn(controller.signal)
-    await conn.ready()
-    const id = conn.currentId++
+    await this.ready()
+    const id = this.currentId++
     const pending = deferred<RpcCallMessage<OkData, ErrorData>>()
     this.callResultPendings[id] = pending
-    conn.send(id, method, params)
+    this.send(id, method, params)
     const result = await pending
     controller.abort()
     return result
@@ -59,25 +86,24 @@ export class RpcClient<D> {
     signal: AbortSignal,
   ) {
     const controller = new AbortController()
-    const conn = this.conn(controller.signal)
     ;(async () => {
-      await conn.ready()
-      const subscribeId = conn.currentId++
+      await this.ready()
+      const subscribeId = this.currentId++
       this.subscriptionInitPendings[subscribeId] = handler as RpcSubscriptionHandler
       signal.addEventListener("abort", () => {
         delete this.subscriptionInitPendings[subscribeId]
         const subscriptionId = this.subscriptionIdByRpcMessageId[subscribeId]
         if (subscriptionId) {
           delete this.subscriptionIdByRpcMessageId[subscribeId]
-          conn.send(conn.currentId++, unsubscribe, [subscriptionId])
+          this.send(this.currentId++, unsubscribe, [subscriptionId])
           controller.abort()
         }
       })
-      conn.send(subscribeId, subscribe, params)
+      this.send(subscribeId, subscribe, params)
     })()
   }
 
-  handler(message: RpcIngressMessage) {
+  handle(message: RpcIngressMessage) {
     if (typeof message.id === "number") {
       const callResultPending = this.callResultPendings[message.id]
       if (callResultPending) {

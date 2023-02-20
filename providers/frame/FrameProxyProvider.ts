@@ -1,6 +1,6 @@
 import { File } from "../../codegen/frame/mod.ts"
 import { deferred } from "../../deps/std/async.ts"
-import { RpcClient, WsRpcConn } from "../../rpc/mod.ts"
+import { WsConnection } from "../../rpc/mod.ts"
 import { PathInfo } from "../../server/mod.ts"
 import { fromPathInfo } from "../../server/PathInfo.ts"
 import { FrameProvider } from "./FrameProvider.ts"
@@ -17,6 +17,7 @@ export abstract class FrameProxyProvider extends FrameProvider {
   }
 
   async proxyWs(request: Request, pathInfo: PathInfo) {
+    console.log("new connection")
     const url = await this.dynamicUrl(pathInfo)
     const server = new WebSocket(url)
     const { socket: client, response } = Deno.upgradeWebSocket(request)
@@ -59,8 +60,8 @@ export abstract class FrameProxyProvider extends FrameProvider {
     ).toString()
   }
 
-  async client(pathInfo: PathInfo) {
-    return new RpcClient(WsRpcConn, await this.dynamicUrl(pathInfo))
+  async client(pathInfo: PathInfo, signal: AbortSignal) {
+    return WsConnection.connect(await this.dynamicUrl(pathInfo), signal)
   }
 
   async clientFile(pathInfo: PathInfo) {
