@@ -5,6 +5,7 @@ ajuna
 alloc
 alphaville
 amannn
+anson
 astar
 asynciterable
 atomf
@@ -56,6 +57,7 @@ devcontainer
 devcontainers
 devs
 dico
+dinodoc
 discoverability
 dispatchable
 dprint
@@ -103,6 +105,7 @@ lldb
 lparachain
 ltex
 lxkf
+markdownlint
 mathchain
 matklad
 merkle

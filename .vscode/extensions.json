@@ -1,5 +1,6 @@
 {
   "recommendations": [
+    "DavidAnson.vscode-markdownlint",
     "EditorConfig.EditorConfig",
     "denoland.vscode-deno",
     "dprint.dprint",

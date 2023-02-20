@@ -1,9 +1,10 @@
 image:
   file: Dockerfile
 tasks:
-  - init: deno task codegen && deno task star
+  - init: deno task star
 vscode:
   extensions:
+    - DavidAnson.vscode-markdownlint
     - EditorConfig.EditorConfig
     - denoland.vscode-deno
     - dprint.dprint
