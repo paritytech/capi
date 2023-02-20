@@ -1,6 +1,6 @@
 import { babeBlockAuthor } from "capi/patterns/consensus/mod.ts"
-import { client } from "polkadot/mod.ts"
+import { chain } from "polkadot/mod.ts"
 
-const result = await babeBlockAuthor(client, client.latestBlock.hash).run()
+const result = await babeBlockAuthor(chain, chain.latestBlock.hash).run()
 
 console.log(result)

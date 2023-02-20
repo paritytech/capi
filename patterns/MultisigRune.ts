@@ -1,4 +1,3 @@
-import { types } from "polkadot_dev/mod.ts"
 import * as bytes from "../deps/std/bytes.ts"
 import { Chain, ChainRune } from "../fluent/ChainRune.ts"
 import { ExtrinsicRune } from "../fluent/mod.ts"
@@ -108,8 +107,8 @@ export class MultisigRune<out U, out C extends Chain = Chain> extends Rune<Multi
   private maybeTimepoint<X>(...[callHash]: RunicArgs<X, [callHash: Uint8Array]>) {
     return Rune.captureUnhandled(
       [this, this.chain, callHash],
-      (multisig, client, callHash) =>
-        multisig.into(MultisigRune, client.into(ChainRune))
+      (multisig, chain, callHash) =>
+        multisig.into(MultisigRune, chain.into(ChainRune))
           .proposal(callHash)
           .unsafeAs<{ when: unknown }>()
           .into(ValueRune)

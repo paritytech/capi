@@ -1,14 +1,14 @@
-import { AddressRune, alice } from "capi"
+import { AddressRune, alice, Rune } from "capi"
 import {
   InkMetadataRune,
   instantiationEventIntoPublicKey,
   isInstantiatedEvent,
 } from "capi/patterns/ink/mod.ts"
-import { client } from "zombienet/rococo_contracts.toml/collator/@latest/mod.ts"
+import { chain } from "zombienet/rococo_contracts.toml/collator/@latest/mod.ts"
 import { parse } from "../../deps/std/flags.ts"
 
 export const metadata = InkMetadataRune.from(
-  client,
+  chain,
   Deno.readTextFileSync("examples/ink_e2e/metadata.json"),
 )
 
@@ -34,15 +34,15 @@ if (!address) {
     )
     .unhandle(FailedToFindContractInstantiatedError)
     .pipe(instantiationEventIntoPublicKey)
-    .address(client)
+    .address(chain)
     .run()
 }
 console.log(`Contract address: ${address}`)
 
-const publicKey = AddressRune.from(client, address).publicKey()
+const publicKey = Rune.resolve(address).into(AddressRune, chain).publicKey()
 console.log("Contract public key:", await publicKey.run())
 
-const contract = metadata.instance(client, publicKey)
+const contract = metadata.instance(chain, publicKey)
 
 console.log("Get:", await contract.call({ sender, method: "get" }).run())
 

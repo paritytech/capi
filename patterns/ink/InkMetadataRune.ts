@@ -30,6 +30,7 @@ export class InkMetadataRune<out U, out C extends Chain = Chain> extends Rune<In
       .map(DeriveCodec)
   }
 
+  // TODO: remove
   static from<U, C extends Chain, X>(
     chain: ChainRune<U, C>,
     ...[jsonText]: RunicArgs<X, [jsonText: string]>

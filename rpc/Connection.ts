@@ -33,7 +33,7 @@ export abstract class Connection {
       const connection = new this(discovery)
       connection.ref(signal)
       connection.signal.addEventListener("abort", () => {
-        memo.delete(connection)
+        memo.delete(discovery)
       })
       return connection
     })

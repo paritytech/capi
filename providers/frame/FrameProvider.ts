@@ -13,8 +13,8 @@ export abstract class FrameProvider extends Provider {
 
   codegenCtxsPending: Record<string, Promise<FrameCodegen>> = {}
 
-  abstract client(pathInfo: PathInfo, signal: AbortSignal): Promise<Connection>
-  abstract clientFile(pathInfo: PathInfo): Promise<File>
+  abstract connect(pathInfo: PathInfo, signal: AbortSignal): Promise<Connection>
+  abstract chainFile(pathInfo: PathInfo): Promise<File>
 
   async handle(request: Request, pathInfo: PathInfo): Promise<Response> {
     const { vRuntime, filePath } = pathInfo
@@ -50,7 +50,7 @@ export abstract class FrameProvider extends Provider {
   // TODO: memo
   async latestVersion(pathInfo: PathInfo) {
     return await withSignal(async (signal) => {
-      const client = await this.client(pathInfo, signal)
+      const client = await this.connect(pathInfo, signal)
       const version = await this.clientCall<string>(client, "system_version", [])
       return this.normalizeRuntimeVersion(version)
     })
@@ -68,8 +68,8 @@ export abstract class FrameProvider extends Provider {
   codegen(pathInfo: PathInfo) {
     return this.codegenMemo.run(this.cacheKey(pathInfo), async () => {
       const metadata = await this.getMetadata(pathInfo)
-      const clientFile = await this.clientFile(pathInfo)
-      return new FrameCodegen({ metadata, clientFile })
+      const chainFile = await this.chainFile(pathInfo)
+      return new FrameCodegen({ metadata, chainFile })
     })
   }
 
@@ -82,7 +82,7 @@ export abstract class FrameProvider extends Provider {
           if (pathInfo.vRuntime !== await this.latestVersion(pathInfo)) {
             throw f.serverError("Cannot get metadata for old runtime version")
           }
-          const client = await this.client(pathInfo, signal)
+          const client = await this.connect(pathInfo, signal)
           const metadata = fromPrefixedHex(
             await this.clientCall(client, "state_getMetadata", []),
           )

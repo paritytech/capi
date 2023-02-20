@@ -17,7 +17,6 @@ export abstract class FrameProxyProvider extends FrameProvider {
   }
 
   async proxyWs(request: Request, pathInfo: PathInfo) {
-    console.log("new connection")
     const url = await this.dynamicUrl(pathInfo)
     const server = new WebSocket(url)
     const { socket: client, response } = Deno.upgradeWebSocket(request)
@@ -60,11 +59,11 @@ export abstract class FrameProxyProvider extends FrameProvider {
     ).toString()
   }
 
-  async client(pathInfo: PathInfo, signal: AbortSignal) {
+  async connect(pathInfo: PathInfo, signal: AbortSignal) {
     return WsConnection.connect(await this.dynamicUrl(pathInfo), signal)
   }
 
-  async clientFile(pathInfo: PathInfo) {
+  async chainFile(pathInfo: PathInfo) {
     const url = this.staticUrl(pathInfo)
     return new File(`
       import * as C from "./capi.ts"
@@ -72,9 +71,8 @@ export abstract class FrameProxyProvider extends FrameProvider {
 
       export const discoveryValue = "${url}"
 
-      export const client = C.rpcClient(C.WsRpcConn, discoveryValue)["_asCodegen"]<Chain>()
-
-      export const rawClient = new C.RpcClient(C.WsRpcConn, discoveryValue)
+      export const chain = C.connection((signal) => C.WsConnection.connect(discoveryValue, signal))
+        .chain()["_asCodegen"]<Chain>()
     `)
   }
 }

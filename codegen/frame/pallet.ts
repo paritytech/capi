@@ -14,12 +14,12 @@ export function pallet(ctx: FrameCodegen, pallet: Pallet) {
     import * as codecs from "./codecs.ts"
     import { $ } from "./capi.ts"
     import * as C from "./capi.ts"
-    import { client } from "./client.ts"
+    import { chain } from "./chain.ts"
   `]
   for (const entry of pallet.storage?.entries ?? []) {
     items.push(
       makeDocComment(entry.docs)
-        + `export const ${entry.name} = client.metadata()`
+        + `export const ${entry.name} = chain.metadata()`
         + `.pallet(${S.string(pallet.name)})`
         + `.storage(${S.string(entry.name)})`
         + `["_asCodegenStorage"](${
@@ -39,7 +39,7 @@ export function pallet(ctx: FrameCodegen, pallet: Pallet) {
       items.push(
         makeDocComment(call.docs)
           + `export function ${type}<X>(...args: Parameters<typeof ${typeName}<X>>): C.ExtrinsicRune<C.RunicArgs.U<X>, Chain>`
-          + `{ return client.extrinsic(C.Rune.rec({ type: ${
+          + `{ return chain.extrinsic(C.Rune.rec({ type: ${
             S.string(pallet.name)
           }, value: ${typeName}(...args) })) }`,
       )
