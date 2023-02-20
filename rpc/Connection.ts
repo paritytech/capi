@@ -1,23 +1,15 @@
 import { Deferred, deferred } from "../deps/std/async.ts"
 import { getOrInit } from "../util/mod.ts"
-import {
-  RpcErrorMessage,
-  RpcErrorMessageData,
-  RpcHandler,
-  RpcIngressMessage,
-  RpcMessageId,
-  RpcNotificationMessage,
-  RpcOkMessage,
-} from "./rpc_common.ts"
+import { RpcCallMessage, RpcIngressMessage, RpcSubscriptionHandler } from "./rpc_messages.ts"
 
 const connectionMemos = new Map<new(discovery: any) => Connection, Map<unknown, Connection>>()
 
 export abstract class Connection {
-  currentId = 0
+  nextId = 0
   references = 0
-
   signal
   #controller
+
   constructor() {
     this.#controller = new AbortController()
     this.signal = this.#controller.signal
@@ -51,52 +43,44 @@ export abstract class Connection {
 
   abstract ready(): Promise<void>
 
-  abstract send(id: RpcMessageId, method: string, params: unknown): void
+  abstract send(
+    id: number,
+    method: string,
+    params: unknown,
+  ): void
 
   protected abstract close(): void
 
-  callResultPendings: Record<RpcMessageId, Deferred<RpcCallMessage>> = {}
-  async call<OkData = unknown, ErrorData extends RpcErrorMessageData = RpcErrorMessageData>(
-    method: string,
-    params: unknown[],
-  ) {
-    const controller = new AbortController()
+  callResultPendings: Record<number, Deferred<RpcCallMessage>> = {}
+  async call(method: string, params: unknown[]) {
     await this.ready()
-    const id = this.currentId++
-    const pending = deferred<RpcCallMessage<OkData, ErrorData>>()
+    const id = this.nextId++
+    const pending = deferred<RpcCallMessage>()
     this.callResultPendings[id] = pending
     this.send(id, method, params)
-    const result = await pending
-    controller.abort()
-    return result
+    return await pending
   }
 
-  subscriptionInitPendings: Record<RpcMessageId, RpcSubscriptionHandler> = {}
-  subscriptionHandlers: Record<RpcMessageId, RpcSubscriptionHandler> = {}
-  subscriptionIdByRpcMessageId: Record<RpcMessageId, string> = {}
-  subscription<
-    Method extends string = string,
-    NotificationData = unknown,
-    ErrorData extends RpcErrorMessageData = RpcErrorMessageData,
-  >(
+  subscriptionInitPendings: Record<number, RpcSubscriptionHandler> = {}
+  subscriptionHandlers: Record<string, RpcSubscriptionHandler> = {}
+  subscriptionIdByRpcMessageId: Record<number, string> = {}
+  subscription(
     subscribe: string,
     unsubscribe: string,
     params: unknown[],
-    handler: RpcSubscriptionHandler<Method, NotificationData, ErrorData>,
+    handler: RpcSubscriptionHandler,
     signal: AbortSignal,
   ) {
-    const controller = new AbortController()
     ;(async () => {
       await this.ready()
-      const subscribeId = this.currentId++
+      const subscribeId = this.nextId++
       this.subscriptionInitPendings[subscribeId] = handler as RpcSubscriptionHandler
       signal.addEventListener("abort", () => {
         delete this.subscriptionInitPendings[subscribeId]
         const subscriptionId = this.subscriptionIdByRpcMessageId[subscribeId]
         if (subscriptionId) {
           delete this.subscriptionIdByRpcMessageId[subscribeId]
-          this.send(this.currentId++, unsubscribe, [subscriptionId])
-          controller.abort()
+          this.send(this.nextId++, unsubscribe, [subscriptionId])
         }
       })
       this.send(subscribeId, subscribe, params)
@@ -115,8 +99,9 @@ export abstract class Connection {
       if (subscriptionPending) {
         if (message.error) subscriptionPending(message)
         else {
-          this.subscriptionHandlers[message.result] = subscriptionPending
-          this.subscriptionIdByRpcMessageId[message.id] = message.result
+          const subscriptionId = message.result as string
+          this.subscriptionHandlers[subscriptionId] = subscriptionPending
+          this.subscriptionIdByRpcMessageId[message.id] = subscriptionId
         }
         delete this.subscriptionInitPendings[message.id]
       }
@@ -124,20 +109,3 @@ export abstract class Connection {
     else throw new Error(Deno.inspect(message)) // ... for now
   }
 }
-
-export type RpcCallMessage<
-  OkData = any,
-  ErrorData extends RpcErrorMessageData = RpcErrorMessageData,
-> = RpcOkMessage<OkData> | RpcErrorMessage<ErrorData>
-
-export type RpcSubscriptionMessage<
-  Method extends string = string,
-  NotificationData = any,
-  ErrorData extends RpcErrorMessageData = RpcErrorMessageData,
-> = RpcNotificationMessage<Method, NotificationData> | RpcErrorMessage<ErrorData>
-
-export type RpcSubscriptionHandler<
-  Method extends string = string,
-  NotificationData = any,
-  ErrorData extends RpcErrorMessageData = RpcErrorMessageData,
-> = RpcHandler<RpcSubscriptionMessage<Method, NotificationData, ErrorData>>

@@ -2,7 +2,7 @@ import { start } from "../deps/smoldot.ts"
 import { Client, ClientOptions } from "../deps/smoldot/client.d.ts"
 import { deferred } from "../deps/std/async.ts"
 import { Connection } from "./Connection.ts"
-import { RpcEgressMessage, RpcMessageId } from "./rpc_common.ts"
+import { RpcEgressMessage } from "./rpc_messages.ts"
 
 // TODO: fix the many possible race conditions
 
@@ -14,7 +14,7 @@ export interface SmoldotRpcConnProps {
 let client: undefined | Client
 
 export class SmoldotConnection extends Connection {
-  chainPending
+  smoldotChainPending
   listening
   stopListening
 
@@ -33,20 +33,20 @@ export class SmoldotConnection extends Connection {
         disableJsonRpc: true,
       })
       const { parachainSpec } = props
-      this.chainPending = (async () => {
+      this.smoldotChainPending = (async () => {
         return client.addChain({
           chainSpec: parachainSpec,
           potentialRelayChains: [await relayChain],
         })
       })()
-    } else this.chainPending = client.addChain({ chainSpec: props.relayChainSpec })
+    } else this.smoldotChainPending = client.addChain({ chainSpec: props.relayChainSpec })
     this.listening = deferred<void>()
     this.stopListening = () => this.listening.resolve()
     this.startListening()
   }
 
   async startListening() {
-    const chain = await this.chainPending
+    const chain = await this.smoldotChainPending
     while (true) {
       try {
         const response = await Promise.race([
@@ -60,16 +60,16 @@ export class SmoldotConnection extends Connection {
   }
 
   async ready() {
-    await this.chainPending
+    await this.smoldotChainPending
   }
 
-  send(id: RpcMessageId, method: string, params: unknown[]) {
-    this.chainPending
+  send(id: number, method: string, params: unknown[]) {
+    this.smoldotChainPending
       .then((chain) => chain.sendJsonRpc(RpcEgressMessage.fmt(id, method, params)))
   }
 
   close() {
     this.stopListening()
-    this.chainPending.then((chain) => chain.remove())
+    this.smoldotChainPending.then((chain) => chain.remove())
   }
 }

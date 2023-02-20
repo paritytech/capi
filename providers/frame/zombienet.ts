@@ -37,6 +37,7 @@ export class ZombienetProvider extends FrameProxyProvider {
   urlMemo = new PermanentMemo<string, string>()
   dynamicUrl(pathInfo: PathInfo) {
     const { target } = pathInfo
+    if (!target) throw new Error("Missing target")
     return this.urlMemo.run(target, async () => {
       const targetParts = splitLast("/", target)
       if (!targetParts) throw new Error("Failed to parse zombienet target")

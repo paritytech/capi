@@ -15,14 +15,14 @@ export class FrameCodegen {
   files = new Map<string, File>()
 
   metadata
-  clientFile
+  chainFile
 
   typeVisitor
   typeFiles = new Map<string, TypeFile>()
 
   constructor({ metadata, chainFile }: FrameCodegenProps) {
     this.metadata = metadata
-    this.clientFile = chainFile
+    this.chainFile = chainFile
 
     this.typeVisitor = typeVisitor(this)
 

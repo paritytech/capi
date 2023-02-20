@@ -2,7 +2,7 @@ import { File, FrameCodegen } from "../../codegen/frame/mod.ts"
 import { posix as path } from "../../deps/std/path.ts"
 import { $metadata } from "../../frame_metadata/Metadata.ts"
 import { fromPrefixedHex } from "../../frame_metadata/mod.ts"
-import { Connection, RpcServerError } from "../../rpc/mod.ts"
+import { Connection, ServerError } from "../../rpc/mod.ts"
 import { f, PathInfo, Provider } from "../../server/mod.ts"
 import { fromPathInfo } from "../../server/PathInfo.ts"
 import { WeakMemo } from "../../util/mod.ts"
@@ -49,11 +49,8 @@ export abstract class FrameProvider extends Provider {
 
   // TODO: memo
   async latestVersion(pathInfo: PathInfo) {
-    return await withSignal(async (signal) => {
-      const client = await this.connect(pathInfo, signal)
-      const version = await this.clientCall<string>(client, "system_version", [])
-      return this.normalizeRuntimeVersion(version)
-    })
+    const version = await this.call<string>(pathInfo, "system_version", [])
+    return this.normalizeRuntimeVersion(version)
   }
 
   normalizeRuntimeVersion(version: string) {
@@ -77,27 +74,28 @@ export abstract class FrameProvider extends Provider {
     return this.env.cache.get(
       `${this.cacheKey(pathInfo)}/metadata`,
       $metadata,
-      () =>
-        withSignal(async (signal) => {
-          if (pathInfo.vRuntime !== await this.latestVersion(pathInfo)) {
-            throw f.serverError("Cannot get metadata for old runtime version")
-          }
-          const client = await this.connect(pathInfo, signal)
-          const metadata = fromPrefixedHex(
-            await this.clientCall(client, "state_getMetadata", []),
-          )
-          return metadata
-        }),
+      async () => {
+        if (pathInfo.vRuntime !== await this.latestVersion(pathInfo)) {
+          throw f.serverError("Cannot get metadata for old runtime version")
+        }
+        const metadata = fromPrefixedHex(
+          await this.call(pathInfo, "state_getMetadata", []),
+        )
+        return metadata
+      },
     )
   }
 
-  async clientCall<OkData>(
-    client: Connection,
+  async call<T>(
+    pathInfo: PathInfo,
     method: string,
     params: unknown[] = [],
-  ): Promise<OkData> {
-    const result = await client.call<OkData>(method, params)
-    if (result.error) throw new RpcServerError(result)
-    return result.result
+  ): Promise<T> {
+    return withSignal(async (signal) => {
+      const connection = await this.connect(pathInfo, signal)
+      const result = await connection.call(method, params)
+      if (result.error) throw new ServerError(result)
+      return result.result as T
+    })
   }
 }
