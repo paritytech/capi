@@ -1,30 +1,29 @@
 import { alice, bob, charlie, dave, Rune } from "capi"
 import { Balances, System, Utility } from "westend_dev/mod.ts"
 
-const recipients = Rune.array([bob, charlie, dave])
+const recipients = Object.entries({ bob, charlie, dave })
 
-const balances = recipients.mapArray((recipient) =>
-  System.Account
-    .entry(recipient.map((x) => [x.publicKey]))
-    .access("data", "free")
-)
+const batch = Utility.batch({
+  calls: Rune.tuple(recipients.map(([, { address }]) =>
+    Balances.transfer({
+      dest: address,
+      value: 3_000_000_123_456_789n,
+    })
+  )),
+})
+  .signed({ sender: alice })
+  .sent()
+  .logStatus("Batch tx:")
+  .finalized()
 
-console.log(await balances.run())
+await logBalances()
+  .chain(() => batch)
+  .chain(logBalances)
+  .run()
 
-console.log(
-  await Utility.batchAll({
-    calls: recipients.mapArray((recipient) =>
-      Balances.transfer({
-        dest: recipient.access("address"),
-        value: 12345n,
-      })
-    ),
-  })
-    .signed({ sender: alice })
-    .sent()
-    .logStatus()
-    .txEvents()
-    .run(),
-)
-
-console.log(await balances.run())
+function logBalances() {
+  return Rune.tuple(recipients.map(([name, { publicKey }]) => {
+    const free = System.Account.entry([publicKey]).access("data", "free")
+    return free.log(Rune.str`${name} balance:`)
+  }))
+}
