@@ -5,7 +5,6 @@ import { ValueRune } from "../rune/ValueRune.ts"
 import { hex, HexHash } from "../util/mod.ts"
 import { Chain, ClientRune } from "./ClientRune.ts"
 import { CodecRune } from "./CodecRune.ts"
-import { EventsRune } from "./EventsRune.ts"
 
 export class BlockRune<out U, out C extends Chain = Chain> extends Rune<known.SignedBlock, U> {
   constructor(
@@ -47,7 +46,9 @@ export class BlockRune<out U, out C extends Chain = Chain> extends Rune<known.Si
       .pallet("System")
       .storage("Events")
       .entry([], this.hash)
-      .unsafeAs<C["event"][]>()
-      .into(EventsRune, this)
+      .unsafeAs<C["event"][] | undefined>()
+      .into(ValueRune)
+      .unhandle(undefined)
+      .rehandle(undefined, () => Rune.constant<C["event"][]>([]))
   }
 }

@@ -7,6 +7,9 @@ import { PalletRune } from "./PalletRune.ts"
 import { state } from "./rpc_method_runes.ts"
 
 export class StorageRune<in out K extends unknown[], out V, out U> extends Rune<M.StorageEntry, U> {
+  $key
+  $value
+
   constructor(_prime: StorageRune<K, V, U>["_prime"], readonly pallet: PalletRune<U>) {
     super(_prime)
     this.$key = Rune.rec({
@@ -17,21 +20,20 @@ export class StorageRune<in out K extends unknown[], out V, out U> extends Rune<
     this.$value = this.pallet.metadata.codec(this.into(ValueRune).access("value"))
   }
 
-  $key
-  $value
-
   entryRaw<X>(...[key, blockHash]: RunicArgs<X, [key: K, blockHash?: U.HexHash]>) {
     const storageKey = this.$key.encoded(key).map(U.hex.encode)
-    return state.getStorage(
-      this.pallet.metadata.client,
-      storageKey,
-      blockHash,
-    ).unhandle(null)
+    return state
+      .getStorage(this.pallet.metadata.client, storageKey, blockHash)
+      .unhandle(null)
+      .rehandle(null, () => Rune.constant(undefined))
   }
 
   entry<X>(...[key, blockHash]: RunicArgs<X, [key: K, blockHash?: U.HexHash]>) {
-    const valueHex = this.entryRaw(key, blockHash)
-    return this.$value.decoded(valueHex.map(U.hex.decode)).unsafeAs<V>().into(ValueRune)
+    return this.$value
+      .decoded(this.entryRaw(key, blockHash).unhandle(undefined).map(U.hex.decode))
+      .unsafeAs<V>()
+      .into(ValueRune)
+      .rehandle(undefined)
   }
 
   keyPage<X>(

@@ -1,18 +1,10 @@
-import { alice, Rune, ValueRune } from "capi"
+import { alice, Rune } from "capi"
 import { types, XcmPallet } from "zombienet/statemine.toml/alice/@latest/mod.ts"
 import { Event as XcmPalletEvent } from "zombienet/statemine.toml/alice/@latest/types/pallet_xcm/pallet.ts"
 import { RuntimeEvent as AliceRuntimeEvent } from "zombienet/statemine.toml/alice/@latest/types/rococo_runtime/mod.ts"
 import { client, System } from "zombienet/statemine.toml/collator/@latest/mod.ts"
 import { Event as ParachainSystemEvent } from "zombienet/statemine.toml/collator/@latest/types/cumulus_pallet_parachain_system/pallet.ts"
 import { RuntimeEvent as CollatorRuntimeEvent } from "zombienet/statemine.toml/collator/@latest/types/statemine_runtime.ts"
-
-// TODO: have the recipient associate the downward message with the sender
-
-const aliceFree = System.Account
-  .entry([alice.publicKey])
-  .access("data", "free")
-
-console.log("Initial balance:", await aliceFree.run())
 
 const {
   VersionedMultiAssets,
@@ -61,26 +53,29 @@ const initiatedEvent = XcmPallet
     events.find((e) =>
       AliceRuntimeEvent.isXcmPallet(e.event)
       && XcmPalletEvent.isAttempted(e.event.value)
-    )
-      ?? new CannotFindAttemptError()
+    ) ?? new CannotFindAttemptError()
   )
   .unhandle(CannotFindAttemptError)
+  .log("Initiated event:")
 
 const processedEvent = System.Events
   .entry([], client.latestBlock.hash)
-  .into(ValueRune)
   .map((events) =>
     events
-      .find((e) =>
+      ?.find((e) =>
         CollatorRuntimeEvent.isParachainSystem(e.event)
         && ParachainSystemEvent.isDownwardMessagesProcessed(e.event.value)
       )
   )
   .filter((event) => !!event)
+  .log("Processed events:")
 
-console.log(
-  await Rune
-    .rec({ initiatedEvent, processedEvent })
-    .run(),
-)
-console.log("Final balance:", await aliceFree.run())
+// TODO: have the recipient associate the downward message with the sender
+await logAliceBalance()
+  .chain(() => Rune.tuple([initiatedEvent, processedEvent]))
+  .chain(() => logAliceBalance())
+  .run()
+
+function logAliceBalance() {
+  return System.Account.entry([alice.publicKey]).access("data", "free").log("Alice balance:")
+}
