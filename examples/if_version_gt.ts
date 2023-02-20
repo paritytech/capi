@@ -2,7 +2,7 @@ import { alice, bob, ExtrinsicRune } from "capi"
 import { Balances, client } from "polkadot_dev/mod.ts"
 
 const result = await client
-  .ifRuntimeGt(
+  .ifVersionGt(
     "0.9.36",
     Balances.transfer({
       value: 12345n,

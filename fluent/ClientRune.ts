@@ -57,11 +57,12 @@ export class ClientRune<out U, out C extends Chain = Chain> extends Rune<rpc.Cli
 
   chainVersion = rpcCall<[], string>("system_version")(this.as(Rune))
 
-  ifRuntimeGt<X, A, B>(
-    ...[threshold, ifCurrentVersion, ifNextVersion]: RunicArgs<
-      X,
-      [currentSemver: string, ifCurrentVersion: A, ifNextVersion: B]
-    >
+  ifVersionGt<X, A, B>(
+    ...[
+      threshold,
+      ifCurrentVersion,
+      ifNextVersion,
+    ]: RunicArgs<X, [currentSemver: string, ifCurrentVersion: A, ifNextVersion: B]>
   ) {
     return Rune
       .tuple([this.chainVersion, threshold])
