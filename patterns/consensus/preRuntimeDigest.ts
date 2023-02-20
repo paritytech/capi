@@ -8,8 +8,7 @@ export function preRuntimeDigest<U, C extends Chain, X>(
   chain: ChainRune<U, C>,
   ...[blockHash]: RunicArgs<X, [HexHash]>
 ) {
-  return client
-    .into(ChainRune)
+  return chain
     .block(blockHash)
     .header()
     .into(ValueRune)

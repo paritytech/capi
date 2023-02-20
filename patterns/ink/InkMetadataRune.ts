@@ -1,5 +1,5 @@
 import * as $ from "../../deps/scale.ts"
-import { Chain, ChainRune, CodecRune, ExtrinsicRune, state } from "../../fluent/mod.ts"
+import { Chain, ChainRune, CodecRune, ExtrinsicRune } from "../../fluent/mod.ts"
 import { ArrayRune, Rune, RunicArgs, ValueRune } from "../../rune/mod.ts"
 import { DeriveCodec } from "../../scale_info/mod.ts"
 import { hex } from "../../util/mod.ts"
@@ -37,7 +37,7 @@ export class InkMetadataRune<out U, out C extends Chain = Chain> extends Rune<In
     return Rune
       .resolve(jsonText)
       .map((jsonText) => normalize(JSON.parse(jsonText)))
-      .into(InkMetadataRune, Rune.resolve(client).into(ChainRune))
+      .into(InkMetadataRune, chain)
   }
 
   salt() {
@@ -109,14 +109,20 @@ export class InkMetadataRune<out U, out C extends Chain = Chain> extends Rune<In
     const gasLimit = Rune
       .resolve(props.gasLimit)
       .unhandle(undefined)
-      .rehandle(undefined, () =>
-        state
-          .call(this.client, "ContractsApi_instantiate", instantiateArgs.map(hex.encode))
-          .map((result) => $contractsApiInstantiateResult.decode(hex.decode(result)))
-          .access("gasRequired"))
+      .rehandle(
+        undefined,
+        () =>
+          this.chain.connection.call(
+            "state_call",
+            "ContractsApi_instantiate",
+            instantiateArgs.map(hex.encode),
+          )
+            .map((result) => $contractsApiInstantiateResult.decode(hex.decode(result)))
+            .access("gasRequired"),
+      )
     return Rune
       .rec({
-        type: "Contracts" as const,
+        type: "Contracts",
         value: Rune.rec({
           type: "instantiateWithCode",
           value,
@@ -127,7 +133,8 @@ export class InkMetadataRune<out U, out C extends Chain = Chain> extends Rune<In
           salt,
         }),
       })
-      .into(ExtrinsicRune, this.client)
+      .unsafeAs<Chain.Call<C>>()
+      .into(ExtrinsicRune, this.chain)
   }
 
   instance<U, C extends Chain, X>(
@@ -136,7 +143,7 @@ export class InkMetadataRune<out U, out C extends Chain = Chain> extends Rune<In
   ) {
     return Rune
       .resolve(publicKey)
-      .into(InkRune, client, this.as(InkMetadataRune))
+      .into(InkRune, chain, this.as(InkMetadataRune))
   }
 }
 

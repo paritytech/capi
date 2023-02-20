@@ -1,5 +1,5 @@
 import { equals } from "../../deps/std/bytes.ts"
-import { Chain, ChainRune, CodecRune, ExtrinsicRune, state } from "../../fluent/mod.ts"
+import { Chain, ChainRune, CodecRune, ExtrinsicRune } from "../../fluent/mod.ts"
 import { Event } from "../../primitives/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../../rune/mod.ts"
 import { hex } from "../../util/mod.ts"
@@ -30,8 +30,8 @@ export class InkRune<out U, out C extends Chain = Chain> extends Rune<Uint8Array
       .constant($contractsApiCallArgs)
       .into(CodecRune)
       .encoded(Rune.tuple([sender, this, value, undefined, undefined, data]))
-    return state
-      .call(this.client, "ContractsApi_call", instantiateArgs.map(hex.encode))
+    return this.chain.connection
+      .call("state_call", "ContractsApi_call", instantiateArgs.map(hex.encode))
       .map((result) => $contractsApiCallResult.decode(hex.decode(result)))
   }
 
@@ -86,7 +86,8 @@ export class InkRune<out U, out C extends Chain = Chain> extends Rune<Uint8Array
           storageDepositLimit,
         }),
       })
-      .into(ExtrinsicRune, this.client)
+      .unsafeAs<Chain.Call<C>>()
+      .into(ExtrinsicRune, this.chain)
   }
 
   filterContractEvents = <X>(...[events]: RunicArgs<X, [events: Event[]]>) => {
@@ -102,7 +103,7 @@ export class InkRune<out U, out C extends Chain = Chain> extends Rune<Uint8Array
 
   // TODO: improve
   decodeErrorEvent = <X>(...[failRuntimeEvent]: RunicArgs<X, [any]>) => {
-    const metadata = this.client.metadata()
+    const metadata = this.chain.metadata()
     const $error = metadata.codec(
       metadata
         .pallet("Contracts")

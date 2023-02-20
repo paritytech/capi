@@ -1,12 +1,14 @@
+import { types } from "polkadot_dev/mod.ts"
 import * as bytes from "../deps/std/bytes.ts"
 import { Chain, ChainRune } from "../fluent/ChainRune.ts"
+import { ExtrinsicRune } from "../fluent/mod.ts"
 import { MultiAddress } from "../primitives/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { multisigAccountId } from "./multisigAccountId.ts"
 
-export interface MultisigRatifyProps {
+export interface MultisigRatifyProps<C extends Chain> {
   sender: MultiAddress
-  call: unknown
+  call: Chain.Call<C>
 }
 
 export interface MultisigVoteProps {
@@ -19,6 +21,7 @@ export interface Multisig {
   threshold: number
 }
 
+// TODO: swap out `Chain` constraints upon subset gen issue resolution... same for other patterns
 export class MultisigRune<out U, out C extends Chain = Chain> extends Rune<Multisig, U> {
   threshold = this.into(ValueRune).access("threshold")
   address = this.into(ValueRune).map(({ signatories, threshold }) =>
@@ -30,15 +33,8 @@ export class MultisigRune<out U, out C extends Chain = Chain> extends Rune<Multi
 
   constructor(_prime: MultisigRune<U>["_prime"], readonly chain: ChainRune<U, C>) {
     super(_prime)
-    this.pallet = this.client.metadata().pallet("Multisig")
+    this.pallet = this.chain.metadata().pallet("Multisig")
     this.storage = this.pallet.storage("Multisigs")
-  }
-
-  static from<U, C extends Chain, X>(
-    chain: ChainRune<U, C>,
-    ...[multisig]: RunicArgs<X, [multisig: Multisig]>
-  ) {
-    return Rune.resolve(multisig).into(MultisigRune, client)
   }
 
   otherSignatories<X>(...[sender]: RunicArgs<X, [sender: MultiAddress]>) {
@@ -49,58 +45,69 @@ export class MultisigRune<out U, out C extends Chain = Chain> extends Rune<Multi
       )
   }
 
-  ratify<X>({ sender, call: _call }: RunicArgs<X, MultisigRatifyProps>) {
-    const call = this.client.extrinsic(_call)
-    const maxWeight = call.feeEstimate().access("weight")
-    return this.client.extrinsic(Rune.rec({
-      type: "Multisig",
-      value: Rune.rec({
-        type: "asMulti",
-        threshold: this.threshold,
-        call,
-        otherSignatories: this.otherSignatories(sender),
-        storeCall: false,
-        maxWeight,
-        maybeTimepoint: this.maybeTimepoint(call.hash),
-      }),
-    }))
+  ratify<X>({ sender, call: call_ }: RunicArgs<X, MultisigRatifyProps<C>>) {
+    const call = Rune
+      .resolve(call_)
+      .unsafeAs<Chain.Call<C>>()
+      .into(ExtrinsicRune, this.chain)
+    return Rune
+      .rec({
+        type: "Multisig",
+        value: Rune.rec({
+          type: "asMulti",
+          threshold: this.threshold,
+          call,
+          otherSignatories: this.otherSignatories(sender),
+          storeCall: false,
+          maxWeight: call.feeEstimate().access("weight"),
+          maybeTimepoint: this.maybeTimepoint(call.hash),
+        }),
+      })
+      .unsafeAs<Chain.Call<C>>()
+      .into(ExtrinsicRune, this.chain)
   }
 
   approve<X>({ sender, callHash }: RunicArgs<X, MultisigVoteProps>) {
-    return this.client.extrinsic(Rune.rec({
-      type: "Multisig",
-      value: Rune.rec({
-        type: "approveAsMulti",
-        threshold: this.threshold,
-        callHash,
-        otherSignatories: this.otherSignatories(sender),
-        storeCall: false,
-        // TODO: is this right?
-        maxWeight: {
-          refTime: 0n,
-          proofSize: 0n,
-        },
-        maybeTimepoint: this.maybeTimepoint(callHash),
-      }),
-    }))
+    return Rune
+      .rec({
+        type: "Multisig",
+        value: Rune.rec({
+          type: "approveAsMulti",
+          threshold: this.threshold,
+          callHash,
+          otherSignatories: this.otherSignatories(sender),
+          storeCall: false,
+          // TODO: is this right?
+          maxWeight: {
+            refTime: 0n,
+            proofSize: 0n,
+          },
+          maybeTimepoint: this.maybeTimepoint(callHash),
+        }),
+      })
+      .unsafeAs<Chain.Call<C>>()
+      .into(ExtrinsicRune, this.chain)
   }
 
   cancel<X>({ sender, callHash }: RunicArgs<X, MultisigVoteProps>) {
-    return this.client.extrinsic(Rune.rec({
-      type: "Multisig",
-      value: Rune.rec({
-        type: "cancelAsMulti",
-        threshold: this.threshold,
-        callHash,
-        otherSignatories: this.otherSignatories(sender),
-        timepoint: this.maybeTimepoint(callHash).map((x) => x ?? new NoProposalError()),
-      }),
-    }))
+    return Rune
+      .rec({
+        type: "Multisig",
+        value: Rune.rec({
+          type: "cancelAsMulti",
+          threshold: this.threshold,
+          callHash,
+          otherSignatories: this.otherSignatories(sender),
+          timepoint: this.maybeTimepoint(callHash).map((x) => x ?? new NoProposalError()),
+        }),
+      })
+      .unsafeAs<Chain.Call<C>>()
+      .into(ExtrinsicRune, this.chain)
   }
 
   private maybeTimepoint<X>(...[callHash]: RunicArgs<X, [callHash: Uint8Array]>) {
     return Rune.captureUnhandled(
-      [this, this.client, callHash],
+      [this, this.chain, callHash],
       (multisig, client, callHash) =>
         multisig.into(MultisigRune, client.into(ChainRune))
           .proposal(callHash)

@@ -9,8 +9,7 @@ export function babeBlockAuthor<U, C extends Chain, X>(
   chain: ChainRune<U, C>,
   ...[blockHash]: RunicArgs<X, [HexHash]>
 ) {
-  const validators = client
-    .into(ChainRune)
+  const validators = chain
     .metadata()
     .pallet("Session")
     .storage("Validators")
@@ -18,7 +17,7 @@ export function babeBlockAuthor<U, C extends Chain, X>(
     .unsafeAs<Uint8Array[] | undefined>()
     .into(ValueRune)
     .unhandle(undefined)
-  const authorityIndex = preRuntimeDigest(client, blockHash)
+  const authorityIndex = preRuntimeDigest(chain, blockHash)
     .map(({ type, value }) => {
       if (type !== "BABE") return new AuthorRetrievalNotSupportedError()
       return $preDigest.decode(value)
@@ -31,7 +30,7 @@ export function babeBlockAuthor<U, C extends Chain, X>(
     .map(([validators, authorityIndex]) => validators[authorityIndex])
     .unhandle(undefined)
     .into(PublicKeyRune)
-    .address(client)
+    .address(chain)
 }
 
 export class AuthorRetrievalNotSupportedError extends Error {

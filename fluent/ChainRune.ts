@@ -9,7 +9,7 @@ import { ConnectionRune } from "./ConnectionRune.ts"
 import { ExtrinsicRune } from "./ExtrinsicRune.ts"
 import { MetadataRune } from "./MetadataRune.ts"
 
-export interface Chain<C = unknown, E extends Event = Event> {
+export interface Chain<C = any, E extends Event = Event> {
   connection: Connection
   _call?: $.Codec<C>
   _event?: $.Codec<E>
