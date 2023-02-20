@@ -1,4 +1,4 @@
-import { alice, Rune, ValueRune } from "capi"
+import { alice, Rune } from "capi"
 import { types, XcmPallet } from "zombienet/statemine.toml/alice/@latest/mod.ts"
 import { Event as XcmPalletEvent } from "zombienet/statemine.toml/alice/@latest/types/pallet_xcm/pallet.ts"
 import { RuntimeEvent as AliceRuntimeEvent } from "zombienet/statemine.toml/alice/@latest/types/rococo_runtime/mod.ts"
