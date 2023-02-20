@@ -3,14 +3,14 @@ import {
   InkMetadataRune,
   instantiationEventIntoPublicKey,
   isInstantiatedEvent,
+  parse as parseMetadata,
 } from "capi/patterns/ink/mod.ts"
 import { chain } from "zombienet/rococo_contracts.toml/collator/@latest/mod.ts"
 import { parse } from "../../deps/std/flags.ts"
 
-export const metadata = InkMetadataRune.from(
-  chain,
-  Deno.readTextFileSync("examples/ink_e2e/metadata.json"),
-)
+export const metadata = Rune
+  .resolve(parseMetadata(Deno.readTextFileSync("examples/ink_e2e/metadata.json")))
+  .into(InkMetadataRune, chain)
 
 const sender = alice.publicKey
 

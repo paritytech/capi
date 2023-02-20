@@ -30,17 +30,6 @@ export class InkMetadataRune<out U, out C extends Chain = Chain> extends Rune<In
       .map(DeriveCodec)
   }
 
-  // TODO: remove
-  static from<U, C extends Chain, X>(
-    chain: ChainRune<U, C>,
-    ...[jsonText]: RunicArgs<X, [jsonText: string]>
-  ) {
-    return Rune
-      .resolve(jsonText)
-      .map((jsonText) => normalize(JSON.parse(jsonText)))
-      .into(InkMetadataRune, chain)
-  }
-
   salt() {
     return Rune.constant(crypto.getRandomValues(new Uint8Array(4)))
   }
