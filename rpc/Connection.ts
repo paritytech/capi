@@ -61,51 +61,33 @@ export abstract class Connection {
     return await pending
   }
 
-  subscriptionInitPendings: Record<number, RpcSubscriptionHandler> = {}
   subscriptionHandlers: Record<string, RpcSubscriptionHandler> = {}
-  subscriptionIdByRpcMessageId: Record<number, string> = {}
-  subscription(
+  async subscription(
     subscribe: string,
     unsubscribe: string,
     params: unknown[],
     handler: RpcSubscriptionHandler,
     signal: AbortSignal,
   ) {
-    ;(async () => {
-      await this.ready()
-      const subscribeId = this.nextId++
-      this.subscriptionInitPendings[subscribeId] = handler as RpcSubscriptionHandler
-      signal.addEventListener("abort", () => {
-        delete this.subscriptionInitPendings[subscribeId]
-        const subscriptionId = this.subscriptionIdByRpcMessageId[subscribeId]
-        if (subscriptionId) {
-          delete this.subscriptionIdByRpcMessageId[subscribeId]
-          this.send(this.nextId++, unsubscribe, [subscriptionId])
-        }
-      })
-      this.send(subscribeId, subscribe, params)
-    })()
+    const message = await this.call(subscribe, params)
+    if (signal.aborted) return
+    if (message.error) return handler(message)
+    const subscriptionId = message.result as string
+    this.subscriptionHandlers[subscriptionId] = handler
+    signal.addEventListener("abort", () => {
+      delete this.subscriptionHandlers[subscriptionId]
+      this.send(this.nextId++, unsubscribe, [subscriptionId])
+    })
   }
 
   handle(message: RpcIngressMessage) {
     if (typeof message.id === "number") {
-      const callResultPending = this.callResultPendings[message.id]
-      if (callResultPending) {
-        callResultPending.resolve(message)
-        delete this.callResultPendings[message.id]
-        return
-      }
-      const subscriptionPending = this.subscriptionInitPendings[message.id]
-      if (subscriptionPending) {
-        if (message.error) subscriptionPending(message)
-        else {
-          const subscriptionId = message.result as string
-          this.subscriptionHandlers[subscriptionId] = subscriptionPending
-          this.subscriptionIdByRpcMessageId[message.id] = subscriptionId
-        }
-        delete this.subscriptionInitPendings[message.id]
-      }
-    } else if (message.params) this.subscriptionHandlers[message.params.subscription]?.(message)
-    else throw new Error(Deno.inspect(message)) // ... for now
+      this.callResultPendings[message.id]?.resolve(message)
+      delete this.callResultPendings[message.id]
+    } else if (message.params) {
+      this.subscriptionHandlers[message.params.subscription]?.(message)
+    } else {
+      throw new Error(Deno.inspect(message)) // ... for now
+    }
   }
 }
