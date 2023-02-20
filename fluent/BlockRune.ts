@@ -3,13 +3,13 @@ import { known } from "../rpc/mod.ts"
 import { ArrayRune, Rune } from "../rune/mod.ts"
 import { ValueRune } from "../rune/ValueRune.ts"
 import { hex, HexHash } from "../util/mod.ts"
-import { Chain, ClientRune } from "./ClientRune.ts"
+import { Chain, ChainRune } from "./ChainRune.ts"
 import { CodecRune } from "./CodecRune.ts"
 
 export class BlockRune<out U, out C extends Chain = Chain> extends Rune<known.SignedBlock, U> {
   constructor(
     _prime: BlockRune<U, C>["_prime"],
-    readonly client: ClientRune<U, C>,
+    readonly chain: ChainRune<U, C>,
     readonly hash: Rune<HexHash, U>,
   ) {
     super(_prime)
@@ -24,7 +24,7 @@ export class BlockRune<out U, out C extends Chain = Chain> extends Rune<known.Si
   }
 
   extrinsics() {
-    const metadata = this.client.metadata()
+    const metadata = this.chain.metadata()
     const $extrinsic = Rune
       .rec({
         metadata,
@@ -41,14 +41,14 @@ export class BlockRune<out U, out C extends Chain = Chain> extends Rune<known.Si
   }
 
   events() {
-    return this.client
+    return this.chain
       .metadata()
       .pallet("System")
       .storage("Events")
       .entry([], this.hash)
-      .unsafeAs<C["event"][] | undefined>()
+      .unsafeAs<Chain.Event<C>[] | undefined>()
       .into(ValueRune)
       .unhandle(undefined)
-      .rehandle(undefined, () => Rune.constant<C["event"][]>([]))
+      .rehandle(undefined, () => Rune.constant<Chain.Event<C>[]>([]))
   }
 }

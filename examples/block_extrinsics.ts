@@ -1,5 +1,5 @@
-import { client } from "polkadot/mod.ts"
+import { chain } from "polkadot/mod.ts"
 
-const result = await client.latestBlock.extrinsics().run()
+const result = await chain.latestBlock.extrinsics().run()
 
 console.log(result)

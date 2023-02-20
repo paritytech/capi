@@ -171,3 +171,7 @@ function normalizeFields(fields: any[]) {
     return { ty, ...rest }
   })
 }
+
+export function parse(jsonText: string) {
+  return normalize(JSON.parse(jsonText))
+}

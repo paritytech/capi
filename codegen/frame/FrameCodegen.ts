@@ -8,21 +8,21 @@ import { typeVisitor } from "./typeVisitor.ts"
 
 export interface FrameCodegenProps {
   metadata: Metadata
-  clientFile: File
+  chainFile: File
 }
 
 export class FrameCodegen {
   files = new Map<string, File>()
 
   metadata
-  clientFile
+  chainFile
 
   typeVisitor
   typeFiles = new Map<string, TypeFile>()
 
-  constructor({ metadata, clientFile }: FrameCodegenProps) {
+  constructor({ metadata, chainFile }: FrameCodegenProps) {
     this.metadata = metadata
-    this.clientFile = clientFile
+    this.chainFile = chainFile
 
     this.typeVisitor = typeVisitor(this)
 
@@ -33,7 +33,7 @@ export class FrameCodegen {
 
     this.files.set("codecs.ts", codecs(this))
 
-    this.files.set("client.ts", clientFile)
+    this.files.set("chain.ts", chainFile)
 
     const callTy = Object
       .fromEntries(this.metadata.extrinsic.ty.params.map((x) => [x.name.toLowerCase(), x.ty]))
@@ -60,7 +60,7 @@ export class FrameCodegen {
         this.typeVisitor.visit(eventTy)
       }>
 
-      export * from "./client.ts"
+      export * from "./chain.ts"
       export * as types from "./types/mod.ts"
 
       ${palletNamespaceExports}

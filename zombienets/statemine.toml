@@ -12,6 +12,14 @@ validator = true
 name = "bob"
 validator = true
 
+[[relaychain.nodes]]
+name = "charlie"
+validator = true
+
+[[relaychain.nodes]]
+name = "dave"
+validator = true
+
 [[parachains]]
 id = 1000
 cumulus_based = true

@@ -1,4 +1,4 @@
-import { Hex, RpcResult, Subscription } from "./utils.ts"
+import { Hex, Subscription } from "./utils.ts"
 
 // https://github.com/paritytech/substrate/blob/0ba251c/client/finality-grandpa/rpc/src/report.rs#L116
 /**
@@ -40,25 +40,26 @@ export type JustificationNotification = Hex
 export type EncodedFinalityProof = Hex
 
 // https://github.com/paritytech/substrate/blob/9b01569/client/finality-grandpa/rpc/src/lib.rs#L48
-export type GrandpaRpc = {
+export type GrandpaCalls = {
   /**
    * Returns the state of the current best round state as well as the
    * ongoing background rounds.
    */
-  grandpa_roundState(): RpcResult<ReportedRoundStates>
-  /**
-   * Returns the block most recently finalized by Grandpa, alongside
-   * side its justification.
-   */
-  grandpa_subscribeJustifications(): RpcResult<
-    Subscription<"grandpa_subscribeJustifications", JustificationNotification>
-  >
-  grandpa_unsubscribeJustifications(
-    subscription: Subscription<"grandpa_subscribeJustifications", JustificationNotification>,
-  ): void
+  grandpa_roundState(): ReportedRoundStates
   /**
    * Prove finality for the given block number by returning the Justification for the last block
    * in the set and all the intermediary headers to link them together.
    */
-  grandpa_proveFinality(block: number): RpcResult<EncodedFinalityProof | null>
+  grandpa_proveFinality(block: number): EncodedFinalityProof | null
+}
+
+export type GrandpaSubscriptions = {
+  /**
+   * Returns the block most recently finalized by Grandpa, alongside
+   * side its justification.
+   */
+  grandpa_subscribeJustifications(): Subscription<
+    "grandpa_unsubscribeJustifications",
+    JustificationNotification
+  >
 }

@@ -2,7 +2,7 @@ import { known } from "../rpc/mod.ts"
 import { MetaRune, Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { Hex } from "../util/mod.ts"
 import { BlockRune } from "./BlockRune.ts"
-import { Chain } from "./ClientRune.ts"
+import { Chain } from "./ChainRune.ts"
 import { SignedExtrinsicRune } from "./SignedExtrinsicRune.ts"
 
 export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
@@ -37,9 +37,9 @@ export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
       )
       .singular()
       .unhandle(NeverInBlockError)
-    return this.extrinsic.client
+    return this.extrinsic.chain
       .block(hash)
-      .into(BlockRune, this.extrinsic.client, hash)
+      .into(BlockRune, this.extrinsic.chain, hash)
   }
 
   finalized() {
@@ -51,7 +51,7 @@ export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
       )
       .singular()
       .unhandle(NeverFinalizedError)
-    return this.extrinsic.client.block(hash)
+    return this.extrinsic.chain.block(hash)
   }
 
   txEvents() {

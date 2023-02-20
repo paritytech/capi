@@ -1,4 +1,4 @@
-import { AccountId, Hash, Hex, NumberOrHex, RpcResult, SerdeEnum, SerdeResult } from "./utils.ts"
+import { AccountId, Hash, Hex, NumberOrHex, SerdeEnum, SerdeResult } from "./utils.ts"
 
 // https://github.com/paritytech/substrate/blob/0246883/frame/contracts/rpc/src/lib.rs#L92
 /** A struct that encodes RPC parameters required for a call to a smart-contract. */
@@ -220,7 +220,7 @@ export interface InstantiateReturnValue {
 }
 
 // https://github.com/paritytech/substrate/blob/0246883/frame/contracts/rpc/src/lib.rs#L127
-export type ContractsRpc = {
+export type ContractsCalls = {
   /**
    * Executes a call to a contract.
    *
@@ -233,7 +233,7 @@ export type ContractsRpc = {
   contracts_call(
     callRequest: CallRequest,
     at?: Hash,
-  ): RpcResult<ContractResult<SerdeResult<ExecReturnValue, DispatchError>>>
+  ): ContractResult<SerdeResult<ExecReturnValue, DispatchError>>
   /**
    * Instantiate a new contract.
    *
@@ -244,7 +244,7 @@ export type ContractsRpc = {
    */
   contracts_instantiate(
     instantiateRequest: InstantiateRequest,
-  ): RpcResult<ContractResult<SerdeResult<InstantiateReturnValue, DispatchError>>>
+  ): ContractResult<SerdeResult<InstantiateReturnValue, DispatchError>>
   /**
    * Upload new code without instantiating a contract from it.
    *
@@ -256,7 +256,7 @@ export type ContractsRpc = {
   contracts_upload_code(
     uploadRequest: CodeUploadRequest,
     at?: Hash,
-  ): RpcResult<SerdeResult<CodeUploadReturnValue, DispatchError>>
+  ): SerdeResult<CodeUploadReturnValue, DispatchError>
   /**
    * Returns the value under a specified storage `key` in a contract given by `address` param,
    * or `None` if it is not set.
@@ -265,5 +265,5 @@ export type ContractsRpc = {
     accountId: AccountId,
     key: Hex,
     aat?: Hash,
-  ): RpcResult<Hex | null>
+  ): Hex | null
 }

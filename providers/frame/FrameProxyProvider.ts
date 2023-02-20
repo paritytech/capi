@@ -1,6 +1,6 @@
 import { File } from "../../codegen/frame/mod.ts"
 import { deferred } from "../../deps/std/async.ts"
-import { Client, proxyProvider } from "../../rpc/mod.ts"
+import { WsConnection } from "../../rpc/mod.ts"
 import { PathInfo } from "../../server/mod.ts"
 import { fromPathInfo } from "../../server/PathInfo.ts"
 import { FrameProvider } from "./FrameProvider.ts"
@@ -59,14 +59,11 @@ export abstract class FrameProxyProvider extends FrameProvider {
     ).toString()
   }
 
-  async client(pathInfo: PathInfo) {
-    const url = await this.dynamicUrl(pathInfo)
-    const client = new Client(proxyProvider, url)
-    this.env.signal.addEventListener("abort", client.discard)
-    return client
+  async connect(pathInfo: PathInfo, signal: AbortSignal) {
+    return WsConnection.connect(await this.dynamicUrl(pathInfo), signal)
   }
 
-  async clientFile(pathInfo: PathInfo) {
+  async chainFile(pathInfo: PathInfo) {
     const url = this.staticUrl(pathInfo)
     return new File(`
       import * as C from "./capi.ts"
@@ -74,9 +71,8 @@ export abstract class FrameProxyProvider extends FrameProvider {
 
       export const discoveryValue = "${url}"
 
-      export const client = C.rpcClient(C.rpc.proxyProvider, discoveryValue)["_asCodegen"]<Chain>()
-
-      export const rawClient = new C.rpc.Client(C.rpc.proxyProvider, discoveryValue)
+      export const chain = C.connection((signal) => C.WsConnection.connect(discoveryValue, signal))
+        .chain()["_asCodegen"]<Chain>()
     `)
   }
 }

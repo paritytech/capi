@@ -1,12 +1,12 @@
 import * as M from "../frame_metadata/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { DeriveCodec, Ty } from "../scale_info/mod.ts"
-import { Chain, ClientRune } from "./ClientRune.ts"
+import { Chain, ChainRune } from "./ChainRune.ts"
 import { CodecRune } from "./CodecRune.ts"
 import { PalletRune } from "./PalletRune.ts"
 
 export class MetadataRune<out U, out C extends Chain = Chain> extends Rune<M.Metadata, U> {
-  constructor(_prime: MetadataRune<U>["_prime"], readonly client: ClientRune<U, C>) {
+  constructor(_prime: MetadataRune<U>["_prime"], readonly chain: ChainRune<U, C>) {
     super(_prime)
   }
 

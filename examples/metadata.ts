@@ -1,5 +1,5 @@
-import { client } from "polkadot_dev/mod.ts"
+import { chain } from "polkadot_dev/mod.ts"
 
-const result = await client.metadata().run()
+const result = await chain.metadata().run()
 
 console.log(result)

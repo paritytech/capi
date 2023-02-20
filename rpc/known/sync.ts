@@ -1,5 +1,5 @@
 import { ChainType } from "./system.ts"
-import { Hash, Hex, RpcResult } from "./utils.ts"
+import { Hash, Hex } from "./utils.ts"
 
 // https://github.com/paritytech/substrate/blob/a7ba55d3/client/chain-spec/src/chain_spec.rs#L161
 /** A configuration of a client. Does not include runtime storage initialization. */
@@ -64,8 +64,8 @@ export interface LightSyncState {
 }
 
 // https://github.com/paritytech/substrate/blob/eddf8883/client/sync-state-rpc/src/lib.rs#L128
-export type SyncRpc = {
+export type SyncCalls = {
   // https://github.com/paritytech/substrate/blob/eddf8883/client/sync-state-rpc/src/lib.rs#L131
   /** Returns the JSON serialized chainspec running the node, with a sync state. */
-  system_gen_sync_spec(raw: boolean): RpcResult<ChainSpec>
+  system_gen_sync_spec(raw: boolean): ChainSpec
 }

@@ -1,4 +1,4 @@
-import { Hex, RpcResult, SerdeEnum } from "./utils.ts"
+import { Hex, SerdeEnum } from "./utils.ts"
 
 /** A type of supported crypto. */
 export type StorageKind = SerdeEnum<{
@@ -21,9 +21,9 @@ export type StorageKind = SerdeEnum<{
 }>
 
 // https://github.com/paritytech/substrate/blob/7d233c2/client/rpc-api/src/offchain/mod.rs#L28
-export type OffchainRpc = {
+export type OffchainCalls = {
   /** Set offchain local storage under given key and prefix. */
-  offchain_localStorageSet(kind: StorageKind, key: Hex, value: Hex): RpcResult<null>
+  offchain_localStorageSet(kind: StorageKind, key: Hex, value: Hex): null
   /** Get offchain local storage under given key and prefix. */
-  offchain_localStorageGet(kind: StorageKind, key: Hex): RpcResult<Hex | null>
+  offchain_localStorageGet(kind: StorageKind, key: Hex): Hex | null
 }

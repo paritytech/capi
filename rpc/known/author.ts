@@ -1,4 +1,4 @@
-import { Hash, Hex, RpcResult, SerdeEnum, Subscription } from "./utils.ts"
+import { Hash, Hex, SerdeEnum, Subscription } from "./utils.ts"
 
 // https://github.com/paritytech/substrate/blob/e0ccd00/client/transaction-pool/api/src/lib.rs#L104
 /**
@@ -102,28 +102,31 @@ export type ExtrinsicOrHash = SerdeEnum<{
 }>
 
 // https://github.com/paritytech/substrate/blob/e0ccd00/client/rpc-api/src/author/mod.rs#L30
-export type AuthorRpc = {
+export type AuthorCalls = {
   /** Submit hex-encoded extrinsic for inclusion in block. */
-  author_submitExtrinsic(extrinsic: Hex): RpcResult<Hash>
+  author_submitExtrinsic(extrinsic: Hex): Hash
   /** Insert a key into the keystore. */
-  author_insertKey(keyType: string, suri: string, publicKey: Hex): RpcResult<null>
+  author_insertKey(keyType: string, suri: string, publicKey: Hex): null
   /** Generate new session keys and returns the corresponding public keys. */
-  author_rotateKeys(): RpcResult<Hex>
+  author_rotateKeys(): Hex
   /**
    * Checks if the keystore has private keys for the given session public keys.
    * `sessionKeys` is the SCALE encoded session keys object from the runtime.
    * Returns `true` iff all private keys could be found.
    */
-  author_hasSessionKeys(sessionsKeys: Hex): RpcResult<boolean>
+  author_hasSessionKeys(sessionsKeys: Hex): boolean
   /**
    * Checks if the keystore has private keys for the given public key and key type.
    * Returns `true` if a private key could be found.
    */
-  author_hasKey(pubKey: Hex, keyType: string): RpcResult<boolean>
+  author_hasKey(pubKey: Hex, keyType: string): boolean
   /** Returns all pending extrinsics, potentially grouped by sender.  */
-  author_pendingExtrinsics(): RpcResult<Hex[]>
+  author_pendingExtrinsics(): Hex[]
   /** Remove given extrinsic from the pool and temporarily ban it to prevent reimporting. */
-  author_removeExtrinsic(extrinsics: ExtrinsicOrHash[]): RpcResult<Hex[]> // todo
+  author_removeExtrinsic(extrinsics: ExtrinsicOrHash[]): Hex[] // todo
+}
+
+export type AuthorSubscriptions = {
   /**
    * Submit an extrinsic to watch.
    *
@@ -132,8 +135,5 @@ export type AuthorRpc = {
    */
   author_submitAndWatchExtrinsic(
     extrinsic: Hex,
-  ): RpcResult<Subscription<"author_submitAndWatchExtrinsic", TransactionStatus>>
-  author_unwatchExtrinsic(
-    subscription: Subscription<"author_submitAndWatchExtrinsic", TransactionStatus>,
-  ): RpcResult<void>
+  ): Subscription<"author_unwatchExtrinsic", TransactionStatus>
 }

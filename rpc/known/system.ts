@@ -1,4 +1,4 @@
-import { Hash, RpcResult, SerdeEnum } from "./utils.ts"
+import { Hash, SerdeEnum } from "./utils.ts"
 
 // https://github.com/paritytech/substrate/blob/57e3486/client/chain-spec/src/lib.rs#L198
 /**
@@ -66,17 +66,17 @@ export interface SyncState {
 }
 
 // https://github.com/paritytech/substrate/blob/e0ccd00/client/rpc-api/src/system/mod.rs#L33
-export type SystemRpc = {
+export type SystemCalls = {
   /** Get the node's implementation name. Plain old string. */
-  system_name(): RpcResult<string>
+  system_name(): string
   /** Get the node implementation's version. Should be a semver string. */
-  system_version(): RpcResult<string>
+  system_version(): string
   /** Get the chain's name. Given as a string identifier. */
-  system_chain(): RpcResult<string>
+  system_chain(): string
   /** Get the chain's type. */
-  system_chainType(): RpcResult<ChainType>
+  system_chainType(): ChainType
   /** Get a custom set of properties as a JSON object, defined in the chain spec. */
-  system_properties(): RpcResult<Record<string, unknown>>
+  system_properties(): Record<string, unknown>
   /**
    * Return health status of the node.
    *
@@ -84,18 +84,18 @@ export type SystemRpc = {
    * - connected to some peers (unless running in dev mode)
    * - not performing a major sync
    */
-  system_health(): RpcResult<Health>
+  system_health(): Health
   /** Returns the base58-encoded PeerId of the node. */
-  system_localPeerId(): RpcResult<string>
+  system_localPeerId(): string
   /**
    * Returns the multi-addresses that the local node is listening on
    *
    * The addresses include a trailing `/p2p/` with the local PeerId, and are thus suitable to
    * be passed to `addReservedPeer` or as a bootnode address for example.
    */
-  system_localListenAddresses(): RpcResult<string[]>
+  system_localListenAddresses(): string[]
   /** Returns currently connected peers */
-  system_peers(): RpcResult<PeerInfo[]>
+  system_peers(): PeerInfo[]
   /**
    * Returns current state of the network.
    *
@@ -104,7 +104,7 @@ export type SystemRpc = {
    */
   // TODO: the future of this call is uncertain: https://github.com/paritytech/substrate/issues/1890
   // https://github.com/paritytech/substrate/issues/5541
-  system_networkState(): RpcResult<unknown>
+  system_networkState(): unknown
   /**
    * Adds a reserved peer. Returns the empty string or an error. The string
    * parameter should encode a `p2p` multiaddr.
@@ -112,21 +112,21 @@ export type SystemRpc = {
    * `/ip4/198.51.100.19/tcp/30333/p2p/QmSk5HQbn6LhUwDiNMseVUjuRYhEtYj4aUZ6WfWoGURpdV`
    * is an example of a valid, passing multiaddr with PeerId attached.
    */
-  system_addReservedPeer(peer: string): RpcResult<void>
+  system_addReservedPeer(peer: string): void
   /**
    * Remove a reserved peer. Returns the empty string or an error. The string
    * should encode only the PeerId e.g. `QmSk5HQbn6LhUwDiNMseVUjuRYhEtYj4aUZ6WfWoGURpdV`.
    */
-  system_removeReservedPeer(peerId: string): RpcResult<void>
+  system_removeReservedPeer(peerId: string): void
   /** Returns the list of reserved peers */
-  system_reservedPeers(): RpcResult<string[]>
+  system_reservedPeers(): string[]
   /** Returns the roles the node is running as. */
-  system_nodeRoles(): RpcResult<NodeRole[]>
+  system_nodeRoles(): NodeRole[]
   /**
    * Returns the state of the syncing of the node: starting block, current best block, highest
    * known block.
    */
-  system_syncState(): RpcResult<SyncState>
+  system_syncState(): SyncState
   /**
    * Adds the supplied directives to the current log filter
    *
@@ -134,7 +134,7 @@ export type SystemRpc = {
    *
    * `sync=debug,state=trace`
    */
-  system_addLogFilter(directives: string): RpcResult<void>
+  system_addLogFilter(directives: string): void
   /** Resets the log filter to Substrate defaults */
-  system_resetLogFilter(): RpcResult<void>
+  system_resetLogFilter(): void
 }

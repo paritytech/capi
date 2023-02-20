@@ -1,7 +1,7 @@
 import { Rune } from "capi"
-import { client, Timestamp } from "polkadot/mod.ts"
+import { chain, Timestamp } from "polkadot/mod.ts"
 
-const block = client.latestBlock
+const block = chain.latestBlock
 const extrinsics = block.extrinsics()
 const events = block.events()
 const now = Timestamp.Now.entry([], block.hash)

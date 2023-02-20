@@ -1,5 +1,5 @@
-import { client } from "polkadot/mod.ts"
+import { chain } from "polkadot/mod.ts"
 
-const result = await client.latestBlock.events().run()
+const result = await chain.latestBlock.events().run()
 
 console.log(result)

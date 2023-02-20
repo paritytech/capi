@@ -1,7 +1,8 @@
-export * from "./client.ts"
 export * as known from "./known/mod.ts"
-export * as msg from "./messages.ts"
-export * from "./provider/base.ts"
-export * from "./provider/errors.ts"
-export * from "./provider/proxy.ts"
-export * from "./provider/smoldot.ts"
+
+// moderate --exclude known
+
+export * from "./Connection.ts"
+export * from "./rpc_messages.ts"
+export * from "./smoldot.ts"
+export * from "./ws.ts"

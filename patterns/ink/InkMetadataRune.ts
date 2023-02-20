@@ -1,10 +1,9 @@
 import * as $ from "../../deps/scale.ts"
-import { Chain, ClientRune, CodecRune, ExtrinsicRune, state } from "../../fluent/mod.ts"
-import { Client } from "../../rpc/client.ts"
+import { Chain, ChainRune, CodecRune, ExtrinsicRune } from "../../fluent/mod.ts"
 import { ArrayRune, Rune, RunicArgs, ValueRune } from "../../rune/mod.ts"
 import { DeriveCodec } from "../../scale_info/mod.ts"
 import { hex } from "../../util/mod.ts"
-import { Callable, InkMetadata, normalize } from "./InkMetadata.ts"
+import { Callable, InkMetadata } from "./InkMetadata.ts"
 import { InkRune } from "./InkRune.ts"
 import { $contractsApiInstantiateArgs, $contractsApiInstantiateResult, Weight } from "./known.ts"
 
@@ -23,19 +22,12 @@ export interface InstantiateProps {
 export class InkMetadataRune<out U, out C extends Chain = Chain> extends Rune<InkMetadata, U> {
   deriveCodec
 
-  constructor(_prime: InkMetadataRune<U>["_prime"], readonly client: ClientRune<U, C>) {
+  constructor(_prime: InkMetadataRune<U>["_prime"], readonly chain: ChainRune<U, C>) {
     super(_prime)
     this.deriveCodec = this
       .into(ValueRune)
       .access("V3", "types")
       .map(DeriveCodec)
-  }
-
-  static from<X>(...[client, jsonText]: RunicArgs<X, [client: Client, jsonText: string]>) {
-    return Rune
-      .resolve(jsonText)
-      .map((jsonText) => normalize(JSON.parse(jsonText)))
-      .into(InkMetadataRune, Rune.resolve(client).into(ClientRune))
   }
 
   salt() {
@@ -107,14 +99,20 @@ export class InkMetadataRune<out U, out C extends Chain = Chain> extends Rune<In
     const gasLimit = Rune
       .resolve(props.gasLimit)
       .unhandle(undefined)
-      .rehandle(undefined, () =>
-        state
-          .call(this.client, "ContractsApi_instantiate", instantiateArgs.map(hex.encode))
-          .map((result) => $contractsApiInstantiateResult.decode(hex.decode(result)))
-          .access("gasRequired"))
+      .rehandle(
+        undefined,
+        () =>
+          this.chain.connection.call(
+            "state_call",
+            "ContractsApi_instantiate",
+            instantiateArgs.map(hex.encode),
+          )
+            .map((result) => $contractsApiInstantiateResult.decode(hex.decode(result)))
+            .access("gasRequired"),
+      )
     return Rune
       .rec({
-        type: "Contracts" as const,
+        type: "Contracts",
         value: Rune.rec({
           type: "instantiateWithCode",
           value,
@@ -125,13 +123,17 @@ export class InkMetadataRune<out U, out C extends Chain = Chain> extends Rune<In
           salt,
         }),
       })
-      .into(ExtrinsicRune, this.client)
+      .unsafeAs<Chain.Call<C>>()
+      .into(ExtrinsicRune, this.chain)
   }
 
-  instance<X>(...[client, publicKey]: RunicArgs<X, [client: Client, publicKey: Uint8Array]>) {
+  instance<U, C extends Chain, X>(
+    chain: ChainRune<U, C>,
+    ...[publicKey]: RunicArgs<X, [Uint8Array]>
+  ) {
     return Rune
       .resolve(publicKey)
-      .into(InkRune, Rune.resolve(client).into(ClientRune), this.as(InkMetadataRune))
+      .into(InkRune, chain, this.as(InkMetadataRune))
   }
 }
 

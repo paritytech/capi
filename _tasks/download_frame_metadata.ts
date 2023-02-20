@@ -1,11 +1,11 @@
-import { rawClient as kusama } from "kusama/client.ts"
-import { rawClient as polkadot } from "polkadot/client.ts"
-import { rawClient as rococo } from "rococo/client.ts"
-import { rawClient as westend } from "westend/client.ts"
+import { chain as kusama } from "kusama/mod.ts"
+import { chain as polkadot } from "polkadot/mod.ts"
+import { chain as rococo } from "rococo/mod.ts"
+import { chain as westend } from "westend/mod.ts"
 
-const knownClients = { kusama, polkadot, westend, rococo }
+const knownChains = { kusama, polkadot, westend, rococo }
 
-const names = Object.keys(knownClients)
+const names = Object.keys(knownChains)
 const outDir = new URL("../frame_metadata/_downloaded", import.meta.url)
 try {
   Deno.removeSync(outDir, { recursive: true })
@@ -33,13 +33,10 @@ async function download(name: string) {
 Deno.writeTextFileSync(modFilePath, modFileContents, { create: true })
 
 await Promise.all(
-  Object.entries(knownClients).map(async ([name, client]) => {
-    const r = await client.call(name, "state_getMetadata", [])
-    if (r instanceof Error) throw r
-    if (r.error) throw new Error(r.error.message)
+  Object.entries(knownChains).map(async ([name, chain]) => {
+    const result = await chain.connection.call("state_getMetadata").run()
     const outPath = new URL(`_downloaded/${name}.scale`, outDir)
     console.log(`Downloading ${name} metadata to "${outPath}".`)
-    await Deno.writeTextFile(outPath, r.result)
-    await client.discard()
+    await Deno.writeTextFile(outPath, result)
   }),
 )

@@ -40,7 +40,6 @@ contramap
 creds
 cummon
 curto
-Curto
 darwinia
 datahighway
 datetime
@@ -103,7 +102,7 @@ litentry
 lldb
 lparachain
 ltex
-Lxkf
+lxkf
 mathchain
 matklad
 merkle
@@ -200,7 +199,7 @@ tnkr
 todos
 tomaka
 tostring
-Tpeyg
+tpeyg
 transcoders
 trufflehog
 trufflesecurity
