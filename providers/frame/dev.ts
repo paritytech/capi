@@ -1,3 +1,4 @@
+import * as $ from "../../deps/scale.ts"
 import { Env, PathInfo } from "../../server/mod.ts"
 import { PermanentMemo } from "../../util/mod.ts"
 import { getAvailable, isReady } from "../../util/port.ts"
@@ -19,7 +20,7 @@ export class PolkadotDevProvider extends FrameProxyProvider {
   urlMemo = new PermanentMemo<DevRuntimeName, string>()
   dynamicUrl(pathInfo: PathInfo) {
     const { target } = pathInfo
-    assertDevRuntimeName(target)
+    $.assert($devRuntimeName, target)
     return this.urlMemo.run(target, async () => {
       const port = await this.spawnDevNet(target)
       return `ws://localhost:${port}`
@@ -51,15 +52,10 @@ export class PolkadotDevProvider extends FrameProxyProvider {
   }
 }
 
-export const DEV_RUNTIME_NAMES = ["polkadot", "kusama", "westend", "rococo"] as const
-export type DevRuntimeName = typeof DEV_RUNTIME_NAMES[number]
-
-export function assertDevRuntimeName(inQuestion: string): asserts inQuestion is DevRuntimeName {
-  if (!(DEV_RUNTIME_NAME_EXISTS as Record<string, true>)[inQuestion]) throw new Error()
-}
-const DEV_RUNTIME_NAME_EXISTS: Record<DevRuntimeName, true> = {
-  polkadot: true,
-  kusama: true,
-  westend: true,
-  rococo: true,
-}
+type DevRuntimeName = $.Native<typeof $devRuntimeName>
+const $devRuntimeName = $.stringUnion([
+  "polkadot",
+  "kusama",
+  "westend",
+  "rococo",
+])
