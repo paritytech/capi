@@ -62,6 +62,10 @@ export class Rune<out T, out U = never> {
     return new Rune((batch) => new ctor(batch, ...args))
   }
 
+  static chain<T, U>(fn: () => Rune<T, U>): ValueRune<T, U> {
+    return fn().into(ValueRune)
+  }
+
   async run(batch = new Batch()): Promise<T> {
     for await (const value of this.iter(batch)) {
       return value
