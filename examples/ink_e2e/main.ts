@@ -27,7 +27,7 @@ if (!address) {
     })
     .signed({ sender: alice })
     .sent()
-    .logStatus("Contract deployment status:")
+    .dbgStatus("Contract deployment status:")
     .txEvents()
     .map((events) =>
       events.find(isInstantiatedEvent) ?? new FailedToFindContractInstantiatedError()
@@ -51,7 +51,7 @@ console.log(
     .tx({ sender, method: "flip" })
     .signed({ sender: alice })
     .sent()
-    .logStatus("Flip status:")
+    .dbgStatus("Flip status:")
     .txEvents()
     .pipe(contract.filterContractEvents)
     .run(),
