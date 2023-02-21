@@ -25,7 +25,7 @@ console.log(
       },
     })
     .sent()
-    .logStatus()
+    .dbgStatus()
     .txEvents()
     .run(),
 )

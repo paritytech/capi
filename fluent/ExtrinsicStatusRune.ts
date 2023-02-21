@@ -15,10 +15,10 @@ export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
     super(_prime)
   }
 
-  logStatus<X>(...prefix: RunicArgs<X, unknown[]>): ExtrinsicStatusRune<U1, U2, C> {
+  dbgStatus<X>(...prefix: RunicArgs<X, unknown[]>): ExtrinsicStatusRune<U1, U2, C> {
     return this
       .into(ValueRune)
-      .map((rune) => rune.into(ValueRune).log(...prefix))
+      .map((rune) => rune.into(ValueRune).dbg(...prefix))
       .into(ExtrinsicStatusRune, this.extrinsic)
   }
 

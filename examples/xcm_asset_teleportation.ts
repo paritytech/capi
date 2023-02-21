@@ -47,7 +47,7 @@ const initiatedEvent = XcmPallet
   })
   .signed({ sender: alice })
   .sent()
-  .logStatus("Teleportation status:")
+  .dbgStatus("Teleportation status:")
   .txEvents()
   .map((events) =>
     events.find((e) =>
@@ -56,7 +56,7 @@ const initiatedEvent = XcmPallet
     ) ?? new CannotFindAttemptError()
   )
   .unhandle(CannotFindAttemptError)
-  .log("Initiated event:")
+  .dbg("Initiated event:")
 
 const processedEvent = System.Events
   .entry([], chain.latestBlock.hash)
@@ -67,7 +67,7 @@ const processedEvent = System.Events
     )
   )
   .filter((event) => !!event)
-  .log("Processed events:")
+  .dbg("Processed events:")
 
 // TODO: have the recipient associate the downward message with the sender
 await logAliceBalance()
@@ -76,5 +76,5 @@ await logAliceBalance()
   .run()
 
 function logAliceBalance() {
-  return System.Account.entry([alice.publicKey]).access("data", "free").log("Alice balance:")
+  return System.Account.entry([alice.publicKey]).access("data", "free").dbg("Alice balance:")
 }
