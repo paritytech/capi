@@ -1,8 +1,13 @@
-import * as bytes from "../deps/std/bytes.ts"
-import { Chain, ChainRune } from "../fluent/ChainRune.ts"
-import { ExtrinsicRune } from "../fluent/mod.ts"
-import { MultiAddress } from "../primitives/mod.ts"
-import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
+import * as bytes from "../../deps/std/bytes.ts"
+import {
+  Chain,
+  ChainRune,
+  ExtrinsicRune,
+  MultiAddress,
+  Rune,
+  RunicArgs,
+  ValueRune,
+} from "../../mod.ts"
 import { multisigAccountId } from "./multisigAccountId.ts"
 
 export interface MultisigRatifyProps<C extends Chain> {

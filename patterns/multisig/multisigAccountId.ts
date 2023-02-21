@@ -1,5 +1,5 @@
-import * as $ from "../deps/scale.ts"
-import { Blake2_256 } from "../util/hashers.ts"
+import * as $ from "../../deps/scale.ts"
+import { Blake2_256 } from "../../util/hashers.ts"
 
 const seed = "modlpy/utilisuba" // cspell:disable-line
 
