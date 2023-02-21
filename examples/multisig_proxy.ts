@@ -9,7 +9,7 @@ import { Balances, chain, Proxy, System, Utility } from "polkadot_dev/mod.ts"
 import { MultisigRune } from "../patterns/MultisigRune.ts"
 
 const build = buildPureProxyMultisig({
-  signer: alice,
+  sender: alice,
   threshold: 2,
   admins: [alice.publicKey, bob.publicKey, charlie.publicKey],
 })
