@@ -27,7 +27,6 @@ const { indentWidth, lineWidth, typescript: config } = dprintConfig
 tsFormatter.setConfig({ indentWidth, lineWidth }, config)
 `,
 )
-if (true as boolean) Deno.exit()
 
 const knownChains = { kusama, polkadot, westend, rococo }
 const names = Object.keys(knownChains)
