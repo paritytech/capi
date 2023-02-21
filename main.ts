@@ -82,5 +82,6 @@ async function after() {
     })
     console.log(Deno.resources())
     controller.abort()
+    setTimeout(() => console.log(Deno.resources()), 100)
   }
 }
