@@ -52,6 +52,7 @@ export class StorageRune<in out K extends unknown[], out V, out U> extends Rune<
           })
         )
       })
+      .unsafeAs<[[K, V][]]>()
   }
 
   entryRaw<X>(...[key, blockHash]: RunicArgs<X, [key: K, blockHash?: HexHash]>) {
