@@ -42,7 +42,7 @@ export function buildPureProxyMultisig<X1>(props: RunicArgs<X1, BuildPureProxyMu
     .batch({ calls: createPureCalls })
     .signed({ sender })
     .sent()
-    .logStatus("Creating pure proxies:")
+    .dbgStatus("Creating pure proxies:")
     .txEvents()
     .pipe(filterPureCreatedEvents)
     .map((e): Record<number, Uint8Array> =>

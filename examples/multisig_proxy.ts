@@ -33,7 +33,7 @@ const existentialDeposits = Utility.batchAll({
   ),
 }).signed({ sender: alice })
   .sent()
-  .logStatus("Existential deposits:")
+  .dbgStatus("Existential deposits:")
   .txEvents()
 
 const getProxyAddress = getMultiAddress(adminProxies)
@@ -53,7 +53,7 @@ const updateProxies = Utility
     ]),
   }).signed({ sender: alice })
   .sent()
-  .logStatus("Update Proxies")
+  .dbgStatus("Update Proxies")
   .txEvents()
 
 const proposalCall = Proxy.proxy({
@@ -76,7 +76,7 @@ const aliceRatify = Proxy
   })
   .signed({ sender: alice })
   .sent()
-  .logStatus("Ratify Proposal Alice:")
+  .dbgStatus("Ratify Proposal Alice:")
   .finalized()
 
 const bobRatify = Proxy
@@ -90,7 +90,7 @@ const bobRatify = Proxy
   })
   .signed({ sender: bob })
   .sent()
-  .logStatus("Ratify Proposal Bob:")
+  .dbgStatus("Ratify Proposal Bob:")
   .finalized()
 
 const daveBalance = System.Account.entry([dave.publicKey])
