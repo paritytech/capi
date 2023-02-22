@@ -8,7 +8,7 @@
     "semiColons": "asi"
   },
   "includes": ["**.{dockerfile,json,md,toml,ts,tsx}"],
-  "excludes": ["target"],
+  "excludes": ["target", "util/tsFormatter.ts"],
   "plugins": [
     "https://plugins.dprint.dev/dockerfile-0.3.0.wasm",
     "https://plugins.dprint.dev/json-0.17.0.wasm",
