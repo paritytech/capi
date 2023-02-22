@@ -1,5 +1,5 @@
 import { alice, bob, charlie, dave, Rune, ValueRune } from "capi"
-import { MultisigRune } from "capi/patterns/MultisigRune.ts"
+import { MultisigRune } from "capi/patterns/multisig/mod.ts"
 import { Balances, chain, System } from "polkadot_dev/mod.ts"
 // TODO: utilize type exposed from capi/patterns/MultisigRune.ts (when we enable client env specificity)
 import { MultiAddress } from "polkadot_dev/types/sp_runtime/multiaddress.ts"
