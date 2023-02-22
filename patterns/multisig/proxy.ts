@@ -2,8 +2,8 @@ import { types } from "polkadot_dev/mod.ts"
 import { Proxy, Utility } from "polkadot_dev/mod.ts"
 import { Event } from "polkadot_dev/types/pallet_proxy/pallet.ts"
 import { RuntimeEvent } from "polkadot_dev/types/polkadot_runtime.ts"
-import { ArrayRune, MultiAddress, Rune, RunicArgs } from "../mod.ts"
-import { hex, Sr25519 } from "../util/mod.ts"
+import { ArrayRune, MultiAddress, Rune, RunicArgs } from "../../mod.ts"
+import { hex, Sr25519 } from "../../util/mod.ts"
 
 export interface BuildPureProxyMultisigProps {
   sender: Sr25519

@@ -4,9 +4,9 @@ import {
   buildPureProxyMultisig,
   getMultiAddress,
   removeProxy,
-} from "capi/patterns/proxy.ts"
+} from "capi/patterns/multisig/proxy.ts"
 import { Balances, chain, Proxy, System, Utility } from "polkadot_dev/mod.ts"
-import { MultisigRune } from "../patterns/MultisigRune.ts"
+import { MultisigRune } from "../patterns/multisig/MultisigRune.ts"
 
 const build = buildPureProxyMultisig({
   sender: alice,
