@@ -13,7 +13,7 @@ const batch = Utility.batch({
 })
   .signed({ sender: alice })
   .sent()
-  .logStatus("Batch tx:")
+  .dbgStatus("Batch tx:")
   .finalized()
 
 await logBalances()
@@ -24,6 +24,6 @@ await logBalances()
 function logBalances() {
   return Rune.tuple(recipients.map(([name, { publicKey }]) => {
     const free = System.Account.entry([publicKey]).access("data", "free")
-    return free.log(Rune.str`${name} balance:`)
+    return free.dbg(Rune.str`${name} balance:`)
   }))
 }

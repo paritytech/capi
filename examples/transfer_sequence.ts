@@ -16,7 +16,7 @@ function balances() {
       bob: balance(bob),
       charlie: balance(charlie),
     })
-    .log("Balances:")
+    .dbg("Balances:")
 }
 
 function balance(user: Sr25519) {
@@ -31,6 +31,6 @@ function transfer(name: string, user: Sr25519) {
     })
     .signed({ sender: alice })
     .sent()
-    .logStatus(`Transfer to ${name}:`)
+    .dbgStatus(`Transfer to ${name}:`)
     .finalized()
 }

@@ -22,7 +22,7 @@ await Balances
   })
   .signed({ sender: alice })
   .sent()
-  .logStatus("Existential deposit:")
+  .dbgStatus("Existential deposit:")
   .finalized()
   .run()
 
@@ -37,7 +37,7 @@ await multisig
   .ratify({ call, sender: alice.address })
   .signed({ sender: alice })
   .sent()
-  .logStatus("Proposal:")
+  .dbgStatus("Proposal:")
   .finalized()
   .run()
 
@@ -52,7 +52,7 @@ await multisig
   })
   .signed({ sender: bob })
   .sent()
-  .logStatus("Vote:")
+  .dbgStatus("Vote:")
   .finalized()
   .run()
 
@@ -72,7 +72,7 @@ await multisig
   .ratify({ call, sender: charlie.address })
   .signed({ sender: charlie })
   .sent()
-  .logStatus("Approval:")
+  .dbgStatus("Approval:")
   .finalized()
   .run()
 

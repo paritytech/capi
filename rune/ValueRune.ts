@@ -124,15 +124,6 @@ export class ValueRune<out T, out U = never> extends Rune<T, U> {
       })
   }
 
-  log<X>(...prefix: RunicArgs<X, unknown[]>) {
-    return Rune
-      .tuple([this, Rune.tuple(prefix).lazy()])
-      .map(([value, prefix]) => {
-        console.log(...prefix, value)
-        return value
-      })
-  }
-
   chain<T2, U2>(fn: (result: ValueRune<T, never>) => Rune<T2, U2>): ValueRune<T2, U | U2> {
     return ValueRune.new(RunChain, this, fn(this as never))
   }

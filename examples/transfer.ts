@@ -8,7 +8,7 @@ const result = await Balances
   })
   .signed({ sender: alice })
   .sent()
-  .logStatus()
+  .dbgStatus()
   .txEvents()
   .run()
 

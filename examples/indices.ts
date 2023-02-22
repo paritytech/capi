@@ -7,11 +7,12 @@ const claim = Indices
   .claim({ index })
   .signed({ sender: alice })
   .sent()
-  .logStatus()
+  .dbgStatus()
   .finalized()
 
-await claim
+const result = await claim
   .into(ValueRune)
   .chain(() => Indices.Accounts.entry([index]).access(0))
-  .log(`Index ${index} mapped to`)
   .run()
+
+console.log(`Index ${index} mapped to ${result}}`)

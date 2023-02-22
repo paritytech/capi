@@ -13,7 +13,7 @@ await Identity
   .setIdentity({ info })
   .signed({ sender: alice })
   .sent()
-  .logStatus()
+  .dbgStatus()
   .finalized()
   .run()
 
