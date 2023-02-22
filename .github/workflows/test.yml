@@ -37,8 +37,8 @@ jobs:
       - name: Setup Zombienet
         uses: ./.github/actions/setup-binary
         with:
-          binary-name: zombienet-linux
-          binary-version: v1.3.18
+          binary-name: zombienet-linux-x64
+          binary-version: v1.3.30
           binary-github: https://github.com/paritytech/zombienet
       - run: deno task test
       # - run: deno task test:examples
