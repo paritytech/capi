@@ -52,7 +52,8 @@ export class StorageRune<in out K extends unknown[], out V, out U> extends Rune<
           })
         )
       })
-      .unsafeAs<[[K, V][]]>()
+      // TODO: why wrapped within the array? Is this consistently a 1-element tuple?
+      .unsafeAs<[K, V][][]>()
   }
 
   entryRaw<X>(...[key, blockHash]: RunicArgs<X, [key: K, blockHash?: HexHash]>) {
