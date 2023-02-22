@@ -1,7 +1,7 @@
 import * as $ from "../deps/scale.ts"
 import * as M from "../frame_metadata/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
-import * as U from "../util/mod.ts"
+import { hex, HexHash } from "../util/mod.ts"
 import { CodecRune } from "./CodecRune.ts"
 import { PalletRune } from "./PalletRune.ts"
 
@@ -19,20 +19,83 @@ export class StorageRune<in out K extends unknown[], out V, out U> extends Rune<
     this.$value = this.pallet.metadata.codec(this.into(ValueRune).access("value"))
   }
 
-  entryRaw<X>(...[key, blockHash]: RunicArgs<X, [key: K, blockHash?: U.HexHash]>) {
-    const storageKey = this.$key.encoded(key).map(U.hex.encode)
+  entryPageRaw<X>(
+    ...[count, partialKey, start, blockHash]: RunicArgs<X, [
+      count: number,
+      partialKey?: unknown[],
+      start?: unknown[],
+      blockHash?: HexHash,
+    ]>
+  ) {
+    const storageKeys = this.keyPageRaw(count, partialKey, start, blockHash)
+    return this.pallet.metadata.chain.connection.call(
+      "state_queryStorageAt",
+      storageKeys,
+      blockHash,
+    )
+  }
+
+  entryPage<X>(
+    ...[count, partialKey, start, blockHash]: RunicArgs<X, [
+      count: number,
+      partialKey?: unknown[],
+      start?: unknown[],
+      blockHash?: HexHash,
+    ]>
+  ) {
+    return Rune
+      .tuple([this.entryPageRaw(count, partialKey, start, blockHash), this.$key, this.$value])
+      .map(([changeset, $key, $value]) => {
+        return changeset.map(({ changes }) =>
+          changes.map(([k, v]) => {
+            return [$key.decode(hex.decode(k)), v ? $value.decode(hex.decode(v)) : undefined]
+          })
+        )
+      })
+  }
+
+  entryRaw<X>(...[key, blockHash]: RunicArgs<X, [key: K, blockHash?: HexHash]>) {
+    const storageKey = this.$key.encoded(key).map(hex.encode)
     return this.pallet.metadata.chain.connection
       .call("state_getStorage", storageKey, blockHash)
       .unhandle(null)
       .rehandle(null, () => Rune.constant(undefined))
   }
 
-  entry<X>(...[key, blockHash]: RunicArgs<X, [key: K, blockHash?: U.HexHash]>) {
+  entry<X>(...[key, blockHash]: RunicArgs<X, [key: K, blockHash?: HexHash]>) {
     return this.$value
-      .decoded(this.entryRaw(key, blockHash).unhandle(undefined).map(U.hex.decode))
+      .decoded(this.entryRaw(key, blockHash).unhandle(undefined).map(hex.decode))
       .unsafeAs<V>()
       .into(ValueRune)
       .rehandle(undefined)
+  }
+
+  keyPageRaw<X>(
+    ...[count, partialKey, start, blockHash]: RunicArgs<X, [
+      count: number,
+      partialKey?: unknown[],
+      start?: unknown[],
+      blockHash?: HexHash,
+    ]>
+  ) {
+    const storageKey = this.$key
+      .encoded(Rune.resolve(partialKey).map((x) => x ?? []))
+      .map(hex.encode)
+    const startKey = Rune.captureUnhandled(
+      [this.$key, start],
+      (codec, start) =>
+        codec.into(CodecRune)
+          .encoded(start.unhandle(undefined))
+          .map(hex.encode)
+          .rehandle(undefined),
+    )
+    return this.pallet.metadata.chain.connection.call(
+      "state_getKeysPaged",
+      storageKey,
+      count,
+      startKey,
+      blockHash,
+    )
   }
 
   keyPage<X>(
@@ -40,33 +103,12 @@ export class StorageRune<in out K extends unknown[], out V, out U> extends Rune<
       count: number,
       partialKey?: unknown[],
       start?: unknown[],
-      blockHash?: U.HexHash,
+      blockHash?: HexHash,
     ]>
   ) {
-    const storageKey = this.$key
-      .encoded(Rune.resolve(partialKey).map((x) => x ?? []))
-      .map(U.hex.encode)
-    const startKey = Rune.captureUnhandled(
-      [this.$key, start],
-      (codec, start) =>
-        codec.into(CodecRune)
-          .encoded(start.unhandle(undefined))
-          .map(U.hex.encode)
-          .rehandle(undefined),
-    )
-    const keysEncoded = this.pallet.metadata.chain.connection.call(
-      "state_getKeysPaged",
-      storageKey,
-      count,
-      startKey,
-      blockHash,
-    )
-    return Rune.tuple([this.$key, keysEncoded])
-      .map(([$key, keysEncoded]) => {
-        return keysEncoded.map((keyEncoded: U.Hex) => {
-          return $key.decode(U.hex.decode(keyEncoded))
-        })
-      })
+    const raw = this.keyPageRaw(count, partialKey, start, blockHash)
+    return Rune.tuple([this.$key, raw])
+      .map(([$key, raw]) => raw.map((keyEncoded) => $key.decode(hex.decode(keyEncoded))))
       .unsafeAs<K[]>()
       .into(ValueRune)
   }
