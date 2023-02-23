@@ -6,6 +6,7 @@ ARG DENO_VERSION=1.30.3
 ARG POLKADOT_VERSION=v0.9.36
 ARG POLKADOT_PARACHAIN_VERSION=v0.9.360
 ARG ZOMBIENET_VERSION=v1.3.30
+ARG SUBSTRATE_CONTRACTS_NODE_VERSION=v0.24.0
 
 ENV DENO_INSTALL=/deno
 ENV DENO_INSTALL_ROOT=/usr/local
@@ -26,6 +27,8 @@ RUN export DEBIAN_FRONTEND=noninteractive \
   && chmod +x /usr/local/bin/polkadot-parachain \
   && curl -fsSL -o /usr/local/bin/zombienet-linux-x64 https://github.com/paritytech/zombienet/releases/download/${ZOMBIENET_VERSION}/zombienet-linux-x64 \
   && chmod +x /usr/local/bin/zombienet-linux-x64 \
+  && curl -fsSL -o /usr/local/bin/substrate-contracts-node https://github.com/paritytech/substrate-contracts-node/releases/download/${SUBSTRATE_CONTRACTS_NODE_VERSION}}/substrate-contracts-node \
+  && chmod +x /usr/local/bin/substrate-contracts-node \
   && curl -fsSL https://dprint.dev/install.sh | DPRINT_INSTALL=/usr/local sh \
   && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
   && apt-get install -y nodejs \
