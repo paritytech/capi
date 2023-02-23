@@ -5,19 +5,17 @@ export function getAvailable(): number {
   return port
 }
 
-export async function isReady(port: number): Promise<void> {
-  let attempts = 60
-  while (--attempts) {
+export async function ready(port: number, maxAttempts?: number): Promise<void> {
+  let i = maxAttempts ?? 60
+  while (i--) {
     try {
       const connection = await Deno.connect({ port })
       connection.close()
       break
     } catch (e) {
-      if (e instanceof Deno.errors.ConnectionRefused && attempts > 0) {
+      if (e instanceof Deno.errors.ConnectionRefused && i > 0) {
         await new Promise((resolve) => setTimeout(resolve, 500))
-      } else {
-        throw new Error()
-      }
+      } else throw new Error()
     }
   }
 }

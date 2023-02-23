@@ -1,7 +1,7 @@
 import * as $ from "../../deps/scale.ts"
 import { Env, PathInfo } from "../../server/mod.ts"
 import { PermanentMemo } from "../../util/mod.ts"
-import { getAvailable, isReady } from "../../util/port.ts"
+import { getAvailable, ready } from "../../util/port.ts"
 import { FrameProxyProvider } from "./FrameProxyProvider.ts"
 
 export interface PolkadotDevProviderProps {
@@ -47,7 +47,7 @@ export class PolkadotDevProvider extends FrameProxyProvider {
           + ` For more information, visit the following link: "https://github.com/paritytech/polkadot".`,
       )
     }
-    await isReady(port)
+    await ready(port)
     return port
   }
 }

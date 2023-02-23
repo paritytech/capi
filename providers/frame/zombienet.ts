@@ -4,7 +4,7 @@ import { copy } from "../../deps/std/streams.ts"
 import { Network } from "../../deps/zombienet/orchestrator.ts"
 import { Env, PathInfo } from "../../server/mod.ts"
 import { PermanentMemo, splitLast } from "../../util/mod.ts"
-import { isReady } from "../../util/port.ts"
+import { ready } from "../../util/port.ts"
 import { FrameProxyProvider } from "./FrameProxyProvider.ts"
 
 export interface ZombienetProviderProps {
@@ -51,7 +51,7 @@ export class ZombienetProvider extends FrameProxyProvider {
           }".`,
         )
       }
-      await isReady(+new URL(node.wsUri).port)
+      await ready(+new URL(node.wsUri).port)
       return node.wsUri
     })
   }
