@@ -9,8 +9,6 @@ export interface ZombienetProviderProps {
 }
 
 export class ZombienetProvider extends FrameBinProvider<ZombienetLaunchInfo> {
-  providerId = "zombienet"
-
   constructor(env: Env, { zombienetPath }: ZombienetProviderProps = {}) {
     super(env, {
       bin: zombienetPath ?? ZOMBIENET_BIN_DEFAULTS[Deno.build.os]!,

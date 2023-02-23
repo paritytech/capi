@@ -41,13 +41,25 @@ const env = new Env({
   signal,
   cache,
   dbg,
-  providerFactories: [
-    (env) => new WssProvider(env),
-    (env) => new PolkadotDevProvider(env),
-    (env) => new ZombienetProvider(env),
-    (env) => new ProjectProvider(env),
-    (env) => new ContractsDevProvider(env),
-  ],
+  providerFactoryGroups: {
+    frame: {
+      wss(env) {
+        return new WssProvider(env)
+      },
+      dev(env) {
+        return new PolkadotDevProvider(env)
+      },
+      zombienet(env) {
+        return new ZombienetProvider(env)
+      },
+      project(env) {
+        return new ProjectProvider(env)
+      },
+      contracts(env) {
+        return new ContractsDevProvider(env)
+      },
+    },
+  },
 })
 
 cache.getString(

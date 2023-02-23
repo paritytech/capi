@@ -3,8 +3,6 @@ import { getAvailable } from "../../util/port.ts"
 import { FrameBinProvider } from "./FrameBinProvider.ts"
 
 export class ContractsDevProvider extends FrameBinProvider<string> {
-  providerId = "contracts_dev"
-
   constructor(env: Env) {
     super(env, {
       bin: "substrate-contracts-node",

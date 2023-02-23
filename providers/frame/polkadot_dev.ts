@@ -8,8 +8,6 @@ export interface PolkadotDevProviderProps {
 }
 
 export class PolkadotDevProvider extends FrameBinProvider<DevRuntimeName> {
-  providerId = "dev"
-
   constructor(env: Env, { polkadotPath }: PolkadotDevProviderProps = {}) {
     super(env, {
       bin: polkadotPath ?? "polkadot",

@@ -3,8 +3,6 @@ import { getAvailable } from "../../util/port.ts"
 import { FrameBinProvider } from "./FrameBinProvider.ts"
 
 export class ProjectProvider extends FrameBinProvider<string> {
-  providerId = "project"
-
   constructor(env: Env) {
     super(env, {
       bin: "cargo",
