@@ -30,10 +30,23 @@ export abstract class FrameBinProvider<LaunchInfo> extends FrameProxyProvider {
   dynamicUrlMemo = new PermanentMemo<string, string>()
   async dynamicUrl(pathInfo: PathInfo) {
     const dynamicUrlKey = this.dynamicUrlKey(pathInfo)
-    return await this.dynamicUrlMemo.run(dynamicUrlKey, async () => {
-      const port = await this.launch(this.parseLaunchInfo(pathInfo))
-      await ready(port)
-      return `ws://localhost:${port}`
+    return this.dynamicUrlMemo.run(dynamicUrlKey, async () => {
+      const url = (async () => {
+        const port = await this.launch(this.parseLaunchInfo(pathInfo))
+        await ready(port)
+        return `ws://localhost:${port}`
+      })()
+      let result: typeof timeout | string = null!
+      if (this.timeout) {
+        result = await Promise.race([
+          new Promise<typeof timeout>((resolve) =>
+            setTimeout(() => resolve(timeout), this.timeout)
+          ),
+          url,
+        ])
+      } else result = await url
+      if (result === timeout) throw new Error("timeout")
+      return result
     })
   }
 
@@ -76,3 +89,5 @@ export abstract class FrameBinProvider<LaunchInfo> extends FrameProxyProvider {
     return this.binValid
   }
 }
+
+const timeout = Symbol()
