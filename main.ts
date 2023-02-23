@@ -1,8 +1,8 @@
 import * as flags from "./deps/std/flags.ts"
 import { serve } from "./deps/std/http.ts"
 import {
+  ContractsDevProvider,
   PolkadotDevProvider,
-  PolkadotDevProvider2,
   ProjectProvider,
   WssProvider,
   ZombienetProvider,
@@ -44,9 +44,9 @@ const env = new Env({
   providerFactories: [
     (env) => new WssProvider(env),
     (env) => new PolkadotDevProvider(env),
-    (env) => new PolkadotDevProvider2(env),
     (env) => new ZombienetProvider(env),
     (env) => new ProjectProvider(env),
+    (env) => new ContractsDevProvider(env),
   ],
 })
 

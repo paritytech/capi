@@ -1,61 +1,38 @@
 import * as $ from "../../deps/scale.ts"
 import { Env, PathInfo } from "../../server/mod.ts"
-import { PermanentMemo } from "../../util/mod.ts"
-import { getAvailable, ready } from "../../util/port.ts"
-import { FrameProxyProvider } from "./FrameProxyProvider.ts"
+import { getAvailable } from "../../util/port.ts"
+import { FrameBinProvider } from "./FrameBinProvider.ts"
 
 export interface PolkadotDevProviderProps {
   polkadotPath?: string
 }
 
-export class PolkadotDevProvider extends FrameProxyProvider {
+export class PolkadotDevProvider extends FrameBinProvider<DevRuntimeName> {
   providerId = "dev"
-  bin
 
   constructor(env: Env, { polkadotPath }: PolkadotDevProviderProps = {}) {
-    super(env)
-    this.bin = polkadotPath ?? "polkadot"
-  }
-
-  urlMemo = new PermanentMemo<DevRuntimeName, string>()
-  dynamicUrl(pathInfo: PathInfo) {
-    const { target } = pathInfo
-    $.assert($devRuntimeName, target)
-    return this.urlMemo.run(target, async () => {
-      const port = await this.spawnDevNet(target)
-      return `ws://localhost:${port}`
+    super(env, {
+      bin: polkadotPath ?? "polkadot",
+      installation: "https://github.com/paritytech/polkadot",
     })
   }
 
-  async spawnDevNet(runtimeName: DevRuntimeName) {
+  dynamicUrlKey(pathInfo: PathInfo) {
+    const { target } = pathInfo
+    $.assert($devRuntimeName, target)
+    return target
+  }
+
+  parseLaunchInfo = this.dynamicUrlKey
+
+  async launch(runtimeName: DevRuntimeName) {
     const port = getAvailable()
-    const cmd: string[] = [this.bin, "--dev", "--ws-port", port.toString()]
-    if (runtimeName !== "polkadot") cmd.push(`--force-${runtimeName}`)
-    try {
-      const process = Deno.run({
-        cmd,
-        stdout: "null",
-        stderr: "null",
-      })
-      this.env.signal.addEventListener("abort", () => {
-        process.kill()
-        process.close()
-      })
-    } catch (_e) {
-      throw new Error( // TODO: auto installation prompt?
-        "The Polkadot CLI was not found. Please ensure Polkadot is installed and PATH is set for `polkadot`."
-          + ` For more information, visit the following link: "https://github.com/paritytech/polkadot".`,
-      )
-    }
-    await ready(port)
+    const args: string[] = ["--dev", "--ws-port", port.toString()]
+    if (runtimeName !== "polkadot") args.push(`--force-${runtimeName}`)
+    await this.initBinRun(args)
     return port
   }
 }
 
 type DevRuntimeName = $.Native<typeof $devRuntimeName>
-const $devRuntimeName = $.literalUnion([
-  "polkadot",
-  "kusama",
-  "westend",
-  "rococo",
-])
+const $devRuntimeName = $.literalUnion(["polkadot", "kusama", "westend", "rococo"])

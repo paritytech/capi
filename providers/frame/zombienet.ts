@@ -1,119 +1,77 @@
-import { deadline } from "../../deps/std/async.ts"
 import * as path from "../../deps/std/path.ts"
-import { copy } from "../../deps/std/streams.ts"
 import { Network } from "../../deps/zombienet/orchestrator.ts"
 import { Env, PathInfo } from "../../server/mod.ts"
-import { PermanentMemo, splitLast } from "../../util/mod.ts"
-import { ready } from "../../util/port.ts"
-import { FrameProxyProvider } from "./FrameProxyProvider.ts"
+import { PermanentMemo } from "../../util/mod.ts"
+import { FrameBinProvider } from "./FrameBinProvider.ts"
 
 export interface ZombienetProviderProps {
   zombienetPath?: string
-  timeout?: number
 }
 
-const defaultZombienetPaths: Record<string, string | undefined> = {
+export class ZombienetProvider extends FrameBinProvider<ZombienetLaunchInfo> {
+  providerId = "zombienet"
+
+  constructor(env: Env, { zombienetPath }: ZombienetProviderProps = {}) {
+    super(env, {
+      bin: zombienetPath ?? ZOMBIENET_BIN_DEFAULTS[Deno.build.os]!,
+      installation: "https://github.com/paritytech/zombienet",
+    })
+  }
+
+  dynamicUrlKey(pathInfo: PathInfo): string {
+    return pathInfo.target!
+  }
+
+  parseLaunchInfo(pathInfo: PathInfo) {
+    const target = pathInfo.target!
+    const i = target.lastIndexOf("/")
+    return {
+      configPath: target.slice(0, i),
+      nodeName: target.slice(i + 1),
+    }
+  }
+
+  launchMemo = new PermanentMemo<string, Network>()
+  async launch(launchInfo: ZombienetLaunchInfo) {
+    const network = await this.launchMemo.run(launchInfo.configPath, async () => {
+      const zombiecache = await Deno.realPath(await Deno.makeTempDir({ prefix: `capi_zombienet_` }))
+      const networkManifestPath = path.join(zombiecache, "zombie.json")
+      const network = this.network(zombiecache, networkManifestPath)
+      const args: string[] = [
+        "-p",
+        "native",
+        "-d",
+        zombiecache,
+        "-f",
+        "spawn",
+        launchInfo.configPath,
+      ]
+      await this.initBinRun(args)
+      return await network
+    })
+    const node = network.nodesByName[launchInfo.nodeName]
+    if (!node) throw new Error()
+    return +new URL(node.wsUri).port
+  }
+
+  async network(zombienetCachePath: string, networkManifestPath: string): Promise<Network> {
+    // TODO: why do even first attempts to close error out with bad resource id?
+    const watcher = Deno.watchFs(zombienetCachePath)
+    for await (const e of watcher) {
+      if (e.kind === "modify" && e.paths.includes(networkManifestPath)) {
+        return JSON.parse(await Deno.readTextFile(networkManifestPath))
+      }
+    }
+    return null!
+  }
+}
+
+const ZOMBIENET_BIN_DEFAULTS: Record<string, string> = {
   darwin: "zombienet-macos",
   linux: "zombienet-linux-x64",
 }
 
-export class ZombienetProvider extends FrameProxyProvider {
-  providerId = "zombienet"
-  zombienetPath
-  timeout
-
-  constructor(env: Env, { zombienetPath, timeout }: ZombienetProviderProps = {}) {
-    super(env)
-    zombienetPath ??= defaultZombienetPaths[Deno.build.os]
-    if (!zombienetPath) {
-      throw new Error(
-        "Failed to determine zombienet path. Please specify in provider via `zombienetPath` prop.",
-      )
-    }
-    this.zombienetPath = zombienetPath
-    this.timeout = timeout ?? 2 * 60 * 1000
-  }
-
-  urlMemo = new PermanentMemo<string, string>()
-  dynamicUrl(pathInfo: PathInfo) {
-    const { target } = pathInfo
-    if (!target) throw new Error("Missing target")
-    return this.urlMemo.run(target, async () => {
-      const targetParts = splitLast("/", target)
-      if (!targetParts) throw new Error("Failed to parse zombienet target")
-      const [configPath, nodeName] = targetParts
-      const network = await this.zombienet(configPath)
-      const node = network.nodesByName[nodeName]
-      if (!node) {
-        throw new Error(
-          `No such node named "${nodeName}" in zombienet. Available names are "${
-            Object.keys(network.nodesByName).join(`", "`)
-          }".`,
-        )
-      }
-      await ready(+new URL(node.wsUri).port)
-      return node.wsUri
-    })
-  }
-
-  zombienetMemo = new PermanentMemo<string, Network>()
-  zombienet(configPath: string): Promise<Network> {
-    return this.zombienetMemo.run(configPath, async () => {
-      const tmpDir = await Deno.realPath(await Deno.makeTempDir({ prefix: `capi_zombienet_` }))
-      const watcher = Deno.watchFs(tmpDir)
-      let watcherClosed = false
-      const closeWatcher = () => {
-        if (!watcherClosed) return
-        watcherClosed = true
-        watcher.close()
-      }
-      const networkManifestPath = path.join(tmpDir, "zombie.json")
-      const configPending = deadline(
-        (async () => {
-          for await (const e of watcher) {
-            if (e.kind === "modify" && e.paths.includes(networkManifestPath)) {
-              return JSON.parse(await Deno.readTextFile(networkManifestPath)) as Network
-            }
-          }
-          return
-        })(),
-        this.timeout,
-      ).finally(closeWatcher)
-      const cmd: string[] = [
-        this.zombienetPath,
-        "-p",
-        "native",
-        "-d",
-        tmpDir,
-        "-f",
-        "spawn",
-        configPath,
-      ]
-      const process = Deno.run({
-        cmd,
-        stdout: "piped",
-        stderr: "piped",
-      })
-      let closeProcess = () => {
-        closeProcess = () => {}
-        process.kill("SIGINT")
-        process.stdout.close()
-        process.stderr.close()
-        process.close()
-      }
-      this.env.signal.addEventListener("abort", async () => {
-        closeWatcher()
-        closeProcess()
-        await Deno.remove(tmpDir, { recursive: true })
-      })
-      const maybeConfig = await Promise.race([
-        configPending,
-        process.status().then(() => undefined),
-      ])
-      if (maybeConfig) return maybeConfig
-      await copy(process.stderr, Deno.stderr)
-      closeProcess()
-      throw new Error("Zombienet exited without launching network")
-    })
-  }
+interface ZombienetLaunchInfo {
+  configPath: string
+  nodeName: string
 }

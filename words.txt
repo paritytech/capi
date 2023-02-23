@@ -224,5 +224,6 @@ westmint
 xxhash
 xxnetwork
 zio
+zombiecache
 zombienet
 zombienets

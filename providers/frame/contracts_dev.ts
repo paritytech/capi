@@ -2,27 +2,27 @@ import { Env } from "../../server/mod.ts"
 import { getAvailable } from "../../util/port.ts"
 import { FrameBinProvider } from "./FrameBinProvider.ts"
 
-export class ProjectProvider extends FrameBinProvider<string> {
-  providerId = "project"
+export class ContractsDevProvider extends FrameBinProvider<string> {
+  providerId = "contracts_dev"
 
   constructor(env: Env) {
     super(env, {
-      bin: "cargo",
-      installation: "https://www.rust-lang.org/tools/install",
+      bin: "substrate-contracts-node",
+      installation: "https://github.com/paritytech/substrate-contracts-node",
     })
   }
 
   dynamicUrlKey() {
-    return Deno.cwd()
+    return ""
   }
 
   parseLaunchInfo() {
-    return Deno.cwd()
+    return ""
   }
 
   async launch() {
     const port = getAvailable()
-    await this.initBinRun(["run", "--release", "--", "--dev", "--ws-port", port.toString()])
+    await this.initBinRun(["--dev", "--ws-port", port.toString()])
     return port
   }
 }
