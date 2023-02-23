@@ -2,7 +2,6 @@ import { CacheBase } from "../util/cache/base.ts"
 import { Provider, ProviderFactories } from "./Provider.ts"
 
 export interface EnvProps {
-  href: string
   signal: AbortSignal
   cache: CacheBase
   providerGroups: Record<string, ProviderFactories>
@@ -10,14 +9,12 @@ export interface EnvProps {
 }
 
 export class Env {
-  href
   signal
   cache
   dbg
   providers
 
-  constructor({ href, signal, cache, providerGroups, dbg }: EnvProps) {
-    this.href = href
+  constructor({ signal, cache, providerGroups, dbg }: EnvProps) {
     this.signal = signal
     this.cache = cache
     this.dbg = dbg ?? false

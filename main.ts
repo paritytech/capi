@@ -19,9 +19,7 @@ const { help, dbg, port, "--": cmd, out } = flags.parse(Deno.args, {
     port: "4646",
     out: "target/capi",
   },
-  alias: {
-    h: "help",
-  },
+  alias: { h: "help" },
   "--": true,
 })
 
@@ -33,11 +31,8 @@ if (help) {
 const controller = new AbortController()
 const { signal } = controller
 
-const href = `http://localhost:${port}`
-
 const cache = new FsCache(out, signal)
 const env = new Env({
-  href,
   signal,
   cache,
   dbg,
@@ -65,16 +60,13 @@ const env = new Env({
 const capiModPath = JSON.stringify(import.meta.resolve("./mod.ts"))
 cache.getString("mod.ts", 0, async () => `export * from ${capiModPath}`)
 
-const alreadyRunning = await (async () => {
-  try {
-    if (await (await fetch(`${href}/capi_cwd`)).text() === Deno.cwd()) {
-      return true
-    }
-  } catch (_e) {}
-  return false
-})()
+let running = false
+const href = `http://localhost:${port}`
+try {
+  if (await (await fetch(`${href}/capi_cwd`)).text() === Deno.cwd()) running = true
+} catch (_e) {}
 
-if (!alreadyRunning) {
+if (!running) {
   await serve(handler(env), {
     port: +port,
     signal,
@@ -82,11 +74,14 @@ if (!alreadyRunning) {
       throw error
     },
     async onListen() {
-      console.log(`Capi server listening on ${href}`)
+      console.log(`Capi server listening ("${href}")`)
       await after()
     },
   })
-} else await after()
+} else {
+  console.log(`Reusing existing Capi server ("${href}")`)
+  await after()
+}
 
 async function after() {
   if (cmd.length) {
