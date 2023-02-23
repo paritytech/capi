@@ -1,23 +1,19 @@
 import { CacheBase } from "../util/cache/base.ts"
 import { Provider, ProviderFactories } from "./Provider.ts"
 
-export interface EnvProps {
-  signal: AbortSignal
-  cache: CacheBase
-  providerGroups: Record<string, ProviderFactories>
-  dbg?: boolean
-}
-
 export class Env {
-  signal
-  cache
-  dbg
+  httpHref
+  wsHref
   providers
 
-  constructor({ signal, cache, providerGroups, dbg }: EnvProps) {
-    this.signal = signal
-    this.cache = cache
-    this.dbg = dbg ?? false
+  constructor(
+    readonly port: number,
+    readonly cache: CacheBase,
+    readonly signal: AbortSignal,
+    providerGroups: Record<string, ProviderFactories>,
+  ) {
+    this.httpHref = `http://localhost:${port}`
+    this.wsHref = `ws://localhost:${port}`
     this.providers = Object.fromEntries(
       Object
         .entries(providerGroups)

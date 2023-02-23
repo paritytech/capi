@@ -11,12 +11,11 @@ import { handler } from "./server/local.ts"
 import { Env } from "./server/mod.ts"
 import { FsCache } from "./util/cache/mod.ts"
 
-const { help, dbg, port, "--": cmd, out } = flags.parse(Deno.args, {
-  boolean: ["help", "dbg"],
+const { help, port: portRaw, "--": cmd, out } = flags.parse(Deno.args, {
+  boolean: ["help"],
   string: ["port", "out"],
   default: {
-    dbg: false,
-    port: "4646",
+    port: 4646,
     out: "target/capi",
   },
   alias: { h: "help" },
@@ -32,54 +31,52 @@ const controller = new AbortController()
 const { signal } = controller
 
 const cache = new FsCache(out, signal)
-const env = new Env({
-  signal,
-  cache,
-  dbg,
-  providerGroups: {
-    frame: {
-      wss(env) {
-        return new WssProvider(env)
-      },
-      dev(env) {
-        return new PolkadotDevProvider(env)
-      },
-      zombienet(env) {
-        return new ZombienetProvider(env)
-      },
-      project(env) {
-        return new ProjectProvider(env)
-      },
-      contracts(env) {
-        return new ContractsDevProvider(env)
-      },
+cache.getString(
+  "mod.ts",
+  0,
+  async () => `export * from ${JSON.stringify(import.meta.resolve("./mod.ts"))}`,
+)
+
+const port = +portRaw
+const env = new Env(port, cache, signal, {
+  frame: {
+    wss(env) {
+      return new WssProvider(env)
+    },
+    dev(env) {
+      return new PolkadotDevProvider(env)
+    },
+    zombienet(env) {
+      return new ZombienetProvider(env)
+    },
+    project(env) {
+      return new ProjectProvider(env)
+    },
+    contracts(env) {
+      return new ContractsDevProvider(env)
     },
   },
 })
 
-const capiModPath = JSON.stringify(import.meta.resolve("./mod.ts"))
-cache.getString("mod.ts", 0, async () => `export * from ${capiModPath}`)
-
 let running = false
-const href = `http://localhost:${port}`
 try {
-  if (await (await fetch(`${href}/capi_cwd`)).text() === Deno.cwd()) running = true
+  if (await (await fetch(`${env.httpHref}/capi_cwd`)).text() === Deno.cwd()) running = true
 } catch (_e) {}
 
 if (!running) {
   await serve(handler(env), {
-    port: +port,
+    port,
     signal,
     onError(error) {
       throw error
     },
     async onListen() {
-      console.log(`Capi server listening ("${href}")`)
+      console.log(`Capi server listening at "${env.httpHref}"`)
       await after()
     },
   })
 } else {
-  console.log(`Reusing existing Capi server ("${href}")`)
+  console.log(`Reusing existing Capi server at "${env.httpHref}"`)
   await after()
 }
 
