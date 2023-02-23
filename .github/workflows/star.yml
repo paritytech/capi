@@ -26,13 +26,13 @@ jobs:
         uses: ./.github/actions/setup-binary
         with:
           binary-name: polkadot
-          binary-version: v0.9.36
+          binary-version: v0.9.37
           binary-github: https://github.com/paritytech/polkadot
       - name: Setup Cumulus
         uses: ./.github/actions/setup-binary
         with:
           binary-name: polkadot-parachain
-          binary-version: v0.9.360
+          binary-version: v0.9.370
           binary-github: https://github.com/paritytech/cumulus
       - name: Setup Zombienet
         uses: ./.github/actions/setup-binary
