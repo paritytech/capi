@@ -44,16 +44,18 @@ export class StorageRune<in out K extends unknown[], out V, out U> extends Rune<
     ]>
   ) {
     return Rune
-      .tuple([this.entryPageRaw(count, partialKey, start, blockHash), this.$key, this.$value])
-      .map(([changeset, $key, $value]) => {
-        return changeset.map(({ changes }) =>
-          changes.map(([k, v]) => {
-            return [$key.decode(hex.decode(k)), v ? $value.decode(hex.decode(v)) : undefined]
-          })
-        )
-      })
-      // TODO: why wrapped within the array? Is this consistently a 1-element tuple?
-      .unsafeAs<[K, V][][]>()
+      .tuple([
+        this.entryPageRaw(count, partialKey, start, blockHash).access(0),
+        this.$key,
+        this.$value,
+      ])
+      .map(([changeset, $key, $value]) =>
+        changeset!.changes.map(([k, v]) => [
+          $key.decode(hex.decode(k)),
+          v ? $value.decode(hex.decode(v)) : undefined,
+        ])
+      )
+      .unsafeAs<[K, V][]>()
   }
 
   entryRaw<X>(...[key, blockHash]: RunicArgs<X, [key: K, blockHash?: HexHash]>) {
