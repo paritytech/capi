@@ -1,3 +1,4 @@
+import { deferred } from "../../deps/std/async.ts"
 import { Env, PathInfo } from "../../server/mod.ts"
 import { PermanentMemo, PromiseOr } from "../../util/mod.ts"
 import { ready } from "../../util/port.ts"
@@ -31,22 +32,26 @@ export abstract class FrameBinProvider<LaunchInfo> extends FrameProxyProvider {
   async dynamicUrl(pathInfo: PathInfo) {
     const dynamicUrlKey = this.dynamicUrlKey(pathInfo)
     return this.dynamicUrlMemo.run(dynamicUrlKey, async () => {
-      const url = (async () => {
+      const urlPending = (async () => {
         const port = await this.launch(this.parseLaunchInfo(pathInfo))
         await ready(port)
         return `ws://localhost:${port}`
       })()
-      let result: typeof timeout | string = null!
-      if (this.timeout) {
-        result = await Promise.race([
-          new Promise<typeof timeout>((resolve) =>
-            setTimeout(() => resolve(timeout), this.timeout)
-          ),
-          url,
-        ])
-      } else result = await url
-      if (result === timeout) throw new Error("timeout")
-      return result
+      const url = await (this.timeout
+        ? (() => {
+          const timeoutPending = deferred<typeof timeout>()
+          const timerId = setTimeout(() => timeoutPending.resolve(timeout), this.timeout)
+          return Promise.race([
+            timeoutPending,
+            urlPending.then((e) => {
+              clearTimeout(timerId)
+              return e
+            }),
+          ])
+        })()
+        : urlPending)
+      if (url === timeout) throw new Error("timeout")
+      return url
     })
   }
 
