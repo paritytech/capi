@@ -62,11 +62,8 @@ const env = new Env({
   },
 })
 
-cache.getString(
-  "mod.ts",
-  0,
-  async () => `export * from ${JSON.stringify(import.meta.resolve("./mod.ts"))}`,
-)
+const capiModPath = JSON.stringify(import.meta.resolve("./mod.ts"))
+cache.getString("mod.ts", 0, async () => `export * from ${capiModPath}`)
 
 const alreadyRunning = await (async () => {
   try {

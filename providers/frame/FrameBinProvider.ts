@@ -7,7 +7,7 @@ import { FrameProxyProvider } from "./FrameProxyProvider.ts"
 export interface FrameBinProviderProps {
   bin: string
   installation: string
-  readyTimeout?: number // TODO
+  readyTimeout?: number
 }
 
 export abstract class FrameBinProvider<LaunchInfo> extends FrameProxyProvider {

@@ -12,6 +12,7 @@ export class PolkadotDevProvider extends FrameBinProvider<DevRuntimeName> {
     super(env, {
       bin: polkadotPath ?? "polkadot",
       installation: "https://github.com/paritytech/polkadot",
+      readyTimeout: 15 * 1000,
     })
   }
 

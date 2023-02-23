@@ -13,6 +13,7 @@ export class ZombienetProvider extends FrameBinProvider<ZombienetLaunchInfo> {
     super(env, {
       bin: zombienetPath ?? ZOMBIENET_BIN_DEFAULTS[Deno.build.os]!,
       installation: "https://github.com/paritytech/zombienet",
+      readyTimeout: 60 * 1000,
     })
   }
 
