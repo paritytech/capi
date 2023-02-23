@@ -77,16 +77,8 @@ async function after() {
     const status = await process.status()
     process.close()
     self.addEventListener("unload", () => {
-      console.log("unloading....")
-      console.log(Deno.resources())
       Deno.exit(status.code)
     })
     controller.abort()
-  }
-  if (Deno.env.has("CI")) {
-    console.log(Deno.resources())
-    const p = Deno.run({ cmd: ["ps", "-He"] })
-    await p.status()
-    p.close()
   }
 }
