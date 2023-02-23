@@ -1,10 +1,6 @@
 import { alice, ArrayRune, bob, charlie, dave, MultiAddress, Rune } from "capi"
-import {
-  addProxy,
-  buildPureProxyMultisig,
-  getMultiAddress,
-  removeProxy,
-} from "capi/patterns/multisig/proxy.ts"
+import { buildPureProxyMultisig } from "capi/patterns/multisig/proxy.ts"
+import { addProxy, getMultiAddress, removeProxy } from "capi/patterns/proxy/mod.ts"
 import { Balances, chain, Proxy, System, Utility } from "polkadot_dev/mod.ts"
 import { MultisigRune } from "../patterns/multisig/MultisigRune.ts"
 
