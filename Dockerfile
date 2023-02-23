@@ -18,6 +18,10 @@ RUN mkdir -p ${DENO_INSTALL} \
 ENV PATH=${DENO_INSTALL}/bin:${PATH} \
     DENO_DIR=/home/vscode/.cache/deno
 
+
+
+    # https://github.com/paritytech/substrate-contracts-node/releases/download/v0.24.0/substrate-contracts-node-linux.tar.gz
+
 RUN export DEBIAN_FRONTEND=noninteractive \
   && apt-get update \
   && apt-get install -y unzip curl git procps \
@@ -27,7 +31,8 @@ RUN export DEBIAN_FRONTEND=noninteractive \
   && chmod +x /usr/local/bin/polkadot-parachain \
   && curl -fsSL -o /usr/local/bin/zombienet-linux-x64 https://github.com/paritytech/zombienet/releases/download/${ZOMBIENET_VERSION}/zombienet-linux-x64 \
   && chmod +x /usr/local/bin/zombienet-linux-x64 \
-  && curl -fsSL -o /usr/local/bin/substrate-contracts-node https://github.com/paritytech/substrate-contracts-node/releases/download/${SUBSTRATE_CONTRACTS_NODE_VERSION}}/substrate-contracts-node \
+  && curl -fsSL -o /usr/local/bin/substrate-contracts-node.tar.gz https://github.com/paritytech/substrate-contracts-node/releases/download/${SUBSTRATE_CONTRACTS_NODE_VERSION}}/substrate-contracts-node-linux.tar.gz \
+  && tar -xf /usr/local/bin/substrate-contracts-node.tar.gz \
   && chmod +x /usr/local/bin/substrate-contracts-node \
   && curl -fsSL https://dprint.dev/install.sh | DPRINT_INSTALL=/usr/local sh \
   && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
