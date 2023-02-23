@@ -98,6 +98,8 @@ export class ZombienetProvider extends FrameProxyProvider {
         closeProcess = () => {}
         process.kill()
         process.close()
+        process.stdout.close()
+        process.stderr.close()
       }
       this.env.signal.addEventListener("abort", async () => {
         closeWatcher()
