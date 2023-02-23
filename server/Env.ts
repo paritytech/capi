@@ -5,7 +5,7 @@ export interface EnvProps {
   href: string
   signal: AbortSignal
   cache: CacheBase
-  providerFactoryGroups: Record<string, ProviderFactories>
+  providerGroups: Record<string, ProviderFactories>
   dbg?: boolean
 }
 
@@ -16,14 +16,14 @@ export class Env {
   dbg
   providers
 
-  constructor({ href, signal, cache, providerFactoryGroups, dbg }: EnvProps) {
+  constructor({ href, signal, cache, providerGroups, dbg }: EnvProps) {
     this.href = href
     this.signal = signal
     this.cache = cache
     this.dbg = dbg ?? false
     this.providers = Object.fromEntries(
       Object
-        .entries(providerFactoryGroups)
+        .entries(providerGroups)
         .map(([group, providerFactories]): [string, Record<string, Provider>] => [
           group,
           Object.fromEntries(

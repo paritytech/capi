@@ -41,7 +41,7 @@ const env = new Env({
   signal,
   cache,
   dbg,
-  providerFactoryGroups: {
+  providerGroups: {
     frame: {
       wss(env) {
         return new WssProvider(env)
