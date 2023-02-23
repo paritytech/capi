@@ -14,7 +14,7 @@ export interface ZombienetProviderProps {
 
 const defaultZombienetPaths: Record<string, string | undefined> = {
   darwin: "zombienet-macos",
-  linux: "zombienet-linux",
+  linux: "zombienet-linux-x64",
 }
 
 export class ZombienetProvider extends FrameProxyProvider {
