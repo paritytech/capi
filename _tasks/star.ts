@@ -86,15 +86,3 @@ for (const [file, deps] of entries.slice(1)) {
 }
 
 console.log("Checked successfully")
-
-setTimeout(async () => {
-  console.log(Deno.resources())
-
-  let p = Deno.run({ cmd: ["ps", "-aux"] })
-  await p.status()
-  p.close()
-
-  p = Deno.run({ cmd: ["ps", "-He"] })
-  await p.status()
-  p.close()
-}, 100)

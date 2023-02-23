@@ -79,4 +79,10 @@ async function after() {
     self.addEventListener("unload", () => Deno.exit(status.code))
     controller.abort()
   }
+  if (Deno.env.has("CI")) {
+    console.log(Deno.resources())
+    const p = Deno.run({ cmd: ["ps", "-He"] })
+    await p.status()
+    p.close()
+  }
 }
