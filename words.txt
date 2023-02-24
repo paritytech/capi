@@ -33,6 +33,7 @@ childstate
 cmds
 codegen
 codegened
+codegens
 codespaces
 combinators
 concat
