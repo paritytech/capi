@@ -57,19 +57,19 @@ Providers are the means by which we target a given chain during development.
 
 ### Production Providers
 
-| junction | description                                                              | example                           |
-| -------- | ------------------------------------------------------------------------ | --------------------------------- |
-| metadata | Codegens based on the metadata contained within the specified scale file | `metadata/path/to/metadata.scale` |
-| wss      | Codegens based on the metadata retrieved through the specified proxy URL | `wss/rpc.polkadot.io`             |
+| Junction   | Description                                                              | Target Example                    |
+| ---------- | ------------------------------------------------------------------------ | --------------------------------- |
+| `wss`      | Codegens based on the metadata retrieved through the specified proxy URL | `wss/rpc.polkadot.io`             |
+| `metadata` | Codegens based on the metadata contained within the specified scale file | `metadata/path/to/metadata.scale` |
 
 ### Development Providers
 
-| junction  | description                                                                                   | example                                   |
-| --------- | --------------------------------------------------------------------------------------------- | ----------------------------------------- |
-| dev       | Spawns and codegens from on a polkadot dev chain                                              | `dev/polkadot`                            |
-| zombienet | Spawns zombienet with the specified config, codegens from the specified node of the zombienet | `zombienet/path/to/config.toml/node_name` |
-| project   | Spawns and codegens from a development chain of the current (cwd) Substrate workspace         | `project`                                 |
-| contracts | Spawns and codegens from an instance of `substrate-contracts-node`                            | `contracts_dev`                           |
+| Junction        | Description                                                                                   | Target Example                            |
+| --------------- | --------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| `dev`           | Spawns and codegens from on a polkadot dev chain                                              | `dev/polkadot`                            |
+| `zombienet`     | Spawns zombienet with the specified config, codegens from the specified node of the zombienet | `zombienet/path/to/config.toml/node_name` |
+| `project`       | Spawns and codegens from a development chain of the current (cwd) Substrate workspace         | `project`                                 |
+| `contracts_dev` | Spawns and codegens from an instance of `substrate-contracts-node`                            | `contracts_dev`                           |
 
 ## Runtime Connection Specificity
 
