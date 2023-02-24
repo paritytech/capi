@@ -1,4 +1,3 @@
-import { SignedBlock } from "../rpc/known/chain.ts"
 import { known } from "../rpc/mod.ts"
 import { MetaRune, Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { Hex } from "../util/mod.ts"
