@@ -110,6 +110,8 @@ mathchain
 matklad
 merkle
 micnncim
+micropayment
+micropayments
 monomorphization
 moonriver
 morfologik
@@ -186,6 +188,7 @@ stalebot
 statemigration
 statemine
 statemint
+stoppability
 struct
 subpaths
 sufficients
