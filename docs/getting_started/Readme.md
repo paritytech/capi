@@ -70,6 +70,6 @@ In this example, the Capi server...
 - Injects a runtime client into the generated API
 - Serves the generated API to the requesting script (`main.ts`)
 
-## Summary
+## Key Takeaway
 
 The Capi server is at the heart of our development. It allows us to spin up test networks, generate narrowly-typed, chain-specific APIs and more. We'll be covering the Capi server in depth in the next section.
