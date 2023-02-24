@@ -46,8 +46,7 @@ export class ZombienetProvider extends FrameBinProvider<ZombienetLaunchInfo> {
         "spawn",
         launchInfo.configPath,
       ]
-      const process = await this.initBinRun(args)
-      copy(process.stderr!, Deno.stderr)
+      await this.initBinRun(args)
       return await network
     })
     const node = network.nodesByName[launchInfo.nodeName]

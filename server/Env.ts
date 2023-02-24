@@ -3,18 +3,18 @@ import { Provider, ProviderFactories } from "./Provider.ts"
 
 export class Env {
   upgradedHref
-  providers
+  providerGroups
 
   constructor(
     readonly href: string,
     readonly cache: CacheBase,
     readonly signal: AbortSignal,
-    providerGroups: Record<string, ProviderFactories>,
+    providerFactoryGroups: Record<string, ProviderFactories>,
   ) {
     this.upgradedHref = href.replace(/^http/, "ws")
-    this.providers = Object.fromEntries(
+    this.providerGroups = Object.fromEntries(
       Object
-        .entries(providerGroups)
+        .entries(providerFactoryGroups)
         .map(([group, providerFactories]): [string, Record<string, Provider>] => [
           group,
           Object.fromEntries(
