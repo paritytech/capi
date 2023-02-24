@@ -2,7 +2,7 @@
 
 ## Dependencies
 
-- (**Required**) We'll be using either the [Deno](https://github.com/denoland/deno) or [NodeJS](https://github.com/nodejs/node) to run Capi's development server.
+- (**Required**) We'll be using either [Deno](https://github.com/denoland/deno) or [NodeJS](https://github.com/nodejs/node) to run Capi's development server.
 
 - (**Recommended**) We **may** also want to install a few additional dependencies, which enable Capi's server to spin up ephemeral networks for easy testing. Assuming you'd like to interact with test networks, let's install [`polkadot`](https://github.com/paritytech/polkadot), so that we can test again Polkadot, Kusama, Westend and Rococo.
 
