@@ -84,7 +84,7 @@ export namespace TransactionStatus {
     return typeof inQuestion === "string"
       ? inQuestion === "invalid" || inQuestion === "dropped"
       : !!(inQuestion.finalized || inQuestion.finalityTimeout || inQuestion.retracted
-        || inQuestion.usurped || inQuestion.inBlock)
+        || inQuestion.usurped)
   }
 }
 
