@@ -109,5 +109,3 @@ const result = await Timestamp.Now
 ## Runtime Version
 
 TODO(@tjjfvi): brief description of why it's best to pin
-
-## Generated Files
