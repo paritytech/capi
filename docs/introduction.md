@@ -6,7 +6,7 @@ Capi is a framework for crafting interactions with Substrate-based chains. It co
 
 <!-- dinodoc fragment.end -->
 
-[LET'S CODE!](/docs/getting_started/first_steps.md)
+The remainder of this page focuses on the impetus for this initiative. If you wish to dive into using Capi, check out [the "Getting Started" guide](/docs/getting_started/first_steps.md).
 
 ## Background
 
