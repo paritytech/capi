@@ -46,9 +46,7 @@ To ease the burden of writing these import specifiers, the Capi server implement
 For retrieving common utilities (such as test pairs and assertions), import from the server's root `mod.ts`, which exports the Capi library itself.
 
 ```ts
-import {
-  // ...
-} from "http://localhost:4646/mod.ts"
+import { alice } from "http://localhost:4646/mod.ts"
 ```
 
 Visit [deno.land/x/capi](https://deno.land/x/capi) to explore this module's exports.
