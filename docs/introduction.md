@@ -2,7 +2,7 @@
 
 <!-- dinodoc fragment.start docs/_fragments/description -->
 
-Capi is a framework for crafting interactions with Substrate-based chains. It consists of a development server, a functional effect system ([Rune](/rune)) and a fluent API, which facilitate multistep, multichain interactions without compromising either performance or ease of use.
+Capi is a framework for crafting interactions with Substrate-based chains. It consists of a development server, a functional effect system, [Rune](/rune), and a fluent API, which facilitate multistep, multichain interactions without compromising either performance or ease of use.
 
 <!-- dinodoc fragment.end -->
 
@@ -14,7 +14,7 @@ Chain resources are intentionally-constrained by economic incentives; this limit
 
 ## The Capi Approach
 
-Capi interactions are defined via [Rune](/docs/rune%3F/Readme.md)s, which are a declarative, portable and strongly-typed building block for descriptions of client-chain interactions (including [XCM](https://github.com/paritytech/xcm-format)essaging). **Rune enable potentially-complex interactions to be folded into their most minimal and parallelized form, so that Capi developers need not think about redundancy and timing. This is what enables Capi to be declarative, performant, fluent and incredibly-well-typed. Speaking of typings: Capi even represents errors within the type system (which is not the case for 99.9% of JavaScript APIs).
+Capi interactions are defined via Runes, which are a declarative, portable and strongly-typed building block for descriptions of client-chain interactions (including [XCM](https://github.com/paritytech/xcm-format)essaging). **Rune enable potentially-complex interactions to be folded into their most minimal and parallelized form, so that Capi developers need not think about redundancy and timing. This is what enables Capi to be declarative, performant, fluent and incredibly-well-typed. Speaking of typings: Capi even represents errors within the type system (which is not the case for 99.9% of JavaScript APIs).
 
 ## Future Considerations
 
