@@ -7,7 +7,7 @@ export class ContractsDevProvider extends FrameBinProvider<string> {
     super(env, {
       bin: "substrate-contracts-node",
       installation: "https://github.com/paritytech/substrate-contracts-node",
-      readyTimeout: 1 * 1000,
+      readyTimeout: 15 * 1000,
     })
   }
 
