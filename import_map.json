@@ -20,10 +20,6 @@
       "capi": "http://localhost:4646/mod.ts",
       "capi/patterns/": "http://localhost:4646/patterns/",
       "zombienet/": "http://localhost:4646/frame/zombienet/zombienets/"
-    },
-    "http://localhost:4646/": {
-      "http://localhost:4646/": "./",
-      "http://localhost:4646/frame/": "http://localhost:4646/frame/"
     }
   }
 }
