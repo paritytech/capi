@@ -18,7 +18,7 @@ Capi interactions are defined via Runes, which are a declarative, portable and s
 
 ## Future Considerations
 
-The Capi approach is meant to accommodate new technical possibilities––as they are devised––without requiring effort from developers. Perhaps we would want to...
+The Capi approach is meant to accommodate new technical possibilities––as they are devised––without requiring effort from developers. **Perhaps we will want to...***
 
 - Serialize and share Runes with other environments (such as RPC nodes), which could assist in their fulfillment for micropayments, therein easing the burden on front-end clients.
 - Statically analyze Runes in order to generate policies that govern session keys related accounting for the scope of those interactions.
