@@ -2,7 +2,7 @@
 
 <!-- dinodoc fragment.start docs/_fragments/description -->
 
-Capi is a framework for crafting interactions with Substrate-based chains. It consists of a development server, a functional effect system, [Rune](/rune), and a fluent API, which facilitate multistep, multichain interactions without compromising either performance or ease of use.
+Capi is a framework for crafting interactions with Substrate-based chains. It consists of a development server, a functional effect system ([Rune](/rune)) and a fluent API, which facilitate multistep, multichain interactions without compromising either performance or ease of use.
 
 <!-- dinodoc fragment.end -->
 
