@@ -44,7 +44,7 @@ Let's go ahead and import a pallet-corresponding namespace of a Polkadot develop
 `main.ts`
 
 ```ts
-import { Timestamp } from "http://localhost:4646/frame/dev/polkadot/@latest/mod.ts"
+import { Timestamp } from "http://localhost:4646/frame/dev/polkadot/@latest/mod.js"
 
 const time = await Timestamp.Now.run()
 
@@ -54,8 +54,8 @@ console.log(time)
 > Note: we can use import maps to simplify import specifiers ([see here](/docs/getting_started/import_mapping.md)).
 >
 > ```diff
-> - import { Timestamp } from "http://localhost:4646/frame/dev/polkadot/@latest/mod.ts"
-> + import { Timestamp } from "polkadot_dev/mod.ts"
+> - import { Timestamp } from "http://localhost:4646/frame/dev/polkadot/@latest/mod.js"
+> + import { Timestamp } from "polkadot_dev/mod.js"
 > ```
 
 Running this script should output a timestamp (a `bigint`).
