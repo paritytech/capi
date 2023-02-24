@@ -14,7 +14,7 @@ Chain resources are intentionally-constrained by economic incentives; this limit
 
 ## The Capi Approach
 
-Capi interactions are defined via Runes, which are a declarative, portable and strongly-typed building blocks describing client-chain interactions (including [XCM](https://github.com/paritytech/xcm-format)essaging). **Rune enable potentially-complex interactions to be folded into their most minimal and parallelized form, so that Capi developers need not think about redundancy and timing. This is what enables Capi to be declarative, performant, fluent and incredibly-well-typed. Speaking of typings: Capi even represents errors within the type system (which is not the case for 99.9% of JavaScript APIs).
+Capi interactions are defined via Runes, which are a declarative, portable and strongly-typed building blocks describing client-chain interactions (including [XCM](https://github.com/paritytech/xcm-format)essaging). **Runes enable potentially-complex interactions to be folded into their most minimal and parallelized form, so that Capi developers need not think about redundancy and timing**. This is what enables Capi to be declarative, performant, fluent and incredibly-well-typed. Speaking of typings: Capi even represents errors within the type system (which is not the case for 99.9% of JavaScript APIs).
 
 ## Future Considerations
 
