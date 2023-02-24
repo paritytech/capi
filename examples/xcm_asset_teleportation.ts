@@ -48,7 +48,7 @@ const initiatedEvent = XcmPallet
   .signed({ sender: alice })
   .sent()
   .dbgStatus("Teleportation status:")
-  .txEvents()
+  .finalizedEvents()
   .map((events) =>
     events.find((e) =>
       AliceRuntimeEvent.isXcmPallet(e.event)
