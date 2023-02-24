@@ -1,4 +1,5 @@
 import * as path from "../../deps/std/path.ts"
+import { copy } from "../../deps/std/streams.ts"
 import { Network } from "../../deps/zombienet/orchestrator.ts"
 import { Env, PathInfo } from "../../server/mod.ts"
 import { PermanentMemo } from "../../util/mod.ts"
@@ -45,7 +46,8 @@ export class ZombienetProvider extends FrameBinProvider<ZombienetLaunchInfo> {
         "spawn",
         launchInfo.configPath,
       ]
-      await this.initBinRun(args)
+      const process = await this.initBinRun(args)
+      copy(process.stderr!, Deno.stderr)
       return await network
     })
     const node = network.nodesByName[launchInfo.nodeName]

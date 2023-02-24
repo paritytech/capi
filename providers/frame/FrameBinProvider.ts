@@ -1,5 +1,4 @@
 import { deferred } from "../../deps/std/async.ts"
-import { copy } from "../../deps/std/streams.ts"
 import { Env, PathInfo } from "../../server/mod.ts"
 import { PermanentMemo, PromiseOr } from "../../util/mod.ts"
 import { ready } from "../../util/port.ts"
@@ -63,8 +62,7 @@ export abstract class FrameBinProvider<LaunchInfo> extends FrameProxyProvider {
       stdout: "piped",
       stderr: "piped",
     })
-    copy(process.stderr, Deno.stderr)
-    this.env.signal.addEventListener("abort", () => {
+    this.env.signal.addEventListener("abort", async () => {
       process.kill("SIGINT")
       process.stdout.close()
       process.stderr.close()
