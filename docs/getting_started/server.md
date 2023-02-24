@@ -39,8 +39,6 @@ To ease the burden of writing these import specifiers, the Capi server implement
 
 <!-- TODO: add screenshot -->
 
-> Note: unfortunately this API does not exist for NodeJS's https imports, which were only recently stabilized. <!-- TODO: link to more info -->
-
 ## The Capi Library
 
 For retrieving common utilities (such as test pairs and assertions), import from the server's root `mod.ts`, which exports the Capi library itself.
