@@ -14,13 +14,20 @@ Before diving into Capi, let's make sure your environment is configured with the
 
 ## Run The Capi Server
 
-Depending on your preferred JavaScript runtime, run one of the following commands.
+Run one of the following commands (depending on your preference of runtime).
 
 ### With **Deno**
 
 ```sh
 deno run -A https://deno.land/x/capi/main.ts
 ```
+
+> Note: we recommend pinning to a specific version of Capi
+>
+> ```diff
+> - deno run -A https://deno.land/x/capi/main.ts
+> + deno run -A https://deno.land/x/capi@v0.1.0/main.ts
+> ```
 
 ### With **Node**
 
