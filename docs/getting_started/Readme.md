@@ -8,7 +8,7 @@ Before diving into Capi, let's make sure your environment is configured with the
 
 2. (**Recommended**) We **may** also want to install a few additional dependencies, which enable Capi's server to spin up ephemeral networks for easy testing. Assuming you'd like to interact with test networks, let's install [`polkadot`](https://github.com/paritytech/polkadot), so that we can test again Polkadot, Kusama, Westend and Rococo.
 
-3. (**Per use case**) For more advanced test network setups, we can install [`zombienet`](https://github.com/paritytech/zombienet) and [`cumulus`](https://github.com/paritytech/cumulus).
+3. (**Per use case**) For more advanced test network setups, we can install [`zombienet`](https://github.com/paritytech/zombienet) and [`cumulus`](https://github.com/paritytech/cumulus) (in addition to [`polkadot`](https://github.com/paritytech/polkadot)).
 
 4. (**Per use case**) For testing smart contracts, we can install [`substrate-contracts-node`](https://github.com/paritytech/substrate-contracts-node).
 
