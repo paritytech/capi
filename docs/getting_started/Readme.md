@@ -41,14 +41,14 @@ Upon running the command, you should see the message `Capi server listening at "
 
 ## Use The Capi Server
 
-Let's go ahead and import a pallet-corresponding namespace of a Polkadot development chain. In this case, we'll get the agreed-upon time of the latest block from the `System` pallet.
+Let's go ahead and import a pallet-corresponding namespace of a Polkadot development chain. In this case, we'll get the agreed-upon time of the latest block from the `Timestamp` pallet.
 
 `main.ts`
 
 ```ts
-import { System } from "http://localhost:4646/frame/dev/polkadot/@latest/mod.ts"
+import { Timestamp } from "http://localhost:4646/frame/dev/polkadot/@latest/mod.ts"
 
-const time = await System.Now.run()
+const time = await Timestamp.Now.run()
 
 console.log(time)
 ```
@@ -56,8 +56,8 @@ console.log(time)
 > Note: we can use import maps to simplify import specifiers ([see here](/docs/getting_started/import_mapping.md)).
 >
 > ```diff
-> - import { System } from "http://localhost:4646/frame/dev/polkadot/@latest/mod.ts"
-> + import { System } from "polkadot_dev/mod.ts"
+> - import { Timestamp } from "http://localhost:4646/frame/dev/polkadot/@latest/mod.ts"
+> + import { Timestamp } from "polkadot_dev/mod.ts"
 > ```
 
 Running this script should output a timestamp (a `bigint`).
