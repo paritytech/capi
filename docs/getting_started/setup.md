@@ -12,5 +12,3 @@
 ## CDN
 
 ### [capi.dev](https://capi.dev)
-
-### Host Your Own
