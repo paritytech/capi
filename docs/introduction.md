@@ -12,7 +12,7 @@ The remainder of this page focuses on the impetus for this initiative. If you wi
 
 Chain resources are intentionally-constrained by economic incentives; this limits an app developer's ability to implement access patterns, which would otherwise benefit the end-user experience. Many such access patterns relate to data aggregation and preprocessing; doing this work on the client-side (in a browser, for example) consumes already-sparse resources. In other circumstances, the developer might move these tasks to less-constrained environments, such as that of a centralized server. Although developers can use centralized servers as proxies to chains, these intermediaries are points of stoppability. There is currently no obvious solution to avoiding this trade-off.
 
-## The Capi Approach
+## The Approach
 
 Capi interactions are defined via Runes, which are a declarative, portable and strongly-typed building blocks describing client-chain interactions (including [XCM](https://github.com/paritytech/xcm-format)essaging). **Runes enable potentially-complex interactions to be folded into their most minimal and parallelized form, so that Capi developers need not think about redundancy and timing**. This is what enables Capi to be declarative, performant, fluent and incredibly-well-typed. Speaking of typings: Capi even represents errors within the type system (which is not the case for 99.9% of JavaScript APIs).
 
