@@ -14,7 +14,7 @@ export interface ZombienetProviderProps {
 
 const defaultZombienetPaths: Record<string, string | undefined> = {
   darwin: "zombienet-macos",
-  linux: "zombienet-linux",
+  linux: "zombienet-linux-x64",
 }
 
 export class ZombienetProvider extends FrameProxyProvider {
@@ -96,7 +96,9 @@ export class ZombienetProvider extends FrameProxyProvider {
       })
       let closeProcess = () => {
         closeProcess = () => {}
-        process.kill()
+        process.kill("SIGINT")
+        process.stdout.close()
+        process.stderr.close()
         process.close()
       }
       this.env.signal.addEventListener("abort", async () => {

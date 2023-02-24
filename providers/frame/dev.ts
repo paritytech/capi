@@ -34,8 +34,8 @@ export class PolkadotDevProvider extends FrameProxyProvider {
     try {
       const process = Deno.run({
         cmd,
-        stdout: "piped",
-        stderr: "piped",
+        stdout: "null",
+        stderr: "null",
       })
       this.env.signal.addEventListener("abort", () => {
         process.kill()

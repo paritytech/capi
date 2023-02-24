@@ -76,6 +76,7 @@ async function after() {
     const process = Deno.run({ cmd })
     const status = await process.status()
     self.addEventListener("unload", () => Deno.exit(status.code))
+    process.close()
     controller.abort()
   }
 }
