@@ -28,7 +28,7 @@ if (!address) {
     .signed({ sender: alice })
     .sent()
     .dbgStatus("Contract deployment status:")
-    .txEvents()
+    .inBlockEvents()
     .map((events) =>
       events.find(isInstantiatedEvent) ?? new FailedToFindContractInstantiatedError()
     )
@@ -52,7 +52,7 @@ console.log(
     .signed({ sender: alice })
     .sent()
     .dbgStatus("Flip status:")
-    .txEvents()
+    .inBlockEvents()
     .pipe(contract.filterContractEvents)
     .run(),
 )

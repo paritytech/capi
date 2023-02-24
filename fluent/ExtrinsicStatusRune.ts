@@ -1,3 +1,4 @@
+import { SignedBlock } from "../rpc/known/chain.ts"
 import { known } from "../rpc/mod.ts"
 import { MetaRune, Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { Hex } from "../util/mod.ts"
@@ -54,13 +55,17 @@ export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
     return this.extrinsic.chain.block(hash)
   }
 
-  txEvents() {
-    const block = this.finalized()
+  inBlockEvents() {
+    return this.events(this.inBlock())
+  }
+
+  finalizedEvents() {
+    return this.events(this.finalized())
+  }
+
+  events<EU>(block: BlockRune<EU, C>) {
     const txI = Rune
-      .tuple([
-        block.into(ValueRune).access("block", "extrinsics"),
-        this.extrinsic.hex(),
-      ])
+      .tuple([block.into(ValueRune).access("block", "extrinsics"), this.extrinsic.hex()])
       .map(([hexes, hex]) => {
         const i = hexes.indexOf(("0x" + hex) as Hex)
         return i === -1 ? undefined : i
