@@ -26,7 +26,7 @@ import {
 //                            codegen type
 ```
 
-In this example, we use the import specifier to ask for the following:
+In this example, we ask the server for the following:
 
 - `frame` is the type of codegen with which we want the server to produce our chain-specific API
 - `wss/rpc.polkadot.io` is the target. `wss` indicates the provider, while `rpc.polkadot.io` is the means of provider-specific discovery (a WebSocket URL)
