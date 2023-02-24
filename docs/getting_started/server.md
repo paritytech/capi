@@ -88,9 +88,7 @@ declare const parachainSpec: string | undefined
 
 const connection = smoldotConnection({ relayChainSpec, parachainSpec })
 
-const result = await Timestamp.Now
-  .apply(connection)
-  .run()
+const result = await Timestamp.Now.apply(connection).run()
 ```
 
 ### (Stoppable) WebSocket URL
@@ -101,9 +99,7 @@ import { wdConnection } from "capi"
 
 const connection = wsConnection(wsUrl)
 
-const result = await Timestamp.Now
-  .apply(connection)
-  .run()
+const result = await Timestamp.Now.apply(connection).run()
 ```
 
 ## Runtime Version
