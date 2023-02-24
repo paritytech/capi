@@ -77,8 +77,6 @@ At runtime, we must inject a connection into our generated code. We currently su
 
 ### Unstoppable (Smoldot)
 
-Let's say I'm developing against `http://localhost:4646/frame/dev/polkadot/@latest/mod.js`.
-
 ```ts
 import { Timestamp } from "#chain/mod.js"
 import { smoldotConnection } from "capi"
