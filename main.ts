@@ -15,7 +15,7 @@ const { help, port: portRaw, "--": cmd, out } = flags.parse(Deno.args, {
   boolean: ["help"],
   string: ["port", "out"],
   default: {
-    port: 4646,
+    port: "4646",
     out: "target/capi",
   },
   alias: { h: "help" },
