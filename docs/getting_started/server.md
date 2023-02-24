@@ -15,13 +15,12 @@ We primarily use import specifiers as a way of telling the Capi server what it i
 import {
   // ...
 } from "http://localhost:4646/frame/wss/rpc.polkadot.io/@latest/mod.js"
-//      ~~~~~~~~~~~~~~~~~~~~~ ~~~~~ ~~~~~~~~~~~~~~~~~~~ ~~~~~~~ ~~~~~~
-//      ^                     ^     ^                   ^       ^
-//      |                     |     |                   |       chain file
-//      |                     |     |                   runtime version
-//      |                     |     target
-//      |                     codegen type
-//      server origin
+//                            ~~~~~ ~~~~~~~~~~~~~~~~~~~ ~~~~~~~ ~~~~~~
+//                            ^     ^                   ^       ^
+//                            |     |                   |       chain file
+//                            |     |                   runtime version
+//                            |     target
+//                            codegen type
 ```
 
 In this example, we use the import specifier to ask for the following:
