@@ -52,7 +52,7 @@ const env = new Env(port, cache, signal, {
     project(env) {
       return new ProjectProvider(env)
     },
-    contracts(env) {
+    contracts_dev(env) {
       return new ContractsDevProvider(env)
     },
   },
