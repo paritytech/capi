@@ -53,19 +53,7 @@ const time = await System.Now.run()
 console.log(time)
 ```
 
-> Note: we can use import maps to simplify import specifiers.
->
-> `import_map.json`
->
-> ```json
-> {
->   "imports": {
->     "polkadot_dev/": "http://localhost:4646/frame/dev/polkadot/@latest/"
->   }
-> }
-> ```
->
-> `main.ts`
+> Note: we can use import maps to simplify import specifiers ([see here](/docs/getting_started/import_mapping.md)).
 >
 > ```diff
 > - import { System } from "http://localhost:4646/frame/dev/polkadot/@latest/mod.ts"
