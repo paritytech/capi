@@ -10,7 +10,7 @@ Capi is a declarative, TypeScript-first toolkit for crafting interactions with S
 
 - [Examples &rarr;](./examples)<br />SHOW ME THE CODE
 - [Docs &rarr;](./docs/introduction.md)<br />Guides for Capi developers and pattern library developers
-- [API Reference &rarr;](https://deno.land/x/capi/mod.ts)<br />A generated API reference, based on type signatures and in-source comments.
+- [API Reference &rarr;](https://deno.land/x/capi/mod.ts)<br />A generated API reference, based on type signatures and TSDocs.
 
 ## At a Glance
 

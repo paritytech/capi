@@ -2,7 +2,7 @@
 
 <!-- dinodoc fragment.start docs/_fragments/description -->
 
-Capi is a declarative, TypeScript-first toolkit for crafting interactions with Substrate-based chains. It consists of a development server, [FRAME](https://docs.substrate.io/reference/glossary/#frame) and other runtime libraries, a functional effect system ([Rune](/rune)) and a fluent API, which facilitates multistep, multichain interactions without compromising either performance or ease of use.
+Capi is a framework for crafting interactions with Substrate-based chains. It consists of a development server, a functional effect system ([Rune](/rune)) and a fluent API, which facilitate multistep, multichain interactions without compromising either performance or ease of use.
 
 <!-- dinodoc fragment.end -->
 
