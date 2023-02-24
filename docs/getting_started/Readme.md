@@ -29,8 +29,37 @@ deno run -A https://deno.land/x/capi/main.ts
 > + deno run -A https://deno.land/x/capi@v0.1.0/main.ts
 > ```
 
-### With **Node**
+### With **NodeJS**
 
 ```sh
 npx capi
 ```
+
+Upon running the command, you should see the message `Capi server listening at "http://localhost:4646"`.
+
+> Note: this documentation is written from the standpoint of a Deno user.
+
+## Use The Capi Server
+
+Let's go ahead and import a pallet-corresponding namespace of a Polkadot development chain. In this case, we'll get the agreed-upon time of the latest block from the `System` pallet.
+
+```ts
+import { System } from "http://localhost:4646/frame/dev/polkadot/@latest/mod.ts"
+
+const time = await System.Now.run()
+
+console.log(time)
+```
+
+Running this script should output a timestamp (a `bigint`).
+
+In this example, the Capi server...
+
+- Receives the request for a Polkadot development chain and API
+- Spins up the Polkadot development chain
+- Uses its metadata to generate a chain-specific API
+- Serves the API to the script
+
+## Summary
+
+The Capi server is at the heart of our development. It allows us to spin up test networks, generate narrowly-typed, chain-specific APIs and more. We'll be covering the Capi server in depth in the next section.
