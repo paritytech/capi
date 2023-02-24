@@ -64,10 +64,11 @@ Running this script should output a timestamp (a `bigint`).
 
 In this example, the Capi server...
 
-- Receives the request for a Polkadot development chain and API
+- Receives the request for a local Polkadot development chain and corresponding API
 - Spins up the Polkadot development chain
 - Uses its metadata to generate a chain-specific API
-- Serves the API to the script
+- Injects a runtime client into the generated API
+- Serves the generated API to the requesting script (`main.ts`)
 
 ## Summary
 
