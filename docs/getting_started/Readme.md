@@ -1,24 +1,25 @@
 # Getting Started
 
-## Prerequisites
+First install [Deno](https://github.com/denoland/deno) or [NodeJS](https://github.com/nodejs/node), our means of executing JavaScript code.
 
-### Required Dependencies
+We **may** also want to install a few additional dependencies, which enable Capi's server to spin up ephemeral networks for easy testing. Assuming you'd like to interact with test networks, let's install [`polkadot`](https://github.com/paritytech/polkadot), so that we can test again Polkadot, Kusama, Westend and Rococo.
 
-- [Deno](https://github.com/denoland/deno) or [NodeJS](https://github.com/nodejs/node)<br />SHOW ME THE CODE
+> For more advanced test network setups, we can install [`zombienet`](https://github.com/paritytech/zombienet) and [`cumulus`](https://github.com/paritytech/cumulus).
+>
+> For testing smart contracts, we can install [`substrate-contracts-node`](https://github.com/paritytech/substrate-contracts-node).
 
-### Recommended Dependencies
+## Run The Capi Server
 
-Capi's server can use the following tools to spin up ephemeral dev chains for testing.
+Depending on your preferred JavaScript runtime, run one of the following commands.
 
-#### For Simple Polkadot/Kusama/Westend/Rococo-Based Dev Chains
+### With **Deno**
 
-- [`polkadot`](https://github.com/paritytech/polkadot)
+```sh
+deno run -A https://deno.land/x/capi/main.ts
+```
 
-#### For Advanced Dev Chain Systems
+### With **Node**
 
-- [`zombienet`](https://github.com/paritytech/zombienet)
-- [`cumulus`](https://github.com/paritytech/cumulus)
-
-#### For Smart-contract Development
-
-- [`substrate-contracts-node`](https://github.com/paritytech/substrate-contracts-node)
+```sh
+npx capi
+```
