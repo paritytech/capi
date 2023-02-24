@@ -18,8 +18,11 @@ import {
 //                            ~~~~~ ~~~~~~~~~~~~~~~~~~~ ~~~~~~~ ~~~~~~
 //                            ^     ^                   ^       ^
 //                            |     |                   |       chain file
+//                            |     |                   |
 //                            |     |                   runtime version
+//                            |     |
 //                            |     target
+//                            |
 //                            codegen type
 ```
 
