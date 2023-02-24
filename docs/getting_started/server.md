@@ -39,6 +39,8 @@ To ease the burden of writing these import specifiers, the Capi server implement
 
 <!-- TODO: add screenshot -->
 
+> Note: TODO: describe status of intellisense for NodeJS projects / TS language server
+
 ## The Capi Library
 
 For retrieving common utilities (such as test pairs and assertions), import from the server's root `mod.ts`, which exports the Capi library itself.
