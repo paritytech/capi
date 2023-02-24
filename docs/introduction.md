@@ -18,4 +18,9 @@ Capi interactions are defined via Runes, which are a declarative, portable and s
 
 ## Future Considerations
 
-The Capi approach is meant to accommodate new technical possibilities––as they are devised––without requiring effort from developers; Runes _could be_ serialized and shared with other environments (such as RPC nodes), which could assist in their fulfillment (perhaps for tiny micropayments), therein easing the burden on front-end clients. Meanwhile, this portability means we can statically analyze the scope of an interaction, which could be useful for the creation of policies that govern session keys, among other future cases. The list of open doors goes on and on.
+The Capi approach is meant to accommodate new technical possibilities––as they are devised––without requiring effort from developers. Perhaps we would want to...
+
+- Serialize and share Runes with other environments (such as RPC nodes), which could assist in their fulfillment for micropayments, therein easing the burden on front-end clients.
+- Statically analyze Runes in order to generate policies that govern session keys related accounting for the scope of those interactions.
+- Generate clients to be consumed in other programming languages.
+- Your feature request (please don't hesitate to [file an issue](https://github.com/paritytech/capi/issues/new))
