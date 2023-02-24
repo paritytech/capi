@@ -55,7 +55,7 @@ export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
   }
 
   txEvents() {
-    const block = this.inBlock()
+    const block = this.finalized()
     const txI = Rune
       .tuple([
         block.into(ValueRune).access("block", "extrinsics"),
