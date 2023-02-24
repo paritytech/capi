@@ -35,11 +35,9 @@ jobs:
           binary-version: v0.9.370
           binary-github: https://github.com/paritytech/cumulus
       - name: Setup substrate-contracts-node
-        uses: ./.github/actions/setup-binary
+        uses: ./.github/actions/setup-substrate-contracts-node
         with:
-          binary-name: substrate-contracts-node
-          binary-version: v0.24.0
-          binary-github: https://github.com/paritytech/substrate-contracts-node
+          version: v0.24.0
       - name: Setup Zombienet
         uses: ./.github/actions/setup-binary
         with:

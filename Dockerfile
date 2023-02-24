@@ -31,9 +31,8 @@ RUN export DEBIAN_FRONTEND=noninteractive \
   && chmod +x /usr/local/bin/polkadot-parachain \
   && curl -fsSL -o /usr/local/bin/zombienet-linux-x64 https://github.com/paritytech/zombienet/releases/download/${ZOMBIENET_VERSION}/zombienet-linux-x64 \
   && chmod +x /usr/local/bin/zombienet-linux-x64 \
-  && curl -fsSL -o /usr/local/bin/substrate-contracts-node.tar.gz https://github.com/paritytech/substrate-contracts-node/releases/download/${SUBSTRATE_CONTRACTS_NODE_VERSION}}/substrate-contracts-node-linux.tar.gz \
-  && tar -xf /usr/local/bin/substrate-contracts-node.tar.gz \
-  && chmod +x /usr/local/bin/substrate-contracts-node \
+  && curl -fsSL https://github.com/paritytech/substrate-contracts-node/releases/download/${SUBSTRATE_CONTRACTS_NODE_VERSION}/substrate-contracts-node-linux.tar.gz | tar -zx \
+  && mv ./artifacts/substrate-contracts-node-linux/substrate-contracts-node /usr/local/bin/ \
   && curl -fsSL https://dprint.dev/install.sh | DPRINT_INSTALL=/usr/local sh \
   && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
   && apt-get install -y nodejs \
