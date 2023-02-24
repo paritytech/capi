@@ -10,7 +10,7 @@ The remainder of this page focuses on the impetus for this initiative. If you wi
 
 ## Background
 
-Chain resources are intentionally-constrained by economic incentives; this limits an app developer's ability to implement access patterns, which would otherwise benefit the end-user experience. Many such access patterns relate to data aggregation and preprocessing; doing this work on the client-side (in a browser, for example) consumes already-sparse resources. In other circumstances, the developer might move these tasks to less-constrained environments, such as that of a centralized server. Although Substrate developers can use centralized servers as proxies to chains, this introduces points of stoppability. There is currently no obvious solution to avoiding this trade-off.
+Chain resources are intentionally-constrained by economic incentives; this limits an app developer's ability to implement access patterns, which would otherwise benefit the end-user experience. Many such access patterns relate to data aggregation and preprocessing; doing this work on the client-side (in a browser, for example) consumes already-sparse resources. In other circumstances, the developer might move these tasks to less-constrained environments, such as that of a centralized server. Although developers can use centralized servers as proxies to chains, this introduces points of stoppability. There is currently no obvious solution to avoiding this trade-off.
 
 ## The Capi Approach
 
