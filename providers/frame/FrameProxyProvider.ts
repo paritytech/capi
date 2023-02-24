@@ -54,7 +54,7 @@ export abstract class FrameProxyProvider extends FrameProvider {
         vRuntime: "",
         filePath: "",
       }),
-      this.env.wsHref,
+      this.env.upgradedHref,
     ).toString()
   }
 

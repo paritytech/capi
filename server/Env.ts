@@ -2,18 +2,16 @@ import { CacheBase } from "../util/cache/base.ts"
 import { Provider, ProviderFactories } from "./Provider.ts"
 
 export class Env {
-  httpHref
-  wsHref
+  upgradedHref
   providers
 
   constructor(
-    readonly port: number,
+    readonly href: string,
     readonly cache: CacheBase,
     readonly signal: AbortSignal,
     providerGroups: Record<string, ProviderFactories>,
   ) {
-    this.httpHref = `http://localhost:${port}`
-    this.wsHref = `ws://localhost:${port}`
+    this.upgradedHref = href.replace(/^http/, "ws")
     this.providers = Object.fromEntries(
       Object
         .entries(providerGroups)

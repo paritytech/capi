@@ -37,8 +37,8 @@ cache.getString(
   async () => `export * from ${JSON.stringify(import.meta.resolve("./mod.ts"))}`,
 )
 
-const port = +portRaw
-const env = new Env(port, cache, signal, {
+const href = `http://localhost:${portRaw}/`
+const env = new Env(href, cache, signal, {
   frame: {
     wss(env) {
       return new WssProvider(env)
@@ -60,23 +60,23 @@ const env = new Env(port, cache, signal, {
 
 let running = false
 try {
-  if (await (await fetch(`${env.httpHref}/capi_cwd`)).text() === Deno.cwd()) running = true
+  if (await (await fetch(`${href}/capi_cwd`)).text() === Deno.cwd()) running = true
 } catch (_e) {}
 
 if (!running) {
   await serve(handler(env), {
-    port,
+    port: +portRaw,
     signal,
     onError(error) {
       throw error
     },
     async onListen() {
-      console.log(`Capi server listening at "${env.httpHref}"`)
+      console.log(`Capi server listening at "${href}"`)
       await after()
     },
   })
 } else {
-  console.log(`Reusing existing Capi server at "${env.httpHref}"`)
+  console.log(`Reusing existing Capi server at "${href}"`)
   await after()
 }
 
