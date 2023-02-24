@@ -40,7 +40,7 @@ export class IdentityInfoTranscoders<A extends Record<string, any>> {
           .resolve(props[key])
           .unhandle(undefined)
           .map(encodeStr)
-          .rehandle(undefined, () => Data.None()),
+          .rehandle(undefined, () => Rune.resolve(Data.None())),
       ])))
       .unsafeAs<Record<typeof REST_KEYS[number], Data>>()
     return Rune
