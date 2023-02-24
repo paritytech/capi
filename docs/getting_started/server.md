@@ -75,7 +75,7 @@ Providers are the means by which we target a given chain during development.
 
 At runtime, we must inject a connection into our generated code. We currently support two connection types out of the box.
 
-### (Unstoppable) Smoldot
+### Unstoppable (Smoldot)
 
 Let's say I'm developing against `http://localhost:4646/frame/dev/polkadot/@latest/mod.js`.
 
@@ -91,7 +91,7 @@ const connection = smoldotConnection({ relayChainSpec, parachainSpec })
 const result = await Timestamp.Now.apply(connection).run()
 ```
 
-### (Stoppable) WebSocket URL
+### Stoppable (WebSocket URL)
 
 ```ts
 import { Timestamp } from "#chain/mod.js"
