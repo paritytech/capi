@@ -27,17 +27,15 @@ if (help) {
   Deno.exit()
 }
 
+const href = `http://localhost:${portRaw}/`
+
 const controller = new AbortController()
 const { signal } = controller
 
 const cache = new FsCache(out, signal)
-cache.getString(
-  "mod.ts",
-  0,
-  async () => `export * from ${JSON.stringify(import.meta.resolve("./mod.ts"))}`,
-)
+const modPath = JSON.stringify(import.meta.resolve("./mod.ts"))
+cache.getString("mod.ts", 0, async () => `export * from ${modPath}`)
 
-const href = `http://localhost:${portRaw}/`
 const env = new Env(href, cache, signal, {
   frame: {
     wss(env) {
