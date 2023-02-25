@@ -1,6 +1,4 @@
-import { Proxy, Utility } from "polkadot_dev/mod.ts"
-
-import { ArrayRune, hex, MultiAddress, Rune, RunicArgs, Sr25519 } from "../../mod.ts"
+import { ArrayRune, ChainRune, hex, MultiAddress, Rune, RunicArgs, Sr25519 } from "../../mod.ts"
 import { filterPureCreatedEvents } from "../proxy/mod.ts"
 
 export interface BuildPureProxyMultisigProps {
@@ -9,7 +7,10 @@ export interface BuildPureProxyMultisigProps {
   threshold?: number
 }
 
-export function buildPureProxyMultisig<X1>(props: RunicArgs<X1, BuildPureProxyMultisigProps>) {
+export function createMultiproxy<U, X>(
+  chain: ChainRune<U, any>, // TODO: constraint `Chain`
+  props: RunicArgs<X, BuildPureProxyMultisigProps>,
+) {
   // TODO: clean up with https://github.com/paritytech/capi/issues/589
   const { admins, threshold: thresholdOrUndef, sender } = RunicArgs.resolve(props)
   const adminCount = admins.map((admins) => admins.length)
@@ -29,15 +30,25 @@ export function buildPureProxyMultisig<X1>(props: RunicArgs<X1, BuildPureProxyMu
     .map((n) => Array.from({ length: n + 1 }, (_, i) => i))
     .into(ArrayRune)
     .mapArray((index) =>
-      Proxy.createPure({
-        proxyType: "Any",
-        delay: 0,
-        index,
+      chain.extrinsic({
+        type: "Proxy",
+        value: Rune.rec({
+          type: "createPure",
+          proxyType: "Any",
+          delay: 0,
+          index,
+        }),
       })
     )
 
-  const proxyAccountIds = Utility
-    .batch({ calls: createPureCalls })
+  const proxyAccountIds = chain
+    .extrinsic({
+      type: "Utility",
+      value: {
+        type: "batch",
+        calls: createPureCalls,
+      },
+    })
     .signed({ sender })
     .sent()
     .dbgStatus("Creating pure proxies:")

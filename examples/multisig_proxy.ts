@@ -1,10 +1,20 @@
-import { alice, ArrayRune, bob, charlie, dave, MultiAddress, Rune } from "capi"
-import { buildPureProxyMultisig } from "capi/patterns/multisig/proxy.ts"
-import { addProxy, getMultiAddress, removeProxy } from "capi/patterns/proxy/mod.ts"
+import {
+  alice,
+  ArrayRune,
+  bob,
+  charlie,
+  dave,
+  hex,
+  MultiAddress,
+  Rune,
+  RunicArgs,
+  ValueRune,
+} from "capi"
+import { createMultiproxy, MultisigRune } from "capi/patterns/multisig/mod.ts"
+import { addProxy, removeProxy } from "capi/patterns/proxy/mod.ts"
 import { Balances, chain, Proxy, System, Utility } from "polkadot_dev/mod.ts"
-import { MultisigRune } from "../patterns/multisig/MultisigRune.ts"
 
-const build = buildPureProxyMultisig({
+const build = createMultiproxy(chain, {
   sender: alice,
   threshold: 2,
   admins: [alice.publicKey, bob.publicKey, charlie.publicKey],
@@ -14,40 +24,48 @@ const multisig = build.access("multisig").into(MultisigRune, chain)
 const stashMultiAddress = build.access("stashMultiAddress")
 const adminProxies = build.access("adminProxies")
 
-const existentialDepositAddresses = Rune.tuple([
-  multisig.address.map(MultiAddress.Id),
-  stashMultiAddress,
-  adminProxies.map((rec) => Object.values(rec).map(MultiAddress.Id)),
-]).map(([a, b, c]) => [a, b, ...c])
+const existentialDepositAddresses = Rune
+  .tuple([
+    multisig.address.map(MultiAddress.Id),
+    stashMultiAddress,
+    adminProxies.map((rec) => Object.values(rec).map(MultiAddress.Id)),
+  ])
+  .map(([a, b, c]) => [a, b, ...c])
 
-const existentialDeposits = Utility.batchAll({
-  calls: existentialDepositAddresses.into(ArrayRune).mapArray((addr) =>
-    Balances.transfer({
-      dest: addr,
-      value: 20_000_000_000_000n,
-    })
-  ),
-}).signed({ sender: alice })
+const existentialDeposits = Utility
+  .batchAll({
+    calls: existentialDepositAddresses
+      .into(ArrayRune)
+      .mapArray((dest) => Balances.transfer({ dest, value: 20_000_000_000_000n })),
+  })
+  .signed({ sender: alice })
   .sent()
   .dbgStatus("Existential deposits:")
   .txEvents()
 
-const getProxyAddress = getMultiAddress(adminProxies)
+function getProxyAddress<X>(...[accountId]: RunicArgs<X, [Uint8Array]>) {
+  return Rune
+    .tuple([adminProxies, accountId])
+    .map(([adminProxies, accountId]) =>
+      MultiAddress.Id(adminProxies[hex.encode(accountId)] ?? new Uint8Array())
+    )
+}
 const aliceProxyAddress = getProxyAddress(alice.publicKey)
 const bobProxyAddress = getProxyAddress(bob.publicKey)
 const charlieProxyAddress = getProxyAddress(charlie.publicKey)
 
 const updateProxies = Utility
   .batchAll({
-    calls: Rune.tuple([
-      addProxy(bobProxyAddress, bob.address),
-      addProxy(charlieProxyAddress, charlie.address),
-      addProxy(stashMultiAddress, multisig.address.map(MultiAddress.Id)),
-      removeProxy(bobProxyAddress, alice.address),
-      removeProxy(charlieProxyAddress, alice.address),
-      removeProxy(stashMultiAddress, alice.address),
-    ]),
-  }).signed({ sender: alice })
+    calls: Rune.array([
+      addProxy(chain, bobProxyAddress, bob.address),
+      addProxy(chain, charlieProxyAddress, charlie.address),
+      addProxy(chain, stashMultiAddress, multisig.address.map(MultiAddress.Id)),
+      removeProxy(chain, bobProxyAddress, alice.address),
+      removeProxy(chain, charlieProxyAddress, alice.address),
+      removeProxy(chain, stashMultiAddress, alice.address),
+    ] as any[]),
+  })
+  .signed({ sender: alice })
   .sent()
   .dbgStatus("Update Proxies")
   .txEvents()

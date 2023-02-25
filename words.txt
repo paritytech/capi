@@ -116,6 +116,7 @@ multiaddress
 multiasset
 multichain
 multilocation
+multiproxy
 multisigs
 multistep
 neatcoin

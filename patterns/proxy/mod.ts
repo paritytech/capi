@@ -1,16 +1,17 @@
-import { types } from "polkadot_dev/mod.ts"
-import { Proxy } from "polkadot_dev/mod.ts"
-import { Event } from "polkadot_dev/types/pallet_proxy/pallet.ts"
-import { RuntimeEvent } from "polkadot_dev/types/polkadot_runtime.ts"
-import { hex, MultiAddress, Rune, RunicArgs } from "../../mod.ts"
+import { type RuntimeEvent } from "http://localhost:4646/frame/dev/polkadot/@v0.9.36/types/polkadot_runtime.ts"
+import { type Event as ProxyEvent } from "polkadot_dev/types/pallet_proxy/pallet.ts"
+import { ChainRune, Event, MultiAddress, Rune, RunicArgs } from "../../mod.ts"
 
-export function addProxy<X>(
+export function addProxy<U, X>(
+  chain: ChainRune<U, any>,
   ...[proxy, delegate]: RunicArgs<X, [proxy: MultiAddress, delegate: MultiAddress]>
 ) {
-  return Proxy.proxy({
+  return chain.extrinsic({
+    type: "Proxy",
     real: proxy,
     forceProxyType: undefined,
-    call: Proxy.addProxy({
+    call: Rune.rec({
+      type: "addProxy",
       proxyType: "Any",
       delegate: delegate,
       delay: 0,
@@ -18,13 +19,16 @@ export function addProxy<X>(
   })
 }
 
-export function removeProxy<X>(
+export function removeProxy<U, X>(
+  chain: ChainRune<U, any>,
   ...[proxy, delegate]: RunicArgs<X, [proxy: MultiAddress, delegate: MultiAddress]>
 ) {
-  return Proxy.proxy({
+  return chain.extrinsic({
+    type: "Proxy",
     real: proxy,
     forceProxyType: undefined,
-    call: Proxy.removeProxy({
+    call: Rune.rec({
+      type: "removeProxy",
       proxyType: "Any",
       delegate: delegate,
       delay: 0,
@@ -32,28 +36,12 @@ export function removeProxy<X>(
   })
 }
 
-export function getMultiAddress<X1>(
-  ...[mapping]: RunicArgs<X1, [Record<string, Uint8Array>]>
-) {
-  return function<X2>(...[accountId]: RunicArgs<X2, [Uint8Array]>) {
-    return Rune
-      .tuple([mapping, accountId])
-      .map(([mapping, accountId]) =>
-        MultiAddress.Id(mapping[hex.encode(accountId)] ?? new Uint8Array())
-      )
-  }
-}
-
-export function filterPureCreatedEvents<X>(
-  ...[events]: RunicArgs<X, [types.frame_system.EventRecord[]]>
-) {
-  return Rune
-    .resolve(events)
-    .map((events) =>
-      events
-        .map((e) => e.event)
-        .filter(RuntimeEvent.isProxy)
-        .map((e) => e.value)
-        .filter(Event.isPureCreated)
-    )
+export function filterPureCreatedEvents<X>(...[events]: RunicArgs<X, [Event[]]>) {
+  return Rune.resolve(events).map((events) =>
+    events
+      .map((e) => e.event)
+      .filter((event): event is RuntimeEvent.Proxy => event.type === "Proxy")
+      .map((e) => e.value)
+      .filter((event): event is ProxyEvent.PureCreated => event.type === "PureCreated")
+  )
 }
