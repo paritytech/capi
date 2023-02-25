@@ -1,8 +1,6 @@
-import type {
-  Data,
-  IdentityInfo as IdentityInfoRaw,
-} from "polkadot_dev/types/pallet_identity/types.ts"
-import { $, Rune, RunicArgs } from "../mod.ts"
+import type { IdentityInfo as IdentityInfoRaw } from "polkadot_dev/types/pallet_identity/types.ts"
+import * as $ from "../deps/scale.ts"
+import { Rune, RunicArgs } from "../rune/mod.ts"
 
 export interface IdentityInfo<A extends Record<string, unknown>> {
   additional: A
@@ -42,7 +40,7 @@ export class IdentityInfoTranscoders<A extends Record<string, any>> {
           .resolve(props[key])
           .unhandle(undefined)
           .map(encodeStr)
-          .rehandle(undefined, () => Rune.resolve(Data.None())),
+          .rehandle(undefined, () => Rune.resolve(none)),
       ])))
       .unsafeAs<Record<typeof REST_KEYS[number], Data>>()
     return Rune
@@ -99,4 +97,15 @@ export class IdentityDataTooLargeError extends Error {
 }
 export class CouldNotDecodeIdentityInfoAdditionalKey extends Error {
   override readonly name = "CouldNotDecodeIdentityInfoAdditionalKey"
+}
+
+// TODO: delete and use codegen from server
+type Data = None | Raw<number>
+interface None {
+  type: "None"
+}
+const none: None = { type: "None" }
+interface Raw<N extends number> {
+  type: `Raw${N}`
+  value: Uint8Array
 }
