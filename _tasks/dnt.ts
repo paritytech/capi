@@ -25,7 +25,6 @@ await Promise.all([
       name: ".",
       path: "./mod.ts",
     }, {
-      // Note: not yet usable, as it draws on server-generated codecs
       name: "./patterns/consensus",
       path: "./patterns/consensus/mod.ts",
     }, {
