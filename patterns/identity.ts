@@ -1,6 +1,8 @@
-import { Data, IdentityInfo as IdentityInfoRaw } from "polkadot_dev/types/pallet_identity/types.ts"
-import * as $ from "../deps/scale.ts"
-import { Rune, RunicArgs } from "../rune/mod.ts"
+import type {
+  Data,
+  IdentityInfo as IdentityInfoRaw,
+} from "polkadot_dev/types/pallet_identity/types.ts"
+import { $, Rune, RunicArgs } from "../mod.ts"
 
 export interface IdentityInfo<A extends Record<string, unknown>> {
   additional: A

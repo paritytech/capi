@@ -8,11 +8,42 @@ await fs.emptyDir(outDir)
 
 await Promise.all([
   build({
+    package: {
+      name: "capi",
+      version: Deno.args[0]!,
+      description: "A TypeScript toolkit for crafting interactions with Substrate-based chains",
+      license: "Apache-2.0",
+      repository: "github:paritytech/capi",
+    },
+    compilerOptions: {
+      importHelpers: true,
+      sourceMap: true,
+      target: "ES2021",
+      lib: ["es2022.error"],
+    },
     entryPoints: [{
       name: ".",
       path: "./mod.ts",
+    }, {
+      // Note: not yet usable, as it draws on server-generated codecs
+      name: "./patterns/consensus",
+      path: "./patterns/consensus/mod.ts",
+    }, {
+      name: "./patterns/ink",
+      path: "./patterns/ink/mod.ts",
+    }, {
+      name: "./patterns/multisig",
+      path: "./patterns/multisig/mod.ts",
+    }, {
+      name: "./patterns/identity",
+      path: "./patterns/identity.ts",
+    }, {
+      name: "./server",
+      path: "./server/mod.ts",
+    }, {
+      name: "./providers",
+      path: "./providers/mod.ts",
     }],
-    outDir,
     mappings: {
       "https://deno.land/x/wat_the_crypto@v0.0.1/mod.ts": {
         name: "wat-the-crypto",
@@ -29,18 +60,7 @@ await Promise.all([
       "https://raw.githubusercontent.com/paritytech/capi-crypto-wrappers/14289c5/lib.ts":
         "https://raw.githubusercontent.com/paritytech/capi-crypto-wrappers/14289c5/lib.node.ts",
     },
-    package: {
-      name: "capi",
-      version: Deno.args[0]!,
-      description: "A TypeScript toolkit for crafting interactions with Substrate-based chains",
-      license: "Apache-2.0",
-      repository: "github:paritytech/capi",
-    },
-    compilerOptions: {
-      importHelpers: true,
-      sourceMap: true,
-      target: "ES2021",
-    },
+    outDir,
     scriptModule: false,
     shims: {
       deno: {

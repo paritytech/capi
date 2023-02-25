@@ -1,11 +1,19 @@
-import * as $ from "../../deps/scale.ts"
-import { Chain, ChainRune, CodecRune, ExtrinsicRune } from "../../fluent/mod.ts"
-import { ArrayRune, Rune, RunicArgs, ValueRune } from "../../rune/mod.ts"
+import {
+  $,
+  ArrayRune,
+  Chain,
+  ChainRune,
+  CodecRune,
+  ExtrinsicRune,
+  hex,
+  Rune,
+  RunicArgs,
+  ValueRune,
+} from "../../mod.ts"
 import { DeriveCodec } from "../../scale_info/mod.ts"
-import { hex } from "../../util/mod.ts"
+import { $contractsApiInstantiateArgs, $contractsApiInstantiateResult, Weight } from "./codecs.ts"
 import { Callable, InkMetadata } from "./InkMetadata.ts"
 import { InkRune } from "./InkRune.ts"
-import { $contractsApiInstantiateArgs, $contractsApiInstantiateResult, Weight } from "./known.ts"
 
 // TODO: `onInstantiated`
 export interface InstantiateProps {

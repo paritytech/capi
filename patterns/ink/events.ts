@@ -1,6 +1,4 @@
-import { PublicKeyRune } from "../../fluent/mod.ts"
-import { ApplyExtrinsicEventPhase, Event } from "../../primitives/mod.ts"
-import { Rune, RunicArgs } from "../../rune/mod.ts"
+import { ApplyExtrinsicEventPhase, Event, PublicKeyRune, Rune, RunicArgs } from "../../mod.ts"
 
 export interface InstantiatedEvent extends Event {
   phase: ApplyExtrinsicEventPhase

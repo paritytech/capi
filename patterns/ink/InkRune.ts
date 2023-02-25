@@ -1,11 +1,18 @@
 import { equals } from "../../deps/std/bytes.ts"
-import { Chain, ChainRune, CodecRune, ExtrinsicRune } from "../../fluent/mod.ts"
-import { Event } from "../../primitives/mod.ts"
-import { Rune, RunicArgs, ValueRune } from "../../rune/mod.ts"
-import { hex } from "../../util/mod.ts"
+import {
+  Chain,
+  ChainRune,
+  CodecRune,
+  Event,
+  ExtrinsicRune,
+  hex,
+  Rune,
+  RunicArgs,
+  ValueRune,
+} from "../../mod.ts"
+import { $contractsApiCallArgs, $contractsApiCallResult, Weight } from "./codecs.ts"
 import { isInstantiatedEvent } from "./events.ts"
 import { InkMetadataRune } from "./InkMetadataRune.ts"
-import { $contractsApiCallArgs, $contractsApiCallResult, Weight } from "./known.ts"
 
 export interface MsgProps {
   sender: Uint8Array
@@ -36,8 +43,9 @@ export class InkRune<out U, out C extends Chain = Chain> extends Rune<Uint8Array
   }
 
   common<X>(props: RunicArgs<X, MsgProps>) {
+    const self = this.as(InkRune)
     const msgMetadata = Rune.tuple([
-      this.contract
+      self.contract
         .into(ValueRune)
         .access("V3", "spec", "messages"),
       props.method,
@@ -46,12 +54,12 @@ export class InkRune<out U, out C extends Chain = Chain> extends Rune<Uint8Array
       .unhandle(undefined)
       .rehandle(undefined, () => Rune.constant(new MethodNotFoundError()))
       .unhandle(MethodNotFoundError)
-    const data = this.contract.encodeData(msgMetadata, props.args)
+    const data = self.contract.encodeData(msgMetadata, props.args)
     const value = Rune
       .resolve(props.value)
       .unhandle(undefined)
       .rehandle(undefined, () => Rune.constant(0n))
-    const innerResult = this.innerCall(props.sender, value, data)
+    const innerResult = self.innerCall(props.sender, value, data)
     return { msgMetadata, data, value, innerResult }
   }
 
