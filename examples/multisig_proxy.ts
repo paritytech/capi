@@ -5,10 +5,10 @@ import {
   charlie,
   dave,
   hex,
+  MetaRune,
   MultiAddress,
   Rune,
   RunicArgs,
-  ValueRune,
 } from "capi"
 import { createMultiproxy, MultisigRune } from "capi/patterns/multisig/mod.ts"
 import { addProxy, removeProxy } from "capi/patterns/proxy/mod.ts"
@@ -24,97 +24,98 @@ const multisig = build.access("multisig").into(MultisigRune, chain)
 const stashMultiAddress = build.access("stashMultiAddress")
 const adminProxies = build.access("adminProxies")
 
-const existentialDepositAddresses = Rune
+const existentialDepositCalls = Rune
   .tuple([
     multisig.address.map(MultiAddress.Id),
     stashMultiAddress,
     adminProxies.map((rec) => Object.values(rec).map(MultiAddress.Id)),
   ])
-  .map(([a, b, c]) => [a, b, ...c])
+  .map(([a, b, c]) =>
+    Rune.array([a, b, ...c].map((dest) => Balances.transfer({ dest, value: 20_000_000_000_000n })))
+  )
+  .into(MetaRune)
+  .flat()
 
 const existentialDeposits = Utility
-  .batchAll({
-    calls: existentialDepositAddresses
-      .into(ArrayRune)
-      .mapArray((dest) => Balances.transfer({ dest, value: 20_000_000_000_000n })),
-  })
+  .batchAll({ calls: existentialDepositCalls })
   .signed({ sender: alice })
   .sent()
   .dbgStatus("Existential deposits:")
   .txEvents()
 
-function getProxyAddress<X>(...[accountId]: RunicArgs<X, [Uint8Array]>) {
-  return Rune
-    .tuple([adminProxies, accountId])
-    .map(([adminProxies, accountId]) =>
-      MultiAddress.Id(adminProxies[hex.encode(accountId)] ?? new Uint8Array())
-    )
-}
-const aliceProxyAddress = getProxyAddress(alice.publicKey)
-const bobProxyAddress = getProxyAddress(bob.publicKey)
-const charlieProxyAddress = getProxyAddress(charlie.publicKey)
+console.log(await existentialDeposits.dbg().run())
 
-const updateProxies = Utility
-  .batchAll({
-    calls: Rune.array([
-      addProxy(chain, bobProxyAddress, bob.address),
-      addProxy(chain, charlieProxyAddress, charlie.address),
-      addProxy(chain, stashMultiAddress, multisig.address.map(MultiAddress.Id)),
-      removeProxy(chain, bobProxyAddress, alice.address),
-      removeProxy(chain, charlieProxyAddress, alice.address),
-      removeProxy(chain, stashMultiAddress, alice.address),
-    ] as any[]),
-  })
-  .signed({ sender: alice })
-  .sent()
-  .dbgStatus("Update Proxies")
-  .txEvents()
+// function getProxyAddress<X>(...[accountId]: RunicArgs<X, [Uint8Array]>) {
+//   return Rune
+//     .tuple([adminProxies, accountId])
+//     .map(([adminProxies, accountId]) =>
+//       MultiAddress.Id(adminProxies[hex.encode(accountId)] ?? new Uint8Array())
+//     )
+// }
+// const aliceProxyAddress = getProxyAddress(alice.publicKey)
+// const bobProxyAddress = getProxyAddress(bob.publicKey)
+// const charlieProxyAddress = getProxyAddress(charlie.publicKey)
 
-const proposalCall = Proxy.proxy({
-  real: stashMultiAddress,
-  forceProxyType: undefined,
-  call: Balances.transferKeepAlive({
-    dest: dave.address,
-    value: 1_234_000_000_000n,
-  }),
-})
+// const updateProxies = Utility
+//   .batchAll({
+//     calls: Rune.array([
+//       addProxy(chain, bobProxyAddress, bob.address),
+//       addProxy(chain, charlieProxyAddress, charlie.address),
+//       addProxy(chain, stashMultiAddress, multisig.address.map(MultiAddress.Id)),
+//       removeProxy(chain, bobProxyAddress, alice.address),
+//       removeProxy(chain, charlieProxyAddress, alice.address),
+//       removeProxy(chain, stashMultiAddress, alice.address),
+//     ] as any[]),
+//   })
+//   .signed({ sender: alice })
+//   .sent()
+//   .dbgStatus("Update Proxies")
+//   .txEvents()
 
-const aliceRatify = Proxy
-  .proxy({
-    real: aliceProxyAddress,
-    forceProxyType: undefined,
-    call: multisig.ratify({
-      call: proposalCall,
-      sender: aliceProxyAddress,
-    }),
-  })
-  .signed({ sender: alice })
-  .sent()
-  .dbgStatus("Ratify Proposal Alice:")
-  .finalized()
+// const proposalCall = Proxy.proxy({
+//   real: stashMultiAddress,
+//   forceProxyType: undefined,
+//   call: Balances.transferKeepAlive({
+//     dest: dave.address,
+//     value: 1_234_000_000_000n,
+//   }),
+// })
 
-const bobRatify = Proxy
-  .proxy({
-    real: bobProxyAddress,
-    forceProxyType: undefined,
-    call: multisig.ratify({
-      call: proposalCall,
-      sender: bobProxyAddress,
-    }),
-  })
-  .signed({ sender: bob })
-  .sent()
-  .dbgStatus("Ratify Proposal Bob:")
-  .finalized()
+// const aliceRatify = Proxy
+//   .proxy({
+//     real: aliceProxyAddress,
+//     forceProxyType: undefined,
+//     call: multisig.ratify({
+//       call: proposalCall,
+//       sender: aliceProxyAddress,
+//     }),
+//   })
+//   .signed({ sender: alice })
+//   .sent()
+//   .dbgStatus("Ratify Proposal Alice:")
+//   .finalized()
 
-const daveBalance = System.Account.entry([dave.publicKey])
+// const bobRatify = Proxy
+//   .proxy({
+//     real: bobProxyAddress,
+//     forceProxyType: undefined,
+//     call: multisig.ratify({
+//       call: proposalCall,
+//       sender: bobProxyAddress,
+//     }),
+//   })
+//   .signed({ sender: bob })
+//   .sent()
+//   .dbgStatus("Ratify Proposal Bob:")
+//   .finalized()
 
-console.log(
-  await existentialDepositAddresses
-    .chain(() => existentialDeposits)
-    .chain(() => updateProxies)
-    .chain(() => aliceRatify)
-    .chain(() => bobRatify)
-    .chain(() => daveBalance)
-    .run(),
-)
+// const daveBalance = System.Account.entry([dave.publicKey])
+
+// console.log(
+//   await existentialDeposits
+//     .chain(() => updateProxies)
+//     .chain(() => aliceRatify)
+//     .chain(() => bobRatify)
+//     .chain(() => daveBalance)
+//     .run(),
+// )

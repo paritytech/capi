@@ -30,7 +30,7 @@ export function createMultiproxy<U, X>(
     .map((n) => Array.from({ length: n + 1 }, (_, i) => i))
     .into(ArrayRune)
     .mapArray((index) =>
-      chain.extrinsic({
+      chain.extrinsic(Rune.rec({
         type: "Proxy",
         value: Rune.rec({
           type: "createPure",
@@ -38,17 +38,17 @@ export function createMultiproxy<U, X>(
           delay: 0,
           index,
         }),
-      })
+      }))
     )
 
   const proxyAccountIds = chain
-    .extrinsic({
+    .extrinsic(Rune.rec({
       type: "Utility",
-      value: {
+      value: Rune.rec({
         type: "batch",
         calls: createPureCalls,
-      },
-    })
+      }),
+    }))
     .signed({ sender })
     .sent()
     .dbgStatus("Creating pure proxies:")

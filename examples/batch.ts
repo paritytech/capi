@@ -3,14 +3,15 @@ import { Balances, System, Utility } from "westend_dev/mod.ts"
 
 const recipients = Object.entries({ bob, charlie, dave })
 
-const batch = Utility.batch({
-  calls: Rune.tuple(recipients.map(([, { address }]) =>
-    Balances.transfer({
-      dest: address,
-      value: 3_000_000_123_456_789n,
-    })
-  )),
-})
+const batch = Utility
+  .batch({
+    calls: Rune.tuple(recipients.map(([, { address }]) =>
+      Balances.transfer({
+        dest: address,
+        value: 3_000_000_123_456_789n,
+      })
+    )),
+  })
   .signed({ sender: alice })
   .sent()
   .dbgStatus("Batch tx:")
