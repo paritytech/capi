@@ -27,18 +27,16 @@ export interface Multisig {
 
 // TODO: swap out `Chain` constraints upon subset gen issue resolution... same for other patterns
 export class MultisigRune<out U, out C extends Chain = Chain> extends Rune<Multisig, U> {
+  private storage
   threshold = this.into(ValueRune).access("threshold")
-  address = this.into(ValueRune).map(({ signatories, threshold }) =>
+  accountId = this.into(ValueRune).map(({ signatories, threshold }) =>
     multisigAccountId(signatories, threshold)
   )
-
-  private pallet
-  private storage
+  address = this.accountId.map(MultiAddress.Id)
 
   constructor(_prime: MultisigRune<U>["_prime"], readonly chain: ChainRune<U, C>) {
     super(_prime)
-    this.pallet = this.chain.metadata().pallet("Multisig")
-    this.storage = this.pallet.storage("Multisigs")
+    this.storage = this.chain.metadata().pallet("Multisig").storage("Multisigs")
   }
 
   otherSignatories<X>(...[sender]: RunicArgs<X, [sender: MultiAddress]>) {
@@ -122,15 +120,15 @@ export class MultisigRune<out U, out C extends Chain = Chain> extends Rune<Multi
   }
 
   proposals<X>(...[count]: RunicArgs<X, [count: number]>) {
-    return this.storage.keyPage(count, Rune.tuple([this.address]))
+    return this.storage.keyPage(count, Rune.tuple([this.accountId]))
   }
 
   proposal<X>(...[callHash]: RunicArgs<X, [callHash: Uint8Array]>) {
-    return this.storage.entry(Rune.tuple([this.address, callHash]))
+    return this.storage.entry(Rune.tuple([this.accountId, callHash]))
   }
 
   isProposed<X>(...[callHash]: RunicArgs<X, [callHash: Uint8Array]>) {
-    return this.storage.entryRaw(Rune.tuple([this.address, callHash]))
+    return this.storage.entryRaw(Rune.tuple([this.accountId, callHash]))
       .map((entry) => entry !== null)
   }
 }

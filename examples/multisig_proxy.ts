@@ -9,6 +9,7 @@ import {
   MultiAddress,
   Rune,
   RunicArgs,
+  Sr25519,
 } from "capi"
 import { createMultiproxy, MultisigRune } from "capi/patterns/multisig/mod.ts"
 import { addProxy, removeProxy } from "capi/patterns/proxy/mod.ts"
@@ -17,7 +18,7 @@ import { Balances, chain, Proxy, System, Utility } from "polkadot_dev/mod.ts"
 const build = createMultiproxy(chain, {
   sender: alice,
   threshold: 2,
-  admins: [alice.publicKey, bob.publicKey, charlie.publicKey],
+  admins: Sr25519.publicKeys([alice, bob, charlie]),
 })
 
 const multisig = build.access("multisig").into(MultisigRune, chain)
@@ -26,7 +27,7 @@ const adminProxies = build.access("adminProxies")
 
 const existentialDepositCalls = Rune
   .tuple([
-    multisig.address.map(MultiAddress.Id),
+    multisig.address,
     stashMultiAddress,
     adminProxies.map((rec) => Object.values(rec).map(MultiAddress.Id)),
   ])

@@ -30,4 +30,8 @@ export class Sr25519 {
   static verify(pubkey: Uint8Array, msg: Uint8Array, sig: Uint8Array) {
     return sr25519_verify(pubkey, msg, sig)
   }
+
+  static publicKeys<L extends Sr25519[]>(sr25519s: [...L]): { [K in keyof L]: L[K]["publicKey"] } {
+    return sr25519s.map(({ publicKey }) => publicKey) as never
+  }
 }
