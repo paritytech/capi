@@ -28,7 +28,6 @@ export function createVirtualMultisig<U, X>(
   props: RunicArgs<X, CreateVirtualMultisigProps>,
 ) {
   const defaultDeposit = chain.metadata().pallet("Balances").const("ExistentialDeposit").decoded
-    .unsafeAs<bigint>().into(ValueRune).map((e) => e + 1_000_000_000n)
   const members = Rune.resolve(props.members)
   const configurator = Rune.resolve(props.configurator)
   const membersCount = members.map((members) => members.length)
