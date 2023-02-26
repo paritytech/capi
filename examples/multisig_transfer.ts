@@ -1,8 +1,6 @@
 import { alice, bob, charlie, dave, Rune, ValueRune } from "capi"
 import { MultisigRune } from "capi/patterns/multisig/mod.ts"
 import { Balances, chain, System } from "polkadot_dev/mod.ts"
-// TODO: utilize type exposed from capi/patterns/MultisigRune.ts (when we enable client env specificity)
-import { MultiAddress } from "polkadot_dev/types/sp_runtime/multiaddress.ts"
 
 const multisig = Rune
   .constant({
@@ -18,7 +16,7 @@ console.log("Dave initial balance:", await System.Account.entry([dave.publicKey]
 await Balances
   .transfer({
     value: 2_000_000_000_000n,
-    dest: MultiAddress.Id(multisig.address),
+    dest: multisig.address,
   })
   .signed({ sender: alice })
   .sent()

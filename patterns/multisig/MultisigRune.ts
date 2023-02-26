@@ -21,7 +21,7 @@ export interface MultisigVoteProps {
 }
 
 export interface Multisig {
-  signatories: Uint8Array[]
+  signatories: Uint8Array[] // TODO: make this optional
   threshold: number
 }
 
@@ -30,6 +30,7 @@ export class MultisigRune<out U, out C extends Chain = Chain> extends Rune<Multi
   private storage
   threshold
   accountId
+  address
 
   constructor(_prime: MultisigRune<U>["_prime"], readonly chain: ChainRune<U, C>) {
     super(_prime)
@@ -39,6 +40,7 @@ export class MultisigRune<out U, out C extends Chain = Chain> extends Rune<Multi
     this.accountId = v.map(({ signatories, threshold }) =>
       multisigAccountId(signatories, threshold)
     )
+    this.address = this.accountId.map(MultiAddress.Id)
   }
 
   otherSignatories<X>(...[sender]: RunicArgs<X, [sender: MultiAddress]>) {
