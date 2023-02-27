@@ -19,9 +19,9 @@ import { Multisig, MultisigRune } from "./MultisigRune.ts"
 export interface VirtualMultisig extends Multisig {
   stash: Uint8Array
 }
-export const $virtualMultisig = $.object(
+export const $virtualMultisig: $.Codec<VirtualMultisig> = $.object(
   $.field("signatories", $.array($.sizedUint8Array(32))),
-  $.field("threshold", $.option($.u8)),
+  $.optionalField("threshold", $.u8),
   $.field("stash", $.sizedUint8Array(32)),
 )
 
