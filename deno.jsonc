@@ -32,7 +32,7 @@
   "tasks": {
     "debug": "deno run -A --inspect-brk",
     "udd": "deno run -A _tasks/udd.ts",
-    "dnt": "deno run -A _tasks/dnt.ts",
+    "dnt": "deno task run _tasks/dnt.ts",
     "test": "deno task capi -- deno test -A -L=info --ignore=target --parallel -r=http://localhost:4646/",
     "test:examples": "deno task test _tasks/test_examples.ts",
     "test:update": "deno task test -- --update",

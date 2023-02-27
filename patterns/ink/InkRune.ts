@@ -42,10 +42,9 @@ export class InkRune<out U, out C extends Chain = Chain> extends Rune<Uint8Array
       .map((result) => $contractsApiCallResult.decode(hex.decode(result)))
   }
 
-  common<X>(props: RunicArgs<X, MsgProps>) {
-    const self = this.as(InkRune)
+  common<X>(this: InkRune<U, C>, props: RunicArgs<X, MsgProps>) {
     const msgMetadata = Rune.tuple([
-      self.contract
+      this.contract
         .into(ValueRune)
         .access("V3", "spec", "messages"),
       props.method,
@@ -54,12 +53,12 @@ export class InkRune<out U, out C extends Chain = Chain> extends Rune<Uint8Array
       .unhandle(undefined)
       .rehandle(undefined, () => Rune.constant(new MethodNotFoundError()))
       .unhandle(MethodNotFoundError)
-    const data = self.contract.encodeData(msgMetadata, props.args)
+    const data = this.contract.encodeData(msgMetadata, props.args)
     const value = Rune
       .resolve(props.value)
       .unhandle(undefined)
       .rehandle(undefined, () => Rune.constant(0n))
-    const innerResult = self.innerCall(props.sender, value, data)
+    const innerResult = this.innerCall(props.sender, value, data)
     return { msgMetadata, data, value, innerResult }
   }
 

@@ -1,8 +1,8 @@
+import { $preDigest } from "polkadot_dev/types/sp_consensus_babe/digests.ts"
 import { Chain, ChainRune } from "../../fluent/mod.ts"
 import { PublicKeyRune } from "../../fluent/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../../rune/mod.ts"
 import { HexHash } from "../../util/branded.ts"
-import { $preDigest } from "./codecs.ts"
 import { preRuntimeDigest } from "./preRuntimeDigest.ts"
 
 export function babeBlockAuthor<U, C extends Chain, X>(

@@ -1,8 +1,8 @@
+import { $digestItem, DigestItem } from "polkadot_dev/types/sp_runtime/generic/digest.ts"
 import { Chain, ChainRune } from "../../fluent/mod.ts"
 import { RunicArgs, ValueRune } from "../../rune/mod.ts"
 import { HexHash } from "../../util/branded.ts"
 import { hex } from "../../util/mod.ts"
-import { $digestItem, DigestItem } from "./codecs.ts"
 
 export function preRuntimeDigest<U, C extends Chain, X>(
   chain: ChainRune<U, C>,
