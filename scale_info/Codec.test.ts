@@ -1,9 +1,9 @@
+import { alice } from "../crypto/mod.ts"
 import { assertEquals } from "../deps/std/testing/asserts.ts"
 import * as downloaded from "../frame_metadata/_downloaded/mod.ts"
 import { getPalletAndEntry } from "../frame_metadata/mod.ts"
-import { alice, throwIfError } from "../util/mod.ts"
-import { ChainError } from "./Codec.ts"
-import { DeriveCodec } from "./Codec.ts"
+import { throwIfError } from "../util/mod.ts"
+import { ChainError, DeriveCodec } from "./Codec.ts"
 
 const metadata = downloaded.polkadot
 const deriveCodec = DeriveCodec(metadata.tys)

@@ -1,9 +1,9 @@
+import { hashers } from "../../crypto/mod.ts"
 import * as $ from "../../deps/scale.ts"
-import { Blake2_256 } from "../../util/hashers.ts"
 
 const seed = "modlpy/utilisuba" // cspell:disable-line
 
-const codec = Blake2_256.$hash($.tuple(
+const codec = hashers.Blake2_256.$hash($.tuple(
   $.constant(null, new TextEncoder().encode(seed)),
   $.array($.sizedUint8Array(32)),
   $.u16,

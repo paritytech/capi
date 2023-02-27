@@ -1,6 +1,6 @@
+import { hashers } from "../crypto/mod.ts"
 import * as $ from "../deps/scale.ts"
 import { DeriveCodec } from "../scale_info/Codec.ts"
-import { hashers } from "../util/mod.ts"
 import { HasherKind, MapStorageEntryType, Pallet, StorageEntry } from "./Metadata.ts"
 
 export type HasherLookup = { [_ in HasherKind]: (input: Uint8Array) => Uint8Array }

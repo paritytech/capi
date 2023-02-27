@@ -1,11 +1,10 @@
 import { Calls, Subscription, Subscriptions } from "../rpc/known/mod.ts"
 import { Connection, ConnectionError, RpcSubscriptionMessage, ServerError } from "../rpc/mod.ts"
 import { Batch, MetaRune, Run, Rune, RunicArgs, RunStream, ValueRune } from "../rune/mod.ts"
-import { PromiseOr } from "../util/mod.ts"
 import { ChainRune } from "./ChainRune.ts"
 
 class RunConnection extends Run<Connection, never> {
-  constructor(ctx: Batch, readonly initConnection: (signal: AbortSignal) => PromiseOr<Connection>) {
+  constructor(ctx: Batch, readonly initConnection: (signal: AbortSignal) => Promise<Connection>) {
     super(ctx)
   }
 
@@ -15,7 +14,7 @@ class RunConnection extends Run<Connection, never> {
   }
 }
 
-export function connection(init: (signal: AbortSignal) => PromiseOr<Connection>) {
+export function connection(init: (signal: AbortSignal) => Promise<Connection>) {
   return Rune.new(RunConnection, init).into(ConnectionRune)
 }
 

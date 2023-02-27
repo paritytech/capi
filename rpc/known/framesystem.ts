@@ -1,4 +1,4 @@
-import { AccountId, Hash, Hex } from "./utils.ts"
+import { AccountId } from "./utils.ts"
 
 // https://github.com/paritytech/substrate/blob/eddf888/utils/frame/rpc/system/src/lib.rs#L41
 export type FrameSystemCalls = {
@@ -12,6 +12,6 @@ export type FrameSystemCalls = {
   system_accountNextIndex(account: AccountId): number
   account_nextIndex: FrameSystemCalls["system_accountNextIndex"]
   /** Dry run an extrinsic at a given block. Return SCALE encoded ApplyExtrinsicResult. */
-  system_dryRun(extrinsic: Hex, at?: Hash): Hex
+  system_dryRun(extrinsic: string, at?: string): string
   system_dryRunAt: FrameSystemCalls["system_dryRun"]
 }

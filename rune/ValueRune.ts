@@ -1,4 +1,3 @@
-import { PromiseOr } from "../util/types.ts"
 import { Batch, Run, Rune, RunicArgs, Unhandled } from "./Rune.ts"
 import { Receipt } from "./Timeline.ts"
 
@@ -35,7 +34,7 @@ export class ValueRune<out T, out U = never> extends Rune<T, U> {
     return new ValueRune((batch) => new ctor(batch, ...args))
   }
 
-  map<T2>(fn: (value: T) => PromiseOr<T2>): ValueRune<T2, U> {
+  map<T2>(fn: (value: T) => T2 | Promise<T2>): ValueRune<T2, U> {
     return ValueRune.new(RunMap, this, fn)
   }
 
@@ -100,7 +99,7 @@ export class ValueRune<out T, out U = never> extends Rune<T, U> {
     return ValueRune.new(RunFinal, this)
   }
 
-  reduce<T2>(init: T2, fn: (last: T2, value: T) => PromiseOr<T2>): ValueRune<T2, U> {
+  reduce<T2>(init: T2, fn: (last: T2, value: T) => T2 | Promise<T2>): ValueRune<T2, U> {
     return ValueRune.new(RunReduce, this, init, fn)
   }
 
@@ -134,7 +133,7 @@ class RunMap<T1, U, T2> extends Run<T2, U> {
   constructor(
     batch: Batch,
     child: Rune<T1, U>,
-    readonly fn: (value: T1) => PromiseOr<T2>,
+    readonly fn: (value: T1) => T2 | Promise<T2>,
   ) {
     super(batch)
     this.child = batch.prime(child, this.signal)
@@ -294,7 +293,7 @@ class RunReduce<T1, U, T2> extends Run<T2, U> {
     batch: Batch,
     child: Rune<T1, U>,
     public lastValue: T2,
-    readonly fn: (last: T2, value: T1) => PromiseOr<T2>,
+    readonly fn: (last: T2, value: T1) => T2 | Promise<T2>,
   ) {
     super(batch)
     this.child = batch.prime(child, this.signal)

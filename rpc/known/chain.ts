@@ -1,23 +1,23 @@
-import { Hash, Hex, ListOrValue, NumberOrHex, Subscription } from "./utils.ts"
+import { ListOrValue, NumberOrHex, Subscription } from "./utils.ts"
 
 // https://github.com/paritytech/substrate/blob/0ba251c/primitives/runtime/src/generic/digest.rs
 /** Generic header digest. */
 export interface Digest {
   /** A list of logs in the digest. */
-  logs: Hex[]
+  logs: string[]
 }
 
 // https://github.com/paritytech/substrate/blob/01a3ad65/primitives/runtime/src/generic/header.rs#L39
 /** Abstraction over a block header for a substrate chain. */
 export interface Header {
   /** The parent hash. */
-  parentHash: Hash
+  parentHash: string
   /** The block number. */
-  number: Hex
+  number: string
   /** The state trie merkle root */
-  stateRoot: Hash
+  stateRoot: string
   /** The merkle root of the extrinsics. */
-  extrinsicsRoot: Hash
+  extrinsicsRoot: string
   /** A chain-specific digest of data useful for light clients or referencing auxiliary data. */
   digest: Digest
 }
@@ -36,24 +36,24 @@ export interface Block {
   /** The block header. */
   header: Header
   /** The accompanying extrinsics. */
-  extrinsics: Hex[]
+  extrinsics: string[]
 }
 
 // https://github.com/paritytech/substrate/blob/934fbfd/client/rpc-api/src/chain/mod.rs#L27
 export type ChainCalls = {
   /** Get header. */
-  chain_getHeader(hash?: Hash): Header | null
+  chain_getHeader(hash?: string): Header | null
   /** Get header and body of a relay chain block. */
-  chain_getBlock(hash?: Hash): SignedBlock | null
+  chain_getBlock(hash?: string): SignedBlock | null
   /**
    * Get hash of the n-th block in the canon chain.
    *
    * By default returns latest block hash.
    */
-  chain_getBlockHash(height?: ListOrValue<NumberOrHex>): ListOrValue<Hash | null>
+  chain_getBlockHash(height?: ListOrValue<NumberOrHex>): ListOrValue<string | null>
   chain_getHead: ChainCalls["chain_getBlockHash"]
   /** Get hash of the last finalized block in the canon chain. */
-  chain_getFinalizedHead(): Hash
+  chain_getFinalizedHead(): string
   chain_getFinalisedHead: ChainCalls["chain_getFinalizedHead"]
 }
 

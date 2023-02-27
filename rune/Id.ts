@@ -1,6 +1,6 @@
+import { encode as hexEncode } from "../crypto/hex.ts"
 import * as $ from "../deps/scale.ts"
 import { Blake2b } from "../deps/wat_the_crypto.ts"
-import { encode as hexEncode } from "../util/hex.ts"
 import { getOrInit, WeakRefMap } from "../util/mod.ts"
 
 export class Id {

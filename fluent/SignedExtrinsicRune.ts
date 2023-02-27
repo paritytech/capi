@@ -1,5 +1,5 @@
+import { hex } from "../crypto/mod.ts"
 import { Rune, ValueRune } from "../rune/mod.ts"
-import { hex } from "../util/mod.ts"
 import { Chain, ChainRune } from "./ChainRune.ts"
 import { ExtrinsicStatusRune } from "./ExtrinsicStatusRune.ts"
 
