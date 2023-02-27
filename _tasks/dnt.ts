@@ -11,7 +11,7 @@ await Promise.all([
     package: {
       name: "capi",
       version: Deno.args[0]!,
-      description: "A TypeScript toolkit for crafting interactions with Substrate-based chains",
+      description: "Capi is a framework for crafting interactions with Substrate chains",
       license: "Apache-2.0",
       repository: "github:paritytech/capi",
     },
