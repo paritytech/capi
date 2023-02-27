@@ -2,7 +2,7 @@ import { Chain, ChainRune, HexHash, MetaRune, Rune, RunicArgs, ValueRune } from 
 
 export function sizeTree<U, C extends Chain, X>(
   chain: ChainRune<U, C>,
-  ...[blockHash]: RunicArgs<X, [HexHash?]>
+  ...[blockHash]: RunicArgs<X, [blockHash?: HexHash]>
 ) {
   const metadata = chain.metadata(blockHash)
   return metadata
@@ -13,7 +13,7 @@ export function sizeTree<U, C extends Chain, X>(
         Rune.rec(Object.fromEntries(
           pallet.storage?.entries.map((entry) => [
             entry.name,
-            metadata.pallet(pallet.name).storage(entry.name).size(blockHash),
+            metadata.pallet(pallet.name).storage(entry.name).size([], blockHash),
           ]) || [],
         )),
       ])))

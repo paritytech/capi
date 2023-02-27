@@ -19,9 +19,13 @@ export class StorageRune<in out K extends unknown[], out V, out U> extends Rune<
     this.$value = this.pallet.metadata.codec(this.into(ValueRune).access("value"))
   }
 
-  size<X>(...[blockHash]: RunicArgs<X, [HexHash?]>) {
+  size<X>(...[partialKey, blockHash]: RunicArgs<X, [partialKey?: unknown[], blockHash?: HexHash]>) {
     return this.pallet.metadata.chain.connection
-      .call("state_getStorageSize", this.$key.encoded([]).map(hex.encode), blockHash)
+      .call(
+        "state_getStorageSize",
+        this.$key.encoded(Rune.resolve(partialKey).map((x) => x ?? [])).map(hex.encode),
+        blockHash,
+      )
       .unhandle(null)
       .rehandle(null, () => Rune.constant(undefined))
   }
