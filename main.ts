@@ -36,25 +36,15 @@ const cache = new FsCache(out, signal)
 const modPath = JSON.stringify(import.meta.resolve("./mod.ts"))
 cache.getString("mod.ts", 0, async () => `export * from ${modPath}`)
 
-const env = new Env(href, cache, signal, {
+const env = new Env(href, cache, signal, (env) => ({
   frame: {
-    wss(env) {
-      return new WssProvider(env)
-    },
-    dev(env) {
-      return new PolkadotDevProvider(env)
-    },
-    zombienet(env) {
-      return new ZombienetProvider(env)
-    },
-    project(env) {
-      return new ProjectProvider(env)
-    },
-    contracts_dev(env) {
-      return new ContractsDevProvider(env)
-    },
+    wss: new WssProvider(env),
+    dev: new PolkadotDevProvider(env),
+    zombienet: new ZombienetProvider(env),
+    project: new ProjectProvider(env),
+    contracts_dev: new ContractsDevProvider(env),
   },
-})
+}))
 
 let running = false
 try {

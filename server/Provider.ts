@@ -6,6 +6,3 @@ export abstract class Provider {
 
   abstract handle(request: Request, pathInfo: PathInfo): Promise<Response>
 }
-
-export type ProviderFactories = Record<string, ProviderFactory>
-export type ProviderFactory = (env: Env) => Provider

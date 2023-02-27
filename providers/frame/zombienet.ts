@@ -1,4 +1,5 @@
 import * as path from "../../deps/std/path.ts"
+import { unreachable } from "../../deps/std/testing/asserts.ts"
 import { Network } from "../../deps/zombienet/orchestrator.ts"
 import { Env, PathInfo } from "../../server/mod.ts"
 import { PermanentMemo } from "../../util/mod.ts"
@@ -37,14 +38,13 @@ export class ZombienetProvider extends FrameBinProvider {
   }
 
   async network(zombienetCachePath: string, networkManifestPath: string): Promise<Network> {
-    // TODO: why do even first attempts to close error out with bad resource id?
     const watcher = Deno.watchFs(zombienetCachePath)
     for await (const e of watcher) {
       if (e.kind === "modify" && e.paths.includes(networkManifestPath)) {
         return JSON.parse(await Deno.readTextFile(networkManifestPath))
       }
     }
-    return null!
+    return unreachable()
   }
 }
 
