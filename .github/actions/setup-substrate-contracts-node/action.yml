@@ -1,0 +1,23 @@
+name: "Setup Substrate contracts node"
+description: "Setup Substrate contracts node"
+inputs:
+  version:
+    description: "Version"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Cache Binary
+      uses: actions/cache@v3
+      id: cache-binary
+      with:
+        path: |
+          /usr/local/bin/substrate-contracts-node
+        key: binary-substrate-contracts-node-${{ inputs.version }}
+    - if: ${{ steps.cache-binary.outputs.cache-hit != 'true' }}
+      name: Download Binary
+      run: |
+        cd /tmp
+        curl -fsSL https://github.com/paritytech/substrate-contracts-node/releases/download/${{ inputs.version }}/substrate-contracts-node-linux.tar.gz | tar -zx
+        mv ./artifacts/substrate-contracts-node-linux/substrate-contracts-node /usr/local/bin/
+      shell: bash

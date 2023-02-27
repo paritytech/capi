@@ -1,36 +1,17 @@
 import { CacheBase } from "../util/cache/base.ts"
-import { Provider, ProviderFactory } from "./Provider.ts"
-
-export interface EnvProps {
-  href: string
-  signal: AbortSignal
-  cache: CacheBase
-  providerFactories: ProviderFactory[]
-  dbg?: boolean
-}
+import { Provider } from "./Provider.ts"
 
 export class Env {
-  href
-  signal
-  cache
-  dbg
-  providers: Record<string, Record<string, Provider>> = {}
+  upgradedHref
+  providers
 
-  constructor({ href, signal, cache, providerFactories, dbg }: EnvProps) {
-    this.href = href
-    this.signal = signal
-    this.cache = cache
-    this.dbg = dbg ?? false
-    for (const factory of providerFactories) {
-      const provider = factory(this)
-      const { generatorId, providerId } = provider
-      const generatorProviders = this.providers[generatorId] ??= {}
-      if (generatorProviders[providerId]) {
-        throw new Error(
-          `${generatorId} Provider with \`providerId\` of \`${providerId}\` already initialized`,
-        )
-      }
-      generatorProviders[providerId] = provider
-    }
+  constructor(
+    readonly href: string,
+    readonly cache: CacheBase,
+    readonly signal: AbortSignal,
+    providersFactory: (env: Env) => Record<string, Record<string, Provider>>,
+  ) {
+    this.upgradedHref = href.replace(/^http/, "ws")
+    this.providers = providersFactory(this)
   }
 }

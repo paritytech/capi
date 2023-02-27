@@ -26,6 +26,6 @@ console.log(
     })
     .sent()
     .dbgStatus()
-    .txEvents()
+    .finalizedEvents()
     .run(),
 )

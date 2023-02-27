@@ -2,8 +2,6 @@ import { PathInfo } from "../../server/mod.ts"
 import { FrameProxyProvider } from "./FrameProxyProvider.ts"
 
 export class WssProvider extends FrameProxyProvider {
-  providerId = "wss"
-
   async dynamicUrl(pathInfo: PathInfo) {
     return this.staticUrl(pathInfo)
   }

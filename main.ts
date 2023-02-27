@@ -1,21 +1,24 @@
 import * as flags from "./deps/std/flags.ts"
 import { serve } from "./deps/std/http.ts"
-import { PolkadotDevProvider, WssProvider, ZombienetProvider } from "./providers/frame/mod.ts"
+import {
+  ContractsDevProvider,
+  PolkadotDevProvider,
+  ProjectProvider,
+  WssProvider,
+  ZombienetProvider,
+} from "./providers/frame/mod.ts"
 import { handler } from "./server/local.ts"
 import { Env } from "./server/mod.ts"
 import { FsCache } from "./util/cache/mod.ts"
 
-const { help, dbg, port, "--": cmd, out } = flags.parse(Deno.args, {
-  boolean: ["help", "dbg"],
+const { help, port: portStr, "--": cmd, out } = flags.parse(Deno.args, {
+  boolean: ["help"],
   string: ["port", "out"],
   default: {
-    dbg: false,
     port: "4646",
     out: "target/capi",
   },
-  alias: {
-    h: "help",
-  },
+  alias: { h: "help" },
   "--": true,
 })
 
@@ -24,54 +27,48 @@ if (help) {
   Deno.exit()
 }
 
+const href = `http://localhost:${portStr}/`
+
 const controller = new AbortController()
 const { signal } = controller
 
-const href = `http://localhost:${port}`
-
 const cache = new FsCache(out, signal)
-const env = new Env({
-  href,
-  signal,
-  cache,
-  dbg,
-  providerFactories: [
-    (env) => new WssProvider(env),
-    (env) => new PolkadotDevProvider(env),
-    (env) => new ZombienetProvider(env),
-  ],
-})
+const modSpecifier = JSON.stringify(import.meta.resolve("./mod.ts"))
+cache.getString("mod.ts", 0, async () => `export * from ${modSpecifier}`)
 
-cache.getString(
-  "mod.ts",
-  0,
-  async () => `export * from ${JSON.stringify(import.meta.resolve("./mod.ts"))}`,
-)
+const env = new Env(href, cache, signal, (env) => ({
+  frame: {
+    wss: new WssProvider(env),
+    dev: new PolkadotDevProvider(env),
+    zombienet: new ZombienetProvider(env),
+    project: new ProjectProvider(env),
+    contracts_dev: new ContractsDevProvider(env),
+  },
+}))
 
-const alreadyRunning = await (async () => {
-  try {
-    if (await (await fetch(`${href}/capi_cwd`)).text() === Deno.cwd()) {
-      return true
-    }
-  } catch (_e) {}
-  return false
-})()
+const running = await fetch(`${href}/capi_cwd`)
+  .then((r) => r.text())
+  .then((r) => r === Deno.cwd())
+  .catch(() => false)
 
-if (!alreadyRunning) {
+if (!running) {
   await serve(handler(env), {
-    port: +port,
+    port: +portStr,
     signal,
     onError(error) {
       throw error
     },
     async onListen() {
-      console.log(`Capi server listening on ${href}`)
-      await after()
+      console.log(`Capi server listening at "${href}"`)
+      await onReady()
     },
   })
-} else await after()
+} else {
+  console.log(`Reusing existing Capi server at "${href}"`)
+  await onReady()
+}
 
-async function after() {
+async function onReady() {
   if (cmd.length) {
     const process = Deno.run({ cmd })
     const status = await process.status()

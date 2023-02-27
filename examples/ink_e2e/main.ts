@@ -5,7 +5,7 @@ import {
   isInstantiatedEvent,
   parse as parseMetadata,
 } from "capi/patterns/ink/mod.ts"
-import { chain } from "zombienet/rococo_contracts.toml/collator/@latest/mod.ts"
+import { chain } from "contracts_dev/mod.ts"
 import { parse } from "../../deps/std/flags.ts"
 
 export const metadata = Rune
@@ -28,7 +28,7 @@ if (!address) {
     .signed({ sender: alice })
     .sent()
     .dbgStatus("Contract deployment status:")
-    .txEvents()
+    .inBlockEvents()
     .map((events) =>
       events.find(isInstantiatedEvent) ?? new FailedToFindContractInstantiatedError()
     )
@@ -52,7 +52,7 @@ console.log(
     .signed({ sender: alice })
     .sent()
     .dbgStatus("Flip status:")
-    .txEvents()
+    .inBlockEvents()
     .pipe(contract.filterContractEvents)
     .run(),
 )

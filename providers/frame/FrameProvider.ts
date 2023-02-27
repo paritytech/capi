@@ -9,11 +9,10 @@ import { WeakMemo } from "../../util/mod.ts"
 import { withSignal } from "../../util/withSignal.ts"
 
 export abstract class FrameProvider extends Provider {
-  generatorId = "frame"
-
   codegenCtxsPending: Record<string, Promise<FrameCodegen>> = {}
 
   abstract connect(pathInfo: PathInfo, signal: AbortSignal): Promise<Connection>
+
   abstract chainFile(pathInfo: PathInfo): Promise<File>
 
   async handle(request: Request, pathInfo: PathInfo): Promise<Response> {
