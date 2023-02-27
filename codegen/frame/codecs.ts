@@ -53,7 +53,7 @@ export function codecs(ctx: FrameCodegen) {
     stringUnion(ty) {
       return addCodecDecl(
         ty,
-        `$.stringUnion(${
+        `$.literalUnion(${
           S.object(
             ...ty.members.map((
               x,

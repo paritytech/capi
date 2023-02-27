@@ -3,7 +3,7 @@ import { $tyId, $tys, Ty } from "../scale_info/Ty.ts"
 import * as U from "../util/mod.ts"
 
 export type HasherKind = $.Native<typeof $hasherKind>
-const $hasherKind = $.stringUnion([
+const $hasherKind = $.literalUnion([
   "Blake2_128",
   "Blake2_256",
   "Blake2_128Concat",
@@ -14,7 +14,7 @@ const $hasherKind = $.stringUnion([
 ])
 
 export type StorageEntryModifier = $.Native<typeof $storageEntryModifier>
-export const $storageEntryModifier = $.stringUnion([
+export const $storageEntryModifier = $.literalUnion([
   "Optional",
   "Default",
 ])
