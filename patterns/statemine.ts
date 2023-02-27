@@ -147,7 +147,7 @@ type Item = any;
 // Alter the attributes of a given item.
 // - freeze(collection, item)
 // Disallow further unprivileged transfer of an item.
-// - setAttribute(collection, maybeItem, key, value)
+// - se tAttribute(collection, maybeItem, key, value)
 // Set an attribute for a collection or item.
 // - thaw(collection, item)
 // Re-allow unprivileged transfer of an item.
