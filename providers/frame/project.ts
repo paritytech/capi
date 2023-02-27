@@ -10,13 +10,9 @@ export class ProjectProvider extends FrameBinProvider {
     })
   }
 
-  dynamicUrlKey() {
-    return Deno.cwd()
-  }
-
   async launch() {
     const port = getAvailable()
-    await this.initBinRun(["run", "--release", "--", "--dev", "--ws-port", port.toString()])
+    await this.runBin(["run", "--release", "--", "--dev", "--ws-port", port.toString()])
     return port
   }
 }

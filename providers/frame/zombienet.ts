@@ -17,10 +17,6 @@ export class ZombienetProvider extends FrameBinProvider {
     })
   }
 
-  dynamicUrlKey(pathInfo: PathInfo): string {
-    return pathInfo.target!
-  }
-
   launchMemo = new PermanentMemo<string, Network>()
   async launch(pathInfo: PathInfo) {
     const target = pathInfo.target!
@@ -31,7 +27,7 @@ export class ZombienetProvider extends FrameBinProvider {
       const networkManifestPath = path.join(zombiecache, "zombie.json")
       const network = this.network(zombiecache, networkManifestPath)
       const args: string[] = ["-p", "native", "-d", zombiecache, "-f", "spawn", configPath]
-      await this.initBinRun(args)
+      await this.runBin(args)
       return await network
     })
     const nodeName = target.slice(i + 1)

@@ -16,21 +16,15 @@ export class PolkadotDevProvider extends FrameBinProvider {
     })
   }
 
-  dynamicUrlKey(pathInfo: PathInfo) {
-    const { target } = pathInfo
-    $.assert($devRuntimeName, target)
-    return target
-  }
-
   async launch(pathInfo: PathInfo) {
-    const runtimeName = this.dynamicUrlKey(pathInfo)
+    const runtimeName = pathInfo.target
+    $.assert($devRuntimeName, runtimeName)
     const port = getAvailable()
     const args: string[] = ["--dev", "--ws-port", port.toString()]
     if (runtimeName !== "polkadot") args.push(`--force-${runtimeName}`)
-    await this.initBinRun(args)
+    await this.runBin(args)
     return port
   }
 }
 
-type DevRuntimeName = $.Native<typeof $devRuntimeName>
 const $devRuntimeName = $.literalUnion(["polkadot", "kusama", "westend", "rococo"])
