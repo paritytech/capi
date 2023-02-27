@@ -21,7 +21,7 @@ export interface VirtualMultisig extends Multisig {
 }
 export const $virtualMultisig = $.object(
   $.field("signatories", $.array($.sizedUint8Array(32))),
-  $.field("threshold", $.u8),
+  $.field("threshold", $.option($.u8)),
   $.field("stash", $.sizedUint8Array(32)),
 )
 

@@ -21,8 +21,8 @@ export interface MultisigVoteProps {
 }
 
 export interface Multisig {
-  signatories: Uint8Array[] // TODO: make this optional
-  threshold: number
+  signatories: Uint8Array[]
+  threshold?: number
 }
 
 // TODO: swap out `Chain` constraints upon subset gen issue resolution... same for other patterns
@@ -36,10 +36,10 @@ export class MultisigRune<out U, out C extends Chain = Chain> extends Rune<Multi
     super(_prime)
     this.storage = this.chain.metadata().pallet("Multisig").storage("Multisigs")
     const v = this.into(ValueRune)
-    this.threshold = v.access("threshold")
-    this.accountId = v.map(({ signatories, threshold }) =>
-      multisigAccountId(signatories, threshold)
-    )
+    this.threshold = v.map(({ threshold, signatories }) => threshold ?? signatories.length)
+    this.accountId = Rune.tuple([v.access("signatories"), this.threshold]).map((
+      [signatories, threshold],
+    ) => multisigAccountId(signatories, threshold))
     this.address = this.accountId.map(MultiAddress.Id)
   }
 
