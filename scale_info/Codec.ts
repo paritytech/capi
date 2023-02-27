@@ -46,7 +46,7 @@ export function DeriveCodec(tys: Ty[]): DeriveCodec {
       for (const { index, name } of ty.members) {
         members[index] = normalizeIdent(name)
       }
-      return $.stringUnion(members)
+      return $.literalUnion(members)
     },
     taggedUnion(ty) {
       const members: Record<number, $.Variant<any, any>> = {}
