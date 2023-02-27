@@ -73,6 +73,7 @@ async function onReady() {
     const [commandPath, ...args] = cmd
     const command = new Deno.Command(commandPath!, { args })
     const process = command.spawn()
+    process.unref()
     const status = await process.status
     self.addEventListener("unload", () => Deno.exit(status.code))
     controller.abort()
