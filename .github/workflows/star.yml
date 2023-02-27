@@ -40,4 +40,6 @@ jobs:
           binary-name: zombienet-linux-x64
           binary-version: v1.3.34
           binary-github: https://github.com/paritytech/zombienet
-      - run: deno task star
+      - run: |
+          zombienet-linux-x64 version
+          deno task star
