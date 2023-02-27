@@ -2,7 +2,7 @@ import { Env } from "../../server/mod.ts"
 import { getAvailable } from "../../util/port.ts"
 import { FrameBinProvider } from "./FrameBinProvider.ts"
 
-export class ContractsDevProvider extends FrameBinProvider<string> {
+export class ContractsDevProvider extends FrameBinProvider {
   constructor(env: Env) {
     super(env, {
       bin: "substrate-contracts-node",
@@ -21,7 +21,7 @@ export class ContractsDevProvider extends FrameBinProvider<string> {
 
   async launch() {
     const port = getAvailable()
-    await this.initBinRun(["--dev", "--ws-port", port.toString()])
+    await this.runBin(["--dev", "--ws-port", port.toString()])
     return port
   }
 }
