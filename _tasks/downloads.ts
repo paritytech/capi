@@ -18,7 +18,7 @@ await Deno.writeTextFile(
   `${GENERATION_NOTICE}
 import { createFromBuffer } from "../deps/dprint.ts"
 import dprintConfig from "../dprint.json" assert { type: "json" }
-import { hex } from "./hex.ts"
+import * as hex from "./hex.ts"
 
 const wasm = "${wasm}"
 
