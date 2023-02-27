@@ -11,14 +11,6 @@ export class ContractsDevProvider extends FrameBinProvider {
     })
   }
 
-  dynamicUrlKey() {
-    return ""
-  }
-
-  parseLaunchInfo() {
-    return ""
-  }
-
   async launch() {
     const port = getAvailable()
     await this.runBin(["--dev", "--ws-port", port.toString()])
