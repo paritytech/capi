@@ -2,7 +2,7 @@ import { Env } from "../../server/mod.ts"
 import { getAvailable } from "../../util/port.ts"
 import { FrameBinProvider } from "./FrameBinProvider.ts"
 
-export class ProjectProvider extends FrameBinProvider<string> {
+export class ProjectProvider extends FrameBinProvider {
   constructor(env: Env) {
     super(env, {
       bin: "cargo",
@@ -11,10 +11,6 @@ export class ProjectProvider extends FrameBinProvider<string> {
   }
 
   dynamicUrlKey() {
-    return Deno.cwd()
-  }
-
-  parseLaunchInfo() {
     return Deno.cwd()
   }
 

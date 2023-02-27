@@ -7,7 +7,7 @@ export interface PolkadotDevProviderProps {
   polkadotPath?: string
 }
 
-export class PolkadotDevProvider extends FrameBinProvider<DevRuntimeName> {
+export class PolkadotDevProvider extends FrameBinProvider {
   constructor(env: Env, { polkadotPath }: PolkadotDevProviderProps = {}) {
     super(env, {
       bin: polkadotPath ?? "polkadot",
@@ -22,9 +22,8 @@ export class PolkadotDevProvider extends FrameBinProvider<DevRuntimeName> {
     return target
   }
 
-  parseLaunchInfo = this.dynamicUrlKey
-
-  async launch(runtimeName: DevRuntimeName) {
+  async launch(pathInfo: PathInfo) {
+    const runtimeName = this.dynamicUrlKey(pathInfo)
     const port = getAvailable()
     const args: string[] = ["--dev", "--ws-port", port.toString()]
     if (runtimeName !== "polkadot") args.push(`--force-${runtimeName}`)

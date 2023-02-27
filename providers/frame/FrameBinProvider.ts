@@ -1,6 +1,6 @@
 import { deferred } from "../../deps/std/async.ts"
 import { Env, PathInfo } from "../../server/mod.ts"
-import { PermanentMemo, PromiseOr } from "../../util/mod.ts"
+import { PermanentMemo } from "../../util/mod.ts"
 import { ready } from "../../util/port.ts"
 import { FrameProxyProvider } from "./FrameProxyProvider.ts"
 
@@ -10,7 +10,7 @@ export interface FrameBinProviderProps {
   readyTimeout?: number
 }
 
-export abstract class FrameBinProvider<LaunchInfo> extends FrameProxyProvider {
+export abstract class FrameBinProvider extends FrameProxyProvider {
   bin
   installation
   timeout
@@ -24,16 +24,14 @@ export abstract class FrameBinProvider<LaunchInfo> extends FrameProxyProvider {
 
   abstract dynamicUrlKey(pathInfo: PathInfo): string
 
-  abstract parseLaunchInfo(pathInfo: PathInfo): LaunchInfo
-
-  abstract launch(launchInfo: LaunchInfo): PromiseOr<number>
+  abstract launch(pathInfo: PathInfo): Promise<number>
 
   dynamicUrlMemo = new PermanentMemo<string, string>()
   async dynamicUrl(pathInfo: PathInfo) {
     const dynamicUrlKey = this.dynamicUrlKey(pathInfo)
     return this.dynamicUrlMemo.run(dynamicUrlKey, async () => {
       const urlPending = (async () => {
-        const port = await this.launch(this.parseLaunchInfo(pathInfo))
+        const port = await this.launch(pathInfo)
         await ready(port)
         return `ws://localhost:${port}`
       })()
