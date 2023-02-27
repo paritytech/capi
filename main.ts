@@ -46,7 +46,7 @@ const env = new Env(href, cache, signal, (env) => ({
   },
 }))
 
-const running = await fetch(`${href}/capi_cwd`)
+const running = await fetch(`${href}capi_cwd`)
   .then((r) => r.text())
   .then((r) => r === Deno.cwd())
   .catch(() => false)

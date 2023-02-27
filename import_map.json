@@ -22,6 +22,10 @@
       "zombienet/": "http://localhost:4646/frame/zombienet/zombienets/",
       "project/": "http://localhost:4646/frame/project/",
       "contracts_dev/": "http://localhost:4646/frame/contracts_dev/@latest/"
+    },
+    "http://localhost:4646/": {
+      "http://localhost:4646/": "./",
+      "http://localhost:4646/frame/": "http://localhost:4646/frame/"
     }
   }
 }

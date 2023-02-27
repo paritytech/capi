@@ -1,11 +1,18 @@
 import { equals } from "../../deps/std/bytes.ts"
-import { Chain, ChainRune, CodecRune, ExtrinsicRune } from "../../fluent/mod.ts"
-import { Event } from "../../primitives/mod.ts"
-import { Rune, RunicArgs, ValueRune } from "../../rune/mod.ts"
-import { hex } from "../../util/mod.ts"
+import {
+  Chain,
+  ChainRune,
+  CodecRune,
+  Event,
+  ExtrinsicRune,
+  hex,
+  Rune,
+  RunicArgs,
+  ValueRune,
+} from "../../mod.ts"
+import { $contractsApiCallArgs, $contractsApiCallResult, Weight } from "./codecs.ts"
 import { isInstantiatedEvent } from "./events.ts"
 import { InkMetadataRune } from "./InkMetadataRune.ts"
-import { $contractsApiCallArgs, $contractsApiCallResult, Weight } from "./known.ts"
 
 export interface MsgProps {
   sender: Uint8Array
@@ -35,7 +42,7 @@ export class InkRune<out U, out C extends Chain = Chain> extends Rune<Uint8Array
       .map((result) => $contractsApiCallResult.decode(hex.decode(result)))
   }
 
-  common<X>(props: RunicArgs<X, MsgProps>) {
+  common<X>(this: InkRune<U, C>, props: RunicArgs<X, MsgProps>) {
     const msgMetadata = Rune.tuple([
       this.contract
         .into(ValueRune)

@@ -1,4 +1,7 @@
-import { Data, IdentityInfo as IdentityInfoRaw } from "polkadot_dev/types/pallet_identity/types.ts"
+import {
+  Data,
+  type IdentityInfo as IdentityInfoRaw,
+} from "polkadot_dev/types/pallet_identity/types.ts"
 import * as $ from "../deps/scale.ts"
 import { Rune, RunicArgs } from "../rune/mod.ts"
 
@@ -27,7 +30,7 @@ export class IdentityInfoTranscoders<A extends Record<string, any>> {
             .entries(additionalCodecs)
             .map(([k, $v]) => [encodeStr(k), encoder($v)(additional[k])] as [Data, Data])
         )
-        .throws(IdentityDataTooLargeError)
+        .throws(IdentityDataSizeInvalidError)
       : []
     const pgpFingerprint = Rune
       .resolve(props.pgpFingerprint)
@@ -85,15 +88,15 @@ function encoder<T>(codec: $.Codec<T>) {
   return (value: T) => {
     const encoded = codec.encode(value)
     const { length } = encoded
-    if (length > 32) throw new IdentityDataTooLargeError()
+    if (length > 32) throw new IdentityDataSizeInvalidError()
     return { type: `Raw${length}`, value: encoded } as Data
   }
 }
 
 const REST_KEYS = ["display", "legal", "web", "riot", "email", "image", "twitter"] as const
 
-export class IdentityDataTooLargeError extends Error {
-  override readonly name = "IdentityDataTooLargeError"
+export class IdentityDataSizeInvalidError extends Error {
+  override readonly name = "IdentityDataSizeInvalidError"
 }
 export class CouldNotDecodeIdentityInfoAdditionalKey extends Error {
   override readonly name = "CouldNotDecodeIdentityInfoAdditionalKey"
