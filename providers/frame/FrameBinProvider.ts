@@ -37,18 +37,12 @@ export abstract class FrameBinProvider extends FrameProxyProvider {
       ))
   }
 
-  async runBin(args: string[]): Promise<Deno.Process> {
+  async runBin(args: string[]): Promise<Deno.ChildProcess> {
     await this.assertBinValid()
-    const process = Deno.run({
-      cmd: [this.bin, ...args],
-      stdout: "piped",
-      stderr: "piped",
-    })
+    const command = new Deno.Command(this.bin, { args, stdout: "piped", stderr: "piped" })
+    const process = command.spawn()
     this.env.signal.addEventListener("abort", async () => {
       process.kill("SIGINT")
-      process.stdout.close()
-      process.stderr.close()
-      process.close()
     })
     return process
   }
