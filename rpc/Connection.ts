@@ -81,6 +81,7 @@ export abstract class Connection {
   }
 
   handle(message: RpcIngressMessage) {
+    console.log("handle", { message })
     if (typeof message.id === "number") {
       this.callResultPendings[message.id]?.resolve(message)
       delete this.callResultPendings[message.id]
