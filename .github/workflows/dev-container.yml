@@ -13,6 +13,6 @@ jobs:
       - name: Checkout (GitHub)
         uses: actions/checkout@v3
       - name: Build and run Dev Container task
-        uses: devcontainers/ci@v0.2
+        uses: devcontainers/ci@v0.3
         with:
           push: never
