@@ -4,11 +4,7 @@ import { chain, System } from "polkadot_dev/mod.ts"
 import * as base64 from "../deps/std/encoding/base64.ts"
 
 const vMultisig = virtualMultisigDeployment(chain, {
-  signatories: [
-    alice.publicKey,
-    bob.publicKey,
-    charlie.publicKey,
-  ],
+  signatories: [alice.publicKey, bob.publicKey, charlie.publicKey],
   threshold: 2,
   deployer: alice,
 })
