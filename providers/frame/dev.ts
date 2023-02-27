@@ -53,7 +53,7 @@ export class PolkadotDevProvider extends FrameProxyProvider {
 }
 
 type DevRuntimeName = $.Native<typeof $devRuntimeName>
-const $devRuntimeName = $.stringUnion([
+const $devRuntimeName = $.literalUnion([
   "polkadot",
   "kusama",
   "westend",

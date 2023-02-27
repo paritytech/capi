@@ -55,7 +55,7 @@ export const $field: $.Codec<Field> = $.object(
 )
 
 export type PrimitiveKind = $.Native<typeof $primitiveKind>
-const $primitiveKind = $.stringUnion([
+const $primitiveKind = $.literalUnion([
   "bool",
   "char",
   "str",
