@@ -118,7 +118,7 @@ export class VirtualMultisigRune<out U, out C extends Chain = Chain>
       .signed({ sender: configurator })
       .sent()
       .dbgStatus("Proxy creation:")
-      .txEvents()
+      .finalizedEvents()
       .pipe(filterPureCreatedEvents)
       .map((events) =>
         events
