@@ -5,28 +5,77 @@ import {
   ChainRune,
   Event,
   ExtrinsicSender,
+  hex,
   MetaRune,
   MultiAddress,
   Rune,
   RunicArgs,
+  ValueRune,
 } from "../../mod.ts"
+import { $ } from "../../mod.ts"
 import { replaceDelegateCalls } from "../proxy/mod.ts"
 import { Multisig, MultisigRune } from "./MultisigRune.ts"
 
 export interface VirtualMultisig extends Multisig {
   stash: Uint8Array
 }
+export const $virtualMultisig = $.object(
+  $.field("signatories", $.array($.sizedUint8Array(32))),
+  $.field("threshold", $.u8),
+  $.field("stash", $.sizedUint8Array(32)),
+)
 
 export class VirtualMultisigRune<out U, out C extends Chain = Chain>
   extends Rune<VirtualMultisig, U>
 {
+  inner
+  signatories
+  threshold
+  stash
+  encoded
+  hex
+
   constructor(_prime: VirtualMultisigRune<U>["_prime"], readonly chain: ChainRune<U, C>) {
     super(_prime)
+    this.inner = this.into(MultisigRune, chain)
+    const v = this.into(ValueRune)
+    this.signatories = v.access("signatories")
+    this.threshold = v.access("threshold")
+    this.stash = v.access("stash")
+    this.encoded = v.map((m) => $virtualMultisig.encode(m))
+    this.hex = this.encoded.map(hex.encode)
+  }
+
+  ratify<X>(...[senderIndex, call]: RunicArgs<X, [number, Chain.Call<C>]>) {
+    const call_ = this.chain.extrinsic(Rune.rec({
+      type: "Proxy" as const,
+      value: Rune.rec({
+        type: "proxy" as const,
+        real: this.stash.map(MultiAddress.Id),
+        forceProxyType: undefined,
+        call,
+      }),
+    }) as Chain.Call<C>)
+    const sender = Rune
+      .tuple([this.signatories, senderIndex])
+      .map(([signatories, senderIndex]) => MultiAddress.Id(signatories[senderIndex]!))
+    return this.chain.extrinsic(Rune.rec({
+      type: "Proxy",
+      value: Rune.rec({
+        type: "proxy",
+        real: sender,
+        forceProxyType: undefined,
+        call: this.inner.ratify({
+          call: call_,
+          sender,
+        } as Chain.Call<C>),
+      }),
+    }) as Chain.Call<C>)
   }
 }
 
 export interface NewVirtualMultisigProps extends Multisig {
-  configurator: ExtrinsicSender
+  deployer: ExtrinsicSender
   deposits?: bigint
 }
 
@@ -43,7 +92,7 @@ export function virtualMultisigDeployment<U, X>(
       () => chain.metadata().pallet("Balances").const("ExistentialDeposit").decoded,
     )
   const members = Rune.resolve(props.signatories)
-  const configurator = Rune.resolve(props.configurator)
+  const configurator = Rune.resolve(props.deployer)
   const membersCount = members.map((members) => members.length)
   const proxyCreationCalls = membersCount.map((n) =>
     Rune.array(Array.from({ length: n + 1 }, (_, index) =>
@@ -161,20 +210,20 @@ export function virtualMultisigDeployment<U, X>(
     }))
     .signed({ sender: configurator })
     .sent()
+    .dbgStatus("Ownership swaps:")
     .finalized()
 
   return proxies
     .chain(() => existentialDeposits)
     .chain(() => ownershipSwaps)
     .chain(() =>
-      Rune
-        .rec({
-          signatories: memberProxies,
-          threshold,
-          stash: stashProxy,
-        })
-        .into(VirtualMultisigRune, chain)
+      Rune.rec({
+        signatories: memberProxies,
+        threshold,
+        stash: stashProxy,
+      })
     )
+    .into(VirtualMultisigRune, chain)
 }
 
 export function filterPureCreatedEvents<X>(...[events]: RunicArgs<X, [Event[]]>) {

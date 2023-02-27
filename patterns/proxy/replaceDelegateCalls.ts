@@ -10,7 +10,7 @@ export function replaceDelegateCalls<U, X>(
       value: Rune.rec({
         type: "proxy",
         real,
-        forceProxyType: "Any",
+        forceProxyType: undefined,
         call: chain.extrinsic(Rune.rec({
           type: "Proxy",
           value: Rune.rec({
@@ -27,7 +27,7 @@ export function replaceDelegateCalls<U, X>(
       value: Rune.rec({
         type: "proxy",
         real,
-        forceProxyType: "Any",
+        forceProxyType: undefined,
         call: chain.extrinsic(Rune.rec({
           type: "Proxy",
           value: Rune.rec({
