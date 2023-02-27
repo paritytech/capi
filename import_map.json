@@ -12,6 +12,7 @@
     "acala/": "http://localhost:4646/frame/wss/acala-polkadot.api.onfinality.io/public-ws/@latest/",
     "moonbeam/": "http://localhost:4646/frame/wss/wss.api.moonbeam.network/@latest/",
     "statemint/": "http://localhost:4646/frame/wss/statemint-rpc.polkadot.io/@latest/",
+    "statemine/": "http://localhost:4646/frame/wss/statemine-rpc.polkadot.io/@latest/",
     "phala/": "http://localhost:4646/frame/wss/api.phala.network/ws#/rpc/@latest/",
     "subsocial/": "http://localhost:4646/frame/para.subsocial.network/@latest/"
   },
