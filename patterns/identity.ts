@@ -1,6 +1,6 @@
-import type {
+import {
   Data,
-  IdentityInfo as IdentityInfoRaw,
+  type IdentityInfo as IdentityInfoRaw,
 } from "polkadot_dev/types/pallet_identity/types.ts"
 import * as $ from "../deps/scale.ts"
 import { Rune, RunicArgs } from "../rune/mod.ts"
@@ -43,7 +43,7 @@ export class IdentityInfoTranscoders<A extends Record<string, any>> {
           .resolve(props[key])
           .unhandle(undefined)
           .map(encodeStr)
-          .rehandle(undefined, () => Rune.resolve({ type: "None" })),
+          .rehandle(undefined, () => Rune.resolve(Data.None())),
       ])))
       .unsafeAs<Record<typeof REST_KEYS[number], Data>>()
     return Rune
