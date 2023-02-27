@@ -6,7 +6,7 @@ export class ProjectProvider extends FrameBinProvider {
   constructor(env: Env) {
     super(env, {
       bin: "cargo",
-      installation: "https://www.rust-lang.org/tools/install",
+      installation: "https://rust-lang.org/tools/install",
     })
   }
 

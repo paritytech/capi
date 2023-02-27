@@ -17,7 +17,7 @@ export function handler(env: Env): Handler {
           "The local Capi sever assumes the same version as itself; another cannot be specified.",
         )
       }
-      const provider = env.providerGroups[generatorId]?.[providerId]
+      const provider = env.providers[generatorId]?.[providerId]
       if (provider) {
         try {
           return await provider.handle(request, pathInfo)

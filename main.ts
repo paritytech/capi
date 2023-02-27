@@ -11,7 +11,7 @@ import { handler } from "./server/local.ts"
 import { Env } from "./server/mod.ts"
 import { FsCache } from "./util/cache/mod.ts"
 
-const { help, port: portRaw, "--": cmd, out } = flags.parse(Deno.args, {
+const { help, port: portStr, "--": cmd, out } = flags.parse(Deno.args, {
   boolean: ["help"],
   string: ["port", "out"],
   default: {
@@ -27,14 +27,14 @@ if (help) {
   Deno.exit()
 }
 
-const href = `http://localhost:${portRaw}/`
+const href = `http://localhost:${portStr}/`
 
 const controller = new AbortController()
 const { signal } = controller
 
 const cache = new FsCache(out, signal)
-const modPath = JSON.stringify(import.meta.resolve("./mod.ts"))
-cache.getString("mod.ts", 0, async () => `export * from ${modPath}`)
+const modSpecifier = JSON.stringify(import.meta.resolve("./mod.ts"))
+cache.getString("mod.ts", 0, async () => `export * from ${modSpecifier}`)
 
 const env = new Env(href, cache, signal, (env) => ({
   frame: {
@@ -46,29 +46,29 @@ const env = new Env(href, cache, signal, (env) => ({
   },
 }))
 
-let running = false
-try {
-  if (await (await fetch(`${href}/capi_cwd`)).text() === Deno.cwd()) running = true
-} catch (_e) {}
+const running = await fetch(`${href}/capi_cwd`)
+  .then((r) => r.text())
+  .then((r) => r === Deno.cwd())
+  .catch(() => false)
 
 if (!running) {
   await serve(handler(env), {
-    port: +portRaw,
+    port: +portStr,
     signal,
     onError(error) {
       throw error
     },
     async onListen() {
       console.log(`Capi server listening at "${href}"`)
-      await after()
+      await onReady()
     },
   })
 } else {
   console.log(`Reusing existing Capi server at "${href}"`)
-  await after()
+  await onReady()
 }
 
-async function after() {
+async function onReady() {
   if (cmd.length) {
     const process = Deno.run({ cmd })
     const status = await process.status()
