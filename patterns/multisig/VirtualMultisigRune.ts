@@ -18,12 +18,12 @@ import { replaceDelegateCalls } from "../proxy/mod.ts"
 import { Multisig, MultisigRune } from "./MultisigRune.ts"
 
 export interface VirtualMultisig {
-  signatories: [Uint8Array, Uint8Array][]
+  signatoriesMap: [Uint8Array, Uint8Array][]
   threshold?: number
   stash: Uint8Array
 }
 export const $virtualMultisig: $.Codec<VirtualMultisig> = $.object(
-  $.field("signatories", $.array($.tuple($.sizedUint8Array(32), $.sizedUint8Array(32)))),
+  $.field("signatoriesMap", $.array($.tuple($.sizedUint8Array(32), $.sizedUint8Array(32)))),
   $.optionalField("threshold", $.u8),
   $.field("stash", $.sizedUint8Array(32)),
 )
@@ -32,9 +32,7 @@ export class VirtualMultisigRune<out U, out C extends Chain = Chain>
   extends Rune<VirtualMultisig, U>
 {
   inner
-  signatories
-  threshold
-  proxyMap
+  proxies
   stash
   encoded
   hex
@@ -42,25 +40,26 @@ export class VirtualMultisigRune<out U, out C extends Chain = Chain>
   constructor(_prime: VirtualMultisigRune<U>["_prime"], readonly chain: ChainRune<U, C>) {
     super(_prime)
     const v = this.into(ValueRune)
-    this.signatories = v.access("signatories").map((arr) => arr.map((a) => a[0]))
-    this.threshold = v.access("threshold")
     this.stash = v.access("stash")
-    this.proxyMap = v.access("signatories")
-      .map((arr) => arr.map((a, i) => [hex.encode(a[1]), i] as const))
+    this.proxies = v.access("signatoriesMap")
+      .map((arr) => arr.map((a, i) => [hex.encode(a[0]), i] as const))
       .map((a) => Object.fromEntries(a))
     this.encoded = v.map((m) => $virtualMultisig.encode(m))
     this.hex = this.encoded.map(hex.encode)
+
+    const signatories = v.access("signatoriesMap").map((arr) => arr.map((a) => a[1]))
+    const threshold = v.access("threshold")
     this.inner = Rune.rec({
-      signatories: this.signatories,
-      threshold: this.threshold,
+      signatories: signatories,
+      threshold: threshold,
     }).into(MultisigRune, chain)
   }
 
   proxyBySenderAddr<X>(...[senderAddr]: RunicArgs<X, [Uint8Array]>) {
     return Rune
       .tuple([
-        this.signatories,
-        this.proxyMap,
+        this.inner.into(ValueRune).access("signatories"),
+        this.proxies,
         Rune.resolve(senderAddr).map(hex.encode),
       ])
       .map(([signatories, proxyMap, senderAddr]) =>
@@ -262,7 +261,7 @@ export class VirtualMultisigRune<out U, out C extends Chain = Chain>
       .dbgStatus("Ownership swaps:")
       .finalized()
 
-    const concatenatedSignatories = Rune.tuple([memberProxies, members])
+    const concatenatedSignatories = Rune.tuple([members, memberProxies])
       .map(([a, b]) => a.map((p, i) => [p, b[i]!] as [Uint8Array, Uint8Array]))
 
     return proxies
@@ -270,7 +269,7 @@ export class VirtualMultisigRune<out U, out C extends Chain = Chain>
       .chain(() => ownershipSwaps)
       .chain(() =>
         Rune.rec({
-          signatories: concatenatedSignatories,
+          signatoriesMap: concatenatedSignatories,
           threshold,
           stash: stashProxy,
         })

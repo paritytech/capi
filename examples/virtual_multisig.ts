@@ -29,13 +29,13 @@ const fundStash = Balances
   .dbgStatus("Fund Stash:")
   .finalized()
 
-const fundBobProxy = vMultisig.fundSenderProxy(1, 20_000_000_000_000n)
+const fundBobProxy = vMultisig.fundSenderProxy(bob.publicKey, 20_000_000_000_000n)
   .signed({ sender: bob })
   .sent()
   .dbgStatus("Fund Bob Proxy:")
   .finalized()
 
-const fundCharlieProxy = vMultisig.fundSenderProxy(2, 20_000_000_000_000n)
+const fundCharlieProxy = vMultisig.fundSenderProxy(charlie.publicKey, 20_000_000_000_000n)
   .signed({ sender: charlie })
   .sent()
   .dbgStatus("Fund Charlie Proxy:")
@@ -47,14 +47,14 @@ const proposal = Balances.transfer({
 })
 
 const bobRatify = vMultisig
-  .ratify(1, proposal)
+  .ratify(bob.publicKey, proposal)
   .signed({ sender: bob })
   .sent()
   .dbgStatus("Bob ratify:")
   .finalized()
 
 const charlieRatify = vMultisig
-  .ratify(2, proposal)
+  .ratify(charlie.publicKey, proposal)
   .signed({ sender: charlie })
   .sent()
   .dbgStatus("Charlie ratify:")
