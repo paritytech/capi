@@ -63,11 +63,17 @@ await Rune
   .chain(() => fundStash)
   .chain(() => fundBobProxy)
   .chain(() => fundCharlieProxy)
+  .chain(() =>
+    Rune.tuple([
+      System.Account.entry(Rune.tuple([vMultisig.stash])).dbg("Stash Balance Before"),
+      System.Account.entry([dave.publicKey]).dbg("Dave Balance Before"),
+    ])
+  )
   .chain(() => bobRatify)
   .chain(() => charlieRatify)
   .chain(() =>
     Rune.tuple([
-      System.Account.entry(Rune.tuple([vMultisig.stash])).dbg("Stash Balance"),
-      System.Account.entry([dave.publicKey]).dbg("Dave Balance"),
+      System.Account.entry(Rune.tuple([vMultisig.stash])).dbg("Stash Balance After"),
+      System.Account.entry([dave.publicKey]).dbg("Dave Balance After"),
     ])
   ).run()
