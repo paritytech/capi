@@ -5,7 +5,7 @@ import { RunicArgs, ValueRune } from "../../rune/mod.ts"
 
 export function preRuntimeDigest<U, C extends Chain, X>(
   chain: ChainRune<U, C>,
-  ...[blockHash]: RunicArgs<X, [string]>
+  ...[blockHash]: RunicArgs<X, [blockHash: string]>
 ) {
   return chain
     .block(blockHash)
