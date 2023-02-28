@@ -1,4 +1,3 @@
-import { deadline } from "../../deps/std/async.ts"
 import { Env, PathInfo } from "../../server/mod.ts"
 import { PermanentMemo } from "../../util/mod.ts"
 import { ready } from "../../util/port.ts"
@@ -26,15 +25,11 @@ export abstract class FrameBinProvider extends FrameProxyProvider {
 
   dynamicUrlMemo = new PermanentMemo<string, string>()
   async dynamicUrl(pathInfo: PathInfo) {
-    return this.dynamicUrlMemo.run(pathInfo.target ?? "", () =>
-      deadline(
-        (async () => {
-          const port = await this.launch(pathInfo)
-          await ready(port)
-          return `ws://localhost:${port}`
-        })(),
-        this.timeout,
-      ))
+    return this.dynamicUrlMemo.run(pathInfo.target ?? "", async () => {
+      const port = await this.launch(pathInfo)
+      await ready(port)
+      return `ws://localhost:${port}`
+    })
   }
 
   async runBin(args: string[]): Promise<Deno.ChildProcess> {
