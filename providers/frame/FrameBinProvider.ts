@@ -54,13 +54,12 @@ export abstract class FrameBinProvider extends FrameProxyProvider {
   binValid?: Promise<void>
   assertBinValid() {
     return this.binValid ??= (async () => {
-      const whichProcess = Deno.run({
-        cmd: ["which", this.bin],
+      const whichProcess = new Deno.Command("which", {
+        args: [this.bin],
         stdout: "piped",
       })
       const binPathBytes = await whichProcess.output()
-      whichProcess.close()
-      if (!binPathBytes.length) {
+      if (!binPathBytes.stdout.length) {
         throw new Error(
           `No such bin "${this.bin}" in path. Installation instructions can be found here: "${this.installation}"`,
         )
