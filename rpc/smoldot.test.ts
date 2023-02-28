@@ -9,75 +9,58 @@ Deno.test({
   sanitizeOps: false,
   sanitizeResources: false,
   async fn(t) {
-    await t.step({
-      name: "relay chain connection",
-      async fn() {
-        const relayChainSpec = await fetchText(
-          "https://raw.githubusercontent.com/paritytech/substrate-connect/main/packages/connect/src/connector/specs/polkadot.json",
-        )
-        const connection = new SmoldotConnection({
-          relayChainSpec,
-        })
-        await connection.ready()
-        const controller = new AbortController()
-        const pendingMessage = deferred<RpcSubscriptionMessage>()
-        connection.subscription(
-          "chainHead_unstable_follow",
-          "chainHead_unstable_unfollow",
-          [false],
-          (message) => {
-            controller.abort()
-            pendingMessage.resolve(message)
-          },
-          controller.signal,
-        )
-        const message = await pendingMessage
-        assertEquals((await message.params?.result as any).event, "initialized")
-      },
+    await t.step("relay chain connection", async () => {
+      const relayChainSpec = await fetchText(
+        "https://raw.githubusercontent.com/paritytech/substrate-connect/main/packages/connect/src/connector/specs/polkadot.json",
+      )
+      const connection = new SmoldotConnection({ relayChainSpec })
+      await connection.ready()
+      const controller = new AbortController()
+      const pendingMessage = deferred<RpcSubscriptionMessage>()
+      connection.subscription(
+        "chainHead_unstable_follow",
+        "chainHead_unstable_unfollow",
+        [false],
+        (message) => {
+          controller.abort()
+          pendingMessage.resolve(message)
+        },
+        controller.signal,
+      )
+      const message = await pendingMessage
+      assertEquals((await message.params?.result as any).event, "initialized")
     })
 
-    await t.step({
-      name: "parachain connection",
-      async fn() {
-        const relayChainSpec = await fetchText(
-          "https://raw.githubusercontent.com/paritytech/substrate-connect/main/packages/connect/src/connector/specs/westend2.json",
-        )
-        const parachainSpec = await fetchText(
-          "https://raw.githubusercontent.com/paritytech/substrate-connect/main/projects/demo/src/assets/westend-westmint.json",
-        )
-        const connection = new SmoldotConnection({
-          relayChainSpec,
-          parachainSpec,
-        })
-        await connection.ready()
-        const controller = new AbortController()
-        const pendingMessage = deferred<RpcSubscriptionMessage>()
-        connection.subscription(
-          "chainHead_unstable_follow",
-          "chainHead_unstable_unfollow",
-          [false],
-          (message) => {
-            controller.abort()
-            pendingMessage.resolve(message)
-          },
-          controller.signal,
-        )
-        const message = await pendingMessage
-        assertEquals((await message.params?.result as any).event, "initialized")
-      },
+    await t.step("parachain connection", async () => {
+      const relayChainSpec = await fetchText(
+        "https://raw.githubusercontent.com/paritytech/substrate-connect/main/packages/connect/src/connector/specs/westend2.json",
+      )
+      const parachainSpec = await fetchText(
+        "https://raw.githubusercontent.com/paritytech/substrate-connect/main/projects/demo/src/assets/westend-westmint.json",
+      )
+      const connection = new SmoldotConnection({
+        relayChainSpec,
+        parachainSpec,
+      })
+      await connection.ready()
+      const controller = new AbortController()
+      const pendingMessage = deferred<RpcSubscriptionMessage>()
+      connection.subscription(
+        "chainHead_unstable_follow",
+        "chainHead_unstable_unfollow",
+        [false],
+        (message) => {
+          controller.abort()
+          pendingMessage.resolve(message)
+        },
+        controller.signal,
+      )
+      const message = await pendingMessage
+      assertEquals((await message.params?.result as any).event, "initialized")
     })
 
-    await t.step({
-      name: "invalid chain spec",
-      fn() {
-        assertRejects(
-          async () =>
-            new SmoldotConnection({
-              relayChainSpec: "",
-            }),
-          AddChainError,
-        )
-      },
+    await t.step("invalid chain spec", async () => {
+      await assertRejects(async () => new SmoldotConnection({ relayChainSpec: "" }), AddChainError)
     })
   },
 })
