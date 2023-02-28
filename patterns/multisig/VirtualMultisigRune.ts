@@ -54,14 +54,16 @@ export class VirtualMultisigRune<out U, out C extends Chain = Chain>
   }
 
   fundSenderProxy<X>(...[senderIndex, amount]: RunicArgs<X, [number, bigint]>) {
-    return Rune.rec({
-      type: "Balances",
-      value: Rune.rec({
-        type: "transfer",
-        dest: this.proxyByIndex(senderIndex),
-        value: amount,
-      }),
-    }).unsafeAs<Chain.Call<C>>()
+    return Rune
+      .rec({
+        type: "Balances",
+        value: Rune.rec({
+          type: "transfer",
+          dest: this.proxyByIndex(senderIndex),
+          value: amount,
+        }),
+      })
+      .unsafeAs<Chain.Call<C>>()
       .into(ExtrinsicRune, this.chain)
   }
 
