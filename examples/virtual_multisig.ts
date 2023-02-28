@@ -19,10 +19,12 @@ console.log(`Virtual multisig state hex: ${stateHex}`)
 
 const vMultisig = VirtualMultisigRune.fromHex(chain, stateHex)
 
-const fundStash = Balances.transfer({
-  dest: vMultisig.stash.map(MultiAddress.Id),
-  value: 20_000_000_000_000n,
-}).signed({ sender: alice })
+const fundStash = Balances
+  .transfer({
+    dest: vMultisig.stash.map(MultiAddress.Id),
+    value: 20_000_000_000_000n,
+  })
+  .signed({ sender: alice })
   .sent()
   .dbgStatus("Fund Stash:")
   .finalized()
