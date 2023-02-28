@@ -4,6 +4,7 @@ import {
   Chain,
   ChainRune,
   Event,
+  ExtrinsicRune,
   ExtrinsicSender,
   hex,
   MetaRune,
@@ -46,20 +47,39 @@ export class VirtualMultisigRune<out U, out C extends Chain = Chain>
     this.hex = this.encoded.map(hex.encode)
   }
 
-  ratify<X>(...[senderIndex, call]: RunicArgs<X, [number, Chain.Call<C>]>) {
-    const call_ = this.chain.extrinsic(Rune.rec({
-      type: "Proxy" as const,
-      value: Rune.rec({
-        type: "proxy" as const,
-        real: this.stash.map(MultiAddress.Id),
-        forceProxyType: undefined,
-        call,
-      }),
-    }) as Chain.Call<C>)
-    const sender = Rune
+  proxyByIndex<X>(...[senderIndex]: RunicArgs<X, [number]>) {
+    return Rune
       .tuple([this.signatories, senderIndex])
       .map(([signatories, senderIndex]) => MultiAddress.Id(signatories[senderIndex]!))
-    return this.chain.extrinsic(Rune.rec({
+  }
+
+  fundSenderProxy<X>(...[senderIndex, amount]: RunicArgs<X, [number, bigint]>) {
+    return Rune.rec({
+      type: "Balances",
+      value: Rune.rec({
+        type: "transfer",
+        dest: this.proxyByIndex(senderIndex),
+        value: amount,
+      }),
+    }).unsafeAs<Chain.Call<C>>()
+      .into(ExtrinsicRune, this.chain)
+  }
+
+  ratify<X>(...[senderIndex, call]: RunicArgs<X, [number, Chain.Call<C>]>) {
+    const sender = this.proxyByIndex(senderIndex)
+    const call_ = this.chain.extrinsic(
+      Rune.rec({
+        type: "Proxy" as const,
+        value: Rune.rec({
+          type: "proxy" as const,
+          real: this.stash.map(MultiAddress.Id),
+          forceProxyType: undefined,
+          call,
+        }),
+      }).unsafeAs<Chain.Call<C>>(),
+    )
+
+    return Rune.rec({
       type: "Proxy",
       value: Rune.rec({
         type: "proxy",
@@ -68,9 +88,11 @@ export class VirtualMultisigRune<out U, out C extends Chain = Chain>
         call: this.inner.ratify({
           call: call_,
           sender,
-        } as Chain.Call<C>),
+        }),
       }),
-    }) as Chain.Call<C>)
+    })
+      .unsafeAs<Chain.Call<C>>()
+      .into(ExtrinsicRune, this.chain)
   }
 
   static fromHex<U, X>(chain: ChainRune<U, any>, ...[hexStr]: RunicArgs<X, [string]>) {
@@ -85,8 +107,8 @@ export class VirtualMultisigRune<out U, out C extends Chain = Chain>
     props: RunicArgs<X, VirtualMultisigDeploymentProps>,
   ) {
     const { threshold } = props
-    const deposits = Rune
-      .resolve(props.deposits)
+    const existentialDepositAmount = Rune
+      .resolve(props.existentialDepositAmount)
       .unhandle(undefined)
       .rehandle(
         undefined,
@@ -134,7 +156,7 @@ export class VirtualMultisigRune<out U, out C extends Chain = Chain>
     const memberProxies = proxiesGrouped.access(0)
     const stashProxy = proxiesGrouped.access(1)
     const memberProxyExistentialDepositCalls = Rune
-      .tuple([deposits, memberProxies])
+      .tuple([existentialDepositAmount, memberProxies])
       .map(([value, memberProxies]) =>
         Rune.array(memberProxies.map((memberProxy) =>
           chain.extrinsic({
@@ -160,12 +182,21 @@ export class VirtualMultisigRune<out U, out C extends Chain = Chain>
       value: Rune.rec({
         type: "transfer",
         dest: multisig.accountId.map(MultiAddress.Id),
-        value: deposits,
+        value: existentialDepositAmount,
       }),
     }))
+    const stashDepositCall = chain.extrinsic(Rune.rec({
+      type: "Balances",
+      value: Rune.rec({
+        type: "transfer",
+        dest: stashProxy.map(MultiAddress.Id),
+        value: existentialDepositAmount,
+      }),
+    }))
+
     const existentialDepositCalls = Rune
-      .tuple([memberProxyExistentialDepositCalls, multisigExistentialDepositCall])
-      .map(([m, s]) => [...m, s])
+      .tuple([memberProxyExistentialDepositCalls, multisigExistentialDepositCall, stashDepositCall])
+      .map(([a, b, c]) => [...a, b, c])
     const existentialDeposits = chain
       .extrinsic(Rune.rec({
         type: "Utility",
@@ -230,7 +261,7 @@ export class VirtualMultisigRune<out U, out C extends Chain = Chain>
 
 export interface VirtualMultisigDeploymentProps extends Multisig {
   deployer: ExtrinsicSender
-  deposits?: bigint
+  existentialDepositAmount?: bigint
 }
 
 export function filterPureCreatedEvents<X>(...[events]: RunicArgs<X, [Event[]]>) {
