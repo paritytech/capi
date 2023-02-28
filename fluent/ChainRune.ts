@@ -3,7 +3,6 @@ import * as M from "../frame_metadata/mod.ts"
 import { Event } from "../primitives/mod.ts"
 import { Connection } from "../rpc/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
-import { HexHash } from "../util/mod.ts"
 import { BlockRune } from "./BlockRune.ts"
 import { ConnectionRune } from "./ConnectionRune.ts"
 import { ExtrinsicRune } from "./ExtrinsicRune.ts"
@@ -32,16 +31,16 @@ export class ChainRune<out U, out C extends Chain = Chain> extends Rune<C, U> {
           .subscribe("chain_subscribeNewHeads", "chain_unsubscribeNewHeads")
           .access("number"),
       )
-      .unsafeAs<HexHash>(),
+      .unsafeAs<string>(),
   )
 
-  block<X>(...[blockHash]: RunicArgs<X, [blockHash: HexHash]>) {
+  block<X>(...[blockHash]: RunicArgs<X, [blockHash: string]>) {
     return this.connection.call("chain_getBlock", blockHash)
       .unhandle(null)
       .into(BlockRune, this, Rune.resolve(blockHash))
   }
 
-  metadata<X>(...[blockHash]: RunicArgs<X, [blockHash?: HexHash]>) {
+  metadata<X>(...[blockHash]: RunicArgs<X, [blockHash?: string]>) {
     return this.connection.call("state_getMetadata", blockHash)
       .map(M.fromPrefixedHex)
       .throws($.ScaleError)

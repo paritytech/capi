@@ -1,6 +1,6 @@
+import { hex } from "../crypto/mod.ts"
 import * as $ from "../deps/scale.ts"
 import { $tyId, $tys, Ty } from "../scale_info/Ty.ts"
-import * as U from "../util/mod.ts"
 
 export type HasherKind = $.Native<typeof $hasherKind>
 const $hasherKind = $.literalUnion([
@@ -146,7 +146,7 @@ export const $metadata: $.Codec<Metadata> = $.object(
 )
 
 export function fromPrefixedHex(scaleEncoded: string): Metadata {
-  return $metadata.decode(U.hex.decode(scaleEncoded as U.Hex))
+  return $metadata.decode(hex.decode(scaleEncoded))
 }
 
 export function getPallet(metadata: Metadata, name: string): Pallet | PalletNotFoundError {

@@ -1,3 +1,4 @@
+import { hashers, hex, ss58 } from "../crypto/mod.ts"
 import * as $ from "../deps/scale.ts"
 import { assert } from "../deps/std/testing/asserts.ts"
 import {
@@ -8,7 +9,6 @@ import {
   Signer,
 } from "../primitives/mod.ts"
 import { $null, DeriveCodec } from "../scale_info/Codec.ts"
-import { hashers, Hex, hex, ss58 } from "../util/mod.ts"
 import { Metadata } from "./Metadata.ts"
 
 // TODO: make generic over chain
@@ -90,7 +90,7 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
             const signer = props.sign
             buffer.writeAsync(0, async (buffer) => {
               const { signature } = await signer.signPayload(payload)
-              buffer.insertArray(hex.decode(signature as Hex))
+              buffer.insertArray(hex.decode(signature))
             })
             buffer.insertArray(extraEncoded)
             buffer.insertArray(callEncoded)

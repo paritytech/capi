@@ -1,6 +1,6 @@
+import { ss58 } from "../crypto/mod.ts"
 import { Rune } from "../rune/mod.ts"
 import { ValueRune } from "../rune/ValueRune.ts"
-import { ss58 } from "../util/mod.ts"
 import { Chain, ChainRune } from "./ChainRune.ts"
 import { PublicKeyRune } from "./PublicKeyRune.ts"
 

@@ -1,4 +1,4 @@
-import { Hex, Subscription } from "./utils.ts"
+import { Subscription } from "./utils.ts"
 
 // https://github.com/paritytech/substrate/blob/0ba251c/client/finality-grandpa/rpc/src/report.rs#L116
 /**
@@ -23,21 +23,21 @@ export interface RoundState {
 // https://github.com/paritytech/substrate/blob/0ba251c/client/finality-grandpa/rpc/src/report.rs#L62
 export interface Prevotes {
   currentWeight: number
-  missing: Hex[]
+  missing: string[]
 }
 
 // https://github.com/paritytech/substrate/blob/0ba251c/client/finality-grandpa/rpc/src/report.rs#L69
 export interface Precommits {
   currentWeight: number
-  missing: Hex[]
+  missing: string[]
 }
 
 // https://github.com/paritytech/substrate/blob/ded44948/client/finality-grandpa/rpc/src/notification.rs
 /** An encoded justification proving that the given header has been finalized */
-export type JustificationNotification = Hex
+export type JustificationNotification = string
 
 // https://github.com/paritytech/substrate/blob/ded44948/client/finality-grandpa/rpc/src/finality.rs
-export type EncodedFinalityProof = Hex
+export type EncodedFinalityProof = string
 
 // https://github.com/paritytech/substrate/blob/9b01569/client/finality-grandpa/rpc/src/lib.rs#L48
 export type GrandpaCalls = {

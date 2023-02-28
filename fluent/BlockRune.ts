@@ -1,8 +1,8 @@
+import { hex } from "../crypto/mod.ts"
 import * as M from "../frame_metadata/mod.ts"
 import { known } from "../rpc/mod.ts"
 import { ArrayRune, Rune } from "../rune/mod.ts"
 import { ValueRune } from "../rune/ValueRune.ts"
-import { hex, HexHash } from "../util/mod.ts"
 import { Chain, ChainRune } from "./ChainRune.ts"
 import { CodecRune } from "./CodecRune.ts"
 
@@ -10,7 +10,7 @@ export class BlockRune<out U, out C extends Chain = Chain> extends Rune<known.Si
   constructor(
     _prime: BlockRune<U, C>["_prime"],
     readonly chain: ChainRune<U, C>,
-    readonly hash: Rune<HexHash, U>,
+    readonly hash: Rune<string, U>,
   ) {
     super(_prime)
   }

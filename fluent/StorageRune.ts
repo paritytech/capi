@@ -1,7 +1,7 @@
+import { hex } from "../crypto/mod.ts"
 import * as $ from "../deps/scale.ts"
 import * as M from "../frame_metadata/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
-import { hex, HexHash } from "../util/mod.ts"
 import { CodecRune } from "./CodecRune.ts"
 import { PalletRune } from "./PalletRune.ts"
 
@@ -19,7 +19,7 @@ export class StorageRune<in out K extends unknown[], out V, out U> extends Rune<
     this.$value = this.pallet.metadata.codec(this.into(ValueRune).access("value"))
   }
 
-  size<X>(...[partialKey, blockHash]: RunicArgs<X, [partialKey?: unknown[], blockHash?: HexHash]>) {
+  size<X>(...[partialKey, blockHash]: RunicArgs<X, [partialKey?: unknown[], blockHash?: string]>) {
     return this.pallet.metadata.chain.connection
       .call(
         "state_getStorageSize",
@@ -35,7 +35,7 @@ export class StorageRune<in out K extends unknown[], out V, out U> extends Rune<
       count: number,
       partialKey?: unknown[],
       start?: unknown[],
-      blockHash?: HexHash,
+      blockHash?: string,
     ]>
   ) {
     const storageKeys = this.keyPageRaw(count, partialKey, start, blockHash)
@@ -51,7 +51,7 @@ export class StorageRune<in out K extends unknown[], out V, out U> extends Rune<
       count: number,
       partialKey?: unknown[],
       start?: unknown[],
-      blockHash?: HexHash,
+      blockHash?: string,
     ]>
   ) {
     return Rune
@@ -69,7 +69,7 @@ export class StorageRune<in out K extends unknown[], out V, out U> extends Rune<
       .unsafeAs<[K, V][]>()
   }
 
-  entryRaw<X>(...[key, blockHash]: RunicArgs<X, [key: K, blockHash?: HexHash]>) {
+  entryRaw<X>(...[key, blockHash]: RunicArgs<X, [key: K, blockHash?: string]>) {
     const storageKey = this.$key.encoded(key).map(hex.encode)
     return this.pallet.metadata.chain.connection
       .call("state_getStorage", storageKey, blockHash)
@@ -77,7 +77,7 @@ export class StorageRune<in out K extends unknown[], out V, out U> extends Rune<
       .rehandle(null, () => Rune.constant(undefined))
   }
 
-  entry<X>(...[key, blockHash]: RunicArgs<X, [key: K, blockHash?: HexHash]>) {
+  entry<X>(...[key, blockHash]: RunicArgs<X, [key: K, blockHash?: string]>) {
     return this.$value
       .decoded(this.entryRaw(key, blockHash).unhandle(undefined).map(hex.decode))
       .unsafeAs<V>()
@@ -90,7 +90,7 @@ export class StorageRune<in out K extends unknown[], out V, out U> extends Rune<
       count: number,
       partialKey?: unknown[],
       start?: unknown[],
-      blockHash?: HexHash,
+      blockHash?: string,
     ]>
   ) {
     const storageKey = this.$key
@@ -118,7 +118,7 @@ export class StorageRune<in out K extends unknown[], out V, out U> extends Rune<
       count: number,
       partialKey?: unknown[],
       start?: unknown[],
-      blockHash?: HexHash,
+      blockHash?: string,
     ]>
   ) {
     const raw = this.keyPageRaw(count, partialKey, start, blockHash)

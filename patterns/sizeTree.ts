@@ -1,8 +1,8 @@
-import { Chain, ChainRune, HexHash, MetaRune, Rune, RunicArgs, ValueRune } from "../mod.ts"
+import { Chain, ChainRune, MetaRune, Rune, RunicArgs, ValueRune } from "../mod.ts"
 
 export function sizeTree<U, C extends Chain, X>(
   chain: ChainRune<U, C>,
-  ...[blockHash]: RunicArgs<X, [blockHash?: HexHash]>
+  ...[blockHash]: RunicArgs<X, [blockHash?: string]>
 ) {
   const metadata = chain.metadata(blockHash)
   return metadata

@@ -1,4 +1,4 @@
-import { AccountId, Hash, Hex, NumberOrHex, SerdeEnum, SerdeResult } from "./utils.ts"
+import { AccountId, NumberOrHex, SerdeEnum, SerdeResult } from "./utils.ts"
 
 // https://github.com/paritytech/substrate/blob/0246883/frame/contracts/rpc/src/lib.rs#L92
 /** A struct that encodes RPC parameters required for a call to a smart-contract. */
@@ -8,7 +8,7 @@ export interface CallRequest {
   value: NumberOrHex
   gasLimit: NumberOrHex
   storageDepositLimit: NumberOrHex | undefined
-  inputData: Hex
+  inputData: string
 }
 
 // https://github.com/paritytech/substrate/blob/622f532/frame/contracts/common/src/lib.rs#L50
@@ -91,7 +91,7 @@ export interface ExecReturnValue {
   /** Flags passed along by `seal_return`. Empty when `seal_return` was never called. */
   flags: ReturnFlags
   /** Buffer passed along by `seal_return`. Empty when `seal_return` was never called. */
-  data: Hex
+  data: string
 }
 
 // https://github.com/paritytech/substrate/blob/dc22e48/primitives/runtime/src/lib.rs#L524
@@ -176,9 +176,9 @@ export type TransactionalError = SerdeEnum<{
 /** Reference to an existing code hash or a new wasm module */
 export type Code = SerdeEnum<{
   /** A wasm module as raw bytes. */
-  upload: Hex
+  upload: string
   /** The code hash of an on-chain wasm blob. */
-  existing: Hash
+  existing: string
 }>
 
 // https://github.com/paritytech/substrate/blob/0246883/frame/contracts/rpc/src/lib.rs#L105
@@ -189,15 +189,15 @@ export interface InstantiateRequest {
   gasLimit: NumberOrHex
   storageDepositLimit: NumberOrHex | undefined
   code: Code
-  data: Hex
-  salt: Hex
+  data: string
+  salt: string
 }
 
 // https://github.com/paritytech/substrate/blob/0246883/frame/contracts/rpc/src/lib.rs#L119
 /** A struct that encodes RPC parameters required for a call to upload a new code. */
 export interface CodeUploadRequest {
   origin: AccountId
-  code: Hex
+  code: string
   storageDepositLimit: NumberOrHex | undefined
 }
 
@@ -205,7 +205,7 @@ export interface CodeUploadRequest {
 /** The result of successfully uploading a contract. */
 export interface CodeUploadReturnValue {
   /** The key under which the new code is stored. */
-  codeHash: Hash
+  codeHash: string
   /** The deposit that was reserved at the caller. Is zero when the code already existed. */
   deposit: NumberOrHex
 }
@@ -232,7 +232,7 @@ export type ContractsCalls = {
    */
   contracts_call(
     callRequest: CallRequest,
-    at?: Hash,
+    at?: string,
   ): ContractResult<SerdeResult<ExecReturnValue, DispatchError>>
   /**
    * Instantiate a new contract.
@@ -255,7 +255,7 @@ export type ContractsCalls = {
    */
   contracts_upload_code(
     uploadRequest: CodeUploadRequest,
-    at?: Hash,
+    at?: string,
   ): SerdeResult<CodeUploadReturnValue, DispatchError>
   /**
    * Returns the value under a specified storage `key` in a contract given by `address` param,
@@ -263,7 +263,7 @@ export type ContractsCalls = {
    */
   contracts_getStorage(
     accountId: AccountId,
-    key: Hex,
-    aat?: Hash,
-  ): Hex | null
+    key: string,
+    aat?: string,
+  ): string | null
 }

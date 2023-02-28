@@ -1,5 +1,3 @@
-import { Hash, Hex } from "./utils.ts"
-
 // https://github.com/paritytech/substrate/blob/6c5ac31/primitives/merkle-mountain-range/src/lib.rs#L37
 /**
  * A type to describe leaf position in the MMR.
@@ -14,22 +12,22 @@ export type LeafIndex = number
 /** Retrieved MMR leaf and its proof. */
 export interface LeafProof {
   /** Block hash the proof was generated for. */
-  blockHash: Hash
+  blockHash: string
   /** SCALE-encoded leaf data. */
-  leaf: Hex
+  leaf: string
   /** SCALE-encoded proof data. See [sp_mmr_primitives::Proof]. */
-  proof: Hex
+  proof: string
 }
 
 // https://github.com/paritytech/substrate/blob/eddf888/frame/merkle-mountain-range/rpc/src/lib.rs#L72
 /** Retrieved MMR leaves and their proof. */
 export interface LeafBatchProof {
   /** Block hash the proof was generated for. */
-  blockHash: Hash
+  blockHash: string
   /** SCALE-encoded vector of `LeafData`. */
-  leaves: Hex
+  leaves: string
   /** SCALE-encoded proof data. See [sp_mmr_primitives::Proof]. */
-  proof: Hex
+  proof: string
 }
 
 // https://github.com/paritytech/substrate/blob/eddf888/frame/merkle-mountain-range/rpc/src/lib.rs#L99
@@ -44,7 +42,7 @@ export type MmrCalls = {
    * Returns the (full) leaf itself and a proof for this leaf (compact encoding, i.e. hash of
    * the leaf). Both parameters are SCALE-encoded.
    */
-  mmr_generateProof(leafIndex: LeafIndex, at?: Hash): LeafProof
+  mmr_generateProof(leafIndex: LeafIndex, at?: string): LeafProof
   /**
    * Generate MMR proof for the given leaf indices.
    *
@@ -57,5 +55,5 @@ export type MmrCalls = {
    * The order of entries in the `leaves` field of the returned struct
    * is the same as the order of the entries in `leaf_indices` supplied
    */
-  mmr_generateBatchProof(leafIndices: LeafIndex[], at?: Hash): LeafBatchProof
+  mmr_generateBatchProof(leafIndices: LeafIndex[], at?: string): LeafBatchProof
 }

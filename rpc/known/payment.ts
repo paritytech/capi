@@ -1,4 +1,4 @@
-import { Hash, Hex, NumberOrHex, SerdeEnum } from "./utils.ts"
+import { NumberOrHex, SerdeEnum } from "./utils.ts"
 
 // https://github.com/paritytech/substrate/blob/3e71d606b7d1e91d9c1701c0a443530eefca1a39/primitives/weights/src/weight_v2.rs#L29
 export interface Weight {
@@ -84,6 +84,6 @@ export interface InclusionFee {
 
 // https://github.com/paritytech/substrate/blob/eddf888/frame/transaction-payment/rpc/src/lib.rs#L41
 export type TransactionPaymentCalls = {
-  payment_queryInfo(extrinsic: Hex, at?: Hash): RuntimeDispatchInfo
-  payment_queryFeeDetails(extrinsic: Hex, at?: Hash): FeeDetails
+  payment_queryInfo(extrinsic: string, at?: string): RuntimeDispatchInfo
+  payment_queryFeeDetails(extrinsic: string, at?: string): FeeDetails
 }

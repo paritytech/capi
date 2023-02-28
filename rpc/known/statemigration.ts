@@ -1,5 +1,3 @@
-import { Hash } from "./utils.ts"
-
 // https://github.com/paritytech/substrate/blob/00cc5f1/utils/frame/rpc/state-trie-migration-rpc/src/lib.rs#L106
 export interface MigrationStatusResult {
   topRemainingToMigrate: number
@@ -15,5 +13,5 @@ export type StateMigrationCalls = {
    * won't change any state. Nonetheless it is a VERY costly call that should be
    * only exposed to trusted peers.
    */
-  state_trieMigrationStatus(at?: Hash): MigrationStatusResult
+  state_trieMigrationStatus(at?: string): MigrationStatusResult
 }

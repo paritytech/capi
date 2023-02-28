@@ -1,5 +1,5 @@
 import { ReadProof, StorageData, StorageKey } from "./childstate.ts"
-import { Hash, Hex, SerdeEnum, Subscription } from "./utils.ts"
+import { SerdeEnum, Subscription } from "./utils.ts"
 
 // https://github.com/paritytech/substrate/blob/01a3ad65/primitives/version/src/lib.rs#L161
 /**
@@ -50,7 +50,7 @@ export interface RuntimeVersion {
    */
   implVersion: number
   /** List of supported API "features" along with their versions. */
-  apis: [Hash, Hex | undefined][]
+  apis: [string, string | undefined][]
   /**
    * All existing dispatches are fully compatible when this number doesn't change. If this
    * number changes, then `spec_version` must change, also.
@@ -74,7 +74,7 @@ export interface RuntimeVersion {
 /** Storage change set */
 export interface StorageChangeSet {
   /** Block hash */
-  block: Hash
+  block: string
   /** A list of changes */
   changes: [StorageKey, StorageData | null][]
 }
@@ -98,9 +98,9 @@ export interface TraceError {
 // https://github.com/paritytech/substrate/blob/ded44948/primitives/rpc/src/tracing.rs#L27
 export interface BlockTrace {
   /** Hash of the block being traced */
-  blockHash: Hash
+  blockHash: string
   /** Parent hash */
-  parentHash: Hash
+  parentHash: string
   /**
    * Module targets that were recorded by the tracing subscriber.
    * Empty string means record all targets.
@@ -162,15 +162,15 @@ export interface Span {
 // https://github.com/paritytech/substrate/blob/28ac0a8/client/rpc-api/src/state/mod.rs#L35
 export type StateCalls = {
   /** Call a contract at a block's state. */
-  state_call(name: string, bytes: Hex, at?: Hash): Hex
+  state_call(name: string, bytes: string, at?: string): string
   state_callAt: StateCalls["state_call"]
   /**
    * Returns the keys with prefix, leave empty to get all the keys.
    * @deprecated [2.0.0] Please use `getKeysPaged` with proper paging support
    */
-  state_getKeys(prefix: StorageKey, at?: Hash): StorageKey[]
+  state_getKeys(prefix: StorageKey, at?: string): StorageKey[]
   /** Returns the keys with prefix, leave empty to get all the keys */
-  state_getPairs(prefix: StorageKey, at?: Hash): [StorageKey, StorageData][]
+  state_getPairs(prefix: StorageKey, at?: string): [StorageKey, StorageData][]
   /**
    * Returns the keys with prefix with pagination support.
    * Up to `count` keys will be returned.
@@ -180,22 +180,22 @@ export type StateCalls = {
     prefix: StorageKey | null,
     count: number,
     startKey?: StorageKey,
-    at?: Hash,
+    at?: string,
   ): StorageKey[]
   state_getKeysPagedAt: StateCalls["state_getKeysPaged"]
   /** Returns a storage entry at a specific block's state. */
-  state_getStorage(key: StorageKey, at?: Hash): StorageData | null
+  state_getStorage(key: StorageKey, at?: string): StorageData | null
   state_getStorageAt: StateCalls["state_getStorage"]
   /** Returns the hash of a storage entry at a block's state. */
-  state_getStorageHash(key: StorageKey, at?: Hash): Hash | null
+  state_getStorageHash(key: StorageKey, at?: string): string | null
   state_getStorageHashAt: StateCalls["state_getStorageHash"]
   /** Returns the size of a storage entry at a block's state. */
-  state_getStorageSize(key: StorageKey, at?: Hash): number | null
+  state_getStorageSize(key: StorageKey, at?: string): number | null
   state_getStorageSizeAt: StateCalls["state_getStorageSize"]
   /** Returns the runtime metadata as an opaque blob. */
-  state_getMetadata(at?: Hash): Hex
+  state_getMetadata(at?: string): string
   /** Get the runtime version. */
-  state_getRuntimeVersion(at?: Hash): RuntimeVersion
+  state_getRuntimeVersion(at?: string): RuntimeVersion
   chain_getRuntimeVersion: StateCalls["state_getRuntimeVersion"]
   /**
    * Query historical storage entries (by key) starting from a block given as the second
@@ -204,11 +204,11 @@ export type StateCalls = {
    * NOTE This first returned result contains the initial state of storage for all keys.
    * Subsequent values in the vector represent changes to the previous state (diffs).
    */
-  state_queryStorage(keys: StorageKey[], block: Hash, at?: Hash): StorageChangeSet[]
+  state_queryStorage(keys: StorageKey[], block: string, at?: string): StorageChangeSet[]
   /** Query storage entries (by key) starting at block hash given as the second parameter. */
-  state_queryStorageAt(keys: StorageKey[], at?: Hash): StorageChangeSet[]
+  state_queryStorageAt(keys: StorageKey[], at?: string): StorageChangeSet[]
   /** Returns proof of storage entries at a specific block's state. */
-  state_getReadProof(keys: StorageKey[], at?: Hash): ReadProof
+  state_getReadProof(keys: StorageKey[], at?: string): ReadProof
 }
 
 export type StateSubscriptions = {
@@ -221,7 +221,7 @@ export type StateSubscriptions = {
   ): Subscription<"state_unsubscribeStorage", StorageChangeSet>
   /** See https://paritytech.github.io/substrate/master/sc_rpc_api/state/trait.StateApiServer.html#tymethod.trace_block */
   state_traceBlock(
-    block: Hash,
+    block: string,
     targets?: string,
     storageKeys?: string,
     methods?: string,

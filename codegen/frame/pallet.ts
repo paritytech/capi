@@ -1,7 +1,7 @@
+import { hex } from "../../crypto/mod.ts"
 import { Pallet } from "../../frame_metadata/mod.ts"
 import { Ty, UnionTyDef } from "../../scale_info/mod.ts"
 import { normalizeIdent } from "../../util/case.ts"
-import { hex } from "../../util/mod.ts"
 import { File } from "./File.ts"
 import { FrameCodegen } from "./FrameCodegen.ts"
 import { getRawCodecPath, makeDocComment, S } from "./util.ts"
@@ -52,7 +52,7 @@ export function pallet(ctx: FrameCodegen, pallet: Pallet) {
           ctx.typeVisitor.visit(constant.ty)
         } = codecs.$${constant.ty.id}.decode(C.hex.decode(${
           S.string(hex.encode(constant.value))
-        } as C.Hex))`,
+        }))`,
     )
     constant.value
   }

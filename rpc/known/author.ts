@@ -1,4 +1,4 @@
-import { Hash, Hex, SerdeEnum, Subscription } from "./utils.ts"
+import { SerdeEnum, Subscription } from "./utils.ts"
 
 // https://github.com/paritytech/substrate/blob/e0ccd00/client/transaction-pool/api/src/lib.rs#L104
 /**
@@ -57,21 +57,21 @@ export type TransactionStatus = SerdeEnum<{
   /** The transaction has been broadcast to the given peers. */
   broadcast: string[]
   /** Transaction has been included in block with given hash. */
-  inBlock: Hash
+  inBlock: string
   /** The block this transaction was included in has been retracted. */
-  retracted: Hash
+  retracted: string
   /**
    * Maximum number of finality watchers has been reached,
    * old watchers are being removed.
    */
-  finalityTimeout: Hash
+  finalityTimeout: string
   /** Transaction has been finalized by a finality-gadget, e.g GRANDPA */
-  finalized: Hash
+  finalized: string
   /**
    * Transaction has been replaced in the pool, by another transaction
    * that provides the same tags. (e.g. same (sender, nonce)).
    */
-  usurped: Hash
+  usurped: string
   /** Transaction has been dropped from the pool because of the limit. */
   dropped: void
   /** Transaction is no longer valid in the current state. */
@@ -96,34 +96,34 @@ export namespace TransactionStatus {
  */
 export type ExtrinsicOrHash = SerdeEnum<{
   /** The hash of the extrinsic. */
-  hash: Hash
+  hash: string
   /** Raw extrinsic bytes. */
-  extrinsic: Hex
+  extrinsic: string
 }>
 
 // https://github.com/paritytech/substrate/blob/e0ccd00/client/rpc-api/src/author/mod.rs#L30
 export type AuthorCalls = {
   /** Submit hex-encoded extrinsic for inclusion in block. */
-  author_submitExtrinsic(extrinsic: Hex): Hash
+  author_submitExtrinsic(extrinsic: string): string
   /** Insert a key into the keystore. */
-  author_insertKey(keyType: string, suri: string, publicKey: Hex): null
+  author_insertKey(keyType: string, suri: string, publicKey: string): null
   /** Generate new session keys and returns the corresponding public keys. */
-  author_rotateKeys(): Hex
+  author_rotateKeys(): string
   /**
    * Checks if the keystore has private keys for the given session public keys.
    * `sessionKeys` is the SCALE encoded session keys object from the runtime.
    * Returns `true` iff all private keys could be found.
    */
-  author_hasSessionKeys(sessionsKeys: Hex): boolean
+  author_hasSessionKeys(sessionsKeys: string): boolean
   /**
    * Checks if the keystore has private keys for the given public key and key type.
    * Returns `true` if a private key could be found.
    */
-  author_hasKey(pubKey: Hex, keyType: string): boolean
+  author_hasKey(pubKey: string, keyType: string): boolean
   /** Returns all pending extrinsics, potentially grouped by sender.  */
-  author_pendingExtrinsics(): Hex[]
+  author_pendingExtrinsics(): string[]
   /** Remove given extrinsic from the pool and temporarily ban it to prevent reimporting. */
-  author_removeExtrinsic(extrinsics: ExtrinsicOrHash[]): Hex[] // todo
+  author_removeExtrinsic(extrinsics: ExtrinsicOrHash[]): string[] // todo
 }
 
 export type AuthorSubscriptions = {
@@ -134,6 +134,6 @@ export type AuthorSubscriptions = {
    * transaction life cycle.
    */
   author_submitAndWatchExtrinsic(
-    extrinsic: Hex,
+    extrinsic: string,
   ): Subscription<"author_unwatchExtrinsic", TransactionStatus>
 }

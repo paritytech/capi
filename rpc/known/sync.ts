@@ -1,5 +1,4 @@
 import { ChainType } from "./system.ts"
-import { Hash, Hex } from "./utils.ts"
 
 // https://github.com/paritytech/substrate/blob/a7ba55d3/client/chain-spec/src/chain_spec.rs#L161
 /** A configuration of a client. Does not include runtime storage initialization. */
@@ -29,12 +28,12 @@ export interface ChainSpec {
    * The given `wasm_code` will be used to substitute the on-chain wasm code starting with the
    * given block number until the `spec_version` on chain changes.
    */
-  codeSubstitutes: Record<string, Hex>
+  codeSubstitutes: Record<string, string>
   // Extensions, flattened into this structure by Serde: https://github.com/paritytech/substrate/blob/409167ef/bin/node/cli/src/chain_spec.rs#L55
   /** Block numbers with known hashes. */
   forkBlocks: null | string
   /** Known bad block hashes. */
-  badBlocks: null | Hash[]
+  badBlocks: null | string[]
   /** The light sync state extension used by the sync-state rpc. */
   lightSyncState: LightSyncState
 }
@@ -47,20 +46,20 @@ export interface GenesisSource {
 // https://github.com/paritytech/substrate/blob/a7ba55d3/client/chain-spec/src/chain_spec.rs#L142
 /** Raw storage content for genesis block. */
 export interface RawGenesis {
-  top: Hex[]
-  childrenDefault: Hex[]
+  top: string[]
+  childrenDefault: string[]
 }
 
 // https://github.com/paritytech/substrate/blob/eddf8883/client/sync-state-rpc/src/lib.rs#L111
 export interface LightSyncState {
   /** The header of the best finalized block. */
-  finalizedBlockHeader: Hex
+  finalizedBlockHeader: string
   /** The epoch changes tree for babe. */
-  babeEpochChanges: Hex
+  babeEpochChanges: string
   /** The babe weight of the finalized block. */
   babeFinalizedBlockWeight: number
   /** The authority set for grandpa. */
-  grandpaAuthoritySet: Hex
+  grandpaAuthoritySet: string
 }
 
 // https://github.com/paritytech/substrate/blob/eddf8883/client/sync-state-rpc/src/lib.rs#L128

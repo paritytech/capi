@@ -1,10 +1,8 @@
+import { hashers, hex, ss58 } from "../crypto/mod.ts"
 import * as M from "../frame_metadata/mod.ts"
 import { MultiAddress, Signer } from "../primitives/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { Era, era } from "../scale_info/mod.ts"
-import { Blake2_256 } from "../util/hashers.ts"
-import * as U from "../util/mod.ts"
-import { HexHash } from "../util/mod.ts"
 import { Chain, ChainRune } from "./ChainRune.ts"
 import { CodecRune } from "./CodecRune.ts"
 import { SignedExtrinsicRune } from "./SignedExtrinsicRune.ts"
@@ -16,7 +14,7 @@ export interface ExtrinsicSender {
 
 export interface SignedExtrinsicProps {
   sender: ExtrinsicSender
-  checkpoint?: U.HexHash
+  checkpoint?: string
   mortality?: Era
   nonce?: number
   tip?: bigint
@@ -29,7 +27,7 @@ export class ExtrinsicRune<out U, out C extends Chain = Chain> extends Rune<Chai
     super(_prime)
     const metadata = this.chain.metadata()
     this.hash = Rune.rec({ metadata, deriveCodec: metadata.deriveCodec })
-      .map((x) => Blake2_256.$hash(M.$call(x)))
+      .map((x) => hashers.Blake2_256.$hash(M.$call(x)))
       .into(CodecRune)
       .encoded(this)
   }
@@ -57,21 +55,21 @@ export class ExtrinsicRune<out U, out C extends Chain = Chain> extends Rune<Chai
       .map(([addrPrefix, sender]) => {
         switch (sender.address.type) {
           case "Id": {
-            return U.ss58.encode(addrPrefix, sender.address.value)
+            return ss58.encode(addrPrefix, sender.address.value)
           }
           default: {
             throw new Error("unimplemented")
           }
         }
       })
-      .throws(U.ss58.InvalidPublicKeyLengthError, U.ss58.InvalidNetworkPrefixError)
+      .throws(ss58.InvalidPublicKeyLengthError, ss58.InvalidNetworkPrefixError)
     // TODO: handle props.nonce resolving to undefined
     const nonce = props.nonce ?? this.chain.connection.call("system_accountNextIndex", senderSs58)
-    const genesisHashHex = this.chain.connection.call("chain_getBlockHash", 0).unsafeAs<HexHash>()
+    const genesisHashHex = this.chain.connection.call("chain_getBlockHash", 0).unsafeAs<string>()
       .into(ValueRune)
-    const genesisHash = genesisHashHex.map(U.hex.decode)
+    const genesisHash = genesisHashHex.map(hex.decode)
     const checkpointHash = Rune.tuple([props.checkpoint, genesisHashHex]).map(([a, b]) => a ?? b)
-      .map(U.hex.decode)
+      .map(hex.decode)
     const mortality = Rune.resolve(props.mortality).map((x) => x ?? era.immortal)
     const tip = Rune.resolve(props.tip).map((x) => x ?? 0n)
     const extra = Rune.tuple([mortality, nonce, tip])
@@ -106,7 +104,7 @@ export class ExtrinsicRune<out U, out C extends Chain = Chain> extends Rune<Chai
   }
 
   feeEstimate() {
-    const extrinsicHex = this.encoded().map(U.hex.encodePrefixed)
+    const extrinsicHex = this.encoded().map(hex.encodePrefixed)
     return this.chain.connection.call("payment_queryInfo", extrinsicHex)
       .map(({ weight, ...rest }) => ({
         ...rest,

@@ -1,5 +1,5 @@
+import { ss58 } from "../crypto/mod.ts"
 import { Rune, ValueRune } from "../rune/mod.ts"
-import { ss58 } from "../util/mod.ts"
 import { AddressRune } from "./AddressRune.ts"
 import { Chain, ChainRune } from "./ChainRune.ts"
 

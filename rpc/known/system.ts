@@ -1,4 +1,4 @@
-import { Hash, SerdeEnum } from "./utils.ts"
+import { SerdeEnum } from "./utils.ts"
 
 // https://github.com/paritytech/substrate/blob/57e3486/client/chain-spec/src/lib.rs#L198
 /**
@@ -41,7 +41,7 @@ export interface PeerInfo {
   /** Roles */
   roles: string
   /** Peer best block hash */
-  best_hash: Hash
+  best_hash: string
   /** Peer best block number */
   best_number: number
 }
