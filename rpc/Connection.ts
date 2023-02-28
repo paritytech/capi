@@ -99,9 +99,8 @@ export abstract class Connection {
     if (typeof message.id === "number") {
       this.callResultPendings[message.id]?.resolve(message)
       delete this.callResultPendings[message.id]
-      if (!message.error && this.subscriptionPendingInits[message.id]) {
-        this.subscriptionPendingInits[message.id]!(message.result as string)
-      }
+      const init = this.subscriptionPendingInits[message.id]
+      if (!message.error && init) init(message.result as string)
     } else if (message.params) {
       this.subscriptionHandlers[message.params.subscription]?.(message)
     } else {
