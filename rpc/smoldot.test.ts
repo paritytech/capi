@@ -1,4 +1,6 @@
 import { deferred } from "../deps/std/async.ts"
+import { assertEquals } from "../deps/std/testing/asserts.ts"
+import { RpcSubscriptionMessage } from "./rpc_messages.ts"
 import { SmoldotConnection } from "./smoldot.ts"
 
 Deno.test({
@@ -9,32 +11,24 @@ Deno.test({
     const relayChainSpec = await fetchText(
       "https://raw.githubusercontent.com/paritytech/substrate-connect/main/packages/connect/src/connector/specs/polkadot.json",
     )
-
     const connection = new SmoldotConnection({
       relayChainSpec,
     })
-
     await connection.ready()
-
     const controller = new AbortController()
-
-    const pending = deferred()
-
+    const pendingMessage = deferred<RpcSubscriptionMessage>()
     connection.subscription(
       "chainHead_unstable_follow",
       "chainHead_unstable_unfollow",
       [false],
       (message) => {
-        console.log({ message })
-        pending.resolve()
+        controller.abort()
+        pendingMessage.resolve(message)
       },
       controller.signal,
     )
-
-    await pending
-    controller.abort()
-
-    // await delay(60 * 1000)
+    const message = await pendingMessage
+    assertEquals((await message.params?.result as any).event, "initialized")
   },
 })
 
