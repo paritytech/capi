@@ -59,9 +59,18 @@ Deno.test({
       assertEquals((await message.params?.result as any).event, "initialized")
     })
 
-    await t.step("invalid chain spec", async () => {
-      await assertRejects(async () => new SmoldotConnection({ relayChainSpec: "" }), AddChainError)
-    })
+    await t.step(
+      "invalid chain spec",
+      async () => {
+        await assertRejects(
+          async () => {
+            const connection = new SmoldotConnection({ relayChainSpec: "" })
+            return connection.smoldotChainPending
+          },
+          AddChainError,
+        )
+      },
+    )
   },
 })
 
