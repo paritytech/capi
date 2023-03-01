@@ -1,4 +1,4 @@
-// moderate --exclude cache port.ts tsFormatter.ts"
+// moderate --exclude cache port.ts tsFormatter.ts
 
 export * from "./case.ts"
 export * from "./clock.ts"
