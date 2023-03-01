@@ -40,6 +40,7 @@
     "dev": "deno run -A --watch=deno.jsonc,docs/ main.ts --serve",
     "capi": "deno run -A main.ts --dbg",
     "cache": "deno task capi -- deno cache -r=http://localhost:4646/",
-    "star": "deno task run _tasks/star.ts"
+    "star": "deno task run _tasks/star.ts",
+    "run": "deno task capi -- deno run -A -r=http://localhost:4646/"
   }
 }
