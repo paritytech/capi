@@ -25,14 +25,11 @@ Deno.test("examples", async (t) => {
     return t.step({
       name: name,
       async fn() {
-        const command = new Deno.Command(
-          Deno.execPath(),
-          {
-            args: ["run", "-A", "-r=http://localhost:4646/", `${dir}/${name}`],
-            stdout: "piped",
-            stderr: "piped",
-          },
-        )
+        const command = new Deno.Command(Deno.execPath(), {
+          args: ["run", "-A", "-r=http://localhost:4646/", `${dir}/${name}`],
+          stdout: "piped",
+          stderr: "piped",
+        })
         const task = command.spawn()
         const out = new Buffer()
         await Promise.all([
