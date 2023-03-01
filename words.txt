@@ -117,6 +117,7 @@ multiasset
 multichain
 multilocation
 multisigs
+multistash
 multistep
 neatcoin
 neer
