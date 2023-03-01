@@ -58,7 +58,7 @@ export class VirtualMultisigRune<out U, out C extends Chain = Chain>
       )
   }
 
-  fundSenderProxy<X>(...[senderAddr, amount]: RunicArgs<X, [Uint8Array, bigint]>) {
+  fundMemberProxy<X>(...[senderAddr, amount]: RunicArgs<X, [Uint8Array, bigint]>) {
     return Rune
       .rec({
         type: "Balances",
@@ -102,9 +102,9 @@ export class VirtualMultisigRune<out U, out C extends Chain = Chain>
       .into(ExtrinsicRune, this.chain)
   }
 
-  static fromHex<U, X>(chain: ChainRune<U, any>, ...[hexStr]: RunicArgs<X, [string]>) {
+  static hydrate<U, X>(chain: ChainRune<U, any>, ...[state]: RunicArgs<X, [state: string]>) {
     return Rune
-      .resolve(hexStr)
+      .resolve(state)
       .map((s) => $virtualMultisig.decode(hex.decode(s)))
       .into(VirtualMultisigRune, chain)
   }
