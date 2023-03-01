@@ -3,21 +3,18 @@ import { VirtualMultisigRune } from "capi/patterns/multisig/mod.ts"
 import { Balances, chain, System } from "polkadot_dev/mod.ts"
 import { parse } from "../deps/std/flags.ts"
 
-let { stateHex } = parse(Deno.args, { string: ["stateHex"] })
-if (!stateHex) {
-  stateHex = await VirtualMultisigRune
-    .deployment(chain, {
-      signatories: [alice.publicKey, bob.publicKey, charlie.publicKey],
-      threshold: 2,
-      deployer: alice,
-    })
-    .hex
-    .run()
+let { state } = parse(Deno.args, { string: ["state"] })
+if (!state) {
+  state = await VirtualMultisigRune.deployment(chain, {
+    founders: [alice.publicKey, bob.publicKey, charlie.publicKey],
+    threshold: 2,
+    deployer: alice,
+  }).hex.run()
 }
 
-console.log(`Virtual multisig state hex: ${stateHex}`)
+console.log(`Virtual multisig state hex: ${state}`)
 
-const vMultisig = VirtualMultisigRune.fromHex(chain, stateHex)
+const vMultisig = VirtualMultisigRune.fromHex(chain, state)
 
 const fundStash = Balances
   .transfer({
