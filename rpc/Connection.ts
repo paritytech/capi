@@ -51,10 +51,14 @@ export abstract class Connection {
 
   protected abstract close(): void
 
-  callResultPendings: Record<number, Deferred<RpcCallMessage>> = {}
   async call(method: string, params: unknown[]) {
-    await this.ready()
     const id = this.nextId++
+    return this.#call(id, method, params)
+  }
+
+  callResultPendings: Record<number, Deferred<RpcCallMessage>> = {}
+  async #call(id: number, method: string, params: unknown[]) {
+    await this.ready()
     const pending = deferred<RpcCallMessage>()
     this.callResultPendings[id] = pending
     this.send(id, method, params)
@@ -62,6 +66,7 @@ export abstract class Connection {
   }
 
   subscriptionHandlers: Record<string, RpcSubscriptionHandler> = {}
+  subscriptionPendingInits: Record<number, (subscriptionId: string) => void> = {}
   async subscription(
     subscribe: string,
     unsubscribe: string,
@@ -69,21 +74,33 @@ export abstract class Connection {
     handler: RpcSubscriptionHandler,
     signal: AbortSignal,
   ) {
-    const message = await this.call(subscribe, params)
-    if (signal.aborted) return
-    if (message.error) return handler(message)
-    const subscriptionId = message.result as string
-    this.subscriptionHandlers[subscriptionId] = handler
-    signal.addEventListener("abort", () => {
-      delete this.subscriptionHandlers[subscriptionId]
-      this.send(this.nextId++, unsubscribe, [subscriptionId])
-    })
+    const id = this.nextId++
+    this.subscriptionPendingInits[id] = (subscriptionId) => {
+      delete this.subscriptionPendingInits[id]
+      if (signal.aborted) return
+      signal.addEventListener("abort", () => {
+        delete this.subscriptionHandlers[subscriptionId]
+        this.send(this.nextId++, unsubscribe, [subscriptionId])
+      })
+      this.subscriptionHandlers[subscriptionId] = handler
+    }
+    const message = await this.#call(id, subscribe, params)
+    if (signal.aborted) {
+      delete this.subscriptionPendingInits[id]
+      return
+    }
+    if (message.error) {
+      delete this.subscriptionPendingInits[id]
+      return handler(message)
+    }
   }
 
   handle(message: RpcIngressMessage) {
     if (typeof message.id === "number") {
       this.callResultPendings[message.id]?.resolve(message)
       delete this.callResultPendings[message.id]
+      const init = this.subscriptionPendingInits[message.id]
+      if (!message.error && init) init(message.result as string)
     } else if (message.params) {
       this.subscriptionHandlers[message.params.subscription]?.(message)
     } else {
