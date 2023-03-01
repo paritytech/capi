@@ -1,3 +1,4 @@
+import { equals } from "../../deps/std/bytes.ts"
 import {
   $,
   Chain,
@@ -86,18 +87,19 @@ export class VirtualMultisigRune<out U, out C extends Chain = Chain>
       }).unsafeAs<Chain.Call<C>>(),
     )
 
-    return Rune.rec({
-      type: "Proxy",
-      value: Rune.rec({
-        type: "proxy",
-        real: sender,
-        forceProxyType: undefined,
-        call: this.inner.ratify({
-          call: call_,
-          sender,
+    return Rune
+      .rec({
+        type: "Proxy",
+        value: Rune.rec({
+          type: "proxy",
+          real: sender,
+          forceProxyType: undefined,
+          call: this.inner.ratify({
+            call: call_,
+            sender,
+          }),
         }),
-      }),
-    })
+      })
       .unsafeAs<Chain.Call<C>>()
       .into(ExtrinsicRune, this.chain)
   }
@@ -122,7 +124,7 @@ export class VirtualMultisigRune<out U, out C extends Chain = Chain>
         () => chain.metadata().pallet("Balances").const("ExistentialDeposit").decoded,
       )
     const memberAccountIds = Rune.resolve(props.founders)
-    const configurator = Rune.resolve(props.deployer)
+    const deployer = Rune.resolve(props.deployer)
     const membersCount = memberAccountIds.map((members) => members.length)
     const proxyCreationCalls = membersCount.map((n) =>
       Rune.array(Array.from({ length: n + 1 }, (_, index) =>
@@ -144,7 +146,7 @@ export class VirtualMultisigRune<out U, out C extends Chain = Chain>
           calls: proxyCreationCalls,
         }),
       }))
-      .signed({ sender: configurator })
+      .signed({ sender: deployer })
       .sent()
       .dbgStatus("Proxy creation:")
       .finalizedEvents()
@@ -212,29 +214,32 @@ export class VirtualMultisigRune<out U, out C extends Chain = Chain>
           calls: existentialDepositCalls,
         }),
       }))
-      .signed({ sender: configurator })
+      .signed({ sender: deployer })
       .sent()
       .dbgStatus("Existential deposits:")
       .finalized()
 
     const ownershipSwapCalls = Rune
-      .tuple([configurator, memberAccountIds, memberProxies, stashProxy, multisig.address])
-      .map(([configurator, memberAccountIds, memberProxies, stashProxy, multisigAddress]) =>
+      .tuple([deployer, memberAccountIds, memberProxies, stashProxy, multisig.address])
+      .map(([deployer, memberAccountIds, memberProxies, stashProxy, multisigAddress]) =>
         Rune.array([
           ...replaceDelegateCalls(
             chain,
             MultiAddress.Id(stashProxy),
-            configurator.address,
+            deployer.address,
             multisigAddress,
           ),
-          ...memberProxies.flatMap((proxy, i) =>
-            replaceDelegateCalls(
-              chain,
-              MultiAddress.Id(proxy),
-              configurator.address,
-              MultiAddress.Id(memberAccountIds[i]!),
-            )
-          ),
+          // TODO: ensure that this supports other address types / revisit source of deployer accountId
+          ...memberProxies
+            .filter((_, i) => !equals(memberAccountIds[i]!, deployer.address.value!))
+            .flatMap((proxy, i) =>
+              replaceDelegateCalls(
+                chain,
+                MultiAddress.Id(proxy),
+                deployer.address,
+                MultiAddress.Id(memberAccountIds[i]!),
+              )
+            ),
         ])
       )
       .into(MetaRune)
@@ -247,7 +252,7 @@ export class VirtualMultisigRune<out U, out C extends Chain = Chain>
           calls: ownershipSwapCalls,
         }),
       }))
-      .signed({ sender: configurator })
+      .signed({ sender: deployer })
       .sent()
       .dbgStatus("Ownership swaps:")
       .finalized()
