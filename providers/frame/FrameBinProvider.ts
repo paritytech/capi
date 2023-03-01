@@ -45,9 +45,7 @@ export abstract class FrameBinProvider extends FrameProxyProvider {
       stderr: "piped",
     })
     const process = command.spawn()
-    this.env.signal.addEventListener("abort", async () => {
-      process.kill("SIGINT")
-    })
+    this.env.signal.addEventListener("abort", () => process.kill("SIGINT"))
     return process
   }
 
@@ -58,8 +56,8 @@ export abstract class FrameBinProvider extends FrameProxyProvider {
         args: [this.bin],
         stdout: "piped",
       })
-      const binPathBytes = await whichProcess.output()
-      if (!binPathBytes.stdout.length) {
+      const { stdout } = await whichProcess.output()
+      if (!stdout.length) {
         throw new Error(
           `No such bin "${this.bin}" in path. Installation instructions can be found here: "${this.installation}"`,
         )
