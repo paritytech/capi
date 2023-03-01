@@ -36,7 +36,7 @@ export class MultisigRune<out U, out C extends Chain = Chain> extends Rune<Multi
     super(_prime)
     this.storage = this.chain.metadata().pallet("Multisig").storage("Multisigs")
     const v = this.into(ValueRune)
-    this.threshold = v.map(({ threshold, signatories }) => threshold ?? signatories.length)
+    this.threshold = v.map(({ threshold, signatories }) => threshold ?? signatories.length - 1)
     this.accountId = Rune.fn(multisigAccountId).call(v.access("signatories"), this.threshold)
     this.address = this.accountId.map(MultiAddress.Id)
   }
