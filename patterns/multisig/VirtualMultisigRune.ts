@@ -44,15 +44,14 @@ export class VirtualMultisigRune<out U, out C extends Chain = Chain>
     this.proxies = v.access("signatoriesMap")
       .map((arr) => arr.map((a, i) => [hex.encode(a[0]), i] as const))
       .map((a) => Object.fromEntries(a))
+
+    this.inner = Rune.rec({
+      signatories: v.access("signatoriesMap").map((arr) => arr.map((a) => a[1])),
+      threshold: v.access("threshold"),
+    }).into(MultisigRune, chain)
+
     this.encoded = v.map((m) => $virtualMultisig.encode(m))
     this.hex = this.encoded.map(hex.encode)
-
-    const signatories = v.access("signatoriesMap").map((arr) => arr.map((a) => a[1]))
-    const threshold = v.access("threshold")
-    this.inner = Rune.rec({
-      signatories: signatories,
-      threshold: threshold,
-    }).into(MultisigRune, chain)
   }
 
   proxyBySenderAddr<X>(...[senderAddr]: RunicArgs<X, [Uint8Array]>) {
