@@ -27,7 +27,15 @@ export class ZombienetProvider extends FrameBinProvider {
       const zombiecache = await Deno.realPath(await Deno.makeTempDir({ prefix: `capi_zombienet_` }))
       const networkManifestPath = path.join(zombiecache, "zombie.json")
       const network = this.network(zombiecache, networkManifestPath)
-      const args: string[] = ["-p", "native", "-d", zombiecache, "-f", "spawn", configPath]
+      const args: string[] = [
+        "-p",
+        "native",
+        "-d",
+        zombiecache,
+        "-f",
+        "spawn",
+        await this.#getConfigPath(configPath),
+      ]
       await this.runBin(args)
       return await network
     })
@@ -45,6 +53,12 @@ export class ZombienetProvider extends FrameBinProvider {
       }
     }
     return unreachable()
+  }
+
+  async #getConfigPath(configPath: string): Promise<string> {
+    const configWithSnapshotPath = path.join("zombienet-db-snapshots", path.basename(configPath))
+    const stat = await Deno.stat(configWithSnapshotPath)
+    return stat.isFile ? configWithSnapshotPath : configPath
   }
 }
 
