@@ -40,7 +40,7 @@ export class ExtrinsicEventsRune<
   }
 }
 
-export class ExtrinsicError<D> extends Error {
+export class ExtrinsicError<D extends { type: string }> extends Error {
   override readonly name = "ExtrinsicError"
 
   constructor(data: D) {
