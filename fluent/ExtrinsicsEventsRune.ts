@@ -1,6 +1,7 @@
 import { isSystemExtrinsicFailedEvent, SystemExtrinsicFailedEvent } from "../primitives/mod.ts"
 import { Rune, ValueRune } from "../rune/mod.ts"
 import { Chain } from "./ChainRune.ts"
+import { CodecRune } from "./CodecRune.ts"
 import { EventsRune } from "./EventsRune.ts"
 
 export class ExtrinsicEventsRune<
@@ -29,12 +30,12 @@ export class ExtrinsicEventsRune<
         dispatchError.access("index"),
       ])
       .map(([pallets, i]) => pallets.find((pallet) => pallet.i === i)!)
-    const $error = Rune
+    return Rune
       .tuple([metadata.deriveCodec, pallet])
       .map(([deriveCodec, pallet]) => deriveCodec(pallet.error!))
-    return Rune
-      .tuple([$error, dispatchError.access("error")])
-      .map(([$error, data]) => new ExtrinsicError($error.decode(data)))
+      .into(CodecRune)
+      .decoded(dispatchError.access("error"))
+      .map((data) => new ExtrinsicError((typeof data === "string" ? { type: data } : data) as any))
       .unhandle(ExtrinsicError)
       .rehandle(undefined, () => this /* TODO: type-level exclusions? */)
   }
