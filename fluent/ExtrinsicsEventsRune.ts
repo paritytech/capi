@@ -19,7 +19,7 @@ export class ExtrinsicEventsRune<
       .access("event", "value", "dispatchError")
       .map((dispatchError) => {
         if (dispatchError.type === "Module") return dispatchError.value
-        return new ExtrinsicError(dispatchError.type)
+        return new ExtrinsicError(dispatchError)
       })
       .unhandle(ExtrinsicError)
     const metadata = this.chain.metadata()
