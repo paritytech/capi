@@ -20,26 +20,30 @@ const fundMultisig = Balances
   .dbgStatus("Fund Multisig:")
   .finalized()
 
-const aliceRatify = multisig.ratify({
-  call: Proxy.createPure({
-    proxyType: "Any",
-    delay: 0,
-    index: 0,
-  }),
-  sender: alice.address,
-}).signed({ sender: alice })
+const aliceRatify = multisig
+  .ratify({
+    call: Proxy.createPure({
+      proxyType: "Any",
+      delay: 0,
+      index: 0,
+    }),
+    sender: alice.address,
+  })
+  .signed({ sender: alice })
   .sent()
   .dbgStatus("Alice Ratify:")
   .finalized()
 
-const bobRatify = multisig.ratify({
-  call: Proxy.createPure({
-    proxyType: "Any",
-    delay: 0,
-    index: 0,
-  }),
-  sender: bob.address,
-}).signed({ sender: bob })
+const bobRatify = multisig
+  .ratify({
+    call: Proxy.createPure({
+      proxyType: "Any",
+      delay: 0,
+      index: 0,
+    }),
+    sender: bob.address,
+  })
+  .signed({ sender: bob })
   .sent()
   .dbgStatus("Bob Ratify:")
 
