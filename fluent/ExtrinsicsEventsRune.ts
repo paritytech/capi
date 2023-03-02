@@ -1,6 +1,6 @@
 import { isSystemExtrinsicFailedEvent, SystemExtrinsicFailedEvent } from "../primitives/mod.ts"
 import { Rune, ValueRune } from "../rune/mod.ts"
-import { Chain, ChainRune } from "./ChainRune.ts"
+import { Chain } from "./ChainRune.ts"
 import { EventsRune } from "./EventsRune.ts"
 
 export class ExtrinsicEventsRune<
@@ -8,14 +8,10 @@ export class ExtrinsicEventsRune<
   out C extends Chain = Chain,
   out E extends Chain.Event<C> = Chain.Event<C>,
 > extends EventsRune<U, C, E> {
-  constructor(_prime: EventsRune<U>["_prime"], chain: ChainRune<U, C>) {
-    super(_prime, chain)
-  }
-
   // TODO: make generic over `Chain.Error` upon T6 metadata rework
   unhandleFailed() {
-    const dispatchError = Rune
-      .resolve(this)
+    const dispatchError = this
+      .into(ValueRune)
       .map((events): SystemExtrinsicFailedEvent | undefined =>
         events.find(isSystemExtrinsicFailedEvent)
       )
@@ -40,6 +36,7 @@ export class ExtrinsicEventsRune<
       .tuple([$error, dispatchError.access("error")])
       .map(([$error, data]) => new ExtrinsicError($error.decode(data)))
       .unhandle(ExtrinsicError)
+      .rehandle(undefined, () => this /* TODO: type-level exclusions? */)
   }
 }
 
