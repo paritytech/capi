@@ -69,11 +69,11 @@ if (!running) {
 }
 
 async function onReady() {
-  if (cmd.length) {
-    const process = Deno.run({ cmd })
-    const status = await process.status()
+  const [bin, ...args] = cmd
+  if (bin) {
+    const command = new Deno.Command(bin, { args })
+    const status = await command.spawn().status
     self.addEventListener("unload", () => Deno.exit(status.code))
-    process.close()
     controller.abort()
   }
 }

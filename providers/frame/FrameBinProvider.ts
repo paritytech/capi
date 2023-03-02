@@ -37,32 +37,27 @@ export abstract class FrameBinProvider extends FrameProxyProvider {
       ))
   }
 
-  async runBin(args: string[]): Promise<Deno.Process> {
+  async runBin(args: string[]): Promise<Deno.ChildProcess> {
     await this.assertBinValid()
-    const process = Deno.run({
-      cmd: [this.bin, ...args],
+    const command = new Deno.Command(this.bin, {
+      args,
       stdout: "piped",
       stderr: "piped",
     })
-    this.env.signal.addEventListener("abort", async () => {
-      process.kill("SIGINT")
-      process.stdout.close()
-      process.stderr.close()
-      process.close()
-    })
+    const process = command.spawn()
+    this.env.signal.addEventListener("abort", () => process.kill("SIGINT"))
     return process
   }
 
   binValid?: Promise<void>
   assertBinValid() {
     return this.binValid ??= (async () => {
-      const whichProcess = Deno.run({
-        cmd: ["which", this.bin],
+      const whichProcess = new Deno.Command("which", {
+        args: [this.bin],
         stdout: "piped",
       })
-      const binPathBytes = await whichProcess.output()
-      whichProcess.close()
-      if (!binPathBytes.length) {
+      const { stdout } = await whichProcess.output()
+      if (!stdout.length) {
         throw new Error(
           `No such bin "${this.bin}" in path. Installation instructions can be found here: "${this.installation}"`,
         )
