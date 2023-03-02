@@ -3,24 +3,25 @@ import { alice } from "../util/mod.ts";
 
 const collection = Uniques
   .create({
-    collection: 11984,
+    collection: 11985,
     admin: alice.address,
   })
-  .signed({ sender: alice })
+  .signed({ sender: alice, tip: 4000000n })
   .sent()
   .txEvents()
-  .dbg("collections");
+  .dbgStatus("collections");
 
-/* const item = Uniques.mint({
+const item = Uniques.mint({
   collection: 1,
   item: 0,
   owner: alice.address,
 }).signed({ sender: alice })
   .sent()
   .txEvents()
+  .
   .dbg("item");
- */
-/* const metadata = Uniques.setMetadata({
+ 
+const metadata = Uniques.setMetadata({
   collection: collection,
   item: item,
   data: [],
@@ -28,12 +29,15 @@ const collection = Uniques
 
 const collections = Uniques.Class.entry();
 
-Uniques.Asset.entry([0, 0]);
+Uniques.Asset.entry();
 
-Uniques.ItemPriceOf.entry([0, 0]); */
+Uniques.Class.keyPage(10);
+const owo = Uniques.Class.entry([1]);
+const sla = Uniques.Account.entry([])
 
-await (collection.run());
-//await (collection.chain(() => item).run());
+Uniques.ItemPriceOf.entry([0, 0]);
+Uniques.setPrice()
+Uniques.buyItem()
 
 /* const aliceRatify = Proxy
   .proxy({
@@ -49,3 +53,4 @@ await (collection.run());
   .dbgStatus("Ratify Proposal Alice:")
   .finalized()
  */
+console.log("lala");
