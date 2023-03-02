@@ -1,0 +1,7 @@
+Description: Statemine Test
+Network: ./statemine.toml
+Creds: config
+
+alice: is up
+alice: parachain 1000 is registered within 225 seconds
+alice: parachain 1000 block height is at least 1 within 200 seconds
