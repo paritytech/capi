@@ -44,6 +44,6 @@ export class ExtrinsicError<D> extends Error {
   override readonly name = "ExtrinsicError"
 
   constructor(data: D) {
-    super(typeof data === "string" ? data : (data as any).type)
+    super(data.type)
   }
 }
