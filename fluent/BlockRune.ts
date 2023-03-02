@@ -5,6 +5,7 @@ import { ArrayRune, Rune } from "../rune/mod.ts"
 import { ValueRune } from "../rune/ValueRune.ts"
 import { Chain, ChainRune } from "./ChainRune.ts"
 import { CodecRune } from "./CodecRune.ts"
+import { EventsRune } from "./EventsRune.ts"
 
 export class BlockRune<out U, out C extends Chain = Chain> extends Rune<known.SignedBlock, U> {
   constructor(
@@ -50,5 +51,6 @@ export class BlockRune<out U, out C extends Chain = Chain> extends Rune<known.Si
       .into(ValueRune)
       .unhandle(undefined)
       .rehandle(undefined, () => Rune.constant<Chain.Event<C>[]>([]))
+      .into(EventsRune, this.chain)
   }
 }

@@ -27,6 +27,27 @@ export interface RuntimeEvent {
   value: unknown
 }
 
+export interface SystemExtrinsicFailedEvent extends Event {
+  phase: ApplyExtrinsicEventPhase
+  event: {
+    type: "System"
+    value: {
+      type: "ExtrinsicFailed"
+      dispatchError: DispatchError
+      dispatchInfo: DispatchInfo
+    }
+  }
+}
+export function isSystemExtrinsicFailedEvent(e: Event): e is SystemExtrinsicFailedEvent {
+  const { event } = e
+  if (event.type === "System") {
+    const { value } = event
+    return typeof value === "object" && value !== null && "type" in value
+      && value.type === "ExtrinsicFailed"
+  }
+  return false
+}
+
 export interface DispatchInfo {
   weight: Weight
   class: DispatchClass

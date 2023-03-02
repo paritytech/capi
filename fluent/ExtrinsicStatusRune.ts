@@ -2,6 +2,7 @@ import { known } from "../rpc/mod.ts"
 import { MetaRune, Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { BlockRune } from "./BlockRune.ts"
 import { Chain } from "./ChainRune.ts"
+import { ExtrinsicEventsRune } from "./ExtrinsicsEventsRune.ts"
 import { SignedExtrinsicRune } from "./SignedExtrinsicRune.ts"
 
 export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
@@ -74,6 +75,7 @@ export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
       .map(([events, txI]) =>
         events.filter((event) => event.phase.type === "ApplyExtrinsic" && event.phase.value === txI)
       )
+      .into(ExtrinsicEventsRune, this.extrinsic.chain)
   }
 }
 
