@@ -83,7 +83,7 @@ function runZombienetTest(
   runningNetworkSpec: string,
 ) {
   return new Deno.Command(
-    "zombienet-macos",
+    ZOMBIENET_BIN_DEFAULTS[Deno.build.os]!,
     {
       args: ["-p", "native", "test", testPath, runningNetworkSpec],
     },
