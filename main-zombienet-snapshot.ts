@@ -3,6 +3,11 @@ import * as flags from "./deps/std/flags.ts"
 import * as path from "./deps/std/path.ts"
 import { unreachable } from "./deps/std/testing/asserts.ts"
 
+const ZOMBIENET_BIN_DEFAULTS: Record<string, string> = {
+  darwin: "zombienet-macos",
+  linux: "zombienet-linux-x64",
+}
+
 if (import.meta.main) {
   await main()
 }
@@ -61,7 +66,7 @@ async function main() {
 
 async function startZombienet(configPath: string, tempDir: string): Promise<Deno.ChildProcess> {
   const cmd = new Deno.Command(
-    "zombienet-macos",
+    ZOMBIENET_BIN_DEFAULTS[Deno.build.os]!,
     {
       args: ["-p", "native", "-d", tempDir, "-f", "spawn", configPath],
       stdout: "null",
