@@ -76,10 +76,14 @@ for (const [file, deps] of entries.slice(1)) {
   if (done.has(file)) continue
   console.log(file)
   const command = new Deno.Command(Deno.execPath(), {
-    args: ["info", "-r=http://localhost:4646/", "--json", "target/star.ts"],
+    args: ["cache", "--check", file],
   })
-  const { code, success } = await command.output()
-  if (!success) Deno.exit(code)
+  const { code, success, stdout, stderr } = await command.output()
+  if (!success) {
+    console.log(new TextDecoder().decode(stdout))
+    console.log(new TextDecoder().decode(stderr))
+    Deno.exit(code)
+  }
   for (const d of deps) {
     done.add(d)
   }

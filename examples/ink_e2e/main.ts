@@ -1,4 +1,4 @@
-import { AddressRune, alice, Rune } from "capi"
+import { AddressRune, alice, Rune, ValueRune } from "capi"
 import {
   InkMetadataRune,
   instantiationEventIntoPublicKey,
@@ -29,6 +29,7 @@ if (!address) {
     .sent()
     .dbgStatus("Contract deployment status:")
     .inBlockEvents()
+    .into(ValueRune)
     .map((events) =>
       events.find(isInstantiatedEvent) ?? new FailedToFindContractInstantiatedError()
     )
