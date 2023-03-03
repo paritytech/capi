@@ -60,8 +60,8 @@ await Promise.all([
         name: "@substrate/smoldot-light",
         version: "0.7.6",
       },
-      "https://raw.githubusercontent.com/paritytech/capi-crypto-wrappers/14289c5/lib.ts":
-        "https://raw.githubusercontent.com/paritytech/capi-crypto-wrappers/14289c5/lib.node.ts",
+      // "https://raw.githubusercontent.com/paritytech/capi-crypto-wrappers/14289c5/lib.ts":
+      //   "https://raw.githubusercontent.com/paritytech/capi-crypto-wrappers/14289c5/lib.node.ts",
     },
     outDir,
     scriptModule: false,
