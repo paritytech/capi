@@ -225,6 +225,7 @@ westmint
 xxhash
 xxnetwork
 zio
+zndsl
 zombiecache
 zombienet
 zombienets
