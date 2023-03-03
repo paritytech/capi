@@ -1,4 +1,5 @@
 import * as toml from "./deps/std/encoding/toml.ts"
+import * as flags from "./deps/std/flags.ts"
 import * as path from "./deps/std/path.ts"
 import { unreachable } from "./deps/std/testing/asserts.ts"
 
@@ -7,38 +8,55 @@ if (import.meta.main) {
 }
 
 async function main() {
+  const { config, testConfig, snapshotPath } = flags.parse(Deno.args, {
+    string: ["config", "testConfig", "snapshotPath"],
+  })
+
+  if (!config || !testConfig || !snapshotPath) {
+    console.log(
+      "usage: main.ts --config config.toml --testConfig testConfig.zndsl --snapshotPath snapshotPath",
+    )
+    Deno.exit(1)
+  }
+
   const tempDir = await Deno.makeTempDir({ prefix: "zombienet_db_snapshot_" })
 
-  const configPath = path.join(Deno.cwd(), "zombienets/statemine.toml")
+  const configPath = path.join(Deno.cwd(), config)
+  const configName = path.parse(configPath).name
   const zombienet = await startZombienet(configPath, tempDir)
 
   const networkManifestPath = path.join(tempDir, "zombie.json")
 
-  const testPath = path.join(Deno.cwd(), "zombienets/statemine.zndsl")
+  const testPath = path.join(Deno.cwd(), testConfig)
   await runCommand(() => runZombienetTest(testPath, networkManifestPath))
 
   zombienet.kill("SIGINT")
 
   const zombienetConfig = await parseToml(configPath)
 
+  await Deno.mkdir(snapshotPath, { recursive: true })
+
   const relaychainDbPath = path.join(tempDir, getFirstValidatorName(zombienetConfig))
-  const relaychainDbSnapshot = `db-snapshot-${path.basename(relaychainDbPath)}.tgz`
-  const relaychainDbSnapshotPath = path.join(tempDir, relaychainDbSnapshot)
+  const relaychainDbSnapshot = `${configName}-${path.basename(relaychainDbPath)}-db-snapshot.tgz`
+  const relaychainDbSnapshotPath = path.join(snapshotPath, relaychainDbSnapshot)
   await runCommand(() => createDbSnapshot(relaychainDbPath, relaychainDbSnapshotPath))
+  console.log("created snapshot", relaychainDbSnapshotPath)
 
   const parachainDbPath = path.join(tempDir, getFirstCollatorName(zombienetConfig))
-  const parachainDbSnapshot = `db-snapshot-${path.basename(parachainDbPath)}.tgz`
-  const parachainDbSnapshotPath = path.join(tempDir, parachainDbSnapshot)
+  const parachainDbSnapshot = `${configName}-${path.basename(parachainDbPath)}-db-snapshot.tgz`
+  const parachainDbSnapshotPath = path.join(snapshotPath, parachainDbSnapshot)
   await runCommand(() => createDbSnapshot(parachainDbPath, parachainDbSnapshotPath))
+  console.log("created snapshot", parachainDbSnapshotPath)
 
-  const snapshotConfigPath = path.join(tempDir, `${path.basename(configPath)}-snapshot.toml`)
+  const snapshotConfigPath = path.join(snapshotPath, path.basename(configPath))
 
   await createZombienetDbSnapshotConfig(
     configPath,
     snapshotConfigPath,
-    `http://localhost:8081/${relaychainDbSnapshot}`,
-    `http://localhost:8081/${parachainDbSnapshot}`,
+    `http://localhost:4646/${snapshotPath}/${relaychainDbSnapshot}`,
+    `http://localhost:4646/${snapshotPath}/${parachainDbSnapshot}`,
   )
+  console.log("created zombienet config with snapshots", snapshotConfigPath)
 }
 
 async function startZombienet(configPath: string, tempDir: string): Promise<Deno.ChildProcess> {
@@ -101,9 +119,9 @@ async function waitForNetworkManifest(
   zombienetCachePath: string,
   networkManifestPath: string,
 ): Promise<void> {
-  const watcher = Deno.watchFs(zombienetCachePath)
+  const watcher = Deno.watchFs(zombienetCachePath, { recursive: false })
   for await (const e of watcher) {
-    if (e.kind === "modify" && e.paths.includes(networkManifestPath)) {
+    if (e.kind === "modify" && e.paths.some((p) => p.endsWith(networkManifestPath))) {
       return
     }
   }
