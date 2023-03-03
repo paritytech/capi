@@ -36,8 +36,12 @@ export class ZombienetProvider extends FrameBinProvider {
         "spawn",
         await this.#getConfigPath(configPath),
       ]
+      console.log("running run", { args })
       await this.runBin(args)
-      return await network
+      console.log("waiting for", { networkManifestPath })
+      const out = await network
+      console.log("wait done for", { networkManifestPath })
+      return out
     })
     const nodeName = target.slice(i + 1)
     const node = network.nodesByName[nodeName]
