@@ -117,7 +117,11 @@ async function createZombienetDbSnapshotConfig(
   config.relaychain["default_db_snapshot"] = relaychainDbSnapshotUrl
   // TODO: support multiple parachain snapshots
   config.parachains[0].collator["db_snapshot"] = parachainDbSnapshotUrl
-  await Deno.writeFile(dbSnapshotConfigPath, new TextEncoder().encode(toml.stringify(config)))
+  await Deno.writeFile(
+    dbSnapshotConfigPath,
+    // FIXME: zombienet throws on https://github.com/paritytech/zombienet/blob/de72245f91b0d66b1a045e237703ef755a17922f/javascript/packages/utils/src/fs.ts#L115
+    new TextEncoder().encode(toml.stringify(config).slice(1)),
+  )
 }
 
 async function waitForNetworkManifest(

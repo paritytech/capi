@@ -44,8 +44,8 @@ export abstract class FrameBinProvider extends FrameProxyProvider {
     await this.assertBinValid()
     const command = new Deno.Command(this.bin, {
       args,
-      // stdout: "piped",
-      // stderr: "piped",
+      stdout: this.bin.startsWith("zombienet") ? "inherit" : "piped",
+      stderr: this.bin.startsWith("zombienet") ? "inherit" : "piped",
     })
     const process = command.spawn()
     this.env.signal.addEventListener("abort", () => process.kill("SIGINT"))
