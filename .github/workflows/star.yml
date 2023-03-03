@@ -24,4 +24,16 @@ jobs:
           key: ${{ runner.os }}-deno-${{ hashFiles('deps/**/*.ts') }}
       - name: Setup binaries
         uses: ./.github/actions/setup-binaries
+      # TODO: move into a custom action
+      - name: Cache Zombienet DB Snapshot
+        uses: actions/cache@v3
+        id: cache-zombienet-db-snapshot
+        with:
+          path: |
+            ./zombienet-db-snapshots
+          key: cache-zombienet-db-snapshot-${{ hashFiles('./zombienets/statemine.toml') }}
+      - if: ${{ steps.cache-zombienet-db-snapshot.outputs.cache-hit != 'true' }}
+        name: Create DB Snapshot
+        run: |
+          deno run -A main-zombienet-snapshot.ts --config zombienets/statemine.toml  --testConfig zombienets/statemine.zndsl --snapshotPath zombienet-db-snapshots
       - run: deno task star
