@@ -34,7 +34,10 @@ export abstract class FrameBinProvider extends FrameProxyProvider {
           return `ws://localhost:${port}`
         })(),
         this.timeout,
-      ))
+      )).catch((error) => {
+        console.log("launch error", { bin: this.bin, pathInfo })
+        throw error
+      })
   }
 
   async runBin(args: string[]): Promise<Deno.ChildProcess> {
