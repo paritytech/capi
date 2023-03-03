@@ -56,9 +56,13 @@ export class ZombienetProvider extends FrameBinProvider {
   }
 
   async #getConfigPath(configPath: string): Promise<string> {
-    const configWithSnapshotPath = path.join("zombienet-db-snapshots", path.basename(configPath))
-    const stat = await Deno.stat(configWithSnapshotPath)
-    return stat.isFile ? configWithSnapshotPath : configPath
+    try {
+      const configWithSnapshotPath = path.join("zombienet-db-snapshots", path.basename(configPath))
+      await Deno.stat(configWithSnapshotPath)
+      return configWithSnapshotPath
+    } catch (_error) {
+      return configPath
+    }
   }
 }
 
