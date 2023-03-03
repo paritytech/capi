@@ -1,4 +1,4 @@
-import { alice, Rune } from "capi"
+import { alice, Rune, ValueRune } from "capi"
 import { types, XcmPallet } from "zombienet/statemine.toml/alice/@latest/mod.ts"
 import { Event as XcmPalletEvent } from "zombienet/statemine.toml/alice/@latest/types/pallet_xcm/pallet.ts"
 import { RuntimeEvent as AliceRuntimeEvent } from "zombienet/statemine.toml/alice/@latest/types/rococo_runtime/mod.ts"
@@ -49,6 +49,7 @@ const initiatedEvent = XcmPallet
   .sent()
   .dbgStatus("Teleportation status:")
   .finalizedEvents()
+  .into(ValueRune)
   .map((events) =>
     events.find((e) =>
       AliceRuntimeEvent.isXcmPallet(e.event)
