@@ -1,1 +1,1 @@
-Capi is a framework for crafting interactions with Substrate chains. It consists of a development server, wide-ranging Substrate-focused utilities and a fluent API, which facilitates multistep, multichain interactions without compromising either performance or ease of use.
+Capi is a framework for crafting interactions with Substrate chains. It consists of a development server and fluent API, which facilitates multistep, multichain interactions without compromising either performance or ease of use.
