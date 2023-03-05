@@ -12,7 +12,7 @@ Add the `capi` task to your Deno config.
 
 `deno.jsonc`
 
-```json
+```diff
 // ...
   "tasks": {
 +   "capi": "deno run -A https://deno.land/x/capi/main.ts"
@@ -33,7 +33,7 @@ Add the `capi` script to your `package.json`.
 
 `package.json`
 
-```json
+```diff
 // ...
   "scripts": {
 +   "capi": "capi"
