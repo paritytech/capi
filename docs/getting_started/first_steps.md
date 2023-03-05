@@ -2,20 +2,18 @@
 
 Let's transact some dot between test users on a Polkadot test network. Let's also read out the balance change to confirm that our transaction was finalized and successful.
 
-First we import the `Balances` namespace from the Polkadot dev provider's root `mod.ts`.
+First let's bring in the imports of which we'll be making use.
 
 ```ts
-import { Balances } from "http://localhost:4646/frame/dev/polkadot/@latest/mod.ts"
+import { alice, bob, ValueRune } from "capi"
+import { Balances, System } from "http://localhost:4646/frame/dev/polkadot/@latest/mod.ts"
 ```
 
-Let's also import two test users (between whom the transaction will take place).
+- `alice` and `bob` are our test users, between whom the transaction will take place
+- `ValueRune` isn't something to scrutinize quite yet: we'll discuss this later
+- `Balances` and `System` are namespaces containing bindings to all of their respective pallets' storage, calls and constants
 
-```diff
-  import { Balances } from "http://localhost:4646/frame/dev/polkadot/@latest/mod.ts"
-+ import { alice, bob } from "capi"
-```
-
-Next, we define the call data that we'd like to submit. Every pallet namespace contains factories for producing this call data in a type-safe manner.
+We use the `Balances.transfer` factory to create the submittable call data.
 
 ```ts
 Balances
@@ -25,7 +23,7 @@ Balances
   })
 ```
 
-Next, we sign the transaction with the `ExtrinsicSender`.
+Next, we sign the transaction with `alice`.
 
 ```diff
 Balances
@@ -36,11 +34,9 @@ Balances
 + .signed({ sender: alice })
 ```
 
-In this case, the extrinsic sender is `alice`, an instance of `Sr25519`, which implicitly implements `ExtrinsicSender` (has the following fields: `address: MultiAddress; sign: Signer`).
+> Note: If we want to supply another sender/signer (such as that of a wallet extension), we can do this with ease. More [info on wallet compatibility here](/docs/integration/wallets.md).
 
-> Note: if we want to sign via a wallet such as Talisman or PolkadotJS extension, we can supply their respective `Signer`s in place of a `sender`. More [info on wallet compatibility here](/docs/integration/wallets.md).
-
-We can now specify what we want to occur with the signed extrinsic (for it to be `sent`).
+Now we specify what we want to occur with the signed extrinsic. It's worth pointing out the declarative naming; generally speaking, we aim for the API to describe what we want to occur (for the signed extrinsic to be `sent`).
 
 ```diff
 Balances
@@ -52,7 +48,7 @@ Balances
 + .sent()
 ```
 
-Next, let's specify what data we want resolved from this tx's execution (in this case, we'll resolve the block in which the extrinsic was finalized).
+Next, we specify what data we want to resolve from this extrinsic's submission. In this case, we'll resolve the block in which the extrinsic was finalized.
 
 ```diff
 Balances
@@ -67,9 +63,22 @@ Balances
 
 > Note: you can call the `dbgStatus` method on the result of the `sent` call in order to see progress logs from the RPC node.
 
-Finally, we'll call the `run` method to trigger the Rune's execution. One last thing to do: let's retrieve Bob's balance as to confirm that the transaction was successful.
+Before finally triggering execution, let's add a continuation: the retrieval of Bob's balance. This lets us confirm that the transaction was successful.
 
-All together, our example looks like so:
+```diff
+Balances
+  .transfer({
+    value: 12345n,
+    dest: bob.address,
+  })
+  .signed({ sender: alice })
+  .sent()
+  .finalized()
++ .into(ValueRune)
++ .chain(() => System.Account.value(bob.publicKey).dbg())
+```
+
+Great! We've built up a description of the desired execution. Let's run it. Altogether, our example looks as follows.
 
 ```ts
 import { alice, bob, ValueRune } from "capi"
