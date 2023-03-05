@@ -44,7 +44,7 @@ We can now use `npm run capi` to run the Capi server.
 
 ## [capi.dev](https://capi.dev)
 
-In the case of the hosted version of the Capi server, we can forgo installation entirely and import directly from "https://capi.dev".
+In the case of the hosted version of the Capi server, we can forgo installation entirely and import directly from [capi.dev](https://capi.dev).
 
 ---
 
