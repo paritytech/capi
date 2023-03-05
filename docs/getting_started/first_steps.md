@@ -1,6 +1,8 @@
 # First Steps
 
-Let's import `Balances` bindings from the Polkadot dev provider's root `mod.ts`.
+Let's transact some dot between test users on a Polkadot test network. Let's also read out the balance change to confirm that our transaction was finalized and successful.
+
+First we import the `Balances` namespace from the Polkadot dev provider's root `mod.ts`.
 
 ```ts
 import { Balances } from "http://localhost:4646/frame/dev/polkadot/@latest/mod.ts"
