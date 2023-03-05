@@ -49,7 +49,7 @@ For retrieving common utilities (such as test pairs and assertions), import from
 import { alice } from "http://localhost:4646/mod.ts"
 ```
 
-Visit [`capi` on the Deno module registry](https://deno.land/x/capi) to explore this module's exports.
+Visit [`capi` on the Deno module registry](https://deno.land/x/capi/mod.ts) to explore this module's exports.
 
 ## Providers
 
