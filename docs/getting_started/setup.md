@@ -19,7 +19,7 @@ Add the `capi` task to your Deno config.
 // ...
 ```
 
-This allows us to interact with the Capi CLI with `deno task capi`.
+We can now use `deno task capi` to run the Capi server.
 
 ### NodeJS
 
@@ -40,7 +40,7 @@ Add the `capi` script to your `package.json`.
 // ...
 ```
 
-This allows us to interact with the Capi CLI with `npm run capi`.
+We can now use `npm run capi` to run the Capi server.
 
 ## [capi.dev](https://capi.dev)
 
