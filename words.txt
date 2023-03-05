@@ -64,6 +64,7 @@ dispatchable
 dprint
 edgeware
 efinity
+encointer
 esbenp
 esque
 extrinsics

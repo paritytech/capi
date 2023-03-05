@@ -14,7 +14,7 @@ We primarily use import specifiers as a way of telling the Capi server what it i
 ```ts
 import {
   // ...
-} from "http://localhost:4646/frame/wss/rpc.polkadot.io/@latest/mod.js"
+} from "http://localhost:4646/frame/wss/rpc.polkadot.io/@latest/mod.ts"
 //                            ~~~~~ ~~~~~~~~~~~~~~~~~~~ ~~~~~~~ ~~~~~~
 //                            ^     ^                   ^       ^
 //                            |     |                   |       chain file
@@ -31,7 +31,7 @@ In this example, we ask the server for the following:
 - `frame` is the type of codegen with which we want the server to produce our chain-specific API
 - `wss/rpc.polkadot.io` is the target. `wss` indicates the provider, while `rpc.polkadot.io` is the means of provider-specific discovery (a WebSocket URL)
 - `@latest` is the semver string associated with the chain runtime version whose metadata we want to use for codegen (best to pin to a specific version / more info [below](#runtime-version))
-- `mod.js` is the codegened file from which we'd like to import. We could just as easily import from other generated files, such as `Balances.js` (a specific pallet bindings file) or `types/frame_system/mod.js` (a file of declarations, guards, factories and raw SCALE codecs)
+- `mod.ts` is the codegened file from which we'd like to import. We could just as easily import from other generated files, such as `Balances.ts` (a specific pallet bindings file) or `types/frame_system/mod.ts` (a file of declarations, guards, factories and raw SCALE codecs)
 
 ### Intellisense
 
@@ -43,10 +43,10 @@ To ease the burden of writing these import specifiers, the Capi server implement
 
 ## The Capi Library
 
-For retrieving common utilities (such as test pairs and assertions), import from the server's root `mod.js`, which exports the Capi library itself.
+For retrieving common utilities (such as test pairs and assertions), import from the server's root `mod.ts`, which exports the Capi library itself.
 
 ```ts
-import { alice } from "http://localhost:4646/mod.js"
+import { alice } from "http://localhost:4646/mod.ts"
 ```
 
 Visit [`capi` on the Deno module registry](https://deno.land/x/capi) to explore this module's exports.
@@ -78,7 +78,7 @@ At runtime, we must inject a connection into our generated code. We currently su
 ### Unstoppable (Smoldot)
 
 ```ts
-import { Timestamp } from "#chain/mod.js"
+import { Timestamp } from "#chain/mod.ts"
 import { smoldotConnection } from "capi"
 
 declare const relayChainSpec: string
@@ -92,7 +92,7 @@ const result = await Timestamp.Now.apply(connection).run()
 ### Stoppable (WebSocket URL)
 
 ```ts
-import { Timestamp } from "#chain/mod.js"
+import { Timestamp } from "#chain/mod.ts"
 import { wdConnection } from "capi"
 
 const connection = wsConnection(wsUrl)

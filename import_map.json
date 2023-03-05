@@ -7,13 +7,14 @@
     "westend/": "http://localhost:4646/frame/wss/westend-rpc.polkadot.io/@latest/",
     "westend_dev/": "http://localhost:4646/frame/dev/westend/@latest/",
     "rococo/": "http://localhost:4646/frame/wss/rococo-contracts-rpc.polkadot.io/@latest/",
-    "rococo_contracts/": "http://localhost:4646/frame/wss/rococo-contracts-rpc.polkadot.io/@latest/",
     "rococo_dev/": "http://localhost:4646/frame/dev/rococo/@latest/",
-    "acala/": "http://localhost:4646/frame/wss/acala-polkadot.api.onfinality.io/public-ws/@latest/",
-    "moonbeam/": "http://localhost:4646/frame/wss/wss.api.moonbeam.network/@latest/",
+    "rococo_contracts/": "http://localhost:4646/frame/wss/rococo-contracts-rpc.polkadot.io/@latest/",
+    "kusama_bridge_hub/": "http://localhost:4646/frame/wss/kusama-bridge-hub-rpc.polkadot.io/@latest/",
+    "statemine/": "http://localhost:4646/frame/wss/statemine.api.onfinality.io/public-ws/@latest/",
+    "encointer/": "http://localhost:4646/frame/wss/kusama.api.encointer.org/@latest/",
+    "polkadot_bridge_hub/": "http://localhost:4646/frame/wss/polkadot-bridge-hub-rpc.polkadot.io/@latest/",
     "statemint/": "http://localhost:4646/frame/wss/statemint-rpc.polkadot.io/@latest/",
-    "phala/": "http://localhost:4646/frame/wss/api.phala.network/ws#/rpc/@latest/",
-    "subsocial/": "http://localhost:4646/frame/para.subsocial.network/@latest/"
+    "collectives/": "http://localhost:4646/frame/wss/polkadot-collectives-rpc.polkadot.io/@latest/"
   },
   "scopes": {
     "examples/": {
