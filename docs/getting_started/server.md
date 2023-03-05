@@ -103,3 +103,7 @@ const result = await Timestamp.Now.apply(connection).run()
 ## Runtime Version
 
 TODO(@tjjfvi): brief description of why it's best to pin
+
+---
+
+Now that we have an understanding of the server's capabilities, let's use them!

@@ -1,7 +1,5 @@
 # First Steps
 
-## Transacting With A Test Network
-
 Let's import `Balances` bindings from the Polkadot dev provider's root `mod.ts`.
 
 ```ts
@@ -67,13 +65,15 @@ Balances
 
 > Note: you can call the `dbgStatus` method on the result of the `sent` call in order to see progress logs from the RPC node.
 
-Finally, we'll call the `run` method to trigger the Rune's execution. All together, our example looks like so:
+Finally, we'll call the `run` method to trigger the Rune's execution. One last thing to do: let's retrieve Bob's balance as to confirm that the transaction was successful.
+
+All together, our example looks like so:
 
 ```ts
-import { alice, bob } from "capi"
-import { Balances } from "http://localhost:4646/frame/dev/polkadot/@latest/mod.ts"
+import { alice, bob, ValueRune } from "capi"
+import { Balances, System } from "http://localhost:4646/frame/dev/polkadot/@latest/mod.ts"
 
-const finalizedBlock = await Balances
+await Balances
   .transfer({
     value: 12345n,
     dest: bob.address,
@@ -81,8 +81,31 @@ const finalizedBlock = await Balances
   .signed({ sender: alice })
   .sent()
   .dbgStatus()
-  .finalizedEvents()
+  .finalized()
+  .into(ValueRune)
+  .chain(() => System.Account.value(bob.publicKey).dbg())
   .run()
-
-console.log(finalizedBlock)
 ```
+
+Upon running this script, we should see three transaction statuses (`ready`, `inBlock` and `finalized`) followed by Bob's new account info.
+
+```ts
+{
+  nonce: 0,
+  consumers: 0,
+  providers: 1,
+  sufficients: 0,
+  data: {
+    free: 10000000000012345n,
+//                    ^
+//                    victory!
+    reserved: 0n,
+    miscFrozen: 0n,
+    feeFrozen: 0n,
+  },
+}
+```
+
+---
+
+Now that we've done a basic transaction and storage retrieval, let's simplify our setup with import mapping.

@@ -44,8 +44,8 @@ We can now use `npm run capi` to run the Capi server.
 
 ## [capi.dev](https://capi.dev)
 
-We can forgo installation if comfortable with a hosted version of the Capi server. This allows us to execute Capi scripts without needing to install dependencies.
+In the case of the hosted version of the Capi server, we can forgo installation entirely and import directly from "https://capi.dev".
 
-```ts
-import { chain } from "https://capi.dev/frame/wss/rpc.polkadot.io/@latest/mod.ts"
-```
+---
+
+Now that we have our server at hand, let's learn about how to interact with it.
