@@ -1,4 +1,3 @@
-import { File } from "../../codegen/frame/mod.ts"
 import { deferred } from "../../deps/std/async.ts"
 import { WsConnection } from "../../rpc/mod.ts"
 import { PathInfo } from "../../server/mod.ts"
@@ -62,16 +61,14 @@ export abstract class FrameProxyProvider extends FrameProvider {
     return WsConnection.connect(await this.dynamicUrl(pathInfo), signal)
   }
 
-  async chainFile(pathInfo: PathInfo) {
+  async connectionCode(pathInfo: PathInfo) {
     const url = this.staticUrl(pathInfo)
-    return new File(`
+    return `
       import * as C from "./capi.ts"
-      import type { Chain } from "./mod.ts"
 
       export const discoveryValue = "${url}"
 
-      export const chain = C.connection((signal) => C.WsConnection.connect(discoveryValue, signal))
-        .chain()["_asCodegen"]<Chain>()
-    `)
+      export const connection = C.connection((signal) => C.WsConnection.connect(discoveryValue, signal))
+    `
   }
 }

@@ -3,8 +3,8 @@ import { Rune, ValueRune } from "../rune/mod.ts"
 import { Chain, ChainRune } from "./ChainRune.ts"
 import { ExtrinsicStatusRune } from "./ExtrinsicStatusRune.ts"
 
-export class SignedExtrinsicRune<out U, out C extends Chain = Chain> extends Rune<Uint8Array, U> {
-  constructor(_prime: SignedExtrinsicRune<U>["_prime"], readonly chain: ChainRune<U, C>) {
+export class SignedExtrinsicRune<out C extends Chain, out U> extends Rune<Uint8Array, U> {
+  constructor(_prime: SignedExtrinsicRune<C, U>["_prime"], readonly chain: ChainRune<C, U>) {
     super(_prime)
   }
 

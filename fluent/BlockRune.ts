@@ -1,16 +1,16 @@
 import { hex } from "../crypto/mod.ts"
-import * as M from "../frame_metadata/mod.ts"
+import { $extrinsic } from "../frame_metadata/Extrinsic.ts"
 import { known } from "../rpc/mod.ts"
 import { ArrayRune, Rune } from "../rune/mod.ts"
 import { ValueRune } from "../rune/ValueRune.ts"
 import { Chain, ChainRune } from "./ChainRune.ts"
 import { CodecRune } from "./CodecRune.ts"
-import { EventsRune } from "./EventsRune.ts"
+import { Event, EventsChain, EventsRune } from "./EventsRune.ts"
 
-export class BlockRune<out U, out C extends Chain = Chain> extends Rune<known.SignedBlock, U> {
+export class BlockRune<out C extends Chain, out U> extends Rune<known.SignedBlock, U> {
   constructor(
-    _prime: BlockRune<U, C>["_prime"],
-    readonly chain: ChainRune<U, C>,
+    _prime: BlockRune<C, U>["_prime"],
+    readonly chain: ChainRune<C, U>,
     readonly hash: Rune<string, U>,
   ) {
     super(_prime)
@@ -25,32 +25,22 @@ export class BlockRune<out U, out C extends Chain = Chain> extends Rune<known.Si
   }
 
   extrinsics() {
-    const metadata = this.chain.metadata()
-    const $extrinsic = Rune
-      .rec({
-        metadata,
-        deriveCodec: metadata.deriveCodec,
-        sign: null!,
-        prefix: null!,
-      })
-      .map(M.$extrinsic)
+    const $ext = Rune.fn($extrinsic)
+      .call(this.chain.metadata, null!)
       .into(CodecRune)
     return this
       .extrinsicsRaw()
       .into(ArrayRune)
-      .mapArray((h) => $extrinsic.decoded(h.map(hex.decode)))
+      .mapArray((h) => $ext.decoded(h.map(hex.decode)))
   }
 
-  events() {
+  events(this: BlockRune<EventsChain<C>, U>) {
     return this.chain
-      .metadata()
       .pallet("System")
       .storage("Events")
-      .entry([], this.hash)
-      .unsafeAs<Chain.Event<C>[] | undefined>()
-      .into(ValueRune)
+      .value(undefined!, this.hash)
       .unhandle(undefined)
-      .rehandle(undefined, () => Rune.constant<Chain.Event<C>[]>([]))
+      .rehandle(undefined, () => Rune.constant<Event<C>[]>([]))
       .into(EventsRune, this.chain)
   }
 }

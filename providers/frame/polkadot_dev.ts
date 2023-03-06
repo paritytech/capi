@@ -48,6 +48,10 @@ export class PolkadotDevProvider extends FrameBinProvider {
     await this.runBin(args)
     return port
   }
+
+  override async chainName(pathInfo: PathInfo): Promise<string> {
+    return pathInfo.target!.replace(/^./, (x) => x.toUpperCase()) + "Dev"
+  }
 }
 
 type DevRuntimeName = $.Native<typeof $devRuntimeName>

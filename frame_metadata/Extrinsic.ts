@@ -1,51 +1,42 @@
-import { hashers, hex, ss58 } from "../crypto/mod.ts"
+import { blake2_256 } from "../crypto/mod.ts"
 import * as $ from "../deps/scale.ts"
-import { assert } from "../deps/std/testing/asserts.ts"
-import {
-  $multiAddress,
-  $multiSignature,
-  MultiAddress,
-  MultiSignature,
-  Signer,
-} from "../primitives/mod.ts"
-import { $null, DeriveCodec } from "../scale_info/Codec.ts"
-import { Metadata } from "./Metadata.ts"
+import { FrameMetadata } from "./FrameMetadata.ts"
 
-// TODO: make generic over chain
-export interface Extrinsic {
+export interface Extrinsic<M extends FrameMetadata> {
   protocolVersion: number
   signature?:
     & {
-      address: MultiAddress
-      extra: unknown[]
+      address: $.Native<M["extrinsic"]["address"]>
+      extra: $.Native<M["extrinsic"]["extra"]>
     }
-    & ({ additional: unknown[] } | { sig: MultiSignature })
-  call: unknown
+    & (
+      | { additional: $.Native<M["extrinsic"]["additional"]> }
+      | { sig: $.Native<M["extrinsic"]["signature"]> }
+    )
+  call: $.Native<M["extrinsic"]["call"]>
 }
 
-export interface ExtrinsicCodecProps {
-  metadata: Metadata
-  deriveCodec: DeriveCodec
-  sign: Signer
-  prefix: number
-}
+export type Signer<M extends FrameMetadata> = (
+  message: Uint8Array,
+) => $.Native<M["extrinsic"]["signature"]> | Promise<$.Native<M["extrinsic"]["signature"]>>
 
-export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
-  const { metadata, deriveCodec } = props
-  const { signedExtensions } = metadata.extrinsic
-  const $multisigPromise = $.promise($multiSignature)
-  const $call_ = $call(props)
-  const [$extra, extraPjsInfo] = getExtensionInfo(pjsExtraKeyMap, "ty")
-  const [$additional, additionalPjsInfo] = getExtensionInfo(
-    pjsAdditionalKeyMap,
-    "additionalSigned",
-  )
-  const pjsInfo = [...extraPjsInfo, ...additionalPjsInfo]
+export function $extrinsic<M extends FrameMetadata>(
+  metadata: M,
+  signer: Signer<M>,
+): $.Codec<Extrinsic<M>> {
+  const $sig = metadata.extrinsic.signature as $.Codec<$.Native<M["extrinsic"]["signature"]>>
+  const $sigPromise = $.promise($sig)
+  const $call = metadata.extrinsic.call as $.Codec<$.Native<M["extrinsic"]["call"]>>
+  const $address = metadata.extrinsic.address as $.Codec<$.Native<M["extrinsic"]["address"]>>
+  const $extra = metadata.extrinsic.extra as $.Codec<$.Native<M["extrinsic"]["extra"]>>
+  const $additional = metadata.extrinsic.additional as $.Codec<
+    $.Native<M["extrinsic"]["additional"]>
+  >
 
-  const toSignSize = $call_._staticSize + $extra._staticSize + $additional._staticSize
-  const totalSize = 1 + $multiAddress._staticSize + $multiSignature._staticSize + toSignSize
+  const toSignSize = $call._staticSize + $extra._staticSize + $additional._staticSize
+  const totalSize = 1 + $address._staticSize + $sig._staticSize + toSignSize
 
-  const $baseExtrinsic: $.Codec<Extrinsic> = $.createCodec({
+  const $baseExtrinsic: $.Codec<Extrinsic<M>> = $.createCodec({
     _metadata: [],
     _staticSize: totalSize,
     _encode(buffer, extrinsic) {
@@ -53,147 +44,71 @@ export function $extrinsic(props: ExtrinsicCodecProps): $.Codec<Extrinsic> {
       buffer.array[buffer.index++] = firstByte
       const { signature, call } = extrinsic
       if (signature) {
-        $multiAddress._encode(buffer, signature.address)
+        $address._encode(buffer, signature.address)
         if ("additional" in signature) {
           const toSignBuffer = new $.EncodeBuffer(buffer.stealAlloc(toSignSize))
-          $call_._encode(toSignBuffer, call)
+          $call._encode(toSignBuffer, call)
           const callEnd = toSignBuffer.finishedSize + toSignBuffer.index
-          if ("signPayload" in props.sign) {
-            const exts = [...signature.extra, ...signature.additional]
-            const extEnds = []
-            for (let i = 0; i < pjsInfo.length; i++) {
-              pjsInfo[i]!.codec._encode(toSignBuffer, exts[i])
-              extEnds.push(toSignBuffer.finishedSize + toSignBuffer.index)
-            }
-            const extraEnd = extEnds[extraPjsInfo.length - 1] ?? callEnd
-            const toSignEncoded = toSignBuffer.finish()
-            const callEncoded = toSignEncoded.subarray(0, callEnd)
-            const extraEncoded = toSignEncoded.subarray(callEnd, extraEnd)
-            if (signature.address.type !== "Id") {
-              throw new Error("polkadot signer: address types other than Id are not supported")
-            }
-            const payload: Record<string, unknown> = {
-              address: ss58.encode(props.prefix, signature.address.value),
-              method: hex.encodePrefixed(callEncoded),
-              signedExtensions: signedExtensions.map((x) => x.ident),
-              version: extrinsic.protocolVersion,
-            }
-            let last = callEnd
-            for (let i = 0; i < pjsInfo.length; i++) {
-              const { key } = pjsInfo[i]!
-              if (!key) throw new Error("polkadot signer: unknown extension")
-              payload[key] = typeof exts[i] === "number"
-                ? exts[i]
-                : hex.encodePrefixed(toSignEncoded.subarray(last, extEnds[i]!))
-              last = extEnds[i]!
-            }
-            const signer = props.sign
-            buffer.writeAsync(0, async (buffer) => {
-              const { signature } = await signer.signPayload(payload)
-              buffer.insertArray(hex.decode(signature))
-            })
-            buffer.insertArray(extraEncoded)
-            buffer.insertArray(callEncoded)
+          $extra._encode(toSignBuffer, signature.extra)
+          const extraEnd = toSignBuffer.finishedSize + toSignBuffer.index
+          $additional._encode(toSignBuffer, signature.additional)
+          const toSignEncoded = toSignBuffer.finish()
+          const callEncoded = toSignEncoded.subarray(0, callEnd)
+          const extraEncoded = toSignEncoded.subarray(callEnd, extraEnd)
+          const toSign = toSignEncoded.length > 256
+            ? blake2_256.hash(toSignEncoded)
+            : toSignEncoded
+          const sig = signer(toSign)
+          if (sig instanceof Promise) {
+            $sigPromise._encode(buffer, sig)
           } else {
-            $extra._encode(toSignBuffer, signature.extra)
-            const extraEnd = toSignBuffer.finishedSize + toSignBuffer.index
-            $additional._encode(toSignBuffer, signature.additional)
-            const toSignEncoded = toSignBuffer.finish()
-            const callEncoded = toSignEncoded.subarray(0, callEnd)
-            const extraEncoded = toSignEncoded.subarray(callEnd, extraEnd)
-            const toSign = toSignEncoded.length > 256
-              ? hashers.Blake2_256.hash(toSignEncoded)
-              : toSignEncoded
-            const sig = props.sign(toSign)
-            if (sig instanceof Promise) {
-              $multisigPromise._encode(buffer, sig)
-            } else {
-              $multiSignature._encode(buffer, sig)
-            }
-            buffer.insertArray(extraEncoded)
-            buffer.insertArray(callEncoded)
+            $sig._encode(buffer, sig)
           }
+          buffer.insertArray(extraEncoded)
+          buffer.insertArray(callEncoded)
         } else {
-          $multiSignature._encode(buffer, signature.sig)
+          $sig._encode(buffer, signature.sig)
           $extra._encode(buffer, signature.extra)
-          $call_._encode(buffer, call)
+          $call._encode(buffer, call)
         }
       } else {
-        $call_._encode(buffer, call)
+        $call._encode(buffer, call)
       }
     },
     _decode(buffer) {
       const firstByte = buffer.array[buffer.index++]!
       const hasSignature = firstByte & (1 << 7)
       const protocolVersion = firstByte & ~(1 << 7)
-      let signature: Extrinsic["signature"]
+      let signature: Extrinsic<M>["signature"]
       if (hasSignature) {
-        const address = $multiAddress._decode(buffer) as MultiAddress
-        const sig = $multiSignature._decode(buffer)
+        const address = $address._decode(buffer)
+        const sig = $sig._decode(buffer)
         const extra = $extra._decode(buffer)
         signature = { address, sig, extra }
       }
-      const call = $call_._decode(buffer)
+      const call = $call._decode(buffer)
       return { protocolVersion, signature, call }
     },
     _assert(assert) {
       assert.typeof(this, "object")
       assert.key(this, "protocolVersion").equals($.u8, 4)
       const value_ = assert.value as any
-      $call_._assert(assert.key(this, "call"))
+      $call._assert(assert.key(this, "call"))
       if (value_.signature) {
         const signatureAssertState = assert.key(this, "signature")
-        $multiAddress._assert(signatureAssertState.key(this, "address"))
+        $address._assert(signatureAssertState.key(this, "address"))
         $extra._assert(signatureAssertState.key(this, "extra"))
         if ("additional" in value_.signature) {
           $additional._assert(signatureAssertState.key(this, "additional"))
         } else {
-          $multiSignature._assert(signatureAssertState.key(this, "sig"))
+          $sig._assert(signatureAssertState.key(this, "sig"))
         }
       }
     },
   })
 
   return $.withMetadata(
-    $.metadata("$extrinsic", $extrinsic, props),
+    $.metadata("$extrinsic", $extrinsic, metadata, signer),
     $.lenPrefixed($baseExtrinsic),
   )
-
-  function getExtensionInfo(
-    keyMap: Record<string, string | undefined>,
-    key: "ty" | "additionalSigned",
-  ): [codec: $.Codec<any>, pjsInfo: { key: string | undefined; codec: $.Codec<any> }[]] {
-    const pjsInfo = signedExtensions
-      .map((e) => ({ key: keyMap[e.ident], codec: deriveCodec(e[key]) }))
-      .filter((x) => x.codec !== $null)
-    return [$.tuple(...pjsInfo.map((x) => x.codec)), pjsInfo]
-  }
-}
-
-interface CallCodecProps {
-  metadata: Metadata
-  deriveCodec: DeriveCodec
-}
-
-export function $call(props: CallCodecProps): $.Codec<unknown> {
-  const { metadata, deriveCodec } = props
-  const callTy = metadata.extrinsic.ty.params.find((x) => x.name === "Call")?.ty!
-  assert(callTy?.type === "Union")
-  return deriveCodec(callTy.id)
-}
-
-const pjsExtraKeyMap: Record<string, string> = {
-  CheckEra: "era",
-  CheckMortality: "era",
-  ChargeTransactionPayment: "tip",
-  CheckNonce: "nonce",
-}
-
-const pjsAdditionalKeyMap: Record<string, string> = {
-  CheckEra: "blockHash",
-  CheckMortality: "blockHash",
-  CheckSpecVersion: "specVersion",
-  CheckTxVersion: "transactionVersion",
-  CheckVersion: "specVersion",
-  CheckGenesis: "genesisHash",
 }

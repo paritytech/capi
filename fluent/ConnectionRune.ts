@@ -1,7 +1,6 @@
 import { Calls, Subscription, Subscriptions } from "../rpc/known/mod.ts"
 import { Connection, ConnectionError, RpcSubscriptionMessage, ServerError } from "../rpc/mod.ts"
-import { Batch, MetaRune, Run, Rune, RunicArgs, RunStream, ValueRune } from "../rune/mod.ts"
-import { ChainRune } from "./ChainRune.ts"
+import { Batch, MetaRune, Run, Rune, RunicArgs, RunStream } from "../rune/mod.ts"
 
 class RunConnection extends Run<Connection, never> {
   constructor(ctx: Batch, readonly initConnection: (signal: AbortSignal) => Promise<Connection>) {
@@ -55,10 +54,6 @@ export class ConnectionRune<U> extends Rune<Connection, U> {
         return event.params.result as Subscription.Result<ReturnType<Subscriptions[K]>>
       })
       .throws(ConnectionError, ServerError)
-  }
-
-  chain() {
-    return this.into(ValueRune).map((x) => ({ connection: x })).into(ChainRune)
   }
 }
 

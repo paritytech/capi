@@ -1,7 +1,6 @@
 export interface MapLike<K, V> {
   set(key: K, value: V): void
   get(key: K): undefined | V
-  delete(key: K): boolean
 }
 
 export function getOrInit<K, V>(
