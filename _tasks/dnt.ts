@@ -18,7 +18,7 @@ await Promise.all([
     compilerOptions: {
       importHelpers: true,
       sourceMap: true,
-      target: "ES2021",
+      target: "Latest",
       lib: ["es2022.error"],
     },
     entryPoints: [{
