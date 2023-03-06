@@ -12,7 +12,7 @@ const claim = Indices
 
 const result = await claim
   .into(ValueRune)
-  .chain(() => Indices.Accounts.entry([index]).access(0))
+  .chain(() => Indices.Accounts.value(index).unhandle(undefined).access(0))
   .run()
 
 console.log(`Index ${index} mapped to ${result}}`)

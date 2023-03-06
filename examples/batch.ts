@@ -23,7 +23,7 @@ await logBalances()
 
 function logBalances() {
   return Rune.tuple(recipients.map(([name, { publicKey }]) => {
-    const free = System.Account.entry([publicKey]).access("data", "free")
+    const free = System.Account.value(publicKey).unhandle(undefined).access("data", "free")
     return free.dbg(Rune.str`${name} balance:`)
   }))
 }

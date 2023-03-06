@@ -1,6 +1,7 @@
-import { alice, bob, charlie, dave, MultiAddress, Rune } from "capi"
+import { alice, bob, charlie, dave, Rune } from "capi"
 import { VirtualMultisigRune } from "capi/patterns/multisig/mod.ts"
 import { Balances, chain, System, Utility } from "polkadot_dev/mod.ts"
+import { MultiAddress } from "polkadot_dev/types/sp_runtime/multiaddress.ts"
 import { parse } from "../deps/std/flags.ts"
 
 let { state } = parse(Deno.args, { string: ["state"] })
@@ -63,8 +64,8 @@ const charlieTx = Utility
 await Rune
   .chain(() => vMultisig)
   .chain(() => fundStash)
-  .chain(() => System.Account.entry([dave.publicKey]).dbg("Dave Balance Before:"))
+  .chain(() => System.Account.value(dave.publicKey).dbg("Dave Balance Before:"))
   .chain(() => bobTx)
   .chain(() => charlieTx)
-  .chain(() => System.Account.entry([dave.publicKey]).dbg("Dave Balance After:"))
+  .chain(() => System.Account.value(dave.publicKey).dbg("Dave Balance After:"))
   .run()

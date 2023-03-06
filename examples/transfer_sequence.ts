@@ -20,7 +20,7 @@ function balances() {
 }
 
 function balance(user: Sr25519) {
-  return System.Account.entry([user.publicKey]).access("data", "free")
+  return System.Account.value(user.publicKey).unhandle(undefined).access("data", "free")
 }
 
 function transfer(name: string, user: Sr25519) {

@@ -60,7 +60,7 @@ const initiatedEvent = XcmPallet
   .dbg("Initiated event:")
 
 const processedEvent = System.Events
-  .entry([], chain.latestBlock.hash)
+  .value(undefined, chain.latestBlock.hash)
   .map((events) =>
     events?.find((e) =>
       CollatorRuntimeEvent.isParachainSystem(e.event)
@@ -77,5 +77,9 @@ await logAliceBalance()
   .run()
 
 function logAliceBalance() {
-  return System.Account.entry([alice.publicKey]).access("data", "free").dbg("Alice balance:")
+  return System.Account
+    .value(alice.publicKey)
+    .unhandle(undefined)
+    .access("data", "free")
+    .dbg("Alice balance:")
 }

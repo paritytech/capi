@@ -41,6 +41,8 @@ export namespace Chain {
   export namespace Storage {
     export type Key<C extends Chain, P extends PalletName<C>, S extends StorageName<C, P>> =
       $.Native<Storage<C, P, S>["key"]>
+    export type PartialKey<C extends Chain, P extends PalletName<C>, S extends StorageName<C, P>> =
+      $.Native<Storage<C, P, S>["partialKey"]>
     export type Value<C extends Chain, P extends PalletName<C>, S extends StorageName<C, P>> =
       $.Native<Storage<C, P, S>["value"]>
   }

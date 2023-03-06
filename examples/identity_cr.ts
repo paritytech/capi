@@ -18,8 +18,8 @@ await Identity
   .run()
 
 const raw = Identity.IdentityOf
-  .entry([alice.publicKey])
-  .access("info")
+  .value(alice.publicKey)
   .unhandle(undefined)
+  .access("info")
 
 console.log(await transcoders.decode(raw).run())
