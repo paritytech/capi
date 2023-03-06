@@ -8,8 +8,6 @@ We have a [code of conduct](CODE_OF_CONDUCT.md); please follow it in all your in
 
 ### Container environment setup
 
-Develop in the cloud with [![Gitpod Open](https://img.shields.io/badge/Gitpod-Open-blue?logo=gitpod)](https://gitpod.io/#https://github.com/paritytech/capi)
-
 Develop locally using the [VSCode Remote Container](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension and [Docker](https://docs.docker.com/get-docker/). [![Open in Remote - Containers](https://img.shields.io/badge/Remote_--_Container-Open-blue?logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/paritytech/capi)
 
 ### Local environment setup
