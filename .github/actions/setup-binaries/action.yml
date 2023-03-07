@@ -23,5 +23,5 @@ runs:
       uses: ./.github/actions/setup-binary
       with:
         binary-name: zombienet-linux-x64
-        binary-version: v1.3.34
+        binary-version: v1.3.37
         binary-github: https://github.com/paritytech/zombienet
