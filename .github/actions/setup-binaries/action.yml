@@ -1,5 +1,5 @@
 name: "Setup Binaries"
-description: "Setup polkadot, polkadot-parachain and zombienet binaires"
+description: "Setup polkadot, polkadot-parachain and zombienet binaries"
 runs:
   using: "composite"
   steps:
