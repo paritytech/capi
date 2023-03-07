@@ -22,6 +22,6 @@ jobs:
             ~/.deno
             ~/.cache/deno
           key: ${{ runner.os }}-deno-${{ hashFiles('deps/**/*.ts') }}
-      - name: Setup Binaries
+      - name: Setup binaries
         uses: ./.github/actions/setup-binaries
       - run: deno task star
