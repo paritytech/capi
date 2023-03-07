@@ -6,6 +6,7 @@ export type HasherKind = $.Native<typeof $hasherKind>
 const $hasherKind = $.literalUnion([
   "Blake2_128",
   "Blake2_256",
+  "Blake2_512",
   "Blake2_128Concat",
   "Twox128",
   "Twox256",
