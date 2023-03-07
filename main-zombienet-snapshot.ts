@@ -68,7 +68,7 @@ async function startZombienet(configPath: string, tempDir: string): Promise<Deno
   const cmd = new Deno.Command(
     ZOMBIENET_BIN_DEFAULTS[Deno.build.os]!,
     {
-      args: ["-p", "native", "-d", tempDir, "-f", "spawn", configPath],
+      args: ["-p", "native", "-d", tempDir, "-c", 4, "-f", "spawn", configPath],
       stdout: "null",
       stderr: "null",
     },
