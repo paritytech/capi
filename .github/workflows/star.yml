@@ -22,26 +22,6 @@ jobs:
             ~/.deno
             ~/.cache/deno
           key: ${{ runner.os }}-deno-${{ hashFiles('deps/**/*.ts') }}
-      - name: Setup Polkadot
-        uses: ./.github/actions/setup-binary
-        with:
-          binary-name: polkadot
-          binary-version: v0.9.37
-          binary-github: https://github.com/paritytech/polkadot
-      - name: Setup Cumulus
-        uses: ./.github/actions/setup-binary
-        with:
-          binary-name: polkadot-parachain
-          binary-version: v0.9.370
-          binary-github: https://github.com/paritytech/cumulus
-      - name: Setup substrate-contracts-node
-        uses: ./.github/actions/setup-substrate-contracts-node
-        with:
-          version: v0.24.0
-      - name: Setup Zombienet
-        uses: ./.github/actions/setup-binary
-        with:
-          binary-name: zombienet-linux-x64
-          binary-version: v1.3.34
-          binary-github: https://github.com/paritytech/zombienet
+      - name: Setup Binaries
+        uses: ./.github/actions/setup-binaries
       - run: deno task star
