@@ -33,7 +33,7 @@ const foo: Foo = {
 const encoded = await $foo.encodeAsync(foo)
 const hexEncoded = hex.encode(encoded)
 
-type HasherKind = FrameHasherKind | 'Blake2_512'
+type HasherKind = FrameHasherKind | "Blake2_512"
 
 const hashes: Record<HasherKind, string> = {
   Blake2_128: "1f709e4fba4e77dc0e5f0d8ad9a34772",
