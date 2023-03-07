@@ -28,8 +28,8 @@ export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
       .flatMap((events) => events.into(ValueRune).filter(isTerminal))
   }
 
-  inBlock() {
-    const hash = this.transactionStatuses((status) =>
+  inBlockHash() {
+    return this.transactionStatuses((status) =>
       known.TransactionStatus.isTerminal(status)
       || (typeof status !== "string" ? !!status.inBlock : false)
     )
@@ -38,13 +38,14 @@ export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
       )
       .singular()
       .unhandle(NeverInBlockError)
-    return this.extrinsic.chain
-      .block(hash)
-      .into(BlockRune, this.extrinsic.chain, hash)
   }
 
-  finalized() {
-    const hash = this.transactionStatuses(known.TransactionStatus.isTerminal)
+  inBlock() {
+    return this.extrinsic.chain.block(this.inBlockHash())
+  }
+
+  finalizedHash() {
+    return this.transactionStatuses(known.TransactionStatus.isTerminal)
       .map((status) =>
         typeof status !== "string" && status.finalized
           ? status.finalized
@@ -52,7 +53,10 @@ export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
       )
       .singular()
       .unhandle(NeverFinalizedError)
-    return this.extrinsic.chain.block(hash)
+  }
+
+  finalized() {
+    return this.extrinsic.chain.block(this.finalizedHash())
   }
 
   inBlockEvents() {
