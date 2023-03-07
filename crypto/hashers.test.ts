@@ -1,6 +1,6 @@
 import * as $ from "../deps/scale.ts"
 import { assertEquals } from "../deps/std/testing/asserts.ts"
-import { HasherKind } from "../frame_metadata/mod.ts"
+import { HasherKind as FrameHasherKind } from "../frame_metadata/mod.ts"
 import { hashers, hex } from "./mod.ts"
 
 interface Foo {
@@ -32,6 +32,8 @@ const foo: Foo = {
 
 const encoded = await $foo.encodeAsync(foo)
 const hexEncoded = hex.encode(encoded)
+
+type HasherKind = FrameHasherKind | 'Blake2_512'
 
 const hashes: Record<HasherKind, string> = {
   Blake2_128: "1f709e4fba4e77dc0e5f0d8ad9a34772",
