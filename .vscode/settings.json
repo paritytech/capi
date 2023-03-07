@@ -18,16 +18,16 @@
     "https://capi.dev": true,
     "http://localhost:4646": false
   },
-  "files.watcherExclude": {
-    "**/.git/objects/**": true,
-    "**/.git/subtree-cache/**": true,
-    "target/**": true
-  },
   "deno.enable": true,
   "deno.lint": true,
   "editor.defaultFormatter": "dprint.dprint",
   "editor.formatOnSave": true,
   "editor.tabSize": 2,
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "target/**": true
+  },
   "prettier.printWidth": 100,
   "ltex.disabledRules": {
     "en-US": ["MORFOLOGIK_RULE_EN_US"]
