@@ -16,7 +16,6 @@ jobs:
         with:
           repository: paritytech/troodontid
           ref: refs/tags/0.0.1
-          token: ${{ secrets.GitHub_PAT }}
       - name: Run the private action
         uses: ./
         with:
