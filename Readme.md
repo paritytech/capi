@@ -18,12 +18,6 @@ interactions without compromising either performance or ease of use.
 
 ### Node.js Usage
 
-Run the Capi server.
-
-```sh
-npx capi
-```
-
 NPM-install chain-specific APIs from the Capi server.
 
 `package.json`
@@ -31,7 +25,7 @@ NPM-install chain-specific APIs from the Capi server.
 ```json
 {
   "dependencies": {
-    "polkadot": "http://localhost:4646/frame/wss/rpc.polkadot.io/@latest/pkg.tgz"
+    "polkadot": "https://capi.dev/frame/wss/rpc.polkadot.io/@latest/pkg.tgz"
   }
 }
 ```
@@ -53,12 +47,6 @@ console.log(await value.run())
 
 ### Deno Usage
 
-Run the Capi server.
-
-```sh
-deno run -A https://deno.land/x/capi/main.ts
-```
-
 Create an import map with the specifier corresponding to your target.
 
 `import_map.json`
@@ -66,7 +54,7 @@ Create an import map with the specifier corresponding to your target.
 ```json
 {
   "imports": {
-    "polkadot/": "http://localhost:4646/frame/wss/rpc.polkadot.io/@latest/"
+    "polkadot/": "https://capi.dev/frame/wss/rpc.polkadot.io/@latest/"
   }
 }
 ```
