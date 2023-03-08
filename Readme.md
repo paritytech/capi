@@ -93,7 +93,7 @@ Within a fresh clone of the repository...
 <!-- TODO: track https://github.com/denoland/dotland/issues/2650#issuecomment-1437015262 -->
 
 ```sh
-deno task capi -- examples/<example_name>.ts
+deno task run examples/<example_name>.ts
 ```
 
 ## Rationale
