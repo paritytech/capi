@@ -18,11 +18,17 @@ interactions without compromising either performance or ease of use.
 
 Run the Capi development server.
 
+### Deno
+
 ```sh
 deno run -A https://deno.land/x/capi/main.ts
 ```
 
-> Node.js users can run `npx capi`
+### Node
+
+```sh
+npx capi
+```
 
 Then, open your editor and import bindings from the local server.
 
