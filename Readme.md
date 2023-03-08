@@ -56,7 +56,10 @@ console.log(await value.run())
 ```
 
 > Node.js users can `npm i` from a similar endpoint:
-> `http://localhost:4646/frame/wss/rpc.polkadot.io/@latest/pkg.tgz`
+>
+> ```sh
+> npm i http://localhost:4646/frame/wss/rpc.polkadot.io/@latest/pkg.tgz
+> ```
 
 ## Running Examples
 
