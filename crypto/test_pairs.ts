@@ -1,3 +1,4 @@
+import { Blake2_256 } from "./hashers.ts"
 import { decode } from "./hex.ts"
 import { Sr25519 } from "./Sr25519.ts"
 
@@ -29,4 +30,10 @@ export const bobStash = pair(
 
 function pair(secret: string) {
   return Sr25519.fromSecret(decode(secret))
+}
+
+export function testPair(userId: number) {
+  return Sr25519.fromSeed(
+    Blake2_256.hash(new TextEncoder().encode(`capi-test-user-${userId}`)),
+  )
 }
