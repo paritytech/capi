@@ -18,7 +18,7 @@ interactions without compromising either performance or ease of use.
 
 ### Node.js Usage
 
-NPM-install chain-specific APIs from the Capi server.
+NPM-install chain-specific APIs from [capi.dev](https://capi.dev/).
 
 `package.json`
 
@@ -59,7 +59,7 @@ Create an import map with the specifier corresponding to your target.
 }
 ```
 
-Then, open your editor and import from the local server.
+Then, open your editor and import from [capi.dev](https://capi.dev/).
 
 ```ts
 import { System } from "polkadot/mod.ts"
