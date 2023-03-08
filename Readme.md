@@ -14,7 +14,9 @@ interactions without compromising either performance or ease of use.
 - [API Reference &rarr;](https://deno.land/x/capi/mod.ts)<br />A generated API
   reference, based on type signatures and TSDocs.
 
-## At a Glance (Node.js)
+## At a Glance
+
+### Node.js Usage
 
 Run the Capi server.
 
@@ -49,7 +51,7 @@ const value = System.Account.value(key)
 console.log(await value.run())
 ```
 
-## At a Glance (Deno)
+### Deno Usage
 
 Create an import map with the specifier corresponding to your target.
 
