@@ -25,7 +25,7 @@ NPM-install chain-specific APIs from [capi.dev](https://capi.dev/).
 ```json
 {
   "dependencies": {
-    "polkadot": "https://capi.dev/frame/wss/rpc.polkadot.io/@latest/pkg.tgz"
+    "@capi/polkadot": "https://capi.dev/frame/wss/rpc.polkadot.io/@latest/pkg.tgz"
   }
 }
 ```
@@ -33,7 +33,7 @@ NPM-install chain-specific APIs from [capi.dev](https://capi.dev/).
 Then, open your editor and import from the installed package.
 
 ```ts
-import { System } from "polkadot"
+import { System } from "@capi/polkadot"
 
 const key = System.Account
   .keyPage(1)
@@ -54,7 +54,7 @@ Create an import map with the specifier corresponding to your target.
 ```json
 {
   "imports": {
-    "polkadot/": "https://capi.dev/frame/wss/rpc.polkadot.io/@latest/"
+    "@capi/polkadot/": "https://capi.dev/frame/wss/rpc.polkadot.io/@latest/"
   }
 }
 ```
@@ -62,7 +62,7 @@ Create an import map with the specifier corresponding to your target.
 Then, open your editor and import from the to-be-mapped chain module.
 
 ```ts
-import { System } from "polkadot/mod.ts"
+import { System } from "@capi/polkadot/mod.ts"
 
 const key = System.Account
   .keyPage(1)
