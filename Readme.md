@@ -16,21 +16,21 @@ interactions without compromising either performance or ease of use.
 
 ## At a Glance
 
-Run the Capi development server.
+### Run The Capi Server
 
-### Deno
+#### Deno
 
 ```sh
 deno run -A https://deno.land/x/capi/main.ts
 ```
 
-### Node
+#### Node
 
 ```sh
 npx capi
 ```
 
-Then, open your editor and import bindings from the local server.
+### Import From The Server
 
 ```ts
 import { System } from "http://localhost:4646/frame/wss/rpc.polkadot.io/@latest/mod.ts"
