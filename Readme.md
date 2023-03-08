@@ -8,9 +8,9 @@ Capi is a framework for crafting interactions with Substrate chains. It consists
 of a development server and fluent API, which facilitates multistep, multichain
 interactions without compromising either performance or ease of use.
 
-- [Examples &rarr;](./examples)<br />SHOW ME THE CODE
 - [Docs &rarr;](https://docs.capi.dev)<br />Guides for Capi developers and
   pattern library developers
+- [Examples &rarr;](./examples)<br />SHOW ME THE CODE
 - [API Reference &rarr;](https://deno.land/x/capi/mod.ts)<br />A generated API
   reference, based on type signatures and TSDocs.
 
