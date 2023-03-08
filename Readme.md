@@ -59,7 +59,7 @@ Create an import map with the specifier corresponding to your target.
 }
 ```
 
-Then, open your editor and import from [capi.dev](https://capi.dev/).
+Then, open your editor and import from the to-be-mapped chain module.
 
 ```ts
 import { System } from "polkadot/mod.ts"
