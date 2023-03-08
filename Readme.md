@@ -16,9 +16,7 @@ interactions without compromising either performance or ease of use.
 
 ## At a Glance
 
-Create an import map (a web platform standard) with the specifier(s)
-corresponding to your provider and chain discovery value (in this case a
-WebSocket URL).
+Create an import map with the specifier corresponding to your target.
 
 `import_map.json`
 
@@ -30,19 +28,19 @@ WebSocket URL).
 }
 ```
 
-Run The Capi Server
+Run The Capi Server.
 
 ```sh
 deno run -A https://deno.land/x/capi/main.ts
 ```
 
-> Or use the Node.js equivalent
+> Or use the Node.js equivalent:
 >
 > ```sh
 > npx capi
 > ```
 
-### Import From The Server
+Then, open your editor and import bindings from the local server.
 
 ```ts
 import { System } from "http://localhost:4646/frame/wss/rpc.polkadot.io/@latest/mod.ts"
