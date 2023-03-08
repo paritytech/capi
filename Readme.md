@@ -16,19 +16,31 @@ interactions without compromising either performance or ease of use.
 
 ## At a Glance
 
-### Run The Capi Server
+Create an import map (a web platform standard) with the specifier(s)
+corresponding to your provider and chain discovery value (in this case a
+WebSocket URL).
 
-#### Deno
+`import_map.json`
+
+```json
+{
+  "imports": {
+    "polkadot/": "http://localhost:4646/frame/wss/rpc.polkadot.io/@latest/"
+  }
+}
+```
+
+Run The Capi Server
 
 ```sh
 deno run -A https://deno.land/x/capi/main.ts
 ```
 
-#### Node
-
-```sh
-npx capi
-```
+> Node.js users can use the CLI from NPM
+>
+> ```sh
+> npx capi
+> ```
 
 ### Import From The Server
 
