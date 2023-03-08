@@ -1,0 +1,23 @@
+name: Examples
+
+on:
+  pull_request:
+  merge_group:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2-beta
+        with:
+          repository: paritytech/troodontid
+          ref: refs/tags/0.0.1
+          token: ${{ secrets.GitHub_PAT }}
+      - name: Run the private action
+        uses: ./
+        with:
+          dir: "examples"
