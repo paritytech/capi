@@ -32,7 +32,6 @@ export class PolkadotDevProvider extends FrameBinProvider {
     const port = getAvailable()
     const chainSpec = await this.#getCustomChainSpec(runtimeName)
     const args: string[] = ["--tmp", "--alice", "--ws-port", port.toString(), "--chain", chainSpec]
-    console.log({ args })
     await this.runBin(args)
     return port
   }
