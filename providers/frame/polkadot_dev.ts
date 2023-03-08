@@ -9,7 +9,7 @@ export interface PolkadotDevProviderProps {
 }
 
 const TEST_USER_COUNT = 1000
-const TEST_USER_INITIAL_FUNDS = 1000000000000000000
+const TEST_USER_INITIAL_FUNDS = 1000000000000000000n
 const DEV_RUNTIME_PREFIXES = {
   polkadot: 0,
   kusama: 2,
@@ -55,7 +55,7 @@ export class PolkadotDevProvider extends FrameBinProvider {
     for (let i = 0; i < TEST_USER_COUNT; i++) {
       balances.push([
         ss58.encode(DEV_RUNTIME_PREFIXES[runtimeName], testPair(i).publicKey),
-        TEST_USER_INITIAL_FUNDS,
+        Number(TEST_USER_INITIAL_FUNDS),
       ])
     }
     const customChainSpecPath = await Deno.makeTempFile({
@@ -63,18 +63,15 @@ export class PolkadotDevProvider extends FrameBinProvider {
       suffix: ".json",
     })
     await Deno.writeTextFile(customChainSpecPath, JSON.stringify(chainSpec, undefined, 2))
-    const buildSpecRawCmd = new Deno.Command(
-      this.bin,
-      {
-        args: [
-          "build-spec",
-          "--disable-default-bootnode",
-          "--chain",
-          customChainSpecPath,
-          "--raw",
-        ],
-      },
-    )
+    const buildSpecRawCmd = new Deno.Command(this.bin, {
+      args: [
+        "build-spec",
+        "--disable-default-bootnode",
+        "--chain",
+        customChainSpecPath,
+        "--raw",
+      ],
+    })
     const chainSpecRaw = JSON.parse(
       new TextDecoder().decode((await buildSpecRawCmd.output()).stdout),
     )

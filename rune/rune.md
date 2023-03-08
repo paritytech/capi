@@ -211,7 +211,8 @@ We can still achieve the same behavior in both, but in RxJS, we had to use a
 different combinator. (`combineLatest` wouldn't have worked in the first example
 as it would've given `a` inconsistent values).
 
-As the timing gets even more complex, though, it becomes infeasible to handle correctly in RxJS:
+As the timing gets even more complex, though, it becomes infeasible to handle
+correctly in RxJS:
 
 ```ts
 import { combineLatest, map, timer, zip } from "npm:rxjs"

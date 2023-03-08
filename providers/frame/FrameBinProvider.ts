@@ -1,3 +1,4 @@
+import { RequestStatus } from "http://localhost:4646/frame/dev/polkadot/@v0.9.36/types/pallet_preimage/mod"
 import { deadline } from "../../deps/std/async.ts"
 import { Env, PathInfo } from "../../server/mod.ts"
 import { PermanentMemo } from "../../util/mod.ts"

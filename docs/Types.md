@@ -1,8 +1,26 @@
 # Types
 
-The types of the on-chain world are declared in a given [Substrate](https://substrate.io/)-based chain's (Rust) source code. While many types may remain consistent across chains, many may differ. On one chain, `AccountData` may be defined with fields describing fungible assets; on another (hypothetical) chain, perhaps `AccountData` references non-fungible assets, reputation, linked accounts or something else entirely. Although [FRAME](https://docs.substrate.io/reference/glossary/#frame) certainly helps to standardize chain properties, those properties can be customized to the extent that we cannot make assumptions regarding shapes of data across chains. Additionally, types can change upon [runtime upgrades](https://docs.substrate.io/build/upgrade-the-runtime/); your assumptions about the shape of a type may become invalid; to interact with these highly-dynamic on-chain environments––and to do so from a JavaScript environment––poses inherent difficulty. We JS developers must (A) think in terms of Rust data types and (B) keep a lookout for breaking changes to chain runtimes. This document does not provide a silver-bullet solution to this complexity, but it should provide the background necessary for you to address types for your specific use cases.
+The types of the on-chain world are declared in a given
+[Substrate](https://substrate.io/)-based chain's (Rust) source code. While many
+types may remain consistent across chains, many may differ. On one chain,
+`AccountData` may be defined with fields describing fungible assets; on another
+(hypothetical) chain, perhaps `AccountData` references non-fungible assets,
+reputation, linked accounts or something else entirely. Although
+[FRAME](https://docs.substrate.io/reference/glossary/#frame) certainly helps to
+standardize chain properties, those properties can be customized to the extent
+that we cannot make assumptions regarding shapes of data across chains.
+Additionally, types can change upon
+[runtime upgrades](https://docs.substrate.io/build/upgrade-the-runtime/); your
+assumptions about the shape of a type may become invalid; to interact with these
+highly-dynamic on-chain environments––and to do so from a JavaScript
+environment––poses inherent difficulty. We JS developers must (A) think in terms
+of Rust data types and (B) keep a lookout for breaking changes to chain
+runtimes. This document does not provide a silver-bullet solution to this
+complexity, but it should provide the background necessary for you to address
+types for your specific use cases.
 
-If you just want to see how Rust types are transformed by Capi, [skip to the conversion table](#rust-⬌-typescript).
+If you just want to see how Rust types are transformed by Capi,
+[skip to the conversion table](#rust-⬌-typescript).
 
 ## Learning About Types
 
@@ -12,7 +30,8 @@ Let's cover how to learn about a chain's types/properties.
 
 ### FRAME Metadata
 
-Every FRAME chain exposes metadata about its types and capabilities. This metadata is called the "FRAME Metadata." Let's retrieve and inspect it.
+Every FRAME chain exposes metadata about its types and capabilities. This
+metadata is called the "FRAME Metadata." Let's retrieve and inspect it.
 
 ```ts
 import { client } from "http://localhost:4646/frame/wss/rpc.polkadot.io/@v0.9.36/mod.ts"
@@ -20,7 +39,8 @@ import { client } from "http://localhost:4646/frame/wss/rpc.polkadot.io/@v0.9.36
 
 > To run the Capi dev server, run `deno run -A https://deno.land/x/capi/main.ts`
 
-Let's connect to Polkadot and fetch the chain's metadata for the present highest block.
+Let's connect to Polkadot and fetch the chain's metadata for the present highest
+block.
 
 ```ts
 // ...
@@ -30,9 +50,15 @@ const metadata = await C.metadata(client)()
 console.log(await metadata.run())
 ```
 
-If we index into `metadata.pallets`, we'll see a list of all pallet metadata. Each element of this list contains a complete description of the given pallet's storage entries, as well as constants, callables (for creating extrinsics), errors and events. Some fields––such as a pallet's `call` field––point to an index in `metadata.tys`, which contains a complete description of the chain's type-level context.
+If we index into `metadata.pallets`, we'll see a list of all pallet metadata.
+Each element of this list contains a complete description of the given pallet's
+storage entries, as well as constants, callables (for creating extrinsics),
+errors and events. Some fields––such as a pallet's `call` field––point to an
+index in `metadata.tys`, which contains a complete description of the chain's
+type-level context.
 
-Let's say we want to learn about the types associated with the `Balances` pallet's `Account` storage.
+Let's say we want to learn about the types associated with the `Balances`
+pallet's `Account` storage.
 
 ```ts
 // ...
@@ -44,7 +70,8 @@ const accountsStorage = C.entryMetadata(balancesPallet, "Account")
 console.log(await accountsStorage.run())
 ```
 
-On chains using the `Balances` pallet, `accountsStorage` will look _similar_ to the following.
+On chains using the `Balances` pallet, `accountsStorage` will look _similar_ to
+the following.
 
 ```ts
 {
@@ -78,11 +105,14 @@ On chains using the `Balances` pallet, `accountsStorage` will look _similar_ to 
 }
 ```
 
-- `type` tells us that this storage is that of a map, not a plain entry (standalone value)
-- `key` tells us what type of value(s) we need to use in order to index into the map
+- `type` tells us that this storage is that of a map, not a plain entry
+  (standalone value)
+- `key` tells us what type of value(s) we need to use in order to index into the
+  map
 - `value` tells us what type of value we can expect to retrieve from the map
 
-In this example, the `key`'s `id` is `0`. Let's take a look at this type (within the top-level `metadata`'s `tys`).
+In this example, the `key`'s `id` is `0`. Let's take a look at this type (within
+the top-level `metadata`'s `tys`).
 
 ```ts
 const keyType = metadata.tys[accountsStorage.key]
@@ -101,7 +131,9 @@ const keyType = metadata.tys[accountsStorage.key]
 };
 ```
 
-If we index again into `metadata.tys` with `1` (as specified in the first field), we'll see the inner types (in this case a 32-element tuple of `u8`s). From these descriptions, we can roughly deduce the JS equivalent.
+If we index again into `metadata.tys` with `1` (as specified in the first
+field), we'll see the inner types (in this case a 32-element tuple of `u8`s).
+From these descriptions, we can roughly deduce the JS equivalent.
 
 ```ts
 namespace sp_core {
@@ -117,7 +149,8 @@ We can instantiate this as we would any other JS-land value.
 const accountId32 = new Uint8Array(RAW_ADDR_BYTES)
 ```
 
-We'll cover the TypeScript <-> Rust conversions more in depth [in a later section](#typescript---rust).
+We'll cover the TypeScript <-> Rust conversions more in depth
+[in a later section](#typescript---rust).
 
 Let's now utilize our `accountId32` definition to read a balance.
 
@@ -135,7 +168,8 @@ const account = await account.run()
 
 What value does this retrieve? How can we deduce this from the FRAME metadata?
 
-We can do the same as before, but this time index into `metadata.tys` with the `accountsStorage.value`.
+We can do the same as before, but this time index into `metadata.tys` with the
+`accountsStorage.value`.
 
 ```ts
 const valueType = metadata.tys[accountsStorage.value]
@@ -159,7 +193,9 @@ This should give us something along the following lines:
 };
 ```
 
-When we follow type `6` (metadata.tys[6]), we see that it represents a `u128`. In TypeScript, this translates to a `bigint`. Therefore, the complete JS-land structure looks as follows.
+When we follow type `6` (metadata.tys[6]), we see that it represents a `u128`.
+In TypeScript, this translates to a `bigint`. Therefore, the complete JS-land
+structure looks as follows.
 
 ```ts
 namespace pallet_balances {
@@ -172,7 +208,8 @@ namespace pallet_balances {
 }
 ```
 
-> Note: we can ignore the `params` field of the `AccountData` metadata, as the type param is already applied to the field metadata.
+> Note: we can ignore the `params` field of the `AccountData` metadata, as the
+> type param is already applied to the field metadata.
 
 ## Rust ⬌ TypeScript
 
@@ -249,9 +286,12 @@ type E1 =
 
 ## Runtime Validation
 
-What happens if we ever specify an invalid value to an untyped effect? Capi will return a validation error with a detailed description of the type incompatibility.
+What happens if we ever specify an invalid value to an untyped effect? Capi will
+return a validation error with a detailed description of the type
+incompatibility.
 
-For instance, the aforementioned system accounts map is keyed with a `Uint8Array`. What happens if we try to key into it with `"HELLO T6"`?
+For instance, the aforementioned system accounts map is keyed with a
+`Uint8Array`. What happens if we try to key into it with `"HELLO T6"`?
 
 ```ts
 const account = C.entryRead(client)("System", "Account", ["HELLO T6"])
@@ -276,9 +316,13 @@ Let's look at the same example from before: reading some `AccountData`.
 const result = await C.entryRead(client)("System", "Account", [key]).run()
 ```
 
-In this storage read example, `result` is typed as the successfully-retrieved value (container) unioned with all possible errors.
+In this storage read example, `result` is typed as the successfully-retrieved
+value (container) unioned with all possible errors.
 
-There are several ways to "unwrap" the inner `value`. The recommended path is to first check for and handle all possible errors, which may encapsulate error specific data (as do [SCALE](https://github.com/paritytech/scale-ts) validation errors).
+There are several ways to "unwrap" the inner `value`. The recommended path is to
+first check for and handle all possible errors, which may encapsulate error
+specific data (as do [SCALE](https://github.com/paritytech/scale-ts) validation
+errors).
 
 ```ts
 if (account instanceof Error) {
