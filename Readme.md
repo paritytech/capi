@@ -36,7 +36,7 @@ NPM-install chain-specific APIs from the Capi server.
 }
 ```
 
-Then, open your editor and import from the generated package.
+Then, open your editor and import from the installed package.
 
 ```ts
 import { System } from "polkadot"
@@ -53,6 +53,12 @@ console.log(await value.run())
 
 ### Deno Usage
 
+Run the Capi server.
+
+```sh
+deno run -A https://deno.land/x/capi/main.ts
+```
+
 Create an import map with the specifier corresponding to your target.
 
 `import_map.json`
@@ -65,16 +71,10 @@ Create an import map with the specifier corresponding to your target.
 }
 ```
 
-Run the Capi server.
-
-```sh
-deno run -A https://deno.land/x/capi/main.ts
-```
-
-Then, open your editor and import bindings from the local server.
+Then, open your editor and import from the local server.
 
 ```ts
-import { System } from "http://localhost:4646/frame/wss/rpc.polkadot.io/@latest/mod.ts"
+import { System } from "polkadot/mod.ts"
 
 const key = System.Account
   .keyPage(1)
