@@ -36,7 +36,7 @@ Run The Capi Server
 deno run -A https://deno.land/x/capi/main.ts
 ```
 
-> Node.js users can use the CLI from NPM
+> Or use the Node.js equivalent
 >
 > ```sh
 > npx capi
