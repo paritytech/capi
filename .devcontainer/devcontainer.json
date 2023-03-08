@@ -3,38 +3,18 @@
   "build": {
     "dockerfile": "Dockerfile"
   },
-  "settings": {
-    "files.watcherExclude": {
-      "**/.git/objects/**": true,
-      "**/.git/subtree-cache/**": true,
-      "target/**": true
-    },
-    "[jsonc]": {
-      "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "[yaml]": {
-      "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "[typescript]": {
-      "editor.defaultFormatter": "dprint.dprint"
-    },
-    "deno.codeLens.testArgs": ["-A", "-L=info"],
-    "deno.config": "./deno.jsonc",
-    "deno.enable": true,
-    "deno.lint": true,
-    "editor.defaultFormatter": "dprint.dprint",
-    "editor.formatOnSave": true,
-    "editor.tabSize": 2,
-    "prettier.printWidth": 100
-  },
-  "extensions": [
-    "EditorConfig.EditorConfig",
-    "denoland.vscode-deno",
-    "dprint.dprint",
-    "esbenp.prettier-vscode",
-    "ms-azuretools.vscode-docker",
-    "streetsidesoftware.code-spell-checker",
-    "vadimcn.vscode-lldb",
-    "bungcip.better-toml"
-  ]
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "EditorConfig.EditorConfig",
+        "denoland.vscode-deno",
+        "dprint.dprint",
+        "esbenp.prettier-vscode",
+        "ms-azuretools.vscode-docker",
+        "streetsidesoftware.code-spell-checker",
+        "vadimcn.vscode-lldb",
+        "bungcip.better-toml"
+      ]
+    }
+  }
 }
