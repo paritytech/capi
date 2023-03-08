@@ -14,7 +14,42 @@ interactions without compromising either performance or ease of use.
 - [API Reference &rarr;](https://deno.land/x/capi/mod.ts)<br />A generated API
   reference, based on type signatures and TSDocs.
 
-## At a Glance
+## At a Glance (Node.js)
+
+Run the Capi server.
+
+```sh
+npx capi
+```
+
+NPM-install chain-specific APIs from the Capi server.
+
+`package.json`
+
+```json
+{
+  "dependencies": {
+    "polkadot": "http://localhost:4646/frame/wss/rpc.polkadot.io/@latest/pkg.tgz"
+  }
+}
+```
+
+Then, open your editor and import from the generated package.
+
+```ts
+import { System } from "polkadot"
+
+const key = System.Account
+  .keyPage(1)
+  .access(0)
+  .unhandle(undefined)
+
+const value = System.Account.value(key)
+
+console.log(await value.run())
+```
+
+## At a Glance (Deno)
 
 Create an import map with the specifier corresponding to your target.
 
@@ -28,17 +63,11 @@ Create an import map with the specifier corresponding to your target.
 }
 ```
 
-Run The Capi Server.
+Run the Capi server.
 
 ```sh
 deno run -A https://deno.land/x/capi/main.ts
 ```
-
-> Or use the Node.js equivalent:
->
-> ```sh
-> npx capi
-> ```
 
 Then, open your editor and import bindings from the local server.
 
@@ -54,12 +83,6 @@ const value = System.Account.value(key)
 
 console.log(await value.run())
 ```
-
-> Node.js users can `npm i` from a similar endpoint:
->
-> ```sh
-> npm i http://localhost:4646/frame/wss/rpc.polkadot.io/@latest/pkg.tgz
-> ```
 
 ## Running Examples
 
