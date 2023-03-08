@@ -16,29 +16,18 @@ interactions without compromising either performance or ease of use.
 
 ## At a Glance
 
-Create an import map with the specifier(s) corresponding to your provider and
-chain discovery value (in this case a WebSocket URL).
-
-`import_map.json`
-
-```json
-{
-  "imports": {
-    "polkadot/": "http://localhost:4646/frame/wss/rpc.polkadot.io/@latest/"
-  }
-}
-```
-
 Run the Capi development server.
 
 ```sh
 deno run -A https://deno.land/x/capi/main.ts
 ```
 
+> Node.js users can run `npx capi`
+
 Then, open your editor and import bindings from the local server.
 
 ```ts
-import { System } from "polkadot/mod.ts"
+import { System } from "http://localhost:4646/frame/wss/rpc.polkadot.io/@latest/mod.ts"
 
 const key = System.Account
   .keyPage(1)
@@ -49,6 +38,9 @@ const value = System.Account.value(key)
 
 console.log(await value.run())
 ```
+
+> Node.js users can `npm i` from a similar endpoint:
+> `http://localhost:4646/frame/wss/rpc.polkadot.io/@latest/pkg.tgz`
 
 ## Running Examples
 
@@ -91,4 +83,4 @@ Contributions are welcome and appreciated! Check out the
 Capi is [Apache licensed](LICENSE).
 
 [^1]: Rune is the unit of composition with which we model Capi programs. See
-[docs/basics/rune.md](docs/basics/rune.md).
+[docs/basics/rune.md](https://docs.capi.dev/rune.md).
