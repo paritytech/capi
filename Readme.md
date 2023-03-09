@@ -16,6 +16,12 @@ interactions without compromising either performance or ease of use.
 
 ## At a Glance
 
+Run the Capi development server.
+
+```sh
+deno run -A https://deno.land/x/capi/main.ts
+```
+
 Create an import map with the specifier corresponding to your target.
 
 `import_map.json`
@@ -23,7 +29,7 @@ Create an import map with the specifier corresponding to your target.
 ```json
 {
   "imports": {
-    "@capi/polkadot/": "https://capi.dev/frame/wss/rpc.polkadot.io/@latest/"
+    "@capi/polkadot/": "http://localhost:4646/frame/wss/rpc.polkadot.io/@latest/"
   }
 }
 ```
