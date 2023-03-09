@@ -1,6 +1,7 @@
 import { File } from "../../codegen/frame/mod.ts"
 import * as $ from "../../deps/scale.ts"
 import { Env, PathInfo } from "../../server/mod.ts"
+import { fromPathInfo } from "../../server/PathInfo.ts"
 import { getAvailable } from "../../util/port.ts"
 import { FrameBinProvider } from "./FrameBinProvider.ts"
 import { createCustomChainSpec } from "./utils/mod.ts"
@@ -30,8 +31,9 @@ export class PolkadotDevProvider extends FrameBinProvider {
   }
 
   override async chainFile(pathInfo: PathInfo): Promise<File> {
+    const url = new URL(fromPathInfo({ ...pathInfo, filePath: "test-users" }), this.env.href)
+      .toString()
     const file = await super.chainFile(pathInfo)
-
     return new File(`
       ${file.codeRaw}
 
@@ -46,7 +48,7 @@ export class PolkadotDevProvider extends FrameBinProvider {
       export async function users<N extends number>(count: N): Promise<ArrayOfLength<C.Sr25519, N>>
       export async function users(count: number): Promise<C.Sr25519[]> {
         const response = await fetch(
-          "http://localhost:4646/frame/dev/polkadot/@v0.9.37/test-users",
+          "${url}",
           {
             method: "POST",
             headers: {
@@ -70,12 +72,6 @@ export class PolkadotDevProvider extends FrameBinProvider {
 
   override async handle(request: Request, pathInfo: PathInfo): Promise<Response> {
     if (request.method.toUpperCase() === "POST" && pathInfo.filePath === "test-users") {
-      console.log("polakdot_dev.handle", {
-        staticUrl: this.staticUrl(pathInfo),
-        request,
-        pathInfo,
-      })
-
       try {
         const { count } = await request.json()
         const currentCount = this.#testUserCountCache[this.#getRuntime(pathInfo)] ?? 0
