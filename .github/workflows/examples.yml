@@ -12,10 +12,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2-beta
-        with:
-          ref: "master"
-      - name: Run the private action
+      - name: Checkout (GitHub)
+        uses: actions/checkout@v3
+      - name: Run the action
         uses: ../troodontid
         with:
           dir: "examples"
