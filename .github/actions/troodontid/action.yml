@@ -17,7 +17,7 @@ runs:
   image: "Dockerfile"
   args:
     - ${{ inputs.dir }}
-    - ${{ inputs.browser }}
     - ${{ inputs.importMap }}
+    - ${{ inputs.browser }}
     - ${{ inputs.concurrency }}
     - ${{ inputs.ignore }}
