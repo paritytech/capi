@@ -231,8 +231,9 @@ export class VirtualMultisigRune<out U, out C extends Chain = Chain>
           ),
           // TODO: ensure that this supports other address types / revisit source of deployer accountId
           ...memberProxies
-            .filter((_, i) => !equals(memberAccountIds[i]!, deployer.address.value!))
-            .flatMap((proxy, i) =>
+            .map((proxy, i) => [proxy, i] as const)
+            .filter(([_, i]) => !equals(memberAccountIds[i]!, deployer.address.value!))
+            .flatMap(([proxy, i]) =>
               replaceDelegateCalls(
                 chain,
                 MultiAddress.Id(proxy),
