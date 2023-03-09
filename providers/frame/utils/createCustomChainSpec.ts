@@ -1,7 +1,7 @@
 import { ss58, testUser } from "../../../crypto/mod.ts"
 
-const DEFAULT_TEST_USER_COUNT = 10
-const DEFAULT_TEST_USER_INITIAL_FUNDS = 1000000000000000000
+const DEFAULT_TEST_USER_COUNT = 100_000
+const DEFAULT_TEST_USER_INITIAL_FUNDS = 1_000_000_000_000_000_000
 
 export interface CreateCustomChainSpecProps {
   binary: string
