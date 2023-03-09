@@ -10,10 +10,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout (GitHub)
-        uses: actions/checkout@v3
-    uses: ./.github/actions/troodontid2
-    with:
-      dir: examples
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/troodontid2
+        with:
+          dir: examples
