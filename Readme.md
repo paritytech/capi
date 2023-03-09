@@ -16,37 +16,6 @@ interactions without compromising either performance or ease of use.
 
 ## At a Glance
 
-### Node.js Usage
-
-NPM-install chain-specific APIs from [capi.dev](https://capi.dev/).
-
-`package.json`
-
-```json
-{
-  "dependencies": {
-    "@capi/polkadot": "https://capi.dev/frame/wss/rpc.polkadot.io/@latest/pkg.tgz"
-  }
-}
-```
-
-Then, open your editor and import from the installed package.
-
-```ts
-import { System } from "@capi/polkadot"
-
-const key = System.Account
-  .keyPage(1)
-  .access(0)
-  .unhandle(undefined)
-
-const value = System.Account.value(key)
-
-console.log(await value.run())
-```
-
-### Deno Usage
-
 Create an import map with the specifier corresponding to your target.
 
 `import_map.json`
@@ -114,5 +83,4 @@ Contributions are welcome and appreciated! Check out the
 
 Capi is [Apache licensed](LICENSE).
 
-[^1]: Rune is the unit of composition with which we model Capi programs. See
-[docs/basics/rune.md](https://docs.capi.dev/rune.md).
+[^1]: Rune is the unit of composition with which we model Capi programs.
