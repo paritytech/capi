@@ -12,8 +12,6 @@ const DEV_RUNTIME_PREFIXES = {
   rococo: 42,
 } as const
 
-const TEST_USER_COUNT = 10
-
 export interface PolkadotDevProviderProps {
   polkadotPath?: string
 }
@@ -80,7 +78,7 @@ export class PolkadotDevProvider extends FrameBinProvider {
       }
       let index = this.#userCount[pathInfo.target!] ?? 0
       const newCount = index + count
-      if (newCount < TEST_USER_COUNT) {
+      if (newCount < PolkadotDevProvider.DEFAULT_TEST_USER_COUNT) {
         this.#userCount[pathInfo.target!] = newCount
       } else {
         index = -1

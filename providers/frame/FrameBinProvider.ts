@@ -5,9 +5,6 @@ import { PermanentMemo } from "../../util/mod.ts"
 import { ready } from "../../util/port.ts"
 import { FrameProxyProvider } from "./FrameProxyProvider.ts"
 
-const DEFAULT_TEST_USER_COUNT = 100_000
-const DEFAULT_TEST_USER_INITIAL_FUNDS = 1_000_000_000_000_000_000
-
 export interface FrameBinProviderProps {
   bin: string
   installation: string
@@ -15,6 +12,9 @@ export interface FrameBinProviderProps {
 }
 
 export abstract class FrameBinProvider extends FrameProxyProvider {
+  static readonly DEFAULT_TEST_USER_COUNT = 100_000
+  static readonly DEFAULT_TEST_USER_INITIAL_FUNDS = 1_000_000_000_000_000_000
+
   bin
   installation
   timeout
@@ -86,10 +86,10 @@ export abstract class FrameBinProvider extends FrameProxyProvider {
     )
     const chainSpec = JSON.parse(new TextDecoder().decode((await buildSpecCmd.output()).stdout))
     const balances: any[] = chainSpec.genesis.runtime.balances.balances
-    for (let i = 0; i < DEFAULT_TEST_USER_COUNT; i++) {
+    for (let i = 0; i < FrameBinProvider.DEFAULT_TEST_USER_COUNT; i++) {
       balances.push([
         ss58.encode(networkPrefix, testUser(i).publicKey),
-        DEFAULT_TEST_USER_INITIAL_FUNDS,
+        FrameBinProvider.DEFAULT_TEST_USER_INITIAL_FUNDS,
       ])
     }
     const customChainSpecPath = await Deno.makeTempFile({
