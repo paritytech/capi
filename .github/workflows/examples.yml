@@ -14,9 +14,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2-beta
         with:
-          repository: paritytech/troodontid
-          ref: refs/tags/0.0.1
+          ref: "master"
       - name: Run the private action
-        uses: ./
+        uses: ../troodontid
         with:
           dir: "examples"
