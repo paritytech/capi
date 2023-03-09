@@ -1,6 +1,5 @@
 name: "troodontid"
-description: ""
-author: "Parity Technologies"
+description: "asdf"
 inputs:
   dir:
     required: true
