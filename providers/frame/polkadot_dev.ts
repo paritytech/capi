@@ -1,12 +1,9 @@
+import { File } from "../../codegen/frame/mod.ts"
 import * as $ from "../../deps/scale.ts"
 import { Env, PathInfo } from "../../server/mod.ts"
 import { getAvailable } from "../../util/port.ts"
 import { FrameBinProvider } from "./FrameBinProvider.ts"
 import { createCustomChainSpec } from "./utils/mod.ts"
-
-export interface PolkadotDevProviderProps {
-  polkadotPath?: string
-}
 
 const DEV_RUNTIME_PREFIXES = {
   polkadot: 0,
@@ -16,6 +13,10 @@ const DEV_RUNTIME_PREFIXES = {
 } as const
 
 const TEST_USER_COUNT = 10
+
+export interface PolkadotDevProviderProps {
+  polkadotPath?: string
+}
 
 export class PolkadotDevProvider extends FrameBinProvider {
   #testUserCountCache: Record<string, number> = {}
@@ -28,9 +29,52 @@ export class PolkadotDevProvider extends FrameBinProvider {
     })
   }
 
+  override async chainFile(pathInfo: PathInfo): Promise<File> {
+    const file = await super.chainFile(pathInfo)
+
+    return new File(`
+      ${file.codeRaw}
+
+      type ArrayOfLength<
+        T,
+        L extends number,
+        A extends T[] = [],
+      > = number extends L ? T[]
+        : L extends A["length"] ? A
+        : ArrayOfLength<T, L, [...A, T]>
+
+      export async function users<N extends number>(count: N): Promise<ArrayOfLength<C.Sr25519, N>>
+      export async function users(count: number): Promise<C.Sr25519[]> {
+        const response = await fetch(
+          "http://localhost:4646/frame/dev/polkadot/@v0.9.37/test-users",
+          {
+            method: "POST",
+            headers: {
+              "content-type": "application/json",
+            },
+            body: JSON.stringify({ count }),
+          },
+        )
+        if (response.status >= 400) {
+          throw new Error(await response.text())
+        }
+        const { from, to }: { from: number; to: number } = await response.json()
+        const userIds: C.Sr25519[] = []
+        for (let i = from; i < to; i++) {
+          userIds.push(C.testUser(i))
+        }
+        return userIds
+      }
+    `)
+  }
+
   override async handle(request: Request, pathInfo: PathInfo): Promise<Response> {
     if (request.method.toUpperCase() === "POST" && pathInfo.filePath === "test-users") {
-      console.log("polakdot_dev.handle", { request, pathInfo })
+      console.log("polakdot_dev.handle", {
+        staticUrl: this.staticUrl(pathInfo),
+        request,
+        pathInfo,
+      })
 
       try {
         const { count } = await request.json()

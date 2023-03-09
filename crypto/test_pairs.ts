@@ -32,7 +32,7 @@ function pair(secret: string) {
   return Sr25519.fromSecret(decode(secret))
 }
 
-export function testPair(userId: number) {
+export function testUser(userId: number) {
   return Sr25519.fromSeed(
     Blake2_256.hash(new TextEncoder().encode(`capi-test-user-${userId}`)),
   )

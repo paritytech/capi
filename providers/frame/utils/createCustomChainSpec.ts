@@ -1,4 +1,4 @@
-import { ss58, testPair } from "../../../crypto/mod.ts"
+import { ss58, testUser } from "../../../crypto/mod.ts"
 
 const DEFAULT_TEST_USER_COUNT = 10
 const DEFAULT_TEST_USER_INITIAL_FUNDS = 1000000000000000000
@@ -35,7 +35,7 @@ export async function createCustomChainSpec({
   const count = testUserAccountProps.count ?? DEFAULT_TEST_USER_COUNT
   for (let i = 0; i < count; i++) {
     balances.push([
-      ss58.encode(testUserAccountProps.networkPrefix, testPair(i).publicKey),
+      ss58.encode(testUserAccountProps.networkPrefix, testUser(i).publicKey),
       initialFunds,
     ])
   }
