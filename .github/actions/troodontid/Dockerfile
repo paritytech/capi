@@ -74,6 +74,8 @@ RUN curl -fsSL https://dprint.dev/install.sh | DPRINT_INSTALL=/usr/local sh \
     && curl -fsSL https://github.com/paritytech/substrate-contracts-node/releases/download/${SUBSTRATE_CONTRACTS_NODE_VERSION}/substrate-contracts-node-linux.tar.gz | tar -zx \
     && mv ./artifacts/substrate-contracts-node-linux/substrate-contracts-node /usr/local/bin/
 
+RUN chmod 666 /github
+
 COPY entrypoint.sh /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
