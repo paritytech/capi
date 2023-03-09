@@ -84,7 +84,6 @@ export class PolkadotDevProvider extends FrameBinProvider {
         const from = currentCount
         const to = currentCount + count
         this.#testUserCountCache[this.#getRuntime(pathInfo)] = to
-
         return new Response(
           JSON.stringify({ from, to }),
           {
