@@ -1,0 +1,13 @@
+name: "Troodontid"
+description: "Troodontid"
+inputs:
+  dir:
+    description: "dir"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: test
+      run: |
+        echo $1
+      shell: bash
