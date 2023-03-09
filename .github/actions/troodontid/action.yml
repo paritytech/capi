@@ -1,13 +1,23 @@
-name: "Troodontid"
-description: "Troodontid"
+name: "troodontid"
+description: "asdf"
 inputs:
   dir:
-    description: "dir"
     required: true
+    description: source directory of files to run
+  browser:
+    description: run files in a browser
+  importMap:
+    description: import map
+  concurrency:
+    description: concurrency
+  ignore:
+    description: ignore file
 runs:
-  using: "composite"
-  steps:
-    - name: test
-      run: |
-        echo $1
-      shell: bash
+  using: "docker"
+  image: "Dockerfile"
+  args:
+    - ${{ inputs.dir }}
+    - ${{ inputs.browser }}
+    - ${{ inputs.importMap }}
+    - ${{ inputs.concurrency }}
+    - ${{ inputs.ignore }}
