@@ -74,6 +74,9 @@ export class PolkadotDevProvider extends FrameBinProvider {
     if (request.method.toUpperCase() === "POST" && pathInfo.filePath === "test-users") {
       try {
         const { count } = await request.json()
+        if (!(count > 0)) {
+          throw new Error("'count' should be greater than 0")
+        }
         const currentCount = this.#testUserCountCache[this.#getRuntime(pathInfo)] ?? 0
         if (count + currentCount > TEST_USER_COUNT) {
           throw new Error("Maximum test user count reached")
