@@ -28,7 +28,7 @@ Create an import map with the specifier corresponding to your target.
 }
 ```
 
-Then, open your editor and import from the to-be-mapped chain module.
+Then, open your editor and import from the mapped chain module.
 
 ```ts
 import { System } from "@capi/polkadot/mod.ts"
