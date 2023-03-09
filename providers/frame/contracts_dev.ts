@@ -1,7 +1,6 @@
 import { Env } from "../../server/mod.ts"
 import { getAvailable } from "../../util/port.ts"
 import { FrameBinProvider } from "./FrameBinProvider.ts"
-import { createCustomChainSpec } from "./utils/mod.ts"
 
 export class ContractsDevProvider extends FrameBinProvider {
   constructor(env: Env) {
@@ -14,13 +13,7 @@ export class ContractsDevProvider extends FrameBinProvider {
 
   async launch() {
     const port = getAvailable()
-    const chainSpec = await createCustomChainSpec({
-      binary: this.bin,
-      chain: "dev",
-      testUserAccountProps: {
-        networkPrefix: 42,
-      },
-    })
+    const chainSpec = await this.createCustomChainSpec("dev", 42)
     await this.runBin(["--tmp", "--alice", "--ws-port", port.toString(), "--chain", chainSpec])
     return port
   }
