@@ -1,0 +1,32 @@
+[relaychain]
+default_image = "docker.io/paritypr/polkadot-debug:master"
+default_command = "polkadot"
+default_args = ["-lparachain=debug"]
+chain = "rococo-local"
+
+[[relaychain.nodes]]
+name = "alice"
+validator = true
+
+[[relaychain.nodes]]
+name = "bob"
+validator = true
+
+[[relaychain.nodes]]
+name = "charlie"
+validator = true
+
+[[relaychain.nodes]]
+name = "dave"
+validator = true
+
+[[parachains]]
+id = 1000
+cumulus_based = true
+chain = "westmint-local"
+
+[parachains.collator]
+name = "collator"
+image = "docker.io/parity/polkadot-parachain:latest"
+command = "polkadot-parachain"
+args = ["-lparachain=debug"]
