@@ -1,25 +1,37 @@
 import { $, alice, bob, MetaRune, Rune, ValueRune } from "capi"
-import { MintType } from "http://localhost:4646/frame/zombienet/zombienets/nfts.toml/collator/@v0.9.370/types/pallet_nfts/types"
 import { Nfts } from "zombienet/nfts.toml/collator/@latest/mod.ts"
+import { MintType } from "zombienet/nfts.toml/collator/@latest/types/pallet_nfts/types"
 
 const collection = 1
 const item = 1
 
-// const collectionSettings = convertToByte({  })
+const DefaultCollectionSetting = {
+  TransferableItems: 1n << 0n,
+  UnlockedMetadata: 1n << 1n,
+  UnlockedAttributes: 1n << 2n,
+  UnlockedMaxSupply: 1n << 3n,
+  DepositRequired: 1n << 4n,
+}
 
-// after done minting all items, need to disable item metadata, and disable new minting (CollectionSetting.UnlockedMaxSupply), and lock collection metadata (CollectionSetting.UnlockedMetadata, .UnlockedAttributes)
+const DefaultItemSetting = {
+  Transferable: 1n << 0n,
+  UnlockedMetadata: 1n << 1n,
+  UnlockedAttributes: 1n << 2n,
+}
+
+const sum = (r: Record<string, bigint>) => Object.values(r).reduce((acc, curr) => curr + acc)
 
 const createCollection = Nfts
   .create({
     config: {
-      settings: BigInt(1 & 1 & 1 & 1 & 1),
+      settings: sum(DefaultCollectionSetting),
       maxSupply: undefined,
       mintSettings: {
         mintType: MintType.Issuer,
         price: undefined,
         startBlock: undefined,
         endBlock: undefined,
-        defaultItemSettings: BigInt(1 & 1 & 1),
+        defaultItemSettings: sum(DefaultItemSetting),
       },
     },
     admin: alice.address,
@@ -76,28 +88,6 @@ const setItemPrice = Nfts
   .dbgStatus("Set Item Price:")
   .finalized()
 
-// prevent new mints in collection
-const setCollectionMaxSupply = Nfts
-  .setCollectionMaxSupply({
-    collection,
-    maxSupply: 1,
-  })
-  .signed({ sender: alice })
-  .sent()
-  .dbgStatus("Set Collection Max Supply:")
-  .finalized()
-
-// const updateMintSettings = Nfts.updateMintSettings({
-//   collection,
-//   mintSettings: {
-//     mintType: MintType.Issuer,
-//     price: undefined,
-//     startBlock: undefined,
-//     endBlock: undefined,
-//     defaultItemSettings: BigInt(1 & 0 & 0), // forbid further updates of metadata
-//   }
-// })
-
 const lockItemProperties = Nfts.lockItemProperties({
   collection,
   item,
@@ -109,9 +99,21 @@ const lockItemProperties = Nfts.lockItemProperties({
   .dbgStatus("Lock Item Properties:")
   .finalized()
 
+// prevent new mints in collection
+const setCollectionMaxSupply = Nfts
+  .setCollectionMaxSupply({
+    collection,
+    maxSupply: 1,
+  })
+  .signed({ sender: alice })
+  .sent()
+  .dbgStatus("Set Collection Max Supply:")
+  .finalized()
+
 const lockCollection = Nfts.lockCollection({
   collection,
-  lockSettings: BigInt(1 | 0 | 0 | 0 | 1), // forbit future updates of max supply
+  // forbid future updates of max supply
+  lockSettings: sum(DefaultCollectionSetting) & ~DefaultCollectionSetting.UnlockedMaxSupply,
 })
   .signed({ sender: alice })
   .sent()
