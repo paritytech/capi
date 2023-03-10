@@ -1,6 +1,7 @@
 import { $, alice } from "capi"
 import { IdentityInfoTranscoders } from "capi/patterns/identity.ts"
-import { Identity } from "polkadot_dev/mod.ts"
+import { signature } from "capi/patterns/signature/polkadot.ts"
+import { chain, Identity } from "polkadot_dev/mod.ts"
 
 const transcoders = new IdentityInfoTranscoders({ stars: $.u8 })
 
@@ -11,7 +12,7 @@ const info = transcoders.encode({
 
 await Identity
   .setIdentity({ info })
-  .signed({ sender: alice })
+  .signed(signature(chain, { sender: alice }))
   .sent()
   .dbgStatus()
   .finalized()

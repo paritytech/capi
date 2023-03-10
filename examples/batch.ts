@@ -1,5 +1,6 @@
 import { alice, bob, charlie, dave, Rune } from "capi"
-import { Balances, System, Utility } from "westend_dev/mod.ts"
+import { signature } from "capi/patterns/signature/polkadot.ts"
+import { Balances, chain, System, Utility } from "westend_dev/mod.ts"
 
 const recipients = Object.entries({ bob, charlie, dave })
 
@@ -11,7 +12,7 @@ const batch = Utility.batch({
     })
   )),
 })
-  .signed({ sender: alice })
+  .signed(signature(chain, { sender: alice }))
   .sent()
   .dbgStatus("Batch tx:")
   .finalized()

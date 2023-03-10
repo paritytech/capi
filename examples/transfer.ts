@@ -1,12 +1,13 @@
-import { alice, bob, Rune } from "capi"
-import { Balances } from "westend_dev/mod.ts"
+import { alice, bob } from "capi"
+import { Balances, chain } from "westend_dev/mod.ts"
+import { signature } from "../patterns/signature/polkadot.ts"
 
 const result = await Balances
   .transfer({
     value: 12345n,
     dest: bob.address,
   })
-  .signed({ sender: alice })
+  .signed(signature(chain, { sender: alice }))
   .sent()
   .dbgStatus()
   .finalizedEvents()

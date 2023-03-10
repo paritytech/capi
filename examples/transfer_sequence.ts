@@ -1,5 +1,6 @@
 import { alice, bob, charlie, Rune, Sr25519 } from "capi"
-import { Balances, System } from "westend_dev/mod.ts"
+import { Balances, chain, System } from "westend_dev/mod.ts"
+import { signature } from "../patterns/signature/polkadot.ts"
 
 await Rune
   .chain(balances)
@@ -29,7 +30,7 @@ function transfer(name: string, user: Sr25519) {
       dest: user.address,
       value: 1000123n,
     })
-    .signed({ sender: alice })
+    .signed(signature(chain, { sender: alice }))
     .sent()
     .dbgStatus(`Transfer to ${name}:`)
     .finalized()

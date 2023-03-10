@@ -1,10 +1,15 @@
 import { alice, Rune, ValueRune } from "capi"
-import { types, XcmPallet } from "zombienet/statemine.toml/alice/@latest/mod.ts"
+import {
+  chain as aliceChain,
+  types,
+  XcmPallet,
+} from "zombienet/statemine.toml/alice/@latest/mod.ts"
 import { Event as XcmPalletEvent } from "zombienet/statemine.toml/alice/@latest/types/pallet_xcm/pallet.ts"
 import { RuntimeEvent as AliceRuntimeEvent } from "zombienet/statemine.toml/alice/@latest/types/rococo_runtime/mod.ts"
-import { chain, System } from "zombienet/statemine.toml/collator/@latest/mod.ts"
+import { chain as collator, System } from "zombienet/statemine.toml/collator/@latest/mod.ts"
 import { Event as ParachainSystemEvent } from "zombienet/statemine.toml/collator/@latest/types/cumulus_pallet_parachain_system/pallet.ts"
 import { RuntimeEvent as CollatorRuntimeEvent } from "zombienet/statemine.toml/collator/@latest/types/statemine_runtime.ts"
+import { signature } from "../patterns/signature/polkadot.ts"
 
 const {
   VersionedMultiAssets,
@@ -45,7 +50,7 @@ const initiatedEvent = XcmPallet
     feeAssetItem: 0,
     weightLimit: WeightLimit.Unlimited(),
   })
-  .signed({ sender: alice })
+  .signed(signature(aliceChain, { sender: alice }))
   .sent()
   .dbgStatus("Teleportation status:")
   .finalizedEvents()
@@ -60,7 +65,7 @@ const initiatedEvent = XcmPallet
   .dbg("Initiated event:")
 
 const processedEvent = System.Events
-  .value(undefined, chain.latestBlock.hash)
+  .value(undefined, collator.latestBlock.hash)
   .map((events) =>
     events?.find((e) =>
       CollatorRuntimeEvent.isParachainSystem(e.event)

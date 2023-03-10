@@ -10,7 +10,7 @@ export interface ExtrinsicSender<C extends Chain> {
   sign: Signer<C["metadata"]>
 }
 
-export interface SignedExtrinsicProps<C extends Chain> {
+export interface SignatureData<C extends Chain> {
   sender: ExtrinsicSender<C>
   extra: Chain.Extra<C>
   additional: Chain.Additional<C>
@@ -29,26 +29,21 @@ export class ExtrinsicRune<out C extends Chain, out U> extends Rune<Chain.Call<C
       .encoded(this)
   }
 
-  signed<X>(_props: RunicArgs<X, SignedExtrinsicProps<C>>) {
-    const props = RunicArgs.resolve(_props)
+  signed<X>(...[signature]: RunicArgs<X, [signatureData: SignatureData<C>]>) {
     return Rune.fn($extrinsic)
-      .call(this.chain.metadata, props.sender.access("sign"))
+      .call(this.chain.metadata)
       .into(CodecRune)
       .encoded(Rune.rec({
         protocolVersion: 4,
         call: this,
-        signature: Rune.rec({
-          address: props.sender.access("address"),
-          extra: props.extra,
-          additional: props.additional,
-        }),
+        signature,
       }))
       .into(SignedExtrinsicRune, this.chain)
   }
 
   encoded() {
     return Rune.fn($extrinsic)
-      .call(this.chain.into(ValueRune).access("metadata"), null!)
+      .call(this.chain.into(ValueRune).access("metadata"))
       .into(CodecRune)
       .encoded(Rune.rec({
         protocolVersion: 4,

@@ -5,14 +5,18 @@ import { FrameMetadata } from "./FrameMetadata.ts"
 export interface Extrinsic<M extends FrameMetadata> {
   protocolVersion: number
   signature?:
-    & {
-      address: $.Native<M["extrinsic"]["address"]>
+    | {
+      sender: { address: $.Native<M["extrinsic"]["address"]>; sign: Signer<M> }
       extra: $.Native<M["extrinsic"]["extra"]>
+      additional: $.Native<M["extrinsic"]["additional"]>
+      sig?: never
     }
-    & (
-      | { additional: $.Native<M["extrinsic"]["additional"]> }
-      | { sig: $.Native<M["extrinsic"]["signature"]> }
-    )
+    | {
+      sender: { address: $.Native<M["extrinsic"]["address"]>; sign?: Signer<M> }
+      extra: $.Native<M["extrinsic"]["extra"]>
+      additional?: never
+      sig: $.Native<M["extrinsic"]["signature"]>
+    }
   call: $.Native<M["extrinsic"]["call"]>
 }
 
@@ -20,10 +24,7 @@ export type Signer<M extends FrameMetadata> = (
   message: Uint8Array,
 ) => $.Native<M["extrinsic"]["signature"]> | Promise<$.Native<M["extrinsic"]["signature"]>>
 
-export function $extrinsic<M extends FrameMetadata>(
-  metadata: M,
-  signer: Signer<M>,
-): $.Codec<Extrinsic<M>> {
+export function $extrinsic<M extends FrameMetadata>(metadata: M): $.Codec<Extrinsic<M>> {
   const $sig = metadata.extrinsic.signature as $.Codec<$.Native<M["extrinsic"]["signature"]>>
   const $sigPromise = $.promise($sig)
   const $call = metadata.extrinsic.call as $.Codec<$.Native<M["extrinsic"]["call"]>>
@@ -44,8 +45,8 @@ export function $extrinsic<M extends FrameMetadata>(
       buffer.array[buffer.index++] = firstByte
       const { signature, call } = extrinsic
       if (signature) {
-        $address._encode(buffer, signature.address)
-        if ("additional" in signature) {
+        $address._encode(buffer, signature.sender.address)
+        if (signature.additional) {
           const toSignBuffer = new $.EncodeBuffer(buffer.stealAlloc(toSignSize))
           $call._encode(toSignBuffer, call)
           const callEnd = toSignBuffer.finishedSize + toSignBuffer.index
@@ -58,7 +59,7 @@ export function $extrinsic<M extends FrameMetadata>(
           const toSign = toSignEncoded.length > 256
             ? blake2_256.hash(toSignEncoded)
             : toSignEncoded
-          const sig = signer(toSign)
+          const sig = signature.sender.sign!(toSign)
           if (sig instanceof Promise) {
             $sigPromise._encode(buffer, sig)
           } else {
@@ -67,7 +68,7 @@ export function $extrinsic<M extends FrameMetadata>(
           buffer.insertArray(extraEncoded)
           buffer.insertArray(callEncoded)
         } else {
-          $sig._encode(buffer, signature.sig)
+          $sig._encode(buffer, signature.sig!)
           $extra._encode(buffer, signature.extra)
           $call._encode(buffer, call)
         }
@@ -84,7 +85,7 @@ export function $extrinsic<M extends FrameMetadata>(
         const address = $address._decode(buffer)
         const sig = $sig._decode(buffer)
         const extra = $extra._decode(buffer)
-        signature = { address, sig, extra }
+        signature = { sender: { address }, sig, extra }
       }
       const call = $call._decode(buffer)
       return { protocolVersion, signature, call }
@@ -96,10 +97,11 @@ export function $extrinsic<M extends FrameMetadata>(
       $call._assert(assert.key(this, "call"))
       if (value_.signature) {
         const signatureAssertState = assert.key(this, "signature")
-        $address._assert(signatureAssertState.key(this, "address"))
+        $address._assert(signatureAssertState.key(this, "sender").key(this, "address"))
         $extra._assert(signatureAssertState.key(this, "extra"))
         if ("additional" in value_.signature) {
           $additional._assert(signatureAssertState.key(this, "additional"))
+          signatureAssertState.key(this, "sender").key(this, "sign").typeof(this, "function")
         } else {
           $sig._assert(signatureAssertState.key(this, "sig"))
         }
@@ -108,7 +110,7 @@ export function $extrinsic<M extends FrameMetadata>(
   })
 
   return $.withMetadata(
-    $.metadata("$extrinsic", $extrinsic, metadata, signer),
+    $.metadata("$extrinsic", $extrinsic, metadata),
     $.lenPrefixed($baseExtrinsic),
   )
 }
