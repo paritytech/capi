@@ -17,8 +17,7 @@ export interface PolkadotDevProviderProps {
 }
 
 export class PolkadotDevProvider extends FrameBinProvider {
-  // FIXME: narrow key
-  userCount: Record<string, number | undefined> = {}
+  userCount = {} as Record<DevRuntimeName, number | undefined>
 
   constructor(env: Env, { polkadotPath }: PolkadotDevProviderProps = {}) {
     super(env, {
@@ -112,3 +111,5 @@ export class PolkadotDevProvider extends FrameBinProvider {
 }
 
 const $devRuntimeName = $.literalUnion(["polkadot", "kusama", "westend", "rococo"])
+
+type DevRuntimeName = $.Native<typeof $devRuntimeName>
