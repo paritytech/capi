@@ -22,6 +22,7 @@ export class TypeCodegen {
     visitor
       .add($.object, (_codec, ...entries) => entries.flatMap((x) => visitor.visit(x)))
       .add($.field, (_codec, key, value) => [[key, value]])
+      .add($.optionalField, (_codec, key, value) => [[key, $.option(value)]])
   )
 
   isTuple = new $.CodecVisitor<boolean>().add($.tuple, () => true).fallback(() => false)
@@ -62,6 +63,10 @@ export class TypeCodegen {
     .add(
       $.field<string, any>,
       (_codec, key, value) => `{ ${stringifyKey(key)}: ${this.print(value)} }`,
+    )
+    .add(
+      $.optionalField<string, any>,
+      (_codec, key, value) => `{ ${stringifyKey(key)}?: ${this.print(value)} }`,
     )
     .add(
       $.object,

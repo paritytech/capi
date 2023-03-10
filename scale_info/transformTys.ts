@@ -59,7 +59,7 @@ export function transformTys(tys: Ty[]): [Codec<any>[], Record<string, Codec<any
         }
       } else {
         return $.object(
-          ...ty.fields.map((x) => $.field(normalizeIdent(x.name!), visit(x.ty))),
+          ...ty.fields.map((x) => maybeOptionalField(normalizeIdent(x.name!), visit(x.ty))),
         )
       }
     } else if (ty.type === "Tuple") {
@@ -92,11 +92,11 @@ export function transformTys(tys: Ty[]): [Codec<any>[], Record<string, Codec<any
             const $value = fields.length === 1
               ? visit(fields[0]!.ty)
               : $.tuple(...fields.map((f) => visit(f.ty)))
-            member = $.variant(type, $.field("value", $value))
+            member = $.variant(type, maybeOptionalField("value", $value))
           } else {
             // Object variant
             const memberFields = fields.map((field) => {
-              return $.field(normalizeIdent(field.name!), visit(field.ty))
+              return maybeOptionalField(normalizeIdent(field.name!), visit(field.ty))
             })
             member = $.variant(type, ...memberFields)
           }
@@ -211,4 +211,12 @@ function eqTy(tys: Ty[], a: number, b: number) {
   function eqArray<T>(a: T[], b: T[], eqVal: (a: T, b: T) => boolean) {
     return a.length === b.length && a.every((x, i) => eqVal(x, b[i]!))
   }
+}
+
+const optionInnerVisitor = new $.CodecVisitor<$.AnyCodec | null>()
+  .add($.option, (_codec, $some) => $some)
+  .fallback(() => null)
+function maybeOptionalField(key: PropertyKey, $value: $.AnyCodec): $.AnyCodec {
+  const $inner = optionInnerVisitor.visit($value)
+  return $inner ? $.optionalField(key, $inner) : $.field(key, $value)
 }
