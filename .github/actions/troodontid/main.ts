@@ -37,7 +37,7 @@ core.info("done running examples")
 await core.summary.addHeading("Test Results").addTable([
   [{ data: "File", header: true }, { data: "ExitCode", header: true }],
   ...result.map(([name, statusCode]) => [name, `${statusCode}`]),
-]).write()
+]).write({ overwrite: true })
 
 function runWithDeno() {
   return Promise.all(sourceFileNames.map((name) =>
