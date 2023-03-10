@@ -17,7 +17,8 @@ export interface PolkadotDevProviderProps {
 }
 
 export class PolkadotDevProvider extends FrameBinProvider {
-  #userCount: Record<string, number> = {}
+  // FIXME: narrow key
+  userCount: Record<string, number | undefined> = {}
 
   constructor(env: Env, { polkadotPath }: PolkadotDevProviderProps = {}) {
     super(env, {
@@ -76,10 +77,10 @@ export class PolkadotDevProvider extends FrameBinProvider {
       $.assert($.field("count", $.u32), body)
       const { count } = body
       $.assert($devRuntimeName, pathInfo.target)
-      let index = this.#userCount[pathInfo.target] ?? 0
+      let index = this.userCount[pathInfo.target] ?? 0
       const newCount = index + count
       if (newCount < PolkadotDevProvider.DEFAULT_TEST_USER_COUNT) {
-        this.#userCount[pathInfo.target!] = newCount
+        this.userCount[pathInfo.target!] = newCount
       } else {
         index = -1
       }
