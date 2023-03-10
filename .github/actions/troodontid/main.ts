@@ -54,17 +54,19 @@ function runWithDeno() {
         pipeThrough(readerFromStreamReader(task.stderr.getReader()), out),
       ])
 
-      await task.output()
       const status = await task.status
       /*       const output = {
         console: "",
         exitCode: status.code,
       } */
-      for await (const line of readLines(out)) {
-        console.log(line)
+      if (!status.success) {
+        for await (const line of readLines(out)) {
+          console.log(line)
+        }
       }
 
       // core.setOutput(name, output)
+      task.kill("SIGKILL")
 
       return [name, status.code] as const
     })
