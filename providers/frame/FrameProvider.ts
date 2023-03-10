@@ -79,9 +79,10 @@ export abstract class FrameProvider extends Provider {
 
   metadataMemo = new WeakMemo<string, FrameMetadata>()
   async getMetadata(pathInfo: PathInfo) {
-    return this.metadataMemo.run(this.cacheKey(pathInfo), async () => {
+    const cacheKey = this.cacheKey(pathInfo)
+    return this.metadataMemo.run(cacheKey, async () => {
       const raw = await this.env.cache.getRaw(
-        `${this.cacheKey(pathInfo)}/metadata`,
+        `${cacheKey}/metadata`,
         async () => {
           if (pathInfo.vRuntime !== await this.latestVersion(pathInfo)) {
             throw f.serverError("Cannot get metadata for old runtime version")

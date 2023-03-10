@@ -67,7 +67,7 @@ const $pallet = $.object(
   $.optionalField("event", $tyId),
   $.field("constants", $.array($constant)),
   $.optionalField("error", $tyId),
-  $.field("i", $.u8),
+  $.field("id", $.u8),
 )
 
 const $extrinsicDef = $.object(
@@ -99,7 +99,7 @@ export function transformMetadata(metadata: $.Native<typeof $metadata>): FrameMe
   return {
     types: paths,
     pallets: Object.fromEntries(metadata.pallets.map((pallet): [string, Pallet] => [pallet.name, {
-      id: pallet.i,
+      id: pallet.id,
       name: pallet.name,
       storagePrefix: pallet.storage?.prefix ?? pallet.name,
       storage: Object.fromEntries(
