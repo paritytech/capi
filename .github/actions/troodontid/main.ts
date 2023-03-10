@@ -33,6 +33,7 @@ const sourceFileNames = Array.from(Deno.readDirSync(dir))
   .map((f) => f.name)
 
 const result = useBrowser ? await runWithBrowser() : await runWithDeno()
+core.info("done running examples")
 await core.summary.addHeading("Test Results").addTable([
   [{ data: "File", header: true }, { data: "ExitCode", header: true }],
   ...result.map(([name, statusCode]) => [name, `${statusCode}`]),
