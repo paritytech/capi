@@ -39,6 +39,8 @@ await core.summary.addHeading("Test Results").addTable([
   ...result.map(([name, statusCode]) => [name, `${statusCode}`]),
 ]).write({ overwrite: true })
 
+Deno.exit(0)
+
 function runWithDeno() {
   return Promise.all(sourceFileNames.map((name) =>
     runWithLimit(async () => {
