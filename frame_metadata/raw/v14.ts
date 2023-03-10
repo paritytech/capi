@@ -13,7 +13,13 @@ import { $ty, $tyId } from "../../scale_info/raw/Ty.ts"
 import { $null, transformTys } from "../../scale_info/transformTys.ts"
 import { normalizeDocs, normalizeIdent } from "../../util/normalize.ts"
 import { Constant, FrameMetadata, Pallet, StorageEntry } from "../FrameMetadata.ts"
-import { $emptyKey, $partialMultiKey, $partialSingleKey, $storageKey } from "../key_codecs.ts"
+import {
+  $emptyKey,
+  $partialEmptyKey,
+  $partialMultiKey,
+  $partialSingleKey,
+  $storageKey,
+} from "../key_codecs.ts"
 
 const $hasher = $.literalUnion<Hasher>([
   blake2_128,
@@ -100,7 +106,8 @@ export function transformMetadata(metadata: $.Native<typeof $metadata>): FrameMe
         pallet.storage?.entries.map((storage): [string, StorageEntry] => {
           let key, partialKey
           if (storage.type === "Plain") {
-            key = partialKey = $emptyKey
+            key = $emptyKey
+            partialKey = $partialEmptyKey
           } else if (storage.hashers.length === 1) {
             key = storage.hashers[0]!.$hash(types[storage.key]!)
             partialKey = $partialSingleKey(key)

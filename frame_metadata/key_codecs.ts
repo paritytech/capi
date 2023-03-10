@@ -29,6 +29,20 @@ export function $storageKey<T>(
 
 export const $emptyKey = $.withMetadata($.metadata("$emptyKey"), $.constant<void>(undefined))
 
+export const $partialEmptyKey = $.createCodec<void | null>({
+  _metadata: $.metadata("$partialEmptyKey"),
+  _staticSize: 0,
+  _encode() {},
+  _decode() {
+    throw new Error("Cannot decode partial key")
+  },
+  _assert(assert) {
+    if (assert.value != null) {
+      throw new $.ScaleAssertError(this, assert.value, `${assert.path} != null`)
+    }
+  },
+})
+
 export function $partialSingleKey<T>($inner: $.Codec<T>): $.Codec<T | null> {
   return $.createCodec({
     _metadata: $.metadata("$partialSingleKey", $partialSingleKey, $inner),
@@ -48,16 +62,17 @@ export function $partialSingleKey<T>($inner: $.Codec<T>): $.Codec<T | null> {
 
 export type PartialMultiKey<T extends unknown[]> = T extends [...infer A, any]
   ? T | PartialMultiKey<A>
-  : T
+  : T | null
 
 export function $partialMultiKey<T extends $.AnyCodec[]>(
   ...keys: [...T]
 ): $.Codec<PartialMultiKey<$.NativeTuple<T>>>
-export function $partialMultiKey<T>(...codecs: $.Codec<T>[]): $.Codec<T[]> {
+export function $partialMultiKey<T>(...codecs: $.Codec<T>[]): $.Codec<T[] | null> {
   return $.createCodec({
     _metadata: $.metadata("$partialMultiKey", $partialMultiKey, ...codecs),
     _staticSize: $.tuple(...codecs)._staticSize,
     _encode(buffer, key) {
+      if (!key) return
       for (let i = 0; i < key.length; i++) {
         codecs[i]!._encode(buffer, key[i]!)
       }
