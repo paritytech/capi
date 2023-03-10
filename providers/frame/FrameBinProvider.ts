@@ -45,7 +45,11 @@ export abstract class FrameBinProvider extends FrameProxyProvider {
       stderr: "piped",
     })
     const process = command.spawn()
-    this.env.signal.addEventListener("abort", () => process.kill("SIGINT"))
+    this.env.signal.addEventListener("abort", () => {
+      try {
+        process.kill("SIGINT")
+      } catch (_) {}
+    })
     return process
   }
 

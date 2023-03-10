@@ -66,7 +66,6 @@ function runWithDeno() {
       }
       //
       // core.setOutput(name, output)
-      task.kill("SIGKILL")
 
       return [name, status.code] as const
     })
