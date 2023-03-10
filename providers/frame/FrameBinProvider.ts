@@ -1,4 +1,3 @@
-import { ss58, testUser } from "../../crypto/mod.ts"
 import { deadline } from "../../deps/std/async.ts"
 import { Env, PathInfo } from "../../server/mod.ts"
 import { PermanentMemo } from "../../util/mod.ts"
@@ -12,9 +11,6 @@ export interface FrameBinProviderProps {
 }
 
 export abstract class FrameBinProvider extends FrameProxyProvider {
-  static readonly DEFAULT_TEST_USER_COUNT = 100_000
-  static readonly DEFAULT_TEST_USER_INITIAL_FUNDS = 1_000_000_000_000_000_000
-
   bin
   installation
   timeout
@@ -67,56 +63,5 @@ export abstract class FrameBinProvider extends FrameProxyProvider {
         )
       }
     })()
-  }
-
-  async createCustomChainSpec(
-    chain: string,
-    networkPrefix: number,
-  ): Promise<string> {
-    const buildSpecCmd = new Deno.Command(
-      this.bin,
-      {
-        args: [
-          "build-spec",
-          "--disable-default-bootnode",
-          "--chain",
-          chain,
-        ],
-      },
-    )
-    const chainSpec = JSON.parse(new TextDecoder().decode((await buildSpecCmd.output()).stdout))
-    const balances: any[] = chainSpec.genesis.runtime.balances.balances
-    for (let i = 0; i < FrameBinProvider.DEFAULT_TEST_USER_COUNT; i++) {
-      balances.push([
-        ss58.encode(networkPrefix, testUser(i).publicKey),
-        FrameBinProvider.DEFAULT_TEST_USER_INITIAL_FUNDS,
-      ])
-    }
-    const customChainSpecPath = await Deno.makeTempFile({
-      prefix: `custom-${chain}-chain-spec`,
-      suffix: ".json",
-    })
-    await Deno.writeTextFile(customChainSpecPath, JSON.stringify(chainSpec, undefined, 2))
-    const buildSpecRawCmd = new Deno.Command(
-      this.bin,
-      {
-        args: [
-          "build-spec",
-          "--disable-default-bootnode",
-          "--chain",
-          customChainSpecPath,
-          "--raw",
-        ],
-      },
-    )
-    const chainSpecRaw = JSON.parse(
-      new TextDecoder().decode((await buildSpecRawCmd.output()).stdout),
-    )
-    const customChainSpecRawPath = await Deno.makeTempFile({
-      prefix: `custom-${chain}-chain-spec-raw`,
-      suffix: ".json",
-    })
-    await Deno.writeTextFile(customChainSpecRawPath, JSON.stringify(chainSpecRaw, undefined, 2))
-    return customChainSpecRawPath
   }
 }
