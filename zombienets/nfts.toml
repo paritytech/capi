@@ -2,7 +2,7 @@
 default_image = "docker.io/paritypr/polkadot-debug:master"
 default_command = "polkadot"
 default_args = ["-lparachain=debug"]
-chain = "rococo-local"
+chain = "westmint-local"
 
 [[relaychain.nodes]]
 name = "alice"
