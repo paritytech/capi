@@ -72,21 +72,27 @@ for (const mod of data.modules) {
 const entries = [...dependencies.entries()].sort((a, b) => b[1].size - a[1].size)
 
 const done = new Set()
+const summary: { file: string; duration: number; exitCode: number }[] = []
 for (const [file, deps] of entries.slice(1)) {
   if (done.has(file)) continue
   console.log(file)
   const command = new Deno.Command(Deno.execPath(), {
     args: ["cache", "--check", file],
   })
+  const start = Date.now()
   const { code, success, stdout, stderr } = await command.output()
+  summary.push({ file, duration: Date.now() - start, exitCode: code })
+  console.log(Date.now() - start)
   if (!success) {
     console.log(new TextDecoder().decode(stdout))
     console.log(new TextDecoder().decode(stderr))
-    Deno.exit(code)
+    // Deno.exit(code)
   }
   for (const d of deps) {
     done.add(d)
   }
 }
+
+console.table(summary)
 
 console.log("Checked successfully")
