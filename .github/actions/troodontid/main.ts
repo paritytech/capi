@@ -66,11 +66,7 @@ function runWithDeno() {
 
       // core.setOutput(name, output)
 
-      const result = [name, status.code] as const
-
-      task.
-
-      return result
+      return [name, status.code] as const
     })
   ))
 }
