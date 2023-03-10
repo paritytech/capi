@@ -5,10 +5,6 @@ ARG POLKADOT_PARACHAIN_VERSION=v0.9.370
 ARG ZOMBIENET_VERSION=v1.3.37
 ARG SUBSTRATE_CONTRACTS_NODE_VERSION=v0.24.0
 
-ENV DENO_INSTALL=/deno
-RUN mkdir -p /deno \
-    && curl -fsSL https://deno.land/x/install/install.sh | sh -s v${DENO_VERSION}
-
 ENV PATH=${DENO_INSTALL}/bin:${PATH} \
     DENO_DIR=/home/vscode/.cache/deno
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
