@@ -10,8 +10,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      GITHUB_STEP_SUMMARY: "/home/summary"
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/troodontid
