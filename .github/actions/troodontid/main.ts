@@ -53,6 +53,8 @@ function runWithDeno() {
         pipeThrough(readerFromStreamReader(task.stdout.getReader()), out),
         pipeThrough(readerFromStreamReader(task.stderr.getReader()), out),
       ])
+
+      await task.output()
       const status = await task.status
       /*       const output = {
         console: "",
@@ -64,7 +66,11 @@ function runWithDeno() {
 
       // core.setOutput(name, output)
 
-      return [name, status.code] as const
+      const result = [name, status.code] as const
+
+      task.
+
+      return result
     })
   ))
 }
