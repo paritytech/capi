@@ -9,11 +9,13 @@ ARG SUBSTRATE_CONTRACTS_NODE_VERSION=v0.24.0
 
 ENV DENO_INSTALL=/deno
 RUN mkdir -p /deno \
-    && curl -fsSL https://deno.land/x/install/install.sh | sh -s v${DENO_VERSION} \
-    && chown -R vscode /deno
+    && curl -fsSL https://deno.land/x/install/install.sh | sh -s v${DENO_VERSION}
+    # \
+    # && chown -R vscode /deno
 
-ENV PATH=${DENO_INSTALL}/bin:${PATH} \
-    DENO_DIR=/home/vscode/.cache/deno
+ENV PATH=${DENO_INSTALL}/bin:${PATH}
+    # \
+    # DENO_DIR=/home/vscode/.cache/deno
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 # Ripped from https://github.com/lucacasonato/deno-puppeteer/blob/main/Dockerfile
@@ -74,8 +76,8 @@ RUN curl -fsSL https://dprint.dev/install.sh | DPRINT_INSTALL=/usr/local sh \
     && curl -fsSL https://github.com/paritytech/substrate-contracts-node/releases/download/${SUBSTRATE_CONTRACTS_NODE_VERSION}/substrate-contracts-node-linux.tar.gz | tar -zx \
     && mv ./artifacts/substrate-contracts-node-linux/substrate-contracts-node /usr/local/bin/
 
-RUN mkdir -p /github/file_commands \
-    && chown -R vscode /github
+# RUN mkdir -p /github/file_commands \
+#     && chown -R vscode /github
 
 COPY entrypoint.sh /entrypoint.sh
 
