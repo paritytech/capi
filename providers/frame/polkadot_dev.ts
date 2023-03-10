@@ -72,11 +72,11 @@ export class PolkadotDevProvider extends FrameBinProvider {
 
   override async handle(request: Request, pathInfo: PathInfo): Promise<Response> {
     if (pathInfo.filePath === "user_i") {
-      const { count } = await request.json()
-      if (!(count > 0)) {
-        throw new Error("'count' should be greater than 0")
-      }
-      let index = this.#userCount[pathInfo.target!] ?? 0
+      const body = await request.json()
+      $.assert($.field("count", $.u32), body)
+      const { count } = body
+      $.assert($devRuntimeName, pathInfo.target)
+      let index = this.#userCount[pathInfo.target] ?? 0
       const newCount = index + count
       if (newCount < PolkadotDevProvider.DEFAULT_TEST_USER_COUNT) {
         this.#userCount[pathInfo.target!] = newCount
