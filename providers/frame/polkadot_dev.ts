@@ -97,7 +97,7 @@ export class PolkadotDevProvider extends FrameBinProvider {
   }
 
   async launch(pathInfo: PathInfo) {
-    const runtimeName = pathInfo.target || "polkadot"
+    const runtimeName = pathInfo.target
     $.assert($devRuntimeName, runtimeName)
     const port = getAvailable()
     const chainSpec = await this.createCustomChainSpec(
