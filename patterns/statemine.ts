@@ -1,9 +1,6 @@
-import { Chain, ClientRune, Rune, RunicArgs } from "capi";
-import {
-  client,
-  Uniques,
-} from "zombienet/statemine.toml/collator/@latest/mod.ts";
-import * as $ from "../deps/scale.ts";
+import { Chain, ClientRune, Rune, RunicArgs } from "capi"
+import { client, Uniques } from "zombienet/statemine.toml/collator/@latest/mod.ts"
+import * as $ from "../deps/scale.ts"
 
 /*
  *
@@ -19,20 +16,21 @@ import * as $ from "../deps/scale.ts";
 
  */
 
+//
 class CollectionFrozenError extends Error {
-  override readonly name = "CannotFindAttemptError";
+  override readonly name = "CannotFindAttemptError"
 }
 class AssetFrozenError extends Error {
-  override readonly name = "CannotFindAttemptError";
+  override readonly name = "CannotFindAttemptError"
 }
 
-type Id = number | Uint32Array;
+type Id = number | Uint32Array
 
-type MetadataValue = Uint8Array | string | number;
+type MetadataValue = Uint8Array | string | number
 
-type Metadata = Record<MetadataValue, MetadataValue>;
+type Metadata = Record<MetadataValue, MetadataValue>
 
-type Address = any;
+type Address = any
 
 class CollectionRune<
   out U,
@@ -49,7 +47,7 @@ class CollectionRune<
     readonly freeHolding: boolean,
     /// The total number of outstanding items of this collection.
     private readonly itemCount: number,
-    /// The total number of outstanding item metadata of this collection.
+    /// The total number of outstanding item mwa2etadata of this collection.
     private readonly metadataCount: number,
     /// The total number of attributes for this collection.
     private readonly attributesCount: number,
@@ -57,7 +55,7 @@ class CollectionRune<
     readonly frozen: boolean,
     // readonly codecs?: { [K in keyof M]: $.Codec<M[K]> },
   ) {
-    super(_prime);
+    super(_prime)
   }
 
   // static create<U, C extends Chain, M extends Record<string, any>>(
@@ -70,19 +68,19 @@ class CollectionRune<
   // }
 
   static create(params: {
-    id?: Id;
+    id?: Id
     // accepts a list of metadata or metadata and attributes (values)
-    metadata?: MetadataValue[] | Metadata;
-    owner: Address;
-    admin?: Address;
-    issuer?: Address;
-    freezer?: Address;
-    frozen?: boolean;
-    maxSupply?: number;
-    force?: boolean;
-    freeHolding?: boolean; // used with force
+    metadata?: MetadataValue[] | Metadata
+    owner: Address
+    admin?: Address
+    issuer?: Address
+    freezer?: Address
+    frozen?: boolean
+    maxSupply?: number
+    force?: boolean
+    freeHolding?: boolean // used with force
   }) {
-    params;
+    params
     // const id = id ?? nextId()
     // if (forceCreate)
     //   Uniques.forceCreate(id, owner, freeHolding)
@@ -141,7 +139,7 @@ class CollectionRune<
   }
 }
 
-type Item = any;
+type Item = any
 
 // - forceItemStatus(collection, owner, issuer, admin, freezer, freeHolding, isFrozen)
 // Alter the attributes of a given item.
