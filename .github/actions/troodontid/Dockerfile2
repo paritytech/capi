@@ -1,5 +1,7 @@
-FROM denoland/deno:latest
+ARG VARIANT=bullseye
+FROM --platform=linux/amd64 mcr.microsoft.com/devcontainers/base:0-${VARIANT}
 
+ARG DENO_VERSION=1.31.1
 ARG POLKADOT_VERSION=v0.9.37
 ARG POLKADOT_PARACHAIN_VERSION=v0.9.370
 ARG ZOMBIENET_VERSION=v1.3.37
@@ -7,7 +9,8 @@ ARG SUBSTRATE_CONTRACTS_NODE_VERSION=v0.24.0
 
 ENV DENO_INSTALL=/deno
 RUN mkdir -p /deno \
-    && curl -fsSL https://deno.land/x/install/install.sh | sh -s v${DENO_VERSION}
+    && curl -fsSL https://deno.land/x/install/install.sh | sh -s v${DENO_VERSION} \
+    && chown -R vscode /deno
 
 ENV PATH=${DENO_INSTALL}/bin:${PATH} \
     DENO_DIR=/home/vscode/.cache/deno
@@ -70,6 +73,9 @@ RUN curl -fsSL https://dprint.dev/install.sh | DPRINT_INSTALL=/usr/local sh \
     && chmod +x /usr/local/bin/zombienet-linux-x64 \
     && curl -fsSL https://github.com/paritytech/substrate-contracts-node/releases/download/${SUBSTRATE_CONTRACTS_NODE_VERSION}/substrate-contracts-node-linux.tar.gz | tar -zx \
     && mv ./artifacts/substrate-contracts-node-linux/substrate-contracts-node /usr/local/bin/
+
+RUN mkdir -p /github/file_commands \
+    && chown -R vscode /github
 
 COPY entrypoint.sh /entrypoint.sh
 
