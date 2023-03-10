@@ -73,5 +73,7 @@ RUN curl -fsSL https://dprint.dev/install.sh | DPRINT_INSTALL=/usr/local sh \
 
 COPY entrypoint.sh /entrypoint.sh
 
+RUN mkdir -p /github/file_commands
+
 ENTRYPOINT ["/entrypoint.sh"]
 #
