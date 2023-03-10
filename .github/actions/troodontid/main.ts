@@ -64,7 +64,7 @@ function runWithDeno() {
           console.log(line)
         }
       }
-
+      //
       // core.setOutput(name, output)
       task.kill("SIGKILL")
 
