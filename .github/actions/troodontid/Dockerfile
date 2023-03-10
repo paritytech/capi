@@ -69,9 +69,9 @@ RUN curl -fsSL https://dprint.dev/install.sh | DPRINT_INSTALL=/usr/local sh \
     && curl -fsSL -o /usr/local/bin/zombienet-linux-x64 https://github.com/paritytech/zombienet/releases/download/${ZOMBIENET_VERSION}/zombienet-linux-x64 \
     && chmod +x /usr/local/bin/zombienet-linux-x64 \
     && curl -fsSL https://github.com/paritytech/substrate-contracts-node/releases/download/${SUBSTRATE_CONTRACTS_NODE_VERSION}/substrate-contracts-node-linux.tar.gz | tar -zx \
-    && mv ./artifacts/substrate-contracts-node-linux/substrate-contracts-node /usr/local/bin/
+    && mv ./artifacts/substrate-contracts-node-linux/substrate-contracts-node /usr/local/bin/ \
+    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
 
 COPY entrypoint.sh /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
-#
