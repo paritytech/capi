@@ -42,7 +42,6 @@ const summary = await core.summary
   ])
   .write({ overwrite: true })
 console.log("summary", summary)
-Deno.exit(0)
 
 function runWithDeno() {
   return Promise.all(sourceFileNames.map((name) =>
