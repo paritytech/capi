@@ -4,4 +4,8 @@ const [config, options] = JSON.parse(Deno.args[0]!) as [LaunchConfig, Parameters
 
 const network = await start("", config, options)
 
-console.log(`capi_network = ${JSON.stringify(network)}`)
+const lookup = Object.fromEntries(
+  Object.entries(network.nodesByName).map(([name, node]) => [name, node.wsUri]),
+)
+
+console.log(`capi_network = ${JSON.stringify(lookup)}`)

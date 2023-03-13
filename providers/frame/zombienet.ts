@@ -19,7 +19,7 @@ export class ZombienetProvider extends FrameBinProvider {
     })
   }
 
-  launchMemo = new PermanentMemo<string, Network>()
+  launchMemo = new PermanentMemo<string, Record<string, string>>()
   async launch(pathInfo: PathInfo) {
     const target = pathInfo.target!
     const i = target.lastIndexOf("/")
@@ -50,15 +50,15 @@ export class ZombienetProvider extends FrameBinProvider {
       })
       for await (const line of readLines(readerFromStreamReader(child.stdout.getReader()))) {
         if (!line.startsWith("capi_network = ")) continue
-        const network = JSON.parse(line.slice("capi_network = ".length)) as Network
+        const network = JSON.parse(line.slice("capi_network = ".length)) as Record<string, string>
         return network
       }
       unreachable()
     })
     const nodeName = target.slice(i + 1)
-    const node = network.nodesByName[nodeName]
+    const node = network[nodeName]
     if (!node) throw new Error()
-    return +new URL(node.wsUri).port
+    return +new URL(node).port
   }
 
   async network(zombienetCachePath: string, networkManifestPath: string): Promise<Network> {

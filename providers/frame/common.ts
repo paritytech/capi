@@ -1,7 +1,7 @@
 import { ss58, testUser } from "../../crypto/mod.ts"
 import * as $ from "../../deps/scale.ts"
 
-const DEFAULT_TEST_USER_COUNT = 100_000
+const DEFAULT_TEST_USER_COUNT = 1_000
 const DEFAULT_TEST_USER_INITIAL_FUNDS = 1_000_000_000_000_000_000
 
 export async function createCustomChainSpec(
