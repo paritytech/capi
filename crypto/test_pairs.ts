@@ -46,7 +46,6 @@ export function testUserFactory(url: string) {
     })
     if (!response.ok) throw new Error(await response.text())
     const { index }: { index: number } = await response.json()
-    if (index === -1) throw new Error("Maximum test user count reached")
     const userIds: Sr25519[] = []
     for (let i = index; i < index + count; i++) userIds.push(testUser(i))
     return userIds as ArrayOfLength<Sr25519, N>

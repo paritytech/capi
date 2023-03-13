@@ -50,10 +50,10 @@ export async function handleCount(request: Request, cache: { count: number }): P
   const body = await request.json()
   $.assert($.field("count", $.u32), body)
   const { count } = body
-  let index = cache.count
+  const index = cache.count
   const newCount = index + count
   if (newCount < DEFAULT_TEST_USER_COUNT) cache.count = newCount
-  else index = -1
+  else throw new Error("Maximum test user count reached")
   return new Response(JSON.stringify({ index }), {
     status: 200,
     headers: { "Content-Type": "application/json" },
