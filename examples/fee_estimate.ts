@@ -1,5 +1,5 @@
 import { bob } from "capi"
-import { Balances } from "westend_dev/mod.ts"
+import { Balances } from "westend_dev/mod.js"
 
 const result = await Balances
   .transfer({

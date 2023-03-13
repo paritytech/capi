@@ -1,5 +1,5 @@
 import { ArrayRune, ValueRune } from "capi"
-import { Paras } from "polkadot/mod.ts"
+import { Paras } from "polkadot/mod.js"
 
 const result = await Paras
   .Parachains

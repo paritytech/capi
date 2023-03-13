@@ -1,5 +1,5 @@
 import { Rune } from "capi"
-import { chain, Timestamp } from "polkadot/mod.ts"
+import { chain, Timestamp } from "polkadot/mod.js"
 
 const block = chain.latestBlock
 const extrinsics = block.extrinsics()

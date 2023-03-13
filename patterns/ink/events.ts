@@ -1,6 +1,6 @@
-import { ApplyExtrinsicEventPhase, Event, PublicKeyRune, Rune, RunicArgs } from "../../mod.ts"
+import { ApplyExtrinsicEventPhase, PublicKeyRune, Rune, RunicArgs } from "../../mod.ts"
 
-export interface InstantiatedEvent extends Event {
+export interface InstantiatedEvent {
   phase: ApplyExtrinsicEventPhase
   event: {
     type: "Contracts"
@@ -12,7 +12,7 @@ export interface InstantiatedEvent extends Event {
   }
 }
 
-export function isInstantiatedEvent(event: Event): event is InstantiatedEvent {
+export function isInstantiatedEvent(event: any): event is InstantiatedEvent {
   return event.event.type === "Contracts" && (event.event.value as any).type === "Instantiated"
 }
 

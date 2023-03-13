@@ -1,5 +1,5 @@
 import { alice, bob, charlie, Rune, Sr25519 } from "capi"
-import { Balances, chain, System } from "westend_dev/mod.ts"
+import { Balances, chain, System } from "westend_dev/mod.js"
 import { signature } from "../patterns/signature/polkadot.ts"
 
 await Rune

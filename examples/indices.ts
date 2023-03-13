@@ -1,5 +1,5 @@
 import { alice, ValueRune } from "capi"
-import { chain, Indices } from "polkadot_dev/mod.ts"
+import { chain, Indices } from "polkadot_dev/mod.js"
 import { signature } from "../patterns/signature/polkadot.ts"
 
 const index = 254

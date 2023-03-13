@@ -39,11 +39,11 @@ export class ValueRune<out T, out U = never> extends Rune<T, U> {
     return ValueRune.new(RunMap, this, fn)
   }
 
-  access<P extends PropertyKey[], T, U, X>(
+  access<P extends (string & {} | "" | number & {} | 0 | symbol)[], T, U, X>(
     this: ValueRune<T, U>,
     ...keys: never extends P ? RunicArgs<X, [...EnsurePath<T, P>]>
       : { [K in keyof P]: P[K] | Rune<P[K], any> }
-  ): ValueRune<GetPath<T, P>, U | RunicArgs.U<X>>
+  ): ValueRune<GetPath<T, { [K in keyof X]: Rune.T<X[K]> }>, U | RunicArgs.U<X>>
   access<X>(
     this: ValueRune<any, U>,
     ...keys: RunicArgs<X, any[]>

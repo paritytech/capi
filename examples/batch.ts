@@ -1,6 +1,6 @@
 import { alice, bob, charlie, dave, Rune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
-import { Balances, chain, System, Utility } from "westend_dev/mod.ts"
+import { Balances, chain, System, Utility } from "westend_dev/mod.js"
 
 const recipients = Object.entries({ bob, charlie, dave })
 

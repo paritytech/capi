@@ -1,7 +1,8 @@
-import { ChainRune, MultiAddress, Rune, RunicArgs } from "../../mod.ts"
+import { MultiAddress } from "polkadot/types/sp_runtime/multiaddress.js"
+import { Chain, ChainRune, Rune, RunicArgs } from "../../mod.ts"
 
-export function replaceDelegateCalls<U, X>(
-  chain: ChainRune<U, any>,
+export function replaceDelegateCalls<C extends Chain, U, X>(
+  chain: ChainRune<C, U>,
   ...[real, from, to]: RunicArgs<X, [real: MultiAddress, from: MultiAddress, to: MultiAddress]>
 ) {
   return [
@@ -11,7 +12,7 @@ export function replaceDelegateCalls<U, X>(
         type: "proxy",
         real,
         forceProxyType: undefined,
-        call: chain.extrinsic(Rune.rec({
+        call: Rune.rec({
           type: "Proxy",
           value: Rune.rec({
             type: "addProxy",
@@ -19,16 +20,16 @@ export function replaceDelegateCalls<U, X>(
             delegate: to,
             delay: 0,
           }),
-        })),
+        }),
       }),
-    })),
+    }) as any),
     chain.extrinsic(Rune.rec({
       type: "Proxy",
       value: Rune.rec({
         type: "proxy",
         real,
         forceProxyType: undefined,
-        call: chain.extrinsic(Rune.rec({
+        call: Rune.rec({
           type: "Proxy",
           value: Rune.rec({
             type: "removeProxy",
@@ -36,8 +37,8 @@ export function replaceDelegateCalls<U, X>(
             delegate: from,
             delay: 0,
           }),
-        })),
+        }),
       }),
-    })),
+    }) as any),
   ]
 }

@@ -1,7 +1,9 @@
-import { alice, bob, charlie, MultiAddress, Rune } from "capi"
+import { alice, bob, charlie, Rune } from "capi"
 import { MultisigRune } from "capi/patterns/multisig/mod.ts"
-import { Balances, chain, Proxy, System } from "polkadot_dev/mod.ts"
-import { filterPureCreatedEvents } from "../patterns/proxy/mod.ts"
+import { filterPureCreatedEvents } from "capi/patterns/proxy/mod.ts"
+import { signature } from "capi/patterns/signature/polkadot.ts"
+import { Balances, chain, Proxy, System } from "polkadot_dev/mod.js"
+import { MultiAddress } from "polkadot_dev/types/sp_runtime/multiaddress.js"
 
 const multisig = Rune
   .constant({
@@ -15,7 +17,7 @@ const fundMultisig = Balances
     value: 20_000_000_000_000n,
     dest: multisig.address,
   })
-  .signed({ sender: alice })
+  .signed(signature(chain, { sender: alice }))
   .sent()
   .dbgStatus("Fund Multisig:")
   .finalized()
@@ -29,7 +31,7 @@ const aliceRatify = multisig
     }),
     sender: alice.address,
   })
-  .signed({ sender: alice })
+  .signed(signature(chain, { sender: alice }))
   .sent()
   .dbgStatus("Alice Ratify:")
   .finalized()
@@ -43,7 +45,7 @@ const bobRatify = multisig
     }),
     sender: bob.address,
   })
-  .signed({ sender: bob })
+  .signed(signature(chain, { sender: bob }))
   .sent()
   .dbgStatus("Bob Ratify:")
 
@@ -56,9 +58,9 @@ const stashAddress = bobRatify
 const fundStash = Balances
   .transfer({
     value: 20_000_000_000_000n,
-    dest: stashAddress.map(MultiAddress.Id),
+    dest: MultiAddress.Id(stashAddress),
   })
-  .signed({ sender: alice })
+  .signed(signature(chain, { sender: alice }))
   .sent()
   .dbgStatus("Fund Stash:")
   .finalized()
@@ -68,5 +70,5 @@ await Rune
   .chain(() => aliceRatify)
   .chain(() => stashAddress)
   .chain(() => fundStash)
-  .chain(() => System.Account.entry(Rune.tuple([stashAddress])).dbg("Stash Balance:"))
+  .chain(() => System.Account.value(stashAddress).dbg("Stash Balance:"))
   .run()

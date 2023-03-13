@@ -22,11 +22,11 @@ export interface MsgProps {
   gasLimit?: Weight
 }
 
-export class InkRune<out U, out C extends Chain = Chain> extends Rune<Uint8Array, U> {
+export class InkRune<out C extends Chain, out U> extends Rune<Uint8Array, U> {
   constructor(
-    _prime: InkRune<U>["_prime"],
-    readonly chain: ChainRune<U, C>,
-    readonly contract: InkMetadataRune<U, C>,
+    _prime: InkRune<C, U>["_prime"],
+    readonly chain: ChainRune<C, U>,
+    readonly contract: InkMetadataRune<C, U>,
   ) {
     super(_prime)
   }
@@ -42,7 +42,7 @@ export class InkRune<out U, out C extends Chain = Chain> extends Rune<Uint8Array
       .map((result) => $contractsApiCallResult.decode(hex.decode(result)))
   }
 
-  common<X>(this: InkRune<U, C>, props: RunicArgs<X, MsgProps>) {
+  common<X>(this: InkRune<C, U>, props: RunicArgs<X, MsgProps>) {
     const msgMetadata = Rune.tuple([
       this.contract
         .into(ValueRune)
@@ -64,12 +64,8 @@ export class InkRune<out U, out C extends Chain = Chain> extends Rune<Uint8Array
 
   call<X>(props: RunicArgs<X, MsgProps>) {
     const { msgMetadata, innerResult } = this.common(props)
-    const $result = Rune
-      .tuple([
-        this.contract.deriveCodec,
-        msgMetadata.access("returnType", "type"),
-      ])
-      .map(([deriveCodec, i]) => deriveCodec(i))
+    const $result = this.contract.codecs
+      .access(msgMetadata.access("returnType", "type"))
       .into(CodecRune)
     return $result.decoded(innerResult.access("result", "data"))
   }
@@ -97,7 +93,7 @@ export class InkRune<out U, out C extends Chain = Chain> extends Rune<Uint8Array
       .into(ExtrinsicRune, this.chain)
   }
 
-  filterContractEvents = <X>(...[events]: RunicArgs<X, [events: Event[]]>) => {
+  filterContractEvents = <X>(...[events]: RunicArgs<X, [events: Event<C>[]]>) => {
     // TODO: return all relevant events, not just instantiated
     return Rune
       .tuple([Rune.resolve(events), this])
@@ -110,16 +106,13 @@ export class InkRune<out U, out C extends Chain = Chain> extends Rune<Uint8Array
 
   // TODO: improve
   decodeErrorEvent = <X>(...[failRuntimeEvent]: RunicArgs<X, [any]>) => {
-    const metadata = this.chain.metadata()
-    const $error = metadata.codec(
-      metadata
-        .pallet("Contracts")
-        .into(ValueRune)
-        .access("error")
-        .unhandle(undefined)
-        .rehandle(undefined, () => Rune.constant(new FailedToDecodeErrorError()))
-        .unhandle(FailedToDecodeErrorError),
-    )
+    const $error = this.chain
+      .pallet("Contracts")
+      .into(ValueRune)
+      .access("types", "error")
+      .unhandle(undefined)
+      .rehandle(undefined, () => Rune.constant(new FailedToDecodeErrorError()))
+      .unhandle(FailedToDecodeErrorError)
     return Rune
       .tuple([Rune.resolve(failRuntimeEvent), $error])
       .map(([failEvent, $error]) => {

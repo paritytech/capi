@@ -1,5 +1,5 @@
 import { unreachable } from "../../deps/std/testing/asserts.ts"
-import { Ty, TyDef, UnionTyDefMember } from "../../scale_info/mod.ts"
+import { Ty } from "../../scale_info/raw/Ty.ts"
 
 export interface InkMetadata {
   source: Source
@@ -110,7 +110,7 @@ function fromRawTy({ type: { def, params, path }, id }: any): Ty {
     params: params ? normalizeFields(params) : [],
     // TODO: grab this from appropriate loc
     docs: [],
-    ...((): TyDef => {
+    ...(() => {
       if (def.primitive) {
         return {
           type: "Primitive",
@@ -126,7 +126,7 @@ function fromRawTy({ type: { def, params, path }, id }: any): Ty {
           type: "Union",
           members: def.variant.variants.map((variant: any) => {
             const { fields, ...rest } = variant
-            const member: UnionTyDefMember = {
+            const member = {
               fields: fields ? normalizeFields(fields) : [],
               ...rest,
             }

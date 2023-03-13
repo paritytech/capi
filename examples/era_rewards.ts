@@ -1,4 +1,4 @@
-import { Staking } from "westend/mod.ts"
+import { Staking } from "westend/mod.js"
 
 const idx = Staking.ActiveEra.value().unhandle(undefined).access("index")
 

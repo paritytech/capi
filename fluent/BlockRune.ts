@@ -26,7 +26,7 @@ export class BlockRune<out C extends Chain, out U> extends Rune<known.SignedBloc
 
   extrinsics() {
     const $ext = Rune.fn($extrinsic)
-      .call(this.chain.metadata, null!)
+      .call(this.chain.metadata)
       .into(CodecRune)
     return this
       .extrinsicsRaw()

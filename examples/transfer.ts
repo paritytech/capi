@@ -1,5 +1,5 @@
 import { alice, bob } from "capi"
-import { Balances, chain } from "westend_dev/mod.ts"
+import { Balances, chain } from "westend_dev/mod.js"
 import { signature } from "../patterns/signature/polkadot.ts"
 
 const result = await Balances

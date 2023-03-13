@@ -10,7 +10,7 @@ import {
   RunicArgs,
   ValueRune,
 } from "../../mod.ts"
-import { DeriveCodec } from "../../scale_info/mod.ts"
+import { transformTys } from "../../scale_info/mod.ts"
 import { $contractsApiInstantiateArgs, $contractsApiInstantiateResult, Weight } from "./codecs.ts"
 import { Callable, InkMetadata } from "./InkMetadata.ts"
 import { InkRune } from "./InkRune.ts"
@@ -27,15 +27,16 @@ export interface InstantiateProps {
   salt?: Uint8Array
 }
 
-export class InkMetadataRune<out U, out C extends Chain = Chain> extends Rune<InkMetadata, U> {
-  deriveCodec
+export class InkMetadataRune<out C extends Chain, out U> extends Rune<InkMetadata, U> {
+  codecs
 
-  constructor(_prime: InkMetadataRune<U>["_prime"], readonly chain: ChainRune<U, C>) {
+  constructor(_prime: InkMetadataRune<C, U>["_prime"], readonly chain: ChainRune<C, U>) {
     super(_prime)
-    this.deriveCodec = this
+    this.codecs = this
       .into(ValueRune)
       .access("V3", "types")
-      .map(DeriveCodec)
+      .map(transformTys)
+      .access(0)
   }
 
   salt() {
@@ -49,11 +50,9 @@ export class InkMetadataRune<out U, out C extends Chain = Chain> extends Rune<In
     const argCodecs = metadata
       .access("args")
       .into(ArrayRune)
-      .mapArray((arg) =>
-        Rune
-          .tuple([this.deriveCodec, arg.access("type").access("type")])
-          .map(([deriveCodec, i]) => deriveCodec(i))
-      )
+      .mapArray((arg) => {
+        return this.codecs.access(arg.access("type", "type"))
+      })
     return Rune
       .tuple([selectorLength, argCodecs])
       .map(([selectorLength, argCodecs]) =>
@@ -135,8 +134,8 @@ export class InkMetadataRune<out U, out C extends Chain = Chain> extends Rune<In
       .into(ExtrinsicRune, this.chain)
   }
 
-  instance<U, C extends Chain, X>(
-    chain: ChainRune<U, C>,
+  instance<CU, X>(
+    chain: ChainRune<C, CU>,
     ...[publicKey]: RunicArgs<X, [Uint8Array]>
   ) {
     return Rune
