@@ -2,6 +2,7 @@ import { $hash } from "../crypto/mod.ts"
 import * as $ from "../deps/scale.ts"
 import {
   $emptyKey,
+  $partialEmptyKey,
   $partialMultiKey,
   $partialSingleKey,
   $storageKey,
@@ -55,6 +56,7 @@ export class TypeCodegen {
     .add($era, () => "C.Era")
     .add($storageKey, (_codec, _palletName, _entryName, inner) => this.print(inner))
     .add($emptyKey, () => "void")
+    .add($partialEmptyKey, () => "void | null")
     .add($partialSingleKey, (_codec, inner) => this.print(inner) + " | null")
     .add(
       $partialMultiKey<any>,

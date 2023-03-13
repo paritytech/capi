@@ -1,6 +1,5 @@
 import * as $ from "../deps/scale.ts"
 import { FrameMetadata } from "../frame_metadata/mod.ts"
-import { stringifyKey } from "../util/key.ts"
 import { CodecCodegen } from "./CodecCodegen.ts"
 import { TypeCodegen } from "./TypeCodegen.ts"
 
