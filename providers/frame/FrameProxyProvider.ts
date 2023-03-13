@@ -64,11 +64,11 @@ export abstract class FrameProxyProvider extends FrameProvider {
   async connectionCode(pathInfo: PathInfo, isTypes: boolean) {
     const url = this.staticUrl(pathInfo)
     return `
-      import * as C from "./capi.${isTypes ? "d.ts" : "js"}"
+import * as C from "./capi.js"
 
-      export const discoveryValue ${isTypes ? ":" : "="} "${url}"
+export const discoveryValue ${isTypes ? ":" : "="} "${url}"
 
-      export const connection ${
+export const connection ${
       isTypes
         ? ": C.ConnectionRune<never>"
         : "= C.connection((signal) => C.WsConnection.connect(discoveryValue, signal))"

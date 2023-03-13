@@ -9,6 +9,7 @@ import { WeakMemo } from "../../util/mod.ts"
 import { normalizeIdent } from "../../util/normalize.ts"
 import { tsFormatter } from "../../util/tsFormatter.ts"
 import { withSignal } from "../../util/withSignal.ts"
+import { generateTar } from "./common.ts"
 
 export abstract class FrameProvider extends Provider {
   codegenCtxsPending: Record<string, Promise<FrameCodegen>> = {}
@@ -38,6 +39,15 @@ export abstract class FrameProvider extends Provider {
         this.env.cache,
         request,
         async () => `export * from ${JSON.stringify(capiPath)}`,
+      )
+    }
+    if (filePath === "pkg.tar") {
+      return new Response(
+        await this.env.cache.getRaw(`${this.cacheKey(pathInfo)}/pkg.tar`, async () => {
+          const files = await this.codegen(pathInfo)
+          const chainName = await this.chainName(pathInfo)
+          return await generateTar(files, chainName, vRuntime)
+        }),
       )
     }
     return await f.code(this.env.cache, request, async () => {

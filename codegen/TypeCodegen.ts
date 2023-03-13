@@ -205,15 +205,15 @@ is${variant.tag}(value) {
       files.set(
         `${["types", ...path].join("/")}${isFolder ? "/mod" : ""}.${ext}`,
         `
-import * as C from "${rootDir}capi.${ext}"
-import * as _codecs from "${rootDir}codecs.${ext}"
-import * as t from "${rootDir}types/mod.${ext}"
+import * as C from "${rootDir}capi.js"
+import * as _codecs from "${rootDir}codecs.js"
+import * as t from "${rootDir}types/mod.js"
 
 ${
           [...groups].map(([name, entries]) => {
             const isFolder = this._write(files, [...path, name], entries)
             return `
-export * as ${name} from ${JSON.stringify(`./${name}${isFolder ? "/mod" : ""}.${ext}`)}`
+export * as ${name} from ${JSON.stringify(`./${name}${isFolder ? "/mod" : ""}.js`)}`
           }).join("\n")
         }
 
@@ -237,8 +237,8 @@ ${this.declVisitor.visit(codec)(name, isTypes)}
     files.set(
       "codecs.d.ts",
       `
-import * as C from "./capi.d.ts"
-import * as t from "./types/mod.d.ts"
+import * as C from "./capi.js"
+import * as t from "./types/mod.js"
 
 ${
         [...this.codecCodegen.codecIds.entries()].filter((x) => x[1] != null).map(([codec, id]) => `

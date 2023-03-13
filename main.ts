@@ -53,6 +53,7 @@ const running = await fetch(`${href}capi_cwd`)
 
 if (!running) {
   await serve(handler(env), {
+    hostname: "[::]",
     port: +portStr,
     signal,
     onError(error) {
