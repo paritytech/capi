@@ -11,12 +11,7 @@ export async function createCustomChainSpec(
   networkPrefix: number,
 ): Promise<string> {
   const buildSpecCmd = new Deno.Command(bin, {
-    args: [
-      "build-spec",
-      "--disable-default-bootnode",
-      "--chain",
-      chain,
-    ],
+    args: ["build-spec", "--disable-default-bootnode", "--chain", chain],
   })
   const chainSpec = JSON.parse(new TextDecoder().decode((await buildSpecCmd.output()).stdout))
   const balances: [string, number][] = chainSpec.genesis.runtime.balances.balances
@@ -32,13 +27,7 @@ export async function createCustomChainSpec(
   })
   await Deno.writeTextFile(customChainSpecPath, JSON.stringify(chainSpec, undefined, 2))
   const buildSpecRawCmd = new Deno.Command(bin, {
-    args: [
-      "build-spec",
-      "--disable-default-bootnode",
-      "--chain",
-      customChainSpecPath,
-      "--raw",
-    ],
+    args: ["build-spec", "--disable-default-bootnode", "--chain", customChainSpecPath, "--raw"],
   })
   const chainSpecRaw = JSON.parse(
     new TextDecoder().decode((await buildSpecRawCmd.output()).stdout),
@@ -51,10 +40,7 @@ export async function createCustomChainSpec(
   return customChainSpecRawPath
 }
 
-export async function chainFileWithUsers(
-  file: File,
-  url: string,
-): Promise<File> {
+export async function chainFileWithUsers(file: File, url: string): Promise<File> {
   return new File(`
     ${file.codeRaw}
 
@@ -62,27 +48,16 @@ export async function chainFileWithUsers(
   `)
 }
 
-export async function handleCount(
-  request: Request,
-  cache: { count: number },
-): Promise<Response> {
+export async function handleCount(request: Request, cache: { count: number }): Promise<Response> {
   const body = await request.json()
   $.assert($.field("count", $.u32), body)
   const { count } = body
   let index = cache.count
   const newCount = index + count
-  if (newCount < DEFAULT_TEST_USER_COUNT) {
-    cache.count = newCount
-  } else {
-    index = -1
-  }
-  return new Response(
-    JSON.stringify({ index }),
-    {
-      status: 200,
-      headers: {
-        "content-type": "application/json",
-      },
-    },
-  )
+  if (newCount < DEFAULT_TEST_USER_COUNT) cache.count = newCount
+  else index = -1
+  return new Response(JSON.stringify({ index }), {
+    status: 200,
+    headers: { "Content-Type": "application/json" },
+  })
 }

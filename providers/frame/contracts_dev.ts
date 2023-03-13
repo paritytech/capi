@@ -17,15 +17,12 @@ export class ContractsDevProvider extends FrameBinProvider {
   }
 
   override async chainFile(pathInfo: PathInfo): Promise<File> {
-    const url = new URL(fromPathInfo({ ...pathInfo, filePath: "user_i" }), this.env.href)
-      .toString()
+    const url = new URL(fromPathInfo({ ...pathInfo, filePath: "user_i" }), this.env.href).toString()
     return chainFileWithUsers(await super.chainFile(pathInfo), url)
   }
 
   override async handle(request: Request, pathInfo: PathInfo): Promise<Response> {
-    if (pathInfo.filePath === "user_i") {
-      return handleCount(request, this.userCount)
-    }
+    if (pathInfo.filePath === "user_i") return handleCount(request, this.userCount)
     return super.handle(request, pathInfo)
   }
 

@@ -7,13 +7,6 @@ import { getOrInit } from "../../util/state.ts"
 import { chainFileWithUsers, createCustomChainSpec, handleCount } from "./common.ts"
 import { FrameBinProvider } from "./FrameBinProvider.ts"
 
-const DEV_RUNTIME_PREFIXES = {
-  polkadot: 0,
-  kusama: 2,
-  westend: 42,
-  rococo: 42,
-} as const
-
 export interface PolkadotDevProviderProps {
   polkadotPath?: string
 }
@@ -30,8 +23,7 @@ export class PolkadotDevProvider extends FrameBinProvider {
   }
 
   override async chainFile(pathInfo: PathInfo): Promise<File> {
-    const url = new URL(fromPathInfo({ ...pathInfo, filePath: "user_i" }), this.env.href)
-      .toString()
+    const url = new URL(fromPathInfo({ ...pathInfo, filePath: "user_i" }), this.env.href).toString()
     return chainFileWithUsers(await super.chainFile(pathInfo), url)
   }
 
@@ -58,6 +50,12 @@ export class PolkadotDevProvider extends FrameBinProvider {
   }
 }
 
+type DevRuntimeName = $.Native<typeof $devRuntimeName>
 const $devRuntimeName = $.literalUnion(["polkadot", "kusama", "westend", "rococo"])
 
-type DevRuntimeName = $.Native<typeof $devRuntimeName>
+const DEV_RUNTIME_PREFIXES: Record<DevRuntimeName, number> = {
+  polkadot: 0,
+  kusama: 2,
+  westend: 42,
+  rococo: 42,
+}
