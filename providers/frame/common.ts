@@ -19,7 +19,7 @@ export async function createCustomChainSpec(
     ],
   })
   const chainSpec = JSON.parse(new TextDecoder().decode((await buildSpecCmd.output()).stdout))
-  const balances: any[] = chainSpec.genesis.runtime.balances.balances
+  const balances: [string, number][] = chainSpec.genesis.runtime.balances.balances
   for (let i = 0; i < DEFAULT_TEST_USER_COUNT; i++) {
     balances.push([
       ss58.encode(networkPrefix, testUser(i).publicKey),
