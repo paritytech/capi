@@ -15,7 +15,7 @@ export abstract class FrameProvider extends Provider {
 
   abstract connect(pathInfo: PathInfo, signal: AbortSignal): Promise<Connection>
 
-  abstract connectionCode(pathInfo: PathInfo): Promise<string>
+  abstract connectionCode(pathInfo: PathInfo, isTypes: boolean): Promise<string>
 
   async handle(request: Request, pathInfo: PathInfo): Promise<Response> {
     const { vRuntime, filePath } = pathInfo
@@ -32,7 +32,7 @@ export abstract class FrameProvider extends Provider {
         vRuntime: await this.latestVersion(pathInfo),
       }))
     }
-    if (filePath === "capi.ts") {
+    if (filePath === "capi.js" || filePath === "capi.d.ts") {
       const capiPath = path.relative(path.dirname(new URL(request.url).pathname), "/mod.ts")
       return f.code(
         this.env.cache,
@@ -65,13 +65,15 @@ export abstract class FrameProvider extends Provider {
   codegenMemo = new WeakMemo<string, Map<string, string>>()
   codegen(pathInfo: PathInfo) {
     return this.codegenMemo.run(this.cacheKey(pathInfo), async () => {
-      const [metadata, connectionCode, chainName] = await Promise.all([
+      const [metadata, connectionCode, connectionTypes, chainName] = await Promise.all([
         this.getMetadata(pathInfo),
-        this.connectionCode(pathInfo),
+        this.connectionCode(pathInfo, false),
+        this.connectionCode(pathInfo, true),
         this.chainName(pathInfo),
       ])
       const files = new Map<string, string>()
-      files.set("connection.ts", connectionCode)
+      files.set("connection.js", connectionCode)
+      files.set("connection.d.ts", connectionTypes)
       new FrameCodegen(metadata, chainName).write(files)
       return files
     })

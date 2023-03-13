@@ -1,5 +1,5 @@
 import { ArrayOfLength } from "../util/mod.ts"
-import { Blake2_256 } from "./hashers.ts"
+import { blake2_256 } from "./hashers.ts"
 import { decode } from "./hex.ts"
 import { Sr25519 } from "./Sr25519.ts"
 
@@ -34,7 +34,7 @@ function pair(secret: string) {
 }
 
 export function testUser(userId: number) {
-  return Sr25519.fromSeed(Blake2_256.hash(new TextEncoder().encode(`capi-test-user-${userId}`)))
+  return Sr25519.fromSeed(blake2_256.hash(new TextEncoder().encode(`capi-test-user-${userId}`)))
 }
 
 export function testUserFactory(url: string) {

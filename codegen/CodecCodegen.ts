@@ -133,9 +133,9 @@ export class CodecCodegen {
 
   write(files: Map<string, string>) {
     files.set(
-      "_codecs.js",
+      "codecs.js",
       `
-import * as C from "./capi.ts"
+import * as C from "./capi.js"
 
 ${
         [...this.codecIds.entries()].filter((x) => x[1] != null).map(([codec, id]) =>

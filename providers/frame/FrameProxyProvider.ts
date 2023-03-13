@@ -61,14 +61,18 @@ export abstract class FrameProxyProvider extends FrameProvider {
     return WsConnection.connect(await this.dynamicUrl(pathInfo), signal)
   }
 
-  async connectionCode(pathInfo: PathInfo) {
+  async connectionCode(pathInfo: PathInfo, isTypes: boolean) {
     const url = this.staticUrl(pathInfo)
     return `
-      import * as C from "./capi.ts"
+      import * as C from "./capi.d.ts"
 
-      export const discoveryValue = "${url}"
+      export const discoveryValue ${isTypes ? ":" : "="} "${url}"
 
-      export const connection = C.connection((signal) => C.WsConnection.connect(discoveryValue, signal))
+      export const connection ${
+      isTypes
+        ? ": C.ConnectionRune<never>"
+        : "= C.connection((signal) => C.WsConnection.connect(discoveryValue, signal))"
+    }
     `
   }
 }

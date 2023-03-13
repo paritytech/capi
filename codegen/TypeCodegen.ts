@@ -28,59 +28,59 @@ export class TypeCodegen {
 
   isTuple = new $.CodecVisitor<boolean>().add($.tuple, () => true).fallback(() => false)
 
-  typeVisitor = new $.CodecVisitor<string>()
+  nativeVisitor = new $.CodecVisitor<string>()
     .add($.int, (_codec, _signed, size) => size > 32 ? "bigint" : "number")
     .add($.str, () => "string")
     .add($.bool, () => "boolean")
-    .add($.tuple<$.Codec<any>[]>, (_codec, ...entries) => `[${entries.map((x) => this.print(x))}]`)
-    .add($.array, (_codec, inner) => `Array<${this.print(inner)}>`)
+    .add($.tuple<$.Codec<any>[]>, (_codec, ...entries) => `[${entries.map((x) => this.native(x))}]`)
+    .add($.array, (_codec, inner) => `Array<${this.native(inner)}>`)
     .add(
       $.sizedArray,
-      (_codec, inner, size) => `[${Array(size).fill(this.print(inner)).join(", ")}]`,
+      (_codec, inner, size) => `[${Array(size).fill(this.native(inner)).join(", ")}]`,
     )
     .add($.uint8Array, () => "Uint8Array")
     .add($.sizedUint8Array, () => "Uint8Array")
-    .add($.option, (_codec, inner) => this.print(inner) + " | undefined")
-    .add($.result, (_codec, ok, err) => this.print(ok) + " | " + this.print(err))
+    .add($.option, (_codec, inner) => this.native(inner) + " | undefined")
+    .add($.result, (_codec, ok, err) => this.native(ok) + " | " + this.native(err))
     .add($.instance, (_codec, ctor, inner) => {
       if (ctor !== ChainError) throw new Error("Cannot get type for non-ChainError $.instance")
-      return `C.ChainError<${this.print(inner).slice(1, -1)}>`
+      return `C.ChainError<${this.native(inner).slice(1, -1)}>`
     })
-    .add($.lenPrefixed, (_codec, inner) => this.print(inner))
-    .add($.compact, (_codec, inner) => this.print(inner))
-    .add($hash, (_codec, _hasher, inner) => this.print(inner))
-    .add($.deferred, (_codec, inner) => this.print(inner()))
-    .add($.set, (_codec, inner) => `Set<${this.print(inner)}>`)
-    .add($.map, (_codec, key, val) => `Map<${this.print(key)}, ${this.print(val)}>`)
+    .add($.lenPrefixed, (_codec, inner) => this.native(inner))
+    .add($.compact, (_codec, inner) => this.native(inner))
+    .add($hash, (_codec, _hasher, inner) => this.native(inner))
+    .add($.deferred, (_codec, inner) => this.native(inner()))
+    .add($.set, (_codec, inner) => `Set<${this.native(inner)}>`)
+    .add($.map, (_codec, key, val) => `Map<${this.native(key)}, ${this.native(val)}>`)
     .add($.bitSequence, () => "C.$.BitSequence")
     .add($era, () => "C.Era")
-    .add($storageKey, (_codec, _palletName, _entryName, inner) => this.print(inner))
+    .add($storageKey, (_codec, _palletName, _entryName, inner) => this.native(inner))
     .add($emptyKey, () => "void")
     .add($partialEmptyKey, () => "void | null")
-    .add($partialSingleKey, (_codec, inner) => this.print(inner) + " | null")
+    .add($partialSingleKey, (_codec, inner) => this.native(inner) + " | null")
     .add(
       $partialMultiKey<any>,
-      (_codec, ...entries) => `C.PartialMultiKey<${this.print($.tuple(...entries))}>`,
+      (_codec, ...entries) => `C.PartialMultiKey<${this.native($.tuple(...entries))}>`,
     )
     .add(
       $.field<string, any>,
-      (_codec, key, value) => `{ ${stringifyKey(key)}: ${this.print(value)} }`,
+      (_codec, key, value) => `{ ${stringifyKey(key)}: ${this.native(value)} }`,
     )
     .add(
       $.optionalField<string, any>,
-      (_codec, key, value) => `{ ${stringifyKey(key)}?: ${this.print(value)} }`,
+      (_codec, key, value) => `{ ${stringifyKey(key)}?: ${this.native(value)} }`,
     )
     .add(
       $.object,
       (_codec, ...entries) =>
-        entries.map((x) => this.print(x)).join(" & ").replace(/} & {/g, ", ") || "{}",
+        entries.map((x) => this.native(x)).join(" & ").replace(/} & {/g, ", ") || "{}",
     )
     .add(
       $.taggedUnion<string, $.Variant<any, any>[]>,
       (_codec, tagKey, variants) =>
         `(${
           Object.values(variants).map((v) =>
-            `{ ${stringifyKey(tagKey)}: ${JSON.stringify(v.tag)} } & ${this.print(v.codec)}`
+            `{ ${stringifyKey(tagKey)}: ${JSON.stringify(v.tag)} } & ${this.native(v.codec)}`
               .replace(
                 /} & {/g,
                 ", ",
@@ -96,13 +96,17 @@ export class TypeCodegen {
     .add($.never, () => "never")
     .add($null, () => "null")
 
-  declVisitor = new $.CodecVisitor<(name: string) => string>()
-    .add($.taggedUnion, (_codec, tagKey: string, variants) => (name) => `
-export type ${name} = ${
-      Object.values(variants).map((variant) => `${name}.${variant.tag}`).join(" | ")
+  declVisitor = new $.CodecVisitor<(name: string, isTypes: boolean) => string>()
+    .add($.taggedUnion, (_codec, tagKey: string, variants) => (name, isTypes) => `
+${
+      isTypes
+        ? `export type ${name} = ${
+          Object.values(variants).map((variant) => `${name}.${variant.tag}`).join(" | ")
+        }`
+        : ""
     }
 
-export namespace ${name} {
+export ${isTypes ? `namespace ${name}` : `const ${name} =`} {
   ${
       Object.values(variants).map((variant) => {
         const fields = this.extractObjectFields.visit(variant.codec)
@@ -124,25 +128,63 @@ export namespace ${name} {
           params = `value: C.RunicArgs<X, Omit<${name}.${variant.tag}, ${JSON.stringify(tagKey)}>>`
           populate = "...C.RunicArgs.resolve(value)"
         }
-        return `
-export type ${variant.tag} = ${this.typeVisitor.visit($.taggedUnion(tagKey, [variant]))}
-export function ${variant.tag}<X>(${params}): C.ValueRune<${name}.${variant.tag}, C.RunicArgs.U<X>> {
-  return C.Rune.rec({ ${stringifyKey(tagKey)}: ${JSON.stringify(variant.tag)}, ${populate} })
-}
-export function is${variant.tag}(value: ${name}): value is ${name}.${variant.tag} {
-  return value${stringifyPropertyAccess(tagKey)} === ${JSON.stringify(variant.tag)}
-}
+        if (isTypes) {
+          return `
+export type ${variant.tag} = ${this.nativeVisitor.visit($.taggedUnion(tagKey, [variant]))}
+export function ${variant.tag}<X>(${params}): C.ValueRune<${name}.${variant.tag}, C.RunicArgs.U<X>>
+export function is${variant.tag}(value: ${name}): value is ${name}.${variant.tag}
         `
+        } else {
+          return `
+${variant.tag}(${params.split(":")[0]}) {
+  return C.Rune.rec({ ${stringifyKey(tagKey)}: ${JSON.stringify(variant.tag)}, ${populate} })
+},
+is${variant.tag}(value) {
+  return value${stringifyPropertyAccess(tagKey)} === ${JSON.stringify(variant.tag)}
+},
+          `
+        }
       }).join("\n")
     }
 }
 `)
-    .fallback((codec) => (name) => `export type ${name} = ${this.typeVisitor.visit(codec)}`)
+    .fallback((codec) => (name, isTypes) =>
+      isTypes ? `export type ${name} = ${this.nativeVisitor.visit(codec)}` : ""
+    )
 
   typeNames = new Map<$.Codec<any>, string>()
 
-  print(codec: $.Codec<any>): string {
-    return this.typeNames.get(codec) ?? this.typeVisitor.visit(codec)
+  native(codec: $.Codec<any>): string {
+    return this.typeNames.get(codec) ?? this.nativeVisitor.visit(codec)
+  }
+
+  print(value: unknown): string {
+    switch (typeof value) {
+      case "string":
+      case "number":
+      case "boolean":
+        return JSON.stringify(value)
+      case "bigint":
+        return value + "n"
+      case "undefined":
+        return "undefined"
+      case "symbol":
+        throw new Error("Cannot serialize symbol")
+    }
+    if (value === null) return "null"
+    if (value instanceof $.Codec) {
+      return `C.$.Codec<${this.native(value)}>`
+    }
+    if (value instanceof Array) {
+      return `[${value.map((x) => this.print(x)).join(", ")}]`
+    }
+    if (value instanceof Uint8Array) {
+      return "Uint8Array"
+    }
+    return `{ ${
+      Object.entries(value!).map(([key, value]) => `${stringifyKey(key)}: ${this.print(value)}`)
+        .join(", ")
+    } }`
   }
 
   _write(files: Map<string, string>, path: string[], entries: [string[], $.Codec<any>][]): boolean {
@@ -158,56 +200,51 @@ export function is${variant.tag}(value: ${name}): value is ${name}.${variant.tag
     }
     const isFolder = !!groups.size
     const rootDir = "../".repeat(path.length + +isFolder)
-    files.set(
-      `${["types", ...path].join("/")}${isFolder ? "/mod" : ""}.ts`,
-      `
-import * as C from "${rootDir}capi.ts"
-import * as _codecs from "${rootDir}codecs.ts"
-import * as t from "${rootDir}types/mod.ts"
+    for (const isTypes of [false, true]) {
+      const ext = isTypes ? "d.ts" : "js"
+      files.set(
+        `${["types", ...path].join("/")}${isFolder ? "/mod" : ""}.${ext}`,
+        `
+import * as C from "${rootDir}capi.${ext}"
+import * as _codecs from "${rootDir}codecs.${ext}"
+import * as t from "${rootDir}types/mod.${ext}"
 
 ${
-        [...groups].map(([name, entries]) => {
-          const isFolder = this._write(files, [...path, name], entries)
-          return `export * as ${name} from ${
-            JSON.stringify(`./${name}${isFolder ? "/mod.ts" : ".ts"}`)
-          }`
-        }).join("\n")
-      }
-
-${
-        codecs.map(([name, codec]) => `
-export const $${name.replace(/^./, (x) => x.toLowerCase())}: C.$.Codec<${name}> = ${
-          this.codecCodegen.print(codec)
+          [...groups].map(([name, entries]) => {
+            const isFolder = this._write(files, [...path, name], entries)
+            return `
+export * as ${name} from ${JSON.stringify(`./${name}${isFolder ? "/mod" : ""}.${ext}`)}`
+          }).join("\n")
         }
-${this.declVisitor.visit(codec)(name)}
+
+${
+          codecs.map(([name, codec]) => `
+export const $${name.replace(/^./, (x) => x.toLowerCase())}${
+            isTypes ? `: C.$.Codec<${name}>` : `= ${this.codecCodegen.print(codec)}`
+          }
+${this.declVisitor.visit(codec)(name, isTypes)}
 `).join("\n")
-      }
+        }
     
 `,
-    )
+      )
+    }
     return isFolder
   }
 
   write(files: Map<string, string>) {
     this._write(files, [], Object.entries(this.types).map((x) => [x[0].split("."), x[1]]))
     files.set(
-      "_codecs.d.ts",
+      "codecs.d.ts",
       `
-import * as C from "./capi.ts"
-import * as t from "./types/mod.ts"
+import * as C from "./capi.d.ts"
+import * as t from "./types/mod.d.ts"
 
 ${
         [...this.codecCodegen.codecIds.entries()].filter((x) => x[1] != null).map(([codec, id]) => `
-export const $${id}: C.$.Codec<${this.print(codec)}>
+export const $${id}: ${this.print(codec)}
 `).join("")
       }`,
-    )
-    files.set(
-      "codecs.ts",
-      `
-// @deno-types="./_codecs.d.ts"
-export * from "./_codecs.js"
-`,
     )
   }
 }
