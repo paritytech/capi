@@ -1,5 +1,9 @@
 import { ss58 } from "../../crypto/mod.ts"
 import * as $ from "../../deps/scale.ts"
+import { Tar } from "../../deps/std/archive.ts"
+import { Buffer } from "../../deps/std/io.ts"
+import { readableStreamFromReader, writableStreamFromWriter } from "../../deps/std/streams.ts"
+import { tsFormatter } from "../../util/tsFormatter.ts"
 
 export const DEFAULT_TEST_USER_COUNT = 100_000
 const DEFAULT_TEST_USER_INITIAL_FUNDS = 1_000_000_000_000_000_000
@@ -66,4 +70,48 @@ export async function handleCount(request: Request, cache: { count: number }): P
     status: 200,
     headers: { "Content-Type": "application/json" },
   })
+}
+
+export async function generateTar(_files: Map<string, string>, chainName: string, version: string) {
+  const files = new Map(_files)
+
+  files.set("capi.js", `export * from "capi"`)
+  files.set("capi.d.ts", `export * from "capi"`)
+  files.set(
+    "package.json",
+    JSON.stringify(
+      {
+        name: packageName(chainName),
+        version,
+        type: "module",
+        main: "./mod.js",
+        peerDependencies: {
+          capi: "*",
+        },
+      },
+      null,
+      2,
+    ),
+  )
+
+  const tar = new Tar()
+  for (const [name, content] of files) {
+    const formatted = /\.(js|ts)$/.test(name) ? tsFormatter.formatText(name, content) : content
+    const data = new TextEncoder().encode(formatted)
+    tar.append(`package/${name}`, {
+      contentSize: data.length,
+      reader: new Buffer(data),
+    })
+  }
+
+  const buffer = new Buffer()
+
+  await readableStreamFromReader(tar.getReader())
+    .pipeTo(writableStreamFromWriter(buffer))
+
+  return buffer.bytes()
+}
+
+function packageName(chainName: string) {
+  return `@capi/` + chainName.replace(/([a-z])(?=[A-Z])/g, (x) => `${x}-`).toLowerCase()
 }

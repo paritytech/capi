@@ -35,10 +35,10 @@ export const chain = C.Rune.rec({ metadata, connection }).into(C.ChainRune)
     files.set(
       "chain.d.ts",
       `
-import * as _codecs from "./codecs.d.ts"
-import { connection } from "./connection.d.ts"
-import * as C from "./capi.d.ts"
-import * as t from "./types/mod.d.ts"
+import * as _codecs from "./codecs.js"
+import { connection } from "./connection.js"
+import * as C from "./capi.js"
+import * as t from "./types/mod.js"
 
 export const metadata: ${this.typeCodegen.print(this.metadata)}
 
@@ -55,19 +55,19 @@ export const chain: C.ChainRune<${this.chainName}, never>
       files.set(
         `mod.${ext}`,
         `
-export * from "./connection.${ext}"
-export * from "./chain.${ext}"
-export * from "./pallets.${ext}"
-export * as types from "./types/mod.${ext}"
+export * from "./connection.js"
+export * from "./chain.js"
+export * from "./pallets.js"
+export * as types from "./types/mod.js"
 `,
       )
 
       files.set(
         `pallets.${ext}`,
         `
-import { chain, ${isTypes ? this.chainName : ""} } from "./chain.${ext}"
-import * as C from "./capi.${ext}"
-import * as t from "./types/mod.${ext}"
+import { chain, ${isTypes ? this.chainName : ""} } from "./chain.js"
+import * as C from "./capi.js"
+import * as t from "./types/mod.js"
 
 ${
           Object.values(this.metadata.pallets).map((pallet) => {
