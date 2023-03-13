@@ -29,9 +29,7 @@ export async function createCustomChainSpec(
   const buildSpecRawCmd = new Deno.Command(bin, {
     args: ["build-spec", "--disable-default-bootnode", "--chain", customChainSpecPath, "--raw"],
   })
-  const chainSpecRaw = JSON.parse(
-    new TextDecoder().decode((await buildSpecRawCmd.output()).stdout),
-  )
+  const chainSpecRaw = JSON.parse(new TextDecoder().decode((await buildSpecRawCmd.output()).stdout))
   const customChainSpecRawPath = await Deno.makeTempFile({
     prefix: `custom-${chain}-chain-spec-raw`,
     suffix: ".json",
