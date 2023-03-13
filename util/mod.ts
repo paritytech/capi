@@ -1,5 +1,6 @@
 // moderate --exclude cache port.ts tsFormatter.ts
 
+export * from "./ArrayOfLength.ts"
 export * from "./case.ts"
 export * from "./clock.ts"
 export * from "./error.ts"

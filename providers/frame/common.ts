@@ -58,39 +58,7 @@ export async function chainFileWithUsers(
   return new File(`
     ${file.codeRaw}
 
-    type ArrayOfLength<
-      T,
-      L extends number,
-      A extends T[] = [],
-    > = number extends L ? T[]
-      : L extends A["length"] ? A
-      : ArrayOfLength<T, L, [...A, T]>
-
-    export async function users<N extends number>(count: N): Promise<ArrayOfLength<C.Sr25519, N>>
-    export async function users(count: number): Promise<C.Sr25519[]> {
-      const response = await fetch(
-        ${JSON.stringify(url)},
-        {
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-          },
-          body: JSON.stringify({ count }),
-        },
-      )
-      if (!response.ok) {
-        throw new Error(await response.text())
-      }
-      const { index }: { index: number } = await response.json()
-      if (index === -1) {
-        throw new Error("Maximum test user count reached")
-      }
-      const userIds: C.Sr25519[] = []
-      for (let i = index; i < index + count; i++) {
-        userIds.push(C.testUser(i))
-      }
-      return userIds
-    }
+    export const users = C.testUserFactory(${JSON.stringify(url)})
   `)
 }
 

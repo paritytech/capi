@@ -1,3 +1,4 @@
+import { ArrayOfLength } from "../util/mod.ts"
 import { Blake2_256 } from "./hashers.ts"
 import { decode } from "./hex.ts"
 import { Sr25519 } from "./Sr25519.ts"
@@ -36,4 +37,31 @@ export function testUser(userId: number) {
   return Sr25519.fromSeed(
     Blake2_256.hash(new TextEncoder().encode(`capi-test-user-${userId}`)),
   )
+}
+
+export function testUserFactory(url: string) {
+  return async function users<N extends number>(count: N): Promise<ArrayOfLength<Sr25519, N>> {
+    const response = await fetch(
+      url,
+      {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({ count }),
+      },
+    )
+    if (!response.ok) {
+      throw new Error(await response.text())
+    }
+    const { index }: { index: number } = await response.json()
+    if (index === -1) {
+      throw new Error("Maximum test user count reached")
+    }
+    const userIds: Sr25519[] = []
+    for (let i = index; i < index + count; i++) {
+      userIds.push(testUser(i))
+    }
+    return userIds as ArrayOfLength<Sr25519, N>
+  }
 }
