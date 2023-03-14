@@ -1,6 +1,7 @@
-import * as path from "../../deps/std/path.ts"
+import { readLines } from "../../deps/std/io.ts"
+import { readerFromStreamReader } from "../../deps/std/streams.ts"
 import { unreachable } from "../../deps/std/testing/asserts.ts"
-import { Network } from "../../deps/zombienet/orchestrator.ts"
+import { Network, readNetworkConfig } from "../../deps/zombienet.ts"
 import { Env, PathInfo } from "../../server/mod.ts"
 import { PermanentMemo } from "../../util/mod.ts"
 import { FrameBinProvider } from "./FrameBinProvider.ts"
@@ -25,11 +26,34 @@ export class ZombienetProvider extends FrameBinProvider {
     const configPath = target.slice(0, i)
     const network = await this.launchMemo.run(configPath, async () => {
       const zombiecache = await Deno.realPath(await Deno.makeTempDir({ prefix: `capi_zombienet_` }))
-      const networkManifestPath = path.join(zombiecache, "zombie.json")
-      const network = this.network(zombiecache, networkManifestPath)
-      const args: string[] = ["-p", "native", "-d", zombiecache, "-f", "spawn", configPath]
-      await this.runBin(args)
-      return await network
+      const config = readNetworkConfig(configPath)
+      ;(config.settings ??= { provider: "native", timeout: 1200 }).provider = "native"
+      const options = {
+        monitor: false,
+        spawnConcurrency: 1,
+        dir: zombiecache,
+        force: true,
+        inCI: false,
+      }
+      const child = new Deno.Command(Deno.execPath(), {
+        args: [
+          "run",
+          "-A",
+          import.meta.resolve("./zombienet_worker.ts"),
+          JSON.stringify([config, options]),
+        ],
+        stdout: "piped",
+        stderr: "piped",
+      }).spawn()
+      this.env.signal.addEventListener("abort", () => {
+        child.kill("SIGINT")
+      })
+      for await (const line of readLines(readerFromStreamReader(child.stdout.getReader()))) {
+        if (!line.startsWith("capi_network = ")) continue
+        const network = JSON.parse(line.slice("capi_network = ".length)) as Network
+        return network
+      }
+      unreachable()
     })
     const nodeName = target.slice(i + 1)
     const node = network.nodesByName[nodeName]
