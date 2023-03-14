@@ -1,14 +1,14 @@
 {
   "imports": {
     "polkadot/": "http://localhost:4646/frame/wss/rpc.polkadot.io/@latest/",
-    "polkadot_dev/": "http://localhost:4646/frame/dev/polkadot/@latest/",
+    "polkadot_dev/": "http://localhost:4646/frame/dev/polkadot/@v0.9.37/",
     "kusama/": "http://localhost:4646/frame/wss/kusama-rpc.polkadot.io/@latest/",
-    "kusama_dev/": "http://localhost:4646/frame/dev/kusama/@latest/",
+    "kusama_dev/": "http://localhost:4646/frame/dev/kusama/@v0.9.37/",
     "westend/": "http://localhost:4646/frame/wss/westend-rpc.polkadot.io/@latest/",
-    "westend_dev/": "http://localhost:4646/frame/dev/westend/@latest/",
+    "westend_dev/": "http://localhost:4646/frame/dev/westend/@v0.9.37/",
     "rococo/": "http://localhost:4646/frame/wss/rococo-contracts-rpc.polkadot.io/@latest/",
     "rococo_contracts/": "http://localhost:4646/frame/wss/rococo-contracts-rpc.polkadot.io/@latest/",
-    "rococo_dev/": "http://localhost:4646/frame/dev/rococo/@latest/",
+    "rococo_dev/": "http://localhost:4646/frame/dev/rococo/@v0.9.37/",
     "acala/": "http://localhost:4646/frame/wss/acala-polkadot.api.onfinality.io/public-ws/@latest/",
     "moonbeam/": "http://localhost:4646/frame/wss/wss.api.moonbeam.network/@latest/",
     "statemint/": "http://localhost:4646/frame/wss/statemint-rpc.polkadot.io/@latest/",
@@ -21,7 +21,7 @@
       "capi/patterns/": "http://localhost:4646/patterns/",
       "zombienet/": "http://localhost:4646/frame/zombienet/zombienets/",
       "project/": "http://localhost:4646/frame/project/",
-      "contracts_dev/": "http://localhost:4646/frame/contracts_dev/@latest/"
+      "contracts_dev/": "http://localhost:4646/frame/contracts_dev/@v0.24.0/"
     },
     "http://localhost:4646/": {
       "http://localhost:4646/": "./",
