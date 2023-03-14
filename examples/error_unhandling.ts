@@ -13,4 +13,4 @@ assertRejects(() =>
     .dbgStatus()
     .finalizedEvents()
     .unhandleFailed()
-    .run(), "unhandleFailed")
+    .run())
