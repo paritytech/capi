@@ -84,7 +84,7 @@ export abstract class FrameProvider extends Provider {
     const cacheKey = this.cacheKey(pathInfo)
     return this.metadataMemo.run(cacheKey, async () => {
       const raw = await this.env.cache.getRaw(
-        `${cacheKey}/metadata`,
+        `${cacheKey}/_metadata`,
         async () => {
           if (pathInfo.vRuntime !== await this.latestVersion(pathInfo)) {
             throw f.serverError("Cannot get metadata for old runtime version")
@@ -110,6 +110,12 @@ export abstract class FrameProvider extends Provider {
   }
 
   async chainName(pathInfo: PathInfo) {
-    return normalizeIdent(await this.call<string>(pathInfo, "system_chain"))
+    return this.env.cache.getString(
+      `${this.cacheKey(pathInfo)}/_chainName`,
+      chainNameTtl,
+      async () => normalizeIdent(await this.call<string>(pathInfo, "system_chain")),
+    )
   }
 }
+
+const chainNameTtl = 60_000
