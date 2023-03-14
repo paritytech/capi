@@ -52,9 +52,9 @@ await Promise.all([
         name: "wat-the-crypto",
         version: "0.0.1",
       },
-      "https://deno.land/x/scale@v0.11.0-beta.0/mod.ts": {
+      "https://deno.land/x/scale@v0.11.0/mod.ts#=": {
         name: "scale-codec",
-        version: "0.11.0-beta.0",
+        version: "0.11.0",
       },
       "https://deno.land/x/smoldot@light-js-deno-v0.7.6/index-deno.js": {
         name: "@substrate/smoldot-light",
