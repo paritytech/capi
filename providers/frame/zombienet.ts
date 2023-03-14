@@ -1,3 +1,4 @@
+import { delay } from "../../deps/std/async.ts"
 import * as path from "../../deps/std/path.ts"
 import { unreachable } from "../../deps/std/testing/asserts.ts"
 import { Network } from "../../deps/zombienet/orchestrator.ts"
@@ -41,6 +42,8 @@ export class ZombienetProvider extends FrameBinProvider {
     const watcher = Deno.watchFs(zombienetCachePath)
     for await (const e of watcher) {
       if (e.kind === "modify" && e.paths.includes(networkManifestPath)) {
+        // the `modify` is triggered while the networkManifestPath is writtent
+        await delay(1000)
         return JSON.parse(await Deno.readTextFile(networkManifestPath))
       }
     }
