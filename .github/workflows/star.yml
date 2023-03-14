@@ -22,6 +22,11 @@ jobs:
             ~/.deno
             ~/.cache/deno
           key: ${{ runner.os }}-deno-${{ hashFiles('deps/**/*.ts') }}
+      - name: Cache metadata
+        uses: actions/cache@v3
+        with:
+          path: target/capi/**/metadata
+          key: ${{ runner.os }}-capi-target-${{ hashFiles('import_map.json') }}
       - name: Setup binaries
         uses: ./.github/actions/setup-binaries
       - run: deno task run _tasks/star.ts
