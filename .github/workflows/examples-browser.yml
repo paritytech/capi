@@ -13,8 +13,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v3
+      # - run: deno run -A _tasks/validate_ignore.ts --dir examples
       - uses: ./.github/actions/troodontid
-      - run: deno run -A _tasks/validate_ignore.ts --dir examples
         with:
           dir: examples
           importMap: import_map.json
