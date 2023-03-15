@@ -1,18 +1,17 @@
-import { $preDigest } from "polkadot_dev/types/sp_consensus_babe/digests.ts"
-import { Chain, ChainRune } from "../../fluent/mod.ts"
+import { $preDigest } from "polkadot/types/sp_consensus_babe/digests.js"
+import { AddressPrefixChain, ChainRune } from "../../fluent/mod.ts"
 import { PublicKeyRune } from "../../fluent/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../../rune/mod.ts"
 import { preRuntimeDigest } from "./preRuntimeDigest.ts"
 
-export function babeBlockAuthor<U, C extends Chain, X>(
-  chain: ChainRune<U, C>,
+export function babeBlockAuthor<C extends AddressPrefixChain, U, X>(
+  chain: ChainRune<C, U>,
   ...[blockHash]: RunicArgs<X, [blockHash: string]>
 ) {
   const validators = chain
-    .metadata()
     .pallet("Session")
     .storage("Validators")
-    .entry([], blockHash)
+    .value(undefined!, blockHash)
     .unsafeAs<Uint8Array[] | undefined>()
     .into(ValueRune)
     .unhandle(undefined)

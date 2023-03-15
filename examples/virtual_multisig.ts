@@ -1,6 +1,8 @@
-import { alice, bob, charlie, dave, MultiAddress, Rune } from "capi"
+import { alice, bob, charlie, dave, Rune } from "capi"
 import { VirtualMultisigRune } from "capi/patterns/multisig/mod.ts"
-import { Balances, chain, System, Utility } from "polkadot_dev/mod.ts"
+import { signature } from "capi/patterns/signature/polkadot.ts"
+import { Balances, chain, System, Utility } from "polkadot_dev/mod.js"
+import { MultiAddress } from "polkadot_dev/types/sp_runtime/multiaddress.js"
 import { parse } from "../deps/std/flags.ts"
 
 let { state } = parse(Deno.args, { string: ["state"] })
@@ -21,10 +23,10 @@ const vMultisig = VirtualMultisigRune.hydrate(chain, state)
 
 const fundStash = Balances
   .transfer({
-    dest: vMultisig.stash.map(MultiAddress.Id),
+    dest: MultiAddress.Id(vMultisig.stash),
     value: 20_000_000_000_000n,
   })
-  .signed({ sender: alice })
+  .signed(signature(chain, { sender: alice }))
   .sent()
   .dbgStatus("Fund Stash:")
   .finalized()
@@ -42,7 +44,7 @@ const bobTx = Utility
       vMultisig.ratify(bob.publicKey, proposal),
     ]),
   })
-  .signed({ sender: bob })
+  .signed(signature(chain, { sender: bob }))
   .sent()
   .dbgStatus("Bob fund & ratify:")
   .finalized()
@@ -55,7 +57,7 @@ const charlieTx = Utility
       vMultisig.ratify(charlie.publicKey, proposal),
     ]),
   })
-  .signed({ sender: charlie })
+  .signed(signature(chain, { sender: charlie }))
   .sent()
   .dbgStatus("Charlie fund & ratify:")
   .finalized()
@@ -63,8 +65,8 @@ const charlieTx = Utility
 await Rune
   .chain(() => vMultisig)
   .chain(() => fundStash)
-  .chain(() => System.Account.entry([dave.publicKey]).dbg("Dave Balance Before:"))
+  .chain(() => System.Account.value(dave.publicKey).dbg("Dave Balance Before:"))
   .chain(() => bobTx)
   .chain(() => charlieTx)
-  .chain(() => System.Account.entry([dave.publicKey]).dbg("Dave Balance After:"))
+  .chain(() => System.Account.value(dave.publicKey).dbg("Dave Balance After:"))
   .run()

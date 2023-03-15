@@ -1,8 +1,7 @@
-import { File } from "../../codegen/frame/mod.ts"
 import { ss58, testUser } from "../../crypto/mod.ts"
 import * as $ from "../../deps/scale.ts"
 
-const DEFAULT_TEST_USER_COUNT = 100_000
+const DEFAULT_TEST_USER_COUNT = 1_000
 const DEFAULT_TEST_USER_INITIAL_FUNDS = 1_000_000_000_000_000_000
 
 export async function createCustomChainSpec(
@@ -38,12 +37,20 @@ export async function createCustomChainSpec(
   return customChainSpecRawPath
 }
 
-export async function chainFileWithUsers(file: File, url: string): Promise<File> {
-  return new File(`
-    ${file.codeRaw}
+export function connectionCodeWithUsers(
+  code: string,
+  isTypes: boolean,
+  url: string,
+): string {
+  return `
+${code}
 
-    export const users = C.testUserFactory(${JSON.stringify(url)})
-  `)
+export const users ${
+    isTypes
+      ? `: ReturnType<typeof C.testUserFactory>`
+      : `= C.testUserFactory(${JSON.stringify(url)})`
+  }
+  `
 }
 
 export async function handleCount(request: Request, cache: { count: number }): Promise<Response> {

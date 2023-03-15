@@ -1,10 +1,9 @@
-import { File } from "../../codegen/frame/mod.ts"
 import * as $ from "../../deps/scale.ts"
 import { Env, PathInfo } from "../../server/mod.ts"
 import { fromPathInfo } from "../../server/PathInfo.ts"
 import { getAvailable } from "../../util/port.ts"
 import { getOrInit } from "../../util/state.ts"
-import { chainFileWithUsers, createCustomChainSpec, handleCount } from "./common.ts"
+import { connectionCodeWithUsers, createCustomChainSpec, handleCount } from "./common.ts"
 import { FrameBinProvider } from "./FrameBinProvider.ts"
 
 export interface PolkadotDevProviderProps {
@@ -22,9 +21,9 @@ export class PolkadotDevProvider extends FrameBinProvider {
     })
   }
 
-  override async chainFile(pathInfo: PathInfo): Promise<File> {
+  override async connectionCode(pathInfo: PathInfo, isTypes: boolean): Promise<string> {
     const url = new URL(fromPathInfo({ ...pathInfo, filePath: "user_i" }), this.env.href).toString()
-    return chainFileWithUsers(await super.chainFile(pathInfo), url)
+    return connectionCodeWithUsers(await super.connectionCode(pathInfo, isTypes), isTypes, url)
   }
 
   override async handle(request: Request, pathInfo: PathInfo): Promise<Response> {
@@ -47,6 +46,10 @@ export class PolkadotDevProvider extends FrameBinProvider {
     const args: string[] = ["--tmp", "--alice", "--ws-port", port.toString(), "--chain", chainSpec]
     await this.runBin(args)
     return port
+  }
+
+  override async chainName(pathInfo: PathInfo): Promise<string> {
+    return pathInfo.target!.replace(/^./, (x) => x.toUpperCase()) + "Dev"
   }
 }
 

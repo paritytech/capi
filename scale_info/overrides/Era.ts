@@ -8,9 +8,9 @@ export type Era =
     phase: bigint
   }
 
-export namespace era {
-  export const immortal: Era = { type: "Immortal" }
-  export function mortal(period: bigint, current: bigint): Era {
+export namespace Era {
+  export const Immortal: Era = { type: "Immortal" }
+  export function Mortal(period: bigint, current: bigint): Era {
     const adjustedPeriod = minN(maxN(nextPowerOfTwo(period), 4n), 1n << 16n)
     const phase = current % adjustedPeriod
     const quantizeFactor = maxN(adjustedPeriod >> 12n, 1n)

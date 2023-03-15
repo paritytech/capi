@@ -1,106 +1,54 @@
-import { hashers, hex, ss58 } from "../crypto/mod.ts"
-import * as M from "../frame_metadata/mod.ts"
-import { MultiAddress, Signer } from "../primitives/mod.ts"
+import { blake2_256, hex } from "../crypto/mod.ts"
+import { $extrinsic, Signer } from "../frame_metadata/Extrinsic.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
-import { Era, era } from "../scale_info/mod.ts"
 import { Chain, ChainRune } from "./ChainRune.ts"
 import { CodecRune } from "./CodecRune.ts"
 import { SignedExtrinsicRune } from "./SignedExtrinsicRune.ts"
 
-export interface ExtrinsicSender {
-  address: MultiAddress
-  sign: Signer
+export interface ExtrinsicSender<C extends Chain> {
+  address: Chain.Address<C>
+  sign: Signer<C["metadata"]>
 }
 
-export interface SignedExtrinsicProps {
-  sender: ExtrinsicSender
-  checkpoint?: string
-  mortality?: Era
-  nonce?: number
-  tip?: bigint
+export interface SignatureData<C extends Chain> {
+  sender: ExtrinsicSender<C>
+  extra: Chain.Extra<C>
+  additional: Chain.Additional<C>
 }
 
-export class ExtrinsicRune<out U, out C extends Chain = Chain> extends Rune<Chain.Call<C>, U> {
+export class ExtrinsicRune<out C extends Chain, out U> extends Rune<Chain.Call<C>, U> {
   hash
 
-  constructor(_prime: ExtrinsicRune<U, C>["_prime"], readonly chain: ChainRune<U, C>) {
+  constructor(_prime: ExtrinsicRune<C, U>["_prime"], readonly chain: ChainRune<C, U>) {
     super(_prime)
-    const metadata = this.chain.metadata()
-    this.hash = Rune.rec({ metadata, deriveCodec: metadata.deriveCodec })
-      .map((x) => hashers.Blake2_256.$hash(M.$call(x)))
+    this.hash = this.chain
+      .into(ValueRune)
+      .access("metadata", "extrinsic", "call")
+      .map((x) => blake2_256.$hash<any>(x))
       .into(CodecRune)
       .encoded(this)
   }
 
-  signed<X>(_props: RunicArgs<X, SignedExtrinsicProps>) {
-    const props = RunicArgs.resolve(_props)
-    const metadata = this.chain.metadata()
-    const System = metadata.pallet("System")
-    const addrPrefix = System.const("SS58Prefix").decoded.unsafeAs<number>()
-    const $extrinsic = Rune.rec({
-      metadata,
-      deriveCodec: metadata.deriveCodec,
-      sign: props.sender.access("sign"),
-      prefix: addrPrefix,
-    }).map(M.$extrinsic).into(CodecRune)
-    const versions = System.const("Version").decoded.unsafeAs<
-      { specVersion: number; transactionVersion: number }
-    >().into(ValueRune)
-    const specVersion = versions.access("specVersion")
-    const transactionVersion = versions.access("transactionVersion")
-    // TODO: create union rune (with `matchTag` method) and utilize here
-    // TODO: MultiAddress conversion utils
-    const senderSs58 = Rune
-      .tuple([addrPrefix, props.sender])
-      .map(([addrPrefix, sender]) => {
-        switch (sender.address.type) {
-          case "Id": {
-            return ss58.encode(addrPrefix, sender.address.value)
-          }
-          default: {
-            throw new Error("unimplemented")
-          }
-        }
-      })
-      .throws(ss58.InvalidPublicKeyLengthError, ss58.InvalidNetworkPrefixError)
-    // TODO: handle props.nonce resolving to undefined
-    const nonce = props.nonce ?? this.chain.connection.call("system_accountNextIndex", senderSs58)
-    const genesisHashHex = this.chain.connection.call("chain_getBlockHash", 0).unsafeAs<string>()
-      .into(ValueRune)
-    const genesisHash = genesisHashHex.map(hex.decode)
-    const checkpointHash = Rune.tuple([props.checkpoint, genesisHashHex]).map(([a, b]) => a ?? b)
-      .map(hex.decode)
-    const mortality = Rune.resolve(props.mortality).map((x) => x ?? era.immortal)
-    const tip = Rune.resolve(props.tip).map((x) => x ?? 0n)
-    const extra = Rune.tuple([mortality, nonce, tip])
-    const additional = Rune.tuple([specVersion, transactionVersion, checkpointHash, genesisHash])
-    const signature = Rune.rec({
-      address: Rune.resolve(props.sender).access("address"),
-      extra,
-      additional,
-    })
-    const extrinsicProps = Rune.rec({
-      protocolVersion: 4,
-      call: this,
-      signature,
-    })
-    const extrinsic = $extrinsic.encoded(extrinsicProps)
-    return extrinsic.into(SignedExtrinsicRune, this.chain)
+  signed<X>(...[signature]: RunicArgs<X, [signatureData: SignatureData<C>]>) {
+    return Rune.fn($extrinsic)
+      .call(this.chain.metadata)
+      .into(CodecRune)
+      .encoded(Rune.rec({
+        protocolVersion: 4,
+        call: this,
+        signature,
+      }))
+      .into(SignedExtrinsicRune, this.chain)
   }
 
   encoded() {
-    const metadata = this.chain.metadata()
-    const $extrinsic = Rune.rec({
-      metadata,
-      deriveCodec: metadata.deriveCodec,
-      sign: null!,
-      prefix: null!,
-    }).map(M.$extrinsic).into(CodecRune)
-    const $extrinsicProps = Rune.rec({
-      protocolVersion: 4,
-      call: this,
-    })
-    return $extrinsic.encoded($extrinsicProps)
+    return Rune.fn($extrinsic)
+      .call(this.chain.into(ValueRune).access("metadata"))
+      .into(CodecRune)
+      .encoded(Rune.rec({
+        protocolVersion: 4,
+        call: this,
+      }))
   }
 
   feeEstimate() {

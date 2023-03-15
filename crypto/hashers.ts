@@ -24,7 +24,7 @@ export abstract class Hasher {
   }
 }
 
-function $hash<T>(hasher: Hasher, $inner: $.Codec<T>): $.Codec<T> {
+export function $hash<T>(hasher: Hasher, $inner: $.Codec<T>): $.Codec<T> {
   return $.createCodec({
     _metadata: $.metadata("$hash", $hash, hasher, $inner),
     _staticSize: hasher.digestLength + $inner._staticSize,
@@ -106,14 +106,14 @@ export interface Hashing {
   dispose?(): void
 }
 
-export const Blake2_128 = new Blake2Hasher(128, false)
-export const Blake2_128Concat = new Blake2Hasher(128, true)
-export const Blake2_256 = new Blake2Hasher(256, false)
-export const Blake2_512 = new Blake2Hasher(512, false)
-export const Identity = new IdentityHasher()
-export const Twox128 = new TwoxHasher(128, false)
-export const Twox256 = new TwoxHasher(256, false)
-export const Twox64Concat = new TwoxHasher(64, true)
+export const blake2_128 = new Blake2Hasher(128, false)
+export const blake2_128Concat = new Blake2Hasher(128, true)
+export const blake2_256 = new Blake2Hasher(256, false)
+export const blake2_512 = new Blake2Hasher(512, false)
+export const identity = new IdentityHasher()
+export const twox128 = new TwoxHasher(128, false)
+export const twox256 = new TwoxHasher(256, false)
+export const twox64Concat = new TwoxHasher(64, true)
 
 function updateHashing(hashing: Hashing, data: EncodeBuffer) {
   for (const array of data.finishedArrays) {

@@ -1,10 +1,15 @@
 import { alice, Rune, ValueRune } from "capi"
-import { types, XcmPallet } from "zombienet/statemine.toml/alice/@latest/mod.ts"
-import { Event as XcmPalletEvent } from "zombienet/statemine.toml/alice/@latest/types/pallet_xcm/pallet.ts"
-import { RuntimeEvent as AliceRuntimeEvent } from "zombienet/statemine.toml/alice/@latest/types/rococo_runtime/mod.ts"
-import { chain, System } from "zombienet/statemine.toml/collator/@latest/mod.ts"
-import { Event as ParachainSystemEvent } from "zombienet/statemine.toml/collator/@latest/types/cumulus_pallet_parachain_system/pallet.ts"
-import { RuntimeEvent as CollatorRuntimeEvent } from "zombienet/statemine.toml/collator/@latest/types/statemine_runtime.ts"
+import {
+  chain as aliceChain,
+  types,
+  XcmPallet,
+} from "zombienet/statemine.toml/alice/@v0.9.37/mod.js"
+import { Event as XcmPalletEvent } from "zombienet/statemine.toml/alice/@v0.9.37/types/pallet_xcm/pallet.js"
+import { RuntimeEvent as AliceRuntimeEvent } from "zombienet/statemine.toml/alice/@v0.9.37/types/rococo_runtime/mod.js"
+import { chain as collator, System } from "zombienet/statemine.toml/collator/@v0.9.370/mod.js"
+import { Event as ParachainSystemEvent } from "zombienet/statemine.toml/collator/@v0.9.370/types/cumulus_pallet_parachain_system/pallet.js"
+import { RuntimeEvent as CollatorRuntimeEvent } from "zombienet/statemine.toml/collator/@v0.9.370/types/statemine_runtime.js"
+import { signature } from "../patterns/signature/polkadot.ts"
 
 const {
   VersionedMultiAssets,
@@ -45,7 +50,7 @@ const initiatedEvent = XcmPallet
     feeAssetItem: 0,
     weightLimit: WeightLimit.Unlimited(),
   })
-  .signed({ sender: alice })
+  .signed(signature(aliceChain, { sender: alice }))
   .sent()
   .dbgStatus("Teleportation status:")
   .finalizedEvents()
@@ -60,7 +65,7 @@ const initiatedEvent = XcmPallet
   .dbg("Initiated event:")
 
 const processedEvent = System.Events
-  .entry([], chain.latestBlock.hash)
+  .value(undefined, collator.latestBlock.hash)
   .map((events) =>
     events?.find((e) =>
       CollatorRuntimeEvent.isParachainSystem(e.event)
@@ -77,5 +82,9 @@ await logAliceBalance()
   .run()
 
 function logAliceBalance() {
-  return System.Account.entry([alice.publicKey]).access("data", "free").dbg("Alice balance:")
+  return System.Account
+    .value(alice.publicKey)
+    .unhandle(undefined)
+    .access("data", "free")
+    .dbg("Alice balance:")
 }

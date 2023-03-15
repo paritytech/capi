@@ -1,12 +1,12 @@
-import { ArrayRune, Rune, ValueRune } from "capi"
-import { Paras } from "polkadot/mod.ts"
+import { ArrayRune, ValueRune } from "capi"
+import { Paras } from "polkadot/mod.js"
 
 const result = await Paras
   .Parachains
-  .entry([])
+  .value()
   .unhandle(undefined)
   .into(ArrayRune)
-  .mapArray((id) => Paras.Heads.entry(Rune.tuple([id])))
+  .mapArray((id) => Paras.Heads.value(id))
   .into(ValueRune)
   .rehandle(undefined)
   .run()

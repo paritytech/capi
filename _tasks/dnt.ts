@@ -25,6 +25,9 @@ await Promise.all([
       name: ".",
       path: "./mod.ts",
     }, {
+      name: "./patterns/signature/polkadot",
+      path: "./patterns/signature/polkadot.ts",
+    }, {
       name: "./patterns/consensus",
       path: "./patterns/consensus/mod.ts",
     }, {

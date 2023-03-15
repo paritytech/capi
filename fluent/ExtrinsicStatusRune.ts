@@ -2,20 +2,21 @@ import { known } from "../rpc/mod.ts"
 import { MetaRune, Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { BlockRune } from "./BlockRune.ts"
 import { Chain } from "./ChainRune.ts"
+import { EventsChain } from "./EventsRune.ts"
 import { ExtrinsicEventsRune } from "./ExtrinsicsEventsRune.ts"
 import { SignedExtrinsicRune } from "./SignedExtrinsicRune.ts"
 
-export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
+export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
   extends Rune<Rune<known.TransactionStatus, U1>, U2>
 {
   constructor(
-    _prime: ExtrinsicStatusRune<U1, U2, C>["_prime"],
-    readonly extrinsic: SignedExtrinsicRune<U2, C>,
+    _prime: ExtrinsicStatusRune<C, U1, U2>["_prime"],
+    readonly extrinsic: SignedExtrinsicRune<C, U2>,
   ) {
     super(_prime)
   }
 
-  dbgStatus<X>(...prefix: RunicArgs<X, unknown[]>): ExtrinsicStatusRune<U1, U2, C> {
+  dbgStatus<X>(...prefix: RunicArgs<X, unknown[]>): ExtrinsicStatusRune<C, U1, U2> {
     return this
       .into(ValueRune)
       .map((rune) => rune.into(ValueRune).dbg(...prefix))
@@ -59,15 +60,18 @@ export class ExtrinsicStatusRune<out U1, out U2, out C extends Chain = Chain>
     return this.extrinsic.chain.block(this.finalizedHash())
   }
 
-  inBlockEvents() {
+  inBlockEvents(this: ExtrinsicStatusRune<EventsChain<C>, U1, U2>) {
     return this.events(this.inBlock())
   }
 
-  finalizedEvents() {
+  finalizedEvents(this: ExtrinsicStatusRune<EventsChain<C>, U1, U2>) {
     return this.events(this.finalized())
   }
 
-  events<EU>(block: BlockRune<EU, C>) {
+  events<EU>(
+    this: ExtrinsicStatusRune<EventsChain<C>, U1, U2>,
+    block: BlockRune<EventsChain<C>, EU>,
+  ) {
     const txI = Rune
       .tuple([block.into(ValueRune).access("block", "extrinsics"), this.extrinsic.hex()])
       .map(([hexes, hex]) => {

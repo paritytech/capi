@@ -1,4 +1,4 @@
-import { chain } from "polkadot/mod.ts"
+import { chain } from "polkadot/mod.js"
 
 const result = await chain.latestBlock.events().run()
 

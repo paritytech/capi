@@ -1,11 +1,8 @@
-import {
-  Data,
-  type IdentityInfo as IdentityInfoRaw,
-} from "polkadot_dev/types/pallet_identity/types.ts"
+import { Data, type IdentityInfo } from "polkadot/types/pallet_identity/types.js"
 import * as $ from "../deps/scale.ts"
 import { Rune, RunicArgs } from "../rune/mod.ts"
 
-export interface IdentityInfo<A extends Record<string, unknown>> {
+export interface NarrowIdentityInfo<A extends Record<string, unknown>> {
   additional: A
   display: string
   legal?: string
@@ -20,7 +17,7 @@ export interface IdentityInfo<A extends Record<string, unknown>> {
 export class IdentityInfoTranscoders<A extends Record<string, any>> {
   constructor(readonly additionalCodecs?: { [K in keyof A]: $.Codec<A[K]> }) {}
 
-  encode<X>(props: RunicArgs<X, IdentityInfo<A>>) {
+  encode<X>(props: RunicArgs<X, NarrowIdentityInfo<A>>) {
     const { additionalCodecs } = this
     const additional = additionalCodecs
       ? Rune
@@ -48,10 +45,14 @@ export class IdentityInfoTranscoders<A extends Record<string, any>> {
       .unsafeAs<Record<typeof REST_KEYS[number], Data>>()
     return Rune
       .tuple([additional, pgpFingerprint, rest])
-      .map(([additional, pgpFingerprint, rest]) => ({ additional, pgpFingerprint, ...rest }))
+      .map(([additional, pgpFingerprint, rest]): IdentityInfo => ({
+        additional,
+        pgpFingerprint,
+        ...rest,
+      }))
   }
 
-  decode<X>(...[identityInfo]: RunicArgs<X, [IdentityInfoRaw]>) {
+  decode<X>(...[identityInfo]: RunicArgs<X, [IdentityInfo]>) {
     const { additionalCodecs } = this
     return Rune
       .resolve(identityInfo)
@@ -59,7 +60,7 @@ export class IdentityInfoTranscoders<A extends Record<string, any>> {
         additional: additionalRaw,
         pgpFingerprint: pgpFingerprintRaw,
         ...restRaw
-      }) => {
+      }): NarrowIdentityInfo<A> => {
         const additional = additionalCodecs
           ? Object.fromEntries(additionalRaw.map(([kd, vd]) => {
             const k: keyof A = "value" in kd ? $.str.decode(kd.value) : (() => {
@@ -77,7 +78,7 @@ export class IdentityInfoTranscoders<A extends Record<string, any>> {
               data.type === "None" ? undefined : $.str.decode(data.value),
             ]),
         )
-        return { pgpFingerprint, additional, ...rest }
+        return { pgpFingerprint, additional, ...rest } as NarrowIdentityInfo<A>
       })
       .throws(CouldNotDecodeIdentityInfoAdditionalKey)
   }

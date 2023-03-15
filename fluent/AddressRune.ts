@@ -4,8 +4,8 @@ import { ValueRune } from "../rune/ValueRune.ts"
 import { Chain, ChainRune } from "./ChainRune.ts"
 import { PublicKeyRune } from "./PublicKeyRune.ts"
 
-export class AddressRune<out U, out C extends Chain = Chain> extends Rune<string, U> {
-  constructor(_prime: AddressRune<U>["_prime"], readonly chain: ChainRune<U, C>) {
+export class AddressRune<out C extends Chain, U> extends Rune<string, U> {
+  constructor(_prime: AddressRune<C, U>["_prime"], readonly chain: ChainRune<C, U>) {
     super(_prime)
   }
 

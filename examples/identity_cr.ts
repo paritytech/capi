@@ -1,6 +1,7 @@
 import { $, alice } from "capi"
 import { IdentityInfoTranscoders } from "capi/patterns/identity.ts"
-import { Identity } from "polkadot_dev/mod.ts"
+import { signature } from "capi/patterns/signature/polkadot.ts"
+import { chain, Identity } from "polkadot_dev/mod.js"
 
 const transcoders = new IdentityInfoTranscoders({ stars: $.u8 })
 
@@ -11,15 +12,16 @@ const info = transcoders.encode({
 
 await Identity
   .setIdentity({ info })
-  .signed({ sender: alice })
+  .signed(signature(chain, { sender: alice }))
   .sent()
   .dbgStatus()
   .finalized()
   .run()
 
 const raw = Identity.IdentityOf
-  .entry([alice.publicKey])
-  .access("info")
+  .value(alice.publicKey)
   .unhandle(undefined)
+  .access("info")
 
+// @ts-ignore will re-implement this pattern later anyways
 console.log(await transcoders.decode(raw).run())

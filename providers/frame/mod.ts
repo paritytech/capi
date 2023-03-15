@@ -1,4 +1,4 @@
-// moderate
+// moderate --exclude zombienet_worker.ts
 
 export * from "./common.ts"
 export * from "./contracts_dev.ts"

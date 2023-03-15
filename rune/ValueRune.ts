@@ -15,16 +15,17 @@ type Access<T, K extends keyof T, _K = NonIndexSignatureKeys<T>> = [
   >,
 ][0]
 
-type GetPath<T, P> = P extends [infer K, ...infer Q]
-  ? T extends {} ? K extends keyof T ? GetPath<Access<T, K>, Q> : never : T
+type GetPath<T, P> = P extends [infer K, ...infer Q] ? GetPath<
+    // @ts-ignore: we assume it's a valid key
+    T[K],
+    Q
+  >
   : T
-type EnsurePath<T, P> = T extends {}
-  ? never extends P
-    ? P extends [infer K, ...infer Q] ? [K] extends [keyof T] ? [K, ...EnsurePath<T[K], Q>]
-      : [keyof T, ...PropertyKey[]]
-    : [(keyof T)?]
+type EnsurePath<T, P> = never extends P ? P extends [infer K, ...infer Q] ? 
+      | [K & keyof T, ...EnsurePath<T[K & keyof T], Q>]
+      | [keyof T, ...PropertyKey[]]
+  : [(keyof T)?]
   : P
-  : []
 
 export class ValueRune<out T, out U = never> extends Rune<T, U> {
   static override new<T, U, A extends unknown[]>(
@@ -38,13 +39,18 @@ export class ValueRune<out T, out U = never> extends Rune<T, U> {
     return ValueRune.new(RunMap, this, fn)
   }
 
-  access<P extends PropertyKey[], T, U>(
+  access<P extends (string & {} | "" | number & {} | 0 | symbol)[], T, U, X>(
     this: ValueRune<T, U>,
-    ...keys: EnsurePath<T, P>
-  ): ValueRune<GetPath<T, P>, U> {
-    return this.map((value: any) => {
+    ...keys: never extends P ? RunicArgs<X, [...EnsurePath<T, P>]>
+      : { [K in keyof P]: P[K] | Rune<P[K], any> }
+  ): ValueRune<GetPath<T, { [K in keyof X]: Rune.T<X[K]> }>, U | RunicArgs.U<X>>
+  access<X>(
+    this: ValueRune<any, U>,
+    ...keys: RunicArgs<X, any[]>
+  ): ValueRune<any, U | RunicArgs.U<X>> {
+    return Rune.tuple([this, ...RunicArgs.resolve(keys)]).map(([value, ...keys]) => {
       for (const key of keys) {
-        value = value?.[key]
+        value = value[key]
       }
       return value
     })

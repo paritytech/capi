@@ -20,7 +20,12 @@ export async function code(cache: CacheBase, request: Request, genCode: () => Pr
   }
   const code = await cache.getString(path, codeTtl, genCode)
   return new Response(code, {
-    headers: { "Content-Type": "application/typescript" },
+    headers: path.endsWith(".js")
+      ? {
+        "Content-Type": "application/javascript",
+        "X-TypeScript-Types": request.url.slice(0, -3) + ".d.ts",
+      }
+      : { "Content-Type": "application/typescript" },
   })
 }
 

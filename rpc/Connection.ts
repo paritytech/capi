@@ -19,8 +19,8 @@ export abstract class Connection {
     this: new(discovery: D) => Connection,
     discovery: D,
     signal: AbortSignal,
-  ) {
-    const memo = getOrInit(connectionMemos, this, () => new Map())
+  ): Connection {
+    const memo = getOrInit(connectionMemos, this, () => new Map<unknown, Connection>())
     return getOrInit(memo, discovery, () => {
       const connection = new this(discovery)
       connection.ref(signal)

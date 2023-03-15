@@ -179,7 +179,7 @@ export class Rune<out T, out U = never> {
     return this
   }
 
-  unsafeAs<T2 extends T, U2 extends U = U>(): Rune<T2, U2> {
+  unsafeAs<T2, U2 = U>(): Rune<T2, U2> {
     return this as never
   }
 

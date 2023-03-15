@@ -22,7 +22,7 @@ export function handler(env: Env): Handler {
         try {
           return await provider.handle(request, pathInfo)
         } catch (e) {
-          if (e instanceof Response) return e
+          if (e instanceof Response) return e.clone()
           console.error(e)
           return f.serverError(Deno.inspect(e))
         }

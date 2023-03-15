@@ -1,10 +1,10 @@
 import { Rune } from "capi"
-import { chain, Timestamp } from "polkadot/mod.ts"
+import { chain, Timestamp } from "polkadot/mod.js"
 
 const block = chain.latestBlock
 const extrinsics = block.extrinsics()
 const events = block.events()
-const now = Timestamp.Now.entry([], block.hash)
+const now = Timestamp.Now.value(undefined, block.hash)
 
 const root = Rune.rec({
   hash: block.hash,

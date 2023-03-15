@@ -1,13 +1,8 @@
+import { MultiAddress } from "polkadot/types/sp_runtime/multiaddress.js"
+// type MultiAddress = any
+// const MultiAddress = null! as any
 import * as bytes from "../../deps/std/bytes.ts"
-import {
-  Chain,
-  ChainRune,
-  ExtrinsicRune,
-  MultiAddress,
-  Rune,
-  RunicArgs,
-  ValueRune,
-} from "../../mod.ts"
+import { Chain, ChainRune, ExtrinsicRune, Rune, RunicArgs, ValueRune } from "../../mod.ts"
 import { multisigAccountId } from "./multisigAccountId.ts"
 
 export interface MultisigRatifyProps<C extends Chain> {
@@ -26,19 +21,19 @@ export interface Multisig {
 }
 
 // TODO: swap out `Chain` constraints upon subset gen issue resolution... same for other patterns
-export class MultisigRune<out U, out C extends Chain = Chain> extends Rune<Multisig, U> {
+export class MultisigRune<out C extends Chain, out U> extends Rune<Multisig, U> {
   private storage
   threshold
   accountId
   address
 
-  constructor(_prime: MultisigRune<U>["_prime"], readonly chain: ChainRune<U, C>) {
+  constructor(_prime: MultisigRune<C, U>["_prime"], readonly chain: ChainRune<C, U>) {
     super(_prime)
-    this.storage = this.chain.metadata().pallet("Multisig").storage("Multisigs")
+    this.storage = this.chain.pallet("Multisig").storage("Multisigs")
     const v = this.into(ValueRune)
     this.threshold = v.map(({ threshold, signatories }) => threshold ?? signatories.length - 1)
     this.accountId = Rune.fn(multisigAccountId).call(v.access("signatories"), this.threshold)
-    this.address = this.accountId.map(MultiAddress.Id)
+    this.address = MultiAddress.Id(this.accountId)
   }
 
   otherSignatories<X>(...[sender]: RunicArgs<X, [sender: MultiAddress]>) {
@@ -122,15 +117,18 @@ export class MultisigRune<out U, out C extends Chain = Chain> extends Rune<Multi
   }
 
   proposals<X>(...[count]: RunicArgs<X, [count: number]>) {
+    // @ts-ignore .
     return this.storage.keyPage(count, Rune.tuple([this.accountId]))
   }
 
   proposal<X>(...[callHash]: RunicArgs<X, [callHash: Uint8Array]>) {
-    return this.storage.entry(Rune.tuple([this.accountId, callHash]))
+    // @ts-ignore .
+    return this.storage.value(Rune.tuple([this.accountId, callHash]))
   }
 
   isProposed<X>(...[callHash]: RunicArgs<X, [callHash: Uint8Array]>) {
-    return this.storage.entryRaw(Rune.tuple([this.accountId, callHash]))
+    // @ts-ignore .
+    return this.storage.valueRaw(Rune.tuple([this.accountId, callHash]))
       .map((entry) => entry !== null)
   }
 }
