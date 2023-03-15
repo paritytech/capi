@@ -9,7 +9,7 @@ import * as path from "./deps/std/path.ts"
 import { readerFromStreamReader, writeAll, writeAllSync } from "./deps/std/streams.ts"
 
 const flags = parse(Deno.args, {
-  string: ["dir", "concurrency", "ignore", "importMap"],
+  string: ["dir", "concurrency", "ignore", "importMap", "filter"],
   boolean: ["browser"],
   default: { ignore: ".ignore" },
 })
@@ -21,6 +21,8 @@ if (!flags.dir) {
 }
 const dir = flags.dir
 
+const filter = flags.filter ? new Set(flags.filter.split(",")) : undefined
+
 const runWithLimit = concurrency
   ? makeRunWithLimit<readonly [string, number]>(concurrency).runWithLimit
   : <T>(fn: () => Promise<T>) => fn()
@@ -30,6 +32,7 @@ const ignoredFiles = new Set(ignoreFile.split("\n"))
 
 const sourceFileNames = Array.from(Deno.readDirSync(dir))
   .filter((e) => e.name.match(/^.*\.ts$/g) && e.isFile && !ignoredFiles.has(e.name))
+  .filter((e) => filter ? filter.has(e.name) : true)
   .map((f) => f.name)
 
 const result = useBrowser ? await runWithBrowser() : await runWithDeno()
@@ -125,7 +128,9 @@ async function runWithBrowser() {
 
       await page.addScriptTag({ content: code, type: "module" })
 
-      return [name, await exit] as const
+      const exitCode = await exit
+
+      return [name, exitCode] as const
     })
   ))
 
