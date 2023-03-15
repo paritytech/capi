@@ -31,6 +31,7 @@ for (
     ],
     [
       "substrate 2 byte payload + 2 byte checksum",
+      // cspell:disable-next-line
       "5jrpfEX",
       [42, Uint8Array.from([1, 2]), 2],
     ],
@@ -51,6 +52,7 @@ for (
     ],
     [
       "substrate 4 byte payload + 4 byte checksum",
+      // cspell:disable-next-line
       "Y1aeU7vNADWR",
       [42, Uint8Array.from([1, 2, 3, 4]), 4],
     ],
@@ -66,6 +68,7 @@ for (
     ],
     [
       "substrate 8 byte payload + 3 byte checksum",
+      // cspell:disable-next-line
       "nyUcq3hBw8bqwazt",
       [42, Uint8Array.from([1, 2, 3, 4, 5, 6, 7, 8]), 3],
     ],
@@ -86,11 +89,13 @@ for (
     ],
     [
       "substrate 8 byte payload + 7 byte checksum",
+      // cspell:disable-next-line
       "6BqUqhpVKyG11bpoR1cb8R",
       [42, Uint8Array.from([1, 2, 3, 4, 5, 6, 7, 8]), 7],
     ],
     [
       "substrate 8 byte payload + 8 byte checksum",
+      // cspell:disable-next-line
       "PtpysyAc2jKD3ehyryi5dkj",
       [42, Uint8Array.from([1, 2, 3, 4, 5, 6, 7, 8]), 8],
     ],
