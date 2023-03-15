@@ -99,6 +99,11 @@ for (
       "PtpysyAc2jKD3ehyryi5dkj",
       [42, Uint8Array.from([1, 2, 3, 4, 5, 6, 7, 8]), 8],
     ],
+    [
+      "substrate 33 byte payload",
+      "KVqMLDzVyHChtJ8imRTkP22Tuz8Yd7X9MABUhz1rHNpHny12V",
+      [42, new Uint8Array(33)],
+    ],
   ] as const
 ) {
   Deno.test(`ss58.encode ${networkName}`, () => {
