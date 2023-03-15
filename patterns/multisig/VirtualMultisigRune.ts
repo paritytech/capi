@@ -149,7 +149,7 @@ export class VirtualMultisigRune<out C extends Chain, out U> extends Rune<Virtua
           calls: proxyCreationCalls,
         }),
       } as any))
-      .signed(signature(chain as any, { sender: deployer }) as any)
+      .signed(signature({ sender: deployer }) as any)
       .sent()
       .dbgStatus("Proxy creation:")
       .finalizedEvents()
@@ -217,7 +217,7 @@ export class VirtualMultisigRune<out C extends Chain, out U> extends Rune<Virtua
           calls: existentialDepositCalls,
         }),
       }) as any)
-      .signed(signature(chain as any, { sender: deployer }) as any)
+      .signed(signature({ sender: deployer }) as any)
       .sent()
       .dbgStatus("Existential deposits:")
       .finalized()
@@ -256,7 +256,7 @@ export class VirtualMultisigRune<out C extends Chain, out U> extends Rune<Virtua
           calls: ownershipSwapCalls,
         }),
       }) as any)
-      .signed(signature(chain as any, { sender: deployer }) as any)
+      .signed(signature({ sender: deployer }) as any)
       .sent()
       .dbgStatus("Ownership swaps:")
       .finalized()
