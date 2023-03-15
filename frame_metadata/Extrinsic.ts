@@ -22,6 +22,7 @@ export interface Extrinsic<M extends FrameMetadata> {
 
 export type Signer<M extends FrameMetadata> = (
   message: Uint8Array,
+  fullData: Uint8Array,
 ) => $.Native<M["extrinsic"]["signature"]> | Promise<$.Native<M["extrinsic"]["signature"]>>
 
 export function $extrinsic<M extends FrameMetadata>(metadata: M): $.Codec<Extrinsic<M>> {
@@ -59,7 +60,7 @@ export function $extrinsic<M extends FrameMetadata>(metadata: M): $.Codec<Extrin
           const toSign = toSignEncoded.length > 256
             ? blake2_256.hash(toSignEncoded)
             : toSignEncoded
-          const sig = signature.sender.sign!(toSign)
+          const sig = signature.sender.sign!(toSign, toSignEncoded)
           if (sig instanceof Promise) {
             $sigPromise._encode(buffer, sig)
           } else {
