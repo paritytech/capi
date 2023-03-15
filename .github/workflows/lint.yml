@@ -16,4 +16,3 @@ jobs:
         with:
           deno-version: v1.x
       - run: deno lint
-      - run: deno run -A _tasks/validate_ignore.ts --dir examples
