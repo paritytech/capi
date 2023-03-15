@@ -1,22 +1,28 @@
 import * as base58 from "../deps/std/encoding/base58.ts"
 import { Blake2b } from "../deps/wat_the_crypto.ts"
 
+export interface EncodeProps {
+  validNetworkPrefixes?: readonly number[]
+  checksumLength?: number
+}
+
 export function encode(
   prefix: number,
   payload: Uint8Array,
-  validNetworkPrefixes?: readonly number[],
+  props?: EncodeProps,
 ): string {
-  return base58.encode(encodeRaw(prefix, payload, validNetworkPrefixes))
+  return base58.encode(encodeRaw(prefix, payload, props))
 }
 
 export function encodeRaw(
   prefix: number,
   payload: Uint8Array,
-  validNetworkPrefixes?: readonly number[],
+  props?: EncodeProps,
 ): Uint8Array {
-  const checksumLength = VALID_PAYLOAD_CHECKSUM_LENGTHS[payload.length]
+  const checksumLength = props?.checksumLength ?? VALID_PAYLOAD_CHECKSUM_LENGTHS[payload.length]
   if (!checksumLength) throw new InvalidPayloadLengthError()
-  const isValidNetworkPrefix = !validNetworkPrefixes || validNetworkPrefixes.includes(prefix)
+  const isValidNetworkPrefix = !props?.validNetworkPrefixes
+    || props.validNetworkPrefixes.includes(prefix)
   if (!isValidNetworkPrefix) throw new InvalidNetworkPrefixError()
   const prefixBytes = prefix < 64
     ? Uint8Array.of(prefix)

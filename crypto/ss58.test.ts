@@ -3,7 +3,7 @@ import * as ss58 from "./ss58.ts"
 import { alice } from "./test_pairs.ts"
 
 for (
-  const [networkName, address, [prefix, payload]] of [
+  const [networkName, address, [prefix, payload, checksumLength]] of [
     [
       "polkadot",
       "15oF4uVJwmo4TdGW7VfQxNLavjCXviqxT9S1MgbjMNHr6Sp5",
@@ -30,19 +30,74 @@ for (
       [42, Uint8Array.from([1, 2])],
     ],
     [
+      "substrate 2 byte payload + 2 byte checksum",
+      "5jrpfEX",
+      [42, Uint8Array.from([1, 2]), 2],
+    ],
+    [
       "substrate 4 byte payload",
       "MvAtmUea",
       [42, Uint8Array.from([1, 2, 3, 4])],
+    ],
+    [
+      "substrate 4 byte payload + 2 byte checksum",
+      "2bKgfVK2sN",
+      [42, Uint8Array.from([1, 2, 3, 4]), 2],
+    ],
+    [
+      "substrate 4 byte payload + 3 byte checksum",
+      "82VU4sxbFKh",
+      [42, Uint8Array.from([1, 2, 3, 4]), 3],
+    ],
+    [
+      "substrate 4 byte payload + 4 byte checksum",
+      "Y1aeU7vNADWR",
+      [42, Uint8Array.from([1, 2, 3, 4]), 4],
     ],
     [
       "substrate 8 byte payload",
       "3MsZWNhRvzMGK9",
       [42, Uint8Array.from([1, 2, 3, 4, 5, 6, 7, 8])],
     ],
+    [
+      "substrate 8 byte payload + 2 byte checksum",
+      "BR8AUemT3J8Sb7o",
+      [42, Uint8Array.from([1, 2, 3, 4, 5, 6, 7, 8]), 2],
+    ],
+    [
+      "substrate 8 byte payload + 3 byte checksum",
+      "nyUcq3hBw8bqwazt",
+      [42, Uint8Array.from([1, 2, 3, 4, 5, 6, 7, 8]), 3],
+    ],
+    [
+      "substrate 8 byte payload + 4 byte checksum",
+      "4VvGu94tPFvYo1w4XE",
+      [42, Uint8Array.from([1, 2, 3, 4, 5, 6, 7, 8]), 4],
+    ],
+    [
+      "substrate 8 byte payload + 5 byte checksum",
+      "GSe9B8c9oEsML77cYU6",
+      [42, Uint8Array.from([1, 2, 3, 4, 5, 6, 7, 8]), 5],
+    ],
+    [
+      "substrate 8 byte payload + 6 byte checksum",
+      "2BAAw5ia9q6DEjKzBstZe",
+      [42, Uint8Array.from([1, 2, 3, 4, 5, 6, 7, 8]), 6],
+    ],
+    [
+      "substrate 8 byte payload + 7 byte checksum",
+      "6BqUqhpVKyG11bpoR1cb8R",
+      [42, Uint8Array.from([1, 2, 3, 4, 5, 6, 7, 8]), 7],
+    ],
+    [
+      "substrate 8 byte payload + 8 byte checksum",
+      "PtpysyAc2jKD3ehyryi5dkj",
+      [42, Uint8Array.from([1, 2, 3, 4, 5, 6, 7, 8]), 8],
+    ],
   ] as const
 ) {
   Deno.test(`ss58.encode ${networkName}`, () => {
-    const actual = ss58.encode(prefix, payload)
+    const actual = ss58.encode(prefix, payload, { checksumLength })
     assertEquals(actual, address)
   })
   Deno.test(`ss58.decode ${networkName}`, () => {
@@ -56,7 +111,10 @@ Deno.test("ss58.encode invalid payload length", () => {
 })
 
 Deno.test("ss58.encode invalid network prefix", () => {
-  assertThrows(() => ss58.encode(46, alice.publicKey, [0]), ss58.InvalidNetworkPrefixError)
+  assertThrows(
+    () => ss58.encode(46, alice.publicKey, { validNetworkPrefixes: [0] }),
+    ss58.InvalidNetworkPrefixError,
+  )
 })
 
 Deno.test("ss58.decodeRaw long address", () => {
