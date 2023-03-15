@@ -15,7 +15,7 @@ export function encodeRaw(
   validNetworkPrefixes?: readonly number[],
 ): Uint8Array {
   const checksumLength = VALID_PAYLOAD_CHECKSUM_LENGTHS[payload.length]
-  if (!checksumLength) throw new InvalidPublicKeyLengthError()
+  if (!checksumLength) throw new InvalidPayloadLengthError()
   const isValidNetworkPrefix = !validNetworkPrefixes || validNetworkPrefixes.includes(prefix)
   if (!isValidNetworkPrefix) throw new InvalidNetworkPrefixError()
   const prefixBytes = prefix < 64
@@ -38,9 +38,9 @@ export function encodeRaw(
   return address
 }
 
-export type EncodeError = InvalidPublicKeyLengthError | InvalidNetworkPrefixError
-export class InvalidPublicKeyLengthError extends Error {
-  override readonly name = "InvalidPublicKeyLengthError"
+export type EncodeError = InvalidPayloadLengthError | InvalidNetworkPrefixError
+export class InvalidPayloadLengthError extends Error {
+  override readonly name = "InvalidPayloadLengthError"
 }
 export class InvalidNetworkPrefixError extends Error {
   override readonly name = "InvalidNetworkPrefixError"
@@ -66,7 +66,7 @@ export function decodeRaw(address: Uint8Array): DecodeResult {
   const digest = hasher.digest()
   const checksum = address.subarray(address.length - checksumLength)
   hasher.dispose()
-  if (digest[0] !== checksum[0] || digest[1] !== checksum[1]) {
+  if (!isValidChecksum(digest, checksum, checksumLength)) {
     throw new InvalidAddressChecksumError()
   }
   const pubKey = address.subarray(prefixLength, address.length - checksumLength)
@@ -110,4 +110,17 @@ const VALID_PAYLOAD_CHECKSUM_LENGTHS: Record<number, number | undefined> = {
   8: 1,
   32: 2,
   33: 2,
+}
+
+function isValidChecksum(
+  digest: Uint8Array,
+  checksum: Uint8Array,
+  checksumLength: number,
+): boolean {
+  for (let i = 0; i < checksumLength; i++) {
+    if (digest[i] !== checksum[i]) {
+      return false
+    }
+  }
+  return true
 }

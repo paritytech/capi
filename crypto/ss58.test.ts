@@ -3,7 +3,7 @@ import * as ss58 from "./ss58.ts"
 import { alice } from "./test_pairs.ts"
 
 for (
-  const [networkName, address, [prefix, publicKey]] of [
+  const [networkName, address, [prefix, payload]] of [
     [
       "polkadot",
       "15oF4uVJwmo4TdGW7VfQxNLavjCXviqxT9S1MgbjMNHr6Sp5",
@@ -19,20 +19,40 @@ for (
       "cLxkfNUiCYsb57YLhTJdNVKxUTB1VTpeygYZNhYuFc83KrFy7",
       [65, alice.publicKey],
     ],
+    [
+      "substrate 1 byte payload",
+      "F7NZ",
+      [42, Uint8Array.from([1])],
+    ],
+    [
+      "substrate 2 byte payload",
+      "25GpW4",
+      [42, Uint8Array.from([1, 2])],
+    ],
+    [
+      "substrate 4 byte payload",
+      "MvAtmUea",
+      [42, Uint8Array.from([1, 2, 3, 4])],
+    ],
+    [
+      "substrate 8 byte payload",
+      "3MsZWNhRvzMGK9",
+      [42, Uint8Array.from([1, 2, 3, 4, 5, 6, 7, 8])],
+    ],
   ] as const
 ) {
   Deno.test(`ss58.encode ${networkName}`, () => {
-    const actual = ss58.encode(prefix, publicKey)
+    const actual = ss58.encode(prefix, payload)
     assertEquals(actual, address)
   })
   Deno.test(`ss58.decode ${networkName}`, () => {
     const actual = ss58.decode(address)
-    assertEquals(actual, [prefix, publicKey])
+    assertEquals(actual, [prefix, payload])
   })
 }
 
-Deno.test("ss58.encode invalid public key length", () => {
-  assertThrows(() => ss58.encode(0, alice.publicKey.slice(0, 30)), ss58.InvalidPublicKeyLengthError)
+Deno.test("ss58.encode invalid payload length", () => {
+  assertThrows(() => ss58.encode(0, alice.publicKey.slice(0, 30)), ss58.InvalidPayloadLengthError)
 })
 
 Deno.test("ss58.encode invalid network prefix", () => {
