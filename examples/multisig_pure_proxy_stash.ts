@@ -17,7 +17,7 @@ const fundMultisig = Balances
     value: 20_000_000_000_000n,
     dest: multisig.address,
   })
-  .signed(signature(chain, { sender: alice }))
+  .signed(signature({ sender: alice }))
   .sent()
   .dbgStatus("Fund Multisig:")
   .finalized()
@@ -31,7 +31,7 @@ const aliceRatify = multisig
     }),
     sender: alice.address,
   })
-  .signed(signature(chain, { sender: alice }))
+  .signed(signature({ sender: alice }))
   .sent()
   .dbgStatus("Alice Ratify:")
   .finalized()
@@ -45,7 +45,7 @@ const bobRatify = multisig
     }),
     sender: bob.address,
   })
-  .signed(signature(chain, { sender: bob }))
+  .signed(signature({ sender: bob }))
   .sent()
   .dbgStatus("Bob Ratify:")
 
@@ -60,7 +60,7 @@ const fundStash = Balances
     value: 20_000_000_000_000n,
     dest: MultiAddress.Id(stashAddress),
   })
-  .signed(signature(chain, { sender: alice }))
+  .signed(signature({ sender: alice }))
   .sent()
   .dbgStatus("Fund Stash:")
   .finalized()

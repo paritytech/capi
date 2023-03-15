@@ -29,7 +29,7 @@ console.log(
       value: 12345n,
       dest: bob.address,
     })
-    .signed(signature(chain, { sender: sender(aliceAddress) }))
+    .signed(signature({ sender: sender(aliceAddress) }))
     .sent()
     .dbgStatus()
     .finalizedEvents()

@@ -1,5 +1,5 @@
 import { alice, bob } from "capi"
-import { Balances, chain } from "westend_dev/mod.js"
+import { Balances } from "westend_dev/mod.js"
 import { signature } from "../patterns/signature/polkadot.ts"
 
 const result = await Balances
@@ -7,7 +7,7 @@ const result = await Balances
     value: 12345n,
     dest: bob.address,
   })
-  .signed(signature(chain, { sender: alice }))
+  .signed(signature({ sender: alice }))
   .sent()
   .dbgStatus()
   .finalizedEvents()

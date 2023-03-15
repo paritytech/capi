@@ -1,6 +1,6 @@
 import { blake2_256, hex } from "../crypto/mod.ts"
 import { $extrinsic, Signer } from "../frame_metadata/Extrinsic.ts"
-import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
+import { Rune, ValueRune } from "../rune/mod.ts"
 import { Chain, ChainRune } from "./ChainRune.ts"
 import { CodecRune } from "./CodecRune.ts"
 import { SignedExtrinsicRune } from "./SignedExtrinsicRune.ts"
@@ -16,6 +16,10 @@ export interface SignatureData<C extends Chain> {
   additional: Chain.Additional<C>
 }
 
+export type SignatureDataFactory<C extends Chain, CU, SU> = (
+  chain: ChainRune<C, CU>,
+) => Rune<SignatureData<C>, SU>
+
 export class ExtrinsicRune<out C extends Chain, out U> extends Rune<Chain.Call<C>, U> {
   hash
 
@@ -29,14 +33,14 @@ export class ExtrinsicRune<out C extends Chain, out U> extends Rune<Chain.Call<C
       .encoded(this)
   }
 
-  signed<X>(...[signature]: RunicArgs<X, [signatureData: SignatureData<C>]>) {
+  signed<SU>(signatureFactory: SignatureDataFactory<C, U, SU>) {
     return Rune.fn($extrinsic)
       .call(this.chain.metadata)
       .into(CodecRune)
       .encoded(Rune.rec({
         protocolVersion: 4,
         call: this,
-        signature,
+        signature: signatureFactory(this.chain),
       }))
       .into(SignedExtrinsicRune, this.chain)
   }
