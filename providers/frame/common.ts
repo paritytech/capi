@@ -1,7 +1,7 @@
 import { ss58, testUser } from "../../crypto/mod.ts"
 import * as $ from "../../deps/scale.ts"
 
-const DEFAULT_TEST_USER_COUNT = 1_000
+const DEFAULT_TEST_USER_COUNT = 100_000
 const DEFAULT_TEST_USER_INITIAL_FUNDS = 1_000_000_000_000_000_000
 
 export async function createCustomChainSpec(
@@ -14,11 +14,21 @@ export async function createCustomChainSpec(
   })
   const chainSpec = JSON.parse(new TextDecoder().decode((await buildSpecCmd.output()).stdout))
   const balances: [string, number][] = chainSpec.genesis.runtime.balances.balances
-  for (let i = 0; i < DEFAULT_TEST_USER_COUNT; i++) {
-    balances.push([
-      ss58.encode(networkPrefix, testUser(i).publicKey),
-      DEFAULT_TEST_USER_INITIAL_FUNDS,
-    ])
+  try {
+    balances.push(
+      ...JSON.parse(
+        await Deno.readTextFile(
+          new URL(`./test_users/network_${networkPrefix}_user_balances.json`, import.meta.url),
+        ),
+      ),
+    )
+  } catch (_error) {
+    for (let i = 0; i < DEFAULT_TEST_USER_COUNT; i++) {
+      balances.push([
+        ss58.encode(networkPrefix, testUser(i).publicKey),
+        DEFAULT_TEST_USER_INITIAL_FUNDS,
+      ])
+    }
   }
   const customChainSpecPath = await Deno.makeTempFile({
     prefix: `custom-${chain}-chain-spec`,
