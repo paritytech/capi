@@ -16,6 +16,10 @@ export interface SignatureData<C extends Chain> {
   additional: Chain.Additional<C>
 }
 
+export type SignatureDataFactory<C extends Chain, U> = (
+  chain: ChainRune<C, U>,
+) => Rune<SignatureData<C>, any>
+
 export class ExtrinsicRune<out C extends Chain, out U> extends Rune<Chain.Call<C>, U> {
   hash
 
@@ -29,14 +33,14 @@ export class ExtrinsicRune<out C extends Chain, out U> extends Rune<Chain.Call<C
       .encoded(this)
   }
 
-  signed<X>(...[signature]: RunicArgs<X, [signatureData: SignatureData<C>]>) {
+  signed(signatureFactory: SignatureDataFactory<C, U>) {
     return Rune.fn($extrinsic)
       .call(this.chain.metadata)
       .into(CodecRune)
       .encoded(Rune.rec({
         protocolVersion: 4,
         call: this,
-        signature,
+        signature: signatureFactory(this.chain),
       }))
       .into(SignedExtrinsicRune, this.chain)
   }

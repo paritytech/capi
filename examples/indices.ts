@@ -1,12 +1,12 @@
 import { alice, ValueRune } from "capi"
-import { chain, Indices } from "polkadot_dev/mod.js"
+import { Indices } from "polkadot_dev/mod.js"
 import { signature } from "../patterns/signature/polkadot.ts"
 
 const index = 254
 
 const claim = Indices
   .claim({ index })
-  .signed(signature(chain, { sender: alice }))
+  .signed(signature({ sender: alice }))
   .sent()
   .dbgStatus()
   .finalized()

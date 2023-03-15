@@ -19,7 +19,7 @@ await Balances
     value: 2_000_000_000_000n,
     dest: multisig.address,
   })
-  .signed(signature(chain, { sender: alice }))
+  .signed(signature({ sender: alice }))
   .sent()
   .dbgStatus("Existential deposit:")
   .finalized()
@@ -34,7 +34,7 @@ const call = Balances.transferKeepAlive({
 // Submit a proposal to dispatch the call
 await multisig
   .ratify({ call, sender: alice.address })
-  .signed(signature(chain, { sender: alice }))
+  .signed(signature({ sender: alice }))
   .sent()
   .dbgStatus("Proposal:")
   .finalized()
@@ -49,7 +49,7 @@ await multisig
     callHash: call.hash,
     sender: bob.address,
   })
-  .signed(signature(chain, { sender: bob }))
+  .signed(signature({ sender: bob }))
   .sent()
   .dbgStatus("Vote:")
   .finalized()
@@ -69,7 +69,7 @@ console.log(
 // Send the executing (final) approval
 await multisig
   .ratify({ call, sender: charlie.address })
-  .signed(signature(chain, { sender: charlie }))
+  .signed(signature({ sender: charlie }))
   .sent()
   .dbgStatus("Approval:")
   .finalized()

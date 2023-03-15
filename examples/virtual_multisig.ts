@@ -26,7 +26,7 @@ const fundStash = Balances
     dest: MultiAddress.Id(vMultisig.stash),
     value: 20_000_000_000_000n,
   })
-  .signed(signature(chain, { sender: alice }))
+  .signed(signature({ sender: alice }))
   .sent()
   .dbgStatus("Fund Stash:")
   .finalized()
@@ -44,7 +44,7 @@ const bobTx = Utility
       vMultisig.ratify(bob.publicKey, proposal),
     ]),
   })
-  .signed(signature(chain, { sender: bob }))
+  .signed(signature({ sender: bob }))
   .sent()
   .dbgStatus("Bob fund & ratify:")
   .finalized()
@@ -57,7 +57,7 @@ const charlieTx = Utility
       vMultisig.ratify(charlie.publicKey, proposal),
     ]),
   })
-  .signed(signature(chain, { sender: charlie }))
+  .signed(signature({ sender: charlie }))
   .sent()
   .dbgStatus("Charlie fund & ratify:")
   .finalized()
