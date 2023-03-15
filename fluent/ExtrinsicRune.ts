@@ -16,9 +16,9 @@ export interface SignatureData<C extends Chain> {
   additional: Chain.Additional<C>
 }
 
-export type SignatureDataFactory<C extends Chain, U> = (
-  chain: ChainRune<C, U>,
-) => Rune<SignatureData<C>, any>
+export type SignatureDataFactory<C extends Chain, CU, SU> = (
+  chain: ChainRune<C, CU>,
+) => Rune<SignatureData<C>, SU>
 
 export class ExtrinsicRune<out C extends Chain, out U> extends Rune<Chain.Call<C>, U> {
   hash
