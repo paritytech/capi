@@ -1,9 +1,11 @@
-import { alice, bob, charlie, Rune } from "capi"
+import { Rune } from "capi"
 import { MultisigRune } from "capi/patterns/multisig/mod.ts"
 import { filterPureCreatedEvents } from "capi/patterns/proxy/mod.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
-import { Balances, chain, Proxy, System } from "polkadot_dev/mod.js"
+import { Balances, chain, Proxy, System, users } from "polkadot_dev/mod.js"
 import { MultiAddress } from "polkadot_dev/types/sp_runtime/multiaddress.js"
+
+const [alice, bob, charlie] = await users(3)
 
 const multisig = Rune
   .constant({

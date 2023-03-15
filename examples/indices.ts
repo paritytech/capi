@@ -1,6 +1,8 @@
-import { alice, ValueRune } from "capi"
-import { Indices } from "polkadot_dev/mod.js"
+import { ValueRune } from "capi"
+import { Indices, users } from "polkadot_dev/mod.js"
 import { signature } from "../patterns/signature/polkadot.ts"
+
+const [alice] = await users(1)
 
 const index = 254
 

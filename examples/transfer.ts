@@ -1,6 +1,7 @@
-import { alice, bob } from "capi"
-import { Balances } from "westend_dev/mod.js"
+import { Balances, users } from "westend_dev/mod.js"
 import { signature } from "../patterns/signature/polkadot.ts"
+
+const [alice, bob] = await users(2)
 
 const result = await Balances
   .transfer({

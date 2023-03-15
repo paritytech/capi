@@ -1,6 +1,8 @@
-import { alice, bob, charlie, Rune, Sr25519 } from "capi"
-import { Balances, System } from "westend_dev/mod.js"
+import { Rune, Sr25519 } from "capi"
+import { Balances, System, users } from "westend_dev/mod.js"
 import { signature } from "../patterns/signature/polkadot.ts"
+
+const [alice, bob, charlie] = await users(3)
 
 await Rune
   .chain(balances)

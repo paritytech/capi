@@ -1,6 +1,8 @@
-import { alice, bob, charlie, dave, Rune } from "capi"
+import { Rune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
-import { Balances, System, Utility } from "westend_dev/mod.js"
+import { Balances, System, users, Utility } from "westend_dev/mod.js"
+
+const [alice, bob, charlie, dave] = await users(4)
 
 const recipients = Object.entries({ bob, charlie, dave })
 
