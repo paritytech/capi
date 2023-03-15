@@ -1,4 +1,3 @@
-import { unreachable } from "../../deps/std/testing/asserts.ts"
 import { Network, readNetworkConfig, start } from "../../deps/zombienet.ts"
 import { PathInfo } from "../../server/mod.ts"
 import { PermanentMemo } from "../../util/mod.ts"
@@ -35,15 +34,5 @@ export class ZombienetProvider extends FrameProxyProvider {
     const url = network.nodesByName[nodeName]?.wsUri
     if (!url) throw new Error()
     return url
-  }
-
-  async network(zombienetCachePath: string, networkManifestPath: string): Promise<Network> {
-    const watcher = Deno.watchFs(zombienetCachePath)
-    for await (const e of watcher) {
-      if (e.kind === "modify" && e.paths.includes(networkManifestPath)) {
-        return JSON.parse(await Deno.readTextFile(networkManifestPath))
-      }
-    }
-    return unreachable()
   }
 }
