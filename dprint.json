@@ -11,8 +11,14 @@
     "lineWidth": 80,
     "textWrap": "always"
   },
-  "includes": ["**.{dockerfile,json,md,toml,ts,tsx}"],
-  "excludes": ["target", "util/tsFormatter.ts"],
+  "includes": [
+    "**.{dockerfile,json,md,toml,ts,tsx}"
+  ],
+  "excludes": [
+    "target",
+    "util/tsFormatter.ts",
+    "providers/frame/test_users/*.json"
+  ],
   "plugins": [
     "https://plugins.dprint.dev/dockerfile-0.3.0.wasm",
     "https://plugins.dprint.dev/json-0.17.0.wasm",
