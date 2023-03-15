@@ -1,6 +1,6 @@
 import { blake2_256, hex } from "../crypto/mod.ts"
 import { $extrinsic, Signer } from "../frame_metadata/Extrinsic.ts"
-import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
+import { Rune, ValueRune } from "../rune/mod.ts"
 import { Chain, ChainRune } from "./ChainRune.ts"
 import { CodecRune } from "./CodecRune.ts"
 import { SignedExtrinsicRune } from "./SignedExtrinsicRune.ts"
