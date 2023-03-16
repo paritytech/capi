@@ -22,3 +22,25 @@ const { indentWidth, lineWidth, typescript: config } = dprintConfig
 tsFormatter.setConfig({ indentWidth, lineWidth }, config)
 `,
 )
+
+const generateTestUserPublicKeysPath = new URL(
+  "../util/generateTestUserPublicKeys.ts",
+  import.meta.url,
+)
+await Deno.writeTextFile(
+  generateTestUserPublicKeysPath,
+  `${GENERATION_NOTICE}
+import { testUser } from "../crypto/mod.ts"
+import * as $ from "../deps/scale.ts"
+
+const DEFAULT_TEST_USER_COUNT = 100_000
+const publicKeys = []
+for (let i = 0; i < DEFAULT_TEST_USER_COUNT; i++) {
+  publicKeys.push(testUser(i).publicKey)
+}
+await Deno.writeFile(
+  new URL("../providers/frame/test_users_public_keys.scale", import.meta.url),
+  $.array($.sizedUint8Array(32)).encode(publicKeys),
+)
+`,
+)
