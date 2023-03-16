@@ -18,6 +18,6 @@
     "**/__snapshots__/*.snap",
     "**/*.contract",
     "examples/smart_contract/metadata.json",
-    "providers/frame/test_users/*.json"
+    "providers/frame/test_users_public_keys"
   ]
 }
