@@ -6,14 +6,15 @@ const [a, b, c, d] = await users(4)
 
 const recipients = Object.entries({ b, c, d })
 
-const batch = Utility.batch({
-  calls: Rune.tuple(recipients.map(([, { address }]) =>
-    Balances.transfer({
-      dest: address,
-      value: 3_000_000_123_456_789n,
-    })
-  )),
-})
+const batch = Utility
+  .batch({
+    calls: Rune.tuple(recipients.map(([, { address }]) =>
+      Balances.transfer({
+        dest: address,
+        value: 3_000_000_123_456_789n,
+      })
+    )),
+  })
   .signed(signature({ sender: a }))
   .sent()
   .dbgStatus("Batch tx:")
