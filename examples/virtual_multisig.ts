@@ -1,17 +1,19 @@
-import { alice, bob, charlie, dave, Rune } from "capi"
+import { Rune } from "capi"
 import { VirtualMultisigRune } from "capi/patterns/multisig/mod.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
-import { Balances, chain, System, Utility } from "polkadot_dev/mod.js"
+import { Balances, chain, System, users, Utility } from "polkadot_dev/mod.js"
 import { MultiAddress } from "polkadot_dev/types/sp_runtime/multiaddress.js"
 import { parse } from "../deps/std/flags.ts"
+
+const [alexa, billy, carol, david] = await users(4)
 
 let { state } = parse(Deno.args, { string: ["state"] })
 if (!state) {
   state = await VirtualMultisigRune
     .deployment(chain, {
-      founders: [alice.publicKey, bob.publicKey, charlie.publicKey],
+      founders: [alexa.publicKey, billy.publicKey, carol.publicKey],
       threshold: 2,
-      deployer: alice,
+      deployer: alexa,
     })
     .hex
     .run()
@@ -26,13 +28,13 @@ const fundStash = Balances
     dest: MultiAddress.Id(vMultisig.stash),
     value: 20_000_000_000_000n,
   })
-  .signed(signature({ sender: alice }))
+  .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Fund Stash:")
   .finalized()
 
 const proposal = Balances.transfer({
-  dest: dave.address,
+  dest: david.address,
   value: 1_234_000_000_000n,
 })
 
@@ -40,11 +42,11 @@ const bobTx = Utility
   .batchAll({
     // @ts-ignore: fix upon #656
     calls: Rune.array([
-      vMultisig.fundMemberProxy(bob.publicKey, 20_000_000_000_000n),
-      vMultisig.ratify(bob.publicKey, proposal),
+      vMultisig.fundMemberProxy(billy.publicKey, 20_000_000_000_000n),
+      vMultisig.ratify(billy.publicKey, proposal),
     ]),
   })
-  .signed(signature({ sender: bob }))
+  .signed(signature({ sender: billy }))
   .sent()
   .dbgStatus("Bob fund & ratify:")
   .finalized()
@@ -53,11 +55,11 @@ const charlieTx = Utility
   .batchAll({
     // @ts-ignore: fix upon #656
     calls: Rune.array([
-      vMultisig.fundMemberProxy(charlie.publicKey, 20_000_000_000_000n),
-      vMultisig.ratify(charlie.publicKey, proposal),
+      vMultisig.fundMemberProxy(carol.publicKey, 20_000_000_000_000n),
+      vMultisig.ratify(carol.publicKey, proposal),
     ]),
   })
-  .signed(signature({ sender: charlie }))
+  .signed(signature({ sender: carol }))
   .sent()
   .dbgStatus("Charlie fund & ratify:")
   .finalized()
@@ -65,8 +67,8 @@ const charlieTx = Utility
 await Rune
   .chain(() => vMultisig)
   .chain(() => fundStash)
-  .chain(() => System.Account.value(dave.publicKey).dbg("Dave Balance Before:"))
+  .chain(() => System.Account.value(david.publicKey).dbg("Dave Balance Before:"))
   .chain(() => bobTx)
   .chain(() => charlieTx)
-  .chain(() => System.Account.value(dave.publicKey).dbg("Dave Balance After:"))
+  .chain(() => System.Account.value(david.publicKey).dbg("Dave Balance After:"))
   .run()

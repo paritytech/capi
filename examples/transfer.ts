@@ -1,13 +1,14 @@
-import { alice, bob } from "capi"
-import { Balances } from "westend_dev/mod.js"
+import { Balances, users } from "westend_dev/mod.js"
 import { signature } from "../patterns/signature/polkadot.ts"
+
+const [alexa, billy] = await users(2)
 
 const result = await Balances
   .transfer({
     value: 12345n,
-    dest: bob.address,
+    dest: billy.address,
   })
-  .signed(signature({ sender: alice }))
+  .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus()
   .finalizedEvents()

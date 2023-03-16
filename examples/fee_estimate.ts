@@ -1,10 +1,11 @@
-import { bob } from "capi"
-import { Balances } from "westend_dev/mod.js"
+import { Balances, users } from "westend_dev/mod.js"
+
+const [alexa] = await users(1)
 
 const result = await Balances
   .transfer({
     value: 12345n,
-    dest: bob.address,
+    dest: alexa.address,
   })
   .feeEstimate()
   .run()

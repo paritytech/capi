@@ -1,17 +1,19 @@
-import { alice, bob, charlie, dave, Rune, ValueRune } from "capi"
+import { Rune, ValueRune } from "capi"
 import { MultisigRune } from "capi/patterns/multisig/mod.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
-import { Balances, chain, System } from "polkadot_dev/mod.js"
+import { Balances, chain, System, users } from "polkadot_dev/mod.js"
+
+const [alexa, billy, carol, david] = await users(4)
 
 const multisig = Rune
   .constant({
-    signatories: [alice.publicKey, bob.publicKey, charlie.publicKey],
+    signatories: [alexa, billy, carol].map(({ publicKey }) => publicKey),
     threshold: 2,
   })
   .into(MultisigRune, chain)
 
 // Read dave's initial balance (to-be changed by the call)
-console.log("Dave initial balance:", await System.Account.value(dave.publicKey).run())
+console.log("Dave initial balance:", await System.Account.value(david.publicKey).run())
 
 // Transfer some funds into the multisig account
 await Balances
@@ -19,7 +21,7 @@ await Balances
     value: 2_000_000_000_000n,
     dest: multisig.address,
   })
-  .signed(signature({ sender: alice }))
+  .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Existential deposit:")
   .finalized()
@@ -27,14 +29,14 @@ await Balances
 
 // The to-be proposed and approved call
 const call = Balances.transferKeepAlive({
-  dest: dave.address,
+  dest: david.address,
   value: 1_230_000_000_000n,
 })
 
 // Submit a proposal to dispatch the call
 await multisig
-  .ratify({ call, sender: alice.address })
-  .signed(signature({ sender: alice }))
+  .ratify({ call, sender: alexa.address })
+  .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Proposal:")
   .finalized()
@@ -47,9 +49,9 @@ console.log("Is proposed?:", await multisig.isProposed(call.hash).run())
 await multisig
   .approve({
     callHash: call.hash,
-    sender: bob.address,
+    sender: billy.address,
   })
-  .signed(signature({ sender: bob }))
+  .signed(signature({ sender: billy }))
   .sent()
   .dbgStatus("Vote:")
   .finalized()
@@ -68,12 +70,12 @@ console.log(
 
 // Send the executing (final) approval
 await multisig
-  .ratify({ call, sender: charlie.address })
-  .signed(signature({ sender: charlie }))
+  .ratify({ call, sender: carol.address })
+  .signed(signature({ sender: carol }))
   .sent()
   .dbgStatus("Approval:")
   .finalized()
   .run()
 
 // Check to see whether Dave's balance has in fact changed
-console.log("Dave final balance:", await System.Account.value(dave.publicKey).run())
+console.log("Dave final balance:", await System.Account.value(david.publicKey).run())

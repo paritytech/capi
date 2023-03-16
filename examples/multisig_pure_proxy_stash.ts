@@ -1,13 +1,15 @@
-import { alice, bob, charlie, Rune } from "capi"
+import { Rune } from "capi"
 import { MultisigRune } from "capi/patterns/multisig/mod.ts"
 import { filterPureCreatedEvents } from "capi/patterns/proxy/mod.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
-import { Balances, chain, Proxy, System } from "polkadot_dev/mod.js"
+import { Balances, chain, Proxy, System, users } from "polkadot_dev/mod.js"
 import { MultiAddress } from "polkadot_dev/types/sp_runtime/multiaddress.js"
+
+const [alexa, billy, carol] = await users(3)
 
 const multisig = Rune
   .constant({
-    signatories: [alice.publicKey, bob.publicKey, charlie.publicKey],
+    signatories: [alexa, billy, carol].map(({ publicKey }) => publicKey),
     threshold: 2,
   })
   .into(MultisigRune, chain)
@@ -17,7 +19,7 @@ const fundMultisig = Balances
     value: 20_000_000_000_000n,
     dest: multisig.address,
   })
-  .signed(signature({ sender: alice }))
+  .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Fund Multisig:")
   .finalized()
@@ -29,9 +31,9 @@ const aliceRatify = multisig
       delay: 0,
       index: 0,
     }),
-    sender: alice.address,
+    sender: alexa.address,
   })
-  .signed(signature({ sender: alice }))
+  .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Alice Ratify:")
   .finalized()
@@ -43,9 +45,9 @@ const bobRatify = multisig
       delay: 0,
       index: 0,
     }),
-    sender: bob.address,
+    sender: billy.address,
   })
-  .signed(signature({ sender: bob }))
+  .signed(signature({ sender: billy }))
   .sent()
   .dbgStatus("Bob Ratify:")
 
@@ -60,7 +62,7 @@ const fundStash = Balances
     value: 20_000_000_000_000n,
     dest: MultiAddress.Id(stashAddress),
   })
-  .signed(signature({ sender: alice }))
+  .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Fund Stash:")
   .finalized()

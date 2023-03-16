@@ -1,18 +1,21 @@
-import { alice, bob, charlie, dave, Rune } from "capi"
+import { Rune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
-import { Balances, System, Utility } from "westend_dev/mod.js"
+import { Balances, System, users, Utility } from "westend_dev/mod.js"
 
-const recipients = Object.entries({ bob, charlie, dave })
+const [alexa, billy, carol, david] = await users(4)
 
-const batch = Utility.batch({
-  calls: Rune.tuple(recipients.map(([, { address }]) =>
-    Balances.transfer({
-      dest: address,
-      value: 3_000_000_123_456_789n,
-    })
-  )),
-})
-  .signed(signature({ sender: alice }))
+const recipients = Object.entries({ billy, carol, david })
+
+const batch = Utility
+  .batch({
+    calls: Rune.tuple(recipients.map(([, { address }]) =>
+      Balances.transfer({
+        dest: address,
+        value: 3_000_000_123_456_789n,
+      })
+    )),
+  })
+  .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Batch tx:")
   .finalized()

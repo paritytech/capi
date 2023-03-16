@@ -1,9 +1,11 @@
-import { alice, bob, ss58 } from "capi"
+import { ss58 } from "capi"
 import { pjsSender } from "capi/patterns/compat/pjs_sender.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 import { createTestPairs } from "https://deno.land/x/polkadot@0.2.25/keyring/mod.ts"
 import { TypeRegistry } from "https://deno.land/x/polkadot@0.2.25/types/mod.ts"
-import { Balances, chain } from "polkadot_dev/mod.js"
+import { Balances, chain, users } from "polkadot_dev/mod.js"
+
+const [alexa, billy] = await users(2)
 
 // Usually injected by an extension, e.g.
 // const pjsSigner = (await web3FromSource("polkadot-js")).signer!;
@@ -19,7 +21,7 @@ const pjsSigner = {
 }
 
 // Usually selected from the accounts provided by the extension
-const aliceAddress = ss58.encode(42, alice.publicKey)
+const aliceAddress = ss58.encode(42, alexa.publicKey)
 
 const sender = pjsSender(chain, pjsSigner)
 
@@ -27,7 +29,7 @@ console.log(
   await Balances
     .transfer({
       value: 12345n,
-      dest: bob.address,
+      dest: billy.address,
     })
     .signed(signature({ sender: sender(aliceAddress) }))
     .sent()
