@@ -33,7 +33,7 @@ await Deno.writeTextFile(
 import { testUser } from "../crypto/mod.ts"
 import * as $ from "../deps/scale.ts"
 
-const DEFAULT_TEST_USER_COUNT = 100_000
+export const DEFAULT_TEST_USER_COUNT = 100_000
 const publicKeys = []
 for (let i = 0; i < DEFAULT_TEST_USER_COUNT; i++) {
   publicKeys.push(testUser(i).publicKey)
