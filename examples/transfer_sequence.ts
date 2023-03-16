@@ -2,22 +2,22 @@ import { Rune, Sr25519 } from "capi"
 import { Balances, System, users } from "westend_dev/mod.js"
 import { signature } from "../patterns/signature/polkadot.ts"
 
-const [a, b, c] = await users(3)
+const [alexa, billy, carol] = await users(3)
 
 await Rune
   .chain(balances)
-  .chain(() => transfer("bob", b))
+  .chain(() => transfer("bob", billy))
   .chain(balances)
-  .chain(() => transfer("charlie", c))
+  .chain(() => transfer("charlie", carol))
   .chain(balances)
   .run()
 
 function balances() {
   return Rune
     .rec({
-      alice: balance(a),
-      bob: balance(b),
-      charlie: balance(c),
+      alice: balance(alexa),
+      bob: balance(billy),
+      charlie: balance(carol),
     })
     .dbg("Balances:")
 }
@@ -32,7 +32,7 @@ function transfer(name: string, user: Sr25519) {
       dest: user.address,
       value: 1000123n,
     })
-    .signed(signature({ sender: a }))
+    .signed(signature({ sender: alexa }))
     .sent()
     .dbgStatus(`Transfer to ${name}:`)
     .finalized()
