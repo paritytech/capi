@@ -1,4 +1,4 @@
-// moderate --exclude cache port.ts tsFormatter.ts generateTestUserPublicKeys.ts
+// moderate --exclude cache port.ts tsFormatter.ts
 
 export * from "./ArrayOfLength.ts"
 export * from "./clock.ts"

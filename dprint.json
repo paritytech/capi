@@ -16,8 +16,7 @@
   ],
   "excludes": [
     "target",
-    "util/tsFormatter.ts",
-    "util/generateTestUserPublicKeys.ts"
+    "util/tsFormatter.ts"
   ],
   "plugins": [
     "https://plugins.dprint.dev/dockerfile-0.3.0.wasm",
