@@ -107,7 +107,7 @@ for (
   ] as const
 ) {
   Deno.test(`ss58.encode ${networkName}`, () => {
-    const actual = ss58.encode(prefix, payload, { checksumLength })
+    const actual = ss58.encode(prefix, payload, checksumLength)
     assertEquals(actual, address)
   })
   Deno.test(`ss58.decode ${networkName}`, () => {
@@ -118,13 +118,6 @@ for (
 
 Deno.test("ss58.encode invalid payload length", () => {
   assertThrows(() => ss58.encode(0, alice.publicKey.slice(0, 30)), ss58.InvalidPayloadLengthError)
-})
-
-Deno.test("ss58.encode invalid network prefix", () => {
-  assertThrows(
-    () => ss58.encode(46, alice.publicKey, { validNetworkPrefixes: [0] }),
-    ss58.InvalidNetworkPrefixError,
-  )
 })
 
 Deno.test("ss58.decodeRaw long address", () => {

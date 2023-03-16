@@ -1,28 +1,21 @@
 import * as base58 from "../deps/std/encoding/base58.ts"
 import { Blake2b } from "../deps/wat_the_crypto.ts"
 
-export interface EncodeProps {
-  validNetworkPrefixes?: readonly number[]
-  checksumLength?: number
-}
-
 export function encode(
   prefix: number,
   payload: Uint8Array,
-  props?: EncodeProps,
+  checksumLength?: number,
 ): string {
-  return base58.encode(encodeRaw(prefix, payload, props))
+  return base58.encode(encodeRaw(prefix, payload, checksumLength))
 }
 
 export function encodeRaw(
   prefix: number,
   payload: Uint8Array,
-  props?: EncodeProps,
+  checksumLength?: number,
 ): Uint8Array {
-  const checksumLength = props?.checksumLength ?? DEFAULT_PAYLOAD_CHECKSUM_LENGTHS[payload.length]
+  checksumLength ??= DEFAULT_PAYLOAD_CHECKSUM_LENGTHS[payload.length]
   if (!checksumLength) throw new InvalidPayloadLengthError()
-  const isValidNetworkPrefix = props?.validNetworkPrefixes?.includes(prefix) ?? true
-  if (!isValidNetworkPrefix) throw new InvalidNetworkPrefixError()
   const prefixBytes = prefix < 64
     ? Uint8Array.of(prefix)
     : Uint8Array.of(
@@ -43,12 +36,9 @@ export function encodeRaw(
   return address
 }
 
-export type EncodeError = InvalidPayloadLengthError | InvalidNetworkPrefixError
+export type EncodeError = InvalidPayloadLengthError
 export class InvalidPayloadLengthError extends Error {
   override readonly name = "InvalidPayloadLengthError"
-}
-export class InvalidNetworkPrefixError extends Error {
-  override readonly name = "InvalidNetworkPrefixError"
 }
 
 export type DecodeResult = [prefix: number, pubKey: Uint8Array]
