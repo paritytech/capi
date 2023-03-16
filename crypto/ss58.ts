@@ -19,10 +19,9 @@ export function encodeRaw(
   payload: Uint8Array,
   props?: EncodeProps,
 ): Uint8Array {
-  const checksumLength = props?.checksumLength ?? VALID_PAYLOAD_CHECKSUM_LENGTHS[payload.length]
+  const checksumLength = props?.checksumLength ?? DEFAULT_PAYLOAD_CHECKSUM_LENGTHS[payload.length]
   if (!checksumLength) throw new InvalidPayloadLengthError()
-  const isValidNetworkPrefix = !props?.validNetworkPrefixes
-    || props.validNetworkPrefixes.includes(prefix)
+  const isValidNetworkPrefix = props?.validNetworkPrefixes?.includes(prefix) ?? true
   if (!isValidNetworkPrefix) throw new InvalidNetworkPrefixError()
   const prefixBytes = prefix < 64
     ? Uint8Array.of(prefix)
@@ -109,7 +108,7 @@ const VALID_ADDRESS_CHECKSUM_LENGTHS: Record<number, number | undefined> = {
   36: 2,
   37: 2,
 }
-const VALID_PAYLOAD_CHECKSUM_LENGTHS: Record<number, number | undefined> = {
+const DEFAULT_PAYLOAD_CHECKSUM_LENGTHS: Record<number, number | undefined> = {
   1: 1,
   2: 1,
   4: 1,
