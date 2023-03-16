@@ -1,45 +1,56 @@
-import { $, alice, bob, MetaRune, Rune, ValueRune } from "capi"
+import { $, alice, bob, Rune, ValueRune } from "capi"
 import { Nfts } from "zombienet/nfts.toml/collator/@latest/mod.ts"
-import { MintType } from "zombienet/nfts.toml/collator/@latest/types/pallet_nfts/types"
+import { Event } from "zombienet/nfts.toml/collator/@latest/types/pallet_nfts/pallet.ts"
+import { MintType } from "zombienet/nfts.toml/collator/@latest/types/pallet_nfts/types.ts"
+import { RuntimeEvent } from "zombienet/nfts.toml/collator/@latest/types/westmint_runtime.ts"
 
-const collection = 1
-const item = 1
-
+// values are inverted for storage optimisation
 const DefaultCollectionSetting = {
-  TransferableItems: 1n << 0n,
-  UnlockedMetadata: 1n << 1n,
-  UnlockedAttributes: 1n << 2n,
-  UnlockedMaxSupply: 1n << 3n,
-  DepositRequired: 1n << 4n,
+  TransferableItems: 0n << 0n,
+  UnlockedMetadata: 0n << 1n,
+  UnlockedAttributes: 0n << 2n,
+  UnlockedMaxSupply: 0n << 3n,
+  DepositRequired: 0n << 4n,
 }
 
 const DefaultItemSetting = {
-  Transferable: 1n << 0n,
-  UnlockedMetadata: 1n << 1n,
-  UnlockedAttributes: 1n << 2n,
+  Transferable: 0n << 0n,
+  UnlockedMetadata: 0n << 1n,
+  UnlockedAttributes: 0n << 2n,
 }
 
 const sum = (r: Record<string, bigint>) => Object.values(r).reduce((acc, curr) => curr + acc)
 
 const createCollection = Nfts
   .create({
-    config: {
+    config: Rune.rec({
       settings: sum(DefaultCollectionSetting),
       maxSupply: undefined,
-      mintSettings: {
-        mintType: MintType.Issuer,
+      mintSettings: Rune.rec({
+        mintType: MintType.Issuer(),
         price: undefined,
         startBlock: undefined,
         endBlock: undefined,
         defaultItemSettings: sum(DefaultItemSetting),
-      },
-    },
+      }),
+    }),
     admin: alice.address,
   })
   .signed({ sender: alice })
   .sent()
   .dbgStatus("Create Collection:")
   .finalized()
+
+const collection = createCollection
+  .events()
+  .map((events) => {
+    const event = events.find((event) =>
+      RuntimeEvent.isNfts(event.event) && Event.isCreated(event.event.value)
+    )?.event.value as Event.Created | undefined
+    return event?.collection
+  })
+  .unhandle(undefined)
+  .dbg("Collection Id:")
 
 const $collectionMetadata = $.object($.field("hello", $.str))
 
@@ -52,6 +63,8 @@ const setCollectionMetadata = Nfts
   .sent()
   .dbgStatus("Set Collection Metadata:")
   .finalized()
+
+const item = 1
 
 const mintItem = Nfts
   .mint({
@@ -113,7 +126,7 @@ const setCollectionMaxSupply = Nfts
 const lockCollection = Nfts.lockCollection({
   collection,
   // forbid future updates of max supply
-  lockSettings: sum(DefaultCollectionSetting) & ~DefaultCollectionSetting.UnlockedMaxSupply,
+  lockSettings: 8n, // 8n TODO
 })
   .signed({ sender: alice })
   .sent()
@@ -130,28 +143,30 @@ const alicePrepareCollection = Rune
   .chain(() => setCollectionMaxSupply)
   .chain(() => lockCollection)
 
-const collectionId = Nfts.Collection
+const collectionId = Nfts.Collection // .entryPageRaw(50)
   .entryPage(50)
   .into(ValueRune)
   .access(0, 0, 0)
   .unhandle(undefined)
+  .dbg("Collections:")
 
-const assetId = collectionId.map((collectionId) => Nfts.Item.entryPage(50, [collectionId]))
-  .into(MetaRune)
-  .flat()
+const itemId = Nfts.Item // .entryPageRaw(50, [collection])
+  .entryPage(50, Rune.tuple([collection]))
   .into(ValueRune)
   .access(0, 0, 1)
   .unhandle(undefined)
+  .dbg("Items:")
 
 const price = Nfts.ItemPriceOf
-  .entry(Rune.tuple([collectionId, assetId]))
+  .entry(Rune.tuple([collection, item]))
   .unhandle(undefined)
   .access(0)
+  .dbg("Price:")
 
 const bobBuyItem = Nfts
   .buyItem({
     collection: collectionId,
-    item: assetId,
+    item: itemId,
     bidPrice: price,
   })
   .signed({ sender: bob })
@@ -164,7 +179,7 @@ await Rune
   .chain(() => bobBuyItem)
   .chain(() =>
     Nfts.Item
-      .entry(Rune.tuple([collectionId, assetId]))
+      .entry(Rune.tuple([collectionId, itemId]))
       .unhandle(undefined)
       .access("owner")
       .dbg("New Owner:")
