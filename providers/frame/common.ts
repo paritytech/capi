@@ -3,7 +3,7 @@ import * as $ from "../../deps/scale.ts"
 
 export const DEFAULT_TEST_USER_COUNT = 100_000
 const DEFAULT_TEST_USER_INITIAL_FUNDS = 1_000_000_000_000_000_000
-export const publicKeysPath = import.meta.resolve("./test_users_public_keys.scale")
+export const publicKeysPath = new URL("./test_users_public_keys.scale", import.meta.url)
 
 export async function createCustomChainSpec(
   bin: string,
