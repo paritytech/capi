@@ -16,7 +16,7 @@ export async function createCustomChainSpec(
   const chainSpec = JSON.parse(new TextDecoder().decode((await buildSpecCmd.output()).stdout))
   const balances: [string, number][] = chainSpec.genesis.runtime.balances.balances
   const publicKeys = $.array($.sizedUint8Array(32)).decode(
-    new Uint8Array(await (await fetch(publicKeysFileUrl)).arrayBuffer()),
+    new Uint8Array(await (await fetch(publicKeysUrl)).arrayBuffer()),
   )
   for (let i = 0; i < DEFAULT_TEST_USER_COUNT; i++) {
     balances.push([ss58.encode(networkPrefix, publicKeys[i]!), DEFAULT_TEST_USER_INITIAL_FUNDS])
