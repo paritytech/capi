@@ -5,7 +5,7 @@ import { createTestPairs } from "https://deno.land/x/polkadot@0.2.25/keyring/mod
 import { TypeRegistry } from "https://deno.land/x/polkadot@0.2.25/types/mod.ts"
 import { Balances, chain, users } from "polkadot_dev/mod.js"
 
-const [alice, bob] = await users(2)
+const [a, b] = await users(2)
 
 // Usually injected by an extension, e.g.
 // const pjsSigner = (await web3FromSource("polkadot-js")).signer!;
@@ -21,7 +21,7 @@ const pjsSigner = {
 }
 
 // Usually selected from the accounts provided by the extension
-const aliceAddress = ss58.encode(42, alice.publicKey)
+const aliceAddress = ss58.encode(42, a.publicKey)
 
 const sender = pjsSender(chain, pjsSigner)
 
@@ -29,7 +29,7 @@ console.log(
   await Balances
     .transfer({
       value: 12345n,
-      dest: bob.address,
+      dest: b.address,
     })
     .signed(signature({ sender: sender(aliceAddress) }))
     .sent()

@@ -3,17 +3,17 @@ import { MultisigRune } from "capi/patterns/multisig/mod.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 import { Balances, chain, System, users } from "polkadot_dev/mod.js"
 
-const [alice, bob, charlie, dave] = await users(4)
+const [a, b, c, d] = await users(4)
 
 const multisig = Rune
   .constant({
-    signatories: [alice.publicKey, bob.publicKey, charlie.publicKey],
+    signatories: [a, b, c].map(({ publicKey }) => publicKey),
     threshold: 2,
   })
   .into(MultisigRune, chain)
 
 // Read dave's initial balance (to-be changed by the call)
-console.log("Dave initial balance:", await System.Account.value(dave.publicKey).run())
+console.log("Dave initial balance:", await System.Account.value(d.publicKey).run())
 
 // Transfer some funds into the multisig account
 await Balances
@@ -21,7 +21,7 @@ await Balances
     value: 2_000_000_000_000n,
     dest: multisig.address,
   })
-  .signed(signature({ sender: alice }))
+  .signed(signature({ sender: a }))
   .sent()
   .dbgStatus("Existential deposit:")
   .finalized()
@@ -29,14 +29,14 @@ await Balances
 
 // The to-be proposed and approved call
 const call = Balances.transferKeepAlive({
-  dest: dave.address,
+  dest: d.address,
   value: 1_230_000_000_000n,
 })
 
 // Submit a proposal to dispatch the call
 await multisig
-  .ratify({ call, sender: alice.address })
-  .signed(signature({ sender: alice }))
+  .ratify({ call, sender: a.address })
+  .signed(signature({ sender: a }))
   .sent()
   .dbgStatus("Proposal:")
   .finalized()
@@ -49,9 +49,9 @@ console.log("Is proposed?:", await multisig.isProposed(call.hash).run())
 await multisig
   .approve({
     callHash: call.hash,
-    sender: bob.address,
+    sender: b.address,
   })
-  .signed(signature({ sender: bob }))
+  .signed(signature({ sender: b }))
   .sent()
   .dbgStatus("Vote:")
   .finalized()
@@ -70,12 +70,12 @@ console.log(
 
 // Send the executing (final) approval
 await multisig
-  .ratify({ call, sender: charlie.address })
-  .signed(signature({ sender: charlie }))
+  .ratify({ call, sender: c.address })
+  .signed(signature({ sender: c }))
   .sent()
   .dbgStatus("Approval:")
   .finalized()
   .run()
 
 // Check to see whether Dave's balance has in fact changed
-console.log("Dave final balance:", await System.Account.value(dave.publicKey).run())
+console.log("Dave final balance:", await System.Account.value(d.publicKey).run())

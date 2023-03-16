@@ -3,7 +3,7 @@ import { IdentityInfoTranscoders } from "capi/patterns/identity.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 import { Identity, users } from "polkadot_dev/mod.js"
 
-const [alice] = await users(1)
+const [a] = await users(1)
 
 const transcoders = new IdentityInfoTranscoders({ stars: $.u8 })
 
@@ -14,14 +14,14 @@ const info = transcoders.encode({
 
 await Identity
   .setIdentity({ info })
-  .signed(signature({ sender: alice }))
+  .signed(signature({ sender: a }))
   .sent()
   .dbgStatus()
   .finalized()
   .run()
 
 const raw = Identity.IdentityOf
-  .value(alice.publicKey)
+  .value(a.publicKey)
   .unhandle(undefined)
   .access("info")
 

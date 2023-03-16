@@ -2,9 +2,9 @@ import { Rune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 import { Balances, System, users, Utility } from "westend_dev/mod.js"
 
-const [alice, bob, charlie, dave] = await users(4)
+const [a, b, c, d] = await users(4)
 
-const recipients = Object.entries({ bob, charlie, dave })
+const recipients = Object.entries({ b, c, d })
 
 const batch = Utility.batch({
   calls: Rune.tuple(recipients.map(([, { address }]) =>
@@ -14,7 +14,7 @@ const batch = Utility.batch({
     })
   )),
 })
-  .signed(signature({ sender: alice }))
+  .signed(signature({ sender: a }))
   .sent()
   .dbgStatus("Batch tx:")
   .finalized()

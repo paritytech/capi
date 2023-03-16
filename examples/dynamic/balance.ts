@@ -1,11 +1,11 @@
 import { chain, users } from "polkadot_dev/mod.js"
 
-const [alice] = await users(1)
+const [a] = await users(1)
 
 const result = await chain
   .pallet("System")
   .storage("Account")
-  .value(alice.publicKey)
+  .value(a.publicKey)
   .run()
 
 console.log(result)
