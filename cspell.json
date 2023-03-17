@@ -8,13 +8,16 @@
       "addWords": true
     }
   ],
-  "dictionaries": ["project-words"],
+  "dictionaries": [
+    "project-words"
+  ],
   "ignorePaths": [
     "**/*.wasm",
     "frame_metadata/raw_erc20_metadata.json",
     "target",
     "**/__snapshots__/*.snap",
     "**/*.contract",
-    "examples/smart_contract/metadata.json"
+    "examples/smart_contract/metadata.json",
+    "**/*.scale"
   ]
 }
