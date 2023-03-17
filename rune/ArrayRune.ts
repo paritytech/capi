@@ -13,4 +13,6 @@ export class ArrayRune<T, U> extends Rune<T[], U> {
       .flat(fn(Rune._placeholder().into(ValueRune)))
       .into(ArrayRune)
   }
+
+  static of() {}
 }

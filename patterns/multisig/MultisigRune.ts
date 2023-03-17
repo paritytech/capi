@@ -3,6 +3,7 @@ import { MultiAddress } from "polkadot/types/sp_runtime/multiaddress.js"
 // const MultiAddress = null! as any
 import * as bytes from "../../deps/std/bytes.ts"
 import { Chain, ChainRune, ExtrinsicRune, Rune, RunicArgs, ValueRune } from "../../mod.ts"
+import { PolkadotSignatureChain } from "../signature/polkadot.ts"
 import { multisigAccountId } from "./multisigAccountId.ts"
 
 export interface MultisigRatifyProps<C extends Chain> {
@@ -21,7 +22,7 @@ export interface Multisig {
 }
 
 // TODO: swap out `Chain` constraints upon subset gen issue resolution... same for other patterns
-export class MultisigRune<out C extends Chain, out U> extends Rune<Multisig, U> {
+export class MultisigRune<out C extends PolkadotSignatureChain, out U> extends Rune<Multisig, U> {
   private storage
   threshold
   accountId

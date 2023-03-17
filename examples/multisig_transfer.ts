@@ -5,12 +5,11 @@ import { Balances, chain, System, users } from "polkadot_dev/mod.js"
 
 const [alexa, billy, carol, david] = await users(4)
 
-const multisig = Rune
-  .constant({
-    signatories: [alexa, billy, carol].map(({ publicKey }) => publicKey),
-    threshold: 2,
-  })
-  .into(MultisigRune, chain)
+const multisig = MultisigRune.from({
+  signatories: [alexa, billy, carol]
+    .map(({ publicKey }) => publicKey),
+  threshold: 2,
+}, chain)
 
 // Read dave's initial balance (to-be changed by the call)
 console.log("Dave initial balance:", await System.Account.value(david.publicKey).run())

@@ -28,7 +28,9 @@ export const $virtualMultisig: $.Codec<VirtualMultisig> = $.object(
   $.field("stash", $.sizedUint8Array(32)),
 )
 
-export class VirtualMultisigRune<out C extends Chain, out U> extends Rune<VirtualMultisig, U> {
+export class VirtualMultisigRune<out C extends PolkadotSignatureChain, out U>
+  extends Rune<VirtualMultisig, U>
+{
   inner
   proxies
   stash
@@ -104,7 +106,7 @@ export class VirtualMultisigRune<out C extends Chain, out U> extends Rune<Virtua
       .into(ExtrinsicRune, this.chain)
   }
 
-  static hydrate<C extends Chain, U, X>(
+  static hydrate<C extends PolkadotSignatureChain, U, X>(
     chain: ChainRune<C, U>,
     ...[state]: RunicArgs<X, [state: string]>
   ) {
@@ -114,7 +116,7 @@ export class VirtualMultisigRune<out C extends Chain, out U> extends Rune<Virtua
       .into(VirtualMultisigRune, chain)
   }
 
-  static deployment<C extends Chain, U, X>(
+  static deployment<C extends PolkadotSignatureChain, U, X>(
     chain: ChainRune<C, U>,
     props: RunicArgs<X, VirtualMultisigDeploymentProps>,
   ) {

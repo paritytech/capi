@@ -66,6 +66,14 @@ export class Rune<out T, out U = never> {
     return fn().into(ValueRune)
   }
 
+  static from<T, V extends T | Rune<T>, A extends unknown[], C>(
+    this: new(_prime: (batch: Batch) => Run<T, Rune.U<V> | RunicArgs.U<A>>, ...args: A) => C,
+    value: V,
+    ...args: A
+  ): C {
+    return (Rune.resolve(value) as ValueRune<T, Rune.U<V>>).into(this, ...args)
+  }
+
   async run(batch = new Batch()): Promise<T> {
     for await (const value of this.iter(batch)) {
       return value
