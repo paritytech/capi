@@ -1,12 +1,23 @@
 import * as core from "./deps/actions/core.ts"
 import * as esbuild from "./deps/esbuild.ts"
 import { denoPlugin } from "./deps/esbuild_deno_loader.ts"
+import { configure, renderFile } from "./deps/eta.ts"
+import { PQueue } from "./deps/pqueue.ts"
 import puppeteer from "./deps/puppeteer.ts"
 import { makeRunWithLimit } from "./deps/run_with_limit.ts"
+import { deferred } from "./deps/std/async.ts"
 import { parse } from "./deps/std/flags.ts"
 import { Buffer, readLines } from "./deps/std/io.ts"
 import * as path from "./deps/std/path.ts"
-import { readerFromStreamReader, writeAll, writeAllSync } from "./deps/std/streams.ts"
+import { readerFromStreamReader, writeAll } from "./deps/std/streams.ts"
+
+const currentDir = new URL(import.meta.url).pathname.split("/").slice(0, -1).join("/")
+const viewPath = `${currentDir}/views/`
+
+configure({
+  autoTrim: ["nl", false],
+  views: viewPath,
+})
 
 const flags = parse(Deno.args, {
   string: ["dir", "concurrency", "ignore", "importMap", "filter"],
@@ -50,12 +61,12 @@ if (Deno.env.get("GITHUB_STEP_SUMMARY")) {
   if (isFailed) {
     core.setFailed("One or more tests failed with exitcode status 1")
     Deno.exit(1)
+  } else {
+    Deno.exit(0)
   }
 } else {
   console.log("Test Results", result)
-  if (isFailed) {
-    Deno.exit(1)
-  }
+  isFailed ? Deno.exit(1) : Deno.exit(0)
 }
 
 function runWithDeno() {
@@ -94,6 +105,11 @@ async function runWithBrowser() {
 
   const result = await Promise.all(sourceFileNames.map((name) =>
     runWithLimit(async () => {
+      core.info(`running example ${name}`)
+      const outputQueue = new PQueue({ concurrency: 1, autoStart: false })
+
+      outputQueue.add(() => console.log(`${name} output:`))
+
       const page = await browser.newPage()
       const result = await esbuild.build({
         plugins: [
@@ -101,7 +117,7 @@ async function runWithBrowser() {
             importMapURL: importMap
               ? path.toFileUrl(`${Deno.cwd()}/${importMap}`)
               : undefined,
-          }),
+          }) as any,
         ],
         entryPoints: [path.join(dir, name)],
         bundle: true,
@@ -109,31 +125,35 @@ async function runWithBrowser() {
         format: "esm",
       })
 
-      const code = executionWrapper(result.outputFiles[0]?.text!)
+      const code = await renderFile("./template", { code: result.outputFiles[0]?.text! })
 
-      const consoleOutput = new Buffer()
-      const encoder = new TextEncoder()
+      await page.exposeFunction("log", (...args: unknown[]) => {
+        outputQueue.add(() => console.log(args))
+      })
 
-      page
-        .on(
-          "console",
-          (message) => writeAllSync(consoleOutput, encoder.encode(`${message.text()}\n`)),
-        )
+      await page.exposeFunction("logError", (...args: unknown[]) => {
+        outputQueue.add(() => console.error(args))
+      })
 
-      const exit = new Promise<number>((res) =>
-        page.exposeFunction("exit", (args: string) => {
-          res(Number.parseInt(args))
-        })
-      )
+      const exit = deferred<number>()
+      await page.exposeFunction("exit", (args: string) => {
+        exit.resolve(Number.parseInt(args))
+      })
 
       await page.addScriptTag({ content: code, type: "module" })
 
       const exitCode = await exit
 
+      outputQueue.start()
+      await outputQueue.onEmpty()
+
+      core.info(`finished example: ${name}`)
+
       return [name, exitCode] as const
     })
   ))
 
+  // await deferred<void>()
   await browser.close()
 
   return result
@@ -144,15 +164,4 @@ async function pipeThrough(reader: Deno.Reader, writer: Deno.Writer) {
   for await (const line of readLines(reader)) {
     await writeAll(writer, encoder.encode(`${line}\n`))
   }
-}
-
-function executionWrapper(code: string) {
-  return `
-try {
-  ${code}
-  exit(0)
-} catch (err) {
-  console.error(err)
-  exit(1)
-}`
 }
