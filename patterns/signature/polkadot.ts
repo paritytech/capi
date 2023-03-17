@@ -49,7 +49,7 @@ export function signature<X>(_props: RunicArgs<X, SignatureProps>) {
           }
         }
       })
-      .throws(ss58.InvalidPublicKeyLengthError, ss58.InvalidNetworkPrefixError)
+      .throws(ss58.InvalidPayloadLengthError)
     const nonce = Rune.resolve(props.nonce)
       .unhandle(undefined)
       .rehandle(undefined, () => chain.connection.call("system_accountNextIndex", senderSs58))
