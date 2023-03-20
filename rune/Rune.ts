@@ -388,7 +388,7 @@ export class Unhandled<U = unknown> {
 
 export type RunicArgs<X, A> =
   | (never extends X ? never : X extends A ? X : never)
-  | { [K in keyof A]: A[K] | Rune<A[K], RunicArgs.U<X>> }
+  | [{ [K in keyof A]: A[K] | Rune<A[K], RunicArgs.U<X>> }][X extends X ? 0 : never]
 
 export namespace RunicArgs {
   export type U<X> = X extends unknown[] ? Rune.U<X[number]> : Rune.U<X[keyof X]>

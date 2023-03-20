@@ -1,5 +1,4 @@
-import { blake2_256 } from "../../crypto/mod.ts"
-import * as $ from "../../deps/scale.ts"
+import { $, blake2_256 } from "capi"
 
 const seed = "modlpy/utilisuba" // cspell:disable-line
 

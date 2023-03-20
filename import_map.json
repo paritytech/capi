@@ -13,16 +13,15 @@
     "moonbeam/": "http://localhost:4646/frame/wss/wss.api.moonbeam.network/@latest/",
     "statemint/": "http://localhost:4646/frame/wss/statemint-rpc.polkadot.io/@latest/",
     "phala/": "http://localhost:4646/frame/wss/api.phala.network/ws#/rpc/@latest/",
-    "subsocial/": "http://localhost:4646/frame/para.subsocial.network/@latest/"
+    "subsocial/": "http://localhost:4646/frame/para.subsocial.network/@latest/",
+
+    "capi": "./mod.ts",
+    "capi/patterns/": "./patterns/",
+    "zombienet/": "http://localhost:4646/frame/zombienet/zombienets/",
+    "project/": "http://localhost:4646/frame/project/",
+    "contracts_dev/": "http://localhost:4646/frame/contracts_dev/@v0.24.0/"
   },
   "scopes": {
-    "examples/": {
-      "capi": "http://localhost:4646/mod.ts",
-      "capi/patterns/": "http://localhost:4646/patterns/",
-      "zombienet/": "http://localhost:4646/frame/zombienet/zombienets/",
-      "project/": "http://localhost:4646/frame/project/",
-      "contracts_dev/": "http://localhost:4646/frame/contracts_dev/@v0.24.0/"
-    },
     "http://localhost:4646/": {
       "http://localhost:4646/": "./",
       "http://localhost:4646/frame/": "http://localhost:4646/frame/"

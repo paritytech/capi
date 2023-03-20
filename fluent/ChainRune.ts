@@ -14,13 +14,43 @@ export interface Chain<M extends FrameMetadata = FrameMetadata> {
 
 export namespace Chain {
   export type Call<C extends Chain> = $.Native<C["metadata"]["extrinsic"]["call"]>
+
+  interface BasicCall<P extends string = string, N extends string = string> {
+    type: P
+    value: BasicCallValue<N>
+  }
+  interface BasicCallValue<N extends string = string> {
+    type: N
+  }
+
+  export type ExtractPalletCall<
+    C extends Chain,
+    P extends PalletName<C>,
+  > = Call<C> & BasicCall<P>
+  export type ExtractPalletCallName<
+    C extends Chain,
+    P extends PalletName<C>,
+  > = ExtractPalletCall<C, P>["value"]["type"]
+  export type ExtractCall<
+    C extends Chain,
+    P extends PalletName<C>,
+    N extends ExtractPalletCallName<C, P>,
+  > = Call<C> & BasicCall<P, N>
+  export interface PickCall<
+    C extends Chain,
+    P extends PalletName<C>,
+    N extends ExtractPalletCallName<C, P>,
+  > extends Chain {
+    // TODO
+  }
+
   export type Address<C extends Chain> = $.Native<C["metadata"]["extrinsic"]["address"]>
   export type Signature<C extends Chain> = $.Native<C["metadata"]["extrinsic"]["signature"]>
   export type Extra<C extends Chain> = $.Native<C["metadata"]["extrinsic"]["extra"]>
   export type Additional<C extends Chain> = $.Native<C["metadata"]["extrinsic"]["additional"]>
 
   export type Pallets<C extends Chain> = C["metadata"]["pallets"]
-  export type PalletName<C extends Chain> = keyof Pallets<C>
+  export type PalletName<C extends Chain> = Extract<keyof Pallets<C>, string>
   export type Pallet<C extends Chain, P extends PalletName<C>> = Pallets<C>[P]
 
   export type Constants<C extends Chain, P extends PalletName<C>> = Pallet<C, P>["constants"]
@@ -37,6 +67,11 @@ export namespace Chain {
   export type StorageName<C extends Chain, P extends PalletName<C>> = keyof StorageEntries<C, P>
   export type Storage<C extends Chain, P extends PalletName<C>, S extends StorageName<C, P>> =
     StorageEntries<C, P>[S]
+  export type PickStorage<
+    C extends Chain,
+    P extends PalletName<C>,
+    S extends StorageName<C, P>,
+  > = Chain<FrameMetadata<{ [_ in P]: FrameMetadata.Pallet<{ [_ in S]: Storage<C, P, S> }> }>>
 
   export namespace Storage {
     export type Key<C extends Chain, P extends PalletName<C>, S extends StorageName<C, P>> =
@@ -68,7 +103,7 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
   block<X>(...[blockHash]: RunicArgs<X, [blockHash: string]>) {
     return this.connection.call("chain_getBlock", blockHash)
       .unhandle(null)
-      .into(BlockRune, this, Rune.resolve(blockHash))
+      .into(BlockRune, this.as(ChainRune), Rune.resolve(blockHash))
   }
 
   extrinsic<X>(...args: RunicArgs<X, [call: Chain.Call<C>]>) {
