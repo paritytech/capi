@@ -16,7 +16,7 @@ jobs:
       # - run: deno run -A _tasks/validate_ignore.ts --dir examples
       - uses: ./.github/actions/troodontid
         with:
-          dir: examples
-          importMap: import_map.json
-          concurrency: 1
+          dir: "examples"
+          importMap: "import_map.json"
+          concurrency: "1"
           browser: true
