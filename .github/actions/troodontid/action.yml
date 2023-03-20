@@ -18,6 +18,6 @@ runs:
   args:
     - ${{ inputs.dir }}
     - ${{ inputs.importMap }}
-    - ${{ inputs.browser }}
     - ${{ inputs.concurrency }}
+    - ${{ inputs.browser }}
     - ${{ inputs.ignore }}
