@@ -15,12 +15,9 @@ type Access<T, K extends keyof T, _K = NonIndexSignatureKeys<T>> = [
   >,
 ][0]
 
-type GetPath<T, P> = P extends [infer K, ...infer Q] ? GetPath<
-    // @ts-ignore: we assume it's a valid key
-    T[K],
-    Q
-  >
-  : T
+/** @ts-ignore: assume it's a valid key */
+type GetPath<T, P> = P extends [infer K, ...infer Q] ? GetPath<T[K], Q> : T
+
 type EnsurePath<T, P> = never extends P ? P extends [infer K, ...infer Q] ? 
       | [K & keyof T, ...EnsurePath<T[K & keyof T], Q>]
       | [keyof T, ...PropertyKey[]]

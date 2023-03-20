@@ -1,5 +1,4 @@
-import { start } from "../deps/smoldot.ts"
-import { Client, ClientOptions } from "../deps/smoldot/client.d.ts"
+import { Client, ClientOptions, start } from "../deps/smoldot.ts"
 import { deferred } from "../deps/std/async.ts"
 import { Connection } from "./Connection.ts"
 import { RpcEgressMessage } from "./rpc_messages.ts"
@@ -14,7 +13,8 @@ export interface SmoldotRpcConnProps {
 let client: undefined | Client
 
 export class SmoldotConnection extends Connection {
-  smoldotChainPending
+  // private so that the types don't need to be referenced when packaged
+  private smoldotChainPending
   listening
   stopListening
 

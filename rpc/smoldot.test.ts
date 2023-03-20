@@ -65,7 +65,7 @@ Deno.test({
         await assertRejects(
           async () => {
             const connection = new SmoldotConnection({ relayChainSpec: "" })
-            return connection.smoldotChainPending
+            return connection["smoldotChainPending"]
           },
           AddChainError,
         )

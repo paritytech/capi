@@ -11,6 +11,7 @@ await Promise.all([
     package: {
       name: "capi",
       version: Deno.args[0]!,
+      type: "module",
       description: "Capi is a framework for crafting interactions with Substrate chains",
       license: "Apache-2.0",
       repository: "github:paritytech/capi",
@@ -63,6 +64,14 @@ await Promise.all([
         name: "@substrate/smoldot-light",
         version: "0.7.6",
       },
+      "https://deno.land/x/smoldot@light-js-deno-v0.7.6/client.d.ts": {
+        name: "@substrate/smoldot-light",
+        version: "0.7.6",
+      },
+      "http://localhost:4646/frame/wss/rpc.polkadot.io/@latest/mod.js": {
+        name: "@capi/polkadot",
+        version: "http://localhost:4646/frame/wss/rpc.polkadot.io/@v0.9.39/pkg.tar",
+      },
       // "https://raw.githubusercontent.com/paritytech/capi-crypto-wrappers/14289c5/lib.ts":
       //   "https://raw.githubusercontent.com/paritytech/capi-crypto-wrappers/14289c5/lib.node.ts",
     },
@@ -73,6 +82,7 @@ await Promise.all([
         test: true,
       },
       webSocket: true,
+      crypto: true,
     },
     test: false,
     typeCheck: false,
