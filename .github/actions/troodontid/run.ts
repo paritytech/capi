@@ -15,11 +15,12 @@ export interface Logger {
 
 export interface RunOptions {
   paths: Array<readonly [dir: string, fileName: string]>
-  concurrency?: number
+  concurrency: number
   runner: (dir: string, fileName: string) => Promise<void>
 }
 
 export async function run({ paths, concurrency, runner }: RunOptions) {
+  console.log("concurrency", concurrency)
   const runQueue = new PQueue({ concurrency })
   runQueue.addAll(paths.map(([dir, fileName]) => () => runner(dir, fileName)))
   await runQueue.onIdle()
