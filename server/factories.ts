@@ -1,4 +1,4 @@
-import * as shiki from "npm:shiki"
+import * as shiki from "https://esm.sh/shiki@0.11.1?bundle"
 import { escapeHtml } from "../deps/escape.ts"
 import { Status } from "../deps/std/http.ts"
 import { CacheBase } from "../util/cache/base.ts"

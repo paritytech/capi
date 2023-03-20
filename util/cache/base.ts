@@ -33,11 +33,4 @@ export abstract class CacheBase {
       return value
     }, ttl)
   }
-
-  abstract _list(prefix: string): Promise<string[]>
-
-  listMemo = new WeakMemo<string, string[]>()
-  list(prefix: string) {
-    return this.listMemo.run(prefix, () => this._list(prefix))
-  }
 }

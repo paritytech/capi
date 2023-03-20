@@ -4,7 +4,7 @@ import * as f from "./factories.ts"
 import { parsePathInfo } from "./PathInfo.ts"
 
 export function handler(env: Env): Handler {
-  return async (request) => {
+  return handleErrors(async (request) => {
     const url = new URL(request.url)
     const { pathname } = url
     if (pathname === "/") return new Response("capi dev server active")
@@ -19,13 +19,7 @@ export function handler(env: Env): Handler {
       }
       const provider = env.providers[generatorId]?.[providerId]
       if (provider) {
-        try {
-          return await provider.handle(request, pathInfo)
-        } catch (e) {
-          if (e instanceof Response) return e.clone()
-          console.error(e)
-          return f.serverError(Deno.inspect(e))
-        }
+        return await provider.handle(request, pathInfo)
       }
     }
     for (const dir of staticDirs) {
@@ -40,7 +34,19 @@ export function handler(env: Env): Handler {
       } catch (_e) {}
     }
     return f.notFound()
-  }
+  })
 }
 
 const staticDirs = ["../", "./static/"].map((p) => import.meta.resolve(p))
+
+export function handleErrors(handler: (request: Request) => Promise<Response>) {
+  return async (request: Request) => {
+    try {
+      return await handler(request)
+    } catch (e) {
+      if (e instanceof Response) return e.clone()
+      console.error(e)
+      return f.serverError(Deno.inspect(e))
+    }
+  }
+}

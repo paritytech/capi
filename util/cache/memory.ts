@@ -6,7 +6,4 @@ export class InMemoryCache extends CacheBase {
   _getRaw(key: string, init: () => Promise<Uint8Array>): Promise<Uint8Array> {
     return Promise.resolve(this.memo.run(key, init))
   }
-  _list(): Promise<string[]> {
-    throw new Error("unimplemented")
-  }
 }

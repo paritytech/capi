@@ -7,7 +7,7 @@ import {
   WssProvider,
   ZombienetProvider,
 } from "./providers/frame/mod.ts"
-import { handler } from "./server/local.ts"
+import { handler } from "./server/handler.ts"
 import { Env } from "./server/mod.ts"
 import { FsCache } from "./util/cache/mod.ts"
 
