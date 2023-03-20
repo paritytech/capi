@@ -68,12 +68,6 @@ await Promise.all([
         name: "@substrate/smoldot-light",
         version: "0.7.6",
       },
-      "http://localhost:4646/frame/wss/rpc.polkadot.io/@latest/mod.js": {
-        name: "@capi/polkadot",
-        version: "http://localhost:4646/frame/wss/rpc.polkadot.io/@v0.9.39/pkg.tar",
-      },
-      // "https://raw.githubusercontent.com/paritytech/capi-crypto-wrappers/14289c5/lib.ts":
-      //   "https://raw.githubusercontent.com/paritytech/capi-crypto-wrappers/14289c5/lib.node.ts",
     },
     outDir,
     scriptModule: false,
