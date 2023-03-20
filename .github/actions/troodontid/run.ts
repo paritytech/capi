@@ -20,7 +20,6 @@ export interface RunOptions {
 }
 
 export async function run({ paths, concurrency, runner }: RunOptions) {
-  console.log("concurrency", concurrency)
   const runQueue = new PQueue({ concurrency })
   runQueue.addAll(paths.map(([dir, fileName]) => () => runner(dir, fileName)))
   await runQueue.onIdle()
