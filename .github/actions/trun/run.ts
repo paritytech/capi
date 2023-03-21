@@ -57,7 +57,7 @@ export async function runWithBrowser(
 
     const exit = deferred<number>()
     await page.exposeFunction("exit", (args: string) => {
-      exit.resolve(Number.parseInt(args))
+      exit.resolve(parseInt(args))
     })
 
     await page.addScriptTag({ content: code, type: "module" })
