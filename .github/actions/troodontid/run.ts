@@ -1,6 +1,5 @@
 import * as esbuild from "./deps/esbuild.ts"
 import { denoPlugin } from "./deps/esbuild_deno_loader.ts"
-import { renderFile } from "./deps/eta.ts"
 import { PQueue } from "./deps/pqueue.ts"
 import { Browser } from "./deps/puppeteer.ts"
 import { deferred } from "./deps/std/async.ts"
@@ -55,7 +54,7 @@ export async function runWithBrowser(
       format: "esm",
     })
 
-    const code = await renderFile("./template", { code: result.outputFiles[0]?.text! })
+    const code = wrapCode(result.outputFiles[0]?.text!)
 
     await page.exposeFunction("log", (...args: unknown[]) => {
       outputQueue.add(() => console.log(args))
@@ -123,3 +122,28 @@ async function pipeThrough(reader: Deno.Reader, writer: Deno.Writer) {
     await writeAll(writer, encoder.encode(`${line}\n`))
   }
 }
+
+const wrapCode = (code: string) => `
+BigInt.prototype.toJSON = function() { return this.toString() }
+
+const consoleLog = console.log.bind(console)
+console.log = (...args) => {
+  log(args)
+  consoleLog(args)
+}
+
+const consoleError = console.error.bind(console)
+console.error = (...args) => {
+  logError(args)
+  consoleError(args)
+}
+
+
+try {
+  ${code}
+  exit(0)
+} catch (err) {
+  console.error(err)
+  exit(1)
+}
+`
