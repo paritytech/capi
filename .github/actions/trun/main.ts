@@ -32,11 +32,6 @@ const sourceFileNames = Array.from(Deno.readDirSync(dir))
   )
   .map((f) => f.name)
 
-const logger = {
-  info: (...args: any[]) => console.log(...args),
-  error: (...args: any[]) => console.error(...args),
-}
-
 const shutdownTasks = new PQueue()
 async function shutdown(exitCode: number) {
   console.log(`\nshutting down with exitcode ${exitCode}`)
@@ -67,8 +62,8 @@ const importMapURL = importMap
 
 const results: [fileName: string, exitCode: number][] = []
 const runner = browser
-  ? await runWithBrowser({ createBrowser, importMapURL, logger, results })
-  : await runWithDeno({ logger, reloadUrl: "http://localhost:4646", results })
+  ? await runWithBrowser({ createBrowser, importMapURL, results })
+  : await runWithDeno({ reloadUrl: "http://localhost:4646", results })
 const paths = sourceFileNames.map((fileName) => [dir, fileName] as const)
 
 await run({ paths, runner, concurrency })

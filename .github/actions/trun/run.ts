@@ -7,11 +7,6 @@ import { Buffer, readLines } from "./deps/std/io.ts"
 import * as path from "./deps/std/path.ts"
 import { readerFromStreamReader, writeAll } from "./deps/std/streams.ts"
 
-export interface Logger {
-  info: (...data: any[]) => void
-  error: (...data: any[]) => void
-}
-
 export interface RunOptions {
   paths: (readonly [dir: string, fileName: string])[]
   concurrency: number
@@ -28,18 +23,17 @@ export interface RunWithBrowserOptions {
   createBrowser: () => Promise<Browser>
   importMapURL?: URL
   results: [fileName: string, exitCode: number][]
-  logger: Logger
 }
 
 export async function runWithBrowser(
-  { createBrowser, importMapURL, logger, results }: RunWithBrowserOptions,
+  { createBrowser, importMapURL, results }: RunWithBrowserOptions,
 ) {
   const browser = await createBrowser()
   const currentDir = new URL(import.meta.url).pathname.split("/").slice(0, -1).join("/")
   const consoleJS = new TextDecoder().decode(await Deno.readFile(`${currentDir}/console.js`))
 
   return (async (dir: string, fileName: string) => {
-    logger.info(`running ${fileName}`)
+    console.log(`running ${fileName}`)
     const outputQueue = new PQueue({ concurrency: 1, autoStart: false })
 
     outputQueue.add(() => console.log(`${fileName} output:`))
@@ -77,7 +71,7 @@ export async function runWithBrowser(
       await outputQueue.onIdle()
     }
 
-    logger.info(`finished ${fileName}`)
+    console.log(`finished ${fileName}`)
 
     results.push([fileName, exitCode])
   })
@@ -85,13 +79,12 @@ export async function runWithBrowser(
 
 export interface RunWithDenoOptions {
   results: [fileName: string, exitCode: number][]
-  logger: Logger
   reloadUrl: string
 }
 
-export async function runWithDeno({ logger, reloadUrl, results }: RunWithDenoOptions) {
+export async function runWithDeno({ reloadUrl, results }: RunWithDenoOptions) {
   return (async (dir: string, fileName: string) => {
-    logger.info(`running ${fileName}`)
+    console.log(`running ${fileName}`)
     const command = new Deno.Command(Deno.execPath(), {
       args: ["run", "-A", `-r=${reloadUrl}`, `${dir}/${fileName}`],
       stdout: "piped",
@@ -113,7 +106,7 @@ export async function runWithDeno({ logger, reloadUrl, results }: RunWithDenoOpt
       }
     }
 
-    logger.info(`finished ${fileName}`)
+    console.log(`finished ${fileName}`)
 
     results.push([fileName, status.code])
   })
