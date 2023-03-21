@@ -57,13 +57,13 @@ const createBrowser = async () => {
 
   return browser
 }
-const importMapURL = importMap
+const importMapUrl = importMap
   ? path.toFileUrl(`${Deno.cwd()}/${importMap}`)
   : undefined
 
 const results: [fileName: string, exitCode: number][] = []
 const runner = browser
-  ? await runWithBrowser({ createBrowser, importMapURL, results })
+  ? await runWithBrowser({ createBrowser, importMapUrl, results })
   : await runWithDeno({ reloadUrl: "http://localhost:4646", results })
 const paths = sourceFileNames.map((fileName) => [dir, fileName] as const)
 

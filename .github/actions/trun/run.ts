@@ -21,15 +21,15 @@ export async function run({ paths, concurrency, runner }: RunOptions) {
 
 export interface RunWithBrowserOptions {
   createBrowser: () => Promise<Browser>
-  importMapURL?: URL
+  importMapUrl?: URL
   results: [fileName: string, exitCode: number][]
 }
 
 export async function runWithBrowser(
-  { createBrowser, importMapURL, results }: RunWithBrowserOptions,
+  { createBrowser, importMapUrl, results }: RunWithBrowserOptions,
 ) {
   const browser = await createBrowser()
-  const consoleJS = await fetch(import.meta.resolve("./console.js")).then((r) => r.text())
+  const consoleJs = await fetch(import.meta.resolve("./console.js")).then((r) => r.text())
 
   return (async (dir: string, fileName: string) => {
     console.log(`running ${fileName}`)
@@ -38,7 +38,7 @@ export async function runWithBrowser(
     const result = await esbuild.build({
       plugins: [
         denoPlugin({
-          importMapURL,
+          importMapURL: importMapUrl,
         }) as any,
       ],
       entryPoints: [path.join(dir, fileName)],
@@ -47,7 +47,7 @@ export async function runWithBrowser(
       format: "esm",
     })
 
-    const code = wrapCode(`${consoleJS}\n${result.outputFiles[0]?.text!}`)
+    const code = wrapCode(`${consoleJs}\n${result.outputFiles[0]?.text!}`)
 
     const outputBuffer = new Buffer()
 
