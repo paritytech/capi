@@ -53,8 +53,10 @@ export async function runWithBrowser(
 
     const code = wrapCode(`${consoleJS}\n${result.outputFiles[0]?.text!}`)
 
-    await page.exposeFunction("__trun_injected_log", (...args: unknown[]) => {
-      outputQueue.add(() => console.log(args))
+    const outputBuffer = new Buffer()
+
+    await page.exposeFunction("__trun_injected_log", (...[msg]: [string, number]) => {
+      outputBuffer.writeSync(new TextEncoder().encode(msg))
     })
 
     const exit = deferred<number>()
@@ -67,8 +69,9 @@ export async function runWithBrowser(
     const exitCode = await exit
 
     if (exitCode != 0) {
-      outputQueue.start()
-      await outputQueue.onIdle()
+      for await (const line of readLines(outputBuffer)) {
+        console.log(line)
+      }
     }
 
     console.log(`finished ${fileName}`)
@@ -120,8 +123,6 @@ async function pipeThrough(reader: Deno.Reader, writer: Deno.Writer) {
 }
 
 const wrapCode = (code: string) => `
-BigInt.prototype.toJSON = function() { return this.toString() }
-
 try {
   ${code}
   exit(0)
