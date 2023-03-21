@@ -35,6 +35,9 @@ export async function runWithBrowser(
   { createBrowser, importMapURL, logger, results }: RunWithBrowserOptions,
 ) {
   const browser = await createBrowser()
+  const currentDir = new URL(import.meta.url).pathname.split("/").slice(0, -1).join("/")
+  const consoleJS = new TextDecoder().decode(await Deno.readFile(`${currentDir}/console.js`))
+
   return (async (dir: string, fileName: string) => {
     logger.info(`running ${fileName}`)
     const outputQueue = new PQueue({ concurrency: 1, autoStart: false })
@@ -54,7 +57,11 @@ export async function runWithBrowser(
       format: "esm",
     })
 
-    const code = wrapCode(result.outputFiles[0]?.text!)
+    const code = wrapCode(`${consoleJS}\n${result.outputFiles[0]?.text!}`)
+
+    await page.exposeFunction("__trun_injected_log", (...args: unknown[]) => {
+      outputQueue.add(() => console.log(args))
+    })
 
     await page.exposeFunction("log", (...args: unknown[]) => {
       outputQueue.add(() => console.log(args))
@@ -129,19 +136,6 @@ async function pipeThrough(reader: Deno.Reader, writer: Deno.Writer) {
 
 const wrapCode = (code: string) => `
 BigInt.prototype.toJSON = function() { return this.toString() }
-
-const consoleLog = console.log.bind(console)
-console.log = (...args) => {
-  log(args)
-  consoleLog(args)
-}
-
-const consoleError = console.error.bind(console)
-console.error = (...args) => {
-  logError(args)
-  consoleError(args)
-}
-
 
 try {
   ${code}
