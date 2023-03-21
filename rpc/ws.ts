@@ -8,9 +8,9 @@ export class WsConnection extends Connection {
     super()
     this.ws = new WebSocket(url)
     this.ws.addEventListener("message", (e) => this.handle(JSON.parse(e.data)))
-    this.ws.addEventListener("error", (e) => { // TODO: recovery
+    this.ws.addEventListener("error", (e) => {
       console.log(e)
-      Deno.exit(1)
+      throw new Error("TODO: more graceful error messaging / recovery")
     })
   }
 

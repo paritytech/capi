@@ -113,7 +113,7 @@ export class StorageRune<
       blockHash?: string,
     ]>
   ) {
-    const storageKey = this.$key.encoded(partialKey).map(hex.encode)
+    const storageKey = this.$partialKey.encoded(partialKey).map(hex.encode)
     const startKey = Rune.captureUnhandled(
       [this.$key, start],
       (codec, start) =>
