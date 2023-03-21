@@ -12,7 +12,7 @@ const flags = parse(Deno.args, {
 
 const { ignore, dir, browser } = flags
 const importMap = flags["import-map"]
-const concurrency = flags.concurrency ? parseInt(flags.concurrency) : Infinity
+const concurrency = flags.concurrency ? Number(flags.concurrency) : Infinity
 if (!dir) {
   throw new Error("dir flag is required")
 }
