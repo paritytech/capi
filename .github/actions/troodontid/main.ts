@@ -1,19 +1,10 @@
 import * as core from "./deps/actions/core.ts"
-import { configure } from "./deps/eta.ts"
 import { PQueue } from "./deps/pqueue.ts"
 import puppeteer from "./deps/puppeteer.ts"
 import { deferred } from "./deps/std/async.ts"
 import { parse } from "./deps/std/flags.ts"
 import * as path from "./deps/std/path.ts"
 import { run, runWithBrowser, runWithDeno } from "./run.ts"
-
-const currentDir = new URL(import.meta.url).pathname.split("/").slice(0, -1).join("/")
-const viewPath = `${currentDir}/views/`
-
-configure({
-  autoTrim: ["nl", false],
-  views: viewPath,
-})
 
 const flags = parse(Deno.args, {
   string: ["dir", "concurrency", "ignore", "importMap", "filter"],
