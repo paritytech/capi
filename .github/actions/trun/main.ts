@@ -1,6 +1,5 @@
 import * as core from "./deps/actions/core.ts"
 import puppeteer from "./deps/puppeteer.ts"
-import { deferred } from "./deps/std/async.ts"
 import { parse } from "./deps/std/flags.ts"
 import * as path from "./deps/std/path.ts"
 import { run, runWithBrowser, runWithDeno } from "./run.ts"
