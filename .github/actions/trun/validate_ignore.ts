@@ -8,9 +8,7 @@ if (!dir) {
   throw new Error("dir flag missing")
 }
 
-const decoder = new TextDecoder("utf-8")
-const files = decoder
-  .decode(await Deno.readFile(`${dir}/${ignore}`))
+const files = (await Deno.readTextFile(`${dir}/${ignore}`))
   .split("\n")
   .filter(Boolean)
 

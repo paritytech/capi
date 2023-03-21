@@ -1,5 +1,4 @@
 import * as core from "./deps/actions/core.ts"
-import PQueue from "./deps/pqueue.ts"
 import puppeteer from "./deps/puppeteer.ts"
 import { deferred } from "./deps/std/async.ts"
 import { parse } from "./deps/std/flags.ts"
@@ -33,25 +32,27 @@ const sourceFileNames = Array.from(Deno.readDirSync(dir))
   )
   .map((f) => f.name)
 
-const shutdownTasks = new PQueue()
+const controller = new AbortController()
+const { signal } = controller
+
 async function shutdown(exitCode: number) {
   console.log(`\nshutting down with exitcode ${exitCode}`)
-  browserCloseSignal.resolve()
-  await shutdownTasks.onIdle()
-  Deno.exit(exitCode)
+
+  self.addEventListener("unload", () => Deno.exit(exitCode))
+  controller.abort()
 }
 
 Deno.addSignalListener("SIGINT", () => shutdown(1))
+Deno.addSignalListener("SIGTERM", () => shutdown(1))
 
-const browserCloseSignal = deferred<void>()
 const createBrowser = async () => {
   const browser = await puppeteer.launch({
     headless: true,
     executablePath: "/usr/bin/chromium",
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
   })
-  shutdownTasks.add(async () => {
-    await browserCloseSignal
+
+  signal.addEventListener("abort", async () => {
     await browser.close()
   })
 
@@ -68,9 +69,10 @@ const runner = browser
 const paths = sourceFileNames.map((fileName) => [dir, fileName] as const)
 
 await run({ paths, runner, concurrency })
-console.log("test results", results)
+console.log("test results")
+console.table(results.map(([fileName, exitCode]) => ({ fileName, exitCode })))
 
-const isFailed = results.find(([_, exitCode]) => exitCode === 1)
+const isFailed = results.some(([_, exitCode]) => exitCode !== 0)
 if (Deno.env.get("GITHUB_STEP_SUMMARY")) {
   await core.summary
     .addHeading("Failures")

@@ -19,13 +19,16 @@ ENV PATH=${DENO_INSTALL}/bin:${PATH} \
     DENO_DIR=/home/vscode/.cache/deno
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
-# Ripped from https://github.com/lucacasonato/deno-puppeteer/blob/main/Dockerfile
-RUN apt-get -qq update \
-    && apt-get -qq install -y --no-install-recommends \
+# See https://github.com/lucacasonato/deno-puppeteer/blob/main/Dockerfile for
+# pupeeter related dependencies
+
+RUN export DEBIAN_FRONTEND=noninteractive \
+  apt-get -qq update \
+  && apt-get -qq install -y --no-install-recommends \
+    chromium \
     curl \
-    ca-certificates \
-    unzip \
     fonts-liberation \
+    git \
     libappindicator3-1 \
     libasound2 \
     libatk-bridge2.0-0 \
@@ -34,6 +37,7 @@ RUN apt-get -qq update \
     libcairo2 \
     libcups2 \
     libdbus-1-3 \
+    libdrm2 \
     libexpat1 \
     libfontconfig1 \
     libgbm1 \
@@ -54,22 +58,17 @@ RUN apt-get -qq update \
     libxext6 \
     libxfixes3 \
     libxi6 \
+    libxkbcommon0 \
     libxrandr2 \
     libxrender1 \
+    libxshmfence1 \
     libxss1 \
     libxtst6 \
     lsb-release \
+    procps \
+    unzip \
     wget \
     xdg-utils \
-    libdrm2 \
-    libxkbcommon0 \
-    libxshmfence1 \
-    chromium
-
-
-RUN export DEBIAN_FRONTEND=noninteractive \
-  && apt-get update \
-  && apt-get install -y unzip curl git procps \
   && PUPPETEER_PRODUCT=chrome deno run -A --unstable https://deno.land/x/puppeteer@16.2.0/install.ts \
   && curl -fsSL -o /usr/local/bin/polkadot https://github.com/paritytech/polkadot/releases/download/${POLKADOT_VERSION}/polkadot \
   && chmod +x /usr/local/bin/polkadot \

@@ -1,5 +1,5 @@
 name: "trun"
-description: "asdf"
+description: "tool for testing typescript files in both deno and browser"
 inputs:
   dir:
     required: true

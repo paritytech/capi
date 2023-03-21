@@ -29,14 +29,10 @@ export async function runWithBrowser(
   { createBrowser, importMapURL, results }: RunWithBrowserOptions,
 ) {
   const browser = await createBrowser()
-  const currentDir = new URL(import.meta.url).pathname.split("/").slice(0, -1).join("/")
-  const consoleJS = new TextDecoder().decode(await Deno.readFile(`${currentDir}/console.js`))
+  const consoleJS = await fetch(import.meta.resolve("./console.js")).then((r) => r.text())
 
   return (async (dir: string, fileName: string) => {
     console.log(`running ${fileName}`)
-    const outputQueue = new PQueue({ concurrency: 1, autoStart: false })
-
-    outputQueue.add(() => console.log(`${fileName} output:`))
 
     const page = await browser.newPage()
     const result = await esbuild.build({
@@ -68,10 +64,9 @@ export async function runWithBrowser(
 
     const exitCode = await exit
 
-    if (exitCode != 0) {
-      for await (const line of readLines(outputBuffer)) {
-        console.log(line)
-      }
+    if (exitCode !== 0) {
+      console.log(`${fileName} failed -- console output:`)
+      console.log(new TextDecoder().decode(outputBuffer.bytes()))
     }
 
     console.log(`finished ${fileName}`)
