@@ -20,7 +20,7 @@ ENV PATH=${DENO_INSTALL}/bin:${PATH} \
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 # See https://github.com/lucacasonato/deno-puppeteer/blob/main/Dockerfile for
-# puppetter related dependencies
+# puppeteer related dependencies
 
 RUN export DEBIAN_FRONTEND=noninteractive \
   apt-get -qq update \
