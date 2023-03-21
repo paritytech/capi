@@ -32,10 +32,12 @@ framesystem
 harrysolovay
 hasher
 hashers
+hrmp
 inherents
 instanceof
 instantiator
 kiera
+lparachain
 ltex
 lxkf
 matty
@@ -52,6 +54,7 @@ noninteractive
 offchain
 parachain
 parachains
+paritypr
 paritytech
 pendings
 polkadot
@@ -85,3 +88,5 @@ unioned
 vadimcn
 westend
 westmint
+xcmp
+zombienet

@@ -33,6 +33,12 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
     .into(CodecRune)
     .encoded(this)
 
+  call = this.chain
+    .into(ValueRune)
+    .access("metadata", "extrinsic", "call")
+    .into(CodecRune)
+    .encoded(this)
+
   signed<SU>(signatureFactory: SignatureDataFactory<C, U, SU>) {
     return Rune
       .fn($extrinsic)
