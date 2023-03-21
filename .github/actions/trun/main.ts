@@ -68,10 +68,16 @@ const runner = browser
 const paths = sourceFileNames.map((fileName) => [dir, fileName] as const)
 
 await run({ paths, runner, concurrency })
-console.log("test results")
-console.table(results.map(([fileName, exitCode]) => ({ fileName, exitCode })))
+const failedTests = results
+  .filter(([_, exitCode]) => exitCode !== 0)
+  .map(([fileName, _]) => fileName)
+const isFailed = failedTests.length > 0
 
-const isFailed = results.some(([_, exitCode]) => exitCode !== 0)
+console.log(`test results -- ${failedTests.length} failure(s)`)
+if (isFailed) {
+  console.log(failedTests)
+}
+
 if (Deno.env.get("GITHUB_STEP_SUMMARY")) {
   await core.summary
     .addHeading("Failures")
