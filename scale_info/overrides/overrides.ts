@@ -30,6 +30,14 @@ export const overrides: Record<string, (ty: Ty, visit: (i: number) => Codec<any>
   "frame_support::traits::misc::WrapperKeepOpaque": (ty, visit) => {
     return $.lenPrefixed(visit(ty.params[0]!.ty!))
   },
+  "xcm::double_encoded::DoubleEncoded": (ty, visit) => {
+    console.log("xcm::double_encoded::DoubleEncoded")
+    return $.lenPrefixed(visit(ty.params[0]!.ty!))
+  },
+  "xcm::DoubleEncoded": (ty, visit) => {
+    console.log("xcm::DoubleEncoded")
+    return $.lenPrefixed(visit(ty.params[0]!.ty!))
+  },
   "sp_runtime::generic::era::Era": () => {
     return $era
   },

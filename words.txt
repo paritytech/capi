@@ -79,6 +79,7 @@ hashbrown
 hasher
 hashers
 heiko
+hrmp
 hydradx
 idents
 inherents
@@ -229,6 +230,7 @@ valiu
 wasmbuild
 westend
 westmint
+xcmp
 xxhash
 xxnetwork
 zio
