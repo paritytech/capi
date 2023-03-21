@@ -1,0 +1,23 @@
+name: "trun"
+description: "asdf"
+inputs:
+  dir:
+    required: true
+    description: source directory of files to run
+  browser:
+    description: run files in a browser
+  importMap:
+    description: import map
+  concurrency:
+    description: concurrency
+  ignore:
+    description: ignore file
+runs:
+  using: "docker"
+  image: "Dockerfile"
+  args:
+    - ${{ inputs.dir }}
+    - ${{ inputs.importMap }}
+    - ${{ inputs.concurrency }}
+    - ${{ inputs.browser }}
+    - ${{ inputs.ignore }}

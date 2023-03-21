@@ -1,4 +1,3 @@
-mod.ts
 multisig_transfer.ts
 ink_e2e/main.ts
 xcm_asset_teleportation.ts
