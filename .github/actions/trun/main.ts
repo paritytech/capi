@@ -7,12 +7,13 @@ import * as path from "./deps/std/path.ts"
 import { run, runWithBrowser, runWithDeno } from "./run.ts"
 
 const flags = parse(Deno.args, {
-  string: ["dir", "concurrency", "ignore", "importMap", "filter"],
+  string: ["dir", "concurrency", "ignore", "import-map", "filter"],
   boolean: ["browser"],
   default: { ignore: ".ignore" },
 })
 
-const { ignore, importMap, dir, browser } = flags
+const { ignore, dir, browser } = flags
+const importMap = flags["import-map"]
 const concurrency = flags.concurrency ? parseInt(flags.concurrency) : Infinity
 if (!dir) {
   throw new Error("dir flag is required")
