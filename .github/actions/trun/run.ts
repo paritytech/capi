@@ -90,18 +90,17 @@ export async function runWithDeno({ reloadUrl, results }: RunWithDenoOptions) {
     })
 
     const task = command.spawn()
-    const out = new Buffer()
+    const outputBuffer = new Buffer()
 
     await Promise.all([
-      pipeThrough(readerFromStreamReader(task.stdout.getReader()), out),
-      pipeThrough(readerFromStreamReader(task.stderr.getReader()), out),
+      pipeThrough(readerFromStreamReader(task.stdout.getReader()), outputBuffer),
+      pipeThrough(readerFromStreamReader(task.stderr.getReader()), outputBuffer),
     ])
 
     const status = await task.status
     if (!status.success) {
-      for await (const line of readLines(out)) {
-        console.log(line)
-      }
+      console.log(`${fileName} failed -- console output:`)
+      console.log(new TextDecoder().decode(outputBuffer.bytes()))
     }
 
     console.log(`finished ${fileName}`)
