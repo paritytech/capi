@@ -73,8 +73,10 @@ export async function runWithBrowser(
 
     const exitCode = await exit
 
-    outputQueue.start()
-    await outputQueue.onIdle()
+    if (exitCode != 0) {
+      outputQueue.start()
+      await outputQueue.onIdle()
+    }
 
     logger.info(`finished ${fileName}`)
 
@@ -106,8 +108,10 @@ export async function runWithDeno({ logger, reloadUrl, results }: RunWithDenoOpt
     ])
 
     const status = await task.status
-    for await (const line of readLines(out)) {
-      console.log(line)
+    if (!status.success) {
+      for await (const line of readLines(out)) {
+        console.log(line)
+      }
     }
 
     logger.info(`finished ${fileName}`)
