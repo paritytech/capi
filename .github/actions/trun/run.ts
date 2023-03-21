@@ -1,6 +1,6 @@
 import * as esbuild from "./deps/esbuild.ts"
 import { denoPlugin } from "./deps/esbuild_deno_loader.ts"
-import { PQueue } from "./deps/pqueue.ts"
+import PQueue from "./deps/pqueue.ts"
 import { Browser } from "./deps/puppeteer.ts"
 import { deferred } from "./deps/std/async.ts"
 import { Buffer, readLines } from "./deps/std/io.ts"
@@ -13,7 +13,7 @@ export interface Logger {
 }
 
 export interface RunOptions {
-  paths: Array<readonly [dir: string, fileName: string]>
+  paths: (readonly [dir: string, fileName: string])[]
   concurrency: number
   runner: (dir: string, fileName: string) => Promise<void>
 }

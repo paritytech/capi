@@ -1,5 +1,5 @@
 import * as core from "./deps/actions/core.ts"
-import { PQueue } from "./deps/pqueue.ts"
+import PQueue from "./deps/pqueue.ts"
 import puppeteer from "./deps/puppeteer.ts"
 import { deferred } from "./deps/std/async.ts"
 import { parse } from "./deps/std/flags.ts"
@@ -12,21 +12,24 @@ const flags = parse(Deno.args, {
   default: { ignore: ".ignore" },
 })
 
-const { ignore, importMap, browser: useBrowser } = flags
-const concurrency = flags.concurrency ? Number.parseInt(flags.concurrency) : Infinity
-if (!flags.dir) {
+const { ignore, importMap, dir, browser } = flags
+const concurrency = flags.concurrency ? parseInt(flags.concurrency) : Infinity
+if (!dir) {
   throw new Error("dir flag is required")
 }
-const dir = flags.dir
 
-const filter = flags.filter ? new Set(flags.filter.split(",")) : undefined
+const filter = flags.filter ? new Set(flags.filter.split(",")) : new Set()
 
 const ignoreFile = await Deno.readTextFile(path.join(dir, ignore))
 const ignoredFiles = new Set(ignoreFile.split("\n"))
 
 const sourceFileNames = Array.from(Deno.readDirSync(dir))
-  .filter((e) => e.name.match(/^.*\.ts$/g) && e.isFile && !ignoredFiles.has(e.name))
-  .filter((e) => filter ? filter.has(e.name) : true)
+  .filter((e) =>
+    e.name.match(/^.*\.ts$/g)
+    && e.isFile
+    && !ignoredFiles.has(e.name)
+    && ((filter.size > 0 && filter.has(e.name)) || filter.size === 0)
+  )
   .map((f) => f.name)
 
 const logger = {
@@ -63,7 +66,7 @@ const importMapURL = importMap
   : undefined
 
 const results: [fileName: string, exitCode: number][] = []
-const runner = useBrowser
+const runner = browser
   ? await runWithBrowser({ createBrowser, importMapURL, logger, results })
   : await runWithDeno({ logger, reloadUrl: "http://localhost:4646", results })
 const paths = sourceFileNames.map((fileName) => [dir, fileName] as const)
@@ -77,7 +80,7 @@ if (Deno.env.get("GITHUB_STEP_SUMMARY")) {
     .addHeading("Failures")
     .addTable([
       [{ data: "file", header: true }],
-      ...results.filter(([_, exitCode]) => exitCode != 0).map(([name]) => [name]),
+      ...results.filter(([_, exitCode]) => exitCode !== 0).map(([name]) => [name]),
     ])
     .write({ overwrite: true })
 }

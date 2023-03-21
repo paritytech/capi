@@ -1,4 +1,4 @@
-import { parse } from "../deps/std/flags.ts"
+import { parse } from "./deps/std/flags.ts"
 
 const { dir, ignore } = parse(Deno.args, {
   string: ["dir", "ignore"],

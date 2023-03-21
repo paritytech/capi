@@ -7,7 +7,7 @@ chmod -R 666 $GITHUB_STEP_SUMMARY
 
 browser=[$4] || "--browser"
 
-deno run -A _tasks/validate_ignore.ts --dir examples
+deno run -A validate_ignore.ts --dir examples
 deno run -A _tasks/star.ts
 deno task cache target/star.ts
 deno task capi -- deno run -A -r=http://localhost:4646/ .github/actions/trun/main.ts --dir $1 --importMap $2 --concurrency $3 $browser
