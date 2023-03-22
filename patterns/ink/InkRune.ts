@@ -1,11 +1,11 @@
 import { equals } from "../../deps/std/bytes.ts"
 import {
   Chain,
-  ChainRune,
   CodecRune,
   Event,
   ExtrinsicRune,
   hex,
+  PatternRune,
   Rune,
   RunicArgs,
   ValueRune,
@@ -22,15 +22,9 @@ export interface MsgProps {
   gasLimit?: Weight
 }
 
-export class InkRune<out C extends Chain, out U> extends Rune<Uint8Array, U> {
-  constructor(
-    _prime: InkRune<C, U>["_prime"],
-    readonly chain: ChainRune<C, U>,
-    readonly contract: InkMetadataRune<C, U>,
-  ) {
-    super(_prime)
-  }
-
+export class InkRune<out C extends Chain, out U>
+  extends PatternRune<Uint8Array, C, U, InkMetadataRune<C, U>>
+{
   innerCall<X>(...args_: RunicArgs<X, [sender: Uint8Array, value: bigint, data: Uint8Array]>) {
     const [sender, value, data] = RunicArgs.resolve(args_)
     const instantiateArgs = Rune
@@ -44,7 +38,7 @@ export class InkRune<out C extends Chain, out U> extends Rune<Uint8Array, U> {
 
   common<X>(this: InkRune<C, U>, props: RunicArgs<X, MsgProps>) {
     const msgMetadata = Rune.tuple([
-      this.contract
+      this.parent
         .into(ValueRune)
         .access("V3", "spec", "messages"),
       props.method,
@@ -53,7 +47,7 @@ export class InkRune<out C extends Chain, out U> extends Rune<Uint8Array, U> {
       .unhandle(undefined)
       .rehandle(undefined, () => Rune.constant(new MethodNotFoundError()))
       .unhandle(MethodNotFoundError)
-    const data = this.contract.encodeData(msgMetadata, props.args)
+    const data = this.parent.encodeData(msgMetadata, props.args)
     const value = Rune
       .resolve(props.value)
       .unhandle(undefined)
@@ -64,7 +58,7 @@ export class InkRune<out C extends Chain, out U> extends Rune<Uint8Array, U> {
 
   call<X>(props: RunicArgs<X, MsgProps>) {
     const { msgMetadata, innerResult } = this.common(props)
-    const $result = this.contract.codecs
+    const $result = this.parent.codecs
       .access(msgMetadata.access("returnType", "type"))
       .into(CodecRune)
     return $result.decoded(innerResult.access("result", "data"))

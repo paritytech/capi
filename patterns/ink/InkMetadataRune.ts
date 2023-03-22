@@ -6,6 +6,7 @@ import {
   CodecRune,
   ExtrinsicRune,
   hex,
+  PatternRune,
   Rune,
   RunicArgs,
   ValueRune,
@@ -27,17 +28,12 @@ export interface InstantiateProps {
   salt?: Uint8Array
 }
 
-export class InkMetadataRune<out C extends Chain, out U> extends Rune<InkMetadata, U> {
-  codecs
-
-  constructor(_prime: InkMetadataRune<C, U>["_prime"], readonly chain: ChainRune<C, U>) {
-    super(_prime)
-    this.codecs = this
-      .into(ValueRune)
-      .access("V3", "types")
-      .map(transformTys)
-      .access(0)
-  }
+export class InkMetadataRune<out C extends Chain, out U> extends PatternRune<InkMetadata, C, U> {
+  codecs = this
+    .into(ValueRune)
+    .access("V3", "types")
+    .map(transformTys)
+    .access(0)
 
   salt() {
     return Rune.constant(crypto.getRandomValues(new Uint8Array(4)))

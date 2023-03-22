@@ -1,8 +1,14 @@
 import { MultiAddress } from "polkadot/types/sp_runtime/multiaddress.js"
-// type MultiAddress = any
-// const MultiAddress = null! as any
 import * as bytes from "../../deps/std/bytes.ts"
-import { Chain, ChainRune, ExtrinsicRune, Rune, RunicArgs, ValueRune } from "../../mod.ts"
+import {
+  Chain,
+  ChainRune,
+  ExtrinsicRune,
+  PatternRune,
+  Rune,
+  RunicArgs,
+  ValueRune,
+} from "../../mod.ts"
 import { multisigAccountId } from "./multisigAccountId.ts"
 
 export interface MultisigRatifyProps<C extends Chain> {
@@ -21,20 +27,12 @@ export interface Multisig {
 }
 
 // TODO: swap out `Chain` constraints upon subset gen issue resolution... same for other patterns
-export class MultisigRune<out C extends Chain, out U> extends Rune<Multisig, U> {
-  private storage
-  threshold
-  accountId
-  address
-
-  constructor(_prime: MultisigRune<C, U>["_prime"], readonly chain: ChainRune<C, U>) {
-    super(_prime)
-    this.storage = this.chain.pallet("Multisig").storage("Multisigs")
-    const v = this.into(ValueRune)
-    this.threshold = v.map(({ threshold, signatories }) => threshold ?? signatories.length - 1)
-    this.accountId = Rune.fn(multisigAccountId).call(v.access("signatories"), this.threshold)
-    this.address = MultiAddress.Id(this.accountId)
-  }
+export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multisig, C, U> {
+  private storage = this.chain.pallet("Multisig").storage("Multisigs")
+  private value = this.into(ValueRune)
+  threshold = this.value.map(({ threshold, signatories }) => threshold ?? signatories.length - 1)
+  accountId = Rune.fn(multisigAccountId).call(this.value.access("signatories"), this.threshold)
+  address = MultiAddress.Id(this.accountId)
 
   otherSignatories<X>(...[sender]: RunicArgs<X, [sender: MultiAddress]>) {
     return Rune
