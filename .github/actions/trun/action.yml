@@ -12,6 +12,8 @@ inputs:
     description: concurrency
   ignore:
     description: ignore file
+  output:
+    description: output file
 runs:
   using: "docker"
   image: "Dockerfile"
@@ -21,3 +23,4 @@ runs:
     - ${{ inputs.concurrency }}
     - ${{ inputs.browser }}
     - ${{ inputs.ignore }}
+    - ${{ inputs.output }}

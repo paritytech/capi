@@ -1,16 +1,15 @@
-import * as core from "./deps/actions/core.ts"
 import puppeteer from "./deps/puppeteer.ts"
 import { parse } from "./deps/std/flags.ts"
 import * as path from "./deps/std/path.ts"
 import { run, runWithBrowser, runWithDeno } from "./run.ts"
 
 const flags = parse(Deno.args, {
-  string: ["dir", "concurrency", "ignore", "import-map", "filter"],
+  string: ["dir", "concurrency", "ignore", "import-map", "filter", "output"],
   boolean: ["browser"],
   default: { ignore: ".ignore" },
 })
 
-const { ignore, dir, browser } = flags
+const { ignore, dir, browser, output } = flags
 const importMap = flags["import-map"]
 const concurrency = flags.concurrency ? Number(flags.concurrency) : Infinity
 if (!dir) {
@@ -19,6 +18,7 @@ if (!dir) {
 
 const filter = flags.filter ? new Set(flags.filter.split(",")) : new Set()
 
+await validateIgnoreFile(dir, ignore)
 const ignoreFile = await Deno.readTextFile(path.join(dir, ignore))
 const ignoredFiles = new Set(ignoreFile.split("\n"))
 
@@ -74,23 +74,34 @@ const failedTests = results
 const isFailed = failedTests.length > 0
 
 console.log(`test results -- ${failedTests.length} failure(s)`)
+if (output) {
+  await Deno.writeTextFile(output, JSON.stringify(failedTests))
+}
+
 if (isFailed) {
   console.log(failedTests)
-}
-
-if (Deno.env.get("GITHUB_STEP_SUMMARY")) {
-  await core.summary
-    .addHeading("Failures")
-    .addTable([
-      [{ data: "file", header: true }],
-      ...results.filter(([_, exitCode]) => exitCode !== 0).map(([name]) => [name]),
-    ])
-    .write({ overwrite: true })
-}
-
-if (isFailed) {
-  core.setFailed("One or more tests failed with exitcode status 1")
   shutdown(1)
 } else {
   shutdown(0)
+}
+
+async function validateIgnoreFile(dir: string, ignoreFile: string) {
+  const files = (await Deno.readTextFile(`${dir}/${ignoreFile}`))
+    .split("\n")
+    .filter(Boolean)
+
+  const result = await Promise.all(
+    files.map((fileName) => `${dir}/${fileName}`)
+      .map((path) =>
+        Deno.stat(path)
+          .then(() => [path, true] as const)
+          .catch(() => [path, false] as const)
+      ),
+  )
+
+  const nonExistentFiles = result.filter(([_, exists]) => !exists)
+  if (nonExistentFiles.length > 0) {
+    console.error(nonExistentFiles.map(([path, _]) => path))
+    shutdown(1)
+  }
 }
