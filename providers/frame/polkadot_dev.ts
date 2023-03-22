@@ -42,6 +42,7 @@ export class PolkadotDevProvider extends FrameBinProvider {
       this.bin,
       `${runtimeName}-dev`,
       DEV_RUNTIME_PREFIXES[runtimeName],
+      this.env.signal,
     )
     const args: string[] = ["--tmp", "--alice", "--ws-port", port.toString(), "--chain", chainSpec]
     await this.runBin(args)
