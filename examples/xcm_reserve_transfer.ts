@@ -59,7 +59,7 @@ async function setup() {
     .signed(signature({ sender: alice }))
     .sent()
     .dbgStatus("ParasSudoWrapper.sudoQueueDownwardXcm")
-    .finalizedEvents()
+    .finalized()
     .run()
 
   await waitFor(async () => (await Statemine.Assets.Asset.value(ASSET_ID).run()) !== undefined) // wait for asset id created
@@ -75,7 +75,7 @@ async function setup() {
     .signed(signature({ sender: alice }))
     .sent()
     .dbgStatus("mint reserve asset")
-    .finalizedEvents()
+    .finalized()
     .run()
 
   console.log("reserve asset minted", await Statemine.Assets.Asset.value(ASSET_ID).run())
@@ -97,7 +97,7 @@ async function setup() {
     .signed(signature({ sender: alice }))
     .sent()
     .dbgStatus("create derived asset")
-    .finalizedEvents()
+    .finalized()
     .run()
 
   const {
@@ -126,7 +126,7 @@ async function setup() {
     .signed(signature({ sender: alice }))
     .sent()
     .dbgStatus("register reserve asset")
-    .finalizedEvents()
+    .finalized()
     .run()
 }
 
@@ -179,6 +179,20 @@ async function doReserveTransfer() {
     .dbgStatus("limitedReserveTransferAssets")
     // TODO: from xcmpQueue.XcmpMessageSent get .messageHash
     .finalizedEvents()
+    .into(ValueRune)
+    .map((events) => {
+      const event = events.find((e) =>
+        Statemine.types.statemine_runtime.RuntimeEvent.isXcmpQueue(e.event)
+        && Statemine.types.cumulus_pallet_xcmp_queue.pallet.Event.isXcmpMessageSent(e.event.value)
+      )?.event.value as
+        | Statemine.types.cumulus_pallet_xcmp_queue.pallet.Event.XcmpMessageSent
+        | undefined
+      if (event?.messageHash) {
+        return hex.encode(event.messageHash)
+      }
+      return event
+    })
+    .dbg("XcmpMessageSent.messageHash")
     .run()
 
   // TODO: wait for xcmpQueue.(Success|Fail) .messageHash
