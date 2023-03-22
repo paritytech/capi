@@ -4,7 +4,7 @@ import { decodeMetadata, FrameMetadata } from "../frame_metadata/mod.ts"
 import { Connection, ConnectionCtorLike } from "../rpc/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { BlockRune } from "./BlockRune.ts"
-import { connection, ConnectionRune } from "./ConnectionRune.ts"
+import { ConnectionRune } from "./ConnectionRune.ts"
 import { ExtrinsicRune } from "./ExtrinsicRune.ts"
 import { PalletRune } from "./PalletRune.ts"
 
@@ -54,30 +54,21 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
   static from<D, M extends FrameMetadata>(
     connectionCtor: ConnectionCtorLike<D>,
     discovery: D,
-    metadata?: M,
+    staticMetadata?: M,
   ) {
-    return Rune
-      .rec({
-        connection: connection(async (signal) => connectionCtor.connect(discovery, signal)),
-        metadata: metadata!,
-      })
-      .into(this)
+    const connection = ConnectionRune.from(async (signal) =>
+      connectionCtor.connect(discovery, signal)
+    )
+    const metadata = staticMetadata || Rune
+      .fn(hex.decode)
+      .call(connection.call("state_getMetadata"))
+      .map(decodeMetadata)
+    return Rune.rec({ connection, metadata }).into(this)
   }
 
   connection = this.into(ValueRune<Chain, U>).access("connection").into(ConnectionRune)
 
-  remoteMetadata = Rune
-    .fn(hex.decode)
-    .call(this.connection.call("state_getMetadata"))
-    .map(decodeMetadata)
-
-  metadata = this
-    .into(ValueRune)
-    .access("metadata")
-    .unsafeAs<FrameMetadata | undefined>()
-    .into(ValueRune)
-    .unhandle(undefined)
-    .rehandle(undefined, () => this.remoteMetadata)
+  metadata = this.into(ValueRune).access("metadata")
 
   latestBlock = this.block(
     this.connection

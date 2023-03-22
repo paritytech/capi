@@ -13,11 +13,11 @@ class RunConnection extends Run<Connection, never> {
   }
 }
 
-export function connection(init: (signal: AbortSignal) => Promise<Connection>) {
-  return Rune.new(RunConnection, init).into(ConnectionRune)
-}
-
 export class ConnectionRune<U> extends Rune<Connection, U> {
+  static from(init: (signal: AbortSignal) => Promise<Connection>) {
+    return Rune.new(RunConnection, init).into(ConnectionRune)
+  }
+
   call<K extends keyof Calls, X>(
     callMethod: K,
     ...args: RunicArgs<X, [...Parameters<Calls[K]>]>
