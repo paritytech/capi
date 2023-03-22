@@ -26,5 +26,5 @@ chain = "statemine-local"
 
 [parachains.collator]
 name = "collator"
-command = "deno task capi bin polkadot-parachain parachains-v9382"
+command = "deno task capi bin polkadot-parachain v0.9.380"
 args = ["-lparachain=debug"]
