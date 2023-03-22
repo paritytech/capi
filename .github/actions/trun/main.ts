@@ -101,6 +101,7 @@ async function validateIgnoreFile(dir: string, ignoreFile: string) {
 
   const nonExistentFiles = result.filter(([_, exists]) => !exists)
   if (nonExistentFiles.length > 0) {
+    console.log("trun preflight step failed -- unknown files specified in ignore:")
     console.error(nonExistentFiles.map(([path, _]) => path))
     shutdown(1)
   }
