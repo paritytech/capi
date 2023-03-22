@@ -1,11 +1,16 @@
-import { chain, users } from "polkadot_dev/mod.js"
+import { ChainRune, connection, Rune, WsConnection } from "capi"
 
-const [alexa] = await users(1)
+const chain = Rune
+  .rec({
+    connection: connection(async (signal) => WsConnection.connect("wss://rpc.polkadot.io", signal)),
+    metadata: null! as any,
+  })
+  .into(ChainRune)
 
-const result = await chain
+const accountInfo = await chain
   .pallet("System")
   .storage("Account")
-  .value(alexa.publicKey)
+  .entryPage(10, null)
   .run()
 
-console.log(result)
+console.log(accountInfo)

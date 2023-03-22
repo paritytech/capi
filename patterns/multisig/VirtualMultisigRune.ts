@@ -1,3 +1,4 @@
+import { Balances, Polkadot, Proxy, Utility } from "polkadot/mod.js"
 import { MultiAddress } from "polkadot/types/sp_runtime/multiaddress.js"
 import { equals } from "../../deps/std/bytes.ts"
 import {
@@ -5,17 +6,18 @@ import {
   Chain,
   ChainRune,
   EventsChain,
-  ExtrinsicRune,
   ExtrinsicSender,
   hex,
   MetaRune,
+  PatternRune,
   Rune,
   RunicArgs,
   ValueRune,
 } from "../../mod.ts"
 import { filterPureCreatedEvents, replaceDelegateCalls } from "../proxy/mod.ts"
+import { ProxyChain } from "../proxy/replaceDelegateCalls.ts"
 import { PolkadotSignatureChain, signature } from "../signature/polkadot.ts"
-import { MultisigRune } from "./MultisigRune.ts"
+import { MultisigChain, MultisigRune } from "./MultisigRune.ts"
 
 export interface VirtualMultisig {
   members: [Uint8Array, Uint8Array][]
@@ -28,84 +30,68 @@ export const $virtualMultisig: $.Codec<VirtualMultisig> = $.object(
   $.field("stash", $.sizedUint8Array(32)),
 )
 
-export class VirtualMultisigRune<out C extends Chain, out U> extends Rune<VirtualMultisig, U> {
-  inner
-  proxies
-  stash
-  encoded
-  hex
+// TODO: incorporate `C` into pick util types
+export type VirtualMultisigChain<C extends Chain> =
+  & Chain.PickStorage<Polkadot, "Multisig", "Multisigs">
+  & Chain.PickStorage<Polkadot, "Proxy", "Proxies">
+  & Chain.PickCall<
+    Polkadot,
+    "Multisig" | "Proxy",
+    "asMulti" | "approveAsMulti" | "cancelAsMulti" | "proxy" | "addProxy" | "removeProxy"
+  >
 
-  constructor(_prime: VirtualMultisigRune<C, U>["_prime"], readonly chain: ChainRune<C, U>) {
-    super(_prime)
-    const v = this.into(ValueRune)
-    this.stash = v.access("stash")
-    this.proxies = v
-      .access("members")
-      .map((arr) => Object.fromEntries(arr.map((a, i): [string, number] => [hex.encode(a[0]), i])))
-    this.inner = Rune.rec({
-      signatories: v.access("members").map((arr) => arr.map((a) => a[1])),
-      threshold: v.access("threshold"),
-    }).into(MultisigRune, chain)
-    this.encoded = v.map((m) => $virtualMultisig.encode(m))
-    this.hex = this.encoded.map(hex.encode)
-  }
+export class VirtualMultisigRune<out C extends Chain, out U>
+  extends PatternRune<VirtualMultisig, VirtualMultisigChain<C>, U>
+{
+  private value = this.into(ValueRune)
+  stash = this.value.access("stash")
+  proxies = this.value.access("members").map((arr) =>
+    Object.fromEntries(arr.map((a, i): [string, number] => [hex.encode(a[0]), i]))
+  )
+  encoded = this.value.map((m) => $virtualMultisig.encode(m))
+  hex = this.encoded.map(hex.encode)
+  inner = Rune
+    .rec({
+      signatories: this.value.access("members").map((arr) => arr.map((a) => a[1])),
+      threshold: this.value.access("threshold"),
+    })
+    // TODO: get rid
+    .into(MultisigRune, this.chain as ChainRune<MultisigChain<C>, U>)
 
   proxyBySenderAddr<X>(...[senderAddr]: RunicArgs<X, [Uint8Array]>) {
-    const signatories = this.inner.into(ValueRune).access("signatories")
-    return Rune
-      .tuple([signatories, this.proxies, senderAddr])
-      .map(([signatories, proxies, senderAddr]) =>
-        MultiAddress.Id(signatories[proxies[hex.encode(senderAddr)]!]!)
-      )
+    const sender = Rune.fn(hex.encode).call(senderAddr)
+    const senderProxyIndex = this.proxies.access(sender)
+    // TODO: why not working within a single `access`?
+    const senderProxy = this.inner
+      .into(ValueRune)
+      .access("signatories")
+      .access(senderProxyIndex)
+    return MultiAddress.Id(senderProxy)
   }
 
   fundMemberProxy<X>(...[senderAddr, amount]: RunicArgs<X, [Uint8Array, bigint]>) {
-    return Rune
-      .rec({
-        type: "Balances",
-        value: Rune.rec({
-          type: "transfer",
-          dest: this.proxyBySenderAddr(senderAddr),
-          value: amount,
-        }),
-      })
-      .unsafeAs<Chain.Call<C>>()
-      .into(ExtrinsicRune, this.chain)
+    return Balances.transfer({
+      dest: this.proxyBySenderAddr(senderAddr),
+      value: amount,
+    })
   }
 
   ratify<X>(...[senderAddr, call]: RunicArgs<X, [Uint8Array, Chain.Call<C>]>) {
     const sender = this.proxyBySenderAddr(senderAddr)
-    const call_ = this.chain.extrinsic(
-      Rune.rec({
-        type: "Proxy" as const,
-        value: Rune.rec({
-          type: "proxy" as const,
-          real: this.stash.map(MultiAddress.Id),
-          forceProxyType: undefined,
-          call,
-        }),
-      }).unsafeAs<Chain.Call<C>>(),
-    )
-
-    return Rune
-      .rec({
-        type: "Proxy",
-        value: Rune.rec({
-          type: "proxy",
-          real: sender,
-          forceProxyType: undefined,
-          call: this.inner.ratify({
-            call: call_,
-            sender: sender as any,
-          }),
-        }),
-      })
-      .unsafeAs<Chain.Call<C>>()
-      .into(ExtrinsicRune, this.chain)
+    const call_ = this.chain.extrinsic(Proxy.proxy({
+      real: MultiAddress.Id(this.stash),
+      forceProxyType: undefined,
+      call,
+    }))
+    return Proxy.proxy({
+      real: sender,
+      forceProxyType: undefined,
+      call: this.inner.ratify({ call: call_, sender }),
+    })
   }
 
   static hydrate<C extends Chain, U, X>(
-    chain: ChainRune<C, U>,
+    chain: ChainRune<VirtualMultisigChain<C>, U>,
     ...[state]: RunicArgs<X, [state: string]>
   ) {
     return Rune
@@ -115,7 +101,7 @@ export class VirtualMultisigRune<out C extends Chain, out U> extends Rune<Virtua
   }
 
   static deployment<C extends Chain, U, X>(
-    chain: ChainRune<C, U>,
+    chain: ChainRune<VirtualMultisigChain<C>, U>,
     props: RunicArgs<X, VirtualMultisigDeploymentProps>,
   ) {
     const { threshold } = props
@@ -129,26 +115,17 @@ export class VirtualMultisigRune<out C extends Chain, out U> extends Rune<Virtua
     const memberAccountIds = Rune.resolve(props.founders)
     const deployer = Rune.resolve(props.deployer)
     const membersCount = memberAccountIds.map((members) => members.length)
+
     const proxyCreationCalls = membersCount.map((n) =>
       Rune.array(Array.from({ length: n + 1 }, (_, index) =>
-        chain.extrinsic({
-          type: "Proxy",
-          value: {
-            type: "createPure",
-            proxyType: "Any",
-            delay: 0,
-            index,
-          },
-        } as any)))
+        chain.extrinsic(Proxy.createPure({
+          proxyType: "Any",
+          delay: 0,
+          index,
+        }))))
     ).into(MetaRune).flat()
     const proxies = (chain as any as ChainRune<EventsChain<C>, U>)
-      .extrinsic(Rune.rec({
-        type: "Utility",
-        value: Rune.rec({
-          type: "batchAll",
-          calls: proxyCreationCalls,
-        }),
-      } as any))
+      .extrinsic(Utility.batchAll({ calls: proxyCreationCalls }))
       .signed(signature({ sender: deployer }) as any)
       .sent()
       .dbgStatus("Proxy creation:")
@@ -171,14 +148,10 @@ export class VirtualMultisigRune<out C extends Chain, out U> extends Rune<Virtua
       .tuple([existentialDepositAmount, memberProxies])
       .map(([value, memberProxies]) =>
         Rune.array(memberProxies.map((memberProxy) =>
-          chain.extrinsic({
-            type: "Balances",
-            value: {
-              type: "transfer",
-              dest: MultiAddress.Id(memberProxy),
-              value,
-            },
-          } as any)
+          chain.extrinsic(Balances.transfer({
+            dest: MultiAddress.Id(memberProxy),
+            value,
+          }))
         ))
       )
       .into(MetaRune)
@@ -188,35 +161,21 @@ export class VirtualMultisigRune<out C extends Chain, out U> extends Rune<Virtua
         signatories: memberProxies,
         threshold,
       })
-      .into(MultisigRune, chain)
-    const multisigExistentialDepositCall = chain.extrinsic(Rune.rec({
-      type: "Balances",
-      value: Rune.rec({
-        type: "transfer",
-        dest: multisig.accountId.map(MultiAddress.Id),
-        value: existentialDepositAmount,
-      }),
-    }) as any)
-    const stashDepositCall = chain.extrinsic(Rune.rec({
-      type: "Balances",
-      value: Rune.rec({
-        type: "transfer",
-        dest: stashProxy.map(MultiAddress.Id),
-        value: existentialDepositAmount,
-      }),
-    }) as any)
+      .into(MultisigRune, chain as ChainRune<MultisigChain<C>, U>)
+    const multisigExistentialDepositCall = chain.extrinsic(Balances.transfer({
+      dest: MultiAddress.Id(multisig.accountId),
+      value: existentialDepositAmount,
+    }))
+    const stashDepositCall = chain.extrinsic(Balances.transfer({
+      dest: MultiAddress.Id(stashProxy),
+      value: existentialDepositAmount,
+    }))
 
     const existentialDepositCalls = Rune
       .tuple([memberProxyExistentialDepositCalls, multisigExistentialDepositCall, stashDepositCall])
       .map(([a, b, c]) => [...a, b, c])
     const existentialDeposits = chain
-      .extrinsic(Rune.rec({
-        type: "Utility",
-        value: Rune.rec({
-          type: "batchAll",
-          calls: existentialDepositCalls,
-        }),
-      }) as any)
+      .extrinsic(Utility.batchAll({ calls: existentialDepositCalls }))
       .signed(signature({ sender: deployer }) as any)
       .sent()
       .dbgStatus("Existential deposits:")
@@ -227,7 +186,7 @@ export class VirtualMultisigRune<out C extends Chain, out U> extends Rune<Virtua
       .map(([deployer, memberAccountIds, memberProxies, stashProxy, multisigAddress]) =>
         Rune.array([
           ...replaceDelegateCalls(
-            chain,
+            chain as ChainRune<ProxyChain<C>, U>,
             MultiAddress.Id(stashProxy),
             deployer.address,
             multisigAddress,
@@ -238,7 +197,7 @@ export class VirtualMultisigRune<out C extends Chain, out U> extends Rune<Virtua
             .filter(([_, i]) => !equals(memberAccountIds[i]!, deployer.address.value!))
             .flatMap(([proxy, i]) =>
               replaceDelegateCalls(
-                chain,
+                chain as ChainRune<ProxyChain<C>, U>,
                 MultiAddress.Id(proxy),
                 deployer.address,
                 MultiAddress.Id(memberAccountIds[i]!),
@@ -249,13 +208,7 @@ export class VirtualMultisigRune<out C extends Chain, out U> extends Rune<Virtua
       .into(MetaRune)
       .flat()
     const ownershipSwaps = chain
-      .extrinsic(Rune.rec({
-        type: "Utility",
-        value: Rune.rec({
-          type: "batchAll",
-          calls: ownershipSwapCalls,
-        }),
-      }) as any)
+      .extrinsic(Utility.batchAll({ calls: ownershipSwapCalls }))
       .signed(signature({ sender: deployer }) as any)
       .sent()
       .dbgStatus("Ownership swaps:")

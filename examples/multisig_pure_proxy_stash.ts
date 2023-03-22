@@ -7,24 +7,23 @@ import { MultiAddress } from "polkadot_dev/types/sp_runtime/multiaddress.js"
 
 const [alexa, billy, carol] = await users(3)
 
-const multisig = Rune
-  .constant({
-    signatories: [alexa, billy, carol].map(({ publicKey }) => publicKey),
-    threshold: 2,
-  })
-  .into(MultisigRune, chain)
+const multisig = MultisigRune.from(chain, {
+  signatories: [alexa, billy, carol].map(({ publicKey }) => publicKey),
+  threshold: 2,
+})
 
-const fundMultisig = Balances
+await Balances
   .transfer({
     value: 20_000_000_000_000n,
     dest: multisig.address,
   })
   .signed(signature({ sender: alexa }))
   .sent()
-  .dbgStatus("Fund Multisig:")
+  .dbgStatus("Fund:")
   .finalized()
+  .run()
 
-const aliceRatify = multisig
+await multisig
   .ratify({
     call: Proxy.createPure({
       proxyType: "Any",
@@ -35,10 +34,11 @@ const aliceRatify = multisig
   })
   .signed(signature({ sender: alexa }))
   .sent()
-  .dbgStatus("Alice Ratify:")
+  .dbgStatus("Alice ratify:")
   .finalized()
+  .run()
 
-const bobRatify = multisig
+await multisig
   .ratify({
     call: Proxy.createPure({
       proxyType: "Any",
@@ -49,7 +49,8 @@ const bobRatify = multisig
   })
   .signed(signature({ sender: billy }))
   .sent()
-  .dbgStatus("Bob Ratify:")
+  .dbgStatus("Bob ratify:")
+  .run()
 
 const stashAddress = bobRatify
   .finalizedEvents()

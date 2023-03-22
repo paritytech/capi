@@ -6,7 +6,9 @@ const [alexa, billy, carol, david] = await users(4)
 
 const recipients = Object.entries({ billy, carol, david })
 
-const batch = Utility
+await balances().run()
+
+const finalizedHash = await Utility
   .batch({
     calls: Rune.tuple(recipients.map(([, { address }]) =>
       Balances.transfer({
@@ -17,17 +19,20 @@ const batch = Utility
   })
   .signed(signature({ sender: alexa }))
   .sent()
-  .dbgStatus("Batch tx:")
-  .finalized()
-
-await logBalances()
-  .chain(() => batch)
-  .chain(logBalances)
+  .dbgStatus()
+  .finalizedHash()
   .run()
 
-function logBalances() {
-  return Rune.tuple(recipients.map(([name, { publicKey }]) => {
-    const free = System.Account.value(publicKey).unhandle(undefined).access("data", "free")
-    return free.dbg(Rune.str`${name} balance:`)
-  }))
+await balances(finalizedHash).run()
+
+function balances(blockHash?: string) {
+  return Rune
+    .rec(Object.fromEntries(recipients.map(([name, { publicKey }]) => {
+      const free = System.Account
+        .value(publicKey, blockHash)
+        .unhandle(undefined)
+        .access("data", "free")
+      return [name, free]
+    })))
+    .dbg("Balances:")
 }

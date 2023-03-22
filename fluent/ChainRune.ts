@@ -1,5 +1,6 @@
+import { hex } from "../crypto/mod.ts"
 import * as $ from "../deps/scale.ts"
-import { FrameMetadata } from "../frame_metadata/mod.ts"
+import { decodeMetadata, FrameMetadata } from "../frame_metadata/mod.ts"
 import { Connection } from "../rpc/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { BlockRune } from "./BlockRune.ts"
@@ -41,7 +42,9 @@ export namespace Chain {
     P extends PalletName<C>,
     N extends ExtractPalletCallName<C, P>,
   > extends Chain {
-    // TODO
+    metadata: FrameMetadata & {
+      extrinsic: $.Codec<ExtractCall<C, P, N>>
+    }
   }
 
   export type Address<C extends Chain> = $.Native<C["metadata"]["extrinsic"]["address"]>
@@ -67,11 +70,20 @@ export namespace Chain {
   export type StorageName<C extends Chain, P extends PalletName<C>> = keyof StorageEntries<C, P>
   export type Storage<C extends Chain, P extends PalletName<C>, S extends StorageName<C, P>> =
     StorageEntries<C, P>[S]
+
   export type PickStorage<
     C extends Chain,
     P extends PalletName<C>,
     S extends StorageName<C, P>,
-  > = Chain<FrameMetadata<{ [_ in P]: FrameMetadata.Pallet<{ [_ in S]: Storage<C, P, S> }> }>>
+  > = Chain<
+    FrameMetadata & {
+      pallets: {
+        [_ in P]: FrameMetadata.Pallet & {
+          storage: { [_ in S]: Storage<C, P, S> }
+        }
+      }
+    }
+  >
 
   export namespace Storage {
     export type Key<C extends Chain, P extends PalletName<C>, S extends StorageName<C, P>> =
@@ -87,7 +99,18 @@ export namespace Chain {
 export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
   connection = this.into(ValueRune<Chain, U>).access("connection").into(ConnectionRune)
 
-  metadata = this.into(ValueRune).access("metadata")
+  remoteMetadata = Rune
+    .fn(hex.decode)
+    .call(this.connection.call("state_getMetadata"))
+    .map(decodeMetadata)
+
+  metadata = this
+    .into(ValueRune)
+    .access("metadata")
+    .unsafeAs<FrameMetadata | null>()
+    .into(ValueRune)
+    .unhandle(null)
+    .rehandle(null, () => this.remoteMetadata)
 
   latestBlock = this.block(
     this.connection
@@ -113,10 +136,10 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
 
   pallet<P extends Chain.PalletName<C>, X>(...args: RunicArgs<X, [palletName: P]>) {
     const [palletName] = RunicArgs.resolve(args)
-    return this
-      .into(ValueRune)
-      .access("metadata", "pallets", palletName.as(Rune))
-      .into(PalletRune, this)
+    return this.metadata
+      .access("pallets", palletName.as(Rune))
+      .unsafeAs<Chain.Pallet<C, P>>()
+      .into(PalletRune, this.as(ChainRune))
   }
 
   addressPrefix(this: ChainRune<AddressPrefixChain, U>) {

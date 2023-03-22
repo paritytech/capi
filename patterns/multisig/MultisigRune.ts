@@ -1,7 +1,15 @@
-import { Chain, ExtrinsicRune, PatternRune, Rune, RunicArgs, ValueRune } from "capi"
 import { Multisig, Polkadot } from "polkadot/mod.ts"
 import { MultiAddress } from "polkadot/types/sp_runtime/multiaddress.js"
 import * as bytes from "../../deps/std/bytes.ts"
+import {
+  Chain,
+  ChainRune,
+  ExtrinsicRune,
+  PatternRune,
+  Rune,
+  RunicArgs,
+  ValueRune,
+} from "../../mod.ts"
 import { multisigAccountId } from "./multisigAccountId.ts"
 
 export interface MultisigRatifyProps<C extends Chain> {
@@ -19,6 +27,7 @@ export interface Multisig {
   threshold?: number
 }
 
+// TODO: incorporate `C` into pick util types
 export type MultisigChain<C extends Chain> =
   & Chain.PickStorage<Polkadot, "Multisig", "Multisigs">
   & Chain.PickCall<Polkadot, "Multisig", "asMulti" | "approveAsMulti" | "cancelAsMulti">
@@ -26,10 +35,18 @@ export type MultisigChain<C extends Chain> =
 export class MultisigRune<out C extends Chain, out U>
   extends PatternRune<Multisig, MultisigChain<C>, U>
 {
-  v = this.into(ValueRune)
-  threshold = this.v.map(({ threshold, signatories }) => threshold ?? signatories.length - 1)
-  accountId = Rune.fn(multisigAccountId).call(this.v.access("signatories"), this.threshold)
+  private value = this.into(ValueRune)
+  threshold = this.value.map(({ threshold, signatories }) => threshold ?? signatories.length - 1)
+  accountId = Rune.fn(multisigAccountId).call(this.value.access("signatories"), this.threshold)
   address = MultiAddress.Id(this.accountId)
+  storage = this.chain.pallet("Multisig").storage("Multisigs")
+
+  static from<C extends Chain, U, X>(
+    chain: ChainRune<MultisigChain<C>, U>,
+    props: RunicArgs<X, Multisig>,
+  ) {
+    return Rune.rec(props).into(this, chain)
+  }
 
   otherSignatories<X>(...[sender]: RunicArgs<X, [sender: MultiAddress]>) {
     return Rune
@@ -41,7 +58,7 @@ export class MultisigRune<out C extends Chain, out U>
 
   ratify<X>({ sender, call: call_ }: RunicArgs<X, MultisigRatifyProps<C>>) {
     const call = Rune.resolve(call_).into(ExtrinsicRune, this.chain)
-    this.chain.extrinsic(Multisig.asMulti({
+    return this.chain.extrinsic(Multisig.asMulti({
       threshold: this.threshold,
       call,
       otherSignatories: this.otherSignatories(sender),
@@ -73,15 +90,15 @@ export class MultisigRune<out C extends Chain, out U>
   }
 
   proposals<X>(...[count]: RunicArgs<X, [count: number]>) {
-    return Multisig.Multisigs.keyPage(count, Rune.tuple([this.accountId])) // TODO: apply chain
+    return this.storage.keyPage(count, Rune.tuple([this.accountId])) // TODO: apply chain
   }
 
   proposal<X>(...[callHash]: RunicArgs<X, [callHash: Uint8Array]>) {
-    return Multisig.Multisigs.value(Rune.tuple([this.accountId, callHash])) // TODO: apply chain
+    return this.storage.value(Rune.tuple([this.accountId, callHash])) // TODO: apply chain
   }
 
   isProposed<X>(...[callHash]: RunicArgs<X, [callHash: Uint8Array]>) {
-    return Multisig.Multisigs
+    return this.storage
       .valueRaw(Rune.tuple([this.accountId, callHash]))
       .map((entry) => entry !== null)
   }
