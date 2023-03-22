@@ -1,11 +1,6 @@
-import { ChainRune, connection, Rune, WsConnection } from "capi"
+import { ChainRune, WsConnection } from "capi"
 
-const chain = Rune
-  .rec({
-    connection: connection(async (signal) => WsConnection.connect("wss://rpc.polkadot.io", signal)),
-    metadata: null! as any,
-  })
-  .into(ChainRune)
+const chain = ChainRune.dynamic(WsConnection, "wss://rpc.polkadot.io")
 
 const accountInfo = await chain
   .pallet("System")

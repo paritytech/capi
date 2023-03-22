@@ -4,7 +4,7 @@ import { decodeMetadata, FrameMetadata } from "../frame_metadata/mod.ts"
 import { Connection } from "../rpc/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { BlockRune } from "./BlockRune.ts"
-import { ConnectionRune } from "./ConnectionRune.ts"
+import { connection, ConnectionRune } from "./ConnectionRune.ts"
 import { ExtrinsicRune } from "./ExtrinsicRune.ts"
 import { PalletRune } from "./PalletRune.ts"
 
@@ -97,6 +97,27 @@ export namespace Chain {
 
 // TODO: do we want to represent the discovery value and conn type within the type system?
 export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
+  static from<X, M extends FrameMetadata>(
+    props: RunicArgs<X, { connection: Connection; metadata?: M }>,
+  ) {
+    return Rune
+      .rec(props)
+      .unsafeAs<{ connection: Connection; metadata: M }>()
+      .into(ChainRune)
+  }
+
+  static dynamic<D>(
+    connectionCtor: {
+      new(discovery: D): Connection
+      connect: (discovery: D, signal: AbortSignal) => Connection
+    },
+    discovery: D,
+  ) {
+    return this.from({
+      connection: connection(async (signal) => connectionCtor.connect(discovery, signal)),
+    })
+  }
+
   connection = this.into(ValueRune<Chain, U>).access("connection").into(ConnectionRune)
 
   remoteMetadata = Rune
@@ -107,10 +128,10 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
   metadata = this
     .into(ValueRune)
     .access("metadata")
-    .unsafeAs<FrameMetadata | null>()
+    .unsafeAs<FrameMetadata | undefined>()
     .into(ValueRune)
-    .unhandle(null)
-    .rehandle(null, () => this.remoteMetadata)
+    .unhandle(undefined)
+    .rehandle(undefined, () => this.remoteMetadata)
 
   latestBlock = this.block(
     this.connection
