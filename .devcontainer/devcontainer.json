@@ -13,7 +13,8 @@
         "ms-azuretools.vscode-docker",
         "streetsidesoftware.code-spell-checker",
         "vadimcn.vscode-lldb",
-        "bungcip.better-toml"
+        "bungcip.better-toml",
+        "ms-vsliveshare.vsliveshare"
       ]
     }
   }
