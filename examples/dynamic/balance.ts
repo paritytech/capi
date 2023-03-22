@@ -1,8 +1,7 @@
 import { ChainRune, WsConnection } from "capi"
 
-const chain = ChainRune.dynamic(WsConnection, "wss://rpc.polkadot.io")
-
-const accountInfo = await chain
+const accountInfo = await ChainRune
+  .dynamic(WsConnection, "wss://rpc.polkadot.io")
   .pallet("System")
   .storage("Account")
   .entryPage(10, null)
