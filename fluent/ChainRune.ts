@@ -1,6 +1,7 @@
+import { hex } from "../crypto/mod.ts"
 import * as $ from "../deps/scale.ts"
-import { FrameMetadata } from "../frame_metadata/mod.ts"
-import { Connection } from "../rpc/mod.ts"
+import { decodeMetadata, FrameMetadata } from "../frame_metadata/mod.ts"
+import { Connection, ConnectionCtorLike } from "../rpc/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { BlockRune } from "./BlockRune.ts"
 import { ConnectionRune } from "./ConnectionRune.ts"
@@ -50,6 +51,21 @@ export namespace Chain {
 
 // TODO: do we want to represent the discovery value and conn type within the type system?
 export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
+  static from<D, M extends FrameMetadata>(
+    connectionCtor: ConnectionCtorLike<D>,
+    discovery: D,
+    staticMetadata?: M,
+  ) {
+    const connection = ConnectionRune.from(async (signal) =>
+      connectionCtor.connect(discovery, signal)
+    )
+    const metadata = staticMetadata ?? Rune
+      .fn(hex.decode)
+      .call(connection.call("state_getMetadata"))
+      .map(decodeMetadata)
+    return Rune.rec({ connection, metadata }).into(this)
+  }
+
   connection = this.into(ValueRune<Chain, U>).access("connection").into(ConnectionRune)
 
   metadata = this.into(ValueRune).access("metadata")
@@ -76,12 +92,11 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
     return call.into(ExtrinsicRune, this.as(ChainRune))
   }
 
-  pallet<P extends Chain.PalletName<C>, X>(...args: RunicArgs<X, [palletName: P]>) {
-    const [palletName] = RunicArgs.resolve(args)
-    return this
-      .into(ValueRune)
-      .access("metadata", "pallets", palletName.as(Rune))
-      .into(PalletRune, this)
+  pallet<P extends Chain.PalletName<C>, X>(...[palletName]: RunicArgs<X, [P]>) {
+    return this.metadata
+      .access("pallets", palletName)
+      .unsafeAs<Chain.Pallet<C, P>>()
+      .into(PalletRune, this.as(ChainRune))
   }
 
   addressPrefix(this: ChainRune<AddressPrefixChain, U>) {

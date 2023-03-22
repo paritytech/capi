@@ -4,6 +4,11 @@ import { RpcCallMessage, RpcIngressMessage, RpcSubscriptionHandler } from "./rpc
 
 const connectionMemos = new Map<new(discovery: any) => Connection, Map<unknown, Connection>>()
 
+export interface ConnectionCtorLike<D> {
+  new(discovery: D): Connection
+  connect: (discovery: D, signal: AbortSignal) => Connection
+}
+
 export abstract class Connection {
   nextId = 0
   references = 0

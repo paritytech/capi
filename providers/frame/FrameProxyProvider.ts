@@ -66,13 +66,8 @@ export abstract class FrameProxyProvider extends FrameProvider {
     return `
 import * as C from "./capi.js"
 
+export const connectionCtor ${isTypes ? `: typeof C.WsConnection` : `= C.WsConnection`}
 export const discoveryValue ${isTypes ? ":" : "="} "${url}"
-
-export const connection ${
-      isTypes
-        ? ": C.ConnectionRune<never>"
-        : "= C.connection((signal) => C.WsConnection.connect(discoveryValue, signal))"
-    }
     `
   }
 }
