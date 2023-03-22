@@ -59,7 +59,7 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
     const connection = ConnectionRune.from(async (signal) =>
       connectionCtor.connect(discovery, signal)
     )
-    const metadata = staticMetadata || Rune
+    const metadata = staticMetadata ?? Rune
       .fn(hex.decode)
       .call(connection.call("state_getMetadata"))
       .map(decodeMetadata)
