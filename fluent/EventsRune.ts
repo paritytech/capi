@@ -1,16 +1,9 @@
 import { Codec } from "../deps/scale.ts"
 import { FrameMetadata } from "../frame_metadata/FrameMetadata.ts"
-import { Rune } from "../rune/mod.ts"
-import { Chain, ChainRune } from "./ChainRune.ts"
+import { Chain } from "./ChainRune.ts"
+import { PatternRune } from "./PatternRune.ts"
 
-export class EventsRune<
-  out C extends Chain,
-  out U,
-> extends Rune<Event<C>[], U> {
-  constructor(_prime: EventsRune<C, U>["_prime"], readonly chain: ChainRune<EventsChain<C>, U>) {
-    super(_prime)
-  }
-}
+export class EventsRune<out C extends Chain, out U> extends PatternRune<Event<C>[], C, U> {}
 
 interface _EventsChain<RE> extends Chain {
   metadata: FrameMetadata & {

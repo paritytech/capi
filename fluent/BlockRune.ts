@@ -3,18 +3,15 @@ import { $extrinsic } from "../frame_metadata/Extrinsic.ts"
 import { known } from "../rpc/mod.ts"
 import { ArrayRune, Rune } from "../rune/mod.ts"
 import { ValueRune } from "../rune/ValueRune.ts"
-import { Chain, ChainRune } from "./ChainRune.ts"
+import { Chain } from "./ChainRune.ts"
 import { CodecRune } from "./CodecRune.ts"
-import { Event, EventsChain, EventsRune } from "./EventsRune.ts"
+import { Event, EventsRune } from "./EventsRune.ts"
+import { PatternRune } from "./PatternRune.ts"
 
-export class BlockRune<out C extends Chain, out U> extends Rune<known.SignedBlock, U> {
-  constructor(
-    _prime: BlockRune<C, U>["_prime"],
-    readonly chain: ChainRune<C, U>,
-    readonly hash: Rune<string, U>,
-  ) {
-    super(_prime)
-  }
+export class BlockRune<out C extends Chain, out U>
+  extends PatternRune<known.SignedBlock, C, U, Rune<string, U>>
+{
+  hash = this.parent
 
   header() {
     return this.into(ValueRune).access("block", "header")
@@ -34,11 +31,11 @@ export class BlockRune<out C extends Chain, out U> extends Rune<known.SignedBloc
       .mapArray((h) => $ext.decoded(h.map(hex.decode)))
   }
 
-  events(this: BlockRune<EventsChain<C>, U>) {
+  events() {
     return this.chain
       .pallet("System")
       .storage("Events")
-      .value(undefined!, this.hash)
+      .value(undefined!, this.parent)
       .unhandle(undefined)
       .rehandle(undefined, () => Rune.constant<Event<C>[]>([]))
       .into(EventsRune, this.chain)

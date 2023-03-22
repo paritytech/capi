@@ -1,14 +1,10 @@
 import { ss58 } from "../crypto/mod.ts"
-import { Rune } from "../rune/mod.ts"
 import { ValueRune } from "../rune/ValueRune.ts"
-import { Chain, ChainRune } from "./ChainRune.ts"
+import { Chain } from "./ChainRune.ts"
+import { PatternRune } from "./PatternRune.ts"
 import { PublicKeyRune } from "./PublicKeyRune.ts"
 
-export class Ss58Rune<out C extends Chain, U> extends Rune<string, U> {
-  constructor(_prime: Ss58Rune<C, U>["_prime"], readonly chain: ChainRune<C, U>) {
-    super(_prime)
-  }
-
+export class AddressRune<out C extends Chain, U> extends PatternRune<string, C, U> {
   publicKey() {
     return this
       .into(ValueRune)
