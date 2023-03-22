@@ -4,6 +4,7 @@ import {
   Chain,
   ChainRune,
   Era,
+  ExtrinsicSender,
   hex,
   Rune,
   RunicArgs,
@@ -15,91 +16,92 @@ import * as Rococo from "zombienet/xcm_playground.toml/alice/@latest/mod.js"
 import * as Statemine from "zombienet/xcm_playground.toml/statemine-collator01/@latest/mod.js"
 import * as Trappist from "zombienet/xcm_playground.toml/trappist-collator01/@latest/mod.js"
 import { delay } from "../deps/std/async.ts"
-import { SignatureProps } from "../patterns/signature/polkadot.ts"
 
-const ASSET_ID = 1
-const TRAPPIST_ASSET_ID = ASSET_ID
-const ASSET_AMOUNT_TO_MINT = 100000000000000n
-const ASSET_AMOUNT_TO_SEND = 10000000000000n
+/**
+ * Reserve Transfer Asset example steps
+ * - Create a sufficient Asset on Reserve Parachain
+ * - Mint assets on Reserve Parachain
+ * - Create asset on Trappist Parachain
+ * - Register Trappist Parachain AssetId to Reserve AssetId
+ * - Reserve transfer AssetId on Reserve Parachain to Trappist Parachain
+ */
 
-// await sanity()
-await setup()
-await doReserveTransfer()
+const RESERVE_ASSET_ID = 1
+const RESERVE_CHAIN_ID = 1000 // Statemine
+const TRAPPIST_ASSET_ID = RESERVE_ASSET_ID
+const TRAPPIST_CHAIN_ID = 2000
+const RESERVE_ASSET_AMOUNT_TO_MINT = 100000000000000n
+const RESERVE_ASSET_AMOUNT_TO_SEND = 10000000000000n
 
-async function setup() {
-  const forceCreateAssetTransactEncodedCall = await Statemine.Assets.forceCreate({
-    id: ASSET_ID,
-    isSufficient: true,
+// In Statemine, root is needed to create a sufficient asset
+// In a common good parachain, root is accessed through the relay chain
+await Rococo.Sudo.sudo({
+  call: Rococo.ParasSudoWrapper.sudoQueueDownwardXcm({
+    id: RESERVE_CHAIN_ID,
+    xcm: Rune.rec({
+      type: "V2",
+      value: Rune.array([
+        Rococo.types.xcm.v2.Instruction.Transact({
+          originType: "Superuser",
+          requireWeightAtMost: 1000000000n,
+          call: Rune.rec({
+            encoded: Statemine.Assets.forceCreate({
+              id: RESERVE_ASSET_ID,
+              isSufficient: true,
+              minBalance: 1n,
+              owner: alice.address,
+            }).call,
+          }),
+        }),
+      ]),
+    }),
+  }),
+})
+  .signed(signature({ sender: alice }))
+  .sent()
+  .dbgStatus("Rococo(root) > Statemine(root): Create asset")
+  .finalized()
+  .run()
+
+await waitFor(async () =>
+  (await Statemine.Assets.Asset.value(RESERVE_ASSET_ID).run()) !== undefined
+)
+console.log(
+  "Statemine: Asset created",
+  await Statemine.Assets.Asset.value(RESERVE_ASSET_ID).run(),
+)
+
+await Statemine.Assets.mint({
+  id: RESERVE_ASSET_ID,
+  amount: RESERVE_ASSET_AMOUNT_TO_MINT,
+  beneficiary: bob.address,
+})
+  .signed(signature({ sender: alice }))
+  .sent()
+  .dbgStatus("Statemine(Alice): Mint reserve asset to Bob")
+  .finalized()
+  .run()
+
+console.log(
+  "Statemine(Bob): asset balance",
+  await Statemine.Assets.Account.value([RESERVE_ASSET_ID, bob.publicKey]).run(),
+)
+
+await Trappist.Sudo.sudo({
+  call: Trappist.Assets.forceCreate({
+    id: TRAPPIST_ASSET_ID,
+    isSufficient: false,
     minBalance: 1n,
     owner: alice.address,
-  }).call
-    // TODO: .map() to relayTypes.xcm.v2.Instruction.Transact or t.xcm.double_encoded.DoubleEncoded
-    .run()
+  }),
+})
+  .signed(signature({ sender: alice }))
+  .sent()
+  .dbgStatus("Trappist(root): Create derived asset")
+  .finalized()
+  .run()
 
-  const createReserveAsset = Rococo.Sudo.sudo({
-    call: Rococo.ParasSudoWrapper.sudoQueueDownwardXcm({
-      id: 1000,
-      xcm: Rune.rec({
-        type: "V2",
-        value: Rune.array([
-          Rococo.types.xcm.v2.Instruction.Transact({
-            originType: "Superuser",
-            requireWeightAtMost: 1000000000n,
-            // TODO: convert to t.xcm.double_encoded.DoubleEncoded
-            call: {
-              encoded: forceCreateAssetTransactEncodedCall,
-            },
-          }),
-        ]),
-      }),
-    }),
-  })
-
-  await createReserveAsset
-    .signed(signature({ sender: alice }))
-    .sent()
-    .dbgStatus("ParasSudoWrapper.sudoQueueDownwardXcm")
-    .finalized()
-    .run()
-
-  await waitFor(async () => (await Statemine.Assets.Asset.value(ASSET_ID).run()) !== undefined) // wait for asset id created
-  console.log("asset created", await Statemine.Assets.Asset.value(ASSET_ID).run())
-
-  const mintAsset = Statemine.Assets.mint({
-    id: ASSET_ID,
-    amount: ASSET_AMOUNT_TO_MINT,
-    beneficiary: bob.address,
-  })
-
-  await mintAsset
-    .signed(signature({ sender: alice }))
-    .sent()
-    .dbgStatus("mint reserve asset")
-    .finalized()
-    .run()
-
-  console.log("reserve asset minted", await Statemine.Assets.Asset.value(ASSET_ID).run())
-  console.log(
-    "bob reserve asset balance",
-    await Statemine.Assets.Account.value([ASSET_ID, bob.publicKey]).run(),
-  )
-
-  const createDerivedAsset = Trappist.Sudo.sudo({
-    call: Trappist.Assets.forceCreate({
-      id: TRAPPIST_ASSET_ID,
-      isSufficient: false,
-      minBalance: 1n,
-      owner: alice.address,
-    }),
-  })
-
-  await createDerivedAsset
-    .signed(signature({ sender: alice }))
-    .sent()
-    .dbgStatus("create derived asset")
-    .finalized()
-    .run()
-
+{
   const {
     v1: {
       junction: { Junction },
@@ -107,47 +109,49 @@ async function setup() {
     },
   } = Trappist.types.xcm
   // TODO: batch with createDerivedAsset
-  const registerReserveAsset = Trappist.Sudo.sudo({
+  await Trappist.Sudo.sudo({
     call: Trappist.AssetRegistry.registerReserveAsset({
       assetId: TRAPPIST_ASSET_ID,
       assetMultiLocation: Rune.rec({
         parents: 1,
         interior: Junctions.X3(
           // TODO: find parachain id
-          Junction.Parachain(1000),
+          Junction.Parachain(RESERVE_CHAIN_ID),
           Junction.PalletInstance((await Statemine.Assets.pallet.run()).id),
-          Junction.GeneralIndex(BigInt(ASSET_ID)),
+          Junction.GeneralIndex(BigInt(RESERVE_ASSET_ID)),
         ),
       }),
     }),
   })
-
-  await registerReserveAsset
     .signed(signature({ sender: alice }))
     .sent()
-    .dbgStatus("register reserve asset")
+    .dbgStatus("Trappist(root): Register AssetId to Reserve AssetId")
     .finalized()
     .run()
 }
 
-async function doReserveTransfer() {
+{
   const {
-    VersionedMultiLocation,
-    VersionedMultiAssets,
-    v0: { junction: { NetworkId } },
-    v1: {
-      junction: { Junction },
-      multilocation: { Junctions },
-      multiasset: { AssetId, Fungibility },
+    xcm: {
+      VersionedMultiLocation,
+      VersionedMultiAssets,
+      v0: { junction: { NetworkId } },
+      v1: {
+        junction: { Junction },
+        multilocation: { Junctions },
+        multiasset: { AssetId, Fungibility },
+      },
+      v2: { WeightLimit },
     },
-    v2: { WeightLimit },
-  } = Statemine.types.xcm
-  const limitedReserveTransferAssets = Statemine.PolkadotXcm.limitedReserveTransferAssets({
+    statemine_runtime: { RuntimeEvent },
+    cumulus_pallet_xcmp_queue: { pallet: { Event } },
+  } = Statemine.types
+  await Statemine.PolkadotXcm.limitedReserveTransferAssets({
     dest: VersionedMultiLocation.V1(Rune.rec({
       parents: 1,
       interior: Junctions.X1(
         // TODO: find parachain id
-        Junction.Parachain(2000),
+        Junction.Parachain(TRAPPIST_CHAIN_ID),
       ),
     })),
     beneficiary: VersionedMultiLocation.V1(Rune.rec({
@@ -164,26 +168,23 @@ async function doReserveTransfer() {
         parents: 0,
         interior: Junctions.X2(
           Junction.PalletInstance((await Statemine.Assets.pallet.run()).id),
-          Junction.GeneralIndex(BigInt(ASSET_ID)),
+          Junction.GeneralIndex(BigInt(RESERVE_ASSET_ID)),
         ),
       })),
-      fun: Fungibility.Fungible(ASSET_AMOUNT_TO_SEND),
+      fun: Fungibility.Fungible(RESERVE_ASSET_AMOUNT_TO_SEND),
     })])),
     feeAssetItem: 0,
     weightLimit: WeightLimit.Unlimited(),
   })
-
-  await limitedReserveTransferAssets
     .signed(signature({ sender: bob }))
     .sent()
-    .dbgStatus("limitedReserveTransferAssets")
-    // TODO: from xcmpQueue.XcmpMessageSent get .messageHash
+    .dbgStatus("Statemine(Bob): Reserve transfer to Trappist")
     .finalizedEvents()
     .into(ValueRune)
     .map((events) => {
       const event = events.find((e) =>
-        Statemine.types.statemine_runtime.RuntimeEvent.isXcmpQueue(e.event)
-        && Statemine.types.cumulus_pallet_xcmp_queue.pallet.Event.isXcmpMessageSent(e.event.value)
+        RuntimeEvent.isXcmpQueue(e.event)
+        && Event.isXcmpMessageSent(e.event.value)
       )?.event.value as
         | Statemine.types.cumulus_pallet_xcmp_queue.pallet.Event.XcmpMessageSent
         | undefined
@@ -194,32 +195,49 @@ async function doReserveTransfer() {
     })
     .dbg("XcmpMessageSent.messageHash")
     .run()
-
-  // TODO: wait for xcmpQueue.(Success|Fail) .messageHash
-  await waitFor(async () =>
-    await Trappist.Assets.Account.value([TRAPPIST_ASSET_ID, bob.publicKey]).run() !== undefined
-  ) // wait for bob balance to update
-  console.log(
-    "Trappist Bob asset balance",
-    await Trappist.Assets.Account.value([TRAPPIST_ASSET_ID, bob.publicKey]).run(),
-  )
 }
+
+// TODO: wait for xcmpQueue.(Success|Fail) .messageHash
+await waitFor(async () =>
+  await Trappist.Assets.Account.value([TRAPPIST_ASSET_ID, bob.publicKey]).run() !== undefined
+)
+console.log(
+  "Trappist(Bob): asset balance",
+  await Trappist.Assets.Account.value([TRAPPIST_ASSET_ID, bob.publicKey]).run(),
+)
+console.log(
+  "Statemine(Bob): asset balance",
+  await Statemine.Assets.Account.value([RESERVE_ASSET_ID, bob.publicKey]).run(),
+)
+console.log(
+  "Statemine(TrappistSovereignAccount): asset balance",
+  await Statemine.Assets.Account.value([
+    RESERVE_ASSET_ID,
+    // Sovereign address on sibling chain
+    // b"sibl" + $.u32.encode(2000) + 0...0
+    hex.decode("0x7369626cd0070000000000000000000000000000000000000000000000000000"),
+  ]).run(),
+)
 
 async function waitFor(
   fn: () => Promise<boolean>,
   delay_ = 1000,
+  maxAttempts = 60,
 ) {
-  while (true) {
-    const result = await fn()
-    if (result) break
+  let attempts = 0
+  while (attempts++ < maxAttempts) {
+    if (await fn()) return
     await delay(delay_)
   }
+  throw new Error("waitFor maxAttempts reached")
 }
 
-async function _sanity() {
-  console.log(await Rococo.System.Account.value(alice.publicKey).run())
-  console.log(await Statemine.System.Account.value(alice.publicKey).run())
-  console.log(await Trappist.System.Account.value(alice.publicKey).run())
+interface SignatureProps<T extends Chain> {
+  sender: ExtrinsicSender<T>
+  checkpoint?: string
+  mortality?: Era
+  nonce?: number
+  tip?: bigint
 }
 
 function signature<X, C extends Chain>(_props: RunicArgs<X, SignatureProps<C>>) {
