@@ -31,7 +31,7 @@ export class PolkadotDevProvider extends FrameBinProvider {
     $.assert($devRuntimeName, runtimeName)
     const port = getAvailable()
     const chainSpec = await createCustomChainSpec(
-      this.bin,
+      await this.getBinPath(pathInfo),
       `${runtimeName}-dev`,
       DEV_RUNTIME_PREFIXES[runtimeName],
       this.env.signal,
