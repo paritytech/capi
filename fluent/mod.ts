@@ -1,6 +1,5 @@
 // moderate
 
-export * from "./AddressRune.ts"
 export * from "./BlockRune.ts"
 export * from "./ChainRune.ts"
 export * from "./CodecRune.ts"
@@ -13,4 +12,5 @@ export * from "./ExtrinsicStatusRune.ts"
 export * from "./PalletRune.ts"
 export * from "./PublicKeyRune.ts"
 export * from "./SignedExtrinsicRune.ts"
+export * from "./Ss58Rune.ts"
 export * from "./StorageRune.ts"
