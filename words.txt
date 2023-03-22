@@ -180,6 +180,7 @@ secp
 serayuzgur
 serde
 shiki
+sibl
 sibz
 smoldot
 spiritnet

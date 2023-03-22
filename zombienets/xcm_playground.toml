@@ -42,16 +42,6 @@ image = "docker.io/parity/polkadot-parachain:latest"
 command = "trappist-collator"
 args = ["--log=xcm=trace,pallet-assets=trace"]
 
-[[parachains]]
-id = 3000
-cumulus_based = true
-
-[[parachains.collators]]
-name = "stout-collator01"
-image = "docker.io/parity/polkadot-parachain:latest"
-command = "stout-collator"
-args = ["--log=xcm=trace,pallet-assets=trace"]
-
 [types.Header]
 number = "u64"
 parent_hash = "Hash"
@@ -66,29 +56,5 @@ max_message_size = 512
 [[hrmp_channels]]
 sender = 2000
 recipient = 1000
-max_capacity = 8
-max_message_size = 512
-
-[[hrmp_channels]]
-sender = 1000
-recipient = 3000
-max_capacity = 8
-max_message_size = 512
-
-[[hrmp_channels]]
-sender = 3000
-recipient = 1000
-max_capacity = 8
-max_message_size = 512
-
-[[hrmp_channels]]
-sender = 2000
-recipient = 3000
-max_capacity = 8
-max_message_size = 512
-
-[[hrmp_channels]]
-sender = 3000
-recipient = 2000
 max_capacity = 8
 max_message_size = 512
