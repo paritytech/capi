@@ -72,7 +72,7 @@ if (!running) {
 async function onReady() {
   const [bin, ...args] = cmd
   if (bin) {
-    const command = new Deno.Command(bin, { args })
+    const command = new Deno.Command(bin, { args, signal })
     const status = await command.spawn().status
     self.addEventListener("unload", () => Deno.exit(status.code))
     controller.abort()

@@ -55,6 +55,7 @@ export abstract class FrameBinProvider extends FrameProxyProvider {
       const whichProcess = new Deno.Command("which", {
         args: [this.bin],
         stdout: "piped",
+        signal: this.env.signal,
       })
       const { stdout } = await whichProcess.output()
       if (!stdout.length) {

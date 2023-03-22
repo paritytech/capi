@@ -13,9 +13,11 @@ export async function createCustomChainSpec(
   bin: string,
   chain: string,
   networkPrefix: number,
+  signal: AbortSignal,
 ): Promise<string> {
   const buildSpecCmd = new Deno.Command(bin, {
     args: ["build-spec", "--disable-default-bootnode", "--chain", chain],
+    signal,
   })
   const chainSpec = JSON.parse(new TextDecoder().decode((await buildSpecCmd.output()).stdout))
   const balances: [string, number][] = chainSpec.genesis.runtime.balances.balances
@@ -32,6 +34,7 @@ export async function createCustomChainSpec(
   await Deno.writeTextFile(customChainSpecPath, JSON.stringify(chainSpec, undefined, 2))
   const buildSpecRawCmd = new Deno.Command(bin, {
     args: ["build-spec", "--disable-default-bootnode", "--chain", customChainSpecPath, "--raw"],
+    signal,
   })
   const chainSpecRaw = JSON.parse(new TextDecoder().decode((await buildSpecRawCmd.output()).stdout))
   const customChainSpecRawPath = await Deno.makeTempFile({
