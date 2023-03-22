@@ -20,8 +20,6 @@ jobs:
         with:
           node-version: "16.x"
           registry-url: "https://registry.npmjs.org"
-      - name: Setup binaries
-        uses: ./.github/actions/setup-binaries
       - name: Build NPM Package
         run: deno task dnt ${{steps.get_tag_version.outputs.tag_version}}
       - run: npm pack

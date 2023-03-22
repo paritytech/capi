@@ -8,11 +8,7 @@ export class ContractsDevProvider extends FrameBinProvider {
   userCount = { count: 0 }
 
   constructor(env: Env) {
-    super(env, {
-      bin: "substrate-contracts-node",
-      installation: "https://github.com/paritytech/substrate-contracts-node",
-      readyTimeout: 60 * 1000,
-    })
+    super(env, "substrate-contracts-node")
   }
 
   override async connectionCode(pathInfo: PathInfo, isTypes: boolean): Promise<string> {
@@ -25,10 +21,17 @@ export class ContractsDevProvider extends FrameBinProvider {
     return super.handle(request, pathInfo)
   }
 
-  async launch() {
+  async launch(pathInfo: PathInfo) {
     const port = getAvailable()
     const chainSpec = await createCustomChainSpec(this.bin, "dev", 42, this.env.signal)
-    await this.runBin(["--tmp", "--alice", "--ws-port", port.toString(), "--chain", chainSpec])
+    await this.runBin(pathInfo, [
+      "--tmp",
+      "--alice",
+      "--ws-port",
+      port.toString(),
+      "--chain",
+      chainSpec,
+    ])
     return port
   }
 }

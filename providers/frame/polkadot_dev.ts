@@ -6,19 +6,11 @@ import { getOrInit } from "../../util/state.ts"
 import { connectionCodeWithUsers, createCustomChainSpec, handleCount } from "./common.ts"
 import { FrameBinProvider } from "./FrameBinProvider.ts"
 
-export interface PolkadotDevProviderProps {
-  polkadotPath?: string
-}
-
 export class PolkadotDevProvider extends FrameBinProvider {
   userCount = new Map<DevRuntimeName, { count: number }>()
 
-  constructor(env: Env, { polkadotPath }: PolkadotDevProviderProps = {}) {
-    super(env, {
-      bin: polkadotPath ?? "polkadot",
-      installation: "https://github.com/paritytech/polkadot",
-      readyTimeout: 60 * 1000,
-    })
+  constructor(env: Env) {
+    super(env, "polkadot")
   }
 
   override async connectionCode(pathInfo: PathInfo, isTypes: boolean): Promise<string> {
@@ -45,7 +37,7 @@ export class PolkadotDevProvider extends FrameBinProvider {
       this.env.signal,
     )
     const args: string[] = ["--tmp", "--alice", "--ws-port", port.toString(), "--chain", chainSpec]
-    await this.runBin(args)
+    await this.runBin(pathInfo, args)
     return port
   }
 

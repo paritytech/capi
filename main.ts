@@ -1,70 +1,12 @@
-import * as flags from "./deps/std/flags.ts"
-import { serve } from "./deps/std/http.ts"
-import {
-  ContractsDevProvider,
-  PolkadotDevProvider,
-  ProjectProvider,
-  WssProvider,
-  ZombienetProvider,
-} from "./providers/frame/mod.ts"
-import { handler } from "./server/handler.ts"
-import { Env } from "./server/mod.ts"
-import { FsCache } from "./util/cache/mod.ts"
+import bin from "./cli/bin.ts"
+import serve from "./cli/serve.ts"
 
-const { help, port: portStr, "--": cmd, out } = flags.parse(Deno.args, {
-  boolean: ["help"],
-  string: ["port", "out"],
-  default: {
-    port: "4646",
-    out: "target/capi",
-  },
-  alias: { h: "help" },
-  "--": true,
-})
+const commands: Record<string, (...args: string[]) => void> = { bin, serve }
 
-if (help) {
-  console.log(Deno.readTextFileSync(new URL(import.meta.resolve("./help.txt"))))
-  Deno.exit()
-}
-
-const href = `http://localhost:${portStr}/`
-
-const controller = new AbortController()
-const { signal } = controller
-
-const cache = new FsCache(out, signal)
-const modSpecifier = JSON.stringify(import.meta.resolve("./mod.ts"))
-cache.getString("mod.ts", 0, async () => `export * from ${modSpecifier}`)
-
-const env = new Env(href, cache, signal, (env) => ({
-  frame: {
-    wss: new WssProvider(env),
-    dev: new PolkadotDevProvider(env),
-    zombienet: new ZombienetProvider(env),
-    project: new ProjectProvider(env),
-    contracts_dev: new ContractsDevProvider(env),
-  },
-}))
-
-const running = await fetch(`${href}capi_cwd`)
-  .then((r) => r.text())
-  .then((r) => r === Deno.cwd())
-  .catch(() => false)
-
-if (!running) {
-  await serve(handler(env), {
-    hostname: "[::]",
-    port: +portStr,
-    signal,
-    onError(error) {
-      throw error
-    },
-    async onListen() {
-      console.log(`Capi server listening at "${href}"`)
-      await onReady()
-    },
-  })
+if (Deno.args[0]! in commands) {
+  commands[Deno.args[0]!]!(...Deno.args.slice(1))
 } else {
+<<<<<<< HEAD
   console.log(`Reusing existing Capi server at "${href}"`)
   await onReady()
 }
@@ -77,4 +19,7 @@ async function onReady() {
     self.addEventListener("unload", () => Deno.exit(status.code))
     controller.abort()
   }
+=======
+  serve(...Deno.args)
+>>>>>>> 1125916 (use capi-binary-builds to auto-install deps)
 }

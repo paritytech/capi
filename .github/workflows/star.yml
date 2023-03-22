@@ -29,8 +29,6 @@ jobs:
             target/capi/**/_metadata
             target/capi/**/_chainName
           key: ${{ runner.os }}-capi-metadata-${{ hashFiles('import_map.json') }}
-      - name: Setup binaries
-        uses: ./.github/actions/setup-binaries
       - run: deno task run _tasks/star.ts
       - run: deno task cache target/star.ts
       - run: deno task check target/star.ts
