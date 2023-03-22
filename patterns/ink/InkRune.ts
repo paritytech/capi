@@ -38,7 +38,7 @@ export class InkRune<out C extends Chain, out U>
 
   common<X>(this: InkRune<C, U>, props: RunicArgs<X, MsgProps>) {
     const msgMetadata = Rune.tuple([
-      this.parent
+      this.prev
         .into(ValueRune)
         .access("V3", "spec", "messages"),
       props.method,
@@ -47,7 +47,7 @@ export class InkRune<out C extends Chain, out U>
       .unhandle(undefined)
       .rehandle(undefined, () => Rune.constant(new MethodNotFoundError()))
       .unhandle(MethodNotFoundError)
-    const data = this.parent.encodeData(msgMetadata, props.args)
+    const data = this.prev.encodeData(msgMetadata, props.args)
     const value = Rune
       .resolve(props.value)
       .unhandle(undefined)
@@ -58,7 +58,7 @@ export class InkRune<out C extends Chain, out U>
 
   call<X>(props: RunicArgs<X, MsgProps>) {
     const { msgMetadata, innerResult } = this.common(props)
-    const $result = this.parent.codecs
+    const $result = this.prev.codecs
       .access(msgMetadata.access("returnType", "type"))
       .into(CodecRune)
     return $result.decoded(innerResult.access("result", "data"))

@@ -5,7 +5,7 @@ export class PatternRune<out T, out C extends Chain, out U, out P = void> extend
   constructor(
     _prime: PatternRune<T, C, U>["_prime"],
     readonly chain: ChainRune<C, U>,
-    readonly parent: P,
+    readonly prev: P,
   ) {
     super(_prime)
   }
