@@ -1,9 +1,10 @@
+import { hex } from "../crypto/mod.ts"
 import * as $ from "../deps/scale.ts"
-import { FrameMetadata } from "../frame_metadata/mod.ts"
+import { decodeMetadata, FrameMetadata } from "../frame_metadata/mod.ts"
 import { Connection } from "../rpc/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { BlockRune } from "./BlockRune.ts"
-import { ConnectionRune } from "./ConnectionRune.ts"
+import { connection, ConnectionRune } from "./ConnectionRune.ts"
 import { ExtrinsicRune } from "./ExtrinsicRune.ts"
 import { PalletRune } from "./PalletRune.ts"
 
@@ -50,9 +51,41 @@ export namespace Chain {
 
 // TODO: do we want to represent the discovery value and conn type within the type system?
 export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
+  static from<X, M extends FrameMetadata>(
+    props: RunicArgs<X, { connection: Connection; metadata?: M }>,
+  ) {
+    return Rune
+      .rec(props)
+      .unsafeAs<{ connection: Connection; metadata: M }>()
+      .into(ChainRune)
+  }
+
+  static dynamic<D>(
+    connectionCtor: {
+      new(discovery: D): Connection
+      connect: (discovery: D, signal: AbortSignal) => Connection
+    },
+    discovery: D,
+  ) {
+    return this.from({
+      connection: connection(async (signal) => connectionCtor.connect(discovery, signal)),
+    })
+  }
+
   connection = this.into(ValueRune<Chain, U>).access("connection").into(ConnectionRune)
 
-  metadata = this.into(ValueRune).access("metadata")
+  remoteMetadata = Rune
+    .fn(hex.decode)
+    .call(this.connection.call("state_getMetadata"))
+    .map(decodeMetadata)
+
+  metadata = this
+    .into(ValueRune)
+    .access("metadata")
+    .unsafeAs<FrameMetadata | undefined>()
+    .into(ValueRune)
+    .unhandle(undefined)
+    .rehandle(undefined, () => this.remoteMetadata)
 
   latestBlock = this.block(
     this.connection
@@ -76,12 +109,11 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
     return call.into(ExtrinsicRune, this.as(ChainRune))
   }
 
-  pallet<P extends Chain.PalletName<C>, X>(...args: RunicArgs<X, [palletName: P]>) {
-    const [palletName] = RunicArgs.resolve(args)
-    return this
-      .into(ValueRune)
-      .access("metadata", "pallets", palletName.as(Rune))
-      .into(PalletRune, this)
+  pallet<P extends Chain.PalletName<C>, X>(...[palletName]: RunicArgs<X, [P]>) {
+    return this.metadata
+      .access("pallets", palletName)
+      .unsafeAs<Chain.Pallet<C, P>>()
+      .into(PalletRune, this.as(ChainRune))
   }
 
   addressPrefix(this: ChainRune<AddressPrefixChain, U>) {
