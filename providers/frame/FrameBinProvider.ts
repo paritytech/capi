@@ -43,10 +43,10 @@ export abstract class FrameBinProvider extends FrameProxyProvider {
       args,
       stdout: "piped",
       stderr: "piped",
+      signal: this.env.signal,
     })
-    const process = command.spawn()
-    this.env.signal.addEventListener("abort", () => process.kill("SIGINT"))
-    return process
+
+    return command.spawn()
   }
 
   binValid?: Promise<void>
