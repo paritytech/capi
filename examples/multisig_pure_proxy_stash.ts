@@ -19,7 +19,7 @@ await Balances
   })
   .signed(signature({ sender: alexa }))
   .sent()
-  .dbgStatus("Fund:")
+  .dbgStatus("Fund multisig:")
   .finalized()
   .run()
 
@@ -38,7 +38,7 @@ await multisig
   .finalized()
   .run()
 
-await multisig
+const bobRatify = multisig
   .ratify({
     call: Proxy.createPure({
       proxyType: "Any",
@@ -49,8 +49,7 @@ await multisig
   })
   .signed(signature({ sender: billy }))
   .sent()
-  .dbgStatus("Bob ratify:")
-  .run()
+  .dbgStatus("Bob Ratify:")
 
 const stashAddress = bobRatify
   .finalizedEvents()

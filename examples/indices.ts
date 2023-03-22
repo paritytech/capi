@@ -1,4 +1,5 @@
-import { Indices, users } from "polkadot_dev/mod.js"
+import { PublicKeyRune } from "capi"
+import { chain, Indices, users } from "polkadot_dev/mod.js"
 import { signature } from "../patterns/signature/polkadot.ts"
 
 const [alexa] = await users(1)
@@ -17,6 +18,8 @@ const retrieved = await Indices.Accounts
   .value(index, finalizedHash)
   .unhandle(undefined)
   .access(0)
+  .into(PublicKeyRune)
+  .ss58Address(chain)
   .run()
 
 console.log(`Index ${index} mapped to ${retrieved}`)
