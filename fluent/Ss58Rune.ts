@@ -4,7 +4,7 @@ import { Chain } from "./ChainRune.ts"
 import { PatternRune } from "./PatternRune.ts"
 import { PublicKeyRune } from "./PublicKeyRune.ts"
 
-export class AddressRune<out C extends Chain, U> extends PatternRune<string, C, U> {
+export class Ss58Rune<out C extends Chain, U> extends PatternRune<string, C, U> {
   publicKey() {
     return this
       .into(ValueRune)
