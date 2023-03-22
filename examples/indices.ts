@@ -1,21 +1,25 @@
-import { ValueRune } from "capi"
-import { Indices, users } from "polkadot_dev/mod.js"
+import { PublicKeyRune } from "capi"
+import { chain, Indices, users } from "polkadot_dev/mod.js"
 import { signature } from "../patterns/signature/polkadot.ts"
 
 const [alexa] = await users(1)
 
 const index = 254
 
-const claim = Indices
+const finalizedHash = await Indices
   .claim({ index })
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus()
-  .finalized()
-
-const result = await claim
-  .into(ValueRune)
-  .chain(() => Indices.Accounts.value(index).unhandle(undefined).access(0))
+  .finalizedHash()
   .run()
 
-console.log(`Index ${index} mapped to ${result}}`)
+const mapped = await Indices.Accounts
+  .value(index, finalizedHash)
+  .unhandle(undefined)
+  .access(0)
+  .into(PublicKeyRune)
+  .address(chain)
+  .run()
+
+console.log(`Index ${index} mapped to ${mapped}}`)

@@ -1,7 +1,7 @@
 import { ss58 } from "../crypto/mod.ts"
 import { Rune, ValueRune } from "../rune/mod.ts"
-import { AddressRune } from "./AddressRune.ts"
 import { AddressPrefixChain, ChainRune } from "./ChainRune.ts"
+import { Ss58AddressRune } from "./Ss58AddressRune.ts"
 
 export class PublicKeyRune<out U> extends Rune<Uint8Array, U> {
   constructor(_prime: PublicKeyRune<U>["_prime"]) {
@@ -12,6 +12,6 @@ export class PublicKeyRune<out U> extends Rune<Uint8Array, U> {
     return Rune
       .tuple([chain.addressPrefix(), this.into(ValueRune)])
       .map(([prefix, publicKey]) => ss58.encode(prefix, publicKey))
-      .into(AddressRune, chain)
+      .into(Ss58AddressRune, chain)
   }
 }
