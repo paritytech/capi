@@ -28,7 +28,7 @@ export function babeBlockAuthor<C extends AddressPrefixChain, U, X>(
     .map(([validators, authorityIndex]) => validators[authorityIndex])
     .unhandle(undefined)
     .into(PublicKeyRune)
-    .address(chain)
+    .ss58(chain)
 }
 
 export class AuthorRetrievalNotSupportedError extends Error {

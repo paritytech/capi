@@ -19,7 +19,7 @@ const mapped = await Indices.Accounts
   .unhandle(undefined)
   .access(0)
   .into(PublicKeyRune)
-  .address(chain)
+  .ss58(chain)
   .run()
 
 console.log(`Index ${index} mapped to ${mapped}}`)
