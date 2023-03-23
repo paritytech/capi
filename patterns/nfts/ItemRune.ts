@@ -5,6 +5,7 @@ import { CancelAttributesApprovalWitness } from "http://localhost:4646/frame/zom
 import { MultiAddress } from "http://localhost:4646/frame/zombienet/zombienets/nfts.toml/collator/@v0.9.370/types/sp_runtime/multiaddress.js"
 
 import {
+  $,
   Chain,
   ChainRune,
   ExtrinsicRune,
@@ -13,14 +14,26 @@ import {
   ValueRune,
 } from "http://localhost:4646/mod.ts"
 
-export class ItemRune<out C extends WestmintLocal, out U>
-  extends Rune<readonly [collectionId: number, id: number], U>
-{
+type Codecs<IM, IA> = {
+  itemMetadata?: $.Codec<IM>
+  itemAttributes?: $.Codec<IA>
+}
+
+export class ItemRune<
+  out C extends WestmintLocal,
+  out U,
+  Md = any,
+  Attrs extends Record<any, any> = any,
+> extends Rune<readonly [collectionId: number, id: number], U> {
   collectionId
   id
   storage
 
-  constructor(_prime: ItemRune<C, U>["_prime"], readonly chain: ChainRune<C, U>) {
+  constructor(
+    _prime: ItemRune<C, U>["_prime"],
+    readonly chain: ChainRune<C, U>,
+    readonly $codecs?: Codecs<Md, Attrs>,
+  ) {
     super(_prime)
     this.storage = this.chain.pallet("Nfts").storage("Collection")
     const value = this.into(ValueRune)

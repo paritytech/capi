@@ -1,78 +1,9 @@
-import {
-  $,
-  alice,
-  bob,
-  ChainRune,
-  Era,
-  hex,
-  Rune,
-  RunicArgs,
-  SignatureData,
-  ss58,
-  ValueRune,
-} from "capi"
-import { SignatureProps } from "capi/patterns/signature/polkadot.ts"
-import { Nfts, WestmintLocal } from "zombienet/nfts.toml/collator/@latest/mod.js"
+import { $, alice, bob, Rune, ValueRune } from "capi"
+import { Nfts } from "zombienet/nfts.toml/collator/@latest/mod.js"
 import { Event } from "zombienet/nfts.toml/collator/@latest/types/pallet_nfts/pallet.js"
 import { MintType } from "zombienet/nfts.toml/collator/@latest/types/pallet_nfts/types.js"
 import { RuntimeEvent } from "zombienet/nfts.toml/collator/@latest/types/westmint_runtime.js"
-
-type NftSigProps = SignatureProps<WestmintLocal> & {
-  assetId?: number
-}
-
-export function signature<X>(_props: RunicArgs<X, NftSigProps>) {
-  return <CU>(chain: ChainRune<WestmintLocal, CU>) => {
-    const props = RunicArgs.resolve(_props)
-    const addrPrefix = chain.addressPrefix()
-    const versions = chain.pallet("System").constant("Version").decoded
-    const specVersion = versions.access("specVersion")
-    const transactionVersion = versions.access("transactionVersion")
-    // TODO: create union rune (with `matchTag` method) and utilize here
-    // TODO: MultiAddress conversion utils
-    const senderSs58 = Rune
-      .tuple([addrPrefix, props.sender])
-      .map(([addrPrefix, sender]) => {
-        switch (sender.address.type) {
-          case "Id": {
-            return ss58.encode(addrPrefix, sender.address.value)
-          }
-          default: {
-            throw new Error("unimplemented")
-          }
-        }
-      })
-      .throws(ss58.InvalidPublicKeyLengthError, ss58.InvalidNetworkPrefixError)
-    const nonce = Rune.resolve(props.nonce)
-      .unhandle(undefined)
-      .rehandle(undefined, () => chain.connection.call("system_accountNextIndex", senderSs58))
-    const genesisHashHex = chain.connection.call("chain_getBlockHash", 0).unsafeAs<string>()
-      .into(ValueRune)
-    const genesisHash = genesisHashHex.map(hex.decode)
-    const checkpointHash = Rune.tuple([props.checkpoint, genesisHashHex]).map(([a, b]) => a ?? b)
-      .map(hex.decode)
-    const mortality = Rune.resolve(props.mortality).map((x) => x ?? Era.Immortal)
-    const tip = Rune.resolve(props.tip).map((x) => x ?? 0n)
-    return Rune.rec({
-      sender: props.sender,
-      extra: Rune.rec({
-        CheckMortality: mortality,
-        CheckNonce: nonce,
-        ChargeTransactionPayment: tip,
-        ChargeAssetTxPayment: Rune.rec({
-          assetId: props.assetId,
-          tip: tip,
-        }),
-      }),
-      additional: Rune.rec({
-        CheckSpecVersion: specVersion,
-        CheckTxVersion: transactionVersion,
-        CheckGenesis: genesisHash,
-        CheckMortality: checkpointHash,
-      }),
-    }) satisfies Rune<SignatureData<WestmintLocal>, unknown>
-  }
-}
+import { signature } from "../patterns/nfts/mod.ts"
 
 // values are inverted for storage optimisation
 const DefaultCollectionSetting = {
@@ -119,107 +50,144 @@ const collection = createCollection
   .unhandle(undefined)
   .dbg("Collection Id:")
 
+const mintRandomizedNft = <U>(id: number, collection: Rune<number, U>) =>
+  Nfts
+    .mint({
+      collection,
+      item: id,
+      mintTo: alice.address,
+    })
+    .signed(signature({ sender: alice }))
+    .sent()
+    .dbgStatus("Mint Item:")
+    .finalized()
+
+// await Utility.batch({
+//   calls: Rune.tuple([
+//     mintRandomizedNft(0, collection),
+//     mintRandomizedNft(1, collection),
+//     mintRandomizedNft(2, collection),
+//   ]),
+// })
+// await mintRandomizedNft(1, collection).run()
+// await mintRandomizedNft(2, collection).run()
+
+// await Nfts.Item // .entryPageRaw(50)
+//   .entryPage(50, Rune.tuple([collection]))
+//   .into(ValueRune)
+//   .dbg("Nfts:")
+//   .run()
+
+// await Nfts.Collection // .entryPageRaw(50)
+//   .entryPage(50, null)
+//   .into(ValueRune)
+//   .dbg("Collections:")
+//   .run()
+
 const $collectionMetadata = $.object($.field("hello", $.str))
 
-const setCollectionMetadata = Nfts
-  .setCollectionMetadata({
-    collection,
-    data: $collectionMetadata.encode({ hello: "collection" }),
-  })
-  .signed(signature({ sender: alice }))
-  .sent()
-  .dbgStatus("Set Collection Metadata:")
-  .finalized()
+const setCollectionMetadata = collection.chain(() =>
+  Nfts
+    .setCollectionMetadata({
+      collection,
+      data: $collectionMetadata.encode({ hello: "collection" }),
+    })
+    .signed(signature({ sender: alice }))
+    .sent()
+    .dbgStatus("Set Collection Metadata:")
+    .finalized()
+)
 
 const item = 0
+const mintItem = setCollectionMetadata.chain(() =>
+  Nfts
+    .mint({
+      collection,
+      item,
+      mintTo: alice.address,
+    })
+    .signed(signature({ sender: alice }))
+    .sent()
+    .dbgStatus("Mint Item:")
+    .finalized()
+)
 
-const mintItem = Nfts
-  .mint({
+const setItemMetadata = mintItem.chain(() =>
+  Nfts
+    .setMetadata({
+      collection,
+      item,
+      data: new Uint8Array(), // TODO: ipfs file url
+    })
+    .signed(signature({ sender: alice }))
+    .sent()
+    .dbgStatus("Set Item Metadata:")
+    .finalized()
+)
+
+const setItemPrice = setItemMetadata.chain(() =>
+  Nfts
+    .setPrice({
+      collection,
+      item,
+      price: 1000000n,
+      whitelistedBuyer: undefined,
+    })
+    .signed(signature({ sender: alice }))
+    .sent()
+    .dbgStatus("Set Item Price:")
+    .finalized()
+)
+
+const lockItemProperties = setItemPrice.chain(() =>
+  Nfts.lockItemProperties({
     collection,
     item,
-    mintTo: alice.address,
+    lockMetadata: true,
+    lockAttributes: true,
   })
-  .signed(signature({ sender: alice }))
-  .sent()
-  .dbgStatus("Mint Item:")
-  .finalized()
-
-const setItemMetadata = Nfts
-  .setMetadata({
-    collection,
-    item,
-    data: new Uint8Array(), // TODO: ipfs file url
-  })
-  .signed(signature({ sender: alice }))
-  .sent()
-  .dbgStatus("Set Item Metadata:")
-  .finalized()
-
-const setItemPrice = Nfts
-  .setPrice({
-    collection,
-    item,
-    price: 1000000n,
-    whitelistedBuyer: undefined,
-  })
-  .signed(signature({ sender: alice }))
-  .sent()
-  .dbgStatus("Set Item Price:")
-  .finalized()
-
-const lockItemProperties = Nfts.lockItemProperties({
-  collection,
-  item,
-  lockMetadata: true,
-  lockAttributes: true,
-})
-  .signed(signature({ sender: alice }))
-  .sent()
-  .dbgStatus("Lock Item Properties:")
-  .finalized()
+    .signed(signature({ sender: alice }))
+    .sent()
+    .dbgStatus("Lock Item Properties:")
+    .finalized()
+)
 
 // prevent new mints in collection
-const setCollectionMaxSupply = Nfts
-  .setCollectionMaxSupply({
+const setCollectionMaxSupply = lockItemProperties.chain(() =>
+  Nfts
+    .setCollectionMaxSupply({
+      collection,
+      maxSupply: 1,
+    })
+    .signed(signature({ sender: alice }))
+    .sent()
+    .dbgStatus("Set Collection Max Supply:")
+    .finalized()
+)
+
+const lockCollection = setCollectionMaxSupply.chain(() =>
+  Nfts.lockCollection({
     collection,
-    maxSupply: 1,
+    // forbid future updates of max supply
+    lockSettings: 8n, // 8n TODO
   })
-  .signed(signature({ sender: alice }))
-  .sent()
-  .dbgStatus("Set Collection Max Supply:")
-  .finalized()
+    .signed(signature({ sender: alice }))
+    .sent()
+    .dbgStatus("Lock Collection:")
+    .finalized()
+)
 
-const lockCollection = Nfts.lockCollection({
-  collection,
-  // forbid future updates of max supply
-  lockSettings: 8n, // 8n TODO
-})
-  .signed(signature({ sender: alice }))
-  .sent()
-  .dbgStatus("Lock Collection:")
-  .finalized()
+// const collectionId = Nfts.Collection // .entryPageRaw(50)
+//   .value(collection)
+//   .into(ValueRune)
+//   .dbg("Collections:")
+//   .access(0, 0)
 
-const alicePrepareCollection = Rune
-  .chain(() => createCollection)
-  .chain(() => setCollectionMetadata)
-  .chain(() => mintItem)
-  .chain(() => setItemMetadata)
-  .chain(() => setItemPrice)
-  .chain(() => lockItemProperties)
-  .chain(() => setCollectionMaxSupply)
-  .chain(() => lockCollection)
-
-const collectionId = Nfts.Collection // .entryPageRaw(50)
-  .entryPage(50, null)
-  .into(ValueRune)
-  .dbg("Collections:")
-  .access(0, 0)
-
-const itemId = Nfts.Item // .entryPageRaw(50, [collection])
-  .entryPage(50, Rune.tuple([collection]))
-  .into(ValueRune)
-  .dbg("Items:")
-  .access(0, 0, 1)
+// const itemId = Nfts.Item // .entryPageRaw(50, [collection])
+//   .entryPage(50, Rune.tuple([collectionId]))
+//   .into(ValueRune)
+//   .dbg("Items:")
+//   .access(0, 0, 1)
 
 const price = Nfts.ItemPriceOf
   .value(Rune.tuple([collection, item]))
@@ -229,8 +197,8 @@ const price = Nfts.ItemPriceOf
 
 const bobBuyItem = Nfts
   .buyItem({
-    collection: collectionId,
-    item: itemId,
+    collection: collection,
+    item: item,
     bidPrice: price,
   })
   .signed(signature({ sender: bob }))
@@ -239,11 +207,11 @@ const bobBuyItem = Nfts
   .finalized()
 
 await Rune
-  .chain(() => alicePrepareCollection)
+  .chain(() => lockCollection)
   .chain(() => bobBuyItem)
   .chain(() =>
     Nfts.Item
-      .value(Rune.tuple([collectionId, itemId]))
+      .value(Rune.tuple([collection, item]))
       .unhandle(undefined)
       .access("owner")
       .dbg("New Owner:")
