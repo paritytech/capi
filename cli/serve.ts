@@ -68,8 +68,14 @@ export default async function(...args: string[]) {
     if (bin) {
       const command = new Deno.Command(bin, { args, signal })
       const status = await command.spawn().status
+      console.log("inner command exited with status code", status.code)
       self.addEventListener("unload", () => Deno.exit(status.code))
       controller.abort()
+      Deno.unrefTimer(setTimeout(() => {
+        // todo: fix
+        console.log("failed to exit gracefully")
+        Deno.exit(status.code)
+      }, 5000))
     }
   }
 }
