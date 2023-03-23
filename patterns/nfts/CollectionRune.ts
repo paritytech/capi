@@ -18,6 +18,7 @@ import {
   Chain,
   ChainRune,
   ExtrinsicRune,
+  MetaRune,
   Rune,
   RunicArgs,
   SignatureDataFactory,
@@ -40,11 +41,29 @@ type ItemSettings = {
 
 type ExtractFns<T> = keyof { [K in keyof T as T[K] extends Function ? K : never]: T[K] }
 
-export class CollectionRune<out C extends WestmintLocal, out U> extends Rune<number, U> {
-  id
-  // storage
+type Codecs<M, A, IM, IA> = {
+  metadata?: $.Codec<M>
+  attributes?: $.Codec<A>
+  itemMetadata?: $.Codec<IM>
+  itemAttributes?: $.Codec<IA>
+}
 
-  constructor(_prime: CollectionRune<C, U>["_prime"], readonly chain: ChainRune<C, U>) {
+export class CollectionRune<
+  out C extends WestmintLocal,
+  out U,
+  CMd = any,
+  CAttrs extends Record<any, any> = any,
+  IMd = any,
+  IAttrs extends Record<any, any> = any,
+> extends Rune<number, U> {
+  id
+
+  // storage
+  constructor(
+    _prime: CollectionRune<C, U>["_prime"],
+    readonly chain: ChainRune<C, U>,
+    readonly $codecs?: Codecs<CMd, CAttrs, IMd, IAttrs>,
+  ) {
     super(_prime)
     // this.storage = this.chain.pallet("Nfts").storage("Collection")
     // const s = this.chain.metadata.access("pallets").access("Nfts").access("")
@@ -93,27 +112,82 @@ export class CollectionRune<out C extends WestmintLocal, out U> extends Rune<num
   }
 
   mint<X>(
-    props: RunicArgs<X, { id: number; mintTo: MultiAddress; witness?: MintWitness }> & {
-      sig: SignatureDataFactory<WestmintLocal, U, unknown>
-    },
+    props:
+      & RunicArgs<
+        X,
+        {
+          id: number
+          mintTo?: MultiAddress
+          witness?: MintWitness
+          price?: bigint
+          settings?: ItemSettings
+          attributes?: Record<string, any>
+          metadata?: Record<string, any>
+        }
+      >
+      & {
+        sig: SignatureDataFactory<WestmintLocal, U, unknown>
+      },
   ) {
-    Nfts.mint({ collection: 21312, item: 123123, mintTo: alice.address })
-    const mint = this.extrinsicBuilder("mint")
-    const extrinsic = mint({
-      item: this.id,
-      mintTo: props.mintTo,
-      witnessData: props.witness,
+    const sig = props.sig(this.chain)
+    const mint = Rune.rec({
+      type: "Nfts",
+      value: Rune.rec({
+        type: "mint",
+        collection: this.id,
+        item: props.id,
+        mintTo: props.mintTo ?? sig.into(ValueRune).access("sender"), // TODO: review all if-null-else conditionals
+      }),
     })
+      .unsafeAs<Chain.Call<C>>()
+      .into(ExtrinsicRune, this.chain)
+      .signed(() => sig)
+      .sent()
+      .finalized()
     return Rune
-      .chain(() => extrinsic.signed(props.sig).sent().finalized())
-      .pipe(() => Rune.tuple([this.id, props.id]).into(ItemRune, this.chain))
+      .chain(() => mint)
+      .chain(() => Rune.tuple([this.id, props.id]))
+      .into(ItemRune, this.chain, this.$codecs)
   }
 
-  static create<U>(props: {
+  static ref<
+    U,
+    CMd = any,
+    CAttrs extends Record<any, any> = any,
+    IMd = any,
+    IAttrs extends Record<any, any> = any,
+  >(
+    id: number | Rune<number, U>,
+    chain: ChainRune<WestmintLocal, U>,
+    $codecs?: Codecs<CMd, CAttrs, IMd, IAttrs>,
+    // ...props: RunicArgs<
+    //   U,
+    //   readonly [
+    //     id: number,
+    //     chain: ChainRune<WestmintLocal, U>,
+    //     codecs?: Codecs<CMd, CAttrs, IMd, IAttrs>,
+    //   ]
+    // >
+  ) {
+    return Rune.resolve(id).into(CollectionRune, chain, $codecs)
+    // return Rune.tuple([chain, codecs]).chain((obj) =>
+    //   id.into(CollectionRune, chain, codecs)
+    // )
+  }
+
+  static create<
+    U,
+    CMd = any,
+    CAttrs extends Record<any, any> = any,
+    IMd = any,
+    IAttrs extends Record<any, any> = any,
+  >(props: {
     chain: ChainRune<WestmintLocal, U>
     admin: MultiAddress
     settings?: CollectionSettings
     maxSupply?: number
+    attributes?: Record<any, any> // $.Codec<Record<any, any>>
+    metadata?: Record<any, any>
     mintSettings?: {
       mintType: MintType
       price?: number
@@ -121,7 +195,8 @@ export class CollectionRune<out C extends WestmintLocal, out U> extends Rune<num
       endBlock?: number
       defaultItemSettings: ItemSettings
     }
-    signatureFactory: SignatureDataFactory<WestmintLocal, U, unknown>
+    $codecs?: Codecs<CMd, CAttrs, IMd, IAttrs>
+    sig: SignatureDataFactory<WestmintLocal, U, unknown>
   }) {
     // const createCollection = Rune.rec({
     //   type: "Nfts",
@@ -154,7 +229,7 @@ export class CollectionRune<out C extends WestmintLocal, out U> extends Rune<num
         }),
         admin: props.admin,
       })
-      .signed(props.signatureFactory)
+      .signed(props.sig)
       .sent()
       .dbgStatus("Create Collection:")
       .finalized()
@@ -168,7 +243,7 @@ export class CollectionRune<out C extends WestmintLocal, out U> extends Rune<num
         return event?.collection
       })
       .unhandle(undefined)
-    return collection.into(CollectionRune, props.chain)
+    return CollectionRune.ref(collection, props.chain, props.$codecs)
   }
 
   destroy<X>(...props: RunicArgs<X, readonly [witness: DestroyWitness]>) {
