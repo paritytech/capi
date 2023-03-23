@@ -17,7 +17,6 @@ interactions without compromising either performance or ease of use.
 ## Installation
 
 We can substitute the URL's target (in this case the WebSocket URL of a proxy).
-The chain-specific API will be generated on-the-fly.
 
 ### Node.js
 
