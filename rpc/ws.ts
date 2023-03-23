@@ -49,7 +49,28 @@ export class WsConnection extends Connection {
     this.ws.send(RpcEgressMessage.fmt(id, method, params))
   }
 
-  close() {
-    this.ws.close()
+  async close() {
+    switch (this.ws.readyState) {
+      case WebSocket.OPEN: {
+        this.ws.close()
+        break
+      }
+      case WebSocket.CONNECTING: {
+        const controller = new AbortController()
+        const options: AddEventListenerOptions = {
+          signal: controller.signal,
+          once: true,
+        }
+        this.ws.addEventListener("open", () => {
+          this.ws.close()
+          controller.abort()
+        }, options)
+        this.ws.addEventListener("close", () => {}, options)
+        this.ws.addEventListener("error", () => {
+          throw new ConnectionError("Error occurred during CONNECTING")
+        }, options)
+        break
+      }
+    }
   }
 }
