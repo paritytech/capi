@@ -1,14 +1,6 @@
 import { MultiAddress } from "polkadot/types/sp_runtime/multiaddress.js"
 import * as bytes from "../../deps/std/bytes.ts"
-import {
-  Chain,
-  ChainRune,
-  ExtrinsicRune,
-  PatternRune,
-  Rune,
-  RunicArgs,
-  ValueRune,
-} from "../../mod.ts"
+import { Chain, ExtrinsicRune, PatternRune, Rune, RunicArgs, ValueRune } from "../../mod.ts"
 import { multisigAccountId } from "./multisigAccountId.ts"
 
 export interface MultisigRatifyProps<C extends Chain> {
@@ -27,7 +19,7 @@ export interface Multisig {
 }
 
 // TODO: swap out `Chain` constraints upon subset gen issue resolution... same for other patterns
-export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multisig, C, U> {
+export class MultisigRune<out U> extends PatternRune<Multisig, Chain, U> {
   private storage = this.chain.pallet("Multisig").storage("Multisigs")
   private value = this.into(ValueRune)
   threshold = this.value.map(({ threshold, signatories }) => threshold ?? signatories.length - 1)
@@ -42,11 +34,8 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
       )
   }
 
-  ratify<X>({ sender, call: call_ }: RunicArgs<X, MultisigRatifyProps<C>>) {
-    const call = Rune
-      .resolve(call_)
-      .unsafeAs<Chain.Call<C>>()
-      .into(ExtrinsicRune, this.chain)
+  ratify<X>({ sender, call: call_ }: RunicArgs<X, MultisigRatifyProps<Chain>>) {
+    const call = Rune.resolve(call_).into(ExtrinsicRune, this.chain)
     return Rune
       .rec({
         type: "Multisig",
@@ -60,7 +49,6 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
           maybeTimepoint: this.maybeTimepoint(call.hash),
         }),
       })
-      .unsafeAs<Chain.Call<C>>()
       .into(ExtrinsicRune, this.chain)
   }
 
@@ -82,7 +70,6 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
           maybeTimepoint: this.maybeTimepoint(callHash),
         }),
       })
-      .unsafeAs<Chain.Call<C>>()
       .into(ExtrinsicRune, this.chain)
   }
 
@@ -98,7 +85,6 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
           timepoint: this.maybeTimepoint(callHash).map((x) => x ?? new NoProposalError()),
         }),
       })
-      .unsafeAs<Chain.Call<C>>()
       .into(ExtrinsicRune, this.chain)
   }
 
@@ -113,19 +99,16 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
   }
 
   proposals<X>(...[count, blockHash]: RunicArgs<X, [count: number, blockHash?: string]>) {
-    // @ts-ignore .
     return this.storage.keyPage(count, Rune.tuple([this.accountId]), undefined, blockHash)
   }
 
   proposal<X>(...[callHash, blockHash]: RunicArgs<X, [callHash: Uint8Array, blockHash?: string]>) {
-    // @ts-ignore .
     return this.storage.value(Rune.tuple([this.accountId, callHash]), blockHash)
   }
 
   isProposed<X>(
     ...[callHash, blockHash]: RunicArgs<X, [callHash: Uint8Array, blockHash?: string]>
   ) {
-    // @ts-ignore .
     return this.storage.valueRaw(Rune.tuple([this.accountId, callHash]), blockHash)
       .map((entry) => entry !== null)
   }

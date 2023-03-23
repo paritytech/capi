@@ -30,7 +30,7 @@ export const $virtualMultisig: $.Codec<VirtualMultisig> = $.object(
 )
 
 export class VirtualMultisigRune<out C extends Chain, out U>
-  extends PatternRune<VirtualMultisig, C, U>
+  extends PatternRune<VirtualMultisig, Chain, U>
 {
   value = this.into(ValueRune)
   stash = this.value.access("stash")
@@ -63,11 +63,10 @@ export class VirtualMultisigRune<out C extends Chain, out U>
           value: amount,
         }),
       })
-      .unsafeAs<Chain.Call<C>>()
       .into(ExtrinsicRune, this.chain)
   }
 
-  ratify<X>(...[senderAddr, call]: RunicArgs<X, [Uint8Array, Chain.Call<C>]>) {
+  ratify<X>(...[senderAddr, call]: RunicArgs<X, [Uint8Array, unknown]>) {
     const sender = this.proxyBySenderAddr(senderAddr)
     const call_ = this.chain.extrinsic(
       Rune.rec({
@@ -78,7 +77,7 @@ export class VirtualMultisigRune<out C extends Chain, out U>
           forceProxyType: undefined,
           call,
         }),
-      }).unsafeAs<Chain.Call<C>>(),
+      }),
     )
 
     return Rune
@@ -94,7 +93,6 @@ export class VirtualMultisigRune<out C extends Chain, out U>
           }),
         }),
       })
-      .unsafeAs<Chain.Call<C>>()
       .into(ExtrinsicRune, this.chain)
   }
 
