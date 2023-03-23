@@ -16,14 +16,16 @@ interactions without compromising either performance or ease of use.
 
 ## Installation
 
+Let's install from capi.dev
+
+> We can substitute the target (in this case a proxy URL). The chain-specific
+> API will be generated on-the-fly.
+
 ### Node.js
 
 ```sh
 npm i https://capi.dev/frame/wss/rpc.polkadot.io/@latest/pkg.tar
 ```
-
-> You can substitute a proxy URL of your choosing. The chain-specific API will
-> be generated on-the-fly.
 
 ### Deno
 
