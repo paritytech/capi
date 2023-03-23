@@ -18,13 +18,13 @@ interactions without compromising either performance or ease of use.
 
 We can substitute the URL's target (in this case the WebSocket URL of a proxy).
 
-### Node.js
+### [Node.js](https://nodejs.org/)
 
 ```sh
 npm i https://capi.dev/frame/wss/rpc.polkadot.io/@latest/pkg.tar
 ```
 
-### Deno
+### [Deno](https://deno.land/)
 
 ```ts
 import {} from "https://capi.dev/frame/wss/rpc.polkadot.io/@latest/mod.js"
