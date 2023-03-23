@@ -39,7 +39,7 @@ await multisig
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Proposal:")
-  .finalized()
+  .finalizedHash()
   .run()
 
 // Check if the call has been proposed
@@ -54,7 +54,7 @@ await multisig
   .signed(signature({ sender: billy }))
   .sent()
   .dbgStatus("Vote:")
-  .finalized()
+  .finalizedHash()
   .run()
 
 // Check for existing approval(s)
@@ -74,7 +74,7 @@ await multisig
   .signed(signature({ sender: carol }))
   .sent()
   .dbgStatus("Approval:")
-  .finalized()
+  .finalizedHash()
   .run()
 
 // Check to see whether Dave's balance has in fact changed
