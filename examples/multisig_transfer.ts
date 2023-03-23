@@ -12,10 +12,8 @@ const multisig = Rune
   })
   .into(MultisigRune, chain)
 
-// Read dave's initial balance (to-be changed by the call)
 console.log("Dave initial balance:", await System.Account.value(david.publicKey).run())
 
-// Transfer some funds into the multisig account
 await Balances
   .transfer({
     value: 2_000_000_000_000n,
@@ -27,13 +25,11 @@ await Balances
   .finalizedHash()
   .run()
 
-// The to-be proposed and approved call
 const call = Balances.transferKeepAlive({
   dest: david.address,
   value: 1_230_000_000_000n,
 })
 
-// Submit a proposal to dispatch the call
 await multisig
   .ratify({ call, sender: alexa.address })
   .signed(signature({ sender: alexa }))
@@ -42,10 +38,8 @@ await multisig
   .finalizedHash()
   .run()
 
-// Check if the call has been proposed
 console.log("Is proposed?:", await multisig.isProposed(call.hash).run())
 
-// Send a non-executing approval
 await multisig
   .approve({
     callHash: call.hash,
@@ -57,18 +51,15 @@ await multisig
   .finalizedHash()
   .run()
 
-// Check for existing approval(s)
 console.log(
   "Existing approvals:",
   await multisig
     .proposal(call.hash)
-    .unsafeAs<any>()
     .into(ValueRune)
     .access("approvals")
     .run(),
 )
 
-// Send the executing (final) approval
 await multisig
   .ratify({ call, sender: carol.address })
   .signed(signature({ sender: carol }))

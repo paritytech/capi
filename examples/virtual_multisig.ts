@@ -13,8 +13,8 @@ if (!state) {
     .deployment(chain, {
       founders: [alexa.publicKey, billy.publicKey, carol.publicKey],
       threshold: 2,
-      deployer: alexa,
-    })
+      deployer: alexa.address,
+    }, signature({ sender: alexa }))
     .hex
     .run()
 }
@@ -23,7 +23,7 @@ console.log(`Virtual multisig state hex: ${state}`)
 
 const vMultisig = VirtualMultisigRune.hydrate(chain, state)
 
-const fundStash = Balances
+await Balances
   .transfer({
     dest: MultiAddress.Id(vMultisig.stash),
     value: 20_000_000_000_000n,
@@ -31,16 +31,18 @@ const fundStash = Balances
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Fund Stash:")
-  .finalized()
+  .finalizedHash()
+  .run()
+
+console.log("Dave balance before:", await System.Account.value(david.publicKey).run())
 
 const proposal = Balances.transfer({
   dest: david.address,
   value: 1_234_000_000_000n,
 })
 
-const bobTx = Utility
+await Utility
   .batchAll({
-    // @ts-ignore: fix upon #656
     calls: Rune.array([
       vMultisig.fundMemberProxy(billy.publicKey, 20_000_000_000_000n),
       vMultisig.ratify(billy.publicKey, proposal),
@@ -49,11 +51,11 @@ const bobTx = Utility
   .signed(signature({ sender: billy }))
   .sent()
   .dbgStatus("Bob fund & ratify:")
-  .finalized()
+  .finalizedHash()
+  .run()
 
-const charlieTx = Utility
+await Utility
   .batchAll({
-    // @ts-ignore: fix upon #656
     calls: Rune.array([
       vMultisig.fundMemberProxy(carol.publicKey, 20_000_000_000_000n),
       vMultisig.ratify(carol.publicKey, proposal),
@@ -62,13 +64,7 @@ const charlieTx = Utility
   .signed(signature({ sender: carol }))
   .sent()
   .dbgStatus("Charlie fund & ratify:")
-  .finalized()
-
-await Rune
-  .chain(() => vMultisig)
-  .chain(() => fundStash)
-  .chain(() => System.Account.value(david.publicKey).dbg("Dave Balance Before:"))
-  .chain(() => bobTx)
-  .chain(() => charlieTx)
-  .chain(() => System.Account.value(david.publicKey).dbg("Dave Balance After:"))
+  .finalizedHash()
   .run()
+
+console.log("Dave balance after:", await System.Account.value(david.publicKey).run())
