@@ -30,7 +30,7 @@ npm i https://capi.dev/frame/wss/rpc.polkadot.io/@latest/pkg.tar
 #### Deno
 
 ```ts
-import {/* ...*/} from "https://capi.dev/frame/wss/rpc.polkadot.io/@latest/mod.js"
+import {} from "https://capi.dev/frame/wss/rpc.polkadot.io/@latest/mod.js"
 ```
 
 ### Usage
