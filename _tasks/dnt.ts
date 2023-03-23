@@ -79,12 +79,12 @@ await Promise.all([
       custom: [{
         package: {
           name: "isomorphic-ws",
-          version: "5.0.0"
+          version: "5.0.0",
         },
         globalNames: [{
           name: "WebSocket",
-          exportName: "default"
-        }]
+          exportName: "default",
+        }],
       }],
     },
     test: false,
