@@ -1,5 +1,4 @@
 import { hex } from "../crypto/mod.ts"
-import * as $ from "../deps/scale.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { Chain } from "./ChainRune.ts"
 import { CodecRune } from "./CodecRune.ts"
