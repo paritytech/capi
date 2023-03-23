@@ -18,7 +18,7 @@ interactions without compromising either performance or ease of use.
 
 ### Installation
 
-#### Node.js
+**Node.js**
 
 ```sh
 npm i https://capi.dev/frame/wss/rpc.polkadot.io/@latest/pkg.tar
@@ -27,7 +27,7 @@ npm i https://capi.dev/frame/wss/rpc.polkadot.io/@latest/pkg.tar
 > You can substitute a proxy URL of your choosing. The chain-specific API will
 > be generated on-the-fly.
 
-#### Deno
+**Deno**
 
 ```ts
 import {} from "https://capi.dev/frame/wss/rpc.polkadot.io/@latest/mod.js"
