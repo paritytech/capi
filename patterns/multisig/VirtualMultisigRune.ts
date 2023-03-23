@@ -45,36 +45,41 @@ export class VirtualMultisigRune<out C extends Chain, out U>
   encoded = this.value.map((m) => $virtualMultisig.encode(m))
   hex = this.encoded.map(hex.encode)
 
-  proxyBySenderAddr<X>(...[senderAddr]: RunicArgs<X, [Uint8Array]>) {
-    const signatories = this.inner.into(ValueRune).access("signatories")
-    return Rune
-      .tuple([signatories, this.proxies, senderAddr])
-      .map(([signatories, proxies, senderAddr]) =>
-        MultiAddress.Id(signatories[proxies[hex.encode(senderAddr)]!]!)
-      )
+  proxyBySenderAccountId<X>(...[senderAccountId]: RunicArgs<X, [senderAccountId: Uint8Array]>) {
+    const senderAccountIdHex = Rune.resolve(senderAccountId).map(hex.encode)
+    const senderProxyI = this.proxies.access(senderAccountIdHex)
+    const senderProxyAccountId = this.inner
+      .into(ValueRune)
+      .access("signatories")
+      .access(senderProxyI)
+    return MultiAddress.Id(senderProxyAccountId)
   }
 
-  fundMemberProxy<X>(...[senderAddr, amount]: RunicArgs<X, [Uint8Array, bigint]>) {
+  fundMemberProxy<X>(
+    ...[senderAccountId, amount]: RunicArgs<X, [senderAccountId: Uint8Array, amount: bigint]>
+  ) {
     return Rune
       .rec({
         type: "Balances",
         value: Rune.rec({
           type: "transfer",
-          dest: this.proxyBySenderAddr(senderAddr),
+          dest: this.proxyBySenderAccountId(senderAccountId),
           value: amount,
         }),
       })
       .into(ExtrinsicRune, this.chain)
   }
 
-  ratify<X>(...[senderAddr, call]: RunicArgs<X, [Uint8Array, unknown]>) {
-    const sender = this.proxyBySenderAddr(senderAddr)
+  ratify<X>(
+    ...[senderAccountId, call]: RunicArgs<X, [senderAccountId: Uint8Array, call: unknown]>
+  ) {
+    const sender = this.proxyBySenderAccountId(senderAccountId)
     const call_ = this.chain.extrinsic(
       Rune.rec({
         type: "Proxy" as const,
         value: Rune.rec({
           type: "proxy" as const,
-          real: this.stash.map(MultiAddress.Id),
+          real: MultiAddress.Id(this.stash),
           forceProxyType: undefined,
           call,
         }),
@@ -107,6 +112,7 @@ export class VirtualMultisigRune<out C extends Chain, out U>
       .into(VirtualMultisigRune, chain)
   }
 
+  // TODO: simplify
   static deployment<C extends Chain, CU, SU, X>(
     chain: ChainRune<VirtualMultisigChain<C>, CU>,
     props: RunicArgs<X, VirtualMultisigDeploymentProps>,
@@ -146,7 +152,7 @@ export class VirtualMultisigRune<out C extends Chain, out U>
       }))
       .signed(signature)
       .sent()
-      .dbgStatus("Proxy creation:")
+      .dbgStatus("Proxy creations:")
       .finalizedEvents()
       .pipe(filterPureCreatedEvents)
       .map((events) =>
@@ -188,7 +194,7 @@ export class VirtualMultisigRune<out C extends Chain, out U>
       type: "Balances",
       value: Rune.rec({
         type: "transfer",
-        dest: multisig.accountId.map(MultiAddress.Id),
+        dest: MultiAddress.Id(multisig.accountId),
         value: existentialDepositAmount,
       }),
     }))
@@ -196,7 +202,7 @@ export class VirtualMultisigRune<out C extends Chain, out U>
       type: "Balances",
       value: Rune.rec({
         type: "transfer",
-        dest: stashProxy.map(MultiAddress.Id),
+        dest: MultiAddress.Id(stashProxy),
         value: existentialDepositAmount,
       }),
     }))
@@ -221,12 +227,7 @@ export class VirtualMultisigRune<out C extends Chain, out U>
       .tuple([deployer, memberAccountIds, memberProxies, stashProxy, multisig.address])
       .map(([deployer, memberAccountIds, memberProxies, stashProxy, multisigAddress]) =>
         Rune.array([
-          ...replaceDelegateCalls(
-            chain,
-            MultiAddress.Id(stashProxy),
-            deployer,
-            multisigAddress,
-          ),
+          ...replaceDelegateCalls(chain, MultiAddress.Id(stashProxy), deployer, multisigAddress),
           // TODO: ensure that this supports other address types / revisit source of deployer accountId
           ...memberProxies
             .map((proxy, i) => [proxy, i] as const)

@@ -10,11 +10,15 @@ const [alexa, billy, carol, david] = await users(4)
 let { state } = parse(Deno.args, { string: ["state"] })
 if (!state) {
   state = await VirtualMultisigRune
-    .deployment(chain, {
-      founders: [alexa.publicKey, billy.publicKey, carol.publicKey],
-      threshold: 2,
-      deployer: alexa.address,
-    }, signature({ sender: alexa }))
+    .deployment( // TODO: simplify
+      chain,
+      {
+        founders: [alexa.publicKey, billy.publicKey, carol.publicKey],
+        threshold: 2,
+        deployer: alexa.address,
+      },
+      signature({ sender: alexa }),
+    )
     .hex
     .run()
 }
