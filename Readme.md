@@ -14,11 +14,9 @@ interactions without compromising either performance or ease of use.
 - [API Reference &rarr;](https://deno.land/x/capi/mod.ts)<br />A generated API
   reference, based on type signatures and TSDocs.
 
-## At a Glance
+## Installation
 
-### Installation
-
-**Node.js**
+### Node.js
 
 ```sh
 npm i https://capi.dev/frame/wss/rpc.polkadot.io/@latest/pkg.tar
@@ -27,13 +25,13 @@ npm i https://capi.dev/frame/wss/rpc.polkadot.io/@latest/pkg.tar
 > You can substitute a proxy URL of your choosing. The chain-specific API will
 > be generated on-the-fly.
 
-**Deno**
+### Deno
 
 ```ts
 import {} from "https://capi.dev/frame/wss/rpc.polkadot.io/@latest/mod.js"
 ```
 
-### Usage
+## Usage
 
 ```ts
 import { System } from "@capi/polkadot"
@@ -45,7 +43,7 @@ const accounts = await System.Account
 console.log(accounts)
 ```
 
-## Running Examples
+## Examples
 
 Within a fresh clone of this repository...
 
