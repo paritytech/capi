@@ -1,4 +1,3 @@
-import { unreachable } from "../deps/std/testing/asserts.ts"
 import { Chain, ChainRune, MetaRune, Rune, RunicArgs, ValueRune } from "../mod.ts"
 
 export function sizeTree<U, X>(
@@ -14,18 +13,11 @@ export function sizeTree<U, X>(
           Rune.rec(Object.fromEntries(
             Object.values(pallet.storage).map((entry) => {
               const partialKeyType = entry.partialKey._metadata[0]?.args[2]?._metadata[0]?.name
-              const partialKey = (() => {
-                switch (partialKeyType) {
-                  case "$partialEmptyKey":
-                    return undefined
-                  case "$partialSingleKey":
-                    return null
-                  case "$partialMultiKey":
-                    return []
-                  default:
-                    return unreachable()
-                }
-              })()
+              const partialKey = {
+                $partialEmptyKey: undefined,
+                $partialSingleKey: null,
+                $partialMultiKey: [],
+              }[partialKeyType as string]
               const storage = chain.pallet(pallet.name).storage(entry.name)
               return [entry.name, storage.size(partialKey, blockHash)]
             }) || [],
