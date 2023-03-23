@@ -35,11 +35,7 @@ import {} from "https://capi.dev/frame/wss/rpc.polkadot.io/@latest/mod.js"
 ```ts
 import { System } from "@capi/polkadot"
 
-const accounts = await System.Account
-  .entryPage(10, null)
-  .run()
-
-console.log(accounts)
+const accounts = await System.Account.entryPage(10, null).run()
 ```
 
 ## Examples
