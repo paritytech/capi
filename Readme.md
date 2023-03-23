@@ -16,10 +16,8 @@ interactions without compromising either performance or ease of use.
 
 ## Installation
 
-Let's install from capi.dev
-
-> We can substitute the target (in this case a proxy URL). The chain-specific
-> API will be generated on-the-fly.
+We can substitute the URL's target (in this case the WebSocket URL of a proxy).
+The chain-specific API will be generated on-the-fly.
 
 ### Node.js
 
