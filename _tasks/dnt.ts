@@ -75,8 +75,17 @@ await Promise.all([
       deno: {
         test: true,
       },
-      webSocket: true,
       crypto: true,
+      custom: [{
+        package: {
+          name: "isomorphic-ws",
+          version: "5.0.0"
+        },
+        globalNames: [{
+          name: "WebSocket",
+          exportName: "default"
+        }]
+      }],
     },
     test: false,
     typeCheck: false,
