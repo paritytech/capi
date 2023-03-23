@@ -16,42 +16,37 @@ interactions without compromising either performance or ease of use.
 
 ## At a Glance
 
-Run the Capi development server.
+### Installation
 
 ```sh
-deno run -A https://deno.land/x/capi/main.ts
+npm i https://capi.dev/frame/wss/rpc.polkadot.io/@latest/pkg.tar
 ```
 
-Create an import map with the specifier corresponding to your target.
+> You can substitute a proxy URL of your choosing. The chain-specific API will
+> be generated on-the-fly.
+>
+> **Deno** users can import directly from the same URL, swapping out `pkg.tar`
+> for `mod.js`.
+>
+> ```ts
+> import {} from "https://capi.dev/frame/wss/rpc.polkadot.io/@latest/mod.js"
+> ```
 
-`import_map.json`
-
-```json
-{
-  "imports": {
-    "@capi/polkadot/": "http://localhost:4646/frame/wss/rpc.polkadot.io/@latest/"
-  }
-}
-```
-
-Then, open your editor and import from the mapped chain module.
+### Usage
 
 ```ts
-import { System } from "@capi/polkadot/mod.ts"
+import { System } from "@capi/polkadot"
 
-const key = System.Account
-  .keyPage(1)
-  .access(0)
-  .unhandle(undefined)
+const accounts = await System.Account
+  .entryPage(10, null)
+  .run()
 
-const value = System.Account.value(key)
-
-console.log(await value.run())
+console.log(accounts)
 ```
 
 ## Running Examples
 
-Within a fresh clone of the repository...
+Within a fresh clone of this repository...
 
 <!-- TODO: track https://github.com/denoland/dotland/issues/2650#issuecomment-1437015262 -->
 
