@@ -1,23 +1,20 @@
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
-import { Chain, ChainRune } from "./ChainRune.ts"
+import { Chain } from "./ChainRune.ts"
 import { ConstantRune } from "./ConstantRune.ts"
+import { PatternRune } from "./PatternRune.ts"
 import { StorageRune } from "./StorageRune.ts"
 
 export class PalletRune<
   out C extends Chain,
   out P extends Chain.PalletName<C>,
   out U,
-> extends Rune<Chain.Pallet<C, P>, U> {
-  constructor(_prime: PalletRune<C, P, U>["_prime"], readonly chain: ChainRune<C, U>) {
-    super(_prime)
-  }
-
+> extends PatternRune<Chain.Pallet<C, P>, C, U> {
   storage<S extends Chain.StorageName<C, P>, X>(...args: RunicArgs<X, [storageName: S]>) {
     const [storageName] = RunicArgs.resolve(args)
     return this
       .into(ValueRune)
       .access("storage", storageName.as(Rune))
-      .into(StorageRune, this)
+      .into(StorageRune, this.chain)
   }
 
   constant<K extends Chain.ConstantName<C, P>, X>(...args: RunicArgs<X, [constantName: K]>) {
@@ -25,6 +22,6 @@ export class PalletRune<
     return this
       .into(ValueRune)
       .access("constants", constantName.as(Rune))
-      .into(ConstantRune, this.as(PalletRune))
+      .into(ConstantRune, this.chain)
   }
 }

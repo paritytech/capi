@@ -4,23 +4,17 @@ import { BlockRune } from "./BlockRune.ts"
 import { Chain } from "./ChainRune.ts"
 import { EventsChain } from "./EventsRune.ts"
 import { ExtrinsicEventsRune } from "./ExtrinsicsEventsRune.ts"
+import { PatternRune } from "./PatternRune.ts"
 import { SignedExtrinsicRune } from "./SignedExtrinsicRune.ts"
 
 export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
-  extends Rune<Rune<known.TransactionStatus, U1>, U2>
+  extends PatternRune<Rune<known.TransactionStatus, U1>, C, U2, SignedExtrinsicRune<C, U2>>
 {
-  constructor(
-    _prime: ExtrinsicStatusRune<C, U1, U2>["_prime"],
-    readonly extrinsic: SignedExtrinsicRune<C, U2>,
-  ) {
-    super(_prime)
-  }
-
   dbgStatus<X>(...prefix: RunicArgs<X, unknown[]>): ExtrinsicStatusRune<C, U1, U2> {
     return this
       .into(ValueRune)
       .map((rune) => rune.into(ValueRune).dbg(...prefix))
-      .into(ExtrinsicStatusRune, this.extrinsic)
+      .into(ExtrinsicStatusRune, this.chain, this.parent)
   }
 
   transactionStatuses(isTerminal: (txStatus: known.TransactionStatus) => boolean) {
@@ -42,7 +36,7 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
   }
 
   inBlock() {
-    return this.extrinsic.chain.block(this.inBlockHash())
+    return this.chain.block(this.inBlockHash())
   }
 
   finalizedHash() {
@@ -57,7 +51,7 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
   }
 
   finalized() {
-    return this.extrinsic.chain.block(this.finalizedHash())
+    return this.chain.block(this.finalizedHash())
   }
 
   inBlockEvents(this: ExtrinsicStatusRune<EventsChain<C>, U1, U2>) {
@@ -73,7 +67,7 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
     block: BlockRune<EventsChain<C>, EU>,
   ) {
     const txI = Rune
-      .tuple([block.into(ValueRune).access("block", "extrinsics"), this.extrinsic.hex()])
+      .tuple([block.into(ValueRune).access("block", "extrinsics"), this.parent.hex()])
       .map(([hexes, hex]) => {
         const i = hexes.indexOf("0x" + hex)
         return i === -1 ? undefined : i
@@ -83,7 +77,7 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
       .map(([events, txI]) =>
         events.filter((event) => event.phase.type === "ApplyExtrinsic" && event.phase.value === txI)
       )
-      .into(ExtrinsicEventsRune, this.extrinsic.chain)
+      .into(ExtrinsicEventsRune, this.chain)
   }
 }
 

@@ -1,13 +1,10 @@
 import { hex } from "../crypto/mod.ts"
-import { Rune, ValueRune } from "../rune/mod.ts"
-import { Chain, ChainRune } from "./ChainRune.ts"
+import { ValueRune } from "../rune/mod.ts"
+import { Chain } from "./ChainRune.ts"
 import { ExtrinsicStatusRune } from "./ExtrinsicStatusRune.ts"
+import { PatternRune } from "./PatternRune.ts"
 
-export class SignedExtrinsicRune<out C extends Chain, out U> extends Rune<Uint8Array, U> {
-  constructor(_prime: SignedExtrinsicRune<C, U>["_prime"], readonly chain: ChainRune<C, U>) {
-    super(_prime)
-  }
-
+export class SignedExtrinsicRune<out C extends Chain, out U> extends PatternRune<Uint8Array, C, U> {
   hex() {
     return this.into(ValueRune).map(hex.encode)
   }
@@ -22,6 +19,6 @@ export class SignedExtrinsicRune<out C extends Chain, out U> extends Rune<Uint8A
           hex,
         )
       )
-      .into(ExtrinsicStatusRune, this)
+      .into(ExtrinsicStatusRune, this.chain, this)
   }
 }

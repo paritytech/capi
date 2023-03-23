@@ -3,6 +3,7 @@ import { $extrinsic, Signer } from "../frame_metadata/Extrinsic.ts"
 import { Rune, ValueRune } from "../rune/mod.ts"
 import { Chain, ChainRune } from "./ChainRune.ts"
 import { CodecRune } from "./CodecRune.ts"
+import { PatternRune } from "./PatternRune.ts"
 import { SignedExtrinsicRune } from "./SignedExtrinsicRune.ts"
 
 export interface ExtrinsicSender<C extends Chain> {
@@ -20,18 +21,13 @@ export type SignatureDataFactory<C extends Chain, CU, SU> = (
   chain: ChainRune<C, CU>,
 ) => Rune<SignatureData<C>, SU>
 
-export class ExtrinsicRune<out C extends Chain, out U> extends Rune<Chain.Call<C>, U> {
-  hash
-
-  constructor(_prime: ExtrinsicRune<C, U>["_prime"], readonly chain: ChainRune<C, U>) {
-    super(_prime)
-    this.hash = this.chain
-      .into(ValueRune)
-      .access("metadata", "extrinsic", "call")
-      .map((x) => blake2_256.$hash<any>(x))
-      .into(CodecRune)
-      .encoded(this)
-  }
+export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain.Call<C>, C, U> {
+  hash = this.chain
+    .into(ValueRune)
+    .access("metadata", "extrinsic", "call")
+    .map((x) => blake2_256.$hash<any>(x))
+    .into(CodecRune)
+    .encoded(this)
 
   signed<SU>(signatureFactory: SignatureDataFactory<C, U, SU>) {
     return Rune.fn($extrinsic)

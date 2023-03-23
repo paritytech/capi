@@ -2,28 +2,19 @@ import { hex } from "../crypto/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { Chain } from "./ChainRune.ts"
 import { CodecRune } from "./CodecRune.ts"
-import { PalletRune } from "./PalletRune.ts"
+import { PatternRune } from "./PatternRune.ts"
 
 export class StorageRune<
   out C extends Chain,
   out P extends Chain.PalletName<C>,
   out S extends Chain.StorageName<C, P>,
   out U,
-> extends Rune<Chain.Storage<C, P, S>, U> {
-  $key
-  $partialKey
-  $value
-
-  constructor(_prime: StorageRune<C, P, S, U>["_prime"], readonly pallet: PalletRune<C, P, U>) {
-    super(_prime)
-    this.$key = this.into(ValueRune).access("key").into(CodecRune<Chain.Storage.Key<C, P, S>, U>)
-    this.$partialKey = this.into(ValueRune).access("partialKey").into(
-      CodecRune<Chain.Storage.PartialKey<C, P, S>, U>,
-    )
-    this.$value = this.into(ValueRune).access("value").into(
-      CodecRune<Chain.Storage.Value<C, P, S>, U>,
-    )
-  }
+> extends PatternRune<Chain.Storage<C, P, S>, C, U> {
+  $key = this.into(ValueRune).access("key").into(CodecRune<Chain.Storage.Key<C, P, S>, U>)
+  $partialKey = this.into(ValueRune).access("partialKey").into(
+    CodecRune<Chain.Storage.PartialKey<C, P, S>, U>,
+  )
+  $value = this.into(ValueRune).access("value").into(CodecRune<Chain.Storage.Value<C, P, S>, U>)
 
   valueRaw<X>(
     ...[key, blockHash]: RunicArgs<X, [
@@ -32,7 +23,7 @@ export class StorageRune<
     ]>
   ) {
     const storageKey = this.$key.encoded(key).map(hex.encode)
-    return this.pallet.chain.connection
+    return this.chain.connection
       .call("state_getStorage", storageKey, blockHash)
       .unhandle(null)
       .rehandle(null, () => Rune.constant(undefined))
@@ -56,12 +47,8 @@ export class StorageRune<
       blockHash?: string,
     ]>
   ) {
-    return this.pallet.chain.connection
-      .call(
-        "state_getStorageSize",
-        this.$partialKey.encoded(partialKey).map(hex.encode),
-        blockHash,
-      )
+    return this.chain.connection
+      .call("state_getStorageSize", this.$partialKey.encoded(partialKey).map(hex.encode), blockHash)
       .unhandle(null)
       .rehandle(null, () => Rune.constant(undefined))
   }
@@ -75,11 +62,7 @@ export class StorageRune<
     ]>
   ) {
     const storageKeys = this.keyPageRaw(count, partialKey, start, blockHash)
-    return this.pallet.chain.connection.call(
-      "state_queryStorageAt",
-      storageKeys,
-      blockHash,
-    )
+    return this.chain.connection.call("state_queryStorageAt", storageKeys, blockHash)
   }
 
   entryPage<X>(
@@ -122,13 +105,7 @@ export class StorageRune<
           .map(hex.encode)
           .rehandle(undefined),
     )
-    return this.pallet.chain.connection.call(
-      "state_getKeysPaged",
-      storageKey,
-      count,
-      startKey,
-      blockHash,
-    )
+    return this.chain.connection.call("state_getKeysPaged", storageKey, count, startKey, blockHash)
   }
 
   keyPage<X>(

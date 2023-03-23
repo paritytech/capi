@@ -9,6 +9,7 @@ import {
   ExtrinsicSender,
   hex,
   MetaRune,
+  PatternRune,
   Rune,
   RunicArgs,
   ValueRune,
@@ -28,27 +29,20 @@ export const $virtualMultisig: $.Codec<VirtualMultisig> = $.object(
   $.field("stash", $.sizedUint8Array(32)),
 )
 
-export class VirtualMultisigRune<out C extends Chain, out U> extends Rune<VirtualMultisig, U> {
-  inner
-  proxies
-  stash
-  encoded
-  hex
-
-  constructor(_prime: VirtualMultisigRune<C, U>["_prime"], readonly chain: ChainRune<C, U>) {
-    super(_prime)
-    const v = this.into(ValueRune)
-    this.stash = v.access("stash")
-    this.proxies = v
-      .access("members")
-      .map((arr) => Object.fromEntries(arr.map((a, i): [string, number] => [hex.encode(a[0]), i])))
-    this.inner = Rune.rec({
-      signatories: v.access("members").map((arr) => arr.map((a) => a[1])),
-      threshold: v.access("threshold"),
-    }).into(MultisigRune, chain)
-    this.encoded = v.map((m) => $virtualMultisig.encode(m))
-    this.hex = this.encoded.map(hex.encode)
-  }
+export class VirtualMultisigRune<out C extends Chain, out U>
+  extends PatternRune<VirtualMultisig, C, U>
+{
+  value = this.into(ValueRune)
+  stash = this.value.access("stash")
+  proxies = this.value
+    .access("members")
+    .map((arr) => Object.fromEntries(arr.map((a, i): [string, number] => [hex.encode(a[0]), i])))
+  inner = Rune.rec({
+    signatories: this.value.access("members").map((arr) => arr.map((a) => a[1])),
+    threshold: this.value.access("threshold"),
+  }).into(MultisigRune, this.chain)
+  encoded = this.value.map((m) => $virtualMultisig.encode(m))
+  hex = this.encoded.map(hex.encode)
 
   proxyBySenderAddr<X>(...[senderAddr]: RunicArgs<X, [Uint8Array]>) {
     const signatories = this.inner.into(ValueRune).access("signatories")
