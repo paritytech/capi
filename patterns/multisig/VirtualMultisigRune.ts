@@ -15,7 +15,6 @@ import {
   ValueRune,
 } from "../../mod.ts"
 import { filterPureCreatedEvents, replaceDelegateCalls } from "../proxy/mod.ts"
-import { signature } from "../signature/polkadot.ts"
 import { MultisigChain, MultisigRune } from "./MultisigRune.ts"
 
 export interface VirtualMultisig {
