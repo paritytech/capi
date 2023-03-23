@@ -30,7 +30,7 @@ npm i https://capi.dev/frame/wss/rpc.polkadot.io/@latest/pkg.tar
 import {} from "https://capi.dev/frame/wss/rpc.polkadot.io/@latest/mod.js"
 ```
 
-## Usage
+## At A Glance
 
 ```ts
 import { System } from "@capi/polkadot"
@@ -38,7 +38,7 @@ import { System } from "@capi/polkadot"
 const accounts = await System.Account.entryPage(10, null).run()
 ```
 
-## Examples
+## Running Examples
 
 Within a fresh clone of this repository...
 
