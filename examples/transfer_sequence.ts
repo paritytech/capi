@@ -4,23 +4,17 @@ import { signature } from "../patterns/signature/polkadot.ts"
 
 const [alexa, billy, carol] = await users(3)
 
-await Rune
-  .chain(balances)
-  .chain(() => transfer("bob", billy))
-  .chain(balances)
-  .chain(() => transfer("charlie", carol))
-  .chain(balances)
-  .run()
+const balances = Rune.rec({
+  alice: balance(alexa),
+  bob: balance(billy),
+  charlie: balance(carol),
+})
 
-function balances() {
-  return Rune
-    .rec({
-      alice: balance(alexa),
-      bob: balance(billy),
-      charlie: balance(carol),
-    })
-    .dbg("Balances:")
-}
+console.log("Initial balances", await balances.run())
+await transfer("bob", billy).run()
+console.log("Balances after Bob transfer", await balances.run())
+await transfer("carol", carol).run()
+console.log("Final balances", await balances.run())
 
 function balance(user: Sr25519) {
   return System.Account.value(user.publicKey).unhandle(undefined).access("data", "free")
@@ -35,5 +29,5 @@ function transfer(name: string, user: Sr25519) {
     .signed(signature({ sender: alexa }))
     .sent()
     .dbgStatus(`Transfer to ${name}:`)
-    .finalized()
+    .finalizedHash()
 }
