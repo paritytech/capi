@@ -24,7 +24,7 @@ await Balances
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Existential deposit:")
-  .finalized()
+  .finalizedHash()
   .run()
 
 // The to-be proposed and approved call

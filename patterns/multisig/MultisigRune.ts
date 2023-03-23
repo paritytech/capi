@@ -102,31 +102,31 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
       .into(ExtrinsicRune, this.chain)
   }
 
-  private maybeTimepoint<X>(...[callHash]: RunicArgs<X, [callHash: Uint8Array]>) {
-    return Rune.captureUnhandled(
-      [this, this.chain, callHash],
-      (multisig, chain, callHash) =>
-        multisig.into(MultisigRune, chain.into(ChainRune))
-          .proposal(callHash)
-          .unsafeAs<{ when: unknown }>()
-          .into(ValueRune)
-          .access("when"),
-    )
+  private maybeTimepoint<X>(
+    ...[callHash, blockHash]: RunicArgs<X, [callHash: Uint8Array, blockHash?: string]>
+  ) {
+    return this
+      .proposal(callHash, blockHash)
+      .unhandle(undefined)
+      .access("when")
+      .rehandle(undefined)
   }
 
-  proposals<X>(...[count]: RunicArgs<X, [count: number]>) {
+  proposals<X>(...[count, blockHash]: RunicArgs<X, [count: number, blockHash?: string]>) {
     // @ts-ignore .
-    return this.storage.keyPage(count, Rune.tuple([this.accountId]))
+    return this.storage.keyPage(count, Rune.tuple([this.accountId]), undefined, blockHash)
   }
 
-  proposal<X>(...[callHash]: RunicArgs<X, [callHash: Uint8Array]>) {
+  proposal<X>(...[callHash, blockHash]: RunicArgs<X, [callHash: Uint8Array, blockHash?: string]>) {
     // @ts-ignore .
-    return this.storage.value(Rune.tuple([this.accountId, callHash]))
+    return this.storage.value(Rune.tuple([this.accountId, callHash]), blockHash)
   }
 
-  isProposed<X>(...[callHash]: RunicArgs<X, [callHash: Uint8Array]>) {
+  isProposed<X>(
+    ...[callHash, blockHash]: RunicArgs<X, [callHash: Uint8Array, blockHash?: string]>
+  ) {
     // @ts-ignore .
-    return this.storage.valueRaw(Rune.tuple([this.accountId, callHash]))
+    return this.storage.valueRaw(Rune.tuple([this.accountId, callHash]), blockHash)
       .map((entry) => entry !== null)
   }
 }
