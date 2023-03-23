@@ -97,6 +97,7 @@ export class StorageRune<
     ]>
   ) {
     const storageKey = this.$partialKey.encoded(partialKey).map(hex.encode)
+    // HEAD
     const startKey = Rune.captureUnhandled(
       [this.$key, start],
       (codec, start) =>
@@ -106,6 +107,19 @@ export class StorageRune<
           .rehandle(undefined),
     )
     return this.chain.connection.call("state_getKeysPaged", storageKey, count, startKey, blockHash)
+    //
+    const startKey = this.$key
+      .encoded(Rune.resolve(start).unhandle(undefined))
+      .map(hex.encode)
+      .rehandle(undefined)
+    return this.pallet.chain.connection.call(
+      "state_getKeysPaged",
+      storageKey,
+      count,
+      startKey,
+      blockHash,
+    )
+    // 2a22306 (continued)
   }
 
   keyPage<X>(

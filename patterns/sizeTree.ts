@@ -13,7 +13,10 @@ export function sizeTree<C extends Chain, U, X>(
           Rune.rec(Object.fromEntries(
             Object.values(pallet.storage).map((entry) => [
               entry.name,
-              chain.pallet(pallet.name).storage(entry.name).size(undefined!, blockHash),
+              chain
+                .pallet(pallet.name)
+                .storage(entry.name)
+                .size(null!, blockHash),
             ]) || [],
           )),
         ]),
