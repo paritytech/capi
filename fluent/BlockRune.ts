@@ -11,7 +11,7 @@ import { PatternRune } from "./PatternRune.ts"
 export class BlockRune<out C extends Chain, out U>
   extends PatternRune<known.SignedBlock, C, U, Rune<string, U>>
 {
-  hash = this.prev
+  hash = this.parent
 
   header() {
     return this.into(ValueRune).access("block", "header")
@@ -35,7 +35,7 @@ export class BlockRune<out C extends Chain, out U>
     return this.chain
       .pallet("System")
       .storage("Events")
-      .value(undefined!, this.prev)
+      .value(undefined!, this.parent)
       .unhandle(undefined)
       .rehandle(undefined, () => Rune.constant<Event<C>[]>([]))
       .into(EventsRune, this.chain)

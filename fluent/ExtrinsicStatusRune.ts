@@ -14,7 +14,7 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
     return this
       .into(ValueRune)
       .map((rune) => rune.into(ValueRune).dbg(...prefix))
-      .into(ExtrinsicStatusRune, this.chain, this.prev)
+      .into(ExtrinsicStatusRune, this.chain, this.parent)
   }
 
   transactionStatuses(isTerminal: (txStatus: known.TransactionStatus) => boolean) {
@@ -67,7 +67,7 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
     block: BlockRune<EventsChain<C>, EU>,
   ) {
     const txI = Rune
-      .tuple([block.into(ValueRune).access("block", "extrinsics"), this.prev.hex()])
+      .tuple([block.into(ValueRune).access("block", "extrinsics"), this.parent.hex()])
       .map(([hexes, hex]) => {
         const i = hexes.indexOf("0x" + hex)
         return i === -1 ? undefined : i
