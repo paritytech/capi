@@ -34,7 +34,7 @@ npm i capi https://capi.dev/frame/wss/rpc.polkadot.io/@latest/pkg.tar
 }
 ```
 
-## At A Glance
+## At a Glance
 
 ```ts
 import { System } from "@capi/polkadot"
