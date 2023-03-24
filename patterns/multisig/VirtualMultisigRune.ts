@@ -45,7 +45,7 @@ export class VirtualMultisigRune<out C extends Chain, out U>
   encoded = this.value.map((m) => $virtualMultisig.encode(m))
   hex = this.encoded.map(hex.encode)
 
-  proxyBySenderAccountId<X>(...[senderAccountId]: RunicArgs<X, [senderAccountId: Uint8Array]>) {
+  senderProxyId<X>(...[senderAccountId]: RunicArgs<X, [senderAccountId: Uint8Array]>) {
     const senderAccountIdHex = Rune.resolve(senderAccountId).map(hex.encode)
     const senderProxyI = this.proxies.access(senderAccountIdHex)
     const senderProxyAccountId = this.inner
@@ -63,7 +63,7 @@ export class VirtualMultisigRune<out C extends Chain, out U>
         type: "Balances",
         value: Rune.rec({
           type: "transfer",
-          dest: this.proxyBySenderAccountId(senderAccountId),
+          dest: this.senderProxyId(senderAccountId),
           value: amount,
         }),
       })
@@ -73,7 +73,7 @@ export class VirtualMultisigRune<out C extends Chain, out U>
   ratify<X>(
     ...[senderAccountId, call]: RunicArgs<X, [senderAccountId: Uint8Array, call: unknown]>
   ) {
-    const sender = this.proxyBySenderAccountId(senderAccountId)
+    const sender = this.senderProxyId(senderAccountId)
     const call_ = this.chain.extrinsic(
       Rune.rec({
         type: "Proxy" as const,

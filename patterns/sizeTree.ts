@@ -1,3 +1,4 @@
+import { mapEntries } from "../deps/std/collections/map_entries.ts"
 import { Chain, ChainRune, MetaRune, Rune, RunicArgs, ValueRune } from "../mod.ts"
 
 export function sizeTree<U, X>(
@@ -7,26 +8,22 @@ export function sizeTree<U, X>(
   return chain.metadata
     .into(ValueRune)
     .map(({ pallets }) =>
-      Rune.rec(Object.fromEntries(
-        Object.values(pallets).map((pallet) => [
-          pallet.name,
-          Rune.rec(Object.fromEntries(
-            Object.values(pallet.storage).map((entry) => {
-              const partialKeyType: string = entry.partialKey._metadata[0]?.args[2]?._metadata[0]
-                ?.name
-              const partialKey = {
-                $partialEmptyKey: undefined,
-                $partialSingleKey: null,
-                $partialMultiKey: [],
-              }[partialKeyType]
-              return [
-                entry.name,
-                chain.pallet(pallet.name).storage(entry.name).size(partialKey, blockHash),
-              ]
-            }) || [],
-          )),
-        ]),
-      ))
+      Rune.rec(mapEntries(pallets, ([palletName, pallet]) => [
+        palletName,
+        Rune.rec(mapEntries(pallet.storage, ([storageName, $storage]) => {
+          const partialKeyType: string = $storage.partialKey._metadata[0]?.args[2]?._metadata[0]
+            ?.name
+          const partialKey = {
+            $partialEmptyKey: undefined,
+            $partialSingleKey: null,
+            $partialMultiKey: [],
+          }[partialKeyType]
+          return [
+            storageName,
+            chain.pallet(pallet.name).storage(storageName).size(partialKey, blockHash),
+          ]
+        })),
+      ]))
     )
     .into(MetaRune)
     .flat()
