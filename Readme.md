@@ -29,7 +29,7 @@ npm i capi https://capi.dev/frame/wss/rpc.polkadot.io/@latest/pkg.tar
 ```json
 {
   "imports": {
-    "@capi/polkadot": "http://localhost:4646/frame/wss/rpc.polkadot.io/@latest/"
+    "@capi/polkadot": "https://capi.dev/frame/wss/rpc.polkadot.io/@latest/"
   }
 }
 ```
