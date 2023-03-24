@@ -24,8 +24,14 @@ npm i capi https://capi.dev/frame/wss/rpc.polkadot.io/@latest/pkg.tar
 
 ### [Deno](https://deno.land/)
 
-```ts
-import {} from "https://capi.dev/frame/wss/rpc.polkadot.io/@latest/mod.js"
+`import_map.json`
+
+```json
+{
+  "imports": {
+    "@capi/polkadot": "http://localhost:4646/frame/wss/rpc.polkadot.io/@latest/mod.js"
+  }
+}
 ```
 
 ## At A Glance
