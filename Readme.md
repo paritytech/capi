@@ -16,12 +16,10 @@ interactions without compromising either performance or ease of use.
 
 ## Installation
 
-We can substitute the URL's target (in this case the WebSocket URL of a proxy).
-
 ### [Node.js](https://nodejs.org/)
 
 ```sh
-npm i https://capi.dev/frame/wss/rpc.polkadot.io/@latest/pkg.tar
+npm i capi https://capi.dev/frame/wss/rpc.polkadot.io/@latest/pkg.tar
 ```
 
 ### [Deno](https://deno.land/)
