@@ -65,7 +65,6 @@ export class WsConnection extends Connection {
           this.ws.close()
           controller.abort()
         }, options)
-        this.ws.addEventListener("close", () => {}, options)
         this.ws.addEventListener("error", () => {
           throw new ConnectionError("Error occurred during CONNECTING")
         }, options)
