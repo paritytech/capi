@@ -14,8 +14,7 @@ if (!state) {
       founders: [alexa.publicKey, billy.publicKey, carol.publicKey],
       threshold: 2,
       deployer: alexa.address,
-    }, signature({ sender: alexa })).hex
-    .run()
+    }, signature({ sender: alexa })).hex.run()
 }
 
 console.log(`Virtual multisig state hex: ${state}`)
@@ -33,7 +32,9 @@ await Balances
   .finalizedHash()
   .run()
 
-console.log("Dave balance before:", await System.Account.value(david.publicKey).run())
+const daveBalance = System.Account.value(david.publicKey)
+
+console.log("Dave balance before:", await daveBalance.run())
 
 const proposal = Balances.transfer({
   dest: david.address,
@@ -43,7 +44,7 @@ const proposal = Balances.transfer({
 await fundAndRatify("billy", carol).run()
 await fundAndRatify("carol", carol).run()
 
-console.log("Dave balance after:", await System.Account.value(david.publicKey).run())
+console.log("Dave balance after:", await daveBalance.run())
 
 function fundAndRatify(name: string, sender: Sr25519) {
   return Utility

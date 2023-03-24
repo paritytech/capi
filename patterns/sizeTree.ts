@@ -18,8 +18,10 @@ export function sizeTree<U, X>(
                 $partialSingleKey: null,
                 $partialMultiKey: [],
               }[partialKeyType as string]
-              const storage = chain.pallet(pallet.name).storage(entry.name)
-              return [entry.name, storage.size(partialKey, blockHash)]
+              return [
+                entry.name,
+                chain.pallet(pallet.name).storage(entry.name).size(partialKey, blockHash),
+              ]
             }) || [],
           )),
         ]),
