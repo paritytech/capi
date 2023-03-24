@@ -12,12 +12,13 @@ export function sizeTree<U, X>(
           pallet.name,
           Rune.rec(Object.fromEntries(
             Object.values(pallet.storage).map((entry) => {
-              const partialKeyType = entry.partialKey._metadata[0]?.args[2]?._metadata[0]?.name
+              const partialKeyType: string = entry.partialKey._metadata[0]?.args[2]?._metadata[0]
+                ?.name
               const partialKey = {
                 $partialEmptyKey: undefined,
                 $partialSingleKey: null,
                 $partialMultiKey: [],
-              }[partialKeyType as string]
+              }[partialKeyType]
               return [
                 entry.name,
                 chain.pallet(pallet.name).storage(entry.name).size(partialKey, blockHash),
