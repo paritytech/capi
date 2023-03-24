@@ -29,7 +29,7 @@ npm i capi https://capi.dev/frame/wss/rpc.polkadot.io/@latest/pkg.tar
 ```json
 {
   "imports": {
-    "@capi/polkadot": "http://localhost:4646/frame/wss/rpc.polkadot.io/@latest/mod.js"
+    "@capi/polkadot": "http://localhost:4646/frame/wss/rpc.polkadot.io/@latest/"
   }
 }
 ```
@@ -41,6 +41,8 @@ import { System } from "@capi/polkadot"
 
 const accounts = await System.Account.entryPage(10, null).run()
 ```
+
+> Note: to run with Deno, import from `@capi/polkadot/mod.js`
 
 ## Running Examples
 
