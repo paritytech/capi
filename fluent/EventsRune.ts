@@ -5,6 +5,21 @@ import { PatternRune } from "./PatternRune.ts"
 
 export class EventsRune<out C extends Chain, out U> extends PatternRune<Event<C>[], C, U> {}
 
+export interface TmpEventsChain extends Chain {
+  metadata: FrameMetadata & {
+    pallets: {
+      System: {
+        storage: {
+          Events: {
+            key: Codec<void>
+            value: Codec<_Event<any>[]>
+          }
+        }
+      }
+    }
+  }
+}
+
 interface _EventsChain<RE> extends Chain {
   metadata: FrameMetadata & {
     pallets: {

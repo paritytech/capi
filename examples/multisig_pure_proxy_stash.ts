@@ -14,7 +14,7 @@ const multisig = Rune
   })
   .into(MultisigRune, chain)
 
-const fundMultisig = Balances
+await Balances
   .transfer({
     value: 20_000_000_000_000n,
     dest: multisig.address,
@@ -22,42 +22,34 @@ const fundMultisig = Balances
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Fund Multisig:")
-  .finalized()
+  .finalizedHash()
+  .run()
 
-const aliceRatify = multisig
-  .ratify({
-    call: Proxy.createPure({
-      proxyType: "Any",
-      delay: 0,
-      index: 0,
-    }),
-    sender: alexa.address,
-  })
+const call = Proxy.createPure({
+  proxyType: "Any",
+  delay: 0,
+  index: 0,
+})
+
+await multisig
+  .ratify({ call, sender: alexa.address })
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Alice Ratify:")
-  .finalized()
+  .finalizedHash()
+  .run()
 
-const bobRatify = multisig
-  .ratify({
-    call: Proxy.createPure({
-      proxyType: "Any",
-      delay: 0,
-      index: 0,
-    }),
-    sender: billy.address,
-  })
+const stashAddress = await multisig
+  .ratify({ call, sender: billy.address })
   .signed(signature({ sender: billy }))
   .sent()
   .dbgStatus("Bob Ratify:")
-
-const stashAddress = bobRatify
   .finalizedEvents()
   .pipe(filterPureCreatedEvents)
-  .map((events) => events[0]!)
-  .access("pure")
+  .access(0, "pure")
+  .run()
 
-const fundStash = Balances
+await Balances
   .transfer({
     value: 20_000_000_000_000n,
     dest: MultiAddress.Id(stashAddress),
@@ -65,12 +57,7 @@ const fundStash = Balances
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Fund Stash:")
-  .finalized()
-
-await Rune
-  .chain(() => fundMultisig)
-  .chain(() => aliceRatify)
-  .chain(() => stashAddress)
-  .chain(() => fundStash)
-  .chain(() => System.Account.value(stashAddress).dbg("Stash Balance:"))
+  .finalizedHash()
   .run()
+
+console.log("Stash balance:", await System.Account.value(stashAddress).run())

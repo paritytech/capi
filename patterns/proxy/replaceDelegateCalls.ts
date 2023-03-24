@@ -1,6 +1,7 @@
 import { MultiAddress } from "polkadot/types/sp_runtime/multiaddress.js"
 import { Chain, ChainRune, Rune, RunicArgs } from "../../mod.ts"
 
+// TODO: constrain
 export function replaceDelegateCalls<C extends Chain, U, X>(
   chain: ChainRune<C, U>,
   ...[real, from, to]: RunicArgs<X, [real: MultiAddress, from: MultiAddress, to: MultiAddress]>

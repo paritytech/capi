@@ -1,23 +1,22 @@
+import { mapEntries } from "../deps/std/collections/map_entries.ts"
 import { Chain, ChainRune, MetaRune, Rune, RunicArgs, ValueRune } from "../mod.ts"
 
-export function sizeTree<C extends Chain, U, X>(
-  chain: ChainRune<C, U>,
+export function sizeTree<U, X>(
+  chain: ChainRune<Chain, U>,
   ...[blockHash]: RunicArgs<X, [blockHash?: string]>
 ) {
   return chain.metadata
     .into(ValueRune)
     .map(({ pallets }) =>
-      Rune.rec(Object.fromEntries(
-        Object.values(pallets).map((pallet) => [
-          pallet.name,
-          Rune.rec(Object.fromEntries(
-            Object.values(pallet.storage).map((entry) => [
-              entry.name,
-              chain.pallet(pallet.name).storage(entry.name).size(undefined!, blockHash),
-            ]) || [],
-          )),
-        ]),
-      ))
+      Rune.rec(mapEntries(pallets, ([palletName, pallet]) => [
+        palletName,
+        Rune.rec(
+          mapEntries(pallet.storage, ([storageName]) => [
+            storageName,
+            chain.pallet(pallet.name).storage(storageName).size(null, blockHash),
+          ]),
+        ),
+      ]))
     )
     .into(MetaRune)
     .flat()

@@ -25,5 +25,4 @@ const raw = Identity.IdentityOf
   .unhandle(undefined)
   .access("info")
 
-// @ts-ignore will re-implement this pattern later anyways
 console.log(await transcoders.decode(raw).run())

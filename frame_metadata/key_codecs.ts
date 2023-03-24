@@ -81,6 +81,7 @@ export function $partialMultiKey<T>(...codecs: $.Codec<T>[]): $.Codec<T[] | null
       throw new Error("Cannot decode partial key")
     },
     _assert(assert) {
+      if (assert.value === null) return
       assert.instanceof(this, Array)
       const assertLength = assert.key(this, "length")
       assertLength.typeof(this, "number")
