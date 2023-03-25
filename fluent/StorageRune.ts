@@ -53,6 +53,12 @@ export class StorageRune<
       .rehandle(null, () => Rune.constant(undefined))
   }
 
+  default() {
+    return this.$value
+      .decoded(this.into(ValueRune).access("default").unhandle(undefined))
+      .rehandle(undefined)
+  }
+
   entryPageRaw<X>(
     ...[count, partialKey, start, blockHash]: RunicArgs<X, [
       count: number,

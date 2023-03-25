@@ -1,3 +1,4 @@
+import { hex } from "../crypto/mod.ts"
 import * as $ from "../deps/scale.ts"
 import { FrameMetadata } from "../frame_metadata/mod.ts"
 import { CodecCodegen } from "./CodecCodegen.ts"
@@ -66,6 +67,7 @@ export * as types from "./types/mod.js"
         `
 import { chain, ${isTypes ? this.chainName : ""} } from "./chain.js"
 import * as C from "./capi.js"
+import * as _codecs from "./codecs.js"
 import * as t from "./types/mod.js"
 
 ${
@@ -86,6 +88,16 @@ export ${isTypes ? `namespace ${pallet.name}` : `const ${pallet.name} =`} {
                     JSON.stringify(storage.name)
                   }, never>`
                   : `${storage.name}: pallet.storage(${JSON.stringify(storage.name)}),`
+              ).join("\n\n")
+            }
+
+  ${
+              Object.values(pallet.constants).map((constant) =>
+                isTypes
+                  ? `export const ${constant.name}: ${this.typeCodegen.native(constant.codec)}`
+                  : `${constant.name}: ${
+                    this.codecCodegen.print(constant.codec)
+                  }.decode(C.hex.decode(${JSON.stringify(hex.encode(constant.value))})),`
               ).join("\n\n")
             }
 
