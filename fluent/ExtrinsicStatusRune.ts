@@ -35,7 +35,7 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
       .unhandle(NeverInBlockError)
   }
 
-  inBlock() {
+  inBlockBlock() {
     return this.chain.block(this.inBlockHash())
   }
 
@@ -50,16 +50,16 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
       .unhandle(NeverFinalizedError)
   }
 
-  finalized() {
+  finalizedBlock() {
     return this.chain.block(this.finalizedHash())
   }
 
   inBlockEvents(this: ExtrinsicStatusRune<EventsChain<C>, U1, U2>) {
-    return this.events(this.inBlock())
+    return this.events(this.inBlockBlock())
   }
 
   finalizedEvents(this: ExtrinsicStatusRune<EventsChain<C>, U1, U2>) {
-    return this.events(this.finalized())
+    return this.events(this.finalizedBlock())
   }
 
   events<EU>(
