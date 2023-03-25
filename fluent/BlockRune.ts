@@ -5,7 +5,8 @@ import { ArrayRune, Rune } from "../rune/mod.ts"
 import { ValueRune } from "../rune/ValueRune.ts"
 import { Chain } from "./ChainRune.ts"
 import { CodecRune } from "./CodecRune.ts"
-import { Event, EventsRune } from "./EventsRune.ts"
+import { EventsChain } from "./constraints/mod.ts"
+import { EventsRune } from "./EventsRune.ts"
 import { PatternRune } from "./PatternRune.ts"
 
 export class BlockRune<out C extends Chain, out U>
@@ -22,7 +23,8 @@ export class BlockRune<out C extends Chain, out U>
   }
 
   extrinsics() {
-    const $ext = Rune.fn($extrinsic)
+    const $ext = Rune
+      .fn($extrinsic)
       .call(this.chain.metadata)
       .into(CodecRune)
     return this
@@ -31,13 +33,13 @@ export class BlockRune<out C extends Chain, out U>
       .mapArray((h) => $ext.decoded(h.map(hex.decode)))
   }
 
-  events() {
+  events(this: BlockRune<EventsChain<C>, U>) {
     return this.chain
       .pallet("System")
       .storage("Events")
-      .value(undefined!, this.parent)
+      .value(undefined, this.parent)
       .unhandle(undefined)
-      .rehandle(undefined, () => Rune.constant<Event<C>[]>([]))
+      .rehandle(undefined, () => Rune.constant([] as EventsChain.Event<C>[]))
       .into(EventsRune, this.chain)
   }
 }

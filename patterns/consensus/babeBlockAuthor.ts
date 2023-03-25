@@ -1,25 +1,29 @@
+import { Polkadot } from "polkadot/mod.js"
 import { $preDigest } from "polkadot/types/sp_consensus_babe/digests.js"
-import { AddressPrefixChain, ChainRune } from "../../fluent/mod.ts"
-import { PublicKeyRune } from "../../fluent/mod.ts"
-import { Rune, RunicArgs, ValueRune } from "../../rune/mod.ts"
+import { Chain, ChainRune, PublicKeyRune, Rune, RunicArgs, ValueRune } from "../../mod.ts"
 import { preRuntimeDigest } from "./preRuntimeDigest.ts"
 
-export function babeBlockAuthor<C extends AddressPrefixChain, U, X>(
-  chain: ChainRune<C, U>,
+export type BabeBlockAuthorChain<C extends Chain> =
+  // & Chain
+  & Chain.PickConstant<Polkadot, "System", "SS58Prefix">
+  & Chain.PickStorage<Polkadot, "Session", "Validators">
+
+export function babeBlockAuthor<C extends Chain, U, X>(
+  chain: ChainRune<BabeBlockAuthorChain<C>, U>,
   ...[blockHash]: RunicArgs<X, [blockHash: string]>
 ) {
   const validators = chain
     .pallet("Session")
     .storage("Validators")
-    .value(undefined!, blockHash)
-    .unsafeAs<Uint8Array[] | undefined>()
+    .value(undefined, blockHash)
     .into(ValueRune)
     .unhandle(undefined)
   const authorityIndex = preRuntimeDigest(chain, blockHash)
-    .map(({ type, value }) => {
-      if (type !== "BABE") return new AuthorRetrievalNotSupportedError()
-      return $preDigest.decode(value)
-    })
+    .map(({ type, value }) =>
+      type !== "BABE"
+        ? new AuthorRetrievalNotSupportedError()
+        : $preDigest.decode(value)
+    )
     .unhandle(AuthorRetrievalNotSupportedError)
     .access("value", "authorityIndex")
   return Rune

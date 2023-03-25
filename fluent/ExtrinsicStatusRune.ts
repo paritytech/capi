@@ -2,7 +2,7 @@ import { known } from "../rpc/mod.ts"
 import { MetaRune, Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { BlockRune } from "./BlockRune.ts"
 import { Chain } from "./ChainRune.ts"
-import { EventsChain } from "./EventsRune.ts"
+import { EventsChain } from "./constraints/mod.ts"
 import { ExtrinsicEventsRune } from "./ExtrinsicsEventsRune.ts"
 import { PatternRune } from "./PatternRune.ts"
 import { SignedExtrinsicRune } from "./SignedExtrinsicRune.ts"
@@ -35,11 +35,11 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
       .unhandle(NeverInBlockError)
   }
 
-  inBlock() {
+  inBlock(this: ExtrinsicStatusRune<EventsChain<C>, U1, U2>) {
     return this.chain.block(this.inBlockHash())
   }
 
-  finalizedHash() {
+  finalizedHash(this: ExtrinsicStatusRune<EventsChain<C>, U1, U2>) {
     return this.transactionStatuses(known.TransactionStatus.isTerminal)
       .map((status) =>
         typeof status !== "string" && status.finalized
@@ -50,8 +50,9 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
       .unhandle(NeverFinalizedError)
   }
 
-  finalized() {
-    return this.chain.block(this.finalizedHash())
+  finalized(this: ExtrinsicStatusRune<EventsChain<C>, U1, U2>) {
+    const x = this.finalizedHash()
+    return this.chain.block(x)
   }
 
   inBlockEvents(this: ExtrinsicStatusRune<EventsChain<C>, U1, U2>) {

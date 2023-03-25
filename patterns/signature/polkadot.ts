@@ -1,6 +1,5 @@
 import { Polkadot } from "polkadot/mod.js"
-import { AddressPrefixChain, Chain, ChainRune } from "../../fluent/ChainRune.ts"
-import { ExtrinsicSender, SignatureData } from "../../fluent/ExtrinsicRune.ts"
+import { Chain, ChainRune, ExtrinsicSender, SignatureData, SpChain } from "../../mod.ts"
 import { $, hex, ss58, ValueRune } from "../../mod.ts"
 import { Rune, RunicArgs } from "../../rune/Rune.ts"
 import { Era } from "../../scale_info/overrides/Era.ts"
@@ -12,6 +11,11 @@ export interface SignatureProps {
   nonce?: number
   tip?: bigint
 }
+
+export type PolkadotSignatureChain =
+  & SpChain
+  & Chain.PickConstant<Polkadot, "System", "Version">
+  & Chain.PickExtrinsic
 
 export interface PolkadotSignatureChain extends AddressPrefixChain {
   metadata: AddressPrefixChain["metadata"] & {
@@ -31,7 +35,7 @@ export interface PolkadotSignatureChain extends AddressPrefixChain {
 export function signature<X>(_props: RunicArgs<X, SignatureProps>) {
   return <CU>(chain: ChainRune<PolkadotSignatureChain, CU>) => {
     const props = RunicArgs.resolve(_props)
-    const addrPrefix = chain.addressPrefix()
+    const addrPrefix = chain.pallet("System").constant("SS58Prefix").decoded
     const versions = chain.pallet("System").constant("Version").decoded
     const specVersion = versions.access("specVersion")
     const transactionVersion = versions.access("transactionVersion")

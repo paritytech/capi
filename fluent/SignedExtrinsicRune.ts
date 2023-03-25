@@ -1,6 +1,7 @@
 import { hex } from "../crypto/mod.ts"
 import { ValueRune } from "../rune/mod.ts"
 import { Chain } from "./ChainRune.ts"
+import { EventsChain } from "./constraints/mod.ts"
 import { ExtrinsicStatusRune } from "./ExtrinsicStatusRune.ts"
 import { PatternRune } from "./PatternRune.ts"
 
@@ -9,7 +10,7 @@ export class SignedExtrinsicRune<out C extends Chain, out U> extends PatternRune
     return this.into(ValueRune).map(hex.encode)
   }
 
-  sent() {
+  sent(this: SignedExtrinsicRune<EventsChain<C>, U>) {
     return this
       .hex()
       .map((hex) =>

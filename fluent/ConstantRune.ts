@@ -9,9 +9,6 @@ export class ConstantRune<
   out K extends Chain.ConstantName<C, P>,
   out U,
 > extends PatternRune<Chain.Constant<C, P, K>, C, U> {
-  $value = this
-    .into(ValueRune)
-    .access("codec")
-    .into(CodecRune<Chain.Constant.Value<C, P, K>, U>)
+  $value = this.into(ValueRune).access("codec").into(CodecRune)
   decoded = this.$value.decoded(this.into(ValueRune).access("value"))
 }
