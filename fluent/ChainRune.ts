@@ -14,11 +14,11 @@ export interface Chain<M extends FrameMetadata = FrameMetadata> {
 }
 
 export namespace Chain {
-  export type Call<C extends Chain> = C["metadata"]["extrinsic"]["call"]
-  export type Address<C extends Chain> = C["metadata"]["extrinsic"]["address"]
-  export type Signature<C extends Chain> = C["metadata"]["extrinsic"]["signature"]
-  export type Extra<C extends Chain> = C["metadata"]["extrinsic"]["extra"]
-  export type Additional<C extends Chain> = C["metadata"]["extrinsic"]["additional"]
+  export type Call<C extends Chain> = $.Native<C["metadata"]["extrinsic"]["call"]>
+  export type Address<C extends Chain> = $.Native<C["metadata"]["extrinsic"]["address"]>
+  export type Signature<C extends Chain> = $.Native<C["metadata"]["extrinsic"]["signature"]>
+  export type Extra<C extends Chain> = $.Native<C["metadata"]["extrinsic"]["extra"]>
+  export type Additional<C extends Chain> = $.Native<C["metadata"]["extrinsic"]["additional"]>
 
   export type Pallets<C extends Chain> = C["metadata"]["pallets"]
   export type PalletName<C extends Chain> = Extract<keyof Pallets<C>, string>
