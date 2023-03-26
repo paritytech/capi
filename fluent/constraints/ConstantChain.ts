@@ -1,3 +1,4 @@
+import * as $ from "../../deps/scale.ts"
 import { FrameMetadata } from "../../frame_metadata/FrameMetadata.ts"
 import { Chain } from "../ChainRune.ts"
 
@@ -18,4 +19,4 @@ export type ConstantChain<
   P extends string,
   K extends string,
   V extends Partial<FrameMetadata.Constant>,
-> = C extends ConstantConstraint<P, K, V> ? C : never
+> = ConstantConstraint<P, K, V> extends C ? never : C
