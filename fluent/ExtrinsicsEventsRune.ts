@@ -1,10 +1,7 @@
 import { Chain } from "./ChainRune.ts"
 import { EventsRune } from "./EventsRune.ts"
 
-export class ExtrinsicEventsRune<
-  out C extends Chain,
-  out U,
-> extends EventsRune<C, U> {
+export class ExtrinsicEventsRune<out C extends Chain, out U> extends EventsRune<C, U> {
   // TODO: update
   // // TODO: make generic over `Chain.Error` upon T6 metadata rework
   // unhandleFailed() {

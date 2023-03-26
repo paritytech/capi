@@ -9,9 +9,9 @@ export type StorageChain<
 > = C extends StorageConstraint<P, K, V> ? C : never
 
 interface StorageConstraint<
-  P extends string = string,
-  N extends string = string,
-  S extends Partial<FrameMetadata.StorageEntry> = Partial<FrameMetadata.StorageEntry>,
+  P extends string,
+  N extends string,
+  S extends Partial<FrameMetadata.StorageEntry>,
 > {
   metadata: {
     pallets: Record<P, {

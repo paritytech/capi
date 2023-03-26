@@ -9,9 +9,9 @@ export type ConstantChain<
 > = ConstantConstraint<P, K, V> extends C ? never : C
 
 interface ConstantConstraint<
-  P extends string = string,
-  N extends string = string,
-  C extends Partial<FrameMetadata.Constant> = Partial<FrameMetadata.Constant>,
+  P extends string,
+  N extends string,
+  C extends Partial<FrameMetadata.Constant>,
 > {
   metadata: {
     pallets: Record<P, {
