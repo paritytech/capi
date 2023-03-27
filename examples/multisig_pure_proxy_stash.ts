@@ -22,7 +22,7 @@ await Balances
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Fund Multisig:")
-  .finalizedHash()
+  .finalized()
   .run()
 
 const call = Proxy.createPure({
@@ -36,7 +36,7 @@ await multisig
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Alice Ratify:")
-  .finalizedHash()
+  .finalized()
   .run()
 
 const stashAddress = await multisig
@@ -57,7 +57,7 @@ await Balances
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Fund Stash:")
-  .finalizedHash()
+  .finalized()
   .run()
 
 console.log("Stash balance:", await System.Account.value(stashAddress).run())

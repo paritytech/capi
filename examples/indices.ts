@@ -6,16 +6,16 @@ const [alexa] = await users(1)
 
 const index = 254
 
-const finalizedHash = await Indices
+const hash = await Indices
   .claim({ index })
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus()
-  .finalizedHash()
+  .finalized()
   .run()
 
 const mapped = await Indices.Accounts
-  .value(index, finalizedHash)
+  .value(index, hash)
   .unhandle(undefined)
   .access(0)
   .into(PublicKeyRune)

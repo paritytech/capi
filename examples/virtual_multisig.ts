@@ -29,7 +29,7 @@ await Balances
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Fund Stash:")
-  .finalizedHash()
+  .finalized()
   .run()
 
 const daveBalance = System.Account.value(david.publicKey)
@@ -57,5 +57,5 @@ function fundAndRatify(name: string, sender: Sr25519) {
     .signed(signature({ sender }))
     .sent()
     .dbgStatus(`${name} fund & ratify:`)
-    .finalizedHash()
+    .finalized()
 }

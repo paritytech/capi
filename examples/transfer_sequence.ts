@@ -29,5 +29,5 @@ function transfer(name: string, user: Sr25519) {
     .signed(signature({ sender: alexa }))
     .sent()
     .dbgStatus(`Transfer to ${name}:`)
-    .finalizedHash()
+    .finalized()
 }

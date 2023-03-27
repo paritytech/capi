@@ -3,7 +3,7 @@ import * as $ from "../deps/scale.ts"
 import { decodeMetadata, FrameMetadata } from "../frame_metadata/mod.ts"
 import { Connection, ConnectionCtorLike } from "../rpc/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
-import { BlockRune } from "./BlockRune.ts"
+import { BlockHashRune } from "./BlockHashRune.ts"
 import { ConnectionRune } from "./ConnectionRune.ts"
 import { ExtrinsicRune } from "./ExtrinsicRune.ts"
 import { PalletRune } from "./PalletRune.ts"
@@ -70,21 +70,22 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
 
   metadata = this.into(ValueRune).access("metadata")
 
-  latestBlock = this.block(
-    this.connection
-      .call(
-        "chain_getBlockHash",
-        this.connection
-          .subscribe("chain_subscribeNewHeads", "chain_unsubscribeNewHeads")
-          .access("number"),
-      )
-      .unsafeAs<string>(),
-  )
+  latestBlockNum = this.connection
+    .subscribe("chain_subscribeNewHeads", "chain_unsubscribeNewHeads")
+    .access("number")
 
-  block<X>(...[blockHash]: RunicArgs<X, [blockHash: string]>) {
-    return this.connection.call("chain_getBlock", blockHash)
-      .unhandle(null)
-      .into(BlockRune, this, Rune.resolve(blockHash))
+  latestBlock = this.connection
+    .call("chain_getBlockHash", this.latestBlockNum)
+    .unsafeAs<string>()
+    .into(BlockHashRune, this)
+    .block()
+
+  blockHash<X>(...[blockHash]: RunicArgs<X, [blockHash?: string]>) {
+    return Rune
+      .resolve(blockHash)
+      .unhandle(undefined)
+      .rehandle(undefined, () => this.connection.call("chain_getFinalizedHead"))
+      .into(BlockHashRune, this)
   }
 
   extrinsic<X>(...args: RunicArgs<X, [call: Chain.Call<C>]>) {

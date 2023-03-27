@@ -1,5 +1,6 @@
 import { known } from "../rpc/mod.ts"
 import { MetaRune, Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
+import { BlockHashRune } from "./BlockHashRune.ts"
 import { BlockRune } from "./BlockRune.ts"
 import { Chain } from "./ChainRune.ts"
 import { EventsChain } from "./EventsRune.ts"
@@ -23,7 +24,7 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
       .flatMap((events) => events.into(ValueRune).filter(isTerminal))
   }
 
-  inBlockHash() {
+  inBlock() {
     return this.transactionStatuses((status) =>
       known.TransactionStatus.isTerminal(status)
       || (typeof status !== "string" ? !!status.inBlock : false)
@@ -33,13 +34,10 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
       )
       .singular()
       .unhandle(NeverInBlockError)
+      .into(BlockHashRune, this.chain)
   }
 
-  inBlock() {
-    return this.chain.block(this.inBlockHash())
-  }
-
-  finalizedHash() {
+  finalized() {
     return this.transactionStatuses(known.TransactionStatus.isTerminal)
       .map((status) =>
         typeof status !== "string" && status.finalized
@@ -48,21 +46,18 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
       )
       .singular()
       .unhandle(NeverFinalizedError)
-  }
-
-  finalized() {
-    return this.chain.block(this.finalizedHash())
+      .into(BlockHashRune, this.chain)
   }
 
   inBlockEvents(this: ExtrinsicStatusRune<EventsChain<C>, U1, U2>) {
-    return this.events(this.inBlock())
+    return this.events(this.inBlock().block())
   }
 
   finalizedEvents(this: ExtrinsicStatusRune<EventsChain<C>, U1, U2>) {
-    return this.events(this.finalized())
+    return this.events(this.finalized().block())
   }
 
-  events<EU>(
+  private events<EU>(
     this: ExtrinsicStatusRune<EventsChain<C>, U1, U2>,
     block: BlockRune<EventsChain<C>, EU>,
   ) {
