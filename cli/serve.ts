@@ -75,7 +75,7 @@ export default async function(...args: string[]) {
         // todo: fix
         console.log("failed to exit gracefully")
         Deno.exit(status.code)
-      }, 5000))
+      }, 30_000))
     }
   }
 }

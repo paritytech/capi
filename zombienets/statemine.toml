@@ -1,5 +1,5 @@
 [relaychain]
-default_command = "deno task capi bin polkadot v0.9.39-1"
+default_command = "`deno task capi bin polkadot v0.9.39-1`"
 default_args = ["-lparachain=debug"]
 chain = "rococo-local"
 
@@ -26,5 +26,5 @@ chain = "statemine-local"
 
 [parachains.collator]
 name = "collator"
-command = "deno task capi bin polkadot-parachain v0.9.380"
+command = "`deno task capi bin polkadot-parachain v0.9.380`"
 args = ["-lparachain=debug"]
