@@ -35,8 +35,7 @@ const createCollection = await Nfts
   .signed(signature({ sender: alice }))
   .sent()
   .dbgStatus("Create Collection:")
-  .finalized()
-  .events()
+  .finalizedEvents()
 
 const getCollectionIdFromEvents = (events: CapiEvent<WestmintLocal>[]) => {
   const event = events.find((event) =>
