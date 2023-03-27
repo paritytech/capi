@@ -27,12 +27,6 @@ export abstract class FrameProvider extends Provider {
         filePath: "mod.ts",
       }))
     }
-    if (vRuntime === "latest") {
-      return f.redirect(fromPathInfo({
-        ...pathInfo,
-        vRuntime: await this.latestVersion(pathInfo),
-      }))
-    }
     if (filePath === "capi.js" || filePath === "capi.d.ts") {
       const capiPath = path.relative(path.dirname(new URL(request.url).pathname), "/mod.ts")
       return f.code(
@@ -56,16 +50,6 @@ export abstract class FrameProvider extends Provider {
       if (!code) throw f.notFound()
       return tsFormatter.formatText(filePath, code)
     })
-  }
-
-  // TODO: memo
-  async latestVersion(pathInfo: PathInfo) {
-    const version = await this.call<string>(pathInfo, "system_version", [])
-    return this.normalizeRuntimeVersion(version)
-  }
-
-  normalizeRuntimeVersion(version: string) {
-    return "v" + version.split("-")[0]!
   }
 
   cacheKey(pathInfo: PathInfo) {
@@ -96,9 +80,6 @@ export abstract class FrameProvider extends Provider {
       const raw = await this.env.cache.getRaw(
         `${cacheKey}/_metadata`,
         async () => {
-          if (pathInfo.vRuntime !== await this.latestVersion(pathInfo)) {
-            throw f.serverError("Cannot get metadata for old runtime version")
-          }
           return hex.decode(await this.call(pathInfo, "state_getMetadata", []))
         },
       )

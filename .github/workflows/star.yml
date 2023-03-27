@@ -9,7 +9,7 @@ jobs:
   star:
     name: Star
     runs-on: ubuntu-latest
-    timeout-minutes: 30 # :(
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v3
       - uses: denoland/setup-deno@9db7f66e8e16b5699a514448ce994936c63f0d54 # v1.1.0
@@ -29,8 +29,6 @@ jobs:
             target/capi/**/_metadata
             target/capi/**/_chainName
           key: ${{ runner.os }}-capi-metadata-${{ hashFiles('import_map.json') }}
-      - name: Setup binaries
-        uses: ./.github/actions/setup-binaries
       - run: deno task run _tasks/star.ts
       - run: deno task cache target/star.ts
       - run: deno task check target/star.ts

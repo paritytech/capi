@@ -10,13 +10,13 @@ import { signature } from "../patterns/signature/polkadot.ts"
 const {
   VersionedMultiAssets,
   VersionedMultiLocation,
-  v1: {
+  v2: {
+    NetworkId,
+    WeightLimit,
     junction: { Junction },
     multilocation: { Junctions },
     multiasset: { AssetId, Fungibility },
   },
-  v0: { junction: { NetworkId } },
-  v2: { WeightLimit },
 } = types.xcm
 
 class CannotFindAttemptError extends Error {
@@ -25,18 +25,18 @@ class CannotFindAttemptError extends Error {
 
 const initiatedEvent = XcmPallet
   .limitedTeleportAssets({
-    dest: VersionedMultiLocation.V1(Rune.rec({
+    dest: VersionedMultiLocation.V2(Rune.rec({
       parents: 0,
       interior: Junctions.X1(Junction.Parachain(1000)),
     })),
-    beneficiary: VersionedMultiLocation.V1(Rune.rec({
+    beneficiary: VersionedMultiLocation.V2(Rune.rec({
       parents: 0,
       interior: Junctions.X1(Junction.AccountId32({
         id: alice.publicKey,
         network: NetworkId.Any(),
       })),
     })),
-    assets: VersionedMultiAssets.V1(Rune.array([Rune.rec({
+    assets: VersionedMultiAssets.V2(Rune.array([Rune.rec({
       id: AssetId.Concrete(Rune.rec({
         parents: 0,
         interior: Junctions.Here(),
