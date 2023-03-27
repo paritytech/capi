@@ -71,13 +71,12 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
 
   metadata = this.into(ValueRune).access("metadata")
 
+  latestBlockNum = this.connection
+    .subscribe("chain_subscribeNewHeads", "chain_unsubscribeNewHeads")
+    .access("number")
+
   latestBlock = this.connection
-    .call(
-      "chain_getBlockHash",
-      this.connection
-        .subscribe("chain_subscribeNewHeads", "chain_unsubscribeNewHeads")
-        .access("number"),
-    )
+    .call("chain_getBlockHash", this.latestBlockNum)
     .unsafeAs<string>()
     .into(BlockHashRune, this)
     .block()

@@ -12,9 +12,7 @@ import { PatternRune } from "./PatternRune.ts"
 export class BlockRune<out C extends Chain, out U>
   extends PatternRune<known.SignedBlock, C, U, BlockHashRune<C, U>>
 {
-  hash() {
-    return Rune.resolve(this.parent).into(BlockHashRune, this.chain)
-  }
+  hash = this.parent
 
   header() {
     return this.into(ValueRune).access("block", "header")
