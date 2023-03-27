@@ -1,9 +1,9 @@
 import { Rune, ValueRune } from "capi"
 import { MultisigRune } from "capi/patterns/multisig/mod.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
-import { Balances, chain, System, users } from "polkadot_dev/mod.js"
+import { Balances, chain, createUsers, System } from "polkadot_dev/mod.js"
 
-const [alexa, billy, carol, david] = await users(4)
+const [alexa, billy, carol, david] = await createUsers(4)
 
 const multisig = Rune
   .constant({
