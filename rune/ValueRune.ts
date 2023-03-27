@@ -58,10 +58,10 @@ export class ValueRune<out T, out U = never> extends Rune<T, U> {
     alt: (rune: ValueRune<T2, never>) => Rune<T3, U2>,
   ): ValueRune<Exclude<T, T2> | T3, U | U2> {
     return ValueRune.new(
-      RunMatch,
+      RunHandle,
       this,
       (x: T): x is T2 => checkGuard(x, guard),
-      ValueRune.new(RunChain, this, alt(this as never)),
+      alt(this as never),
     )
   }
 
@@ -89,7 +89,7 @@ export class ValueRune<out T, out U = never> extends Rune<T, U> {
     alt: (rune: ValueRune<U2, never>) => Rune<T3, U3> = (x) => x as any,
   ): ValueRune<T | T3, Exclude<U, U2> | U3> {
     return ValueRune.new(
-      RunHandle,
+      RunRehandle,
       this,
       (x: U): x is U2 => checkGuard(x, guard),
       alt(
@@ -163,13 +163,13 @@ class RunMap<T1, U, T2> extends Run<T2, U> {
   }
 }
 
-class RunMatch<T, T2 extends T, T3, U, U2> extends Run<Exclude<T, T2> | T3, U | U2> {
+class RunHandle<T, T2 extends T, T3, U, U2> extends Run<Exclude<T, T2> | T3, U | U2> {
   child
   alt
   constructor(
     batch: Batch,
     child: Rune<T, U>,
-    readonly fn: (value: T) => value is T2,
+    readonly guard: Guard<T, T2>,
     alt: Rune<T3, U2>,
   ) {
     super(batch)
@@ -179,7 +179,7 @@ class RunMatch<T, T2 extends T, T3, U, U2> extends Run<Exclude<T, T2> | T3, U | 
 
   async _evaluate(time: number, receipt: Receipt) {
     const value = await this.child.evaluate(time, receipt) as T
-    if (this.fn(value)) {
+    if (checkGuard(value, this.guard)) {
       return await this.alt.evaluate(time, receipt)
     } else return value as Exclude<T, T2>
   }
@@ -242,7 +242,7 @@ class RunGetUnhandled<T, U> extends Run<Unhandled<U> | null, never> {
   }
 }
 
-class RunHandle<T1, U1, U2 extends U1, T3, U3> extends Run<T1 | T3, Exclude<U1, U2> | U3> {
+class RunRehandle<T1, U1, U2 extends U1, T3, U3> extends Run<T1 | T3, Exclude<U1, U2> | U3> {
   child
   alt
   constructor(
