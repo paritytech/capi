@@ -1,15 +1,24 @@
 import { Polkadot } from "polkadot/mod.js"
 import { $preDigest } from "polkadot/types/sp_consensus_babe/digests.js"
-import { Chain, ChainRune, PublicKeyRune, Rune, RunicArgs, ValueRune } from "../../mod.ts"
+import {
+  Chain,
+  ChainRune,
+  Has,
+  HasConstant,
+  HasStorage,
+  PublicKeyRune,
+  Rune,
+  RunicArgs,
+  ValueRune,
+} from "../../mod.ts"
 import { preRuntimeDigest } from "./preRuntimeDigest.ts"
 
-export type BabeBlockAuthorChain<C extends Chain> =
-  // & Chain
-  & Chain.PickConstant<Polkadot, "System", "SS58Prefix">
-  & Chain.PickStorage<Polkadot, "Session", "Validators">
+export type BabeBlockAuthorBearer =
+  | ConstantBearer.Pick<Polkadot, "System", "SS58Prefix">
+  | StorageBearer.Pick<Polkadot, "Session", "Validators">
 
 export function babeBlockAuthor<C extends Chain, U, X>(
-  chain: ChainRune<BabeBlockAuthorChain<C>, U>,
+  chain: ChainRune<Has<C, BabeBlockAuthorBearer>, U>,
   ...[blockHash]: RunicArgs<X, [blockHash: string]>
 ) {
   const validators = chain

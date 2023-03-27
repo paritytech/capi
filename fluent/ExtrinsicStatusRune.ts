@@ -2,7 +2,7 @@ import { known } from "../rpc/mod.ts"
 import { MetaRune, Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { BlockRune } from "./BlockRune.ts"
 import { Chain } from "./ChainRune.ts"
-import { EventsChain } from "./constraints/mod.ts"
+import { EventPhase, HasSystemEvents } from "./constraints.ts"
 import { ExtrinsicEventsRune } from "./ExtrinsicsEventsRune.ts"
 import { PatternRune } from "./PatternRune.ts"
 import { SignedExtrinsicRune } from "./SignedExtrinsicRune.ts"
@@ -35,11 +35,11 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
       .unhandle(NeverInBlockError)
   }
 
-  inBlock(this: ExtrinsicStatusRune<EventsChain<C>, U1, U2>) {
+  inBlock() {
     return this.chain.block(this.inBlockHash())
   }
 
-  finalizedHash(this: ExtrinsicStatusRune<EventsChain<C>, U1, U2>) {
+  finalizedHash() {
     return this.transactionStatuses(known.TransactionStatus.isTerminal)
       .map((status) =>
         typeof status !== "string" && status.finalized
@@ -50,23 +50,20 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
       .unhandle(NeverFinalizedError)
   }
 
-  finalized(this: ExtrinsicStatusRune<EventsChain<C>, U1, U2>) {
+  finalized() {
     const x = this.finalizedHash()
     return this.chain.block(x)
   }
 
-  inBlockEvents(this: ExtrinsicStatusRune<EventsChain<C>, U1, U2>) {
+  inBlockEvents() {
     return this.events(this.inBlock())
   }
 
-  finalizedEvents(this: ExtrinsicStatusRune<EventsChain<C>, U1, U2>) {
+  finalizedEvents() {
     return this.events(this.finalized())
   }
 
-  events<EU>(
-    this: ExtrinsicStatusRune<EventsChain<C>, U1, U2>,
-    block: BlockRune<EventsChain<C>, EU>,
-  ) {
+  events<EU>(block: BlockRune<Chain.Req<C, HasSystemEvents>, EU>) {
     const txI = Rune
       .tuple([block.into(ValueRune).access("block", "extrinsics"), this.parent.hex()])
       .map(([hexes, hex]) => {
@@ -76,7 +73,9 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
     return Rune
       .tuple([block.events(), txI])
       .map(([events, txI]) =>
-        events.filter((event) => event.phase.type === "ApplyExtrinsic" && event.phase.value === txI)
+        events.filter((event) =>
+          EventPhase.isApplyExtrinsicEvent(event) && event.phase.value === txI
+        )
       )
       .into(ExtrinsicEventsRune, this.chain)
   }

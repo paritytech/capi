@@ -3,6 +3,7 @@ import * as $ from "../deps/scale.ts"
 import { decodeMetadata, FrameMetadata } from "../frame_metadata/mod.ts"
 import { Connection, ConnectionCtorLike } from "../rpc/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
+import { U2I } from "../util/mod.ts"
 import { BlockRune } from "./BlockRune.ts"
 import { ConnectionRune } from "./ConnectionRune.ts"
 import { ExtrinsicRune } from "./ExtrinsicRune.ts"
@@ -14,11 +15,15 @@ export interface Chain<M extends FrameMetadata = FrameMetadata> {
 }
 
 export namespace Chain {
-  export type Call<C extends Chain> = $.Native<C["metadata"]["extrinsic"]["call"]>
-  export type Address<C extends Chain> = $.Native<C["metadata"]["extrinsic"]["address"]>
-  export type Signature<C extends Chain> = $.Native<C["metadata"]["extrinsic"]["signature"]>
-  export type Extra<C extends Chain> = $.Native<C["metadata"]["extrinsic"]["extra"]>
-  export type Additional<C extends Chain> = $.Native<C["metadata"]["extrinsic"]["additional"]>
+  export type Req<C extends Chain, Rest extends Chain> = U2I<Rest> & { _chain?: C }
+
+  type ExtrinsicFieldNative<C extends Chain, K extends keyof Chain["metadata"]["extrinsic"]> =
+    $.Native<C["metadata"]["extrinsic"][K]>
+  export type Call<C extends Chain> = ExtrinsicFieldNative<C, "call">
+  export type Address<C extends Chain> = ExtrinsicFieldNative<C, "address">
+  export type Signature<C extends Chain> = ExtrinsicFieldNative<C, "signature">
+  export type Extra<C extends Chain> = ExtrinsicFieldNative<C, "extra">
+  export type Additional<C extends Chain> = ExtrinsicFieldNative<C, "additional">
 
   export type Pallets<C extends Chain> = C["metadata"]["pallets"]
   export type PalletName<C extends Chain> = Extract<keyof Pallets<C>, string>

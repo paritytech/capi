@@ -1,39 +1,38 @@
 import { Polkadot } from "polkadot/mod.js"
-import { Chain, ChainRune, ExtrinsicSender, SignatureData, SpChain } from "../../mod.ts"
-import { $, hex, ss58, ValueRune } from "../../mod.ts"
-import { Rune, RunicArgs } from "../../rune/Rune.ts"
-import { Era } from "../../scale_info/overrides/Era.ts"
+import {
+  $,
+  Chain,
+  ChainRune,
+  Era,
+  ExtrinsicSender,
+  HasSystemVersion,
+  hex,
+  Rune,
+  RunicArgs,
+  ss58,
+  ValueRune,
+} from "../../mod.ts"
 
-export interface SignatureProps {
-  sender: ExtrinsicSender<PolkadotSignatureChain>
+export interface SignatureProps<C extends Chain> {
+  sender: ExtrinsicSender<C>
   checkpoint?: string
   mortality?: Era
   nonce?: number
   tip?: bigint
 }
 
-export type PolkadotSignatureChain =
-  & SpChain
-  & Chain.PickConstant<Polkadot, "System", "Version">
-  & Chain.PickExtrinsic
-
-export interface PolkadotSignatureChain extends AddressPrefixChain {
-  metadata: AddressPrefixChain["metadata"] & {
-    pallets: {
-      System: {
-        constants: {
-          Version: {
-            codec: $.Codec<Chain.Constant.Value<Polkadot, "System", "Version">>
-          }
+export type OmitCall<C extends Chain> = {
+  [K in keyof C]: K extends "metadata" ? {
+      [KM in keyof C[K]]: KM extends "extrinsic" ? {
+          [KME in keyof C[K][KM]]: KME extends "call" ? $.Codec<any> : C[K][KM][KME]
         }
-      }
+        : C[K][KM]
     }
-    extrinsic: Omit<Polkadot["metadata"]["extrinsic"], "call">
-  }
+    : C[K]
 }
 
-export function signature<X>(_props: RunicArgs<X, SignatureProps>) {
-  return <CU>(chain: ChainRune<PolkadotSignatureChain, CU>) => {
+export function signature<C extends Chain, X>(_props: RunicArgs<X, SignatureProps<C>>) {
+  return <U>(chain: ChainRune<Chain.Req<OmitCall<C>, HasSystemVersion>, U>) => {
     const props = RunicArgs.resolve(_props)
     const addrPrefix = chain.pallet("System").constant("SS58Prefix").decoded
     const versions = chain.pallet("System").constant("Version").decoded
@@ -77,6 +76,6 @@ export function signature<X>(_props: RunicArgs<X, SignatureProps>) {
         CheckGenesis: genesisHash,
         CheckMortality: checkpointHash,
       }),
-    }) satisfies Rune<SignatureData<PolkadotSignatureChain>, unknown>
+    }) // satisfies Rune<SignatureData<C>, unknown>
   }
 }

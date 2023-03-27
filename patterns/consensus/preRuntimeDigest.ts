@@ -13,9 +13,7 @@ export function preRuntimeDigest<C extends Chain, U, X>(
     .into(ValueRune)
     .access("digest", "logs")
     .map((logs) =>
-      logs
-        .map((log) => $digestItem.decode(hex.decode(log)))
-        .find((digestItem): digestItem is DigestItem.PreRuntime => digestItem.type === "PreRuntime")
+      logs.map((log) => $digestItem.decode(hex.decode(log))).find(DigestItem.isPreRuntime)
         ?? new CouldNotRetrievePreRuntimeDigestError()
     )
     .unhandle(CouldNotRetrievePreRuntimeDigestError)

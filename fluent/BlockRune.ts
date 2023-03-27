@@ -5,7 +5,7 @@ import { ArrayRune, Rune } from "../rune/mod.ts"
 import { ValueRune } from "../rune/ValueRune.ts"
 import { Chain } from "./ChainRune.ts"
 import { CodecRune } from "./CodecRune.ts"
-import { EventsChain } from "./constraints/mod.ts"
+import { HasSystemEvents } from "./constraints.ts"
 import { EventsRune } from "./EventsRune.ts"
 import { PatternRune } from "./PatternRune.ts"
 
@@ -33,13 +33,16 @@ export class BlockRune<out C extends Chain, out U>
       .mapArray((h) => $ext.decoded(h.map(hex.decode)))
   }
 
-  events(this: BlockRune<EventsChain<C>, U>) {
+  events(this: BlockRune<Chain.Req<C, HasSystemEvents>, U>) {
     return this.chain
       .pallet("System")
       .storage("Events")
       .value(undefined, this.parent)
       .unhandle(undefined)
-      .rehandle(undefined, () => Rune.constant([] as EventsChain.Event<C>[]))
+      .rehandle(
+        undefined,
+        () => Rune.constant<HasSystemEvents.Get<Chain.Req<C, HasSystemEvents>>[]>([]),
+      )
       .into(EventsRune, this.chain)
   }
 }
