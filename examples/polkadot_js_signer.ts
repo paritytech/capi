@@ -1,7 +1,7 @@
 import { ss58 } from "capi"
 import { pjsSender } from "capi/patterns/compat/pjs_sender.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
-import { createTestPairs } from "https://deno.land/x/polkadot@0.2.25/keyring/mod.ts"
+import { createPair } from "https://deno.land/x/polkadot@0.2.25/keyring/mod.ts"
 import { TypeRegistry } from "https://deno.land/x/polkadot@0.2.25/types/mod.ts"
 import { Balances, chain, users } from "polkadot_dev/mod.js"
 
@@ -15,13 +15,16 @@ const pjsSigner = {
     tr.setSignedExtensions(payload.signedExtensions)
     return Promise.resolve(
       tr.createType("ExtrinsicPayload", payload, { version: payload.version })
-        .sign(createTestPairs().alice!),
+        .sign(createPair(
+          { toSS58: () => alexaAddress, type: "sr25519" },
+          alexa,
+        )),
     )
   },
 }
 
 // Usually selected from the accounts provided by the extension
-const aliceAddress = ss58.encode(42, alexa.publicKey)
+const alexaAddress = ss58.encode(42, alexa.publicKey)
 
 const sender = pjsSender(chain, pjsSigner)
 
@@ -31,7 +34,7 @@ console.log(
       value: 12345n,
       dest: billy.address,
     })
-    .signed(signature({ sender: sender(aliceAddress) }))
+    .signed(signature({ sender: sender(alexaAddress) }))
     .sent()
     .dbgStatus()
     .finalizedEvents()
