@@ -12,10 +12,7 @@ export interface Extrinsic<M extends FrameMetadata> {
       sig?: never
     }
     | {
-      sender: {
-        address: $.Native<M["extrinsic"]["address"]>
-        sign?: Signer<M>
-      }
+      sender: { address: $.Native<M["extrinsic"]["address"]>; sign?: Signer<M> }
       extra: $.Native<M["extrinsic"]["extra"]>
       additional?: never
       sig: $.Native<M["extrinsic"]["signature"]>
@@ -26,32 +23,19 @@ export interface Extrinsic<M extends FrameMetadata> {
 export type Signer<M extends FrameMetadata> = (
   message: Uint8Array,
   fullData: Uint8Array,
-) =>
-  | $.Native<M["extrinsic"]["signature"]>
-  | Promise<$.Native<M["extrinsic"]["signature"]>>
+) => $.Native<M["extrinsic"]["signature"]> | Promise<$.Native<M["extrinsic"]["signature"]>>
 
-export function $extrinsic<M extends FrameMetadata>(
-  metadata: M,
-): $.Codec<Extrinsic<M>> {
-  const $sig = metadata.extrinsic.signature as $.Codec<
-    $.Native<M["extrinsic"]["signature"]>
-  >
+export function $extrinsic<M extends FrameMetadata>(metadata: M): $.Codec<Extrinsic<M>> {
+  const $sig = metadata.extrinsic.signature as $.Codec<$.Native<M["extrinsic"]["signature"]>>
   const $sigPromise = $.promise($sig)
-  const $call = metadata.extrinsic.call as $.Codec<
-    $.Native<M["extrinsic"]["call"]>
-  >
-  const $address = metadata.extrinsic.address as $.Codec<
-    $.Native<M["extrinsic"]["address"]>
-  >
-  const $extra = metadata.extrinsic.extra as $.Codec<
-    $.Native<M["extrinsic"]["extra"]>
-  >
+  const $call = metadata.extrinsic.call as $.Codec<$.Native<M["extrinsic"]["call"]>>
+  const $address = metadata.extrinsic.address as $.Codec<$.Native<M["extrinsic"]["address"]>>
+  const $extra = metadata.extrinsic.extra as $.Codec<$.Native<M["extrinsic"]["extra"]>>
   const $additional = metadata.extrinsic.additional as $.Codec<
     $.Native<M["extrinsic"]["additional"]>
   >
 
-  const toSignSize = $call._staticSize + $extra._staticSize
-    + $additional._staticSize
+  const toSignSize = $call._staticSize + $extra._staticSize + $additional._staticSize
   const totalSize = 1 + $address._staticSize + $sig._staticSize + toSignSize
 
   const $baseExtrinsic: $.Codec<Extrinsic<M>> = $.createCodec({
@@ -64,9 +48,7 @@ export function $extrinsic<M extends FrameMetadata>(
       if (signature) {
         $address._encode(buffer, signature.sender.address)
         if (signature.additional) {
-          const toSignBuffer = new $.EncodeBuffer(
-            buffer.stealAlloc(toSignSize),
-          )
+          const toSignBuffer = new $.EncodeBuffer(buffer.stealAlloc(toSignSize))
           $call._encode(toSignBuffer, call)
           const callEnd = toSignBuffer.finishedSize + toSignBuffer.index
           $extra._encode(toSignBuffer, signature.extra)
@@ -116,16 +98,11 @@ export function $extrinsic<M extends FrameMetadata>(
       $call._assert(assert.key(this, "call"))
       if (value_.signature) {
         const signatureAssertState = assert.key(this, "signature")
-        $address._assert(
-          signatureAssertState.key(this, "sender").key(this, "address"),
-        )
+        $address._assert(signatureAssertState.key(this, "sender").key(this, "address"))
         $extra._assert(signatureAssertState.key(this, "extra"))
         if ("additional" in value_.signature) {
           $additional._assert(signatureAssertState.key(this, "additional"))
-          signatureAssertState.key(this, "sender").key(this, "sign").typeof(
-            this,
-            "function",
-          )
+          signatureAssertState.key(this, "sender").key(this, "sign").typeof(this, "function")
         } else {
           $sig._assert(signatureAssertState.key(this, "sig"))
         }
