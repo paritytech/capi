@@ -3,15 +3,18 @@ import { $extrinsic } from "../frame_metadata/Extrinsic.ts"
 import { known } from "../rpc/mod.ts"
 import { ArrayRune, Rune } from "../rune/mod.ts"
 import { ValueRune } from "../rune/ValueRune.ts"
+import { BlockHashRune } from "./BlockHashRune.ts"
 import { Chain } from "./ChainRune.ts"
 import { CodecRune } from "./CodecRune.ts"
 import { Event, EventsRune } from "./EventsRune.ts"
 import { PatternRune } from "./PatternRune.ts"
 
 export class BlockRune<out C extends Chain, out U>
-  extends PatternRune<known.SignedBlock, C, U, Rune<string, U>>
+  extends PatternRune<known.SignedBlock, C, U, BlockHashRune<C, U>>
 {
-  hash = this.parent
+  hash() {
+    return Rune.resolve(this.parent).into(BlockHashRune, this.chain)
+  }
 
   header() {
     return this.into(ValueRune).access("block", "header")

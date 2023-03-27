@@ -221,7 +221,7 @@ export class VirtualMultisigRune<out C extends Chain, out U>
       .signed(signature)
       .sent()
       .dbgStatus("Existential deposits:")
-      .finalizedHash()
+      .finalized()
 
     const ownershipSwapCalls = Rune
       .tuple([deployer, memberAccountIds, memberProxies, stashProxy, multisig.address])
@@ -255,7 +255,7 @@ export class VirtualMultisigRune<out C extends Chain, out U>
       .signed(signature)
       .sent()
       .dbgStatus("Ownership swaps:")
-      .finalizedHash()
+      .finalized()
 
     const members = Rune.tuple([memberAccountIds, memberProxies])
       .map(([a, b]) => a.map((p, i) => [p, b[i]!] as [Uint8Array, Uint8Array]))

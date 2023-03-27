@@ -1,5 +1,6 @@
 // moderate
 
+export * from "./BlockHashRune.ts"
 export * from "./BlockRune.ts"
 export * from "./ChainRune.ts"
 export * from "./CodecRune.ts"

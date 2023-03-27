@@ -29,7 +29,7 @@ await Utility
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Batch tx:")
-  .finalizedHash()
+  .finalized()
   .run()
 
 console.log("Final balances:", await balances.run())

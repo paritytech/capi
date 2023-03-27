@@ -17,7 +17,7 @@ await Identity
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus()
-  .finalizedHash()
+  .finalized()
   .run()
 
 const raw = Identity.IdentityOf
