@@ -5,7 +5,7 @@ import { Balances, chain, System, users, Utility } from "polkadot_dev/mod.js"
 import { MultiAddress } from "polkadot_dev/types/sp_runtime/multiaddress.js"
 import { parse } from "../deps/std/flags.ts"
 
-const [alexa, billy, carol, david] = await users(4)
+const { alexa, billy, carol, david } = await users()
 
 let { state } = parse(Deno.args, { string: ["state"] })
 if (!state) {

@@ -3,7 +3,7 @@ import { IdentityInfoTranscoders } from "capi/patterns/identity.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 import { Identity, users } from "polkadot_dev/mod.js"
 
-const [alexa] = await users(1)
+const { alexa } = await users()
 
 const transcoders = new IdentityInfoTranscoders({ stars: $.u8 })
 

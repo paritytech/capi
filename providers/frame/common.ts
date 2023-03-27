@@ -45,11 +45,7 @@ export async function createCustomChainSpec(
   return customChainSpecRawPath
 }
 
-export function connectionCodeWithUsers(
-  code: string,
-  isTypes: boolean,
-  url: string,
-): string {
+export function connectionCodeWithUsers(code: string, isTypes: boolean, url: string): string {
   return `
 ${code}
 

@@ -2,7 +2,7 @@ import { PublicKeyRune } from "capi"
 import { chain, Indices, users } from "polkadot_dev/mod.js"
 import { signature } from "../patterns/signature/polkadot.ts"
 
-const [alexa] = await users(1)
+const { alexa } = await users()
 
 const index = 254
 

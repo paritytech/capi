@@ -38,7 +38,8 @@ export function testUser(userId: number) {
 }
 
 export function testUserFactory(url: string) {
-  return async function users<N extends number>(count: N): Promise<ArrayOfLength<Sr25519, N>> {
+  return async <R extends [number?]>(...[count_]: R): Promise<TestUsers<R[0]>> => {
+    const count = count_ ?? 26
     const response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -48,6 +49,39 @@ export function testUserFactory(url: string) {
     const { index }: { index: number } = await response.json()
     const userIds: Sr25519[] = []
     for (let i = index; i < index + count; i++) userIds.push(testUser(i))
-    return userIds as ArrayOfLength<Sr25519, N>
+    return (typeof count_ === "number"
+      ? userIds
+      : (Object.fromEntries(TEST_USER_NAMES.map((name, i) => [name, userIds[i]!])))) as never
   }
 }
+
+export type TestUsers<N extends number | undefined> = N extends number ? ArrayOfLength<Sr25519, N>
+  : Record<typeof TEST_USER_NAMES[number], Sr25519>
+const TEST_USER_NAMES = [
+  "alexa",
+  "billy",
+  "carol",
+  "david",
+  "ellie",
+  "felix",
+  "grace",
+  "harry",
+  "india",
+  "jason",
+  "kiera",
+  "laura",
+  "matty",
+  "nadia",
+  "oscar",
+  "piper",
+  "quinn",
+  "ryann",
+  "steff",
+  "teee6",
+  "usher",
+  "vicky",
+  "wendy",
+  "xenia",
+  "yetis",
+  "zelda",
+] as const

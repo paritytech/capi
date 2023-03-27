@@ -1,6 +1,6 @@
 import { Balances, users } from "westend_dev/mod.js"
 
-const [alexa] = await users(1)
+const { alexa } = await users()
 
 const result = await Balances
   .transfer({

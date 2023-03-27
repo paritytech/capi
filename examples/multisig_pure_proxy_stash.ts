@@ -5,7 +5,7 @@ import { signature } from "capi/patterns/signature/polkadot.ts"
 import { Balances, chain, Proxy, System, users } from "polkadot_dev/mod.js"
 import { MultiAddress } from "polkadot_dev/types/sp_runtime/multiaddress.js"
 
-const [alexa, billy, carol] = await users(3)
+const { alexa, billy, carol } = await users()
 
 const multisig = Rune
   .constant({

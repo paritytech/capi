@@ -5,7 +5,7 @@ import { createPair } from "https://deno.land/x/polkadot@0.2.25/keyring/mod.ts"
 import { TypeRegistry } from "https://deno.land/x/polkadot@0.2.25/types/mod.ts"
 import { Balances, chain, users } from "polkadot_dev/mod.js"
 
-const [alexa, billy] = await users(2)
+const { alexa, billy } = await users()
 
 // Usually injected by an extension, e.g.
 // const pjsSigner = (await web3FromSource("polkadot-js")).signer!;
