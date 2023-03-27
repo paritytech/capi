@@ -40,10 +40,7 @@ export namespace Chain {
   export type Pallet<C extends Chain, P extends PalletName<C>> = Pallets<C>[P]
 
   export type Constants<C extends Chain, P extends PalletName<C>> = Pallet<C, P>["constants"]
-  export type ConstantName<
-    C extends Chain,
-    P extends PalletName<C>,
-  > = keyof Constants<C, P>
+  export type ConstantName<C extends Chain, P extends PalletName<C>> = keyof Constants<C, P>
   export type Constant<C extends Chain, P extends PalletName<C>, K extends ConstantName<C, P>> =
     Constants<C, P>[K]
 
@@ -53,10 +50,7 @@ export namespace Chain {
   }
 
   export type StorageEntries<C extends Chain, P extends PalletName<C>> = Pallet<C, P>["storage"]
-  export type StorageName<
-    C extends Chain,
-    P extends PalletName<C>,
-  > = keyof StorageEntries<C, P>
+  export type StorageName<C extends Chain, P extends PalletName<C>> = keyof StorageEntries<C, P>
   export type Storage<C extends Chain, P extends PalletName<C>, S extends StorageName<C, P>> =
     StorageEntries<C, P>[S]
 
