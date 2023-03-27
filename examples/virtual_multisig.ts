@@ -1,11 +1,11 @@
 import { Rune, Sr25519 } from "capi"
 import { VirtualMultisigRune } from "capi/patterns/multisig/mod.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
-import { Balances, chain, System, users, Utility } from "polkadot_dev/mod.js"
+import { Balances, chain, createUsers, System, Utility } from "polkadot_dev/mod.js"
 import { MultiAddress } from "polkadot_dev/types/sp_runtime/multiaddress.js"
 import { parse } from "../deps/std/flags.ts"
 
-const { alexa, billy, carol, david } = await users()
+const { alexa, billy, carol, david } = await createUsers()
 
 let { state } = parse(Deno.args, { string: ["state"] })
 if (!state) {

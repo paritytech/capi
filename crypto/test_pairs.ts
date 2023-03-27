@@ -36,50 +36,51 @@ function pair(secret: string) {
 export function testUser(userId: number) {
   return Sr25519.fromSeed(blake2_256.hash(new TextEncoder().encode(`capi-test-user-${userId}`)))
 }
-
-export function testUserFactory(url: string) {
-  return users
-  function users(): Promise<Record<typeof TEST_USER_NAMES[number], Sr25519>>
-  function users<N extends number>(count: N): Promise<ArrayOfLength<Sr25519, N>>
-  async function users(count?: number): Promise<Record<string, Sr25519> | Sr25519[]> {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ count: count ?? TEST_USER_NAMES.length }),
-    })
-    if (!response.ok) throw new Error(await response.text())
-    const { index }: { index: number } = await response.json()
-    return typeof count === "number"
-      ? Array.from({ length: count }, (_, i) => testUser(index + i))
-      : Object.fromEntries(TEST_USER_NAMES.map((name, i) => [name, testUser(index + i)]))
+export namespace testUser {
+  export function factory(url: string) {
+    return createUsers
+    function createUsers(): Promise<Record<typeof NAMES[number], Sr25519>>
+    function createUsers<N extends number>(count: N): Promise<ArrayOfLength<Sr25519, N>>
+    async function createUsers(count?: number): Promise<Record<string, Sr25519> | Sr25519[]> {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ count: count ?? NAMES.length }),
+      })
+      if (!response.ok) throw new Error(await response.text())
+      const { index }: { index: number } = await response.json()
+      return typeof count === "number"
+        ? Array.from({ length: count }, (_, i) => testUser(index + i))
+        : Object.fromEntries(NAMES.map((name, i) => [name, testUser(index + i)]))
+    }
   }
-}
 
-const TEST_USER_NAMES = [
-  "alexa",
-  "billy",
-  "carol",
-  "david",
-  "ellie",
-  "felix",
-  "grace",
-  "harry",
-  "india",
-  "jason",
-  "kiera",
-  "laura",
-  "matty",
-  "nadia",
-  "oscar",
-  "piper",
-  "quinn",
-  "ryann",
-  "steff",
-  "teee6",
-  "usher",
-  "vicky",
-  "wendy",
-  "xenia",
-  "yetis",
-  "zelda",
-] as const
+  export const NAMES = [
+    "alexa",
+    "billy",
+    "carol",
+    "david",
+    "ellie",
+    "felix",
+    "grace",
+    "harry",
+    "india",
+    "jason",
+    "kiera",
+    "laura",
+    "matty",
+    "nadia",
+    "oscar",
+    "piper",
+    "quinn",
+    "ryann",
+    "steff",
+    "teee6",
+    "usher",
+    "vicky",
+    "wendy",
+    "xenia",
+    "yetis",
+    "zelda",
+  ] as const
+}

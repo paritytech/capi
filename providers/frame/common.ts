@@ -49,10 +49,10 @@ export function connectionCodeWithUsers(code: string, isTypes: boolean, url: str
   return `
 ${code}
 
-export const users ${
+export const createUsers ${
     isTypes
-      ? `: ReturnType<typeof C.testUserFactory>`
-      : `= C.testUserFactory(${JSON.stringify(url)})`
+      ? `: ReturnType<typeof C.testUser.factory>`
+      : `= C.testUser.factory(${JSON.stringify(url)})`
   }
   `
 }
