@@ -92,5 +92,4 @@ await Promise.all([
   }),
   fs.copy("LICENSE", path.join(outDir, "LICENSE")),
   fs.copy("Readme.md", path.join(outDir, "Readme.md")),
-  fs.copy("help.txt", path.join(outDir, "help.txt")),
 ])
