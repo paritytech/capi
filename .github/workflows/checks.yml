@@ -1,0 +1,86 @@
+name: Checks
+on:
+  pull_request:
+  merge_group:
+  push:
+    branches:
+      - main
+jobs:
+  fmt:
+    name: Formatting
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dprint/check@2f1cf31537886c3bfb05591c031f7744e48ba8a1 # v2.2
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v3
+      - uses: denoland/setup-deno@9db7f66e8e16b5699a514448ce994936c63f0d54 # v1.1.0
+        with:
+          deno-version: v1.x
+      - run: deno lint
+
+  spellcheck:
+    name: Spelling
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v3
+      - uses: streetsidesoftware/cspell-action@c5e5f42f5bba8df1c0b7e74596c5600a3167efab # v2.7.0
+
+  star:
+    name: Star
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v3
+      - uses: denoland/setup-deno@9db7f66e8e16b5699a514448ce994936c63f0d54 # v1.1.0
+        with:
+          deno-version: v1.x
+      - name: Cache Deno dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.deno
+            ~/.cache/deno
+          key: ${{ runner.os }}-deno-${{ hashFiles('deps/**/*.ts') }}
+      - name: Cache metadata
+        uses: actions/cache@v3
+        with:
+          path: |
+            target/capi/**/_metadata
+            target/capi/**/_chainName
+          key: ${{ runner.os }}-capi-metadata-${{ hashFiles('import_map.json') }}
+      - run: deno task run _tasks/star.ts
+      - run: deno task cache target/star.ts
+      - run: deno task check target/star.ts
+
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v3
+      - uses: denoland/setup-deno@9db7f66e8e16b5699a514448ce994936c63f0d54 # v1.1.0
+        with:
+          deno-version: v1.x
+      - name: Cache Deno dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.deno
+            ~/.cache/deno
+          key: ${{ runner.os }}-deno-${{ hashFiles('deps/**/*.ts') }}
+      - name: Cache metadata
+        uses: actions/cache@v3
+        with:
+          path: |
+            target/capi/**/_metadata
+            target/capi/**/_chainName
+          key: ${{ runner.os }}-capi-metadata-${{ hashFiles('import_map.json') }}
+      - run: deno task test
