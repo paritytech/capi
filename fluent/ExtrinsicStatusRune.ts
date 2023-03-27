@@ -63,7 +63,7 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
     return this.events(this.finalized())
   }
 
-  events<EU>(block: BlockRune<Chain.Req<C, HasSystemEvents>, EU>) {
+  events<EU>(block: BlockRune<Chain.Requirement<C, HasSystemEvents>, EU>) {
     const txI = Rune
       .tuple([block.into(ValueRune).access("block", "extrinsics"), this.parent.hex()])
       .map(([hexes, hex]) => {

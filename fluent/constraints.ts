@@ -18,7 +18,7 @@ export namespace HasStorage {
     A extends Chain,
     P extends Chain.PalletName<A>,
     K extends Chain.StorageName<A, P>,
-  > extends HasStorage<P, K, Chain.Storage<A, P, K>> {}
+  > extends HasStorage<Extract<P, string>, Extract<K, string>, Chain.Storage<A, P, K>> {}
 }
 
 export type HasSystemSs58Prefix = HasConstant<"System", "Ss58Prefix", { codec: $.Codec<number> }>
@@ -39,12 +39,12 @@ export namespace HasConstant {
     A extends Chain,
     P extends Chain.PalletName<A>,
     K extends Chain.ConstantName<A, P>,
-  > extends HasConstant<P, K, Chain.Constant<A, P, K>> {}
+  > extends HasConstant<Extract<P, string>, Extract<K, string>, Chain.Constant<A, P, K>> {}
 }
 
 export type HasSystemEvents = HasStorage<"System", "Events", {
   key: $.Codec<undefined>
-  value: $.Codec<Event<EventPhase, any>>
+  value: $.Codec<Event<EventPhase>>
 }>
 export namespace HasSystemEvents {
   export type Get<C extends HasSystemEvents> = Chain.Storage<C, "System", "Events">
@@ -78,11 +78,7 @@ export namespace EventPhase {
   }
 }
 
-export type HasSystemVersion = ConstantBearer<
-  "System",
-  "Version",
-  { codec: $.Codec<RuntimeVersion> }
->
+export type HasSystemVersion = HasConstant<"System", "Version", { codec: $.Codec<RuntimeVersion> }>
 
 export interface RuntimeVersion {
   apis: [Uint8Array, number][]

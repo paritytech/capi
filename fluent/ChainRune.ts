@@ -15,7 +15,7 @@ export interface Chain<M extends FrameMetadata = FrameMetadata> {
 }
 
 export namespace Chain {
-  export type Req<C extends Chain, Rest extends Chain> = U2I<Rest> & { _chain?: C }
+  export type Requirement<C extends Chain, Rest extends Chain> = U2I<Rest> & { _chain?: C }
 
   type ExtrinsicFieldNative<C extends Chain, K extends keyof Chain["metadata"]["extrinsic"]> =
     $.Native<C["metadata"]["extrinsic"][K]>
@@ -25,15 +25,25 @@ export namespace Chain {
   export type Extra<C extends Chain> = ExtrinsicFieldNative<C, "extra">
   export type Additional<C extends Chain> = ExtrinsicFieldNative<C, "additional">
 
+  export type OmitCall<C extends Chain> = { // TODO: scrap
+    [K in keyof C]: K extends "metadata" ? {
+        [KM in keyof C[K]]: KM extends "extrinsic" ? {
+            [KME in keyof C[K][KM]]: KME extends "call" ? $.Codec<any> : C[K][KM][KME]
+          }
+          : C[K][KM]
+      }
+      : C[K]
+  }
+
   export type Pallets<C extends Chain> = C["metadata"]["pallets"]
-  export type PalletName<C extends Chain> = Extract<keyof Pallets<C>, string>
+  export type PalletName<C extends Chain> = keyof Pallets<C>
   export type Pallet<C extends Chain, P extends PalletName<C>> = Pallets<C>[P]
 
   export type Constants<C extends Chain, P extends PalletName<C>> = Pallet<C, P>["constants"]
   export type ConstantName<
     C extends Chain,
     P extends PalletName<C>,
-  > = Extract<keyof Constants<C, P>, string>
+  > = keyof Constants<C, P>
   export type Constant<C extends Chain, P extends PalletName<C>, K extends ConstantName<C, P>> =
     Constants<C, P>[K]
 
@@ -46,7 +56,7 @@ export namespace Chain {
   export type StorageName<
     C extends Chain,
     P extends PalletName<C>,
-  > = Extract<keyof StorageEntries<C, P>, string>
+  > = keyof StorageEntries<C, P>
   export type Storage<C extends Chain, P extends PalletName<C>, S extends StorageName<C, P>> =
     StorageEntries<C, P>[S]
 

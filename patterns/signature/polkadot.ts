@@ -5,10 +5,12 @@ import {
   ChainRune,
   Era,
   ExtrinsicSender,
+  HasSystemSs58Prefix,
   HasSystemVersion,
   hex,
   Rune,
   RunicArgs,
+  SignatureData,
   ss58,
   ValueRune,
 } from "../../mod.ts"
@@ -21,20 +23,15 @@ export interface SignatureProps<C extends Chain> {
   tip?: bigint
 }
 
-export type OmitCall<C extends Chain> = {
-  [K in keyof C]: K extends "metadata" ? {
-      [KM in keyof C[K]]: KM extends "extrinsic" ? {
-          [KME in keyof C[K][KM]]: KME extends "call" ? $.Codec<any> : C[K][KM][KME]
-        }
-        : C[K][KM]
-    }
-    : C[K]
-}
-
 export function signature<C extends Chain, X>(_props: RunicArgs<X, SignatureProps<C>>) {
-  return <U>(chain: ChainRune<Chain.Req<OmitCall<C>, HasSystemVersion>, U>) => {
+  return <U>(
+    chain: ChainRune<
+      Chain.OmitCall<Chain.Requirement<C, HasSystemVersion | HasSystemSs58Prefix>>,
+      U
+    >,
+  ) => {
     const props = RunicArgs.resolve(_props)
-    const addrPrefix = chain.pallet("System").constant("SS58Prefix").decoded
+    const addrPrefix = chain.pallet("System").constant("Ss58Prefix").decoded
     const versions = chain.pallet("System").constant("Version").decoded
     const specVersion = versions.access("specVersion")
     const transactionVersion = versions.access("transactionVersion")
@@ -44,12 +41,10 @@ export function signature<C extends Chain, X>(_props: RunicArgs<X, SignatureProp
       .tuple([addrPrefix, props.sender])
       .map(([addrPrefix, sender]) => {
         switch (sender.address.type) {
-          case "Id": {
+          case "Id":
             return ss58.encode(addrPrefix, sender.address.value)
-          }
-          default: {
+          default:
             throw new Error("unimplemented")
-          }
         }
       })
       .throws(ss58.InvalidPayloadLengthError)
@@ -76,6 +71,6 @@ export function signature<C extends Chain, X>(_props: RunicArgs<X, SignatureProp
         CheckGenesis: genesisHash,
         CheckMortality: checkpointHash,
       }),
-    }) // satisfies Rune<SignatureData<C>, unknown>
+    }) satisfies Rune<SignatureData<C>, unknown>
   }
 }

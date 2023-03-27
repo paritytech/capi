@@ -5,7 +5,7 @@ import { HasSystemSs58Prefix } from "./constraints.ts"
 import { Ss58Rune } from "./Ss58Rune.ts"
 
 export class PublicKeyRune<out U> extends Rune<Uint8Array, U> {
-  ss58<C extends Chain, U>(chain: ChainRune<Chain.Req<C, HasSystemSs58Prefix>, U>) {
+  ss58<C extends Chain, U>(chain: ChainRune<Chain.Requirement<C, HasSystemSs58Prefix>, U>) {
     const prefix = chain
       .pallet("System")
       .constant("SS58Prefix")

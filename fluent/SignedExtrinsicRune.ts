@@ -10,7 +10,7 @@ export class SignedExtrinsicRune<out C extends Chain, out U> extends PatternRune
     return this.into(ValueRune).map(hex.encode)
   }
 
-  sent(this: SignedExtrinsicRune<Chain.Req<C, HasSystemEvents>, U>) {
+  sent(this: SignedExtrinsicRune<Chain.Requirement<C, HasSystemEvents>, U>) {
     return this
       .hex()
       .map((hex) =>

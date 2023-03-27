@@ -33,7 +33,7 @@ export class BlockRune<out C extends Chain, out U>
       .mapArray((h) => $ext.decoded(h.map(hex.decode)))
   }
 
-  events(this: BlockRune<Chain.Req<C, HasSystemEvents>, U>) {
+  events(this: BlockRune<Chain.Requirement<C, HasSystemEvents>, U>) {
     return this.chain
       .pallet("System")
       .storage("Events")
@@ -41,7 +41,7 @@ export class BlockRune<out C extends Chain, out U>
       .unhandle(undefined)
       .rehandle(
         undefined,
-        () => Rune.constant<HasSystemEvents.Get<Chain.Req<C, HasSystemEvents>>[]>([]),
+        () => Rune.constant<HasSystemEvents.Get<Chain.Requirement<C, HasSystemEvents>>[]>([]),
       )
       .into(EventsRune, this.chain)
   }
