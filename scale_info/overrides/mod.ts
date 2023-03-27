@@ -1,4 +1,4 @@
-// moderate --exclude overrides/mod.ts
+// moderate
 
 export * from "./ChainError.ts"
 export * from "./Era.ts"
