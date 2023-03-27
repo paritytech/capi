@@ -22,7 +22,7 @@ await Balances
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Existential deposit:")
-  .finalizedHash()
+  .finalized()
   .run()
 
 const call = Balances.transferKeepAlive({
@@ -35,7 +35,7 @@ await multisig
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Proposal:")
-  .finalizedHash()
+  .finalized()
   .run()
 
 console.log("Is proposed?:", await multisig.isProposed(call.hash).run())
@@ -48,7 +48,7 @@ await multisig
   .signed(signature({ sender: billy }))
   .sent()
   .dbgStatus("Vote:")
-  .finalizedHash()
+  .finalized()
   .run()
 
 console.log(
@@ -65,7 +65,7 @@ await multisig
   .signed(signature({ sender: carol }))
   .sent()
   .dbgStatus("Approval:")
-  .finalizedHash()
+  .finalized()
   .run()
 
 // Check to see whether Dave's balance has in fact changed

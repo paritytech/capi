@@ -8,7 +8,8 @@ export function preRuntimeDigest<C extends Chain, U, X>(
   ...[blockHash]: RunicArgs<X, [blockHash: string]>
 ) {
   return chain
-    .block(blockHash)
+    .blockHash(blockHash)
+    .block()
     .header()
     .into(ValueRune)
     .access("digest", "logs")
