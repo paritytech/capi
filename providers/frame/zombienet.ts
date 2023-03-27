@@ -14,9 +14,7 @@ export class ZombienetProvider extends FrameProxyProvider {
     const i = target.lastIndexOf("/")
     const configPath = target.slice(0, i)
     const network = await this.networkMemo.run(configPath, async () => {
-      const zombiecache = await Deno.realPath(
-        await Deno.makeTempDir({ prefix: `capi_zombienet_` }),
-      )
+      const zombiecache = await Deno.realPath(await Deno.makeTempDir({ prefix: `capi_zombienet_` }))
       const config = readNetworkConfig(configPath)
       ;(config.settings ??= { provider: "native", timeout: 1200 }).provider = "native"
       const options = {
