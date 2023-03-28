@@ -53,6 +53,18 @@ export class ValueRune<out T, out U = never> extends Rune<T, U> {
     })
   }
 
+  handle<T2 extends T, T3, U2>(
+    guard: Guard<T, T2>,
+    alt: (rune: ValueRune<T2, never>) => Rune<T3, U2>,
+  ): ValueRune<Exclude<T, T2> | T3, U | U2> {
+    return ValueRune.new(
+      RunHandle,
+      this,
+      guard,
+      alt(this as never),
+    )
+  }
+
   unhandle<U2 extends T>(fn: Guard<T, U2>): ValueRune<Unguard<T, U2>, U | U2>
   unhandle(fn: Guard<T, T>): ValueRune<T, U | T> {
     return ValueRune.new(RunUnhandle, this, fn)
@@ -77,7 +89,7 @@ export class ValueRune<out T, out U = never> extends Rune<T, U> {
     alt: (rune: ValueRune<U2, never>) => Rune<T3, U3> = (x) => x as any,
   ): ValueRune<T | T3, Exclude<U, U2> | U3> {
     return ValueRune.new(
-      RunHandle,
+      RunRehandle,
       this,
       (x: U): x is U2 => checkGuard(x, guard),
       alt(
@@ -151,6 +163,28 @@ class RunMap<T1, U, T2> extends Run<T2, U> {
   }
 }
 
+class RunHandle<T, T2 extends T, T3, U, U2> extends Run<Exclude<T, T2> | T3, U | U2> {
+  child
+  alt
+  constructor(
+    batch: Batch,
+    child: Rune<T, U>,
+    readonly guard: Guard<T, T2>,
+    alt: Rune<T3, U2>,
+  ) {
+    super(batch)
+    this.child = batch.prime(child, this.signal)
+    this.alt = batch.prime(alt, this.signal)
+  }
+
+  async _evaluate(time: number, receipt: Receipt) {
+    const value = await this.child.evaluate(time, receipt) as T
+    if (checkGuard(value, this.guard)) {
+      return await this.alt.evaluate(time, receipt)
+    } else return value as Exclude<T, T2>
+  }
+}
+
 class RunUnhandle<T, U> extends Run<T, U | T> {
   child
   constructor(batch: Batch, child: Rune<T, U>, readonly guard: Guard<T, T>) {
@@ -208,7 +242,7 @@ class RunGetUnhandled<T, U> extends Run<Unhandled<U> | null, never> {
   }
 }
 
-class RunHandle<T1, U1, U2 extends U1, T3, U3> extends Run<T1 | T3, Exclude<U1, U2> | U3> {
+class RunRehandle<T1, U1, U2 extends U1, T3, U3> extends Run<T1 | T3, Exclude<U1, U2> | U3> {
   child
   alt
   constructor(
