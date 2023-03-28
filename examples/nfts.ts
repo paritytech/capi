@@ -5,29 +5,31 @@ import { Event } from "zombienet/nfts.toml/collator/@latest/types/pallet_nfts/pa
 import { MintType } from "zombienet/nfts.toml/collator/@latest/types/pallet_nfts/types.js"
 import { RuntimeEvent } from "zombienet/nfts.toml/collator/@latest/types/westmint_runtime.js"
 
+// The nfts pallet uses inverted bitflags; on means exclude and off means include.
 const DefaultCollectionSetting = {
-  TransferableItems: 0n << 0n,
-  UnlockedMetadata: 0n << 1n,
-  UnlockedAttributes: 0n << 2n,
-  UnlockedMaxSupply: 0n << 3n,
-  DepositRequired: 0n << 4n,
+  TransferableItems: 1n << 0n,
+  UnlockedMetadata: 1n << 1n,
+  UnlockedAttributes: 1n << 2n,
+  UnlockedMaxSupply: 1n << 3n,
+  DepositRequired: 1n << 4n,
+  allOff: 0n,
+  allOn: 0b11111n,
 }
-
 const DefaultItemSetting = {
-  Transferable: 0n << 0n,
-  UnlockedMetadata: 0n << 1n,
-  UnlockedAttributes: 0n << 2n,
+  Transferable: 1n << 0n,
+  UnlockedMetadata: 1n << 1n,
+  UnlockedAttributes: 1n << 2n,
+  allOff: 0n,
+  allOn: 0b111n,
 }
-
-const sum = (r: Record<string, bigint>) => Object.values(r).reduce((acc, curr) => curr + acc)
 
 const createCollection = await Nfts
   .create({
     config: Rune.rec({
-      settings: sum(DefaultCollectionSetting),
+      settings: DefaultCollectionSetting.allOn,
       mintSettings: Rune.rec({
         mintType: MintType.Issuer(),
-        defaultItemSettings: sum(DefaultItemSetting),
+        defaultItemSettings: DefaultItemSetting.allOn,
       }),
     }),
     admin: alice.address,
