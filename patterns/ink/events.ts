@@ -1,4 +1,4 @@
-import { ApplyExtrinsicEventPhase, PublicKeyRune, Rune, RunicArgs } from "../../mod.ts"
+import { AccountIdRune, ApplyExtrinsicEventPhase, Rune, RunicArgs } from "../../mod.ts"
 
 export interface InstantiatedEvent {
   phase: ApplyExtrinsicEventPhase
@@ -22,5 +22,5 @@ export function instantiationEventIntoPublicKey<X>(
   return Rune
     .resolve(event)
     .access("event", "value", "contract")
-    .into(PublicKeyRune)
+    .into(AccountIdRune)
 }
