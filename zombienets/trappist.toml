@@ -3,7 +3,7 @@ timeout = 1000
 
 [relaychain]
 default_image = "docker.io/paritypr/polkadot-debug:master"
-default_command = "polkadot"
+default_command = "`deno task capi bin polkadot v0.9.37`"
 chain = "rococo-local"
 
 [[relaychain.nodes]]
@@ -29,7 +29,7 @@ chain = "statemine-local"
 [[parachains.collators]]
 name = "statemine-collator01"
 image = "docker.io/parity/polkadot-parachain:latest"
-command = "polkadot-parachain"
+command = "`deno task capi bin polkadot-parachain v0.9.370`"
 args = ["--log=xcm=trace,pallet-assets=trace"]
 
 [[parachains]]
@@ -39,7 +39,7 @@ cumulus_based = true
 [[parachains.collators]]
 name = "trappist-collator01"
 image = "docker.io/parity/polkadot-parachain:latest"
-command = "trappist-collator"
+command = "`deno task capi bin trappist-collator 22755b2`"
 args = ["--log=xcm=trace,pallet-assets=trace"]
 
 [types.Header]

@@ -12,9 +12,9 @@ import {
   ss58,
   ValueRune,
 } from "capi"
-import * as Rococo from "zombienet/xcm_playground.toml/alice/@latest/mod.js"
-import * as Statemine from "zombienet/xcm_playground.toml/statemine-collator01/@latest/mod.js"
-import * as Trappist from "zombienet/xcm_playground.toml/trappist-collator01/@latest/mod.js"
+import * as Rococo from "zombienet/trappist.toml/alice/@latest/mod.js"
+import * as Statemine from "zombienet/trappist.toml/statemine-collator01/@latest/mod.js"
+import * as Trappist from "zombienet/trappist.toml/trappist-collator01/@latest/mod.js"
 import { delay } from "../deps/std/async.ts"
 
 /**
