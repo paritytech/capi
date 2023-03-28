@@ -108,14 +108,12 @@ await Trappist.Sudo.sudo({
       multilocation: { Junctions },
     },
   } = Trappist.types.xcm
-  // TODO: batch with createDerivedAsset
   await Trappist.Sudo.sudo({
     call: Trappist.AssetRegistry.registerReserveAsset({
       assetId: TRAPPIST_ASSET_ID,
       assetMultiLocation: Rune.rec({
         parents: 1,
         interior: Junctions.X3(
-          // TODO: find parachain id
           Junction.Parachain(RESERVE_CHAIN_ID),
           Junction.PalletInstance((await Statemine.Assets.pallet.run()).id),
           Junction.GeneralIndex(BigInt(RESERVE_ASSET_ID)),
@@ -150,7 +148,6 @@ await Trappist.Sudo.sudo({
     dest: VersionedMultiLocation.V1(Rune.rec({
       parents: 1,
       interior: Junctions.X1(
-        // TODO: find parachain id
         Junction.Parachain(TRAPPIST_CHAIN_ID),
       ),
     })),
@@ -197,7 +194,6 @@ await Trappist.Sudo.sudo({
     .run()
 }
 
-// TODO: wait for xcmpQueue.(Success|Fail) .messageHash
 await waitFor(async () =>
   await Trappist.Assets.Account.value([TRAPPIST_ASSET_ID, bob.publicKey]).run() !== undefined
 )
