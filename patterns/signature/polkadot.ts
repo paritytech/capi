@@ -5,8 +5,8 @@ import { $, hex, ss58, ValueRune } from "../../mod.ts"
 import { Rune, RunicArgs } from "../../rune/Rune.ts"
 import { Era } from "../../scale_info/overrides/Era.ts"
 
-export interface SignatureProps<T extends Chain> {
-  sender: ExtrinsicSender<T>
+export interface SignatureProps {
+  sender: ExtrinsicSender<PolkadotSignatureChain>
   checkpoint?: string
   mortality?: Era
   nonce?: number
@@ -28,7 +28,7 @@ export interface PolkadotSignatureChain extends AddressPrefixChain {
   }
 }
 
-export function signature<X>(_props: RunicArgs<X, SignatureProps<PolkadotSignatureChain>>) {
+export function signature<X>(_props: RunicArgs<X, SignatureProps>) {
   return <CU>(chain: ChainRune<PolkadotSignatureChain, CU>) => {
     const props = RunicArgs.resolve(_props)
     const addrPrefix = chain.addressPrefix()
