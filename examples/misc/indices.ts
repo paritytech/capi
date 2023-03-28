@@ -1,6 +1,6 @@
 import { AccountIdRune } from "capi"
+import { signature } from "capi/patterns/signature/polkadot.ts"
 import { chain, createUsers, Indices } from "polkadot_dev/mod.js"
-import { signature } from "../patterns/signature/polkadot.ts"
 
 const { alexa } = await createUsers()
 

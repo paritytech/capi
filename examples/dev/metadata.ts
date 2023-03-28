@@ -1,6 +1,8 @@
 /**
  * @title Retrieve chain metadata
- * @stability stable
+ * @stability unstable – We'll likely restructure the metadata such that we can use its type signature
+ * within a type utility to produce constraints over calls and events.
+ * Tracked in [881](https://github.com/paritytech/capi/issues/811).
  *
  * The chain's metadata (formally-termed "FRAME Metadata") describes all of its runtime properties,
  * including storage, constants, callables, their types and even plain-text descriptions.
@@ -8,8 +10,11 @@
  * building an advanced Capi-based library, chances are that you don't need to work with the metadata directly.
  */
 
+import { assertObjectMatch } from "asserts"
 import { chain } from "polkadot_dev/mod.js"
 
-const result = await chain.metadata.run()
+// Execute the metadata Rune.
+const metadata = await chain.metadata.run()
 
-console.log(result)
+// `metadata` should have the following outline.
+assertObjectMatch(metadata, { types: {}, pallets: {}, extrinsic: {} })
