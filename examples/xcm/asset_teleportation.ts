@@ -2,8 +2,8 @@ import { alice, Rune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 import { types, XcmPallet } from "zombienet/statemine.toml/alice/@latest/mod.js"
 import { chain as parachain, System } from "zombienet/statemine.toml/collator/@latest/mod.js"
-import { Event as ParachainEvent } from "zombienet/statemine.toml/collator/@latest/types/cumulus_pallet_parachain_system/pallet.js"
-import { RuntimeEvent as ParachainRuntimeEvent } from "zombienet/statemine.toml/collator/@latest/types/statemine_runtime.js"
+import { Event } from "zombienet/statemine.toml/collator/@latest/types/cumulus_pallet_parachain_system/pallet.js"
+import { RuntimeEvent } from "zombienet/statemine.toml/collator/@latest/types/statemine_runtime.js"
 
 const {
   VersionedMultiAssets,
@@ -58,12 +58,9 @@ outer:
 for await (const e of System.Events.value(undefined, parachain.latestBlock.hash).iter()) {
   if (e) {
     for (const { event } of e) {
-      if (ParachainRuntimeEvent.isParachainSystem(event)) {
-        const { value } = event
-        if (ParachainEvent.isDownwardMessagesProcessed(value)) {
-          console.log("Alice balance after:", await aliceBalance.run())
-          break outer
-        }
+      if (RuntimeEvent.isParachainSystem(event) && Event.isDownwardMessagesProcessed(event.value)) {
+        console.log("Alice balance after:", await aliceBalance.run())
+        break outer
       }
     }
   }
