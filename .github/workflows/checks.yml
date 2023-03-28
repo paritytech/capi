@@ -31,7 +31,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v3
-      - uses: streetsidesoftware/cspell-action@c5e5f42f5bba8df1c0b7e74596c5600a3167efab # v2.7.0
+      - uses: streetsidesoftware/cspell-action@fb047b6866b3893c12bc3ef002327bc57c0037c8 # v2.7.0
 
   star:
     name: Star
