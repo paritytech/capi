@@ -60,7 +60,7 @@ export class ValueRune<out T, out U = never> extends Rune<T, U> {
     return ValueRune.new(
       RunHandle,
       this,
-      (x: T): x is T2 => checkGuard(x, guard),
+      guard,
       alt(this as never),
     )
   }
