@@ -1,9 +1,9 @@
 import { $ } from "capi"
 import { IdentityInfoTranscoders } from "capi/patterns/identity.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
-import { Identity, users } from "polkadot_dev/mod.js"
+import { createUsers, Identity } from "polkadot_dev/mod.js"
 
-const [alexa] = await users(1)
+const { alexa } = await createUsers()
 
 const transcoders = new IdentityInfoTranscoders({ stars: $.u8 })
 

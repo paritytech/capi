@@ -45,15 +45,11 @@ export async function createCustomChainSpec(
   return customChainSpecRawPath
 }
 
-export function connectionCodeWithUsers(
-  code: string,
-  isTypes: boolean,
-  url: string,
-): string {
+export function connectionCodeWithUsers(code: string, isTypes: boolean, url: string): string {
   return `
 ${code}
 
-export const users ${
+export const createUsers ${
     isTypes
       ? `: ReturnType<typeof C.testUserFactory>`
       : `= C.testUserFactory(${JSON.stringify(url)})`

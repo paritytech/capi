@@ -1,9 +1,9 @@
 import { Rune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
-import { Balances, System, users, Utility } from "westend_dev/mod.js"
+import { Balances, createUsers, System, Utility } from "westend_dev/mod.js"
 import { mapEntries } from "../deps/std/collections/map_entries.ts"
 
-const [alexa, billy, carol, david] = await users(4)
+const { alexa, billy, carol, david } = await createUsers()
 
 const balances = Rune.rec(
   mapEntries({ billy, carol, david }, ([name, { publicKey }]) => {

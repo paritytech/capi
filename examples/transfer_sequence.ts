@@ -1,8 +1,8 @@
 import { Rune, Sr25519 } from "capi"
-import { Balances, System, users } from "westend_dev/mod.js"
+import { Balances, createUsers, System } from "westend_dev/mod.js"
 import { signature } from "../patterns/signature/polkadot.ts"
 
-const [alexa, billy, carol] = await users(3)
+const { alexa, billy, carol } = await createUsers()
 
 const balances = Rune.rec({
   alice: balance(alexa),

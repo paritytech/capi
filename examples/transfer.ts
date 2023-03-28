@@ -1,7 +1,7 @@
-import { Balances, users } from "westend_dev/mod.js"
+import { Balances, createUsers } from "westend_dev/mod.js"
 import { signature } from "../patterns/signature/polkadot.ts"
 
-const [alexa, billy] = await users(2)
+const { alexa, billy } = await createUsers()
 
 const result = await Balances
   .transfer({

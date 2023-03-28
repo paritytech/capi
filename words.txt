@@ -91,6 +91,7 @@ katal
 katalchain
 keypair
 kico
+kiera
 kint
 kintsugi
 kton
@@ -106,6 +107,7 @@ ltex
 lxkf
 mathchain
 matklad
+matty
 merkle
 micnncim
 monomorphization
@@ -169,6 +171,7 @@ rotr
 runtimes
 rustc
 rustup
+ryann
 sastan
 schnorr
 schnorrkel
@@ -184,6 +187,7 @@ stalebot
 statemigration
 statemine
 statemint
+steff
 struct
 subpaths
 sufficients
@@ -196,6 +200,7 @@ teer
 tidefi
 tifi
 timepoint
+tisix
 tjjfvi
 tnkr
 todos
