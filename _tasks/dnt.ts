@@ -41,8 +41,8 @@ await Promise.all([
       name: "./patterns/identity",
       path: "./patterns/identity.ts",
     }, {
-      name: "./patterns/size_tree",
-      path: "./patterns/sizeTree.ts",
+      name: "./patterns/storage_sizes",
+      path: "./patterns/storage_sizes.ts",
     }, {
       name: "./server",
       path: "./server/mod.ts",
