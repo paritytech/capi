@@ -1,4 +1,4 @@
-mod.ts
-multisig_transfer.ts
-ink_e2e/main.ts
-xcm_asset_teleportation.ts
+multisig/pure_proxy_stash.ts
+multisig/transfer.ts
+multisig/virtual.ts
+xcm/asset_teleportation.ts

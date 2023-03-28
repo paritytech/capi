@@ -1,5 +1,5 @@
+import { signature } from "capi/patterns/signature/polkadot.ts"
 import { Balances, createUsers } from "westend_dev/mod.js"
-import { signature } from "../patterns/signature/polkadot.ts"
 
 const { alexa, billy } = await createUsers()
 

@@ -1,4 +1,4 @@
-import { PublicKeyRune } from "capi"
+import { AccountIdRune } from "capi"
 import { chain, createUsers, Indices } from "polkadot_dev/mod.js"
 import { signature } from "../patterns/signature/polkadot.ts"
 
@@ -18,7 +18,7 @@ const mapped = await Indices.Accounts
   .value(index, hash)
   .unhandle(undefined)
   .access(0)
-  .into(PublicKeyRune)
+  .into(AccountIdRune)
   .ss58(chain)
   .run()
 
