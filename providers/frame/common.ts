@@ -51,8 +51,8 @@ ${code}
 
 export const createUsers ${
     isTypes
-      ? `: ReturnType<typeof C.testUser.factory>`
-      : `= C.testUser.factory(${JSON.stringify(url)})`
+      ? `: ReturnType<typeof C.testUserFactory>`
+      : `= C.testUserFactory(${JSON.stringify(url)})`
   }
   `
 }
