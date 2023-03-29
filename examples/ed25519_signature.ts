@@ -24,7 +24,7 @@ await Balances
   })
   .signed(signature({ sender: alexa }))
   .sent()
-  .finalizedHash()
+  .finalized()
   .run()
 
 console.log(
