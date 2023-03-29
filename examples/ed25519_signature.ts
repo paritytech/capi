@@ -1,5 +1,4 @@
 import { Balances, users } from "westend_dev/mod.js"
-import { MultiAddress } from "westend_dev/types/sp_runtime/multiaddress.js"
 import * as ed from "../deps/ed25519.ts"
 import { signature } from "../patterns/signature/polkadot.ts"
 
@@ -9,7 +8,10 @@ const ed25519PrivateKey = eddie.secretKey.slice(0, 32)
 const ed25519PublicKey = await ed.getPublicKey(ed25519PrivateKey)
 
 const ed25519Eddie = {
-  address: MultiAddress.Id(ed25519PublicKey),
+  address: {
+    type: "Id" as const,
+    value: ed25519PublicKey,
+  },
   sign: (msg: Uint8Array) => ({
     type: "Ed25519" as const,
     value: ed.sync.sign(msg, ed25519PrivateKey),
