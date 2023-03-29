@@ -1,19 +1,18 @@
+import * as ed from "https://esm.sh/@noble/ed25519@1.7.3"
 import { Balances, users } from "westend_dev/mod.js"
 import { MultiAddress } from "westend_dev/types/sp_runtime/multiaddress.js"
-import * as ed from "../deps/ed25519.ts"
 import { Rune } from "../mod.ts"
 import { signature } from "../patterns/signature/polkadot.ts"
 
-const [alexa, billy, eddie] = await users(3)
+const [alexa, billy] = await users(2)
 
-const ed25519PrivateKey = eddie.secretKey.slice(0, 32)
-const ed25519PublicKey = await ed.getPublicKey(ed25519PrivateKey)
-
-const ed25519Eddie = Rune.rec({
-  address: MultiAddress.Id(ed25519PublicKey),
+const eddieSecretKey = crypto.getRandomValues(new Uint8Array(32))
+const eddiePublicKey = await ed.getPublicKey(eddieSecretKey)
+const eddie = Rune.rec({
+  address: MultiAddress.Id(eddiePublicKey),
   sign: async (msg: Uint8Array) => ({
     type: "Ed25519" as const,
-    value: await ed.sign(msg, ed25519PrivateKey),
+    value: await ed.sign(msg, eddieSecretKey),
   }),
 })
 
@@ -21,7 +20,7 @@ const ed25519Eddie = Rune.rec({
 await Balances
   .transfer({
     value: 1_000_000_000_000n,
-    dest: ed25519Eddie.access("address"),
+    dest: eddie.access("address"),
   })
   .signed(signature({ sender: alexa }))
   .sent()
@@ -34,7 +33,7 @@ console.log(
       value: 12345n,
       dest: billy.address,
     })
-    .signed(signature({ sender: ed25519Eddie }))
+    .signed(signature({ sender: eddie }))
     .sent()
     .dbgStatus()
     .finalizedEvents()
