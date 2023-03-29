@@ -1,10 +1,10 @@
 import * as ed from "https://esm.sh/@noble/ed25519@1.7.3"
-import { Balances, users } from "westend_dev/mod.js"
+import { Balances, createUsers } from "westend_dev/mod.js"
 import { MultiAddress } from "westend_dev/types/sp_runtime/multiaddress.js"
 import { Rune } from "../mod.ts"
 import { signature } from "../patterns/signature/polkadot.ts"
 
-const [alexa, billy] = await users(2)
+const { alexa, billy } = await createUsers()
 
 const eddieSecretKey = crypto.getRandomValues(new Uint8Array(32))
 const eddiePublicKey = await ed.getPublicKey(eddieSecretKey)
