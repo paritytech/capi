@@ -11,9 +11,9 @@ const ed25519PublicKey = await ed.getPublicKey(ed25519PrivateKey)
 
 const ed25519Eddie = Rune.rec({
   address: MultiAddress.Id(ed25519PublicKey),
-  sign: (msg: Uint8Array) => ({
+  sign: async (msg: Uint8Array) => ({
     type: "Ed25519" as const,
-    value: ed.sync.sign(msg, ed25519PrivateKey),
+    value: await ed.sign(msg, ed25519PrivateKey),
   }),
 })
 

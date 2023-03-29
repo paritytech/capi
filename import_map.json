@@ -13,8 +13,7 @@
     "moonbeam/": "http://localhost:4646/frame/wss/wss.api.moonbeam.network/@latest/",
     "statemint/": "http://localhost:4646/frame/wss/statemint-rpc.polkadot.io/@latest/",
     "phala/": "http://localhost:4646/frame/wss/api.phala.network/ws#/rpc/@latest/",
-    "subsocial/": "http://localhost:4646/frame/para.subsocial.network/@latest/",
-    "crypto": "https://deno.land/std@0.153.0/node/crypto.ts"
+    "subsocial/": "http://localhost:4646/frame/para.subsocial.network/@latest/"
   },
   "scopes": {
     "examples/": {
