@@ -1,4 +1,5 @@
 import * as $ from "../../deps/scale.ts"
+import { AsyncMemo } from "../memo.ts"
 import { getOrInit, TimedMemo, WeakMemo } from "../mod.ts"
 
 export abstract class CacheBase {
@@ -7,6 +8,13 @@ export abstract class CacheBase {
   }
 
   abstract _getRaw(key: string, init: () => Promise<Uint8Array>): Promise<Uint8Array>
+
+  abstract _has(key: string): Promise<boolean>
+
+  hasMemo = new AsyncMemo<string, boolean>()
+  has(key: string) {
+    return this.hasMemo.run(key, () => this._has(key))
+  }
 
   rawMemo = new WeakMemo<string, Uint8Array>()
   getRaw(key: string, init: () => Promise<Uint8Array>): Promise<Uint8Array> {

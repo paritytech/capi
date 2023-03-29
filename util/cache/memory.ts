@@ -6,4 +6,8 @@ export class InMemoryCache extends CacheBase {
   _getRaw(key: string, init: () => Promise<Uint8Array>): Promise<Uint8Array> {
     return Promise.resolve(this.memo.run(key, init))
   }
+
+  async _has(key: string): Promise<boolean> {
+    return this.memo.done.has(key)
+  }
 }

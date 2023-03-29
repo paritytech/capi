@@ -12,13 +12,8 @@ export interface ConnectionCtorLike<D> {
 export abstract class Connection {
   nextId = 0
   references = 0
-  signal
-  #controller
-
-  constructor() {
-    this.#controller = new AbortController()
-    this.signal = this.#controller.signal
-  }
+  #controller = new AbortController()
+  signal = this.#controller.signal
 
   static connect<D>(
     this: new(discovery: D) => Connection,

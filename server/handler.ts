@@ -1,40 +1,131 @@
+import { mime } from "https://deno.land/x/mimetypes@v1.0.0/mod.ts"
+import { FrameCodegen } from "../codegen/FrameCodegen.ts"
+import { blake2_512, blake2_64 } from "../crypto/hashers.ts"
+import { hex } from "../crypto/mod.ts"
 import { Handler, Status } from "../deps/std/http.ts"
-import { Env } from "./Env.ts"
+import { decodeMetadata } from "../frame_metadata/decodeMetadata.ts"
+import { $metadata } from "../frame_metadata/raw/v14.ts"
+import { CacheBase } from "../util/cache/base.ts"
+import { WeakMemo } from "../util/memo.ts"
+import { tsFormatter } from "../util/tsFormatter.ts"
+import { $codegenSpec, CodegenEntry } from "./codegenSpec.ts"
 import * as f from "./factories.ts"
-import { parsePathInfo } from "./PathInfo.ts"
 
-export function handler(env: Env): Handler {
+const rCodegenUrl = /^\/([\da-f]{16})(\/.+)?$/
+const rUploadUrl = /^\/upload\/(codegen\/[\da-f]{16}|metadata\/[\da-f]{128})$/
+
+const codeTtl = 60_000
+
+export function handler(dataCache: CacheBase, generatedCache: CacheBase): Handler {
+  const filesMemo = new WeakMemo<string, Map<string, string>>()
   return handleCors(handleErrors(async (request) => {
     const url = new URL(request.url)
     const { pathname } = url
-    if (pathname === "/") return new Response("capi dev server active")
-    if (pathname === "/capi_cwd") return new Response(Deno.cwd())
-    const pathInfo = parsePathInfo(pathname)
-    if (pathInfo) {
-      const { vCapi, providerId, generatorId } = pathInfo
-      if (vCapi) {
-        return f.serverError(
-          "The local Capi sever assumes the same version as itself; another cannot be specified.",
-        )
-      }
-      const provider = env.providers[generatorId]?.[providerId]
-      if (provider) {
-        return await provider.handle(request, pathInfo)
-      }
+    if (pathname === "/") return await fetch(import.meta.resolve("./static/index.html"))
+    let match
+    if ((match = rUploadUrl.exec(pathname))) {
+      const key = match[1]!
+      return handleUpload(request, key)
+    } else if ((match = rCodegenUrl.exec(pathname))) {
+      const hash = match[1]!
+      const path = match[2] ?? "/"
+      return handleCodegen(request, hash, path)
     }
     for (const dir of staticDirs) {
       try {
         const url = new URL(pathname.slice(1), dir)
-        const res = await fetch(url)
-        if (!res.ok) continue
-        if (f.acceptsHtml(request)) {
-          return f.html(await f.renderCode(await res.text()))
+        const response = await fetch(url)
+        if (!response.ok) continue
+        if (f.acceptsHtml(request) && /\.[jt]s$/.test(pathname)) {
+          return f.html(await f.renderCode(await response.text()))
         }
-        return res
-      } catch (_e) {}
+        return new Response(response.body, {
+          headers: {
+            "Content-Type": mime.getType(pathname) ?? "text/plain",
+          },
+        })
+      } catch {}
     }
     return f.notFound()
   }))
+
+  async function handleUpload(request: Request, key: string) {
+    const [kind, untrustedHash] = key.split("/") as ["codegen" | "metadata", string]
+    if (request.method === "HEAD") {
+      const exists = await dataCache.has(key)
+      return new Response(null, { status: exists ? 204 : 404 })
+    } else if (request.method === "PUT") {
+      if (await dataCache.has(key)) {
+        return new Response(null, { status: 204 })
+      }
+      const untrustedData = new Uint8Array(await request.arrayBuffer())
+      const hasher = kind === "codegen" ? blake2_64 : blake2_512
+      const codec = kind === "codegen" ? $codegenSpec : $metadata
+      let data: Uint8Array
+      try {
+        const value = codec.decode(untrustedData)
+        codec.assert(value)
+        data = codec.encode(value as any)
+      } catch {
+        return new Response("invalid request body data", { status: 400 })
+      }
+      const hash = hex.encode(hasher.hash(data))
+      if (hash !== untrustedHash) {
+        return new Response("request body does not match provided hash", { status: 400 })
+      }
+      dataCache.getRaw(key, async () => data)
+      return new Response(null, { status: 204 })
+    } else {
+      return new Response(null, { status: 405 })
+    }
+  }
+
+  async function handleCodegen(request: Request, hash: string, path: string) {
+    return f.code(
+      generatedCache,
+      request,
+      () =>
+        generatedCache.getString(hash + path, codeTtl, async () => {
+          const codegenSpec = await dataCache.get(`codegen/${hash}`, $codegenSpec, () => {
+            throw new Response(`${hash} not found`, { status: 404 })
+          })
+
+          let match: [string[], CodegenEntry] | undefined = undefined
+          for (const [key, value] of codegenSpec.codegen) {
+            console.log(path, key, value)
+            if (
+              path.startsWith(`/${key.map((x) => x + "/").join("")}`)
+              && key.length >= (match?.[0].length ?? 0)
+            ) {
+              match = [key, value]
+            }
+          }
+
+          if (!match) throw f.notFound()
+
+          const [key, entry] = match
+
+          const files = await filesMemo.run(`${hash}/${key.join("/")}`, async () => {
+            const metadataHash = hex.encode(entry.metadata)
+            const metadata = decodeMetadata(
+              await dataCache.getRaw(`metadata/${metadataHash}`, async () => {
+                throw new Response(`${hash} not found`, { status: 404 })
+              }),
+            )
+
+            const codegen = new FrameCodegen(metadata, entry.chainName)
+            const files = new Map<string, string>()
+            codegen.write(files)
+            return files
+          })
+
+          const subpath = path.slice(`/${key.map((x) => x + "/").join("")}`.length)
+
+          if (!files.has(subpath)) throw f.notFound()
+          return tsFormatter.formatText(path, files.get(subpath)!)
+        }),
+    )
+  }
 }
 
 const staticDirs = ["../", "./static/"].map((p) => import.meta.resolve(p))

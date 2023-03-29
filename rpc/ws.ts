@@ -7,11 +7,13 @@ export class WsConnection extends Connection {
   constructor(readonly url: string) {
     super()
     this.ws = new WebSocket(url)
-    this.ws.addEventListener("message", (e) => this.handle(JSON.parse(e.data)))
+    this.ws.addEventListener("message", (e) => this.handle(JSON.parse(e.data)), {
+      signal: this.signal,
+    })
     this.ws.addEventListener("error", (e) => {
       console.log(e)
       throw new Error("TODO: more graceful error messaging / recovery")
-    })
+    }, { signal: this.signal })
   }
 
   async ready() {
