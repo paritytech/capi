@@ -2,6 +2,7 @@ import { MultiAddress } from "polkadot/types/sp_runtime/multiaddress.js"
 import * as bytes from "../../deps/std/bytes.ts"
 import {
   Chain,
+  ChainRune,
   ExtrinsicRune,
   PatternRune,
   Rune,
@@ -33,6 +34,13 @@ export type MultisigChain<C extends Chain> = PolkadotSignatureChain & TmpEventsC
 export class MultisigRune<out C extends Chain, out U>
   extends PatternRune<Multisig, MultisigChain<C>, U>
 {
+  static from<C extends Chain, U, X>(
+    chain: ChainRune<MultisigChain<C>, U>,
+    ...[multisig]: RunicArgs<X, [multisig: Multisig]>
+  ) {
+    return Rune.resolve(multisig).into(MultisigRune, chain)
+  }
+
   private storage = this.chain.pallet("Multisig").storage("Multisigs")
   private value = this.into(ValueRune)
   threshold = this.value.map(({ threshold, signatories }) => threshold ?? signatories.length - 1)

@@ -1,6 +1,6 @@
 import { Rune, Sr25519 } from "capi"
+import { signature } from "capi/patterns/signature/polkadot.ts"
 import { Balances, createUsers, System } from "westend_dev/mod.js"
-import { signature } from "../patterns/signature/polkadot.ts"
 
 const { alexa, billy, carol } = await createUsers()
 

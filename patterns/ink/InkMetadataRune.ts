@@ -66,7 +66,7 @@ export class InkMetadataRune<out U> extends Rune<InkMetadata, U> {
       )
   }
 
-  instantiate<C extends Chain, U, X>(
+  instantiation<C extends Chain, U, X>(
     chain: ChainRune<C, U>,
     props: RunicArgs<X, InstantiateProps>,
   ) {

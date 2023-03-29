@@ -1,32 +1,48 @@
-import { AccountIdRune, alice, ValueRune } from "capi"
+/**
+ * @title Deploy an Ink Smart Contract
+ * @stability unstable – We intend to work on an Ink provider (for static codegen)
+ * in the near future. This work will likely entail large changes to the current ink patterns.
+ *
+ * Deploying an Ink contract (instantiating) to a production contracts-enabled parachain
+ * is much the same as any other extrinsic submission; it involves specifying the ink
+ * metadata, WebAssembly bytes and sender/signer.
+ */
+
+import { alice, ss58 } from "capi"
 import { InkMetadataRune, isInstantiatedEvent } from "capi/patterns/ink/mod.ts"
-import { chain } from "contracts_dev/mod.js"
-import { signature } from "../../patterns/signature/polkadot.ts"
+import { signature } from "capi/patterns/signature/polkadot.ts"
+import { chain, System } from "contracts_dev/mod.js"
 
-class FailedToInstantiateError extends Error {
-  override readonly name = "FailedToInstantiateError"
-}
+// Initialize an `InkMetadataRune` with the raw Ink metadata text.
+const metadata = InkMetadataRune.fromMetadataText(
+  Deno.readTextFileSync(new URL(import.meta.resolve("./metadata.json"))),
+)
 
-const metadataText = Deno.readTextFileSync(new URL(import.meta.resolve("./metadata.json")))
-const metadata = InkMetadataRune.fromMetadataText(metadataText)
-
-const accountId = await metadata
-  .instantiate(chain, {
+// Instantiate `code.wasm` with `alice` and––upon block inclusion––return the
+// list of system events specific to this instantiation.
+const events = await metadata
+  .instantiation(chain, {
     sender: alice.publicKey,
     code: Deno.readFileSync(new URL("./code.wasm", import.meta.url)),
   })
   .signed(signature({ sender: alice }))
   .sent()
-  .dbgStatus("Contract deployment status:")
+  .dbgStatus("Contract instantiation:")
   .inBlockEvents()
-  .into(ValueRune)
-  .map((events) => events.find(isInstantiatedEvent) ?? new FailedToInstantiateError())
-  .unhandle(FailedToInstantiateError)
-  .access("event", "value", "contract")
-  .unsafeAs<Uint8Array>() // TODO: implicitly narrow
-  .into(AccountIdRune)
-  .ss58(chain)
   .run()
 
-console.log(`Contract address: ${accountId}`)
-Deno.env.set("CONTRACT_ADDRESS", accountId)
+// > Note: we're using `inBlockEvents` and not `finalizedEvents` because our provider
+// > is configured with instant finality. This is optimal for testing, but not production.
+
+// Find the event corresponding to instantiation, and extract the instance's `accountId`.
+// We'll convert this to an Ss58 address and place it within an environment variable. This
+// way we can easy deploy from other scripts with a simple `await import("./deploy.ts")`.
+for (const event of events) {
+  if (isInstantiatedEvent(event)) {
+    const accountId = event.event.value.contract
+    const address = ss58.encode(System.SS58Prefix, accountId)
+    console.log(`Deployed as ${address}`)
+    Deno.env.set("CONTRACT_ADDRESS", address)
+    break
+  }
+}

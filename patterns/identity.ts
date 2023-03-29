@@ -17,7 +17,7 @@ export interface NarrowIdentityInfo<A extends Record<string, unknown>> {
 export class IdentityInfoTranscoders<A extends Record<string, any>> {
   constructor(readonly additionalCodecs?: { [K in keyof A]: $.Codec<A[K]> }) {}
 
-  encode<X>(props: RunicArgs<X, NarrowIdentityInfo<A>>) {
+  encode = <X>(props: RunicArgs<X, NarrowIdentityInfo<A>>) => {
     const { additionalCodecs } = this
     const additional = additionalCodecs
       ? Rune
@@ -52,7 +52,7 @@ export class IdentityInfoTranscoders<A extends Record<string, any>> {
       }))
   }
 
-  decode<X>(...[identityInfo]: RunicArgs<X, [IdentityInfo]>) {
+  decode = <X>(...[identityInfo]: RunicArgs<X, [IdentityInfo]>) => {
     const { additionalCodecs } = this
     return Rune
       .resolve(identityInfo)

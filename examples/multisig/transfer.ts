@@ -1,18 +1,22 @@
-import { Rune, ValueRune } from "capi"
+import { assert } from "asserts"
+import { ValueRune } from "capi"
 import { MultisigRune } from "capi/patterns/multisig/mod.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 import { Balances, chain, createUsers, System } from "polkadot_dev/mod.js"
 
 const { alexa, billy, carol, david } = await createUsers()
 
-const multisig = Rune
-  .constant({
-    signatories: [alexa, billy, carol].map(({ publicKey }) => publicKey),
-    threshold: 2,
-  })
-  .into(MultisigRune, chain)
+const multisig = MultisigRune.from(chain, {
+  signatories: [alexa, billy, carol].map(({ publicKey }) => publicKey),
+  threshold: 2,
+})
 
-console.log("Dave initial balance:", await System.Account.value(david.publicKey).run())
+const daveBalance = System.Account
+  .value(david.publicKey)
+  .unhandle(undefined)
+  .access("data", "free")
+const daveBalanceInitial = await daveBalance.run()
+console.log("Dave initial balance:", daveBalanceInitial)
 
 await Balances
   .transfer({
@@ -38,27 +42,19 @@ await multisig
   .finalized()
   .run()
 
-console.log("Is proposed?:", await multisig.isProposed(call.hash).run())
+const isProposed = await multisig.isProposed(call.hash).run()
+console.log("Is proposed?:", isProposed)
 
-await multisig
-  .approve({
-    callHash: call.hash,
-    sender: billy.address,
-  })
+await multisig // TODO: get `ratify` working in place of `approve`
+  .approve({ callHash: call.hash, sender: billy.address })
   .signed(signature({ sender: billy }))
   .sent()
   .dbgStatus("Vote:")
   .finalized()
   .run()
 
-console.log(
-  "Existing approvals:",
-  await multisig
-    .proposal(call.hash)
-    .into(ValueRune)
-    .access("approvals")
-    .run(),
-)
+const { approvals } = await multisig.proposal(call.hash).into(ValueRune).run()
+console.log("Existing approvals:", approvals)
 
 await multisig
   .ratify({ call, sender: carol.address })
@@ -69,4 +65,6 @@ await multisig
   .run()
 
 // Check to see whether Dave's balance has in fact changed
-console.log("Dave final balance:", await System.Account.value(david.publicKey).run())
+const daveBalanceFinal = await daveBalance.run()
+console.log("Dave final balance:", daveBalanceFinal)
+assert(daveBalanceInitial < daveBalanceFinal)
