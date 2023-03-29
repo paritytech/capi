@@ -24,8 +24,15 @@ export async function createCustomChainSpec(
   const publicKeys = $.array($.sizedUint8Array(32)).decode(
     new Uint8Array(await (await fetch(publicKeysUrl)).arrayBuffer()),
   )
+
   for (let i = 0; i < DEFAULT_TEST_USER_COUNT; i++) {
-    balances.push([ss58.encode(networkPrefix, publicKeys[i]!), DEFAULT_TEST_USER_INITIAL_FUNDS])
+    // Sr25519
+    balances.push([ss58.encode(networkPrefix, publicKeys[i * 2]!), DEFAULT_TEST_USER_INITIAL_FUNDS])
+    // Ed25519
+    balances.push([
+      ss58.encode(networkPrefix, publicKeys[i * 2 + 1]!),
+      DEFAULT_TEST_USER_INITIAL_FUNDS,
+    ])
   }
   const customChainSpecPath = await Deno.makeTempFile({
     prefix: `custom-${chain}-chain-spec`,

@@ -1,7 +1,7 @@
 import { ArrayOfLength } from "../util/mod.ts"
 import { blake2_256 } from "./hashers.ts"
 import { decode } from "./hex.ts"
-import { Sr25519 } from "./Sr25519.ts"
+import { Sr25519 } from "./Keypair.ts"
 
 export const alice = pair(
   "98319d4ff8a9508c4bb0cf0b5a78d760a0b2082c02775e6e82370816fedfff48925a225d97aa00682d6a59b95b18780c10d7032336e88f3442b42361f4a66011",
