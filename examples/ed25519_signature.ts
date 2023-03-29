@@ -1,19 +1,43 @@
 import { Balances, users } from "westend_dev/mod.js"
+import * as ed from "../deps/ed25519.ts"
 import { signature } from "../patterns/signature/polkadot.ts"
 
-const [alexa, billy] = await users(2)
+const [alexa, billy, eddie] = await users(3)
 
-const ed25519Alexa = alexa.toEd25519()
+const ed25519PrivateKey = eddie.secretKey.slice(0, 32)
+const ed25519PublicKey = await ed.getPublicKey(ed25519PrivateKey)
 
-const result = await Balances
+const ed25519Eddie = {
+  address: {
+    type: "Id" as const,
+    value: ed25519PublicKey,
+  },
+  sign: (msg: Uint8Array) => ({
+    type: "Ed25519" as const,
+    value: ed.sync.sign(msg, ed25519PrivateKey),
+  }),
+}
+
+// Existential Deposit
+await Balances
   .transfer({
-    value: 12345n,
-    dest: billy.address,
+    value: 1_000_000_000_000n,
+    dest: ed25519Eddie.address,
   })
-  .signed(signature({ sender: ed25519Alexa }))
+  .signed(signature({ sender: alexa }))
   .sent()
-  .dbgStatus()
-  .finalizedEvents()
+  .finalizedHash()
   .run()
 
-console.log(result)
+console.log(
+  await Balances
+    .transfer({
+      value: 12345n,
+      dest: billy.address,
+    })
+    .signed(signature({ sender: ed25519Eddie }))
+    .sent()
+    .dbgStatus()
+    .finalizedEvents()
+    .run(),
+)
