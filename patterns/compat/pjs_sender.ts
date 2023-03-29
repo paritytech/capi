@@ -4,7 +4,7 @@ import { AddressPrefixChain, Chain, ChainRune } from "../../fluent/ChainRune.ts"
 import { ExtrinsicSender } from "../../fluent/ExtrinsicRune.ts"
 import { Rune, RunicArgs } from "../../rune/Rune.ts"
 
-type PjsSigner = { signPayload(payload: any): Promise<{ signature: string }> }
+export type PjsSigner = { signPayload(payload: any): Promise<{ signature: string }> }
 
 export function pjsSender<C extends AddressPrefixChain, CU>(
   chain: ChainRune<C, CU>,
@@ -21,10 +21,7 @@ export function pjsSender<C extends AddressPrefixChain, CU>(
     )
 
     const $pjsExtrinsic = $.object<$.AnyCodec[]>(
-      $.field(
-        "signedExtensions",
-        $.constant(signedExtensions),
-      ),
+      $.field("signedExtensions", $.constant(signedExtensions)),
       $.field("version", $.constant(4)), // protocolVersion
       $.field("method", $pjs($call)),
       convertExtensionCodec(pjsExtraKeyMap).visit($extra),

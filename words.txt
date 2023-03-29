@@ -194,7 +194,6 @@ sufficients
 suri
 syncer
 syncstate
-taekwondo
 tailaiw
 tcess
 teer
@@ -221,6 +220,7 @@ uink
 unfollow
 unguard
 unhandle
+unhandling
 uniarts
 unioned
 unsanitized

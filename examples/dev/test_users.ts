@@ -7,8 +7,7 @@
  * This simplifies signing extrinsics for submission to the given test chain.
  */
 
-import { assertInstanceOf } from "asserts"
-import { Sr25519 } from "capi"
+import { $, $sr25519 } from "capi"
 import { createUsers } from "polkadot_dev/mod.js"
 
 // Test users can be initialized with no count. The resulting collection is
@@ -20,4 +19,4 @@ const [david, ellie, felix] = await createUsers(3)
 
 // Each of the following elements should be an `Sr25519` instance.
 const users = [alexa, billy, carol, david, ellie, felix]
-users.map((user) => assertInstanceOf(user, Sr25519))
+users.forEach((user) => $.assert($sr25519, user))

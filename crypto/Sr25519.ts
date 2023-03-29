@@ -4,6 +4,7 @@ import {
   sr25519_sign,
   sr25519_verify,
 } from "../deps/capi_crypto_wrappers.ts"
+import * as $ from "../deps/scale.ts"
 
 export class Sr25519 {
   address
@@ -32,3 +33,9 @@ export class Sr25519 {
     return sr25519_verify(pubkey, msg, sig)
   }
 }
+
+export const $sr25519 = $.instance(
+  Sr25519,
+  $.tuple($.uint8Array, $.uint8Array),
+  (sr25519) => [sr25519.publicKey, sr25519.secretKey],
+)

@@ -8,7 +8,7 @@
  * metadata, WebAssembly bytes and sender/signer.
  */
 
-import { alice, ss58 } from "capi"
+import { $, alice, ss58 } from "capi"
 import { InkMetadataRune, isInstantiatedEvent } from "capi/patterns/ink/mod.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 import { chain, System } from "contracts_dev/mod.js"
@@ -40,6 +40,7 @@ const events = await metadata
 for (const event of events) {
   if (isInstantiatedEvent(event)) {
     const accountId = event.event.value.contract
+    $.assert($.sizedUint8Array(32), accountId)
     const address = ss58.encode(System.SS58Prefix, accountId)
     console.log(`Deployed as ${address}`)
     Deno.env.set("CONTRACT_ADDRESS", address)

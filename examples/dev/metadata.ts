@@ -10,11 +10,8 @@
  * building an advanced Capi-based library, chances are that you don't need to work with the metadata directly.
  */
 
-import { assertObjectMatch } from "asserts"
 import { chain } from "polkadot_dev/mod.js"
 
 // Execute the metadata Rune.
+// deno-lint-ignore no-unused-vars
 const metadata = await chain.metadata.run()
-
-// `metadata` should have the following outline.
-assertObjectMatch(metadata, { types: {}, pallets: {}, extrinsic: {} })

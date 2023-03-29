@@ -12,8 +12,7 @@
  * 3. Chain-specifics are untyped (which makes them error-prone).
  */
 
-import { assertEquals } from "asserts"
-import { ChainRune, SmoldotConnection, WsConnection } from "capi"
+import { $, ChainRune, SmoldotConnection, WsConnection } from "capi"
 
 // Bring the chainspec(s) into scope. Here, we'll fetch it from the Smoldot GitHub repository.
 const relayChainSpec = await (await fetch(
@@ -37,5 +36,28 @@ const Account = System.storage("Account")
 // Note how the lack of partial key is communicated via `null`.
 const entries = await Account.entryPage(10, null).run()
 
-// `entries` should contain 10 `AccountInfo`s
-assertEquals(entries.length, 10)
+// `entries` should contain a `[Uint8Array, AccountInfo]` tuple of length 10
+$.assert(
+  $.sizedArray(
+    $.tuple(
+      $.sizedUint8Array(32),
+      $.object(
+        $.field("nonce", $.u32),
+        $.field("consumers", $.u32),
+        $.field("providers", $.u32),
+        $.field("sufficients", $.u32),
+        $.field(
+          "data",
+          $.object(
+            $.field("free", $.u128),
+            $.field("reserved", $.u128),
+            $.field("miscFrozen", $.u128),
+            $.field("feeFrozen", $.u128),
+          ),
+        ),
+      ),
+    ),
+    10,
+  ),
+  entries,
+)

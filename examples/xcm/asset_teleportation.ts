@@ -1,3 +1,12 @@
+/**
+ * @title XCM Asset Teleportation
+ * @stability nearing
+ *
+ * Initialize a limited asset teleportation from a relaychain to a parachain
+ * and listen for the processed event on the parachain. Finally, read the new
+ * balance of the user to whom the asset was transferred.
+ */
+
 import { alice, Rune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 import { types, XcmPallet } from "zombienet/statemine.toml/alice/@latest/mod.js"
