@@ -38,7 +38,10 @@ export class BlockRune<out C extends Chain, out U>
       .storage("Events")
       .value(undefined!, this.parent)
       .unhandle(undefined)
-      .rehandle(undefined, () => Rune.constant<Chain.Storage.Value<C, "System", "Events">>([]))
+      .rehandle(
+        undefined,
+        () => Rune.constant([]).unsafeAs<Chain.Storage.Value<C, "System", "Events">>(),
+      )
       .into(EventsRune, this.chain)
   }
 }

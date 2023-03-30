@@ -20,14 +20,14 @@ const multisig = MultisigRune.from(chain, {
   threshold: 2,
 })
 
-// Reference Dave's initial balance. We'll be executing a transfer of some funds to Dave.
-const davidBalance = System.Account
+// Reference David's initial balance. We'll be executing a transfer of some funds to David.
+const davidFree = System.Account
   .value(david.publicKey)
   .unhandle(undefined)
   .access("data", "free")
 
-// Execute the `daveBalance` Rune.
-const daveBalanceInitial = await daveBalance.run()
+// Execute the `davidBalance` Rune.
+const davidBalanceInitial = await davidFree.run()
 
 // Transfer initial funds to the multisig (existential deposit).
 await Balances
@@ -81,8 +81,8 @@ await multisig
   .finalized()
   .run()
 
-// Check to see whether Dave's balance has in fact changed
-const daveBalanceFinal = await daveBalance.run()
+// Check to see whether David's balance has in fact changed
+const davidBalanceFinal = await davidFree.run()
 
 // The final balance should be greater than the initial.
-assert(daveBalanceFinal > daveBalanceInitial)
+assert(davidBalanceFinal > davidBalanceInitial)

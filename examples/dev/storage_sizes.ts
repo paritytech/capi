@@ -14,4 +14,4 @@ import { chain } from "polkadot_dev/mod.js"
 // Use the storageSizes factory to produce a Rune. Then execute it.
 const sizes = await storageSizes(chain).run()
 
-$.assert($.record($.str, $.record($.str, $.option($.u32))), sizes)
+$.assert($.record($.record($.option($.u32))), sizes)
