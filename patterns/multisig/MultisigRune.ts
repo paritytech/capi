@@ -58,7 +58,9 @@ export class MultisigRune<out C extends Chain, out U>
           call,
           otherSignatories: this.otherSignatories(sender),
           storeCall: false,
-          maxWeight: call.feeEstimate().access("weight"),
+          maxWeight: call.feeEstimate().access("weight")
+            // TODO: revert when this is merged https://github.com/paritytech/substrate/pull/13766
+            .map((weight) => ({ ...weight, proofSize: 200_000_000n })),
           maybeTimepoint: this.maybeTimepoint(call.hash),
         }),
       })
