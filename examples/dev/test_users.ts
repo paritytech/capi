@@ -19,4 +19,4 @@ const [david, ellie, felix] = await createUsers(3)
 
 // Each of the following elements should be an `Sr25519` instance.
 const users = [alexa, billy, carol, david, ellie, felix]
-users.forEach((user) => $.assert($sr25519, user))
+$.assert($.array($sr25519), users)
