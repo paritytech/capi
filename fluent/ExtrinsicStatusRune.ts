@@ -63,11 +63,16 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
         const i = hexes.indexOf("0x" + hex)
         return i === -1 ? undefined : i
       })
+      .unhandle(undefined)
     return Rune
       .tuple([block.events(), txI])
       .map(([events, txI]) =>
-        events.filter((event) => event.phase.type === "ApplyExtrinsic" && event.phase.value === txI)
+        // TODO: narrow
+        events.filter((event: any) =>
+          event.phase.type === "ApplyExtrinsic" && event.phase.value === txI
+        )
       )
+      .rehandle(undefined, () => Rune.constant([]))
       .into(ExtrinsicEventsRune, this.chain)
   }
 }

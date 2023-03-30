@@ -3,7 +3,9 @@ import { FrameMetadata } from "../frame_metadata/FrameMetadata.ts"
 import { Chain } from "./ChainRune.ts"
 import { PatternRune } from "./PatternRune.ts"
 
-export class EventsRune<out C extends Chain, out U> extends PatternRune<Event<C>[], C, U> {}
+export class EventsRune<out C extends Chain, out U>
+  extends PatternRune<Chain.Storage.Value<C, "System", "Events">, C, U>
+{}
 
 export interface TmpEventsChain extends Chain {
   metadata: FrameMetadata & {

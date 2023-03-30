@@ -8,7 +8,7 @@
  */
 
 import { $, alice, ss58 } from "capi"
-import { InkMetadataRune, isInstantiatedEvent } from "capi/patterns/ink/mod.ts"
+import { InkMetadataRune } from "capi/patterns/ink/mod.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 import { chain, System } from "contracts_dev/mod.js"
 
@@ -36,9 +36,9 @@ const events = await metadata
 // Find the event corresponding to instantiation, and extract the instance's `accountId`.
 // We'll convert this to an Ss58 address and place it within an environment variable. This
 // way we can easy deploy from other scripts with a simple `await import("./deploy.ts")`.
-for (const event of events) {
-  if (isInstantiatedEvent(event)) {
-    const accountId = event.event.value.contract
+for (const { event } of events) {
+  if (event.type === "Contracts" && event.value.type === "Instantiated") {
+    const accountId = event.value.contract
     $.assert($.sizedUint8Array(32), accountId)
     const address = ss58.encode(System.SS58Prefix, accountId)
     console.log(`Deployed as ${address}`)

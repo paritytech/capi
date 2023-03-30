@@ -22,7 +22,7 @@ const billyFree = System.Account
 const billyFreeInitial = await billyFree.run()
 
 // Bring your own Ed25519 implementation. In this case, we utilize
-// [`noble-ed25519`](https://github.com/paulmillr/noble-ed25519), which first
+// [`noble-ed25519`](https://github.com/paulmillr/noble-ed25519), which
 // requires us to specify a sync sha512 hasher implementation.
 ed.etc.sha512Sync = (...msgs) => sha512(ed.etc.concatBytes(...msgs))
 
