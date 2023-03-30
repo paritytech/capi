@@ -1,4 +1,4 @@
-multisig/pure_proxy_stash.ts
-multisig/transfer.ts
+multisig/basic.ts
+multisig/stash.ts
 multisig/virtual.ts
 xcm/asset_teleportation.ts
