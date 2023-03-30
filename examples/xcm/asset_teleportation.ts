@@ -14,6 +14,7 @@ import { chain as parachain, System } from "zombienet/statemine.toml/collator/@l
 import { Event } from "zombienet/statemine.toml/collator/@latest/types/cumulus_pallet_parachain_system/pallet.js"
 import { RuntimeEvent } from "zombienet/statemine.toml/collator/@latest/types/statemine_runtime.js"
 
+// Destructure the various type factories for convenient access.
 const {
   VersionedMultiAssets,
   VersionedMultiLocation,
@@ -26,11 +27,13 @@ const {
   },
 } = types.xcm
 
+// Reference Alice's free balance.
 const aliceBalance = System.Account
   .value(alice.publicKey)
   .unhandle(undefined)
   .access("data", "free")
 
+// Read the initial free.
 console.log("Alice balance before:", await aliceBalance.run())
 
 XcmPallet
@@ -62,7 +65,8 @@ XcmPallet
   .finalized()
   .run()
 
-// TODO: have the recipient associate the downward message with the sender
+// Iterate over the parachain events until receiving a downward message processed event,
+// at which point we can read alice's balance, which should be updated.
 outer:
 for await (const e of System.Events.value(undefined, parachain.latestBlock.hash).iter()) {
   if (e) {

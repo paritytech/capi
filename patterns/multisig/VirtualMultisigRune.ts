@@ -102,7 +102,7 @@ export class VirtualMultisigRune<out C extends Chain, out U>
       .into(ExtrinsicRune, this.chain)
   }
 
-  static hydrate<C extends Chain, U, X>(
+  static fromHex<C extends Chain, U, X>(
     chain: ChainRune<VirtualMultisigChain<C>, U>,
     ...[state]: RunicArgs<X, [state: string]>
   ) {

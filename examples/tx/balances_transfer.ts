@@ -29,7 +29,7 @@ await Balances
   })
   .signed(signature({ sender: alexa }))
   .sent()
-  .dbgStatus()
+  .dbgStatus("Transfer:")
   .finalized()
   .run()
 
