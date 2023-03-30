@@ -3,7 +3,6 @@ import { MetaRune, Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { BlockHashRune } from "./BlockHashRune.ts"
 import { BlockRune } from "./BlockRune.ts"
 import { Chain } from "./ChainRune.ts"
-import { EventsChain } from "./EventsRune.ts"
 import { ExtrinsicEventsRune } from "./ExtrinsicsEventsRune.ts"
 import { PatternRune } from "./PatternRune.ts"
 import { SignedExtrinsicRune } from "./SignedExtrinsicRune.ts"
@@ -49,18 +48,15 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
       .into(BlockHashRune, this.chain)
   }
 
-  inBlockEvents(this: ExtrinsicStatusRune<EventsChain<C>, U1, U2>) {
+  inBlockEvents() {
     return this.events(this.inBlock().block())
   }
 
-  finalizedEvents(this: ExtrinsicStatusRune<EventsChain<C>, U1, U2>) {
+  finalizedEvents() {
     return this.events(this.finalized().block())
   }
 
-  private events<EU>(
-    this: ExtrinsicStatusRune<EventsChain<C>, U1, U2>,
-    block: BlockRune<EventsChain<C>, EU>,
-  ) {
+  private events<EU>(block: BlockRune<C, EU>) {
     const txI = Rune
       .tuple([block.into(ValueRune).access("block", "extrinsics"), this.parent.hex()])
       .map(([hexes, hex]) => {

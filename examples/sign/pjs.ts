@@ -1,5 +1,5 @@
 /**
- * @title Polkadot-Js Signature Compatibility
+ * @title Polkadot-js Signature Compatibility
  * @stability nearing
  *
  * Utilize a Polkadot-js signer (such as from a browser wallet extension) to
