@@ -4,8 +4,7 @@
  * in the near future. This work will likely entail large changes to the current ink patterns.
  *
  * Deploying an Ink contract (instantiating) to a production contracts-enabled parachain
- * is much the same as any other extrinsic submission; it involves specifying the ink
- * metadata, WebAssembly bytes and sender/signer.
+ * is much the same as any other extrinsic submission.
  */
 
 import { $, alice, ss58 } from "capi"

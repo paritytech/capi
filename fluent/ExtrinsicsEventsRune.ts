@@ -42,7 +42,7 @@ export class ExtrinsicEventsRune<out C extends Chain, out U> extends EventsRune<
 }
 
 export class ExtrinsicError<D extends { type: string }> extends Error {
-  override readonly name = "DispatchError"
+  override readonly name = "ExtrinsicError"
 
   constructor(data: D) {
     super(data.type)

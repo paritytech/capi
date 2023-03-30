@@ -7,6 +7,7 @@
  * balance of the user to whom the asset was transferred.
  */
 
+import { assert } from "asserts"
 import { alice, Rune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 import { types, XcmPallet } from "zombienet/statemine.toml/alice/@latest/mod.js"
@@ -34,7 +35,7 @@ const aliceBalance = System.Account
   .access("data", "free")
 
 // Read the initial free.
-console.log("Alice balance before:", await aliceBalance.run())
+const aliceFreeInitial = await aliceBalance.run()
 
 XcmPallet
   .limitedTeleportAssets({
@@ -66,13 +67,14 @@ XcmPallet
   .run()
 
 // Iterate over the parachain events until receiving a downward message processed event,
-// at which point we can read alice's balance, which should be updated.
+// at which point we can read alice's free balance, which should be greater than the initial.
 outer:
-for await (const e of System.Events.value(undefined, parachain.latestBlock.hash).iter()) {
+for await (const e of System.Events.value(undefined, parachain.latestBlockHash).iter()) {
   if (e) {
     for (const { event } of e) {
       if (RuntimeEvent.isParachainSystem(event) && Event.isDownwardMessagesProcessed(event.value)) {
-        console.log("Alice balance after:", await aliceBalance.run())
+        const aliceFreeFinal = await aliceBalance.run()
+        assert(aliceFreeFinal > aliceFreeInitial)
         break outer
       }
     }

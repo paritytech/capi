@@ -3,8 +3,8 @@
  * @stability nearing
  *
  * When developing against a test chain, the `createUsers` utility
- * provides `Sr25519` instances, which correspond to test users (pre-seeded with funds).
- * This simplifies signing extrinsics for submission to the given test chain.
+ * provides `Sr25519` instances, which correspond to test users who are pre-seeded with
+ * funds. This simplifies signing extrinsics for submission to the given test chain.
  */
 
 import { $, $sr25519 } from "capi"

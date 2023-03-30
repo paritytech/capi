@@ -17,28 +17,27 @@ const { alexa } = await createUsers()
 // Initialize an `IdentityInfoTranscoders` of shape `{ stars: number }`.
 const transcoders = new IdentityInfoTranscoders({ stars: $.u8 })
 
-// Encode some identity info into the expected shape.
-const info = transcoders.encode({
-  display: "Chev Chelios",
-  additional: { stars: 5 },
-})
-
-// Execute the identity-setting transaction.
+// Encode some identity info into the expected shape and use it
+// to execute the identity-setting transaction.
 await Identity
-  .setIdentity({ info })
+  .setIdentity({
+    info: transcoders.encode({
+      display: "Chev Chelios",
+      additional: { stars: 5 },
+    }),
+  })
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus()
   .finalized()
   .run()
 
-// Reference the raw identity info from the chain.
-const infoRaw = Identity.IdentityOf
+// Retrieve and decode the identity info.
+const infoDecoded = await Identity.IdentityOf
   .value(alexa.publicKey)
   .unhandle(undefined)
   .access("info")
-
-// Retrieve and decode the identity info.
-const infoDecoded = await transcoders.decode(infoRaw).run()
+  .pipe((raw) => transcoders.decode(raw))
+  .run()
 
 $.assert($.u8, infoDecoded.additional.stars)
