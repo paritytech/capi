@@ -88,7 +88,7 @@ export class InkRune<out C extends Chain, out U>
       .into(ExtrinsicRune, this.chain)
   }
 
-  filterContractEvents = <X>(...[events]: RunicArgs<X, [events: Event<C>[]]>) => {
+  filterContractEvents = <X>(...[events]: RunicArgs<X, [events: Event[]]>) => {
     // TODO: return all relevant events, not just instantiated
     return Rune
       .tuple([Rune.resolve(events), this])
