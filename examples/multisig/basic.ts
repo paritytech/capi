@@ -21,7 +21,7 @@ const multisig = MultisigRune.from(chain, {
 })
 
 // Reference Dave's initial balance. We'll be executing a transfer of some funds to Dave.
-const daveBalance = System.Account
+const davidBalance = System.Account
   .value(david.publicKey)
   .unhandle(undefined)
   .access("data", "free")
