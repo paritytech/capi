@@ -212,6 +212,7 @@ tpeyg
 transcoders
 trufflehog
 trufflesecurity
+trun
 twind
 twox
 typebox
