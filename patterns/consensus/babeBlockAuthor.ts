@@ -1,6 +1,6 @@
 import { $preDigest } from "polkadot/types/sp_consensus_babe/digests.js"
 import { AddressPrefixChain, ChainRune } from "../../fluent/mod.ts"
-import { PublicKeyRune } from "../../fluent/mod.ts"
+import { AccountIdRune } from "../../fluent/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../../rune/mod.ts"
 import { preRuntimeDigest } from "./preRuntimeDigest.ts"
 
@@ -27,7 +27,7 @@ export function babeBlockAuthor<C extends AddressPrefixChain, U, X>(
     // TODO: swap this out upon Rune-compatible ValueRune.access
     .map(([validators, authorityIndex]) => validators[authorityIndex])
     .unhandle(undefined)
-    .into(PublicKeyRune)
+    .into(AccountIdRune)
     .ss58(chain)
 }
 

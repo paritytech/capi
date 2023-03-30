@@ -1,3 +1,4 @@
+import * as $ from "../../deps/scale.ts"
 import { ListOrValue, NumberOrHex, Subscription } from "./utils.ts"
 
 // https://github.com/paritytech/substrate/blob/0ba251c/primitives/runtime/src/generic/digest.rs
@@ -6,6 +7,7 @@ export interface Digest {
   /** A list of logs in the digest. */
   logs: string[]
 }
+export const $digest: $.Codec<Digest> = $.field("logs", $.array($.str))
 
 // https://github.com/paritytech/substrate/blob/01a3ad65/primitives/runtime/src/generic/header.rs#L39
 /** Abstraction over a block header for a substrate chain. */
@@ -21,15 +23,13 @@ export interface Header {
   /** A chain-specific digest of data useful for light clients or referencing auxiliary data. */
   digest: Digest
 }
-
-// https://github.com/paritytech/substrate/blob/ded44948/primitives/runtime/src/generic/block.rs#L126
-/** Abstraction over a substrate block and justification. */
-export interface SignedBlock {
-  /** Full block. */
-  block: Block
-  /** Block justification. */
-  justifications?: [number[], number[]][]
-}
+export const $header: $.Codec<Header> = $.object(
+  $.field("parentHash", $.str),
+  $.field("number", $.str),
+  $.field("stateRoot", $.str),
+  $.field("extrinsicsRoot", $.str),
+  $.field("digest", $digest),
+)
 
 // https://github.com/paritytech/substrate/blob/ded44948/primitives/runtime/src/generic/block.rs#L88
 export interface Block {
@@ -38,6 +38,23 @@ export interface Block {
   /** The accompanying extrinsics. */
   extrinsics: string[]
 }
+export const $block: $.Codec<Block> = $.object(
+  $.field("header", $header),
+  $.field("extrinsics", $.array($.str)),
+)
+
+// https://github.com/paritytech/substrate/blob/ded44948/primitives/runtime/src/generic/block.rs#L126
+/** Abstraction over a substrate block and justification. */
+export interface SignedBlock {
+  /** Full block. */
+  block: Block
+  /** Block justification. */
+  justifications: [number[], number[]][] | null
+}
+export const $signedBlock: $.Codec<SignedBlock> = $.object(
+  $.field("block", $block),
+  $.field("justifications", $.nullable($.array($.tuple($.array($.u32), $.array($.u32))))),
+)
 
 // https://github.com/paritytech/substrate/blob/934fbfd/client/rpc-api/src/chain/mod.rs#L27
 export type ChainCalls = {

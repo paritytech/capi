@@ -74,11 +74,10 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
     .subscribe("chain_subscribeNewHeads", "chain_unsubscribeNewHeads")
     .access("number")
 
-  latestBlock = this.connection
+  latestBlockHash = this.connection
     .call("chain_getBlockHash", this.latestBlockNum)
     .unsafeAs<string>()
     .into(BlockHashRune, this)
-    .block()
 
   blockHash<X>(...[blockHash]: RunicArgs<X, [blockHash?: string]>) {
     return Rune

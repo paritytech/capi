@@ -3,14 +3,14 @@
  * @stability nearing
  *
  * Accessing blocks and block-related data is among the most fundamental of chain
- * client capabilities. In the following example, we'll utilize Capi's fluent API
- * to turning a block reference (in this case the latest block hash) into a block.
- * Then we access various pieces of data pertaining to that block.
+ * client capabilities. Utilize Capi's fluent API to turn a block reference (in
+ * this case the latest block hash) into a block. Then access various pieces of
+ * data pertaining to that block.
  */
 
-import { Rune } from "capi"
+import { $, $extrinsic, known, Rune } from "capi"
 import { babeBlockAuthor } from "capi/patterns/consensus/mod.ts"
-import { chain } from "polkadot/mod.js"
+import { chain, metadata, types } from "polkadot/mod.js"
 
 // Reference the latest block hash.
 const blockHash = chain.blockHash()
@@ -27,11 +27,11 @@ const extrinsicsRaw = block.extrinsicsRaw()
 // ... and events.
 const events = block.events()
 
-// Let's get the author as well.
+// Reference the author as well.
 const author = babeBlockAuthor(chain, blockHash)
 
 // Use `Rune.rec` to parallelize these retrievals.
-const result = await Rune
+const collection = await Rune
   .rec({
     blockHash,
     block,
@@ -42,4 +42,15 @@ const result = await Rune
   })
   .run()
 
-console.log(result)
+// Define a codec against which we can validate `collection`.
+const $collection = $.object(
+  $.field("blockHash", $.str),
+  $.field("block", known.$signedBlock),
+  $.field("extrinsics", $.array($extrinsic(metadata))),
+  $.field("extrinsicsRaw", $.array($.str)),
+  $.field("events", $.array(types.frame_system.$eventRecord)),
+  $.field("author", $.str),
+)
+
+// `collection` should have the aforementioned shape.
+$.assert($collection, collection)
