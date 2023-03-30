@@ -7,6 +7,7 @@
  * the submission of transactions.
  */
 
+import { assertNotEquals } from "asserts"
 import { alice } from "capi"
 import { InkMetadataRune } from "capi/patterns/ink/mod.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
@@ -36,21 +37,23 @@ const state = contract.call({
   method: "get",
 })
 
-// Our initial state retrieval.
-console.log("Initial state:", await state.run())
+// Retrieve the initial state.
+const initialState = await state.run()
 
 // Use the `flip` method to *flip* the contract instance state.
-await (contract
+await contract
   .tx({
     sender: alice.publicKey,
     method: "flip",
   })
-  .signed(signature({ sender: alice }) as any) // TODO
+  .signed(signature({ sender: alice }))
   .sent()
-  .dbgStatus("Flip:") as any) // TODO
+  .dbgStatus("Flip:")
   .inBlockEvents()
   .pipe(contract.filterContractEvents)
   .run()
 
-// Our final state retrieval.
-console.log("Final state:", await state.run())
+// Retrieve the final state.
+const finalState = await state.run()
+
+assertNotEquals(initialState, finalState)

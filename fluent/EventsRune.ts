@@ -8,7 +8,7 @@ export class EventsRune<out C extends Chain, out U>
 export interface Event<RE = any> {
   phase: EventPhase
   event: RE
-  topics: string[]
+  topics: Uint8Array[]
 }
 
 export type EventPhase =
