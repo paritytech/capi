@@ -1,5 +1,3 @@
-import { Codec } from "../deps/scale.ts"
-import { FrameMetadata } from "../frame_metadata/FrameMetadata.ts"
 import { Chain } from "./ChainRune.ts"
 import { PatternRune } from "./PatternRune.ts"
 
@@ -7,44 +5,10 @@ export class EventsRune<out C extends Chain, out U>
   extends PatternRune<Chain.Storage.Value<C, "System", "Events">, C, U>
 {}
 
-export interface TmpEventsChain extends Chain {
-  metadata: FrameMetadata & {
-    pallets: {
-      System: {
-        storage: {
-          Events: {
-            key: Codec<void>
-            value: Codec<_Event<any>[]>
-          }
-        }
-      }
-    }
-  }
-}
-
-interface _EventsChain<RE> extends Chain {
-  metadata: FrameMetadata & {
-    pallets: {
-      System: {
-        storage: {
-          Events: {
-            key: Codec<void>
-            value: Codec<_Event<RE>[]>
-          }
-        }
-      }
-    }
-  }
-}
-
-export type RuntimeEvent<C extends Chain> = C extends _EventsChain<infer E> ? E : never
-export type EventsChain<C extends Chain> = _EventsChain<RuntimeEvent<C>>
-
-export type Event<C extends Chain> = _Event<RuntimeEvent<C>>
-
-interface _Event<RE> {
+export interface Event<RE = any> {
   phase: EventPhase
   event: RE
+  topics: string[]
 }
 
 export type EventPhase =

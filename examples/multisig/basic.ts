@@ -69,7 +69,12 @@ await multisig // TODO: get `ratify` working in place of `approve`
   .finalized()
   .run()
 
-const { approvals } = await multisig.proposal(call.hash).run()
+const { approvals } = await multisig
+  .proposal(call.hash)
+  .unhandle(undefined)
+  .run()
+
+// `approvals` should be a list of the approvers (account ids).
 $.assert($.array($.sizedUint8Array(32)), approvals)
 
 // Approve the proposal as Carol (final approval).

@@ -12,6 +12,10 @@ export interface InstantiatedEvent {
   }
 }
 
+export function isInstantiatedEvent(event: any): event is InstantiatedEvent {
+  return event.event.type === "Contracts" && (event.event.value as any).type === "Instantiated"
+}
+
 export function instantiationEventIntoPublicKey<X>(
   ...[event]: RunicArgs<X, [event: InstantiatedEvent]>
 ) {

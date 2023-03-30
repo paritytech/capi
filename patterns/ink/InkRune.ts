@@ -23,7 +23,7 @@ export interface MsgProps {
 }
 
 export class InkRune<out C extends Chain, out U>
-  extends PatternRune<Uint8Array, C, U, InkMetadataRune<C, U>>
+  extends PatternRune<Uint8Array, C, U, InkMetadataRune<U>>
 {
   innerCall<X>(...args_: RunicArgs<X, [sender: Uint8Array, value: bigint, data: Uint8Array]>) {
     const [sender, value, data] = RunicArgs.resolve(args_)
@@ -37,12 +37,13 @@ export class InkRune<out C extends Chain, out U>
   }
 
   common<X>(this: InkRune<C, U>, props: RunicArgs<X, MsgProps>) {
-    const msgMetadata = Rune.tuple([
-      this.parent
-        .into(ValueRune)
-        .access("V3", "spec", "messages"),
-      props.method,
-    ])
+    const msgMetadata = Rune
+      .tuple([
+        this.parent
+          .into(ValueRune)
+          .access("V3", "spec", "messages"),
+        props.method,
+      ])
       .map(([msgs, methodName]) => msgs.find((msgs) => msgs.label === methodName))
       .unhandle(undefined)
       .rehandle(undefined, () => Rune.constant(new MethodNotFoundError()))
@@ -92,9 +93,10 @@ export class InkRune<out C extends Chain, out U>
     return Rune
       .tuple([Rune.resolve(events), this])
       .map(([events, publicKey]) =>
-        events.filter((e) => {
-          return isInstantiatedEvent(e) && equals(e.event.value.contract, publicKey)
-        })
+        events.filter((e) =>
+          // TODO: clean up
+          isInstantiatedEvent(e) && equals((e.event as any).value.contract, publicKey)
+        )
       )
   }
 

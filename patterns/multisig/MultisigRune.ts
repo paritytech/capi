@@ -106,8 +106,6 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
       .proposal(callHash, blockHash)
       .unhandle(undefined)
       .access("when")
-      .unsafeAs<{ height: number; index: number }>()
-      .into(ValueRune)
       .rehandle(undefined)
   }
 
@@ -130,7 +128,14 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
           .unsafeAs<$.Native<Chain.Storage<C, "Multisig", "Multisigs">["key"]>>(),
         blockHash,
       )
-      .unsafeAs<{ approvals: Uint8Array[] }>()
+      .unsafeAs<
+        undefined | {
+          when: { height: number; index: number }
+          approvals: Uint8Array[]
+          depositor: bigint
+        }
+      >()
+      .into(ValueRune)
   }
 
   isProposed<X>(
