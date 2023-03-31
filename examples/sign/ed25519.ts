@@ -66,5 +66,8 @@ await Balances
   .finalizedEvents()
   .run()
 
+// Retrieve Billy's final free.
 const billyFreeFinal = await billyFree.run()
+
+// Ensure that the final is greater than the initial.
 assert(billyFreeFinal > billyFreeInitial)

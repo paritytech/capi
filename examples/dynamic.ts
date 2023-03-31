@@ -37,7 +37,7 @@ const Account = System.storage("Account")
 // Note how the lack of partial key is communicated via `null`.
 const entries = await Account.entryPage(10, null).run()
 
-// `entries` should contain a `[Uint8Array, AccountInfo]` tuple of length 10
+// The result should contain a `[Uint8Array, AccountInfo]` tuple of length 10.
 $.assert(
   $.sizedArray(
     $.tuple(
