@@ -8,7 +8,6 @@ for await (
     skip: [
       /^target\//,
       path.globToRegExp("examples/ink/*.ts"),
-      path.globToRegExp("examples/xcm/*.ts"),
     ],
   })
 ) {
