@@ -46,7 +46,7 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
 
   encoded() {
     return Rune.fn($extrinsic)
-      .call(this.chain.into(ValueRune).access("metadata"))
+      .call(this.chain.metadata)
       .into(CodecRune)
       .encoded(Rune.rec({
         protocolVersion: ExtrinsicRune.PROTOCOL_VERSION,
