@@ -1,5 +1,5 @@
 /**
- * @title Decode And Unhandle Dispatch Errors
+ * @title Decode and Unhandle Dispatch Errors
  * @stability unstable
  *
  * The `unhandleFailed` method of `ExtrinsicEventsRune` enables easy decoding
