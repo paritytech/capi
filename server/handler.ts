@@ -4,7 +4,7 @@ import * as f from "./factories.ts"
 import { parsePathInfo } from "./PathInfo.ts"
 
 export function handler(env: Env): Handler {
-  return handleErrors(async (request) => {
+  return handleCors(handleErrors(async (request) => {
     const url = new URL(request.url)
     const { pathname } = url
     if (pathname === "/") return new Response("capi dev server active")
@@ -34,19 +34,42 @@ export function handler(env: Env): Handler {
       } catch (_e) {}
     }
     return f.notFound()
-  })
+  }))
 }
 
 const staticDirs = ["../", "./static/"].map((p) => import.meta.resolve(p))
 
-export function handleErrors(handler: (request: Request) => Promise<Response>) {
-  return async (request: Request) => {
+export function handleErrors(handler: Handler): Handler {
+  return async (request, connInfo) => {
     try {
-      return await handler(request)
+      return await handler(request, connInfo)
     } catch (e) {
       if (e instanceof Response) return e.clone()
       console.error(e)
       return f.serverError(Deno.inspect(e))
     }
+  }
+}
+
+export function handleCors(handler: Handler): Handler {
+  return async (request, connInfo) => {
+    const res = await handler(request, connInfo)
+
+    // Deno.upgradeWebSocket response objects cannot be modified
+    if (res.headers.get("upgrade") !== "websocket") {
+      const newHeaders = new Headers(res.headers)
+      newHeaders.set("Access-Control-Allow-Origin", "*")
+      newHeaders.set("Access-Control-Allow-Headers", "*")
+      newHeaders.set("Access-Control-Allow-Methods", "*")
+      newHeaders.set("Access-Control-Allow-Credentials", "true")
+
+      return new Response(res.body, {
+        headers: newHeaders,
+        status: res.status,
+        statusText: res.statusText,
+      })
+    }
+
+    return res
   }
 }
