@@ -20,7 +20,7 @@ let { address } = parse(Deno.args, { string: ["address"] })
 // If no such argument was supplied, run the `deploy.ts` script and extract
 // the address from the `CONTRACT_ADDRESS` environment variable (set by `deploy.ts`).
 if (!address) {
-  await import("./deploy.ts")
+  await import("./deploy.eg.ts")
   address = Deno.env.get("CONTRACT_ADDRESS")!
 }
 
