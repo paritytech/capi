@@ -28,7 +28,7 @@ await Identity
   })
   .signed(signature({ sender: alexa }))
   .sent()
-  .dbgStatus()
+  .dbgStatus("Set identity:")
   .finalized()
   .run()
 
@@ -40,4 +40,5 @@ const infoDecoded = await Identity.IdentityOf
   .pipe((raw) => transcoders.decode(raw))
   .run()
 
+console.log("identity info:", infoDecoded)
 $.assert($.u8, infoDecoded.additional.stars)

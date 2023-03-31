@@ -15,5 +15,4 @@ import { chain } from "polkadot_dev/mod.js"
 // Execute the metadata Rune.
 const metadata = await chain.metadata.run()
 
-// Log it to the console.
-console.log(metadata)
+console.log("Metadata:", metadata)

@@ -19,4 +19,5 @@ const [david, ellie, felix] = await createUsers(3)
 
 // Each of the following elements should be an `Sr25519` instance.
 const users = [alexa, billy, carol, david, ellie, felix]
+console.log("Users:", users)
 $.assert($.array($sr25519), users)

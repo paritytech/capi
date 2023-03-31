@@ -19,7 +19,7 @@ const hash = await Indices
   .claim({ index })
   .signed(signature({ sender: alexa }))
   .sent()
-  .dbgStatus()
+  .dbgStatus("Claim index:")
   .finalized()
   .run()
 

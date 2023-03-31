@@ -55,7 +55,7 @@ const stashAccountId = await multisig
   .ratify({ call, sender: billy.address })
   .signed(signature({ sender: billy }))
   .sent()
-  .dbgStatus("Approval:")
+  .dbgStatus("Final approval:")
   .finalizedEvents()
   .pipe(filterPureCreatedEvents)
   .access(0, "pure")

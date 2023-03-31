@@ -21,7 +21,7 @@ let { address } = parse(Deno.args, { string: ["address"] })
 // the address from the `CONTRACT_ADDRESS` environment variable (set by `deploy.ts`).
 if (!address) {
   await import("./deploy.eg.ts")
-  address = Deno.env.get("CONTRACT_ADDRESS")!
+  address = Deno.env.get("SS58_ADDRESS")!
 }
 
 // Initialize an `InkMetadataRune` with the raw Ink metadata text.
@@ -39,6 +39,7 @@ const state = contract.call({
 
 // Retrieve the initial state.
 const initialState = await state.run()
+console.log("initial state:", initialState)
 
 // Use the `flip` method to *flip* the contract instance state.
 await contract
@@ -55,5 +56,6 @@ await contract
 
 // Retrieve the final state.
 const finalState = await state.run()
+console.log("final state:", finalState)
 
 assertNotEquals(initialState, finalState)

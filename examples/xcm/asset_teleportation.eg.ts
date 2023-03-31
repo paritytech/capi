@@ -62,7 +62,7 @@ XcmPallet
   })
   .signed(signature({ sender: alice }))
   .sent()
-  .dbgStatus()
+  .dbgStatus("Teleportation:")
   .finalized()
   .run()
 

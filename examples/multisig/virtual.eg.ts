@@ -59,7 +59,7 @@ await Balances
   })
   .signed(signature({ sender: alexa }))
   .sent()
-  .dbgStatus("Fund Stash:")
+  .dbgStatus("Fund stash:")
   .finalized()
   .run()
 
@@ -98,6 +98,6 @@ function fundAndRatify(name: string, sender: Sr25519) {
     })
     .signed(signature({ sender }))
     .sent()
-    .dbgStatus(`${name} fund & ratify:`)
+    .dbgStatus(`${name} fund and ratify:`)
     .finalized()
 }
