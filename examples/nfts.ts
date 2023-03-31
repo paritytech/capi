@@ -1,5 +1,5 @@
 import { $, alice, bob, Event as CapiEvent, Rune, ValueRune } from "capi"
-import { signature } from "capi/patterns/signature/nft.ts"
+import { signature } from "capi/patterns/signature/nfts.ts"
 import { Nfts, Utility, WestmintLocal } from "zombienet/nfts.toml/collator/@latest/mod.js"
 import { Event } from "zombienet/nfts.toml/collator/@latest/types/pallet_nfts/pallet.js"
 import { MintType } from "zombienet/nfts.toml/collator/@latest/types/pallet_nfts/types.js"
