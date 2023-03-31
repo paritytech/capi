@@ -5,7 +5,7 @@ import { AddressPrefixChain, ChainRune } from "./ChainRune.ts"
 import { Ss58Rune } from "./Ss58Rune.ts"
 
 export class AccountIdRune<out U> extends Rune<Uint8Array, U> {
-  static from<X>(...[accountId]: RunicArgs<X, [Uint8Array]>) {
+  static from<X>(...[accountId]: RunicArgs<X, [accountId: Uint8Array]>) {
     return Rune.resolve(accountId).into(this)
   }
 
