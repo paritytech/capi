@@ -16,7 +16,7 @@ jobs:
           types: |
             fix
             feat
-            examples
+            eg
             test
             docs
             perf
