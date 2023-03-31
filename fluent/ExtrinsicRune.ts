@@ -23,7 +23,7 @@ export type SignatureDataFactory<C extends Chain, CU, SU> = (
 ) => Rune<SignatureData<C>, SU>
 
 export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain.Call<C>, C, U> {
-  static PROTOCOL_VERSION = 4
+  static readonly PROTOCOL_VERSION = 4
 
   hash = this.chain
     .into(ValueRune)
