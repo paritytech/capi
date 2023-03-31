@@ -1,4 +1,5 @@
 import { blake2_256, hex } from "../crypto/mod.ts"
+import { concat } from "../deps/std/bytes.ts"
 import { $extrinsic, Signer } from "../frame_metadata/Extrinsic.ts"
 import { $ } from "../mod.ts"
 import { Rune, ValueRune } from "../rune/mod.ts"
@@ -33,7 +34,8 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
     .encoded(this)
 
   signed<SU>(signatureFactory: SignatureDataFactory<C, U, SU>) {
-    return Rune.fn($extrinsic)
+    return Rune
+      .fn($extrinsic)
       .call(this.chain.metadata)
       .into(CodecRune)
       .encoded(Rune.rec({
@@ -45,7 +47,8 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
   }
 
   encoded() {
-    return Rune.fn($extrinsic)
+    return Rune
+      .fn($extrinsic)
       .call(this.chain.metadata)
       .into(CodecRune)
       .encoded(Rune.rec({
@@ -55,21 +58,13 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
   }
 
   feeEstimate() {
-    const args = Rune
-      .fn($extrinsic)
-      .call(this.chain.metadata)
-      .map(($c) => $.tuple($c, $.u32))
-      .into(CodecRune)
-      .encoded(Rune.tuple([
-        Rune.rec({
-          protocolVersion: ExtrinsicRune.PROTOCOL_VERSION,
-          call: this,
-        }),
-        this.encoded().access("length"),
-      ]))
+    const encoded = this.encoded()
+    const arg = Rune
+      .fn(concat)
+      .call(encoded, encoded.access("length").map((n) => $.u32.encode(n)))
       .map(hex.encodePrefixed)
     const data = this.chain.connection
-      .call("state_call", "TransactionPaymentApi_query_info", args)
+      .call("state_call", "TransactionPaymentApi_query_info", arg)
       .map(hex.decode)
     return this.chain.metadata
       .access("types", "sp_weights.weight_v2.Weight")
