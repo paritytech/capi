@@ -1,5 +1,5 @@
 /**
- * @title Derived-Read A List
+ * @title Derived-Read a List
  * @stability nearing
  *
  * Model a derived read, in which a list in storage (parachain ids) is
