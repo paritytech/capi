@@ -71,9 +71,18 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
     const data = this.chain.connection
       .call("state_call", "TransactionPaymentApi_query_info", args)
       .map(hex.decode)
-    return this.chain.metadata
-      .access("types", "sp_weights.weight_v2.Weight")
-      .into(CodecRune)
+    // return this.chain.metadata
+    //   .access("types", "sp_weights.weight_v2.Weight")
+    //   .dbg()
+    return Rune.constant($transactionPaymentApiQueryInfoResult).into(CodecRune)
       .decoded(data)
   }
 }
+
+const $transactionPaymentApiQueryInfoResult = $.field(
+  "weight",
+  $.object(
+    $.field("refTime", $.u64),
+    $.field("proofSize", $.u64),
+  ),
+)
