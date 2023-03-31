@@ -53,7 +53,7 @@ export interface SignedBlock {
 }
 export const $signedBlock: $.Codec<SignedBlock> = $.object(
   $.field("block", $block),
-  $.field("justifications", $.nullable($.array($.tuple($.array($.u32), $.array($.u32))))),
+  $.field("justifications", $.option($.array($.tuple($.array($.u32), $.array($.u32))), null)),
 )
 
 // https://github.com/paritytech/substrate/blob/934fbfd/client/rpc-api/src/chain/mod.rs#L27
