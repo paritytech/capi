@@ -1,5 +1,6 @@
 import { blake2_256, hex } from "../crypto/mod.ts"
 import { $extrinsic, Signer } from "../frame_metadata/Extrinsic.ts"
+import { $ } from "../mod.ts"
 import { Rune, ValueRune } from "../rune/mod.ts"
 import { Chain, ChainRune } from "./ChainRune.ts"
 import { CodecRune } from "./CodecRune.ts"
@@ -22,6 +23,8 @@ export type SignatureDataFactory<C extends Chain, CU, SU> = (
 ) => Rune<SignatureData<C>, SU>
 
 export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain.Call<C>, C, U> {
+  static PROTOCOL_VERSION = 4
+
   hash = this.chain
     .into(ValueRune)
     .access("metadata", "extrinsic", "call")
@@ -46,20 +49,35 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
       .call(this.chain.into(ValueRune).access("metadata"))
       .into(CodecRune)
       .encoded(Rune.rec({
-        protocolVersion: 4,
+        protocolVersion: ExtrinsicRune.PROTOCOL_VERSION,
         call: this,
       }))
   }
 
   feeEstimate() {
-    const extrinsicHex = this.encoded().map(hex.encodePrefixed)
-    return this.chain.connection.call("payment_queryInfo", extrinsicHex)
-      .map(({ weight, ...rest }) => ({
-        ...rest,
-        weight: {
-          proofSize: BigInt(typeof weight === "number" ? 0 : weight.proof_size),
-          refTime: BigInt(typeof weight === "number" ? weight : weight.ref_time),
-        },
-      }))
+    const $queryInfoCallArgs = Rune.fn($extrinsic)
+      .call(this.chain.into(ValueRune).access("metadata"))
+      .map((ext) => $.tuple(ext, $.u32))
+
+    const args = $queryInfoCallArgs
+      .into(CodecRune)
+      .encoded(Rune.tuple([
+        Rune.rec({
+          protocolVersion: ExtrinsicRune.PROTOCOL_VERSION,
+          call: this,
+        }),
+        this.encoded().access("length"),
+      ]))
+
+    const $transactionPaymentApiQueryInfoResult = $.object(
+      $.field("weight", $.object($.field("refTime", $.u64), $.field("proofSize", $.u64))),
+    )
+
+    return this.chain.connection.call(
+      "state_call",
+      "TransactionPaymentApi_query_info",
+      args.map(hex.encodePrefixed),
+    )
+      .map((result) => $transactionPaymentApiQueryInfoResult.decode(hex.decode(result)))
   }
 }
