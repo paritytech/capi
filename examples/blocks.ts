@@ -2,10 +2,9 @@
  * @title Blocks
  * @stability nearing
  *
- * Accessing blocks and block-related data is among the most fundamental of chain
- * client capabilities. Utilize Capi's fluent API to turn a block reference (in
- * this case the latest block hash) into a block. Then access various pieces of
- * data pertaining to that block.
+ * Utilize Capi's fluent API to turn a block reference (in this case the
+ * retrieved latest finalized block hash) into a block. Then access various
+ * pieces of data pertaining to that block.
  */
 
 import { $, $extrinsic, known, Rune } from "capi"
@@ -15,10 +14,10 @@ import { chain, metadata, types } from "polkadot/mod.js"
 // Reference the latest block hash.
 const blockHash = chain.blockHash()
 
-// Use the latest block hash to reference the associated block.
+// Reference the associated block.
 const block = blockHash.block()
 
-// Use `block` to reference the associated extrinsics...
+// Reference the associated extrinsics...
 const extrinsics = block.extrinsics()
 
 // ... and raw extrinsics (hex-scale-encoded strings) ...
