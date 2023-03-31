@@ -1,5 +1,5 @@
 /**
- * @title Utility Batch Tx
+ * @title Batch Transaction
  * @stability nearing
  *
  * Sign and submit multiple calls within a single extrinsic.
