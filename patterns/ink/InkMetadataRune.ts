@@ -6,14 +6,14 @@ import {
   CodecRune,
   ExtrinsicRune,
   hex,
-  PatternRune,
   Rune,
   RunicArgs,
+  Ss58Rune,
   ValueRune,
 } from "../../mod.ts"
 import { transformTys } from "../../scale_info/mod.ts"
 import { $contractsApiInstantiateArgs, $contractsApiInstantiateResult, Weight } from "./codecs.ts"
-import { Callable, InkMetadata } from "./InkMetadata.ts"
+import { Callable, InkMetadata, parse } from "./InkMetadata.ts"
 import { InkRune } from "./InkRune.ts"
 
 // TODO: `onInstantiated`
@@ -28,7 +28,11 @@ export interface InstantiateProps {
   salt?: Uint8Array
 }
 
-export class InkMetadataRune<out C extends Chain, out U> extends PatternRune<InkMetadata, C, U> {
+export class InkMetadataRune<out U> extends Rune<InkMetadata, U> {
+  static fromMetadataText<X>(...[text]: RunicArgs<X, [text: string]>) {
+    return Rune.resolve(text).map(parse).into(InkMetadataRune)
+  }
+
   codecs = this
     .into(ValueRune)
     .access("V3", "types")
@@ -62,7 +66,10 @@ export class InkMetadataRune<out C extends Chain, out U> extends PatternRune<Ink
       )
   }
 
-  instantiate<X>(props: RunicArgs<X, InstantiateProps>) {
+  instantiation<C extends Chain, U, X>(
+    chain: ChainRune<C, U>,
+    props: RunicArgs<X, InstantiateProps>,
+  ) {
     const { code } = props
     const salt = Rune
       .resolve(props.salt)
@@ -104,14 +111,13 @@ export class InkMetadataRune<out C extends Chain, out U> extends PatternRune<Ink
       .unhandle(undefined)
       .rehandle(
         undefined,
-        () =>
-          this.chain.connection.call(
-            "state_call",
-            "ContractsApi_instantiate",
-            instantiateArgs.map(hex.encode),
-          )
+        () => {
+          const args = instantiateArgs.map(hex.encode)
+          return chain.connection
+            .call("state_call", "ContractsApi_instantiate", args)
             .map((result) => $contractsApiInstantiateResult.decode(hex.decode(result)))
-            .access("gasRequired"),
+            .access("gasRequired")
+        },
       )
     return Rune
       .rec({
@@ -127,16 +133,24 @@ export class InkMetadataRune<out C extends Chain, out U> extends PatternRune<Ink
         }),
       })
       .unsafeAs<Chain.Call<C>>()
-      .into(ExtrinsicRune, this.chain)
+      .into(ExtrinsicRune, chain)
   }
 
-  instance<CU, X>(
+  instanceFromAccountId<C extends Chain, CU, X>(
     chain: ChainRune<C, CU>,
-    ...[publicKey]: RunicArgs<X, [Uint8Array]>
+    ...[accountId]: RunicArgs<X, [accountId: Uint8Array]>
   ) {
-    return Rune
-      .resolve(publicKey)
-      .into(InkRune, chain, this.as(InkMetadataRune))
+    return Rune.resolve(accountId).into(InkRune, chain, this.as(InkMetadataRune))
+  }
+
+  instanceFromSs58<C extends Chain, CU, X>(
+    chain: ChainRune<C, CU>,
+    ...[ss58]: RunicArgs<X, [ss58: string]>
+  ) {
+    return this.instanceFromAccountId(
+      chain,
+      Rune.resolve(ss58).into(Ss58Rune, chain).accountId(),
+    )
   }
 }
 

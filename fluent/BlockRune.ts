@@ -6,7 +6,7 @@ import { ValueRune } from "../rune/ValueRune.ts"
 import { BlockHashRune } from "./BlockHashRune.ts"
 import { Chain } from "./ChainRune.ts"
 import { CodecRune } from "./CodecRune.ts"
-import { Event, EventsRune } from "./EventsRune.ts"
+import { EventsRune } from "./EventsRune.ts"
 import { PatternRune } from "./PatternRune.ts"
 
 export class BlockRune<out C extends Chain, out U>
@@ -38,7 +38,10 @@ export class BlockRune<out C extends Chain, out U>
       .storage("Events")
       .value(undefined!, this.parent)
       .unhandle(undefined)
-      .rehandle(undefined, () => Rune.constant<Event<C>[]>([]))
+      .rehandle(
+        undefined,
+        () => Rune.constant([]).unsafeAs<Chain.Storage.Value<C, "System", "Events">>(),
+      )
       .into(EventsRune, this.chain)
   }
 }

@@ -5,7 +5,7 @@ import { PermanentMemo } from "../../util/mod.ts"
 import { ready } from "../../util/port.ts"
 import { FrameProxyProvider } from "./FrameProxyProvider.ts"
 
-const readyTimeout = 60_000
+const readyTimeout = 3 * 60 * 1000
 
 export abstract class FrameBinProvider extends FrameProxyProvider {
   constructor(env: Env, readonly bin: string) {
@@ -39,7 +39,9 @@ export abstract class FrameBinProvider extends FrameProxyProvider {
       stderr: "piped",
       signal: this.env.signal,
     })
-
-    return command.spawn()
+    const child = command.spawn()
+    // TODO: get rid of this without breaking CI
+    this.env.signal.addEventListener("abort", () => child.kill("SIGKILL"))
+    return child
   }
 }

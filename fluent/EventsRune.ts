@@ -1,46 +1,11 @@
-import { Codec } from "../deps/scale.ts"
-import { FrameMetadata } from "../frame_metadata/FrameMetadata.ts"
 import { Chain } from "./ChainRune.ts"
 import { PatternRune } from "./PatternRune.ts"
 
-export class EventsRune<out C extends Chain, out U> extends PatternRune<Event<C>[], C, U> {}
+export class EventsRune<out C extends Chain, out U>
+  extends PatternRune<Chain.Storage.Value<C, "System", "Events">, C, U>
+{}
 
-export interface TmpEventsChain extends Chain {
-  metadata: FrameMetadata & {
-    pallets: {
-      System: {
-        storage: {
-          Events: {
-            key: Codec<void>
-            value: Codec<_Event<any>[]>
-          }
-        }
-      }
-    }
-  }
-}
-
-interface _EventsChain<RE> extends Chain {
-  metadata: FrameMetadata & {
-    pallets: {
-      System: {
-        storage: {
-          Events: {
-            key: Codec<void>
-            value: Codec<_Event<RE>[]>
-          }
-        }
-      }
-    }
-  }
-}
-
-export type RuntimeEvent<C extends Chain> = C extends _EventsChain<infer E> ? E : never
-export type EventsChain<C extends Chain> = _EventsChain<RuntimeEvent<C>>
-
-export type Event<C extends Chain> = _Event<RuntimeEvent<C>>
-
-interface _Event<RE> {
+export interface Event<RE = any> {
   phase: EventPhase
   event: RE
   topics: Uint8Array[]
@@ -60,4 +25,38 @@ export interface FinalizationEventPhase {
 }
 export interface InitializationEventPhase {
   type: "Initialization"
+}
+
+// TODO: delete this
+export type SystemExtrinsicFailedEvent = Event<{
+  type: "System"
+  value: {
+    type: "ExtrinsicFailed"
+    dispatchError: DispatchError
+    dispatchInfo: any // TODO
+  }
+}>
+export type DispatchError =
+  | "Other"
+  | "CannotLookup"
+  | "BadOrigin"
+  | "Module"
+  | "ConsumerRemaining"
+  | "NoProviders"
+  | "TooManyConsumers"
+  | "Token"
+  | "Arithmetic"
+  | "Transactional"
+  | "Exhausted"
+  | "Corruption"
+  | "Unavailable"
+  | { type: "Module"; value: number }
+
+export function isSystemExtrinsicFailedEvent(event: Event): event is SystemExtrinsicFailedEvent {
+  if (event.event.type === "System") {
+    const { value } = event.event
+    return typeof value === "object" && value !== null && "type" in value
+      && value.type === "ExtrinsicFailed"
+  }
+  return false
 }

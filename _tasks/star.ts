@@ -1,13 +1,11 @@
-import { parse } from "../deps/std/flags.ts"
 import * as fs from "../deps/std/fs.ts"
 import * as path from "../deps/std/path.ts"
 
-const { ignore } = parse(Deno.args, { string: ["ignore"] })
 let generated = ""
 for await (
   const entry of fs.walk(".", {
     match: [/\.ts$/],
-    skip: [/^target\//, ...ignore ? [new RegExp(ignore)] : []],
+    skip: [/^target\//],
   })
 ) {
   generated += `import ${JSON.stringify(`../${entry.path}`)};\n`
