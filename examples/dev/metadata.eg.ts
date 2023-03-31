@@ -1,5 +1,5 @@
 /**
- * @title Retrieve chain metadata
+ * @title Retrieve Chain Metadata
  * @stability unstable – We'll likely restructure the metadata such that we can use its type signature
  * within a type utility to produce constraints over calls and events.
  * Tracked in [881](https://github.com/paritytech/capi/issues/811).
@@ -13,5 +13,7 @@
 import { chain } from "polkadot_dev/mod.js"
 
 // Execute the metadata Rune.
-// deno-lint-ignore no-unused-vars
 const metadata = await chain.metadata.run()
+
+// Log it to the console.
+console.log(metadata)

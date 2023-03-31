@@ -1,5 +1,5 @@
 /**
- * @title Reserve an Index
+ * @title Utilize The Identity Pallet With Fields
  * @stability experiment – it's unclear how useful the identity info transcoding
  * is (or the identity pallet for that matter). We may decide we do not wish to
  * maintain this utility. For now however, it's a good way to stress-test Rune.
