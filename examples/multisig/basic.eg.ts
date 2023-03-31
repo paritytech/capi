@@ -10,7 +10,10 @@ import { assert } from "asserts"
 import { $ } from "capi"
 import { MultisigRune } from "capi/patterns/multisig/mod.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
+import { weight_v2 } from "http://localhost:4646/frame/wss/rpc.polkadot.io/@latest/types/sp_weights/mod.js"
 import { Balances, chain, createUsers, System } from "polkadot_dev/mod.js"
+
+console.log(weight_v2.$weight)
 
 const { alexa, billy, carol, david } = await createUsers()
 
