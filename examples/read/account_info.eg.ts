@@ -1,5 +1,5 @@
 /**
- * @title Read A Map Value
+ * @title Read a Map Value
  * @stability nearing
  *
  * Read the value (an `AccountInfo`) from the system account map.
