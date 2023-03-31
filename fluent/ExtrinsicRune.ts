@@ -55,11 +55,10 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
   }
 
   feeEstimate() {
-    const $queryInfoCallArgs = Rune.fn($extrinsic)
-      .call(this.chain.into(ValueRune).access("metadata"))
-      .map((ext) => $.tuple(ext, $.u32))
-
-    const args = $queryInfoCallArgs
+    const args = Rune
+      .fn($extrinsic)
+      .call(this.chain.metadata)
+      .map(($x) => $.tuple($x, $.u32))
       .into(CodecRune)
       .encoded(Rune.tuple([
         Rune.rec({
@@ -68,16 +67,17 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
         }),
         this.encoded().access("length"),
       ]))
-
-    const $transactionPaymentApiQueryInfoResult = $.object(
-      $.field("weight", $.object($.field("refTime", $.u64), $.field("proofSize", $.u64))),
-    )
-
-    return this.chain.connection.call(
-      "state_call",
-      "TransactionPaymentApi_query_info",
-      args.map(hex.encodePrefixed),
-    )
-      .map((result) => $transactionPaymentApiQueryInfoResult.decode(hex.decode(result)))
+      .map(hex.encodePrefixed)
+    return this.chain.connection
+      .call("state_call", "TransactionPaymentApi_query_info", args)
+      .map((raw) => $transactionPaymentApiQueryInfoResult.decode(hex.decode(raw)))
   }
 }
+
+const $transactionPaymentApiQueryInfoResult = $.field(
+  "weight",
+  $.object(
+    $.field("refTime", $.u64),
+    $.field("proofSize", $.u64),
+  ),
+)
