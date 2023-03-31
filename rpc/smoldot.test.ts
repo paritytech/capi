@@ -75,5 +75,5 @@ Deno.test({
 })
 
 async function fetchText(url: string) {
-  return await (await fetch(url)).text()
+  return await fetch(url).then(r => r.text())
 }
