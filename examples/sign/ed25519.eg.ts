@@ -20,6 +20,7 @@ const billyFree = System.Account
   .access("data", "free")
 
 const billyFreeInitial = await billyFree.run()
+console.log("Billy free initial:", billyFreeInitial)
 
 // Bring your own Ed25519 implementation. In this case, we utilize
 // [`noble-ed25519`](https://github.com/paulmillr/noble-ed25519), which
@@ -68,6 +69,7 @@ await Balances
 
 // Retrieve Billy's final free.
 const billyFreeFinal = await billyFree.run()
+console.log("Billy free final:", billyFreeFinal)
 
 // Ensure that the final is greater than the initial.
 assert(billyFreeFinal > billyFreeInitial)

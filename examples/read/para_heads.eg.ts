@@ -19,4 +19,6 @@ const heads = await Paras.Parachains
   .rehandle(undefined)
   .run()
 
+console.log("Parachain heads:", heads)
+
 $.assert($.option($.array($.uint8Array)), heads)

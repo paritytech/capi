@@ -20,7 +20,7 @@ assertRejects(() =>
     })
     .signed(signature({ sender: alice }))
     .sent()
-    .dbgStatus("Transfer")
+    .dbgStatus("Transfer:")
     .finalizedEvents()
     .unhandleFailed()
     .run(), ExtrinsicError)

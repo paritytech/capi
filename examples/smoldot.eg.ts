@@ -24,4 +24,5 @@ const [metadata, extrinsics] = await Rune
   ])
   .run()
 
+console.log("Extrinsics:", extrinsics)
 $.assert($.array($extrinsic(metadata)), extrinsics)

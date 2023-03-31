@@ -31,4 +31,5 @@ const mapped = await Indices.Accounts
   .run()
 
 // The retrieved mapped account id should be Alexa's.
+console.log(`Index ${index} Mapped to:`, mapped)
 assertEquals(mapped, alexa.publicKey)

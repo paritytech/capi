@@ -23,6 +23,7 @@ const frees = Rune.tuple(
 
 // Retrieve the initial free balances of the recipients.
 const initialFrees = await frees.run()
+console.log("Initial frees:", initialFrees)
 
 // Create and submit the batch call. Not how we must utilize `Rune.tuple` in
 // order to convert the `Rune<RuntimeCall>[]` into a `Rune<RuntimeCall[]>`.
@@ -43,6 +44,7 @@ await Utility
 
 // Retrieve the final free balances of the recipients.
 const finalFrees = await frees.run()
+console.log("Final frees:", finalFrees)
 
 // Ensure that the final balances are greater than the initial ones.
 recipients.forEach((_, i) => assert(finalFrees[i]! > initialFrees[i]!))

@@ -26,8 +26,9 @@ const davidFree = System.Account
   .unhandle(undefined)
   .access("data", "free")
 
-// Execute the `davidBalance` Rune.
-const davidBalanceInitial = await davidFree.run()
+// Execute the `davidFree` Rune.
+const davidFreeInitial = await davidFree.run()
+console.log("David free initial:", davidFreeInitial)
 
 // Transfer initial funds to the multisig (existential deposit).
 await Balances
@@ -58,6 +59,7 @@ await multisig
 
 // Check whether the call has been proposed.
 const isProposed = await multisig.isProposed(call.hash).run()
+console.log("Is proposed:", isProposed)
 assert(isProposed)
 
 // Approve proposal as Billy.
@@ -75,6 +77,7 @@ const { approvals } = await multisig
   .run()
 
 // `approvals` should be a list of the approvers (account ids).
+console.log("Approvals:", approvals)
 $.assert($.array($.sizedUint8Array(32)), approvals)
 
 // Approve the proposal as Carol (final approval).
@@ -87,7 +90,8 @@ await multisig
   .run()
 
 // Check to see whether David's balance has in fact changed
-const davidBalanceFinal = await davidFree.run()
+const davidFreeFinal = await davidFree.run()
+console.log("David free final:", davidFreeFinal)
 
 // The final balance should be greater than the initial.
-assert(davidBalanceFinal > davidBalanceInitial)
+assert(davidFreeFinal > davidFreeInitial)

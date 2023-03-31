@@ -36,6 +36,7 @@ const aliceBalance = System.Account
 
 // Read the initial free.
 const aliceFreeInitial = await aliceBalance.run()
+console.log("Alice initial free:", aliceFreeInitial)
 
 XcmPallet
   .limitedTeleportAssets({
@@ -74,6 +75,7 @@ for await (const e of System.Events.value(undefined, parachain.latestBlockHash).
     for (const { event } of e) {
       if (RuntimeEvent.isParachainSystem(event) && Event.isDownwardMessagesProcessed(event.value)) {
         const aliceFreeFinal = await aliceBalance.run()
+        console.log("Alice final free:", aliceFreeFinal)
         assert(aliceFreeFinal > aliceFreeInitial)
         break outer
       }

@@ -46,6 +46,7 @@ if (!state) {
   console.log(`Virtual multisig state: ${state}`)
 }
 
+console.log("State:", state)
 $.assert($.str, state)
 
 // Initialize a `VirtualMultisigRune` with the state's scale-encoded hex string.
@@ -71,6 +72,7 @@ const davidFree = System.Account
 
 // Retrieve David's initial free.
 const davidFreeInitial = await davidFree.run()
+console.log("David free initial:", davidFreeInitial)
 
 // Describe the call we wish to dispatch from the virtual multisig's stash.
 const call = Balances.transfer({
@@ -84,6 +86,7 @@ await fundAndRatify("carol", carol).run()
 
 // Retrieve David's final balance.
 const davidFreeFinal = await davidFree.run()
+console.log("David free final:", davidFreeFinal)
 
 // David's final balance should be greater than the initial.
 assert(davidFreeFinal > davidFreeInitial)

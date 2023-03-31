@@ -19,7 +19,8 @@ let i = 0
 
 // Use the `watch` method to retrieve an async iterable, which will
 // gather and yield the `collection`-described data upon new blocks.
-for await (const timestamp of now.iter()) {
-  $.assert($.u32, timestamp)
+for await (const item of now.iter()) {
+  console.log(item)
+  $.assert($.u32, item)
   if (++i === 3) break
 }

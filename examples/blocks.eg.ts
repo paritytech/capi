@@ -42,6 +42,7 @@ const collection = await Rune
   .run()
 
 // Ensure that collection contains the expected shape of data.
+console.log("Collection:", collection)
 $.assert(
   $.object(
     $.field("blockHash", $.str),

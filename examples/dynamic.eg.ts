@@ -29,6 +29,7 @@ const Account = System.storage("Account")
 const entries = await Account.entryPage(10, null).run()
 
 // The result should contain a `[Uint8Array, AccountInfo]` tuple of length 10.
+console.log("Entries page:", entries)
 $.assert(
   $.sizedArray(
     $.tuple(

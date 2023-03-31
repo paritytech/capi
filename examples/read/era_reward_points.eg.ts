@@ -15,5 +15,7 @@ const idx = Staking.ActiveEra
   .access("index")
 
 const points = await Staking.ErasRewardPoints.value(idx).run()
+console.log("Era reward points:", points)
 
+// Ensure the era reward points is of the correct shape.
 $.assert(types.pallet_staking.$eraRewardPoints, points)

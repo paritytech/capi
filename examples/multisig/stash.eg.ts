@@ -81,4 +81,5 @@ const stashFree = await System.Account
   .run()
 
 // The stash's free should be greater than zero.
+console.log("Stash free:", stashFree)
 assert(stashFree > 0)

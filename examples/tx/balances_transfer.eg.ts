@@ -20,6 +20,7 @@ const billyFree = System.Account
 
 // Read the initial free.
 const initialFree = await billyFree.run()
+console.log("Billy free initial:", initialFree)
 
 // Create and submit the transaction.
 await Balances
@@ -35,6 +36,7 @@ await Balances
 
 // Read the final free.
 const finalFree = await billyFree.run()
+console.log("Billy free final:", finalFree)
 
 // The final free should be greater than the initial.
 assert(finalFree > initialFree)
