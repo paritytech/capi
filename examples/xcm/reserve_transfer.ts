@@ -15,7 +15,7 @@ import {
 import * as Rococo from "zombienet/trappist.toml/alice/@latest/mod.js"
 import * as Statemine from "zombienet/trappist.toml/statemine-collator01/@latest/mod.js"
 import * as Trappist from "zombienet/trappist.toml/trappist-collator01/@latest/mod.js"
-import { delay } from "../deps/std/async.ts"
+import { delay } from "../../deps/std/async.ts"
 
 /**
  * Reserve Transfer Asset example steps
