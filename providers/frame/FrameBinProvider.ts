@@ -5,8 +5,6 @@ import { PermanentMemo } from "../../util/mod.ts"
 import { ready } from "../../util/port.ts"
 import { FrameProxyProvider } from "./FrameProxyProvider.ts"
 
-const readyTimeout = 3 * 60 * 1000
-
 export abstract class FrameBinProvider extends FrameProxyProvider {
   constructor(env: Env, readonly bin: string) {
     super(env)
@@ -17,26 +15,14 @@ export abstract class FrameBinProvider extends FrameProxyProvider {
   dynamicUrlMemo = new PermanentMemo<string, string>()
   async dynamicUrl(pathInfo: PathInfo) {
     return this.dynamicUrlMemo.run(pathInfo.target ?? "", () =>
-      (() => {
-        const d = deferred<never>()
-        const t = setTimeout(
-          () =>
-            d.reject(
-              new Error(
-                `Timed out during codegen of the following path info: ${Deno.inspect(pathInfo)}`,
-              ),
-            ),
-          readyTimeout,
-        )
-        return Promise.race([
-          (async () => {
-            const port = await this.launch(pathInfo)
-            await ready(port)
-            return `ws://localhost:${port}`
-          })(),
-          d,
-        ]).finally(() => clearTimeout(t))
-      })())
+      deadline(
+        (async () => {
+          const port = await this.launch(pathInfo)
+          await ready(port)
+          return `ws://localhost:${port}`
+        })(),
+        pathInfo,
+      ))
   }
 
   async getBinPath(pathInfo: PathInfo) {
@@ -54,4 +40,17 @@ export abstract class FrameBinProvider extends FrameProxyProvider {
 
     return command.spawn()
   }
+}
+
+const readyTimeout = 3 * 60 * 1000
+function deadline<T>(p: Promise<T>, pathInfo: PathInfo): Promise<T> {
+  const d = deferred<never>()
+  const t = setTimeout(
+    () =>
+      d.reject(
+        new Error(`Timed out during codegen of the following path info: ${Deno.inspect(pathInfo)}`),
+      ),
+    readyTimeout,
+  )
+  return Promise.race([p, d]).finally(() => clearTimeout(t))
 }
