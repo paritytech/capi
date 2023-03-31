@@ -1,5 +1,5 @@
 /**
- * @title Balance Transfer Tx
+ * @title Balance Transfer
  * @stability nearing
  *
  * Transfer some funds from one user to another.
