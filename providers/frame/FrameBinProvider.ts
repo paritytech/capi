@@ -5,7 +5,7 @@ import { PermanentMemo } from "../../util/mod.ts"
 import { ready } from "../../util/port.ts"
 import { FrameProxyProvider } from "./FrameProxyProvider.ts"
 
-const readyTimeout = 3 * 60 * 1000
+const readyTimeout = 5 * 60 * 1000
 
 export abstract class FrameBinProvider extends FrameProxyProvider {
   constructor(env: Env, readonly bin: string) {
