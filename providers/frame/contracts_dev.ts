@@ -22,6 +22,7 @@ export class ContractsDevProvider extends FrameBinProvider {
   }
 
   async launch(pathInfo: PathInfo) {
+    console.log("begin launch")
     const port = getAvailable()
     console.log("port", port)
     const chainSpec = await createCustomChainSpec(
@@ -31,7 +32,7 @@ export class ContractsDevProvider extends FrameBinProvider {
       this.env.signal,
     )
     console.log("chainSpec", chainSpec)
-    this.runBin(pathInfo, [
+    await this.runBin(pathInfo, [
       "--tmp",
       "--alice",
       "--ws-port",

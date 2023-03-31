@@ -5,10 +5,7 @@ let generated = ""
 for await (
   const entry of fs.walk(".", {
     match: [/\.ts$/],
-    skip: [
-      /^target\//,
-      path.globToRegExp("examples/ink/*.ts"),
-    ],
+    skip: [/^target\//],
   })
 ) {
   generated += `import ${JSON.stringify(`../${entry.path}`)};\n`
