@@ -13,14 +13,14 @@ import { Balances } from "westend_dev/mod.js"
 
 // The following should reject with an `ExtrinsicError`.
 assertRejects(() =>
-  (Balances
+  Balances
     .transfer({
       value: 1_000_000_000_000_000_000_000_000_000_000_000_000n,
       dest: bob.address,
     })
     .signed(signature({ sender: alice }))
     .sent()
-    .dbgStatus() as any)
+    .dbgStatus()
     .finalizedEvents()
     .unhandleFailed()
     .run(), ExtrinsicError)

@@ -35,7 +35,8 @@ const pjsSigner: PjsSigner = {
 
 // The signer is usually accompanied by the ss58 address (aka. provided by the
 // extension). In our case––since we manually create the signer––we'll also manually
-// create the associated address.
+// create the associated ss58 (by applying the prefix and Alexa's public key to
+// Capi's `ss58.encode` util).
 const alexaSs58 = ss58.encode(System.SS58Prefix, alexa.publicKey)
 
 // Use the `chain` and signer to create a `sender` factory, which accepts an Ss58

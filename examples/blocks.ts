@@ -42,15 +42,15 @@ const collection = await Rune
   })
   .run()
 
-// Define a codec against which we can validate `collection`.
-const $collection = $.object(
-  $.field("blockHash", $.str),
-  $.field("block", known.$signedBlock),
-  $.field("extrinsics", $.array($extrinsic(metadata))),
-  $.field("extrinsicsRaw", $.array($.str)),
-  $.field("events", $.array(types.frame_system.$eventRecord)),
-  $.field("author", $.str),
+// Ensure that collection contains the expected shape of data.
+$.assert(
+  $.object(
+    $.field("blockHash", $.str),
+    $.field("block", known.$signedBlock),
+    $.field("extrinsics", $.array($extrinsic(metadata))),
+    $.field("extrinsicsRaw", $.array($.str)),
+    $.field("events", $.array(types.frame_system.$eventRecord)),
+    $.field("author", $.str),
+  ),
+  collection,
 )
-
-// `collection` should have the aforementioned shape.
-$.assert($collection, collection)
