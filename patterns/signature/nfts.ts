@@ -1,17 +1,5 @@
-import {
-  WestmintLocal,
-} from "http://localhost:4646/frame/zombienet/zombienets/nfts.toml/collator/@latest/mod.js"
-
-import {
-  ChainRune,
-  Era,
-  hex,
-  Rune,
-  RunicArgs,
-  SignatureData,
-  ss58,
-  ValueRune,
-} from "http://localhost:4646/mod.ts"
+import { WestmintLocal } from "zombienet/nfts.toml/collator/@v0.9.370/mod.js"
+import { ChainRune, Era, hex, Rune, RunicArgs, SignatureData, ss58, ValueRune } from "../../mod.ts"
 import { SignatureProps } from "../signature/polkadot.ts"
 
 type NftSigProps = SignatureProps<WestmintLocal> & {

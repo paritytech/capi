@@ -1,6 +1,6 @@
 import { $, alice, bob, Event as CapiEvent, Rune, ValueRune } from "capi"
 import { signature } from "capi/patterns/signature/nft.ts"
-import { Nfts, WestmintLocal } from "zombienet/nfts.toml/collator/@latest/mod.js"
+import { Nfts, Utility, WestmintLocal } from "zombienet/nfts.toml/collator/@latest/mod.js"
 import { Event } from "zombienet/nfts.toml/collator/@latest/types/pallet_nfts/pallet.js"
 import { MintType } from "zombienet/nfts.toml/collator/@latest/types/pallet_nfts/types.js"
 import { RuntimeEvent } from "zombienet/nfts.toml/collator/@latest/types/westmint_runtime.js"
@@ -23,6 +23,7 @@ const DefaultItemSetting = {
   allOn: 0b111n,
 }
 
+// Create a collection
 const createCollection = await Nfts
   .create({
     config: Rune.rec({
@@ -39,14 +40,7 @@ const createCollection = await Nfts
   .dbgStatus("Create Collection:")
   .finalizedEvents()
 
-const getCollectionIdFromEvents = (events: CapiEvent<WestmintLocal>[]) => {
-  const event = events.find((event) =>
-    RuntimeEvent.isNfts(event.event) && Event.isCreated(event.event.value)
-  )?.event.value as Event.Created | undefined
-  return event?.collection
-}
-
-// Create a collection and extract its id from the events
+// Extract the collection's id from emitted events
 const collection = await createCollection
   .into(ValueRune)
   .map(getCollectionIdFromEvents)
@@ -54,24 +48,10 @@ const collection = await createCollection
   .dbg("Collection Id:")
   .run()
 
-// Create and encode metadata for the collection
-const collectionMetadata = $.object($.field("name", $.str)).encode({ name: "Collection 01" })
-
-// Set the collection's metadata
-await Nfts
-  .setCollectionMetadata({
-    collection,
-    data: collectionMetadata,
-  })
-  .signed(signature({ sender: alice }))
-  .sent()
-  .dbgStatus("Set Collection Metadata:")
-  .finalized()
-
 const item = 0
 
 // Mint an item to the collection
-Nfts
+await Nfts
   .mint({
     collection,
     item,
@@ -82,65 +62,73 @@ Nfts
   .dbgStatus("Mint Item:")
   .finalized()
 
+// Create and encode metadata for the collection
+const collectionMetadata = $.object($.field("name", $.str)).encode({ name: "Collection 01" })
+
+/// The following extrinsics will first be created, then batched to be sent together:
+
+// Set the collection's metadata
+const setCollectionMetadata = Nfts
+  .setCollectionMetadata({
+    collection,
+    data: collectionMetadata,
+  })
+
 // Create and encode metadata for the NFT
 const itemMetadata = $.object($.field("name", $.str)).encode({ name: "NFT #01" })
 
 // Set the NFT's metadata
-await Nfts
+const setItemMetadata = Nfts
   .setMetadata({
     collection,
     item,
     data: itemMetadata,
   })
-  .signed(signature({ sender: alice }))
-  .sent()
-  .dbgStatus("Set Item Metadata:")
-  .finalized()
 
 // Set the NFT's price
-await Nfts
+const setItemPrice = Nfts
   .setPrice({
     collection,
     item,
     price: 1000000n,
     whitelistedBuyer: undefined,
   })
-  .signed(signature({ sender: alice }))
-  .sent()
-  .dbgStatus("Set Item Price:")
-  .finalized()
 
 // Lock the NFT against further metadata changes
-await Nfts.lockItemProperties({
+const lockItem = Nfts.lockItemProperties({
   collection,
   item,
   lockMetadata: true,
   lockAttributes: true,
 })
-  .signed(signature({ sender: alice }))
-  .sent()
-  .dbgStatus("Lock Item Properties:")
-  .finalized()
 
 // Limit NFTs for this collection to 1, preventing further minting
-await Nfts
+const setCollectionMaxSupply = Nfts
   .setCollectionMaxSupply({
     collection,
     maxSupply: 1,
   })
-  .signed(signature({ sender: alice }))
-  .sent()
-  .dbgStatus("Set Collection Max Supply:")
-  .finalized()
 
 // Lock collection to prevent changes to the NFT limit
-await Nfts.lockCollection({
+const lockCollection = Nfts.lockCollection({
   collection,
   lockSettings: 8n, // TODO: enum helper
 })
+
+// Send the batched extrinsics:
+await Utility.batchAll({
+  calls: Rune.tuple([
+    setCollectionMetadata,
+    setItemMetadata,
+    setItemPrice,
+    lockItem,
+    setCollectionMaxSupply,
+    lockCollection,
+  ]),
+})
   .signed(signature({ sender: alice }))
   .sent()
-  .dbgStatus("Lock Collection:")
+  .dbgStatus("Batched calls:")
   .finalized()
 
 // Get the price of the NFT
@@ -173,3 +161,11 @@ console.log(
     .access("owner")
     .run(),
 )
+
+// Utility function for extracting id from CreateCollection events
+function getCollectionIdFromEvents(events: CapiEvent<WestmintLocal>[]) {
+  const event = events.find((event) =>
+    RuntimeEvent.isNfts(event.event) && Event.isCreated(event.event.value)
+  )?.event.value as Event.Created | undefined
+  return event?.collection
+}
