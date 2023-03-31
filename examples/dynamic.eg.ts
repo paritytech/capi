@@ -13,16 +13,7 @@
  * 3. Chain-specifics are untyped (be wary to supply the correct data, as the checker is on vacation).
  */
 
-import { $, ChainRune, SmoldotConnection, WsConnection } from "capi"
-
-// Bring the chainspec(s) into scope. Here, we'll fetch it from the Smoldot GitHub repository.
-const relayChainSpec = await (await fetch(
-  `https://raw.githubusercontent.com/smol-dot/smoldot/main/demo-chain-specs/polkadot.json`,
-)).text()
-
-// Initialize a `ChainRune` with `SmoldotConnection` and the chainspec.
-// deno-lint-ignore no-unused-vars
-const smoldotChain = ChainRune.from(SmoldotConnection, { relayChainSpec })
+import { $, ChainRune, WsConnection } from "capi"
 
 // We could also initialize a `ChainRune` with `WsConnection` and an RPC node WebSocket URL.
 const wsChain = ChainRune.from(WsConnection, "wss://rpc.polkadot.io")

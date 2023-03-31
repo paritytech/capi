@@ -1,5 +1,5 @@
 /**
- * @title Derived-Read An Item
+ * @title Read The Era Reward Points
  * @stability nearing
  *
  * Model a derived read, in which one piece of storage (the staking active era index)
