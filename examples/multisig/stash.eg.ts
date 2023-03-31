@@ -1,5 +1,5 @@
 /**
- * @title Multisig Administration Of Pure Proxy Stash
+ * @title Multisig Administration of Pure Proxy Stash
  * @stability unstable
  *
  * Administrate a stash account (pure proxy) through a multisig with three signatories.
