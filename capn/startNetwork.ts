@@ -14,32 +14,23 @@ async function startNetwork(signal: AbortSignal) {
   const parachainId = 2000
   const tempDir = await Deno.makeTempDir({
     dir: path.join(Deno.cwd(), "tmp"),
-    prefix: "capi-network",
+    prefix: `capn-${new Date().toISOString()}-`,
   })
   console.log({ tempDir })
 
   const parachainCmd = await download("polkadot-parachain", "v0.9.370")
-  const parachainChainSpec = await generatePlainChainSpec<ParaChainSpec>(
+
+  const parachainRawChainSpecPath = await createCustomChainSpec(
+    tempDir,
+    "parachain",
     parachainCmd,
     "statemine-local",
-    signal,
-  )
-  // FIXME: add custom account balances
-  parachainChainSpec.para_id = parachainId
-  parachainChainSpec.genesis.runtime.parachainInfo.parachainId = parachainId
-
-  const parachainChainSpecPath = path.join(tempDir, "parachain-chainspec.json")
-  await Deno.writeTextFile(parachainChainSpecPath, JSON.stringify(parachainChainSpec, undefined, 2))
-
-  const parachainRawChainSpec = await generateRawChainSpec(
-    parachainCmd,
-    parachainChainSpecPath,
-    signal,
-  )
-  const parachainRawChainSpecPath = path.join(tempDir, "parachain-raw-chainspec.json")
-  await Deno.writeTextFile(
-    parachainRawChainSpecPath,
-    JSON.stringify(parachainRawChainSpec, undefined, 2),
+    (chainSpec: ParaChainSpec) => {
+      // TODO: add custom account balances
+      chainSpec.para_id = parachainId
+      chainSpec.genesis.runtime.parachainInfo.parachainId = parachainId
+      return chainSpec
+    },
   )
 
   const parachainWasm = await parachainExportGenesis(
@@ -58,18 +49,19 @@ async function startNetwork(signal: AbortSignal) {
   const relayCmd = await download("polkadot", "v0.9.37")
   const nodeKey = await generateNodeKey(relayCmd, signal)
 
-  const chainSpec = await generatePlainChainSpec(relayCmd, "rococo-local", signal)
-  // FIXME: add custom account balances
-  chainSpec.genesis.runtime.runtime_genesis_config.paras.paras.push(
-    [parachainId, [parachainState, parachainWasm, true]],
+  const relayRawChainSpecPath = await createCustomChainSpec(
+    tempDir,
+    "relay",
+    relayCmd,
+    "rococo-local",
+    (chainSpec: ChainSpec) => {
+      // TODO: add custom account balances
+      chainSpec.genesis.runtime.runtime_genesis_config.paras.paras.push(
+        [parachainId, [parachainState, parachainWasm, true]],
+      )
+      return chainSpec
+    },
   )
-
-  const relayChainSpecPath = path.join(tempDir, "relay-chainspec.json")
-  await Deno.writeTextFile(relayChainSpecPath, JSON.stringify(chainSpec, undefined, 2))
-
-  const rawChainSpec = await generateRawChainSpec(relayCmd, relayChainSpecPath, signal)
-  const relayRawChainSpecPath = path.join(tempDir, "relay-raw-chainspec.json")
-  await Deno.writeTextFile(relayRawChainSpecPath, JSON.stringify(rawChainSpec, undefined, 2))
 
   const relayBootNodePath = path.join(tempDir, "relay-bootnode")
   const relayBootNode = spawnRelayBootNode({
@@ -191,8 +183,8 @@ function spawnParachainNode({
       "--bootnodes",
       relayBootnodes,
     ],
-    stdout: "piped",
-    stderr: "piped",
+    stdout: "inherit",
+    stderr: "inherit",
     signal,
   }).spawn()
 
@@ -370,17 +362,6 @@ function spawnRelayBootNode({
   return { child, port, wsPort }
 }
 
-async function generateRawChainSpec(binary: string, chain: string, signal: AbortSignal) {
-  const { success, stdout } = await new Deno.Command(binary, {
-    args: ["build-spec", "--disable-default-bootnode", "--chain", chain, "--raw"],
-    signal,
-  }).output()
-  if (!success) {
-    throw new Error()
-  }
-  return JSON.parse(new TextDecoder().decode(stdout))
-}
-
 interface ChainSpec {
   bootNodes: string[]
   genesis: {
@@ -417,22 +398,6 @@ interface ParaChainSpec {
   }
 }
 
-async function generatePlainChainSpec<T extends ChainSpec | ParaChainSpec = ChainSpec>(
-  binary: string,
-  chain?: string,
-  signal?: AbortSignal,
-) {
-  const args = ["build-spec", "--disable-default-bootnode"]
-  if (chain) {
-    args.push("--chain", chain)
-  }
-  const { success, stdout } = await new Deno.Command(binary, { args, signal }).output()
-  if (!success) {
-    throw new Error()
-  }
-  return JSON.parse(new TextDecoder().decode(stdout)) as T
-}
-
 async function generateNodeKey(binary: string, signal?: AbortSignal) {
   const { success, stdout, stderr } = await new Deno.Command(binary, {
     args: ["key", "generate-node-key"],
@@ -445,4 +410,37 @@ async function generateNodeKey(binary: string, signal?: AbortSignal) {
   const nodeKey = decoder.decode(stdout)
   const peerId = decoder.decode(stderr).replace("\n", "")
   return { nodeKey, peerId }
+}
+
+async function createCustomChainSpec<T>(
+  tempDir: string,
+  id: string,
+  binary: string,
+  chain: string,
+  customize: (chainSpec: T) => T,
+) {
+  const specResult = await new Deno.Command(binary, {
+    args: ["build-spec", "--disable-default-bootnode", "--chain", chain],
+  }).output()
+  if (!specResult.success) {
+    // TODO: improve error message
+    throw new Error("build-spec failed")
+  }
+  const spec = customize(JSON.parse(new TextDecoder().decode(specResult.stdout)))
+
+  const specPath = path.join(tempDir, `${id}-chainspec.json`)
+  await Deno.writeTextFile(specPath, JSON.stringify(spec, undefined, 2))
+
+  const rawResult = await new Deno.Command(binary, {
+    args: ["build-spec", "--disable-default-bootnode", "--chain", specPath, "--raw"],
+  }).output()
+  if (!rawResult.success) {
+    // TODO: improve error message
+    throw new Error("build-spec --raw failed")
+  }
+
+  const rawPath = path.join(tempDir, `${id}-chainspec-raw.json`)
+  await Deno.writeFile(rawPath, rawResult.stdout)
+
+  return rawPath
 }
