@@ -1,56 +1,78 @@
-import { download } from "../deps/capi_binary_builds.ts"
+import { Narrow } from "../deps/scale.ts"
 import * as path from "../deps/std/path.ts"
 import { writableStreamFromWriter } from "../deps/std/streams.ts"
 import { getFreePort } from "../util/port.ts"
+import { binary, resolveBinary } from "./binary.ts"
+import { NetworkConfig } from "./mod.ts"
 
 if (import.meta.main) {
   const controller = new AbortController()
   Deno.addSignalListener("SIGINT", () => controller.abort())
   Deno.addSignalListener("SIGTERM", () => controller.abort())
 
-  startNetwork(controller.signal)
+  startNetwork({
+    relay: {
+      binary: binary("polkadot", "v0.9.37"),
+      chain: "rococo-local",
+    },
+    parachains: {
+      statemine: {
+        id: 1000,
+        binary: binary("polkadot-parachain", "v0.9.370"),
+        chain: "statemine-local",
+      },
+    },
+  }, controller.signal)
 }
 
-async function startNetwork(signal: AbortSignal) {
-  const parachainId = 2000
+async function startNetwork(network: NetworkConfig, signal: AbortSignal) {
   const tempDir = await Deno.makeTempDir({
     dir: path.join(Deno.cwd(), "tmp"),
     prefix: `capn-${new Date().toISOString()}-`,
   })
   console.log({ tempDir })
 
-  const parachainCmd = await download("polkadot-parachain", "v0.9.370")
+  const paras = await Promise.all(
+    Object.entries(network.parachains).map(async ([name, chain]) => {
+      const binary = await resolveBinary(chain.binary, signal)
 
-  const parachainRawChainSpecPath = await createCustomChainSpec(
-    tempDir,
-    "parachain",
-    parachainCmd,
-    "statemine-local",
-    (chainSpec: ParaChainSpec) => {
-      // TODO: add custom account balances
-      chainSpec.para_id = parachainId
-      chainSpec.genesis.runtime.parachainInfo.parachainId = parachainId
-      return chainSpec
-    },
+      const spec = await createCustomChainSpec(
+        tempDir,
+        name,
+        binary,
+        chain.chain,
+        (chainSpec: ParaChainSpec) => {
+          // TODO: add custom account balances
+          chainSpec.para_id = chain.id
+          chainSpec.genesis.runtime.parachainInfo.parachainId = chain.id
+          return chainSpec
+        },
+      )
+
+      const genesis = await exportParachainGenesis(binary, spec, signal)
+
+      return {
+        id: chain.id,
+        name,
+        binary,
+        spec,
+        genesis,
+        count: chain.nodes ?? 2,
+      }
+    }),
   )
 
-  const parachainGenesis = await exportParachainGenesis(
-    parachainCmd,
-    parachainRawChainSpecPath,
-    signal,
-  )
+  const relayBinary = await resolveBinary(network.relay.binary, signal)
 
-  const relayCmd = await download("polkadot", "v0.9.37")
-
-  const relayRawChainSpecPath = await createCustomChainSpec(
+  const relaySpec = await createCustomChainSpec(
     tempDir,
     "relay",
-    relayCmd,
-    "rococo-local",
+    relayBinary,
+    network.relay.chain,
     (chainSpec: ChainSpec) => {
       // TODO: add custom account balances
       chainSpec.genesis.runtime.runtime_genesis_config.paras.paras.push(
-        [parachainId, [...parachainGenesis, true]],
+        ...paras.map(({ id, genesis }) => [id, [...genesis, true]] satisfies Narrow),
       )
       return chainSpec
     },
@@ -58,28 +80,32 @@ async function startNetwork(signal: AbortSignal) {
 
   const relayBootnodes = await spawnNodes(
     path.join(tempDir, "relay"),
-    relayCmd,
-    relayRawChainSpecPath,
-    8,
+    relayBinary,
+    relaySpec,
+    network.relay.nodes ?? 2,
     [],
     signal,
   )
 
-  await spawnNodes(
-    path.join(tempDir, "parachain"),
-    parachainCmd,
-    parachainRawChainSpecPath,
-    8,
-    [
-      "--",
-      "--execution",
-      "wasm",
-      "--chain",
-      relayRawChainSpecPath,
-      "--bootnodes",
-      relayBootnodes,
-    ],
-    signal,
+  await Promise.all(
+    paras.map(({ name, binary, spec, count }) =>
+      spawnNodes(
+        path.join(tempDir, name),
+        binary,
+        spec,
+        count,
+        [
+          "--",
+          "--execution",
+          "wasm",
+          "--chain",
+          relaySpec,
+          "--bootnodes",
+          relayBootnodes,
+        ],
+        signal,
+      )
+    ),
   )
 }
 

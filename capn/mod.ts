@@ -21,10 +21,12 @@ export interface BinaryChain {
 export interface CapiConfig {
   server: string
   chains?: Record<string, ProxyChain | BinaryChain>
-  networks?: Record<string, {
-    relay: BinaryChain & { nodes?: number }
-    parachains: Record<string, BinaryChain & { id: number; nodes?: number }>
-  }>
+  networks?: Record<string, NetworkConfig>
+}
+
+export interface NetworkConfig {
+  relay: BinaryChain & { nodes?: number }
+  parachains: Record<string, BinaryChain & { id: number; nodes?: number }>
 }
 
 export async function processConfig(config: CapiConfig) {
