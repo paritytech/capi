@@ -38,7 +38,6 @@ export async function startNetwork(network: NetworkConfig, signal: AbortSignal) 
     dir: path.join(Deno.cwd(), "tmp"),
     prefix: `capn-${new Date().toISOString()}-`,
   })
-  console.log({ tempDir })
 
   const paras = await Promise.all(
     Object.entries(network.parachains).map(async ([name, chain]) => {
@@ -268,7 +267,6 @@ async function spawnNodes(
     args.push(...extraArgs)
     spawnNode(nodeDir, binary, args, signal)
     await portReady(wsPort)
-    console.log(binary, keystoreAccount, wsPort)
   }
 
   if (!bootnodes) throw new Error("count must be > 1")

@@ -40,9 +40,7 @@ export async function processConfig(config: CapiConfig) {
           const metadata = chain.url !== undefined
             ? await getUrlMetadata(chain, signal)
             : await getBinaryMetadata(chain, signal)
-          console.error("uploading metadata for", name)
           const metadataHash = await uploadMetadata(server, metadata)
-          console.error(name, metadataHash)
           return [[[normalizePackageName(name)], {
             type: "frame",
             metadata: metadataHash,
@@ -59,9 +57,7 @@ export async function processConfig(config: CapiConfig) {
           Object.entries(chains).map(
             async ([name, [port]]): Promise<[string[], CodegenEntry]> => {
               const metadata = await getUrlMetadata({ url: `ws://localhost:${port}` }, signal)
-              console.error("uploading metadata for", networkName, name)
               const metadataHash = await uploadMetadata(server, metadata)
-              console.error(networkName, name, metadataHash)
               return [[
                 normalizePackageName(networkName),
                 normalizePackageName(name),
@@ -76,7 +72,6 @@ export async function processConfig(config: CapiConfig) {
         )
       }),
     ])).flat()
-    // console.log(entries)
     const codegenHash = await uploadCodegenSpec(server, {
       type: "v0",
       codegen: new Map(entries),
