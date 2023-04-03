@@ -47,7 +47,7 @@ export async function processConfig(config: CapiConfig) {
             chainName: name.replace(/^./, (x) => x.toUpperCase()),
             connection: chain.url !== undefined
               ? { type: "ws", discovery: chain.url }
-              : { type: "none" },
+              : { type: "capnChain", name },
           }]]
         },
       ),
@@ -65,7 +65,7 @@ export async function processConfig(config: CapiConfig) {
                 type: "frame",
                 metadata: metadataHash,
                 chainName: name.replace(/^./, (x) => x.toUpperCase()),
-                connection: { type: "none" },
+                connection: { type: "capnNetworkChain", network: networkName, name },
               }]
             },
           ),

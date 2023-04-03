@@ -1,17 +1,15 @@
 import { download } from "../deps/capi_binary_builds.ts"
 
-export type Binary = string | ((signal: AbortSignal) => Promise<string>)
+export type Binary = string | { binary: string; version: string; resolved?: Promise<string> }
 
-export function binary(binary: string, version: string) {
-  let promise: Promise<string>
-  // TODO: use signal
-  return () => promise ??= download(binary, version)
+export function binary(binary: string, version: string): Binary {
+  return { binary, version }
 }
 
-export async function resolveBinary(binary: Binary, signal: AbortSignal) {
+export async function resolveBinary(binary: Binary, _signal: AbortSignal) {
   if (typeof binary === "string") {
     return binary
   } else {
-    return await binary(signal)
+    return await (binary.resolved ??= download(binary.binary, binary.version))
   }
 }

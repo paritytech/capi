@@ -1,44 +1,31 @@
 import { config } from "../capi.config.ts"
-import { processConfig } from "./mod.ts"
+import { serve } from "../deps/std/http.ts"
+import { assertRejects } from "../deps/std/testing/asserts.ts"
+import { withSignal } from "../util/withSignal.ts"
+import { $api } from "./api.ts"
+import { connectScald, ScaldError, serveScald, WsConnection } from "./scald.ts"
+import { createApi } from "./server.ts"
 
-processConfig(config)
+await withSignal(async (signal) => {
+  const _api = createApi(config, signal)
 
-// await withSignal(async (signal) => {
-//   // serve(handler(new FsCache("target/capn", signal), new InMemoryCache(signal)), {
-//   //   // signal,
-//   //   port: 4646,
-//   // })
-//   // await portReady(4646)
+  serve((request) => {
+    const { response, socket } = Deno.upgradeWebSocket(request)
+    serveScald($api, _api, new WsConnection(socket, signal), signal)
+    return response
+  }, { port: 4646, signal })
 
-//   const server = "https://capi.dev/@capn/"
+  const api = await connectScald(
+    $api,
+    new WsConnection(new WebSocket("ws://localhost:4646"), signal),
+    signal,
+  )
 
-//   const metadata = await getBinaryMetadata(
-//     {
-//       binary: binary("polkadot", "v0.9.40"),
-//       chain: "polkadot-dev",
-//     },
-//     signal,
-//   )
+  const polkadotDev = (await api.getNetwork("rococoDev")).get("statemine")!
+  console.log(polkadotDev)
 
-//   const metadataHash = await uploadMetadata(server, metadata)
-
-//   const codegenSpec: CodegenSpec = {
-//     type: "v0",
-//     codegen: new Map([
-//       [["polkadot-dev"], {
-//         type: "frame",
-//         metadata: metadataHash,
-//         chainName: "PolkadotDev",
-//         connection: {
-//           type: "none",
-//         },
-//       }],
-//     ]),
-//   }
-
-//   const codegenSpecHash = await uploadCodegenSpec(server, codegenSpec)
-
-//   const url = new URL(`${codegenSpecHash}/polkadot-dev/mod.js`, server).toString()
-//   console.log(url)
-//   console.log(await fetch(url).then((r) => r.text()))
-// })
+  console.log(await polkadotDev.nextUsers(10))
+  console.log(await polkadotDev.nextUsers(10))
+  console.log(await polkadotDev.nextUsers(10))
+  await assertRejects(() => polkadotDev.nextUsers(10000000000), ScaldError)
+})
