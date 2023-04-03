@@ -10,16 +10,24 @@ if (import.meta.main) {
   Deno.addSignalListener("SIGINT", () => controller.abort())
   Deno.addSignalListener("SIGTERM", () => controller.abort())
 
+  const polkadot = binary("polkadot", "v0.9.37")
+  const polkadotParachain = binary("polkadot-parachain", "v0.9.370")
+
   startNetwork({
     relay: {
-      binary: binary("polkadot", "v0.9.37"),
+      binary: polkadot,
       chain: "rococo-local",
     },
     parachains: {
       statemine: {
         id: 1000,
-        binary: binary("polkadot-parachain", "v0.9.370"),
+        binary: polkadotParachain,
         chain: "statemine-local",
+      },
+      contracts: {
+        id: 2000,
+        binary: polkadotParachain,
+        chain: "contracts-rococo-local",
       },
     },
   }, controller.signal)
