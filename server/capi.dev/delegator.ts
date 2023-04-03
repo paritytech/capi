@@ -4,6 +4,9 @@ import { f, handleCors, handleErrors } from "../mod.ts"
 
 serve(handleCors(handleErrors(handler)))
 
+const githubToken = Deno.env.get("GITHUB_TOKEN")
+if (!githubToken) throw new Error("GITHUB_TOKEN not set")
+
 const ttl = 60_000
 const shaAbbrevLength = 8
 
@@ -74,7 +77,11 @@ async function getDeployment(sha: string) {
 }
 
 async function github<T>(url: string): Promise<T> {
-  const response = await fetch(new URL(url, githubApiBase))
+  const response = await fetch(new URL(url, githubApiBase), {
+    headers: {
+      Authorization: `token ${githubToken}`,
+    },
+  })
   if (!response.ok) throw new Error(`${url}: invalid response`)
   return await response.json()
 }
