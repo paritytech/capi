@@ -1,7 +1,7 @@
 import { Narrow } from "../deps/scale.ts"
 import * as path from "../deps/std/path.ts"
 import { writableStreamFromWriter } from "../deps/std/streams.ts"
-import { getFreePort } from "../util/port.ts"
+import { getFreePort, portReady } from "../util/port.ts"
 import { binary, resolveBinary } from "./binary.ts"
 import { NetworkConfig } from "./mod.ts"
 
@@ -33,7 +33,7 @@ if (import.meta.main) {
   }, controller.signal)
 }
 
-async function startNetwork(network: NetworkConfig, signal: AbortSignal) {
+export async function startNetwork(network: NetworkConfig, signal: AbortSignal) {
   const tempDir = await Deno.makeTempDir({
     dir: path.join(Deno.cwd(), "tmp"),
     prefix: `capn-${new Date().toISOString()}-`,
@@ -86,7 +86,7 @@ async function startNetwork(network: NetworkConfig, signal: AbortSignal) {
     },
   )
 
-  const relayBootnodes = await spawnNodes(
+  const { bootnodes: relayBootnodes, wsPorts: relayPorts } = await spawnNodes(
     path.join(tempDir, "relay"),
     relayBinary,
     relaySpec,
@@ -95,26 +95,30 @@ async function startNetwork(network: NetworkConfig, signal: AbortSignal) {
     signal,
   )
 
-  await Promise.all(
-    paras.map(({ name, binary, spec, count }) =>
-      spawnNodes(
-        path.join(tempDir, name),
-        binary,
-        spec,
-        count,
-        [
-          "--",
-          "--execution",
-          "wasm",
-          "--chain",
-          relaySpec,
-          "--bootnodes",
-          relayBootnodes,
-        ],
-        signal,
-      )
+  return Object.fromEntries([
+    ["relay", relayPorts],
+    ...await Promise.all(
+      paras.map(async ({ name, binary, spec, count }) => {
+        const { wsPorts } = await spawnNodes(
+          path.join(tempDir, name),
+          binary,
+          spec,
+          count,
+          [
+            "--",
+            "--execution",
+            "wasm",
+            "--chain",
+            relaySpec,
+            "--bootnodes",
+            relayBootnodes,
+          ],
+          signal,
+        )
+        return [name, wsPorts] satisfies Narrow
+      }),
     ),
-  )
+  ])
 }
 
 async function exportParachainGenesis(
@@ -232,6 +236,7 @@ async function spawnNodes(
   signal: AbortSignal,
 ) {
   let bootnodes: string | undefined
+  const wsPorts = []
 
   for (let i = 0; i < count; i++) {
     const keystoreAccount = keystoreAccounts[i]
@@ -240,6 +245,7 @@ async function spawnNodes(
     await Deno.mkdir(nodeDir, { recursive: true })
     const port = getFreePort()
     const wsPort = getFreePort()
+    wsPorts.push(wsPort)
     const args = [
       "--validator",
       `--${keystoreAccount}`,
@@ -261,11 +267,12 @@ async function spawnNodes(
     }
     args.push(...extraArgs)
     spawnNode(nodeDir, binary, args, signal)
+    await portReady(wsPort)
     console.log(binary, keystoreAccount, wsPort)
   }
 
   if (!bootnodes) throw new Error("count must be > 1")
-  return bootnodes
+  return { bootnodes, wsPorts }
 }
 
 async function spawnNode(dir: string, binary: string, args: string[], signal: AbortSignal) {

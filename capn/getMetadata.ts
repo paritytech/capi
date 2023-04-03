@@ -13,8 +13,8 @@ export async function getBinaryMetadata({ binary, chain }: BinaryChain, signal: 
     new Deno.Command(bin, {
       args: ["--chain", chain, "--ws-port", `${port}`],
       stdin: "null",
-      stdout: chain === "contracts-rococo-local" ? "inherit" : "piped",
-      stderr: chain === "contracts-rococo-local" ? "inherit" : "piped",
+      stdout: "piped",
+      stderr: "piped",
       signal,
     }).spawn()
     await portReady(port)

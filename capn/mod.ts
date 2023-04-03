@@ -3,8 +3,10 @@ export * from "./binary.ts"
 import { blake2_512, blake2_64, Hasher } from "../crypto/hashers.ts"
 import { hex } from "../crypto/mod.ts"
 import { $codegenSpec, CodegenEntry, CodegenSpec } from "../server/codegenSpec.ts"
+import { normalizePackageName, withSignal } from "../util/mod.ts"
 import { Binary } from "./binary.ts"
 import { getBinaryMetadata, getUrlMetadata } from "./getMetadata.ts"
+import { startNetwork } from "./startNetwork.ts"
 
 export interface ProxyChain {
   url: string
@@ -30,58 +32,61 @@ export interface NetworkConfig {
 }
 
 export async function processConfig(config: CapiConfig) {
-  const { server } = config
-  const signal = null! as AbortSignal
-  const entries = await Promise.all([
-    ...Object.entries(config.chains ?? {}).map(
-      async ([name, chain]): Promise<[string[], CodegenEntry]> => {
-        const metadata = chain.url !== undefined
-          ? await getUrlMetadata(chain, signal)
-          : await getBinaryMetadata(chain, signal)
-        console.error("uploading metadata for", name)
-        const metadataHash = await uploadMetadata(server, metadata)
-        console.error(name, metadataHash)
-        return [[name.replace(/[A-Z]/g, (x) => `-` + x.toLowerCase())], {
-          type: "frame",
-          metadata: metadataHash,
-          chainName: name.replace(/^./, (x) => x.toUpperCase()),
-          connection: chain.url !== undefined
-            ? { type: "ws", discovery: chain.url }
-            : { type: "none" },
-        }]
-      },
-    ),
-    ...Object.entries(config.networks ?? {}).flatMap(([networkName, network]) => {
-      const chains = { relay: network.relay, ...network.parachains }
-      return Object.entries(chains).map(
-        async ([name, chain]): Promise<[string[], CodegenEntry]> => {
-          const metadata = await getBinaryMetadata(chain, signal)
-          console.error("uploading metadata for", networkName, name)
+  return withSignal(async (signal) => {
+    const { server } = config
+    const entries = (await Promise.all([
+      ...Object.entries(config.chains ?? {}).map(
+        async ([name, chain]): Promise<[string[], CodegenEntry][]> => {
+          const metadata = chain.url !== undefined
+            ? await getUrlMetadata(chain, signal)
+            : await getBinaryMetadata(chain, signal)
+          console.error("uploading metadata for", name)
           const metadataHash = await uploadMetadata(server, metadata)
-          console.error(networkName, name, metadataHash)
-          return [[
-            networkName.replace(/[A-Z]/g, (x) => `-` + x.toLowerCase()),
-            name.replace(/[A-Z]/g, (x) => `-` + x.toLowerCase()),
-          ], {
+          console.error(name, metadataHash)
+          return [[[normalizePackageName(name)], {
             type: "frame",
             metadata: metadataHash,
             chainName: name.replace(/^./, (x) => x.toUpperCase()),
-            connection: { type: "none" },
-          }]
+            connection: chain.url !== undefined
+              ? { type: "ws", discovery: chain.url }
+              : { type: "none" },
+          }]]
         },
-      )
-    }),
-  ])
-  // console.log(entries)
-  const codegenHash = await uploadCodegenSpec(server, {
-    type: "v0",
-    codegen: new Map(entries),
+      ),
+      ...Object.entries(config.networks ?? {}).map(async ([networkName, network]) => {
+        const chains = await startNetwork(network, signal)
+        return await Promise.all(
+          Object.entries(chains).map(
+            async ([name, [port]]): Promise<[string[], CodegenEntry]> => {
+              const metadata = await getUrlMetadata({ url: `ws://localhost:${port}` }, signal)
+              console.error("uploading metadata for", networkName, name)
+              const metadataHash = await uploadMetadata(server, metadata)
+              console.error(networkName, name, metadataHash)
+              return [[
+                normalizePackageName(networkName),
+                normalizePackageName(name),
+              ], {
+                type: "frame",
+                metadata: metadataHash,
+                chainName: name.replace(/^./, (x) => x.toUpperCase()),
+                connection: { type: "none" },
+              }]
+            },
+          ),
+        )
+      }),
+    ])).flat()
+    // console.log(entries)
+    const codegenHash = await uploadCodegenSpec(server, {
+      type: "v0",
+      codegen: new Map(entries),
+    })
+    console.log(
+      entries.map(([key]) =>
+        new URL(codegenHash + "/" + key.join("/") + "/mod.js", server).toString()
+      ).join("\n"),
+    )
   })
-  console.log(
-    entries.map(([key]) =>
-      new URL(codegenHash + "/" + key.join("/") + "/mod.js", server).toString()
-    ).join("\n"),
-  )
 }
 
 async function _upload(server: string, kind: string, data: Uint8Array, hasher: Hasher) {
