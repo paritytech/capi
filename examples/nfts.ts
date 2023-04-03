@@ -1,6 +1,6 @@
-import { $, alice, bob, Event as CapiEvent, Rune, ValueRune } from "capi"
+import { $, alice, bob, Rune } from "capi"
 import { signature } from "capi/patterns/signature/nfts.ts"
-import { Nfts, Utility, WestmintLocal } from "zombienet/nfts.toml/collator/@latest/mod.js"
+import { Nfts, Utility } from "zombienet/nfts.toml/collator/@latest/mod.js"
 import { Event } from "zombienet/nfts.toml/collator/@latest/types/pallet_nfts/pallet.js"
 import { MintType } from "zombienet/nfts.toml/collator/@latest/types/pallet_nfts/types.js"
 import { RuntimeEvent } from "zombienet/nfts.toml/collator/@latest/types/westmint_runtime.js"
@@ -23,11 +23,11 @@ const DefaultItemSetting = {
   allOn: 0b111n,
 }
 
-// Create a collection
-const createCollection = await Nfts
+// Create a collection and grab its events
+const createCollectionEvents = await Nfts
   .create({
     config: Rune.rec({
-      settings: DefaultCollectionSetting.allOn,
+      settings: DefaultCollectionSetting.allOff,
       mintSettings: Rune.rec({
         mintType: MintType.Issuer(),
         defaultItemSettings: DefaultItemSetting.allOn,
@@ -39,14 +39,16 @@ const createCollection = await Nfts
   .sent()
   .dbgStatus("Create Collection:")
   .finalizedEvents()
+  .run()
 
 // Extract the collection's id from emitted events
-const collection = await createCollection
-  .into(ValueRune)
-  .map(getCollectionIdFromEvents)
-  .unhandle(undefined)
-  .dbg("Collection Id:")
-  .run()
+const collectionCreatedEvent = createCollectionEvents.find((event: any) =>
+  RuntimeEvent.isNfts(event.event) && Event.isCreated(event.event.value)
+)?.event.value! as Event.Created
+
+const collection = collectionCreatedEvent.collection
+
+console.log("Collection Id:", collection)
 
 const item = 0
 
@@ -61,6 +63,7 @@ await Nfts
   .sent()
   .dbgStatus("Mint Item:")
   .finalized()
+  .run()
 
 // Create and encode metadata for the collection
 const collectionMetadata = $.object($.field("name", $.str)).encode({ name: "Collection 01" })
@@ -130,6 +133,7 @@ await Utility.batchAll({
   .sent()
   .dbgStatus("Batched calls:")
   .finalized()
+  .run()
 
 // Get the price of the NFT
 const price = await Nfts.ItemPriceOf
@@ -161,11 +165,3 @@ console.log(
     .access("owner")
     .run(),
 )
-
-// Utility function for extracting id from CreateCollection events
-function getCollectionIdFromEvents(events: CapiEvent<WestmintLocal>[]) {
-  const event = events.find((event) =>
-    RuntimeEvent.isNfts(event.event) && Event.isCreated(event.event.value)
-  )?.event.value as Event.Created | undefined
-  return event?.collection
-}
