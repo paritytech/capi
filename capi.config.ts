@@ -5,7 +5,7 @@ const polkadotParachain = binary("polkadot-parachain", "v0.9.370")
 const substrateContractsNode = binary("substrate-contracts-node", "v0.24.0")
 
 export const config: CapiConfig = {
-  server: "https://capi-dev-delegatee-dkvt8vt7xdkg.deno.dev/",
+  server: "https://capi.dev/@capn/",
   chains: {
     polkadot: {
       url: "wss://rpc.polkadot.io/",
