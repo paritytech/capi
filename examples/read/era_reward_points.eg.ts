@@ -6,8 +6,8 @@
  * is used as the key to another piece of storage (the corresponding reward points).
  */
 
+import { Staking, types } from "@capi/westend/mod.js"
 import { $ } from "capi"
-import { Staking, types } from "westend/mod.js"
 
 const idx = Staking.ActiveEra
   .value()

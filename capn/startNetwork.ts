@@ -2,41 +2,13 @@ import { Narrow } from "../deps/scale.ts"
 import * as path from "../deps/std/path.ts"
 import { writableStreamFromWriter } from "../deps/std/streams.ts"
 import { getFreePort, portReady } from "../util/port.ts"
-import { binary, resolveBinary } from "./binary.ts"
-import { NetworkConfig } from "./mod.ts"
+import { resolveBinary } from "./binary.ts"
+import { NetworkConfig } from "./CapiConfig.ts"
 import { addTestUsers } from "./testUsers.ts"
-
-if (import.meta.main) {
-  const controller = new AbortController()
-  Deno.addSignalListener("SIGINT", () => controller.abort())
-  Deno.addSignalListener("SIGTERM", () => controller.abort())
-
-  const polkadot = binary("polkadot", "v0.9.37")
-  const polkadotParachain = binary("polkadot-parachain", "v0.9.370")
-
-  startNetwork({
-    relay: {
-      binary: polkadot,
-      chain: "rococo-local",
-    },
-    parachains: {
-      statemine: {
-        id: 1000,
-        binary: polkadotParachain,
-        chain: "statemine-local",
-      },
-      contracts: {
-        id: 2000,
-        binary: polkadotParachain,
-        chain: "contracts-rococo-local",
-      },
-    },
-  }, controller.signal)
-}
 
 export async function startNetwork(network: NetworkConfig, signal: AbortSignal) {
   const tempDir = await Deno.makeTempDir({
-    dir: path.join(Deno.cwd(), "tmp"),
+    dir: path.resolve("target"),
     prefix: `capn-${new Date().toISOString()}-`,
   })
 
@@ -141,7 +113,7 @@ function generateBootnodeString(port: number, peerId: string) {
   return `/ip4/127.0.0.1/tcp/${port}/p2p/${peerId}`
 }
 
-interface ChainSpec {
+export interface ChainSpec {
   bootNodes: string[]
   genesis: {
     runtime: {
@@ -162,7 +134,7 @@ interface ChainSpec {
   }
 }
 
-interface ParaChainSpec {
+export interface ParaChainSpec {
   bootNodes: string[]
   para_id: number
   genesis: {
@@ -191,7 +163,7 @@ async function generateNodeKey(binary: string, signal?: AbortSignal) {
   return { nodeKey, peerId }
 }
 
-async function createCustomChainSpec<T>(
+export async function createCustomChainSpec<T>(
   tempDir: string,
   id: string,
   binary: string,
@@ -295,7 +267,7 @@ async function spawnNode(dir: string, binary: string, args: string[], signal: Ab
 
   child.status.then((status) => {
     if (!signal.aborted) {
-      throw new Error(`process exited with code ${status.code}`)
+      throw new Error(`process exited with code ${status.code} (${dir})`)
     }
   })
 }

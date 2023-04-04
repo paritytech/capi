@@ -4,8 +4,8 @@
  * @description Interact directly with the RPC node's call methods.
  */
 
+import { chain } from "@capi/polkadot-dev/mod.js"
 import { $ } from "capi"
-import { chain } from "polkadot_dev/mod.js"
 
 // Make a call.
 const hash = await chain.connection

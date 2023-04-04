@@ -5,8 +5,8 @@
  * Read pages (either of keys or entries) from storage maps.
  */
 
+import { System, types } from "@capi/polkadot-dev/mod.js"
 import { $ } from "capi"
-import { System, types } from "polkadot_dev/mod.js"
 
 // Reference the first 10 keys of a polkadot dev chain's system account map.
 const accountKeys = await System.Account.keyPage(10, null).run()

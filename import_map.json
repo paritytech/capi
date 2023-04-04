@@ -1,5 +1,15 @@
 {
   "imports": {
-    "@capi/polkadot/": "https://capi.dev/polkadot-abcdserfd12345/"
+    "@capi/": "http://localhost:4646/b0ffa6144c570158/"
+  },
+  "scopes": {
+    "examples/": {
+      "capi": "./mod.ts",
+      "capi/": "./",
+      "asserts": "./deps/std/testing/asserts.ts"
+    },
+    "http://localhost:4646/": {
+      "http://localhost:4646/capi/": "./"
+    }
   }
 }

@@ -31,22 +31,21 @@ export function handler(dataCache: CacheBase, generatedCache: CacheBase): Handle
       const path = match[2] ?? "/"
       return handleCodegen(request, hash, path)
     }
-    for (const dir of staticDirs) {
-      try {
-        const url = new URL(pathname.slice(1), dir)
+    if (pathname.startsWith("/capi/")) {
+      return f.code(generatedCache, request, async () => {
+        const url = new URL(pathname.slice(1), import.meta.resolve("../"))
         const response = await fetch(url)
-        if (!response.ok) continue
-        if (f.acceptsHtml(request) && /\.[jt]s$/.test(pathname)) {
-          return f.html(await f.renderCode(await response.text()))
-        }
-        return new Response(response.body, {
-          headers: {
-            "Content-Type": mime.getType(pathname) ?? "text/plain",
-          },
-        })
-      } catch {}
+        if (!response.ok) throw f.notFound()
+        return response.text()
+      })
     }
-    return f.notFound()
+    const response = await fetch(new URL(pathname.slice(1), import.meta.resolve("./static/")))
+    if (!response.ok) return f.notFound()
+    return new Response(response.body, {
+      headers: {
+        "Content-Type": mime.getType(pathname) ?? "text/plain",
+      },
+    })
   }))
 
   async function handleUpload(request: Request, key: string) {
@@ -92,7 +91,6 @@ export function handler(dataCache: CacheBase, generatedCache: CacheBase): Handle
 
           let match: [string[], CodegenEntry] | undefined = undefined
           for (const [key, value] of codegenSpec.codegen) {
-            console.log(path, key, value)
             if (
               path.startsWith(`/${key.map((x) => x + "/").join("")}`)
               && key.length >= (match?.[0].length ?? 0)
@@ -116,6 +114,55 @@ export function handler(dataCache: CacheBase, generatedCache: CacheBase): Handle
             const codegen = new FrameCodegen(metadata, entry.chainName)
             const files = new Map<string, string>()
             codegen.write(files)
+            files.set("capi.js", `export * from "${"../".repeat(key.length + 1)}capi/mod.ts"`)
+            files.set("capi.d.ts", `export * from "${"../".repeat(key.length + 1)}capi/mod.ts"`)
+            files.set(
+              "connection.js",
+              `
+import * as C from "./capi.js"
+
+export const connectionCtor = C.WsConnection
+
+${
+                entry.connection.type === "ws"
+                  ? `export const discoveryValue = ${JSON.stringify(entry.connection.discovery)}`
+                  : `
+const controller = new AbortController()
+const signal = controller.signal
+const api = await C.connectScald(C.$api, new C.WsLink(new WebSocket("ws://localhost:4646/api"), signal), signal)
+const devChain = ${
+                    entry.connection.type === "capnChain"
+                      ? `await api.getChain(${JSON.stringify(entry.connection.name)})`
+                      : `(await api.getNetwork(${JSON.stringify(entry.connection.network)})).get(${
+                        JSON.stringify(entry.connection.name)
+                      })`
+                  }
+
+export const discoveryValue = devChain.url
+export const createUsers = C.testUserFactory(devChain.nextUsers)
+
+// TODO: fix
+setTimeout(() => controller.abort(), 5000)
+`
+              }
+
+`,
+            )
+            files.set(
+              "connection.d.ts",
+              `
+import * as C from "./capi.js"
+
+export const connectionCtor: typeof C.WsConnection
+export const discoveryValue: string
+
+${
+                entry.connection.type === "ws" ? "" : `
+export const createUsers: ReturnType<typeof C.testUserFactory>
+`
+              }
+`,
+            )
             return files
           })
 
@@ -127,8 +174,6 @@ export function handler(dataCache: CacheBase, generatedCache: CacheBase): Handle
     )
   }
 }
-
-const staticDirs = ["../", "./static/"].map((p) => import.meta.resolve(p))
 
 export function handleErrors(handler: Handler): Handler {
   return async (request, connInfo) => {

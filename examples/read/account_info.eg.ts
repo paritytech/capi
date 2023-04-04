@@ -5,8 +5,8 @@
  * Read the value (an `AccountInfo`) from the system account map.
  */
 
+import { createUsers, System, types } from "@capi/polkadot-dev/mod.js"
 import { $ } from "capi"
-import { createUsers, System, types } from "polkadot_dev/mod.js"
 
 const { alexa } = await createUsers()
 

@@ -3,14 +3,14 @@ import { WsConnection } from "../rpc/mod.ts"
 import { getFreePort, portReady } from "../util/port.ts"
 import { withSignal } from "../util/withSignal.ts"
 import { resolveBinary } from "./binary.ts"
-import { BinaryChain } from "./mod.ts"
+import { BinaryChain } from "./CapiConfig.ts"
 
 export async function getBinaryMetadata({ binary, chain }: BinaryChain, signal: AbortSignal) {
   const bin = await resolveBinary(binary, signal)
   const port = getFreePort()
   return await withSignal(async (signal) => {
     new Deno.Command(bin, {
-      args: ["--chain", chain, "--ws-port", `${port}`],
+      args: ["--tmp", "--chain", chain, "--ws-port", `${port}`],
       stdin: "null",
       stdout: "piped",
       stderr: "piped",

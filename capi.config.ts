@@ -1,15 +1,23 @@
-import { binary, CapiConfig } from "./capn/mod.ts"
+import { binary, CapiConfig } from "./mod.ts"
 
-const polkadot = binary("polkadot", "v0.9.37")
-const polkadotParachain = binary("polkadot-parachain", "v0.9.370")
+const polkadot = binary("polkadot", "v0.9.38")
+const polkadotParachain = binary("polkadot-parachain", "v0.9.380")
 const substrateContractsNode = binary("substrate-contracts-node", "v0.24.0")
 
 export const config: CapiConfig = {
-  server: "https://capi.dev/@capn/",
+  server: "http://localhost:4646/",
   chains: {
     polkadot: {
       url: "wss://rpc.polkadot.io/",
       version: "v0.9.40",
+    },
+    westend: {
+      url: "wss://westend-rpc.polkadot.io/",
+      version: "latest",
+    },
+    statemint: {
+      url: "wss://statemint-rpc.polkadot.io/",
+      version: "latest",
     },
     polkadotDev: {
       binary: polkadot,

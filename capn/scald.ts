@@ -25,13 +25,13 @@ const $message = $.taggedUnion("type", [
 
 type ResolutionMessage = Extract<Message, { type: "resolve" | "reject" }>
 
-export interface Connection {
+export interface Link {
   send(data: Uint8Array): void
   recv(cb: (data: Uint8Array) => void, signal: AbortSignal): void
 }
 
 class Scald {
-  constructor(readonly connection: Connection, readonly signal: AbortSignal) {
+  constructor(readonly connection: Link, readonly signal: AbortSignal) {
     this.connection.recv((data) => {
       const message = $message.decode(data)
       this.recv(message)
@@ -141,7 +141,7 @@ export function $fn<A extends unknown[], R>(
   })
 }
 
-export class WsConnection implements Connection {
+export class WsLink implements Link {
   ready = deferred()
   constructor(readonly ws: WebSocket, signal: AbortSignal) {
     ws.binaryType = "arraybuffer"
@@ -169,7 +169,7 @@ export class WsConnection implements Connection {
 export function serveScald<T>(
   $api: $.Codec<T>,
   api: T,
-  connection: Connection,
+  connection: Link,
   signal: AbortSignal,
 ) {
   const scald = new Scald(connection, signal)
@@ -178,7 +178,7 @@ export function serveScald<T>(
 
 export async function connectScald<T>(
   $api: $.Codec<T>,
-  connection: Connection,
+  connection: Link,
   signal: AbortSignal,
 ): Promise<T> {
   const scald = new Scald(connection, signal)

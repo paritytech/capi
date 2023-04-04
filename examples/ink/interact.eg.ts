@@ -7,11 +7,11 @@
  * @todo utilize `createUsers` instead of `alice` and `bob`.
  */
 
+import { chain } from "@capi/contracts-dev/mod.js"
 import { assert } from "asserts"
 import { $, alice, bob } from "capi"
 import { InkMetadataRune } from "capi/patterns/ink/mod.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
-import { chain } from "contracts_dev/mod.js"
 import { parse } from "../../deps/std/flags.ts"
 
 // Attempt to read contract address from command line argument (optional)

@@ -4,8 +4,8 @@
  * @description Interact directly with the RPC node's subscription methods.
  */
 
+import { chain } from "@capi/polkadot-dev/mod.js"
 import { $, known } from "capi"
-import { chain } from "polkadot_dev/mod.js"
 
 // Get an async iterator, which yields subscription events.
 const headerIter = chain.connection

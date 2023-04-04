@@ -6,10 +6,10 @@
  * (and handling) of dispatch errors.
  */
 
+import { Balances } from "@capi/contracts-dev/mod.js"
 import { assertInstanceOf } from "asserts"
 import { alice, bob, ExtrinsicError } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
-import { Balances } from "contracts_dev/mod.js"
 
 // The following should reject with an `ExtrinsicError`.
 const extrinsicError = await Balances

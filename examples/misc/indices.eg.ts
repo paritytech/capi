@@ -6,9 +6,9 @@
  * using the index.
  */
 
+import { createUsers, Indices } from "@capi/polkadot-dev/mod.js"
 import { assertEquals } from "asserts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
-import { createUsers, Indices } from "polkadot_dev/mod.js"
 
 const { alexa } = await createUsers()
 

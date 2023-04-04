@@ -24,8 +24,7 @@
   "editor.tabSize": 2,
   "files.watcherExclude": {
     "**/.git/objects/**": true,
-    "**/.git/subtree-cache/**": true,
-    "target/**": true
+    "**/.git/subtree-cache/**": true
   },
   "prettier.printWidth": 100,
   "ltex.disabledRules": {

@@ -32,14 +32,15 @@
     "debug": "deno run -A --inspect-brk",
     "udd": "deno run -A _tasks/udd.ts",
     "dnt": "deno task run _tasks/dnt.ts",
-    "test": "deno task capi -- deno test -A -L=info --ignore=target --parallel -r=http://localhost:4646/",
-    "test:examples:deno": "deno task capi -- deno run -A -r=http://localhost:4646/ https://deno.land/x/trun@v0.1.0-beta.2/main.ts --include \"**/*.eg.ts\" --import-map import_map.json --concurrency 4 --reload http://localhost:4646/",
+    "test": "deno task capi serve -- deno test -A -L=info --ignore=target --parallel -r=http://localhost:4646/",
+    "test:examples:deno": "deno task capi serve -- deno run -A -r=http://localhost:4646/ https://deno.land/x/trun@v0.1.0-beta.2/main.ts --include \"**/*.eg.ts\" --import-map import_map.json --concurrency 4 --reload http://localhost:4646/",
     "test:update": "deno task test -- --update",
     "moderate": "deno run -A https://deno.land/x/moderate@0.0.5/mod.ts --exclude '*.test.ts' && dprint fmt",
     "capi": "deno run -A main.ts",
-    "cache": "deno task capi -- deno cache -r=http://localhost:4646/",
-    "check": "deno task capi -- deno cache --check",
+    "cache": "deno task capi serve -- deno cache -r=http://localhost:4646/",
+    "check": "deno task capi serve -- deno cache --check",
     "star": "deno task run _tasks/star.ts && deno task check target/star.ts",
-    "run": "deno task capi -- deno run -A -r=http://localhost:4646/"
+    "sync": "deno task capi serve -- deno task capi sync --import-map import_map.json",
+    "run": "deno task capi serve -- deno run -A -r=http://localhost:4646/"
   }
 }

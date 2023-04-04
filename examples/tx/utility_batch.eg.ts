@@ -5,10 +5,10 @@
  * Sign and submit multiple calls within a single extrinsic.
  */
 
+import { Balances, createUsers, System, Utility } from "@capi/westend-dev/mod.js"
 import { assert } from "asserts"
 import { Rune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
-import { Balances, createUsers, System, Utility } from "westend_dev/mod.js"
 
 // Create four test users, one of whom will be the batch sender. The other
 // three will be recipients of balance transfers described in the batch.

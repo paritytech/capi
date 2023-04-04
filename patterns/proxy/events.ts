@@ -1,5 +1,5 @@
-import { type Event as ProxyEvent } from "polkadot/types/pallet_proxy/pallet.js"
-import { type RuntimeEvent } from "polkadot/types/polkadot_runtime.js"
+import { type Event as ProxyEvent } from "@capi/polkadot/types/pallet_proxy/pallet.js"
+import { type RuntimeEvent } from "@capi/polkadot/types/polkadot_runtime.js"
 import { Rune, RunicArgs } from "../../mod.ts"
 
 export function filterPureCreatedEvents<X>(...[events]: RunicArgs<X, [any[]]>) {

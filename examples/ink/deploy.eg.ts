@@ -7,10 +7,10 @@
  * @todo utilize `createUsers` instead of `alice`
  */
 
+import { chain, System } from "@capi/contracts-dev/mod.js"
 import { $, alice, ss58 } from "capi"
 import { InkMetadataRune } from "capi/patterns/ink/mod.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
-import { chain, System } from "contracts_dev/mod.js"
 
 // Initialize an `InkMetadataRune` with the raw Ink metadata text.
 const metadata = InkMetadataRune.fromMetadataText(

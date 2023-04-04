@@ -36,18 +36,12 @@ function pair(secret: string) {
 export function testUser(userId: number) {
   return Sr25519.fromSeed(blake2_256.hash(new TextEncoder().encode(`capi-test-user-${userId}`)))
 }
-export function testUserFactory(url: string) {
+export function testUserFactory(getIndex: (count: number) => Promise<number>) {
   return createUsers
   function createUsers(): Promise<Record<typeof NAMES[number], Sr25519>>
   function createUsers<N extends number>(count: N): Promise<ArrayOfLength<Sr25519, N>>
   async function createUsers(count?: number): Promise<Record<string, Sr25519> | Sr25519[]> {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ count: count ?? NAMES.length }),
-    })
-    if (!response.ok) throw new Error(await response.text())
-    const { index }: { index: number } = await response.json()
+    const index = await getIndex(count ?? NAMES.length)
     return typeof count === "number"
       ? Array.from({ length: count }, (_, i) => testUser(index + i))
       : Object.fromEntries(NAMES.map((name, i) => [name, testUser(index + i)]))
