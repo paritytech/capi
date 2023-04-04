@@ -25,7 +25,7 @@ export default async function(...args: string[]) {
   if (importMapFile) {
     const importMap = JSON.parse(await Deno.readTextFile(importMapFile))
     importMap.imports["@capi/"] = baseUrl
-    await Deno.writeTextFile(importMapFile, JSON.stringify(importMap, null, 2))
+    await Deno.writeTextFile(importMapFile, JSON.stringify(importMap, null, 2) + "\n")
   }
 
   if (packageJsonFile) {
