@@ -1,10 +1,7 @@
-import * as shiki from "https://esm.sh/shiki@0.11.1?bundle"
 import { escapeHtml } from "../deps/escape.ts"
+import { highlighterPromise } from "../deps/shiki.ts"
 import { Status } from "../deps/std/http.ts"
 import { CacheBase } from "../util/cache/base.ts"
-
-shiki.setCDN("https://unpkg.com/shiki/")
-export const highlighterPromise = shiki.getHighlighter({ theme: "github-dark", langs: ["ts"] })
 
 const codeTtl = 60_000
 

@@ -14,10 +14,7 @@
   "includes": [
     "**.{dockerfile,json,md,toml,ts,tsx}"
   ],
-  "excludes": [
-    "target",
-    "util/tsFormatter.ts"
-  ],
+  "excludes": ["target", "util/_artifacts"],
   "plugins": [
     "https://plugins.dprint.dev/dockerfile-0.3.0.wasm",
     "https://plugins.dprint.dev/json-0.17.0.wasm",
