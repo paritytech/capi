@@ -1,4 +1,4 @@
-import { Handler } from "../deps/std/http.ts"
+import { Handler, Status } from "../deps/std/http.ts"
 import { Env } from "./Env.ts"
 import * as f from "./factories.ts"
 import { parsePathInfo } from "./PathInfo.ts"
@@ -53,15 +53,26 @@ export function handleErrors(handler: Handler): Handler {
 
 export function handleCors(handler: Handler): Handler {
   return async (request, connInfo) => {
+    const newHeaders = new Headers()
+    newHeaders.set("Access-Control-Allow-Origin", "*")
+    newHeaders.set("Access-Control-Allow-Headers", "*")
+    newHeaders.set("Access-Control-Allow-Methods", "*")
+    newHeaders.set("Access-Control-Allow-Credentials", "true")
+
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        headers: newHeaders,
+        status: Status.NoContent,
+      })
+    }
+
     const res = await handler(request, connInfo)
 
     // Deno.upgradeWebSocket response objects cannot be modified
     if (res.headers.get("upgrade") !== "websocket") {
-      const newHeaders = new Headers(res.headers)
-      newHeaders.set("Access-Control-Allow-Origin", "*")
-      newHeaders.set("Access-Control-Allow-Headers", "*")
-      newHeaders.set("Access-Control-Allow-Methods", "*")
-      newHeaders.set("Access-Control-Allow-Credentials", "true")
+      for (const [k, v] of res.headers) {
+        newHeaders.append(k, v)
+      }
 
       return new Response(res.body, {
         headers: newHeaders,

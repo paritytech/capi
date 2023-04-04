@@ -58,23 +58,17 @@ export const createUsers ${
 }
 
 export async function handleCount(request: Request, cache: { count: number }): Promise<Response> {
-  switch (request.method) {
-    case "POST": {
-      const body = await request.json()
-      $.assert($.field("count", $.u32), body)
-      const { count } = body
-      const index = cache.count
-      const newCount = index + count
-      if (newCount < DEFAULT_TEST_USER_COUNT) cache.count = newCount
-      else throw new Error("Maximum test user count reached")
-      return new Response(JSON.stringify({ index }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      })
-    }
-    default:
-      return new Response(null, { status: 200 })
-  }
+  const body = await request.json()
+  $.assert($.field("count", $.u32), body)
+  const { count } = body
+  const index = cache.count
+  const newCount = index + count
+  if (newCount < DEFAULT_TEST_USER_COUNT) cache.count = newCount
+  else throw new Error("Maximum test user count reached")
+  return new Response(JSON.stringify({ index }), {
+    status: 200,
+    headers: { "Content-Type": "application/json" },
+  })
 }
 
 export async function generateTar(_files: Map<string, string>, chainName: string, version: string) {
