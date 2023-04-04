@@ -8,15 +8,14 @@
       "addWords": true
     }
   ],
-  "dictionaries": [
-    "project-words"
-  ],
+  "dictionaries": ["project-words"],
   "ignorePaths": [
     "**/*.wasm",
     "target",
     "**/__snapshots__/*.snap",
     "**/*.contract",
     "examples/ink/erc20.json",
-    "**/*.scale"
+    "**/*.scale",
+    "**/*.svg"
   ]
 }

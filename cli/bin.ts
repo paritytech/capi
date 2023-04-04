@@ -1,5 +1,4 @@
 import { download } from "../deps/capi_binary_builds.ts"
-import * as path from "../deps/std/path.ts"
 
 export default async function(
   binary: string,
