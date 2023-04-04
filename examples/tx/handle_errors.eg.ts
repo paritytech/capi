@@ -22,7 +22,7 @@ const extrinsicError = await Balances
   .dbgStatus("Transfer:")
   .inBlockEvents()
   .unhandleFailed()
-  .rehandle(ExtrinsicError, (error) => error)
+  .rehandle(ExtrinsicError)
   .run()
 
 // Ensure `extrinsicError` is in fact an instance of `ExtrinsicError`
