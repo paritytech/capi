@@ -11,7 +11,7 @@ import {
   ValueRune,
 } from "../../mod.ts"
 import { $contractsApiCallArgs, $contractsApiCallResult, Weight } from "./codecs.ts"
-import { isInstantiatedEvent } from "./events.ts"
+import { isContractsRuntimeEvent } from "./events.ts"
 import { InkMetadataRune } from "./InkMetadataRune.ts"
 
 export interface MsgProps {
@@ -92,8 +92,7 @@ export class InkRune<out C extends Chain, out U>
       .tuple([Rune.resolve(events), this])
       .map(([events, publicKey]) =>
         events.filter((e) =>
-          // TODO: clean up
-          isInstantiatedEvent(e) && equals((e.event as any).value.contract, publicKey)
+          isContractsRuntimeEvent(e) && equals(e.event.value.contract, publicKey)
         )
       )
   }

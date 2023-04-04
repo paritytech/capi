@@ -1,5 +1,19 @@
 import { AccountIdRune, ApplyExtrinsicEventPhase, Rune, RunicArgs } from "../../mod.ts"
 
+export interface ContractsRuntimeEvent {
+  phase: ApplyExtrinsicEventPhase
+  event: {
+    type: "Contracts"
+    value: {
+      contract?: Uint8Array
+    }
+  }
+}
+
+export function isContractsRuntimeEvent(event: any): event is ContractsRuntimeEvent {
+  return event.event.type === "Contracts"
+}
+
 export interface InstantiatedEvent {
   phase: ApplyExtrinsicEventPhase
   event: {
