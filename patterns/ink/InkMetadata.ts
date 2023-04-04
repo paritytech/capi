@@ -106,7 +106,7 @@ export function normalize({ V3: { types, ...v3Rest }, ...topLevelRest }: InkMeta
 function fromRawTy({ type: { def, params, path }, id }: any): Ty {
   return {
     id,
-    path,
+    path: path ?? [],
     params: params ? normalizeFields(params) : [],
     // TODO: grab this from appropriate loc
     docs: [],
