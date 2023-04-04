@@ -1,7 +1,7 @@
 import { blake2_256, hex } from "../crypto/mod.ts"
+import * as $ from "../deps/scale.ts"
 import { concat } from "../deps/std/bytes.ts"
 import { $extrinsic, Signer } from "../frame_metadata/Extrinsic.ts"
-import * as $ from "../deps/scale.ts"
 import { Rune, ValueRune } from "../rune/mod.ts"
 import { Chain, ChainRune } from "./ChainRune.ts"
 import { CodecRune } from "./CodecRune.ts"
