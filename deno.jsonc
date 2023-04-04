@@ -12,7 +12,7 @@
   "lock": false,
   "lint": {
     "files": {
-      "exclude": ["target"],
+      "exclude": ["target", "util/_artifacts"],
       "include": ["."]
     },
     "rules": {
