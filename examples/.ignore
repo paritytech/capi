@@ -1,4 +1,3 @@
-multisig/basic.ts
-multisig/stash.ts
-multisig/virtual.ts
+ink/deploy.eg.ts
+smoldot.eg.ts
 xcm/asset_teleportation.ts
