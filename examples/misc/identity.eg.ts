@@ -1,10 +1,9 @@
 /**
  * @title Utilize The Identity Pallet With Fields
- * @stability experiment – it's unclear how useful the identity info transcoding
+ * @stability experiment it's unclear how useful the identity info transcoding
  * is (or the identity pallet for that matter). We may decide we do not wish to
  * maintain this utility. For now however, it's a good way to stress-test Rune.
- *
- * Set a user's identity, potentially with metadata of arbitrary user-defined shape.
+ * @description Set a user's identity, potentially with metadata of arbitrary user-defined shape.
  */
 
 import { createUsers, Identity } from "@capi/polkadot-dev/mod.js"

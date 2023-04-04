@@ -1,9 +1,8 @@
 /**
  * @title Decode and Unhandle Dispatch Errors
  * @stability unstable
- *
- * The `unhandleFailed` method of `ExtrinsicEventsRune` enables easy decoding
- * (and handling) of dispatch errors.
+ * @description The `unhandleFailed` method of `ExtrinsicEventsRune` enables
+ * easy decoding (and handling) of dispatch errors.
  */
 
 import { Balances } from "@capi/contracts-dev/mod.js"

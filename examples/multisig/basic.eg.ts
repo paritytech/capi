@@ -1,8 +1,7 @@
 /**
  * @title Multisig Transfer
  * @stability unstable
- *
- * Create a multisig account and ratify a vote to execute a transfer from
+ * @description Create a multisig account and ratify a vote to execute a transfer from
  * that multisig.
  */
 

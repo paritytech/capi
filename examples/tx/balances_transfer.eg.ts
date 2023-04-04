@@ -1,8 +1,7 @@
 /**
  * @title Balance Transfer
  * @stability nearing
- *
- * Transfer some funds from one user to another.
+ * @description Transfer some funds from one user to another.
  */
 
 import { Balances, createUsers, System } from "@capi/westend-dev/mod.js"

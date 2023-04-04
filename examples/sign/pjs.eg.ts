@@ -1,9 +1,8 @@
 /**
  * @title Polkadot-JS Signature Compatibility
  * @stability nearing
- *
- * Utilize a Polkadot-JS signer (such as from a browser wallet extension) to
- * sign a Capi extrinsic.
+ * @description Utilize a Polkadot-JS signer (such as from a browser wallet
+ * extension) to sign a Capi extrinsic.
  */
 
 import { Balances, chain, createUsers, System } from "@capi/polkadot-dev/mod.js"

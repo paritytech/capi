@@ -1,8 +1,7 @@
 /**
  * @title Current Agreed-Upon Time
  * @stability nearing
- *
- * Read the current timestamp as agreed upon by validators.
+ * @description Read the current timestamp as agreed upon by validators.
  */
 
 import { Timestamp } from "@capi/polkadot/mod.js"

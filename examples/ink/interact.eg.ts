@@ -2,8 +2,8 @@
  * @title Interact With An Ink Smart Contract
  * @stability unstable – We intend to work on an Ink provider (for static codegen)
  * in the near future. This work will likely entail large changes to the current ink patterns.
- * @description The Ink patterns simplify the reading of contract instance state and events, as well as
- * the submission of transactions.
+ * @description The Ink patterns simplify the reading of contract instance state and events,
+ * as well as the submission of transactions.
  * @todo utilize `createUsers` instead of `alice` and `bob`.
  */
 

@@ -1,10 +1,9 @@
 /**
  * @title Blocks
  * @stability nearing
- *
- * Utilize Capi's fluent API to turn a block reference (in this case the
- * retrieved latest finalized block hash) into a block. Then access various
- * pieces of data pertaining to that block.
+ * @description Utilize Capi's fluent API to turn a block reference (in this
+ * case the retrieved latest finalized block hash) into a block. Then access
+ * various pieces of data pertaining to that block.
  */
 
 import { chain, metadata, types } from "@capi/polkadot/mod.js"

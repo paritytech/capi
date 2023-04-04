@@ -1,8 +1,8 @@
 /**
  * @title Multisig Administration of Pure Proxy Stash
  * @stability unstable
- *
- * Administrate a stash account (pure proxy) through a multisig with three signatories.
+ * @description Administrate a stash account (pure proxy) through a multisig with
+ * three signatories.
  */
 
 import { Balances, chain, createUsers, Proxy, System } from "@capi/polkadot-dev/mod.js"

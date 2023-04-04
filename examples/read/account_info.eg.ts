@@ -1,8 +1,7 @@
 /**
  * @title Read a Map Value
  * @stability nearing
- *
- * Read the value (an `AccountInfo`) from the system account map.
+ * @description Read the value (an `AccountInfo`) from the system account map.
  */
 
 import { createUsers, System, types } from "@capi/polkadot-dev/mod.js"

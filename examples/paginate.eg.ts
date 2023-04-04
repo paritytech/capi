@@ -1,8 +1,7 @@
 /**
  * @title Paginate
  * @stability unstable
- *
- * Read pages (either of keys or entries) from storage maps.
+ * @description Read pages (either of keys or entries) from storage maps.
  */
 
 import { System, types } from "@capi/polkadot-dev/mod.js"

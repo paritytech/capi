@@ -1,10 +1,9 @@
 /**
  * @title XCM Asset Teleportation
  * @stability nearing
- *
- * Initialize a limited asset teleportation from a relaychain to a parachain
- * and listen for the processed event on the parachain. Finally, read the new
- * balance of the user to whom the asset was transferred.
+ * @description Initialize a limited asset teleportation from a relaychain to a
+ * parachain and listen for the processed event on the parachain. Finally, read
+ * the new balance of the user to whom the asset was transferred.
  */
 
 import { types, XcmPallet } from "@capi/rococo-dev/mod.js"

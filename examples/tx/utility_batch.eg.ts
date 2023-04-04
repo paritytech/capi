@@ -1,8 +1,7 @@
 /**
  * @title Batch Transaction
  * @stability nearing
- *
- * Sign and submit multiple calls within a single extrinsic.
+ * @description Sign and submit multiple calls within a single extrinsic.
  */
 
 import { Balances, createUsers, System, Utility } from "@capi/westend-dev/mod.js"

@@ -1,10 +1,9 @@
 /**
  * @title Watch
  * @stability unstable
- *
- * Capi allows you to model your data requirements as Runes and then utilize `watch`,
- * which produces an async generator, the pulls of which produce promises resolving to
- * subsequent states.
+ * @description Capi allows you to model your data requirements as Runes and
+ * then utilize `watch`, which produces an async generator, the pulls of which
+ * produce promises resolving to subsequent states.
  */
 
 import { chain, Timestamp } from "@capi/polkadot/mod.js"

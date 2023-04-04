@@ -1,12 +1,12 @@
 /**
  * @title Dynamic Usage
  * @stability nearing
- *
- * You may want to write code whose target chain is unknown before runtime. A common
- * example of this is block explorers. Use cases such as this are "dynamic" in that they require
- * one to read the chain's metadata at runtime in order to derive the means of interacting with
- * that chain. Dynamic usage of Capi entails a subtly-different DX compared to that of chain-specific
- * (codegen) usage. There are three key difference:
+ * @description You may want to write code whose target chain is unknown before
+ * runtime. A common example of this is block explorers. Use cases such as this
+ * are "dynamic" in that they require one to read the chain's metadata at runtime
+ * in order to derive the means of interacting with that chain. Dynamic usage of
+ * Capi entails a subtly-different DX compared to that of chain-specific (codegen)
+ * usage. There are three key differences:
  *
  * 1. We manually initialize the `ChainRune`.
  * 2. We manually access bindings.
