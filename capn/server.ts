@@ -2,9 +2,9 @@ import { PermanentMemo } from "../util/memo.ts"
 import { getFreePort, portReady } from "../util/port.ts"
 import { Api, DevChain } from "./api.ts"
 import { resolveBinary } from "./binary.ts"
-import { DEFAULT_TEST_USER_COUNT } from "./chainSpec.ts"
 import { CapiConfig } from "./mod.ts"
 import { startNetwork } from "./startNetwork.ts"
+import { testUserPublicKeys } from "./testUsers.ts"
 
 export function createApi(config: CapiConfig, signal: AbortSignal): Api {
   const chainMemo = new PermanentMemo<string, DevChain>()
@@ -47,7 +47,7 @@ export function createApi(config: CapiConfig, signal: AbortSignal): Api {
       async nextUsers(count) {
         const index = userCount
         const newCount = index + count
-        if (newCount < DEFAULT_TEST_USER_COUNT) userCount = newCount
+        if (newCount < testUserPublicKeys.length) userCount = newCount
         else throw new Error("Maximum test user count reached")
         return index
       },

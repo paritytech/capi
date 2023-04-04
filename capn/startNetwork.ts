@@ -4,6 +4,7 @@ import { writableStreamFromWriter } from "../deps/std/streams.ts"
 import { getFreePort, portReady } from "../util/port.ts"
 import { binary, resolveBinary } from "./binary.ts"
 import { NetworkConfig } from "./mod.ts"
+import { addTestUsers } from "./testUsers.ts"
 
 if (import.meta.main) {
   const controller = new AbortController()
@@ -48,11 +49,10 @@ export async function startNetwork(network: NetworkConfig, signal: AbortSignal) 
         name,
         binary,
         chain.chain,
-        (chainSpec: ParaChainSpec) => {
-          // TODO: add custom account balances
+        async (chainSpec: ParaChainSpec) => {
           chainSpec.para_id = chain.id
           chainSpec.genesis.runtime.parachainInfo.parachainId = chain.id
-          return chainSpec
+          await addTestUsers(chainSpec.genesis.runtime.balances.balances)
         },
       )
 
@@ -76,12 +76,11 @@ export async function startNetwork(network: NetworkConfig, signal: AbortSignal) 
     "relay",
     relayBinary,
     network.relay.chain,
-    (chainSpec: ChainSpec) => {
-      // TODO: add custom account balances
+    async (chainSpec: ChainSpec) => {
       chainSpec.genesis.runtime.runtime_genesis_config.paras.paras.push(
         ...paras.map(({ id, genesis }) => [id, [...genesis, true]] satisfies Narrow),
       )
-      return chainSpec
+      await addTestUsers(chainSpec.genesis.runtime.runtime_genesis_config.balances.balances)
     },
   )
 
@@ -197,7 +196,7 @@ async function createCustomChainSpec<T>(
   id: string,
   binary: string,
   chain: string,
-  customize: (chainSpec: T) => T,
+  customize: (chainSpec: T) => Promise<void>,
 ) {
   const specResult = await new Deno.Command(binary, {
     args: ["build-spec", "--disable-default-bootnode", "--chain", chain],
@@ -206,7 +205,8 @@ async function createCustomChainSpec<T>(
     // TODO: improve error message
     throw new Error("build-spec failed")
   }
-  const spec = customize(JSON.parse(new TextDecoder().decode(specResult.stdout)))
+  const spec = JSON.parse(new TextDecoder().decode(specResult.stdout))
+  await customize(spec)
 
   const specPath = path.join(tempDir, `${id}-chainspec.json`)
   await Deno.writeTextFile(specPath, JSON.stringify(spec, undefined, 2))
