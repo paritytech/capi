@@ -1,4 +1,6 @@
 import { blake2_256, hex } from "../crypto/mod.ts"
+import * as $ from "../deps/scale.ts"
+import { concat } from "../deps/std/bytes.ts"
 import { $extrinsic, Signer } from "../frame_metadata/Extrinsic.ts"
 import { Rune, ValueRune } from "../rune/mod.ts"
 import { Chain, ChainRune } from "./ChainRune.ts"
@@ -22,6 +24,8 @@ export type SignatureDataFactory<C extends Chain, CU, SU> = (
 ) => Rune<SignatureData<C>, SU>
 
 export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain.Call<C>, C, U> {
+  static readonly PROTOCOL_VERSION = 4
+
   hash = this.chain
     .into(ValueRune)
     .access("metadata", "extrinsic", "call")
@@ -30,7 +34,8 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
     .encoded(this)
 
   signed<SU>(signatureFactory: SignatureDataFactory<C, U, SU>) {
-    return Rune.fn($extrinsic)
+    return Rune
+      .fn($extrinsic)
       .call(this.chain.metadata)
       .into(CodecRune)
       .encoded(Rune.rec({
@@ -42,24 +47,29 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
   }
 
   encoded() {
-    return Rune.fn($extrinsic)
-      .call(this.chain.into(ValueRune).access("metadata"))
+    return Rune
+      .fn($extrinsic)
+      .call(this.chain.metadata)
       .into(CodecRune)
       .encoded(Rune.rec({
-        protocolVersion: 4,
+        protocolVersion: ExtrinsicRune.PROTOCOL_VERSION,
         call: this,
       }))
   }
 
   feeEstimate() {
-    const extrinsicHex = this.encoded().map(hex.encodePrefixed)
-    return this.chain.connection.call("payment_queryInfo", extrinsicHex)
-      .map(({ weight, ...rest }) => ({
-        ...rest,
-        weight: {
-          proofSize: BigInt(typeof weight === "number" ? 0 : weight.proof_size),
-          refTime: BigInt(typeof weight === "number" ? weight : weight.ref_time),
-        },
-      }))
+    const encoded = this.encoded()
+    const arg = Rune
+      .fn(concat)
+      .call(encoded, encoded.access("length").map((n) => $.u32.encode(n)))
+      .map(hex.encodePrefixed)
+    const data = this.chain.connection
+      .call("state_call", "TransactionPaymentApi_query_info", arg)
+      .map(hex.decode)
+    return this.chain.metadata
+      .access("types", "sp_weights.weight_v2.Weight")
+      .map(($c) => $.field("weight", $c))
+      .into(CodecRune)
+      .decoded(data)
   }
 }
