@@ -1,0 +1,5 @@
+**/multisig/{basic,stash,virtual}.eg.ts
+**/xcm/asset_teleportation.eg.ts
+**/smoldot.eg.ts
+**/ink/*.eg.ts
+**/sign/ed25519.eg.ts
