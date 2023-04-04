@@ -6,21 +6,25 @@
  * (and handling) of dispatch errors.
  */
 
-import { assertRejects } from "asserts"
+import { assertInstanceOf } from "asserts"
 import { alice, bob, ExtrinsicError } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
-import { Balances } from "westend_dev/mod.js"
+import { Balances } from "contracts_dev/mod.js"
 
 // The following should reject with an `ExtrinsicError`.
-assertRejects(() =>
-  Balances
-    .transfer({
-      value: 1_000_000_000_000_000_000_000_000_000_000_000_000n,
-      dest: bob.address,
-    })
-    .signed(signature({ sender: alice }))
-    .sent()
-    .dbgStatus("Transfer:")
-    .finalizedEvents()
-    .unhandleFailed()
-    .run(), ExtrinsicError)
+const extrinsicError = await Balances
+  .transfer({
+    value: 1_000_000_000_000_000_000_000_000_000_000_000_000n,
+    dest: bob.address,
+  })
+  .signed(signature({ sender: alice }))
+  .sent()
+  .dbgStatus("Transfer:")
+  .inBlockEvents()
+  .unhandleFailed()
+  .rehandle(ExtrinsicError, (error) => error)
+  .run()
+
+// Ensure `extrinsicError` is in fact an instance of `ExtrinsicError`
+console.log("The unhandled extrinsic error:", extrinsicError)
+assertInstanceOf(extrinsicError, ExtrinsicError)

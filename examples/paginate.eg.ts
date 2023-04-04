@@ -17,11 +17,11 @@ console.log("Account keys:", accountKeys)
 $.assert($.sizedArray($.uint8Array, 10), accountKeys)
 
 // Reference the first 10 key-value pairs of a statemint dev chain's uniques class map.
-const collectionsEntries = Uniques.Class.entryPage(10, null)
+const collectionsEntries = await Uniques.Class.entryPage(10, null).run()
 
 // Each entry should be of type `[number, types.pallet_uniques.types.CollectionDetails]`
 console.log("Collections entries:", collectionsEntries)
 $.assert(
-  $.sizedArray($.tuple($.u8, types.pallet_uniques.types.$collectionDetails), 10),
+  $.sizedArray($.tuple($.u16, types.pallet_uniques.types.$collectionDetails), 10),
   collectionsEntries,
 )

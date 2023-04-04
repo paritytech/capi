@@ -8,8 +8,7 @@
 import { assert } from "asserts"
 import { Rune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
-import * as ed from "npm:@noble/ed25519"
-import { sha512 } from "npm:@noble/hashes/sha512"
+import * as ed from "https://esm.sh/@noble/ed25519@1.7.3"
 import { Balances, createUsers, System, types } from "westend_dev/mod.js"
 
 const { alexa, billy } = await createUsers()
@@ -22,23 +21,18 @@ const billyFree = System.Account
 const billyFreeInitial = await billyFree.run()
 console.log("Billy free initial:", billyFreeInitial)
 
-// Bring your own Ed25519 implementation. In this case, we utilize
-// [`noble-ed25519`](https://github.com/paulmillr/noble-ed25519), which
-// requires us to specify a sync sha512 hasher implementation.
-ed.etc.sha512Sync = (...msgs) => sha512(ed.etc.concatBytes(...msgs))
-
 // Initialize a secret with the `crypto.getRandomValues` builtin.
 const secret = crypto.getRandomValues(new Uint8Array(32))
 
 // Get a Rune of the secret-corresponding multiaddress.
 const address = types.sp_runtime.multiaddress.MultiAddress
-  .Id(ed.getPublicKey(secret))
+  .Id(await ed.getPublicKey(secret))
 
 // Define a `sign` function for later use.
-function sign(msg: Uint8Array) {
+async function sign(msg: Uint8Array) {
   return {
     type: "Ed25519" as const,
-    value: ed.sign(msg, secret),
+    value: await ed.sign(msg, secret),
   }
 }
 
