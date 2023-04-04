@@ -81,7 +81,7 @@ const call = Balances.transfer({
 })
 
 // Fund Billy and Carol's proxy accounts (existential deposits).
-await fundAndRatify("billy", carol).run()
+await fundAndRatify("billy", billy).run()
 await fundAndRatify("carol", carol).run()
 
 // Retrieve David's final balance.
