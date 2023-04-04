@@ -8,15 +8,11 @@
  */
 
 import { assertNotEquals } from "asserts"
-import { alice, Rune } from "capi"
+import { alice } from "capi"
 import { InkMetadataRune } from "capi/patterns/ink/mod.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
-import { chain, types } from "contracts_dev/mod.js"
+import { chain } from "contracts_dev/mod.js"
 import { parse } from "../../deps/std/flags.ts"
-
-const {
-  contracts_node_runtime: { RuntimeEvent },
-} = types
 
 // Attempt to read contract address from command line argument (optional)
 let { address } = parse(Deno.args, { string: ["address"] })
@@ -55,10 +51,8 @@ await contract
   .sent()
   .dbgStatus("Flip:")
   .inBlockEvents()
-  .pipe((events) =>
-    Rune.resolve(events).map((events) => events.filter((e) => RuntimeEvent.isContracts(e.event)))
-  )
-  // .pipe(contract.filterContractEvents)
+  // .pipe((events) => Rune.resolve(events))
+  .pipe(contract.filterContractEvents)
   .dbg("filtered events")
   .run()
 
