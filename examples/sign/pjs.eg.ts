@@ -9,8 +9,8 @@
 import { ss58 } from "capi"
 import { pjsSender, PjsSigner } from "capi/patterns/compat/pjs_sender.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
-import { createPair } from "https://deno.land/x/polkadot@0.2.25/keyring/mod.ts"
-import { TypeRegistry } from "https://deno.land/x/polkadot@0.2.25/types/mod.ts"
+import { createPair } from "https://deno.land/x/polkadot@0.2.34/keyring/mod.ts"
+import { TypeRegistry } from "https://deno.land/x/polkadot@0.2.34/types/mod.ts"
 import { Balances, chain, createUsers, System } from "polkadot_dev/mod.js"
 
 const { alexa, billy } = await createUsers()

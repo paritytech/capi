@@ -5,7 +5,10 @@ const pending = [udd("_tasks/udd.ts")]
 
 for await (
   const entry of fs.walk(".", {
-    match: [path.globToRegExp("deps/**/*.ts")],
+    match: [
+      path.globToRegExp("examples/**/*.ts"),
+      path.globToRegExp("deps/**/*.ts"),
+    ],
   })
 ) pending.push(udd(entry.path))
 
