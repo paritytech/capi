@@ -1,8 +1,8 @@
 import { serve } from "../../deps/std/http.ts"
 import { TimedMemo } from "../../util/memo.ts"
-import { f, handleErrors } from "../mod.ts"
+import { f, handleCors, handleErrors } from "../mod.ts"
 
-serve(handleErrors(handler))
+serve(handleCors(handleErrors(handler)))
 
 const ttl = 60_000
 const shaAbbrevLength = 8
