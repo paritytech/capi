@@ -19,7 +19,7 @@ const d = Rune.tuple([a, b])
 // Use `Rune.rec` to create a new Rune resolving to `{ c: cT, d: dT }`.
 const e = Rune.rec({ c, d })
 
-// Execute `e`. Note this the resolution of inner Runes is parallelized,
+// Execute `e`. Note the resolution of inner Runes is parallelized,
 // much like a `Promise.all` call.
 const result = await e.run()
 
