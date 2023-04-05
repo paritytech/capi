@@ -87,24 +87,6 @@ export class InkRune<out C extends Chain, out U>
       .into(ExtrinsicRune, this.chain)
   }
 
-  // TODO: protect / consider whether this should be exposed
-  filterContractEvents = <X>(...[events]: RunicArgs<X, [events: Event[]]>) => {
-    return Rune
-      .tuple([Rune.resolve(events), this])
-      .map(([events, publicKey]) =>
-        events.filter((e): e is ContractsRuntimeEvent =>
-          isContractsRuntimeEvent(e)
-          && !!e.event.value.contract
-          && equals(e.event.value.contract, publicKey)
-        )
-      )
-  }
-
-  // TODO: protect / consider whether this should be exposed
-  filterContractEmittedEvents = <X>(...[events]: RunicArgs<X, [events: Event[]]>) => {
-    return this.filterContractEvents(events).map((events) => events.filter(isContractEmitted))
-  }
-
   // TODO: improve
   decodeErrorEvent = <X>(...[failRuntimeEvent]: RunicArgs<X, [any]>) => {
     const $error = this.chain
