@@ -8,7 +8,7 @@
  */
 
 import { assertNotEquals } from "asserts"
-import { alice } from "capi"
+import { alice, ValueRune } from "capi"
 import { InkMetadataRune } from "capi/patterns/ink/mod.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 import { chain } from "contracts_dev/mod.js"
@@ -53,10 +53,8 @@ await contract
   .sent()
   .dbgStatus("Flip:")
   .inBlockEvents()
-  // .pipe(contract.filterContractEmittedEvents)
-  // .pipe(contract.emissions.bind(contract))
-  // .pipe(contract.emissionsVariant2.bind(contract))
-  .pipe(contract.emissionsVariant3.bind(contract))
+  .pipe(contract.emittedEvents)
+  .into(ValueRune)
   .dbg("filtered events")
   .run()
 

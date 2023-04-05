@@ -1,6 +1,5 @@
 import { equals } from "../../deps/std/bytes.ts"
 import {
-  $,
   ArrayRune,
   Chain,
   CodecRune,
@@ -88,6 +87,7 @@ export class InkRune<out C extends Chain, out U>
       .into(ExtrinsicRune, this.chain)
   }
 
+  // TODO: protect / consider whether this should be exposed
   filterContractEvents = <X>(...[events]: RunicArgs<X, [events: Event[]]>) => {
     return Rune
       .tuple([Rune.resolve(events), this])
@@ -100,6 +100,7 @@ export class InkRune<out C extends Chain, out U>
       )
   }
 
+  // TODO: protect / consider whether this should be exposed
   filterContractEmittedEvents = <X>(...[events]: RunicArgs<X, [events: Event[]]>) => {
     return this.filterContractEvents(events).map((events) => events.filter(isContractEmitted))
   }
@@ -117,63 +118,19 @@ export class InkRune<out C extends Chain, out U>
       .tuple([Rune.resolve(failRuntimeEvent), $error])
       .map(([failEvent, $error]) => {
         const { dispatchError } = failEvent.event.value
-        if (dispatchError.type !== "Module") return new FailedToDecodeErrorError()
-        return $error.decode(dispatchError.value.error)
+        return (dispatchError.type !== "Module")
+          ? new FailedToDecodeErrorError()
+          : $error.decode(dispatchError.value.error)
       })
       .unhandle(FailedToDecodeErrorError)
   }
 
-  emissions<X>(...[events]: RunicArgs<X, [events: Event[]]>) {
-    // const $event = this.parent.into(ValueRune)
-    //   .access("V3", "spec", "events").map(
-    //     (events) =>
-    //       $.taggedUnion(
-    //         "type",
-    //         events.map((event) => {
-    //           return $.variant(
-    //             event.label,
-    //             $.tuple(event.args.map((arg) => this.parent.codecs.access(arg.type.type))),
-    //           )
-    //         }),
-    //       ),
-    //   )
-    const $event = Rune.tuple([
-      this.parent.into(ValueRune).access("V3", "spec", "events"),
-      this.parent.codecs,
-    ]).map(([events, codecs]) =>
-      $.taggedUnion(
-        "type",
-        events.map((event) =>
-          $.variant(
-            event.label,
-            $.object(...event.args.map((arg) => $.field(arg.label, codecs[arg.type.type]!))),
-          )
-        ),
-      )
-    )
+  emittedEvents = <X>(...[events]: RunicArgs<X, [events: Event[]]>) => {
     return Rune
-      .tuple([events, $event])
-      .map(([events, $event]) =>
-        events
-          .filter(isContractEmitted)
-          .map((event) => $event.decode(event.event.value.data))
-      )
-  }
-
-  emissionsVariant2<X>(...[events]: RunicArgs<X, [events: Event[]]>) {
-    return Rune.resolve(events)
-      .map((events) => events.filter(isContractEmitted).map((event) => event.event.value.data))
+      .resolve(events)
+      .map((events) => events.filter(isContractEmitted))
       .into(ArrayRune)
-      .mapArray((event) => this.parent.decodeEvent(event))
-      .into(ValueRune)
-  }
-
-  emissionsVariant3<X>(...[events]: RunicArgs<X, [events: Event[]]>) {
-    return this.filterContractEmittedEvents(events)
-      .map((events) => events.filter(isContractEmitted).map((event) => event.event.value.data))
-      .into(ArrayRune)
-      .mapArray((event) => this.parent.decodeEvent(event))
-      .into(ValueRune)
+      .mapArray((event) => this.parent.$event.decoded(event.access("event", "value", "data")))
   }
 }
 

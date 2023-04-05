@@ -39,10 +39,29 @@ export class InkMetadataRune<out U> extends Rune<InkMetadata, U> {
     .map(transformTys)
     .access(0)
 
+  $event = Rune
+    .tuple([
+      this.into(ValueRune).access("V3", "spec", "events"),
+      this.codecs,
+    ])
+    .map(([events, codecs]) =>
+      $.taggedUnion(
+        "type",
+        events.map((event) =>
+          $.variant(
+            event.label,
+            $.object(...event.args.map((arg) => $.field(arg.label, codecs[arg.type.type]!))),
+          )
+        ),
+      )
+    )
+    .into(CodecRune)
+
   salt() {
     return Rune.constant(crypto.getRandomValues(new Uint8Array(4)))
   }
 
+  // TODO: protected?
   encodeData<X>(...args_: RunicArgs<X, [metadata: Callable, args?: unknown[]]>) {
     const [metadata, args] = RunicArgs.resolve(args_)
     const selector = metadata.access("selector").map(hex.decode)
@@ -64,25 +83,6 @@ export class InkMetadataRune<out U> extends Rune<InkMetadata, U> {
           .tuple([selector, args])
           .map(([selector, args]) => [selector, ...args ?? []]),
       )
-  }
-
-  decodeEvent<X>(...[event]: RunicArgs<X, [event: Uint8Array]>) {
-    return Rune.tuple([
-      this.into(ValueRune).access("V3", "spec", "events"),
-      this.codecs,
-    ]).map(([events, codecs]) =>
-      $.taggedUnion(
-        "type",
-        events.map((event) =>
-          $.variant(
-            event.label,
-            $.object(...event.args.map((arg) => $.field(arg.label, codecs[arg.type.type]!))),
-          )
-        ),
-      )
-    )
-      .into(CodecRune)
-      .decoded(event)
   }
 
   instantiation<C extends Chain, U, X>(
