@@ -13,11 +13,10 @@
   ],
   "ignorePaths": [
     "**/*.wasm",
-    "frame_metadata/raw_erc20_metadata.json",
     "target",
     "**/__snapshots__/*.snap",
     "**/*.contract",
-    "examples/smart_contract/metadata.json",
+    "examples/ink/erc20.json",
     "**/*.scale"
   ]
 }
