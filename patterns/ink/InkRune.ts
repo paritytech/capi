@@ -1,5 +1,7 @@
 import { equals } from "../../deps/std/bytes.ts"
 import {
+  $,
+  ArrayRune,
   Chain,
   CodecRune,
   Event,
@@ -11,7 +13,7 @@ import {
   ValueRune,
 } from "../../mod.ts"
 import { $contractsApiCallArgs, $contractsApiCallResult, Weight } from "./codecs.ts"
-import { isContractsRuntimeEvent } from "./events.ts"
+import { ContractsRuntimeEvent, isContractEmitted, isContractsRuntimeEvent } from "./events.ts"
 import { InkMetadataRune } from "./InkMetadataRune.ts"
 
 export interface MsgProps {
@@ -87,14 +89,19 @@ export class InkRune<out C extends Chain, out U>
   }
 
   filterContractEvents = <X>(...[events]: RunicArgs<X, [events: Event[]]>) => {
-    // TODO: return all relevant events, not just instantiated
     return Rune
       .tuple([Rune.resolve(events), this])
       .map(([events, publicKey]) =>
-        events.filter((e) =>
-          isContractsRuntimeEvent(e) && equals(e.event.value.contract, publicKey)
+        events.filter((e): e is ContractsRuntimeEvent =>
+          isContractsRuntimeEvent(e)
+          && !!e.event.value.contract
+          && equals(e.event.value.contract, publicKey)
         )
       )
+  }
+
+  filterContractEmittedEvents = <X>(...[events]: RunicArgs<X, [events: Event[]]>) => {
+    return this.filterContractEvents(events).map((events) => events.filter(isContractEmitted))
   }
 
   // TODO: improve
@@ -116,17 +123,58 @@ export class InkRune<out C extends Chain, out U>
       .unhandle(FailedToDecodeErrorError)
   }
 
-  // // TODO: finish this
-  // emissions<X>(...[events]: RunicArgs<X, [events: Event[]]>) {
-  //   const $event: $.Codec<unknown> = null!
-  //   return Rune
-  //     .tuple([Rune.resolve(events), $event])
-  //     .map(([events, $event]) =>
-  //       events
-  //         .filter(isContractEmittedEvent)
-  //         .map((event) => $event.decode(event.event.value.data))
-  //     )
-  // }
+  emissions<X>(...[events]: RunicArgs<X, [events: Event[]]>) {
+    // const $event = this.parent.into(ValueRune)
+    //   .access("V3", "spec", "events").map(
+    //     (events) =>
+    //       $.taggedUnion(
+    //         "type",
+    //         events.map((event) => {
+    //           return $.variant(
+    //             event.label,
+    //             $.tuple(event.args.map((arg) => this.parent.codecs.access(arg.type.type))),
+    //           )
+    //         }),
+    //       ),
+    //   )
+    const $event = Rune.tuple([
+      this.parent.into(ValueRune).access("V3", "spec", "events"),
+      this.parent.codecs,
+    ]).map(([events, codecs]) =>
+      $.taggedUnion(
+        "type",
+        events.map((event) =>
+          $.variant(
+            event.label,
+            $.object(...event.args.map((arg) => $.field(arg.label, codecs[arg.type.type]!))),
+          )
+        ),
+      )
+    )
+    return Rune
+      .tuple([events, $event])
+      .map(([events, $event]) =>
+        events
+          .filter(isContractEmitted)
+          .map((event) => $event.decode(event.event.value.data))
+      )
+  }
+
+  emissionsVariant2<X>(...[events]: RunicArgs<X, [events: Event[]]>) {
+    return Rune.resolve(events)
+      .map((events) => events.filter(isContractEmitted).map((event) => event.event.value.data))
+      .into(ArrayRune)
+      .mapArray((event) => this.parent.decodeEvent(event))
+      .into(ValueRune)
+  }
+
+  emissionsVariant3<X>(...[events]: RunicArgs<X, [events: Event[]]>) {
+    return this.filterContractEmittedEvents(events)
+      .map((events) => events.filter(isContractEmitted).map((event) => event.event.value.data))
+      .into(ArrayRune)
+      .mapArray((event) => this.parent.decodeEvent(event))
+      .into(ValueRune)
+  }
 }
 
 export class MethodNotFoundError extends Error {

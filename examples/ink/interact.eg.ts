@@ -45,14 +45,18 @@ console.log("initial state:", initialState)
 await contract
   .tx({
     sender: alice.publicKey,
-    method: "flip",
+    // TODO: change ink contract to an ERC-20 implementation
+    method: "inc_by_with_event",
+    args: [7],
   })
   .signed(signature({ sender: alice }))
   .sent()
   .dbgStatus("Flip:")
   .inBlockEvents()
-  // .pipe((events) => Rune.resolve(events))
-  .pipe(contract.filterContractEvents)
+  // .pipe(contract.filterContractEmittedEvents)
+  // .pipe(contract.emissions.bind(contract))
+  // .pipe(contract.emissionsVariant2.bind(contract))
+  .pipe(contract.emissionsVariant3.bind(contract))
   .dbg("filtered events")
   .run()
 

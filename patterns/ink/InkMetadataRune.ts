@@ -13,7 +13,7 @@ import {
 } from "../../mod.ts"
 import { transformTys } from "../../scale_info/mod.ts"
 import { $contractsApiInstantiateArgs, $contractsApiInstantiateResult, Weight } from "./codecs.ts"
-import { Callable, InkMetadata, parse } from "./InkMetadata.ts"
+import { Callable, Event, InkMetadata, parse } from "./InkMetadata.ts"
 import { InkRune } from "./InkRune.ts"
 
 // TODO: `onInstantiated`
@@ -64,6 +64,25 @@ export class InkMetadataRune<out U> extends Rune<InkMetadata, U> {
           .tuple([selector, args])
           .map(([selector, args]) => [selector, ...args ?? []]),
       )
+  }
+
+  decodeEvent<X>(...[event]: RunicArgs<X, [event: Uint8Array]>) {
+    return Rune.tuple([
+      this.into(ValueRune).access("V3", "spec", "events"),
+      this.codecs,
+    ]).map(([events, codecs]) =>
+      $.taggedUnion(
+        "type",
+        events.map((event) =>
+          $.variant(
+            event.label,
+            $.object(...event.args.map((arg) => $.field(arg.label, codecs[arg.type.type]!))),
+          )
+        ),
+      )
+    )
+      .into(CodecRune)
+      .decoded(event)
   }
 
   instantiation<C extends Chain, U, X>(
