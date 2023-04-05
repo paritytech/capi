@@ -88,15 +88,8 @@ export class InkRune<out C extends Chain, out U>
 
   // TODO: improve
   unhandleFailed = <X>(...[failRuntimeEvent]: RunicArgs<X, [any]>) => {
-    const $error = this.chain
-      .pallet("Contracts")
-      .into(ValueRune)
-      .access("types", "error")
-      .unhandle(undefined)
-      .rehandle(undefined, () => Rune.constant(new FailedToDecodeErrorError()))
-      .unhandle(FailedToDecodeErrorError)
     return Rune
-      .tuple([Rune.resolve(failRuntimeEvent), $error])
+      .tuple([Rune.resolve(failRuntimeEvent), this.parent.$error(this.chain)])
       .map(([failEvent, $error]) => {
         const { dispatchError } = failEvent.event.value
         return (dispatchError.type !== "Module")

@@ -57,6 +57,18 @@ export class InkMetadataRune<out U> extends Rune<InkMetadata, U> {
     )
     .into(CodecRune)
 
+  $error<C extends Chain, U, X>(
+    chain: ChainRune<C, U>,
+  ) {
+    return chain
+      .pallet("Contracts")
+      .into(ValueRune)
+      .access("types", "error")
+      .unhandle(undefined)
+      .rehandle(undefined, () => Rune.constant(new FailedToDecodeErrorError()))
+      .unhandle(FailedToDecodeErrorError)
+  }
+
   salt() {
     return Rune.constant(crypto.getRandomValues(new Uint8Array(4)))
   }
@@ -175,4 +187,8 @@ export class InkMetadataRune<out U> extends Rune<InkMetadata, U> {
 
 export class CtorNotFoundError extends Error {
   override readonly name = "CtorNotFoundError"
+}
+
+export class FailedToDecodeErrorError extends Error {
+  override readonly name = "FailedToDecodeErrorError"
 }
