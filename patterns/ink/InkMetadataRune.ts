@@ -13,7 +13,7 @@ import {
 } from "../../mod.ts"
 import { transformTys } from "../../scale_info/mod.ts"
 import { $contractsApiInstantiateArgs, $contractsApiInstantiateResult, Weight } from "./codecs.ts"
-import { Callable, Event, InkMetadata, parse } from "./InkMetadata.ts"
+import { Callable, InkMetadata, parse } from "./InkMetadata.ts"
 import { InkRune } from "./InkRune.ts"
 
 // TODO: `onInstantiated`
