@@ -22,6 +22,6 @@ const collectionsEntries = await Uniques.Class.entryPage(10, null).run()
 // Each entry should be of type `[number, types.pallet_uniques.types.CollectionDetails]`
 console.log("Collections entries:", collectionsEntries)
 $.assert(
-  $.sizedArray($.tuple($.u16, types.pallet_uniques.types.$collectionDetails), 10),
+  $.sizedArray($.tuple($.u32, types.pallet_uniques.types.$collectionDetails), 10),
   collectionsEntries,
 )
