@@ -21,12 +21,7 @@ assertEquals(a, 9)
 
 // Now lets create a Rune factory (a function that accepts a given
 // runic value(s) and produces a new Rune). If this looks a bit
-// strange, there's a reason: the consumer of this factory could
-// supply either a number or a Rune that resolves to a number.
-// If a numeric Rune is applied, that Rune might contain important
-// type information (more on this in [u_track](./u_track)). In the
-// case that there is in fact `U` type info, we want this info propagated
-// to the factory-produced Rune. Hence, we define Rune factories like so:
+// strange, there's a good reason (which we'll cover in [u_track](./u_track)).
 function exp<X>(...[n]: RunicArgs<X, [n: number]>) {
   return Rune.resolve(n).map((n) => n * n)
 }
