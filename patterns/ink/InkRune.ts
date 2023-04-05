@@ -86,19 +86,6 @@ export class InkRune<out C extends Chain, out U>
       .into(ExtrinsicRune, this.chain)
   }
 
-  // TODO: improve
-  unhandleFailed = <X>(...[failRuntimeEvent]: RunicArgs<X, [any]>) => {
-    return Rune
-      .tuple([Rune.resolve(failRuntimeEvent), this.parent.$error(this.chain)])
-      .map(([failEvent, $error]) => {
-        const { dispatchError } = failEvent.event.value
-        return (dispatchError.type !== "Module")
-          ? new FailedToDecodeErrorError()
-          : $error.decode(dispatchError.value.error)
-      })
-      .unhandle(FailedToDecodeErrorError)
-  }
-
   emittedEvents = <X>(...[events]: RunicArgs<X, [events: Event[]]>) => {
     return Rune
       .resolve(events)
@@ -110,8 +97,4 @@ export class InkRune<out C extends Chain, out U>
 
 export class MethodNotFoundError extends Error {
   override readonly name = "MethodNotFoundError"
-}
-
-export class FailedToDecodeErrorError extends Error {
-  override readonly name = "FailedToDecodeErrorError"
 }
