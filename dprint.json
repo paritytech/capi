@@ -14,7 +14,11 @@
   "includes": [
     "**.{dockerfile,json,md,toml,ts,tsx}"
   ],
-  "excludes": ["target", "util/_artifacts"],
+  "excludes": [
+    "target",
+    "util/_artifacts",
+    "examples/ink/erc20.json"
+  ],
   "plugins": [
     "https://plugins.dprint.dev/dockerfile-0.3.0.wasm",
     "https://plugins.dprint.dev/json-0.17.0.wasm",
