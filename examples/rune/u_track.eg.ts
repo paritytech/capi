@@ -1,7 +1,9 @@
 /**
  * @title Rune U Track
  * @stability nearing
- * @description Rune `U` Track
+ * @description The `U` track allows for values such as errors and empty options
+ * to be moved in and out of your purview. This can drastically simplify branching,
+ * such as error recovery.
  */
 
 import { assert, assertEquals, assertInstanceOf } from "asserts"
@@ -27,8 +29,10 @@ const start = initial.map((value) => Math.random() > .5 ? new MyError() : value)
 // instance resides. The other half of the time, we'll get our initial message.
 try {
   const unhandled = await start.unhandle(MyError).run()
+  console.log("Unhandled:", unhandled)
   assertEquals(unhandled, INITIAL_MSG)
 } catch (e) {
+  console.log("Unhandled:", e)
   assertInstanceOf(e, Unhandled)
   assertInstanceOf(e.value, MyError)
 }
@@ -37,6 +41,7 @@ try {
 // the error constructor or a type guard to specify some alternative execution.
 const RECOVERY_MSG = "Smooth recovery"
 const handled = await start.handle(MyError, () => Rune.constant(RECOVERY_MSG)).run()
+console.log("Handled:", handled)
 assert(handled === INITIAL_MSG || handled === RECOVERY_MSG)
 
 // We can also explicitly **re**handle that which has been unhandled.
@@ -45,6 +50,7 @@ const unReHandled = await start
   .map((msg) => `**${msg}**`)
   .rehandle(MyError)
   .run()
+console.log("(Un|Re)handled", unReHandled)
 assert(unReHandled === `**${INITIAL_MSG}**` || unReHandled instanceof MyError)
 
 // When rehandling, we can optionally specify the alternative execution, as we do with `handle`.
@@ -52,4 +58,5 @@ const unReHandledWithFallback = await start
   .unhandle(MyError)
   .rehandle(MyError, () => Rune.constant(RECOVERY_MSG))
   .run()
+console.log("(Un|Re)handled with fallback:", unReHandledWithFallback)
 assert(unReHandledWithFallback === `**${INITIAL_MSG}**` || unReHandledWithFallback === RECOVERY_MSG)
