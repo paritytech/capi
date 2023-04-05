@@ -1,28 +1,28 @@
+import { createTempDir } from "../capn/createTempDir.ts"
+import { createCapnHandler } from "../capn/mod.ts"
 import * as flags from "../deps/std/flags.ts"
 import { serve } from "../deps/std/http.ts"
-import * as path from "../deps/std/path.ts"
-import { $api, createApi, serveScald, WsLink } from "../mod.ts"
-import { handler } from "../server/handler.ts"
+import { createErrorHandler } from "../server/errorHandler.ts"
+import { createCodegenHandler } from "../server/mod.ts"
 import { InMemoryCache } from "../util/cache/memory.ts"
 import { FsCache } from "../util/cache/mod.ts"
+import { resolveConfig } from "./resolveConfig.ts"
 
 export default async function(...args: string[]) {
-  const { config: configFile, port: portStr, "--": cmd, out } = flags.parse(args, {
-    string: ["port", "out", "config"],
+  const { port, "--": cmd, out } = flags.parse(args, {
+    string: ["port", "out"],
     default: {
-      config: "./capi.config.ts",
       port: "4646",
       out: "target/capi",
     },
     "--": true,
   })
-  const configPath = path.resolve(configFile)
-  await Deno.stat(configPath)
-  const configModule = await import(path.toFileUrl(configPath).toString())
-  const config = configModule.config
-  if (typeof config !== "object") throw new Error("config file must have a config export")
 
-  const href = `http://localhost:${portStr}/`
+  const config = await resolveConfig(...args)
+
+  const tempDir = await createTempDir()
+
+  const href = `http://localhost:${port}/`
 
   const controller = new AbortController()
   const { signal } = controller
@@ -36,18 +36,17 @@ export default async function(...args: string[]) {
     .catch(() => false)
 
   if (!running) {
-    const h = handler(dataCache, tempCache)
-    const api = createApi(config, signal)
-    await serve((request, connInfo) => {
-      if (new URL(request.url).pathname === "/api") {
-        const { response, socket } = Deno.upgradeWebSocket(request)
-        serveScald($api, api, new WsLink(socket, signal), signal)
-        return response
+    const capnHandler = createCapnHandler(tempDir, config, signal)
+    const codegenHandler = createCodegenHandler(dataCache, tempCache)
+    const handler = createErrorHandler((request) => {
+      if (new URL(request.url).pathname.startsWith("/capn/")) {
+        return capnHandler(request)
       }
-      return h(request, connInfo)
-    }, {
+      return codegenHandler(request)
+    })
+    await serve(handler, {
       hostname: "[::]",
-      port: +portStr,
+      port: +port,
       signal,
       onError(error) {
         throw error
@@ -65,7 +64,13 @@ export default async function(...args: string[]) {
   async function onReady() {
     const [bin, ...args] = cmd
     if (bin) {
-      const command = new Deno.Command(bin, { args, signal })
+      const command = new Deno.Command(bin, {
+        args,
+        signal,
+        env: {
+          CAPN_SERVER: `http://localhost:${port}/capn/`,
+        },
+      })
       const status = await command.spawn().status
       self.addEventListener("unload", () => Deno.exit(status.code))
       controller.abort()

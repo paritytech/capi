@@ -9,9 +9,8 @@ const $codegenEntry = $.taggedUnion("type", [
     $.field(
       "connection",
       $.taggedUnion("type", [
-        $.variant("ws", $.field("discovery", $.str)),
-        $.variant("capnChain", $.field("name", $.str)),
-        $.variant("capnNetworkChain", $.field("network", $.str), $.field("name", $.str)),
+        $.variant("WsConnection", $.field("discovery", $.str)),
+        $.variant("CapnConnection", $.field("discovery", $.str)),
       ]),
     ),
   ),
@@ -21,12 +20,6 @@ export type CodegenSpec = $.Native<typeof $codegenSpec>
 export const $codegenSpec = $.taggedUnion("type", [
   $.variant(
     "v0",
-    $.field(
-      "codegen",
-      $.map(
-        $.array($.str),
-        $codegenEntry,
-      ),
-    ),
+    $.field("codegen", $.map($.str, $codegenEntry)),
   ),
 ])

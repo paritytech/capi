@@ -1,5 +1,5 @@
+import { testUser } from "../capn/mod.ts"
 import { hex } from "../crypto/mod.ts"
-import { testUser } from "../crypto/mod.ts"
 import * as $ from "../deps/scale.ts"
 import { emptyDir } from "../deps/std/fs.ts"
 import * as path from "../deps/std/path.ts"

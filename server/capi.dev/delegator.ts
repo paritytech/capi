@@ -1,8 +1,8 @@
 import { serve } from "../../deps/std/http.ts"
 import { TimedMemo } from "../../util/memo.ts"
-import { f, handleCors, handleErrors } from "../mod.ts"
+import { createCorsHandler, createErrorHandler, f } from "../mod.ts"
 
-serve(handleCors(handleErrors(handler)))
+serve(createCorsHandler(createErrorHandler(handler)))
 
 const githubToken = Deno.env.get("GITHUB_TOKEN")
 if (!githubToken) throw new Error("GITHUB_TOKEN not set")

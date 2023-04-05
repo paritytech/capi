@@ -1,25 +1,24 @@
-import { processConfig } from "../capn/processConfig.ts"
+import { createTempDir } from "../capn/createTempDir.ts"
+import { syncConfig } from "../capn/mod.ts"
 import * as flags from "../deps/std/flags.ts"
-import * as path from "../deps/std/path.ts"
+import { resolveConfig } from "./resolveConfig.ts"
 
 export default async function(...args: string[]) {
-  const { config: configFile, "import-map": importMapFile, "package-json": packageJsonFile } = flags
-    .parse(
-      args,
-      {
-        string: ["config", "import-map", "package-json"],
-        default: {
-          config: "./capi.config.ts",
-        },
-      },
-    )
-  const configPath = path.resolve(configFile)
-  await Deno.stat(configPath)
-  const configModule = await import(path.toFileUrl(configPath).toString())
-  const config = configModule.config
-  if (typeof config !== "object") throw new Error("config file must have a config export")
+  const {
+    "import-map": importMapFile,
+    "package-json": packageJsonFile,
+  } = flags.parse(
+    args,
+    {
+      string: ["config", "import-map", "package-json"],
+    },
+  )
 
-  const baseUrl = await processConfig(config)
+  const config = await resolveConfig(...args)
+
+  const tempDir = await createTempDir()
+
+  const baseUrl = await syncConfig(tempDir, config)
   console.log(baseUrl)
 
   if (importMapFile) {

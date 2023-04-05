@@ -6,19 +6,20 @@ export interface ProxyChain {
   version: string
 }
 
-export interface BinaryChain {
+export interface NetworkConfig {
   url?: never
   binary: Binary
   chain: string
+  nodes?: number
+  parachains?: Record<string, {
+    binary: Binary
+    chain: string
+    id: number
+    nodes?: number
+  }>
 }
 
 export interface CapiConfig {
   server: string
-  chains?: Record<string, ProxyChain | BinaryChain>
-  networks?: Record<string, NetworkConfig>
-}
-
-export interface NetworkConfig {
-  relay: BinaryChain & { nodes?: number }
-  parachains: Record<string, BinaryChain & { id: number; nodes?: number }>
+  chains?: Record<string, ProxyChain | NetworkConfig>
 }

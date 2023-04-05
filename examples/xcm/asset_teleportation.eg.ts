@@ -7,7 +7,7 @@
  * balance of the user to whom the asset was transferred.
  */
 
-import { types, XcmPallet } from "@capi/rococo-dev/relay/mod.js"
+import { types, XcmPallet } from "@capi/rococo-dev/mod.js"
 import { chain as parachain, System } from "@capi/rococo-dev/statemine/mod.js"
 import { Event } from "@capi/rococo-dev/statemine/types/cumulus_pallet_parachain_system/pallet.js"
 import { RuntimeEvent } from "@capi/rococo-dev/statemine/types/statemine_runtime.js"

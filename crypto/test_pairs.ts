@@ -1,5 +1,3 @@
-import { ArrayOfLength } from "../util/mod.ts"
-import { blake2_256 } from "./hashers.ts"
 import { decode } from "./hex.ts"
 import { Sr25519 } from "./Sr25519.ts"
 
@@ -32,21 +30,3 @@ export const bobStash = pair(
 function pair(secret: string) {
   return Sr25519.fromSecret(decode(secret))
 }
-
-export function testUser(userId: number) {
-  return Sr25519.fromSeed(blake2_256.hash(new TextEncoder().encode(`capi-test-user-${userId}`)))
-}
-export function testUserFactory(getIndex: (count: number) => Promise<number>) {
-  return createUsers
-  function createUsers(): Promise<Record<typeof NAMES[number], Sr25519>>
-  function createUsers<N extends number>(count: N): Promise<ArrayOfLength<Sr25519, N>>
-  async function createUsers(count?: number): Promise<Record<string, Sr25519> | Sr25519[]> {
-    const index = await getIndex(count ?? NAMES.length)
-    return typeof count === "number"
-      ? Array.from({ length: count }, (_, i) => testUser(index + i))
-      : Object.fromEntries(NAMES.map((name, i) => [name, testUser(index + i)]))
-  }
-}
-
-// dprint-ignore-next-line
-const NAMES = ["alexa", "billy", "carol", "david", "ellie", "felix", "grace", "harry", "india", "jason", "kiera", "laura", "matty", "nadia", "oscar", "piper", "quinn", "ryann", "steff", "tisix", "usher", "vicky", "wendy", "xenia", "yetis", "zelda"] as const

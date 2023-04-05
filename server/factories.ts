@@ -38,6 +38,10 @@ export function notFound() {
   return new Response("404", { status: Status.NotFound })
 }
 
+export function badRequest() {
+  return new Response("400", { status: Status.BadRequest })
+}
+
 export function serverError(message?: string) {
   return new Response(message || "500", { status: Status.InternalServerError })
 }

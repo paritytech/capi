@@ -4,16 +4,27 @@ import { writableStreamFromWriter } from "../deps/std/streams.ts"
 import { getFreePort, portReady } from "../util/port.ts"
 import { resolveBinary } from "./binary.ts"
 import { NetworkConfig } from "./CapiConfig.ts"
+import { createCustomChainSpec, getGenesisConfig } from "./chainSpec.ts"
 import { addTestUsers } from "./testUsers.ts"
 
-export async function startNetwork(network: NetworkConfig, signal: AbortSignal) {
-  const tempDir = await Deno.makeTempDir({
-    dir: path.resolve("target"),
-    prefix: `capn-${new Date().toISOString()}-`,
-  })
+export interface Network {
+  relay: NetworkChain
+  paras: Record<string, NetworkChain>
+}
 
+export interface NetworkChain {
+  testUserIndex: number
+  bootnodes: string
+  ports: number[]
+}
+
+export async function startNetwork(
+  tempDir: string,
+  config: NetworkConfig,
+  signal: AbortSignal,
+): Promise<Network> {
   const paras = await Promise.all(
-    Object.entries(network.parachains).map(async ([name, chain]) => {
+    Object.entries(config.parachains ?? {}).map(async ([name, chain]) => {
       const binary = await resolveBinary(chain.binary, signal)
 
       const spec = await createCustomChainSpec(
@@ -21,10 +32,11 @@ export async function startNetwork(network: NetworkConfig, signal: AbortSignal) 
         name,
         binary,
         chain.chain,
-        async (chainSpec: ParaChainSpec) => {
+        async (chainSpec) => {
           chainSpec.para_id = chain.id
-          chainSpec.genesis.runtime.parachainInfo.parachainId = chain.id
-          await addTestUsers(chainSpec.genesis.runtime.balances.balances)
+          const genesisConfig = getGenesisConfig(chainSpec)
+          genesisConfig.parachainInfo.parachainId = chain.id
+          await addTestUsers(genesisConfig.balances.balances)
         },
       )
 
@@ -41,54 +53,59 @@ export async function startNetwork(network: NetworkConfig, signal: AbortSignal) 
     }),
   )
 
-  const relayBinary = await resolveBinary(network.relay.binary, signal)
+  const relayBinary = await resolveBinary(config.binary, signal)
 
   const relaySpec = await createCustomChainSpec(
     tempDir,
     "relay",
     relayBinary,
-    network.relay.chain,
-    async (chainSpec: ChainSpec) => {
-      chainSpec.genesis.runtime.runtime_genesis_config.paras.paras.push(
-        ...paras.map(({ id, genesis }) => [id, [...genesis, true]] satisfies Narrow),
-      )
-      await addTestUsers(chainSpec.genesis.runtime.runtime_genesis_config.balances.balances)
+    config.chain,
+    async (chainSpec) => {
+      const genesisConfig = getGenesisConfig(chainSpec)
+      if (paras.length) {
+        genesisConfig.paras.paras.push(
+          ...paras.map(({ id, genesis }) => [id, [...genesis, true]] satisfies Narrow),
+        )
+      }
+      await addTestUsers(genesisConfig.balances.balances)
     },
   )
 
-  const { bootnodes: relayBootnodes, wsPorts: relayPorts } = await spawnNodes(
+  const relay = await spawnChain(
     path.join(tempDir, "relay"),
     relayBinary,
     relaySpec,
-    network.relay.nodes ?? 2,
+    config.nodes ?? 2,
     [],
     signal,
   )
 
-  return Object.fromEntries([
-    ["relay", relayPorts],
-    ...await Promise.all(
-      paras.map(async ({ name, binary, spec, count }) => {
-        const { wsPorts } = await spawnNodes(
-          path.join(tempDir, name),
-          binary,
-          spec,
-          count,
-          [
-            "--",
-            "--execution",
-            "wasm",
-            "--chain",
-            relaySpec,
-            "--bootnodes",
-            relayBootnodes,
-          ],
-          signal,
-        )
-        return [name, wsPorts] satisfies Narrow
-      }),
+  return {
+    relay,
+    paras: Object.fromEntries(
+      await Promise.all(
+        paras.map(async ({ name, binary, spec, count }) => {
+          const chain = await spawnChain(
+            path.join(tempDir, name),
+            binary,
+            spec,
+            count,
+            [
+              "--",
+              "--execution",
+              "wasm",
+              "--chain",
+              relaySpec,
+              "--bootnodes",
+              relay.bootnodes,
+            ],
+            signal,
+          )
+          return [name, chain] satisfies Narrow
+        }),
+      ),
     ),
-  ])
+  }
 }
 
 async function exportParachainGenesis(
@@ -113,42 +130,6 @@ function generateBootnodeString(port: number, peerId: string) {
   return `/ip4/127.0.0.1/tcp/${port}/p2p/${peerId}`
 }
 
-export interface ChainSpec {
-  bootNodes: string[]
-  genesis: {
-    runtime: {
-      runtime_genesis_config: {
-        paras: {
-          paras: [
-            [
-              parachainId: number,
-              genesis: [state: string, wasm: string, kind: boolean],
-            ],
-          ]
-        }
-        balances: {
-          balances: [account: string, initialBalance: number][]
-        }
-      }
-    }
-  }
-}
-
-export interface ParaChainSpec {
-  bootNodes: string[]
-  para_id: number
-  genesis: {
-    runtime: {
-      parachainInfo: {
-        parachainId: number
-      }
-      balances: {
-        balances: [account: string, initialBalance: number][]
-      }
-    }
-  }
-}
-
 async function generateNodeKey(binary: string, signal?: AbortSignal) {
   const { success, stdout, stderr } = await new Deno.Command(binary, {
     args: ["key", "generate-node-key"],
@@ -163,60 +144,26 @@ async function generateNodeKey(binary: string, signal?: AbortSignal) {
   return { nodeKey, peerId }
 }
 
-export async function createCustomChainSpec<T>(
-  tempDir: string,
-  id: string,
-  binary: string,
-  chain: string,
-  customize: (chainSpec: T) => Promise<void>,
-) {
-  const specResult = await new Deno.Command(binary, {
-    args: ["build-spec", "--disable-default-bootnode", "--chain", chain],
-  }).output()
-  if (!specResult.success) {
-    // TODO: improve error message
-    throw new Error("build-spec failed")
-  }
-  const spec = JSON.parse(new TextDecoder().decode(specResult.stdout))
-  await customize(spec)
-
-  const specPath = path.join(tempDir, `${id}-chainspec.json`)
-  await Deno.writeTextFile(specPath, JSON.stringify(spec, undefined, 2))
-
-  const rawResult = await new Deno.Command(binary, {
-    args: ["build-spec", "--disable-default-bootnode", "--chain", specPath, "--raw"],
-  }).output()
-  if (!rawResult.success) {
-    // TODO: improve error message
-    throw new Error("build-spec --raw failed")
-  }
-
-  const rawPath = path.join(tempDir, `${id}-chainspec-raw.json`)
-  await Deno.writeFile(rawPath, rawResult.stdout)
-
-  return rawPath
-}
-
 const keystoreAccounts = ["alice", "bob", "charlie", "dave", "eve", "ferdie", "one", "two"]
-async function spawnNodes(
-  dir: string,
+async function spawnChain(
+  tempDir: string,
   binary: string,
   chain: string,
   count: number,
   extraArgs: string[],
   signal: AbortSignal,
-) {
+): Promise<NetworkChain> {
   let bootnodes: string | undefined
-  const wsPorts = []
+  const ports = []
 
   for (let i = 0; i < count; i++) {
     const keystoreAccount = keystoreAccounts[i]
     if (!keystoreAccount) throw new Error("ran out of keystore accounts")
-    const nodeDir = path.join(dir, keystoreAccount)
+    const nodeDir = path.join(tempDir, keystoreAccount)
     await Deno.mkdir(nodeDir, { recursive: true })
-    const port = getFreePort()
+    const httpPort = getFreePort()
     const wsPort = getFreePort()
-    wsPorts.push(wsPort)
+    ports.push(wsPort)
     const args = [
       "--validator",
       `--${keystoreAccount}`,
@@ -225,7 +172,7 @@ async function spawnNodes(
       "--chain",
       chain,
       "--port",
-      `${port}`,
+      `${httpPort}`,
       "--ws-port",
       `${wsPort}`,
     ]
@@ -234,7 +181,7 @@ async function spawnNodes(
     } else {
       const { nodeKey, peerId } = await generateNodeKey(binary)
       args.push("--node-key", nodeKey)
-      bootnodes = generateBootnodeString(port, peerId)
+      bootnodes = generateBootnodeString(httpPort, peerId)
     }
     args.push(...extraArgs)
     spawnNode(nodeDir, binary, args, signal)
@@ -242,10 +189,10 @@ async function spawnNodes(
   }
 
   if (!bootnodes) throw new Error("count must be > 1")
-  return { bootnodes, wsPorts }
+  return { testUserIndex: 0, bootnodes, ports }
 }
 
-async function spawnNode(dir: string, binary: string, args: string[], signal: AbortSignal) {
+async function spawnNode(tempDir: string, binary: string, args: string[], signal: AbortSignal) {
   const child = new Deno.Command(binary, {
     args,
     signal,
@@ -255,19 +202,19 @@ async function spawnNode(dir: string, binary: string, args: string[], signal: Ab
 
   child.stdout.pipeTo(
     writableStreamFromWriter(
-      await Deno.open(path.join(dir, "stdout"), { write: true, create: true }),
+      await Deno.open(path.join(tempDir, "stdout"), { write: true, create: true }),
     ),
   )
 
   child.stderr.pipeTo(
     writableStreamFromWriter(
-      await Deno.open(path.join(dir, "stderr"), { write: true, create: true }),
+      await Deno.open(path.join(tempDir, "stderr"), { write: true, create: true }),
     ),
   )
 
   child.status.then((status) => {
     if (!signal.aborted) {
-      throw new Error(`process exited with code ${status.code} (${dir})`)
+      throw new Error(`process exited with code ${status.code} (${tempDir})`)
     }
   })
 }

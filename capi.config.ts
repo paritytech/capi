@@ -31,14 +31,9 @@ export const config: CapiConfig = {
       binary: substrateContractsNode,
       chain: "dev",
     },
-  },
-  networks: {
     rococoDev: {
-      relay: {
-        binary: polkadot,
-        chain: "rococo-local",
-        nodes: 4,
-      },
+      binary: polkadot,
+      chain: "rococo-local",
       parachains: {
         statemine: {
           id: 1000,

@@ -2,7 +2,7 @@ import { mime } from "https://deno.land/x/mimetypes@v1.0.0/mod.ts"
 import { FrameCodegen } from "../codegen/FrameCodegen.ts"
 import { blake2_512, blake2_64 } from "../crypto/hashers.ts"
 import { hex } from "../crypto/mod.ts"
-import { Handler, Status } from "../deps/std/http.ts"
+import { posix as path } from "../deps/std/path.ts"
 import { decodeMetadata } from "../frame_metadata/decodeMetadata.ts"
 import { $metadata } from "../frame_metadata/raw/v14.ts"
 import { CacheBase } from "../util/cache/base.ts"
@@ -11,14 +11,18 @@ import { tsFormatter } from "../util/tsFormatter.ts"
 import { $codegenSpec, CodegenEntry } from "./codegenSpec.ts"
 import * as f from "./factories.ts"
 
+const { relative } = path
+
 const rCodegenUrl = /^\/([\da-f]{16})(\/.+)?$/
 const rUploadUrl = /^\/upload\/(codegen\/[\da-f]{16}|metadata\/[\da-f]{128})$/
 
 const codeTtl = 60_000
 
-export function handler(dataCache: CacheBase, generatedCache: CacheBase): Handler {
+export function createCodegenHandler(dataCache: CacheBase, generatedCache: CacheBase) {
   const filesMemo = new WeakMemo<string, Map<string, string>>()
-  return handleCors(handleErrors(async (request) => {
+  return handle
+
+  async function handle(request: Request) {
     const url = new URL(request.url)
     const { pathname } = url
     if (pathname === "/") return await fetch(import.meta.resolve("./static/index.html"))
@@ -46,7 +50,7 @@ export function handler(dataCache: CacheBase, generatedCache: CacheBase): Handle
         "Content-Type": mime.getType(pathname) ?? "text/plain",
       },
     })
-  }))
+  }
 
   async function handleUpload(request: Request, key: string) {
     const [kind, untrustedHash] = key.split("/") as ["codegen" | "metadata", string]
@@ -89,10 +93,10 @@ export function handler(dataCache: CacheBase, generatedCache: CacheBase): Handle
             throw new Response(`${hash} not found`, { status: 404 })
           })
 
-          let match: [string[], CodegenEntry] | undefined = undefined
+          let match: [string, CodegenEntry] | undefined = undefined
           for (const [key, value] of codegenSpec.codegen) {
             if (
-              path.startsWith(`/${key.map((x) => x + "/").join("")}`)
+              path.startsWith(`/${key}/`)
               && key.length >= (match?.[0].length ?? 0)
             ) {
               match = [key, value]
@@ -103,7 +107,7 @@ export function handler(dataCache: CacheBase, generatedCache: CacheBase): Handle
 
           const [key, entry] = match
 
-          const files = await filesMemo.run(`${hash}/${key.join("/")}`, async () => {
+          const files = await filesMemo.run(`${hash}/${key}`, async () => {
             const metadataHash = hex.encode(entry.metadata)
             const metadata = decodeMetadata(
               await dataCache.getRaw(`metadata/${metadataHash}`, async () => {
@@ -114,38 +118,25 @@ export function handler(dataCache: CacheBase, generatedCache: CacheBase): Handle
             const codegen = new FrameCodegen(metadata, entry.chainName)
             const files = new Map<string, string>()
             codegen.write(files)
-            files.set("capi.js", `export * from "${"../".repeat(key.length + 1)}capi/mod.ts"`)
-            files.set("capi.d.ts", `export * from "${"../".repeat(key.length + 1)}capi/mod.ts"`)
+            const capiCode = `export * from "${relative(`${hash}/${key}/`, "capi/mod.ts")}"`
+            files.set("capi.js", capiCode)
+            files.set("capi.d.ts", capiCode)
             files.set(
               "connection.js",
               `
 import * as C from "./capi.js"
 
-export const connectionCtor = C.WsConnection
+export const connect = C.${entry.connection.type}.bind(${
+                JSON.stringify(entry.connection.discovery)
+              })
 
 ${
-                entry.connection.type === "ws"
-                  ? `export const discoveryValue = ${JSON.stringify(entry.connection.discovery)}`
-                  : `
-const controller = new AbortController()
-const signal = controller.signal
-const api = await C.connectScald(C.$api, new C.WsLink(new WebSocket("ws://localhost:4646/api"), signal), signal)
-const devChain = ${
-                    entry.connection.type === "capnChain"
-                      ? `await api.getChain(${JSON.stringify(entry.connection.name)})`
-                      : `(await api.getNetwork(${JSON.stringify(entry.connection.network)})).get(${
-                        JSON.stringify(entry.connection.name)
-                      })`
-                  }
-
-export const discoveryValue = devChain.url
-export const createUsers = C.testUserFactory(devChain.nextUsers)
-
-// TODO: fix
-setTimeout(() => controller.abort(), 5000)
-`
+                entry.connection.type === "CapnConnection"
+                  ? `export const createUsers = C.testUserFactory(${
+                    JSON.stringify(entry.connection.discovery)
+                  })`
+                  : ""
               }
-
 `,
             )
             files.set(
@@ -153,70 +144,23 @@ setTimeout(() => controller.abort(), 5000)
               `
 import * as C from "./capi.js"
 
-export const connectionCtor: typeof C.WsConnection
-export const discoveryValue: string
+export const connect: (signal: AbortSignal) => C.Connection
 
 ${
-                entry.connection.type === "ws" ? "" : `
-export const createUsers: ReturnType<typeof C.testUserFactory>
-`
+                entry.connection.type === "CapnConnection"
+                  ? `export const createUsers: ReturnType<typeof C.testUserFactory>`
+                  : ""
               }
 `,
             )
             return files
           })
 
-          const subpath = path.slice(`/${key.map((x) => x + "/").join("")}`.length)
+          const subpath = path.slice(`/${key}/`.length)
 
           if (!files.has(subpath)) throw f.notFound()
           return tsFormatter.formatText(path, files.get(subpath)!)
         }),
     )
-  }
-}
-
-export function handleErrors(handler: Handler): Handler {
-  return async (request, connInfo) => {
-    try {
-      return await handler(request, connInfo)
-    } catch (e) {
-      if (e instanceof Response) return e.clone()
-      console.error(e)
-      return f.serverError(Deno.inspect(e))
-    }
-  }
-}
-
-export function handleCors(handler: Handler): Handler {
-  return async (request, connInfo) => {
-    const newHeaders = new Headers()
-    newHeaders.set("Access-Control-Allow-Origin", "*")
-    newHeaders.set("Access-Control-Allow-Headers", "*")
-    newHeaders.set("Access-Control-Allow-Methods", "*")
-    newHeaders.set("Access-Control-Allow-Credentials", "true")
-
-    if (request.method === "OPTIONS") {
-      return new Response(null, {
-        headers: newHeaders,
-        status: Status.NoContent,
-      })
-    }
-
-    const res = await handler(request, connInfo)
-
-    // Deno.upgradeWebSocket response objects cannot be modified
-    if (res.headers.get("upgrade") !== "websocket") {
-      for (const [k, v] of res.headers) {
-        newHeaders.append(k, v)
-      }
-
-      return new Response(res.body, {
-        headers: newHeaders,
-        status: res.status,
-        statusText: res.statusText,
-      })
-    }
-
-    return res
   }
 }

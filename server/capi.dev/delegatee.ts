@@ -1,6 +1,7 @@
 import { serve } from "../../deps/std/http.ts"
 import { S3Cache } from "../../util/cache/mod.ts"
-import { handler } from "../handler.ts"
+import { createCodegenHandler } from "../codegenHandler.ts"
+import { createErrorHandler } from "../errorHandler.ts"
 
 const controller = new AbortController()
 const { signal } = controller
@@ -19,4 +20,4 @@ const generatedCache = new S3Cache(Deno.env.get("DENO_DEPLOYMENT_ID")! + "/", {
   bucket: Deno.env.get("S3_BUCKET_TEMP")!,
 }, signal)
 
-serve(handler(dataCache, generatedCache))
+serve(createErrorHandler(createCodegenHandler(dataCache, generatedCache)))

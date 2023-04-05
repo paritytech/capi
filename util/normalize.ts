@@ -10,3 +10,7 @@ export function normalizeDocs(docs: string[] | undefined): string {
 export function normalizePackageName(name: string) {
   return name.replace(/[A-Z]/g, (x) => `-` + x.toLowerCase())
 }
+
+export function normalizeTypeName(name: string) {
+  return normalizeIdent(name).replace(/^./, (x) => x.toUpperCase())
+}

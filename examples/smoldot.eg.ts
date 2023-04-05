@@ -15,7 +15,7 @@ const relayChainSpec = await (await fetch(
 )).text()
 
 // Initialize a `ChainRune` with `SmoldotConnection` and the chainspec.
-const smoldotChain = ChainRune.from(SmoldotConnection, { relayChainSpec })
+const smoldotChain = ChainRune.from(SmoldotConnection.bind({ relayChainSpec }))
 
 const [metadata, extrinsics] = await Rune
   .tuple([

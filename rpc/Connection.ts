@@ -15,11 +15,18 @@ export abstract class Connection {
   #controller = new AbortController()
   signal = this.#controller.signal
 
+  static bind<D>(
+    this: new(discovery: D) => Connection,
+    discovery: D,
+  ): (signal: AbortSignal) => Connection {
+    return (signal) => (Connection.connect<D>).call(this, discovery, signal)
+  }
+
   static connect<D>(
     this: new(discovery: D) => Connection,
     discovery: D,
     signal: AbortSignal,
-  ): Connection {
+  ) {
     const memo = getOrInit(connectionMemos, this, () => new Map<unknown, Connection>())
     return getOrInit(memo, discovery, () => {
       const connection = new this(discovery)
