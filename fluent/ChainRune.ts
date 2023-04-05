@@ -99,7 +99,7 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
       .into(PalletRune, this.as(ChainRune))
   }
 
-  addressPrefix(this: ChainRune<AddressPrefixChain, U>) {
+  addressPrefix() {
     return this
       .pallet("System")
       .constant("SS58Prefix")
