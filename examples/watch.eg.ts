@@ -21,6 +21,6 @@ let i = 0
 // gather and yield the `collection`-described data upon new blocks.
 for await (const item of now.iter()) {
   console.log(item)
-  $.assert($.u32, item)
+  $.assert($.u64, item)
   if (++i === 3) break
 }

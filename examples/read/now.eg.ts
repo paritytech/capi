@@ -12,4 +12,4 @@ const now = await Timestamp.Now.value().run()
 console.log("Now:", now)
 
 // Ensure `now` is of the correct shape.
-$.assert($.u32, now)
+$.assert($.u64, now)
