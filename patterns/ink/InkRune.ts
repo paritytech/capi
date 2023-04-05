@@ -1,4 +1,3 @@
-import { equals } from "../../deps/std/bytes.ts"
 import {
   ArrayRune,
   Chain,
@@ -12,7 +11,7 @@ import {
   ValueRune,
 } from "../../mod.ts"
 import { $contractsApiCallArgs, $contractsApiCallResult, Weight } from "./codecs.ts"
-import { ContractsRuntimeEvent, isContractEmitted, isContractsRuntimeEvent } from "./events.ts"
+import { isContractEmitted } from "./events.ts"
 import { InkMetadataRune } from "./InkMetadataRune.ts"
 
 export interface MsgProps {
@@ -88,7 +87,7 @@ export class InkRune<out C extends Chain, out U>
   }
 
   // TODO: improve
-  decodeErrorEvent = <X>(...[failRuntimeEvent]: RunicArgs<X, [any]>) => {
+  unhandleFailed = <X>(...[failRuntimeEvent]: RunicArgs<X, [any]>) => {
     const $error = this.chain
       .pallet("Contracts")
       .into(ValueRune)
