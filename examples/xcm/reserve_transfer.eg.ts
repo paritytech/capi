@@ -13,7 +13,7 @@ import * as Statemine from "zombienet/trappist.toml/statemine-collator01/@latest
 import * as Trappist from "zombienet/trappist.toml/trappist-collator01/@latest/mod.js"
 import { waitFor } from "../../util/mod.ts"
 
-// Define some constants, which we'll make use of later.
+// Define some constants for later use.
 const RESERVE_ASSET_ID = 1
 const RESERVE_CHAIN_ID = 1000 // Statemine
 const TRAPPIST_ASSET_ID = RESERVE_ASSET_ID
@@ -58,7 +58,7 @@ console.log(
   await Statemine.Assets.Asset.value(RESERVE_ASSET_ID).run(),
 )
 
-// Mint assets on Reserve Parachain.
+// Mint assets on reserve parachain.
 await Statemine.Assets
   .mint({
     id: RESERVE_ASSET_ID,
@@ -79,7 +79,7 @@ const bobStatemintBalance = Statemine.Assets.Account
 const bobStatemintBalanceInitial = await bobStatemintBalance.run()
 console.log("Statemine(Bob): asset balance", bobStatemintBalanceInitial)
 
-// Create the asset on the Trappist Parachain.
+// Create the asset on the Trappist parachain.
 await Trappist.Sudo
   .sudo({
     call: Trappist.Assets.forceCreate({
@@ -188,9 +188,7 @@ const bobTrappistAssetAccount = Trappist.Assets.Account.value([TRAPPIST_ASSET_ID
 await waitFor(async () => !!await bobTrappistAssetAccount.run())
 
 const bobTrappistBalance = await bobTrappistAssetAccount
-  .unhandle(undefined)
-  .access("balance")
-  .run()
+  .unhandle(undefined).access("balance").run()
 console.log("Trappist(Bob): asset balance:", bobTrappistBalance)
 
 const bobStatemintBalanceFinal = await bobStatemintBalance.run()
