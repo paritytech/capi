@@ -40,7 +40,7 @@ export class InkRune<out C extends Chain, out U>
   common<X>(this: InkRune<C, U>, props: RunicArgs<X, MsgProps>) {
     const msgMetadata = Rune
       .tuple([
-        this.parent.into(ValueRune).access("V3", "spec", "messages"),
+        this.parent.into(ValueRune).access("spec", "messages"),
         props.method,
       ])
       .map(([msgs, methodName]) => msgs.find((msgs) => msgs.label === methodName))

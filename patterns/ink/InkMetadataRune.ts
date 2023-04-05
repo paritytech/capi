@@ -35,13 +35,13 @@ export class InkMetadataRune<out U> extends Rune<InkMetadata, U> {
 
   codecs = this
     .into(ValueRune)
-    .access("V3", "types")
+    .access("types")
     .map(transformTys)
     .access(0)
 
   $event = Rune
     .tuple([
-      this.into(ValueRune).access("V3", "spec", "events"),
+      this.into(ValueRune).access("spec", "events"),
       this.codecs,
     ])
     .map(([events, codecs]) =>
@@ -102,11 +102,11 @@ export class InkMetadataRune<out U> extends Rune<InkMetadata, U> {
     const ctorMetadata = Rune.tuple([
       this
         .into(ValueRune)
-        .access("V3", "spec", "constructors"),
+        .access("spec", "constructors"),
       Rune
         .resolve(props.ctor)
         .unhandle(undefined)
-        .rehandle(undefined, () => Rune.resolve("default")),
+        .rehandle(undefined, () => Rune.resolve("new")),
     ])
       .map(([ctors, label]) => ctors.find((ctor) => ctor.label === label))
       .unhandle(undefined)

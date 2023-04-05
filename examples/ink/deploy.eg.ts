@@ -14,7 +14,7 @@ import { chain, System } from "contracts_dev/mod.js"
 
 // Initialize an `InkMetadataRune` with the raw Ink metadata text.
 const metadata = InkMetadataRune.fromMetadataText(
-  Deno.readTextFileSync(new URL(import.meta.resolve("./metadata.json"))),
+  Deno.readTextFileSync(new URL(import.meta.resolve("./erc20.json"))),
 )
 
 // Instantiate `code.wasm` with `alice` and––upon block inclusion––return the
@@ -22,7 +22,8 @@ const metadata = InkMetadataRune.fromMetadataText(
 const events = await metadata
   .instantiation(chain, {
     sender: alice.publicKey,
-    code: Deno.readFileSync(new URL("./code.wasm", import.meta.url)),
+    code: Deno.readFileSync(new URL("./erc20.wasm", import.meta.url)),
+    args: [1_000_000n],
   })
   .signed(signature({ sender: alice }))
   .sent()
@@ -42,7 +43,7 @@ for (const { event } of events) {
     console.log("account id:", accountId)
     $.assert($.sizedUint8Array(32), accountId)
     const address = ss58.encode(System.SS58Prefix, accountId)
-    console.log("ss58 address:", address)
+    console.log("contract ss58 address:", address)
     Deno.env.set("SS58_ADDRESS", address)
     break
   }

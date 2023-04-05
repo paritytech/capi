@@ -8,7 +8,7 @@
  */
 
 import { assertNotEquals } from "asserts"
-import { alice, ValueRune } from "capi"
+import { alice, bob, ValueRune } from "capi"
 import { InkMetadataRune } from "capi/patterns/ink/mod.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 import { chain } from "contracts_dev/mod.js"
@@ -26,7 +26,7 @@ if (!address) {
 
 // Initialize an `InkMetadataRune` with the raw Ink metadata text.
 export const metadata = InkMetadataRune.fromMetadataText(
-  Deno.readTextFileSync(new URL("./metadata.json", import.meta.url)),
+  Deno.readTextFileSync(new URL("./erc20.json", import.meta.url)),
 )
 
 // Initialize an `InkRune` with `metadata`, `chain` and the deployed contract address.
@@ -34,32 +34,32 @@ const contract = metadata.instanceFromSs58(chain, address)
 
 const state = contract.call({
   sender: alice.publicKey,
-  method: "get",
+  method: "balance_of",
+  args: [alice.publicKey],
 })
 
 // Retrieve the initial state.
 const initialState = await state.run()
-console.log("initial state:", initialState)
+console.log("Alice initial balance:", initialState)
 
 // Use the `flip` method to *flip* the contract instance state.
 await contract
   .tx({
     sender: alice.publicKey,
-    // TODO: change ink contract to an ERC-20 implementation
-    method: "inc_by_with_event",
-    args: [7],
+    method: "transfer",
+    args: [bob.publicKey, 1_000n],
   })
   .signed(signature({ sender: alice }))
   .sent()
-  .dbgStatus("Flip:")
+  .dbgStatus("Transfer:")
   .inBlockEvents()
   .pipe(contract.emittedEvents)
   .into(ValueRune)
-  .dbg("filtered events")
+  .dbg("Emitted events")
   .run()
 
 // Retrieve the final state.
 const finalState = await state.run()
-console.log("final state:", finalState)
+console.log("Alice final balance:", finalState)
 
 assertNotEquals(initialState, finalState)
