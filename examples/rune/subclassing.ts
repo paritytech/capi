@@ -9,8 +9,6 @@ import { assertEquals } from "asserts"
 import { Rune, RunicArgs } from "capi"
 
 // The following is a Rune of `number`.
-// There are several Rune-wide methods attached to it, but we may
-// want to access methods that are specific to numbers.
 const num = Rune.constant(46)
 
 // We can define a Rune subclass, which implements methods that
@@ -26,7 +24,7 @@ class MyNumRune<U> extends Rune<number, U> {
 // Use `into` to get an instance of `MyNumRune`, bound to `num`.
 const myNum = num.into(MyNumRune)
 
-// This allows us to interact with `num` via the `MyNumRune`-defined fluent API.
+// This allows us to operate on `num` with the `MyNumRune`-defined fluent API.
 const result0 = await myNum.add(100).run()
 
 // Ensure that `result0` is equal to 146.
@@ -34,7 +32,7 @@ console.log(result0)
 assertEquals(result0, 146)
 
 // Let's do the same thing. This time, we'll accept an argument `arg`. Within
-// the subclass-defined method––`added`––we can make reference to `this.`
+// the subclass-defined method, we can make reference to `this.`
 class MyRuneWithArgs<U> extends Rune<number, U> {
   constructor(_prime: MyRuneWithArgs<U>["_prime"], readonly arg: number) {
     super(_prime)

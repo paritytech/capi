@@ -5,15 +5,15 @@
  */
 
 import { assert, assertEquals, assertInstanceOf } from "asserts"
-import { Rune } from "capi"
+import { Rune, Unhandled } from "capi"
 
 // Define a custom error, potentially with a constructor accepting
-// some error-specific data (here we'll inherit the constructor signature).
+// some error-specific data (here we'll leave as is).
 class MyError extends Error {
   override readonly name = "MyError"
 }
 
-// Define some initial data, and turn it into a Rune `initial`.
+// Define some initial data, and turn it into a Rune (`initial`).
 const INITIAL_MSG = "Hello world... or error"
 const initial = Rune.constant(INITIAL_MSG)
 
@@ -29,7 +29,8 @@ try {
   const unhandled = await start.unhandle(MyError).run()
   assertEquals(unhandled, INITIAL_MSG)
 } catch (e) {
-  assertInstanceOf(e, MyError)
+  assertInstanceOf(e, Unhandled)
+  assertInstanceOf(e.value, MyError)
 }
 
 // A better solution might be to `handle` the error. We can use `handle` along with
@@ -46,7 +47,7 @@ const unReHandled = await start
   .run()
 assert(unReHandled === `**${INITIAL_MSG}**` || unReHandled instanceof MyError)
 
-// Specificity of a rehandle fallback is optional.
+// When rehandling, we can optionally specify the alternative execution, as we do with `handle`.
 const unReHandledWithFallback = await start
   .unhandle(MyError)
   .rehandle(MyError, () => Rune.constant(RECOVERY_MSG))
