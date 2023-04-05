@@ -24,4 +24,5 @@ const e = Rune.rec({ c, d })
 const result = await e.run()
 
 // Ensure the result is of the expected shape.
+console.log(result)
 assertEquals(result, { c: "c", d: ["a", "b"] })
