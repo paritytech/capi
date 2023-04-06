@@ -1,8 +1,7 @@
 /**
  * @title Offline Signing
  * @stability nearing
- *
- * Create and sign an extrinsic, then serialize it into a hex for later use.
+ * @description Create and sign an extrinsic, then serialize it into a hex for later use.
  * Finally, rehydrate the extrinsic and submit it.
  */
 
