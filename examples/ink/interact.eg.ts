@@ -74,4 +74,4 @@ console.log(events)
 const finalState = await state.run()
 console.log("Alice final balance:", finalState)
 
-assert(initialState > finalState)
+assert(finalState < initialState)
