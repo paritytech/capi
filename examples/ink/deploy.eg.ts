@@ -40,10 +40,10 @@ const events = await metadata
 for (const { event } of events) {
   if (event.type === "Contracts" && event.value.type === "Instantiated") {
     const accountId = event.value.contract
-    console.log("account id:", accountId)
+    console.log("Account id:", accountId)
     $.assert($.sizedUint8Array(32), accountId)
     const address = ss58.encode(System.SS58Prefix, accountId)
-    console.log("contract ss58 address:", address)
+    console.log("Contract ss58 address:", address)
     Deno.env.set("SS58_ADDRESS", address)
     break
   }
