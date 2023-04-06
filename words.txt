@@ -189,6 +189,7 @@ statemine
 statemint
 steff
 struct
+subclassing
 subpaths
 sufficients
 suri
