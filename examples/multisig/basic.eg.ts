@@ -57,13 +57,13 @@ await multisig
   .run()
 
 // Check whether the call has been proposed.
-const isProposed = await multisig.isProposed(call.hash).run()
+const isProposed = await multisig.isProposed(call.callHash).run()
 console.log("Is proposed:", isProposed)
 assert(isProposed)
 
 // Approve proposal as Billy.
 await multisig // TODO: get `ratify` working in place of `approve`
-  .approve({ callHash: call.hash, sender: billy.address })
+  .approve({ callHash: call.callHash, sender: billy.address })
   .signed(signature({ sender: billy }))
   .sent()
   .dbgStatus("First approval:")
@@ -71,7 +71,7 @@ await multisig // TODO: get `ratify` working in place of `approve`
   .run()
 
 const { approvals } = await multisig
-  .proposal(call.hash)
+  .proposal(call.callHash)
   .unhandle(undefined)
   .run()
 
