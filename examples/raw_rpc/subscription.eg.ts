@@ -18,7 +18,5 @@ for await (const header of headerIter) {
   $.assert(known.$header, header)
   console.log(header)
   count += 1
-  if (count === 3) {
-    break
-  }
+  if (count === 3) break
 }
