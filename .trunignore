@@ -1,2 +1,2 @@
-examples/xcm/asset_teleportation.eg.ts
+examples/xcm/*.eg.ts
 examples/ink/*.eg.ts

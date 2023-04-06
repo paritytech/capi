@@ -54,7 +54,7 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
             otherSignatories: this.otherSignatories(sender),
             storeCall: false,
             maxWeight: call.feeEstimate().access("weight"),
-            maybeTimepoint: this.maybeTimepoint(call.hash),
+            maybeTimepoint: this.maybeTimepoint(call.callHash),
           }),
         })
         .unsafeAs<Chain.Call<C>>(),
