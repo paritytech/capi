@@ -50,7 +50,7 @@ const unReHandled = await start
   .map((msg) => `**${msg}**`)
   .rehandle(MyError)
   .run()
-console.log("(Un|Re)handled", unReHandled)
+console.log("(Un|Re)handled:", unReHandled)
 assert(unReHandled === `**${INITIAL_MSG}**` || unReHandled instanceof MyError)
 
 // When rehandling, we can optionally specify the alternative execution, as we do with `handle`.
@@ -59,4 +59,4 @@ const unReHandledWithFallback = await start
   .rehandle(MyError, () => Rune.constant(RECOVERY_MSG))
   .run()
 console.log("(Un|Re)handled with fallback:", unReHandledWithFallback)
-assert(unReHandledWithFallback === `**${INITIAL_MSG}**` || unReHandledWithFallback === RECOVERY_MSG)
+assert(unReHandledWithFallback === INITIAL_MSG || unReHandledWithFallback === RECOVERY_MSG)

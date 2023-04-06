@@ -12,8 +12,11 @@ const headerIter = chain.connection
   .subscribe("chain_subscribeFinalizedHeads", "chain_unsubscribeAllHeads")
   .iter()
 
+let count = 0
 // Iterate over its items and ensure they conform to the expected shape.
 for await (const header of headerIter) {
   $.assert(known.$header, header)
   console.log(header)
+  count += 1
+  if (count === 3) break
 }

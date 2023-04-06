@@ -84,3 +84,27 @@ jobs:
             target/capi/**/_chainName
           key: ${{ runner.os }}-capi-metadata-${{ hashFiles('import_map.json') }}
       - run: deno task test
+  examples-deno:
+    name: Examples (Deno)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v3
+      - uses: denoland/setup-deno@9db7f66e8e16b5699a514448ce994936c63f0d54 # v1.1.0
+        with:
+          deno-version: v1.x
+      - name: Cache Deno dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.deno
+            ~/.cache/deno
+          key: ${{ runner.os }}-deno-${{ hashFiles('deps/**/*.ts') }}
+      - name: Cache metadata
+        uses: actions/cache@v3
+        with:
+          path: |
+            target/capi/**/_metadata
+            target/capi/**/_chainName
+          key: ${{ runner.os }}-capi-metadata-${{ hashFiles('import_map.json') }}
+      - run: deno task test:examples:deno
