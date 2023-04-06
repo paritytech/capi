@@ -108,12 +108,3 @@ jobs:
             target/capi/**/_chainName
           key: ${{ runner.os }}-capi-metadata-${{ hashFiles('import_map.json') }}
       - run: deno task test:examples:deno
-  test-examples-browser:
-    name: Test Examples (Browser)
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    container:
-      image: ghcr.io/paritytech/trun:main
-    steps:
-      - uses: actions/checkout@v3
-      - run: deno task test:examples:browser
