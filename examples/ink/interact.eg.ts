@@ -6,7 +6,7 @@
  * the submission of transactions.
  */
 
-import { assertNotEquals } from "asserts"
+import { assert } from "asserts"
 import { $, alice, bob } from "capi"
 import { InkMetadataRune } from "capi/patterns/ink/mod.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
@@ -74,4 +74,4 @@ console.log(events)
 const finalState = await state.run()
 console.log("Alice final balance:", finalState)
 
-assertNotEquals(initialState, finalState)
+assert(initialState > finalState)
