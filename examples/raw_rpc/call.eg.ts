@@ -13,5 +13,5 @@ const hash = await chain.connection
   .run()
 
 // Ensure the result is a block hash.
-console.log(hash)
 $.assert($.str, hash)
+console.log(hash)
