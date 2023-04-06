@@ -1,4 +1,4 @@
-import * as shiki from "https://esm.sh/shiki@0.14.1?bundle"
+import * as shiki from "https://esm.sh/v113/shiki@0.14.1?bundle"
 import typescriptLang from "https://unpkg.com/shiki@0.14.1/languages/typescript.tmLanguage.json" assert {
   type: "json",
 }
