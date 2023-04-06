@@ -37,7 +37,7 @@ export function createCodegenHandler(dataCache: CacheBase, generatedCache: Cache
     }
     if (pathname.startsWith("/capi/")) {
       return f.code(generatedCache, request, async () => {
-        const url = new URL(pathname.slice(1), import.meta.resolve("../"))
+        const url = new URL(pathname.slice("/capi/".length), import.meta.resolve("../"))
         const response = await fetch(url)
         if (!response.ok) throw f.notFound()
         return response.text()
