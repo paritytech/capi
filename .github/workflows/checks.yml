@@ -84,8 +84,8 @@ jobs:
             target/capi/**/_chainName
           key: ${{ runner.os }}-capi-metadata-${{ hashFiles('import_map.json') }}
       - run: deno task test
-  test-examples-deno:
-    name: Test Examples (Deno)
+  examples-deno:
+    name: Examples (Deno)
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
