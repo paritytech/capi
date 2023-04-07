@@ -3,7 +3,6 @@ import * as path from "../deps/std/path.ts"
 
 export async function createCustomChainSpec(
   tempDir: string,
-  id: string,
   binary: string,
   chain: string,
   customize: (chainSpec: ChainSpec) => void,
@@ -20,7 +19,7 @@ export async function createCustomChainSpec(
   const spec = JSON.parse(new TextDecoder().decode(specResult.stdout))
   customize(spec)
 
-  const specPath = path.join(tempDir, `${id}-chainspec.json`)
+  const specPath = path.join(tempDir, `chainspec.json`)
   await Deno.writeTextFile(specPath, JSON.stringify(spec, undefined, 2))
 
   const rawResult = await new Deno.Command(binary, {
@@ -31,7 +30,7 @@ export async function createCustomChainSpec(
     throw new Error("build-spec --raw failed")
   }
 
-  const rawPath = path.join(tempDir, `${id}-chainspec-raw.json`)
+  const rawPath = path.join(tempDir, `chainspec-raw.json`)
   await Deno.writeFile(rawPath, rawResult.stdout)
 
   return rawPath

@@ -28,8 +28,7 @@ export async function startNetwork(
       const binary = await resolveBinary(chain.binary, signal)
 
       const spec = await createCustomChainSpec(
-        tempDir,
-        name,
+        path.join(tempDir, name),
         binary,
         chain.chain,
         (chainSpec) => {
@@ -56,8 +55,7 @@ export async function startNetwork(
   const relayBinary = await resolveBinary(config.binary, signal)
 
   const relaySpec = await createCustomChainSpec(
-    tempDir,
-    "relay",
+    path.join(tempDir, "relay"),
     relayBinary,
     config.chain,
     (chainSpec) => {
