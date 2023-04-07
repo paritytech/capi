@@ -7,13 +7,13 @@
  * balance of the user to whom the asset was transferred.
  */
 
+import { types, XcmPallet } from "@capi/rococo-dev/mod.js"
+import { chain as parachain, System } from "@capi/rococo-dev/statemine/mod.js"
+import { Event } from "@capi/rococo-dev/statemine/types/cumulus_pallet_parachain_system/pallet.js"
+import { RuntimeEvent } from "@capi/rococo-dev/statemine/types/statemine_runtime.js"
 import { assert } from "asserts"
 import { alice, Rune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
-import { types, XcmPallet } from "zombienet/statemine.toml/alice/@latest/mod.js"
-import { chain as parachain, System } from "zombienet/statemine.toml/collator/@latest/mod.js"
-import { Event } from "zombienet/statemine.toml/collator/@latest/types/cumulus_pallet_parachain_system/pallet.js"
-import { RuntimeEvent } from "zombienet/statemine.toml/collator/@latest/types/statemine_runtime.js"
 
 // Destructure the various type factories for convenient access.
 const {

@@ -5,11 +5,11 @@
  * Utilize an Ed25519 library for signing.
  */
 
+import { Balances, createUsers, System, types } from "@capi/westend-dev/mod.js"
 import { assert } from "asserts"
 import { Rune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 import * as ed from "https://esm.sh/@noble/ed25519@1.7.3"
-import { Balances, createUsers, System, types } from "westend_dev/mod.js"
 
 const { alexa, billy } = await createUsers()
 

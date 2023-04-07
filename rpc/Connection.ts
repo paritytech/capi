@@ -4,27 +4,24 @@ import { RpcCallMessage, RpcIngressMessage, RpcSubscriptionHandler } from "./rpc
 
 const connectionMemos = new Map<new(discovery: any) => Connection, Map<unknown, Connection>>()
 
-export interface ConnectionCtorLike<D> {
-  new(discovery: D): Connection
-  connect: (discovery: D, signal: AbortSignal) => Connection
-}
-
 export abstract class Connection {
   nextId = 0
   references = 0
-  signal
-  #controller
+  #controller = new AbortController()
+  signal = this.#controller.signal
 
-  constructor() {
-    this.#controller = new AbortController()
-    this.signal = this.#controller.signal
+  static bind<D>(
+    this: new(discovery: D) => Connection,
+    discovery: D,
+  ): (signal: AbortSignal) => Connection {
+    return (signal) => (Connection.connect<D>).call(this, discovery, signal)
   }
 
   static connect<D>(
     this: new(discovery: D) => Connection,
     discovery: D,
     signal: AbortSignal,
-  ): Connection {
+  ) {
     const memo = getOrInit(connectionMemos, this, () => new Map<unknown, Connection>())
     return getOrInit(memo, discovery, () => {
       const connection = new this(discovery)

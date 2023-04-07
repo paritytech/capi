@@ -1,7 +1,7 @@
 import { hex } from "../crypto/mod.ts"
 import * as $ from "../deps/scale.ts"
 import { decodeMetadata, FrameMetadata } from "../frame_metadata/mod.ts"
-import { Connection, ConnectionCtorLike } from "../rpc/mod.ts"
+import { Connection } from "../rpc/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { BlockHashRune } from "./BlockHashRune.ts"
 import { ConnectionRune } from "./ConnectionRune.ts"
@@ -51,14 +51,11 @@ export namespace Chain {
 
 // TODO: do we want to represent the discovery value and conn type within the type system?
 export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
-  static from<D, M extends FrameMetadata>(
-    connectionCtor: ConnectionCtorLike<D>,
-    discovery: D,
+  static from<M extends FrameMetadata>(
+    connect: (signal: AbortSignal) => Connection,
     staticMetadata?: M,
   ) {
-    const connection = ConnectionRune.from(async (signal) =>
-      connectionCtor.connect(discovery, signal)
-    )
+    const connection = ConnectionRune.from(connect)
     const metadata = staticMetadata ?? Rune
       .fn(hex.decode)
       .call(connection.call("state_getMetadata"))

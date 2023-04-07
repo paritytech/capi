@@ -2,6 +2,7 @@
 
 export * from "./ArrayOfLength.ts"
 export * from "./clock.ts"
+export * from "./compression.ts"
 export * from "./error.ts"
 export * from "./key.ts"
 export * from "./memo.ts"

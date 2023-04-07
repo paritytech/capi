@@ -7,9 +7,9 @@
  * pieces of data pertaining to that block.
  */
 
+import { chain, metadata, types } from "@capi/polkadot/mod.js"
 import { $, $extrinsic, known, Rune } from "capi"
 import { babeBlockAuthor } from "capi/patterns/consensus/mod.ts"
-import { chain, metadata, types } from "polkadot/mod.js"
 
 // Reference the latest block hash.
 const blockHash = chain.blockHash()

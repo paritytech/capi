@@ -19,4 +19,8 @@ export class S3Cache extends CacheBase {
     await this.bucket.putObject(key, value)
     return value
   }
+
+  async _has(key: string): Promise<boolean> {
+    return !!(await this.bucket.headObject(key))
+  }
 }

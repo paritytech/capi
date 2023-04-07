@@ -8,15 +8,17 @@
       "addWords": true
     }
   ],
-  "dictionaries": [
-    "project-words"
-  ],
+  "enableGlobDot": true,
+  "dictionaries": ["project-words"],
   "ignorePaths": [
+    ".git",
     "**/*.wasm",
     "target",
     "**/__snapshots__/*.snap",
     "**/*.contract",
     "examples/ink/erc20.json",
-    "**/*.scale"
+    "**/*.scale",
+    "**/*.svg",
+    "util/_artifacts"
   ]
 }

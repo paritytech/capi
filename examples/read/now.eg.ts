@@ -5,8 +5,8 @@
  * Read the current timestamp as agreed upon by validators.
  */
 
+import { Timestamp } from "@capi/polkadot/mod.js"
 import { $ } from "capi"
-import { Timestamp } from "polkadot/mod.js"
 
 const now = await Timestamp.Now.value().run()
 console.log("Now:", now)

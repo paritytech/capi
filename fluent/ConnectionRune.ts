@@ -3,7 +3,10 @@ import { Connection, ConnectionError, RpcSubscriptionMessage, ServerError } from
 import { Batch, MetaRune, Run, Rune, RunicArgs, RunStream } from "../rune/mod.ts"
 
 class RunConnection extends Run<Connection, never> {
-  constructor(ctx: Batch, readonly initConnection: (signal: AbortSignal) => Promise<Connection>) {
+  constructor(
+    ctx: Batch,
+    readonly initConnection: (signal: AbortSignal) => Connection | Promise<Connection>,
+  ) {
     super(ctx)
   }
 
@@ -14,7 +17,7 @@ class RunConnection extends Run<Connection, never> {
 }
 
 export class ConnectionRune<U> extends Rune<Connection, U> {
-  static from(init: (signal: AbortSignal) => Promise<Connection>) {
+  static from(init: (signal: AbortSignal) => Connection | Promise<Connection>) {
     return Rune.new(RunConnection, init).into(ConnectionRune)
   }
 

@@ -7,6 +7,16 @@ export class FsCache extends CacheBase {
     super(signal)
   }
 
+  async _has(key: string) {
+    const file = path.join(this.location, key)
+    try {
+      await Deno.lstat(file)
+      return true
+    } catch {
+      return false
+    }
+  }
+
   async _getRaw(key: string, init: () => Promise<Uint8Array>) {
     const file = path.join(this.location, key)
     try {

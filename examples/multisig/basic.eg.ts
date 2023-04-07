@@ -6,11 +6,11 @@
  * that multisig.
  */
 
+import { Balances, chain, createUsers, System } from "@capi/polkadot-dev/mod.js"
 import { assert } from "asserts"
 import { $ } from "capi"
 import { MultisigRune } from "capi/patterns/multisig/mod.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
-import { Balances, chain, createUsers, System } from "polkadot_dev/mod.js"
 
 const { alexa, billy, carol, david } = await createUsers()
 

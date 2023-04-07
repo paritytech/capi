@@ -7,8 +7,8 @@
  * funds. This simplifies signing extrinsics for submission to the given test chain.
  */
 
+import { createUsers } from "@capi/polkadot-dev/mod.js"
 import { $, $sr25519 } from "capi"
-import { createUsers } from "polkadot_dev/mod.js"
 
 // Test users can be initialized with no count. The resulting collection is
 // a record with 26 `Sr25519`s (one for every letter of the alphabet).

@@ -10,7 +10,7 @@
  * building an advanced Capi-based library, chances are that you don't need to work with the metadata directly.
  */
 
-import { chain } from "polkadot_dev/mod.js"
+import { chain } from "@capi/polkadot-dev/mod.js"
 
 // Execute the metadata Rune.
 const metadata = await chain.metadata.run()

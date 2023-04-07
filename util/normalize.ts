@@ -6,3 +6,11 @@ export function normalizeIdent(ident: string) {
 export function normalizeDocs(docs: string[] | undefined): string {
   return docs?.join("\n") ?? ""
 }
+
+export function normalizePackageName(name: string) {
+  return name.replace(/[A-Z]/g, (x) => `-` + x.toLowerCase())
+}
+
+export function normalizeTypeName(name: string) {
+  return normalizeIdent(name).replace(/^./, (x) => x.toUpperCase())
+}

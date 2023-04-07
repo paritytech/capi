@@ -56,7 +56,7 @@ export function $hash<T>(hasher: Hasher, $inner: $.Codec<T>): $.Codec<T> {
 
 export class Blake2Hasher extends Hasher {
   digestLength
-  constructor(size: 128 | 256 | 512, public concat: boolean) {
+  constructor(size: 64 | 128 | 256 | 512, public concat: boolean) {
     super()
     this.digestLength = size / 8
   }
@@ -106,6 +106,7 @@ export interface Hashing {
   dispose?(): void
 }
 
+export const blake2_64 = new Blake2Hasher(64, false)
 export const blake2_128 = new Blake2Hasher(128, false)
 export const blake2_128Concat = new Blake2Hasher(128, true)
 export const blake2_256 = new Blake2Hasher(256, false)

@@ -5,9 +5,9 @@
  * Transfer some funds from one user to another.
  */
 
+import { Balances, createUsers, System } from "@capi/westend-dev/mod.js"
 import { assert } from "asserts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
-import { Balances, createUsers, System } from "westend_dev/mod.js"
 
 // Create two test users. Alexa will send the funds to Billy.
 const { alexa, billy } = await createUsers()

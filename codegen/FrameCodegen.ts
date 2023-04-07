@@ -24,13 +24,13 @@ export class FrameCodegen {
       "chain.js",
       `
 import * as _codecs from "./codecs.js"
-import { connectionCtor, discoveryValue } from "./connection.js"
+import { connect } from "./connection.js"
 import * as C from "./capi.js"
 import * as t from "./types/mod.js"
 
 export const metadata = ${this.codecCodegen.print(this.metadata)}
 
-export const chain = C.ChainRune.from(connectionCtor, discoveryValue, metadata)
+export const chain = C.ChainRune.from(connect, metadata)
 `,
     )
     files.set(

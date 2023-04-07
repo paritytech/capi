@@ -20,7 +20,7 @@ export async function code(cache: CacheBase, request: Request, genCode: () => Pr
     headers: path.endsWith(".js")
       ? {
         "Content-Type": "application/javascript",
-        "X-TypeScript-Types": request.url.slice(0, -3) + ".d.ts",
+        "X-TypeScript-Types": `./${path.split("/").at(-1)!.slice(0, -3)}.d.ts`,
       }
       : { "Content-Type": "application/typescript" },
   })
@@ -36,6 +36,10 @@ export async function redirect(path: string): Promise<Response> {
 
 export function notFound() {
   return new Response("404", { status: Status.NotFound })
+}
+
+export function badRequest() {
+  return new Response("400", { status: Status.BadRequest })
 }
 
 export function serverError(message?: string) {

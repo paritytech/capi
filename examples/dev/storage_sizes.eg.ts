@@ -7,9 +7,9 @@
  * That being said, this can be helpful in the context of chain development.
  */
 
+import { chain } from "@capi/polkadot-dev/mod.js"
 import { $ } from "capi"
 import { storageSizes } from "capi/patterns/storage_sizes.ts"
-import { chain } from "polkadot_dev/mod.js"
 
 // Use the storageSizes factory to produce a Rune. Then execute it.
 const sizes = await storageSizes(chain).run()

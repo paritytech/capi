@@ -1,18 +1,16 @@
 import * as flags from "../deps/std/flags.ts"
 import { serve } from "../deps/std/http.ts"
-import {
-  ContractsDevProvider,
-  PolkadotDevProvider,
-  ProjectProvider,
-  WssProvider,
-  ZombienetProvider,
-} from "../providers/frame/mod.ts"
-import { handler } from "../server/handler.ts"
-import { Env } from "../server/mod.ts"
+import { createTempDir } from "../devnets/createTempDir.ts"
+import { createDevnetsHandler } from "../devnets/mod.ts"
+import { createCorsHandler } from "../server/corsHandler.ts"
+import { createErrorHandler } from "../server/errorHandler.ts"
+import { createCodegenHandler } from "../server/mod.ts"
+import { InMemoryCache } from "../util/cache/memory.ts"
 import { FsCache } from "../util/cache/mod.ts"
+import { resolveConfig } from "./resolveConfig.ts"
 
 export default async function(...args: string[]) {
-  const { port: portStr, "--": cmd, out } = flags.parse(args, {
+  const { port, "--": cmd, out } = flags.parse(args, {
     string: ["port", "out"],
     default: {
       port: "4646",
@@ -21,24 +19,17 @@ export default async function(...args: string[]) {
     "--": true,
   })
 
-  const href = `http://localhost:${portStr}/`
+  const config = await resolveConfig(...args)
+
+  const tempDir = await createTempDir()
+
+  const href = `http://localhost:${port}/`
 
   const controller = new AbortController()
   const { signal } = controller
 
-  const cache = new FsCache(out, signal)
-  const modSpecifier = JSON.stringify(import.meta.resolve("./mod.ts"))
-  cache.getString("mod.ts", 0, async () => `export * from ${modSpecifier}`)
-
-  const env = new Env(href, cache, signal, (env) => ({
-    frame: {
-      wss: new WssProvider(env),
-      dev: new PolkadotDevProvider(env),
-      zombienet: new ZombienetProvider(env),
-      project: new ProjectProvider(env),
-      contracts_dev: new ContractsDevProvider(env),
-    },
-  }))
+  const dataCache = new FsCache(out, signal)
+  const tempCache = new InMemoryCache(signal)
 
   const running = await fetch(`${href}capi_cwd`)
     .then((r) => r.text())
@@ -46,9 +37,21 @@ export default async function(...args: string[]) {
     .catch(() => false)
 
   if (!running) {
-    await serve(handler(env), {
+    const devnetsHandler = createDevnetsHandler(tempDir, config, signal)
+    const codegenHandler = createCodegenHandler(dataCache, tempCache)
+    const handler = createCorsHandler(createErrorHandler(async (request) => {
+      const { pathname } = new URL(request.url)
+      if (pathname === "/capi_cwd") {
+        return new Response(Deno.cwd())
+      }
+      if (pathname.startsWith("/devnets/")) {
+        return await devnetsHandler(request)
+      }
+      return await codegenHandler(request)
+    }))
+    await serve(handler, {
       hostname: "[::]",
-      port: +portStr,
+      port: +port,
       signal,
       onError(error) {
         throw error
@@ -66,16 +69,16 @@ export default async function(...args: string[]) {
   async function onReady() {
     const [bin, ...args] = cmd
     if (bin) {
-      const command = new Deno.Command(bin, { args, signal })
+      const command = new Deno.Command(bin, {
+        args,
+        signal,
+        env: {
+          DEVNETS_SERVER: `http://localhost:${port}/devnets/`,
+        },
+      })
       const status = await command.spawn().status
-      console.log("inner command exited with status code", status.code)
       self.addEventListener("unload", () => Deno.exit(status.code))
       controller.abort()
-      Deno.unrefTimer(setTimeout(() => {
-        // todo: fix
-        console.log("failed to exit gracefully")
-        Deno.exit(status.code)
-      }, 30_000))
     }
   }
 }

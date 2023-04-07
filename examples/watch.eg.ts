@@ -7,8 +7,8 @@
  * subsequent states.
  */
 
+import { chain, Timestamp } from "@capi/polkadot/mod.js"
 import { $ } from "capi"
-import { chain, Timestamp } from "polkadot/mod.js"
 
 // Specifying `chain.latestBlockHash` indicates that (A) this Rune tree
 // can be treated as reactive and (B) is a dependent of a "timeline" associated

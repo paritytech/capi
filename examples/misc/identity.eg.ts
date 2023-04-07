@@ -7,10 +7,10 @@
  * Set a user's identity, potentially with metadata of arbitrary user-defined shape.
  */
 
+import { createUsers, Identity } from "@capi/polkadot-dev/mod.js"
 import { $ } from "capi"
 import { IdentityInfoTranscoders } from "capi/patterns/identity.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
-import { createUsers, Identity } from "polkadot_dev/mod.js"
 
 const { alexa } = await createUsers()
 

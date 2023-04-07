@@ -2,7 +2,6 @@ import {
   blake2_128,
   blake2_128Concat,
   blake2_256,
-  Hasher,
   identity,
   twox128,
   twox256,
@@ -21,7 +20,7 @@ import {
   $storageKey,
 } from "../key_codecs.ts"
 
-const $hasher = $.literalUnion<Hasher>([
+const hashers = {
   blake2_128,
   blake2_256,
   blake2_128Concat,
@@ -29,6 +28,16 @@ const $hasher = $.literalUnion<Hasher>([
   twox256,
   twox64Concat,
   identity,
+}
+
+const $hasher = $.literalUnion<keyof typeof hashers>([
+  "blake2_128",
+  "blake2_256",
+  "blake2_128Concat",
+  "twox128",
+  "twox256",
+  "twox64Concat",
+  "identity",
 ])
 
 const $storageEntry = $.object(
@@ -92,6 +101,8 @@ export const $metadata = $.object(
   $.field("tys", $.array($ty)),
   $.field("pallets", $.array($pallet)),
   $.field("extrinsic", $extrinsicDef),
+  // TODO: is this useful?
+  $.field("runtime", $tyId),
 )
 
 export function transformMetadata(metadata: $.Native<typeof $metadata>): FrameMetadata {
@@ -109,11 +120,11 @@ export function transformMetadata(metadata: $.Native<typeof $metadata>): FrameMe
             key = $emptyKey
             partialKey = $partialEmptyKey
           } else if (storage.hashers.length === 1) {
-            key = storage.hashers[0]!.$hash(types[storage.key]!)
+            key = hashers[storage.hashers[0]!].$hash(types[storage.key]!)
             partialKey = $partialSingleKey(key)
           } else {
             const codecs = extractTupleMembersVisitor.visit(types[storage.key]!).map((codec, i) =>
-              storage.hashers[i]!.$hash(codec)
+              hashers[storage.hashers[i]!].$hash(codec)
             )
             key = $.tuple(...codecs)
             partialKey = $partialMultiKey(...codecs)
