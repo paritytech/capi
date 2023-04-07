@@ -1,6 +1,6 @@
 import { Binary } from "./binary.ts"
 
-export interface ProxyChain {
+export interface WsChain {
   url: string
   binary?: never
   version: string
@@ -21,5 +21,5 @@ export interface NetworkConfig {
 
 export interface CapiConfig {
   server: string
-  chains?: Record<string, ProxyChain | NetworkConfig>
+  chains?: Record<string, WsChain | NetworkConfig>
 }
