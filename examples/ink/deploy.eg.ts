@@ -2,9 +2,9 @@
  * @title Deploy an Ink Smart Contract
  * @stability unstable – We intend to work on an Ink provider (for static codegen)
  * in the near future. This work will likely entail large changes to the current ink patterns.
- *
- * Deploying an Ink contract (instantiating) to a production contracts-enabled parachain
+ * @description Deploying an Ink contract (instantiating) to a production contracts-enabled parachain
  * is much the same as any other extrinsic submission.
+ * @todo utilize `createUsers` instead of `alice`
  */
 
 import { $, alice, ss58 } from "capi"
