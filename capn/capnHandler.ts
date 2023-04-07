@@ -14,7 +14,8 @@ export function createCapnHandler(tempDir: string, config: CapiConfig, signal: A
     const { pathname, searchParams } = new URL(request.url)
     const match = rCapnApi.exec(pathname)
     if (!match) return f.notFound()
-    const [, name, paraName] = match
+    const name = match[1]!
+    const paraName = match[2]
     const networkConfig = config.chains?.[name!]
     if (networkConfig?.binary == null) return f.notFound()
     const network = await networkMemo.run(name!, async () => {
