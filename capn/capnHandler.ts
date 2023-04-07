@@ -1,5 +1,6 @@
 import { deferred } from "../deps/std/async.ts"
 import * as path from "../deps/std/path.ts"
+import { $ } from "../mod.ts"
 import * as f from "../server/factories.ts"
 import { PermanentMemo } from "../util/memo.ts"
 import { CapiConfig } from "./CapiConfig.ts"
@@ -29,9 +30,8 @@ export function createCapnHandler(tempDir: string, config: CapiConfig, signal: A
       return proxyWebSocket(request, `ws://localhost:${port}`)
     }
     if (request.method === "POST" && searchParams.has("users")) {
-      const count = ~~searchParams.get("users")!
-      // NaN comparisons are false
-      if (!(count > 0)) return f.badRequest()
+      const count = +searchParams.get("users")!
+      if (!$.is($.u32, count)) return f.badRequest()
       const index = chain.testUserIndex
       const newCount = index + count
       if (newCount < testUserPublicKeys.length) chain.testUserIndex = newCount
