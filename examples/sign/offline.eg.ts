@@ -36,7 +36,7 @@ const hash = await SignedExtrinsicRune
 // Ensure the extrinsic has been finalized.
 $.assert($.str, hash)
 
-// egts-ignore-start
+// hide-start
 // The following noop is solely for explanation. Swap this out with your
 // own signed-hex-representation-consuming code.
 function save(_hex: string) {}
