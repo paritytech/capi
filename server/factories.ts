@@ -20,7 +20,7 @@ export async function code(cache: CacheBase, request: Request, genCode: () => Pr
     headers: path.endsWith(".js")
       ? {
         "Content-Type": "application/javascript",
-        "X-TypeScript-Types": request.url.slice(0, -3) + ".d.ts",
+        "X-TypeScript-Types": `./${path.split("/").at(-1)!.slice(0, -3)}.d.ts`,
       }
       : { "Content-Type": "application/typescript" },
   })
