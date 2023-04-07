@@ -1,9 +1,8 @@
 /**
  * @title Reserve an Index
  * @stability nearing
- *
- * Reserve an index using the indices pallet. Then retrieve the user's account id
- * using the index.
+ * @description Reserve an index using the indices pallet. Then retrieve
+ * the user's account id using the index.
  */
 
 import { createUsers, Indices } from "@capi/polkadot-dev/mod.js"

@@ -5,7 +5,7 @@
   "scopes": {
     "examples/": {
       "capi": "./mod.ts",
-      "capi/": "./",
+      "capi/patterns/": "./patterns/",
       "asserts": "./deps/std/testing/asserts.ts"
     },
     "http://localhost:4646/": {

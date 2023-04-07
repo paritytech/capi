@@ -1,8 +1,7 @@
 /**
  * @title Ed25519 Signatures
  * @stability nearing
- *
- * Utilize an Ed25519 library for signing.
+ * @description Utilize an Ed25519 library for signing.
  */
 
 import { Balances, createUsers, System, types } from "@capi/westend-dev/mod.js"

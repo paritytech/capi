@@ -1,8 +1,7 @@
 /**
  * @title Virtual Multisig
  * @stability unstable
- *
- * Virtual multisigs simulate an editable multisig. The onchain correlates include:
+ * @description Virtual multisigs simulate an editable multisig. The onchain correlates include:
  *
  * 1. Pure proxies for/administrated by each of the members.
  * 2. A multisig account, formed from those pure proxies.

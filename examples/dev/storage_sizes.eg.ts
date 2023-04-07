@@ -1,10 +1,10 @@
 /**
  * @title Determine Storage Sizes of Dev Chains
  * @stability experiment
- *
- * The `storageSizes` pattern produces a record––keyed by pallet name––of storage sizes, keyed by storage name.
- * It is unlikely that we'll ever stabilize this feature, as we don't want to abuse rpc nodes.
- * That being said, this can be helpful in the context of chain development.
+ * @description The `storageSizes` pattern produces a record––keyed by pallet
+ * name––of storage sizes, keyed by storage name. It is unlikely that we'll ever
+ * stabilize this pattern, as we don't want to abuse rpc nodes. That being said,
+ * this can be helpful in the context of chain development.
  */
 
 import { chain } from "@capi/polkadot-dev/mod.js"

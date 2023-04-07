@@ -1,9 +1,9 @@
 /**
  * @title Read The Era Reward Points
  * @stability nearing
- *
- * Model a derived read, in which one piece of storage (the staking active era index)
- * is used as the key to another piece of storage (the corresponding reward points).
+ * @description Model a derived read, in which one piece of storage (the staking
+ * active era index)is used as the key to another piece of storage (the corresponding
+ * reward points).
  */
 
 import { Staking, types } from "@capi/westend/mod.js"
