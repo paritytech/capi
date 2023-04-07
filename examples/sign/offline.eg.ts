@@ -40,4 +40,4 @@ $.assert($.str, hash)
 // The following noop is solely for explanation. Swap this out with your
 // own signed-hex-representation-consuming code.
 function save(_hex: string) {}
-// egts-ignore-end
+// hide-end
