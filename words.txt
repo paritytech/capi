@@ -27,12 +27,9 @@ inherents
 instanceof
 instantiator
 kiera
-linecap
-lparachain
 lxkf
 matty
 merkle
-miterlimit
 multiaddr
 multiaddress
 multiasset
@@ -56,6 +53,7 @@ shiki
 smoldot
 statemigration
 statemine
+statemint
 steff
 struct
 subclassing
@@ -71,4 +69,3 @@ unguard
 unhandle
 unioned
 westend
-zombienet
