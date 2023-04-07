@@ -23,7 +23,6 @@ devnet
 devnets
 dispatchable
 dprint
-egts
 esbenp
 extrinsics
 ferdie
