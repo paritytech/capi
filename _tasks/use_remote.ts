@@ -1,3 +1,6 @@
+// This task is used in CI to edit the import map to use capi.dev for codegen
+// instead of the local server.
+
 import { config } from "../capi.config.ts"
 import { checkCodegenUploaded, syncConfig } from "../mod.ts"
 
