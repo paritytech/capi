@@ -6,7 +6,7 @@ export async function createCustomChainSpec(
   id: string,
   binary: string,
   chain: string,
-  customize: (chainSpec: ChainSpec) => Promise<void>,
+  customize: (chainSpec: ChainSpec) => void,
 ) {
   await ensureDir(tempDir)
 
@@ -18,7 +18,7 @@ export async function createCustomChainSpec(
     throw new Error("build-spec failed")
   }
   const spec = JSON.parse(new TextDecoder().decode(specResult.stdout))
-  await customize(spec)
+  customize(spec)
 
   const specPath = path.join(tempDir, `${id}-chainspec.json`)
   await Deno.writeTextFile(specPath, JSON.stringify(spec, undefined, 2))

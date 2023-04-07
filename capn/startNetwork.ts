@@ -32,11 +32,11 @@ export async function startNetwork(
         name,
         binary,
         chain.chain,
-        async (chainSpec) => {
+        (chainSpec) => {
           chainSpec.para_id = chain.id
           const genesisConfig = getGenesisConfig(chainSpec)
           genesisConfig.parachainInfo.parachainId = chain.id
-          await addTestUsers(genesisConfig.balances.balances)
+          addTestUsers(genesisConfig.balances.balances)
         },
       )
 
@@ -60,14 +60,14 @@ export async function startNetwork(
     "relay",
     relayBinary,
     config.chain,
-    async (chainSpec) => {
+    (chainSpec) => {
       const genesisConfig = getGenesisConfig(chainSpec)
       if (paras.length) {
         genesisConfig.paras.paras.push(
           ...paras.map(({ id, genesis }) => [id, [...genesis, true]] satisfies Narrow),
         )
       }
-      await addTestUsers(genesisConfig.balances.balances)
+      addTestUsers(genesisConfig.balances.balances)
     },
   )
 
