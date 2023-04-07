@@ -137,8 +137,8 @@ async function generateNodeKey(binary: string, signal?: AbortSignal) {
     throw new Error()
   }
   const decoder = new TextDecoder()
-  const nodeKey = decoder.decode(stdout)
-  const peerId = decoder.decode(stderr).replace("\n", "")
+  const nodeKey = decoder.decode(stdout).trim()
+  const peerId = decoder.decode(stderr).trim()
   return { nodeKey, peerId }
 }
 
