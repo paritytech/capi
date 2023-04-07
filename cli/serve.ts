@@ -2,6 +2,7 @@ import { createTempDir } from "../capn/createTempDir.ts"
 import { createCapnHandler } from "../capn/mod.ts"
 import * as flags from "../deps/std/flags.ts"
 import { serve } from "../deps/std/http.ts"
+import { createCorsHandler } from "../server/corsHandler.ts"
 import { createErrorHandler } from "../server/errorHandler.ts"
 import { createCodegenHandler } from "../server/mod.ts"
 import { InMemoryCache } from "../util/cache/memory.ts"
@@ -38,12 +39,16 @@ export default async function(...args: string[]) {
   if (!running) {
     const capnHandler = createCapnHandler(tempDir, config, signal)
     const codegenHandler = createCodegenHandler(dataCache, tempCache)
-    const handler = createErrorHandler((request) => {
-      if (new URL(request.url).pathname.startsWith("/capn/")) {
-        return capnHandler(request)
+    const handler = createCorsHandler(createErrorHandler(async (request) => {
+      const { pathname } = new URL(request.url)
+      if (pathname === "/capi_cwd") {
+        return new Response(Deno.cwd())
       }
-      return codegenHandler(request)
-    })
+      if (pathname.startsWith("/capn/")) {
+        return await capnHandler(request)
+      }
+      return await codegenHandler(request)
+    }))
     await serve(handler, {
       hostname: "[::]",
       port: +port,

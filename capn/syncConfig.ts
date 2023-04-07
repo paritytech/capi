@@ -13,7 +13,7 @@ import { startNetwork } from "./startNetwork.ts"
 export async function syncConfig(tempDir: string, config: CapiConfig) {
   return withSignal(async (signal) => {
     const { server } = config
-    let entries = new Map<string, CodegenEntry>()
+    const entries = new Map<string, CodegenEntry>()
     await Promise.all(
       Object.entries(config.chains ?? {}).map(async ([name, chain]) => {
         if (chain.url != null) {
@@ -54,10 +54,10 @@ export async function syncConfig(tempDir: string, config: CapiConfig) {
         )
       }),
     )
-    entries = new Map([...entries].sort((a, b) => a[0] < b[0] ? 1 : -1))
+    const sortedEntries = new Map([...entries].sort((a, b) => a[0] < b[0] ? 1 : -1))
     const codegenHash = await uploadCodegenSpec(server, {
       type: "v0",
-      codegen: entries,
+      codegen: sortedEntries,
     })
     return new URL(codegenHash + "/", server).toString()
   })

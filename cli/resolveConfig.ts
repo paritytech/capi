@@ -3,13 +3,13 @@ import * as flags from "../deps/std/flags.ts"
 import * as path from "../deps/std/path.ts"
 
 export async function resolveConfig(...args: string[]) {
-  const { config: configFile } = flags.parse(args, {
+  const { config: rawConfigPath } = flags.parse(args, {
     string: ["config"],
     default: {
       config: "./capi.config.ts",
     },
   })
-  const configPath = path.resolve(configFile)
+  const configPath = path.resolve(rawConfigPath)
   await Deno.stat(configPath)
   const configModule = await import(path.toFileUrl(configPath).toString())
   const config = configModule.config
