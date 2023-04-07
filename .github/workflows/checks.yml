@@ -86,6 +86,7 @@ jobs:
           key: ${{ runner.os }}-capi-metadata-${{ hashFiles('import_map.json') }}
       - run: deno task sync
       - run: deno task test
+
   examples-deno:
     name: Examples (Deno)
     runs-on: ubuntu-latest
@@ -109,4 +110,5 @@ jobs:
             target/capi/**/_metadata
             target/capi/**/_chainName
           key: ${{ runner.os }}-capi-metadata-${{ hashFiles('import_map.json') }}
+      - run: deno task sync
       - run: deno task test:examples:deno
