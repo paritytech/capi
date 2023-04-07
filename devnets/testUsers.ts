@@ -22,8 +22,8 @@ export function testUserFactory(endpoint: string) {
   function createUsers(): Promise<Record<typeof testUserNames[number], Sr25519>>
   function createUsers<N extends number>(count: N): Promise<ArrayOfLength<Sr25519, N>>
   async function createUsers(count?: number): Promise<Record<string, Sr25519> | Sr25519[]> {
-    const server = Deno.env.get("CAPN_SERVER")
-    if (!server) throw new Error("Must be run with a capn server")
+    const server = Deno.env.get("DEVNETS_SERVER")
+    if (!server) throw new Error("Must be run with a devnets server")
     const response = await fetch(
       new URL(`${endpoint}?users=${count ?? testUserNames.length}`, server),
       {

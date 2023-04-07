@@ -7,13 +7,13 @@ import { CapiConfig } from "./CapiConfig.ts"
 import { Network, startNetwork } from "./startNetwork.ts"
 import { testUserPublicKeys } from "./testUsers.ts"
 
-const rCapnApi = /^\/capn\/([\w-]+)(?:\/([\w-]+))?$/
+const rDevnetsApi = /^\/devnets\/([\w-]+)(?:\/([\w-]+))?$/
 
-export function createCapnHandler(tempDir: string, config: CapiConfig, signal: AbortSignal) {
+export function createDevnetsHandler(tempDir: string, config: CapiConfig, signal: AbortSignal) {
   const networkMemo = new PermanentMemo<string, Network>()
   return async (request: Request) => {
     const { pathname, searchParams } = new URL(request.url)
-    const match = rCapnApi.exec(pathname)
+    const match = rDevnetsApi.exec(pathname)
     if (!match) return f.notFound()
     const name = match[1]!
     const paraName = match[2]

@@ -1,10 +1,10 @@
 import * as path from "../deps/std/path.ts"
 
 export async function createTempDir() {
-  const dir = path.resolve("target/capn")
+  const dir = path.resolve("target/devnets")
   await Deno.mkdir(dir, { recursive: true })
   return await Deno.makeTempDir({
     dir,
-    prefix: `capn-${new Date().toISOString()}-`,
+    prefix: `devnets-${new Date().toISOString()}-`,
   })
 }

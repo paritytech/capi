@@ -131,7 +131,7 @@ export const connect = C.${entry.connection.type}.bind(${
               })
 
 ${
-                entry.connection.type === "CapnConnection"
+                entry.connection.type === "DevnetConnection"
                   ? `export const createUsers = C.testUserFactory(${
                     JSON.stringify(entry.connection.discovery)
                   })`
@@ -147,7 +147,7 @@ import * as C from "./capi.js"
 export const connect: (signal: AbortSignal) => C.Connection
 
 ${
-                entry.connection.type === "CapnConnection"
+                entry.connection.type === "DevnetConnection"
                   ? `export const createUsers: ReturnType<typeof C.testUserFactory>`
                   : ""
               }

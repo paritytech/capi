@@ -1,7 +1,7 @@
-import { createTempDir } from "../capn/createTempDir.ts"
-import { syncConfig } from "../capn/mod.ts"
 import * as flags from "../deps/std/flags.ts"
 import { assertEquals } from "../deps/std/testing/asserts.ts"
+import { createTempDir } from "../devnets/createTempDir.ts"
+import { syncConfig } from "../devnets/mod.ts"
 import { resolveConfig } from "./resolveConfig.ts"
 
 export default async function(...args: string[]) {

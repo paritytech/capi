@@ -5,7 +5,6 @@ bootnode
 bootnodes
 callables
 capi
-capn
 chainspec
 chelios
 chev
@@ -13,6 +12,8 @@ childstate
 codegen
 concat
 deno
+Devnet
+devnets
 dispatchable
 dprint
 egdoc

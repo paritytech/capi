@@ -1,6 +1,6 @@
-import { CapiConfig } from "../capn/mod.ts"
 import * as flags from "../deps/std/flags.ts"
 import * as path from "../deps/std/path.ts"
+import { CapiConfig } from "../devnets/mod.ts"
 
 export async function resolveConfig(...args: string[]) {
   const { config: rawConfigPath } = flags.parse(args, {

@@ -44,7 +44,7 @@ export async function syncConfig(tempDir: string, config: CapiConfig) {
                   metadata: metadata,
                   chainName: normalizeTypeName(name),
                   connection: {
-                    type: "CapnConnection",
+                    type: "DevnetConnection",
                     discovery: name + (paraName ? `/${paraName}` : ""),
                   },
                 },

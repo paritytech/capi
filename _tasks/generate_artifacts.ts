@@ -1,8 +1,8 @@
-import { testUser } from "../capn/mod.ts"
 import { hex } from "../crypto/mod.ts"
 import * as $ from "../deps/scale.ts"
 import { emptyDir } from "../deps/std/fs.ts"
 import * as path from "../deps/std/path.ts"
+import { testUser } from "../devnets/mod.ts"
 import dprintConfig from "../dprint.json" assert { type: "json" }
 import { compress } from "../util/compression.ts"
 

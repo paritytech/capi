@@ -1,7 +1,7 @@
-import { createTempDir } from "../capn/createTempDir.ts"
-import { createCapnHandler } from "../capn/mod.ts"
 import * as flags from "../deps/std/flags.ts"
 import { serve } from "../deps/std/http.ts"
+import { createTempDir } from "../devnets/createTempDir.ts"
+import { createDevnetsHandler } from "../devnets/mod.ts"
 import { createCorsHandler } from "../server/corsHandler.ts"
 import { createErrorHandler } from "../server/errorHandler.ts"
 import { createCodegenHandler } from "../server/mod.ts"
@@ -37,15 +37,15 @@ export default async function(...args: string[]) {
     .catch(() => false)
 
   if (!running) {
-    const capnHandler = createCapnHandler(tempDir, config, signal)
+    const devnetsHandler = createDevnetsHandler(tempDir, config, signal)
     const codegenHandler = createCodegenHandler(dataCache, tempCache)
     const handler = createCorsHandler(createErrorHandler(async (request) => {
       const { pathname } = new URL(request.url)
       if (pathname === "/capi_cwd") {
         return new Response(Deno.cwd())
       }
-      if (pathname.startsWith("/capn/")) {
-        return await capnHandler(request)
+      if (pathname.startsWith("/devnets/")) {
+        return await devnetsHandler(request)
       }
       return await codegenHandler(request)
     }))
@@ -73,7 +73,7 @@ export default async function(...args: string[]) {
         args,
         signal,
         env: {
-          CAPN_SERVER: `http://localhost:${port}/capn/`,
+          DEVNETS_SERVER: `http://localhost:${port}/devnets/`,
         },
       })
       const status = await command.spawn().status

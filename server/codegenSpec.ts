@@ -10,7 +10,7 @@ const $codegenEntry = $.taggedUnion("type", [
       "connection",
       $.taggedUnion("type", [
         $.variant("WsConnection", $.field("discovery", $.str)),
-        $.variant("CapnConnection", $.field("discovery", $.str)),
+        $.variant("DevnetConnection", $.field("discovery", $.str)),
       ]),
     ),
   ),
