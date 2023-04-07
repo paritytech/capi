@@ -86,3 +86,9 @@ async function uploadMetadata(server: string, url: string) {
 async function uploadCodegenSpec(server: string, spec: CodegenSpec) {
   return hex.encode(await _upload(server, "codegen", $codegenSpec.encode(spec), blake2_64))
 }
+
+export async function checkCodegenUploaded(server: string, hash: string) {
+  const url = new URL(`upload/codegen/${hash}`, server)
+  const exists = await fetch(url, { method: "HEAD" })
+  return exists.ok
+}

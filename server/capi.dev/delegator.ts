@@ -2,7 +2,9 @@ import { serve } from "../../deps/std/http.ts"
 import { TimedMemo } from "../../util/memo.ts"
 import { createCorsHandler, createErrorHandler, f } from "../mod.ts"
 
-serve(createCorsHandler(createErrorHandler(handler)))
+if (import.meta.main) {
+  serve(createCorsHandler(createErrorHandler(handler)))
+}
 
 const githubToken = Deno.env.get("GITHUB_TOKEN")
 if (!githubToken) throw new Error("GITHUB_TOKEN not set")
@@ -66,11 +68,7 @@ async function getSha(version: string): Promise<string> {
 const deploymentMemo = new TimedMemo<string, string>(ttl, signal)
 async function getDeployment(sha: string) {
   return await deploymentMemo.run(sha, async () => {
-    const deployments = await github<GithubDeployment[]>(`deployments?sha=${sha}`)
-    const deployment = deployments.find((x) => x.payload.project_id === delegateeProjectId)
-    if (!deployment) throw f.notFound()
-    const statuses = await github<GithubStatus[]>(deployment.statuses_url)
-    const url = statuses.map((x) => x.environment_url).find((x) => x)
+    const url = await _getDeploymentUrl(sha)
     if (!url) throw f.notFound()
     return url
   })
@@ -101,4 +99,13 @@ interface GithubRelease {
 
 interface GithubCommit {
   sha: string
+}
+
+export async function _getDeploymentUrl(sha: string) {
+  const deployments = await github<GithubDeployment[]>(`deployments?sha=${sha}`)
+  const deployment = deployments.find((x) => x.payload.project_id === delegateeProjectId)
+  if (!deployment) return
+  const statuses = await github<GithubStatus[]>(deployment.statuses_url)
+  const url = statuses.map((x) => x.environment_url).find((x) => x)
+  return url
 }
