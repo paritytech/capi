@@ -35,14 +35,33 @@ export class InkMetadataRune<out U> extends Rune<InkMetadata, U> {
 
   codecs = this
     .into(ValueRune)
-    .access("V3", "types")
+    .access("types")
     .map(transformTys)
     .access(0)
+
+  $event = Rune
+    .tuple([
+      this.into(ValueRune).access("spec", "events"),
+      this.codecs,
+    ])
+    .map(([events, codecs]) =>
+      $.taggedUnion(
+        "type",
+        events.map((event) =>
+          $.variant(
+            event.label,
+            $.object(...event.args.map((arg) => $.field(arg.label, codecs[arg.type.type]!))),
+          )
+        ),
+      )
+    )
+    .into(CodecRune)
 
   salt() {
     return Rune.constant(crypto.getRandomValues(new Uint8Array(4)))
   }
 
+  // TODO: protected?
   encodeData<X>(...args_: RunicArgs<X, [metadata: Callable, args?: unknown[]]>) {
     const [metadata, args] = RunicArgs.resolve(args_)
     const selector = metadata.access("selector").map(hex.decode)
@@ -83,11 +102,11 @@ export class InkMetadataRune<out U> extends Rune<InkMetadata, U> {
     const ctorMetadata = Rune.tuple([
       this
         .into(ValueRune)
-        .access("V3", "spec", "constructors"),
+        .access("spec", "constructors"),
       Rune
         .resolve(props.ctor)
         .unhandle(undefined)
-        .rehandle(undefined, () => Rune.resolve("default")),
+        .rehandle(undefined, () => Rune.resolve("new")),
     ])
       .map(([ctors, label]) => ctors.find((ctor) => ctor.label === label))
       .unhandle(undefined)

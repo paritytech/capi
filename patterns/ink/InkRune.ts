@@ -1,5 +1,5 @@
-import { equals } from "../../deps/std/bytes.ts"
 import {
+  ArrayRune,
   Chain,
   CodecRune,
   Event,
@@ -11,7 +11,7 @@ import {
   ValueRune,
 } from "../../mod.ts"
 import { $contractsApiCallArgs, $contractsApiCallResult, Weight } from "./codecs.ts"
-import { isInstantiatedEvent } from "./events.ts"
+import { isContractEmitted } from "./events.ts"
 import { InkMetadataRune } from "./InkMetadataRune.ts"
 
 export interface MsgProps {
@@ -39,7 +39,7 @@ export class InkRune<out C extends Chain, out U>
   common<X>(this: InkRune<C, U>, props: RunicArgs<X, MsgProps>) {
     const msgMetadata = Rune
       .tuple([
-        this.parent.into(ValueRune).access("V3", "spec", "messages"),
+        this.parent.into(ValueRune).access("spec", "messages"),
         props.method,
       ])
       .map(([msgs, methodName]) => msgs.find((msgs) => msgs.label === methodName))
@@ -86,54 +86,15 @@ export class InkRune<out C extends Chain, out U>
       .into(ExtrinsicRune, this.chain)
   }
 
-  filterContractEvents = <X>(...[events]: RunicArgs<X, [events: Event[]]>) => {
-    // TODO: return all relevant events, not just instantiated
+  emittedEvents = <X>(...[events]: RunicArgs<X, [events: Event[]]>) => {
     return Rune
-      .tuple([Rune.resolve(events), this])
-      .map(([events, publicKey]) =>
-        events.filter((e) =>
-          // TODO: clean up
-          isInstantiatedEvent(e) && equals((e.event as any).value.contract, publicKey)
-        )
-      )
+      .resolve(events)
+      .map((events) => events.filter(isContractEmitted))
+      .into(ArrayRune)
+      .mapArray((event) => this.parent.$event.decoded(event.access("event", "value", "data")))
   }
-
-  // TODO: improve
-  decodeErrorEvent = <X>(...[failRuntimeEvent]: RunicArgs<X, [any]>) => {
-    const $error = this.chain
-      .pallet("Contracts")
-      .into(ValueRune)
-      .access("types", "error")
-      .unhandle(undefined)
-      .rehandle(undefined, () => Rune.constant(new FailedToDecodeErrorError()))
-      .unhandle(FailedToDecodeErrorError)
-    return Rune
-      .tuple([Rune.resolve(failRuntimeEvent), $error])
-      .map(([failEvent, $error]) => {
-        const { dispatchError } = failEvent.event.value
-        if (dispatchError.type !== "Module") return new FailedToDecodeErrorError()
-        return $error.decode(dispatchError.value.error)
-      })
-      .unhandle(FailedToDecodeErrorError)
-  }
-
-  // // TODO: finish this
-  // emissions<X>(...[events]: RunicArgs<X, [events: Event[]]>) {
-  //   const $event: $.Codec<unknown> = null!
-  //   return Rune
-  //     .tuple([Rune.resolve(events), $event])
-  //     .map(([events, $event]) =>
-  //       events
-  //         .filter(isContractEmittedEvent)
-  //         .map((event) => $event.decode(event.event.value.data))
-  //     )
-  // }
 }
 
 export class MethodNotFoundError extends Error {
   override readonly name = "MethodNotFoundError"
-}
-
-export class FailedToDecodeErrorError extends Error {
-  override readonly name = "FailedToDecodeErrorError"
 }

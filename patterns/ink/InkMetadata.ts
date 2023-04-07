@@ -4,7 +4,10 @@ import { Ty } from "../../scale_info/raw/Ty.ts"
 export interface InkMetadata {
   source: Source
   contract: Contract
-  V3: Abi
+  spec: Spec
+  storage: Storage
+  types: Ty[]
+  version: string
 }
 
 export interface Source {
@@ -27,12 +30,6 @@ export interface Contract {
 
 export interface User {
   json: Record<string, unknown>
-}
-
-export interface Abi {
-  spec: Spec
-  storage: Storage
-  types: Ty[]
 }
 
 export interface Spec {
@@ -92,13 +89,10 @@ export interface Storage {
   }
 }
 
-export function normalize({ V3: { types, ...v3Rest }, ...topLevelRest }: InkMetadata): InkMetadata {
+export function normalize({ types, ...rest }: InkMetadata): InkMetadata {
   return {
-    ...topLevelRest,
-    V3: {
-      ...v3Rest,
-      types: types.map(fromRawTy),
-    },
+    ...rest,
+    types: types.map(fromRawTy),
   }
 }
 
@@ -106,7 +100,7 @@ export function normalize({ V3: { types, ...v3Rest }, ...topLevelRest }: InkMeta
 function fromRawTy({ type: { def, params, path }, id }: any): Ty {
   return {
     id,
-    path,
+    path: path ?? [],
     params: params ? normalizeFields(params) : [],
     // TODO: grab this from appropriate loc
     docs: [],

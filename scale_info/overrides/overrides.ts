@@ -4,13 +4,29 @@ import { Ty } from "../raw/Ty.ts"
 import { ChainError } from "./ChainError.ts"
 import { $era } from "./Era.ts"
 
+const isResult = new $.CodecVisitor<boolean>()
+  .add($.result<any, any>, () => true)
+  .fallback(() => false)
+
+const isOption = new $.CodecVisitor<boolean>()
+  .add($.option<any>, () => true)
+  .fallback(() => false)
+
 export const overrides: Record<string, (ty: Ty, visit: (i: number) => Codec<any>) => Codec<any>> = {
   Option: (ty, visit) => {
-    return $.option(visit(ty.params[0]!.ty!))
+    let $some = visit(ty.params[0]!.ty!)
+    if (isOption.visit($some)) {
+      $some = $.tuple($some)
+    }
+    return $.option($some)
   },
   Result: (ty, visit) => {
+    let $ok = visit(ty.params[0]!.ty!)
+    if (isResult.visit($ok)) {
+      $ok = $.tuple($ok)
+    }
     return $.result(
-      visit(ty.params[0]!.ty!),
+      $ok,
       $.instance(
         ChainError,
         $.tuple(visit(ty.params[1]!.ty!)),

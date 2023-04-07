@@ -2,9 +2,9 @@
  * @title Deploy an Ink Smart Contract
  * @stability unstable – We intend to work on an Ink provider (for static codegen)
  * in the near future. This work will likely entail large changes to the current ink patterns.
- *
- * Deploying an Ink contract (instantiating) to a production contracts-enabled parachain
+ * @description Deploying an Ink contract (instantiating) to a production contracts-enabled parachain
  * is much the same as any other extrinsic submission.
+ * @todo utilize `createUsers` instead of `alice`
  */
 
 import { $, alice, ss58 } from "capi"
@@ -14,7 +14,7 @@ import { chain, System } from "contracts_dev/mod.js"
 
 // Initialize an `InkMetadataRune` with the raw Ink metadata text.
 const metadata = InkMetadataRune.fromMetadataText(
-  Deno.readTextFileSync(new URL(import.meta.resolve("./metadata.json"))),
+  Deno.readTextFileSync(new URL(import.meta.resolve("./erc20.json"))),
 )
 
 // Instantiate `code.wasm` with `alice` and––upon block inclusion––return the
@@ -22,7 +22,8 @@ const metadata = InkMetadataRune.fromMetadataText(
 const events = await metadata
   .instantiation(chain, {
     sender: alice.publicKey,
-    code: Deno.readFileSync(new URL("./code.wasm", import.meta.url)),
+    code: Deno.readFileSync(new URL("./erc20.wasm", import.meta.url)),
+    args: [1_000_000n],
   })
   .signed(signature({ sender: alice }))
   .sent()
@@ -39,10 +40,10 @@ const events = await metadata
 for (const { event } of events) {
   if (event.type === "Contracts" && event.value.type === "Instantiated") {
     const accountId = event.value.contract
-    console.log("account id:", accountId)
+    console.log("Account id:", accountId)
     $.assert($.sizedUint8Array(32), accountId)
     const address = ss58.encode(System.SS58Prefix, accountId)
-    console.log("ss58 address:", address)
+    console.log("Contract ss58 address:", address)
     Deno.env.set("SS58_ADDRESS", address)
     break
   }

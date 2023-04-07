@@ -24,6 +24,7 @@ hasher
 hashers
 inherents
 instanceof
+instantiator
 kiera
 kusama
 lparachain
