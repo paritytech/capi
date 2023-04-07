@@ -53,7 +53,7 @@ jobs:
       - run: deno run -A _tasks/await_deployment.ts
         timeout-minutes: 1
         env:
-          GITHUB_TOKEN: ${{ secrets.ADD_TO_PROJECT_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: deno run -A _tasks/use_remote.ts
       - run: deno task run _tasks/star.ts
       - run: deno cache target/star.ts || deno cache target/star.ts || deno cache target/star.ts
