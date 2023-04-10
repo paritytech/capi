@@ -63,6 +63,7 @@ export async function startNetwork(
         genesisConfig.paras.paras.push(
           ...paras.map(({ id, genesis }) => [id, [...genesis, true]] satisfies Narrow),
         )
+        addXcmHrmpChannels(genesisConfig, paras.map(({ id }) => id))
       }
       addAuthorities(genesisConfig, minValidators)
       addTestUsers(genesisConfig.balances.balances)
@@ -290,4 +291,16 @@ function addAuthorities(genesisConfig: GenesisConfig, count: number) {
       },
     ])
   )
+}
+
+function addXcmHrmpChannels(genesisConfig: GenesisConfig, paraIds: number[]) {
+  if (!genesisConfig.hrmp) {
+    genesisConfig.hrmp = { preopenHrmpChannels: [] }
+  }
+  for (const senderParaId of paraIds) {
+    for (const recipientParaId of paraIds) {
+      if (senderParaId === recipientParaId) continue
+      genesisConfig.hrmp.preopenHrmpChannels.push([senderParaId, recipientParaId, 8, 512])
+    }
+  }
 }
