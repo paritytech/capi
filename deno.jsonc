@@ -41,6 +41,7 @@
     "check": "deno task capi serve -- deno cache --check",
     "star": "deno task run _tasks/star.ts && deno task check target/star.ts",
     "sync": "mkdir -p target && deno task capi serve -- deno task capi sync --import-map import_map.json",
-    "run": "deno task capi serve -- deno run -A -r=http://localhost:4646/"
+    "run": "deno task capi serve -- deno run -A -r=http://localhost:4646/",
+    "test:eg": "deno task run ../egts/test.ts 'examples/blocks.eg.ts' -b"
   }
 }

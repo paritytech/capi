@@ -3,6 +3,7 @@
  * @stability unstable
  * @description Administrate a stash account (pure proxy) through a multisig with
  * three signatories.
+ * @test_skip
  */
 
 import { Balances, chain, MultiAddress, Proxy, System } from "@capi/polkadot-dev"

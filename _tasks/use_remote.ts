@@ -2,7 +2,7 @@
 // instead of the local server.
 
 import { config } from "../capi.config.ts"
-import { checkCodegenUploaded, syncConfig } from "../mod.ts"
+import { checkCodegenUploaded, syncConfig } from "../devnets/mod.ts"
 
 const shaAbbrevLength = 8
 const sha = Deno.env.get("CAPI_SHA")!.slice(0, shaAbbrevLength)
