@@ -169,16 +169,10 @@ async function spawnChain(
       nodeDir,
       "--chain",
       chain,
+      "--port",
+      `${httpPort}`,
       "--ws-port",
       `${wsPort}`,
-      "--listen-addr",
-      `/ip4/0.0.0.0/tcp/${httpPort}`,
-      "--listen-addr",
-      `/ip6/::/tcp/${httpPort}`,
-      "--listen-addr",
-      `/ip4/0.0.0.0/tcp/${wsPort}/ws`,
-      "--listen-addr",
-      `/ip6/::/tcp/${wsPort}/ws`,
     ]
     if (bootnodes) {
       args.push("--bootnodes", bootnodes)

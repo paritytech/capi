@@ -15,7 +15,7 @@ export function getFreePort(): Promise<number> {
 export async function portReady(port: number): Promise<void> {
   while (true) {
     try {
-      const connection = net.createConnection({ port })
+      const connection = net.createConnection(port, "127.0.0.1")
       await new Promise<void>((resolve, reject) => {
         connection.on("connect", resolve)
         connection.on("error", reject)
