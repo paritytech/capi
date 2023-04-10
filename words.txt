@@ -60,6 +60,7 @@ paritytech
 pendings
 polkadot
 precommits
+preopen
 prevotes
 procps
 relaychain
