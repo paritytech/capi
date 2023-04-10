@@ -6,26 +6,23 @@
  * the new balance of the user to whom the asset was transferred.
  */
 
-import { types, XcmPallet } from "@capi/rococo-dev/mod.js"
+import { XcmPallet } from "@capi/rococo-dev/mod.js"
 import { chain as parachain, System } from "@capi/rococo-dev/statemine/mod.js"
-import { Event } from "@capi/rococo-dev/statemine/types/cumulus_pallet_parachain_system/pallet.js"
-import { RuntimeEvent } from "@capi/rococo-dev/statemine/types/statemine_runtime.js"
+import { CumulusPalletParachainSystemEvent } from "@capi/rococo-dev/statemine/types/mod.js"
+import { RuntimeEvent } from "@capi/rococo-dev/statemine/types/mod.js"
+import {
+  VersionedMultiAssets,
+  VersionedMultiLocation,
+  XcmV2AssetId,
+  XcmV2Fungibility,
+  XcmV2Junction,
+  XcmV2Junctions,
+  XcmV2NetworkId,
+  XcmV2WeightLimit,
+} from "@capi/rococo-dev/types/mod.js"
 import { assert } from "asserts"
 import { alice, Rune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
-
-// Destructure the various type factories for convenient access.
-const {
-  VersionedMultiAssets,
-  VersionedMultiLocation,
-  v2: {
-    NetworkId,
-    WeightLimit,
-    junction: { Junction },
-    multilocation: { Junctions },
-    multiasset: { AssetId, Fungibility },
-  },
-} = types.xcm
 
 // Reference Alice's free balance.
 const aliceBalance = System.Account
@@ -41,24 +38,24 @@ XcmPallet
   .limitedTeleportAssets({
     dest: VersionedMultiLocation.V2(Rune.rec({
       parents: 0,
-      interior: Junctions.X1(Junction.Parachain(1000)),
+      interior: XcmV2Junctions.X1(XcmV2Junction.Parachain(1000)),
     })),
     beneficiary: VersionedMultiLocation.V2(Rune.rec({
       parents: 0,
-      interior: Junctions.X1(Junction.AccountId32({
+      interior: XcmV2Junctions.X1(XcmV2Junction.AccountId32({
         id: alice.publicKey,
-        network: NetworkId.Any(),
+        network: XcmV2NetworkId.Any(),
       })),
     })),
     assets: VersionedMultiAssets.V2(Rune.array([Rune.rec({
-      id: AssetId.Concrete(Rune.rec({
+      id: XcmV2AssetId.Concrete(Rune.rec({
         parents: 0,
-        interior: Junctions.Here(),
+        interior: XcmV2Junctions.Here(),
       })),
-      fun: Fungibility.Fungible(500_000_000_000_000n),
+      fun: XcmV2Fungibility.Fungible(500_000_000_000_000n),
     })])),
     feeAssetItem: 0,
-    weightLimit: WeightLimit.Unlimited(),
+    weightLimit: XcmV2WeightLimit.Unlimited(),
   })
   .signed(signature({ sender: alice }))
   .sent()
@@ -72,7 +69,10 @@ outer:
 for await (const e of System.Events.value(undefined, parachain.latestBlockHash).iter()) {
   if (e) {
     for (const { event } of e) {
-      if (RuntimeEvent.isParachainSystem(event) && Event.isDownwardMessagesProcessed(event.value)) {
+      if (
+        RuntimeEvent.isParachainSystem(event)
+        && CumulusPalletParachainSystemEvent.isDownwardMessagesProcessed(event.value)
+      ) {
         const aliceFreeFinal = await aliceBalance.run()
         console.log("Alice final free:", aliceFreeFinal)
         assert(aliceFreeFinal > aliceFreeInitial)

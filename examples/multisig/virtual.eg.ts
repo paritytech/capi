@@ -18,7 +18,7 @@
  */
 
 import { Balances, chain, createUsers, System, Utility } from "@capi/polkadot-dev/mod.js"
-import { MultiAddress } from "@capi/polkadot-dev/types/sp_runtime/multiaddress.js"
+import { MultiAddress } from "@capi/polkadot-dev/types/mod.js"
 import { assert } from "asserts"
 import { $, Rune, Sr25519 } from "capi"
 import { VirtualMultisigRune } from "capi/patterns/multisig/mod.ts"

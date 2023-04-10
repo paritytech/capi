@@ -1,4 +1,4 @@
-import { $digestItem, DigestItem } from "@capi/polkadot/types/sp_runtime/generic/digest.js"
+import { $digestItem, DigestItem } from "@capi/polkadot/types/mod.js"
 import { hex } from "../../crypto/mod.ts"
 import { Chain, ChainRune } from "../../fluent/mod.ts"
 import { RunicArgs, ValueRune } from "../../rune/mod.ts"

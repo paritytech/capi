@@ -1,7 +1,7 @@
 import * as $ from "../deps/scale.ts"
 import { Codec } from "../deps/scale.ts"
 import { getOrInit } from "../util/mod.ts"
-import { normalizeDocs, normalizeIdent } from "../util/normalize.ts"
+import { normalizeDocs, normalizeIdent, normalizeTypeName } from "../util/normalize.ts"
 import { overrides } from "./overrides/mod.ts"
 import { $field, Ty } from "./raw/Ty.ts"
 
@@ -50,8 +50,12 @@ export function transformTys(tys: Ty[]): [Codec<any>[], Record<string, Codec<any
     const name = parts.at(-1)!
     const map = nameCounts.get(name)!
     const pathLength = parts.findIndex((_, i) => map.get(parts.slice(0, i).join(".")) === 1)
-    remappedPaths.set(path, [...parts.slice(0, pathLength), name].join("."))
+    const newPath = [...parts.slice(0, pathLength), name].join(".")
+    const newName = normalizeTypeName(newPath)
+    remappedPaths.set(path, newName)
   }
+
+  paths["_._"] = $null
 
   return [tys.map((_, i) => visit(i)), paths]
 

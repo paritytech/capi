@@ -1,4 +1,4 @@
-import { MultiAddress } from "@capi/polkadot/types/sp_runtime/multiaddress.js"
+import { MultiAddress } from "@capi/polkadot/types/mod.js"
 import { equals } from "../../deps/std/bytes.ts"
 import {
   $,
