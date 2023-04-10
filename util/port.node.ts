@@ -4,7 +4,7 @@ export function getFreePort(): Promise<number> {
   return new Promise((resolve) => {
     const tmp = net.createServer()
     tmp.listen(0, () => {
-      const { port } = tmp.address()
+      const { port } = tmp.address() as net.AddressInfo
       tmp.close(() => {
         resolve(port)
       })

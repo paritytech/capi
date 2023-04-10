@@ -36,12 +36,12 @@ export const serve: typeof _serve = (handler, options = {}) => {
 }
 
 function convertRequest(req: http.IncomingMessage) {
-  const request = new Request(new URL(req.url, "http://_/"), {
+  const request = new Request(new URL(req.url!, "http://_/"), {
     method: req.method,
-    headers: req.headers,
+    headers: req.headers as any,
     body: req.method === "GET" || req.method === "HEAD"
       ? undefined
-      : stream.Readable.toWeb(req),
+      : stream.Readable.toWeb(req) as ReadableStream<Uint8Array>,
     // @ts-ignore https://github.com/nodejs/undici#requestduplex
     duplex: "half",
   })
