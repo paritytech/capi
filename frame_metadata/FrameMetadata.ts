@@ -2,6 +2,7 @@ import * as $ from "../deps/scale.ts"
 
 export interface FrameMetadata {
   types: Record<string, $.AnyCodec>
+  paths: Record<string, $.AnyCodec>
   pallets: Record<string, Pallet>
   extrinsic: {
     call: $.AnyCodec

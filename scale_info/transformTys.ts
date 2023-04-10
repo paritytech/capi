@@ -11,8 +11,14 @@ import { $field, Ty } from "./raw/Ty.ts"
  */
 export const $null = $.withMetadata($.metadata("$null"), $.constant(null))
 
-export function transformTys(tys: Ty[]): [Codec<any>[], Record<string, Codec<any>>] {
+export interface ScaleInfo {
+  ids: Codec<any>[]
+  types: Record<string, Codec<any>>
+  paths: Record<string, Codec<any>>
+}
+export function transformTys(tys: Ty[]): ScaleInfo {
   const memo = new Map<number, Codec<any>>()
+  const types: Record<string, Codec<any>> = {}
   const paths: Record<string, Codec<any>> = {}
   const seenPaths = new Map<string, Ty | null>()
   const includePaths = new Set<string>()
@@ -54,18 +60,18 @@ export function transformTys(tys: Ty[]): [Codec<any>[], Record<string, Codec<any
     names.set(path, newName)
   }
 
-  return [tys.map((_, i) => visit(i)), paths]
+  return { ids: tys.map((_, i) => visit(i)), types, paths }
 
   function visit(i: number): Codec<any> {
     return getOrInit(memo, i, () => {
       memo.set(i, $.deferred(() => memo.get(i)!))
       const ty = tys[i]!
-      const rawPath = ty.path.join("::")
-      const usePath = includePaths.has(rawPath)
-      const path = names.get(rawPath) ?? rawPath
-      if (usePath && paths[path]) return paths[path]!
+      const path = ty.path.join("::")
+      const usePath = includePaths.has(path)
+      const name = names.get(path)!
+      if (usePath && types[name]) return types[name]!
       const codec = withDocs(ty.docs, _visit(ty))
-      if (usePath) return paths[path] ??= codec
+      if (usePath) return types[name] ??= paths[path] = codec
       return codec
     })
   }
