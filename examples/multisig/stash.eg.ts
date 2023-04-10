@@ -5,14 +5,7 @@
  * three signatories.
  */
 
-import {
-  Balances,
-  chain,
-  createUsers,
-  MultiAddress,
-  Proxy,
-  System,
-} from "@capi/polkadot-dev/mod.js"
+import { Balances, chain, createUsers, MultiAddress, Proxy, System } from "@capi/polkadot-dev"
 import { assert } from "asserts"
 import { MultisigRune } from "capi/patterns/multisig/mod.ts"
 import { filterPureCreatedEvents } from "capi/patterns/proxy/mod.ts"

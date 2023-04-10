@@ -6,7 +6,7 @@
  * various pieces of data pertaining to that block.
  */
 
-import { chain, metadata, types } from "@capi/polkadot/mod.js"
+import { $eventRecord, chain, metadata } from "@capi/polkadot"
 import { $, $extrinsic, known, Rune } from "capi"
 import { babeBlockAuthor } from "capi/patterns/consensus/mod.ts"
 
@@ -48,7 +48,7 @@ $.assert(
     $.field("block", known.$signedBlock),
     $.field("extrinsics", $.array($extrinsic(metadata))),
     $.field("extrinsicsRaw", $.array($.str)),
-    $.field("events", $.array(types.frame_system.$eventRecord)),
+    $.field("events", $.array($eventRecord)),
     $.field("author", $.str),
   ),
   collection,

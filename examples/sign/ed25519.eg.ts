@@ -4,7 +4,7 @@
  * @description Utilize an Ed25519 library for signing.
  */
 
-import { Balances, createUsers, System, types } from "@capi/westend-dev/mod.js"
+import { Balances, createUsers, MultiAddress, System } from "@capi/westend-dev"
 import { assert } from "asserts"
 import { Rune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
@@ -24,8 +24,7 @@ console.log("Billy free initial:", billyFreeInitial)
 const secret = crypto.getRandomValues(new Uint8Array(32))
 
 // Get a Rune of the secret-corresponding multiaddress.
-const address = types.sp_runtime.multiaddress.MultiAddress
-  .Id(await ed.getPublicKey(secret))
+const address = MultiAddress.Id(await ed.getPublicKey(secret))
 
 // Define a `sign` function for later use.
 async function sign(msg: Uint8Array) {

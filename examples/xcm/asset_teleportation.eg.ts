@@ -16,13 +16,13 @@ import {
   XcmV2Junctions,
   XcmV2NetworkId,
   XcmV2WeightLimit,
-} from "@capi/rococo-dev/mod.js"
+} from "@capi/rococo-dev"
 import {
   chain as parachain,
   CumulusPalletParachainSystemEvent,
   RuntimeEvent,
   System,
-} from "@capi/rococo-dev/statemine/mod.js"
+} from "@capi/rococo-dev/statemine"
 import { assert } from "asserts"
 import { alice, Rune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"

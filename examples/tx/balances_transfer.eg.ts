@@ -4,7 +4,7 @@
  * @description Transfer some funds from one user to another.
  */
 
-import { Balances, createUsers, System } from "@capi/westend-dev/mod.js"
+import { Balances, createUsers, System } from "@capi/westend-dev"
 import { assert } from "asserts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 

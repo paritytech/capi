@@ -4,7 +4,7 @@
  * @description Read the current timestamp as agreed upon by validators.
  */
 
-import { Timestamp } from "@capi/polkadot/mod.js"
+import { Timestamp } from "@capi/polkadot"
 import { $ } from "capi"
 
 const now = await Timestamp.Now.value().run()

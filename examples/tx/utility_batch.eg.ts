@@ -4,7 +4,7 @@
  * @description Sign and submit multiple calls within a single extrinsic.
  */
 
-import { Balances, createUsers, System, Utility } from "@capi/westend-dev/mod.js"
+import { Balances, createUsers, System, Utility } from "@capi/westend-dev"
 import { assert } from "asserts"
 import { Rune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"

@@ -17,14 +17,7 @@
  * members ratify a call to give ownership of the stash account to the new multisig.
  */
 
-import {
-  Balances,
-  chain,
-  createUsers,
-  MultiAddress,
-  System,
-  Utility,
-} from "@capi/polkadot-dev/mod.js"
+import { Balances, chain, createUsers, MultiAddress, System, Utility } from "@capi/polkadot-dev"
 import { assert } from "asserts"
 import { $, Rune, Sr25519 } from "capi"
 import { VirtualMultisigRune } from "capi/patterns/multisig/mod.ts"

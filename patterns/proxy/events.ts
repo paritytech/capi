@@ -1,4 +1,4 @@
-import { PalletProxyEvent, RuntimeEvent } from "@capi/polkadot/mod.js"
+import { PalletProxyEvent, RuntimeEvent } from "@capi/polkadot"
 import { Rune, RunicArgs } from "../../mod.ts"
 
 export function filterPureCreatedEvents<X>(...[events]: RunicArgs<X, [any[]]>) {

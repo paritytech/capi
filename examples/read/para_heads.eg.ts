@@ -6,7 +6,7 @@
  * (the corresponding parachain heads).
  */
 
-import { Paras } from "@capi/polkadot/mod.js"
+import { Paras } from "@capi/polkadot"
 import { $, ArrayRune, ValueRune } from "capi"
 
 const heads = await Paras.Parachains

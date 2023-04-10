@@ -1,4 +1,4 @@
-import { MultiAddress } from "@capi/polkadot/mod.js"
+import { MultiAddress } from "@capi/polkadot"
 import { Chain, ChainRune, Rune, RunicArgs } from "../../mod.ts"
 
 // TODO: constrain

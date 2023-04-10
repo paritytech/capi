@@ -1,4 +1,4 @@
-import { Polkadot } from "@capi/polkadot/mod.js"
+import { Polkadot } from "@capi/polkadot"
 import { AddressPrefixChain, Chain, ChainRune } from "../../fluent/ChainRune.ts"
 import { ExtrinsicSender, SignatureData } from "../../fluent/ExtrinsicRune.ts"
 import { $, hex, ss58, ValueRune } from "../../mod.ts"
