@@ -1,6 +1,20 @@
+import { config } from "../capi.config.ts"
 import { build } from "../deps/dnt.ts"
+import * as flags from "../deps/std/flags.ts"
 import * as fs from "../deps/std/fs.ts"
 import * as path from "../deps/std/path.ts"
+import importMap from "../import_map.json" assert { type: "json" }
+import { normalizePackageName } from "../util/normalize.ts"
+
+const { version: packageVersion, server: serverVersion } = flags.parse(Deno.args, {
+  string: ["version", "server"],
+  default: {
+    version: "v0.0.0-local",
+  },
+})
+
+const server = serverVersion ? `https://capi.dev/@${serverVersion}/` : "http://localhost:4646/"
+const hash = new URL(importMap.imports["@capi/"]).pathname.slice(1, -1)
 
 const outDir = path.join("target", "npm")
 
@@ -10,11 +24,17 @@ await Promise.all([
   build({
     package: {
       name: "capi",
-      version: Deno.args[0]!,
+      version: packageVersion,
       type: "module",
       description: "Capi is a framework for crafting interactions with Substrate chains",
       license: "Apache-2.0",
       repository: "github:paritytech/capi",
+      dependencies: Object.fromEntries(
+        Object.keys(config.chains ?? {}).map((key) => {
+          const name = normalizePackageName(key)
+          return [`@capi/${name}`, `${server}${hash}/${name}.tar`]
+        }),
+      ),
     },
     compilerOptions: {
       importHelpers: true,
@@ -57,7 +77,6 @@ await Promise.all([
         path: "./patterns/storage_sizes.ts",
       },
     ],
-    importMap: "import_map.json",
     mappings: {
       "https://deno.land/x/wat_the_crypto@v0.0.1/mod.ts": {
         name: "wat-the-crypto",
