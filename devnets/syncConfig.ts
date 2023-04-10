@@ -35,7 +35,7 @@ export async function syncConfig(tempDir: string, config: CapiConfig) {
             async ([paraName, chain]) => {
               const metadata = await uploadMetadata(
                 server,
-                `ws://localhost:${chain.ports[0]}`,
+                `ws://127.0.0.1:${chain.ports[0]}`,
               )
               entries.set(
                 normalizePackageName(name) + (paraName ? `/${normalizePackageName(paraName)}` : ""),

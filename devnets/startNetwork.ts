@@ -159,8 +159,8 @@ async function spawnChain(
     if (!keystoreAccount) throw new Error("ran out of keystore accounts")
     const nodeDir = path.join(tempDir, keystoreAccount)
     await Deno.mkdir(nodeDir, { recursive: true })
-    const httpPort = getFreePort()
-    const wsPort = getFreePort()
+    const httpPort = await getFreePort()
+    const wsPort = await getFreePort()
     ports.push(wsPort)
     const args = [
       "--validator",
@@ -169,10 +169,16 @@ async function spawnChain(
       nodeDir,
       "--chain",
       chain,
-      "--port",
-      `${httpPort}`,
       "--ws-port",
       `${wsPort}`,
+      "--listen-addr",
+      `/ip4/0.0.0.0/tcp/${httpPort}`,
+      "--listen-addr",
+      `/ip6/::/tcp/${httpPort}`,
+      "--listen-addr",
+      `/ip4/0.0.0.0/tcp/${wsPort}/ws`,
+      "--listen-addr",
+      `/ip6/::/tcp/${wsPort}/ws`,
     ]
     if (bootnodes) {
       args.push("--bootnodes", bootnodes)

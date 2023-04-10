@@ -7,11 +7,10 @@ export class WsConnection extends Connection {
   constructor(readonly url: string) {
     super()
     this.ws = new WebSocket(url)
-    this.ws.addEventListener("message", (e) => this.handle(JSON.parse(e.data)), {
-      signal: this.signal,
-    })
+    this.ws.addEventListener("message", (e) => {
+      this.handle(JSON.parse(e.data))
+    }, { signal: this.signal })
     this.ws.addEventListener("error", (e) => {
-      console.log(e)
       throw new Error("TODO: more graceful error messaging / recovery")
     }, { signal: this.signal })
   }
@@ -28,15 +27,15 @@ export class WsConnection extends Connection {
               controller.abort()
               resolve()
             }, controller)
-            this.ws.addEventListener("close", throw_, controller)
-            this.ws.addEventListener("error", throw_, controller)
+            this.ws.addEventListener("close", abort, controller)
+            this.ws.addEventListener("error", abort, controller)
 
-            function throw_() {
+            function abort() {
               controller.abort()
               reject()
             }
           })
-        } catch (_e) {
+        } catch {
           throw new ConnectionError()
         }
       }

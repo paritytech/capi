@@ -1,4 +1,4 @@
-export function getFreePort(): number {
+export async function getFreePort(): Promise<number> {
   const tmp = Deno.listen({ port: 0 })
   const { port } = tmp.addr as Deno.NetAddr
   tmp.close()

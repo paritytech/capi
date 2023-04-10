@@ -3,7 +3,6 @@ import { FrameCodegen } from "../codegen/FrameCodegen.ts"
 import { blake2_512, blake2_64 } from "../crypto/hashers.ts"
 import { hex } from "../crypto/mod.ts"
 import { Tar } from "../deps/std/archive.ts"
-import { Handler } from "../deps/std/http.ts"
 import { Buffer } from "../deps/std/io.ts"
 import { posix as path } from "../deps/std/path.ts"
 import { readableStreamFromReader, writableStreamFromWriter } from "../deps/std/streams.ts"
@@ -15,6 +14,7 @@ import { normalizePackageName } from "../util/normalize.ts"
 import { tsFormatter } from "../util/tsFormatter.ts"
 import { $codegenSpec, CodegenEntry } from "./codegenSpec.ts"
 import * as f from "./factories.ts"
+import { getStatic } from "./getStatic.ts"
 
 const { relative } = path
 
@@ -24,14 +24,14 @@ const rTarball = /^\/([^\/]+)\.tar$/
 
 const codeTtl = 60_000
 
-export function createCodegenHandler(dataCache: CacheBase, tempCache: CacheBase): Handler {
+export function createCodegenHandler(dataCache: CacheBase, tempCache: CacheBase) {
   const filesMemo = new WeakMemo<string, Map<string, string>>()
   return handle
 
   async function handle(request: Request) {
     const url = new URL(request.url)
     const { pathname } = url
-    if (pathname === "/") return await fetch(import.meta.resolve("./static/index.html"))
+    if (pathname === "/") return f.html(await getStatic("./static/index.html"))
     let match
     if ((match = rUploadUrl.exec(pathname))) {
       const key = match[1]!
@@ -43,15 +43,10 @@ export function createCodegenHandler(dataCache: CacheBase, tempCache: CacheBase)
     }
     if (pathname.startsWith("/capi/")) {
       return f.code(tempCache, request, async () => {
-        const url = new URL(pathname.slice("/capi/".length), import.meta.resolve("../"))
-        const response = await fetch(url)
-        if (!response.ok) throw f.notFound()
-        return response.text()
+        return await getStatic(`../${pathname.slice("/capi/".length)}`)
       })
     }
-    const response = await fetch(new URL(pathname.slice(1), import.meta.resolve("./static/")))
-    if (!response.ok) return f.notFound()
-    return new Response(response.body, {
+    return new Response(await getStatic(`./static${pathname}`), {
       headers: {
         "Content-Type": mime.getType(pathname) ?? "text/plain",
       },
@@ -157,14 +152,14 @@ export function createCodegenHandler(dataCache: CacheBase, tempCache: CacheBase)
         [...codegenSpec.codegen]
           .filter(([key]) => key === name || key.startsWith(`${name}/`))
           .map(async ([key, entry]) => {
-            key = key.slice(name.length + 1)
+            const prefix = key.slice(name.length + 1)
             const files = await getFiles(hash, key, entry)
             for (let [path, content] of files) {
               if (path === "capi.js" || path === "capi.d.ts") {
                 content = `export * from "capi"`
               }
-              if (key) {
-                path = `${key}/${path}`
+              if (prefix) {
+                path = `${prefix}/${path}`
               }
               if (/\.(js|ts)$/.test(path)) {
                 content = tsFormatter.formatText(path, content)
