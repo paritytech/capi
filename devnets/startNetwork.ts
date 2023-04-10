@@ -75,6 +75,7 @@ export async function startNetwork(
     relaySpec,
     config.nodes ?? 2,
     [],
+    relayBinary,
     signal,
   )
 
@@ -97,6 +98,7 @@ export async function startNetwork(
               "--bootnodes",
               relay.bootnodes,
             ],
+            relayBinary,
             signal,
           )
           return [name, chain] satisfies Narrow
@@ -149,6 +151,7 @@ async function spawnChain(
   chain: string,
   count: number,
   extraArgs: string[],
+  generateNodeKeyBinary: string,
   signal: AbortSignal,
 ): Promise<NetworkChain> {
   let bootnodes: string | undefined
@@ -177,7 +180,7 @@ async function spawnChain(
     if (bootnodes) {
       args.push("--bootnodes", bootnodes)
     } else {
-      const { nodeKey, peerId } = await generateNodeKey(binary)
+      const { nodeKey, peerId } = await generateNodeKey(generateNodeKeyBinary)
       args.push("--node-key", nodeKey)
       bootnodes = generateBootnodeString(httpPort, peerId)
     }

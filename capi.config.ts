@@ -3,6 +3,7 @@ import { binary, CapiConfig } from "./mod.ts"
 const polkadot = binary("polkadot", "v0.9.38")
 const polkadotParachain = binary("polkadot-parachain", "v0.9.380")
 const substrateContractsNode = binary("substrate-contracts-node", "v0.24.0")
+const trappistParachain = binary("trappist-collator", "22755b2")
 
 export const config: CapiConfig = {
   server: "http://localhost:4646/",
@@ -55,6 +56,22 @@ export const config: CapiConfig = {
           id: 1000,
           binary: polkadotParachain,
           chain: "westmint-local",
+        },
+      },
+    },
+    rococoDevXcm: {
+      binary: polkadot,
+      chain: "rococo-local",
+      parachains: {
+        statemine: {
+          id: 1000,
+          binary: polkadotParachain,
+          chain: "statemine-local",
+        },
+        trappist: {
+          id: 2000,
+          binary: trappistParachain,
+          chain: "local",
         },
       },
     },

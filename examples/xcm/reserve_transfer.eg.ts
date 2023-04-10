@@ -6,11 +6,11 @@
  * the exchange.
  */
 
+import * as Rococo from "@capi/rococo-dev-xcm/mod.js"
+import * as Statemine from "@capi/rococo-dev-xcm/statemine/mod.js"
+import * as Trappist from "@capi/rococo-dev-xcm/trappist/mod.js"
 import { alice, bob, hex, Rune, ValueRune } from "capi"
 import { signature } from "capi/patterns/signature/statemint.ts"
-import * as Rococo from "zombienet/trappist.toml/alice/@latest/mod.js"
-import * as Statemine from "zombienet/trappist.toml/statemine-collator01/@latest/mod.js"
-import * as Trappist from "zombienet/trappist.toml/trappist-collator01/@latest/mod.js"
 import { waitFor } from "../../util/mod.ts"
 
 // Define some constants for later use.
