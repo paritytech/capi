@@ -21,7 +21,7 @@ jobs:
           node-version: "16.x"
           registry-url: "https://registry.npmjs.org"
       - name: Build NPM Package
-        run: deno task dnt ${{steps.get_tag_version.outputs.tag_version}}
+        run: deno task dnt --version ${{steps.get_tag_version.outputs.tag_version}} --server ${{steps.get_tag_version.outputs.tag_version}}
       - run: npm pack
         working-directory: "./target/npm"
       - uses: actions/upload-artifact@v3

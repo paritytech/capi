@@ -13,11 +13,11 @@ const dataCache = new S3Cache("", {
   bucket: Deno.env.get("S3_BUCKET_DATA")!,
 }, signal)
 
-const generatedCache = new S3Cache(Deno.env.get("DENO_DEPLOYMENT_ID")! + "/", {
+const tempCache = new S3Cache(Deno.env.get("DENO_DEPLOYMENT_ID")! + "/", {
   accessKeyID: Deno.env.get("S3_ACCESS_KEY")!,
   secretKey: Deno.env.get("S3_SECRET_KEY")!,
   region: Deno.env.get("S3_REGION")!,
   bucket: Deno.env.get("S3_BUCKET_TEMP")!,
 }, signal)
 
-serve(createErrorHandler(createCodegenHandler(dataCache, generatedCache)))
+serve(createErrorHandler(createCodegenHandler(dataCache, tempCache)))

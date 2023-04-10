@@ -15,21 +15,21 @@ export function createCorsHandler(handler: Handler): Handler {
       })
     }
 
-    const res = await handler(request, connInfo)
+    const response = await handler(request, connInfo)
 
     // Deno.upgradeWebSocket response objects cannot be modified
-    if (res.headers.get("upgrade") !== "websocket") {
-      for (const [k, v] of res.headers) {
+    if (response.headers.get("upgrade") !== "websocket") {
+      for (const [k, v] of response.headers) {
         newHeaders.append(k, v)
       }
 
-      return new Response(res.body, {
+      return new Response(response.body, {
         headers: newHeaders,
-        status: res.status,
-        statusText: res.statusText,
+        status: response.status,
+        statusText: response.statusText,
       })
     }
 
-    return res
+    return response
   }
 }

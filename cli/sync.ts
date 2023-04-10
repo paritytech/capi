@@ -2,6 +2,7 @@ import * as flags from "../deps/std/flags.ts"
 import { assertEquals } from "../deps/std/testing/asserts.ts"
 import { createTempDir } from "../devnets/createTempDir.ts"
 import { syncConfig } from "../devnets/mod.ts"
+import { normalizePackageName } from "../util/mod.ts"
 import { resolveConfig } from "./resolveConfig.ts"
 
 export default async function(...args: string[]) {
@@ -22,16 +23,35 @@ export default async function(...args: string[]) {
   console.log(baseUrl)
 
   if (importMapFile) {
-    const importMap = JSON.parse(await Deno.readTextFile(importMapFile))
+    const importMapText = await Deno.readTextFile(importMapFile)
+    const importMap = JSON.parse(importMapText)
+    importMap.imports["@capi/"] = baseUrl
     if (check) {
-      assertEquals(importMap.imports["@capi/"], baseUrl)
+      assertEquals(JSON.parse(importMapText), importMap)
     } else {
-      importMap.imports["@capi/"] = baseUrl
       await Deno.writeTextFile(importMapFile, JSON.stringify(importMap, null, 2) + "\n")
     }
   }
 
   if (packageJsonFile) {
-    throw new Error("not yet supported")
+    const packageJsonText = await Deno.readTextFile(packageJsonFile)
+    const packageJson = JSON.parse(packageJsonText)
+    const addedPackages = new Set()
+    for (const rawName of Object.keys(config.chains ?? {})) {
+      const name = normalizePackageName(rawName)
+      const packageName = `@capi/${name}`
+      addedPackages.add(packageName)
+      packageJson.dependencies[packageName] = `${baseUrl}${name}.tar`
+    }
+    for (const packageName of Object.keys(packageJson.dependencies)) {
+      if (packageName.startsWith("@capi/") && !addedPackages.has(packageName)) {
+        delete packageJson.dependencies[packageName]
+      }
+    }
+    if (check) {
+      assertEquals(JSON.parse(packageJsonText), packageJson)
+    } else {
+      await Deno.writeTextFile(packageJsonFile, JSON.stringify(packageJson, null, 2) + "\n")
+    }
   }
 }

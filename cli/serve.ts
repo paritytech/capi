@@ -7,6 +7,7 @@ import { createErrorHandler } from "../server/errorHandler.ts"
 import { createCodegenHandler } from "../server/mod.ts"
 import { InMemoryCache } from "../util/cache/memory.ts"
 import { FsCache } from "../util/cache/mod.ts"
+import { gracefulExit } from "../util/mod.ts"
 import { resolveConfig } from "./resolveConfig.ts"
 
 export default async function(...args: string[]) {
@@ -50,7 +51,7 @@ export default async function(...args: string[]) {
       return await codegenHandler(request)
     }))
     await serve(handler, {
-      hostname: "[::]",
+      hostname: "::",
       port: +port,
       signal,
       onError(error) {
@@ -77,7 +78,7 @@ export default async function(...args: string[]) {
         },
       })
       const status = await command.spawn().status
-      self.addEventListener("unload", () => Deno.exit(status.code))
+      gracefulExit(status.code)
       controller.abort()
     }
   }

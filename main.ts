@@ -1,3 +1,5 @@
+import "./deps/shims/register.ts"
+
 import bin from "./cli/bin.ts"
 import serve from "./cli/serve.ts"
 import sync from "./cli/sync.ts"

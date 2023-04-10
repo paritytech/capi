@@ -1,9 +1,9 @@
-import { deferred } from "../deps/std/async.ts"
 import * as path from "../deps/std/path.ts"
 import { $ } from "../mod.ts"
 import * as f from "../server/factories.ts"
 import { PermanentMemo } from "../util/memo.ts"
 import { CapiConfig } from "./CapiConfig.ts"
+import { proxyWebSocket } from "./proxyWebSocket.ts"
 import { Network, startNetwork } from "./startNetwork.ts"
 import { testUserPublicKeys } from "./testUsers.ts"
 
@@ -27,7 +27,7 @@ export function createDevnetsHandler(tempDir: string, config: CapiConfig, signal
     if (request.headers.get("Upgrade") === "websocket") {
       const port = chain.ports.shift()!
       chain.ports.push(port)
-      return proxyWebSocket(request, `ws://localhost:${port}`)
+      return proxyWebSocket(request, `ws://127.0.0.1:${port}`)
     }
     if (request.method === "POST" && searchParams.has("users")) {
       const count = +searchParams.get("users")!
@@ -39,34 +39,5 @@ export function createDevnetsHandler(tempDir: string, config: CapiConfig, signal
       return new Response(`${index}`, { status: 200 })
     }
     return new Response("Network launched")
-  }
-}
-
-function proxyWebSocket(request: Request, url: string) {
-  const server = new WebSocket(url)
-  const { socket: client, response } = Deno.upgradeWebSocket(request)
-  setup(client, server)
-  setup(server, client)
-  return response
-
-  function setup(a: WebSocket, b: WebSocket) {
-    const ready = deferred()
-    b.addEventListener("open", () => {
-      ready.resolve()
-    })
-    a.addEventListener("close", async () => {
-      try {
-        b.close()
-      } catch {}
-    })
-    a.addEventListener("message", async (event) => {
-      try {
-        await ready
-        b.send(event.data)
-      } catch {
-        a.close()
-        b.close()
-      }
-    })
   }
 }
