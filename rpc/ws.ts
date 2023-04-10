@@ -11,6 +11,7 @@ export class WsConnection extends Connection {
       this.handle(JSON.parse(e.data))
     }, { signal: this.signal })
     this.ws.addEventListener("error", (e) => {
+      console.error(e)
       throw new Error("TODO: more graceful error messaging / recovery")
     }, { signal: this.signal })
   }
