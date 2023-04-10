@@ -50,7 +50,7 @@ export interface ChainSpec {
   }
 }
 
-interface GenesisConfig {
+export interface GenesisConfig {
   runtime_genesis_config?: never
   paras: {
     paras: [
@@ -65,5 +65,13 @@ interface GenesisConfig {
   }
   balances: {
     balances: [account: string, initialBalance: number][]
+  }
+  hrmp?: {
+    preopenHrmpChannels: [
+      senderParaId: number,
+      recipientParaId: number,
+      maxCapacity: number,
+      maxMessageSize: number,
+    ][]
   }
 }

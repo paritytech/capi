@@ -4,7 +4,7 @@ import { writableStreamFromWriter } from "../deps/std/streams.ts"
 import { getFreePort, portReady } from "../util/port.ts"
 import { resolveBinary } from "./binary.ts"
 import { NetworkConfig } from "./CapiConfig.ts"
-import { createCustomChainSpec, getGenesisConfig } from "./chainSpec.ts"
+import { createCustomChainSpec, GenesisConfig, getGenesisConfig } from "./chainSpec.ts"
 import { addTestUsers } from "./testUsers.ts"
 
 export interface Network {
@@ -64,6 +64,7 @@ export async function startNetwork(
         genesisConfig.paras.paras.push(
           ...paras.map(({ id, genesis }) => [id, [...genesis, true]] satisfies Narrow),
         )
+        addXcmHrmpChannels(genesisConfig, paras.map(({ id }) => id))
       }
       addTestUsers(genesisConfig.balances.balances)
     },
@@ -218,4 +219,16 @@ async function spawnNode(tempDir: string, binary: string, args: string[], signal
       throw new Error(`process exited with code ${status.code} (${tempDir})`)
     }
   })
+}
+
+function addXcmHrmpChannels(genesisConfig: GenesisConfig, paraIds: number[]) {
+  if (!genesisConfig.hrmp) {
+    genesisConfig.hrmp = { preopenHrmpChannels: [] }
+  }
+  for (const senderParaId of paraIds) {
+    for (const recipientParaId of paraIds) {
+      if (senderParaId === recipientParaId) continue
+      genesisConfig.hrmp.preopenHrmpChannels.push([senderParaId, recipientParaId, 8, 512])
+    }
+  }
 }
