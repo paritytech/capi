@@ -1,13 +1,13 @@
-import { WestmintLocal } from "zombienet/nfts.toml/collator/@v0.9.370/mod.js"
+import { RococoDev } from "@capi/rococo-dev/westmint/mod.js"
 import { ChainRune, Era, hex, Rune, RunicArgs, SignatureData, ss58, ValueRune } from "../../mod.ts"
 import { SignatureProps } from "../signature/polkadot.ts"
 
-type NftSigProps = SignatureProps<WestmintLocal> & {
+type NftSigProps = SignatureProps<RococoDev> & {
   assetId?: number
 }
 
 export function signature<X>(_props: RunicArgs<X, NftSigProps>) {
-  return <CU>(chain: ChainRune<WestmintLocal, CU>) => {
+  return <CU>(chain: ChainRune<RococoDev, CU>) => {
     const props = RunicArgs.resolve(_props)
     const addrPrefix = chain.addressPrefix()
     const versions = chain.pallet("System").constant("Version").decoded
@@ -19,15 +19,13 @@ export function signature<X>(_props: RunicArgs<X, NftSigProps>) {
       .tuple([addrPrefix, props.sender])
       .map(([addrPrefix, sender]) => {
         switch (sender.address.type) {
-          case "Id": {
+          case "Id":
             return ss58.encode(addrPrefix, sender.address.value)
-          }
-          default: {
+          default:
             throw new Error("unimplemented")
-          }
         }
       })
-      .throws(ss58.InvalidPublicKeyLengthError, ss58.InvalidNetworkPrefixError)
+      .throws(ss58.InvalidPayloadLengthError)
     const nonce = Rune.resolve(props.nonce)
       .unhandle(undefined)
       .rehandle(undefined, () => chain.connection.call("system_accountNextIndex", senderSs58))
@@ -55,6 +53,6 @@ export function signature<X>(_props: RunicArgs<X, NftSigProps>) {
         CheckGenesis: genesisHash,
         CheckMortality: checkpointHash,
       }),
-    }) satisfies Rune<SignatureData<WestmintLocal>, unknown>
+    }) satisfies Rune<SignatureData<RococoDev>, unknown>
   }
 }

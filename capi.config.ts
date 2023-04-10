@@ -45,6 +45,11 @@ export const config: CapiConfig = {
           binary: polkadotParachain,
           chain: "contracts-rococo-local",
         },
+        westmint: {
+          id: 3000,
+          binary: polkadotParachain,
+          chain: "westmint-local",
+        },
       },
     },
     rococoWestmint: {
