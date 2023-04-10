@@ -8,7 +8,7 @@ import {
   $storageKey,
 } from "../frame_metadata/key_codecs.ts"
 import { $era, $null, ChainError } from "../scale_info/mod.ts"
-import { getOrInit, stringifyKey, stringifyPropertyAccess } from "../util/mod.ts"
+import { stringifyKey, stringifyPropertyAccess } from "../util/mod.ts"
 import { CodecCodegen } from "./CodecCodegen.ts"
 
 export class TypeCodegen {
@@ -185,10 +185,6 @@ is${variant.tag}(value) {
       Object.entries(value!).map(([key, value]) => `${stringifyKey(key)}: ${this.print(value)}`)
         .join(", ")
     } }`
-  }
-
-  _write(files: Map<string, string>, entries: [string, $.Codec<any>][]): boolean {
-    return false
   }
 
   write(files: Map<string, string>) {
