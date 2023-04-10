@@ -30,7 +30,7 @@ export default async function(...args: string[]) {
   const { signal } = controller
 
   const dataCache = new FsCache(out, signal)
-  const tempCache = new FsCache("target/capi", signal)
+  const tempCache = new InMemoryCache(signal)
 
   const running = await fetch(`${href}capi_cwd`)
     .then((r) => r.text())

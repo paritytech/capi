@@ -16,9 +16,11 @@ export function transformTys(tys: Ty[]): [Codec<any>[], Record<string, Codec<any
   const paths: Record<string, Codec<any>> = {}
   const seenPaths = new Map<string, Ty | null>()
   const includePaths = new Set<string>()
+  const names = new Map<string, string>()
+  const nameCounts = new Map<string, Map<string, number>>()
 
   for (const ty of tys) {
-    const path = ty.path.join(".")
+    const path = ty.path.join("::")
     if (!path) continue
     const last = seenPaths.get(path)
     if (last !== undefined) {
@@ -32,30 +34,25 @@ export function transformTys(tys: Ty[]): [Codec<any>[], Record<string, Codec<any
     includePaths.add(path)
   }
 
-  const remappedPaths = new Map<string, string>()
-  const nameCounts = new Map<string, Map<string, number>>()
-
   for (const path of includePaths) {
-    const parts = path.split(".")
+    const parts = path.split("::")
     const name = parts.at(-1)!
     const map = getOrInit(nameCounts, name, () => new Map())
     for (let i = 0; i < parts.length; i++) {
-      const pathPart = parts.slice(0, i).join(".")
+      const pathPart = parts.slice(0, i).join("::")
       map.set(pathPart, (map.get(pathPart) ?? 0) + 1)
     }
   }
 
   for (const path of includePaths) {
-    const parts = path.split(".")
+    const parts = path.split("::")
     const name = parts.at(-1)!
     const map = nameCounts.get(name)!
-    const pathLength = parts.findIndex((_, i) => map.get(parts.slice(0, i).join(".")) === 1)
-    const newPath = [...parts.slice(0, pathLength), name].join(".")
+    const pathLength = parts.findIndex((_, i) => map.get(parts.slice(0, i).join("::")) === 1)
+    const newPath = [...parts.slice(0, pathLength), name].join("::")
     const newName = normalizeTypeName(newPath)
-    remappedPaths.set(path, newName)
+    names.set(path, newName)
   }
-
-  paths["_._"] = $null
 
   return [tys.map((_, i) => visit(i)), paths]
 
@@ -63,9 +60,9 @@ export function transformTys(tys: Ty[]): [Codec<any>[], Record<string, Codec<any
     return getOrInit(memo, i, () => {
       memo.set(i, $.deferred(() => memo.get(i)!))
       const ty = tys[i]!
-      const rawPath = ty.path.join(".")
+      const rawPath = ty.path.join("::")
       const usePath = includePaths.has(rawPath)
-      const path = remappedPaths.get(rawPath) ?? rawPath
+      const path = names.get(rawPath) ?? rawPath
       if (usePath && paths[path]) return paths[path]!
       const codec = withDocs(ty.docs, _visit(ty))
       if (usePath) return paths[path] ??= codec
@@ -178,7 +175,7 @@ function eqTy(tys: Ty[], a: number, b: number) {
     const b = tys[bi]!
     if (a.id === b.id) return true
     if (a.type !== b.type) return false
-    if (a.path.join(".") !== b.path.join(".")) return false
+    if (a.path.join("::") !== b.path.join("::")) return false
     if (normalizeDocs(a.docs) !== normalizeDocs(b.docs)) return false
     if (
       !eqArray(

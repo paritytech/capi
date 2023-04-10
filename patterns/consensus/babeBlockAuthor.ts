@@ -1,4 +1,4 @@
-import { $preDigest } from "@capi/polkadot/types/mod.js"
+import { $preDigest } from "@capi/polkadot/mod.js"
 import { AddressPrefixChain, ChainRune } from "../../fluent/mod.ts"
 import { AccountIdRune } from "../../fluent/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../../rune/mod.ts"

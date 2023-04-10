@@ -6,20 +6,23 @@
  * the new balance of the user to whom the asset was transferred.
  */
 
-import { XcmPallet } from "@capi/rococo-dev/mod.js"
-import { chain as parachain, System } from "@capi/rococo-dev/statemine/mod.js"
-import { CumulusPalletParachainSystemEvent } from "@capi/rococo-dev/statemine/types/mod.js"
-import { RuntimeEvent } from "@capi/rococo-dev/statemine/types/mod.js"
 import {
   VersionedMultiAssets,
   VersionedMultiLocation,
+  XcmPallet,
   XcmV2AssetId,
   XcmV2Fungibility,
   XcmV2Junction,
   XcmV2Junctions,
   XcmV2NetworkId,
   XcmV2WeightLimit,
-} from "@capi/rococo-dev/types/mod.js"
+} from "@capi/rococo-dev/mod.js"
+import {
+  chain as parachain,
+  CumulusPalletParachainSystemEvent,
+  RuntimeEvent,
+  System,
+} from "@capi/rococo-dev/statemine/mod.js"
 import { assert } from "asserts"
 import { alice, Rune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"

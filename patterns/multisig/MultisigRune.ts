@@ -1,4 +1,4 @@
-import { MultiAddress } from "@capi/polkadot/types/mod.js"
+import { MultiAddress } from "@capi/polkadot/mod.js"
 import * as bytes from "../../deps/std/bytes.ts"
 import { $, Chain, ChainRune, PatternRune, Rune, RunicArgs, ValueRune } from "../../mod.ts"
 import { multisigAccountId } from "./multisigAccountId.ts"

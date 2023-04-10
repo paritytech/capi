@@ -106,9 +106,9 @@ export const $metadata = $.object(
 )
 
 export function transformMetadata(metadata: $.Native<typeof $metadata>): FrameMetadata {
-  const [types, paths] = transformTys(metadata.tys)
+  const [types, names] = transformTys(metadata.tys)
   return {
-    types: paths,
+    types: names,
     pallets: Object.fromEntries(metadata.pallets.map((pallet): [string, Pallet] => [pallet.name, {
       id: pallet.id,
       name: pallet.name,
