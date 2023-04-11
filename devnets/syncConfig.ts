@@ -42,7 +42,7 @@ export async function syncConfig(tempDir: string, config: CapiConfig) {
                 {
                   type: "frame",
                   metadata: metadata,
-                  chainName: normalizeTypeName(name),
+                  chainName: normalizeTypeName(paraName ?? name),
                   connection: {
                     type: "DevnetConnection",
                     discovery: name + (paraName ? `/${paraName}` : ""),
