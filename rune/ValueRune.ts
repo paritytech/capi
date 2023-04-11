@@ -15,6 +15,8 @@ type Access<T, K extends keyof T, _K = NonIndexSignatureKeys<T>> = [
   >,
 ][0]
 
+type AnyKey = string & {} | "" | number & {} | 0 | symbol
+
 /** @ts-ignore: assume it's a valid key */
 type GetPath<T, P> = P extends [infer K, ...infer Q] ? GetPath<T[K], Q> : T
 
@@ -36,7 +38,10 @@ export class ValueRune<out T, out U = never> extends Rune<T, U> {
     return ValueRune.new(RunMap, this, fn)
   }
 
-  access<P extends (string & {} | "" | number & {} | 0 | symbol)[], T, U, X>(
+  access(this: ValueRune<Record<any, any>, U>): Rune.Destructure<this, T, U>
+  access(this: ValueRune<any[], U>): Rune.Destructure<this, T, U>
+  access(this: unknown): Rune.Destructure<this, T, U>
+  access<P extends [AnyKey, ...AnyKey[]], T, U, X>(
     this: ValueRune<T, U>,
     ...keys: never extends P ? RunicArgs<X, [...EnsurePath<T, P>]>
       : { [K in keyof P]: P[K] | Rune<P[K], any> }
@@ -44,13 +49,20 @@ export class ValueRune<out T, out U = never> extends Rune<T, U> {
   access<X>(
     this: ValueRune<any, U>,
     ...keys: RunicArgs<X, any[]>
-  ): ValueRune<any, U | RunicArgs.U<X>> {
+  ): ValueRune<any, U | RunicArgs.U<X>>
+  access<X>(
+    this: ValueRune<any, U>,
+    ...keys: RunicArgs<X, any[]> | []
+  ): ValueRune<any, U | RunicArgs.U<X>> | Rune.Destructure<this, T, U> {
+    if (keys.length == 0) {
+      return Rune.access(this) as Rune.Destructure<this, T, U>
+    }
     return Rune.tuple([this, ...RunicArgs.resolve(keys)]).map(([value, ...keys]) => {
       for (const key of keys) {
         value = value[key]
       }
       return value
-    })
+    }) as ValueRune<any, U | RunicArgs.U<X>>
   }
 
   handle<T2 extends T, T3, U2>(
