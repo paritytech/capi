@@ -1,13 +1,16 @@
 import {
+  createUsers,
   MintType,
   Nfts,
   PalletNftsEvent,
   RuntimeEvent,
   Utility,
 } from "@capi/westend-dev/westmint/mod.js"
-import { $, alice, bob, Rune } from "capi"
+import { Rune } from "capi"
 import { DefaultCollectionSetting, DefaultItemSetting } from "capi/patterns/nfts.ts"
 import { signature } from "capi/patterns/signature/westmint.ts"
+
+const { alexa, billy } = await createUsers()
 
 // Create a collection and grab its events
 const createEvents = await Nfts
@@ -19,9 +22,9 @@ const createEvents = await Nfts
         defaultItemSettings: DefaultItemSetting.allOn,
       }),
     }),
-    admin: alice.address,
+    admin: alexa.address,
   })
-  .signed(signature({ sender: alice }))
+  .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Create Collection:")
   .finalizedEvents()
@@ -45,68 +48,41 @@ await Nfts
   .mint({
     collection,
     item,
-    mintTo: alice.address,
+    mintTo: alexa.address,
   })
-  .signed(signature({ sender: alice }))
+  .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Mint Item:")
   .finalized()
   .run()
 
-/// The following extrinsics will first be created, then batched to be sent together:
-
-// Set the collection's metadata
-const setCollectionMetadata = Nfts.setCollectionMetadata({
-  collection,
-  data: new Uint8Array(),
-})
-
-// Create and encode metadata for the NFT
-const itemMetadata = $.object($.field("name", $.str)).encode({ name: "NFT #01" })
-
-// Set the NFT's metadata
-const setItemMetadata = Nfts.setMetadata({
-  collection,
-  item,
-  data: itemMetadata,
-})
-
-// Set the NFT's price
-const setItemPrice = Nfts.setPrice({
-  collection,
-  item,
-  price: 1000000n,
-  whitelistedBuyer: undefined,
-})
-
-// Lock the NFT against further metadata changes
-const lockItem = Nfts.lockItemProperties({
-  collection,
-  item,
-  lockMetadata: true,
-  lockAttributes: true,
-})
-
-// Limit NFTs for this collection to 1, preventing further minting
-const setCollectionMaxSupply = Nfts.setCollectionMaxSupply({ collection, maxSupply: 1 })
-
-// Lock collection to prevent changes to the NFT limit
-// TODO: enum helper
-const lockCollection = Nfts.lockCollection({ collection, lockSettings: 8n })
-
-// Send the batched extrinsics:
 await Utility
   .batchAll({
     calls: Rune.tuple([
-      setCollectionMetadata,
-      setItemMetadata,
-      setItemPrice,
-      lockItem,
-      setCollectionMaxSupply,
-      lockCollection,
+      // 1. Set the NFT's price.
+      Nfts.setPrice({
+        collection,
+        item,
+        price: 1000000n,
+        whitelistedBuyer: undefined,
+      }),
+
+      // 2. Lock the NFT against further metadata changes.
+      Nfts.lockItemProperties({
+        collection,
+        item,
+        lockMetadata: true,
+        lockAttributes: true,
+      }),
+
+      // 3. Limit NFTs for this collection to 1, preventing further minting.
+      Nfts.setCollectionMaxSupply({ collection, maxSupply: 1 }),
+
+      // Lock collection to prevent changes to the NFT limit
+      Nfts.lockCollection({ collection, lockSettings: 8n }), // TODO: enum helper
     ]),
   })
-  .signed(signature({ sender: alice }))
+  .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Batched calls:")
   .finalized()
@@ -120,20 +96,20 @@ const price = await Nfts.ItemPriceOf
   .run()
 console.log(price)
 
-// Buy the NFT using Bob's address
+// Buy the NFT using Billy's address
 await Nfts
   .buyItem({
     collection: collection,
     item: item,
     bidPrice: price,
   })
-  .signed(signature({ sender: bob }))
+  .signed(signature({ sender: billy }))
   .sent()
   .dbgStatus("Buying Item:")
   .finalized()
   .run()
 
-// Check for Bob's new ownership of the NFT
+// Check for Billy's new ownership of the NFT
 const owner = await Nfts.Item
   .value(Rune.tuple([collection, item]))
   .unhandle(undefined)
