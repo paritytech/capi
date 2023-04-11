@@ -16,10 +16,10 @@ const { alexa, billy } = await createUsers()
 const createEvents = await Nfts
   .create({
     config: Rune.rec({
-      settings: DefaultCollectionSetting.allOff,
+      settings: DefaultCollectionSetting.AllOff,
       mintSettings: Rune.rec({
         mintType: MintType.Issuer(),
-        defaultItemSettings: DefaultItemSetting.allOn,
+        defaultItemSettings: DefaultItemSetting.AllOn,
       }),
     }),
     admin: alexa.address,
