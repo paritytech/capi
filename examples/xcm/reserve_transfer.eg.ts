@@ -6,9 +6,9 @@
  * the exchange.
  */
 
-import * as Rococo from "@capi/rococo-dev-xcm/mod.js"
-import * as Statemine from "@capi/rococo-dev-xcm/statemine/mod.js"
-import * as Trappist from "@capi/rococo-dev-xcm/trappist/mod.js"
+import * as Rococo from "@capi/rococo-dev-xcm"
+import * as Statemine from "@capi/rococo-dev-xcm/statemine"
+import * as Trappist from "@capi/rococo-dev-xcm/trappist"
 import { alice, bob, hex, Rune, ValueRune } from "capi"
 import { signature } from "capi/patterns/signature/statemint.ts"
 import { waitFor } from "../../util/mod.ts"
@@ -28,7 +28,7 @@ await Rococo.Sudo
       xcm: Rune.rec({
         type: "V2",
         value: Rune.tuple([
-          Rococo.types.xcm.v2.Instruction.Transact({
+          Rococo.Instruction.Transact({
             originType: "Superuser",
             requireWeightAtMost: 1000000000n,
             call: Rune.rec({
@@ -97,17 +97,17 @@ await Trappist.Sudo
 
 // Register Trappist parachain asset id to reserve asset id.
 {
-  const { v1: { junction: { Junction }, multilocation } } = Trappist.types.xcm
+  const { Junctions, XcmV1Junction } = Trappist
   await Trappist.Sudo
     .sudo({
       call: Trappist.AssetRegistry.registerReserveAsset({
         assetId: TRAPPIST_ASSET_ID,
         assetMultiLocation: Rune.rec({
           parents: 1,
-          interior: multilocation.Junctions.X3(
-            Junction.Parachain(RESERVE_CHAIN_ID),
-            Junction.PalletInstance((await Statemine.Assets.pallet.run()).id),
-            Junction.GeneralIndex(BigInt(RESERVE_ASSET_ID)),
+          interior: Junctions.X3(
+            XcmV1Junction.Parachain(RESERVE_CHAIN_ID),
+            XcmV1Junction.PalletInstance((await Statemine.Assets.pallet.run()).id),
+            XcmV1Junction.GeneralIndex(BigInt(RESERVE_ASSET_ID)),
           ),
         }),
       }),
@@ -122,32 +122,29 @@ await Trappist.Sudo
 // Reserve transfer asset id on reserve parachain to Trappist parachain.
 {
   const {
-    xcm: {
-      VersionedMultiLocation,
-      VersionedMultiAssets,
-      v0: { junction: { NetworkId } },
-      v1: {
-        junction: { Junction },
-        multilocation: { Junctions },
-        multiasset: { AssetId, Fungibility },
-      },
-      v2: { WeightLimit },
-    },
-    statemine_runtime: { RuntimeEvent },
-    cumulus_pallet_xcmp_queue: { pallet: { Event } },
-  } = Statemine.types
+    VersionedMultiLocation,
+    VersionedMultiAssets,
+    Fungibility,
+    XcmV1Junction,
+    Junctions,
+    AssetId,
+    NetworkId,
+    WeightLimit,
+    RuntimeEvent,
+    CumulusPalletXcmpQueueEvent: { isXcmpMessageSent },
+  } = Statemine
   await Statemine.PolkadotXcm
     .limitedReserveTransferAssets({
       dest: VersionedMultiLocation.V1(Rune.rec({
         parents: 1,
         interior: Junctions.X1(
-          Junction.Parachain(TRAPPIST_CHAIN_ID),
+          XcmV1Junction.Parachain(TRAPPIST_CHAIN_ID),
         ),
       })),
       beneficiary: VersionedMultiLocation.V1(Rune.rec({
         parents: 0,
         interior: Junctions.X1(
-          Junction.AccountId32({
+          XcmV1Junction.AccountId32({
             network: NetworkId.Any(),
             id: bob.publicKey,
           }),
@@ -157,8 +154,8 @@ await Trappist.Sudo
         id: AssetId.Concrete(Rune.rec({
           parents: 0,
           interior: Junctions.X2(
-            Junction.PalletInstance((await Statemine.Assets.pallet.run()).id),
-            Junction.GeneralIndex(BigInt(RESERVE_ASSET_ID)),
+            XcmV1Junction.PalletInstance((await Statemine.Assets.pallet.run()).id),
+            XcmV1Junction.GeneralIndex(BigInt(RESERVE_ASSET_ID)),
           ),
         })),
         fun: Fungibility.Fungible(10000000000000n),
@@ -173,9 +170,9 @@ await Trappist.Sudo
     .into(ValueRune)
     .map((events) => {
       const event = events
-        .find((e) => RuntimeEvent.isXcmpQueue(e.event) && Event.isXcmpMessageSent(e.event.value))
+        .find((e) => RuntimeEvent.isXcmpQueue(e.event) && isXcmpMessageSent(e.event.value))
         ?.event.value as
-          | Statemine.types.cumulus_pallet_xcmp_queue.pallet.Event.XcmpMessageSent
+          | Statemine.CumulusPalletXcmpQueueEvent.XcmpMessageSent
           | undefined
       return event?.messageHash ? hex.encode(event.messageHash) : event
     })
