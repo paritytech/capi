@@ -63,9 +63,7 @@ jobs:
         if: failure()
         with:
           name: cache-target
-          path: |
-            target/**/stderr
-            target/**/stdout
+          path: target
 
   sync:
     name: Sync
