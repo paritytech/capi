@@ -6,7 +6,7 @@
  * funds. This simplifies signing extrinsics for submission to the given test chain.
  */
 
-import { createUsers } from "@capi/polkadot-dev/mod.js"
+import { createUsers } from "@capi/polkadot-dev"
 import { $, $sr25519 } from "capi"
 
 // Test users can be initialized with no count. The resulting collection is

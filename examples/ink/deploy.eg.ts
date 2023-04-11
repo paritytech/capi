@@ -7,7 +7,7 @@
  * @todo utilize `createUsers` instead of `alice`
  */
 
-import { chain, System } from "@capi/contracts-dev/mod.js"
+import { chain, System } from "@capi/contracts-dev"
 import { $, alice, ss58 } from "capi"
 import { InkMetadataRune } from "capi/patterns/ink/mod.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"

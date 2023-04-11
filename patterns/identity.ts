@@ -1,4 +1,4 @@
-import { Data, type IdentityInfo } from "@capi/polkadot-dev/types/pallet_identity/types.js"
+import { Data, type IdentityInfo } from "@capi/polkadot-dev"
 import * as $ from "../deps/scale.ts"
 import { Rune, RunicArgs } from "../rune/mod.ts"
 

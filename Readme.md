@@ -42,8 +42,6 @@ import { System } from "@capi/polkadot"
 const accounts = await System.Account.entryPage(10, null).run()
 ```
 
-> Note: to run with Deno, import from `@capi/polkadot/mod.js`
-
 ## Running Examples
 
 Within a fresh clone of this repository...

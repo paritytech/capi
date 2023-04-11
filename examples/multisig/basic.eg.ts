@@ -5,7 +5,7 @@
  * that multisig.
  */
 
-import { Balances, chain, createUsers, System } from "@capi/polkadot-dev/mod.js"
+import { Balances, chain, createUsers, System } from "@capi/polkadot-dev"
 import { assert } from "asserts"
 import { $ } from "capi"
 import { MultisigRune } from "capi/patterns/multisig/mod.ts"

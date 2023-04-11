@@ -5,7 +5,7 @@
  * extension) to sign a Capi extrinsic.
  */
 
-import { Balances, chain, createUsers, System } from "@capi/polkadot-dev/mod.js"
+import { Balances, chain, createUsers, System } from "@capi/polkadot-dev"
 import { ss58 } from "capi"
 import { pjsSender, PjsSigner } from "capi/patterns/compat/pjs_sender.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"

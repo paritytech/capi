@@ -6,7 +6,7 @@
  * @description Set a user's identity, potentially with metadata of arbitrary user-defined shape.
  */
 
-import { createUsers, Identity } from "@capi/polkadot-dev/mod.js"
+import { createUsers, Identity } from "@capi/polkadot-dev"
 import { $ } from "capi"
 import { IdentityInfoTranscoders } from "capi/patterns/identity.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"

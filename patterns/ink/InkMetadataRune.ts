@@ -37,7 +37,7 @@ export class InkMetadataRune<out U> extends Rune<InkMetadata, U> {
     .into(ValueRune)
     .access("types")
     .map(transformTys)
-    .access(0)
+    .access("ids")
 
   $event = Rune
     .tuple([

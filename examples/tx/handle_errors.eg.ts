@@ -5,7 +5,7 @@
  * easy decoding (and handling) of dispatch errors.
  */
 
-import { Balances } from "@capi/contracts-dev/mod.js"
+import { Balances } from "@capi/contracts-dev"
 import { assertInstanceOf } from "asserts"
 import { alice, bob, ExtrinsicError } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"

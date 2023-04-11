@@ -106,9 +106,10 @@ export const $metadata = $.object(
 )
 
 export function transformMetadata(metadata: $.Native<typeof $metadata>): FrameMetadata {
-  const [types, paths] = transformTys(metadata.tys)
+  const { ids, types, paths } = transformTys(metadata.tys)
   return {
-    types: paths,
+    types,
+    paths,
     pallets: Object.fromEntries(metadata.pallets.map((pallet): [string, Pallet] => [pallet.name, {
       id: pallet.id,
       name: pallet.name,
@@ -120,10 +121,10 @@ export function transformMetadata(metadata: $.Native<typeof $metadata>): FrameMe
             key = $emptyKey
             partialKey = $partialEmptyKey
           } else if (storage.hashers.length === 1) {
-            key = hashers[storage.hashers[0]!].$hash(types[storage.key]!)
+            key = hashers[storage.hashers[0]!].$hash(ids[storage.key]!)
             partialKey = $partialSingleKey(key)
           } else {
-            const codecs = extractTupleMembersVisitor.visit(types[storage.key]!).map((codec, i) =>
+            const codecs = extractTupleMembersVisitor.visit(ids[storage.key]!).map((codec, i) =>
               hashers[storage.hashers[i]!].$hash(codec)
             )
             key = $.tuple(...codecs)
@@ -134,7 +135,7 @@ export function transformMetadata(metadata: $.Native<typeof $metadata>): FrameMe
             name: storage.name,
             key: $storageKey(pallet.name, storage.name, key),
             partialKey: $storageKey(pallet.name, storage.name, partialKey),
-            value: types[storage.value]!,
+            value: ids[storage.value]!,
             docs: normalizeDocs(storage.docs),
             default: storage.modifier === "Default" ? storage.default : undefined,
           }]
@@ -143,15 +144,15 @@ export function transformMetadata(metadata: $.Native<typeof $metadata>): FrameMe
       constants: Object.fromEntries(
         pallet.constants.map((constant): [string, Constant] => [constant.name, {
           name: constant.name,
-          codec: types[constant.ty]!,
+          codec: ids[constant.ty]!,
           value: constant.value,
           docs: normalizeDocs(constant.docs),
         }]),
       ),
       types: {
-        call: types[pallet.calls!],
-        error: types[pallet.error!],
-        event: types[pallet.event!],
+        call: ids[pallet.calls!],
+        error: ids[pallet.error!],
+        event: ids[pallet.event!],
       },
       docs: "",
     }])),
@@ -164,13 +165,13 @@ export function transformMetadata(metadata: $.Native<typeof $metadata>): FrameMe
     },
   }
   function getExtrinsicParameter(key: "call" | "signature" | "address") {
-    return types[
+    return ids[
       metadata.tys[metadata.extrinsic.ty]!.params.find((x) => x.name.toLowerCase() === key)!.ty!
     ]!
   }
   function getExtensionsCodec(key: "ty" | "additionalSigned") {
     return $.object(...metadata.extrinsic.signedExtensions.flatMap((ext) => {
-      const codec = types[ext[key]]!
+      const codec = ids[ext[key]]!
       if (codec === $null) return []
       return [$.field(normalizeIdent(ext.ident), codec)]
     }))

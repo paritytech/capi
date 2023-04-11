@@ -26,7 +26,7 @@ export class FrameCodegen {
 import * as _codecs from "./codecs.js"
 import { connect } from "./connection.js"
 import * as C from "./capi.js"
-import * as t from "./types/mod.js"
+import * as t from "./types.js"
 
 export const metadata = ${this.codecCodegen.print(this.metadata)}
 
@@ -38,7 +38,7 @@ export const chain = C.ChainRune.from(connect, metadata)
       `
 import * as _codecs from "./codecs.js"
 import * as C from "./capi.js"
-import * as t from "./types/mod.js"
+import * as t from "./types.js"
 
 export const metadata: ${this.typeCodegen.print(this.metadata)}
 
@@ -58,7 +58,7 @@ export const chain: C.ChainRune<${this.chainName}, never>
 export * from "./connection.js"
 export * from "./chain.js"
 export * from "./pallets.js"
-export * as types from "./types/mod.js"
+export * from "./types.js"
 `,
       )
 
@@ -68,7 +68,7 @@ export * as types from "./types/mod.js"
 import { chain, ${isTypes ? this.chainName : ""} } from "./chain.js"
 import * as C from "./capi.js"
 import * as _codecs from "./codecs.js"
-import * as t from "./types/mod.js"
+import * as t from "./types.js"
 
 ${
           Object.values(this.metadata.pallets).map((pallet) => {

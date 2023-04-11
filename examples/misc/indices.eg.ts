@@ -5,7 +5,7 @@
  * the user's account id using the index.
  */
 
-import { createUsers, Indices } from "@capi/polkadot-dev/mod.js"
+import { createUsers, Indices } from "@capi/polkadot-dev"
 import { assertEquals } from "asserts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 

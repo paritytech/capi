@@ -5,7 +5,7 @@
  * Finally, rehydrate the extrinsic and submit it.
  */
 
-import { Balances, chain, createUsers } from "@capi/westend-dev/mod.js"
+import { Balances, chain, createUsers } from "@capi/westend-dev"
 import { $, SignedExtrinsicRune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 

@@ -4,7 +4,7 @@
  * @description Interact directly with the RPC node's call methods.
  */
 
-import { chain } from "@capi/polkadot-dev/mod.js"
+import { chain } from "@capi/polkadot-dev"
 import { $ } from "capi"
 
 // Make a call.

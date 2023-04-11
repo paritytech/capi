@@ -7,7 +7,7 @@
  * this can be helpful in the context of chain development.
  */
 
-import { chain } from "@capi/polkadot-dev/mod.js"
+import { chain } from "@capi/polkadot-dev"
 import { $ } from "capi"
 import { storageSizes } from "capi/patterns/storage_sizes.ts"
 

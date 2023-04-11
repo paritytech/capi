@@ -6,7 +6,7 @@
  * reward points).
  */
 
-import { Staking, types } from "@capi/westend/mod.js"
+import { $eraRewardPoints, Staking } from "@capi/westend"
 import { $ } from "capi"
 
 const idx = Staking.ActiveEra
@@ -18,4 +18,4 @@ const points = await Staking.ErasRewardPoints.value(idx).run()
 console.log("Era reward points:", points)
 
 // Ensure the era reward points is of the correct shape.
-$.assert(types.pallet_staking.$eraRewardPoints, points)
+$.assert($eraRewardPoints, points)

@@ -7,7 +7,7 @@
  * @todo utilize `createUsers` instead of `alice` and `bob`.
  */
 
-import { chain } from "@capi/contracts-dev/mod.js"
+import { chain } from "@capi/contracts-dev"
 import { assert } from "asserts"
 import { $, alice, bob } from "capi"
 import { InkMetadataRune } from "capi/patterns/ink/mod.ts"

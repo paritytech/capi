@@ -98,8 +98,11 @@ export function createCodegenHandler(dataCache: CacheBase, tempCache: CacheBase)
 
           let match: [string, CodegenEntry] | undefined = undefined
           for (const [key, value] of codegenSpec.codegen) {
+            if (path === `/${key}`) {
+              return `export * from "./${key.split("/").at(-1)!}/mod.js"`
+            }
             if (
-              path.startsWith(`/${key}/`)
+              (path === `/${key}` || path.startsWith(`/${key}/`))
               && key.length >= (match?.[0].length ?? 0)
             ) {
               match = [key, value]

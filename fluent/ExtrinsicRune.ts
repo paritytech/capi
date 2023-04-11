@@ -67,7 +67,7 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
       .call("state_call", "TransactionPaymentApi_query_info", arg)
       .map(hex.decode)
     return this.chain.metadata
-      .access("types", "sp_weights.weight_v2.Weight")
+      .access("paths", "sp_weights::weight_v2::Weight")
       .map(($c) => $.field("weight", $c))
       .into(CodecRune)
       .decoded(data)

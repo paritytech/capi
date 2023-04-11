@@ -56,8 +56,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: deno run -A _tasks/use_remote.ts
       - run: deno task run _tasks/star.ts
-      # Attempt caching thrice; #856
-      - run: deno cache target/star.ts || deno cache target/star.ts || deno cache target/star.ts
+      # Attempt caching many times; #856
+      - run: deno cache target/star.ts || deno cache target/star.ts || deno cache target/star.ts || deno cache target/star.ts || deno cache target/star.ts || deno cache target/star.ts
 
   sync:
     name: Sync

@@ -8,7 +8,7 @@ import {
   $storageKey,
 } from "../frame_metadata/key_codecs.ts"
 import { $era, $null, ChainError } from "../scale_info/mod.ts"
-import { getOrInit, stringifyKey, stringifyPropertyAccess } from "../util/mod.ts"
+import { stringifyKey, stringifyPropertyAccess } from "../util/mod.ts"
 import { CodecCodegen } from "./CodecCodegen.ts"
 
 export class TypeCodegen {
@@ -187,38 +187,18 @@ is${variant.tag}(value) {
     } }`
   }
 
-  _write(files: Map<string, string>, path: string[], entries: [string[], $.Codec<any>][]): boolean {
-    const groups = new Map<string, [string[], $.Codec<any>][]>()
-    const codecs = []
-    for (const entry of entries) {
-      const name = entry[0][path.length]!
-      if (entry[0].length === path.length + 1) {
-        codecs.push([name, entry[1]] as const)
-      } else {
-        getOrInit(groups, name, () => []).push(entry)
-      }
-    }
-    const isFolder = !!groups.size
-    const rootDir = "../".repeat(path.length + +isFolder)
+  write(files: Map<string, string>) {
     for (const isTypes of [false, true]) {
       const ext = isTypes ? "d.ts" : "js"
       files.set(
-        `${["types", ...path].join("/")}${isFolder ? "/mod" : ""}.${ext}`,
+        `types.${ext}`,
         `
-import * as C from "${rootDir}capi.js"
-import * as _codecs from "${rootDir}codecs.js"
-import * as t from "${rootDir}types/mod.js"
+import * as C from "./capi.js"
+import * as _codecs from "./codecs.js"
+import * as t from "./types.js"
 
 ${
-          [...groups].map(([name, entries]) => {
-            const isFolder = this._write(files, [...path, name], entries)
-            return `
-export * as ${name} from ${JSON.stringify(`./${name}${isFolder ? "/mod" : ""}.js`)}`
-          }).join("\n")
-        }
-
-${
-          codecs.map(([name, codec]) => `
+          Object.entries(this.types).map(([name, codec]) => `
 export const $${name.replace(/^./, (x) => x.toLowerCase())}${
             isTypes ? `: C.$.Codec<${name}>` : `= ${this.codecCodegen.print(codec)}`
           }
@@ -229,16 +209,11 @@ ${this.declVisitor.visit(codec)(name, isTypes)}
 `,
       )
     }
-    return isFolder
-  }
-
-  write(files: Map<string, string>) {
-    this._write(files, [], Object.entries(this.types).map((x) => [x[0].split("."), x[1]]))
     files.set(
       "codecs.d.ts",
       `
 import * as C from "./capi.js"
-import * as t from "./types/mod.js"
+import * as t from "./types.js"
 
 ${
         [...this.codecCodegen.codecIds.entries()].filter((x) => x[1] != null).map(([codec, id]) => `

@@ -6,7 +6,7 @@
  * produce promises resolving to subsequent states.
  */
 
-import { chain, Timestamp } from "@capi/polkadot/mod.js"
+import { chain, Timestamp } from "@capi/polkadot"
 import { $ } from "capi"
 
 // Specifying `chain.latestBlockHash` indicates that (A) this Rune tree
