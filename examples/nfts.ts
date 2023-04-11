@@ -68,6 +68,18 @@ await Nfts
   .finalized()
   .run()
 
+const owner = Nfts.Item
+  .value([collection, item])
+  .unhandle(undefined)
+  .access("owner")
+
+// Retrieve the final owner.
+const initialOwner = await owner.run()
+
+// Ensure Alexa is the initial owner.
+console.log("Initial owner:", initialOwner)
+assertEquals(initialOwner, alexa.publicKey)
+
 // Submit a batch, which reverts if any calls fail. The contained calls do the following:
 //
 // 1. Set the price.
@@ -104,17 +116,13 @@ await Nfts
   .buyItem({ collection, item, bidPrice })
   .signed(signature({ sender: billy }))
   .sent()
-  .dbgStatus("Buying Item:")
+  .dbgStatus("Buy NFT:")
   .finalized()
   .run()
 
-// Retrieve the NFT's current owner.
-const owner = await Nfts.Item
-  .value([collection, item])
-  .unhandle(undefined)
-  .access("owner")
-  .run()
+// Retrieve the final owner.
+const finalOwner = await owner.run()
 
-// Ensure Billy is the new owner.
-console.log("Owner:", owner)
-assertEquals(owner, billy.publicKey)
+// Ensure Billy is the final owner.
+console.log("Final owner:", finalOwner)
+assertEquals(finalOwner, billy.publicKey)
