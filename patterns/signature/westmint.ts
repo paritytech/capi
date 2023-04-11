@@ -1,4 +1,4 @@
-import { RococoDev } from "@capi/rococo-dev/westmint/mod.js"
+import { RococoDev } from "@capi/rococo-dev/westmint"
 import { ChainRune, Era, hex, Rune, RunicArgs, SignatureData, ss58, ValueRune } from "../../mod.ts"
 import { SignatureProps } from "../signature/polkadot.ts"
 
