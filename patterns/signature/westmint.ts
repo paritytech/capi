@@ -1,13 +1,13 @@
-import { WestendDev } from "@capi/westend-dev/westmint/mod.js"
+import { RococoDev } from "@capi/rococo-dev/westmint/mod.js"
 import { ChainRune, Era, hex, Rune, RunicArgs, SignatureData, ss58, ValueRune } from "../../mod.ts"
 import { SignatureProps } from "../signature/polkadot.ts"
 
-type NftSigProps = SignatureProps<WestendDev> & {
+type NftSigProps = SignatureProps<RococoDev> & {
   assetId?: number
 }
 
 export function signature<X>(_props: RunicArgs<X, NftSigProps>) {
-  return <CU>(chain: ChainRune<WestendDev, CU>) => {
+  return <CU>(chain: ChainRune<RococoDev, CU>) => {
     const props = RunicArgs.resolve(_props)
     const addrPrefix = chain.addressPrefix()
     const versions = chain.pallet("System").constant("Version").decoded
@@ -53,6 +53,6 @@ export function signature<X>(_props: RunicArgs<X, NftSigProps>) {
         CheckGenesis: genesisHash,
         CheckMortality: checkpointHash,
       }),
-    }) satisfies Rune<SignatureData<WestendDev>, unknown>
+    }) satisfies Rune<SignatureData<RococoDev>, unknown>
   }
 }

@@ -1,3 +1,9 @@
+/**
+ * @title NFTs
+ * @stability nearing
+ * @description An example using the upcoming NFTs pallet to create an NFT collection,
+ * mint, list and purchase an NFT, as well as lock the collection and NFT as to prevent.
+ */
 import {
   createUsers,
   MintType,
@@ -5,14 +11,16 @@ import {
   PalletNftsEvent,
   RuntimeEvent,
   Utility,
-} from "@capi/westend-dev/westmint/mod.js"
+} from "@capi/rococo-dev/westmint/mod.js"
+import { assertEquals } from "asserts"
 import { $, Rune } from "capi"
 import { DefaultCollectionSetting, DefaultItemSetting } from "capi/patterns/nfts.ts"
 import { signature } from "capi/patterns/signature/westmint.ts"
 
+// Create two test users. Alexa will mint and list the NFT. Billy will purchase it.
 const { alexa, billy } = await createUsers()
 
-// Create a collection and grab its events
+// Create a collection and get the resulting events.
 const createEvents = await Nfts
   .create({
     config: Rune.rec({
@@ -26,11 +34,11 @@ const createEvents = await Nfts
   })
   .signed(signature({ sender: alexa }))
   .sent()
-  .dbgStatus("Create Collection:")
+  .dbgStatus("Create collection:")
   .finalizedEvents()
   .run()
 
-// Extract the collection's id from emitted events
+// Extract the collection's id from emitted events.
 const collection = (() => {
   for (const { event } of createEvents) {
     if (RuntimeEvent.isNfts(event) && PalletNftsEvent.isCreated(event.value)) {
@@ -47,7 +55,7 @@ console.log("Collection id:", collection)
 // We'll create a single NFT with the id of 46
 const item = 46
 
-// Mint an item to the collection
+// Mint an item to the collection.
 await Nfts
   .mint({
     collection,
@@ -56,25 +64,26 @@ await Nfts
   })
   .signed(signature({ sender: alexa }))
   .sent()
-  .dbgStatus("Mint Item:")
+  .dbgStatus("Mint the NFT:")
   .finalized()
   .run()
 
+// Submit a batch, which reverts if any calls fail. The contained calls do the following:
+//
+// 1. Set the price.
+// 2. Prevent further minting.
+// 3. Lock the collection to prevent changes.
+const price = 1000000n
 await Utility
   .batchAll({
     calls: Rune.tuple([
-      // 1. Set the NFT's price.
       Nfts.setPrice({
         collection,
         item,
-        price: 1000000n,
+        price,
         whitelistedBuyer: undefined,
       }),
-
-      // 2. Limit NFTs for this collection to 1, preventing further minting.
       Nfts.setCollectionMaxSupply({ collection, maxSupply: 1 }),
-
-      // 3. Lock collection to prevent changes to the NFT limit
       Nfts.lockCollection({ collection, lockSettings: 8n }), // TODO: enum helper
     ]),
   })
@@ -84,20 +93,23 @@ await Utility
   .finalized()
   .run()
 
-// Get the price of the NFT
-const price = await Nfts.ItemPriceOf
+// Retrieve the price of the NFT.
+const bidPrice = await Nfts.ItemPriceOf
   .value(Rune.tuple([collection, item]))
   .unhandle(undefined)
   .access(0)
   .run()
-console.log(price)
 
-// Buy the NFT using Billy's address
+// Ensure the `bidPrice` is the expected value.
+console.log(bidPrice)
+assertEquals(price, bidPrice)
+
+// Buy the NFT as Billy.
 await Nfts
   .buyItem({
     collection: collection,
-    item: item,
-    bidPrice: price,
+    item,
+    bidPrice,
   })
   .signed(signature({ sender: billy }))
   .sent()
@@ -105,10 +117,13 @@ await Nfts
   .finalized()
   .run()
 
-// Check for Billy's new ownership of the NFT
+// Retrieve the NFT's current owner.
 const owner = await Nfts.Item
-  .value(Rune.tuple([collection, item]))
+  .value([collection, item])
   .unhandle(undefined)
   .access("owner")
   .run()
+
+// Ensure Billy is the new owner.
 console.log("Owner:", owner)
+assertEquals(owner, billy.publicKey)
