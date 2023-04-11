@@ -293,11 +293,11 @@ function addAuthorities(genesisConfig: GenesisConfig, count: number) {
   )
 }
 
+const hrmpChannelMaxCapacity = 8
+const hrmpChannelMaxMessageSize = 512
 function addXcmHrmpChannels(
   genesisConfig: GenesisConfig,
   paraIds: number[],
-  channelMaxCapacity = 8,
-  channelMaxMessageSize = 512,
 ) {
   genesisConfig.hrmp ??= { preopenHrmpChannels: [] }
   for (const senderParaId of paraIds) {
@@ -306,8 +306,8 @@ function addXcmHrmpChannels(
       genesisConfig.hrmp.preopenHrmpChannels.push([
         senderParaId,
         recipientParaId,
-        channelMaxCapacity,
-        channelMaxMessageSize,
+        hrmpChannelMaxCapacity,
+        hrmpChannelMaxMessageSize,
       ])
     }
   }
