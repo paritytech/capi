@@ -77,12 +77,7 @@ const price = 1000000n
 await Utility
   .batchAll({
     calls: Rune.tuple([
-      Nfts.setPrice({
-        collection,
-        item,
-        price,
-        whitelistedBuyer: undefined,
-      }),
+      Nfts.setPrice({ collection, item, price }),
       Nfts.setCollectionMaxSupply({ collection, maxSupply: 1 }),
       Nfts.lockCollection({ collection, lockSettings: 8n }), // TODO: enum helper
     ]),
@@ -106,11 +101,7 @@ assertEquals(price, bidPrice)
 
 // Buy the NFT as Billy.
 await Nfts
-  .buyItem({
-    collection: collection,
-    item,
-    bidPrice,
-  })
+  .buyItem({ collection, item, bidPrice })
   .signed(signature({ sender: billy }))
   .sent()
   .dbgStatus("Buying Item:")
