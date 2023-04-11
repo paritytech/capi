@@ -6,7 +6,7 @@ import {
   RuntimeEvent,
   Utility,
 } from "@capi/westend-dev/westmint/mod.js"
-import { Rune } from "capi"
+import { $, Rune } from "capi"
 import { DefaultCollectionSetting, DefaultItemSetting } from "capi/patterns/nfts.ts"
 import { signature } from "capi/patterns/signature/westmint.ts"
 
@@ -38,10 +38,14 @@ const collection = (() => {
     }
   }
   return
-})()!
-console.log("Collection Id:", collection)
+})()
 
-const item = 0
+// Ensure the collection id is a number.
+$.assert($.u32, collection)
+console.log("Collection id:", collection)
+
+// We'll create a single NFT with the id of 46
+const item = 46
 
 // Mint an item to the collection
 await Nfts
@@ -67,24 +71,16 @@ await Utility
         whitelistedBuyer: undefined,
       }),
 
-      // 2. Lock the NFT against further metadata changes.
-      Nfts.lockItemProperties({
-        collection,
-        item,
-        lockMetadata: true,
-        lockAttributes: true,
-      }),
-
-      // 3. Limit NFTs for this collection to 1, preventing further minting.
+      // 2. Limit NFTs for this collection to 1, preventing further minting.
       Nfts.setCollectionMaxSupply({ collection, maxSupply: 1 }),
 
-      // Lock collection to prevent changes to the NFT limit
+      // 3. Lock collection to prevent changes to the NFT limit
       Nfts.lockCollection({ collection, lockSettings: 8n }), // TODO: enum helper
     ]),
   })
   .signed(signature({ sender: alexa }))
   .sent()
-  .dbgStatus("Batched calls:")
+  .dbgStatus("Sale prep calls:")
   .finalized()
   .run()
 
