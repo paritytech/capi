@@ -58,6 +58,14 @@ jobs:
       - run: deno task run _tasks/star.ts
       # Attempt caching many times; #856
       - run: deno cache target/star.ts || deno cache target/star.ts || deno cache target/star.ts || deno cache target/star.ts || deno cache target/star.ts || deno cache target/star.ts
+      - name: Archive target
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: cache-target
+          path: |
+            target/**/stderr
+            target/**/stdout
 
   sync:
     name: Sync
@@ -69,6 +77,14 @@ jobs:
         with:
           deno-version: v1.x
       - run: deno task sync --check
+      - name: Archive target
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: sync-target
+          path: |
+            target/**/stderr
+            target/**/stdout
 
   star:
     name: Star
@@ -122,3 +138,11 @@ jobs:
           key: cache-${{ env.CAPI_SHA }}
       - run: deno run -A _tasks/use_remote.ts
       - run: deno task test:examples:deno
+      - name: Archive target
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: examples-deno-target
+          path: |
+            target/**/stderr
+            target/**/stdout
