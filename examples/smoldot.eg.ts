@@ -6,7 +6,10 @@
  * a centralized intermediary. This is the future of unstoppable applications.
  */
 
-import { $, $extrinsic, ChainRune, Rune, SmoldotConnection } from "capi"
+import { $accountInfo, chain, createUsers } from "@capi/polkadot-dev"
+import { $, SmoldotConnection } from "capi"
+
+const { alexa } = await createUsers()
 
 // Bring the chainspec(s) into scope. Here, we'll fetch it from the Smoldot GitHub repository.
 const relayChainSpec = await (await fetch(
@@ -14,14 +17,13 @@ const relayChainSpec = await (await fetch(
 )).text()
 
 // Initialize a `ChainRune` with `SmoldotConnection` and the chainspec.
-const smoldotChain = ChainRune.from(SmoldotConnection.bind({ relayChainSpec }))
+const smoldotChain = chain.with(SmoldotConnection.bind({ relayChainSpec }))
 
-const [metadata, extrinsics] = await Rune
-  .tuple([
-    smoldotChain.metadata,
-    smoldotChain.blockHash().block().extrinsics(),
-  ])
+const accountInfo = await smoldotChain
+  .pallet("System")
+  .storage("Account")
+  .value(alexa.publicKey)
   .run()
 
-console.log("Extrinsics:", extrinsics)
-$.assert($.array($extrinsic(metadata)), extrinsics)
+console.log("Account info:", accountInfo)
+$.assert($accountInfo, accountInfo)

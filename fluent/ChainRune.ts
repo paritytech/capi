@@ -63,6 +63,11 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
     return Rune.rec({ connection, metadata }).into(this)
   }
 
+  with(connect: (signal: AbortSignal) => Connection) {
+    const connection = ConnectionRune.from(connect)
+    return Rune.rec({ connection, metadata: this.metadata }).into(ChainRune)
+  }
+
   connection = this.into(ValueRune<Chain, U>).access("connection").into(ConnectionRune)
 
   metadata = this.into(ValueRune).access("metadata")
