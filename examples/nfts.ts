@@ -1,13 +1,16 @@
-import { Nfts, Utility } from "@capi/rococo-dev/westmint/mod.js"
-import { Event } from "@capi/rococo-dev/westmint/types/pallet_nfts/pallet.js"
-import { MintType } from "@capi/rococo-dev/westmint/types/pallet_nfts/types.js"
-import { RuntimeEvent } from "@capi/rococo-dev/westmint/types/westmint_runtime.js"
+import {
+  MintType,
+  Nfts,
+  PalletNftsEvent,
+  RuntimeEvent,
+  Utility,
+} from "@capi/westend-dev/westmint/mod.js"
 import { $, alice, bob, Rune } from "capi"
 import { DefaultCollectionSetting, DefaultItemSetting } from "capi/patterns/nfts.ts"
 import { signature } from "capi/patterns/signature/westmint.ts"
 
 // Create a collection and grab its events
-const createCollectionEvents = await Nfts
+const createEvents = await Nfts
   .create({
     config: Rune.rec({
       settings: DefaultCollectionSetting.allOff,
@@ -25,11 +28,14 @@ const createCollectionEvents = await Nfts
   .run()
 
 // Extract the collection's id from emitted events
-const collection =
-  (createCollectionEvents.find((event) =>
-    RuntimeEvent.isNfts(event.event) && Event.isCreated(event.event.value)
-  )?.event.value as Event.Created).collection
-
+const collection = (() => {
+  for (const { event } of createEvents) {
+    if (RuntimeEvent.isNfts(event) && PalletNftsEvent.isCreated(event.value)) {
+      return event.value.collection
+    }
+  }
+  return
+})()!
 console.log("Collection Id:", collection)
 
 const item = 0

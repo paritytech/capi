@@ -26,6 +26,13 @@ export const config: CapiConfig = {
     westendDev: {
       binary: polkadot,
       chain: "westend-dev",
+      parachains: {
+        westmint: {
+          id: 1000,
+          binary: polkadotParachain,
+          chain: "westmint-local",
+        },
+      },
     },
     contractsDev: {
       binary: substrateContractsNode,
@@ -44,11 +51,6 @@ export const config: CapiConfig = {
           id: 2000,
           binary: polkadotParachain,
           chain: "contracts-rococo-local",
-        },
-        westmint: {
-          id: 3000,
-          binary: polkadotParachain,
-          chain: "westmint-local",
         },
       },
     },
