@@ -80,9 +80,7 @@ jobs:
         if: failure()
         with:
           name: sync-target
-          path: |
-            target/**/stderr
-            target/**/stdout
+          path: target
 
   star:
     name: Star
@@ -141,6 +139,4 @@ jobs:
         if: failure()
         with:
           name: examples-deno-target
-          path: |
-            target/**/stderr
-            target/**/stdout
+          path: target
