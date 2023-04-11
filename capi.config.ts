@@ -69,7 +69,7 @@ export const config: CapiConfig = {
         },
         trappist: {
           id: 2000,
-          binary: binary("trappist-collator", "22755b2"),
+          binary: binary("trappist-collator", "79bba6e"),
           chain: "local",
         },
       },
