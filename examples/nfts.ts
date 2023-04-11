@@ -102,7 +102,7 @@ await Utility
 
 // Retrieve the price of the NFT.
 const bidPrice = await Nfts.ItemPriceOf
-  .value(Rune.tuple([collection, item]))
+  .value([collection, item])
   .unhandle(undefined)
   .access(0)
   .run()
@@ -116,7 +116,7 @@ await Nfts
   .buyItem({ collection, item, bidPrice })
   .signed(signature({ sender: billy }))
   .sent()
-  .dbgStatus("Buy NFT:")
+  .dbgStatus("Purchase:")
   .finalized()
   .run()
 

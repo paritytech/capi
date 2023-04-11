@@ -35,11 +35,6 @@ export const config: CapiConfig = {
       binary: polkadot,
       chain: "rococo-local",
       parachains: {
-        statemine: {
-          id: 1000,
-          binary: polkadotParachain,
-          chain: "statemine-local",
-        },
         contracts: {
           id: 2000,
           binary: polkadotParachain,
