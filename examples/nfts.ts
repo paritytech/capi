@@ -96,7 +96,7 @@ await Utility
   })
   .signed(signature({ sender: alexa }))
   .sent()
-  .dbgStatus("Sale prep calls:")
+  .dbgStatus("Sale prep:")
   .finalized()
   .run()
 
