@@ -222,9 +222,7 @@ async function spawnNode(tempDir: string, binary: string, args: string[], signal
 }
 
 function addXcmHrmpChannels(genesisConfig: GenesisConfig, paraIds: number[]) {
-  if (!genesisConfig.hrmp) {
-    genesisConfig.hrmp = { preopenHrmpChannels: [] }
-  }
+ genesisConfig.hrmp ??= { preopenHrmpChannels: [] }
   for (const senderParaId of paraIds) {
     for (const recipientParaId of paraIds) {
       if (senderParaId === recipientParaId) continue
