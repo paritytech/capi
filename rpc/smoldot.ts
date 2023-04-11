@@ -69,7 +69,15 @@ export class SmoldotConnection extends Connection {
   }
 
   close() {
+    console.log("SmoldotConnection.close()")
     this.stopListening()
-    this.smoldotChainPending.then((chain) => chain.remove())
+    this.smoldotChainPending.then((chain) => {
+      chain.remove()
+      console.log("deno", Deno.resources())
+      client?.terminate().then(() => {
+        console.log("deno", Deno.resources())
+        console.log("client terminated")
+      })
+    })
   }
 }
