@@ -293,12 +293,22 @@ function addAuthorities(genesisConfig: GenesisConfig, count: number) {
   )
 }
 
-function addXcmHrmpChannels(genesisConfig: GenesisConfig, paraIds: number[]) {
- genesisConfig.hrmp ??= { preopenHrmpChannels: [] }
+function addXcmHrmpChannels(
+  genesisConfig: GenesisConfig,
+  paraIds: number[],
+  channelMaxCapacity = 8,
+  channelMaxMessageSize = 512,
+) {
+  genesisConfig.hrmp ??= { preopenHrmpChannels: [] }
   for (const senderParaId of paraIds) {
     for (const recipientParaId of paraIds) {
       if (senderParaId === recipientParaId) continue
-      genesisConfig.hrmp.preopenHrmpChannels.push([senderParaId, recipientParaId, 8, 512])
+      genesisConfig.hrmp.preopenHrmpChannels.push([
+        senderParaId,
+        recipientParaId,
+        channelMaxCapacity,
+        channelMaxMessageSize,
+      ])
     }
   }
 }
