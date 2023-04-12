@@ -8,6 +8,7 @@ import { RpcEgressMessage } from "./rpc_messages.ts"
 export interface SmoldotRpcConnProps {
   relayChainSpec: string
   parachainSpec?: string
+  maxLogLevel?: number
 }
 
 let client: undefined | Client
@@ -29,6 +30,7 @@ export class SmoldotConnection extends Connection {
         forbidTcp: true,
         forbidNonLocalWs: true,
         cpuRateLimit: .25,
+        maxLogLevel: props.maxLogLevel,
       } as ClientOptions)
     }
     if (props.parachainSpec) {
