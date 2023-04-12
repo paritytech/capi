@@ -11,15 +11,19 @@ export interface SmoldotRpcConnProps {
 }
 
 let client: undefined | Client
+let count = 0
 
 export class SmoldotConnection extends Connection {
   // private so that the types don't need to be referenced when packaged
   private smoldotChainPending
   listening
   stopListening
+  chainsCount
 
   constructor(readonly props: SmoldotRpcConnProps) {
     super()
+    this.chainsCount = props.parachainSpec ? 2 : 1
+    count += this.chainsCount
     if (!client) {
       client = start({
         forbidTcp: true,
@@ -70,6 +74,13 @@ export class SmoldotConnection extends Connection {
 
   close() {
     this.stopListening()
-    this.smoldotChainPending.then((chain) => chain.remove())
+    this.smoldotChainPending.then((chain) => {
+      count -= this.chainsCount
+      chain.remove()
+      if (!count) {
+        client?.terminate()
+        client = undefined
+      }
+    })
   }
 }
