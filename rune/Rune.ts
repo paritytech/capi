@@ -40,8 +40,6 @@ export class Batch {
 
 declare const _T: unique symbol
 declare const _U: unique symbol
-declare const _objectSpread: unique symbol
-declare const _arraySpread: unique symbol
 
 export namespace Rune {
   export type T<R> = R extends { [_T]: infer T } ? T : R
@@ -129,14 +127,27 @@ export class Rune<out T, out U = never> {
     return Rune.resolve(fn).into(FnRune)
   }
 
+  /**
+   * Returns a object that you can destruture or access its properties.
+   *
+   * WARNING: the returned object is a Proxy, which means only simple usage (destructuring
+   * and statically acessing its properties) are supported.
+   *
+   * Using `const [...values] = Rune.access` `Object.entries()`, `for...of` `for...in` and
+   * other operators are NOT supported, and will error in runtime.
+   *
+   * ```ts
+   * const [ a, b, c ] = Rune.access(Rune.tuple(1, 2, 3))
+   * const msg = Rune.access(Rune.rec({ msg: "Hello World" })).msg
+   * ```
+   */
   static access<T extends Record<any, any> | any[], U>(
     rune: ValueRune<T, U>,
   ): Rune.Destructure<ValueRune<T, U>, T, U> {
-    const obj = new Proxy(
-      rune as any,
+    return new Proxy(
+      {} as any,
       {
-        get(obj, prop) {
-          if (obj[prop]) return obj[prop]
+        get(_, prop) {
           if (prop == Symbol.iterator) {
             return function*() {
               let i = 0
@@ -150,8 +161,6 @@ export class Rune<out T, out U = never> {
         },
       },
     )
-
-    return obj
   }
 
   static rec<R extends {}>(
