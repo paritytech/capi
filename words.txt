@@ -92,4 +92,3 @@ vadimcn
 westend
 westmint
 xcmp
-zombienet
