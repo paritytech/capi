@@ -10,7 +10,7 @@ import * as Rococo from "@capi/rococo-dev-xcm"
 import * as Statemine from "@capi/rococo-dev-xcm/statemine"
 import * as Trappist from "@capi/rococo-dev-xcm/trappist"
 import { assert, assertNotEquals } from "asserts"
-import { $, hex, Rune } from "capi"
+import { $, alice as root, hex, Rune } from "capi"
 import { signature } from "capi/patterns/signature/statemint.ts"
 import { retry } from "../../deps/std/async.ts"
 
@@ -25,6 +25,7 @@ const TRAPPIST_CHAIN_ID = 2000
 // Define some common options to be used along with `retry`,
 // which will poll for XCM-resulting changes.
 const retryOptions = {
+  multiplier: 1,
   maxAttempts: Infinity,
   maxTimeout: 2 * 60 * 1000,
 }
@@ -54,18 +55,17 @@ await Rococo.Sudo
       }),
     }),
   })
-  .signed(signature({ sender: alexa }))
+  .signed(signature({ sender: root }))
   .sent()
   .dbgStatus("Rococo(root) > Statemine(root): Create asset")
   .finalized()
   .run()
 
 // Wait for the asset to be recorded in storage.
-const assetDetails = await retry(() =>
-  Statemine.Assets.Asset
-    .value(RESERVE_ASSET_ID)
-    .unhandle(undefined)
-    .run(), retryOptions)
+const assetDetails = await retry(
+  () => Statemine.Assets.Asset.value(RESERVE_ASSET_ID).unhandle(undefined).run(),
+  retryOptions,
+)
 
 // Ensure the reserve asset was created.
 console.log("Statemine: Asset created", assetDetails)
@@ -103,7 +103,7 @@ await Trappist.Sudo
       owner: alexa.address,
     }),
   })
-  .signed(signature({ sender: alexa }))
+  .signed(signature({ sender: root }))
   .sent()
   .dbgStatus("Trappist(root): Create derived asset")
   .finalized()
@@ -124,7 +124,7 @@ await Trappist.Sudo
       }),
     }),
   })
-  .signed(signature({ sender: alexa }))
+  .signed(signature({ sender: root }))
   .sent()
   .dbgStatus("Trappist(root): Register AssetId to Reserve AssetId")
   .finalized()
@@ -184,7 +184,6 @@ await Trappist.Sudo
   for (const { event } of events) {
     if (RuntimeEvent.isXcmpQueue(event) && isXcmpMessageSent(event.value)) {
       console.log("XcmpMessageSent.messageHash:", event.value)
-      // TODO: assert on specific variant of runtime event value
     }
   }
 }
