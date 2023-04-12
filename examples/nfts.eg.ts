@@ -27,7 +27,7 @@ const createEvents = await Nfts
       settings: DefaultCollectionSetting.AllOff,
       mintSettings: Rune.rec({
         mintType: MintType.Issuer(),
-        defaultItemSettings: DefaultItemSetting.AllOn,
+        defaultItemSettings: DefaultItemSetting.AllOff,
       }),
     }),
     admin: alexa.address,
