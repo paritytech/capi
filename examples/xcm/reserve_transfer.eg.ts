@@ -190,12 +190,9 @@ await Trappist.Sudo
 }
 
 // Retrieve billy's balance on Trappist.
-const billyTrappistAssetAccount = Trappist.Assets.Account.value([
-  TRAPPIST_ASSET_ID,
-  billy.publicKey,
-])
 const { balance: billyTrappistBalance } = await retry(
-  () => billyTrappistAssetAccount.unhandle(undefined).run(),
+  () =>
+    Trappist.Assets.Account.value([TRAPPIST_ASSET_ID, billy.publicKey]).unhandle(undefined).run(),
   retryOptions,
 )
 
