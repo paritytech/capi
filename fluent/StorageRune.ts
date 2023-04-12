@@ -22,7 +22,7 @@ export class StorageRune<
       blockHash?: string,
     ]>
   ) {
-    const storageKey = this.$key.encoded(key).map(hex.encode)
+    const storageKey = this.$key.encoded(key).map(hex.encodePrefixed)
     return this.chain.connection
       .call("state_getStorage", storageKey, blockHash)
       .unhandle(null)
@@ -48,7 +48,11 @@ export class StorageRune<
     ]>
   ) {
     return this.chain.connection
-      .call("state_getStorageSize", this.$partialKey.encoded(partialKey).map(hex.encode), blockHash)
+      .call(
+        "state_getStorageSize",
+        this.$partialKey.encoded(partialKey).map(hex.encodePrefixed),
+        blockHash,
+      )
       .unhandle(null)
       .rehandle(null, () => Rune.constant(undefined))
   }
@@ -102,10 +106,10 @@ export class StorageRune<
       blockHash?: string,
     ]>
   ) {
-    const storageKey = this.$partialKey.encoded(partialKey).map(hex.encode)
+    const storageKey = this.$partialKey.encoded(partialKey).map(hex.encodePrefixed)
     const startKey = this.$key
       .encoded(Rune.resolve(start).unhandle(undefined))
-      .map(hex.encode)
+      .map(hex.encodePrefixed)
       .rehandle(undefined)
     return this.chain.connection.call("state_getKeysPaged", storageKey, count, startKey, blockHash)
   }

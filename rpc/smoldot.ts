@@ -8,9 +8,11 @@ import { RpcEgressMessage } from "./rpc_messages.ts"
 export interface SmoldotRpcConnProps {
   relayChainSpec: string
   parachainSpec?: string
+  maxLogLevel?: number
 }
 
 let client: undefined | Client
+let count = 0
 
 export class SmoldotConnection extends Connection {
   // private so that the types don't need to be referenced when packaged
@@ -20,11 +22,13 @@ export class SmoldotConnection extends Connection {
 
   constructor(readonly props: SmoldotRpcConnProps) {
     super()
+    count++
     if (!client) {
       client = start({
         forbidTcp: true,
         forbidNonLocalWs: true,
         cpuRateLimit: .25,
+        maxLogLevel: props.maxLogLevel,
       } as ClientOptions)
     }
     if (props.parachainSpec) {
@@ -70,6 +74,13 @@ export class SmoldotConnection extends Connection {
 
   close() {
     this.stopListening()
-    this.smoldotChainPending.then((chain) => chain.remove())
+    this.smoldotChainPending.then((chain) => {
+      count--
+      chain.remove()
+      if (!count) {
+        client?.terminate()
+        client = undefined
+      }
+    })
   }
 }
