@@ -1,3 +1,4 @@
 examples/xcm/*.eg.ts
+examples/smoldot.eg.ts
 examples/ink/*.eg.ts
 examples/nfts
