@@ -1,6 +1,6 @@
 /**
  * @title XCM Reserve Asset Transfer
- * @stability nearing
+ * @stability unstable
  * @description Perform an XCM reserve asset transfer, in which two chains, which
  * do not trust one another, rely on a third chain to store assets and facilitate
  * the exchange.
@@ -9,15 +9,25 @@
 import * as Rococo from "@capi/rococo-dev-xcm"
 import * as Statemine from "@capi/rococo-dev-xcm/statemine"
 import * as Trappist from "@capi/rococo-dev-xcm/trappist"
-import { alice, bob, hex, Rune, ValueRune } from "capi"
+import { assert, assertNotEquals } from "asserts"
+import { $, hex, Rune } from "capi"
 import { signature } from "capi/patterns/signature/statemint.ts"
-import { waitFor } from "../../util/mod.ts"
+import { retry } from "../../deps/std/async.ts"
+
+const { alexa, billy } = await Statemine.createUsers()
 
 // Define some constants for later use.
 const RESERVE_ASSET_ID = 1
 const RESERVE_CHAIN_ID = 1000 // Statemine
 const TRAPPIST_ASSET_ID = RESERVE_ASSET_ID
 const TRAPPIST_CHAIN_ID = 2000
+
+// Define some common options to be used along with `retry`,
+// which will poll for XCM-resulting changes.
+const retryOptions = {
+  maxAttempts: Infinity,
+  maxTimeout: 2 * 60 * 1000,
+}
 
 // Create a sufficient asset with Sudo. When targeting a common good
 // parachain, access root instead through the relay chain.
@@ -36,7 +46,7 @@ await Rococo.Sudo
                 id: RESERVE_ASSET_ID,
                 isSufficient: true,
                 minBalance: 1n,
-                owner: alice.address,
+                owner: alexa.address,
               }).call,
             }),
           }),
@@ -44,40 +54,44 @@ await Rococo.Sudo
       }),
     }),
   })
-  .signed(signature({ sender: alice }))
+  .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Rococo(root) > Statemine(root): Create asset")
   .finalized()
   .run()
 
-await waitFor(async () =>
-  (await Statemine.Assets.Asset.value(RESERVE_ASSET_ID).run()) !== undefined
-)
-console.log(
-  "Statemine: Asset created",
-  await Statemine.Assets.Asset.value(RESERVE_ASSET_ID).run(),
-)
+// Wait for the asset to be recorded in storage.
+const assetDetails = await retry(() =>
+  Statemine.Assets.Asset
+    .value(RESERVE_ASSET_ID)
+    .unhandle(undefined)
+    .run(), retryOptions)
+
+// Ensure the reserve asset was created.
+console.log("Statemine: Asset created", assetDetails)
+$.assert(Statemine.$assetDetails, assetDetails)
 
 // Mint assets on reserve parachain.
 await Statemine.Assets
   .mint({
     id: RESERVE_ASSET_ID,
     amount: 100000000000000n,
-    beneficiary: bob.address,
+    beneficiary: billy.address,
   })
-  .signed(signature({ sender: alice }))
+  .signed(signature({ sender: alexa }))
   .sent()
-  .dbgStatus("Statemine(Alice): Mint reserve asset to Bob")
+  .dbgStatus("Statemine(Alexa): Mint reserve asset to Billy")
   .finalized()
   .run()
 
-const bobStatemintBalance = Statemine.Assets.Account
-  .value([RESERVE_ASSET_ID, bob.publicKey])
+const billyStatemintBalance = Statemine.Assets.Account
+  .value([RESERVE_ASSET_ID, billy.publicKey])
   .unhandle(undefined)
   .access("balance")
 
-const bobStatemintBalanceInitial = await bobStatemintBalance.run()
-console.log("Statemine(Bob): asset balance", bobStatemintBalanceInitial)
+const billyStatemintBalanceInitial = await billyStatemintBalance.run()
+console.log("Statemine(Billy): asset balance", billyStatemintBalanceInitial)
+$.assert($.u128, billyStatemintBalanceInitial)
 
 // Create the asset on the Trappist parachain.
 await Trappist.Sudo
@@ -86,41 +100,39 @@ await Trappist.Sudo
       id: TRAPPIST_ASSET_ID,
       isSufficient: false,
       minBalance: 1n,
-      owner: alice.address,
+      owner: alexa.address,
     }),
   })
-  .signed(signature({ sender: alice }))
+  .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Trappist(root): Create derived asset")
   .finalized()
   .run()
 
 // Register Trappist parachain asset id to reserve asset id.
-{
-  const { Junctions, XcmV1Junction } = Trappist
-  await Trappist.Sudo
-    .sudo({
-      call: Trappist.AssetRegistry.registerReserveAsset({
-        assetId: TRAPPIST_ASSET_ID,
-        assetMultiLocation: Rune.rec({
-          parents: 1,
-          interior: Junctions.X3(
-            XcmV1Junction.Parachain(RESERVE_CHAIN_ID),
-            XcmV1Junction.PalletInstance((await Statemine.Assets.pallet.run()).id),
-            XcmV1Junction.GeneralIndex(BigInt(RESERVE_ASSET_ID)),
-          ),
-        }),
+await Trappist.Sudo
+  .sudo({
+    call: Trappist.AssetRegistry.registerReserveAsset({
+      assetId: TRAPPIST_ASSET_ID,
+      assetMultiLocation: Rune.rec({
+        parents: 1,
+        interior: Trappist.Junctions.X3(
+          Trappist.XcmV1Junction.Parachain(RESERVE_CHAIN_ID),
+          Trappist.XcmV1Junction.PalletInstance((await Statemine.Assets.pallet.run()).id),
+          Trappist.XcmV1Junction.GeneralIndex(BigInt(RESERVE_ASSET_ID)),
+        ),
       }),
-    })
-    .signed(signature({ sender: alice }))
-    .sent()
-    .dbgStatus("Trappist(root): Register AssetId to Reserve AssetId")
-    .finalized()
-    .run()
-}
+    }),
+  })
+  .signed(signature({ sender: alexa }))
+  .sent()
+  .dbgStatus("Trappist(root): Register AssetId to Reserve AssetId")
+  .finalized()
+  .run()
 
 // Reserve transfer asset id on reserve parachain to Trappist parachain.
 {
+  // Destructure the factories to be used (for convenience).
   const {
     VersionedMultiLocation,
     VersionedMultiAssets,
@@ -133,7 +145,7 @@ await Trappist.Sudo
     RuntimeEvent,
     CumulusPalletXcmpQueueEvent: { isXcmpMessageSent },
   } = Statemine
-  await Statemine.PolkadotXcm
+  const events = await Statemine.PolkadotXcm
     .limitedReserveTransferAssets({
       dest: VersionedMultiLocation.V1(Rune.rec({
         parents: 1,
@@ -146,7 +158,7 @@ await Trappist.Sudo
         interior: Junctions.X1(
           XcmV1Junction.AccountId32({
             network: NetworkId.Any(),
-            id: bob.publicKey,
+            id: billy.publicKey,
           }),
         ),
       })),
@@ -163,34 +175,42 @@ await Trappist.Sudo
       feeAssetItem: 0,
       weightLimit: WeightLimit.Unlimited(),
     })
-    .signed(signature({ sender: bob }))
+    .signed(signature({ sender: billy }))
     .sent()
-    .dbgStatus("Statemine(Bob): Reserve transfer to Trappist")
+    .dbgStatus("Statemine(Billy): Reserve transfer to Trappist")
     .finalizedEvents()
-    .into(ValueRune)
-    .map((events) => {
-      const event = events
-        .find((e) => RuntimeEvent.isXcmpQueue(e.event) && isXcmpMessageSent(e.event.value))
-        ?.event.value as
-          | Statemine.CumulusPalletXcmpQueueEvent.XcmpMessageSent
-          | undefined
-      return event?.messageHash ? hex.encode(event.messageHash) : event
-    })
-    .dbg("XcmpMessageSent.messageHash")
     .run()
+
+  for (const { event } of events) {
+    if (RuntimeEvent.isXcmpQueue(event) && isXcmpMessageSent(event.value)) {
+      console.log("XcmpMessageSent.messageHash:", event.value)
+      // TODO: assert on specific variant of runtime event value
+    }
+  }
 }
 
-const bobTrappistAssetAccount = Trappist.Assets.Account.value([TRAPPIST_ASSET_ID, bob.publicKey])
+// Retrieve billy's balance on Trappist.
+const billyTrappistAssetAccount = Trappist.Assets.Account.value([
+  TRAPPIST_ASSET_ID,
+  billy.publicKey,
+])
+const { balance: billyTrappistBalance } = await retry(
+  () => billyTrappistAssetAccount.unhandle(undefined).run(),
+  retryOptions,
+)
 
-await waitFor(async () => !!await bobTrappistAssetAccount.run())
+// Ensure the balance is greater than zero.
+console.log("Trappist(Billy): asset balance:", billyTrappistBalance)
+assert(billyTrappistBalance > 0)
 
-const bobTrappistBalance = await bobTrappistAssetAccount
-  .unhandle(undefined).access("balance").run()
-console.log("Trappist(Bob): asset balance:", bobTrappistBalance)
+// Retrieve Billy's balance on statemint.
+const billyStatemintBalanceFinal = await billyStatemintBalance.run()
 
-const bobStatemintBalanceFinal = await bobStatemintBalance.run()
-console.log("Statemine(Bob): asset balance:", bobStatemintBalanceFinal)
+// Ensure the balance is different from the initial.
+console.log("Statemine(Billy): asset balance:", billyStatemintBalanceFinal)
+assertNotEquals(billyStatemintBalanceInitial, billyStatemintBalanceFinal)
 
+// Retrieve the statemint sovereign account balance.
 const statemintSovereignAccountBalance = await Statemine.Assets.Account
   // Sovereign address on sibling chain
   // b"sibl" + $.u32.encode(2000) + 0...0
@@ -198,5 +218,10 @@ const statemintSovereignAccountBalance = await Statemine.Assets.Account
     RESERVE_ASSET_ID,
     hex.decode("0x7369626cd0070000000000000000000000000000000000000000000000000000"),
   ])
+  .unhandle(undefined)
+  .access("balance")
   .run()
+
+// Ensure the balance is greater than zero.
 console.log("Statemine(TrappistSovereignAccount): asset balance", statemintSovereignAccountBalance)
+assert(statemintSovereignAccountBalance > 0)
