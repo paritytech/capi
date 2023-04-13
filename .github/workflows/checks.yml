@@ -132,7 +132,8 @@ jobs:
         with:
           path: ~/.cache/deno
           key: cache-${{ env.CAPI_SHA }}
-      - run: deno run -A _tasks/use_remote.ts
+      # - run: deno run -A _tasks/use_remote.ts
+      - run: deno task sync
       - run: deno task run examples/raw_rpc/subscription.eg.ts
       - run: deno task test:examples:deno
       - name: Archive target
