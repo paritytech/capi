@@ -2,7 +2,6 @@
  * @title Raw RPC Subscription Usage
  * @stability nearing
  * @description Interact directly with the RPC node's subscription methods.
- * @test_skip
  */
 
 import { chain } from "@capi/polkadot-dev"
