@@ -128,10 +128,10 @@ jobs:
       - uses: denoland/setup-deno@9db7f66e8e16b5699a514448ce994936c63f0d54 # v1.1.0
         with:
           deno-version: v1.x
-      - uses: actions/cache@v3
-        with:
-          path: ~/.cache/deno
-          key: cache-${{ env.CAPI_SHA }}
+      # - uses: actions/cache@v3
+      #   with:
+      #     path: ~/.cache/deno
+      #     key: cache-${{ env.CAPI_SHA }}
       # - run: deno run -A _tasks/use_remote.ts
       - run: deno task sync
       - run: deno task run examples/raw_rpc/subscription.eg.ts
