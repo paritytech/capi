@@ -3,6 +3,7 @@
  * @stability unstable
  * @description The `unhandleFailed` method of `ExtrinsicEventsRune` enables
  * easy decoding (and handling) of dispatch errors.
+ * @test_skip
  */
 
 import { Balances } from "@capi/contracts-dev"

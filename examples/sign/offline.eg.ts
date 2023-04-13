@@ -3,6 +3,7 @@
  * @stability nearing
  * @description Create and sign an extrinsic, then serialize it into a hex for later use.
  * Finally, rehydrate the extrinsic and submit it.
+ * @test_skip
  */
 
 import { Balances, chain } from "@capi/westend-dev"

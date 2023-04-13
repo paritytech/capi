@@ -5,7 +5,6 @@
  * such that they can connect directly to the network(s) without going through
  * a centralized intermediary. This is the future of unstoppable applications.
  * @test_skip
- * @todo get this exiting!
  */
 
 import { chain } from "@capi/polkadot-dev"

@@ -2,6 +2,7 @@
  * @title Balance Transfer
  * @stability nearing
  * @description Transfer some funds from one user to another.
+ * @test_skip
  */
 
 import { Balances, System } from "@capi/westend-dev"

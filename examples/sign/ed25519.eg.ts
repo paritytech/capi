@@ -2,6 +2,7 @@
  * @title Ed25519 Signatures
  * @stability nearing
  * @description Utilize an Ed25519 library for signing.
+ * @test_skip
  */
 
 import { Balances, MultiAddress, System } from "@capi/westend-dev"

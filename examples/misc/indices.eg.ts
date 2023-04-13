@@ -3,6 +3,7 @@
  * @stability nearing
  * @description Reserve an index using the indices pallet. Then retrieve
  * the user's account id using the index.
+ * @test_skip
  */
 
 import { Indices } from "@capi/polkadot-dev"

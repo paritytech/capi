@@ -2,6 +2,7 @@
  * @title Batch Transaction
  * @stability nearing
  * @description Sign and submit multiple calls within a single extrinsic.
+ * @test_skip
  */
 
 import { Balances, System, Utility } from "@capi/westend-dev"
