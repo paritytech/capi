@@ -212,6 +212,7 @@ async function spawnNode(tempDir: string, binary: string, args: string[], signal
   )
 
   child.status.then((status) => {
+    console.log({ spawnNodeStatus: { binary, args, status } })
     if (!signal.aborted) {
       throw new Error(`process exited with code ${status.code} (${tempDir})`)
     }
