@@ -191,6 +191,7 @@ async function spawnChain(
 }
 
 async function spawnNode(tempDir: string, binary: string, args: string[], signal: AbortSignal) {
+  console.log({ spawnNode: { binary, args } })
   const child = new Deno.Command(binary, {
     args,
     signal,
