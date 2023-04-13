@@ -6,21 +6,22 @@
  * a centralized intermediary. This is the future of unstoppable applications.
  */
 
-import { chain } from "@capi/polkadot-dev"
-import { $, known, SmoldotConnection } from "capi"
+import { $, $extrinsic, ChainRune, Rune, SmoldotConnection } from "capi"
 
 // Bring the chainspec(s) into scope. Here, we'll fetch it from the Smoldot GitHub repository.
-const relayChainSpec = await fetch(
+const relayChainSpec = await (await fetch(
   `https://raw.githubusercontent.com/smol-dot/smoldot/main/demo-chain-specs/polkadot.json`,
-).then((r) => r.text())
+)).text()
 
 // Initialize a `ChainRune` with `SmoldotConnection` and the chainspec.
-const { block } = await chain
-  .with(SmoldotConnection.bind({ relayChainSpec }))
-  .blockHash()
-  .block()
+const smoldotChain = ChainRune.from(SmoldotConnection.bind({ relayChainSpec }))
+
+const [metadata, extrinsics] = await Rune
+  .tuple([
+    smoldotChain.metadata,
+    smoldotChain.blockHash().block().extrinsics(),
+  ])
   .run()
 
-// Ensure the block is of the expected shape.
-console.log(block)
-$.assert(known.$block, block)
+console.log("Extrinsics:", extrinsics)
+$.assert($.array($extrinsic(metadata)), extrinsics)
