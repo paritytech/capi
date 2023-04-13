@@ -19,9 +19,11 @@ export function createDevnetsHandler(tempDir: string, config: CapiConfig, signal
     const paraName = match[2]
     const networkConfig = config.chains?.[name!]
     if (networkConfig?.binary == null) return f.notFound()
+    console.log("networkMemo.run")
     const network = await networkMemo.run(name!, async () => {
       return startNetwork(path.join(tempDir, name!), networkConfig, signal)
     })
+    console.log(request.url, network)
     const chain = paraName ? network.paras[paraName] : network.relay
     if (!chain) return f.notFound()
     if (request.headers.get("Upgrade") === "websocket") {
