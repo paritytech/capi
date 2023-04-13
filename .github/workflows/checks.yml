@@ -121,7 +121,7 @@ jobs:
   examples-deno:
     name: Examples (Deno)
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     needs: cache
     steps:
       - uses: actions/checkout@v3
@@ -132,7 +132,7 @@ jobs:
         with:
           path: ~/.cache/deno
           key: cache-${{ env.CAPI_SHA }}
-      - run: deno run -A _tasks/use_remote.ts
+      - run: deno task sync
       - run: deno task test:examples:deno
       - name: Archive target
         uses: actions/upload-artifact@v3
