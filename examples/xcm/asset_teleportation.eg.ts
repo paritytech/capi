@@ -14,6 +14,9 @@ import {
   XcmV2Fungibility,
   XcmV2Junction,
   XcmV2Junctions,
+  XcmV2MultiAsset,
+  XcmV2MultiAssets,
+  XcmV2MultiLocation,
   XcmV2NetworkId,
   XcmV2WeightLimit,
 } from "@capi/rococo-dev"
@@ -24,7 +27,7 @@ import {
   System,
 } from "@capi/rococo-dev/statemine"
 import { assert } from "asserts"
-import { alice, Rune } from "capi"
+import { alice } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 
 // Reference Alice's free balance.
@@ -39,22 +42,30 @@ console.log("Alice initial free:", aliceFreeInitial)
 
 XcmPallet
   .limitedTeleportAssets({
-    dest: VersionedMultiLocation.V2(Rune.rec({
-      parents: 0,
-      interior: XcmV2Junctions.X1(XcmV2Junction.Parachain(1000)),
-    })),
-    beneficiary: VersionedMultiLocation.V2(Rune.rec({
-      parents: 0,
-      interior: XcmV2Junctions.X1(XcmV2Junction.AccountId32({
-        id: alice.publicKey,
-        network: XcmV2NetworkId.Any(),
-      })),
-    })),
-    assets: VersionedMultiAssets.V2(Rune.array([Rune.rec({
-      id: XcmV2AssetId.Concrete(Rune.rec({
+    dest: VersionedMultiLocation.V2(
+      XcmV2MultiLocation({
         parents: 0,
-        interior: XcmV2Junctions.Here(),
-      })),
+        interior: XcmV2Junctions.X1(XcmV2Junction.Parachain(1000)),
+      }),
+    ),
+    beneficiary: VersionedMultiLocation.V2(
+      XcmV2MultiLocation({
+        parents: 0,
+        interior: XcmV2Junctions.X1(
+          XcmV2Junction.AccountId32({
+            id: alice.publicKey,
+            network: XcmV2NetworkId.Any(),
+          }),
+        ),
+      }),
+    ),
+    assets: VersionedMultiAssets.V2(XcmV2MultiAssets([XcmV2MultiAsset({
+      id: XcmV2AssetId.Concrete(
+        XcmV2MultiLocation({
+          parents: 0,
+          interior: XcmV2Junctions.Here(),
+        }),
+      ),
       fun: XcmV2Fungibility.Fungible(500_000_000_000_000n),
     })])),
     feeAssetItem: 0,

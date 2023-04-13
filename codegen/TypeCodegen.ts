@@ -148,6 +148,29 @@ is${variant.tag}(value) {
     }
 }
 `)
+    .add($.object, (_codec) => (name, isTypes) => `
+${
+      isTypes
+        ? `export type ${name} = ${this.nativeVisitor.visit(_codec)}
+        export function ${name}<X>(fields: C.RunicArgs<X, ${name}>): C.ValueRune<${name}, C.RunicArgs.U<X>>`
+        : `export function ${name}(fields) {
+  return Rune.rec(fields)
+}`
+    }`)
+    .add($.array, (_codec, _element) => (name, isTypes) =>
+      isTypes
+        ? `export type ${name} = ${this.nativeVisitor.visit(_codec)}
+        export function ${name}<X>(elements: C.RunicArgs<X, ${name}>): C.ValueRune<${name}, C.RunicArgs.U<X>>`
+        : `export function ${name}(elements) {
+  return Rune.array(elements)
+}`)
+    .add($.tuple, (_codec, ..._element) => (name, isTypes) =>
+      isTypes
+        ? `export type ${name} = ${this.nativeVisitor.visit(_codec)}
+        export function ${name}<X>(elements: C.RunicArgs<X, ${name}>): C.ValueRune<${name}, C.RunicArgs.U<X>>`
+        : `export function ${name}(elements) {
+  return Rune.tuple(elements)
+}`)
     .fallback((codec) => (name, isTypes) =>
       isTypes ? `export type ${name} = ${this.nativeVisitor.visit(codec)}` : ""
     )
@@ -205,7 +228,7 @@ export const $${name.replace(/^./, (x) => x.toLowerCase())}${
 ${this.declVisitor.visit(codec)(name, isTypes)}
 `).join("\n")
         }
-    
+
 `,
       )
     }
