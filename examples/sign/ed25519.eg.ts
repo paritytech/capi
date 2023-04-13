@@ -6,7 +6,7 @@
 
 import { Balances, createUsers, MultiAddress, System } from "@capi/westend-dev"
 import { assert } from "asserts"
-import { ExtrinsicSender, Rune } from "capi"
+import { ExtrinsicSender } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 import * as ed from "https://esm.sh/@noble/ed25519@1.7.3"
 
