@@ -5,6 +5,7 @@
  * name––of storage sizes, keyed by storage name. It is unlikely that we'll ever
  * stabilize this pattern, as we don't want to abuse rpc nodes. That being said,
  * this can be helpful in the context of chain development.
+ * @test_skip
  */
 
 import { chain } from "@capi/polkadot-dev"

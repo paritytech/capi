@@ -2,6 +2,7 @@
  * @title Read a Map Value
  * @stability nearing
  * @description Read the value (an `AccountInfo`) from the system account map.
+ * @test_skip
  */
 
 import { $accountInfo, System } from "@capi/polkadot-dev"

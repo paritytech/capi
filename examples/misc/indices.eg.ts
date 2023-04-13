@@ -23,6 +23,8 @@ const hash = await Indices
   .finalized()
   .run()
 
+if (true as boolean) throw new Error("MADE IT HERE")
+
 // Use the index to key into the indices accounts map.
 const mapped = await Indices.Accounts
   .value(index, hash)

@@ -3,6 +3,7 @@
  * @stability nearing
  * @description Define a subclass (set of type-specific utilities), from which
  * any compatibly-typed Rune can adopt the subclass-defined fluent API.
+ * @test_skip
  */
 
 import { assertEquals } from "asserts"

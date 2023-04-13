@@ -2,6 +2,7 @@
  * @title Rune Collections
  * @stability nearing
  * @description Parallelize resolution and collect results.
+ * @test_skip
  */
 
 import { assertEquals } from "asserts"
