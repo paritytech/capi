@@ -11,8 +11,6 @@
  * 1. We manually initialize the `ChainRune`.
  * 2. We manually access bindings.
  * 3. Chain-specifics are untyped (be wary to supply the correct data, as the checker is on vacation).
- *
- * @test_skip
  */
 
 import { $, ChainRune, WsConnection } from "capi"

@@ -2,7 +2,6 @@
  * @title Paginate
  * @stability unstable
  * @description Read pages (either of keys or entries) from storage maps.
- * @test_skip
  */
 
 import { $accountInfo, System } from "@capi/polkadot-dev"
