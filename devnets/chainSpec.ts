@@ -50,7 +50,17 @@ export interface ChainSpec {
   }
 }
 
-interface GenesisConfig {
+interface SessionKey {
+  grandpa: string
+  babe: string
+  im_online: string
+  para_validator: string
+  para_assignment: string
+  authority_discovery: string
+  beefy: string
+}
+
+export interface GenesisConfig {
   runtime_genesis_config?: never
   paras: {
     paras: [
@@ -65,5 +75,8 @@ interface GenesisConfig {
   }
   balances: {
     balances: [account: string, initialBalance: number][]
+  }
+  session?: {
+    keys: [account: string, account: string, key: SessionKey][]
   }
 }
