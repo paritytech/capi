@@ -10,7 +10,8 @@ import * as Rococo from "@capi/rococo-dev-xcm"
 import * as Statemine from "@capi/rococo-dev-xcm/statemine"
 import * as Trappist from "@capi/rococo-dev-xcm/trappist"
 import { assert, assertNotEquals } from "asserts"
-import { $, alice as root, hex, Rune } from "capi"
+import { $, alice as root, Rune } from "capi"
+import { $siblId } from "capi/patterns/para_id.ts"
 import { signature } from "capi/patterns/signature/statemint.ts"
 import { retry } from "../../deps/std/async.ts"
 
@@ -212,7 +213,7 @@ const statemintSovereignAccountBalance = await Statemine.Assets.Account
   // b"sibl" + $.u32.encode(2000) + 0...0
   .value([
     RESERVE_ASSET_ID,
-    hex.decode("0x7369626cd0070000000000000000000000000000000000000000000000000000"),
+    $siblId.encode(TRAPPIST_CHAIN_ID),
   ])
   .unhandle(undefined)
   .access("balance")
