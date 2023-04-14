@@ -167,7 +167,7 @@ ${
     .add($.tuple, (_codec, ..._element) => (name, isTypes) =>
       isTypes
         ? `export type ${name} = ${this.nativeVisitor.visit(_codec)}
-        export function ${name}<X>(elements: C.RunicArgs<X, ${name}>): C.ValueRune<${name}, C.RunicArgs.U<X>>`
+        export function ${name}<X>(...elements: C.RunicArgs<X, ${name}>): C.ValueRune<${name}, C.RunicArgs.U<X>>`
         : `export function ${name}(elements) {
   return Rune.tuple(elements)
 }`)

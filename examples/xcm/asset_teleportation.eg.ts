@@ -15,7 +15,6 @@ import {
   XcmV2Junction,
   XcmV2Junctions,
   XcmV2MultiAsset,
-  XcmV2MultiAssets,
   XcmV2MultiLocation,
   XcmV2NetworkId,
   XcmV2WeightLimit,
@@ -27,7 +26,7 @@ import {
   System,
 } from "@capi/rococo-dev/statemine"
 import { assert } from "asserts"
-import { alice } from "capi"
+import { alice, Rune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 
 // Reference Alice's free balance.
@@ -59,7 +58,7 @@ XcmPallet
         ),
       }),
     ),
-    assets: VersionedMultiAssets.V2(XcmV2MultiAssets([XcmV2MultiAsset({
+    assets: VersionedMultiAssets.V2(Rune.array([XcmV2MultiAsset({
       id: XcmV2AssetId.Concrete(
         XcmV2MultiLocation({
           parents: 0,
