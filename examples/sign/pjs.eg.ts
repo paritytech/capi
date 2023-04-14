@@ -3,7 +3,6 @@
  * @stability nearing
  * @description Utilize a Polkadot-JS signer (such as from a browser wallet
  * extension) to sign a Capi extrinsic.
- * @test_skip
  */
 
 import { Balances, chain, System } from "@capi/polkadot-dev"

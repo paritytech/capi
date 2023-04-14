@@ -4,7 +4,6 @@
  * is (or the identity pallet for that matter). We may decide we do not wish to
  * maintain this utility. For now however, it's a good way to stress-test Rune.
  * @description Set a user's identity, potentially with metadata of arbitrary user-defined shape.
- * @test_skip
  */
 
 import { Identity } from "@capi/polkadot-dev"

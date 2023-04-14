@@ -4,7 +4,6 @@
  * @description Model a derived read, in which one piece of storage (the staking
  * active era index)is used as the key to another piece of storage (the corresponding
  * reward points).
- * @test_skip
  */
 
 import { $eraRewardPoints, Staking } from "@capi/westend"

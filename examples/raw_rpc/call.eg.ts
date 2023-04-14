@@ -2,7 +2,6 @@
  * @title Raw RPC Call Usage
  * @stability nearing
  * @description Interact directly with the RPC node's call methods.
- * @test_skip
  */
 
 import { chain } from "@capi/polkadot-dev"
