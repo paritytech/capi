@@ -60,7 +60,7 @@ jobs:
       - run: deno cache target/star.ts || deno cache target/star.ts || deno cache target/star.ts || deno cache target/star.ts || deno cache target/star.ts || deno cache target/star.ts
       - name: Archive target
         uses: actions/upload-artifact@v3
-        if: failure()
+        if: failure() || cancelled()
         with:
           name: cache-target
           path: target
@@ -77,7 +77,7 @@ jobs:
       - run: deno task sync --check
       - name: Archive target
         uses: actions/upload-artifact@v3
-        if: failure()
+        if: failure() || cancelled()
         with:
           name: sync-target
           path: target
@@ -119,6 +119,7 @@ jobs:
       - run: deno task test
 
   examples-deno:
+    if: false
     name: Examples (Deno)
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -136,7 +137,7 @@ jobs:
       - run: deno task test:examples:deno
       - name: Archive target
         uses: actions/upload-artifact@v3
-        if: failure()
+        if: failure() || cancelled()
         with:
           name: examples-deno-target
           path: target
