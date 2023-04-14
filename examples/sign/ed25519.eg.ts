@@ -6,7 +6,7 @@
 
 import { Balances, createUsers, MultiAddress, System } from "@capi/westend-dev"
 import { assert } from "asserts"
-import { Rune } from "capi"
+import { ExtrinsicSender } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 import * as ed from "https://esm.sh/@noble/ed25519@1.7.3"
 
@@ -53,7 +53,7 @@ await Balances
     value: 12345n,
     dest: billy.address,
   })
-  .signed(signature({ sender: Rune.rec({ address, sign }) }))
+  .signed(signature({ sender: ExtrinsicSender({ address, sign }) }))
   .sent()
   .dbgStatus("Transfer:")
   .finalizedEvents()

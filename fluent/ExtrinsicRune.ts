@@ -2,7 +2,7 @@ import { blake2_256, hex } from "../crypto/mod.ts"
 import * as $ from "../deps/scale.ts"
 import { concat } from "../deps/std/bytes.ts"
 import { $extrinsic, Signer } from "../frame_metadata/Extrinsic.ts"
-import { Rune, ValueRune } from "../rune/mod.ts"
+import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { Chain, ChainRune } from "./ChainRune.ts"
 import { CodecRune } from "./CodecRune.ts"
 import { PatternRune } from "./PatternRune.ts"
@@ -11,6 +11,11 @@ import { SignedExtrinsicRune } from "./SignedExtrinsicRune.ts"
 export interface ExtrinsicSender<C extends Chain> {
   address: Chain.Address<C>
   sign: Signer<C["metadata"]>
+}
+export function ExtrinsicSender<X, C extends Chain>(
+  extrinsicSender: RunicArgs<X, ExtrinsicSender<C>>,
+): Rune<ExtrinsicSender<C>, RunicArgs.U<X>> {
+  return Rune.rec(RunicArgs.resolve(extrinsicSender))
 }
 
 export interface SignatureData<C extends Chain> {
