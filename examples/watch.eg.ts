@@ -4,7 +4,6 @@
  * @description Capi allows you to model your data requirements as Runes and
  * then utilize `watch`, which produces an async generator, the pulls of which
  * produce promises resolving to subsequent states.
- * @test_skip
  */
 
 import { chain, Timestamp } from "@capi/polkadot"
