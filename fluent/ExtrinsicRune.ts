@@ -15,7 +15,7 @@ export interface ExtrinsicSender<C extends Chain> {
 export function ExtrinsicSender<X, C extends Chain>(
   extrinsicSender: RunicArgs<X, ExtrinsicSender<C>>,
 ): Rune<ExtrinsicSender<C>, RunicArgs.U<X>> {
-  return Rune.rec(extrinsicSender) as never
+  return Rune.rec(RunicArgs.resolve(extrinsicSender))
 }
 
 export interface SignatureData<C extends Chain> {
