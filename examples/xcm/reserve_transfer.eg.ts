@@ -209,12 +209,7 @@ assertNotEquals(billyStatemintBalanceInitial, billyStatemintBalanceFinal)
 
 // Retrieve the statemint sovereign account balance.
 const statemintSovereignAccountBalance = await Statemine.Assets.Account
-  // Sovereign address on sibling chain
-  // b"sibl" + $.u32.encode(2000) + 0...0
-  .value([
-    RESERVE_ASSET_ID,
-    $siblId.encode(TRAPPIST_CHAIN_ID),
-  ])
+  .value([RESERVE_ASSET_ID, $siblId.encode(TRAPPIST_CHAIN_ID)])
   .unhandle(undefined)
   .access("balance")
   .run()
