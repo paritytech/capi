@@ -4,7 +4,6 @@
  * @description Utilize Capi's fluent API to turn a block reference (in this
  * case the retrieved latest finalized block hash) into a block. Then access
  * various pieces of data pertaining to that block.
- * @test_skip
  */
 
 import { $eventRecord, chain, metadata } from "@capi/polkadot"
