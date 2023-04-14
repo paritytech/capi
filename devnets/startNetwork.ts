@@ -242,14 +242,12 @@ async function spawnChain(
 }
 
 async function spawnNode(tempDir: string, binary: string, args: string[], signal: AbortSignal) {
-  console.log("BEFORE DOWNLOAD", binary, args)
   const child = new Deno.Command(binary, {
     args,
     signal,
     stdout: "piped",
     stderr: "piped",
   }).spawn()
-  console.log("AFTER DOWNLOAD", binary, args)
 
   child.stdout.pipeTo(
     writableStreamFromWriter(
