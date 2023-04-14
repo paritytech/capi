@@ -120,7 +120,7 @@ jobs:
 
   examples-deno:
     name: Examples (Deno)
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     timeout-minutes: 15
     needs: cache
     steps:
