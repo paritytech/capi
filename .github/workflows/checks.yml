@@ -119,7 +119,6 @@ jobs:
       - run: deno task test
 
   examples-deno:
-    if: false
     name: Examples (Deno)
     runs-on: ubuntu-latest
     timeout-minutes: 15
