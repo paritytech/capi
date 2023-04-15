@@ -3,7 +3,7 @@ import * as path from "../deps/std/path.ts"
 import { writableStreamFromWriter } from "../deps/std/streams.ts"
 import { getFreePort, portReady } from "../util/port.ts"
 import { resolveBinary } from "./binary.ts"
-import { NetworkConfig } from "./CapiConfig.ts"
+import { DevChainConfig } from "./CapiConfig.ts"
 import { createCustomChainSpec, GenesisConfig, getGenesisConfig } from "./chainSpec.ts"
 import { addTestUsers } from "./testUsers.ts"
 
@@ -20,7 +20,7 @@ export interface NetworkChain {
 
 export async function startNetwork(
   tempDir: string,
-  config: NetworkConfig,
+  config: DevChainConfig,
   signal: AbortSignal,
 ): Promise<Network> {
   const paras = await Promise.all(

@@ -14,6 +14,7 @@ export abstract class Connection {
     this: new(discovery: D) => Connection,
     discovery: D,
   ): (signal: AbortSignal) => Connection {
+    // @ts-ignore 'Connection' only refers to a type, but is being used as a namespace here.
     return (signal) => (Connection.connect<D>).call(this, discovery, signal)
   }
 
@@ -51,11 +52,10 @@ export abstract class Connection {
     params: unknown,
   ): void
 
-  protected abstract close(): void
+  abstract close(): void
 
   async call(method: string, params: unknown[]) {
-    const id = this.nextId++
-    return this.#call(id, method, params)
+    return this.#call(this.nextId++, method, params)
   }
 
   callResultPendings: Record<number, Deferred<RpcCallMessage>> = {}

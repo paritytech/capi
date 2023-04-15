@@ -1,14 +1,25 @@
 import { Binary } from "./binary.ts"
 
-export interface WsChain {
+export interface CapiConfig {
+  server: string
+  chains?: Record<string, Chain>
+}
+
+export type Chain = WsChainConfig | DevChainConfig | CustomChainConfig
+
+export interface WsChainConfig {
   url: string
   binary?: never
+  metadata?: never
+
   version: string
 }
 
-export interface NetworkConfig {
+export interface DevChainConfig {
   url?: never
   binary: Binary
+  metadata?: never
+
   chain: string
   nodes?: number
   parachains?: Record<string, {
@@ -19,7 +30,11 @@ export interface NetworkConfig {
   }>
 }
 
-export interface CapiConfig {
-  server: string
-  chains?: Record<string, WsChain | NetworkConfig>
+export interface CustomChainConfig {
+  url?: never
+  binary?: never
+  metadata: Uint8Array
+
+  /** A JavaScript module which exports `connect` (of type `(signal: AbortSignal) => Connection`) */
+  connect: URL
 }

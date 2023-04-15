@@ -63,6 +63,7 @@ runtimes
 ryann
 serde
 shiki
+smol
 smoldot
 statemigration
 statemine

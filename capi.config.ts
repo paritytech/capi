@@ -1,3 +1,4 @@
+import { metadata } from "./examples/smoldot/metadata.ts"
 import { binary, CapiConfig } from "./mod.ts"
 
 const polkadot = binary("polkadot", "v0.9.38")
@@ -18,6 +19,10 @@ export const config: CapiConfig = {
     statemint: {
       url: "wss://statemint-rpc.polkadot.io/",
       version: "latest",
+    },
+    polkadotViaSmoldot: {
+      metadata: await metadata(),
+      connect: new URL("./examples/smoldot/connect.js", import.meta.url),
     },
     polkadotDev: {
       binary: polkadot,

@@ -25,33 +25,43 @@ export async function syncConfig(tempDir: string, config: CapiConfig) {
             connection: { type: "WsConnection", discovery: chain.url },
           })
           return
-        }
-        const network = await startNetwork(path.join(tempDir, name), chain, signal)
-        await Promise.all(
-          [
-            [undefined, network.relay] as const,
-            ...Object.entries(network.paras),
-          ].map(
-            async ([paraName, chain]) => {
-              const metadata = await uploadMetadata(
-                server,
-                `ws://127.0.0.1:${chain.ports[0]}`,
-              )
-              entries.set(
-                normalizePackageName(name) + (paraName ? `/${normalizePackageName(paraName)}` : ""),
-                {
-                  type: "frame",
-                  metadata: metadata,
-                  chainName: normalizeTypeName(paraName ?? name),
-                  connection: {
-                    type: "DevnetConnection",
-                    discovery: name + (paraName ? `/${paraName}` : ""),
+        } else if (chain.metadata) {
+          const metadata = await _upload(server, "metadata", chain.metadata, blake2_512)
+          entries.set(normalizePackageName(name), {
+            type: "frame",
+            metadata,
+            chainName: normalizeTypeName(name),
+            connection: { type: "CustomConnection", discovery: chain.connect.href },
+          })
+        } else {
+          const network = await startNetwork(path.join(tempDir, name), chain, signal)
+          await Promise.all(
+            [
+              [undefined, network.relay] as const,
+              ...Object.entries(network.paras),
+            ].map(
+              async ([paraName, chain]) => {
+                const metadata = await uploadMetadata(
+                  server,
+                  `ws://127.0.0.1:${chain.ports[0]}`,
+                )
+                entries.set(
+                  normalizePackageName(name)
+                    + (paraName ? `/${normalizePackageName(paraName)}` : ""),
+                  {
+                    type: "frame",
+                    metadata: metadata,
+                    chainName: normalizeTypeName(paraName ?? name),
+                    connection: {
+                      type: "DevnetConnection",
+                      discovery: name + (paraName ? `/${paraName}` : ""),
+                    },
                   },
-                },
-              )
-            },
-          ),
-        )
+                )
+              },
+            ),
+          )
+        }
       }),
     )
     const sortedEntries = new Map([...entries].sort((a, b) => a[0] < b[0] ? 1 : -1))
