@@ -154,7 +154,7 @@ ${
         ? `export type ${name} = ${this.nativeVisitor.visit(_codec)}
 export function ${name}<X>(fields: C.RunicArgs<X, ${name}>): C.ValueRune<${name}, C.RunicArgs.U<X>>`
         : `export function ${name}(fields) {
-  return Rune.object(fields)
+  return C.Rune.object(fields)
 }`
     }`)
     .add($.tuple, (_codec, ..._element) => (name, isTypes) =>
