@@ -37,13 +37,12 @@ await Rococo.Sudo
   .sudo({
     call: Rococo.ParasSudoWrapper.sudoQueueDownwardXcm({
       id: RESERVE_CHAIN_ID,
-      xcm: Rune.rec({
-        type: "V2",
-        value: Rune.tuple([
+      xcm: Rococo.VersionedXcm.V2(
+        Rune.array([
           Rococo.Instruction.Transact({
             originType: "Superuser",
             requireWeightAtMost: 1000000000n,
-            call: Rune.rec({
+            call: Rococo.DoubleEncoded({
               encoded: Statemine.Assets.forceCreate({
                 id: RESERVE_ASSET_ID,
                 isSufficient: true,
@@ -53,7 +52,7 @@ await Rococo.Sudo
             }),
           }),
         ]),
-      }),
+      ),
     }),
   })
   .signed(signature({ sender: root }))
@@ -115,7 +114,7 @@ await Trappist.Sudo
   .sudo({
     call: Trappist.AssetRegistry.registerReserveAsset({
       assetId: TRAPPIST_ASSET_ID,
-      assetMultiLocation: Rune.rec({
+      assetMultiLocation: Trappist.XcmV1MultiLocation({
         parents: 1,
         interior: Trappist.Junctions.X3(
           Trappist.XcmV1Junction.Parachain(RESERVE_CHAIN_ID),
@@ -148,13 +147,13 @@ await Trappist.Sudo
   } = Statemine
   const events = await Statemine.PolkadotXcm
     .limitedReserveTransferAssets({
-      dest: VersionedMultiLocation.V1(Rune.rec({
+      dest: VersionedMultiLocation.V1(Statemine.XcmV1MultiLocation({
         parents: 1,
         interior: Junctions.X1(
           XcmV1Junction.Parachain(TRAPPIST_CHAIN_ID),
         ),
       })),
-      beneficiary: VersionedMultiLocation.V1(Rune.rec({
+      beneficiary: VersionedMultiLocation.V1(Statemine.XcmV1MultiLocation({
         parents: 0,
         interior: Junctions.X1(
           XcmV1Junction.AccountId32({
@@ -163,8 +162,8 @@ await Trappist.Sudo
           }),
         ),
       })),
-      assets: VersionedMultiAssets.V1(Rune.array([Rune.rec({
-        id: AssetId.Concrete(Rune.rec({
+      assets: VersionedMultiAssets.V1(Rune.array([Statemine.XcmV1MultiAsset({
+        id: AssetId.Concrete(Statemine.XcmV1MultiLocation({
           parents: 0,
           interior: Junctions.X2(
             XcmV1Junction.PalletInstance((await Statemine.Assets.pallet.run()).id),
