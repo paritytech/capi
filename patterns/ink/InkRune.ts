@@ -68,11 +68,11 @@ export class InkRune<out C extends Chain, out U>
     const gasLimit = innerResult.access("gasRequired") // TODO: make explicitly configurable?
     const storageDepositLimit = innerResult.access("storageDeposit", "value")
     return Rune
-      .rec({
+      .object({
         type: "Contracts",
-        value: Rune.rec({
+        value: Rune.object({
           type: "call",
-          dest: Rune.rec({
+          dest: Rune.object({
             type: "Id",
             value: this.as(InkRune),
           }),

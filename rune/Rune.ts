@@ -126,7 +126,7 @@ export class Rune<out T, out U = never> {
     return Rune.resolve(fn).into(FnRune)
   }
 
-  static rec<R extends {}>(
+  static object<R extends {}>(
     runes: R,
   ): ValueRune<{ [K in keyof R]: Rune.T<R[K]> }, Rune.U<R[keyof R]>> {
     const keys = Object.keys(runes)

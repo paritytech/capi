@@ -114,7 +114,7 @@ export function ${variant.tag}<X>(...args: Parameters<typeof ${factoryName}<X>>)
 `
                       : `
 ${variant.tag}(...args){
-  return chain.extrinsic(C.Rune.rec({ type: ${palletStr}, value: ${factoryName}(...args) }))
+  return chain.extrinsic(C.Rune.object({ type: ${palletStr}, value: ${factoryName}(...args) }))
 },
 `
                   }))

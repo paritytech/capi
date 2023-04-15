@@ -34,7 +34,7 @@ export class IdentityInfoTranscoders<A extends Record<string, any>> {
       .unhandle(undefined).map((v) => $.str.encode(v))
       .rehandle(undefined)
     const rest = Rune
-      .rec(Object.fromEntries(REST_KEYS.map((key) => [
+      .object(Object.fromEntries(REST_KEYS.map((key) => [
         key,
         Rune
           .resolve(props[key])

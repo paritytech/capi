@@ -7,15 +7,15 @@ export function replaceDelegateCalls<C extends Chain, U, X>(
   ...[real, from, to]: RunicArgs<X, [real: MultiAddress, from: MultiAddress, to: MultiAddress]>
 ) {
   return [
-    chain.extrinsic(Rune.rec({
+    chain.extrinsic(Rune.object({
       type: "Proxy",
-      value: Rune.rec({
+      value: Rune.object({
         type: "proxy",
         real,
         forceProxyType: undefined,
-        call: Rune.rec({
+        call: Rune.object({
           type: "Proxy",
-          value: Rune.rec({
+          value: Rune.object({
             type: "addProxy",
             proxyType: "Any",
             delegate: to,
@@ -24,15 +24,15 @@ export function replaceDelegateCalls<C extends Chain, U, X>(
         }),
       }),
     }) as any),
-    chain.extrinsic(Rune.rec({
+    chain.extrinsic(Rune.object({
       type: "Proxy",
-      value: Rune.rec({
+      value: Rune.object({
         type: "proxy",
         real,
         forceProxyType: undefined,
-        call: Rune.rec({
+        call: Rune.object({
           type: "Proxy",
-          value: Rune.rec({
+          value: Rune.object({
             type: "removeProxy",
             proxyType: "Any",
             delegate: from,

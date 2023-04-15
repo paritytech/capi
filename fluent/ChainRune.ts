@@ -60,12 +60,12 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
       .fn(hex.decode)
       .call(connection.call("state_getMetadata"))
       .map(decodeMetadata)
-    return Rune.rec({ connection, metadata }).into(this)
+    return Rune.object({ connection, metadata }).into(this)
   }
 
   with(connect: (signal: AbortSignal) => Connection) {
     const connection = ConnectionRune.from(connect)
-    return Rune.rec({ connection, metadata: this.metadata }).into(ChainRune) as ChainRune<C, U>
+    return Rune.object({ connection, metadata: this.metadata }).into(ChainRune) as ChainRune<C, U>
   }
 
   connection = this.into(ValueRune<Chain, U>).access("connection").into(ConnectionRune)

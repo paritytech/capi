@@ -60,14 +60,14 @@ export function signature<X>(_props: RunicArgs<X, SignatureProps>) {
       .map(hex.decode)
     const mortality = Rune.resolve(props.mortality).map((x) => x ?? Era.Immortal)
     const tip = Rune.resolve(props.tip).map((x) => x ?? 0n)
-    return Rune.rec({
+    return Rune.object({
       sender: props.sender,
-      extra: Rune.rec({
+      extra: Rune.object({
         CheckMortality: mortality,
         CheckNonce: nonce,
         ChargeTransactionPayment: tip,
       }),
-      additional: Rune.rec({
+      additional: Rune.object({
         CheckSpecVersion: specVersion,
         CheckTxVersion: transactionVersion,
         CheckGenesis: genesisHash,

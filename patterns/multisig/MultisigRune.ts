@@ -45,9 +45,9 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
     const call = this.chain.extrinsic(Rune.resolve(call_).unsafeAs<Chain.Call<C>>())
     return this.chain.extrinsic(
       Rune
-        .rec({
+        .object({
           type: "Multisig",
-          value: Rune.rec({
+          value: Rune.object({
             type: "asMulti",
             threshold: this.threshold,
             call,
@@ -64,9 +64,9 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
   approve<X>({ sender, callHash }: RunicArgs<X, MultisigVoteProps>) {
     return this.chain.extrinsic(
       Rune
-        .rec({
+        .object({
           type: "Multisig",
-          value: Rune.rec({
+          value: Rune.object({
             type: "approveAsMulti",
             threshold: this.threshold,
             callHash,
@@ -83,9 +83,9 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
   cancel<X>({ sender, callHash }: RunicArgs<X, MultisigVoteProps>) {
     return this.chain.extrinsic(
       Rune
-        .rec({
+        .object({
           type: "Multisig",
-          value: Rune.rec({
+          value: Rune.object({
             type: "cancelAsMulti",
             threshold: this.threshold,
             callHash,
