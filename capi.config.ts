@@ -22,7 +22,8 @@ export const config: CapiConfig = {
     },
     polkadotViaSmoldot: {
       metadata: await metadata(),
-      connect: new URL("./examples/smoldot/connect.js", import.meta.url),
+      // Note: if you're not targeting Deno, you'll likely want to specify a JS file.
+      connect: new URL("./examples/smoldot/connect.ts", import.meta.url),
     },
     polkadotDev: {
       binary: polkadot,
