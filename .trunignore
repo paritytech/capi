@@ -1,2 +1,3 @@
-examples/xcm/asset_teleportation.eg.ts
 examples/ink/*.eg.ts
+examples/smoldot/smoldot.eg.ts
+examples/xcm/asset_teleportation.eg.ts
