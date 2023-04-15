@@ -2,10 +2,10 @@ import { Binary } from "./binary.ts"
 
 export interface CapiConfig {
   server: string
-  chains?: Record<string, Chain>
+  chains?: Record<string, ChainConfig>
 }
 
-export type Chain = WsChainConfig | DevChainConfig | CustomChainConfig
+export type ChainConfig = WsChainConfig | DevChainConfig | CustomChainConfig
 
 export interface WsChainConfig {
   url: string
