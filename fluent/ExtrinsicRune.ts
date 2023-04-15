@@ -15,7 +15,7 @@ export interface ExtrinsicSender<C extends Chain> {
 export function ExtrinsicSender<X, C extends Chain>(
   extrinsicSender: RunicArgs<X, ExtrinsicSender<C>>,
 ): Rune<ExtrinsicSender<C>, RunicArgs.U<X>> {
-  return Rune.rec(RunicArgs.resolve(extrinsicSender))
+  return Rune.object(RunicArgs.resolve(extrinsicSender))
 }
 
 export interface SignatureData<C extends Chain> {
@@ -43,7 +43,7 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
       .fn($extrinsic)
       .call(this.chain.metadata)
       .into(CodecRune)
-      .encoded(Rune.rec({
+      .encoded(Rune.object({
         protocolVersion: 4,
         call: this,
         signature: signatureFactory(this.chain),
@@ -56,7 +56,7 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
       .fn($extrinsic)
       .call(this.chain.metadata)
       .into(CodecRune)
-      .encoded(Rune.rec({
+      .encoded(Rune.object({
         protocolVersion: ExtrinsicRune.PROTOCOL_VERSION,
         call: this,
       }))

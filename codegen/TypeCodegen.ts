@@ -137,7 +137,7 @@ export function is${variant.tag}(value: ${name}): value is ${name}.${variant.tag
         } else {
           return `
 ${variant.tag}(${params.split(":")[0]}) {
-  return C.Rune.rec({ ${stringifyKey(tagKey)}: ${JSON.stringify(variant.tag)}, ${populate} })
+  return C.Rune.object({ ${stringifyKey(tagKey)}: ${JSON.stringify(variant.tag)}, ${populate} })
 },
 is${variant.tag}(value) {
   return value${stringifyPropertyAccess(tagKey)} === ${JSON.stringify(variant.tag)}
@@ -154,7 +154,7 @@ ${
         ? `export type ${name} = ${this.nativeVisitor.visit(_codec)}
 export function ${name}<X>(fields: C.RunicArgs<X, ${name}>): C.ValueRune<${name}, C.RunicArgs.U<X>>`
         : `export function ${name}(fields) {
-  return Rune.rec(fields)
+  return Rune.object(fields)
 }`
     }`)
     .add($.tuple, (_codec, ..._element) => (name, isTypes) =>

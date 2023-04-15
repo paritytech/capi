@@ -121,7 +121,7 @@ export class InkMetadataRune<out U> extends Rune<InkMetadata, U> {
         value,
         undefined,
         storageDepositLimit,
-        Rune.rec({ type: "Upload" as const, value: code }),
+        Rune.object({ type: "Upload" as const, value: code }),
         data,
         salt,
       ]))
@@ -139,9 +139,9 @@ export class InkMetadataRune<out U> extends Rune<InkMetadata, U> {
         },
       )
     return Rune
-      .rec({
+      .object({
         type: "Contracts",
-        value: Rune.rec({
+        value: Rune.object({
           type: "instantiateWithCode",
           value,
           gasLimit,

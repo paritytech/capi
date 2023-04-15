@@ -16,8 +16,8 @@ const c = Rune.constant("c")
 // Use `Rune.tuple` to create a new Rune resolving to `[aT, bT]`.
 const d = Rune.tuple([a, b])
 
-// Use `Rune.rec` to create a new Rune resolving to `{ c: cT, d: dT }`.
-const e = Rune.rec({ c, d })
+// Use `Rune.object` to create a new Rune resolving to `{ c: cT, d: dT }`.
+const e = Rune.object({ c, d })
 
 // Execute `e`. Note the resolution of inner Runes is parallelized,
 // much like a `Promise.all` call.

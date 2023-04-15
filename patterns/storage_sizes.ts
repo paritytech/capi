@@ -8,9 +8,9 @@ export function storageSizes<U, X>(
   return chain.metadata
     .into(ValueRune)
     .map(({ pallets }) =>
-      Rune.rec(mapEntries(pallets, ([palletName, pallet]) => [
+      Rune.object(mapEntries(pallets, ([palletName, pallet]) => [
         palletName,
-        Rune.rec(
+        Rune.object(
           mapEntries(pallet.storage, ([storageName]) => [
             storageName,
             chain.pallet(pallet.name).storage(storageName).size(null, blockHash),

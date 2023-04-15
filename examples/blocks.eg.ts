@@ -28,9 +28,9 @@ const events = block.events()
 // Reference the author as well.
 const author = babeBlockAuthor(chain, blockHash)
 
-// Use `Rune.rec` to parallelize these retrievals.
+// Use `Rune.object` to parallelize these retrievals.
 const collection = await Rune
-  .rec({
+  .object({
     blockHash,
     block,
     extrinsics,

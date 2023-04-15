@@ -34,7 +34,7 @@ export class VirtualMultisigRune<out C extends Chain, out U>
   proxies = this.value
     .access("members")
     .map((arr) => Object.fromEntries(arr.map((a, i): [string, number] => [hex.encode(a[0]), i])))
-  inner = Rune.rec({
+  inner = Rune.object({
     signatories: this.value.access("members").map((arr) => arr.map((a) => a[1])),
     threshold: this.value.access("threshold"),
   }).into(MultisigRune, this.chain)
@@ -56,9 +56,9 @@ export class VirtualMultisigRune<out C extends Chain, out U>
   ) {
     return this.chain.extrinsic(
       Rune
-        .rec({
+        .object({
           type: "Balances",
-          value: Rune.rec({
+          value: Rune.object({
             type: "transfer",
             dest: this.senderProxyId(senderAccountId),
             value: amount,
@@ -74,9 +74,9 @@ export class VirtualMultisigRune<out C extends Chain, out U>
     const sender = this.senderProxyId(senderAccountId)
     const call_ = this.chain.extrinsic(
       Rune
-        .rec({
+        .object({
           type: "Proxy" as const,
-          value: Rune.rec({
+          value: Rune.object({
             type: "proxy" as const,
             real: MultiAddress.Id(this.stash),
             forceProxyType: undefined,
@@ -87,9 +87,9 @@ export class VirtualMultisigRune<out C extends Chain, out U>
     )
     return this.chain.extrinsic(
       Rune
-        .rec({
+        .object({
           type: "Proxy",
-          value: Rune.rec({
+          value: Rune.object({
             type: "proxy",
             real: sender,
             forceProxyType: undefined,
@@ -133,7 +133,7 @@ export class VirtualMultisigRune<out C extends Chain, out U>
       Rune.array(Array.from({ length: n + 1 }, (_, index) =>
         chain.extrinsic(
           Rune
-            .rec({
+            .object({
               type: "Proxy",
               value: {
                 type: "createPure",
@@ -149,9 +149,9 @@ export class VirtualMultisigRune<out C extends Chain, out U>
     const proxies = chain
       .extrinsic(
         Rune
-          .rec({
+          .object({
             type: "Utility",
-            value: Rune.rec({
+            value: Rune.object({
               type: "batchAll",
               calls: proxyCreationCalls,
             }),
@@ -182,9 +182,9 @@ export class VirtualMultisigRune<out C extends Chain, out U>
         Rune.array(memberProxies.map((memberProxy) =>
           chain.extrinsic(
             Rune
-              .rec({
+              .object({
                 type: "Balances",
-                value: Rune.rec({
+                value: Rune.object({
                   type: "transfer",
                   dest: MultiAddress.Id(memberProxy),
                   value,
@@ -197,16 +197,16 @@ export class VirtualMultisigRune<out C extends Chain, out U>
       .into(MetaRune)
       .flat()
     const multisig = Rune
-      .rec({
+      .object({
         signatories: memberProxies,
         threshold,
       })
       .into(MultisigRune, chain)
     const multisigExistentialDepositCall = chain.extrinsic(
       Rune
-        .rec({
+        .object({
           type: "Balances",
-          value: Rune.rec({
+          value: Rune.object({
             type: "transfer",
             dest: MultiAddress.Id(multisig.accountId),
             value: existentialDepositAmount,
@@ -216,9 +216,9 @@ export class VirtualMultisigRune<out C extends Chain, out U>
     )
     const stashDepositCall = chain.extrinsic(
       Rune
-        .rec({
+        .object({
           type: "Balances",
-          value: Rune.rec({
+          value: Rune.object({
             type: "transfer",
             dest: MultiAddress.Id(stashProxy),
             value: existentialDepositAmount,
@@ -233,9 +233,9 @@ export class VirtualMultisigRune<out C extends Chain, out U>
     const existentialDeposits = chain
       .extrinsic(
         Rune
-          .rec({
+          .object({
             type: "Utility",
-            value: Rune.rec({
+            value: Rune.object({
               type: "batchAll",
               calls: existentialDepositCalls,
             }),
@@ -271,9 +271,9 @@ export class VirtualMultisigRune<out C extends Chain, out U>
     const ownershipSwaps = chain
       .extrinsic(
         Rune
-          .rec({
+          .object({
             type: "Utility",
-            value: Rune.rec({
+            value: Rune.object({
               type: "batchAll",
               calls: ownershipSwapCalls,
             }),
@@ -292,7 +292,7 @@ export class VirtualMultisigRune<out C extends Chain, out U>
       .chain(() => existentialDeposits)
       .chain(() => ownershipSwaps)
       .chain(() =>
-        Rune.rec({
+        Rune.object({
           members,
           threshold,
           stash: stashProxy,
