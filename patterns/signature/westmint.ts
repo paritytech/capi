@@ -1,35 +1,13 @@
-import { Polkadot } from "@capi/polkadot"
-import { AddressPrefixChain, Chain, ChainRune } from "../../fluent/ChainRune.ts"
-import { ExtrinsicSender, SignatureData } from "../../fluent/ExtrinsicRune.ts"
-import { $, hex, ss58, ValueRune } from "../../mod.ts"
-import { Rune, RunicArgs } from "../../rune/Rune.ts"
-import { Era } from "../../scale_info/overrides/Era.ts"
+import { Westmint } from "@capi/rococo-westmint/westmint"
+import { ChainRune, Era, hex, Rune, RunicArgs, SignatureData, ss58, ValueRune } from "../../mod.ts"
+import { SignatureProps } from "../signature/polkadot.ts"
 
-export interface SignatureProps<T extends Chain> {
-  sender: ExtrinsicSender<T>
-  checkpoint?: string
-  mortality?: Era
-  nonce?: number
-  tip?: bigint
+type NftSigProps = SignatureProps<Westmint> & {
+  assetId?: number
 }
 
-export interface PolkadotSignatureChain extends AddressPrefixChain {
-  metadata: AddressPrefixChain["metadata"] & {
-    pallets: {
-      System: {
-        constants: {
-          Version: {
-            codec: $.Codec<Chain.Constant.Value<Polkadot, "System", "Version">>
-          }
-        }
-      }
-    }
-    extrinsic: Omit<Polkadot["metadata"]["extrinsic"], "call">
-  }
-}
-
-export function signature<X>(_props: RunicArgs<X, SignatureProps<PolkadotSignatureChain>>) {
-  return <CU>(chain: ChainRune<PolkadotSignatureChain, CU>) => {
+export function signature<X>(_props: RunicArgs<X, NftSigProps>) {
+  return <CU>(chain: ChainRune<Westmint, CU>) => {
     const props = RunicArgs.resolve(_props)
     const addrPrefix = chain.addressPrefix()
     const versions = chain.pallet("System").constant("Version").decoded
@@ -41,12 +19,10 @@ export function signature<X>(_props: RunicArgs<X, SignatureProps<PolkadotSignatu
       .tuple([addrPrefix, props.sender])
       .map(([addrPrefix, sender]) => {
         switch (sender.address.type) {
-          case "Id": {
+          case "Id":
             return ss58.encode(addrPrefix, sender.address.value)
-          }
-          default: {
+          default:
             throw new Error("unimplemented")
-          }
         }
       })
       .throws(ss58.InvalidPayloadLengthError)
@@ -66,6 +42,10 @@ export function signature<X>(_props: RunicArgs<X, SignatureProps<PolkadotSignatu
         CheckMortality: mortality,
         CheckNonce: nonce,
         ChargeTransactionPayment: tip,
+        ChargeAssetTxPayment: Rune.object({
+          assetId: props.assetId,
+          tip: tip,
+        }),
       }),
       additional: Rune.object({
         CheckSpecVersion: specVersion,
@@ -73,6 +53,6 @@ export function signature<X>(_props: RunicArgs<X, SignatureProps<PolkadotSignatu
         CheckGenesis: genesisHash,
         CheckMortality: checkpointHash,
       }),
-    }) satisfies Rune<SignatureData<PolkadotSignatureChain>, unknown>
+    }) satisfies Rune<SignatureData<Westmint>, unknown>
   }
 }
