@@ -5,7 +5,9 @@
  * mint, list and purchase an NFT, as well as lock the collection and NFT as to prevent.
  */
 import {
+  CollectionConfig,
   createUsers,
+  MintSettings,
   MintType,
   Nfts,
   PalletNftsEvent,
@@ -23,9 +25,9 @@ const { alexa, billy } = await createUsers()
 // Create a collection and get the resulting events.
 const createEvents = await Nfts
   .create({
-    config: Rune.rec({
+    config: CollectionConfig({
       settings: DefaultCollectionSetting.AllOff,
-      mintSettings: Rune.rec({
+      mintSettings: MintSettings({
         mintType: MintType.Issuer(),
         defaultItemSettings: DefaultItemSetting.AllOff,
       }),
@@ -88,7 +90,7 @@ assertEquals(initialOwner, alexa.publicKey)
 const price = 1000000n
 await Utility
   .batchAll({
-    calls: Rune.tuple([
+    calls: Rune.array([
       Nfts.setPrice({ collection, item, price }),
       Nfts.setCollectionMaxSupply({ collection, maxSupply: 1 }),
       Nfts.lockCollection({ collection, lockSettings: 8n }), // TODO: enum helper
