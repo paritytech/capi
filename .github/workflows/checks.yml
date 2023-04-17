@@ -63,7 +63,10 @@ jobs:
         if: failure() || cancelled()
         with:
           name: cache-target
-          path: target
+          path: |
+            target
+            !target/**/db/full/*
+            !target/**/paritydb/full/*
 
   sync:
     name: Sync
@@ -80,7 +83,10 @@ jobs:
         if: failure() || cancelled()
         with:
           name: sync-target
-          path: target
+          path: |
+            target
+            !target/**/db/full/*
+            !target/**/paritydb/full/*
 
   star:
     name: Star
@@ -139,4 +145,7 @@ jobs:
         if: failure() || cancelled()
         with:
           name: examples-deno-target
-          path: target
+          path: |
+            target
+            !target/**/db/full/*
+            !target/**/paritydb/full/*
