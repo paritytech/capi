@@ -9,14 +9,12 @@
 import { chain } from "@capi/polkadot-dev"
 import { $, known, SmoldotConnection } from "capi"
 
-// Bring the chainspec(s) into scope. Here, we'll fetch it from the Smoldot GitHub repository.
-const relayChainSpec = await fetch(
-  `https://raw.githubusercontent.com/smol-dot/smoldot/main/demo-chain-specs/polkadot.json`,
-).then((r) => r.text())
+// Bring the chainspec into scope. Here, we'll import it from a local file.
+import relayChainSpec from "./smoldot_chainspec.json" assert { type: "json" }
 
 // Initialize a `ChainRune` with `SmoldotConnection` and the chainspec.
 const { block } = await chain
-  .with(SmoldotConnection.bind({ relayChainSpec }))
+  .with(SmoldotConnection.bind({ relayChainSpec: JSON.stringify(relayChainSpec) }))
   .blockHash()
   .block()
   .run()
