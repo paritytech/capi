@@ -24,7 +24,7 @@ import {
   CumulusPalletParachainSystemEvent,
   RuntimeEvent,
   System,
-} from "@capi/rococo-dev/statemine"
+} from "@capi/rococo-westmint/westmint"
 import { assert } from "asserts"
 import { alice, Rune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
