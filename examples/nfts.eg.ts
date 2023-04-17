@@ -3,7 +3,9 @@
  * @stability unstable
  * @description An example using the upcoming NFTs pallet to create an NFT collection,
  * mint, list and purchase an NFT, as well as lock the collection and NFT as to prevent.
+ * @test_skip
  */
+
 import {
   CollectionConfig,
   MintSettings,
