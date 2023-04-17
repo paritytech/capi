@@ -41,7 +41,6 @@ if (!state) {
     }, signature({ sender: alexa }))
     .hex
     .run()
-  console.log(`Virtual multisig state: ${state}`)
 }
 
 console.log("State:", state)
