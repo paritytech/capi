@@ -52,6 +52,7 @@ noninteractive
 offchain
 parachain
 parachains
+paritydb
 paritytech
 pendings
 polkadot
