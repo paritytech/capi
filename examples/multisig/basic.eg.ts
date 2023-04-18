@@ -16,7 +16,7 @@ const { alexa, billy, carol, david } = await createDevUsers()
 // Initialize the `MultisigRune` with Alexa, Billy and Carol. Set the passing threshold to 2.
 const multisig = MultisigRune.from(chain, {
   signatories: [alexa, billy, carol].map(({ publicKey }) => publicKey),
-  threshold: 2,
+  threshold: 3,
 })
 
 // Reference David's initial balance. We'll be executing a transfer of some funds to David.
@@ -62,8 +62,8 @@ console.log("Is proposed:", isProposed)
 assert(isProposed)
 
 // Approve proposal as Billy.
-await multisig // TODO: get `ratify` working in place of `approve`
-  .approve({ callHash: call.callHash, sender: billy.address })
+await multisig
+  .ratify({ call, sender: billy.address })
   .signed(signature({ sender: billy }))
   .sent()
   .dbgStatus("First approval:")
