@@ -17,7 +17,7 @@ import {
 import { assertEquals } from "asserts"
 import { $, Rune } from "capi"
 import { DefaultCollectionSetting, DefaultItemSetting } from "capi/patterns/nfts.ts"
-import { signature } from "capi/patterns/signature/westmint.ts"
+import { signature } from "capi/patterns/signature/statemint.ts"
 
 // Create two test users. Alexa will mint and list the NFT. Billy will purchase it.
 const { alexa, billy } = await createUsers()

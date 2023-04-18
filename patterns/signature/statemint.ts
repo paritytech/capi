@@ -11,7 +11,11 @@ import {
 } from "../../mod.ts"
 import { SignatureProps } from "../signature/polkadot.ts"
 
-export function signature<X, C extends Chain>(_props: RunicArgs<X, SignatureProps<C>>) {
+type StatemintSignatureProps<C extends Chain> = SignatureProps<C> & {
+  assetId?: number
+}
+
+export function signature<X, C extends Chain>(_props: RunicArgs<X, StatemintSignatureProps<C>>) {
   return <CU>(chain: ChainRune<C, CU>) => {
     const props = RunicArgs.resolve(_props)
     const addrPrefix = chain.addressPrefix()
@@ -48,6 +52,7 @@ export function signature<X, C extends Chain>(_props: RunicArgs<X, SignatureProp
         CheckNonce: nonce,
         ChargeTransactionPayment: tip,
         ChargeAssetTxPayment: Rune.object({
+          assetId: props.assetId,
           tip: tip,
         }),
       }),
