@@ -20,7 +20,7 @@ export function createDevnetsHandler(tempDir: string, config: CapiConfig, signal
       const index = devUserIndex
       const newCount = index + count
       if (newCount < devUserPublicKeys.length) devUserIndex = newCount
-      else throw new Error("Maximum test user count reached")
+      else throw new Error("Maximum dev user count reached")
       return new Response(`${index}`, { status: 200 })
     }
     const match = rDevnetsApi.exec(pathname)
