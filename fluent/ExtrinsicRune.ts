@@ -32,7 +32,7 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
   static readonly PROTOCOL_VERSION = 4
 
   $call = this.chain.into(ValueRune).access("metadata", "extrinsic", "call").into(CodecRune)
-  call = this.$call.encoded(this)
+  callData = this.$call.encoded(this)
 
   $callHash = this.$call.into(ValueRune).map((x) => blake2_256.$hash<any>(x)).into(CodecRune)
   callHash = this.$callHash.encoded(this)
