@@ -63,6 +63,7 @@ export async function startNetwork(
         genesisConfig.paras.paras.push(
           ...paras.map(({ id, genesis }) => [id, [...genesis, true]] satisfies Narrow),
         )
+        addXcmHrmpChannels(genesisConfig, paras.map(({ id }) => id))
       }
       addAuthorities(genesisConfig, minValidators)
       addTestUsers(genesisConfig.balances.balances)
@@ -74,6 +75,7 @@ export async function startNetwork(
     relaySpec,
     config.nodes ?? minValidators,
     [],
+    relayBinary,
     signal,
   )
   return {
@@ -95,6 +97,7 @@ export async function startNetwork(
               "--bootnodes",
               relay.bootnodes,
             ],
+            relayBinary,
             signal,
           )
           return [name, chain] satisfies Narrow
@@ -147,6 +150,7 @@ async function spawnChain(
   chain: string,
   count: number,
   extraArgs: string[],
+  generateNodeKeyBinary: string,
   signal: AbortSignal,
 ): Promise<NetworkChain> {
   let bootnodes: string | undefined
@@ -175,7 +179,7 @@ async function spawnChain(
     if (bootnodes) {
       args.push("--bootnodes", bootnodes)
     } else {
-      const { nodeKey, peerId } = await generateNodeKey(binary)
+      const { nodeKey, peerId } = await generateNodeKey(generateNodeKeyBinary)
       args.push("--node-key", nodeKey)
       bootnodes = generateBootnodeString(httpPort, peerId)
     }
@@ -287,4 +291,24 @@ function addAuthorities(genesisConfig: GenesisConfig, count: number) {
       },
     ])
   )
+}
+
+const hrmpChannelMaxCapacity = 8
+const hrmpChannelMaxMessageSize = 512
+function addXcmHrmpChannels(
+  genesisConfig: GenesisConfig,
+  paraIds: number[],
+) {
+  genesisConfig.hrmp ??= { preopenHrmpChannels: [] }
+  for (const senderParaId of paraIds) {
+    for (const recipientParaId of paraIds) {
+      if (senderParaId === recipientParaId) continue
+      genesisConfig.hrmp.preopenHrmpChannels.push([
+        senderParaId,
+        recipientParaId,
+        hrmpChannelMaxCapacity,
+        hrmpChannelMaxMessageSize,
+      ])
+    }
+  }
 }

@@ -79,4 +79,12 @@ export interface GenesisConfig {
   session?: {
     keys: [account: string, account: string, key: SessionKey][]
   }
+  hrmp?: {
+    preopenHrmpChannels: [
+      senderParaId: number,
+      recipientParaId: number,
+      maxCapacity: number,
+      maxMessageSize: number,
+    ][]
+  }
 }

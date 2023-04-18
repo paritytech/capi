@@ -32,10 +32,12 @@ framesystem
 harrysolovay
 hasher
 hashers
+hrmp
 inherents
 instanceof
 instantiator
 kiera
+lparachain
 ltex
 lxkf
 matty
@@ -53,10 +55,12 @@ offchain
 parachain
 parachains
 paritydb
+paritypr
 paritytech
 pendings
 polkadot
 precommits
+preopen
 prevotes
 procps
 relaychain
@@ -64,6 +68,7 @@ runtimes
 ryann
 serde
 shiki
+sibl
 smoldot
 statemigration
 statemine
@@ -86,3 +91,4 @@ unioned
 vadimcn
 westend
 westmint
+xcmp

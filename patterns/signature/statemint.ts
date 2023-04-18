@@ -1,13 +1,22 @@
-import { Westmint } from "@capi/rococo-westmint/westmint"
-import { ChainRune, Era, hex, Rune, RunicArgs, SignatureData, ss58, ValueRune } from "../../mod.ts"
+import {
+  Chain,
+  ChainRune,
+  Era,
+  hex,
+  Rune,
+  RunicArgs,
+  SignatureData,
+  ss58,
+  ValueRune,
+} from "../../mod.ts"
 import { SignatureProps } from "../signature/polkadot.ts"
 
-type NftSigProps = SignatureProps<Westmint> & {
+type StatemintSignatureProps<C extends Chain> = SignatureProps<C> & {
   assetId?: number
 }
 
-export function signature<X>(_props: RunicArgs<X, NftSigProps>) {
-  return <CU>(chain: ChainRune<Westmint, CU>) => {
+export function signature<X, C extends Chain>(_props: RunicArgs<X, StatemintSignatureProps<C>>) {
+  return <CU>(chain: ChainRune<C, CU>) => {
     const props = RunicArgs.resolve(_props)
     const addrPrefix = chain.addressPrefix()
     const versions = chain.pallet("System").constant("Version").decoded
@@ -53,6 +62,7 @@ export function signature<X>(_props: RunicArgs<X, NftSigProps>) {
         CheckGenesis: genesisHash,
         CheckMortality: checkpointHash,
       }),
-    }) satisfies Rune<SignatureData<Westmint>, unknown>
+      // @ts-ignore: .
+    }) satisfies Rune<SignatureData<C>, unknown>
   }
 }

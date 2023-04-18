@@ -58,5 +58,21 @@ export const config: CapiConfig = {
         },
       },
     },
+    rococoDevXcm: {
+      binary: binary("polkadot", "v0.9.37"),
+      chain: "rococo-local",
+      parachains: {
+        statemine: {
+          id: 1000,
+          binary: binary("polkadot-parachain", "v0.9.370"),
+          chain: "statemine-local",
+        },
+        trappist: {
+          id: 2000,
+          binary: binary("trappist-collator", "79bba6e"),
+          chain: "local",
+        },
+      },
+    },
   },
 }
