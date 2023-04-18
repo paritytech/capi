@@ -31,10 +31,10 @@ export type SignatureDataFactory<C extends Chain, CU, SU> = (
 export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain.Call<C>, C, U> {
   static readonly PROTOCOL_VERSION = 4
 
-  $call = this.chain.into(ValueRune).access("metadata", "extrinsic", "call").into(CodecRune)
-  callData = this.$call.encoded(this)
+  $callData = this.chain.into(ValueRune).access("metadata", "extrinsic", "call").into(CodecRune)
+  callData = this.$callData.encoded(this)
 
-  $callHash = this.$call.into(ValueRune).map((x) => blake2_256.$hash<any>(x)).into(CodecRune)
+  $callHash = this.$callData.into(ValueRune).map((x) => blake2_256.$hash<any>(x)).into(CodecRune)
   callHash = this.$callHash.encoded(this)
 
   $extrinsic = Rune.fn($extrinsic).call(this.chain.metadata).into(CodecRune)
