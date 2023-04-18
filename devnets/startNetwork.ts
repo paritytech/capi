@@ -17,6 +17,59 @@ export interface NetworkChain {
   ports: number[]
 }
 
+export async function startNetworkForMetadata(
+  tempDir: string,
+  config: NetworkConfig,
+  signal: AbortSignal,
+): Promise<Network> {
+  const relayBinary = await resolveBinary(config.binary, signal)
+  const relaySpec = await createCustomChainSpec(
+    path.join(tempDir, "relay"),
+    relayBinary,
+    config.chain,
+    () => {},
+  )
+  return {
+    relay: await spawnChain(
+      path.join(tempDir, "relay"),
+      relayBinary,
+      relaySpec,
+      1,
+      [],
+      relayBinary,
+      signal,
+    ),
+    paras: Object.fromEntries(
+      await Promise.all(
+        Object.entries(config.parachains ?? {}).map(async ([name, config]) => {
+          const binary = await resolveBinary(config.binary, signal)
+          const chain = await spawnChain(
+            path.join(tempDir, name),
+            binary,
+            await createCustomChainSpec(
+              path.join(tempDir, name),
+              binary,
+              config.chain,
+              () => {},
+            ),
+            1,
+            [
+              "--",
+              "--execution",
+              "wasm",
+              "--chain",
+              relaySpec,
+            ],
+            relayBinary,
+            signal,
+          )
+          return [name, chain] satisfies Narrow
+        }),
+      ),
+    ),
+  }
+}
+
 export async function startNetwork(
   tempDir: string,
   config: NetworkConfig,
