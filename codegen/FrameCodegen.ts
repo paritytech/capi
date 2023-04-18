@@ -30,7 +30,13 @@ import * as t from "./types.js"
 
 export const metadata = ${this.codecCodegen.print(this.metadata)}
 
-export const chain = C.ChainRune.from(connect, metadata)
+export class ${this.chainName}Rune extends C.ChainRune {
+  static from(connect) {
+    return super.from(connect, metadata)
+  }
+}
+
+export const chain = ${this.chainName}.from(connect)
 `,
     )
     files.set(
@@ -40,13 +46,16 @@ import * as _codecs from "./codecs.js"
 import * as C from "./capi.js"
 import * as t from "./types.js"
 
-export const metadata: ${this.typeCodegen.print(this.metadata)}
+export const metadata: metadata
+export type metadata = ${this.typeCodegen.print(this.metadata)}
 
-export interface ${this.chainName} extends C.Chain {
-  metadata: typeof metadata
+export interface ${this.chainName} extends C.Chain<metadata> {}
+
+export class ${this.chainName}Rune<U> extends C.ChainRune<${this.chainName}, U> {
+  static override from(connect: (signal: AbortSignal) => C.Connection): ${this.chainName}Rune
 }
 
-export const chain: C.ChainRune<${this.chainName}, never>
+export const chain: ${this.chainName}Rune<never>
 `,
     )
 
