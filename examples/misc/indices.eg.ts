@@ -5,11 +5,12 @@
  * the user's account id using the index.
  */
 
-import { createUsers, Indices } from "@capi/polkadot-dev"
+import { Indices } from "@capi/polkadot-dev"
 import { assertEquals } from "asserts"
+import { createTestUsers } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 
-const { alexa } = await createUsers()
+const { alexa } = await createTestUsers()
 
 const index = 254
 

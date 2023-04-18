@@ -7,16 +7,18 @@
 
 import { Balances } from "@capi/contracts-dev"
 import { assertInstanceOf } from "asserts"
-import { alice, bob, ExtrinsicError } from "capi"
+import { createTestUsers, ExtrinsicError } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
+
+const { alexa, billy } = await createTestUsers()
 
 // The following should reject with an `ExtrinsicError`.
 const extrinsicError = await Balances
   .transfer({
     value: 1_000_000_000_000_000_000_000_000_000_000_000_000n,
-    dest: bob.address,
+    dest: billy.address,
   })
-  .signed(signature({ sender: alice }))
+  .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Transfer:")
   .inBlockEvents()

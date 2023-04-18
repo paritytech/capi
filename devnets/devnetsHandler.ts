@@ -11,8 +11,18 @@ const rDevnetsApi = /^\/devnets\/([\w-]+)(?:\/([\w-]+))?$/
 
 export function createDevnetsHandler(tempDir: string, config: CapiConfig, signal: AbortSignal) {
   const networkMemo = new PermanentMemo<string, Network>()
+  let testUserIndex = 0
   return async (request: Request) => {
     const { pathname, searchParams } = new URL(request.url)
+    if (request.method === "POST" && searchParams.has("users")) {
+      const count = +searchParams.get("users")!
+      if (!$.is($.u32, count)) return f.badRequest()
+      const index = testUserIndex
+      const newCount = index + count
+      if (newCount < testUserPublicKeys.length) testUserIndex = newCount
+      else throw new Error("Maximum test user count reached")
+      return new Response(`${index}`, { status: 200 })
+    }
     const match = rDevnetsApi.exec(pathname)
     if (!match) return f.notFound()
     const name = match[1]!
@@ -28,15 +38,6 @@ export function createDevnetsHandler(tempDir: string, config: CapiConfig, signal
       const port = chain.ports.shift()!
       chain.ports.push(port)
       return proxyWebSocket(request, `ws://127.0.0.1:${port}`)
-    }
-    if (request.method === "POST" && searchParams.has("users")) {
-      const count = +searchParams.get("users")!
-      if (!$.is($.u32, count)) return f.badRequest()
-      const index = chain.testUserIndex
-      const newCount = index + count
-      if (newCount < testUserPublicKeys.length) chain.testUserIndex = newCount
-      else throw new Error("Maximum test user count reached")
-      return new Response(`${index}`, { status: 200 })
     }
     return new Response("Network launched")
   }

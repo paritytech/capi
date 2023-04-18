@@ -212,30 +212,16 @@ export function createCodegenHandler(dataCache: CacheBase, tempCache: CacheBase)
 function writeConnectionCode(files: Map<string, string>, connection: CodegenEntry["connection"]) {
   files.set(
     "connection.js",
-    `
-import * as C from "./capi.js"
+    `import * as C from "./capi.js"
 
 export const connect = C.${connection.type}.bind(${JSON.stringify(connection.discovery)})
-
-${
-      connection.type === "DevnetConnection"
-        ? `export const createUsers = C.testUserFactory(${JSON.stringify(connection.discovery)})`
-        : ""
-    }
 `,
   )
   files.set(
     "connection.d.ts",
-    `
-import * as C from "./capi.js"
+    `import * as C from "./capi.js"
 
 export const connect: (signal: AbortSignal) => C.Connection
-
-${
-      connection.type === "DevnetConnection"
-        ? `export const createUsers: ReturnType<typeof C.testUserFactory>`
-        : ""
-    }
 `,
   )
 }

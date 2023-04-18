@@ -5,11 +5,11 @@
  * Finally, rehydrate the extrinsic and submit it.
  */
 
-import { Balances, chain, createUsers } from "@capi/westend-dev"
-import { $, SignedExtrinsicRune } from "capi"
+import { Balances, chain } from "@capi/westend-dev"
+import { $, createTestUsers, SignedExtrinsicRune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 
-const { alexa, billy } = await createUsers()
+const { alexa, billy } = await createTestUsers()
 
 // Create and sign the extrinsic. Extract the hex.
 const hex = await Balances

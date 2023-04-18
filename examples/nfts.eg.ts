@@ -6,7 +6,6 @@
  */
 import {
   CollectionConfig,
-  createUsers,
   MintSettings,
   MintType,
   Nfts,
@@ -15,12 +14,12 @@ import {
   Utility,
 } from "@capi/rococo-westmint/westmint"
 import { assertEquals } from "asserts"
-import { $, Rune } from "capi"
+import { $, createTestUsers, Rune } from "capi"
 import { DefaultCollectionSetting, DefaultItemSetting } from "capi/patterns/nfts.ts"
 import { signature } from "capi/patterns/signature/statemint.ts"
 
 // Create two test users. Alexa will mint and list the NFT. Billy will purchase it.
-const { alexa, billy } = await createUsers()
+const { alexa, billy } = await createTestUsers()
 
 // Create a collection and get the resulting events.
 const createEvents = await Nfts

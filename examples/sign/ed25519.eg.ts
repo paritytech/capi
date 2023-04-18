@@ -4,13 +4,13 @@
  * @description Utilize an Ed25519 library for signing.
  */
 
-import { Balances, createUsers, MultiAddress, System } from "@capi/westend-dev"
+import { Balances, MultiAddress, System } from "@capi/westend-dev"
 import { assert } from "asserts"
-import { ExtrinsicSender } from "capi"
+import { createTestUsers, ExtrinsicSender } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 import * as ed from "https://esm.sh/@noble/ed25519@1.7.3"
 
-const { alexa, billy } = await createUsers()
+const { alexa, billy } = await createTestUsers()
 
 const billyFree = System.Account
   .value(billy.publicKey)

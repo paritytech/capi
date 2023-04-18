@@ -4,14 +4,14 @@
  * @description Sign and submit multiple calls within a single extrinsic.
  */
 
-import { Balances, createUsers, System, Utility } from "@capi/westend-dev"
+import { Balances, System, Utility } from "@capi/westend-dev"
 import { assert } from "asserts"
-import { Rune } from "capi"
+import { createTestUsers, Rune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 
 // Create four test users, one of whom will be the batch sender. The other
 // three will be recipients of balance transfers described in the batch.
-const [sender, ...recipients] = await createUsers(4)
+const [sender, ...recipients] = await createTestUsers(4)
 
 // Reference the three recipient user free balances as a single Rune.
 const frees = Rune.tuple(

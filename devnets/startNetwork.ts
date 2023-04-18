@@ -13,7 +13,6 @@ export interface Network {
 }
 
 export interface NetworkChain {
-  testUserIndex: number
   bootnodes: string
   ports: number[]
 }
@@ -189,7 +188,7 @@ async function spawnChain(
   }
 
   if (!bootnodes) throw new Error("count must be > 1")
-  return { testUserIndex: 0, bootnodes, ports }
+  return { bootnodes, ports }
 }
 
 async function spawnNode(tempDir: string, binary: string, args: string[], signal: AbortSignal) {

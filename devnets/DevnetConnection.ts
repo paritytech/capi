@@ -1,10 +1,9 @@
 import { WsConnection } from "../rpc/mod.ts"
+import { devnetsUrl } from "./devnets_env.ts"
 
 export class DevnetConnection extends WsConnection {
   constructor(path: string) {
-    const server = Deno.env.get("DEVNETS_SERVER")
-    if (!server) throw new Error("Must be run with a devnets server")
-    const url = new URL(path, server)
+    const url = new URL(path, devnetsUrl())
     url.protocol = "ws"
     super(url.toString())
   }

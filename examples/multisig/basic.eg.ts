@@ -5,13 +5,13 @@
  * that multisig.
  */
 
-import { Balances, chain, createUsers, System } from "@capi/polkadot-dev"
+import { Balances, chain, System } from "@capi/polkadot-dev"
 import { assert } from "asserts"
-import { $ } from "capi"
+import { $, createTestUsers } from "capi"
 import { MultisigRune } from "capi/patterns/multisig/mod.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 
-const { alexa, billy, carol, david } = await createUsers()
+const { alexa, billy, carol, david } = await createTestUsers()
 
 // Initialize the `MultisigRune` with Alexa, Billy and Carol. Set the passing threshold to 2.
 const multisig = MultisigRune.from(chain, {

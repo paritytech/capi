@@ -2,6 +2,7 @@ import { blake2_256, Sr25519, ss58 } from "../crypto/mod.ts"
 import * as $ from "../deps/scale.ts"
 import { testUserPublicKeysData } from "../util/_artifacts/testUserPublicKeysData.ts"
 import { ArrayOfLength } from "../util/ArrayOfLength.ts"
+import { devnetsUrl } from "./devnets_env.ts"
 
 const testUserInitialFunds = 1_000_000_000_000_000_000
 
@@ -17,25 +18,20 @@ export function addTestUsers(balances: [string, number][]) {
 export function testUser(userId: number) {
   return Sr25519.fromSeed(blake2_256.hash(new TextEncoder().encode(`capi-test-user-${userId}`)))
 }
-export function testUserFactory(endpoint: string) {
-  return createUsers
-  function createUsers(): Promise<Record<typeof testUserNames[number], Sr25519>>
-  function createUsers<N extends number>(count: N): Promise<ArrayOfLength<Sr25519, N>>
-  async function createUsers(count?: number): Promise<Record<string, Sr25519> | Sr25519[]> {
-    const server = Deno.env.get("DEVNETS_SERVER")
-    if (!server) throw new Error("Must be run with a devnets server")
-    const response = await fetch(
-      new URL(`${endpoint}?users=${count ?? testUserNames.length}`, server),
-      {
-        method: "POST",
-      },
-    )
-    if (!response.ok) throw new Error(await response.text())
-    const index = +(await response.text())
-    return typeof count === "number"
-      ? Array.from({ length: count }, (_, i) => testUser(index + i))
-      : Object.fromEntries(testUserNames.map((name, i) => [name, testUser(index + i)]))
-  }
+
+export function createTestUsers(): Promise<Record<typeof testUserNames[number], Sr25519>>
+export function createTestUsers<N extends number>(count: N): Promise<ArrayOfLength<Sr25519, N>>
+export async function createTestUsers(
+  count?: number,
+): Promise<Record<string, Sr25519> | Sr25519[]> {
+  const response = await fetch(`${devnetsUrl()}?users=${count ?? testUserNames.length}`, {
+    method: "POST",
+  })
+  if (!response.ok) throw new Error(await response.text())
+  const index = +(await response.text())
+  return typeof count === "number"
+    ? Array.from({ length: count }, (_, i) => testUser(index + i))
+    : Object.fromEntries(testUserNames.map((name, i) => [name, testUser(index + i)]))
 }
 
 export const testUserNames = [
