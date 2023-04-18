@@ -11,6 +11,7 @@ export interface MultisigRatifyProps<C extends Chain> {
 export interface MultisigVoteProps {
   sender: MultiAddress
   callHash: Uint8Array
+  blockHash?: string
 }
 
 export interface Multisig {
@@ -61,7 +62,7 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
     )
   }
 
-  approve<X>({ sender, callHash }: RunicArgs<X, MultisigVoteProps>) {
+  approve<X>({ sender, callHash, blockHash }: RunicArgs<X, MultisigVoteProps>) {
     return this.chain.extrinsic(
       Rune
         .object({
@@ -73,7 +74,7 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
             otherSignatories: this.otherSignatories(sender),
             storeCall: false,
             maxWeight: { refTime: 0n, proofSize: 0n },
-            maybeTimepoint: this.maybeTimepoint(callHash),
+            maybeTimepoint: this.maybeTimepoint(callHash, blockHash),
           }),
         })
         .unsafeAs<Chain.Call<C>>(),

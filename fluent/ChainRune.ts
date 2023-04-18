@@ -81,6 +81,13 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
     .unsafeAs<string>()
     .into(BlockHashRune, this)
 
+  blockHashFromNumber<X>(...[blockNumber]: RunicArgs<X, [blockNumber?: string]>) {
+    return this.connection
+      .call("chain_getBlockHash", blockNumber)
+      .unsafeAs<string>()
+      .into(BlockHashRune, this)
+  }
+
   blockHash<X>(...[blockHash]: RunicArgs<X, [blockHash?: string]>) {
     return Rune
       .resolve(blockHash)
