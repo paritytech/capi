@@ -9,7 +9,7 @@ import { assert } from "asserts"
 import { createDevUsers } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 
-// Create two test users. Alexa will send the funds to Billy.
+// Create two dev users. Alexa will send the funds to Billy.
 const { alexa, billy } = await createDevUsers()
 
 // Reference Billy's free balance.
