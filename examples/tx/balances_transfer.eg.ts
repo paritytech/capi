@@ -6,11 +6,11 @@
 
 import { Balances, System } from "@capi/westend-dev"
 import { assert } from "asserts"
-import { createTestUsers } from "capi"
+import { createDevUsers } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 
 // Create two test users. Alexa will send the funds to Billy.
-const { alexa, billy } = await createTestUsers()
+const { alexa, billy } = await createDevUsers()
 
 // Reference Billy's free balance.
 const billyFree = System.Account

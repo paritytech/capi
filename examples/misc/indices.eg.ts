@@ -7,10 +7,10 @@
 
 import { Indices } from "@capi/polkadot-dev"
 import { assertEquals } from "asserts"
-import { createTestUsers } from "capi"
+import { createDevUsers } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 
-const { alexa } = await createTestUsers()
+const { alexa } = await createDevUsers()
 
 const index = 254
 

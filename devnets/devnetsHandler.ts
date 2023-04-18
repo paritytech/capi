@@ -3,23 +3,23 @@ import { $ } from "../mod.ts"
 import * as f from "../server/factories.ts"
 import { PermanentMemo } from "../util/memo.ts"
 import { CapiConfig } from "./CapiConfig.ts"
+import { devUserPublicKeys } from "./devUsers.ts"
 import { proxyWebSocket } from "./proxyWebSocket.ts"
 import { Network, startNetwork } from "./startNetwork.ts"
-import { testUserPublicKeys } from "./testUsers.ts"
 
 const rDevnetsApi = /^\/devnets\/([\w-]+)(?:\/([\w-]+))?$/
 
 export function createDevnetsHandler(tempDir: string, config: CapiConfig, signal: AbortSignal) {
   const networkMemo = new PermanentMemo<string, Network>()
-  let testUserIndex = 0
+  let devUserIndex = 0
   return async (request: Request) => {
     const { pathname, searchParams } = new URL(request.url)
     if (request.method === "POST" && searchParams.has("users")) {
       const count = +searchParams.get("users")!
       if (!$.is($.u32, count)) return f.badRequest()
-      const index = testUserIndex
+      const index = devUserIndex
       const newCount = index + count
-      if (newCount < testUserPublicKeys.length) testUserIndex = newCount
+      if (newCount < devUserPublicKeys.length) devUserIndex = newCount
       else throw new Error("Maximum test user count reached")
       return new Response(`${index}`, { status: 200 })
     }

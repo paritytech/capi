@@ -6,13 +6,13 @@
  */
 
 import { Balances, chain, System } from "@capi/polkadot-dev"
-import { createTestUsers, ss58 } from "capi"
+import { createDevUsers, ss58 } from "capi"
 import { pjsSender, PjsSigner } from "capi/patterns/compat/pjs_sender.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 import { createPair } from "https://deno.land/x/polkadot@0.2.34/keyring/mod.ts"
 import { TypeRegistry } from "https://deno.land/x/polkadot@0.2.34/types/mod.ts"
 
-const { alexa, billy } = await createTestUsers()
+const { alexa, billy } = await createDevUsers()
 
 // Here, we manually create a signer. Chances are that **you should not do this**.
 // Instead, it's likely that you'll want to access a signer from a wallet browser

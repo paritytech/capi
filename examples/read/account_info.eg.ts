@@ -5,9 +5,9 @@
  */
 
 import { $accountInfo, System } from "@capi/polkadot-dev"
-import { $, createTestUsers } from "capi"
+import { $, createDevUsers } from "capi"
 
-const { alexa } = await createTestUsers()
+const { alexa } = await createDevUsers()
 
 const accountInfo = await System.Account.value(alexa.publicKey).run()
 

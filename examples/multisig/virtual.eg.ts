@@ -19,12 +19,12 @@
 
 import { Balances, chain, MultiAddress, System, Utility } from "@capi/polkadot-dev"
 import { assert } from "asserts"
-import { $, createTestUsers, Rune, Sr25519 } from "capi"
+import { $, createDevUsers, Rune, Sr25519 } from "capi"
 import { VirtualMultisigRune } from "capi/patterns/multisig/mod.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 import { parse } from "../../deps/std/flags.ts"
 
-const { alexa, billy, carol, david } = await createTestUsers()
+const { alexa, billy, carol, david } = await createDevUsers()
 
 // To reference a virtual multisig, one must have several pieces of data, including
 // the member->proxy account id lookup, the threshold and the stash account id.

@@ -4,7 +4,7 @@
  * in the near future. This work will likely entail large changes to the current ink patterns.
  * @description The Ink patterns simplify the reading of contract instance state and events,
  * as well as the submission of transactions.
- * @todo utilize `createTestUsers` instead of `alice` and `bob`.
+ * @todo utilize `createDevUsers` instead of `alice` and `bob`.
  */
 
 import { chain } from "@capi/contracts-dev"

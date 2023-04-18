@@ -6,11 +6,11 @@
 
 import { Balances, MultiAddress, System } from "@capi/westend-dev"
 import { assert } from "asserts"
-import { createTestUsers, ExtrinsicSender } from "capi"
+import { createDevUsers, ExtrinsicSender } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 import * as ed from "https://esm.sh/@noble/ed25519@1.7.3"
 
-const { alexa, billy } = await createTestUsers()
+const { alexa, billy } = await createDevUsers()
 
 const billyFree = System.Account
   .value(billy.publicKey)

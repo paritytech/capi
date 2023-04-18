@@ -26,10 +26,10 @@ import {
   System,
 } from "@capi/rococo-westmint/westmint"
 import { assert } from "asserts"
-import { createTestUsers, Rune } from "capi"
+import { createDevUsers, Rune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 
-const { alexa } = await createTestUsers()
+const { alexa } = await createDevUsers()
 
 // Reference Alexa's free balance.
 const alexaBalance = System.Account

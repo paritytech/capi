@@ -5,7 +5,7 @@ import { getFreePort, portReady } from "../util/port.ts"
 import { resolveBinary } from "./binary.ts"
 import { NetworkConfig } from "./CapiConfig.ts"
 import { createCustomChainSpec, GenesisConfig, getGenesisConfig } from "./chainSpec.ts"
-import { addTestUsers } from "./testUsers.ts"
+import { addDevUsers } from "./devUsers.ts"
 
 export interface Network {
   relay: NetworkChain
@@ -34,7 +34,7 @@ export async function startNetwork(
           chainSpec.para_id = chain.id
           const genesisConfig = getGenesisConfig(chainSpec)
           genesisConfig.parachainInfo.parachainId = chain.id
-          addTestUsers(genesisConfig.balances.balances)
+          addDevUsers(genesisConfig.balances.balances)
         },
       )
 
@@ -65,7 +65,7 @@ export async function startNetwork(
         addXcmHrmpChannels(genesisConfig, paras.map(({ id }) => id))
       }
       addAuthorities(genesisConfig, minValidators)
-      addTestUsers(genesisConfig.balances.balances)
+      addDevUsers(genesisConfig.balances.balances)
     },
   )
   const relay = await spawnChain(

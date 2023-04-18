@@ -6,10 +6,10 @@
  */
 
 import { Balances, chain } from "@capi/westend-dev"
-import { $, createTestUsers, SignedExtrinsicRune } from "capi"
+import { $, createDevUsers, SignedExtrinsicRune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 
-const { alexa, billy } = await createTestUsers()
+const { alexa, billy } = await createDevUsers()
 
 // Create and sign the extrinsic. Extract the hex.
 const hex = await Balances

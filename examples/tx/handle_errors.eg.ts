@@ -7,10 +7,10 @@
 
 import { Balances } from "@capi/contracts-dev"
 import { assertInstanceOf } from "asserts"
-import { createTestUsers, ExtrinsicError } from "capi"
+import { createDevUsers, ExtrinsicError } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 
-const { alexa, billy } = await createTestUsers()
+const { alexa, billy } = await createDevUsers()
 
 // The following should reject with an `ExtrinsicError`.
 const extrinsicError = await Balances

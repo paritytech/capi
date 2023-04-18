@@ -7,11 +7,11 @@
  */
 
 import { Identity } from "@capi/polkadot-dev"
-import { $, createTestUsers } from "capi"
+import { $, createDevUsers } from "capi"
 import { IdentityInfoTranscoders } from "capi/patterns/identity.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 
-const { alexa } = await createTestUsers()
+const { alexa } = await createDevUsers()
 
 // Initialize an `IdentityInfoTranscoders` of shape `{ stars: number }`.
 const transcoders = new IdentityInfoTranscoders({ stars: $.u8 })

@@ -2,11 +2,11 @@ import { hex } from "../crypto/mod.ts"
 import * as $ from "../deps/scale.ts"
 import { emptyDir } from "../deps/std/fs.ts"
 import * as path from "../deps/std/path.ts"
-import { testUser } from "../devnets/mod.ts"
+import { devUser } from "../devnets/mod.ts"
 import dprintConfig from "../dprint.json" assert { type: "json" }
 import { compress } from "../util/compression.ts"
 
-export const TEST_USER_COUNT = 100_000
+export const DEV_USER_COUNT = 100_000
 
 const artifacts: Record<string, () => Promise<Uint8Array>> = {
   async tsFormatterWasm() {
@@ -18,10 +18,10 @@ const artifacts: Record<string, () => Promise<Uint8Array>> = {
   async shikiWasm() {
     return await fetchBinary("https://unpkg.com/shiki@0.14.1/dist/onig.wasm")
   },
-  async testUserPublicKeysData() {
+  async devUserPublicKeysData() {
     const publicKeys = []
-    for (let i = 0; i < TEST_USER_COUNT; i++) {
-      publicKeys.push(testUser(i).publicKey)
+    for (let i = 0; i < DEV_USER_COUNT; i++) {
+      publicKeys.push(devUser(i).publicKey)
     }
     const encoded = $.array($.sizedUint8Array(32)).encode(publicKeys)
     return encoded

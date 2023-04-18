@@ -7,12 +7,12 @@
 
 import { Balances, chain, MultiAddress, Proxy, System } from "@capi/polkadot-dev"
 import { assert } from "asserts"
-import { createTestUsers } from "capi"
+import { createDevUsers } from "capi"
 import { MultisigRune } from "capi/patterns/multisig/mod.ts"
 import { filterPureCreatedEvents } from "capi/patterns/proxy/mod.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 
-const { alexa, billy, carol } = await createTestUsers()
+const { alexa, billy, carol } = await createDevUsers()
 
 // Initialize the `MultisigRune` with Alexa, Billy and Carol. Set the passing threshold to 2.
 const multisig = MultisigRune.from(chain, {
