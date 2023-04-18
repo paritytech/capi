@@ -1,5 +1,5 @@
 import { WsConnection } from "../rpc/mod.ts"
-import { devnetsUrl } from "./devnets_env.ts"
+import { devnetsUrl } from "./devnetsUrl.ts"
 
 export class DevnetConnection extends WsConnection {
   constructor(path: string) {

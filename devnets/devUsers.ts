@@ -2,7 +2,7 @@ import { blake2_256, Sr25519, ss58 } from "../crypto/mod.ts"
 import * as $ from "../deps/scale.ts"
 import { devUserPublicKeysData } from "../util/_artifacts/devUserPublicKeysData.ts"
 import { ArrayOfLength } from "../util/ArrayOfLength.ts"
-import { devnetsUrl } from "./devnets_env.ts"
+import { devnetsUrl } from "./devnetsUrl.ts"
 
 const devUserInitialFunds = 1_000_000_000_000_000_000
 
