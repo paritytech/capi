@@ -1,6 +1,6 @@
 import { readableStreamFromReader, writableStreamFromWriter } from "../std/streams.ts"
 
-class Command implements Deno.Command {
+export class Command implements Deno.Command {
   #command
   #options
   constructor(command: string, options?: Deno.CommandOptions) {
@@ -127,8 +127,4 @@ class ChildProcess implements Deno.ChildProcess {
       stderr: stderrData!,
     }
   }
-}
-
-if (!("Command" in Deno)) {
-  Deno.Command = Command
 }

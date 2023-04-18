@@ -102,6 +102,7 @@ await Promise.all([
         name: "ws",
         version: "8.13.0",
       },
+      "./deps/shims/shim-deno.ts": "@deno/shim-deno",
       "./deps/shims/upgradeWebSocket.ts": "./deps/shims/upgradeWebSocket.node.ts",
       "./deps/shims/register.ts": "./deps/shims/register.node.ts",
       "./deps/std/http.ts": "./deps/std/http.node.ts",
@@ -136,8 +137,21 @@ await Promise.all([
   fs.copy("server/static/", path.join(outDir, "esm/server/static/")),
 ])
 
-await Deno.writeTextFile(
-  "target/npm/esm/main.js",
-  (await Deno.readTextFile("target/npm/esm/main.js"))
-    .replace(/^#!.+/, "#!/usr/bin/env -S node --loader ts-node/esm"),
-)
+await Promise.all([
+  editFile(
+    "target/npm/esm/main.js",
+    (content) =>
+      content
+        .replace(/^#!.+/, "#!/usr/bin/env -S node --loader ts-node/esm"),
+  ),
+  editFile(
+    "target/npm/esm/_dnt.shims.js",
+    (content) =>
+      content
+        .replace(/"@deno\/shim-deno"/g, `"./deps/shims/Deno.node.js"`),
+  ),
+])
+
+async function editFile(path: string, modify: (content: string) => string) {
+  await Deno.writeTextFile(path, modify(await Deno.readTextFile(path)))
+}
