@@ -6,12 +6,12 @@
  * @description Set a user's identity, potentially with metadata of arbitrary user-defined shape.
  */
 
-import { createUsers, Identity } from "@capi/polkadot-dev"
-import { $ } from "capi"
+import { Identity } from "@capi/polkadot-dev"
+import { $, createDevUsers } from "capi"
 import { IdentityInfoTranscoders } from "capi/patterns/identity.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 
-const { alexa } = await createUsers()
+const { alexa } = await createDevUsers()
 
 // Initialize an `IdentityInfoTranscoders` of shape `{ stars: number }`.
 const transcoders = new IdentityInfoTranscoders({ stars: $.u8 })

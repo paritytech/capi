@@ -4,10 +4,10 @@
  * @description Read the value (an `AccountInfo`) from the system account map.
  */
 
-import { $accountInfo, createUsers, System } from "@capi/polkadot-dev"
-import { $ } from "capi"
+import { $accountInfo, System } from "@capi/polkadot-dev"
+import { $, createDevUsers } from "capi"
 
-const { alexa } = await createUsers()
+const { alexa } = await createDevUsers()
 
 const accountInfo = await System.Account.value(alexa.publicKey).run()
 

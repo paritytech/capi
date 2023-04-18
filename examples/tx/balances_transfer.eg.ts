@@ -4,12 +4,13 @@
  * @description Transfer some funds from one user to another.
  */
 
-import { Balances, createUsers, System } from "@capi/westend-dev"
+import { Balances, System } from "@capi/westend-dev"
 import { assert } from "asserts"
+import { createDevUsers } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 
-// Create two test users. Alexa will send the funds to Billy.
-const { alexa, billy } = await createUsers()
+// Create two dev users. Alexa will send the funds to Billy.
+const { alexa, billy } = await createDevUsers()
 
 // Reference Billy's free balance.
 const billyFree = System.Account

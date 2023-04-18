@@ -10,12 +10,12 @@ import * as Rococo from "@capi/rococo-dev-xcm"
 import * as Statemine from "@capi/rococo-dev-xcm/statemine"
 import * as Trappist from "@capi/rococo-dev-xcm/trappist"
 import { assert, assertNotEquals } from "asserts"
-import { $, alice as root, Rune } from "capi"
+import { $, alice as root, createDevUsers, Rune } from "capi"
 import { $siblId } from "capi/patterns/para_id.ts"
 import { signature } from "capi/patterns/signature/statemint.ts"
 import { retry } from "../../deps/std/async.ts"
 
-const { alexa, billy } = await Statemine.createUsers()
+const { alexa, billy } = await createDevUsers()
 
 // Define some constants for later use.
 const RESERVE_ASSET_ID = 1

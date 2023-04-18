@@ -26,18 +26,20 @@ import {
   System,
 } from "@capi/rococo-westmint/westmint"
 import { assert } from "asserts"
-import { alice, Rune } from "capi"
+import { createDevUsers, Rune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 
-// Reference Alice's free balance.
-const aliceBalance = System.Account
-  .value(alice.publicKey)
+const { alexa } = await createDevUsers()
+
+// Reference Alexa's free balance.
+const alexaBalance = System.Account
+  .value(alexa.publicKey)
   .unhandle(undefined)
   .access("data", "free")
 
 // Read the initial free.
-const aliceFreeInitial = await aliceBalance.run()
-console.log("Alice initial free:", aliceFreeInitial)
+const alexaFreeInitial = await alexaBalance.run()
+console.log("Alexa initial free:", alexaFreeInitial)
 
 XcmPallet
   .limitedTeleportAssets({
@@ -52,7 +54,7 @@ XcmPallet
         parents: 0,
         interior: XcmV2Junctions.X1(
           XcmV2Junction.AccountId32({
-            id: alice.publicKey,
+            id: alexa.publicKey,
             network: XcmV2NetworkId.Any(),
           }),
         ),
@@ -70,14 +72,14 @@ XcmPallet
     feeAssetItem: 0,
     weightLimit: XcmV2WeightLimit.Unlimited(),
   })
-  .signed(signature({ sender: alice }))
+  .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Teleportation:")
   .finalized()
   .run()
 
 // Iterate over the parachain events until receiving a downward message processed event,
-// at which point we can read alice's free balance, which should be greater than the initial.
+// at which point we can read alexa's free balance, which should be greater than the initial.
 outer:
 for await (const e of System.Events.value(undefined, parachain.latestBlockHash).iter()) {
   if (e) {
@@ -86,9 +88,9 @@ for await (const e of System.Events.value(undefined, parachain.latestBlockHash).
         RuntimeEvent.isParachainSystem(event)
         && CumulusPalletParachainSystemEvent.isDownwardMessagesProcessed(event.value)
       ) {
-        const aliceFreeFinal = await aliceBalance.run()
-        console.log("Alice final free:", aliceFreeFinal)
-        assert(aliceFreeFinal > aliceFreeInitial)
+        const alexaFreeFinal = await alexaBalance.run()
+        console.log("Alexa final free:", alexaFreeFinal)
+        assert(alexaFreeFinal > alexaFreeInitial)
         break outer
       }
     }

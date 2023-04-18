@@ -4,7 +4,7 @@
  * in the near future. This work will likely entail large changes to the current ink patterns.
  * @description Deploying an Ink contract (instantiating) to a production contracts-enabled parachain
  * is much the same as any other extrinsic submission.
- * @todo utilize `createUsers` instead of `alice`
+ * @todo utilize `createDevUsers` instead of `alice`
  */
 
 import { chain, System } from "@capi/contracts-dev"
