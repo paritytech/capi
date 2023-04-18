@@ -11,7 +11,7 @@ function sovereignAccountFactory(prefix: "sibl" | "para") {
     _staticSize: $prefix._staticSize + $.u32._staticSize + $postfix._staticSize,
     _encode(buffer, value) {
       $prefix._encode(buffer, null)
-      $.u32.encode(buffer, value)
+      $.u32._encode(buffer, value)
       $postfix._encode(buffer, null)
     },
     _decode(buffer) {
@@ -24,5 +24,4 @@ function sovereignAccountFactory(prefix: "sibl" | "para") {
       $.u32._assert(assert)
     },
   })
-}
 }

@@ -2,7 +2,6 @@ import {
   Chain,
   ChainRune,
   Era,
-  ExtrinsicSender,
   hex,
   Rune,
   RunicArgs,
@@ -10,14 +9,7 @@ import {
   ss58,
   ValueRune,
 } from "../../mod.ts"
-
-export interface SignatureProps<T extends Chain> {
-  sender: ExtrinsicSender<T>
-  checkpoint?: string
-  mortality?: Era
-  nonce?: number
-  tip?: bigint
-}
+import { SignatureProps } from "../signature/polkadot.ts"
 
 export function signature<X, C extends Chain>(_props: RunicArgs<X, SignatureProps<C>>) {
   return <CU>(chain: ChainRune<C, CU>) => {
@@ -56,8 +48,6 @@ export function signature<X, C extends Chain>(_props: RunicArgs<X, SignatureProp
         CheckNonce: nonce,
         ChargeTransactionPayment: tip,
         ChargeAssetTxPayment: Rune.object({
-          // TODO:
-          // assetId: props.assetId,
           tip: tip,
         }),
       }),

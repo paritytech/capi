@@ -48,7 +48,7 @@ await Rococo.Sudo
                 isSufficient: true,
                 minBalance: 1n,
                 owner: alexa.address,
-              }).call,
+              }).callData,
             }),
           }),
         ]),
