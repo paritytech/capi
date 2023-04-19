@@ -61,15 +61,6 @@ const isProposed = await multisig.isProposed(call.callHash).run()
 console.log("Is proposed:", isProposed)
 assert(isProposed)
 
-// Approve proposal as Billy.
-await multisig
-  .ratify(billy.address, call, true)
-  .signed(signature({ sender: billy }))
-  .sent()
-  .dbgStatus("First approval:")
-  .finalized()
-  .run()
-
 const { approvals } = await multisig
   .proposal(call.callHash)
   .unhandle(undefined)
@@ -79,10 +70,10 @@ const { approvals } = await multisig
 console.log("Approvals:", approvals)
 $.assert($.array($.sizedUint8Array(32)), approvals)
 
-// Approve the proposal as Carol (final approval).
+// Approve proposal as Billy.
 await multisig
-  .ratify(carol.address, call)
-  .signed(signature({ sender: carol }))
+  .ratify(billy.address, call)
+  .signed(signature({ sender: billy }))
   .sent()
   .dbgStatus("Final approval:")
   .finalized()
