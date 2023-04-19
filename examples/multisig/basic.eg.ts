@@ -62,8 +62,8 @@ console.log("Is proposed:", isProposed)
 assert(isProposed)
 
 // Approve proposal as Billy.
-await multisig // TODO: get `ratify` working in place of `approve`
-  .approve({ callHash: call.callHash, sender: billy.address })
+await multisig
+  .ratify({ call, sender: billy.address, nonExecuting: true })
   .signed(signature({ sender: billy }))
   .sent()
   .dbgStatus("First approval:")

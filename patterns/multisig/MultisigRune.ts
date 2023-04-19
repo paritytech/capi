@@ -6,9 +6,10 @@ import { multisigAccountId } from "./multisigAccountId.ts"
 export interface MultisigRatifyProps<C extends Chain> {
   sender: MultiAddress
   call: Chain.Call<C>
+  nonExecuting?: boolean
 }
 
-export interface MultisigVoteProps {
+export interface MultisigCancelProps {
   sender: MultiAddress
   callHash: Uint8Array
 }
@@ -41,46 +42,38 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
       )
   }
 
-  ratify<X>({ sender, call: call_ }: RunicArgs<X, MultisigRatifyProps<C>>) {
+  ratify<X>({ sender, call: call_, nonExecuting }: RunicArgs<X, MultisigRatifyProps<C>>) {
     const call = this.chain.extrinsic(Rune.resolve(call_).unsafeAs<Chain.Call<C>>())
+    const otherSignatories = this.otherSignatories(sender)
+    const maybeTimepoint = this.maybeTimepoint(call.callHash)
+    const threshold = this.threshold
     return this.chain.extrinsic(
       Rune
         .object({
           type: "Multisig",
-          value: Rune.object({
-            type: "asMulti",
-            threshold: this.threshold,
-            call,
-            otherSignatories: this.otherSignatories(sender),
-            storeCall: false,
-            maxWeight: call.feeEstimate().access("weight"),
-            maybeTimepoint: this.maybeTimepoint(call.callHash),
-          }),
+          value: nonExecuting
+            ? Rune.object({
+              type: "approveAsMulti",
+              threshold,
+              callHash: call.callHash,
+              otherSignatories,
+              maxWeight: { refTime: 0n, proofSize: 0n },
+              maybeTimepoint,
+            })
+            : Rune.object({
+              type: "asMulti",
+              threshold,
+              call,
+              otherSignatories,
+              maxWeight: call.feeEstimate().access("weight"),
+              maybeTimepoint,
+            }),
         })
         .unsafeAs<Chain.Call<C>>(),
     )
   }
 
-  approve<X>({ sender, callHash }: RunicArgs<X, MultisigVoteProps>) {
-    return this.chain.extrinsic(
-      Rune
-        .object({
-          type: "Multisig",
-          value: Rune.object({
-            type: "approveAsMulti",
-            threshold: this.threshold,
-            callHash,
-            otherSignatories: this.otherSignatories(sender),
-            storeCall: false,
-            maxWeight: { refTime: 0n, proofSize: 0n },
-            maybeTimepoint: this.maybeTimepoint(callHash),
-          }),
-        })
-        .unsafeAs<Chain.Call<C>>(),
-    )
-  }
-
-  cancel<X>({ sender, callHash }: RunicArgs<X, MultisigVoteProps>) {
+  cancel<X>({ sender, callHash }: RunicArgs<X, MultisigCancelProps>) {
     return this.chain.extrinsic(
       Rune
         .object({
