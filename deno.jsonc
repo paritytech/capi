@@ -34,13 +34,13 @@
     "dnt": "deno task run _tasks/dnt.ts",
     "test": "deno task capi serve -- deno test -A -L=info --ignore=target --parallel -r=http://localhost:4646/",
     "test:update": "deno task test -- --update",
-    "test:eg": "deno task run -r https://raw.githubusercontent.com/paritytech/trun/reworking/test.ts 'examples/**/*.eg.ts'",
+    "test:eg": "deno task run https://raw.githubusercontent.com/paritytech/trun/reworking/test.ts 'examples/**/*.eg.ts'",
     "moderate": "deno run -A https://deno.land/x/moderate@0.0.5/mod.ts --exclude '*.test.ts' '*.node.ts' && dprint fmt",
     "capi": "deno run -A main.ts",
     "cache": "deno task capi serve -- deno cache -r=http://localhost:4646/",
     "check": "deno task capi serve -- deno cache --check",
     "star": "deno task run _tasks/star.ts && deno task check target/star.ts",
     "sync": "mkdir -p target && deno task capi serve -- deno task capi sync --import-map import_map.json",
-    "run": "deno task capi serve -- deno run -A -r=http://localhost:4646/"
+    "run": "deno task capi serve -- deno run -A -r"
   }
 }
