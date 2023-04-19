@@ -20,13 +20,13 @@ const billyFree = System.Account
 const billyFreeInitial = await billyFree.run()
 console.log("Billy free initial:", billyFreeInitial)
 
-// Initialize a secret with the `crypto.getRandomValues` builtin.
+/// Initialize a secret with the `crypto.getRandomValues` builtin.
 const secret = crypto.getRandomValues(new Uint8Array(32))
 
-// Get a Rune of the secret-corresponding multiaddress.
+/// Get a Rune of the secret-corresponding multiaddress.
 const address = MultiAddress.Id(await ed.getPublicKey(secret))
 
-// Define a `sign` function for later use.
+/// Define a `sign` function for later use.
 async function sign(msg: Uint8Array) {
   return {
     type: "Ed25519" as const,
@@ -34,7 +34,7 @@ async function sign(msg: Uint8Array) {
   }
 }
 
-// Transfer some funds to the derived address (existential deposit).
+/// Transfer some funds to the derived address (existential deposit).
 await Balances
   .transfer({
     value: 1_000_000_000_000n,
@@ -46,8 +46,8 @@ await Balances
   .finalized()
   .run()
 
-// Execute a transfer from the derived user to Billy. We utilize our
-// derived ed25519 `sign` function for this.
+/// Execute a transfer from the derived user to Billy. We utilize our
+/// derived ed25519 `sign` function for this.
 await Balances
   .transfer({
     value: 12345n,
@@ -59,9 +59,9 @@ await Balances
   .finalizedEvents()
   .run()
 
-// Retrieve Billy's final free.
+/// Retrieve Billy's final free.
 const billyFreeFinal = await billyFree.run()
 console.log("Billy free final:", billyFreeFinal)
 
-// Ensure that the final is greater than the initial.
+/// Ensure that the final is greater than the initial.
 assert(billyFreeFinal > billyFreeInitial)

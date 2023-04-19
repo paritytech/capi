@@ -9,13 +9,15 @@
 import { $eraRewardPoints, Staking } from "@capi/westend"
 import { $ } from "capi"
 
+/// Reference the active era index.
 const idx = Staking.ActiveEra
   .value()
   .unhandle(undefined)
   .access("index")
 
+/// Retrieve the reward points corresponding to `idx`.
 const points = await Staking.ErasRewardPoints.value(idx).run()
-console.log("Era reward points:", points)
 
-// Ensure the era reward points is of the correct shape.
+/// Ensure the era reward points is of the correct shape.
+console.log("Era reward points:", points)
 $.assert($eraRewardPoints, points)

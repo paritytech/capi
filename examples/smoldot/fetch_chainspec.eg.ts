@@ -8,8 +8,8 @@
 
 import { chain } from "@capi/polkadot"
 
-// We'll connect to the polkadot wss server to get the chainspec.
+/// We'll connect to the polkadot wss server to get the chainspec.
 const chainSpec = await chain.connection.call("sync_state_genSyncSpec", true).run()
 
-// We'll print out the chainspec here. This can be written into a file for later use.
+/// We'll print out the chainspec here. This can be written into a file for later use.
 console.log(JSON.stringify(chainSpec, null, 2))

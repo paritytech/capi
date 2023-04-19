@@ -9,6 +9,7 @@
 import { Paras } from "@capi/polkadot"
 import { $, ArrayRune, ValueRune } from "capi"
 
+/// Retrieve the head for each id in the parachains storage.
 const heads = await Paras.Parachains
   .value()
   .unhandle(undefined)
@@ -18,6 +19,6 @@ const heads = await Paras.Parachains
   .rehandle(undefined)
   .run()
 
+/// Ensure `heads` is of the expected shape.
 console.log("Parachain heads:", heads)
-
 $.assert($.option($.array($.uint8Array)), heads)

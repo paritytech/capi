@@ -7,13 +7,13 @@
 import { chain } from "@capi/polkadot-dev"
 import { $, known } from "capi"
 
-// Get an async iterator, which yields subscription events.
+/// Get an async iterator, which yields subscription events.
 const headerIter = chain.connection
   .subscribe("chain_subscribeFinalizedHeads", "chain_unsubscribeAllHeads")
   .iter()
 
+/// Iterate over its items and ensure they conform to the expected shape.
 let count = 0
-// Iterate over its items and ensure they conform to the expected shape.
 for await (const header of headerIter) {
   $.assert(known.$header, header)
   console.log(header)

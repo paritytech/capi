@@ -13,11 +13,11 @@ import { signature } from "capi/patterns/signature/polkadot.ts"
 
 const { alexa } = await createDevUsers()
 
-// Initialize an `IdentityInfoTranscoders` of shape `{ stars: number }`.
+/// Initialize an `IdentityInfoTranscoders` of shape `{ stars: number }`.
 const transcoders = new IdentityInfoTranscoders({ stars: $.u8 })
 
-// Encode some identity info into the expected shape and use it
-// to execute the identity-setting transaction.
+/// Encode some identity info into the expected shape and use it
+/// to execute the identity-setting transaction.
 await Identity
   .setIdentity({
     info: transcoders.encode({
@@ -31,7 +31,7 @@ await Identity
   .finalized()
   .run()
 
-// Retrieve and decode the identity info.
+/// Retrieve and decode the identity info.
 const infoDecoded = await Identity.IdentityOf
   .value(alexa.publicKey)
   .unhandle(undefined)

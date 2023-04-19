@@ -15,20 +15,20 @@
 
 import { $, ChainRune, WsConnection } from "capi"
 
-// We could also initialize a `ChainRune` with `WsConnection` and an RPC node WebSocket URL.
+/// We could also initialize a `ChainRune` with `WsConnection` and an RPC node WebSocket URL.
 const wsChain = ChainRune.from(WsConnection.bind("wss://rpc.polkadot.io"))
 
-// Create a binding to the `System` pallet.
+/// Create a binding to the `System` pallet.
 const System = wsChain.pallet("System")
 
-// Create a binding to the `Account` storage map.
+/// Create a binding to the `Account` storage map.
 const Account = System.storage("Account")
 
-// Read the first ten entries of the `Account` storage map.
-// Note how the lack of partial key is communicated via `null`.
+/// Read the first ten entries of the `Account` storage map.
+/// Note how the lack of partial key is communicated via `null`.
 const entries = await Account.entryPage(10, null).run()
 
-// The result should contain a `[Uint8Array, AccountInfo]` tuple of length 10.
+/// The result should contain a `[Uint8Array, AccountInfo]` tuple of length 10.
 console.log("Entries page:", entries)
 $.assert(
   $.sizedArray(

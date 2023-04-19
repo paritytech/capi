@@ -9,20 +9,20 @@ import { assert } from "asserts"
 import { createDevUsers } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 
-// Create two dev users. Alexa will send the funds to Billy.
+/// Create two dev users. Alexa will send the funds to Billy.
 const { alexa, billy } = await createDevUsers()
 
-// Reference Billy's free balance.
+/// Reference Billy's free balance.
 const billyFree = System.Account
   .value(billy.publicKey)
   .unhandle(undefined)
   .access("data", "free")
 
-// Read the initial free.
+/// Read the initial free.
 const initialFree = await billyFree.run()
 console.log("Billy free initial:", initialFree)
 
-// Create and submit the transaction.
+/// Create and submit the transaction.
 await Balances
   .transfer({
     value: 12345n,
@@ -34,9 +34,9 @@ await Balances
   .finalized()
   .run()
 
-// Read the final free.
+/// Read the final free.
 const finalFree = await billyFree.run()
 console.log("Billy free final:", finalFree)
 
-// The final free should be greater than the initial.
+/// The final free should be greater than the initial.
 assert(finalFree > initialFree)

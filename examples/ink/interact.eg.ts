@@ -12,22 +12,22 @@ import { $, createDevUsers, hex } from "capi"
 import { InkMetadataRune } from "capi/patterns/ink/mod.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 
-// Get two test users. Alexa will deploy, Billy will be the recipient of an erc20
-// token transfer.
+/// Get two test users. Alexa will deploy, Billy will be the recipient of an erc20
+/// token transfer.
 const { alexa, billy } = await createDevUsers()
 
-// If no such argument was supplied, run the `deploy.ts` script and extract
-// the address from the `CONTRACT_ADDRESS` environment variable (set by `deploy.ts`).
+/// If no such argument was supplied, run the `deploy.ts` script and extract
+/// the address from the `CONTRACT_ADDRESS` environment variable (set by `deploy.ts`).
 Deno.env.set("DEPLOYER_SECRET", hex.encode(alexa.secretKey))
 await import("./deploy.eg.ts")
 const address = Deno.env.get("CONTRACT_SS58_ADDRESS")!
 
-// Initialize an `InkMetadataRune` with the raw Ink metadata text.
+/// Initialize an `InkMetadataRune` with the raw Ink metadata text.
 export const metadata = InkMetadataRune.fromMetadataText(
   Deno.readTextFileSync(new URL("./erc20.json", import.meta.url)),
 )
 
-// Initialize an `InkRune` with `metadata`, `chain` and the deployed contract address.
+/// Initialize an `InkRune` with `metadata`, `chain` and the deployed contract address.
 const contract = metadata.instanceFromSs58(chain, address)
 
 const state = contract.call({
@@ -36,11 +36,11 @@ const state = contract.call({
   args: [alexa.publicKey],
 })
 
-// Retrieve the initial state.
+/// Retrieve the initial state.
 const initialState = await state.run()
 console.log("Alexa initial balance:", initialState)
 
-// Use the `flip` method to *flip* the contract instance state.
+/// Use the `flip` method to *flip* the contract instance state.
 const events = await contract
   .tx({
     sender: alexa.publicKey,
@@ -54,8 +54,8 @@ const events = await contract
   .pipe(contract.emittedEvents)
   .run()
 
-// Ensure the emitted events are of the expected shape.
-// In this case, we expect only a `Transfer` event.
+/// Ensure the emitted events are of the expected shape.
+/// In this case, we expect only a `Transfer` event.
 $.assert(
   $.array($.taggedUnion("type", [
     $.variant(
@@ -69,7 +69,7 @@ $.assert(
 )
 console.log(events)
 
-// Retrieve the final state.
+/// Retrieve the final state.
 const finalState = await state.run()
 console.log("Alexa final balance:", finalState)
 

@@ -11,21 +11,21 @@ import { $, createDevUsers, hex, Sr25519, ss58 } from "capi"
 import { InkMetadataRune } from "capi/patterns/ink/mod.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 
-// Initialize an `InkMetadataRune` with the raw Ink metadata text.
+/// Initialize an `InkMetadataRune` with the raw Ink metadata text.
 const metadata = InkMetadataRune.fromMetadataText(
   Deno.readTextFileSync(new URL(import.meta.resolve("./erc20.json"))),
 )
 
-// Given that other examples may utilize this script, we'll allow the
-// contract deployer to be optionally specified via an environment variable.
-// In the case that it's not specified, we'll create a new test user.
+/// Given that other examples may utilize this script, we'll allow the
+/// contract deployer to be optionally specified via an environment variable.
+/// In the case that it's not specified, we'll create a new test user.
 const senderSecret = Deno.env.get("DEPLOYER_SECRET")
 const sender = senderSecret
   ? Sr25519.fromSecret(hex.decode(senderSecret))
   : (await createDevUsers(1))[0]
 
-// Instantiate `code.wasm` with `alice` and––upon block inclusion––return the
-// list of system events specific to this instantiation.
+/// Instantiate `code.wasm` with `alice` and––upon block inclusion––return the
+/// list of system events specific to this instantiation.
 const events = await metadata
   .instantiation(chain, {
     sender: sender.publicKey,
@@ -38,12 +38,12 @@ const events = await metadata
   .inBlockEvents()
   .run()
 
-// > Note: we're using `inBlockEvents` and not `finalizedEvents` because our provider
-// > is configured with instant finality. This is optimal for testing, but not production.
+/// > Note: we're using `inBlockEvents` and not `finalizedEvents` because our provider
+/// > is configured with instant finality. This is optimal for testing, but not production.
 
-// Find the event corresponding to instantiation, and extract the instance's `accountId`.
-// We'll convert this to an Ss58 address and place it within an environment variable. This
-// way we can easy deploy from other scripts with a simple `await import("./deploy.ts")`.
+/// Find the event corresponding to instantiation, and extract the instance's `accountId`.
+/// We'll convert this to an Ss58 address and place it within an environment variable. This
+/// way we can easy deploy from other scripts with a simple `await import("./deploy.ts")`.
 for (const { event } of events) {
   if (event.type === "Contracts" && event.value.type === "Instantiated") {
     const accountId = event.value.contract
