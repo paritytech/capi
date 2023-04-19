@@ -69,7 +69,10 @@ export class VirtualMultisigRune<out C extends Chain, out U>
   }
 
   ratify<X>(
-    ...[senderAccountId, call]: RunicArgs<X, [senderAccountId: Uint8Array, call: unknown]>
+    ...[senderAccountId, call, nonExecuting]: RunicArgs<
+      X,
+      [senderAccountId: Uint8Array, call: unknown, nonExecuting?: boolean]
+    >
   ) {
     const sender = this.senderProxyId(senderAccountId)
     const call_ = this.chain.extrinsic(
@@ -93,7 +96,7 @@ export class VirtualMultisigRune<out C extends Chain, out U>
             type: "proxy",
             real: sender,
             forceProxyType: undefined,
-            call: this.inner.ratify(sender, call_),
+            call: this.inner.ratify(sender, call_, nonExecuting),
           }),
         })
         .unsafeAs<Chain.Call<C>>(),
