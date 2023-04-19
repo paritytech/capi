@@ -8,7 +8,7 @@ import { $codegenSpec, CodegenEntry, CodegenSpec } from "../server/codegenSpec.t
 import { normalizePackageName, withSignal } from "../util/mod.ts"
 import { normalizeTypeName } from "../util/normalize.ts"
 import { CapiConfig } from "./CapiConfig.ts"
-import { startNetwork } from "./startNetwork.ts"
+import { startNetworkForMetadata } from "./startNetwork.ts"
 
 export async function syncConfig(tempDir: string, config: CapiConfig) {
   return withSignal(async (signal) => {
@@ -26,7 +26,7 @@ export async function syncConfig(tempDir: string, config: CapiConfig) {
           })
           return
         }
-        const network = await startNetwork(path.join(tempDir, name), chain, signal)
+        const network = await startNetworkForMetadata(path.join(tempDir, name), chain, signal)
         await Promise.all(
           [
             [undefined, network.relay] as const,

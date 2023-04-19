@@ -8,7 +8,6 @@ export async function createCustomChainSpec(
   customize: (chainSpec: ChainSpec) => void,
 ) {
   await ensureDir(tempDir)
-
   const specResult = await new Deno.Command(binary, {
     args: ["build-spec", "--disable-default-bootnode", "--chain", chain],
   }).output()
@@ -18,21 +17,22 @@ export async function createCustomChainSpec(
   }
   const spec = JSON.parse(new TextDecoder().decode(specResult.stdout))
   customize(spec)
-
   const specPath = path.join(tempDir, `chainspec.json`)
   await Deno.writeTextFile(specPath, JSON.stringify(spec, undefined, 2))
+  return createRawChainSpec(tempDir, binary, specPath)
+}
 
+export async function createRawChainSpec(tempDir: string, binary: string, chain: string) {
+  await ensureDir(tempDir)
   const rawResult = await new Deno.Command(binary, {
-    args: ["build-spec", "--disable-default-bootnode", "--chain", specPath, "--raw"],
+    args: ["build-spec", "--disable-default-bootnode", "--chain", chain, "--raw"],
   }).output()
   if (!rawResult.success) {
     // TODO: improve error message
     throw new Error("build-spec --raw failed")
   }
-
   const rawPath = path.join(tempDir, `chainspec-raw.json`)
   await Deno.writeFile(rawPath, rawResult.stdout)
-
   return rawPath
 }
 

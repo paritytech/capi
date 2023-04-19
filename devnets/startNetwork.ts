@@ -4,7 +4,12 @@ import { writableStreamFromWriter } from "../deps/std/streams.ts"
 import { getFreePort, portReady } from "../util/port.ts"
 import { resolveBinary } from "./binary.ts"
 import { NetworkConfig } from "./CapiConfig.ts"
-import { createCustomChainSpec, GenesisConfig, getGenesisConfig } from "./chainSpec.ts"
+import {
+  createCustomChainSpec,
+  createRawChainSpec,
+  GenesisConfig,
+  getGenesisConfig,
+} from "./chainSpec.ts"
 import { addDevUsers } from "./devUsers.ts"
 
 export interface Network {
@@ -15,6 +20,51 @@ export interface Network {
 export interface NetworkChain {
   bootnodes: string
   ports: number[]
+}
+
+export async function startNetworkForMetadata(
+  tempDir: string,
+  config: NetworkConfig,
+  signal: AbortSignal,
+): Promise<Network> {
+  const relayBinary = await resolveBinary(config.binary, signal)
+  const relaySpec = await createRawChainSpec(path.join(tempDir, "relay"), relayBinary, config.chain)
+  const [relay, paras] = await Promise.all([
+    spawnChain(
+      path.join(tempDir, "relay"),
+      relayBinary,
+      relaySpec,
+      1,
+      [],
+      relayBinary,
+      signal,
+    ),
+    Promise.all(
+      Object.entries(config.parachains ?? {}).map(async ([name, config]) => {
+        const binary = await resolveBinary(config.binary, signal)
+        const chain = await spawnChain(
+          path.join(tempDir, name),
+          binary,
+          await createRawChainSpec(path.join(tempDir, name), binary, config.chain),
+          1,
+          [
+            "--",
+            "--execution",
+            "wasm",
+            "--chain",
+            relaySpec,
+          ],
+          relayBinary,
+          signal,
+        )
+        return [name, chain] satisfies Narrow
+      }),
+    ),
+  ])
+  return {
+    relay,
+    paras: Object.fromEntries(paras),
+  }
 }
 
 export async function startNetwork(
