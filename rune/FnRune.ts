@@ -8,3 +8,5 @@ export class FnRune<F extends (...args: any[]) => any, U> extends Rune<F, U> {
     return Rune.tuple([this.as(Rune), ...args]).map(([fn, ...args]) => fn(...args))
   }
 }
+
+Rune.FnRune = FnRune

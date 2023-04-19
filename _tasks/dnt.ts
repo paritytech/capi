@@ -57,6 +57,10 @@ await Promise.all([
         path: "./patterns/signature/polkadot.ts",
       },
       {
+        name: "./patterns/compat/pjs_sender",
+        path: "./patterns/compat/pjs_sender.ts",
+      },
+      {
         name: "./patterns/consensus",
         path: "./patterns/consensus/mod.ts",
       },

@@ -163,6 +163,8 @@ class RunMap<T1, U, T2> extends Run<T2, U> {
   }
 }
 
+Rune.ValueRune = ValueRune
+
 class RunHandle<T, T2 extends T, T3, U, U2> extends Run<Exclude<T, T2> | T3, U | U2> {
   child
   alt
