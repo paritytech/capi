@@ -3,17 +3,6 @@ import * as bytes from "../../deps/std/bytes.ts"
 import { $, Chain, ChainRune, PatternRune, Rune, RunicArgs, ValueRune } from "../../mod.ts"
 import { multisigAccountId } from "./multisigAccountId.ts"
 
-export interface MultisigRatifyProps<C extends Chain> {
-  sender: MultiAddress
-  call: Chain.Call<C>
-  nonExecuting?: boolean
-}
-
-export interface MultisigCancelProps {
-  sender: MultiAddress
-  callHash: Uint8Array
-}
-
 export interface Multisig {
   signatories: Uint8Array[]
   threshold?: number
@@ -42,7 +31,12 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
       )
   }
 
-  ratify<X>({ sender, call: call_, nonExecuting }: RunicArgs<X, MultisigRatifyProps<C>>) {
+  ratify<X>(
+    ...[sender, call_, nonExecuting]: RunicArgs<
+      X,
+      [sender: MultiAddress, call: Chain.Call<C>, nonExecuting?: boolean]
+    >
+  ) {
     const call = this.chain.extrinsic(Rune.resolve(call_).unsafeAs<Chain.Call<C>>())
     const otherSignatories = this.otherSignatories(sender)
     const maybeTimepoint = this.maybeTimepoint(call.callHash)
@@ -73,7 +67,7 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
     )
   }
 
-  cancel<X>({ sender, callHash }: RunicArgs<X, MultisigCancelProps>) {
+  cancel<X>(...[sender, callHash]: RunicArgs<X, [sender: MultiAddress, callHash: Uint8Array]>) {
     return this.chain.extrinsic(
       Rune
         .object({

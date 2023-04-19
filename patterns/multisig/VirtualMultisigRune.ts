@@ -93,10 +93,7 @@ export class VirtualMultisigRune<out C extends Chain, out U>
             type: "proxy",
             real: sender,
             forceProxyType: undefined,
-            call: this.inner.ratify({
-              call: call_,
-              sender: sender as any,
-            }),
+            call: this.inner.ratify(sender, call_),
           }),
         })
         .unsafeAs<Chain.Call<C>>(),

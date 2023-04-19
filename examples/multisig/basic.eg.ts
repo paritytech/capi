@@ -49,7 +49,7 @@ const call = Balances.transferKeepAlive({
 
 // Propose the call.
 await multisig
-  .ratify({ call, sender: alexa.address })
+  .ratify(alexa.address, call)
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Proposal:")
@@ -63,7 +63,7 @@ assert(isProposed)
 
 // Approve proposal as Billy.
 await multisig
-  .ratify({ call, sender: billy.address, nonExecuting: true })
+  .ratify(billy.address, call, true)
   .signed(signature({ sender: billy }))
   .sent()
   .dbgStatus("First approval:")
@@ -81,7 +81,7 @@ $.assert($.array($.sizedUint8Array(32)), approvals)
 
 // Approve the proposal as Carol (final approval).
 await multisig
-  .ratify({ call, sender: carol.address })
+  .ratify(carol.address, call)
   .signed(signature({ sender: carol }))
   .sent()
   .dbgStatus("Final approval:")
