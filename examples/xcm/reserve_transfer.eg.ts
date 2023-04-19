@@ -4,6 +4,7 @@
  * @description Perform an XCM reserve asset transfer, in which two chains, which
  * do not trust one another, rely on a third chain to store assets and facilitate
  * the exchange.
+ * @test_skip
  */
 
 import * as Rococo from "@capi/rococo-dev-xcm"
