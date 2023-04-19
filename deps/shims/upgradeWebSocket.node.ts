@@ -1,8 +1,9 @@
-import { WebSocketServer } from "./ws.ts"
+import * as WS from "./ws.ts"
 
-const wss = new WebSocketServer({ noServer: true })
+let wss: WS.WebSocketServer | undefined
 
 export function upgradeWebSocket(request: Request) {
+  wss ??= new WS.WebSocketServer({ noServer: true })
   // Set by http.node.ts
   const [req, socket, head] = (request as any)._upgrade
   return {

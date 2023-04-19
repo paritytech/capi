@@ -14,3 +14,5 @@ export class ArrayRune<T, U> extends Rune<T[], U> {
       .into(ArrayRune)
   }
 }
+
+Rune.ArrayRune = ArrayRune

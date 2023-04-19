@@ -2,7 +2,7 @@ import { hex, ss58 } from "../../crypto/mod.ts"
 import * as $ from "../../deps/scale.ts"
 import { AddressPrefixChain, Chain, ChainRune } from "../../fluent/ChainRune.ts"
 import { ExtrinsicSender } from "../../fluent/ExtrinsicRune.ts"
-import { Rune, RunicArgs } from "../../rune/Rune.ts"
+import { Rune, RunicArgs } from "../../rune/mod.ts"
 
 export type PjsSigner = { signPayload(payload: any): Promise<{ signature: string }> }
 

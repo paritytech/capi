@@ -1,7 +1,10 @@
 import { deferred } from "../deps/std/async.ts"
 import { getOrInit } from "../util/state.ts"
-import { ArrayRune, FnRune, ValueRune } from "./mod.ts"
 import { EventSource, Receipt, Timeline } from "./Timeline.ts"
+
+// Hack to work around circularity issues
+// @deno-types="./mod.ts"
+import * as _ from "./_empty.js"
 
 export class Batch {
   constructor(
@@ -41,9 +44,12 @@ export class Batch {
 declare const _T: unique symbol
 declare const _U: unique symbol
 
-export namespace Rune {
+export declare namespace Rune {
   export type T<R> = R extends { [_T]: infer T } ? T : R
   export type U<R> = R extends { [_U]: infer U } ? U : never
+  export import ValueRune = _.ValueRune
+  export import ArrayRune = _.ArrayRune
+  export import FnRune = _.FnRune
 }
 
 export interface Rune<out T, out U = never> {
@@ -89,11 +95,11 @@ export class Rune<out T, out U = never> {
   }
 
   static constant<T>(value: T) {
-    return ValueRune.new(RunConstant, value)
+    return Rune.ValueRune.new(RunConstant, value)
   }
 
-  static resolve<V>(value: V): ValueRune<Rune.T<V>, Rune.U<V>> {
-    return value instanceof Rune ? value.into(ValueRune) : Rune.constant(value)
+  static resolve<V>(value: V): Rune.ValueRune<Rune.T<V>, Rune.U<V>> {
+    return value instanceof Rune ? value.into(Rune.ValueRune) : Rune.constant(value)
   }
 
   static str<X>(strings: TemplateStringsArray, ..._values: RunicArgs<X, unknown[]>) {
@@ -111,24 +117,24 @@ export class Rune<out T, out U = never> {
 
   static tuple<R extends unknown[]>(
     runes: [...R],
-  ): ValueRune<{ [K in keyof R]: Rune.T<R[K]> }, Rune.U<R[number]>>
+  ): Rune.ValueRune<{ [K in keyof R]: Rune.T<R[K]> }, Rune.U<R[number]>>
   static tuple<R extends unknown[]>(
     runes: [...R],
-  ): ValueRune<Rune.T<R[number]>[], Rune.U<R[number]>> {
-    return ValueRune.new(RunLs, runes.map(Rune.resolve))
+  ): Rune.ValueRune<Rune.T<R[number]>[], Rune.U<R[number]>> {
+    return Rune.ValueRune.new(RunLs, runes.map(Rune.resolve))
   }
 
   static array<T, X>(runes: RunicArgs<X, T[]>) {
-    return ValueRune.new(RunLs, RunicArgs.resolve(runes)).into(ArrayRune)
+    return Rune.ValueRune.new(RunLs, RunicArgs.resolve(runes)).into(Rune.ArrayRune)
   }
 
   static fn<A extends any[], T, X>(...[fn]: RunicArgs<X, [(...args: A) => T]>) {
-    return Rune.resolve(fn).into(FnRune)
+    return Rune.resolve(fn).into(Rune.FnRune)
   }
 
   static object<R extends {}>(
     runes: R,
-  ): ValueRune<{ [K in keyof R]: Rune.T<R[K]> }, Rune.U<R[keyof R]>> {
+  ): Rune.ValueRune<{ [K in keyof R]: Rune.T<R[K]> }, Rune.U<R[keyof R]>> {
     const keys = Object.keys(runes)
     const values = Object.values(runes)
     return Rune.tuple(values).map((values) => {
@@ -139,25 +145,27 @@ export class Rune<out T, out U = never> {
   static captureUnhandled<R extends unknown[], T2, U2>(
     sources: [...R],
     fn: (
-      ...runes: { [K in keyof R]: ValueRune<Rune.T<R[K]>, never> }
+      ...runes: { [K in keyof R]: Rune.ValueRune<Rune.T<R[K]>, never> }
     ) => Rune<T2, U2>,
-  ): ValueRune<T2, Rune.U<R[number]> | U2>
+  ): Rune.ValueRune<T2, Rune.U<R[number]> | U2>
   static captureUnhandled<R, T2, U2>(
     sources: any[],
-    fn: (...runes: ValueRune<Rune.T<R>, never>[]) => Rune<T2, U2>,
-  ): ValueRune<T2, Rune.U<R> | U2> {
+    fn: (...runes: Rune.ValueRune<Rune.T<R>, never>[]) => Rune<T2, U2>,
+  ): Rune.ValueRune<T2, Rune.U<R> | U2> {
     const symbol = Symbol()
-    return ValueRune.new(
+    return Rune.ValueRune.new(
       RunCaptureUnhandled<T2, U2, Rune.U<R>>,
       fn(
-        ...sources.map((source) => ValueRune.new(RunBubbleUnhandled, Rune.resolve(source), symbol)),
+        ...sources.map((source) =>
+          Rune.ValueRune.new(RunBubbleUnhandled, Rune.resolve(source), symbol)
+        ),
       ),
       symbol,
     )
   }
 
-  static asyncIter<T>(fn: (signal: AbortSignal) => AsyncIterable<T>): ValueRune<T, never> {
-    return ValueRune.new(RunAsyncIter, fn)
+  static asyncIter<T>(fn: (signal: AbortSignal) => AsyncIterable<T>): Rune.ValueRune<T, never> {
+    return Rune.ValueRune.new(RunAsyncIter, fn)
   }
 
   static _placeholder() {
@@ -390,7 +398,7 @@ export namespace RunicArgs {
   export type U<X> = X extends unknown[] ? Rune.U<X[number]> : Rune.U<X[keyof X]>
   export function resolve<X, A>(
     args: RunicArgs<X, A>,
-  ): { [K in keyof A]: ValueRune<A[K], RunicArgs.U<X>> }
+  ): { [K in keyof A]: Rune.ValueRune<A[K], RunicArgs.U<X>> }
   export function resolve(args: any): any {
     return args instanceof Array
       ? args.map(Rune.resolve)
