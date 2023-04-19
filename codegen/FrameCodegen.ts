@@ -92,16 +92,14 @@ export class FrameCodegen {
 
   extrinsicsDts(_pallet: Pallet, call: $.AnyCodec) {
     return new $.CodecVisitor<string[]>()
-      .add($.taggedUnion, (_, _tagKey: string, variantsRaw) => {
-        const variants = Array.isArray(variantsRaw) ? variantsRaw : Object.values(variantsRaw)
-        const callTypeName = this.typeCodegen.typeNames.get(call)!
-        return variants.map((variant) =>
-          `${variant.tag}: <X>(...args: Parameters<typeof ${callTypeName}.${variant.tag}<X>>) => C.ExtrinsicRune<${this.chainIdent}, C.RunicArgs.U<X>>`
-        )
+      .add($.taggedUnion, (_codec, _tagKey: string, variantsRaw) => {
+        return (Array.isArray(variantsRaw) ? variantsRaw : Object.values(variantsRaw))
+          .map((variant) =>
+            this.extrinsicFactoryDts(this.typeCodegen.typeNames.get(call)!, variant.tag)
+          )
       })
       .add($.literalUnion<unknown>, (_, values) => {
-        const variants = Object.values(values)
-        return variants.map((value) => {
+        return Object.values(values).map((value) => {
           if (typeof value !== "string") {
             throw new Error("pallet call non-string literalUnion is unsupported")
           }
@@ -113,25 +111,64 @@ export class FrameCodegen {
       .join("\n")
   }
 
+  extrinsicsJs(pallet: Pallet, call: $.AnyCodec) {
+    const palletCallFactory = this.typeCodegen.typeNames.get(call)!
+    return new $.CodecVisitor<string[]>()
+      .add($.taggedUnion, (_codec, _tagKey: string, variantsRaw) => {
+        return (Array.isArray(variantsRaw) ? variantsRaw : Object.values(variantsRaw))
+          .map((variant) => this.extrinsicFactoryJs(palletCallFactory, pallet.name, variant.tag))
+      })
+      .add($.literalUnion<unknown>, (_, values) => {
+        return Object.values(values).map((value) => {
+          if (typeof value !== "string") {
+            throw new Error("pallet call non-string literalUnion is unsupported")
+          }
+          return this.extrinsicFactoryJs(palletCallFactory, pallet.name, value)
+        })
+      })
+      .add($.never, () => [])
+      .visit(call)
+      .join("\n")
+  }
+
   palletJs(pallet: Pallet) {
-    // const storageEntries = Object.values(pallet.storage)
-    // const storageEntriesJs = storageEntries.length
-    //   ? storageEntries
-    //     .map((storageEntry) => this.storageDts(pallet, storageEntry))
-    //     .join(",\n")
-    //     .concat(",")
-    //   : ""
-    // const constants = Object.values(pallet.constants)
-    // const constantsJs = constants.length
-    //   ? constants
-    //     .map((constant) => this.constantDts(constant))
-    //     .join(",\n")
-    //     .concat(",")
-    //   : ""
+    const storageEntries = Object.values(pallet.storage)
+    const storageEntriesJs = storageEntries.length
+      ? storageEntries
+        .map((storageEntry) => this.storageJs(storageEntry.name))
+        .join("\n")
+      : ""
+    const constants = Object.values(pallet.constants)
+    const constantsJs = constants.length
+      ? constants
+        .map((constant) => this.constantJs(constant))
+        .join("\n")
+      : ""
+    const extrinsicsJs = pallet.types.call ? this.extrinsicsJs(pallet, pallet.types.call) : ""
     return `${pallet.name} = (() => {
-      const pallet = this.pallet("${pallet.name}")
-      return {}
+      const chain = this
+      const pallet = chain.pallet("${pallet.name}")
+      return {
+        ${storageEntriesJs}
+        ${constantsJs}
+        ${extrinsicsJs}
+      }
     })()`
+  }
+
+  extrinsicFactoryDts(palletCallFactory: string, methodIdent: string) {
+    return `${methodIdent}<X>(
+      props: C.RunicArgs<X, Omit<${palletCallFactory}.${methodIdent}, "type">>
+    ): C.ExtrinsicRune<${this.chainIdent}, C.RunicArgs.U<X>>`
+  }
+
+  extrinsicFactoryJs(palletCallFactory: string, palletIdent: string, methodIdent: string) {
+    return `${methodIdent}(...args) {
+      return chain.extrinsic(C.Rune.object({
+        type: "${palletIdent}",
+        value: ${palletCallFactory}(...args),
+      }))
+    },`
   }
 
   storageDts(pallet: Pallet, storage: StorageEntry) {

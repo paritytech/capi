@@ -6,18 +6,18 @@
  * produce promises resolving to subsequent states.
  */
 
-import { chain, Timestamp } from "@capi/polkadot"
+import { chain } from "@capi/polkadot"
 import { $ } from "capi"
 
-/// Specifying `chain.latestBlockHash` indicates that (A) this Rune tree
-/// can be treated as reactive and (B) is a dependent of a "timeline" associated
-/// with Polkadot's block production.
-const now = Timestamp.Now.value(undefined, chain.latestBlockHash)
-
-let i = 0
+// Specifying `chain.latestBlockHash` indicates that (A) this Rune tree
+// can be treated as reactive and (B) is a dependent of a "timeline" associated
+// with Polkadot's block production.
+const now = chain.Timestamp.Now.value(undefined, chain.latestBlockHash)
 
 /// Use the `watch` method to retrieve an async iterable, which will
 /// gather and yield the `collection`-described data upon new blocks.
+let i = 0
+
 for await (const item of now.iter()) {
   console.log(item)
   $.assert($.u64, item)
