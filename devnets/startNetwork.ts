@@ -1,4 +1,7 @@
+import { hex } from "../crypto/mod.ts"
+import * as ed25519 from "../deps/npm/noble/ed25519.ts"
 import { Narrow } from "../deps/scale.ts"
+import * as base58 from "../deps/std/encoding/base58.ts"
 import * as path from "../deps/std/path.ts"
 import { writableStreamFromWriter } from "../deps/std/streams.ts"
 import { getFreePort, portReady } from "../util/port.ts"
@@ -36,7 +39,6 @@ export async function startNetworkForMetadata(
       relaySpec,
       1,
       [],
-      relayBinary,
       signal,
     ),
     Promise.all(
@@ -54,7 +56,6 @@ export async function startNetworkForMetadata(
             "--chain",
             relaySpec,
           ],
-          relayBinary,
           signal,
         )
         return [name, chain] satisfies Narrow
@@ -124,7 +125,6 @@ export async function startNetwork(
     relaySpec,
     config.nodes ?? minValidators,
     [],
-    relayBinary,
     signal,
   )
   return {
@@ -146,7 +146,6 @@ export async function startNetwork(
               "--bootnodes",
               relay.bootnodes,
             ],
-            relayBinary,
             signal,
           )
           return [name, chain] satisfies Narrow
@@ -178,20 +177,6 @@ function generateBootnodeString(port: number, peerId: string) {
   return `/ip4/127.0.0.1/tcp/${port}/p2p/${peerId}`
 }
 
-async function generateNodeKey(binary: string, signal?: AbortSignal) {
-  const { success, stdout, stderr } = await new Deno.Command(binary, {
-    args: ["key", "generate-node-key"],
-    signal,
-  }).output()
-  if (!success) {
-    throw new Error()
-  }
-  const decoder = new TextDecoder()
-  const nodeKey = decoder.decode(stdout).trim()
-  const peerId = decoder.decode(stderr).trim()
-  return { nodeKey, peerId }
-}
-
 const keystoreAccounts = ["alice", "bob", "charlie", "dave", "eve", "ferdie"]
 async function spawnChain(
   tempDir: string,
@@ -199,7 +184,6 @@ async function spawnChain(
   chain: string,
   count: number,
   extraArgs: string[],
-  generateNodeKeyBinary: string,
   signal: AbortSignal,
 ): Promise<NetworkChain> {
   let bootnodes: string | undefined
@@ -228,8 +212,9 @@ async function spawnChain(
     if (bootnodes) {
       args.push("--bootnodes", bootnodes)
     } else {
-      const { nodeKey, peerId } = await generateNodeKey(generateNodeKeyBinary)
-      args.push("--node-key", nodeKey)
+      const nodeKey = ed25519.utils.randomPrivateKey()
+      const peerId = await getLibp2pPeerId(nodeKey)
+      args.push("--node-key", hex.encode(nodeKey))
       bootnodes = generateBootnodeString(httpPort, peerId)
     }
     args.push(...extraArgs)
@@ -360,4 +345,9 @@ function addXcmHrmpChannels(
       ])
     }
   }
+}
+
+async function getLibp2pPeerId(privateKey: Uint8Array) {
+  const publicKey = await ed25519.getPublicKeyAsync(privateKey)
+  return base58.encode(new Uint8Array([0, 36, 8, 1, 18, 32, ...publicKey]))
 }
