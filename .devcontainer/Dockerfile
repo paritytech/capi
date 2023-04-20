@@ -2,7 +2,7 @@
 ARG VARIANT=bullseye
 FROM --platform=linux/amd64 mcr.microsoft.com/devcontainers/base:0-${VARIANT}
 
-ARG DENO_VERSION=1.32.3
+ARG DENO_VERSION=1.32.5
 
 ENV DENO_INSTALL=/deno
 ENV DENO_INSTALL_ROOT=/usr/local
