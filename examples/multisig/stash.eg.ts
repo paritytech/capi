@@ -15,13 +15,13 @@ import { signature } from "capi/patterns/signature/polkadot.ts"
 
 const { alexa, billy, carol } = await createDevUsers()
 
-// Initialize the `MultisigRune` with Alexa, Billy and Carol. Set the passing threshold to 2.
+/// Initialize the `MultisigRune` with Alexa, Billy and Carol. Set the passing threshold to 2.
 const multisig = MultisigRune.from(chain, {
   signatories: [alexa, billy, carol].map(({ publicKey }) => publicKey),
   threshold: 2,
 })
 
-// Send funds to the multisig (existential deposit).
+/// Send funds to the multisig (existential deposit).
 await Balances
   .transfer({
     value: 20_000_000_000_000n,
@@ -33,15 +33,15 @@ await Balances
   .finalized()
   .run()
 
-// Describe the call which we wish to dispatch from the multisig account:
-// the creation of the stash / pure proxy, belonging to the multisig account itself.
+/// Describe the call which we wish to dispatch from the multisig account:
+/// the creation of the stash / pure proxy, belonging to the multisig account itself.
 const call = Proxy.createPure({
   proxyType: "Any",
   delay: 0,
   index: 0,
 })
 
-// Propose the stash creation call.
+/// Propose the stash creation call.
 await multisig
   .ratify(alexa.address, call)
   .signed(signature({ sender: alexa }))
@@ -50,8 +50,8 @@ await multisig
   .finalized()
   .run()
 
-// Approve the stash creation call and extract the pure creation event, which should
-// contain its account id.
+/// Approve the stash creation call and extract the pure creation event, which should
+/// contain its account id.
 const stashAccountId = await multisig
   .ratify(billy.address, call)
   .signed(signature({ sender: billy }))
@@ -62,7 +62,7 @@ const stashAccountId = await multisig
   .access(0, "pure")
   .run()
 
-// Send funds to the stash (existential deposit).
+/// Send funds to the stash (existential deposit).
 await Balances
   .transfer({
     value: 20_000_000_000_000n,
@@ -74,13 +74,13 @@ await Balances
   .finalized()
   .run()
 
-// Ensure that the funds arrived successfully.
+/// Ensure that the funds arrived successfully.
 const stashFree = await System.Account
   .value(stashAccountId)
   .unhandle(undefined)
   .access("data", "free")
   .run()
 
-// The stash's free should be greater than zero.
+/// The stash's free should be greater than zero.
 console.log("Stash free:", stashFree)
 assert(stashFree > 0)

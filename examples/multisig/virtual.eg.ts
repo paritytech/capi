@@ -28,11 +28,11 @@ import { parse } from "../../deps/std/flags.ts"
 
 const { alexa, billy, carol, david } = await createDevUsers()
 
-// To reference a virtual multisig, one must have several pieces of data, including
-// the member->proxy account id lookup, the threshold and the stash account id.
-// With this state, we can hydrate from / use an existing virtual multisig.
-// Let's see if we can hydrate the virtual multisig state from command line arguments.
-// If we haven't specified any virtual multisig state, we deploy a new virtual multisig.
+/// To reference a virtual multisig, one must have several pieces of data, including
+/// the member->proxy account id lookup, the threshold and the stash account id.
+/// With this state, we can hydrate from / use an existing virtual multisig.
+/// Let's see if we can hydrate the virtual multisig state from command line arguments.
+/// If we haven't specified any virtual multisig state, we deploy a new virtual multisig.
 let { state } = parse(Deno.args, { string: ["state"] })
 if (!state) {
   state = await VirtualMultisigRune
@@ -48,10 +48,10 @@ if (!state) {
 console.log("State:", state)
 $.assert($.str, state)
 
-// Initialize a `VirtualMultisigRune` with the state's scale-encoded hex string.
+/// Initialize a `VirtualMultisigRune` with the state's scale-encoded hex string.
 const vMultisig = VirtualMultisigRune.fromHex(chain, state)
 
-// Transfer funds to the virtual multisig's stash account.
+/// Transfer funds to the virtual multisig's stash account.
 await Balances
   .transfer({
     dest: MultiAddress.Id(vMultisig.stash),
@@ -63,27 +63,27 @@ await Balances
   .finalized()
   .run()
 
-// Reference David's free balance.
+/// Reference David's free balance.
 const davidFree = System.Account
   .value(david.publicKey)
   .unhandle(undefined)
   .access("data", "free")
 
-// Retrieve David's initial free.
+/// Retrieve David's initial free.
 const davidFreeInitial = await davidFree.run()
 console.log("David free initial:", davidFreeInitial)
 
-// Describe the call we wish to dispatch from the virtual multisig's stash.
+/// Describe the call we wish to dispatch from the virtual multisig's stash.
 const call = Balances.transfer({
   dest: david.address,
   value: 1_234_000_000_000n,
 })
 
-// Fund Billy and Carol's proxy accounts (existential deposits).
+/// Fund Billy and Carol's proxy accounts (existential deposits).
 await fundAndRatify("billy", billy).run()
 await fundAndRatify("carol", carol).run()
 
-// Retrieve David's final balance.
+/// Retrieve David's final balance.
 const davidFreeFinal = await davidFree.run()
 console.log("David free final:", davidFreeFinal)
 
