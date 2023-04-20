@@ -4,7 +4,7 @@
  * @description Read pages (either of keys or entries) from storage maps.
  */
 
-import { $accountInfo } from "@capi/polkadot-dev"
+import { $accountInfo, chain } from "@capi/polkadot-dev"
 import { $ } from "capi"
 
 // Reference the first 10 keys of a polkadot dev chain's system account map.

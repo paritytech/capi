@@ -7,13 +7,12 @@
  */
 
 import {
+  chain,
   CollectionConfig,
   MintSettings,
   MintType,
-  Nfts,
   PalletNftsEvent,
   RuntimeEvent,
-  Utility,
 } from "@capi/rococo-westmint/westmint"
 import { assertEquals } from "asserts"
 import { $, createDevUsers, Rune } from "capi"
@@ -89,7 +88,7 @@ assertEquals(initialOwner, alexa.publicKey)
 /// 2. Prevent further minting.
 /// 3. Lock the collection to prevent changes.
 const price = 1000000n
-await Utility
+await chain.Utility
   .batchAll({
     calls: Rune.array([
       Nfts.setPrice({ collection, item, price }),

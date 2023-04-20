@@ -67,7 +67,7 @@ export class FrameCodegen {
         ${Object.values(this.metadata.pallets).map((pallet) => this.palletJs(pallet)).join("\n")}
       }
 
-      export const chain = ${this.chainIdent}.from(connect)
+      export const chain = ${this.chainIdent}Rune.from(connect)
     `
   }
 
@@ -84,6 +84,7 @@ export class FrameCodegen {
     )
     const extrinsicsDts = pallet.types.call ? this.extrinsicsDts(pallet, pallet.types.call) : ""
     return `${pallet.name}: {
+      pallet: C.PalletRune<${this.chainIdent}, "${pallet.name}", U>
       ${extrinsicsDts}
       ${storageDts}
       ${constantsDts}
@@ -149,6 +150,7 @@ export class FrameCodegen {
       const chain = this
       const pallet = chain.pallet("${pallet.name}")
       return {
+        pallet,
         ${storageEntriesJs}
         ${constantsJs}
         ${extrinsicsJs}
@@ -157,16 +159,16 @@ export class FrameCodegen {
   }
 
   extrinsicFactoryDts(palletCallFactory: string, methodIdent: string) {
-    return `${methodIdent}<X>(
+    return `${methodIdent}: <X>(
       props: C.RunicArgs<X, Omit<${palletCallFactory}.${methodIdent}, "type">>
-    ): C.ExtrinsicRune<${this.chainIdent}, C.RunicArgs.U<X>>`
+    ) => C.ExtrinsicRune<${this.chainIdent}, C.RunicArgs.U<X>>`
   }
 
   extrinsicFactoryJs(palletCallFactory: string, palletIdent: string, methodIdent: string) {
-    return `${methodIdent}(...args) {
+    return `${methodIdent}: (...args) => {
       return chain.extrinsic(C.Rune.object({
         type: "${palletIdent}",
-        value: ${palletCallFactory}(...args),
+        value: ${palletCallFactory}.${methodIdent}(...args),
       }))
     },`
   }

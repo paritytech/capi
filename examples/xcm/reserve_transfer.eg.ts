@@ -7,9 +7,25 @@
  * @test_skip
  */
 
-import * as Rococo from "@capi/rococo-dev-xcm"
-import * as Statemine from "@capi/rococo-dev-xcm/statemine"
-import * as Trappist from "@capi/rococo-dev-xcm/trappist"
+import { chain as rococo, DoubleEncoded, Instruction } from "@capi/rococo-dev-xcm"
+import {
+  $assetDetails,
+  AssetId,
+  chain as statemine,
+  CumulusPalletXcmpQueueEvent,
+  Fungibility,
+  Junctions,
+  NetworkId,
+  RuntimeEvent,
+  VersionedMultiAssets,
+  VersionedMultiLocation,
+  VersionedXcm,
+  WeightLimit,
+  XcmV1Junction,
+  XcmV1MultiAsset,
+  XcmV1MultiLocation,
+} from "@capi/rococo-dev-xcm/statemine"
+import { chain as trappist } from "@capi/rococo-dev-xcm/trappist"
 import { assert, assertNotEquals } from "asserts"
 import { $, alice as root, createDevUsers, Rune, ValueRune } from "capi"
 import { $siblId } from "capi/patterns/para_id.ts"
@@ -32,19 +48,25 @@ const retryOptions = {
   maxTimeout: 2 * 60 * 1000,
 }
 
+// HEAD
 /// Create a sufficient asset with Sudo. When targeting a common good
 /// parachain, access root instead through the relay chain.
 await Rococo.Sudo
+//
+// Create a sufficient asset with Sudo. When targeting a common good
+// parachain, access root instead through the relay chain.
+await rococo.Sudo
+  // ae8aa6c (clean up reserve transfer example)
   .sudo({
-    call: Rococo.ParasSudoWrapper.sudoQueueDownwardXcm({
+    call: rococo.ParasSudoWrapper.sudoQueueDownwardXcm({
       id: RESERVE_CHAIN_ID,
-      xcm: Rococo.VersionedXcm.V2(
+      xcm: VersionedXcm.V2(
         Rune.array([
-          Rococo.Instruction.Transact({
+          Instruction.Transact({
             originType: "Superuser",
             requireWeightAtMost: 1000000000n,
-            call: Rococo.DoubleEncoded({
-              encoded: Statemine.Assets.forceCreate({
+            call: DoubleEncoded({
+              encoded: statemine.Assets.forceCreate({
                 id: RESERVE_ASSET_ID,
                 isSufficient: true,
                 minBalance: 1n,
@@ -64,16 +86,16 @@ await Rococo.Sudo
 
 /// Wait for the asset to be recorded in storage.
 const assetDetails = await retry(
-  () => Statemine.Assets.Asset.value(RESERVE_ASSET_ID).unhandle(undefined).run(),
+  () => statemine.Assets.Asset.value(RESERVE_ASSET_ID).unhandle(undefined).run(),
   retryOptions,
 )
 
 /// Ensure the reserve asset was created.
 console.log("Statemine: Asset created", assetDetails)
-$.assert(Statemine.$assetDetails, assetDetails)
+$.assert($assetDetails, assetDetails)
 
 /// Mint assets on reserve parachain.
-await Statemine.Assets
+await statemine.Assets
   .mint({
     id: RESERVE_ASSET_ID,
     amount: 100000000000000n,
@@ -85,7 +107,7 @@ await Statemine.Assets
   .finalized()
   .run()
 
-const billyStatemintBalance = Statemine.Assets.Account
+const billyStatemintBalance = statemine.Assets.Account
   .value([RESERVE_ASSET_ID, billy.publicKey])
   .unhandle(undefined)
   .access("balance")
@@ -95,9 +117,9 @@ console.log("Statemine(Billy): asset balance", billyStatemintBalanceInitial)
 $.assert($.u128, billyStatemintBalanceInitial)
 
 /// Create the asset on the Trappist parachain.
-await Trappist.Sudo
+await trappist.Sudo
   .sudo({
-    call: Trappist.Assets.forceCreate({
+    call: trappist.Assets.forceCreate({
       id: TRAPPIST_ASSET_ID,
       isSufficient: false,
       minBalance: 1n,
@@ -110,23 +132,17 @@ await Trappist.Sudo
   .finalized()
   .run()
 
-// TODO: delete in codegen rework
-const assetsPalletId = Statemine.chain
-  .pallet("Assets")
-  .into(ValueRune)
-  .access("id")
-
 /// Register Trappist parachain asset id to reserve asset id.
-await Trappist.Sudo
+await trappist.Sudo
   .sudo({
-    call: Trappist.AssetRegistry.registerReserveAsset({
+    call: trappist.AssetRegistry.registerReserveAsset({
       assetId: TRAPPIST_ASSET_ID,
-      assetMultiLocation: Trappist.XcmV1MultiLocation({
+      assetMultiLocation: XcmV1MultiLocation({
         parents: 1,
-        interior: Trappist.Junctions.X3(
-          Trappist.XcmV1Junction.Parachain(RESERVE_CHAIN_ID),
-          Trappist.XcmV1Junction.PalletInstance(assetsPalletId),
-          Trappist.XcmV1Junction.GeneralIndex(BigInt(RESERVE_ASSET_ID)),
+        interior: Junctions.X3(
+          XcmV1Junction.Parachain(RESERVE_CHAIN_ID),
+          XcmV1Junction.PalletInstance((await statemine.Assets.pallet.run()).id),
+          XcmV1Junction.GeneralIndex(BigInt(RESERVE_ASSET_ID)),
         ),
       }),
     }),
@@ -137,68 +153,56 @@ await Trappist.Sudo
   .finalized()
   .run()
 
-/// Reserve transfer asset id on reserve parachain to Trappist parachain.
-{
-  // Destructure the factories to be used (for convenience).
-  const {
-    VersionedMultiLocation,
-    VersionedMultiAssets,
-    Fungibility,
-    XcmV1Junction,
-    Junctions,
-    AssetId,
-    NetworkId,
-    WeightLimit,
-    RuntimeEvent,
-    CumulusPalletXcmpQueueEvent: { isXcmpMessageSent },
-  } = Statemine
-  const events = await Statemine.PolkadotXcm
-    .limitedReserveTransferAssets({
-      dest: VersionedMultiLocation.V1(Statemine.XcmV1MultiLocation({
-        parents: 1,
-        interior: Junctions.X1(
-          XcmV1Junction.Parachain(TRAPPIST_CHAIN_ID),
-        ),
-      })),
-      beneficiary: VersionedMultiLocation.V1(Statemine.XcmV1MultiLocation({
+// Reserve transfer asset id on reserve parachain to Trappist parachain.
+const events = await statemine.PolkadotXcm
+  .limitedReserveTransferAssets({
+    dest: VersionedMultiLocation.V1(XcmV1MultiLocation({
+      parents: 1,
+      interior: Junctions.X1(
+        XcmV1Junction.Parachain(TRAPPIST_CHAIN_ID),
+      ),
+    })),
+    beneficiary: VersionedMultiLocation.V1(XcmV1MultiLocation({
+      parents: 0,
+      interior: Junctions.X1(
+        XcmV1Junction.AccountId32({
+          network: NetworkId.Any(),
+          id: billy.publicKey,
+        }),
+      ),
+    })),
+    assets: VersionedMultiAssets.V1(Rune.array([XcmV1MultiAsset({
+      id: AssetId.Concrete(XcmV1MultiLocation({
         parents: 0,
-        interior: Junctions.X1(
-          XcmV1Junction.AccountId32({
-            network: NetworkId.Any(),
-            id: billy.publicKey,
-          }),
+        interior: Junctions.X2(
+          XcmV1Junction.PalletInstance((await statemine.Assets.pallet.run()).id),
+          XcmV1Junction.GeneralIndex(BigInt(RESERVE_ASSET_ID)),
         ),
       })),
-      assets: VersionedMultiAssets.V1(Rune.array([Statemine.XcmV1MultiAsset({
-        id: AssetId.Concrete(Statemine.XcmV1MultiLocation({
-          parents: 0,
-          interior: Junctions.X2(
-            XcmV1Junction.PalletInstance(assetsPalletId),
-            XcmV1Junction.GeneralIndex(BigInt(RESERVE_ASSET_ID)),
-          ),
-        })),
-        fun: Fungibility.Fungible(10000000000000n),
-      })])),
-      feeAssetItem: 0,
-      weightLimit: WeightLimit.Unlimited(),
-    })
-    .signed(signature({ sender: billy }))
-    .sent()
-    .dbgStatus("Statemine(Billy): Reserve transfer to Trappist")
-    .finalizedEvents()
-    .run()
+      fun: Fungibility.Fungible(10000000000000n),
+    })])),
+    feeAssetItem: 0,
+    weightLimit: WeightLimit.Unlimited(),
+  })
+  .signed(signature({ sender: billy }))
+  .sent()
+  .dbgStatus("Statemine(Billy): Reserve transfer to Trappist")
+  .finalizedEvents()
+  .run()
 
-  for (const { event } of events) {
-    if (RuntimeEvent.isXcmpQueue(event) && isXcmpMessageSent(event.value)) {
-      console.log("XcmpMessageSent.messageHash:", event.value)
-    }
-  }
+for (const { event } of events) {
+  if (
+    RuntimeEvent.isXcmpQueue(event) && CumulusPalletXcmpQueueEvent.isXcmpMessageSent(event.value)
+  ) console.log("XcmpMessageSent.messageHash:", event.value)
 }
 
 /// Retrieve billy's balance on Trappist.
 const { balance: billyTrappistBalance } = await retry(
   () =>
-    Trappist.Assets.Account.value([TRAPPIST_ASSET_ID, billy.publicKey]).unhandle(undefined).run(),
+    trappist.Assets.Account
+      .value([TRAPPIST_ASSET_ID, billy.publicKey])
+      .unhandle(undefined)
+      .run(),
   retryOptions,
 )
 
@@ -213,8 +217,8 @@ const billyStatemintBalanceFinal = await billyStatemintBalance.run()
 console.log("Statemine(Billy): asset balance:", billyStatemintBalanceFinal)
 assertNotEquals(billyStatemintBalanceInitial, billyStatemintBalanceFinal)
 
-/// Retrieve the statemint sovereign account balance.
-const statemintSovereignAccountBalance = await Statemine.Assets.Account
+// Retrieve the statemint sovereign account balance.
+const statemintSovereignAccountBalance = await statemine.Assets.Account
   .value([RESERVE_ASSET_ID, $siblId.encode(TRAPPIST_CHAIN_ID)])
   .unhandle(undefined)
   .access("balance")
