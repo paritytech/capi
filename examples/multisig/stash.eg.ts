@@ -42,7 +42,7 @@ const call = Proxy.createPure({
 
 // Propose the stash creation call.
 await multisig
-  .ratify({ call, sender: alexa.address })
+  .ratify(alexa.address, call)
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Proposal:")
@@ -52,7 +52,7 @@ await multisig
 // Approve the stash creation call and extract the pure creation event, which should
 // contain its account id.
 const stashAccountId = await multisig
-  .ratify({ call, sender: billy.address })
+  .ratify(billy.address, call)
   .signed(signature({ sender: billy }))
   .sent()
   .dbgStatus("Final approval:")

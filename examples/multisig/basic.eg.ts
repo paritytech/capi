@@ -49,7 +49,7 @@ const call = Balances.transferKeepAlive({
 
 // Propose the call.
 await multisig
-  .ratify({ call, sender: alexa.address })
+  .ratify(alexa.address, call)
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Proposal:")
@@ -61,15 +61,6 @@ const isProposed = await multisig.isProposed(call.callHash).run()
 console.log("Is proposed:", isProposed)
 assert(isProposed)
 
-// Approve proposal as Billy.
-await multisig // TODO: get `ratify` working in place of `approve`
-  .approve({ callHash: call.callHash, sender: billy.address })
-  .signed(signature({ sender: billy }))
-  .sent()
-  .dbgStatus("First approval:")
-  .finalized()
-  .run()
-
 const { approvals } = await multisig
   .proposal(call.callHash)
   .unhandle(undefined)
@@ -79,10 +70,10 @@ const { approvals } = await multisig
 console.log("Approvals:", approvals)
 $.assert($.array($.sizedUint8Array(32)), approvals)
 
-// Approve the proposal as Carol (final approval).
+// Approve proposal as Billy.
 await multisig
-  .ratify({ call, sender: carol.address })
-  .signed(signature({ sender: carol }))
+  .ratify(billy.address, call)
+  .signed(signature({ sender: billy }))
   .sent()
   .dbgStatus("Final approval:")
   .finalized()
