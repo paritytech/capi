@@ -11,7 +11,7 @@ import * as Rococo from "@capi/rococo-dev-xcm"
 import * as Statemine from "@capi/rococo-dev-xcm/statemine"
 import * as Trappist from "@capi/rococo-dev-xcm/trappist"
 import { assert, assertNotEquals } from "asserts"
-import { $, alice as root, createDevUsers, Rune } from "capi"
+import { $, alice as root, createDevUsers, Rune, ValueRune } from "capi"
 import { $siblId } from "capi/patterns/para_id.ts"
 import { signature } from "capi/patterns/signature/statemint.ts"
 import { retry } from "../../deps/std/async.ts"
@@ -110,6 +110,12 @@ await Trappist.Sudo
   .finalized()
   .run()
 
+// TODO: delete in codegen rework
+const assetsPalletId = Statemine.chain
+  .pallet("Assets")
+  .into(ValueRune)
+  .access("id")
+
 /// Register Trappist parachain asset id to reserve asset id.
 await Trappist.Sudo
   .sudo({
@@ -119,7 +125,7 @@ await Trappist.Sudo
         parents: 1,
         interior: Trappist.Junctions.X3(
           Trappist.XcmV1Junction.Parachain(RESERVE_CHAIN_ID),
-          Trappist.XcmV1Junction.PalletInstance((await Statemine.Assets.pallet.run()).id),
+          Trappist.XcmV1Junction.PalletInstance(assetsPalletId),
           Trappist.XcmV1Junction.GeneralIndex(BigInt(RESERVE_ASSET_ID)),
         ),
       }),
@@ -167,7 +173,7 @@ await Trappist.Sudo
         id: AssetId.Concrete(Statemine.XcmV1MultiLocation({
           parents: 0,
           interior: Junctions.X2(
-            XcmV1Junction.PalletInstance((await Statemine.Assets.pallet.run()).id),
+            XcmV1Junction.PalletInstance(assetsPalletId),
             XcmV1Junction.GeneralIndex(BigInt(RESERVE_ASSET_ID)),
           ),
         })),
