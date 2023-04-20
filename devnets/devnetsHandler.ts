@@ -3,7 +3,7 @@ import { $ } from "../mod.ts"
 import * as f from "../server/factories.ts"
 import { PermanentMemo } from "../util/memo.ts"
 import { CapiConfig } from "./CapiConfig.ts"
-import { devUserPublicKeys } from "./devUsers.ts"
+import { devUserPublicKeys } from "./dev_users.ts"
 import { proxyWebSocket } from "./proxyWebSocket.ts"
 import { Network, startNetwork } from "./startNetwork.ts"
 

@@ -10,7 +10,7 @@ import {
   GenesisConfig,
   getGenesisConfig,
 } from "./chainSpec.ts"
-import { addDevUsers } from "./devUsers.ts"
+import { addDevUsers } from "./dev_users.ts"
 
 export interface Network {
   relay: NetworkChain
