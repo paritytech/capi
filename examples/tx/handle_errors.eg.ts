@@ -12,7 +12,7 @@ import { signature } from "capi/patterns/signature/polkadot.ts"
 
 const { alexa, billy } = await createDevUsers()
 
-// The following should reject with an `ExtrinsicError`.
+/// The following should reject with an `ExtrinsicError`.
 const extrinsicError = await Balances
   .transfer({
     value: 1_000_000_000_000_000_000_000_000_000_000_000_000n,
@@ -26,6 +26,6 @@ const extrinsicError = await Balances
   .rehandle(ExtrinsicError)
   .run()
 
-// Ensure `extrinsicError` is in fact an instance of `ExtrinsicError`
+/// Ensure `extrinsicError` is in fact an instance of `ExtrinsicError`
 console.log("The unhandled extrinsic error:", extrinsicError)
 assertInstanceOf(extrinsicError, ExtrinsicError)

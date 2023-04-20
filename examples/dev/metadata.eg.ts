@@ -12,7 +12,7 @@
 
 import { chain } from "@capi/polkadot-dev"
 
-// Execute the metadata Rune.
+/// Execute the metadata Rune.
 const metadata = await chain.metadata.run()
 
 console.log("Metadata:", metadata)

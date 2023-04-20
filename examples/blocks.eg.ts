@@ -10,25 +10,25 @@ import { $eventRecord, chain, metadata } from "@capi/polkadot"
 import { $, $extrinsic, known, Rune } from "capi"
 import { babeBlockAuthor } from "capi/patterns/consensus/mod.ts"
 
-// Reference the latest block hash.
+/// Reference the latest block hash.
 const blockHash = chain.blockHash()
 
-// Reference the associated block.
+/// Reference the associated block.
 const block = blockHash.block()
 
-// Reference the associated extrinsics...
+/// Reference the associated extrinsics...
 const extrinsics = block.extrinsics()
 
-// ... and raw extrinsics (hex-scale-encoded strings) ...
+/// ... and raw extrinsics (hex-scale-encoded strings) ...
 const extrinsicsRaw = block.extrinsicsRaw()
 
-// ... and events.
+/// ... and events.
 const events = block.events()
 
-// Reference the author as well.
+/// Reference the author as well.
 const author = babeBlockAuthor(chain, blockHash)
 
-// Use `Rune.object` to parallelize these retrievals.
+/// Use `Rune.object` to parallelize these retrievals.
 const collection = await Rune
   .object({
     blockHash,
@@ -40,7 +40,7 @@ const collection = await Rune
   })
   .run()
 
-// Ensure that collection contains the expected shape of data.
+/// Ensure that collection contains the expected shape of data.
 console.log("Collection:", collection)
 $.assert(
   $.object(

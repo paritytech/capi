@@ -14,7 +14,7 @@ const { alexa } = await createDevUsers()
 
 const index = 254
 
-// Claim the index.
+/// Claim the index.
 const hash = await Indices
   .claim({ index })
   .signed(signature({ sender: alexa }))
@@ -23,13 +23,13 @@ const hash = await Indices
   .finalized()
   .run()
 
-// Use the index to key into the indices accounts map.
+/// Use the index to key into the indices accounts map.
 const mapped = await Indices.Accounts
   .value(index, hash)
   .unhandle(undefined)
   .access(0)
   .run()
 
-// The retrieved mapped account id should be Alexa's.
+/// The retrieved mapped account id should be Alexa's.
 console.log(`Index ${index} Mapped to:`, mapped)
 assertEquals(mapped, alexa.publicKey)

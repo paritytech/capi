@@ -7,8 +7,9 @@
 import { Timestamp } from "@capi/polkadot"
 import { $ } from "capi"
 
+/// Retrieve the chain's current recorded time.
 const now = await Timestamp.Now.value().run()
-console.log("Now:", now)
 
-// Ensure `now` is of the correct shape.
+/// Ensure `now` is of the correct shape.
+console.log("Now:", now)
 $.assert($.u64, now)

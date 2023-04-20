@@ -11,7 +11,7 @@ import { signature } from "capi/patterns/signature/polkadot.ts"
 
 const { alexa, billy } = await createDevUsers()
 
-// Create and sign the extrinsic. Extract the hex.
+/// Create and sign the extrinsic. Extract the hex.
 const hex = await Balances
   .transfer({
     value: 12345n,
@@ -21,11 +21,11 @@ const hex = await Balances
   .hex()
   .run()
 
-// Save `hex` however you'd like (potentially sending to a relayer service,
-// writing to disk, etc.).
+/// Save `hex` however you'd like (potentially sending to a relayer service,
+/// writing to disk, etc.).
 save(hex)
 
-// Hydrate the signed extrinsic, submit it and await finalization.
+/// Hydrate the signed extrinsic, submit it and await finalization.
 const hash = await SignedExtrinsicRune
   .fromHex(chain, hex)
   .sent()
@@ -33,7 +33,7 @@ const hash = await SignedExtrinsicRune
   .finalized()
   .run()
 
-// Ensure the extrinsic has been finalized.
+/// Ensure the extrinsic has been finalized.
 $.assert($.str, hash)
 
 // hide-start

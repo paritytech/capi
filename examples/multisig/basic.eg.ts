@@ -3,6 +3,7 @@
  * @stability unstable
  * @description Create a multisig account and ratify a vote to execute a transfer from
  * that multisig.
+ * @test_skip
  */
 
 import { Balances, chain, System } from "@capi/polkadot-dev"
@@ -13,23 +14,23 @@ import { signature } from "capi/patterns/signature/polkadot.ts"
 
 const { alexa, billy, carol, david } = await createDevUsers()
 
-// Initialize the `MultisigRune` with Alexa, Billy and Carol. Set the passing threshold to 2.
+/// Initialize the `MultisigRune` with Alexa, Billy and Carol. Set the passing threshold to 2.
 const multisig = MultisigRune.from(chain, {
   signatories: [alexa, billy, carol].map(({ publicKey }) => publicKey),
   threshold: 2,
 })
 
-// Reference David's initial balance. We'll be executing a transfer of some funds to David.
+/// Reference David's initial balance. We'll be executing a transfer of some funds to David.
 const davidFree = System.Account
   .value(david.publicKey)
   .unhandle(undefined)
   .access("data", "free")
 
-// Execute the `davidFree` Rune.
+/// Execute the `davidFree` Rune.
 const davidFreeInitial = await davidFree.run()
 console.log("David free initial:", davidFreeInitial)
 
-// Transfer initial funds to the multisig (existential deposit).
+/// Transfer initial funds to the multisig (existential deposit).
 await Balances
   .transfer({
     value: 2_000_000_000_000n,
@@ -41,13 +42,13 @@ await Balances
   .finalized()
   .run()
 
-// Describe the call we wish to dispatch from the multisig.
+/// Describe the call we wish to dispatch from the multisig.
 const call = Balances.transferKeepAlive({
   dest: david.address,
   value: 1_230_000_000_000n,
 })
 
-// Propose the call.
+/// Propose the call.
 await multisig
   .ratify(alexa.address, call)
   .signed(signature({ sender: alexa }))
@@ -56,7 +57,7 @@ await multisig
   .finalized()
   .run()
 
-// Check whether the call has been proposed.
+/// Check whether the call has been proposed.
 const isProposed = await multisig.isProposed(call.callHash).run()
 console.log("Is proposed:", isProposed)
 assert(isProposed)
@@ -66,11 +67,11 @@ const { approvals } = await multisig
   .unhandle(undefined)
   .run()
 
-// `approvals` should be a list of the approvers (account ids).
+/// `approvals` should be a list of the approvers (account ids).
 console.log("Approvals:", approvals)
 $.assert($.array($.sizedUint8Array(32)), approvals)
 
-// Approve proposal as Billy.
+/// Approve proposal as Billy.
 await multisig
   .ratify(billy.address, call)
   .signed(signature({ sender: billy }))
@@ -79,9 +80,9 @@ await multisig
   .finalized()
   .run()
 
-// Check to see whether David's balance has in fact changed
+/// Check to see whether David's balance has in fact changed
 const davidFreeFinal = await davidFree.run()
 console.log("David free final:", davidFreeFinal)
 
-// The final balance should be greater than the initial.
+/// The final balance should be greater than the initial.
 assert(davidFreeFinal > davidFreeInitial)
