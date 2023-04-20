@@ -38,6 +38,7 @@ inherents
 instanceof
 instantiator
 kiera
+libp
 lparachain
 ltex
 lxkf
