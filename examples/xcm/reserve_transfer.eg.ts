@@ -141,7 +141,7 @@ await trappist.Sudo
         parents: 1,
         interior: Junctions.X3(
           XcmV1Junction.Parachain(RESERVE_CHAIN_ID),
-          XcmV1Junction.PalletInstance((await statemine.Assets.pallet.run()).id),
+          XcmV1Junction.PalletInstance(await statemine.Assets.into(ValueRune).access("id").run()),
           XcmV1Junction.GeneralIndex(BigInt(RESERVE_ASSET_ID)),
         ),
       }),

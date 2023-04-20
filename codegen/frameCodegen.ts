@@ -50,40 +50,43 @@ export function frameCodegen(
     if (call) {
       const factory = typeCodegen.typeNames.get(call)!
       new $.CodecVisitor<void>()
-        .add($.taggedUnion, (_codec, _tagKey: string, variantsRaw) => {
-          ;(Array.isArray(variantsRaw) ? variantsRaw : Object.values(variantsRaw)).forEach(
-            (variant) => {
-              palletDeclarationStatements.push(`${variant.tag}: <X>(
-                props: C.RunicArgs<X, Omit<${factory}.${variant.tag}, "type">>
-              ) => C.ExtrinsicRune<${chainIdent}, C.RunicArgs.U<X>>`)
-              palletStatements.push(extrinsicFactory(variant.tag))
-            },
-          )
-        })
-        .add($.literalUnion<unknown>, (_, values) => {
-          return Object
-            .values(values)
-            .forEach((value) => {
-              if (typeof value !== "string") {
-                throw new Error("pallet call non-string literalUnion is unsupported")
-              }
-              palletDeclarationStatements.push(
-                `${value}: () => C.ExtrinsicRune<${chainIdent}, never>`,
-              )
-              palletStatements.push(extrinsicFactory(value))
-            })
-        })
+        .add(
+          $.taggedUnion,
+          (_codec, _tagKey: string, variantsRaw) =>
+            (Array.isArray(variantsRaw) ? variantsRaw : Object.values(variantsRaw)).forEach(
+              (variant) => {
+                palletDeclarationStatements.push(
+                  `
+                    ${variant.tag}: <X>(
+                      props: C.RunicArgs<X, Omit<${factory}.${variant.tag}, "type">>
+                    ) => C.ExtrinsicRune<${chainIdent}, C.RunicArgs.U<X>>
+                  `,
+                )
+                palletStatements.push(extrinsicFactory(variant.tag))
+              },
+            ),
+        )
+        .add($.literalUnion<unknown>, (_, values) =>
+          Object.values(values).forEach((value) => {
+            if (typeof value !== "string") {
+              throw new Error("pallet call non-string literalUnion is unsupported")
+            }
+            palletDeclarationStatements.push(
+              `${value}: () => C.ExtrinsicRune<${chainIdent}, never>`,
+            )
+            palletStatements.push(extrinsicFactory(value))
+          }))
         .add($.never, () => {})
         .visit(call)
 
       // deno-lint-ignore no-inner-declarations
       function extrinsicFactory(methodIdent: string) {
-        return `${methodIdent} = (...args) => {
-          return chain.extrinsic(C.Rune.object({
+        return `
+          ${methodIdent} = (...args) => chain.extrinsic(C.Rune.object({
             type: "${pallet.name}",
             value: ${factory}.${methodIdent}(...args),
           }))
-        }`
+        `
       }
     }
 
