@@ -132,7 +132,9 @@ await trappist.Sudo
   .finalized()
   .run()
 
-/// Register Trappist parachain asset id to reserve asset id.
+const assetsPalletId = statemine.Assets.into(ValueRune).access("id")
+
+// Register Trappist parachain asset id to reserve asset id.
 await trappist.Sudo
   .sudo({
     call: trappist.AssetRegistry.registerReserveAsset({
@@ -141,7 +143,7 @@ await trappist.Sudo
         parents: 1,
         interior: Junctions.X3(
           XcmV1Junction.Parachain(RESERVE_CHAIN_ID),
-          XcmV1Junction.PalletInstance(await statemine.Assets.into(ValueRune).access("id").run()),
+          XcmV1Junction.PalletInstance(assetsPalletId),
           XcmV1Junction.GeneralIndex(BigInt(RESERVE_ASSET_ID)),
         ),
       }),
@@ -175,7 +177,7 @@ const events = await statemine.PolkadotXcm
       id: AssetId.Concrete(XcmV1MultiLocation({
         parents: 0,
         interior: Junctions.X2(
-          XcmV1Junction.PalletInstance((await statemine.Assets.pallet.run()).id),
+          XcmV1Junction.PalletInstance(assetsPalletId),
           XcmV1Junction.GeneralIndex(BigInt(RESERVE_ASSET_ID)),
         ),
       })),
