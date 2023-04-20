@@ -16,6 +16,25 @@ export function frameCodegen(
   const typeCodegen = new TypeCodegen(codecCodegen, metadata.types)
   typeCodegen.write(files)
 
+  files.set("mod.d.ts", MOD)
+  files.set("mod.js", MOD)
+
+  files.set(
+    "metadata.d.ts",
+    `
+      ${IMPORTS_COMMON}
+      export const metadata: metadata
+      export type metadata = ${typeCodegen.print(metadata)}
+    `,
+  )
+  files.set(
+    "metadata.js",
+    `
+      ${IMPORTS_COMMON}
+      export const metadata = ${codecCodegen.print(metadata)}
+    `,
+  )
+
   const chainMemberDeclarations: string[] = []
   const chainMembers: string[] = []
   const palletDeclarations: string[] = []
@@ -103,17 +122,28 @@ export function frameCodegen(
   }
 
   files.set(
+    "pallets.d.ts",
+    `
+      ${IMPORTS_COMMON}
+      ${palletDeclarations.join("\n")}
+    `,
+  )
+  files.set(
+    "pallets.js",
+    `
+      ${IMPORTS_COMMON}
+      ${palletDefinitions.join("\n")}
+    `,
+  )
+
+  files.set(
     "mod.d.ts",
     `
-      import * as _codecs from "./codecs.js"
-      import * as C from "./capi.js"
-      import * as t from "./types.js"
+      ${IMPORTS_COMMON}
+      import { metadata } from "./metadata.js"
 
       export * from "./connection.js"
       export * from "./types.js"
-
-      export const metadata: metadata
-      export type metadata = ${typeCodegen.print(metadata)}
 
       export interface ${chainIdent} extends C.Chain<metadata> {}
 
@@ -132,15 +162,12 @@ export function frameCodegen(
   files.set(
     "mod.js",
     `
-      import * as _codecs from "./codecs.js"
+      ${IMPORTS_COMMON}
       import { connect } from "./connection.js"
-      import * as C from "./capi.js"
-      import * as t from "./types.js"
+      import { metadata } from "./metadata.js"
 
       export * from "./connection.js"
       export * from "./types.js"
-
-      export const metadata = ${codecCodegen.print(metadata)}
 
       export class ${chainIdent}ChainRune extends C.ChainRune {
         static from(connect) {
@@ -156,3 +183,17 @@ export function frameCodegen(
     `,
   )
 }
+
+const MOD = `
+  export * from "./chain.js"
+  export * from "./connection.js"
+  export * from "./metadata.js"
+  export * from "./pallets.js"
+  export * from "./types.js"
+`
+
+const IMPORTS_COMMON = `
+  import * as _codecs from "./codecs.js"
+  import * as C from "./capi.js"
+  import * as t from "./types.js"
+`
