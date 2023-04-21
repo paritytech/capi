@@ -101,7 +101,7 @@ export function frameCodegen(
       // deno-lint-ignore no-inner-declarations
       function extrinsicFactory(methodIdent: string) {
         return `
-          ${methodIdent} = (...args) => this.extrinsic(C.Rune.object({
+          ${methodIdent} = (...args) => this.chain.extrinsic(C.Rune.object({
             type: "${pallet.name}",
             value: ${factory}.${methodIdent}(...args),
           }))
