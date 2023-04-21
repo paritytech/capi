@@ -73,16 +73,15 @@ export const config: CapiConfig = {
 }
 ```
 
-### Generate Chain-specific APIs
+## Codegen Chain-specific APIs
 
-**Node.JS** users can run the following command to install the chain-specific
-APIs.
+### [Node.js](https://nodejs.org/)
 
 ```sh
 ./node_modules/.bin/capi sync --package-json package.json
 ```
 
-**Deno** users can do the following.
+### [Deno](https://deno.land/)
 
 ```sh
 deno run -A https://deno.land/x/capi sync --import-map import_map.json
