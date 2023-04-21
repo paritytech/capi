@@ -119,8 +119,8 @@ Let's modify the usage above to target our configured devnet.
 + import { chain } from "@capi/polkadot-dev"
 ```
 
-To run code that depends on a Capi devnet, use the `serve` command, followed by
-a `--` and your devnet-using command. In this case, we'll run the script
+To run code that depends on a devnet, use the `serve` command, followed by a
+"--" and your devnet-using command. In this case, we'll run the script
 (`main.js`) with Node.JS.
 
 ```sh
