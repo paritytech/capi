@@ -127,24 +127,21 @@ export class CodecCodegen {
     )
   }
 
-  codecsFile() {
-    return
-  }
-
   write(files: Map<string, string>) {
+    const codecDefinitionStatements = [...this.codecIds.entries()]
+      .filter((x) => x[1] != null)
+      .map(([codec, id]) => {
+        const printed = this.print(codec, true).replace(/\b_codecs\.\$(\d+)\b/g, (_, i) => `$${i}`)
+        return `export const $${id} = ${printed}`
+      })
+      .join("\n\n")
     files.set(
       "codecs.js",
       `
-import * as C from "./capi.js"
+        import * as C from "./capi.js"
 
-${
-        [...this.codecIds.entries()].filter((x) => x[1] != null).map(([codec, id]) =>
-          `export const $${id} = ${
-            this.print(codec, true).replace(/\b_codecs\.\$(\d+)\b/g, (_, i) => `$${i}`)
-          }`
-        ).join("\n\n")
-      }
-        `,
+        ${codecDefinitionStatements}
+      `,
     )
   }
 }
