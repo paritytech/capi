@@ -127,9 +127,11 @@ To run this same example against the Polkadot development network, use the
 `serve` command, followed by a `--` and your devnet-using command.
 
 ```sh
-capi serve -- <your-command-here>
+capi serve -- <your-command>
 ```
 
+> Some examples:
+>
 > - `capi serve -- npm run start`
 > - `capi serve -- node ./main.js`
 > - `capi serve -- deno run -A ./main.ts`
