@@ -27,7 +27,7 @@ npm i capi
 ```json
 {
   "imports": {
-    "capi": "https://deno.land/x/capi"
+    "capi": "https://deno.land/x/capi/mod.ts"
   }
 }
 ```
