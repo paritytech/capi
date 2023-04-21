@@ -129,41 +129,51 @@ export ${isTypes ? `namespace ${name}` : `const ${name} =`} {
           populate = "...C.RunicArgs.resolve(value)"
         }
         if (isTypes) {
+          const typeSrc = this.nativeVisitor.visit($.taggedUnion(tagKey, [variant]))
           return `
-export type ${variant.tag} = ${this.nativeVisitor.visit($.taggedUnion(tagKey, [variant]))}
-export function ${variant.tag}<X>(${params}): C.ValueRune<${name}.${variant.tag}, C.RunicArgs.U<X>>
-export function is${variant.tag}(value: ${name}): value is ${name}.${variant.tag}
-        `
+            export type ${variant.tag} = ${typeSrc}
+            export function ${variant.tag}<X>(${params}): C.ValueRune<${name}.${variant.tag}, C.RunicArgs.U<X>>
+            export function is${variant.tag}(value: ${name}): value is ${name}.${variant.tag}
+          `
         } else {
           return `
-${variant.tag}(${params.split(":")[0]}) {
-  return C.Rune.object({ ${stringifyKey(tagKey)}: ${JSON.stringify(variant.tag)}, ${populate} })
-},
-is${variant.tag}(value) {
-  return value${stringifyPropertyAccess(tagKey)} === ${JSON.stringify(variant.tag)}
-},
+            ${variant.tag}(${params.split(":")[0]}) {
+              return C.Rune.object({
+                ${tagKey}: "${variant.tag}",
+                ${populate}
+              })
+            },
+            is${variant.tag}(value) {
+              return value${stringifyPropertyAccess(tagKey)} === "${variant.tag}"
+            },
           `
         }
       }).join("\n")
     }
 }
 `)
-    .add($.object, (_codec) => (name, isTypes) => `
-${
+    .add($.object, (_codec) => (name, isTypes) =>
       isTypes
-        ? `export type ${name} = ${this.nativeVisitor.visit(_codec)}
-export function ${name}<X>(fields: C.RunicArgs<X, ${name}>): C.ValueRune<${name}, C.RunicArgs.U<X>>`
-        : `export function ${name}(fields) {
-  return C.Rune.object(fields)
-}`
-    }`)
+        ? `
+            export type ${name} = ${this.nativeVisitor.visit(_codec)}
+            export function ${name}<X>(fields: C.RunicArgs<X, ${name}>): C.ValueRune<${name}, C.RunicArgs.U<X>>
+          `
+        : `
+            export function ${name}(fields) {
+              return C.Rune.object(fields)
+            }
+          `)
     .add($.tuple, (_codec, ..._element) => (name, isTypes) =>
       isTypes
-        ? `export type ${name} = ${this.nativeVisitor.visit(_codec)}
-export function ${name}<X>(...elements: C.RunicArgs<X, ${name}>): C.ValueRune<${name}, C.RunicArgs.U<X>>`
-        : `export function ${name}(...elements) {
-  return C.Rune.tuple(elements)
-}`)
+        ? `
+            export type ${name} = ${this.nativeVisitor.visit(_codec)}
+            export function ${name}<X>(...elements: C.RunicArgs<X, ${name}>): C.ValueRune<${name}, C.RunicArgs.U<X>>
+          `
+        : `
+            export function ${name}(...elements) {
+              return C.Rune.tuple(elements)
+            }
+          `)
     .fallback((codec) => (name, isTypes) =>
       isTypes ? `export type ${name} = ${this.nativeVisitor.visit(codec)}` : ""
     )
@@ -206,36 +216,34 @@ export function ${name}<X>(...elements: C.RunicArgs<X, ${name}>): C.ValueRune<${
   write(files: Map<string, string>) {
     for (const isTypes of [false, true]) {
       const ext = isTypes ? "d.ts" : "js"
+      const statements = Object.entries(this.types).map(([name, codec]) => {
+        const trailing = isTypes ? `: C.$.Codec<${name}>` : `= ${this.codecCodegen.print(codec)}`
+        return `
+          export const $${name.replace(/^./, (x) => x.toLowerCase())}${trailing}
+          ${this.declVisitor.visit(codec)(name, isTypes)}
+        `
+      }).join("\n")
       files.set(
         `types.${ext}`,
         `
-import * as C from "./capi.js"
-import * as _codecs from "./codecs.js"
-import * as t from "./types.js"
+          import * as C from "./capi.js"
+          import * as _codecs from "./codecs.js"
+          import * as t from "./types.js"
 
-${
-          Object.entries(this.types).map(([name, codec]) => `
-export const $${name.replace(/^./, (x) => x.toLowerCase())}${
-            isTypes ? `: C.$.Codec<${name}>` : `= ${this.codecCodegen.print(codec)}`
-          }
-${this.declVisitor.visit(codec)(name, isTypes)}
-`).join("\n")
-        }
-
-`,
+          ${statements}
+        `,
       )
     }
+    const codecDeclarations = [...this.codecCodegen.codecIds.entries()].filter((x) => x[1] != null)
+      .map(([codec, id]) => `export const $${id}: ${this.print(codec)}`)
     files.set(
       "codecs.d.ts",
       `
-import * as C from "./capi.js"
-import * as t from "./types.js"
+        import * as C from "./capi.js"
+        import * as t from "./types.js"
 
-${
-        [...this.codecCodegen.codecIds.entries()].filter((x) => x[1] != null).map(([codec, id]) => `
-export const $${id}: ${this.print(codec)}
-`).join("")
-      }`,
+        ${codecDeclarations.join("\n")}
+      `,
     )
   }
 }

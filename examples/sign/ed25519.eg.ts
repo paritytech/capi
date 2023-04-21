@@ -4,7 +4,7 @@
  * @description Utilize an Ed25519 library for signing.
  */
 
-import { Balances, MultiAddress, System } from "@capi/westend-dev"
+import { chain, MultiAddress } from "@capi/westend-dev"
 import { assert } from "asserts"
 import { createDevUsers, ExtrinsicSender } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
@@ -12,7 +12,8 @@ import * as ed from "../../deps/ed25519.ts"
 
 const { alexa, billy } = await createDevUsers()
 
-const billyFree = System.Account
+/// Reference Billy's free balance for later use.
+const billyFree = chain.System.Account
   .value(billy.publicKey)
   .unhandle(undefined)
   .access("data", "free")
@@ -35,7 +36,7 @@ async function sign(msg: Uint8Array) {
 }
 
 /// Transfer some funds to the derived address (existential deposit).
-await Balances
+await chain.Balances
   .transfer({
     value: 1_000_000_000_000n,
     dest: address,
@@ -48,7 +49,7 @@ await Balances
 
 /// Execute a transfer from the derived user to Billy. We utilize our
 /// derived ed25519 `sign` function for this.
-await Balances
+await chain.Balances
   .transfer({
     value: 12345n,
     dest: billy.address,

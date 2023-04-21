@@ -6,15 +6,15 @@
  * (the corresponding parachain heads).
  */
 
-import { Paras } from "@capi/polkadot"
+import { chain } from "@capi/polkadot"
 import { $, ArrayRune, ValueRune } from "capi"
 
 /// Retrieve the head for each id in the parachains storage.
-const heads = await Paras.Parachains
+const heads = await chain.Paras.Parachains
   .value()
   .unhandle(undefined)
   .into(ArrayRune)
-  .mapArray((id) => Paras.Heads.value(id).unhandle(undefined))
+  .mapArray((id) => chain.Paras.Heads.value(id).unhandle(undefined))
   .into(ValueRune)
   .rehandle(undefined)
   .run()

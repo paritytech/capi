@@ -4,7 +4,7 @@
  * @description Sign and submit multiple calls within a single extrinsic.
  */
 
-import { Balances, System, Utility } from "@capi/westend-dev"
+import { chain } from "@capi/westend-dev"
 import { assert } from "asserts"
 import { createDevUsers, Rune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
@@ -16,7 +16,7 @@ const [sender, ...recipients] = await createDevUsers(4)
 /// Reference the three recipient user free balances as a single Rune.
 const frees = Rune.tuple(
   recipients.map(({ publicKey }) =>
-    System.Account.value(publicKey).unhandle(undefined).access("data", "free")
+    chain.System.Account.value(publicKey).unhandle(undefined).access("data", "free")
   ),
 )
 
@@ -26,10 +26,10 @@ console.log("Initial frees:", initialFrees)
 
 /// Create and submit the batch call. Not how we must utilize `Rune.tuple` in
 /// order to convert the `Rune<RuntimeCall>[]` into a `Rune<RuntimeCall[]>`.
-await Utility
+await chain.Utility
   .batch({
     calls: Rune.tuple(recipients.map(({ address }) =>
-      Balances.transfer({
+      chain.Balances.transfer({
         dest: address,
         value: 3_000_000_123_456_789n,
       })

@@ -1,5 +1,5 @@
 import { mime } from "https://deno.land/x/mimetypes@v1.0.0/mod.ts"
-import { FrameCodegen } from "../codegen/FrameCodegen.ts"
+import { frameCodegen } from "../codegen/frameCodegen.ts"
 import { blake2_512, blake2_64 } from "../crypto/hashers.ts"
 import { hex } from "../crypto/mod.ts"
 import { Tar } from "../deps/std/archive.ts"
@@ -132,9 +132,8 @@ export function createCodegenHandler(dataCache: CacheBase, tempCache: CacheBase)
         }),
       )
 
-      const codegen = new FrameCodegen(metadata, entry.chainName)
       const files = new Map<string, string>()
-      codegen.write(files)
+      frameCodegen(metadata, entry.chainName, files)
       const capiCode = `export * from "${relative(`${hash}/${key}/`, "capi/mod.ts")}"`
       files.set("capi.js", capiCode)
       files.set("capi.d.ts", capiCode)

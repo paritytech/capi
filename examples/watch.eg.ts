@@ -6,14 +6,15 @@
  * produce promises resolving to subsequent states.
  */
 
-import { chain, Timestamp } from "@capi/polkadot"
+import { chain } from "@capi/polkadot"
 import { $ } from "capi"
 
 /// Specifying `chain.latestBlockHash` indicates that (A) this Rune tree
 /// can be treated as reactive and (B) is a dependent of a "timeline" associated
 /// with Polkadot's block production.
-const now = Timestamp.Now.value(undefined, chain.latestBlockHash)
+const now = chain.Timestamp.Now.value(undefined, chain.latestBlockHash)
 
+/// Create a simple counter so that we can break iteration at 3.
 let i = 0
 
 /// Use the `watch` method to retrieve an async iterable, which will

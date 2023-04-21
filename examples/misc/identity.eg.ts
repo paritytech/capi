@@ -6,7 +6,7 @@
  * @description Set a user's identity, potentially with metadata of arbitrary user-defined shape.
  */
 
-import { Identity } from "@capi/polkadot-dev"
+import { chain } from "@capi/polkadot-dev"
 import { $, createDevUsers } from "capi"
 import { IdentityInfoTranscoders } from "capi/patterns/identity.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
@@ -18,7 +18,7 @@ const transcoders = new IdentityInfoTranscoders({ stars: $.u8 })
 
 /// Encode some identity info into the expected shape and use it
 /// to execute the identity-setting transaction.
-await Identity
+await chain.Identity
   .setIdentity({
     info: transcoders.encode({
       display: "Chev Chelios",
@@ -32,7 +32,7 @@ await Identity
   .run()
 
 /// Retrieve and decode the identity info.
-const infoDecoded = await Identity.IdentityOf
+const infoDecoded = await chain.Identity.IdentityOf
   .value(alexa.publicKey)
   .unhandle(undefined)
   .access("info")

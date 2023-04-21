@@ -4,7 +4,7 @@
  * @description Transfer some funds from one user to another.
  */
 
-import { Balances, System } from "@capi/westend-dev"
+import { chain } from "@capi/westend-dev"
 import { assert } from "asserts"
 import { createDevUsers } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
@@ -13,7 +13,7 @@ import { signature } from "capi/patterns/signature/polkadot.ts"
 const { alexa, billy } = await createDevUsers()
 
 /// Reference Billy's free balance.
-const billyFree = System.Account
+const billyFree = chain.System.Account
   .value(billy.publicKey)
   .unhandle(undefined)
   .access("data", "free")
@@ -22,8 +22,8 @@ const billyFree = System.Account
 const initialFree = await billyFree.run()
 console.log("Billy free initial:", initialFree)
 
-/// Create and submit the transaction.
-await Balances
+// Create and submit the transaction.
+await chain.Balances
   .transfer({
     value: 12345n,
     dest: billy.address,

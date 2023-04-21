@@ -7,18 +7,20 @@
  */
 
 import {
+  chain,
   CollectionConfig,
   MintSettings,
   MintType,
-  Nfts,
   PalletNftsEvent,
   RuntimeEvent,
-  Utility,
 } from "@capi/rococo-westmint/westmint"
 import { assertEquals } from "asserts"
 import { $, createDevUsers, Rune } from "capi"
 import { DefaultCollectionSetting, DefaultItemSetting } from "capi/patterns/nfts.ts"
 import { signature } from "capi/patterns/signature/statemint.ts"
+
+/// Destructure the pallet bindings for later use.
+const { Nfts } = chain
 
 /// Create two dev users. Alexa will mint and list the NFT. Billy will purchase it.
 const { alexa, billy } = await createDevUsers()
@@ -89,7 +91,7 @@ assertEquals(initialOwner, alexa.publicKey)
 /// 2. Prevent further minting.
 /// 3. Lock the collection to prevent changes.
 const price = 1000000n
-await Utility
+await chain.Utility
   .batchAll({
     calls: Rune.array([
       Nfts.setPrice({ collection, item, price }),
