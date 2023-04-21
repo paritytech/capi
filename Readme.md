@@ -53,8 +53,7 @@ export const config: CapiConfig = {
 }
 ```
 
-Let's also prepare our config with an ephemeral Polkadot-like development
-network.
+Let's also configure an ephemeral Polkadot development network.
 
 ```diff
 - import { CapiConfig } from "capi"
