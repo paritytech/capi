@@ -130,7 +130,7 @@ To run this same example against the Polkadot development network, use the
 capi serve -- <your-command>
 ```
 
-> For examples...
+> For example...
 >
 > - `capi serve -- npm run start`
 > - `capi serve -- node ./main.js`
