@@ -12,23 +12,33 @@ interactions without compromising either performance or ease of use.
 - [API Reference &rarr;](https://deno.land/x/capi/mod.ts)<br />A generated API
   reference, based on type signatures and TSDocs.
 
-## Setup
+## Installation
 
-### Installation
+### [Node.js](https://nodejs.org/)
 
-**[Node.js](https://nodejs.org/)** users can `npm i capi`.
-**[Deno](https://deno.land)** users can depend on Capi from `deno.land/x/capi`.
+```sh
+npm i capi
+```
+
+### [Deno](https://deno.land/)
+
+`import_map.json`
+
+```json
+{
+  "imports": {
+    "capi": "https://deno.land/x/capi"
+  }
+}
+```
 
 ### Configuration
 
 Create a `capi.config.ts` and specify the chains with which you'd like to
-interact. an ephemeral Polkadot-like development network, against which we'll
-soon test.
-
-`capi.config.ts`
+interact.
 
 ```ts
-import { CapiConfig } from "./mod.ts"
+import { CapiConfig } from "capi"
 
 export const config: CapiConfig = {
   server: "https://capi.dev/",
@@ -45,8 +55,8 @@ Let's also prepare our config with an ephemeral Polkadot-like development
 network.
 
 ```diff
-- import { CapiConfig } from "./mod.ts"
-+ import { binary, CapiConfig } from "./mod.ts"
+- import { CapiConfig } from "capi"
++ import { binary, CapiConfig } from "capi"
 
 export const config: CapiConfig = {
   server: "https://capi.dev/",
