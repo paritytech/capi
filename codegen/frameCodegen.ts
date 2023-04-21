@@ -23,8 +23,7 @@ export function frameCodegen(
     "metadata.d.ts",
     `
       ${IMPORTS_COMMON}
-      export const metadata: metadata
-      export type metadata = ${typeCodegen.print(metadata)}
+      export const metadata: ${typeCodegen.print(metadata)}
     `,
   )
   files.set(
