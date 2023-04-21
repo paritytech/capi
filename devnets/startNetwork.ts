@@ -1,5 +1,5 @@
 import { hex } from "../crypto/mod.ts"
-import * as ed25519 from "../deps/npm/noble/ed25519.ts"
+import * as ed25519 from "../deps/ed25519.ts"
 import { Narrow } from "../deps/scale.ts"
 import * as base58 from "../deps/std/encoding/base58.ts"
 import * as path from "../deps/std/path.ts"
@@ -173,7 +173,15 @@ async function exportParachainGenesis(
   })) satisfies string[] as [state: string, wasm: string]
 }
 
-function generateBootnodeString(port: number, peerId: string) {
+async function generateBootnodeString(port: number, privateKey: Uint8Array) {
+  const publicKey = await ed25519.getPublicKey(privateKey)
+  // Peer IDs are derived by hashing the encoded public key with multihash.
+  // See https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#peer-ids
+  // For any 32 byte ed25519 public key the first 6 bytes are always [0, 36, 8, 1, 18, 32]
+  // PeerId = [0, 36, 8, 1, 18, 32, ...publicKey]
+  //                  -------------------------- > protobuf encoded ed25519 public key (36 bytes)
+  //           --------------------------------- > identity multihash of the protobuf encoded ed25519 public key (38 bytes)
+  const peerId = base58.encode(new Uint8Array([0, 36, 8, 1, 18, 32, ...publicKey]))
   return `/ip4/127.0.0.1/tcp/${port}/p2p/${peerId}`
 }
 
@@ -212,10 +220,9 @@ async function spawnChain(
     if (bootnodes) {
       args.push("--bootnodes", bootnodes)
     } else {
-      const nodeKey = ed25519.utils.randomPrivateKey()
-      const peerId = await getLibp2pPeerId(nodeKey)
+      const nodeKey = crypto.getRandomValues(new Uint8Array(32))
       args.push("--node-key", hex.encode(nodeKey))
-      bootnodes = generateBootnodeString(httpPort, peerId)
+      bootnodes = await generateBootnodeString(httpPort, nodeKey)
     }
     args.push(...extraArgs)
     spawnNode(nodeDir, binary, args, signal)
@@ -345,9 +352,4 @@ function addXcmHrmpChannels(
       ])
     }
   }
-}
-
-async function getLibp2pPeerId(privateKey: Uint8Array) {
-  const publicKey = await ed25519.getPublicKeyAsync(privateKey)
-  return base58.encode(new Uint8Array([0, 36, 8, 1, 18, 32, ...publicKey]))
 }
