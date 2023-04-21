@@ -14,13 +14,13 @@ interactions without compromising either performance or ease of use.
 
 ## Installation
 
-### [Node.js](https://nodejs.org/)
-
 ```sh
 npm i capi
 ```
 
-### [Deno](https://deno.land/)
+<details open>
+<summary>Deno Equivalent</summary>
+<br>
 
 `import_map.json`
 
@@ -31,6 +31,8 @@ npm i capi
   }
 }
 ```
+
+</details>
 
 ## Configuration
 
@@ -79,31 +81,35 @@ Capi's CLI can be used in both Deno and Node.JS. In the remainder of
 documentation, we'll reference the CLI via the alias `capi`, instead of via its
 full path.
 
-### [Node.js](https://nodejs.org/)
-
 ```sh
 ./node_modules/.bin/capi
 ```
 
-### [Deno](https://deno.land/)
+<details open>
+<summary>Deno Equivalent</summary>
+<br>
 
 ```sh
 deno run -A https://deno.land/x/capi/main.ts
 ```
 
-## Codegen Chain-specific APIs
+</details>
 
-### [Node.js](https://nodejs.org/)
+## Codegen Chain-specific APIs
 
 ```sh
 capi sync --package-json package.json
 ```
 
-### [Deno](https://deno.land/)
+<details open>
+<summary>Deno Equivalent</summary>
+<br>
 
 ```sh
 capi sync --import-map import_map.json
 ```
+
+</details>
 
 ## At a Glance
 
