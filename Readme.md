@@ -113,6 +113,11 @@ Let's modify the usage above to target our configured devnet.
 ```diff
 - import { Polkadot } from "@capi/polkadot"
 + import { PolkadotDev } from "@capi/polkadot-dev"
+
+- const accounts = await Polkadot.System.Account
++ const accounts = await PolkadotDev.System.Account
+    .entryPage(10, null)
+    .run()
 ```
 
 To run code that depends on a devnet, use the `serve` command, followed by a
