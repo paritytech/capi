@@ -32,7 +32,7 @@ npm i capi
 }
 ```
 
-### Configuration
+## Configuration
 
 Create a `capi.config.ts` and specify the chains with which you'd like to
 interact.
