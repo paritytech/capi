@@ -5,33 +5,77 @@
 > 2023**.
 
 Capi is a framework for crafting interactions with Substrate chains. It consists
-of a development server and fluent API, which facilitates multistep, multichain
+of a development server and fluent API, which facilitates multichain
 interactions without compromising either performance or ease of use.
 
-- [Docs &rarr;](https://docs.capi.dev)<br />Guides for Capi developers and
-  pattern library developers
 - [Examples &rarr;](./examples)<br />SHOW ME THE CODE
 - [API Reference &rarr;](https://deno.land/x/capi/mod.ts)<br />A generated API
   reference, based on type signatures and TSDocs.
 
-## Installation
+## Setup
 
-### [Node.js](https://nodejs.org/)
+### Installation
 
-```sh
-npm i capi https://capi.dev/frame/wss/rpc.polkadot.io/@latest/pkg.tar
+**[Node.js](https://nodejs.org/)** users can `npm i capi`.
+**[Deno](https://deno.land)** users can depend on Capi from `deno.land/x/capi`.
+
+### Configuration
+
+Create a `capi.config.ts` and specify the chains with which you'd like to
+interact. an ephemeral Polkadot-like development network, against which we'll
+soon test.
+
+`capi.config.ts`
+
+```ts
+import { CapiConfig } from "./mod.ts"
+
+export const config: CapiConfig = {
+  server: "https://capi.dev/",
+  chains: {
+    polkadot: {
+      url: "wss://rpc.polkadot.io/",
+      version: "v0.9.40",
+    },
+  },
+}
 ```
 
-### [Deno](https://deno.land/)
+Let's also prepare our config with an ephemeral Polkadot-like development
+network.
 
-`import_map.json`
+```diff
+- import { CapiConfig } from "./mod.ts"
++ import { binary, CapiConfig } from "./mod.ts"
 
-```json
-{
-  "imports": {
-    "@capi/polkadot": "https://capi.dev/frame/wss/rpc.polkadot.io/@latest/"
-  }
+export const config: CapiConfig = {
+  server: "https://capi.dev/",
+  chains: {
+    polkadot: {
+      url: "wss://rpc.polkadot.io/",
+      version: "v0.9.40",
+    },
++   polkadotDev: {
++     binary: binary("polkadot", "v0.9.38"),
++     chain: "polkadot-dev",
++   },
+  },
 }
+```
+
+### Generate Chain-specific APIs
+
+**Node.JS** users can run the following command to install the chain-specific
+APIs.
+
+```sh
+./node_modules/.bin/capi sync --package-json package.json
+```
+
+**Deno** users can do the following.
+
+```sh
+deno run -A https://deno.land/x/capi sync --import-map import_map.json
 ```
 
 ## At a Glance
