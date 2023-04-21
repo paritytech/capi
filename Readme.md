@@ -18,7 +18,7 @@ interactions without compromising either performance or ease of use.
 npm i capi
 ```
 
-<details >
+<details>
 <summary>Deno Equivalent</summary>
 <br>
 
@@ -39,37 +39,26 @@ npm i capi
 Create a `capi.config.ts` and specify the chains with which you'd like to
 interact.
 
+<!-- dprint-ignore -->
 ```ts
-import { CapiConfig } from "capi"
+import { binary, CapiConfig } from "capi"
 
 export const config: CapiConfig = {
   server: "https://capi.dev/",
   chains: {
+
+    // 1. the Polkadot relay chain
     polkadot: {
       url: "wss://rpc.polkadot.io/",
       version: "v0.9.40",
     },
-  },
-}
-```
 
-Let's also configure an ephemeral development network.
-
-```diff
-- import { CapiConfig } from "capi"
-+ import { binary, CapiConfig } from "capi"
-
-export const config: CapiConfig = {
-  server: "https://capi.dev/",
-  chains: {
-    polkadot: {
-      url: "wss://rpc.polkadot.io/",
-      version: "v0.9.40",
+    // 2. a development network
+    polkadotDev: {
+      binary: binary("polkadot", "v0.9.38"),
+      chain: "polkadot-dev",
     },
-+   polkadotDev: {
-+     binary: binary("polkadot", "v0.9.38"),
-+     chain: "polkadot-dev",
-+   },
+
   },
 }
 ```
@@ -99,7 +88,7 @@ deno run -A https://deno.land/x/capi/main.ts
 capi sync --package-json package.json
 ```
 
-<details >
+<details>
 <summary>Deno Equivalent</summary>
 <br>
 
@@ -123,17 +112,24 @@ const accounts = await chain.System.Account
 
 ## Development Networks
 
-To run this same example against the Polkadot development network, use the
-`serve` command, followed by a `--` and your devnet-using command.
+Let's modify the usage above to target our configured devnet.
 
-```sh
-capi serve -- <your-command>
+```diff
+- import { chain } from "@capi/polkadot"
++ import { chain } from "@capi/polkadot-dev"
 ```
 
-> For example...
+To run code that depends on a Capi devnet, use the `serve` command, followed by
+a `--` and your devnet-using command. In this case, we'll run the script
+(`main.js`) with Node.JS.
+
+```sh
+capi serve -- node main.js
+```
+
+> Other examples:
 >
 > - `capi serve -- npm run start`
-> - `capi serve -- node ./main.js`
 > - `capi serve -- deno run -A ./main.ts`
 
 ## Running Examples
