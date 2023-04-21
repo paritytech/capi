@@ -18,7 +18,7 @@ interactions without compromising either performance or ease of use.
 npm i capi
 ```
 
-<details open>
+<details >
 <summary>Deno Equivalent</summary>
 <br>
 
@@ -85,7 +85,7 @@ full path.
 ./node_modules/.bin/capi
 ```
 
-<details open>
+<details >
 <summary>Deno Equivalent</summary>
 <br>
 
@@ -101,7 +101,7 @@ deno run -A https://deno.land/x/capi/main.ts
 capi sync --package-json package.json
 ```
 
-<details open>
+<details >
 <summary>Deno Equivalent</summary>
 <br>
 
@@ -116,9 +116,11 @@ capi sync --import-map import_map.json
 Retrieve the first 10 entries from a storage map of Polkadot.
 
 ```ts
-import { System } from "@capi/polkadot"
+import { chain } from "@capi/polkadot"
 
-const accounts = await System.Account.entryPage(10, null).run()
+const accounts = await chain.System.Account
+  .entryPage(10, null)
+  .run()
 ```
 
 ## Devnets
