@@ -73,26 +73,56 @@ export const config: CapiConfig = {
 }
 ```
 
-## Codegen Chain-specific APIs
+## CLI
+
+Capi's CLI can be used in both Deno and Node.JS. In the remainder of
+documentation, we'll reference the CLI via the alias `capi`, instead of via its
+full path.
 
 ### [Node.js](https://nodejs.org/)
 
 ```sh
-./node_modules/.bin/capi sync --package-json package.json
+./node_modules/.bin/capi
 ```
 
 ### [Deno](https://deno.land/)
 
 ```sh
-deno run -A https://deno.land/x/capi sync --import-map import_map.json
+deno run -A https://deno.land/x/capi/main.ts
+```
+
+## Codegen Chain-specific APIs
+
+### [Node.js](https://nodejs.org/)
+
+```sh
+capi sync --package-json package.json
+```
+
+### [Deno](https://deno.land/)
+
+```sh
+capi sync --import-map import_map.json
 ```
 
 ## At a Glance
+
+Retrieve the first 10 entries from a storage map of Polkadot.
 
 ```ts
 import { System } from "@capi/polkadot"
 
 const accounts = await System.Account.entryPage(10, null).run()
+```
+
+## Devnets
+
+To run this same example against the Polkadot development network, use the Capi
+`serve` command, followed by a `--` and the command to run your devnet-using
+code.
+
+```sh
+capi serve -- <your-command-here>
 ```
 
 ## Running Examples
