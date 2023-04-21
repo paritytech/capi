@@ -41,7 +41,7 @@ interact.
 import { CapiConfig } from "capi"
 
 export const config: CapiConfig = {
-  server: "https://capi.dev/", // more on this later
+  server: "https://capi.dev/",
   chains: {
     polkadot: {
       url: "wss://rpc.polkadot.io/",
