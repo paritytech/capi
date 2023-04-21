@@ -14,7 +14,7 @@ import { $ } from "capi"
 /// with Polkadot's block production.
 const now = chain.Timestamp.Now.value(undefined, chain.latestBlockHash)
 
-// Create a simple counter so that we can break iteration at 3.
+/// Create a simple counter so that we can break iteration at 3.
 let i = 0
 
 /// Use the `watch` method to retrieve an async iterable, which will
