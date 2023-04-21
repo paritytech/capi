@@ -1,14 +1,28 @@
 import { Binary } from "./binary.ts"
 
-export interface WsChain {
+export interface Config {
+  server: string
+  chains?: Record<string, ChainConfig>
+}
+
+export type ChainConfig =
+  | WsChainConfig
+  | DevChainConfig
+  | RawMetadataChainConfig
+
+export interface WsChainConfig {
   url: string
   binary?: never
+  metadata?: never
+
   version: string
 }
 
-export interface NetworkConfig {
+export interface DevChainConfig {
   url?: never
   binary: Binary
+  metadata?: never
+
   chain: string
   nodes?: number
   parachains?: Record<string, {
@@ -19,7 +33,8 @@ export interface NetworkConfig {
   }>
 }
 
-export interface CapiConfig {
-  server: string
-  chains?: Record<string, WsChain | NetworkConfig>
+export interface RawMetadataChainConfig {
+  url?: never
+  binary?: never
+  metadata: Uint8Array
 }

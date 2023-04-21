@@ -2,14 +2,14 @@ import * as path from "../deps/std/path.ts"
 import { $ } from "../mod.ts"
 import * as f from "../server/factories.ts"
 import { PermanentMemo } from "../util/memo.ts"
-import { CapiConfig } from "./CapiConfig.ts"
+import { Config } from "./CapiConfig.ts"
 import { devUserPublicKeys } from "./dev_users.ts"
 import { proxyWebSocket } from "./proxyWebSocket.ts"
 import { Network, startNetwork } from "./startNetwork.ts"
 
 const rDevnetsApi = /^\/devnets\/([\w-]+)(?:\/([\w-]+))?$/
 
-export function createDevnetsHandler(tempDir: string, config: CapiConfig, signal: AbortSignal) {
+export function createDevnetsHandler(tempDir: string, config: Config, signal: AbortSignal) {
   const networkMemo = new PermanentMemo<string, Network>()
   let devUserIndex = 0
   return async (request: Request) => {

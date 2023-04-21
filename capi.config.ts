@@ -1,10 +1,10 @@
-import { binary, CapiConfig } from "./mod.ts"
+import { binary, Config } from "./mod.ts"
 
 const polkadot = binary("polkadot", "v0.9.38")
 const polkadotParachain = binary("polkadot-parachain", "v0.9.380")
 const substrateContractsNode = binary("substrate-contracts-node", "v0.24.0")
 
-export const config: CapiConfig = {
+export const config: Config = {
   server: "http://localhost:4646/",
   chains: {
     polkadot: {
@@ -73,6 +73,9 @@ export const config: CapiConfig = {
           chain: "local",
         },
       },
+    },
+    polkadotFromMetadata: {
+      metadata: await Deno.readFile("examples/raw_rpc/metadata"),
     },
   },
 }

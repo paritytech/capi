@@ -11,13 +11,12 @@
     "lineWidth": 80,
     "textWrap": "always"
   },
-  "includes": [
-    "**.{dockerfile,json,md,toml,ts,tsx}"
-  ],
+  "includes": ["**.{dockerfile,json,md,toml,ts,tsx}"],
   "excludes": [
+    "examples/ink/erc20.json",
+    "examples/raw_rpc/metadata",
     "target",
-    "util/_artifacts",
-    "examples/ink/erc20.json"
+    "util/_artifacts"
   ],
   "plugins": [
     "https://plugins.dprint.dev/dockerfile-0.3.0.wasm",
