@@ -50,7 +50,7 @@ export const config: CapiConfig = {
       url: "wss://rpc.polkadot.io/",
       version: "v0.9.40",
     },
-    // 2. a development network
+    // 2. a Polkadot development network
     polkadotDev: {
       binary: binary("polkadot", "v0.9.38"),
       chain: "polkadot-dev",
