@@ -137,13 +137,10 @@ export function frameCodegen(
   )
 
   files.set(
-    "mod.d.ts",
+    "chain.d.ts",
     `
       ${IMPORTS_COMMON}
       import { metadata } from "./metadata.js"
-
-      export * from "./connection.js"
-      export * from "./types.js"
 
       export interface ${chainIdent} extends C.Chain<metadata> {}
 
@@ -160,14 +157,11 @@ export function frameCodegen(
   )
 
   files.set(
-    "mod.js",
+    "chain.js",
     `
       ${IMPORTS_COMMON}
       import { connect } from "./connection.js"
       import { metadata } from "./metadata.js"
-
-      export * from "./connection.js"
-      export * from "./types.js"
 
       export class ${chainIdent}ChainRune extends C.ChainRune {
         static from(connect) {

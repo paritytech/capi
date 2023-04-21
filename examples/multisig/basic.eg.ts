@@ -6,7 +6,7 @@
  * @test_skip
  */
 
-import { Balances, chain, System } from "@capi/polkadot-dev"
+import { chain } from "@capi/polkadot-dev"
 import { assert } from "asserts"
 import { $, createDevUsers } from "capi"
 import { MultisigRune } from "capi/patterns/multisig/mod.ts"
@@ -21,7 +21,7 @@ const multisig = MultisigRune.from(chain, {
 })
 
 /// Reference David's initial balance. We'll be executing a transfer of some funds to David.
-const davidFree = System.Account
+const davidFree = chain.System.Account
   .value(david.publicKey)
   .unhandle(undefined)
   .access("data", "free")
@@ -31,7 +31,7 @@ const davidFreeInitial = await davidFree.run()
 console.log("David free initial:", davidFreeInitial)
 
 /// Transfer initial funds to the multisig (existential deposit).
-await Balances
+await chain.Balances
   .transfer({
     value: 2_000_000_000_000n,
     dest: multisig.address,
@@ -43,7 +43,7 @@ await Balances
   .run()
 
 /// Describe the call we wish to dispatch from the multisig.
-const call = Balances.transferKeepAlive({
+const call = chain.Balances.transferKeepAlive({
   dest: david.address,
   value: 1_230_000_000_000n,
 })

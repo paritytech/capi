@@ -4,13 +4,13 @@
  * @description Read the value (an `AccountInfo`) from the system account map.
  */
 
-import { $accountInfo, System } from "@capi/polkadot-dev"
+import { $accountInfo, chain } from "@capi/polkadot-dev"
 import { $, createDevUsers } from "capi"
 
 const { alexa } = await createDevUsers()
 
 /// Retrieve Alexa's account info.
-const accountInfo = await System.Account.value(alexa.publicKey).run()
+const accountInfo = await chain.System.Account.value(alexa.publicKey).run()
 
 /// Ensure that the account info is of the expected shape.
 console.log("Account info:", accountInfo)

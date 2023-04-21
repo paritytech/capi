@@ -19,7 +19,7 @@
  * @test_skip
  */
 
-import { Balances, chain, MultiAddress, System, Utility } from "@capi/polkadot-dev"
+import { chain, MultiAddress } from "@capi/polkadot-dev"
 import { assert } from "asserts"
 import { $, createDevUsers, Rune, Sr25519 } from "capi"
 import { VirtualMultisigRune } from "capi/patterns/multisig/mod.ts"
@@ -52,7 +52,7 @@ $.assert($.str, state)
 const vMultisig = VirtualMultisigRune.fromHex(chain, state)
 
 /// Transfer funds to the virtual multisig's stash account.
-await Balances
+await chain.Balances
   .transfer({
     dest: MultiAddress.Id(vMultisig.stash),
     value: 20_000_000_000_000n,
@@ -64,7 +64,7 @@ await Balances
   .run()
 
 /// Reference David's free balance.
-const davidFree = System.Account
+const davidFree = chain.System.Account
   .value(david.publicKey)
   .unhandle(undefined)
   .access("data", "free")
@@ -74,7 +74,7 @@ const davidFreeInitial = await davidFree.run()
 console.log("David free initial:", davidFreeInitial)
 
 /// Describe the call we wish to dispatch from the virtual multisig's stash.
-const call = Balances.transfer({
+const call = chain.Balances.transfer({
   dest: david.address,
   value: 1_234_000_000_000n,
 })
@@ -91,7 +91,7 @@ console.log("David free final:", davidFreeFinal)
 assert(davidFreeFinal > davidFreeInitial)
 
 function fundAndRatify(name: string, sender: Sr25519) {
-  return Utility
+  return chain.Utility
     .batchAll({
       calls: Rune.array([
         vMultisig.fundMemberProxy(sender.publicKey, 20_000_000_000_000n),

@@ -6,7 +6,7 @@
  * is much the same as any other extrinsic submission.
  */
 
-import { chain, System } from "@capi/contracts-dev"
+import { chain } from "@capi/contracts-dev"
 import { $, createDevUsers, hex, Sr25519, ss58 } from "capi"
 import { InkMetadataRune } from "capi/patterns/ink/mod.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
@@ -49,7 +49,7 @@ for (const { event } of events) {
     const accountId = event.value.contract
     console.log("Account id:", accountId)
     $.assert($.sizedUint8Array(32), accountId)
-    const address = ss58.encode(System.SS58Prefix, accountId)
+    const address = ss58.encode(chain.System.SS58Prefix, accountId)
     console.log("Contract ss58 address:", address)
     Deno.env.set("CONTRACT_SS58_ADDRESS", address)
     break

@@ -19,6 +19,9 @@ import { $, createDevUsers, Rune } from "capi"
 import { DefaultCollectionSetting, DefaultItemSetting } from "capi/patterns/nfts.ts"
 import { signature } from "capi/patterns/signature/statemint.ts"
 
+/// Destructure the pallet bindings for later use.
+const { Nfts } = chain
+
 /// Create two dev users. Alexa will mint and list the NFT. Billy will purchase it.
 const { alexa, billy } = await createDevUsers()
 

@@ -5,14 +5,14 @@
  * Finally, rehydrate the extrinsic and submit it.
  */
 
-import { Balances, chain } from "@capi/westend-dev"
+import { chain } from "@capi/westend-dev"
 import { $, createDevUsers, SignedExtrinsicRune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 
 const { alexa, billy } = await createDevUsers()
 
 /// Create and sign the extrinsic. Extract the hex.
-const hex = await Balances
+const hex = await chain.Balances
   .transfer({
     value: 12345n,
     dest: billy.address,
