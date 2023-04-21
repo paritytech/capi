@@ -8,7 +8,7 @@ import { Balances, MultiAddress, System } from "@capi/westend-dev"
 import { assert } from "asserts"
 import { createDevUsers, ExtrinsicSender } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
-import * as ed from "https://esm.sh/@noble/ed25519@1.7.3"
+import * as ed from "../../deps/ed25519.ts"
 
 const { alexa, billy } = await createDevUsers()
 
@@ -24,13 +24,13 @@ console.log("Billy free initial:", billyFreeInitial)
 const secret = crypto.getRandomValues(new Uint8Array(32))
 
 /// Get a Rune of the secret-corresponding multiaddress.
-const address = MultiAddress.Id(await ed.getPublicKey(secret))
+const address = MultiAddress.Id(await ed.getPublicKeyAsync(secret))
 
 /// Define a `sign` function for later use.
 async function sign(msg: Uint8Array) {
   return {
     type: "Ed25519" as const,
-    value: await ed.sign(msg, secret),
+    value: await ed.signAsync(msg, secret),
   }
 }
 

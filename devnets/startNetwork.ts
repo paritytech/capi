@@ -174,7 +174,7 @@ async function exportParachainGenesis(
 }
 
 async function generateBootnodeString(port: number, privateKey: Uint8Array) {
-  const publicKey = await ed25519.getPublicKey(privateKey)
+  const publicKey = await ed25519.getPublicKeyAsync(privateKey)
   // Peer IDs are derived by hashing the encoded public key with multihash.
   // See https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#peer-ids
   // For any 32 byte ed25519 public key the first 6 bytes are always [0, 36, 8, 1, 18, 32]
