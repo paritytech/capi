@@ -5,42 +5,128 @@
 > 2023**.
 
 Capi is a framework for crafting interactions with Substrate chains. It consists
-of a development server and fluent API, which facilitates multistep, multichain
+of a development server and fluent API, which facilitates multichain
 interactions without compromising either performance or ease of use.
 
-- [Docs &rarr;](https://docs.capi.dev)<br />Guides for Capi developers and
-  pattern library developers
 - [Examples &rarr;](./examples)<br />SHOW ME THE CODE
 - [API Reference &rarr;](https://deno.land/x/capi/mod.ts)<br />A generated API
   reference, based on type signatures and TSDocs.
 
 ## Installation
 
-### [Node.js](https://nodejs.org/)
-
 ```sh
-npm i capi https://capi.dev/frame/wss/rpc.polkadot.io/@latest/pkg.tar
+npm i capi
 ```
 
-### [Deno](https://deno.land/)
+<details>
+<summary>Deno Equivalent</summary>
+<br>
 
 `import_map.json`
 
 ```json
 {
   "imports": {
-    "@capi/polkadot": "https://capi.dev/frame/wss/rpc.polkadot.io/@latest/"
+    "capi": "https://deno.land/x/capi/mod.ts"
   }
 }
 ```
 
-## At a Glance
+</details>
+
+## Configuration
+
+Create a `capi.config.ts` and specify the chains with which you'd like to
+interact.
 
 ```ts
-import { System } from "@capi/polkadot"
+import { binary, CapiConfig } from "capi"
 
-const accounts = await System.Account.entryPage(10, null).run()
+export const config: CapiConfig = {
+  server: "https://capi.dev/",
+  chains: {
+    // 1. the Polkadot relay chain
+    polkadot: {
+      url: "wss://rpc.polkadot.io/",
+      version: "v0.9.40",
+    },
+    // 2. a Polkadot development network
+    polkadotDev: {
+      binary: binary("polkadot", "v0.9.38"),
+      chain: "polkadot-dev",
+    },
+  },
+}
 ```
+
+## Command Line Tool
+
+In this documentation, we use Capi's CLI via the alias "capi", instead of via
+its full path:
+
+```sh
+./node_modules/.bin/capi
+```
+
+<details>
+<summary>Deno Equivalent</summary>
+<br>
+
+```sh
+deno run -A https://deno.land/x/capi/main.ts
+```
+
+</details>
+
+## Codegen Chain-specific APIs
+
+```sh
+capi sync --package-json package.json
+```
+
+<details>
+<summary>Deno Equivalent</summary>
+<br>
+
+```sh
+capi sync --import-map import_map.json
+```
+
+</details>
+
+## At a Glance
+
+Retrieve the first 10 entries from a storage map of Polkadot.
+
+```ts
+import { chain } from "@capi/polkadot"
+
+const accounts = await chain.System.Account
+  .entryPage(10, null)
+  .run()
+```
+
+## Development Networks
+
+Let's modify the usage above to target our configured devnet.
+
+```diff
+- import { chain } from "@capi/polkadot"
++ import { chain } from "@capi/polkadot-dev"
+```
+
+To run code that depends on a devnet, use the `serve` command, followed by a
+"--" and your devnet-using command. In this case, we'll run the script
+(`main.js`) with Node.JS.
+
+```sh
+capi serve -- node main.js
+```
+
+> Other examples:
+>
+> - `capi serve -- npm run start`
+> - `capi serve -- deno run -A ./main.ts`
 
 ## Running Examples
 
