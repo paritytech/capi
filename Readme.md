@@ -99,9 +99,9 @@ capi sync --import-map import_map.json
 Retrieve the first 10 entries from a storage map of Polkadot.
 
 ```ts
-import { chain } from "@capi/polkadot"
+import { Polkadot } from "@capi/polkadot"
 
-const accounts = await chain.System.Account
+const accounts = await Polkadot.System.Account
   .entryPage(10, null)
   .run()
 ```
@@ -111,8 +111,8 @@ const accounts = await chain.System.Account
 Let's modify the usage above to target our configured devnet.
 
 ```diff
-- import { chain } from "@capi/polkadot"
-+ import { chain } from "@capi/polkadot-dev"
+- import { Polkadot } from "@capi/polkadot"
++ import { PolkadotDev } from "@capi/polkadot-dev"
 ```
 
 To run code that depends on a devnet, use the `serve` command, followed by a
