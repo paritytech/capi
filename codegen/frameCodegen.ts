@@ -16,20 +16,20 @@ export function frameCodegen(
   const typeCodegen = new TypeCodegen(codecCodegen, metadata.types)
   typeCodegen.write(files)
 
-  files.set("mod.d.ts", MOD)
-  files.set("mod.js", MOD)
+  files.set("mod.d.ts", mod)
+  files.set("mod.js", mod)
 
   files.set(
     "metadata.d.ts",
     `
-      ${IMPORTS_COMMON}
+      ${importsCommon}
       export const metadata: ${typeCodegen.print(metadata)}
     `,
   )
   files.set(
     "metadata.js",
     `
-      ${IMPORTS_COMMON}
+      ${importsCommon}
       export const metadata = ${codecCodegen.print(metadata)}
     `,
   )
@@ -123,14 +123,14 @@ export function frameCodegen(
   files.set(
     "pallets.d.ts",
     `
-      ${IMPORTS_COMMON}
+      ${importsCommon}
       ${palletDeclarations.join("\n")}
     `,
   )
   files.set(
     "pallets.js",
     `
-      ${IMPORTS_COMMON}
+      ${importsCommon}
       ${palletDefinitions.join("\n")}
     `,
   )
@@ -138,7 +138,7 @@ export function frameCodegen(
   files.set(
     "chain.d.ts",
     `
-      ${IMPORTS_COMMON}
+      ${importsCommon}
       import { metadata } from "./metadata.js"
 
       export interface ${chainIdent} extends C.Chain<typeof metadata> {}
@@ -160,7 +160,7 @@ export function frameCodegen(
   files.set(
     "chain.js",
     `
-      ${IMPORTS_COMMON}
+      ${importsCommon}
       import { connect } from "./connection.js"
       import { metadata } from "./metadata.js"
 
@@ -183,7 +183,7 @@ export function frameCodegen(
   )
 }
 
-const MOD = `
+const mod = `
   export * from "./chain.js"
   export * from "./connection.js"
   export * from "./metadata.js"
@@ -191,7 +191,7 @@ const MOD = `
   export * from "./types.js"
 `
 
-const IMPORTS_COMMON = `
+const importsCommon = `
   import * as _codecs from "./codecs.js"
   import * as C from "./capi.js"
   import * as t from "./types.js"
