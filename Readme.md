@@ -53,7 +53,7 @@ export const config: CapiConfig = {
 }
 ```
 
-Let's also configure an ephemeral Polkadot development network.
+Let's also configure an ephemeral development network.
 
 ```diff
 - import { CapiConfig } from "capi"
@@ -76,8 +76,8 @@ export const config: CapiConfig = {
 
 ## Command Line Tool
 
-In this documentation, we use Capi's CLI via the alias `capi`, instead of via
-its full path.
+In this documentation, we use Capi's CLI via the alias "capi", instead of via
+its full path:
 
 ```sh
 ./node_modules/.bin/capi
@@ -121,15 +121,18 @@ const accounts = await chain.System.Account
   .run()
 ```
 
-## Devnets
+## Development Networks
 
-To run this same example against the Polkadot development network, use the Capi
-`serve` command, followed by a `--` and the command to run your devnet-using
-code.
+To run this same example against the Polkadot development network, use the
+`serve` command, followed by a `--` and your devnet-using command.
 
 ```sh
 capi serve -- <your-command-here>
 ```
+
+> - `capi serve -- npm run start`
+> - `capi serve -- node ./main.js`
+> - `capi serve -- deno run -A ./main.ts`
 
 ## Running Examples
 
