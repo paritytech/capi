@@ -147,6 +147,8 @@ export function frameCodegen(
       export class ${chainIdent}ChainRune<U> extends C.ChainRune<${chainIdent}, U> {
         static override from(connect: (signal: AbortSignal) => C.Connection): ${chainIdent}Rune
 
+        override with: (connection: (signal: AbortSignal) => C.Connection) => this
+
         ${chainMemberDeclarations.join("\n")}
       }
 
@@ -166,6 +168,10 @@ export function frameCodegen(
       export class ${chainIdent}ChainRune extends C.ChainRune {
         static from(connect) {
           return super.from(connect, metadata)
+        }
+
+        with(connect) {
+          return super.with(connect).into(${chainIdent}ChainRune)
         }
 
         ${chainMembers.join("\n")}
