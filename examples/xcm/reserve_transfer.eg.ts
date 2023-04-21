@@ -48,13 +48,8 @@ const retryOptions = {
   maxTimeout: 2 * 60 * 1000,
 }
 
-// HEAD
 /// Create a sufficient asset with Sudo. When targeting a common good
 /// parachain, access root instead through the relay chain.
-await Rococo.Sudo
-//
-// Create a sufficient asset with Sudo. When targeting a common good
-// parachain, access root instead through the relay chain.
 await rococo.Sudo
   // ae8aa6c (clean up reserve transfer example)
   .sudo({
@@ -134,7 +129,7 @@ await trappist.Sudo
 
 const assetsPalletId = statemine.Assets.into(ValueRune).access("id")
 
-// Register Trappist parachain asset id to reserve asset id.
+/// Register Trappist parachain asset id to reserve asset id.
 await trappist.Sudo
   .sudo({
     call: trappist.AssetRegistry.registerReserveAsset({
@@ -155,7 +150,7 @@ await trappist.Sudo
   .finalized()
   .run()
 
-// Reserve transfer asset id on reserve parachain to Trappist parachain.
+/// Reserve transfer asset id on reserve parachain to Trappist parachain.
 const events = await statemine.PolkadotXcm
   .limitedReserveTransferAssets({
     dest: VersionedMultiLocation.V1(XcmV1MultiLocation({
