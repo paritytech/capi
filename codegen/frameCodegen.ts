@@ -43,7 +43,7 @@ export function frameCodegen(
   for (const pallet of Object.values(metadata.pallets)) {
     chainMemberDeclarations.push(`${pallet.name}: ${pallet.name}PalletRune<U>`)
     chainMembers.push(
-      `${pallet.name} = this.pallet("${pallet.name}").into(${pallet.name}PalletRune)`,
+      `${pallet.name} = this.pallet("${pallet.name}").into(${pallet.name}PalletRune, this)`,
     )
 
     const palletDeclarationStatements: string[] = []
