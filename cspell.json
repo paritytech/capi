@@ -11,14 +11,14 @@
   "enableGlobDot": true,
   "dictionaries": ["project-words"],
   "ignorePaths": [
-    ".git",
-    "**/*.wasm",
-    "target",
-    "**/__snapshots__/*.snap",
     "**/*.contract",
-    "examples/ink/erc20.json",
     "**/*.scale",
     "**/*.svg",
+    "**/__snapshots__/*.snap",
+    ".git",
+    "examples/ink/erc20.json",
+    "examples/raw_rpc/metadata",
+    "target",
     "util/_artifacts"
   ]
 }
