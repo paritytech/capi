@@ -38,6 +38,7 @@ inherents
 instanceof
 instantiator
 kiera
+libp
 lparachain
 ltex
 lxkf
@@ -49,6 +50,7 @@ multiaddress
 multiasset
 multichain
 multilocation
+multihash
 multisigs
 multistep
 noninteractive
@@ -64,6 +66,7 @@ precommits
 preopen
 prevotes
 procps
+protobuf
 relaychain
 runtimes
 ryann
