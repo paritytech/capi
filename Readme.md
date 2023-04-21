@@ -83,7 +83,7 @@ its full path:
 ./node_modules/.bin/capi
 ```
 
-<details >
+<details>
 <summary>Deno Equivalent</summary>
 <br>
 
