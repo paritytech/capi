@@ -145,7 +145,7 @@ export function frameCodegen(
       export interface ${chainIdent} extends C.Chain<metadata> {}
 
       export class ${chainIdent}ChainRune<U> extends C.ChainRune<${chainIdent}, U> {
-        static override from(connect: (signal: AbortSignal) => C.Connection): ${chainIdent}ChainRune<U>
+        static override from(connect: (signal: AbortSignal) => C.Connection): ${chainIdent}ChainRune<never>
 
         override with(connection: (signal: AbortSignal) => C.Connection): ${chainIdent}ChainRune<U>
 
