@@ -4,11 +4,11 @@
  * @description Interact directly with the RPC node's call methods.
  */
 
-import { chain } from "@capi/polkadot-dev"
+import { PolkadotDev } from "@capi/polkadot-dev"
 import { $ } from "capi"
 
 /// Make a call.
-const hash = await chain.connection
+const hash = await PolkadotDev.connection
   .call("chain_getFinalizedHead")
   .run()
 

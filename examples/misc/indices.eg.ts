@@ -5,7 +5,7 @@
  * the user's account id using the index.
  */
 
-import { chain } from "@capi/polkadot-dev"
+import { PolkadotDev } from "@capi/polkadot-dev"
 import { assertEquals } from "asserts"
 import { createDevUsers } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
@@ -15,7 +15,7 @@ const { alexa } = await createDevUsers()
 const index = 254
 
 /// Claim the index.
-const hash = await chain.Indices
+const hash = await PolkadotDev.Indices
   .claim({ index })
   .signed(signature({ sender: alexa }))
   .sent()
@@ -24,7 +24,7 @@ const hash = await chain.Indices
   .run()
 
 /// Use the index to key into the indices accounts map.
-const mapped = await chain.Indices.Accounts
+const mapped = await PolkadotDev.Indices.Accounts
   .value(index, hash)
   .unhandle(undefined)
   .access(0)

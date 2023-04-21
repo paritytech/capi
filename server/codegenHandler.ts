@@ -137,7 +137,7 @@ export function createCodegenHandler(dataCache: CacheBase, tempCache: CacheBase)
       const capiCode = `export * from "${relative(`${hash}/${key}/`, "capi/mod.ts")}"`
       files.set("capi.js", capiCode)
       files.set("capi.d.ts", capiCode)
-      writeConnectionCode(files, entry.connection)
+      writeConnectionCode(entry.chainName, files, entry.connection)
       return files
     })
   }
@@ -208,22 +208,37 @@ export function createCodegenHandler(dataCache: CacheBase, tempCache: CacheBase)
   }
 }
 
-function writeConnectionCode(files: Map<string, string>, connection: CodegenEntry["connection"]) {
-  const bindArg = connection.discovery ? JSON.stringify(connection.discovery) : ""
-  files.set(
-    "connection.js",
-    `
-      import * as C from "./capi.js"
-
-      export const connect = C.${connection.type}.bind(${bindArg})
-    `,
-  )
+function writeConnectionCode(
+  chainIdent: string,
+  files: Map<string, string>,
+  connection: CodegenEntry["connection"],
+) {
   files.set(
     "connection.d.ts",
-    `
-      import * as C from "./capi.js"
+    connection.discovery
+      ? `
+          import * as C from "./capi.js"
+          import { ${chainIdent}ChainRune } from "./chain.js"
 
-      export const connect: (signal: AbortSignal) => C.Connection
-    `,
+          export const connect: (signal: AbortSignal) => C.Connection
+
+          export const ${chainIdent}: ${chainIdent}ChainRune<never>
+        `
+      : emptyMod,
+  )
+  files.set(
+    "connection.js",
+    connection.discovery
+      ? `
+          import * as C from "./capi.js"
+          import { ${chainIdent}ChainRune } from "./chain.js"
+
+          export const connect = C.${connection.type}.bind(${JSON.stringify(connection.discovery)})
+
+          export const ${chainIdent} = ${chainIdent}ChainRune.from(connect)
+        `
+      : emptyMod,
   )
 }
+
+const emptyMod = "export {}"

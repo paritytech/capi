@@ -6,7 +6,7 @@
  * as well as the submission of transactions.
  */
 
-import { chain } from "@capi/contracts-dev"
+import { ContractsDev } from "@capi/contracts-dev"
 import { assert } from "asserts"
 import { $, createDevUsers, hex } from "capi"
 import { InkMetadataRune } from "capi/patterns/ink/mod.ts"
@@ -28,7 +28,7 @@ export const metadata = InkMetadataRune.fromMetadataText(
 )
 
 /// Initialize an `InkRune` with `metadata`, `chain` and the deployed contract address.
-const contract = metadata.instanceFromSs58(chain, address)
+const contract = metadata.instanceFromSs58(ContractsDev, address)
 
 const state = contract.call({
   sender: alexa.publicKey,

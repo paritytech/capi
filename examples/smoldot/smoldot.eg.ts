@@ -6,14 +6,14 @@
  * a centralized intermediary. This is the future of unstoppable applications.
  */
 
-import { chain } from "@capi/polkadot-dev"
+import { PolkadotDev } from "@capi/polkadot-dev"
 import { $, known, SmoldotConnection } from "capi"
 
 /// Bring the chainspec into scope. Here, we'll import it from a local file.
 import relayChainSpec from "./chainspec.json" assert { type: "json" }
 
-/// Initialize a `ChainRune` with `SmoldotConnection` and the chainspec.
-const { block } = await chain
+/// Use the generate chain rune with `SmoldotConnection` and the chainspec.
+const { block } = await PolkadotDev
   .with(SmoldotConnection.bind({ relayChainSpec: JSON.stringify(relayChainSpec) }))
   .blockHash()
   .block()

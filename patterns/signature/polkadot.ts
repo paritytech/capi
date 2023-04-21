@@ -1,4 +1,4 @@
-import { Polkadot } from "@capi/polkadot"
+import { PolkadotChain } from "@capi/polkadot"
 import { AddressPrefixChain, Chain, ChainRune } from "../../fluent/ChainRune.ts"
 import { ExtrinsicSender, SignatureData } from "../../fluent/ExtrinsicRune.ts"
 import { $, hex, ss58, ValueRune } from "../../mod.ts"
@@ -19,12 +19,12 @@ export interface PolkadotSignatureChain extends AddressPrefixChain {
       System: {
         constants: {
           Version: {
-            codec: $.Codec<Chain.Constant.Value<Polkadot, "System", "Version">>
+            codec: $.Codec<Chain.Constant.Value<PolkadotChain, "System", "Version">>
           }
         }
       }
     }
-    extrinsic: Omit<Polkadot["metadata"]["extrinsic"], "call">
+    extrinsic: Omit<PolkadotChain["metadata"]["extrinsic"], "call">
   }
 }
 

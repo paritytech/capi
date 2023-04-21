@@ -50,7 +50,7 @@ export function frameCodegen(
 
     for (const storage of Object.values(pallet.storage)) {
       palletDeclarationStatements.push(
-        `${storage.name}: C.StorageRune<${chainIdent}, "${pallet.name}", "${storage.name}", never>`,
+        `${storage.name}: C.StorageRune<${chainIdent}Chain, "${pallet.name}", "${storage.name}", never>`,
       )
       palletStatements.push(`${storage.name} = this.storage("${storage.name}")`)
     }
@@ -77,7 +77,7 @@ export function frameCodegen(
                   `
                     ${variant.tag}: <X>(
                       props: C.RunicArgs<X, Omit<${factory}.${variant.tag}, "type">>
-                    ) => C.ExtrinsicRune<${chainIdent}, C.RunicArgs.U<X>>
+                    ) => C.ExtrinsicRune<${chainIdent}Chain, C.RunicArgs.U<X>>
                   `,
                 )
                 palletStatements.push(extrinsicFactory(variant.tag))
@@ -90,7 +90,7 @@ export function frameCodegen(
               throw new Error("pallet call non-string literalUnion is unsupported")
             }
             palletDeclarationStatements.push(
-              `${value}: () => C.ExtrinsicRune<${chainIdent}, never>`,
+              `${value}: () => C.ExtrinsicRune<${chainIdent}Chain, never>`,
             )
             palletStatements.push(extrinsicFactory(value))
           }))
@@ -109,7 +109,7 @@ export function frameCodegen(
     }
 
     palletDeclarations.push(`
-      export class ${pallet.name}PalletRune<out U> extends C.PalletRune<${chainIdent}, "${pallet.name}", U> {
+      export class ${pallet.name}PalletRune<out U> extends C.PalletRune<${chainIdent}Chain, "${pallet.name}", U> {
         ${palletDeclarationStatements.join("\n")}
       }
     `)
@@ -141,9 +141,9 @@ export function frameCodegen(
       ${importsCommon}
       import { metadata } from "./metadata.js"
 
-      export interface ${chainIdent} extends C.Chain<typeof metadata> {}
+      export interface ${chainIdent}Chain extends C.Chain<typeof metadata> {}
 
-      export class ${chainIdent}ChainRune<out U> extends C.ChainRune<${chainIdent}, U> {
+      export class ${chainIdent}ChainRune<out U> extends C.ChainRune<${chainIdent}Chain, U> {
         static override from(connect: (signal: AbortSignal) => C.Connection): ${chainIdent}ChainRune<never>
 
         override with(connection: (signal: AbortSignal) => C.Connection): ${chainIdent}ChainRune<U>
@@ -152,8 +152,6 @@ export function frameCodegen(
       }
 
       ${palletDeclarations.join("\n")}
-
-      export const chain: ${chainIdent}ChainRune<never>
     `,
   )
 
@@ -161,7 +159,6 @@ export function frameCodegen(
     "chain.js",
     `
       ${importsCommon}
-      import { connect } from "./connection.js"
       import { metadata } from "./metadata.js"
 
       export class ${chainIdent}ChainRune extends C.ChainRune {
@@ -177,8 +174,6 @@ export function frameCodegen(
       }
 
       ${palletDefinitions.join("\n")}
-
-      export const chain = ${chainIdent}ChainRune.from(connect)
     `,
   )
 }

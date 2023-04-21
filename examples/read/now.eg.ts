@@ -4,11 +4,11 @@
  * @description Read the current timestamp as agreed upon by validators.
  */
 
-import { chain } from "@capi/polkadot"
+import { Polkadot } from "@capi/polkadot"
 import { $ } from "capi"
 
 /// Retrieve the chain's current recorded time.
-const now = await chain.Timestamp.Now.value().run()
+const now = await Polkadot.Timestamp.Now.value().run()
 
 /// Ensure `now` is of the correct shape.
 console.log("Now:", now)

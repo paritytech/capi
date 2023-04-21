@@ -7,12 +7,12 @@
  * this can be helpful in the context of chain development.
  */
 
-import { chain } from "@capi/polkadot-dev"
+import { PolkadotDev } from "@capi/polkadot-dev"
 import { $ } from "capi"
 import { storageSizes } from "capi/patterns/storage_sizes.ts"
 
 /// Use the storageSizes factory to produce a Rune. Then execute it.
-const sizes = await storageSizes(chain).run()
+const sizes = await storageSizes(PolkadotDev).run()
 
 /// Ensure `sizes` is of the expected shape.
 console.log("Sizes:", sizes)
