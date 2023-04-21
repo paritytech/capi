@@ -14,10 +14,11 @@ import { $ } from "capi"
 /// with Polkadot's block production.
 const now = chain.Timestamp.Now.value(undefined, chain.latestBlockHash)
 
-/// Use the `watch` method to retrieve an async iterable, which will
-/// gather and yield the `collection`-described data upon new blocks.
+// Create a simple counter so that we can break iteration at 3.
 let i = 0
 
+/// Use the `watch` method to retrieve an async iterable, which will
+/// gather and yield the `collection`-described data upon new blocks.
 for await (const item of now.iter()) {
   console.log(item)
   $.assert($.u64, item)
