@@ -8,9 +8,9 @@
  */
 
 import {
+  chain as relayChain,
   VersionedMultiAssets,
   VersionedMultiLocation,
-  XcmPallet,
   XcmV2AssetId,
   XcmV2Fungibility,
   XcmV2Junction,
@@ -32,7 +32,7 @@ import { signature } from "capi/patterns/signature/polkadot.ts"
 const { alexa } = await createDevUsers()
 
 /// Reference Alexa's free balance.
-const alexaBalance = chain.System.Account
+const alexaBalance = parachain.System.Account
   .value(alexa.publicKey)
   .unhandle(undefined)
   .access("data", "free")
@@ -42,7 +42,7 @@ const alexaFreeInitial = await alexaBalance.run()
 console.log("Alexa initial free:", alexaFreeInitial)
 
 /// Execute the teleportation without blocking.
-XcmPallet
+relayChain.XcmPallet
   .limitedTeleportAssets({
     dest: VersionedMultiLocation.V2(
       XcmV2MultiLocation({
@@ -82,7 +82,7 @@ XcmPallet
 /// Iterate over the parachain events until receiving a downward message processed event,
 /// at which point we can read alexa's free balance, which should be greater than the initial.
 outer:
-for await (const e of chain.System.Events.value(undefined, parachain.latestBlockHash).iter()) {
+for await (const e of parachain.System.Events.value(undefined, parachain.latestBlockHash).iter()) {
   if (e) {
     for (const { event } of e) {
       if (
