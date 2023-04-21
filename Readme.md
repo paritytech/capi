@@ -74,11 +74,10 @@ export const config: CapiConfig = {
 }
 ```
 
-## CLI
+## Command Line Tool
 
-Capi's CLI can be used in both Deno and Node.JS. In the remainder of
-documentation, we'll reference the CLI via the alias `capi`, instead of via its
-full path.
+In this documentation, we use Capi's CLI via the alias `capi`, instead of via
+its full path.
 
 ```sh
 ./node_modules/.bin/capi
