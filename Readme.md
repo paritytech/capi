@@ -39,26 +39,22 @@ npm i capi
 Create a `capi.config.ts` and specify the chains with which you'd like to
 interact.
 
-<!-- dprint-ignore -->
 ```ts
 import { binary, CapiConfig } from "capi"
 
 export const config: CapiConfig = {
   server: "https://capi.dev/",
   chains: {
-
     // 1. the Polkadot relay chain
     polkadot: {
       url: "wss://rpc.polkadot.io/",
       version: "v0.9.40",
     },
-
     // 2. a development network
     polkadotDev: {
       binary: binary("polkadot", "v0.9.38"),
       chain: "polkadot-dev",
     },
-
   },
 }
 ```
