@@ -12,7 +12,7 @@ import { signature } from "capi/patterns/signature/polkadot.ts"
 /// Create two dev users. Alexa will send the funds to Billy.
 const { alexa, billy } = await createDevUsers()
 
-// Reference Billy's free balance.
+/// Reference Billy's free balance.
 const billyFree = chain.System.Account
   .value(billy.publicKey)
   .unhandle(undefined)

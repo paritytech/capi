@@ -9,9 +9,9 @@
 import { chain } from "@capi/polkadot"
 import { $ } from "capi"
 
-// Specifying `chain.latestBlockHash` indicates that (A) this Rune tree
-// can be treated as reactive and (B) is a dependent of a "timeline" associated
-// with Polkadot's block production.
+/// Specifying `chain.latestBlockHash` indicates that (A) this Rune tree
+/// can be treated as reactive and (B) is a dependent of a "timeline" associated
+/// with Polkadot's block production.
 const now = chain.Timestamp.Now.value(undefined, chain.latestBlockHash)
 
 /// Use the `watch` method to retrieve an async iterable, which will

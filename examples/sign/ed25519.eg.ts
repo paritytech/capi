@@ -12,6 +12,7 @@ import * as ed from "../../deps/ed25519.ts"
 
 const { alexa, billy } = await createDevUsers()
 
+/// Reference Billy's free balance for later use.
 const billyFree = chain.System.Account
   .value(billy.publicKey)
   .unhandle(undefined)

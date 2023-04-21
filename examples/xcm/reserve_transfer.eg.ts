@@ -214,7 +214,7 @@ const billyStatemintBalanceFinal = await billyStatemintBalance.run()
 console.log("Statemine(Billy): asset balance:", billyStatemintBalanceFinal)
 assertNotEquals(billyStatemintBalanceInitial, billyStatemintBalanceFinal)
 
-// Retrieve the statemint sovereign account balance.
+/// Retrieve the statemint sovereign account balance.
 const statemintSovereignAccountBalance = await statemine.Assets.Account
   .value([RESERVE_ASSET_ID, $siblId.encode(TRAPPIST_CHAIN_ID)])
   .unhandle(undefined)

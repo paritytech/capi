@@ -15,10 +15,10 @@
 
 import { $, ChainRune, WsConnection } from "capi"
 
-// We could also initialize a `ChainRune` with `WsConnection` and an RPC node WebSocket URL.
+/// We could also initialize a `ChainRune` with `WsConnection` and an RPC node WebSocket URL.
 const chain = ChainRune.from(WsConnection.bind("wss://rpc.polkadot.io"))
 
-// Create a binding to the `System` pallet.
+/// Create a binding to the `System` pallet.
 const System = chain.pallet("System")
 
 /// Create a binding to the `Account` storage map.
