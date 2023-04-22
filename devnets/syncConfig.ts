@@ -49,9 +49,9 @@ export async function syncConfig(tempDir: string, config: Config) {
             [[undefined, network.relay] as const, ...Object.entries(network.paras)].map(
               async ([paraName, chain]) => {
                 const metadata = await uploadMetadata(server, `ws://127.0.0.1:${chain.ports[0]}`)
-                const maybeParaPackageName = relayPackageName
+                const packageName = relayPackageName
                   + (paraName ? `/${normalizePackageName(paraName)}` : "")
-                entries.set(maybeParaPackageName, {
+                entries.set(packageName, {
                   type: "frame",
                   metadata: metadata,
                   chainName: normalizeTypeName(paraName ?? name),
@@ -60,7 +60,7 @@ export async function syncConfig(tempDir: string, config: Config) {
                     discovery: name + (paraName ? `/${paraName}` : ""),
                   },
                 })
-                logSynced(maybeParaPackageName)
+                logSynced(packageName)
               },
             ),
           )
