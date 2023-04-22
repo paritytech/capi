@@ -1,4 +1,6 @@
 import * as flags from "../deps/std/flags.ts"
+import { blue } from "../deps/std/fmt/colors.ts"
+import * as path from "../deps/std/path.ts"
 import { assertEquals } from "../deps/std/testing/asserts.ts"
 import { createTempDir } from "../devnets/createTempDir.ts"
 import { syncConfig } from "../devnets/mod.ts"
@@ -20,7 +22,6 @@ export default async function(...args: string[]) {
   const tempDir = await createTempDir()
 
   const baseUrl = await syncConfig(tempDir, config)
-  console.log(baseUrl)
 
   if (importMapFile) {
     const importMapText = await Deno.readTextFile(importMapFile)
@@ -31,6 +32,7 @@ export default async function(...args: string[]) {
     } else {
       await Deno.writeTextFile(importMapFile, JSON.stringify(importMap, null, 2) + "\n")
     }
+    logSynced(importMapFile)
   }
 
   if (packageJsonFile) {
@@ -53,5 +55,10 @@ export default async function(...args: string[]) {
     } else {
       await Deno.writeTextFile(packageJsonFile, JSON.stringify(packageJson, null, 2) + "\n")
     }
+    logSynced(packageJsonFile)
   }
+}
+
+function logSynced(manifestPath: string) {
+  console.log(blue("Synced"), "and updated", path.relative(Deno.cwd(), path.resolve(manifestPath)))
 }

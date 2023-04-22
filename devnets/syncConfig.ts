@@ -2,6 +2,7 @@ export * from "./binary.ts"
 
 import { blake2_512, blake2_64, Hasher } from "../crypto/hashers.ts"
 import { hex } from "../crypto/mod.ts"
+import { gray, green } from "../deps/std/fmt/colors.ts"
 import * as path from "../deps/std/path.ts"
 import { WsConnection } from "../mod.ts"
 import { $codegenSpec, CodegenEntry, CodegenSpec } from "../server/codegenSpec.ts"
@@ -14,52 +15,59 @@ export async function syncConfig(tempDir: string, config: Config) {
   return withSignal(async (signal) => {
     const { server } = config
     const entries = new Map<string, CodegenEntry>()
+    const chainConfigEntries = Object.entries(config.chains ?? {})
+    let n = chainConfigEntries.length
+    chainConfigEntries.forEach(([_, entry]) => {
+      n += entry.binary && entry.parachains ? Object.values(entry.parachains).length : 0
+    })
+    let synced = 0
     await Promise.all(
-      Object.entries(config.chains ?? {}).map(async ([name, chain]) => {
+      chainConfigEntries.map(async ([name, chain]) => {
+        const relayPackageName = normalizePackageName(name)
+        console.log(gray("Syncing"), relayPackageName)
         if (chain.url != null) {
           const metadata = await uploadMetadata(server, chain.url)
-          entries.set(normalizePackageName(name), {
+          entries.set(relayPackageName, {
             type: "frame",
             metadata,
             chainName: normalizeTypeName(name),
             connection: { type: "WsConnection", discovery: chain.url },
           })
+          logSynced(relayPackageName)
         } else if (chain.metadata) {
           const metadata = await _upload(server, "metadata", chain.metadata, blake2_512)
-          entries.set(normalizePackageName(name), {
+          entries.set(relayPackageName, {
             type: "frame",
             metadata,
             chainName: normalizeTypeName(name),
             connection: { type: "NoConnection" },
           })
+          logSynced(relayPackageName)
         } else {
           const network = await startNetworkForMetadata(path.join(tempDir, name), chain, signal)
           await Promise.all(
-            [
-              [undefined, network.relay] as const,
-              ...Object.entries(network.paras),
-            ].map(
+            [[undefined, network.relay] as const, ...Object.entries(network.paras)].map(
               async ([paraName, chain]) => {
-                const metadata = await uploadMetadata(
-                  server,
-                  `ws://127.0.0.1:${chain.ports[0]}`,
-                )
-                entries.set(
-                  normalizePackageName(name)
-                    + (paraName ? `/${normalizePackageName(paraName)}` : ""),
-                  {
-                    type: "frame",
-                    metadata: metadata,
-                    chainName: normalizeTypeName(paraName ?? name),
-                    connection: {
-                      type: "DevnetConnection",
-                      discovery: name + (paraName ? `/${paraName}` : ""),
-                    },
+                const metadata = await uploadMetadata(server, `ws://127.0.0.1:${chain.ports[0]}`)
+                const maybeParaPackageName = relayPackageName
+                  + (paraName ? `/${normalizePackageName(paraName)}` : "")
+                entries.set(maybeParaPackageName, {
+                  type: "frame",
+                  metadata: metadata,
+                  chainName: normalizeTypeName(paraName ?? name),
+                  connection: {
+                    type: "DevnetConnection",
+                    discovery: name + (paraName ? `/${paraName}` : ""),
                   },
-                )
+                })
+                logSynced(maybeParaPackageName)
               },
             ),
           )
+        }
+
+        function logSynced(packageName: string) {
+          console.log(green("Synced"), gray(`(${++synced}/${n})`), `@capi/${packageName}`)
         }
       }),
     )
