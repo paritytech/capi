@@ -1,8 +1,8 @@
 // moderate
 
 export * from "./binary.ts"
-export * from "./CapiConfig.ts"
 export * from "./chainSpec.ts"
+export * from "./Config.ts"
 export * from "./createTempDir.ts"
 export * from "./dev_users.ts"
 export * from "./DevnetConnection.ts"

@@ -6,13 +6,13 @@ import * as path from "../deps/std/path.ts"
 import { writableStreamFromWriter } from "../deps/std/streams.ts"
 import { getFreePort, portReady } from "../util/port.ts"
 import { resolveBinary } from "./binary.ts"
-import { DevChainConfig } from "./CapiConfig.ts"
 import {
   createCustomChainSpec,
   createRawChainSpec,
   GenesisConfig,
   getGenesisConfig,
 } from "./chainSpec.ts"
+import { DevChainConfig } from "./Config.ts"
 import { addDevUsers } from "./dev_users.ts"
 
 export interface Network {

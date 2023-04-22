@@ -8,7 +8,7 @@ import { WsConnection } from "../mod.ts"
 import { $codegenSpec, CodegenEntry, CodegenSpec } from "../server/codegenSpec.ts"
 import { normalizePackageName, withSignal } from "../util/mod.ts"
 import { normalizeTypeName } from "../util/normalize.ts"
-import { Config } from "./CapiConfig.ts"
+import { Config } from "./Config.ts"
 import { startNetworkForMetadata } from "./startNetwork.ts"
 
 export async function syncConfig(tempDir: string, config: Config) {
