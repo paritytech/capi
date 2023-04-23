@@ -1,5 +1,5 @@
-export * from "https://deno.land/std@0.182.0/http/mod.ts"
-import { type serve as _serve } from "https://deno.land/std@0.182.0/http/mod.ts"
+export * from "https://deno.land/std@0.184.0/http/mod.ts"
+import { type serve as _serve } from "https://deno.land/std@0.184.0/http/mod.ts"
 import * as http from "node:http"
 import * as stream from "node:stream"
 
