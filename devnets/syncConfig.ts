@@ -16,10 +16,9 @@ export async function syncConfig(tempDir: string, config: Config) {
     const { server } = config
     const entries = new Map<string, CodegenEntry>()
     const chainConfigEntries = Object.entries(config.chains ?? {})
-    let n = chainConfigEntries.length
-    chainConfigEntries.forEach(([_, entry]) => {
-      n += entry.binary && entry.parachains ? Object.values(entry.parachains).length : 0
-    })
+    const syncTotal = chainConfigEntries
+      .map(([_, entry]) => entry.binary && entry.parachains ?Object.values(entry.parachains).length : 0) 
+      .reduce((a, b) => a + b, 0)
     let synced = 0
     await Promise.all(
       chainConfigEntries.map(async ([name, chain]) => {
