@@ -215,7 +215,7 @@ function writeConnectionCode(
 ) {
   files.set(
     "connection.d.ts",
-    connection.discovery
+    connection
       ? `
           import * as C from "./capi.js"
           import { ${chainIdent}ChainRune } from "./chain.js"
@@ -228,7 +228,7 @@ function writeConnectionCode(
   )
   files.set(
     "connection.js",
-    connection.discovery
+    connection
       ? `
           import * as C from "./capi.js"
           import { ${chainIdent}ChainRune } from "./chain.js"

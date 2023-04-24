@@ -17,13 +17,14 @@ export async function syncConfig(tempDir: string, config: Config) {
     const entries = new Map<string, CodegenEntry>()
     const chainConfigEntries = Object.entries(config.chains ?? {})
     const syncTotal = chainConfigEntries
-      .map(([_, entry]) => entry.binary && entry.parachains ?Object.values(entry.parachains).length : 0) 
+      .map(([_, entry]) =>
+        entry.binary && entry.parachains ? 1 + Object.values(entry.parachains).length : 1
+      )
       .reduce((a, b) => a + b, 0)
     let synced = 0
     await Promise.all(
       chainConfigEntries.map(async ([name, chain]) => {
         const relayPackageName = normalizePackageName(name)
-        console.log(gray("Syncing"), relayPackageName)
         if (chain.url != null) {
           const metadata = await uploadMetadata(server, chain.url)
           entries.set(relayPackageName, {
@@ -39,7 +40,6 @@ export async function syncConfig(tempDir: string, config: Config) {
             type: "frame",
             metadata,
             chainName: normalizeTypeName(name),
-            connection: { type: "NoConnection" },
           })
           logSynced(relayPackageName)
         } else {
@@ -64,10 +64,6 @@ export async function syncConfig(tempDir: string, config: Config) {
             ),
           )
         }
-
-        function logSynced(packageName: string) {
-          console.log(green("Synced"), gray(`(${++synced}/${n})`), `@capi/${packageName}`)
-        }
       }),
     )
     const sortedEntries = new Map([...entries].sort((a, b) => a[0] < b[0] ? 1 : -1))
@@ -76,6 +72,10 @@ export async function syncConfig(tempDir: string, config: Config) {
       codegen: sortedEntries,
     })
     return new URL(codegenHash + "/", server).toString()
+
+    function logSynced(packageName: string) {
+      console.log(green("Synced"), gray(`(${++synced}/${syncTotal})`), `@capi/${packageName}`)
+    }
   })
 }
 

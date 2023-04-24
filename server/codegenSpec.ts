@@ -6,12 +6,11 @@ const $codegenEntry = $.taggedUnion("type", [
     "frame",
     $.field("metadata", $.sizedUint8Array(64)),
     $.field("chainName", $.str),
-    $.field(
+    $.optionalField(
       "connection",
       $.taggedUnion("type", [
         $.variant("WsConnection", $.field("discovery", $.str)),
         $.variant("DevnetConnection", $.field("discovery", $.str)),
-        $.variant("NoConnection", $.optionalField("discovery", $.never)),
       ]),
     ),
   ),
