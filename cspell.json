@@ -17,6 +17,7 @@
     "**/__snapshots__/*.snap",
     ".git",
     "examples/ink/erc20.json",
+    "examples/ink/erc20.wasm",
     "examples/raw_rpc/metadata",
     "examples/smoldot/chainspec.json",
     "target",
