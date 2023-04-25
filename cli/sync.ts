@@ -1,4 +1,5 @@
 import * as flags from "../deps/std/flags.ts"
+import { blue, gray } from "../deps/std/fmt/colors.ts"
 import { assertEquals } from "../deps/std/testing/asserts.ts"
 import { createTempDir } from "../devnets/createTempDir.ts"
 import { syncConfig } from "../devnets/mod.ts"
@@ -20,38 +21,41 @@ export default async function(...args: string[]) {
   const tempDir = await createTempDir()
 
   const baseUrl = await syncConfig(tempDir, config)
-  console.log(baseUrl)
 
   if (importMapFile) {
-    const importMapText = await Deno.readTextFile(importMapFile)
-    const importMap = JSON.parse(importMapText)
-    importMap.imports["@capi/"] = baseUrl
-    if (check) {
-      assertEquals(JSON.parse(importMapText), importMap)
-    } else {
-      await Deno.writeTextFile(importMapFile, JSON.stringify(importMap, null, 2) + "\n")
-    }
+    syncFile(importMapFile, (importMap) => {
+      importMap.imports["@capi/"] = baseUrl
+    })
   }
 
   if (packageJsonFile) {
-    const packageJsonText = await Deno.readTextFile(packageJsonFile)
-    const packageJson = JSON.parse(packageJsonText)
-    const addedPackages = new Set()
-    for (const rawName of Object.keys(config.chains ?? {})) {
-      const name = normalizePackageName(rawName)
-      const packageName = `@capi/${name}`
-      addedPackages.add(packageName)
-      packageJson.dependencies[packageName] = `${baseUrl}${name}.tar`
-    }
-    for (const packageName of Object.keys(packageJson.dependencies)) {
-      if (packageName.startsWith("@capi/") && !addedPackages.has(packageName)) {
-        delete packageJson.dependencies[packageName]
+    syncFile(packageJsonFile, (packageJson) => {
+      const addedPackages = new Set()
+      for (const rawName of Object.keys(config.chains ?? {})) {
+        const name = normalizePackageName(rawName)
+        const packageName = `@capi/${name}`
+        addedPackages.add(packageName)
+        packageJson.dependencies[packageName] = `${baseUrl}${name}.tar`
       }
-    }
-    if (check) {
-      assertEquals(JSON.parse(packageJsonText), packageJson)
-    } else {
-      await Deno.writeTextFile(packageJsonFile, JSON.stringify(packageJson, null, 2) + "\n")
+      for (const packageName of Object.keys(packageJson.dependencies)) {
+        if (packageName.startsWith("@capi/") && !addedPackages.has(packageName)) {
+          delete packageJson.dependencies[packageName]
+        }
+      }
+    })
+  }
+
+  async function syncFile(filePath: string, modify: (value: any) => void) {
+    const text = await Deno.readTextFile(filePath)
+    const newJson = JSON.parse(text)
+    modify(newJson)
+    try {
+      assertEquals(JSON.parse(text), newJson)
+      console.log(gray("Unchanged"), filePath)
+    } catch (e) {
+      if (check) throw e
+      await Deno.writeTextFile(filePath, JSON.stringify(newJson, null, 2) + "\n")
+      console.log(blue("Updated"), filePath)
     }
   }
 }

@@ -2,44 +2,55 @@ export * from "./binary.ts"
 
 import { blake2_512, blake2_64, Hasher } from "../crypto/hashers.ts"
 import { hex } from "../crypto/mod.ts"
+import { gray, green } from "../deps/std/fmt/colors.ts"
 import * as path from "../deps/std/path.ts"
 import { WsConnection } from "../mod.ts"
 import { $codegenSpec, CodegenEntry, CodegenSpec } from "../server/codegenSpec.ts"
 import { normalizePackageName, withSignal } from "../util/mod.ts"
 import { normalizeTypeName } from "../util/normalize.ts"
-import { CapiConfig } from "./CapiConfig.ts"
+import { Config } from "./Config.ts"
 import { startNetworkForMetadata } from "./startNetwork.ts"
 
-export async function syncConfig(tempDir: string, config: CapiConfig) {
+export async function syncConfig(tempDir: string, config: Config) {
   return withSignal(async (signal) => {
     const { server } = config
     const entries = new Map<string, CodegenEntry>()
+    const chainConfigEntries = Object.entries(config.chains ?? {})
+    const syncTotal = chainConfigEntries
+      .map(([_, entry]) =>
+        entry.binary && entry.parachains ? 1 + Object.values(entry.parachains).length : 1
+      )
+      .reduce((a, b) => a + b, 0)
+    let synced = 0
     await Promise.all(
-      Object.entries(config.chains ?? {}).map(async ([name, chain]) => {
+      chainConfigEntries.map(async ([name, chain]) => {
+        const relayPackageName = normalizePackageName(name)
         if (chain.url != null) {
           const metadata = await uploadMetadata(server, chain.url)
-          entries.set(normalizePackageName(name), {
+          entries.set(relayPackageName, {
             type: "frame",
             metadata,
             chainName: normalizeTypeName(name),
             connection: { type: "WsConnection", discovery: chain.url },
           })
-          return
-        }
-        const network = await startNetworkForMetadata(path.join(tempDir, name), chain, signal)
-        await Promise.all(
-          [
-            [undefined, network.relay] as const,
-            ...Object.entries(network.paras),
-          ].map(
-            async ([paraName, chain]) => {
-              const metadata = await uploadMetadata(
-                server,
-                `ws://127.0.0.1:${chain.ports[0]}`,
-              )
-              entries.set(
-                normalizePackageName(name) + (paraName ? `/${normalizePackageName(paraName)}` : ""),
-                {
+          logSynced(relayPackageName)
+        } else if (chain.metadata) {
+          const metadata = await _upload(server, "metadata", chain.metadata, blake2_512)
+          entries.set(relayPackageName, {
+            type: "frame",
+            metadata,
+            chainName: normalizeTypeName(name),
+          })
+          logSynced(relayPackageName)
+        } else {
+          const network = await startNetworkForMetadata(path.join(tempDir, name), chain, signal)
+          await Promise.all(
+            [[undefined, network.relay] as const, ...Object.entries(network.paras)].map(
+              async ([paraName, chain]) => {
+                const metadata = await uploadMetadata(server, `ws://127.0.0.1:${chain.ports[0]}`)
+                const packageName = relayPackageName
+                  + (paraName ? `/${normalizePackageName(paraName)}` : "")
+                entries.set(packageName, {
                   type: "frame",
                   metadata: metadata,
                   chainName: normalizeTypeName(paraName ?? name),
@@ -47,11 +58,12 @@ export async function syncConfig(tempDir: string, config: CapiConfig) {
                     type: "DevnetConnection",
                     discovery: name + (paraName ? `/${paraName}` : ""),
                   },
-                },
-              )
-            },
-          ),
-        )
+                })
+                logSynced(packageName)
+              },
+            ),
+          )
+        }
       }),
     )
     const sortedEntries = new Map([...entries].sort((a, b) => a[0] < b[0] ? 1 : -1))
@@ -60,6 +72,10 @@ export async function syncConfig(tempDir: string, config: CapiConfig) {
       codegen: sortedEntries,
     })
     return new URL(codegenHash + "/", server).toString()
+
+    function logSynced(packageName: string) {
+      console.log(green("Synced"), gray(`(${++synced}/${syncTotal})`), `@capi/${packageName}`)
+    }
   })
 }
 

@@ -6,13 +6,13 @@ import * as path from "../deps/std/path.ts"
 import { writableStreamFromWriter } from "../deps/std/streams.ts"
 import { getFreePort, portReady } from "../util/port.ts"
 import { resolveBinary } from "./binary.ts"
-import { NetworkConfig } from "./CapiConfig.ts"
 import {
   createCustomChainSpec,
   createRawChainSpec,
   GenesisConfig,
   getGenesisConfig,
 } from "./chainSpec.ts"
+import { DevChainConfig } from "./Config.ts"
 import { addDevUsers } from "./dev_users.ts"
 
 export interface Network {
@@ -27,7 +27,7 @@ export interface NetworkChain {
 
 export async function startNetworkForMetadata(
   tempDir: string,
-  config: NetworkConfig,
+  config: DevChainConfig,
   signal: AbortSignal,
 ): Promise<Network> {
   const relayBinary = await resolveBinary(config.binary, signal)
@@ -70,7 +70,7 @@ export async function startNetworkForMetadata(
 
 export async function startNetwork(
   tempDir: string,
-  config: NetworkConfig,
+  config: DevChainConfig,
   signal: AbortSignal,
 ): Promise<Network> {
   const paras = await Promise.all(

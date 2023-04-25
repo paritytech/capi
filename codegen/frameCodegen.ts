@@ -39,10 +39,13 @@ export function frameCodegen(
   const palletDeclarations: string[] = []
   const palletDefinitions: string[] = []
 
+  const chainRuneIdent = `${chainIdent}Rune`
+
   for (const pallet of Object.values(metadata.pallets)) {
-    chainMemberDeclarations.push(`${pallet.name}: ${pallet.name}PalletRune<U>`)
+    const palletRuneIdent = `${chainIdent}${pallet.name}Rune`
+    chainMemberDeclarations.push(`${pallet.name}: ${palletRuneIdent}<U>`)
     chainMembers.push(
-      `${pallet.name} = this.pallet("${pallet.name}").into(${pallet.name}PalletRune, this)`,
+      `${pallet.name} = this.pallet("${pallet.name}").into(${palletRuneIdent}, this)`,
     )
 
     const palletDeclarationStatements: string[] = []
@@ -109,12 +112,12 @@ export function frameCodegen(
     }
 
     palletDeclarations.push(`
-      export class ${pallet.name}PalletRune<out U> extends C.PalletRune<${chainIdent}, "${pallet.name}", U> {
+      export class ${palletRuneIdent}<out U> extends C.PalletRune<${chainIdent}, "${pallet.name}", U> {
         ${palletDeclarationStatements.join("\n")}
       }
     `)
     palletDefinitions.push(`
-      export class ${pallet.name}PalletRune extends C.PalletRune {
+      export class ${palletRuneIdent} extends C.PalletRune {
         ${palletStatements.join("\n")}
       }
     `)
@@ -143,17 +146,15 @@ export function frameCodegen(
 
       export interface ${chainIdent} extends C.Chain<typeof metadata> {}
 
-      export class ${chainIdent}ChainRune<out U> extends C.ChainRune<${chainIdent}, U> {
-        static override from(connect: (signal: AbortSignal) => C.Connection): ${chainIdent}ChainRune<never>
+      export class ${chainRuneIdent}<out U> extends C.ChainRune<${chainIdent}, U> {
+        static override from(connect: (signal: AbortSignal) => C.Connection): ${chainRuneIdent}<never>
 
-        override with(connection: (signal: AbortSignal) => C.Connection): ${chainIdent}ChainRune<U>
+        override with(connection: (signal: AbortSignal) => C.Connection): ${chainRuneIdent}<U>
 
         ${chainMemberDeclarations.join("\n")}
       }
 
       ${palletDeclarations.join("\n")}
-
-      export const chain: ${chainIdent}ChainRune<never>
     `,
   )
 
@@ -161,24 +162,21 @@ export function frameCodegen(
     "chain.js",
     `
       ${importsCommon}
-      import { connect } from "./connection.js"
       import { metadata } from "./metadata.js"
 
-      export class ${chainIdent}ChainRune extends C.ChainRune {
+      export class ${chainRuneIdent} extends C.ChainRune {
         static from(connect) {
           return super.from(connect, metadata)
         }
 
         with(connect) {
-          return super.with(connect).into(${chainIdent}ChainRune)
+          return super.with(connect).into(${chainRuneIdent})
         }
 
         ${chainMembers.join("\n")}
       }
 
       ${palletDefinitions.join("\n")}
-
-      export const chain = ${chainIdent}ChainRune.from(connect)
     `,
   )
 }

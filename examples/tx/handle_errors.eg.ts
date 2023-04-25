@@ -5,7 +5,7 @@
  * easy decoding (and handling) of dispatch errors.
  */
 
-import { chain } from "@capi/contracts-dev"
+import { contractsDev } from "@capi/contracts-dev"
 import { assertInstanceOf } from "asserts"
 import { createDevUsers, ExtrinsicError } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
@@ -13,7 +13,7 @@ import { signature } from "capi/patterns/signature/polkadot.ts"
 const { alexa, billy } = await createDevUsers()
 
 /// The following should reject with an `ExtrinsicError`.
-const extrinsicError = await chain.Balances
+const extrinsicError = await contractsDev.Balances
   .transfer({
     value: 1_000_000_000_000_000_000_000_000_000_000_000_000n,
     dest: billy.address,

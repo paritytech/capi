@@ -7,16 +7,16 @@
  * @test_skip
  */
 
-import { chain as rococo, DoubleEncoded, Instruction } from "@capi/rococo-dev-xcm"
+import { DoubleEncoded, Instruction, rococoDevXcm } from "@capi/rococo-dev-xcm"
 import {
   $assetDetails,
   AssetId,
-  chain as statemine,
   CumulusPalletXcmpQueueEvent,
   Fungibility,
   Junctions,
   NetworkId,
   RuntimeEvent,
+  statemine,
   VersionedMultiAssets,
   VersionedMultiLocation,
   VersionedXcm,
@@ -25,7 +25,7 @@ import {
   XcmV1MultiAsset,
   XcmV1MultiLocation,
 } from "@capi/rococo-dev-xcm/statemine"
-import { chain as trappist } from "@capi/rococo-dev-xcm/trappist"
+import { trappist } from "@capi/rococo-dev-xcm/trappist"
 import { assert, assertNotEquals } from "asserts"
 import { $, alice as root, createDevUsers, Rune, ValueRune } from "capi"
 import { $siblId } from "capi/patterns/para_id.ts"
@@ -50,10 +50,10 @@ const retryOptions = {
 
 /// Create a sufficient asset with Sudo. When targeting a common good
 /// parachain, access root instead through the relay chain.
-await rococo.Sudo
+await rococoDevXcm.Sudo
   // ae8aa6c (clean up reserve transfer example)
   .sudo({
-    call: rococo.ParasSudoWrapper.sudoQueueDownwardXcm({
+    call: rococoDevXcm.ParasSudoWrapper.sudoQueueDownwardXcm({
       id: RESERVE_CHAIN_ID,
       xcm: VersionedXcm.V2(
         Rune.array([

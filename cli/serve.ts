@@ -1,4 +1,5 @@
 import * as flags from "../deps/std/flags.ts"
+import { blue, gray, yellow } from "../deps/std/fmt/colors.ts"
 import { serve } from "../deps/std/http.ts"
 import { createTempDir } from "../devnets/createTempDir.ts"
 import { createDevnetsHandler } from "../devnets/mod.ts"
@@ -58,12 +59,12 @@ export default async function(...args: string[]) {
         throw error
       },
       async onListen() {
-        console.log(`Capi server listening at "${href}"`)
+        console.log(blue("Created"), "Capi server instance", gray(`at ${href}`))
         await onReady()
       },
     })
   } else {
-    console.log(`Reusing existing Capi server at "${href}"`)
+    console.log(yellow("Reusing"), "Capi server instance", gray(`at ${href}`))
     await onReady()
   }
 

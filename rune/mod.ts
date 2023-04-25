@@ -1,6 +1,6 @@
 export * from "./Rune.ts"
 
-// moderate --exclude Rune.ts
+// moderate --exclude _empty.js Rune.ts
 
 export * from "./ArrayRune.ts"
 export * from "./FnRune.ts"
