@@ -39,10 +39,13 @@ export function frameCodegen(
   const palletDeclarations: string[] = []
   const palletDefinitions: string[] = []
 
+  const chainRuneIdent = `${chainIdent}Rune`
+
   for (const pallet of Object.values(metadata.pallets)) {
-    chainMemberDeclarations.push(`${pallet.name}: ${pallet.name}PalletRune<U>`)
+    const palletRuneIdent = `${chainIdent}${pallet.name}Rune`
+    chainMemberDeclarations.push(`${pallet.name}: ${palletRuneIdent}<U>`)
     chainMembers.push(
-      `${pallet.name} = this.pallet("${pallet.name}").into(${pallet.name}PalletRune, this)`,
+      `${pallet.name} = this.pallet("${pallet.name}").into(${palletRuneIdent}, this)`,
     )
 
     const palletDeclarationStatements: string[] = []
@@ -50,7 +53,7 @@ export function frameCodegen(
 
     for (const storage of Object.values(pallet.storage)) {
       palletDeclarationStatements.push(
-        `${storage.name}: C.StorageRune<${chainIdent}Chain, "${pallet.name}", "${storage.name}", never>`,
+        `${storage.name}: C.StorageRune<${chainIdent}, "${pallet.name}", "${storage.name}", never>`,
       )
       palletStatements.push(`${storage.name} = this.storage("${storage.name}")`)
     }
@@ -77,7 +80,7 @@ export function frameCodegen(
                   `
                     ${variant.tag}: <X>(
                       props: C.RunicArgs<X, Omit<${factory}.${variant.tag}, "type">>
-                    ) => C.ExtrinsicRune<${chainIdent}Chain, C.RunicArgs.U<X>>
+                    ) => C.ExtrinsicRune<${chainIdent}, C.RunicArgs.U<X>>
                   `,
                 )
                 palletStatements.push(extrinsicFactory(variant.tag))
@@ -90,7 +93,7 @@ export function frameCodegen(
               throw new Error("pallet call non-string literalUnion is unsupported")
             }
             palletDeclarationStatements.push(
-              `${value}: () => C.ExtrinsicRune<${chainIdent}Chain, never>`,
+              `${value}: () => C.ExtrinsicRune<${chainIdent}, never>`,
             )
             palletStatements.push(extrinsicFactory(value))
           }))
@@ -109,12 +112,12 @@ export function frameCodegen(
     }
 
     palletDeclarations.push(`
-      export class ${pallet.name}PalletRune<out U> extends C.PalletRune<${chainIdent}Chain, "${pallet.name}", U> {
+      export class ${palletRuneIdent}<out U> extends C.PalletRune<${chainIdent}, "${pallet.name}", U> {
         ${palletDeclarationStatements.join("\n")}
       }
     `)
     palletDefinitions.push(`
-      export class ${pallet.name}PalletRune extends C.PalletRune {
+      export class ${palletRuneIdent} extends C.PalletRune {
         ${palletStatements.join("\n")}
       }
     `)
@@ -141,12 +144,12 @@ export function frameCodegen(
       ${importsCommon}
       import { metadata } from "./metadata.js"
 
-      export interface ${chainIdent}Chain extends C.Chain<typeof metadata> {}
+      export interface ${chainIdent} extends C.Chain<typeof metadata> {}
 
-      export class ${chainIdent}ChainRune<out U> extends C.ChainRune<${chainIdent}Chain, U> {
-        static override from(connect: (signal: AbortSignal) => C.Connection): ${chainIdent}ChainRune<never>
+      export class ${chainRuneIdent}<out U> extends C.ChainRune<${chainIdent}, U> {
+        static override from(connect: (signal: AbortSignal) => C.Connection): ${chainRuneIdent}<never>
 
-        override with(connection: (signal: AbortSignal) => C.Connection): ${chainIdent}ChainRune<U>
+        override with(connection: (signal: AbortSignal) => C.Connection): ${chainRuneIdent}<U>
 
         ${chainMemberDeclarations.join("\n")}
       }
@@ -161,13 +164,13 @@ export function frameCodegen(
       ${importsCommon}
       import { metadata } from "./metadata.js"
 
-      export class ${chainIdent}ChainRune extends C.ChainRune {
+      export class ${chainRuneIdent} extends C.ChainRune {
         static from(connect) {
           return super.from(connect, metadata)
         }
 
         with(connect) {
-          return super.with(connect).into(${chainIdent}ChainRune)
+          return super.with(connect).into(${chainRuneIdent})
         }
 
         ${chainMembers.join("\n")}

@@ -7,7 +7,7 @@
  * @test_skip
  */
 
-import { DoubleEncoded, Instruction, RococoDevXcm } from "@capi/rococo-dev-xcm"
+import { DoubleEncoded, Instruction, rococoDevXcm } from "@capi/rococo-dev-xcm"
 import {
   $assetDetails,
   AssetId,
@@ -16,7 +16,7 @@ import {
   Junctions,
   NetworkId,
   RuntimeEvent,
-  Statemine,
+  statemine,
   VersionedMultiAssets,
   VersionedMultiLocation,
   VersionedXcm,
@@ -25,7 +25,7 @@ import {
   XcmV1MultiAsset,
   XcmV1MultiLocation,
 } from "@capi/rococo-dev-xcm/statemine"
-import { Trappist } from "@capi/rococo-dev-xcm/trappist"
+import { trappist } from "@capi/rococo-dev-xcm/trappist"
 import { assert, assertNotEquals } from "asserts"
 import { $, alice as root, createDevUsers, Rune, ValueRune } from "capi"
 import { $siblId } from "capi/patterns/para_id.ts"
@@ -50,10 +50,10 @@ const retryOptions = {
 
 /// Create a sufficient asset with Sudo. When targeting a common good
 /// parachain, access root instead through the relay chain.
-await RococoDevXcm.Sudo
+await rococoDevXcm.Sudo
   // ae8aa6c (clean up reserve transfer example)
   .sudo({
-    call: RococoDevXcm.ParasSudoWrapper.sudoQueueDownwardXcm({
+    call: rococoDevXcm.ParasSudoWrapper.sudoQueueDownwardXcm({
       id: RESERVE_CHAIN_ID,
       xcm: VersionedXcm.V2(
         Rune.array([
@@ -61,7 +61,7 @@ await RococoDevXcm.Sudo
             originType: "Superuser",
             requireWeightAtMost: 1000000000n,
             call: DoubleEncoded({
-              encoded: Statemine.Assets.forceCreate({
+              encoded: statemine.Assets.forceCreate({
                 id: RESERVE_ASSET_ID,
                 isSufficient: true,
                 minBalance: 1n,
@@ -81,7 +81,7 @@ await RococoDevXcm.Sudo
 
 /// Wait for the asset to be recorded in storage.
 const assetDetails = await retry(
-  () => Statemine.Assets.Asset.value(RESERVE_ASSET_ID).unhandle(undefined).run(),
+  () => statemine.Assets.Asset.value(RESERVE_ASSET_ID).unhandle(undefined).run(),
   retryOptions,
 )
 
@@ -90,7 +90,7 @@ console.log("Statemine: Asset created", assetDetails)
 $.assert($assetDetails, assetDetails)
 
 /// Mint assets on reserve parachain.
-await Statemine.Assets
+await statemine.Assets
   .mint({
     id: RESERVE_ASSET_ID,
     amount: 100000000000000n,
@@ -102,7 +102,7 @@ await Statemine.Assets
   .finalized()
   .run()
 
-const billyStatemintBalance = Statemine.Assets.Account
+const billyStatemintBalance = statemine.Assets.Account
   .value([RESERVE_ASSET_ID, billy.publicKey])
   .unhandle(undefined)
   .access("balance")
@@ -112,9 +112,9 @@ console.log("Statemine(Billy): asset balance", billyStatemintBalanceInitial)
 $.assert($.u128, billyStatemintBalanceInitial)
 
 /// Create the asset on the Trappist parachain.
-await Trappist.Sudo
+await trappist.Sudo
   .sudo({
-    call: Trappist.Assets.forceCreate({
+    call: trappist.Assets.forceCreate({
       id: TRAPPIST_ASSET_ID,
       isSufficient: false,
       minBalance: 1n,
@@ -127,12 +127,12 @@ await Trappist.Sudo
   .finalized()
   .run()
 
-const assetsPalletId = Statemine.Assets.into(ValueRune).access("id")
+const assetsPalletId = statemine.Assets.into(ValueRune).access("id")
 
 /// Register Trappist parachain asset id to reserve asset id.
-await Trappist.Sudo
+await trappist.Sudo
   .sudo({
-    call: Trappist.AssetRegistry.registerReserveAsset({
+    call: trappist.AssetRegistry.registerReserveAsset({
       assetId: TRAPPIST_ASSET_ID,
       assetMultiLocation: XcmV1MultiLocation({
         parents: 1,
@@ -151,7 +151,7 @@ await Trappist.Sudo
   .run()
 
 /// Reserve transfer asset id on reserve parachain to Trappist parachain.
-const events = await Statemine.PolkadotXcm
+const events = await statemine.PolkadotXcm
   .limitedReserveTransferAssets({
     dest: VersionedMultiLocation.V1(XcmV1MultiLocation({
       parents: 1,
@@ -196,7 +196,7 @@ for (const { event } of events) {
 /// Retrieve billy's balance on Trappist.
 const { balance: billyTrappistBalance } = await retry(
   () =>
-    Trappist.Assets.Account
+    trappist.Assets.Account
       .value([TRAPPIST_ASSET_ID, billy.publicKey])
       .unhandle(undefined)
       .run(),
@@ -215,7 +215,7 @@ console.log("Statemine(Billy): asset balance:", billyStatemintBalanceFinal)
 assertNotEquals(billyStatemintBalanceInitial, billyStatemintBalanceFinal)
 
 /// Retrieve the statemint sovereign account balance.
-const statemintSovereignAccountBalance = await Statemine.Assets.Account
+const statemintSovereignAccountBalance = await statemine.Assets.Account
   .value([RESERVE_ASSET_ID, $siblId.encode(TRAPPIST_CHAIN_ID)])
   .unhandle(undefined)
   .access("balance")

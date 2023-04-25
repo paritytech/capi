@@ -4,11 +4,11 @@
  * @description Interact directly with the RPC node's subscription methods.
  */
 
-import { PolkadotDev } from "@capi/polkadot-dev"
+import { polkadotDev } from "@capi/polkadot-dev"
 import { $, known } from "capi"
 
 /// Get an async iterator, which yields subscription events.
-const headerIter = PolkadotDev.connection
+const headerIter = polkadotDev.connection
   .subscribe("chain_subscribeFinalizedHeads", "chain_unsubscribeAllHeads")
   .iter()
 

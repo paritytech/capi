@@ -6,17 +6,17 @@
  * reward points).
  */
 
-import { $eraRewardPoints, Westend } from "@capi/westend"
+import { $eraRewardPoints, westend } from "@capi/westend"
 import { $ } from "capi"
 
 /// Reference the active era index.
-const idx = Westend.Staking.ActiveEra
+const idx = westend.Staking.ActiveEra
   .value()
   .unhandle(undefined)
   .access("index")
 
 /// Retrieve the reward points corresponding to `idx`.
-const points = await Westend.Staking.ErasRewardPoints.value(idx).run()
+const points = await westend.Staking.ErasRewardPoints.value(idx).run()
 
 /// Ensure the era reward points is of the correct shape.
 console.log("Era reward points:", points)

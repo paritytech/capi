@@ -5,14 +5,14 @@
  * Finally, rehydrate the extrinsic and submit it.
  */
 
-import { WestendDev } from "@capi/westend-dev"
+import { westendDev } from "@capi/westend-dev"
 import { $, createDevUsers, SignedExtrinsicRune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 
 const { alexa, billy } = await createDevUsers()
 
 /// Create and sign the extrinsic. Extract the hex.
-const hex = await WestendDev.Balances
+const hex = await westendDev.Balances
   .transfer({
     value: 12345n,
     dest: billy.address,
@@ -27,7 +27,7 @@ save(hex)
 
 /// Hydrate the signed extrinsic, submit it and await finalization.
 const hash = await SignedExtrinsicRune
-  .fromHex(WestendDev, hex)
+  .fromHex(westendDev, hex)
   .sent()
   .dbgStatus("Tx status:")
   .finalized()

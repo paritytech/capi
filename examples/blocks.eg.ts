@@ -6,12 +6,12 @@
  * various pieces of data pertaining to that block.
  */
 
-import { $eventRecord, metadata, Polkadot } from "@capi/polkadot"
+import { $eventRecord, metadata, polkadot } from "@capi/polkadot"
 import { $, $extrinsic, known, Rune } from "capi"
 import { babeBlockAuthor } from "capi/patterns/consensus/mod.ts"
 
 /// Reference the latest block hash.
-const blockHash = Polkadot.blockHash()
+const blockHash = polkadot.blockHash()
 
 /// Reference the associated block.
 const block = blockHash.block()
@@ -26,7 +26,7 @@ const extrinsicsRaw = block.extrinsicsRaw()
 const events = block.events()
 
 /// Reference the author as well.
-const author = babeBlockAuthor(Polkadot, blockHash)
+const author = babeBlockAuthor(polkadot, blockHash)
 
 /// Use `Rune.object` to parallelize these retrievals.
 const collection = await Rune

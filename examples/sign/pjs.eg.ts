@@ -5,7 +5,7 @@
  * extension) to sign a Capi extrinsic.
  */
 
-import { PolkadotDev } from "@capi/polkadot-dev"
+import { polkadotDev } from "@capi/polkadot-dev"
 import { createDevUsers, ss58 } from "capi"
 import { pjsSender, PjsSigner } from "capi/patterns/compat/pjs_sender.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
@@ -36,14 +36,14 @@ const pjsSigner: PjsSigner = {
 /// extension). In our case––since we manually create the signer––we'll also manually
 /// create the associated ss58 (by applying the prefix and Alexa's public key to
 /// Capi's `ss58.encode` util).
-const alexaSs58 = ss58.encode(PolkadotDev.System.SS58Prefix, alexa.publicKey)
+const alexaSs58 = ss58.encode(polkadotDev.System.SS58Prefix, alexa.publicKey)
 
 /// Use the `chain` and signer to create a `sender` factory, which accepts an Ss58
 /// address and returns the `ExtrinsicSender`.
-const sender = pjsSender(PolkadotDev, pjsSigner)
+const sender = pjsSender(polkadotDev, pjsSigner)
 
 /// Sign and send the transfer with the pjs compat `sender` factory and Alexa's Ss58.
-await PolkadotDev.Balances
+await polkadotDev.Balances
   .transfer({
     value: 12345n,
     dest: billy.address,

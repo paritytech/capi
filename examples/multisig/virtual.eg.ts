@@ -19,7 +19,7 @@
  * @test_skip
  */
 
-import { MultiAddress, PolkadotDev } from "@capi/polkadot-dev"
+import { MultiAddress, polkadotDev } from "@capi/polkadot-dev"
 import { assert } from "asserts"
 import { $, createDevUsers, Rune, Sr25519 } from "capi"
 import { VirtualMultisigRune } from "capi/patterns/multisig/mod.ts"
@@ -36,7 +36,7 @@ const { alexa, billy, carol, david } = await createDevUsers()
 let { state } = parse(Deno.args, { string: ["state"] })
 if (!state) {
   state = await VirtualMultisigRune
-    .deployment(PolkadotDev, {
+    .deployment(polkadotDev, {
       founders: [alexa.publicKey, billy.publicKey, carol.publicKey],
       threshold: 2,
       deployer: alexa.address,
@@ -49,10 +49,10 @@ console.log("State:", state)
 $.assert($.str, state)
 
 /// Initialize a `VirtualMultisigRune` with the state's scale-encoded hex string.
-const vMultisig = VirtualMultisigRune.fromHex(PolkadotDev, state)
+const vMultisig = VirtualMultisigRune.fromHex(polkadotDev, state)
 
 /// Transfer funds to the virtual multisig's stash account.
-await PolkadotDev.Balances
+await polkadotDev.Balances
   .transfer({
     dest: MultiAddress.Id(vMultisig.stash),
     value: 20_000_000_000_000n,
@@ -64,7 +64,7 @@ await PolkadotDev.Balances
   .run()
 
 /// Reference David's free balance.
-const davidFree = PolkadotDev.System.Account
+const davidFree = polkadotDev.System.Account
   .value(david.publicKey)
   .unhandle(undefined)
   .access("data", "free")
@@ -74,7 +74,7 @@ const davidFreeInitial = await davidFree.run()
 console.log("David free initial:", davidFreeInitial)
 
 /// Describe the call we wish to dispatch from the virtual multisig's stash.
-const call = PolkadotDev.Balances.transfer({
+const call = polkadotDev.Balances.transfer({
   dest: david.address,
   value: 1_234_000_000_000n,
 })
@@ -91,7 +91,7 @@ console.log("David free final:", davidFreeFinal)
 assert(davidFreeFinal > davidFreeInitial)
 
 function fundAndRatify(name: string, sender: Sr25519) {
-  return PolkadotDev.Utility
+  return polkadotDev.Utility
     .batchAll({
       calls: Rune.array([
         vMultisig.fundMemberProxy(sender.publicKey, 20_000_000_000_000n),

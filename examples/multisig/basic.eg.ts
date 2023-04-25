@@ -6,7 +6,7 @@
  * @test_skip
  */
 
-import { PolkadotDev } from "@capi/polkadot-dev"
+import { polkadotDev } from "@capi/polkadot-dev"
 import { assert } from "asserts"
 import { $, createDevUsers } from "capi"
 import { MultisigRune } from "capi/patterns/multisig/mod.ts"
@@ -15,13 +15,13 @@ import { signature } from "capi/patterns/signature/polkadot.ts"
 const { alexa, billy, carol, david } = await createDevUsers()
 
 /// Initialize the `MultisigRune` with Alexa, Billy and Carol. Set the passing threshold to 2.
-const multisig = MultisigRune.from(PolkadotDev, {
+const multisig = MultisigRune.from(polkadotDev, {
   signatories: [alexa, billy, carol].map(({ publicKey }) => publicKey),
   threshold: 2,
 })
 
 /// Reference David's initial balance. We'll be executing a transfer of some funds to David.
-const davidFree = PolkadotDev.System.Account
+const davidFree = polkadotDev.System.Account
   .value(david.publicKey)
   .unhandle(undefined)
   .access("data", "free")
@@ -31,7 +31,7 @@ const davidFreeInitial = await davidFree.run()
 console.log("David free initial:", davidFreeInitial)
 
 /// Transfer initial funds to the multisig (existential deposit).
-await PolkadotDev.Balances
+await polkadotDev.Balances
   .transfer({
     value: 2_000_000_000_000n,
     dest: multisig.address,
@@ -43,7 +43,7 @@ await PolkadotDev.Balances
   .run()
 
 /// Describe the call we wish to dispatch from the multisig.
-const call = PolkadotDev.Balances.transferKeepAlive({
+const call = polkadotDev.Balances.transferKeepAlive({
   dest: david.address,
   value: 1_230_000_000_000n,
 })

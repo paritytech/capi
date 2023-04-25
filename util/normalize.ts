@@ -14,3 +14,7 @@ export function normalizePackageName(name: string) {
 export function normalizeTypeName(name: string) {
   return normalizeIdent(name).replace(/^./, (x) => x.toUpperCase())
 }
+
+export function normalizeVariableName(name: string) {
+  return normalizeIdent(name).replace(/^./, (x) => x.toLowerCase())
+}

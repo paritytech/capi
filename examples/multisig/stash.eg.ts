@@ -6,7 +6,7 @@
  * @test_skip
  */
 
-import { MultiAddress, PolkadotDev } from "@capi/polkadot-dev"
+import { MultiAddress, polkadotDev } from "@capi/polkadot-dev"
 import { assert } from "asserts"
 import { createDevUsers } from "capi"
 import { MultisigRune } from "capi/patterns/multisig/mod.ts"
@@ -16,13 +16,13 @@ import { signature } from "capi/patterns/signature/polkadot.ts"
 const { alexa, billy, carol } = await createDevUsers()
 
 /// Initialize the `MultisigRune` with Alexa, Billy and Carol. Set the passing threshold to 2.
-const multisig = MultisigRune.from(PolkadotDev, {
+const multisig = MultisigRune.from(polkadotDev, {
   signatories: [alexa, billy, carol].map(({ publicKey }) => publicKey),
   threshold: 2,
 })
 
 /// Send funds to the multisig (existential deposit).
-await PolkadotDev.Balances
+await polkadotDev.Balances
   .transfer({
     value: 20_000_000_000_000n,
     dest: multisig.address,
@@ -35,7 +35,7 @@ await PolkadotDev.Balances
 
 /// Describe the call which we wish to dispatch from the multisig account:
 /// the creation of the stash / pure proxy, belonging to the multisig account itself.
-const call = PolkadotDev.Proxy.createPure({
+const call = polkadotDev.Proxy.createPure({
   proxyType: "Any",
   delay: 0,
   index: 0,
@@ -63,7 +63,7 @@ const stashAccountId = await multisig
   .run()
 
 /// Send funds to the stash (existential deposit).
-await PolkadotDev.Balances
+await polkadotDev.Balances
   .transfer({
     value: 20_000_000_000_000n,
     dest: MultiAddress.Id(stashAccountId),
@@ -75,7 +75,7 @@ await PolkadotDev.Balances
   .run()
 
 /// Ensure that the funds arrived successfully.
-const stashFree = await PolkadotDev.System.Account
+const stashFree = await polkadotDev.System.Account
   .value(stashAccountId)
   .unhandle(undefined)
   .access("data", "free")
