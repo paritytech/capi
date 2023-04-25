@@ -18,7 +18,7 @@ import { InkRune } from "./InkRune.ts"
 
 // TODO: `onInstantiated`
 export interface InstantiateProps {
-  code: Uint8Array
+  code?: Uint8Array
   sender: Uint8Array
   value?: bigint
   ctor?: string
@@ -89,7 +89,30 @@ export class InkMetadataRune<out U> extends Rune<InkMetadata, U> {
     chain: ChainRune<C, U>,
     props: RunicArgs<X, InstantiateProps>,
   ) {
-    const { code } = props
+    const code = Rune
+      .resolve(props.code)
+      .unhandle(undefined)
+      .rehandle(undefined, () =>
+        this.into(ValueRune)
+          .access("source", "wasm")
+          .unhandle(undefined)
+          .map(hex.decode)
+          .rehandle(undefined))
+    const codeHash = this.into(ValueRune).access("source", "hash").map(hex.decode)
+    // TODO: verify deployed or throw
+    // const sourceHash = this.into(ValueRune).access("source", "hash").map(hex.decode)
+    // const codeHash = Rune.tuple([code, sourceHash])
+    //   .map(([code, sourceHash]) =>
+    //     code
+    //       ? sourceHash
+    //       : chain.pallet("Contracts").storage("CodeStorage").valueRaw(
+    //         sourceHash as $.Native<Chain.Storage<C, "Contracts", "CodeStorage">["key"]>,
+    //       )
+    //         .unhandle(undefined)
+    //         .map(() => sourceHash)
+    //         .rehandle(undefined, () => Rune.constant(new NotDeployedError()))
+    //         .unhandle(NotDeployedError)
+    //   )
     const salt = Rune
       .resolve(props.salt)
       .unhandle(undefined)
@@ -113,6 +136,11 @@ export class InkMetadataRune<out U> extends Rune<InkMetadata, U> {
       .rehandle(undefined, () => Rune.constant(new CtorNotFoundError()))
       .unhandle(CtorNotFoundError)
     const data = this.encodeData(ctorMetadata, props.args)
+    const codeUploadOrExisting = code
+      .unhandle(undefined)
+      .map((code) => ({ type: "Upload" as const, value: code }))
+      .rehandle(undefined, () => Rune.object({ type: "Existing" as const, value: codeHash }))
+      .into(ValueRune)
     const instantiateArgs = Rune
       .constant($contractsApiInstantiateArgs)
       .into(CodecRune)
@@ -121,7 +149,7 @@ export class InkMetadataRune<out U> extends Rune<InkMetadata, U> {
         value,
         undefined,
         storageDepositLimit,
-        Rune.object({ type: "Upload" as const, value: code }),
+        codeUploadOrExisting,
         data,
         salt,
       ]))
@@ -142,11 +170,12 @@ export class InkMetadataRune<out U> extends Rune<InkMetadata, U> {
       .object({
         type: "Contracts",
         value: Rune.object({
-          type: "instantiateWithCode",
+          type: code.map((code) => code ? "instantiateWithCode" : "instantiate"),
           value,
           gasLimit,
           storageDepositLimit,
           code,
+          codeHash,
           data,
           salt,
         }),
@@ -175,4 +204,8 @@ export class InkMetadataRune<out U> extends Rune<InkMetadata, U> {
 
 export class CtorNotFoundError extends Error {
   override readonly name = "CtorNotFoundError"
+}
+
+export class NotDeployedError extends Error {
+  override readonly name = "NotDeployedError"
 }

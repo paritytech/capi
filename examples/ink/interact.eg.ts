@@ -40,7 +40,7 @@ const state = contract.call({
 const initialState = await state.run()
 console.log("Alexa initial balance:", initialState)
 
-/// Use the `flip` method to *flip* the contract instance state.
+/// Use the `transfer` method to *transfer* 1000 tokens to Billy.
 const events = await contract
   .tx({
     sender: alexa.publicKey,
