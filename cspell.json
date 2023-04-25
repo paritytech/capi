@@ -18,6 +18,7 @@
     ".git",
     "examples/ink/erc20.json",
     "examples/raw_rpc/metadata",
+    "examples/smoldot/chainspec.json",
     "target",
     "util/_artifacts"
   ]
