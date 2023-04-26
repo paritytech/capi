@@ -35,26 +35,15 @@ export const config: Config = {
       binary: polkadot,
       chain: "rococo-local",
       parachains: {
-        contracts: {
-          id: 2000,
-          binary: polkadotParachain,
-          chain: "contracts-rococo-local",
-        },
-        westmint: {
-          id: 3000,
-          binary: polkadotParachain,
-          chain: "westmint-local",
-        },
-      },
-    },
-    rococoWestmint: {
-      binary: polkadot,
-      chain: "rococo-local",
-      parachains: {
         westmint: {
           id: 1000,
           binary: polkadotParachain,
           chain: "westmint-local",
+        },
+        contracts: {
+          id: 2000,
+          binary: polkadotParachain,
+          chain: "contracts-rococo-local",
         },
       },
     },

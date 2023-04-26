@@ -24,7 +24,7 @@ import {
   CumulusPalletParachainSystemEvent,
   RuntimeEvent,
   westmint,
-} from "@capi/rococo-westmint/westmint"
+} from "@capi/rococo-dev/westmint"
 import { assert } from "asserts"
 import { createDevUsers, Rune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
