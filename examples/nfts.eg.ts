@@ -13,7 +13,7 @@ import {
   PalletNftsEvent,
   RuntimeEvent,
   westmint,
-} from "@capi/rococo-westmint/westmint"
+} from "@capi/rococo-dev/westmint"
 import { assertEquals } from "asserts"
 import { $, createDevUsers, Rune } from "capi"
 import { DefaultCollectionSetting, DefaultItemSetting } from "capi/patterns/nfts.ts"
