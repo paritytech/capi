@@ -1,5 +1,5 @@
 import { config } from "../capi.config.ts"
-import { build } from "../deps/dnt.ts"
+import { build, EntryPoint } from "../deps/dnt.ts"
 import * as flags from "../deps/std/flags.ts"
 import * as fs from "../deps/std/fs.ts"
 import * as path from "../deps/std/path.ts"
@@ -19,6 +19,17 @@ const hash = new URL(importMap.imports["@capi/"]).pathname.slice(1, -1)
 const outDir = path.join("target", "npm")
 
 await fs.emptyDir(outDir)
+const patternsDir = new URL("../patterns", import.meta.url)
+const patternEntries: EntryPoint[] = []
+for await (const dirEntry of fs.walkSync(patternsDir)) {
+  if (dirEntry.isFile) {
+    const pathname = path.relative(patternsDir.pathname, dirEntry.path)
+    patternEntries.push({
+      name: `./patterns/${pathname.slice(0, pathname.endsWith("mod.ts") ? -7 : -3)}`,
+      path: `./patterns/${pathname}`,
+    })
+  }
+}
 
 await Promise.all([
   build({
@@ -52,34 +63,7 @@ await Promise.all([
         name: "capi",
         path: "./main.ts",
       },
-      {
-        name: "./patterns/signature/polkadot",
-        path: "./patterns/signature/polkadot.ts",
-      },
-      {
-        name: "./patterns/compat/pjs_sender",
-        path: "./patterns/compat/pjs_sender.ts",
-      },
-      {
-        name: "./patterns/consensus",
-        path: "./patterns/consensus/mod.ts",
-      },
-      {
-        name: "./patterns/ink",
-        path: "./patterns/ink/mod.ts",
-      },
-      {
-        name: "./patterns/multisig",
-        path: "./patterns/multisig/mod.ts",
-      },
-      {
-        name: "./patterns/identity",
-        path: "./patterns/identity.ts",
-      },
-      {
-        name: "./patterns/storage_sizes",
-        path: "./patterns/storage_sizes.ts",
-      },
+      ...patternEntries,
     ],
     mappings: {
       "https://deno.land/x/wat_the_crypto@v0.0.1/mod.ts": {
