@@ -23,6 +23,12 @@ export interface GenesisConfig {
   session?: {
     keys: [account: string, account: string, key: SessionKey][]
   }
+  aura?: {
+    authorities: string[]
+  }
+  grandpa?: {
+    authorities: [string, 1][]
+  }
   hrmp?: {
     preopenHrmpChannels: [
       senderParaId: number,
