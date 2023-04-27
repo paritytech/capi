@@ -84,6 +84,21 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
     )
   }
 
+  fund<X>(...[amount]: RunicArgs<X, [amount: bigint]>) {
+    return this.chain.extrinsic(
+      Rune
+        .object({
+          type: "Balances",
+          value: Rune.object({
+            type: "transfer",
+            dest: this.address,
+            value: amount,
+          }),
+        })
+        .unsafeAs<Chain.Call<C>>(),
+    )
+  }
+
   maybeTimepoint<X>(
     ...[callHash, blockHash]: RunicArgs<X, [callHash: Uint8Array, blockHash?: string]>
   ) {
