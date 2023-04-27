@@ -3,7 +3,6 @@
  * @stability unstable
  * @description Create a multisig account and ratify a vote to execute a transfer from
  * that multisig.
- * @test_skip
  */
 
 import { polkadotDev } from "@capi/polkadot-dev"

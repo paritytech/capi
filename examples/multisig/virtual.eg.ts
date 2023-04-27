@@ -15,8 +15,6 @@
  * To edit a virtual multisig, its members can propose the creation of a new multisig,
  * comprised of proxy accounts corresponding to its new members. Finally, the current
  * members ratify a call to give ownership of the stash account to the new multisig.
- *
- * @test_skip
  */
 
 import { MultiAddress, polkadotDev } from "@capi/polkadot-dev"
