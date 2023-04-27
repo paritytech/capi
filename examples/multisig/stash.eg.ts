@@ -22,7 +22,8 @@ const multisig = MultisigRune.from(polkadotDev, {
 })
 
 /// Send funds to the multisig (existential deposit).
-await multisig.fund(20_000_000_000_000n)
+await multisig
+  .fund(20_000_000_000_000n)
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Existential deposit:")
