@@ -3,7 +3,6 @@
  * @stability unstable
  * @description Create a multisig account and ratify a vote to execute a transfer from
  * that multisig.
- * @test_skip
  */
 
 import { polkadotDev } from "@capi/polkadot-dev"
@@ -31,11 +30,8 @@ const davidFreeInitial = await davidFree.run()
 console.log("David free initial:", davidFreeInitial)
 
 /// Transfer initial funds to the multisig (existential deposit).
-await polkadotDev.Balances
-  .transfer({
-    value: 2_000_000_000_000n,
-    dest: multisig.address,
-  })
+await multisig
+  .fund(2_000_000_000_000n)
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Existential deposit:")
