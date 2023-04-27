@@ -1,3 +1,4 @@
+import { deepMerge } from "../deps/std/collections/deep_merge.ts"
 import {
   addAuthorities,
   addDevUsers,
@@ -5,6 +6,7 @@ import {
   createCustomChainSpec,
   GenesisConfig,
   getGenesisConfig,
+  setGenesisConfig,
 } from "./chain_spec/mod.ts"
 import { DevNet, DevNetSpec, spawnDevNet } from "./DevNetSpec.ts"
 import { DevParachainProps, DevParachainSpec } from "./DevParachainSpec.ts"
@@ -39,15 +41,16 @@ export class DevRelaySpec extends DevNetSpec {
     return createCustomChainSpec(tempDir, binary, this.chain, (chainSpec) => {
       const genesisConfig = getGenesisConfig(chainSpec)
       if (parachainInfo.length) {
-        genesisConfig.paras.paras.push(
-          ...parachainInfo.map((
-            { id, genesis },
-          ): GenesisConfig["paras"]["paras"][number] => [id, [...genesis, true]]),
+        genesisConfig.paras?.paras.push(
+          ...parachainInfo.map(({ id, genesis: [state, wasm] }) =>
+            [id, [state, wasm, true]] as NonNullable<GenesisConfig["paras"]>["paras"][number]
+          ),
         )
         addXcmHrmpChannels(genesisConfig, parachainInfo.map(({ id }) => id))
       }
       addAuthorities(genesisConfig, minValidators)
-      addDevUsers(genesisConfig.balances.balances)
+      addDevUsers(genesisConfig)
+      setGenesisConfig(chainSpec, deepMerge(genesisConfig, this.genesis ?? {}))
     })
   }
 
