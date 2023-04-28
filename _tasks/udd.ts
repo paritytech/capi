@@ -17,6 +17,5 @@ await Promise.all(pending)
 async function udd(filePath: string) {
   await new Deno.Command("deno", {
     args: ["run", "-A", "https://deno.land/x/udd@0.8.2/main.ts", filePath],
-  }).spawn()
-    .status
+  }).spawn().output()
 }

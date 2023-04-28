@@ -1,4 +1,3 @@
-// deno-lint-ignore-file
 import { Command } from "./command.node.ts"
 
 declare const process: { env: Record<string, string> }

@@ -1,4 +1,3 @@
-// deno-lint-ignore-file
 import { readableStreamFromReader, writableStreamFromWriter } from "../std/streams.ts"
 
 export class Command implements Deno.Command {
