@@ -25,7 +25,7 @@ for await (const dirEntry of fs.walkSync(patternsDir)) {
   if (dirEntry.isFile) {
     const pathname = path.relative(patternsDir.pathname, dirEntry.path)
     patternEntries.push({
-      name: `./patterns/${pathname.slice(0, pathname.endsWith("mod.ts") ? -7 : -3)}`,
+      name: `./patterns/${pathname.slice(0, pathname.endsWith("mod.ts") ? "/mod.ts".length : ".ts".length)}`,
       path: `./patterns/${pathname}`,
     })
   }
