@@ -112,7 +112,7 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
   // TODO: why the type errors?
   proposals<X>(
     ...[count, blockHash]: RunicArgs<X, [count: number, blockHash?: string]>
-  ): ValueRune<Chain.Storage.Key<C, "Multisig", "multisigs">[], U> {
+  ): ValueRune<Chain.Storage.Key<C, "Multisig", "multisigs">[], RunicArgs.U<X> | U> {
     const partialKey = Rune.tuple([this.accountId])
     return this.storage.keys({
       count,
