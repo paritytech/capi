@@ -126,10 +126,12 @@ export class VirtualMultisigRune<out C extends Chain, out U>
         undefined,
         () => chain.pallet("Balances").constant("ExistentialDeposit").decoded,
       )
+    const suppliedStash = Rune.resolve(props.stash)
+
     const memberAccountIds = Rune.resolve(props.founders)
     const deployer = Rune.resolve(props.deployer)
     const membersCount = memberAccountIds.map((members) => members.length)
-    const proxyCreationCalls = membersCount.map((n) =>
+    const proxyCreationCalls = Rune.tuple([membersCount, suppliedStash]).map(([n, stash]) =>
       Rune.array(Array.from({ length: n + (stash ? 0 : 1) }, (_, index) =>
         chain.extrinsic(
           Rune
@@ -171,8 +173,8 @@ export class VirtualMultisigRune<out C extends Chain, out U>
       )
 
     const proxiesGrouped = Rune
-      .tuple([proxies, membersCount])
-      .map(([proxies, membersCount]) =>
+      .tuple([proxies, membersCount, suppliedStash])
+      .map(([proxies, membersCount, stash]) =>
         [
           proxies.slice(0, membersCount),
           stash ?? proxies[membersCount],
