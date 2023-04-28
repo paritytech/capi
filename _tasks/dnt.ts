@@ -19,15 +19,29 @@ const hash = new URL(importMap.imports["@capi/"]).pathname.slice(1, -1)
 const outDir = path.join("target", "npm")
 
 await fs.emptyDir(outDir)
-const patternsDir = new URL("../patterns", import.meta.url)
-const patternEntries: EntryPoint[] = []
-for await (const dirEntry of fs.walkSync(patternsDir)) {
-  if (dirEntry.isFile) {
-    const pathname = path.relative(patternsDir.pathname, dirEntry.path)
-    patternEntries.push({
-      name: `./patterns/${pathname.slice(0, pathname.endsWith("mod.ts") ? "/mod.ts".length : ".ts".length)}`,
-      path: `./patterns/${pathname}`,
+
+const entryPoints: EntryPoint[] = []
+const mappings: Record<string, string> = {}
+
+const allFiles = []
+for await (
+  const { path } of fs.walkSync(".", {
+    exts: [".ts"],
+    skip: [/\.test\.ts$/, /^\.\/target\//, /\/_/],
+    includeDirs: false,
+  })
+) allFiles.push(`./${path}`)
+
+for (const pathname of allFiles) {
+  if (!pathname.endsWith(".node.ts")) {
+    entryPoints.push({
+      name: pathname.slice(0, -(pathname.endsWith("mod.ts") ? "/mod.ts".length : ".ts".length)),
+      path: pathname,
     })
+    const nodePath = pathname.slice(0, -".ts".length) + ".node.ts"
+    if (allFiles.includes(nodePath)) {
+      mappings[pathname] = nodePath
+    }
   }
 }
 
@@ -55,17 +69,14 @@ await Promise.all([
     },
     entryPoints: [
       {
-        name: ".",
-        path: "./mod.ts",
-      },
-      {
         kind: "bin",
         name: "capi",
         path: "./main.ts",
       },
-      ...patternEntries,
+      ...entryPoints,
     ],
     mappings: {
+      ...mappings,
       "https://deno.land/x/wat_the_crypto@v0.0.1/mod.ts": {
         name: "wat-the-crypto",
         version: "0.0.1",
@@ -91,12 +102,6 @@ await Promise.all([
         version: "8.13.0",
       },
       "./deps/shims/shim-deno.ts": "@deno/shim-deno",
-      "./deps/shims/upgradeWebSocket.ts": "./deps/shims/upgradeWebSocket.node.ts",
-      "./deps/shims/register.ts": "./deps/shims/register.node.ts",
-      "./deps/std/http.ts": "./deps/std/http.node.ts",
-      "./server/getStatic.ts": "./server/getStatic.node.ts",
-      "./util/port.ts": "./util/port.node.ts",
-      "./util/gracefulExit.ts": "./util/gracefulExit.node.ts",
       "node:net": "node:net",
       "node:http": "node:http",
       "node:stream": "node:stream",
