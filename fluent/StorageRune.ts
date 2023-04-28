@@ -64,7 +64,7 @@ export class StorageRune<
   }
 
   entriesRaw<X, Y>(
-    props: RunicArgs<X, StorageRangeProps<C, P, S>>,
+    props: RunicArgs<X, StoragePageProps<C, P, S>>,
     ...[blockHash]: RunicArgs<Y, [blockHash?: string]>
   ) {
     const storageKeys = this.keysRaw(props, blockHash)
@@ -72,7 +72,7 @@ export class StorageRune<
   }
 
   entries<X, Y>(
-    props: RunicArgs<X, StorageRangeProps<C, P, S>>,
+    props: RunicArgs<X, StoragePageProps<C, P, S>>,
     ...[blockHash]: RunicArgs<Y, [blockHash?: string]>
   ) {
     return Rune
@@ -87,7 +87,7 @@ export class StorageRune<
   }
 
   keysRaw<X, Y>(
-    props: RunicArgs<X, StorageRangeProps<C, P, S>>,
+    props: RunicArgs<X, StoragePageProps<C, P, S>>,
     ...[blockHash]: RunicArgs<Y, [blockHash?: string]>
   ) {
     const storageKey = this.$partialKey.encoded(
@@ -108,7 +108,7 @@ export class StorageRune<
   }
 
   keys<X, Y>(
-    props: RunicArgs<X, StorageRangeProps<C, P, S>>,
+    props: RunicArgs<X, StoragePageProps<C, P, S>>,
     ...[blockHash]: RunicArgs<Y, [blockHash?: string]>
   ) {
     const raw = this.keysRaw(props, blockHash)
@@ -118,7 +118,7 @@ export class StorageRune<
   }
 }
 
-export interface StorageRangeProps<
+export interface StoragePageProps<
   out C extends Chain,
   out P extends Chain.PalletName<C>,
   out S extends Chain.StorageName<C, P>,
