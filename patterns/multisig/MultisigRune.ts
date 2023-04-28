@@ -109,15 +109,15 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
       .rehandle(undefined)
   }
 
-  proposals<X>(...[count, blockHash]: RunicArgs<X, [count: number, blockHash?: string]>) {
-    return this.storage.keyPage(
+  // TODO: why the type errors?
+  proposals<X>(
+    ...[count, blockHash]: RunicArgs<X, [count: number, blockHash?: string]>
+  ): ValueRune<Chain.Storage.Key<C, "Multisig", "multisigs">[], U> {
+    const partialKey = Rune.tuple([this.accountId])
+    return this.storage.keys({
       count,
-      Rune
-        .tuple([this.accountId])
-        .unsafeAs<$.Native<Chain.Storage<C, "Multisig", "Multisigs">["partialKey"]>>(),
-      undefined,
-      blockHash,
-    )
+      partialKey: partialKey as never,
+    }, blockHash) as never
   }
 
   proposal<X>(...[callHash, blockHash]: RunicArgs<X, [callHash: Uint8Array, blockHash?: string]>) {

@@ -63,32 +63,20 @@ export class StorageRune<
       .rehandle(undefined)
   }
 
-  entryPageRaw<X>(
-    ...[count, partialKey, start, blockHash]: RunicArgs<X, [
-      count: number,
-      partialKey: Chain.Storage.PartialKey<C, P, S>,
-      start?: Chain.Storage.Key<C, P, S>,
-      blockHash?: string,
-    ]>
+  entriesRaw<X, Y>(
+    props: RunicArgs<X, StorageRangeProps<C, P, S>>,
+    ...[blockHash]: RunicArgs<Y, [blockHash?: string]>
   ) {
-    const storageKeys = this.keyPageRaw(count, partialKey, start, blockHash)
+    const storageKeys = this.keysRaw(props, blockHash)
     return this.chain.connection.call("state_queryStorageAt", storageKeys, blockHash)
   }
 
-  entryPage<X>(
-    ...[count, partialKey, start, blockHash]: RunicArgs<X, [
-      count: number,
-      partialKey: Chain.Storage.PartialKey<C, P, S>,
-      start?: Chain.Storage.Key<C, P, S>,
-      blockHash?: string,
-    ]>
+  entries<X, Y>(
+    props: RunicArgs<X, StorageRangeProps<C, P, S>>,
+    ...[blockHash]: RunicArgs<Y, [blockHash?: string]>
   ) {
     return Rune
-      .tuple([
-        this.entryPageRaw(count, partialKey, start, blockHash).access(0),
-        this.$key,
-        this.$value,
-      ])
+      .tuple([this.entriesRaw(props, blockHash).access(0), this.$key, this.$value])
       .map(([changeset, $key, $value]) =>
         changeset!.changes.map(([k, v]) => [
           $key.decode(hex.decode(k)),
@@ -98,33 +86,44 @@ export class StorageRune<
       .unsafeAs<[Chain.Storage.Key<C, P, S>, Chain.Storage.Value<C, P, S>][]>()
   }
 
-  keyPageRaw<X>(
-    ...[count, partialKey, start, blockHash]: RunicArgs<X, [
-      count: number,
-      partialKey: Chain.Storage.PartialKey<C, P, S>,
-      start?: Chain.Storage.Key<C, P, S>,
-      blockHash?: string,
-    ]>
+  keysRaw<X, Y>(
+    props: RunicArgs<X, StorageRangeProps<C, P, S>>,
+    ...[blockHash]: RunicArgs<Y, [blockHash?: string]>
   ) {
-    const storageKey = this.$partialKey.encoded(partialKey).map(hex.encodePrefixed)
+    const storageKey = this.$partialKey.encoded(
+      Rune.resolve("partialKey" in props ? props.partialKey : null).unsafeAs(),
+    )
+      .map(hex.encodePrefixed)
     const startKey = this.$key
-      .encoded(Rune.resolve(start).unhandle(undefined))
+      .encoded(Rune.resolve(props.start).unhandle(undefined))
       .map(hex.encodePrefixed)
       .rehandle(undefined)
-    return this.chain.connection.call("state_getKeysPaged", storageKey, count, startKey, blockHash)
+    return this.chain.connection.call(
+      "state_getKeysPaged",
+      storageKey,
+      Rune.resolve(props.count).handle(undefined, () => Rune.constant(100)),
+      startKey,
+      blockHash,
+    )
   }
 
-  keyPage<X>(
-    ...[count, partialKey, start, blockHash]: RunicArgs<X, [
-      count: number,
-      partialKey: Chain.Storage.PartialKey<C, P, S>,
-      start?: Chain.Storage.Key<C, P, S>,
-      blockHash?: string,
-    ]>
+  keys<X, Y>(
+    props: RunicArgs<X, StorageRangeProps<C, P, S>>,
+    ...[blockHash]: RunicArgs<Y, [blockHash?: string]>
   ) {
-    const raw = this.keyPageRaw(count, partialKey, start, blockHash)
+    const raw = this.keysRaw(props, blockHash)
     return Rune.tuple([this.$key, raw])
       .map(([$key, raw]) => raw.map((keyEncoded) => $key.decode(hex.decode(keyEncoded))))
       .into(ValueRune)
   }
+}
+
+export interface StorageRangeProps<
+  out C extends Chain,
+  out P extends Chain.PalletName<C>,
+  out S extends Chain.StorageName<C, P>,
+> {
+  count?: number
+  partialKey?: Chain.Storage.PartialKey<C, P, S>
+  start?: Chain.Storage.Key<C, P, S>
 }
