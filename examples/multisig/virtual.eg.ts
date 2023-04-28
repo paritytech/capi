@@ -23,6 +23,7 @@ import { $, createDevUsers, Rune, Sr25519 } from "capi"
 import { VirtualMultisigRune } from "capi/patterns/multisig/mod.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 import { parse } from "../../deps/std/flags.ts"
+import { filterPureCreatedEvents } from "../../patterns/proxy/mod.ts"
 
 const { alexa, billy, carol, david } = await createDevUsers()
 
@@ -31,13 +32,30 @@ const { alexa, billy, carol, david } = await createDevUsers()
 /// With this state, we can hydrate from / use an existing virtual multisig.
 /// Let's see if we can hydrate the virtual multisig state from command line arguments.
 /// If we haven't specified any virtual multisig state, we deploy a new virtual multisig.
-let { state } = parse(Deno.args, { string: ["state"] })
+const args = parse(Deno.args, { string: ["state"], boolean: ["use-stash"] })
+let state = args.state
+const useStash = args["use-stash"]
+
 if (!state) {
+  const stashAccountId = useStash
+    ? await polkadotDev.Proxy.createPure({
+      proxyType: "Any",
+      delay: 0,
+      index: 0,
+    }).signed(signature({ sender: alexa }))
+      .sent()
+      .finalizedEvents()
+      .pipe(filterPureCreatedEvents)
+      .access(0, "pure")
+      .run()
+    : undefined
+
   state = await VirtualMultisigRune
     .deployment(polkadotDev, {
       founders: [alexa.publicKey, billy.publicKey, carol.publicKey],
       threshold: 2,
       deployer: alexa.address,
+      stash: stashAccountId,
     }, signature({ sender: alexa }))
     .hex
     .run()

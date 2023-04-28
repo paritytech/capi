@@ -118,7 +118,7 @@ export class VirtualMultisigRune<out C extends Chain, out U>
     props: RunicArgs<X, VirtualMultisigDeploymentProps>,
     signature: SignatureDataFactory<C, any, SU>,
   ) {
-    const { threshold } = props
+    const { threshold, stash } = props
     const existentialDepositAmount = Rune
       .resolve(props.existentialDepositAmount)
       .unhandle(undefined)
@@ -130,7 +130,7 @@ export class VirtualMultisigRune<out C extends Chain, out U>
     const deployer = Rune.resolve(props.deployer)
     const membersCount = memberAccountIds.map((members) => members.length)
     const proxyCreationCalls = membersCount.map((n) =>
-      Rune.array(Array.from({ length: n + 1 }, (_, index) =>
+      Rune.array(Array.from({ length: n + (stash ? 0 : 1) }, (_, index) =>
         chain.extrinsic(
           Rune
             .object({
@@ -173,7 +173,10 @@ export class VirtualMultisigRune<out C extends Chain, out U>
     const proxiesGrouped = Rune
       .tuple([proxies, membersCount])
       .map(([proxies, membersCount]) =>
-        [proxies.slice(0, membersCount), proxies[membersCount]] as [Uint8Array[], Uint8Array]
+        [
+          proxies.slice(0, membersCount),
+          stash ?? proxies[membersCount],
+        ] as [Uint8Array[], Uint8Array]
       )
     const memberProxies = proxiesGrouped.access(0)
     const stashProxy = proxiesGrouped.access(1)
@@ -306,6 +309,7 @@ export class VirtualMultisigRune<out C extends Chain, out U>
 export interface VirtualMultisigDeploymentProps {
   founders: Uint8Array[]
   threshold?: number
+  stash?: Uint8Array
   deployer: MultiAddress
   existentialDepositAmount?: bigint
 }
