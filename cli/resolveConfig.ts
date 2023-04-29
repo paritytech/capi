@@ -1,18 +1,14 @@
 import * as flags from "../deps/std/flags.ts"
 import * as path from "../deps/std/path.ts"
-import { Config } from "../devnets/mod.ts"
+import { NetConfig } from "../devnets/mod.ts"
 
-export async function resolveConfig(...args: string[]): Promise<Config> {
-  const { config: rawConfigPath } = flags.parse(args, {
-    string: ["config"],
-    default: {
-      config: "./capi.config.ts",
-    },
+export async function resolveConfig(...args: string[]): Promise<Record<string, NetConfig>> {
+  const { nets: netsPathRaw } = flags.parse(args, {
+    string: ["nets"],
+    default: { nets: "./nets.ts" },
   })
-  const configPath = path.resolve(rawConfigPath)
-  await Deno.stat(configPath)
-  const configModule = await import(path.toFileUrl(configPath).toString())
-  const config = configModule.config
-  if (typeof config !== "object") throw new Error("config file must have a config export")
-  return config
+  const netsPath = path.resolve(netsPathRaw)
+  await Deno.stat(netsPath)
+  // TODO: validation a la `scale-ts`
+  return await import(path.toFileUrl(netsPath).toString())
 }

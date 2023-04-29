@@ -1,7 +1,7 @@
 export * as $ from "./deps/scale.ts"
 export { BitSequence } from "./deps/scale.ts"
 
-// moderate --exclude main.ts server util capi.config.ts
+// moderate --exclude main.ts nets.ts server util
 
 export * from "./crypto/mod.ts"
 export * from "./devnets/mod.ts"

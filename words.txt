@@ -1,5 +1,6 @@
 alexa
 amannn
+autobin
 autoremove
 aventus
 azuretools
@@ -49,8 +50,8 @@ multiaddr
 multiaddress
 multiasset
 multichain
-multilocation
 multihash
+multilocation
 multisigs
 multistep
 noninteractive

@@ -8,14 +8,17 @@ import { WsConnection } from "../mod.ts"
 import { $codegenSpec, CodegenEntry, CodegenSpec } from "../server/codegenSpec.ts"
 import { normalizePackageName, withSignal } from "../util/mod.ts"
 import { normalizeTypeName } from "../util/normalize.ts"
-import { Config } from "./Config.ts"
+import { NetConfig } from "./NetConfig.ts"
 import { startNetworkForMetadata } from "./startNetwork.ts"
 
-export async function syncConfig(tempDir: string, config: Config) {
+export async function syncConfig(
+  tempDir: string,
+  chains: Record<string, NetConfig>,
+  server: string,
+) {
   return withSignal(async (signal) => {
-    const { server } = config
     const entries = new Map<string, CodegenEntry>()
-    const chainConfigEntries = Object.entries(config.chains ?? {})
+    const chainConfigEntries = Object.entries(chains)
     const syncTotal = chainConfigEntries
       .map(([_, entry]) =>
         entry.binary && entry.parachains ? 1 + Object.values(entry.parachains).length : 1

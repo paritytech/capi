@@ -2,14 +2,18 @@ import * as path from "../deps/std/path.ts"
 import { $ } from "../mod.ts"
 import * as f from "../server/factories.ts"
 import { PermanentMemo } from "../util/memo.ts"
-import { Config } from "./Config.ts"
 import { devUserPublicKeys } from "./dev_users.ts"
+import { NetConfig } from "./NetConfig.ts"
 import { proxyWebSocket } from "./proxyWebSocket.ts"
 import { Network, startNetwork } from "./startNetwork.ts"
 
 const rDevnetsApi = /^\/devnets\/([\w-]+)(?:\/([\w-]+))?$/
 
-export function createDevnetsHandler(tempDir: string, config: Config, signal: AbortSignal) {
+export function createDevnetsHandler(
+  tempDir: string,
+  nets: Record<string, NetConfig>,
+  signal: AbortSignal,
+) {
   const networkMemo = new PermanentMemo<string, Network>()
   let devUserIndex = 0
   return async (request: Request) => {
@@ -27,7 +31,7 @@ export function createDevnetsHandler(tempDir: string, config: Config, signal: Ab
     if (!match) return f.notFound()
     const name = match[1]!
     const paraName = match[2]
-    const networkConfig = config.chains?.[name!]
+    const networkConfig = nets[name!]
     if (networkConfig?.binary == null) return f.notFound()
     const network = await networkMemo.run(name!, async () => {
       return startNetwork(path.join(tempDir, name!), networkConfig, signal)

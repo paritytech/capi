@@ -11,16 +11,18 @@ export default async function(...args: string[]) {
     "import-map": importMapFile,
     "package-json": packageJsonFile,
     check,
+    server,
   } = flags.parse(args, {
-    string: ["config", "import-map", "package-json"],
+    string: ["config", "import-map", "package-json", "server"],
     boolean: ["check"],
+    default: { server: "https://capi.dev/" },
   })
 
   const config = await resolveConfig(...args)
 
   const tempDir = await createTempDir()
 
-  const baseUrl = await syncConfig(tempDir, config)
+  const baseUrl = await syncConfig(tempDir, config, server)
 
   if (importMapFile) {
     syncFile(importMapFile, (importMap) => {
