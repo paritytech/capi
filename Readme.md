@@ -49,7 +49,7 @@ export const polkadot = wss({
 
 // 2. a Polkadot development network
 export const polkadotDev = dev({
-  binary: binary("polkadot", "v0.9.38"),
+  binary: autobin("polkadot", "v0.9.38"),
   chain: "polkadot-dev",
 })
 ```

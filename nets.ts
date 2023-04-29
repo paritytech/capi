@@ -1,8 +1,8 @@
-import { binary, devnet, rawNet, wsNet } from "./mod.ts"
+import { autobin, devnet, rawNet, wsNet } from "./mod.ts"
 
-const polkadotBin = binary("polkadot", "v0.9.38")
-const polkadotParachainBin = binary("polkadot-parachain", "v0.9.380")
-const substrateContractsNodeBin = binary("substrate-contracts-node", "v0.24.0")
+const polkadotBin = autobin("polkadot", "v0.9.38")
+const polkadotParachainBin = autobin("polkadot-parachain", "v0.9.380")
+const substrateContractsNodeBin = autobin("substrate-contracts-node", "v0.24.0")
 
 export const polkadot = wsNet({
   url: "wss://rpc.polkadot.io/",
@@ -52,17 +52,17 @@ export const rococoDev = devnet({
 })
 
 export const rococoDevXcm = devnet({
-  binary: binary("polkadot", "v0.9.37"),
+  binary: autobin("polkadot", "v0.9.37"),
   chain: "rococo-local",
   parachains: {
     statemine: {
       id: 1000,
-      binary: binary("polkadot-parachain", "v0.9.370"),
+      binary: autobin("polkadot-parachain", "v0.9.370"),
       chain: "statemine-local",
     },
     trappist: {
       id: 2000,
-      binary: binary("trappist-collator", "79bba6e"),
+      binary: autobin("trappist-collator", "79bba6e"),
       chain: "local",
     },
   },
