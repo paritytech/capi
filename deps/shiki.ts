@@ -1,8 +1,8 @@
 import * as shiki from "https://esm.sh/v113/shiki@0.14.1?bundle"
-import typescriptLang from "https://unpkg.com/shiki@0.14.1/languages/typescript.tmLanguage.json" assert {
+import typescriptLang from "https://unpkg.com/shiki@0.14.2/languages/typescript.tmLanguage.json" assert {
   type: "json",
 }
-import githubDark from "https://unpkg.com/shiki@0.14.1/themes/github-dark.json" assert {
+import githubDark from "https://unpkg.com/shiki@0.14.2/themes/github-dark.json" assert {
   type: "json",
 }
 import { shikiWasm } from "../util/_artifacts/shikiWasm.ts"
