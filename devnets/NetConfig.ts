@@ -1,41 +1,68 @@
 import { Binary } from "./binary.ts"
 
-export type NetConfig = WsNetConfig | DevNetConfig | RawMetadataNetConfig
+export type NetConfig = WsNetConfig | RelayChainConfig | ParachainConfig | MetadataNetConfig
 
-export function wsNet(props: WsNetConfig) {
-  return props
-}
-export interface WsNetConfig {
-  url: string
+export class WsNetConfig {
   binary?: never
   metadata?: never
 
-  version: string
+  constructor(readonly url: string, readonly version: string) {}
 }
 
-export function devnet(props: DevNetConfig) {
-  return props
-}
-export interface DevNetConfig {
+export abstract class DevNetConfig {
   url?: never
-  binary: Binary
   metadata?: never
 
-  chain: string
-  nodes?: number
-  parachains?: Record<string, {
-    binary: Binary
-    chain: string
-    id: number
-    nodes?: number
-  }>
+  abstract binary: Binary
+  abstract chain: string
+  abstract nodes?: number
 }
 
-export function rawNet(metadata: Uint8Array): RawMetadataNetConfig {
-  return { metadata }
+export class RelayChainConfig extends DevNetConfig {
+  constructor(
+    readonly binary: Binary,
+    readonly chain: string,
+    readonly nodes?: number,
+    readonly parachains?: Record<string, ParachainConfig>,
+  ) {
+    super()
+  }
 }
-export interface RawMetadataNetConfig {
+
+export class ParachainConfig extends DevNetConfig {
+  parachains?: never
+
+  constructor(
+    readonly binary: Binary,
+    readonly chain: string,
+    readonly id: number,
+    readonly nodes?: number,
+  ) {
+    super()
+  }
+}
+
+export interface MetadataNetConfig {
   url?: never
   binary?: never
   metadata: Uint8Array
+}
+
+export namespace net {
+  export function fromWs(url: string, version = "latest") {
+    return new WsNetConfig(url, version)
+  }
+
+  export function fromBin(
+    binary: Binary,
+    chain: string,
+    nodes?: number,
+    parachains?: Record<string, ParachainConfig>,
+  ) {
+    return new RelayChainConfig(binary, chain, nodes, parachains)
+  }
+
+  export function fromMetadata(metadata: Uint8Array): MetadataNetConfig {
+    return { metadata }
+  }
 }

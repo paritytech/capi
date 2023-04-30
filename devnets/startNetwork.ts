@@ -13,7 +13,7 @@ import {
   getGenesisConfig,
 } from "./chainSpec.ts"
 import { addDevUsers } from "./dev_users.ts"
-import { DevNetConfig } from "./NetConfig.ts"
+import { RelayChainConfig } from "./NetConfig.ts"
 
 export interface Network {
   relay: NetworkChain
@@ -27,7 +27,7 @@ export interface NetworkChain {
 
 export async function startNetworkForMetadata(
   tempDir: string,
-  config: DevNetConfig,
+  config: RelayChainConfig,
   signal: AbortSignal,
 ): Promise<Network> {
   const relayBinary = await resolveBinary(config.binary, signal)
@@ -70,7 +70,7 @@ export async function startNetworkForMetadata(
 
 export async function startNetwork(
   tempDir: string,
-  config: DevNetConfig,
+  config: RelayChainConfig,
   signal: AbortSignal,
 ): Promise<Network> {
   const paras = await Promise.all(
