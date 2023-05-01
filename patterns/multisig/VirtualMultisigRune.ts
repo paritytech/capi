@@ -118,7 +118,7 @@ export class VirtualMultisigRune<out C extends Chain, out U>
     props: RunicArgs<X, VirtualMultisigDeploymentProps>,
     signature: SignatureDataFactory<C, any, SU>,
   ) {
-    const { threshold, stash } = props
+    const { threshold } = props
     const existentialDepositAmount = Rune
       .resolve(props.existentialDepositAmount)
       .unhandle(undefined)
