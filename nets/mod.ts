@@ -1,6 +1,6 @@
 import { BinaryGetter } from "./DevNet.ts"
+import { DevRelayChain } from "./DevRelayChain.ts"
 import { MetadataNet } from "./MetadataNet.ts"
-import { RelayChain } from "./RelayChain.ts"
 import { WsNet } from "./WsNet.ts"
 
 export namespace net {
@@ -13,7 +13,7 @@ export namespace net {
   }
 
   export function dev(binary: BinaryGetter, chain: string, nodeCount?: number) {
-    return new RelayChain(binary, chain, nodeCount)
+    return new DevRelayChain(binary, chain, nodeCount)
   }
 }
 
@@ -21,8 +21,8 @@ export namespace net {
 
 export * from "./common/mod.ts"
 export * from "./DevNet.ts"
+export * from "./DevParachain.ts"
+export * from "./DevRelayChain.ts"
 export * from "./MetadataNet.ts"
 export * from "./Net.ts"
-export * from "./Parachain.ts"
-export * from "./RelayChain.ts"
 export * from "./WsNet.ts"

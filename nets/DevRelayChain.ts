@@ -8,13 +8,13 @@ import {
 import { addDevUsers } from "./common/dev_users.ts"
 import { spawnDevNet, SpawnDevNetResult } from "./common/spawnDevNet.ts"
 import { BinaryGetter, DevNet } from "./DevNet.ts"
-import { Parachain, ParachainInfo } from "./Parachain.ts"
+import { DevParachain, ParachainInfo } from "./DevParachain.ts"
 
-export class RelayChain extends DevNet {
-  parachains: Parachain[] = []
+export class DevRelayChain extends DevNet {
+  parachains: DevParachain[] = []
 
   parachain(binary: BinaryGetter, chain: string, id: number, nodes?: number) {
-    return new Parachain(this, binary, chain, id, nodes)
+    return new DevParachain(this, binary, chain, id, nodes)
   }
 
   preflightNetworkArgs() {

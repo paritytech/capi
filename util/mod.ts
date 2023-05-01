@@ -1,6 +1,7 @@
 // moderate --exclude autobin cache port.ts proxyWebSocket.ts tempDir.ts tsFormatter.ts
 
 export * from "./ArrayOfLength.ts"
+export * from "./autobin.ts"
 export * from "./clock.ts"
 export * from "./compression.ts"
 export * from "./error.ts"

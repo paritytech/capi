@@ -33,6 +33,4 @@ export const rococoDevXcmStatemine = rococoDevXcm.parachain(
 )
 export const rococoDevXcmTrappist = rococoDevXcm.parachain(bin.trappist, "local", 2000)
 
-export const polkadotFromMetadata = net.metadata(
-  await Deno.readFile("examples/raw_rpc/metadata"),
-)
+export const polkadotFromMetadata = net.metadata(await Deno.readFile("examples/raw_rpc/metadata"))

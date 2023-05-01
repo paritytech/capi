@@ -6,11 +6,11 @@ import {
 import { addDevUsers } from "./common/dev_users.ts"
 import { spawnDevNet, SpawnDevNetResult } from "./common/spawnDevNet.ts"
 import { BinaryGetter, DevNet } from "./DevNet.ts"
-import { RelayChain } from "./RelayChain.ts"
+import { DevRelayChain } from "./DevRelayChain.ts"
 
-export class Parachain extends DevNet {
+export class DevParachain extends DevNet {
   constructor(
-    readonly relayChain: RelayChain,
+    readonly relayChain: DevRelayChain,
     binary: BinaryGetter,
     chain: string,
     readonly id: number,
