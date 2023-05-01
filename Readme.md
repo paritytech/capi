@@ -39,19 +39,15 @@ npm i capi
 Create a `nets.ts` and specify the chains with which you'd like to interact.
 
 ```ts
-import { autobin, dev, wss } from "capi"
+import { autobin, net } from "capi"
 
-// 1. the Polkadot relay chain
-export const polkadot = wss({
-  url: "wss://rpc.polkadot.io/",
-  version: "v0.9.40",
-})
+const bin = autobin({ polkadot: ["polkadot", "v0.9.38"] })
 
-// 2. a Polkadot development network
-export const polkadotDev = dev({
-  binary: autobin("polkadot", "v0.9.38"),
-  chain: "polkadot-dev",
-})
+// 1. a Polkadot development network
+export const polkadotDev = net.dev(bin.polkadot, "polkadot-dev")
+
+// 2. the Polkadot relay chain
+export const polkadot = net.ws("wss://rpc.polkadot.io/")
 ```
 
 ## Command Line Tool
