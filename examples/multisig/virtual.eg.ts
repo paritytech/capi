@@ -32,9 +32,11 @@ const { alexa, billy, carol, david } = await createDevUsers()
 /// With this state, we can hydrate from / use an existing virtual multisig.
 /// Let's see if we can hydrate the virtual multisig state from command line arguments.
 /// If we haven't specified any virtual multisig state, we deploy a new virtual multisig.
-const args = parse(Deno.args, { string: ["state"], boolean: ["use-stash"] })
+const { "use-stash": useStash, ...args } = parse(
+  Deno.args,
+  { string: ["state"], boolean: ["use-stash"] },
+)
 let state = args.state
-const useStash = args["use-stash"]
 
 if (!state) {
   const stashAccountId = useStash
