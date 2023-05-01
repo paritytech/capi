@@ -38,11 +38,9 @@ const useStash = args["use-stash"]
 
 if (!state) {
   const stashAccountId = useStash
-    ? await polkadotDev.Proxy.createPure({
-      proxyType: "Any",
-      delay: 0,
-      index: 0,
-    }).signed(signature({ sender: alexa }))
+    ? await polkadotDev.Proxy
+      .createPure({ proxyType: "Any", delay: 0, index: 0 })
+      .signed(signature({ sender: alexa }))
       .sent()
       .finalizedEvents()
       .pipe(filterPureCreatedEvents)
