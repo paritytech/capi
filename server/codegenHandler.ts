@@ -128,7 +128,7 @@ export function createCodegenHandler(dataCache: CacheBase, tempCache: CacheBase)
 
   async function getFiles(hash: string, key: string, entry: CodegenEntryV0) {
     return await filesMemo.run(`${hash}/${key}`, async () => {
-      const metadataHash = hex.encode(entry.metadata)
+      const metadataHash = hex.encode(entry.metadataHash)
       const metadata = decodeMetadata(
         await dataCache.getRaw(`metadata/${metadataHash}`, async () => {
           throw new Response(`${hash} not found`, { status: Status.NotFound })

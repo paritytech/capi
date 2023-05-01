@@ -5,9 +5,9 @@ import { getMetadataFromWsUrl, Net } from "./Net.ts"
 import { spawnDevNet } from "./spawnDevNet.ts"
 
 export abstract class DevNet extends Net {
-  abstract binary: Binary
-  abstract chain: string
-  abstract nodes?: number
+  constructor(readonly binary: Binary, readonly chain: string, readonly nodeCount?: number) {
+    super()
+  }
 
   connection(name: string) {
     return {

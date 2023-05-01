@@ -14,14 +14,6 @@ import { spawnDevNet, SpawnDevNetResult } from "./spawnDevNet.ts"
 export class RelayChain extends DevNet {
   parachains: Parachain[] = []
 
-  constructor(
-    readonly binary: Binary,
-    readonly chain: string,
-    readonly nodes?: number,
-  ) {
-    super()
-  }
-
   parachain(binary: Binary, chain: string, id: number, nodes?: number) {
     return new Parachain(this, binary, chain, id, nodes)
   }
@@ -73,7 +65,7 @@ export class RelayChain extends DevNet {
           this.chainSpecPath(signal, tempParentDir),
           this.parachainInfo(signal, tempParentDir),
         ])
-        const nodeCount = this.nodes ?? Math.max(2, parachainInfo.length)
+        const nodeCount = this.nodeCount ?? Math.max(2, parachainInfo.length)
         return spawnDevNet({
           tempDir,
           binaryPath,

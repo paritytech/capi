@@ -1,4 +1,4 @@
-import { Autobin, resolveBinary } from "../devnets/binary.ts"
+import { CapiBinary, resolveBinary } from "../devnets/binary.ts"
 
 export default async function(
   binary: string,
@@ -7,7 +7,7 @@ export default async function(
 ) {
   if (!binary || !version) throw new Error("Must specify binary and version")
 
-  const binaryPath = await resolveBinary(new Autobin(binary, version))
+  const binaryPath = await resolveBinary(new CapiBinary(binary, version))
 
   const child = new Deno.Command(binaryPath, {
     args,

@@ -22,9 +22,9 @@ import {
 } from "@capi/rococo-dev"
 import {
   CumulusPalletParachainSystemEvent,
+  rococoDevWestmint,
   RuntimeEvent,
-  westmint,
-} from "@capi/rococo-dev/westmint"
+} from "@capi/rococo-dev-westmint"
 import { assert } from "asserts"
 import { createDevUsers, Rune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
@@ -32,7 +32,7 @@ import { signature } from "capi/patterns/signature/polkadot.ts"
 const { alexa } = await createDevUsers()
 
 /// Reference Alexa's free balance.
-const alexaBalance = westmint.System.Account
+const alexaBalance = rococoDevWestmint.System.Account
   .value(alexa.publicKey)
   .unhandle(undefined)
   .access("data", "free")
@@ -82,7 +82,11 @@ rococoDev.XcmPallet
 /// Iterate over the parachain events until receiving a downward message processed event,
 /// at which point we can read alexa's free balance, which should be greater than the initial.
 outer:
-for await (const e of westmint.System.Events.value(undefined, westmint.latestBlockHash).iter()) {
+for await (
+  const e of rococoDevWestmint.System.Events
+    .value(undefined, rococoDevWestmint.latestBlockHash)
+    .iter()
+) {
   if (e) {
     for (const { event } of e) {
       if (
