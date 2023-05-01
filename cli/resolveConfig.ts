@@ -1,8 +1,8 @@
 import * as flags from "../deps/std/flags.ts"
 import * as path from "../deps/std/path.ts"
-import { NetConfig } from "../devnets/mod.ts"
+import { Net } from "../nets/mod.ts"
 
-export async function resolveConfig(...args: string[]): Promise<Record<string, NetConfig>> {
+export async function resolveConfig(...args: string[]): Promise<Record<string, Net>> {
   const { nets: netsPathRaw } = flags.parse(args, {
     string: ["nets"],
     default: { nets: "./nets.ts" },

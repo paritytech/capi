@@ -1,8 +1,7 @@
 import * as flags from "../deps/std/flags.ts"
 import { blue, gray } from "../deps/std/fmt/colors.ts"
 import { assertEquals } from "../deps/std/testing/asserts.ts"
-import { createTempDir } from "../devnets/createTempDir.ts"
-import { syncConfig } from "../devnets/mod.ts"
+import { createTempDir, syncConfig } from "../nets/mod.ts"
 import { normalizePackageName } from "../util/mod.ts"
 import { resolveConfig } from "./resolveConfig.ts"
 

@@ -1,4 +1,4 @@
-import { CapiBinary, resolveBinary } from "../devnets/binary.ts"
+import { CapiBinary, resolveBinary } from "../nets/mod.ts"
 
 export default async function(
   binary: string,
