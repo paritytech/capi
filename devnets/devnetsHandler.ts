@@ -1,20 +1,19 @@
-import * as path from "../deps/std/path.ts"
 import { $ } from "../mod.ts"
 import * as f from "../server/factories.ts"
 import { PermanentMemo } from "../util/memo.ts"
 import { devUserPublicKeys } from "./dev_users.ts"
-import { NetConfig } from "./NetConfig.ts"
+import { Net } from "./Net.ts"
 import { proxyWebSocket } from "./proxyWebSocket.ts"
-import { Network, startNetwork } from "./startNetwork.ts"
+import { SpawnDevNetResult } from "./spawnDevNet.ts"
 
-const rDevnetsApi = /^\/devnets\/([\w-]+)(?:\/([\w-]+))?$/
+const rDevnetsApi = /^\/devnets\/([\w-]+)$/
 
 export function createDevnetsHandler(
   tempDir: string,
-  nets: Record<string, NetConfig>,
+  nets: Record<string, Net>,
   signal: AbortSignal,
 ) {
-  const networkMemo = new PermanentMemo<string, Network>()
+  const networkMemo = new PermanentMemo<string, SpawnDevNetResult>()
   let devUserIndex = 0
   return async (request: Request) => {
     const { pathname, searchParams } = new URL(request.url)
@@ -30,17 +29,12 @@ export function createDevnetsHandler(
     const match = rDevnetsApi.exec(pathname)
     if (!match) return f.notFound()
     const name = match[1]!
-    const paraName = match[2]
-    const networkConfig = nets[name!]
-    if (networkConfig?.binary == null) return f.notFound()
-    const network = await networkMemo.run(name!, async () => {
-      return startNetwork(path.join(tempDir, name!), networkConfig, signal)
-    })
-    const chain = paraName ? network.paras[paraName] : network.relay
-    if (!chain) return f.notFound()
+    const spawn = nets[name]?.spawn
+    if (!spawn) return f.notFound()
+    const network = await networkMemo.run(name, () => spawn(signal, tempDir))
     if (request.headers.get("Upgrade") === "websocket") {
-      const port = chain.ports.shift()!
-      chain.ports.push(port)
+      const port = network.ports.shift()!
+      network.ports.push(port)
       return proxyWebSocket(request, `ws://127.0.0.1:${port}`)
     }
     return new Response("Network launched")

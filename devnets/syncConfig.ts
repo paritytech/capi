@@ -1,86 +1,35 @@
-export * from "./binary.ts"
-
 import { blake2_512, blake2_64, Hasher } from "../crypto/hashers.ts"
 import { hex } from "../crypto/mod.ts"
 import { gray, green } from "../deps/std/fmt/colors.ts"
-import * as path from "../deps/std/path.ts"
-import { WsConnection } from "../mod.ts"
-import { $codegenSpec, CodegenEntry, CodegenSpec } from "../server/codegenSpec.ts"
+import { $codegenSpec, CodegenEntryV0 } from "../server/codegenSpec.ts"
 import { normalizePackageName, withSignal } from "../util/mod.ts"
 import { normalizeTypeName } from "../util/normalize.ts"
-import { NetConfig } from "./NetConfig.ts"
-import { startNetworkForMetadata } from "./startNetwork.ts"
+import { Net } from "./Net.ts"
 
-export async function syncConfig(
-  tempDir: string,
-  nets: Record<string, NetConfig>,
-  server: string,
-) {
+export async function syncConfig(tempDir: string, nets: Record<string, Net>, server: string) {
   return withSignal(async (signal) => {
-    const entries = new Map<string, CodegenEntry>()
     const netEntries = Object.entries(nets)
-    const syncTotal = netEntries
-      .map(([_, entry]) =>
-        entry.binary && entry.parachains ? 1 + Object.values(entry.parachains).length : 1
-      )
-      .reduce((a, b) => a + b, 0)
     let synced = 0
-    await Promise.all(netEntries.map(async ([name, chain]) => {
-      const relayPackageName = normalizePackageName(name)
-      if (chain.url != null) {
-        const metadata = await uploadMetadata(server, chain.url)
-        entries.set(relayPackageName, {
-          type: "frame",
-          metadata,
-          chainName: normalizeTypeName(name),
-          connection: { type: "WsConnection", discovery: chain.url },
-        })
-        logSynced(relayPackageName)
-      } else if (chain.metadata) {
-        const metadata = await _upload(server, "metadata", chain.metadata, blake2_512)
-        entries.set(relayPackageName, {
-          type: "frame",
-          metadata,
-          chainName: normalizeTypeName(name),
-        })
-        logSynced(relayPackageName)
-      } else {
-        const network = await startNetworkForMetadata(path.join(tempDir, name), chain, signal)
-        await Promise.all(
-          [[undefined, network.relay] as const, ...Object.entries(network.paras)].map(
-            async ([paraName, chain]) => {
-              const metadata = await uploadMetadata(server, `ws://127.0.0.1:${chain.ports[0]}`)
-              const packageName = relayPackageName
-                + (paraName ? `/${normalizePackageName(paraName)}` : "")
-              entries.set(packageName, {
-                type: "frame",
-                metadata: metadata,
-                chainName: normalizeTypeName(paraName ?? name),
-                connection: {
-                  type: "DevnetConnection",
-                  discovery: name + (paraName ? `/${paraName}` : ""),
-                },
-              })
-              logSynced(packageName)
-            },
-          ),
-        )
-      }
-    }))
+    const entries = await Promise.all(
+      netEntries.map(async ([name, chain]): Promise<[string, CodegenEntryV0]> => {
+        const packageName = normalizePackageName(name)
+        const chainName = normalizeTypeName(name)
+        const metadata = await chain.metadata(signal, tempDir)
+        const metadataHash = await upload(server, "metadata", metadata, blake2_512)
+        const progress = gray(`(${++synced}/${netEntries.length})`)
+        console.log(green("Synced"), progress, `@capi/${packageName}`)
+        const connection = chain.connection(name)
+        return [packageName, { type: "frame", metadataHash, chainName, connection }]
+      }),
+    )
     const sortedEntries = new Map([...entries].sort((a, b) => a[0] < b[0] ? 1 : -1))
-    const codegenHash = await uploadCodegenSpec(server, {
-      type: "v0",
-      codegen: sortedEntries,
-    })
+    const codegenSpec = $codegenSpec.encode({ type: "v0", codegen: sortedEntries })
+    const codegenHash = hex.encode(await upload(server, "codegen", codegenSpec, blake2_64))
     return new URL(codegenHash + "/", server).toString()
-
-    function logSynced(packageName: string) {
-      console.log(green("Synced"), gray(`(${++synced}/${syncTotal})`), `@capi/${packageName}`)
-    }
   })
 }
 
-async function _upload(server: string, kind: string, data: Uint8Array, hasher: Hasher) {
+async function upload(server: string, kind: string, data: Uint8Array, hasher: Hasher) {
   const hash = hasher.hash(data)
   const url = new URL(`upload/${kind}/${hex.encode(hash)}`, server)
   const exists = await fetch(url, { method: "HEAD" })
@@ -88,20 +37,6 @@ async function _upload(server: string, kind: string, data: Uint8Array, hasher: H
   const response = await fetch(url, { method: "PUT", body: data })
   if (!response.ok) throw new Error(await response.text())
   return hash
-}
-
-async function uploadMetadata(server: string, url: string) {
-  const metadata = await withSignal(async (signal) => {
-    const connection = WsConnection.connect(url, signal)
-    const response = await connection.call("state_getMetadata", [])
-    if (response.error) throw new Error("Error getting metadata")
-    return hex.decode(response.result as string)
-  })
-  return await _upload(server, "metadata", metadata, blake2_512)
-}
-
-async function uploadCodegenSpec(server: string, spec: CodegenSpec) {
-  return hex.encode(await _upload(server, "codegen", $codegenSpec.encode(spec), blake2_64))
 }
 
 export async function checkCodegenUploaded(server: string, hash: string) {

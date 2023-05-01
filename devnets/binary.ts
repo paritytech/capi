@@ -1,5 +1,5 @@
 // TODO: rename within `capi_binary_builds`
-export { binary as autobin, CapiBinary as Autobin } from "../deps/capi_binary_builds.ts"
+export { binary, CapiBinary } from "../deps/capi_binary_builds.ts"
 
 import { CapiBinary } from "../deps/capi_binary_builds.ts"
 
