@@ -1,9 +1,4 @@
-<<<<<<< HEAD
-import { config } from "../capi.config.ts"
 import { build, EntryPoint } from "../deps/dnt.ts"
-=======
-import { build } from "../deps/dnt.ts"
->>>>>>> cf8c79f (begin config revamp)
 import * as flags from "../deps/std/flags.ts"
 import * as fs from "../deps/std/fs.ts"
 import * as path from "../deps/std/path.ts"
