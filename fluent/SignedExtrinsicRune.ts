@@ -1,4 +1,5 @@
 import { hex } from "../crypto/mod.ts"
+import { $extrinsic } from "../mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { Chain, ChainRune } from "./ChainRune.ts"
 import { ExtrinsicStatusRune } from "./ExtrinsicStatusRune.ts"
@@ -17,6 +18,11 @@ export class SignedExtrinsicRune<out C extends Chain, out U> extends PatternRune
     ...[value]: RunicArgs<X, [value: string]>
   ): SignedExtrinsicRune<C, U | RunicArgs.U<X>> {
     return this.from(chain, Rune.resolve(value).map(hex.decode))
+  }
+
+  extrinsic() {
+    return Rune.tuple([this.chain.metadata, this.into(ValueRune)])
+      .map(([metadata, bytes]) => $extrinsic(metadata).decode(bytes))
   }
 
   hex() {
