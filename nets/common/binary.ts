@@ -1,7 +1,4 @@
-// TODO: rename within `capi_binary_builds`
-export { binary, CapiBinary } from "../deps/capi_binary_builds.ts"
-
-import { CapiBinary } from "../deps/capi_binary_builds.ts"
+import { CapiBinary } from "../../deps/capi_binary_builds.ts"
 
 export type Binary = string | CapiBinary
 

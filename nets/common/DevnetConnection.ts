@@ -1,4 +1,4 @@
-import { WsConnection } from "../rpc/mod.ts"
+import { WsConnection } from "../../rpc/mod.ts"
 import { devnetsUrl } from "./devnetsUrl.ts"
 
 export class DevnetConnection extends WsConnection {

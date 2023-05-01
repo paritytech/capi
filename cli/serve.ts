@@ -1,10 +1,15 @@
 import * as flags from "../deps/std/flags.ts"
 import { blue, gray, yellow } from "../deps/std/fmt/colors.ts"
 import { serve } from "../deps/std/http.ts"
-import { createDevnetsHandler, createTempDir } from "../nets/mod.ts"
-import { createCodegenHandler, createCorsHandler, createErrorHandler } from "../server/mod.ts"
+import {
+  createCodegenHandler,
+  createCorsHandler,
+  createDevnetsHandler,
+  createErrorHandler,
+} from "../server/mod.ts"
 import { FsCache, InMemoryCache } from "../util/cache/mod.ts"
 import { gracefulExit } from "../util/mod.ts"
+import { tempDir } from "../util/tempDir.ts"
 import { resolveConfig } from "./resolveConfig.ts"
 
 export default async function(...args: string[]) {
@@ -19,7 +24,7 @@ export default async function(...args: string[]) {
 
   const config = await resolveConfig(...args)
 
-  const tempDir = await createTempDir()
+  const devnetTempDir = await tempDir(out, "devnet")
 
   const href = `http://localhost:${port}/`
 
@@ -35,7 +40,7 @@ export default async function(...args: string[]) {
     .catch(() => false)
 
   if (!running) {
-    const devnetsHandler = createDevnetsHandler(tempDir, config, signal)
+    const devnetsHandler = createDevnetsHandler(devnetTempDir, config, signal)
     const codegenHandler = createCodegenHandler(dataCache, tempCache)
     const handler = createCorsHandler(createErrorHandler(async (request) => {
       const { pathname } = new URL(request.url)

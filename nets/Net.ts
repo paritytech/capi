@@ -1,13 +1,13 @@
 import { hex } from "../crypto/mod.ts"
 import { WsConnection } from "../rpc/mod.ts"
-import { ConnectionV0 } from "../server/codegenSpec.ts"
+import { ConnectionV0 } from "../server/mod.ts"
 import { withSignal } from "../util/mod.ts"
-import { SpawnDevNetResult } from "./spawnDevNet.ts"
+import { SpawnDevNetResult } from "./common/spawnDevNet.ts"
 
 export abstract class Net {
   abstract connection(name: string): ConnectionV0 | undefined
-  abstract metadata(signal: AbortSignal, tempParentDir: string): Promise<Uint8Array>
-  spawn?: (signal: AbortSignal, tempParentDir: string) => Promise<SpawnDevNetResult>
+  abstract metadata(signal: AbortSignal, devnetTempDir: string): Promise<Uint8Array>
+  spawn?: (signal: AbortSignal, devnetTempDir: string) => Promise<SpawnDevNetResult>
 }
 
 export function getMetadataFromWsUrl(url: string) {

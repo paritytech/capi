@@ -1,15 +1,13 @@
-import { $ } from "../mod.ts"
-import * as f from "../server/factories.ts"
-import { PermanentMemo } from "../util/memo.ts"
-import { devUserPublicKeys } from "./dev_users.ts"
-import { Net } from "./Net.ts"
-import { proxyWebSocket } from "./proxyWebSocket.ts"
-import { SpawnDevNetResult } from "./spawnDevNet.ts"
+import * as $ from "../deps/scale.ts"
+import { devUserPublicKeys, Net, SpawnDevNetResult } from "../nets/mod.ts"
+import { PermanentMemo } from "../util/mod.ts"
+import { proxyWebSocket } from "../util/proxyWebSocket.ts"
+import * as f from "./factories.ts"
 
 const rDevnetsApi = /^\/devnets\/([\w-]+)$/
 
 export function createDevnetsHandler(
-  tempDir: string,
+  devnetTempDir: string,
   nets: Record<string, Net>,
   signal: AbortSignal,
 ) {
@@ -31,7 +29,7 @@ export function createDevnetsHandler(
     const name = match[1]!
     const spawn = nets[name]?.spawn
     if (!spawn) return f.notFound()
-    const network = await networkMemo.run(name, () => spawn(signal, tempDir))
+    const network = await networkMemo.run(name, () => spawn(signal, devnetTempDir))
     if (request.headers.get("Upgrade") === "websocket") {
       const port = network.ports.shift()!
       network.ports.push(port)

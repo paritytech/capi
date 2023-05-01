@@ -1,14 +1,17 @@
-import { Binary } from "./binary.ts"
-import { createCustomChainSpec, exportParachainGenesis, getGenesisConfig } from "./chain_spec.ts"
-import { addDevUsers } from "./dev_users.ts"
-import { DevNet } from "./DevNet.ts"
+import {
+  createCustomChainSpec,
+  exportParachainGenesis,
+  getGenesisConfig,
+} from "./common/chain_spec.ts"
+import { addDevUsers } from "./common/dev_users.ts"
+import { spawnDevNet, SpawnDevNetResult } from "./common/spawnDevNet.ts"
+import { BinaryGetter, DevNet } from "./DevNet.ts"
 import { RelayChain } from "./RelayChain.ts"
-import { spawnDevNet, SpawnDevNetResult } from "./spawnDevNet.ts"
 
 export class Parachain extends DevNet {
   constructor(
     readonly relayChain: RelayChain,
-    binary: Binary,
+    binary: BinaryGetter,
     chain: string,
     readonly id: number,
     nodeCount: number = 2,
@@ -27,10 +30,10 @@ export class Parachain extends DevNet {
     if (!this._parachainInfo) {
       this._parachainInfo = (async () => {
         const tempDir = this.tempDir(tempParentDir)
-        const binaryPath = await this.binaryPath(signal)
+        const binary = await this.binary(signal)
         const chainSpecPath = await createCustomChainSpec(
           tempDir,
-          binaryPath,
+          binary,
           this.chain,
           (chainSpec) => {
             chainSpec.para_id = this.id
@@ -39,7 +42,7 @@ export class Parachain extends DevNet {
             addDevUsers(genesisConfig.balances.balances)
           },
         )
-        const genesis = await exportParachainGenesis(binaryPath, chainSpecPath, signal)
+        const genesis = await exportParachainGenesis(binary, chainSpecPath, signal)
         return { id: this.id, chainSpecPath, genesis }
       })()
     }
@@ -54,8 +57,7 @@ export class Parachain extends DevNet {
     if (!this._network) {
       const tempDir = this.tempDir(tempParentDir)
       this._network = (async () => {
-        const [binaryPath, { chainSpecPath }, relayChainSpecPath, relayChain] = await Promise.all([
-          this.binaryPath(signal),
+        const [{ chainSpecPath }, relayChainSpecPath, relayChain] = await Promise.all([
           this.parachainInfo(signal, tempParentDir),
           this.relayChain.chainSpecPath(signal, tempParentDir),
           this.relayChain.spawn(signal, tempParentDir),
@@ -63,7 +65,7 @@ export class Parachain extends DevNet {
         const nodeCount = this.nodeCount ?? 2
         return spawnDevNet({
           tempDir,
-          binaryPath,
+          binary: await this.binary(signal),
           chainSpecPath,
           nodeCount,
           extraArgs: [

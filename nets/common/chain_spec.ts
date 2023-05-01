@@ -1,5 +1,5 @@
-import { ensureDir } from "../deps/std/fs.ts"
-import * as path from "../deps/std/path.ts"
+import { ensureDir } from "../../deps/std/fs.ts"
+import * as path from "../../deps/std/path.ts"
 
 export async function createCustomChainSpec(
   tempDir: string,

@@ -1,13 +1,13 @@
-import { hex } from "../crypto/mod.ts"
-import * as ed25519 from "../deps/ed25519.ts"
-import * as base58 from "../deps/std/encoding/base58.ts"
-import * as path from "../deps/std/path.ts"
-import { writableStreamFromWriter } from "../deps/std/streams.ts"
-import { getFreePort, portReady } from "../util/port.ts"
+import { hex } from "../../crypto/mod.ts"
+import * as ed25519 from "../../deps/ed25519.ts"
+import * as base58 from "../../deps/std/encoding/base58.ts"
+import * as path from "../../deps/std/path.ts"
+import { writableStreamFromWriter } from "../../deps/std/streams.ts"
+import { getFreePort, portReady } from "../../util/port.ts"
 
 export interface SpawnDevNetProps {
   tempDir: string
-  binaryPath: string
+  binary: string
   chainSpecPath: string
   nodeCount: number
   extraArgs: string[]
@@ -20,7 +20,7 @@ export interface SpawnDevNetResult {
 }
 
 export async function spawnDevNet(
-  { tempDir, binaryPath, chainSpecPath, nodeCount, extraArgs, signal }: SpawnDevNetProps,
+  { tempDir, binary, chainSpecPath, nodeCount, extraArgs, signal }: SpawnDevNetProps,
 ): Promise<SpawnDevNetResult> {
   let bootnodes: string | undefined
   const ports = []
@@ -53,7 +53,7 @@ export async function spawnDevNet(
       bootnodes = await generateBootnodeString(httpPort, nodeKey)
     }
     args.push(...extraArgs)
-    spawnNode(nodeDir, binaryPath, args, signal)
+    spawnNode(nodeDir, binary, args, signal)
     await portReady(wsPort)
   }
 

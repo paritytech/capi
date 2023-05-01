@@ -1,8 +1,8 @@
 // This task is used in CI to edit the import map to use capi.dev for codegen
 // instead of the local server.
 
-import { checkCodegenUploaded, syncConfig } from "../mod.ts"
 import * as nets from "../nets.ts"
+import { checkCodegenUploaded, sync } from "../server/mod.ts"
 
 const LOCAL_SERVER = "http://localhost:4646/"
 
@@ -33,5 +33,5 @@ if (await checkCodegenUploaded(capiServer, codegenHash)) {
   console.log("codegen already uploaded")
 } else {
   console.log("uploading codegen")
-  await syncConfig("target/capi", nets, "https://capi.dev/")
+  await sync("https://capi.dev/", "target/capi", nets)
 }

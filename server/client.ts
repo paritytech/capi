@@ -1,12 +1,12 @@
 import { blake2_512, blake2_64, Hasher } from "../crypto/hashers.ts"
 import { hex } from "../crypto/mod.ts"
 import { gray, green } from "../deps/std/fmt/colors.ts"
-import { $codegenSpec, CodegenEntryV0 } from "../server/codegenSpec.ts"
+import { Net } from "../nets/mod.ts"
+import { $codegenSpec, CodegenEntryV0 } from "../server/mod.ts"
 import { normalizePackageName, withSignal } from "../util/mod.ts"
 import { normalizeTypeName } from "../util/normalize.ts"
-import { Net } from "./Net.ts"
 
-export async function syncConfig(tempDir: string, nets: Record<string, Net>, server: string) {
+export async function sync(server: string, devnetTempDir: string, nets: Record<string, Net>) {
   return withSignal(async (signal) => {
     const netEntries = Object.entries(nets)
     let synced = 0
@@ -14,7 +14,7 @@ export async function syncConfig(tempDir: string, nets: Record<string, Net>, ser
       netEntries.map(async ([name, chain]): Promise<[string, CodegenEntryV0]> => {
         const packageName = normalizePackageName(name)
         const chainName = normalizeTypeName(name)
-        const metadata = await chain.metadata(signal, tempDir)
+        const metadata = await chain.metadata(signal, devnetTempDir)
         const metadataHash = await upload(server, "metadata", metadata, blake2_512)
         const progress = gray(`(${++synced}/${netEntries.length})`)
         console.log(green("Synced"), progress, `@capi/${packageName}`)

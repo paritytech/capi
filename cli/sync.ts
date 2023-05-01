@@ -1,8 +1,9 @@
 import * as flags from "../deps/std/flags.ts"
 import { blue, gray } from "../deps/std/fmt/colors.ts"
 import { assertEquals } from "../deps/std/testing/asserts.ts"
-import { createTempDir, syncConfig } from "../nets/mod.ts"
+import { sync } from "../server/mod.ts"
 import { normalizePackageName } from "../util/mod.ts"
+import { tempDir } from "../util/tempDir.ts"
 import { resolveConfig } from "./resolveConfig.ts"
 
 export default async function(...args: string[]) {
@@ -10,18 +11,22 @@ export default async function(...args: string[]) {
     "import-map": importMapFile,
     "package-json": packageJsonFile,
     check,
+    out,
     server,
   } = flags.parse(args, {
-    string: ["config", "import-map", "package-json", "server"],
+    string: ["config", "import-map", "out", "package-json", "server"],
     boolean: ["check"],
-    default: { server: "https://capi.dev/" },
+    default: {
+      server: "https://capi.dev/",
+      out: "target/capi",
+    },
   })
 
   const config = await resolveConfig(...args)
 
-  const tempDir = await createTempDir()
+  const devnetTempDir = await tempDir(out, "devnet")
 
-  const baseUrl = await syncConfig(tempDir, config, server)
+  const baseUrl = await sync(server, devnetTempDir, config)
 
   if (importMapFile) {
     syncFile(importMapFile, (importMap) => {

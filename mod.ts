@@ -1,5 +1,6 @@
 export * as $ from "./deps/scale.ts"
 export { BitSequence } from "./deps/scale.ts"
+export * from "./util/autobin.ts"
 
 // moderate --exclude main.ts nets.ts server util
 
