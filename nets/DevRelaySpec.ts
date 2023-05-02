@@ -23,8 +23,8 @@ export class DevRelaySpec extends DevNetSpec {
     return para
   }
 
-  preflightNetworkArgs() {
-    return Promise.resolve([])
+  async preflightNetworkArgs() {
+    return []
   }
 
   parachainsInfo(signal: AbortSignal, rootTempDir: string) {
