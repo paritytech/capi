@@ -1,12 +1,12 @@
 {
   "imports": {
-    "@capi/": "http://localhost:4646/029d4f2852e1a7d7/"
+    "@capi/": "http://localhost:4646/9da407039c86bfd0/"
   },
   "scopes": {
     "examples/": {
+      "asserts": "./deps/std/testing/asserts.ts",
       "capi": "./mod.ts",
-      "capi/patterns/": "./patterns/",
-      "asserts": "./deps/std/testing/asserts.ts"
+      "capi/patterns/": "./patterns/"
     },
     "http://localhost:4646/": {
       "http://localhost:4646/capi/": "./"

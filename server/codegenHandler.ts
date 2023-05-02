@@ -3,6 +3,7 @@ import { frameCodegen } from "../codegen/frameCodegen.ts"
 import { blake2_512, blake2_64 } from "../crypto/hashers.ts"
 import { hex } from "../crypto/mod.ts"
 import { Tar } from "../deps/std/archive.ts"
+import { Status } from "../deps/std/http.ts"
 import { Buffer } from "../deps/std/io.ts"
 import { posix as path } from "../deps/std/path.ts"
 import { readableStreamFromReader, writableStreamFromWriter } from "../deps/std/streams.ts"
@@ -10,9 +11,9 @@ import { decodeMetadata } from "../frame_metadata/decodeMetadata.ts"
 import { $metadata } from "../frame_metadata/raw/v14.ts"
 import { CacheBase } from "../util/cache/base.ts"
 import { WeakMemo } from "../util/memo.ts"
-import { normalizePackageName, normalizeVariableName } from "../util/normalize.ts"
+import { normalizePackageName, normalizeVariableName } from "../util/mod.ts"
 import { tsFormatter } from "../util/tsFormatter.ts"
-import { $codegenSpec, CodegenEntry } from "./codegenSpec.ts"
+import { $codegenSpec, CodegenEntry } from "./CodegenSpec.ts"
 import * as f from "./factories.ts"
 import { getStatic } from "./getStatic.ts"
 
@@ -57,10 +58,10 @@ export function createCodegenHandler(dataCache: CacheBase, tempCache: CacheBase)
     const [kind, untrustedHash] = key.split("/") as ["codegen" | "metadata", string]
     if (request.method === "HEAD") {
       const exists = await dataCache.has(key)
-      return new Response(null, { status: exists ? 204 : 404 })
+      return new Response(null, { status: exists ? Status.NoContent : Status.NotFound })
     } else if (request.method === "PUT") {
       if (await dataCache.has(key)) {
-        return new Response(null, { status: 204 })
+        return new Response(null, { status: Status.NoContent })
       }
       const untrustedData = new Uint8Array(await request.arrayBuffer())
       const hasher = kind === "codegen" ? blake2_64 : blake2_512
@@ -71,16 +72,18 @@ export function createCodegenHandler(dataCache: CacheBase, tempCache: CacheBase)
         codec.assert(value)
         data = codec.encode(value as any)
       } catch {
-        return new Response("invalid request body data", { status: 400 })
+        return new Response("invalid request body data", { status: Status.BadRequest })
       }
       const hash = hex.encode(hasher.hash(data))
       if (hash !== untrustedHash) {
-        return new Response("request body does not match provided hash", { status: 400 })
+        return new Response("request body does not match provided hash", {
+          status: Status.BadRequest,
+        })
       }
       dataCache.getRaw(key, async () => data)
-      return new Response(null, { status: 204 })
+      return new Response(null, { status: Status.NoContent })
     } else {
-      return new Response(null, { status: 405 })
+      return new Response(null, { status: Status.MethodNotAllowed })
     }
   }
 
@@ -93,7 +96,7 @@ export function createCodegenHandler(dataCache: CacheBase, tempCache: CacheBase)
       () =>
         tempCache.getString(hash + path, codeTtl, async () => {
           const codegenSpec = await dataCache.get(`codegen/${hash}`, $codegenSpec, () => {
-            throw new Response(`${hash} not found`, { status: 404 })
+            throw new Response(`${hash} not found`, { status: Status.NotFound })
           })
 
           let match: [string, CodegenEntry] | undefined = undefined
@@ -125,10 +128,10 @@ export function createCodegenHandler(dataCache: CacheBase, tempCache: CacheBase)
 
   async function getFiles(hash: string, key: string, entry: CodegenEntry) {
     return await filesMemo.run(`${hash}/${key}`, async () => {
-      const metadataHash = hex.encode(entry.metadata)
+      const metadataHash = hex.encode(entry.metadataHash)
       const metadata = decodeMetadata(
         await dataCache.getRaw(`metadata/${metadataHash}`, async () => {
-          throw new Response(`${hash} not found`, { status: 404 })
+          throw new Response(`${hash} not found`, { status: Status.NotFound })
         }),
       )
 
@@ -145,7 +148,7 @@ export function createCodegenHandler(dataCache: CacheBase, tempCache: CacheBase)
   async function handleTarball(hash: string, name: string) {
     const tarball = await tempCache.getRaw(`${hash}/${name}.tar`, async () => {
       const codegenSpec = await dataCache.get(`codegen/${hash}`, $codegenSpec, () => {
-        throw new Response(`${hash} not found`, { status: 404 })
+        throw new Response(`${hash} not found`, { status: Status.NotFound })
       })
 
       const rootFiles = new Map<string, string>()

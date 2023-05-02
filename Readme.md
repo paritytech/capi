@@ -36,27 +36,21 @@ npm i capi
 
 ## Configuration
 
-Create a `capi.config.ts` and specify the chains with which you'd like to
-interact.
+Create a `nets.ts` and specify the chains with which you'd like to interact.
 
 ```ts
-import { binary, CapiConfig } from "capi"
+import { bins, net } from "capi"
 
-export const config: CapiConfig = {
-  server: "https://capi.dev/",
-  chains: {
-    // 1. the Polkadot relay chain
-    polkadot: {
-      url: "wss://rpc.polkadot.io/",
-      version: "v0.9.40",
-    },
-    // 2. a Polkadot development network
-    polkadotDev: {
-      binary: binary("polkadot", "v0.9.38"),
-      chain: "polkadot-dev",
-    },
-  },
-}
+const bin = bins({ polkadot: ["polkadot", "v0.9.38"] })
+
+// The Polkadot relay chain
+export const polkadot = net.ws({ url: "wss://rpc.polkadot.io/" })
+
+// A Polkadot development network
+export const polkadotDev = net.dev({
+  bin: bin.polkadot,
+  chain: "polkadot-dev",
+})
 ```
 
 ## Command Line Tool

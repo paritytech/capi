@@ -1,15 +1,16 @@
 import * as flags from "../deps/std/flags.ts"
 import { blue, gray, yellow } from "../deps/std/fmt/colors.ts"
 import { serve } from "../deps/std/http.ts"
-import { createTempDir } from "../devnets/createTempDir.ts"
-import { createDevnetsHandler } from "../devnets/mod.ts"
-import { createCorsHandler } from "../server/corsHandler.ts"
-import { createErrorHandler } from "../server/errorHandler.ts"
-import { createCodegenHandler } from "../server/mod.ts"
-import { InMemoryCache } from "../util/cache/memory.ts"
-import { FsCache } from "../util/cache/mod.ts"
+import {
+  createCodegenHandler,
+  createCorsHandler,
+  createDevnetsHandler,
+  createErrorHandler,
+} from "../server/mod.ts"
+import { FsCache, InMemoryCache } from "../util/cache/mod.ts"
 import { gracefulExit } from "../util/mod.ts"
-import { resolveConfig } from "./resolveConfig.ts"
+import { tempDir } from "../util/tempDir.ts"
+import { resolveNets } from "./resolveNets.ts"
 
 export default async function(...args: string[]) {
   const { port, "--": cmd, out } = flags.parse(args, {
@@ -21,9 +22,9 @@ export default async function(...args: string[]) {
     "--": true,
   })
 
-  const config = await resolveConfig(...args)
+  const nets = await resolveNets(...args)
 
-  const tempDir = await createTempDir()
+  const devnetTempDir = await tempDir(out, "devnet")
 
   const href = `http://localhost:${port}/`
 
@@ -39,7 +40,7 @@ export default async function(...args: string[]) {
     .catch(() => false)
 
   if (!running) {
-    const devnetsHandler = createDevnetsHandler(tempDir, config, signal)
+    const devnetsHandler = createDevnetsHandler(devnetTempDir, nets, signal)
     const codegenHandler = createCodegenHandler(dataCache, tempCache)
     const handler = createCorsHandler(createErrorHandler(async (request) => {
       const { pathname } = new URL(request.url)
@@ -75,7 +76,7 @@ export default async function(...args: string[]) {
         args,
         signal,
         env: {
-          DEVNETS_SERVER: `http://localhost:${port}/devnets/`,
+          CAPI_SERVER: href,
         },
       })
       const status = await command.spawn().status

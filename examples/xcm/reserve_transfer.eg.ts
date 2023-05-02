@@ -15,8 +15,8 @@ import {
   Fungibility,
   Junctions,
   NetworkId,
+  rococoDevXcmStatemine,
   RuntimeEvent,
-  statemine,
   VersionedMultiAssets,
   VersionedMultiLocation,
   VersionedXcm,
@@ -24,8 +24,8 @@ import {
   XcmV1Junction,
   XcmV1MultiAsset,
   XcmV1MultiLocation,
-} from "@capi/rococo-dev-xcm/statemine"
-import { trappist } from "@capi/rococo-dev-xcm/trappist"
+} from "@capi/rococo-dev-xcm-statemine"
+import { rococoDevXcmTrappist } from "@capi/rococo-dev-xcm-trappist"
 import { assert, assertNotEquals } from "asserts"
 import { $, alice as root, createDevUsers, Rune, ValueRune } from "capi"
 import { $siblId } from "capi/patterns/para_id.ts"
@@ -61,7 +61,7 @@ await rococoDevXcm.Sudo
             originType: "Superuser",
             requireWeightAtMost: 1000000000n,
             call: DoubleEncoded({
-              encoded: statemine.Assets.forceCreate({
+              encoded: rococoDevXcmStatemine.Assets.forceCreate({
                 id: RESERVE_ASSET_ID,
                 isSufficient: true,
                 minBalance: 1n,
@@ -81,7 +81,7 @@ await rococoDevXcm.Sudo
 
 /// Wait for the asset to be recorded in storage.
 const assetDetails = await retry(
-  () => statemine.Assets.Asset.value(RESERVE_ASSET_ID).unhandle(undefined).run(),
+  () => rococoDevXcmStatemine.Assets.Asset.value(RESERVE_ASSET_ID).unhandle(undefined).run(),
   retryOptions,
 )
 
@@ -90,7 +90,7 @@ console.log("Statemine: Asset created", assetDetails)
 $.assert($assetDetails, assetDetails)
 
 /// Mint assets on reserve parachain.
-await statemine.Assets
+await rococoDevXcmStatemine.Assets
   .mint({
     id: RESERVE_ASSET_ID,
     amount: 100000000000000n,
@@ -102,7 +102,7 @@ await statemine.Assets
   .finalized()
   .run()
 
-const billyStatemintBalance = statemine.Assets.Account
+const billyStatemintBalance = rococoDevXcmStatemine.Assets.Account
   .value([RESERVE_ASSET_ID, billy.publicKey])
   .unhandle(undefined)
   .access("balance")
@@ -112,9 +112,9 @@ console.log("Statemine(Billy): asset balance", billyStatemintBalanceInitial)
 $.assert($.u128, billyStatemintBalanceInitial)
 
 /// Create the asset on the Trappist parachain.
-await trappist.Sudo
+await rococoDevXcmTrappist.Sudo
   .sudo({
-    call: trappist.Assets.forceCreate({
+    call: rococoDevXcmTrappist.Assets.forceCreate({
       id: TRAPPIST_ASSET_ID,
       isSufficient: false,
       minBalance: 1n,
@@ -127,12 +127,12 @@ await trappist.Sudo
   .finalized()
   .run()
 
-const assetsPalletId = statemine.Assets.into(ValueRune).access("id")
+const assetsPalletId = rococoDevXcmStatemine.Assets.into(ValueRune).access("id")
 
 /// Register Trappist parachain asset id to reserve asset id.
-await trappist.Sudo
+await rococoDevXcmTrappist.Sudo
   .sudo({
-    call: trappist.AssetRegistry.registerReserveAsset({
+    call: rococoDevXcmTrappist.AssetRegistry.registerReserveAsset({
       assetId: TRAPPIST_ASSET_ID,
       assetMultiLocation: XcmV1MultiLocation({
         parents: 1,
@@ -151,7 +151,7 @@ await trappist.Sudo
   .run()
 
 /// Reserve transfer asset id on reserve parachain to Trappist parachain.
-const events = await statemine.PolkadotXcm
+const events = await rococoDevXcmStatemine.PolkadotXcm
   .limitedReserveTransferAssets({
     dest: VersionedMultiLocation.V1(XcmV1MultiLocation({
       parents: 1,
@@ -196,7 +196,7 @@ for (const { event } of events) {
 /// Retrieve billy's balance on Trappist.
 const { balance: billyTrappistBalance } = await retry(
   () =>
-    trappist.Assets.Account
+    rococoDevXcmTrappist.Assets.Account
       .value([TRAPPIST_ASSET_ID, billy.publicKey])
       .unhandle(undefined)
       .run(),
@@ -215,7 +215,7 @@ console.log("Statemine(Billy): asset balance:", billyStatemintBalanceFinal)
 assertNotEquals(billyStatemintBalanceInitial, billyStatemintBalanceFinal)
 
 /// Retrieve the statemint sovereign account balance.
-const statemintSovereignAccountBalance = await statemine.Assets.Account
+const statemintSovereignAccountBalance = await rococoDevXcmStatemine.Assets.Account
   .value([RESERVE_ASSET_ID, $siblId.encode(TRAPPIST_CHAIN_ID)])
   .unhandle(undefined)
   .access("balance")

@@ -1,4 +1,4 @@
-import { CapiBinary, resolveBinary } from "../devnets/binary.ts"
+import { CapiBinary } from "../deps/capi_binary_builds.ts"
 
 export default async function(
   binary: string,
@@ -7,9 +7,14 @@ export default async function(
 ) {
   if (!binary || !version) throw new Error("Must specify binary and version")
 
-  const binaryPath = await resolveBinary(new CapiBinary(binary, version))
+  const bin = new CapiBinary(binary, version)
 
-  const child = new Deno.Command(binaryPath, {
+  if (!(await bin.exists())) {
+    console.error("Downloading", bin.key)
+    await bin.download()
+  }
+
+  const child = new Deno.Command(bin.path, {
     args,
     stdin: "inherit",
     stdout: "inherit",

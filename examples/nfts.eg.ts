@@ -11,9 +11,9 @@ import {
   MintSettings,
   MintType,
   PalletNftsEvent,
+  rococoDevWestmint,
   RuntimeEvent,
-  westmint,
-} from "@capi/rococo-dev/westmint"
+} from "@capi/rococo-dev-westmint"
 import { assertEquals } from "asserts"
 import { $, createDevUsers, Rune } from "capi"
 import { DefaultCollectionSetting, DefaultItemSetting } from "capi/patterns/nfts.ts"
@@ -23,7 +23,7 @@ import { signature } from "capi/patterns/signature/statemint.ts"
 const { alexa, billy } = await createDevUsers()
 
 /// Create a collection and get the resulting events.
-const createEvents = await westmint.Nfts
+const createEvents = await rococoDevWestmint.Nfts
   .create({
     config: CollectionConfig({
       settings: DefaultCollectionSetting.AllOff,
@@ -58,7 +58,7 @@ console.log("Collection id:", collection)
 const item = 46
 
 /// Mint an item to the collection.
-await westmint.Nfts
+await rococoDevWestmint.Nfts
   .mint({
     collection,
     item,
@@ -70,7 +70,7 @@ await westmint.Nfts
   .finalized()
   .run()
 
-const owner = westmint.Nfts.Item
+const owner = rococoDevWestmint.Nfts.Item
   .value([collection, item])
   .unhandle(undefined)
   .access("owner")
@@ -88,12 +88,12 @@ assertEquals(initialOwner, alexa.publicKey)
 /// 2. Prevent further minting.
 /// 3. Lock the collection to prevent changes.
 const price = 1000000n
-await westmint.Utility
+await rococoDevWestmint.Utility
   .batchAll({
     calls: Rune.array([
-      westmint.Nfts.setPrice({ collection, item, price }),
-      westmint.Nfts.setCollectionMaxSupply({ collection, maxSupply: 1 }),
-      westmint.Nfts.lockCollection({ collection, lockSettings: 8n }), /// TODO: enum helper
+      rococoDevWestmint.Nfts.setPrice({ collection, item, price }),
+      rococoDevWestmint.Nfts.setCollectionMaxSupply({ collection, maxSupply: 1 }),
+      rococoDevWestmint.Nfts.lockCollection({ collection, lockSettings: 8n }), /// TODO: enum helper
     ]),
   })
   .signed(signature({ sender: alexa }))
@@ -103,7 +103,7 @@ await westmint.Utility
   .run()
 
 /// Retrieve the price of the NFT.
-const bidPrice = await westmint.Nfts.ItemPriceOf
+const bidPrice = await rococoDevWestmint.Nfts.ItemPriceOf
   .value([collection, item])
   .unhandle(undefined)
   .access(0)
@@ -114,7 +114,7 @@ console.log(bidPrice)
 assertEquals(price, bidPrice)
 
 /// Buy the NFT as Billy.
-await westmint.Nfts
+await rococoDevWestmint.Nfts
   .buyItem({ collection, item, bidPrice })
   .signed(signature({ sender: billy }))
   .sent()

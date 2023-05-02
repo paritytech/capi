@@ -49,8 +49,8 @@ multiaddr
 multiaddress
 multiasset
 multichain
-multilocation
 multihash
+multilocation
 multisigs
 multistep
 noninteractive

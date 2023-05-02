@@ -1,9 +1,9 @@
-import { config } from "../capi.config.ts"
 import { build, EntryPoint } from "../deps/dnt.ts"
 import * as flags from "../deps/std/flags.ts"
 import * as fs from "../deps/std/fs.ts"
 import * as path from "../deps/std/path.ts"
 import importMap from "../import_map.json" assert { type: "json" }
+import * as nets from "../nets.ts"
 import { normalizePackageName } from "../util/normalize.ts"
 
 const { version: packageVersion, server: serverVersion } = flags.parse(Deno.args, {
@@ -55,7 +55,7 @@ await Promise.all([
       license: "Apache-2.0",
       repository: "github:paritytech/capi",
       dependencies: Object.fromEntries(
-        Object.keys(config.chains ?? {}).map((key) => {
+        Object.keys(nets).map((key) => {
           const name = normalizePackageName(key)
           return [`@capi/${name}`, `${server}${hash}/${name}.tar`]
         }),
