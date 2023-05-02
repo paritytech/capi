@@ -10,7 +10,7 @@ import {
 import { FsCache, InMemoryCache } from "../util/cache/mod.ts"
 import { gracefulExit } from "../util/mod.ts"
 import { tempDir } from "../util/tempDir.ts"
-import { resolveConfig } from "./resolveConfig.ts"
+import { resolveNets } from "./resolveNets.ts"
 
 export default async function(...args: string[]) {
   const { port, "--": cmd, out } = flags.parse(args, {
@@ -22,7 +22,7 @@ export default async function(...args: string[]) {
     "--": true,
   })
 
-  const config = await resolveConfig(...args)
+  const nets = await resolveNets(...args)
 
   const devnetTempDir = await tempDir(out, "devnet")
 
@@ -40,7 +40,7 @@ export default async function(...args: string[]) {
     .catch(() => false)
 
   if (!running) {
-    const devnetsHandler = createDevnetsHandler(devnetTempDir, config, signal)
+    const devnetsHandler = createDevnetsHandler(devnetTempDir, nets, signal)
     const codegenHandler = createCodegenHandler(dataCache, tempCache)
     const handler = createCorsHandler(createErrorHandler(async (request) => {
       const { pathname } = new URL(request.url)
@@ -76,7 +76,7 @@ export default async function(...args: string[]) {
         args,
         signal,
         env: {
-          DEVNETS_SERVER: `http://localhost:${port}/devnets/`,
+          CAPI_SERVER: href,
         },
       })
       const status = await command.spawn().status

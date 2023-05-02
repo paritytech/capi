@@ -6,8 +6,7 @@
  * funds. This simplifies signing extrinsics for submission to the given dev chain.
  */
 
-import { $, $sr25519 } from "capi"
-import { createDevUsers } from "capi/server"
+import { $, $sr25519, createDevUsers } from "capi"
 
 /// Dev users can be initialized with no count. The resulting collection is
 /// a record with 26 `Sr25519`s (one for every letter of the alphabet).

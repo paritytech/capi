@@ -1,4 +1,4 @@
-import { ss58 } from "../../crypto/mod.ts"
+import { blake2_256, Sr25519, ss58 } from "../../crypto/mod.ts"
 import * as $ from "../../deps/scale.ts"
 import { devUserPublicKeysData } from "../../util/_artifacts/devUserPublicKeysData.ts"
 
@@ -11,4 +11,8 @@ export function addDevUsers(balances: [string, number][]) {
   for (const publicKey of devUserPublicKeys) {
     balances.push([ss58.encode(networkPrefix, publicKey), devUserInitialFunds])
   }
+}
+
+export function devUser(userId: number) {
+  return Sr25519.fromSeed(blake2_256.hash(new TextEncoder().encode(`capi-dev-user-${userId}`)))
 }

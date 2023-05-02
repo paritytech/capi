@@ -1,9 +1,9 @@
 import { WsConnection } from "../../rpc/mod.ts"
-import { devnetsUrl } from "./detectServer.ts"
+import { detectServer } from "./detectServer.ts"
 
 export class DevnetConnection extends WsConnection {
   constructor(path: string) {
-    const url = new URL(path, devnetsUrl())
+    const url = new URL(`/devnets/${path}`, detectServer())
     url.protocol = "ws"
     super(url.toString())
   }

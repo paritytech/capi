@@ -3,7 +3,8 @@ import * as $ from "../deps/scale.ts"
 import { emptyDir } from "../deps/std/fs.ts"
 import * as path from "../deps/std/path.ts"
 import dprintConfig from "../dprint.json" assert { type: "json" }
-import { compress, devUser } from "../util/mod.ts"
+import { devUser } from "../nets/mod.ts"
+import { compress } from "../util/mod.ts"
 
 export const DEV_USER_COUNT = 100_000
 

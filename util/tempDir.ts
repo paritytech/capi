@@ -1,7 +1,7 @@
 import * as path from "../deps/std/path.ts"
 
 export async function tempDir(parentDir: string, name: string) {
-  const dir = path.resolve(`${parentDir}/${name}/${name}-${timeKey()}`)
+  const dir = path.join(parentDir, name, timeKey())
   await Deno.mkdir(dir, { recursive: true })
   return dir
 }

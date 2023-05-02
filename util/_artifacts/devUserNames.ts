@@ -1,1 +1,0 @@
-export const devUserNames = ["alexa", "billy", "carol", "david", "ellie", "felix", "grace", "harry", "india", "james", "kiera", "laura", "matty", "nadia", "oscar", "piper", "quinn", "ryann", "steff", "tisix", "usher", "vicky", "wendy", "xenia", "yetis", "zelda"] as const

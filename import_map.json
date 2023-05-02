@@ -6,8 +6,7 @@
     "examples/": {
       "asserts": "./deps/std/testing/asserts.ts",
       "capi": "./mod.ts",
-      "capi/patterns/": "./patterns/",
-      "capi/server": "./server/mod.ts"
+      "capi/patterns/": "./patterns/"
     },
     "http://localhost:4646/": {
       "http://localhost:4646/capi/": "./"

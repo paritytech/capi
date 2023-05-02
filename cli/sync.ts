@@ -1,10 +1,10 @@
 import * as flags from "../deps/std/flags.ts"
 import { blue, gray } from "../deps/std/fmt/colors.ts"
 import { assertEquals } from "../deps/std/testing/asserts.ts"
-import { sync } from "../server/mod.ts"
+import { syncNets } from "../server/mod.ts"
 import { normalizePackageName } from "../util/mod.ts"
 import { tempDir } from "../util/tempDir.ts"
-import { resolveConfig } from "./resolveConfig.ts"
+import { resolveNets } from "./resolveNets.ts"
 
 export default async function(...args: string[]) {
   const {
@@ -22,11 +22,11 @@ export default async function(...args: string[]) {
     },
   })
 
-  const config = await resolveConfig(...args)
+  const config = await resolveNets(...args)
 
   const devnetTempDir = await tempDir(out, "devnet")
 
-  const baseUrl = await sync(server, devnetTempDir, config)
+  const baseUrl = await syncNets(server, devnetTempDir, config)
 
   if (importMapFile) {
     syncFile(importMapFile, (importMap) => {

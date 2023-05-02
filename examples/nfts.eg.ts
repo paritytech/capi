@@ -15,10 +15,9 @@ import {
   RuntimeEvent,
 } from "@capi/rococo-dev-westmint"
 import { assertEquals } from "asserts"
-import { $, Rune } from "capi"
+import { $, createDevUsers, Rune } from "capi"
 import { DefaultCollectionSetting, DefaultItemSetting } from "capi/patterns/nfts.ts"
 import { signature } from "capi/patterns/signature/statemint.ts"
-import { createDevUsers } from "capi/server"
 
 /// Create two dev users. Alexa will mint and list the NFT. Billy will purchase it.
 const { alexa, billy } = await createDevUsers()

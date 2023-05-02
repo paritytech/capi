@@ -26,9 +26,8 @@ import {
   RuntimeEvent,
 } from "@capi/rococo-dev-westmint"
 import { assert } from "asserts"
-import { Rune } from "capi"
+import { createDevUsers, Rune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
-import { createDevUsers } from "capi/server"
 
 const { alexa } = await createDevUsers()
 

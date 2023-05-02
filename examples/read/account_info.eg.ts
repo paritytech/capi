@@ -5,8 +5,7 @@
  */
 
 import { $accountInfo, polkadotDev } from "@capi/polkadot-dev"
-import { $ } from "capi"
-import { createDevUsers } from "capi/server"
+import { $, createDevUsers } from "capi"
 
 const { alexa } = await createDevUsers()
 

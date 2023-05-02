@@ -7,9 +7,8 @@
 
 import { contractsDev } from "@capi/contracts-dev"
 import { assertInstanceOf } from "asserts"
-import { ExtrinsicError } from "capi"
+import { createDevUsers, ExtrinsicError } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
-import { createDevUsers } from "capi/server"
 
 const { alexa, billy } = await createDevUsers()
 

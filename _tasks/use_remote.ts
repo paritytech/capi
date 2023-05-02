@@ -2,7 +2,7 @@
 // instead of the local server.
 
 import * as nets from "../nets.ts"
-import { isUploaded, sync } from "../server/mod.ts"
+import { syncNets } from "../server/mod.ts"
 
 const LOCAL_SERVER = "http://localhost:4646/"
 
@@ -33,5 +33,11 @@ if (await isUploaded(capiServer, codegenHash)) {
   console.log("codegen already uploaded")
 } else {
   console.log("uploading codegen")
-  await sync("https://capi.dev/", "target/capi", nets)
+  await syncNets("https://capi.dev/", "target/capi", nets)
+}
+
+async function isUploaded(server: string, hash: string) {
+  const url = new URL(`upload/codegen/${hash}`, server)
+  const exists = await fetch(url, { method: "HEAD" })
+  return exists.ok
 }

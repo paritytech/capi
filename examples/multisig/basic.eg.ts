@@ -7,10 +7,9 @@
 
 import { polkadotDev } from "@capi/polkadot-dev"
 import { assert } from "asserts"
-import { $ } from "capi"
+import { $, createDevUsers } from "capi"
 import { MultisigRune } from "capi/patterns/multisig/mod.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
-import { createDevUsers } from "capi/server"
 
 const { alexa, billy, carol, david } = await createDevUsers()
 

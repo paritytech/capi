@@ -13,7 +13,7 @@ import { CacheBase } from "../util/cache/base.ts"
 import { WeakMemo } from "../util/memo.ts"
 import { normalizePackageName, normalizeVariableName } from "../util/mod.ts"
 import { tsFormatter } from "../util/tsFormatter.ts"
-import { $codegenSpec, CodegenEntryV0 } from "./CodegenSpec.ts"
+import { $codegenSpec, CodegenEntry } from "./CodegenSpec.ts"
 import * as f from "./factories.ts"
 import { getStatic } from "./getStatic.ts"
 
@@ -99,7 +99,7 @@ export function createCodegenHandler(dataCache: CacheBase, tempCache: CacheBase)
             throw new Response(`${hash} not found`, { status: Status.NotFound })
           })
 
-          let match: [string, CodegenEntryV0] | undefined = undefined
+          let match: [string, CodegenEntry] | undefined = undefined
           for (const [key, value] of codegenSpec.codegen) {
             if (path === `/${key}`) {
               return `export * from "./${key.split("/").at(-1)!}/mod.js"`
@@ -126,7 +126,7 @@ export function createCodegenHandler(dataCache: CacheBase, tempCache: CacheBase)
     )
   }
 
-  async function getFiles(hash: string, key: string, entry: CodegenEntryV0) {
+  async function getFiles(hash: string, key: string, entry: CodegenEntry) {
     return await filesMemo.run(`${hash}/${key}`, async () => {
       const metadataHash = hex.encode(entry.metadataHash)
       const metadata = decodeMetadata(
@@ -214,7 +214,7 @@ export function createCodegenHandler(dataCache: CacheBase, tempCache: CacheBase)
 function writeConnectionCode(
   chainIdent: string,
   files: Map<string, string>,
-  connection: CodegenEntryV0["connection"],
+  connection: CodegenEntry["connection"],
 ) {
   const chainRuneTypeName = `${chainIdent}Rune`
   const chainRuneInstanceName = normalizeVariableName(chainIdent)
