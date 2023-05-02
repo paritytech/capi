@@ -9,6 +9,10 @@ import {
 import { BinaryGetter, DevNet, SpawnDevNetResult } from "./DevNet.ts"
 import { DevParachain } from "./DevParachain.ts"
 
+export function dev(binary: BinaryGetter, chain: string, nodeCount?: number) {
+  return new DevRelayChain(binary, chain, nodeCount)
+}
+
 export class DevRelayChain extends DevNet {
   parachains: DevParachain[] = []
 

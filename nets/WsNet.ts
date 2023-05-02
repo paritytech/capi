@@ -1,5 +1,9 @@
 import { getMetadataFromWsUrl, Net } from "./Net.ts"
 
+export function ws(url: string, version?: string) {
+  return new WsNet(url, version)
+}
+
 export class WsNet extends Net {
   constructor(readonly url: string, readonly version = "latest") {
     super()
