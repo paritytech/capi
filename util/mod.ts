@@ -1,4 +1,4 @@
-// moderate --exclude autobin cache port.ts proxyWebSocket.ts tempDir.ts tsFormatter.ts
+// moderate --exclude cache port.ts proxyWebSocket.ts tsFormatter.ts
 
 export * from "./ArrayOfLength.ts"
 export * from "./clock.ts"
