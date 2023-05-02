@@ -162,6 +162,7 @@ export class VirtualMultisigRune<out C extends Chain, out U>
       .sent()
       .dbgStatus("Proxy creations:")
       .finalizedEvents()
+      .unhandleFailed()
       .pipe(filterPureCreatedEvents)
       .map((events) =>
         events
