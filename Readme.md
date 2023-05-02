@@ -101,9 +101,7 @@ Retrieve the first 10 entries from a storage map of Polkadot.
 ```ts
 import { polkadot } from "@capi/polkadot"
 
-const accounts = await polkadot.System.Account
-  .entryPage(10, null)
-  .run()
+const accounts = await polkadot.System.Account.entries({ count: 10 }).run()
 ```
 
 ## Development Networks
@@ -116,7 +114,7 @@ Let's modify the usage above to target our configured devnet.
 
 - const accounts = await polkadot.System.Account
 + const accounts = await polkadotDev.System.Account
-    .entryPage(10, null)
+    .entries({ count: 10 })
     .run()
 ```
 
