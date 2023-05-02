@@ -24,60 +24,43 @@ export class DevParachain extends DevNet {
     return ["--", "--execution", "wasm", "--chain", relayChainSpecPath]
   }
 
-  _parachainInfo?: Promise<ParachainInfo>
-  parachainInfo(signal: AbortSignal, tempParentDir: string) {
-    if (!this._parachainInfo) {
-      this._parachainInfo = (async () => {
-        const tempDir = this.tempDir(tempParentDir)
-        const binary = await this.binary(signal)
-        const chainSpecPath = await createCustomChainSpec(
-          tempDir,
-          binary,
-          this.chain,
-          (chainSpec) => {
-            chainSpec.para_id = this.id
-            const genesisConfig = getGenesisConfig(chainSpec)
-            genesisConfig.parachainInfo.parachainId = this.id
-            addDevUsers(genesisConfig.balances.balances)
-          },
-        )
-        const genesis = await exportParachainGenesis(binary, chainSpecPath, signal)
-        return { id: this.id, chainSpecPath, genesis }
-      })()
-    }
-    return this._parachainInfo
+  async parachainInfo(signal: AbortSignal, tempParentDir: string) {
+    const tempDir = this.tempDir(tempParentDir)
+    const binary = await this.binary(signal)
+    const chainSpecPath = await createCustomChainSpec(tempDir, binary, this.chain, (chainSpec) => {
+      chainSpec.para_id = this.id
+      const genesisConfig = getGenesisConfig(chainSpec)
+      genesisConfig.parachainInfo.parachainId = this.id
+      addDevUsers(genesisConfig.balances.balances)
+    })
+    const genesis = await exportParachainGenesis(binary, chainSpecPath, signal)
+    return { id: this.id, chainSpecPath, genesis }
   }
 
-  _network?: Promise<SpawnDevNetResult>
   async spawn(signal: AbortSignal, tempParentDir: string): Promise<SpawnDevNetResult> {
-    if (!this._network) {
-      const tempDir = this.tempDir(tempParentDir)
-      this._network = (async () => {
-        const [{ chainSpecPath }, relayChainSpecPath, relayChain] = await Promise.all([
-          this.parachainInfo(signal, tempParentDir),
-          this.relayChain.chainSpecPath(signal, tempParentDir),
-          this.relayChain.spawn(signal, tempParentDir),
-        ])
-        const nodeCount = this.nodeCount ?? 2
-        return this.spawnDevNet({
-          tempDir,
-          binary: await this.binary(signal),
-          chainSpecPath,
-          nodeCount,
-          extraArgs: [
-            "--",
-            "--execution",
-            "wasm",
-            "--chain",
-            relayChainSpecPath,
-            "--bootnodes",
-            relayChain.bootnodes,
-          ],
-          signal,
-        })
-      })()
-    }
-    return this._network
+    const tempDir = this.tempDir(tempParentDir)
+    const [{ chainSpecPath }, relayChainSpecPath, relayChain] = await Promise.all([
+      this.parachainInfo(signal, tempParentDir),
+      this.relayChain.chainSpecPath(signal, tempParentDir),
+      this.relayChain.spawn(signal, tempParentDir),
+    ])
+    const nodeCount = this.nodeCount ?? 2
+    return await this.spawnDevNet({
+      tempDir,
+      binary: await this.binary(signal),
+      chainSpecPath,
+      nodeCount,
+      extraArgs: [
+        "--",
+        "--execution",
+        "wasm",
+        "--chain",
+        relayChainSpecPath,
+        "--bootnodes",
+        relayChain.bootnodes,
+      ],
+      signal,
+    })
   }
 }
 

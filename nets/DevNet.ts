@@ -25,18 +25,8 @@ export abstract class DevNet extends Net {
     return this._tempDir
   }
 
-  _rawChainSpecPath?: Promise<string>
-  rawChainSpecPath(signal: AbortSignal, devnetTempDir: string) {
-    if (!this._rawChainSpecPath) {
-      this._rawChainSpecPath = (async () => {
-        return createRawChainSpec(
-          this.tempDir(devnetTempDir),
-          await this.binary(signal),
-          this.chain,
-        )
-      })()
-    }
-    return this._rawChainSpecPath
+  async rawChainSpecPath(signal: AbortSignal, devnetTempDir: string) {
+    return createRawChainSpec(this.tempDir(devnetTempDir), await this.binary(signal), this.chain)
   }
 
   async preflightNetwork(signal: AbortSignal, devnetTempDir: string) {
@@ -56,27 +46,16 @@ export abstract class DevNet extends Net {
 
   abstract preflightNetworkArgs(signal: AbortSignal, devnetTempDir: string): Promise<string[]>
 
-  _metadata?: Promise<Uint8Array>
-  metadata(signal: AbortSignal, devnetTempDir: string) {
-    if (!this._metadata) {
-      this._metadata = (async () => {
-        const { ports: [port0] } = await this.preflightNetwork(signal, devnetTempDir)
-        return getMetadataFromWsUrl(`ws://127.0.0.1:${port0}`)
-      })()
-    }
-    return this._metadata
+  async metadata(signal: AbortSignal, devnetTempDir: string) {
+    const { ports: [port0] } = await this.preflightNetwork(signal, devnetTempDir)
+    return getMetadataFromWsUrl(`ws://127.0.0.1:${port0}`)
   }
 
   abstract spawn(signal: AbortSignal, tempParentDir: string): Promise<SpawnDevNetResult>
 
-  async spawnDevNet({
-    tempDir,
-    binary,
-    chainSpecPath,
-    nodeCount,
-    extraArgs,
-    signal,
-  }: SpawnDevNetProps): Promise<SpawnDevNetResult> {
+  async spawnDevNet(
+    { tempDir, binary, chainSpecPath, nodeCount, extraArgs, signal }: SpawnDevNetProps,
+  ): Promise<SpawnDevNetResult> {
     let bootnodes: string | undefined
     const ports = []
     for (let i = 0; i < nodeCount; i++) {
