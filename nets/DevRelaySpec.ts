@@ -78,10 +78,10 @@ export class DevRelaySpec extends DevNetSpec {
           async (parachain, i): Promise<[DevParachainSpec, DevNet]> => {
             const parachainInfo = parachainsInfo[i]!
             const tempDir = parachain.tempDir(relayTempDir)
-            const nodeCount = this.nodeCount ?? 2
+            const nodeCount = parachain.nodeCount ?? 2
             const chain = await spawnDevNet({
               tempDir,
-              binary: await this.binary(signal),
+              binary: await parachain.binary(signal),
               chainSpecPath: parachainInfo.chainSpecPath,
               nodeCount,
               extraArgs: [
