@@ -4,10 +4,6 @@ export interface MetadataNetProps {
   metadata: Uint8Array
 }
 
-export function metadata(props: MetadataNetProps) {
-  return new MetadataNetSpec(props)
-}
-
 export class MetadataNetSpec extends NetSpec {
   _metadata
   constructor(props: MetadataNetProps) {

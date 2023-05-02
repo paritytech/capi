@@ -5,10 +5,6 @@ export interface WsNetProps {
   version?: string
 }
 
-export function ws(props: WsNetProps) {
-  return new WsNetSpec(props)
-}
-
 export class WsNetSpec extends NetSpec {
   readonly url
   readonly version

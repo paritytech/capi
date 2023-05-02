@@ -6,12 +6,8 @@ import {
   GenesisConfig,
   getGenesisConfig,
 } from "./chain_spec/mod.ts"
-import { DevNet, DevNetProps, DevNetSpec, spawnDevNet } from "./DevNetSpec.ts"
+import { DevNet, DevNetSpec, spawnDevNet } from "./DevNetSpec.ts"
 import { DevParachainProps, DevParachainSpec } from "./DevParachainSpec.ts"
-
-export function dev(props: DevNetProps) {
-  return new DevRelaySpec(props)
-}
 
 export class DevRelaySpec extends DevNetSpec {
   parachains: DevParachainSpec[] = []
