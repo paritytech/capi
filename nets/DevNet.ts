@@ -8,15 +8,30 @@ import { createRawChainSpec } from "./chain_spec/mod.ts"
 import { getMetadataFromWsUrl, Net } from "./Net.ts"
 
 export abstract class DevNet extends Net {
-  constructor(readonly binary: BinaryGetter, readonly chain: string, readonly nodeCount?: number) {
+  constructor(
+    readonly getBinary: BinaryGetter,
+    readonly chain: string,
+    readonly nodeCount?: number,
+  ) {
     super()
   }
+
+  abstract preflightNetworkArgs(signal: AbortSignal, devnetTempDir: string): Promise<string[]>
+  abstract spawn(signal: AbortSignal, tempParentDir: string): Promise<SpawnDevNetResult>
 
   connection(name: string) {
     return {
       type: "DevnetConnection" as const,
       discovery: name,
     }
+  }
+
+  _binary?: Promise<string>
+  binary(signal: AbortSignal) {
+    if (!this._binary) {
+      this._binary = this.getBinary(signal)
+    }
+    return this._binary
   }
 
   _tempDir?: string
@@ -26,7 +41,7 @@ export abstract class DevNet extends Net {
   }
 
   async rawChainSpecPath(signal: AbortSignal, devnetTempDir: string) {
-    return createRawChainSpec(this.tempDir(devnetTempDir), await this.binary(signal), this.chain)
+    return createRawChainSpec(this.tempDir(devnetTempDir), await this.getBinary(signal), this.chain)
   }
 
   async preflightNetwork(signal: AbortSignal, devnetTempDir: string) {
@@ -36,7 +51,7 @@ export abstract class DevNet extends Net {
     ])
     return this.spawnDevNet({
       tempDir: this.tempDir(devnetTempDir),
-      binary: await this.binary(signal),
+      binary: await this.getBinary(signal),
       chainSpecPath,
       nodeCount: 1,
       extraArgs,
@@ -44,18 +59,19 @@ export abstract class DevNet extends Net {
     })
   }
 
-  abstract preflightNetworkArgs(signal: AbortSignal, devnetTempDir: string): Promise<string[]>
-
   async metadata(signal: AbortSignal, devnetTempDir: string) {
     const { ports: [port0] } = await this.preflightNetwork(signal, devnetTempDir)
     return getMetadataFromWsUrl(`ws://127.0.0.1:${port0}`)
   }
 
-  abstract spawn(signal: AbortSignal, tempParentDir: string): Promise<SpawnDevNetResult>
-
-  async spawnDevNet(
-    { tempDir, binary, chainSpecPath, nodeCount, extraArgs, signal }: SpawnDevNetProps,
-  ): Promise<SpawnDevNetResult> {
+  async spawnDevNet({
+    tempDir,
+    binary,
+    chainSpecPath,
+    nodeCount,
+    extraArgs,
+    signal,
+  }: SpawnDevNetProps): Promise<SpawnDevNetResult> {
     let bootnodes: string | undefined
     const ports = []
     for (let i = 0; i < nodeCount; i++) {

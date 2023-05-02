@@ -16,8 +16,8 @@ export function dev(binary: BinaryGetter, chain: string, nodeCount?: number) {
 export class DevRelayChain extends DevNet {
   parachains: DevParachain[] = []
 
-  parachain(binary: BinaryGetter, chain: string, id: number, nodes?: number) {
-    return new DevParachain(this, binary, chain, id, nodes)
+  parachain(getBinary: BinaryGetter, chain: string, id: number, nodes?: number) {
+    return new DevParachain(this, getBinary, chain, id, nodes)
   }
 
   preflightNetworkArgs() {
@@ -33,7 +33,7 @@ export class DevRelayChain extends DevNet {
   async chainSpecPath(signal: AbortSignal, tempParentDir: string) {
     const [parachainInfo, binary] = await Promise.all([
       this.parachainInfo(signal, tempParentDir),
-      this.binary(signal),
+      this.getBinary(signal),
     ])
     const minValidators = Math.max(2, parachainInfo.length)
     const tempDir = this.tempDir(tempParentDir)
@@ -52,21 +52,27 @@ export class DevRelayChain extends DevNet {
     })
   }
 
-  async spawn(signal: AbortSignal, tempParentDir: string): Promise<SpawnDevNetResult> {
-    const tempDir = this.tempDir(tempParentDir)
-    const [chainSpecPath, parachainInfo, binary] = await Promise.all([
-      this.chainSpecPath(signal, tempParentDir),
-      this.parachainInfo(signal, tempParentDir),
-      this.binary(signal),
-    ])
-    const nodeCount = this.nodeCount ?? Math.max(2, parachainInfo.length)
-    return await this.spawnDevNet({
-      tempDir,
-      binary,
-      chainSpecPath,
-      nodeCount,
-      extraArgs: [],
-      signal,
-    })
+  _spawn?: Promise<SpawnDevNetResult>
+  spawn(signal: AbortSignal, tempParentDir: string): Promise<SpawnDevNetResult> {
+    if (!this._spawn) {
+      this._spawn = (async () => {
+        const tempDir = this.tempDir(tempParentDir)
+        const [chainSpecPath, parachainInfo, binary] = await Promise.all([
+          this.chainSpecPath(signal, tempParentDir),
+          this.parachainInfo(signal, tempParentDir),
+          this.getBinary(signal),
+        ])
+        const nodeCount = this.nodeCount ?? Math.max(2, parachainInfo.length)
+        return await this.spawnDevNet({
+          tempDir,
+          binary,
+          chainSpecPath,
+          nodeCount,
+          extraArgs: [],
+          signal,
+        })
+      })()
+    }
+    return this._spawn
   }
 }

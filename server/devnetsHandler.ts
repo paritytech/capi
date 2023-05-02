@@ -29,7 +29,7 @@ export function createDevnetsHandler(
     const name = match[1]!
     const net = nets[name]
     if (net instanceof DevNet) {
-      const network = await networkMemo.run(name, () => net.spawn(signal, devnetTempDir))
+      const network = await networkMemo.run(name, () => net.spawn(name, signal, devnetTempDir))
       if (request.headers.get("Upgrade") === "websocket") {
         const port = network.ports.shift()!
         network.ports.push(port)
