@@ -2,7 +2,7 @@ export * as f from "./factories.ts"
 
 // moderate --exclude factories.ts
 
-export * from "./client.ts"
+export * from "./client/mod.ts"
 export * from "./codegenHandler.ts"
 export * from "./CodegenSpec.ts"
 export * from "./corsHandler.ts"

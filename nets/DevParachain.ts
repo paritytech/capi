@@ -1,11 +1,10 @@
 import {
+  addDevUsers,
   createCustomChainSpec,
   exportParachainGenesis,
   getGenesisConfig,
-} from "./common/chain_spec.ts"
-import { addDevUsers } from "./common/dev_users.ts"
-import { spawnDevNet, SpawnDevNetResult } from "./common/spawnDevNet.ts"
-import { BinaryGetter, DevNet } from "./DevNet.ts"
+} from "./chain_spec/mod.ts"
+import { BinaryGetter, DevNet, SpawnDevNetResult } from "./DevNet.ts"
 import { DevRelayChain } from "./DevRelayChain.ts"
 
 export class DevParachain extends DevNet {
@@ -50,10 +49,7 @@ export class DevParachain extends DevNet {
   }
 
   _network?: Promise<SpawnDevNetResult>
-  override spawn = async (
-    signal: AbortSignal,
-    tempParentDir: string,
-  ): Promise<SpawnDevNetResult> => {
+  async spawn(signal: AbortSignal, tempParentDir: string): Promise<SpawnDevNetResult> {
     if (!this._network) {
       const tempDir = this.tempDir(tempParentDir)
       this._network = (async () => {
@@ -63,7 +59,7 @@ export class DevParachain extends DevNet {
           this.relayChain.spawn(signal, tempParentDir),
         ])
         const nodeCount = this.nodeCount ?? 2
-        return spawnDevNet({
+        return this.spawnDevNet({
           tempDir,
           binary: await this.binary(signal),
           chainSpecPath,

@@ -1,5 +1,5 @@
 import * as $ from "../deps/scale.ts"
-import { devUserPublicKeys, Net, SpawnDevNetResult } from "../nets/mod.ts"
+import { DevNet, devUserPublicKeys, Net, SpawnDevNetResult } from "../nets/mod.ts"
 import { PermanentMemo } from "../util/mod.ts"
 import { proxyWebSocket } from "../util/proxyWebSocket.ts"
 import * as f from "./factories.ts"
@@ -27,14 +27,16 @@ export function createDevnetsHandler(
     const match = rDevnetsApi.exec(pathname)
     if (!match) return f.notFound()
     const name = match[1]!
-    const spawn = nets[name]?.spawn
-    if (!spawn) return f.notFound()
-    const network = await networkMemo.run(name, () => spawn(signal, devnetTempDir))
-    if (request.headers.get("Upgrade") === "websocket") {
-      const port = network.ports.shift()!
-      network.ports.push(port)
-      return proxyWebSocket(request, `ws://127.0.0.1:${port}`)
+    const net = nets[name]
+    if (net instanceof DevNet) {
+      const network = await networkMemo.run(name, () => net.spawn(signal, devnetTempDir))
+      if (request.headers.get("Upgrade") === "websocket") {
+        const port = network.ports.shift()!
+        network.ports.push(port)
+        return proxyWebSocket(request, `ws://127.0.0.1:${port}`)
+      }
+      return new Response("Network launched")
     }
-    return new Response("Network launched")
+    return f.notFound()
   }
 }

@@ -19,7 +19,7 @@ export namespace net {
 
 // moderate
 
-export * from "./common/mod.ts"
+export * from "./chain_spec/mod.ts"
 export * from "./DevNet.ts"
 export * from "./DevParachain.ts"
 export * from "./DevRelayChain.ts"

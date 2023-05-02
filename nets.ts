@@ -9,11 +9,12 @@ const bin = autobin({
   trappist: ["trappist-collator", "79bba6e"],
 })
 
+export const polkadotDev = net.dev(bin.polkadot, "polkadot-dev")
 export const polkadot = net.ws("wss://rpc.polkadot.io/", "v0.9.40")
+
 export const westend = net.ws("wss://westend-rpc.polkadot.io/")
 export const statemint = net.ws("wss://statemint-rpc.polkadot.io/")
 
-export const polkadotDev = net.dev(bin.polkadot, "polkadot-dev")
 export const westendDev = net.dev(bin.polkadot, "westend-dev")
 export const contractsDev = net.dev(bin.substrateContractsNode, "dev")
 

@@ -6,8 +6,9 @@
  */
 
 import { westendDev } from "@capi/westend-dev"
-import { $, createDevUsers, SignedExtrinsicRune } from "capi"
+import { $, SignedExtrinsicRune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
+import { createDevUsers } from "capi/server"
 
 const { alexa, billy } = await createDevUsers()
 

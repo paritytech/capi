@@ -6,8 +6,9 @@
 
 import { westendDev } from "@capi/westend-dev"
 import { assert } from "asserts"
-import { createDevUsers, Rune } from "capi"
+import { Rune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
+import { createDevUsers } from "capi/server"
 
 /// Create four dev users, one of whom will be the batch sender. The other
 /// three will be recipients of balance transfers described in the batch.

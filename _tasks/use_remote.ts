@@ -2,7 +2,7 @@
 // instead of the local server.
 
 import * as nets from "../nets.ts"
-import { checkCodegenUploaded, sync } from "../server/mod.ts"
+import { isUploaded, sync } from "../server/mod.ts"
 
 const LOCAL_SERVER = "http://localhost:4646/"
 
@@ -29,7 +29,7 @@ await Deno.writeTextFile("import_map.json", JSON.stringify(importMap, null, 2))
 
 const codegenHash = oldCodegenUrl.slice(LOCAL_SERVER.length).split("/")[0]
 
-if (await checkCodegenUploaded(capiServer, codegenHash)) {
+if (await isUploaded(capiServer, codegenHash)) {
   console.log("codegen already uploaded")
 } else {
   console.log("uploading codegen")

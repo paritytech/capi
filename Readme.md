@@ -43,11 +43,11 @@ import { autobin, net } from "capi"
 
 const bin = autobin({ polkadot: ["polkadot", "v0.9.38"] })
 
-// 1. a Polkadot development network
-export const polkadotDev = net.dev(bin.polkadot, "polkadot-dev")
-
-// 2. the Polkadot relay chain
+// The Polkadot relay chain
 export const polkadot = net.ws("wss://rpc.polkadot.io/")
+
+// A Polkadot development network
+export const polkadotDev = net.dev(bin.polkadot, "polkadot-dev")
 ```
 
 ## Command Line Tool

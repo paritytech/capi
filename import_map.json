@@ -4,9 +4,10 @@
   },
   "scopes": {
     "examples/": {
+      "asserts": "./deps/std/testing/asserts.ts",
       "capi": "./mod.ts",
       "capi/patterns/": "./patterns/",
-      "asserts": "./deps/std/testing/asserts.ts"
+      "capi/server": "./server/mod.ts"
     },
     "http://localhost:4646/": {
       "http://localhost:4646/capi/": "./"

@@ -1,10 +1,9 @@
-import { blake2_512, blake2_64, Hasher } from "../crypto/hashers.ts"
-import { hex } from "../crypto/mod.ts"
-import { gray, green } from "../deps/std/fmt/colors.ts"
-import { Net } from "../nets/mod.ts"
-import { $codegenSpec, CodegenEntryV0 } from "../server/mod.ts"
-import { normalizePackageName, withSignal } from "../util/mod.ts"
-import { normalizeTypeName } from "../util/normalize.ts"
+import { blake2_512, blake2_64, hex } from "../../crypto/mod.ts"
+import { gray, green } from "../../deps/std/fmt/colors.ts"
+import { Net } from "../../nets/mod.ts"
+import { normalizePackageName, normalizeTypeName, withSignal } from "../../util/mod.ts"
+import { $codegenSpec, CodegenEntryV0 } from "../CodegenSpec.ts"
+import { upload } from "./upload.ts"
 
 export async function sync(server: string, devnetTempDir: string, nets: Record<string, Net>) {
   return withSignal(async (signal) => {
@@ -27,20 +26,4 @@ export async function sync(server: string, devnetTempDir: string, nets: Record<s
     const codegenHash = hex.encode(await upload(server, "codegen", codegenSpec, blake2_64))
     return new URL(codegenHash + "/", server).toString()
   })
-}
-
-async function upload(server: string, kind: string, data: Uint8Array, hasher: Hasher) {
-  const hash = hasher.hash(data)
-  const url = new URL(`upload/${kind}/${hex.encode(hash)}`, server)
-  const exists = await fetch(url, { method: "HEAD" })
-  if (exists.ok) return hash
-  const response = await fetch(url, { method: "PUT", body: data })
-  if (!response.ok) throw new Error(await response.text())
-  return hash
-}
-
-export async function checkCodegenUploaded(server: string, hash: string) {
-  const url = new URL(`upload/codegen/${hash}`, server)
-  const exists = await fetch(url, { method: "HEAD" })
-  return exists.ok
 }
