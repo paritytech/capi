@@ -1,10 +1,8 @@
-import { deepMerge } from "../deps/std/collections/deep_merge.ts"
 import {
   addDevUsers,
   createCustomChainSpec,
   exportParachainGenesis,
   getGenesisConfig,
-  setGenesisConfig,
 } from "./chain_spec/mod.ts"
 import { DevNetProps, DevNetSpec } from "./DevNetSpec.ts"
 import { DevRelaySpec } from "./DevRelaySpec.ts"
@@ -37,7 +35,7 @@ export class DevParachainSpec extends DevNetSpec {
         const genesisConfig = getGenesisConfig(chainSpec)
         genesisConfig.parachainInfo && (genesisConfig.parachainInfo.parachainId = this.id)
         addDevUsers(genesisConfig)
-        setGenesisConfig(chainSpec, deepMerge(genesisConfig, this.genesis ?? {}))
+        this.customize?.(chainSpec)
       },
     )
     const genesis = await exportParachainGenesis(binary, chainSpecPath, signal)

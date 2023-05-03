@@ -4,6 +4,7 @@ export interface ChainSpec {
   genesis: {
     runtime: GenesisConfig | { runtime_genesis_config: GenesisConfig }
   }
+  [key: string]: unknown
 }
 
 export interface GenesisConfig {
@@ -37,7 +38,6 @@ export interface GenesisConfig {
       maxMessageSize: number,
     ][]
   }
-  [key: string]: unknown
 }
 
 export interface SessionKey {
