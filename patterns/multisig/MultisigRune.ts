@@ -59,7 +59,7 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
               threshold,
               call,
               otherSignatories,
-              maxWeight: call.weight().access("weight"),
+              maxWeight: call.weight(),
               maybeTimepoint,
             }),
         })
