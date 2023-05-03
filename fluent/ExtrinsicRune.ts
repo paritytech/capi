@@ -50,7 +50,7 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
       .into(SignedExtrinsicRune, this.chain)
   }
 
-  feeEstimate() {
+  weightRaw() {
     const extrinsic = this.chain.$extrinsic.encoded(Rune.object({
       protocolVersion: ExtrinsicRune.PROTOCOL_VERSION,
       call: this,
@@ -59,13 +59,24 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
       .fn(concat)
       .call(extrinsic, extrinsic.access("length").map((n) => $.u32.encode(n)))
       .map(hex.encodePrefixed)
-    const data = this.chain.connection
+    return this.chain.connection
       .call("state_call", "TransactionPaymentApi_query_info", arg)
       .map(hex.decode)
+      .map((v) => v.slice(0, 6))
+      .map(hex.encode)
+  }
+
+  weight() {
     return this.chain.metadata
       .access("paths", "sp_weights::weight_v2::Weight")
-      .map(($c) => $.field("weight", $c))
       .into(CodecRune)
-      .decoded(data)
+      .decoded(this.weightRaw().map(hex.decode))
+  }
+
+  estimate() {
+    return this.chain.connection
+      .call("state_call", "TransactionPaymentApi_query_weight_to_fee", this.weightRaw())
+      .map(hex.decode)
+      .map((value) => $.u128.decode(value))
   }
 }
