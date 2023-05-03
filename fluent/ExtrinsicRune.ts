@@ -74,9 +74,12 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
   }
 
   estimate() {
-    return this.chain.connection
+    const encoded = this.chain.connection
       .call("state_call", "TransactionPaymentApi_query_weight_to_fee", this.weightRaw())
       .map(hex.decode)
-      .map((value) => $.u128.decode(value))
+    return Rune
+      .constant($.u128)
+      .into(CodecRune)
+      .decoded(encoded)
   }
 }
