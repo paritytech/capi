@@ -7,23 +7,23 @@ import { $codegenSpec, CodegenEntry } from "../CodegenSpec.ts"
 export async function syncNets(
   server: string,
   devnetTempDir: string,
-  nets: Record<string, NetSpec>,
+  netSpecs: Record<string, NetSpec>,
 ) {
   return withSignal(async (signal) => {
-    const netEntries = Object.entries(nets)
+    const netSpecsEntries = Object.entries(netSpecs)
     let synced = 0
     const entries = await Promise.all(
-      netEntries.map(async ([name, chain]): Promise<[string, CodegenEntry]> => {
+      netSpecsEntries.map(async ([name, netSpec]): Promise<[string, CodegenEntry]> => {
         const packageName = normalizePackageName(name)
         const chainName = normalizeTypeName(name)
-        const metadata = await chain.metadata(signal, devnetTempDir)
+        const metadata = await netSpec.metadata(signal, devnetTempDir)
         const metadataHash = await upload(server, "metadata", metadata, blake2_512)
         console.log(
           green("Synced"),
-          gray(`(${++synced}/${netEntries.length})`),
+          gray(`(${++synced}/${netSpecsEntries.length})`),
           `@capi/${packageName}`,
         )
-        const connection = chain.connection(name)
+        const connection = netSpec.connection(name)
         return [packageName, { type: "frame", metadataHash, chainName, connection }]
       }),
     )
