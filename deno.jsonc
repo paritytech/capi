@@ -11,8 +11,10 @@
   "include": ["."],
   "lock": false,
   "lint": {
-    "exclude": ["deps/shims", "target", "util/_artifacts"],
-    "include": ["."],
+    "files": {
+      "exclude": ["deps/shims", "target", "util/_artifacts"],
+      "include": ["."]
+    },
     "rules": {
       "exclude": [
         "no-empty-interface",
