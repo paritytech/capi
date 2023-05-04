@@ -37,14 +37,8 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
   $callHash = this.$callData.into(ValueRune).map((x) => blake2_256.$hash<any>(x)).into(CodecRune)
   callHash = this.$callHash.encoded(this)
 
-  $extrinsic = Rune.fn($extrinsic).call(this.chain.metadata).into(CodecRune)
-  extrinsic = this.$extrinsic.encoded(Rune.object({
-    protocolVersion: 4,
-    call: this,
-  }))
-
   signed<SU>(signatureFactory: SignatureDataFactory<C, U, SU>) {
-    return this.$extrinsic
+    return this.chain.$extrinsic
       .encoded(Rune.object({
         protocolVersion: 4,
         call: this,
@@ -65,9 +59,13 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
   }
 
   feeEstimate() {
+    const extrinsic = this.chain.$extrinsic.encoded(Rune.object({
+      protocolVersion: 4,
+      call: this,
+    }))
     const arg = Rune
       .fn(concat)
-      .call(this.extrinsic, this.extrinsic.access("length").map((n) => $.u32.encode(n)))
+      .call(extrinsic, extrinsic.access("length").map((n) => $.u32.encode(n)))
       .map(hex.encodePrefixed)
     const data = this.chain.connection
       .call("state_call", "TransactionPaymentApi_query_info", arg)

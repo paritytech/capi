@@ -1,9 +1,10 @@
 import { hex } from "../crypto/mod.ts"
 import * as $ from "../deps/scale.ts"
-import { decodeMetadata, FrameMetadata } from "../frame_metadata/mod.ts"
+import { $extrinsic, decodeMetadata, FrameMetadata } from "../frame_metadata/mod.ts"
 import { Connection } from "../rpc/mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { BlockHashRune } from "./BlockHashRune.ts"
+import { CodecRune } from "./CodecRune.ts"
 import { ConnectionRune } from "./ConnectionRune.ts"
 import { ExtrinsicRune } from "./ExtrinsicRune.ts"
 import { PalletRune } from "./PalletRune.ts"
@@ -71,6 +72,8 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
   connection = this.into(ValueRune<Chain, U>).access("connection").into(ConnectionRune)
 
   metadata = this.into(ValueRune).access("metadata")
+
+  $extrinsic = Rune.fn($extrinsic).call(this.metadata).into(CodecRune)
 
   latestBlockNum = this.connection
     .subscribe("chain_subscribeNewHeads", "chain_unsubscribeNewHeads")
