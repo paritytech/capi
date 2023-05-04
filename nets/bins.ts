@@ -19,15 +19,14 @@ export function bins(
       if (typeof v === "string") return [k, () => Promise.resolve(v)]
       const binary = new CapiBinary(...v as CapiBinaryArgs)
       const key = `${v[0]}@${v[1]}`
-      return [k, (_signal: AbortSignal) => {
-        return memo.run(key, async () => {
+      return [k, (_signal: AbortSignal) =>
+        memo.run(key, async () => {
           if (!(await binary.exists())) {
             console.log("Downloading", key)
             await binary.download()
           }
           return binary.path
-        })
-      }]
+        })]
     }),
   )
 }
