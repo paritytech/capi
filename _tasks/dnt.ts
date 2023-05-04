@@ -27,13 +27,18 @@ const allFiles = []
 for await (
   const { path } of fs.walkSync(".", {
     exts: [".ts"],
-    skip: [/\.test\.ts$/, /^\.\/target\//, /\/_/],
+    skip: [/\.test\.ts$/, /^(target|_tasks|examples)\//],
     includeDirs: false,
   })
 ) allFiles.push(`./${path}`)
 
 for (const pathname of allFiles) {
-  if (!pathname.endsWith(".node.ts")) {
+  if (
+    !(pathname.endsWith(".node.ts")
+      // TODO: group shims
+      || pathname.endsWith("deps/shims/ws.ts")
+      || pathname.endsWith("deps/shims/shim-deno.ts"))
+  ) {
     entryPoints.push({
       name: pathname.slice(0, -(pathname.endsWith("mod.ts") ? "/mod.ts".length : ".ts".length)),
       path: pathname,
@@ -68,6 +73,10 @@ await Promise.all([
       lib: ["es2022.error"],
     },
     entryPoints: [
+      {
+        name: ".",
+        path: "./mod.ts",
+      },
       {
         kind: "bin",
         name: "capi",
