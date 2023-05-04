@@ -3,8 +3,8 @@ import * as ed25519 from "../deps/ed25519.ts"
 import * as base58 from "../deps/std/encoding/base58.ts"
 import * as path from "../deps/std/path.ts"
 import { writableStreamFromWriter } from "../deps/std/streams.ts"
+import { PermanentMemo } from "../util/memo.ts"
 import { getFreePort, portReady } from "../util/port.ts"
-import { getOrInit } from "../util/state.ts"
 import { BinaryResolver } from "./bins.ts"
 import { createRawChainSpec } from "./chain_spec/mod.ts"
 import type { DevRelaySpec } from "./DevRelaySpec.ts"
@@ -20,13 +20,11 @@ export abstract class DevNetSpec extends NetSpec {
   readonly binary
   readonly chain
   readonly nodeCount
-  readonly #rawChainSpecPaths
   constructor(props: DevNetProps) {
     super()
     this.binary = props.bin
     this.chain = props.chain
     this.nodeCount = props.nodeCount
-    this.#rawChainSpecPaths = new Map<string, Promise<string>>()
   }
 
   abstract relay: DevRelaySpec
@@ -43,17 +41,13 @@ export abstract class DevNetSpec extends NetSpec {
     return path.join(parentDir, this.name)
   }
 
+  readonly #rawChainSpecPaths = new PermanentMemo<string, string>()
   async rawChainSpecPath(signal: AbortSignal, devnetTempDir: string) {
     const tempDir = this.tempDir(devnetTempDir)
-    return getOrInit(this.#rawChainSpecPaths, tempDir, async () =>
-      createRawChainSpec(
-        tempDir,
-        await this.binary(signal),
-        this.chain,
-      ).catch((error) => {
-        this.#rawChainSpecPaths.delete(tempDir)
-        throw error
-      }))
+    return this.#rawChainSpecPaths.run(
+      tempDir,
+      async () => createRawChainSpec(tempDir, await this.binary(signal), this.chain),
+    )
   }
 
   async preflightNetwork(signal: AbortSignal, devnetTempDir: string) {
