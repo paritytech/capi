@@ -5,6 +5,8 @@ export type CapiBinaryArgs = ConstructorParameters<typeof CapiBinary>
 
 export type BinaryResolver = (signal: AbortSignal) => Promise<string>
 
+const memo = new AsyncMemo<string, string>()
+
 // TODO: use `_signal` in capi-binary-builds
 export function bins<K extends PropertyKey>(
   binariesProps: Record<K, string | CapiBinaryArgs>,
@@ -12,7 +14,6 @@ export function bins<K extends PropertyKey>(
 export function bins(
   binariesProps: Record<string, string | CapiBinaryArgs>,
 ): Record<string, BinaryResolver> {
-  const memo = new AsyncMemo<string, string>()
   return Object.fromEntries(
     Object.entries(binariesProps).map(([k, v]) => {
       if (typeof v === "string") return [k, () => Promise.resolve(v)]
