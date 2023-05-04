@@ -1,4 +1,5 @@
 import { CapiBinary } from "../deps/capi_binary_builds.ts"
+import { AsyncMemo } from "../util/memo.ts"
 
 export type CapiBinaryArgs = ConstructorParameters<typeof CapiBinary>
 
@@ -11,22 +12,20 @@ export function bins<K extends PropertyKey>(
 export function bins(
   binariesProps: Record<string, string | CapiBinaryArgs>,
 ): Record<string, BinaryResolver> {
+  const memo = new AsyncMemo<string, string>()
   return Object.fromEntries(
     Object.entries(binariesProps).map(([k, v]) => {
       if (typeof v === "string") return [k, () => Promise.resolve(v)]
       const binary = new CapiBinary(...v as CapiBinaryArgs)
-      let binaryPath: Promise<string> | undefined
+      const key = `${v[0]}@${v[1]}`
       return [k, (_signal: AbortSignal) => {
-        if (!binaryPath) {
-          binaryPath = (async () => {
-            if (!(await binary.exists())) {
-              console.log("Downloading", binary.key)
-              await binary.download()
-            }
-            return binary.path
-          })()
-        }
-        return binaryPath
+        return memo.run(key, async () => {
+          if (!(await binary.exists())) {
+            console.log("Downloading", key)
+            await binary.download()
+          }
+          return binary.path
+        })
       }]
     }),
   )
