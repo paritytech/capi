@@ -3,6 +3,7 @@ import * as ed25519 from "../deps/ed25519.ts"
 import * as base58 from "../deps/std/encoding/base58.ts"
 import * as path from "../deps/std/path.ts"
 import { writableStreamFromWriter } from "../deps/std/streams.ts"
+import { PermanentMemo } from "../util/memo.ts"
 import { getFreePort, portReady } from "../util/port.ts"
 import { BinaryResolver } from "./bins.ts"
 import { createRawChainSpec } from "./chain_spec/mod.ts"
@@ -40,11 +41,12 @@ export abstract class DevNetSpec extends NetSpec {
     return path.join(parentDir, this.name)
   }
 
+  readonly #rawChainSpecPaths = new PermanentMemo<string, string>()
   async rawChainSpecPath(signal: AbortSignal, devnetTempDir: string) {
-    return createRawChainSpec(
-      this.tempDir(devnetTempDir),
-      await this.binary(signal),
-      this.chain,
+    const tempDir = this.tempDir(devnetTempDir)
+    return this.#rawChainSpecPaths.run(
+      tempDir,
+      async () => createRawChainSpec(tempDir, await this.binary(signal), this.chain),
     )
   }
 
