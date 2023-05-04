@@ -44,12 +44,11 @@ export abstract class DevNetSpec extends NetSpec {
   }
 
   async rawChainSpecPath(signal: AbortSignal, devnetTempDir: string) {
-    const binary = await this.binary(signal)
     const tempDir = this.tempDir(devnetTempDir)
-    return getOrInit(this.#rawChainSpecPaths, tempDir, () =>
+    return getOrInit(this.#rawChainSpecPaths, tempDir, async () =>
       createRawChainSpec(
         tempDir,
-        binary,
+        await this.binary(signal),
         this.chain,
       ).catch((error) => {
         this.#rawChainSpecPaths.delete(tempDir)
