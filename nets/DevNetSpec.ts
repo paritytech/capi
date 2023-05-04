@@ -19,6 +19,7 @@ export abstract class DevNetSpec extends NetSpec {
   readonly binary
   readonly chain
   readonly nodeCount
+  #rawChainSpecPath?: Promise<string>
   constructor(props: DevNetProps) {
     super()
     this.binary = props.bin
@@ -41,11 +42,15 @@ export abstract class DevNetSpec extends NetSpec {
   }
 
   async rawChainSpecPath(signal: AbortSignal, devnetTempDir: string) {
-    return createRawChainSpec(
-      this.tempDir(devnetTempDir),
-      await this.binary(signal),
-      this.chain,
-    )
+    const binary = await this.binary(signal)
+    if (!this.#rawChainSpecPath) {
+      this.#rawChainSpecPath = createRawChainSpec(
+        this.tempDir(devnetTempDir),
+        binary,
+        this.chain,
+      )
+    }
+    return this.#rawChainSpecPath
   }
 
   async preflightNetwork(signal: AbortSignal, devnetTempDir: string) {
