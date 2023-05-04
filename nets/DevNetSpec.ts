@@ -1,5 +1,6 @@
 import { hex } from "../crypto/mod.ts"
 import * as ed25519 from "../deps/ed25519.ts"
+import { Deferred, deferred } from "../deps/std/async.ts"
 import * as base58 from "../deps/std/encoding/base58.ts"
 import * as path from "../deps/std/path.ts"
 import { writableStreamFromWriter } from "../deps/std/streams.ts"
@@ -19,12 +20,13 @@ export abstract class DevNetSpec extends NetSpec {
   readonly binary
   readonly chain
   readonly nodeCount
-  #rawChainSpecPath?: Promise<string>
+  private readonly rawChainSpecPaths
   constructor(props: DevNetProps) {
     super()
     this.binary = props.bin
     this.chain = props.chain
     this.nodeCount = props.nodeCount
+    this.rawChainSpecPaths = new Map<string, Deferred<string>>()
   }
 
   abstract relay: DevRelaySpec
@@ -42,15 +44,17 @@ export abstract class DevNetSpec extends NetSpec {
   }
 
   async rawChainSpecPath(signal: AbortSignal, devnetTempDir: string) {
-    const binary = await this.binary(signal)
-    if (!this.#rawChainSpecPath) {
-      this.#rawChainSpecPath = createRawChainSpec(
+    if (!this.rawChainSpecPaths.has(devnetTempDir)) {
+      const result = deferred<string>()
+      this.rawChainSpecPaths.set(devnetTempDir, result)
+      createRawChainSpec(
         this.tempDir(devnetTempDir),
-        binary,
+        await this.binary(signal),
         this.chain,
-      )
+      ).then(result.resolve).catch(result.reject)
     }
-    return this.#rawChainSpecPath
+
+    return this.rawChainSpecPaths.get(devnetTempDir)!
   }
 
   async preflightNetwork(signal: AbortSignal, devnetTempDir: string) {
