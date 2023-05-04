@@ -1,8 +1,8 @@
 import { bins, net } from "./mod.ts"
 
 const bin = bins({
-  polkadot: ["polkadot", "v0.9.38"],
-  polkadotParachain: ["polkadot-parachain", "v0.9.380"],
+  polkadot: ["polkadot-fast", "v0.9.38"],
+  polkadotParachain: ["polkadot-parachain-fast", "v0.9.380"],
   substrateContractsNode: ["substrate-contracts-node", "v0.24.0"],
   trappistPolkadot: ["polkadot", "v0.9.37"],
   trappistPolkadotParachain: ["polkadot-parachain", "v0.9.370"],
