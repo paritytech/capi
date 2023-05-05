@@ -33,7 +33,9 @@ export class DevParachainSpec extends DevNetSpec {
       (chainSpec) => {
         chainSpec.para_id = this.id
         const genesisConfig = getGenesisConfig(chainSpec)
-        genesisConfig.parachainInfo && (genesisConfig.parachainInfo.parachainId = this.id)
+        if (genesisConfig.parachainInfo) {
+          genesisConfig.parachainInfo.parachainId = this.id
+        }
         addDevUsers(genesisConfig)
         this.customize?.(chainSpec)
       },
