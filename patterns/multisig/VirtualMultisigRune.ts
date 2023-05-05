@@ -126,11 +126,12 @@ export class VirtualMultisigRune<out C extends Chain, out U>
         undefined,
         () => chain.pallet("Balances").constant("ExistentialDeposit").decoded,
       )
+    const suppliedStash = Rune.resolve(props.stash)
     const memberAccountIds = Rune.resolve(props.founders)
     const deployer = Rune.resolve(props.deployer)
     const membersCount = memberAccountIds.map((members) => members.length)
-    const proxyCreationCalls = membersCount.map((n) =>
-      Rune.array(Array.from({ length: n + 1 }, (_, index) =>
+    const proxyCreationCalls = Rune.tuple([membersCount, suppliedStash]).map(([n, stash]) =>
+      Rune.array(Array.from({ length: n + (stash ? 0 : 1) }, (_, index) =>
         chain.extrinsic(
           Rune
             .object({
@@ -171,9 +172,12 @@ export class VirtualMultisigRune<out C extends Chain, out U>
       )
 
     const proxiesGrouped = Rune
-      .tuple([proxies, membersCount])
-      .map(([proxies, membersCount]) =>
-        [proxies.slice(0, membersCount), proxies[membersCount]] as [Uint8Array[], Uint8Array]
+      .tuple([proxies, membersCount, suppliedStash])
+      .map(([proxies, membersCount, stash]) =>
+        [
+          proxies.slice(0, membersCount),
+          stash ?? proxies[membersCount],
+        ] as [Uint8Array[], Uint8Array]
       )
     const memberProxies = proxiesGrouped.access(0)
     const stashProxy = proxiesGrouped.access(1)
@@ -306,6 +310,7 @@ export class VirtualMultisigRune<out C extends Chain, out U>
 export interface VirtualMultisigDeploymentProps {
   founders: Uint8Array[]
   threshold?: number
+  stash?: Uint8Array
   deployer: MultiAddress
   existentialDepositAmount?: bigint
 }
