@@ -22,7 +22,7 @@ const collection = await Rune
   })
   .run()
 
-/// Ensure the data is of the expected shape
+/// Ensure the data is of the expected shape.
 console.log(collection)
 $.assert(
   $.object(
