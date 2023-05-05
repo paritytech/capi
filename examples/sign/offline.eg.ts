@@ -29,11 +29,11 @@ save(hex)
 const signedExtrinsic = SignedExtrinsicRune.fromHex(westendDev, hex)
 
 /// Get an `ExtrinsicRune` (resolves to call data) from the `SignedExtrinsicRune`.
-const extrinsic = await signedExtrinsic.unsigned().run()
+const call = await signedExtrinsic.call().run()
 
 /// Ensure the call data is what we expect.
-console.log(extrinsic)
-$.assert($runtimeCall, extrinsic)
+console.log(call)
+$.assert($runtimeCall, call)
 
 /// Submit it and await finalization.
 const hash = await SignedExtrinsicRune

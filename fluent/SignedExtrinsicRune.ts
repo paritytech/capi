@@ -20,7 +20,7 @@ export class SignedExtrinsicRune<out C extends Chain, out U> extends PatternRune
     return this.from(chain, Rune.resolve(value).map(hex.decode))
   }
 
-  unsigned() {
+  call() {
     return this.chain.$extrinsic
       .decoded(this.as(SignedExtrinsicRune))
       .access("call")
