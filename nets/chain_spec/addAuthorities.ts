@@ -4,8 +4,9 @@ export function addAuthorities(genesisConfig: GenesisConfig, count: number) {
   if (count > authorities.length) {
     throw new Error(`authorities count should be <= ${authorities.length}`)
   }
+  const genesisAuthorities = authorities.slice(0, count)
   if (genesisConfig.session) {
-    genesisConfig.session.keys = authorities.slice(0, count).map((
+    genesisConfig.session.keys = genesisAuthorities.map((
       { srAccount, srStash, edAccount, ecAccount },
     ) => [
       srStash,
@@ -21,8 +22,8 @@ export function addAuthorities(genesisConfig: GenesisConfig, count: number) {
       },
     ])
   } else if (genesisConfig.aura && genesisConfig.grandpa) {
-    genesisConfig.aura.authorities = authorities.slice(0, count).map(({ srAccount }) => srAccount)
-    genesisConfig.grandpa.authorities = authorities.slice(0, count).map((
+    genesisConfig.aura.authorities = genesisAuthorities.map(({ srAccount }) => srAccount)
+    genesisConfig.grandpa.authorities = genesisAuthorities.map((
       { edAccount },
     ) => [edAccount, 1])
   }
