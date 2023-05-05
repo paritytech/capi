@@ -127,7 +127,6 @@ export class VirtualMultisigRune<out C extends Chain, out U>
         () => chain.pallet("Balances").constant("ExistentialDeposit").decoded,
       )
     const suppliedStash = Rune.resolve(props.stash)
-
     const memberAccountIds = Rune.resolve(props.founders)
     const deployer = Rune.resolve(props.deployer)
     const membersCount = memberAccountIds.map((members) => members.length)
