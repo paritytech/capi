@@ -1,4 +1,4 @@
-import { Command } from "../deps/cliffy.ts"
+import { Command, EnumType } from "../deps/cliffy.ts"
 import { blue, gray } from "../deps/std/fmt/colors.ts"
 import { assertEquals } from "../deps/std/testing/asserts.ts"
 import { syncNets } from "../server/mod.ts"
@@ -6,37 +6,47 @@ import { normalizePackageName } from "../util/mod.ts"
 import { tempDir } from "../util/tempDir.ts"
 import { resolveNets } from "./resolveNets.ts"
 
+enum Runtime {
+  Deno = "deno",
+  Node = "node",
+}
+
 export const sync = new Command()
+  .type("runtime", new EnumType(Runtime))
   .description("Syncs metadata and codegen")
+  .arguments("<runtime:runtime>")
   .option("-n, --nets <nets:file>", "nets.ts file path", { default: "./nets.ts" })
-  .option("--import-map <import-map:file>", "import_map.json file path")
-  .option("--package-json <package-json:file>", "package.json file path")
   .option("--check", "ensures that metadata and codegen are in sync")
   .option("-o, --out <out:string>", "Metadata and codegen output directory", {
     default: "target/capi",
   })
   .option("-s, --server <server:string>", "", { default: "https://capi.dev/" })
+  .option(
+    "--runtime-config <runtimeConfig:string>",
+    "the import_map.json or package.json file path",
+  )
   .action(
     async function(
       {
         nets: netsFile,
-        importMap: importMapFile,
-        packageJson: packageJsonFile,
         check,
         out,
         server,
+        runtimeConfig,
       },
+      runtime,
     ) {
       const netSpecs = await resolveNets(netsFile)
       const devnetTempDir = await tempDir(out, "devnet")
       const baseUrl = await syncNets(server, devnetTempDir, netSpecs)
-      if (importMapFile) {
-        syncFile(importMapFile, (importMap) => {
+      if (runtime === Runtime.Deno) {
+        runtimeConfig ??= "import_map.json"
+        syncFile(runtimeConfig, (importMap) => {
           importMap.imports["@capi/"] = baseUrl
         })
-      }
-      if (packageJsonFile) {
-        syncFile(packageJsonFile, (packageJson) => {
+      } else if (runtime === Runtime.Node) {
+        runtimeConfig ??= "package.json"
+        syncFile(runtimeConfig, (packageJson) => {
           const addedPackages = new Set()
           for (const rawName of Object.keys(netSpecs ?? {})) {
             const name = normalizePackageName(rawName)
