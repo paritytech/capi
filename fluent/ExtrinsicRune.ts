@@ -50,15 +50,11 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
       .into(SignedExtrinsicRune, this.chain)
   }
 
-  bytes() {
-    return this.chain.$extrinsic.encoded(Rune.object({
+  feeEstimate() {
+    const extrinsic = this.chain.$extrinsic.encoded(Rune.object({
       protocolVersion: ExtrinsicRune.PROTOCOL_VERSION,
       call: this,
     }))
-  }
-
-  feeEstimate() {
-    const extrinsic = this.bytes()
     const arg = Rune
       .fn(concat)
       .call(extrinsic, extrinsic.access("length").map((n) => $.u32.encode(n)))
