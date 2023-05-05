@@ -37,7 +37,7 @@ export default async function(...args: string[]) {
   if (packageJsonFile) {
     syncFile(packageJsonFile, (packageJson) => {
       const addedPackages = new Set()
-      for (const rawName of Object.keys(config.chains ?? {})) {
+      for (const rawName of Object.keys(config ?? {})) {
         const name = normalizePackageName(rawName)
         const packageName = `@capi/${name}`
         addedPackages.add(packageName)
