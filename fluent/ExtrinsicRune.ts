@@ -34,13 +34,16 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
   $callData = this.chain.into(ValueRune).access("metadata", "extrinsic", "call").into(CodecRune)
   callData = this.$callData.encoded(this)
 
-  $callHash = Rune.fn(blake2_256.$hash).call(this.$callData).into(CodecRune)
+  $callHash = Rune
+    .fn(($inner: $.Codec<unknown>) => blake2_256.$hash($inner))
+    .call(this.$callData)
+    .into(CodecRune)
   callHash = this.$callHash.encoded(this)
 
   signed<SU>(signatureFactory: SignatureDataFactory<C, U, SU>) {
     return this.chain.$extrinsic
       .encoded(Rune.object({
-        protocolVersion: 4,
+        protocolVersion: ExtrinsicRune.PROTOCOL_VERSION,
         call: this,
         signature: signatureFactory(this.chain),
       }))
