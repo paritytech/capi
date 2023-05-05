@@ -59,6 +59,8 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
       .fn(concat)
       .call(extrinsic, extrinsic.access("length").map((n) => $.u32.encode(n)))
       .map(hex.encodePrefixed)
+    // The TransactionPaymentApi_query_info endpoint returns a heavily-padded hex str.
+    // If we don't strip the excess before passing to other calls, we get a runtime panic.
     return this.chain.connection
       .call("state_call", "TransactionPaymentApi_query_info", arg)
       .map(hex.decode)
