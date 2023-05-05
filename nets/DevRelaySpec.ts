@@ -1,9 +1,9 @@
+import { Narrow } from "../deps/scale.ts"
 import {
   addAuthorities,
   addDevUsers,
   addXcmHrmpChannels,
   createCustomChainSpec,
-  GenesisConfig,
   getGenesisConfig,
 } from "./chain_spec/mod.ts"
 import { DevNet, DevNetSpec, spawnDevNet } from "./DevNetSpec.ts"
@@ -41,7 +41,7 @@ export class DevRelaySpec extends DevNetSpec {
       if (parachainInfo.length) {
         genesisConfig.paras?.paras.push(
           ...parachainInfo.map(({ id, genesis: [state, wasm] }) =>
-            [id, [state, wasm, true]] as NonNullable<GenesisConfig["paras"]>["paras"][number]
+            [id, [state, wasm, true]] satisfies Narrow
           ),
         )
         addXcmHrmpChannels(genesisConfig, parachainInfo.map(({ id }) => id))
