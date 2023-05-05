@@ -143,6 +143,13 @@ await Promise.all([
       content
         .replace(/"@deno\/shim-deno"/g, `"./deps/shims/Deno.node.js"`),
   ),
+  editFile(
+    "target/npm/package.json",
+    (content) =>
+      content
+        .replace(/(?<="module":\s).*(?=,)/g, `"/esm/mod.js"`)
+        .replace(/(?<="types":\s).*(?=,)/g, `"./types/mod.d.ts"`),
+  ),
 ])
 
 async function editFile(path: string, modify: (content: string) => string) {
