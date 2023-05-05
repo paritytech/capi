@@ -1,7 +1,7 @@
 import { blake2_256, hex } from "../crypto/mod.ts"
 import * as $ from "../deps/scale.ts"
 import { concat } from "../deps/std/bytes.ts"
-import { $extrinsic, Signer } from "../frame_metadata/Extrinsic.ts"
+import { Signer } from "../frame_metadata/Extrinsic.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { Chain, ChainRune } from "./ChainRune.ts"
 import { CodecRune } from "./CodecRune.ts"
@@ -34,40 +34,30 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
   $callData = this.chain.into(ValueRune).access("metadata", "extrinsic", "call").into(CodecRune)
   callData = this.$callData.encoded(this)
 
-  $callHash = this.$callData.into(ValueRune).map((x) => blake2_256.$hash<any>(x)).into(CodecRune)
+  $callHash = Rune
+    .fn(($inner: $.Codec<unknown>) => blake2_256.$hash($inner))
+    .call(this.$callData)
+    .into(CodecRune)
   callHash = this.$callHash.encoded(this)
 
-  $extrinsic = Rune.fn($extrinsic).call(this.chain.metadata).into(CodecRune)
-  extrinsic = this.$extrinsic.encoded(Rune.object({
-    protocolVersion: 4,
-    call: this,
-  }))
-
   signed<SU>(signatureFactory: SignatureDataFactory<C, U, SU>) {
-    return this.$extrinsic
+    return this.chain.$extrinsic
       .encoded(Rune.object({
-        protocolVersion: 4,
+        protocolVersion: ExtrinsicRune.PROTOCOL_VERSION,
         call: this,
         signature: signatureFactory(this.chain),
       }))
       .into(SignedExtrinsicRune, this.chain)
   }
 
-  encoded() {
-    return Rune
-      .fn($extrinsic)
-      .call(this.chain.metadata)
-      .into(CodecRune)
-      .encoded(Rune.object({
-        protocolVersion: ExtrinsicRune.PROTOCOL_VERSION,
-        call: this,
-      }))
-  }
-
   feeEstimate() {
+    const extrinsic = this.chain.$extrinsic.encoded(Rune.object({
+      protocolVersion: ExtrinsicRune.PROTOCOL_VERSION,
+      call: this,
+    }))
     const arg = Rune
       .fn(concat)
-      .call(this.extrinsic, this.extrinsic.access("length").map((n) => $.u32.encode(n)))
+      .call(extrinsic, extrinsic.access("length").map((n) => $.u32.encode(n)))
       .map(hex.encodePrefixed)
     const data = this.chain.connection
       .call("state_call", "TransactionPaymentApi_query_info", arg)

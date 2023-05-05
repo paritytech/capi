@@ -5,7 +5,7 @@
  * Finally, rehydrate the extrinsic and submit it.
  */
 
-import { westendDev } from "@capi/westend-dev"
+import { $runtimeCall, westendDev } from "@capi/westend-dev"
 import { $, createDevUsers, SignedExtrinsicRune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 
@@ -25,7 +25,17 @@ const hex = await westendDev.Balances
 /// writing to disk, etc.).
 save(hex)
 
-/// Hydrate the signed extrinsic, submit it and await finalization.
+/// Hydrate the signed extrinsic.
+const signedExtrinsic = SignedExtrinsicRune.fromHex(westendDev, hex)
+
+/// Get an `ExtrinsicRune` (resolves to call data) from the `SignedExtrinsicRune`.
+const call = await signedExtrinsic.call().run()
+
+/// Ensure the call data is what we expect.
+console.log(call)
+$.assert($runtimeCall, call)
+
+/// Submit it and await finalization.
 const hash = await SignedExtrinsicRune
   .fromHex(westendDev, hex)
   .sent()
