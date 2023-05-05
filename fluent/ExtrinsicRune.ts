@@ -1,7 +1,7 @@
 import { blake2_256, hex } from "../crypto/mod.ts"
 import * as $ from "../deps/scale.ts"
 import { concat } from "../deps/std/bytes.ts"
-import { $extrinsic, Signer } from "../frame_metadata/Extrinsic.ts"
+import { Signer } from "../frame_metadata/Extrinsic.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { Chain, ChainRune } from "./ChainRune.ts"
 import { CodecRune } from "./CodecRune.ts"
@@ -48,21 +48,14 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
   }
 
   encoded() {
-    return Rune
-      .fn($extrinsic)
-      .call(this.chain.metadata)
-      .into(CodecRune)
-      .encoded(Rune.object({
-        protocolVersion: ExtrinsicRune.PROTOCOL_VERSION,
-        call: this,
-      }))
+    return this.chain.$extrinsic.encoded(Rune.object({
+      protocolVersion: ExtrinsicRune.PROTOCOL_VERSION,
+      call: this,
+    }))
   }
 
   feeEstimate() {
-    const extrinsic = this.chain.$extrinsic.encoded(Rune.object({
-      protocolVersion: 4,
-      call: this,
-    }))
+    const extrinsic = this.encoded()
     const arg = Rune
       .fn(concat)
       .call(extrinsic, extrinsic.access("length").map((n) => $.u32.encode(n)))
