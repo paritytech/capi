@@ -1,9 +1,9 @@
 import "./deps/shims/register.ts"
 import { Command } from "./deps/cliffy.ts"
 
-import bin from "./cli/bin.ts"
-import serve from "./cli/serve.ts"
-import sync from "./cli/sync.ts"
+import { bin } from "./cli/bin.ts"
+import { serve } from "./cli/serve.ts"
+import { sync } from "./cli/sync.ts"
 
 await new Command()
   .name("capi")

@@ -6,7 +6,7 @@ import { normalizePackageName } from "../util/mod.ts"
 import { tempDir } from "../util/tempDir.ts"
 import { resolveNets } from "./resolveNets.ts"
 
-export default new Command()
+export const sync = new Command()
   .description("Syncs metadata and codegen")
   .option("-n, --nets <nets:file>", "nets.ts file path", { default: "./nets.ts" })
   .option("--import-map <import-map:file>", "import_map.json file path")

@@ -1,6 +1,6 @@
 import { Command } from "../deps/cliffy.ts"
 import { blue, gray, yellow } from "../deps/std/fmt/colors.ts"
-import { serve } from "../deps/std/http.ts"
+import { serve as httpServe } from "../deps/std/http.ts"
 import {
   createCodegenHandler,
   createCorsHandler,
@@ -12,13 +12,17 @@ import { gracefulExit } from "../util/mod.ts"
 import { tempDir } from "../util/tempDir.ts"
 import { resolveNets } from "./resolveNets.ts"
 
-export default new Command()
+export const serve = new Command()
   .description("Starts CAPI server")
   .option("-n, --nets <nets:file>", "nets.ts file path", { default: "./nets.ts" })
   .option("-p, --port <port:number>", "", { default: 4646 })
-  .option("-o, --out <out:string>", "Directory at which disk-related operations (such as storing devnet logs and caching metadata) can occur", {
-    default: "target/capi",
-  })
+  .option(
+    "-o, --out <out:string>",
+    "Directory at which disk-related operations (such as storing devnet logs and caching metadata) can occur",
+    {
+      default: "target/capi",
+    },
+  )
   .option("--target <target:string>", "target name in net.ts")
   .action(async function({ nets: netsPath, port, out, target }) {
     const literalArgs = this.getLiteralArgs()
@@ -46,7 +50,7 @@ export default new Command()
         }
         return await codegenHandler(request)
       }))
-      await serve(handler, {
+      await httpServe(handler, {
         hostname: "::",
         port: +port,
         signal,
