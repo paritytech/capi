@@ -36,8 +36,7 @@ for (const pathname of allFiles) {
   if (
     !(pathname.endsWith(".node.ts")
       // TODO: group shims
-      || pathname.endsWith("deps/shims/ws.ts")
-      || pathname.endsWith("deps/shims/shim-deno.ts"))
+      || pathname.startsWith("./deps/shims/")
   ) {
     entryPoints.push({
       name: pathname.slice(0, -(pathname.endsWith("mod.ts") ? "/mod.ts".length : ".ts".length)),
