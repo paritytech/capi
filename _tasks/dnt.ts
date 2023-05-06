@@ -33,11 +33,8 @@ for await (
 ) allFiles.push(`./${path}`)
 
 for (const pathname of allFiles) {
-  if (
-    !(pathname.endsWith(".node.ts")
-      // TODO: group shims
-      || pathname.startsWith("./deps/shims/")
-  ) {
+  // TODO: group shims
+  if (!pathname.endsWith(".node.ts") || pathname.startsWith("./deps/shims/")) {
     entryPoints.push({
       name: pathname.slice(0, -(pathname.endsWith("mod.ts") ? "/mod.ts".length : ".ts".length)),
       path: pathname,
