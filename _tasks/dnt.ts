@@ -33,15 +33,16 @@ for await (
 ) allFiles.push(`./${path}`)
 
 for (const pathname of allFiles) {
-  // TODO: group shims
-  if (!(pathname.endsWith(".node.ts") || pathname.startsWith("./deps/shims/"))) {
-    entryPoints.push({
-      name: pathname.slice(0, -(pathname.endsWith("mod.ts") ? "/mod.ts".length : ".ts".length)),
-      path: pathname,
-    })
+  if (!pathname.endsWith(".node.ts")) {
     const nodePath = pathname.slice(0, -".ts".length) + ".node.ts"
     if (allFiles.includes(nodePath)) {
       mappings[pathname] = nodePath
+    }
+    if (!pathname.startsWith("./deps/")) {
+      entryPoints.push({
+        name: pathname.slice(0, -(pathname.endsWith("mod.ts") ? "/mod.ts".length : ".ts".length)),
+        path: pathname,
+      })
     }
   }
 }
