@@ -1,3 +1,9 @@
+const CAPI_MARKER = Symbol.for("paritytech/capi")
+if (CAPI_MARKER in globalThis) {
+  console.warn("Multiple instances of Capi loaded -- this will lead to unexpected behavior!")
+}
+;(globalThis as any)[CAPI_MARKER] = true
+
 export * as $ from "./deps/scale.ts"
 export { BitSequence } from "./deps/scale.ts"
 export * from "./server/client/mod.ts"
