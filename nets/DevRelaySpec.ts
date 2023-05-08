@@ -1,9 +1,9 @@
+import { Narrow } from "../deps/scale.ts"
 import {
   addAuthorities,
   addDevUsers,
   addXcmHrmpChannels,
   createCustomChainSpec,
-  GenesisConfig,
   getGenesisConfig,
 } from "./chain_spec/mod.ts"
 import { DevNet, DevNetSpec, spawnDevNet } from "./DevNetSpec.ts"
@@ -39,15 +39,16 @@ export class DevRelaySpec extends DevNetSpec {
     return createCustomChainSpec(tempDir, binary, this.chain, (chainSpec) => {
       const genesisConfig = getGenesisConfig(chainSpec)
       if (parachainInfo.length) {
-        genesisConfig.paras.paras.push(
-          ...parachainInfo.map((
-            { id, genesis },
-          ): GenesisConfig["paras"]["paras"][number] => [id, [...genesis, true]]),
+        genesisConfig.paras?.paras.push(
+          ...parachainInfo.map(({ id, genesis: [state, wasm] }) =>
+            [id, [state, wasm, true]] satisfies Narrow
+          ),
         )
         addXcmHrmpChannels(genesisConfig, parachainInfo.map(({ id }) => id))
       }
       addAuthorities(genesisConfig, minValidators)
-      addDevUsers(genesisConfig.balances.balances)
+      addDevUsers(genesisConfig)
+      this.customize?.(chainSpec)
     })
   }
 

@@ -1,24 +1,32 @@
 import { GenesisConfig } from "./ChainSpec.ts"
 
-// TODO: #889 add support for pallet_session, pallet_aura and pallet_grandpa
-
 export function addAuthorities(genesisConfig: GenesisConfig, count: number) {
   if (count > authorities.length) {
     throw new Error(`authorities count should be <= ${authorities.length}`)
   }
-  if (!genesisConfig.session) return
-  genesisConfig.session.keys.length = 0
-  authorities.slice(0, count).forEach(({ srAccount, srStash, edAccount, ecAccount }) =>
-    genesisConfig.session!.keys.push([srStash, srStash, {
-      grandpa: edAccount,
-      babe: srAccount,
-      im_online: srAccount,
-      para_validator: srAccount,
-      para_assignment: srAccount,
-      authority_discovery: srAccount,
-      beefy: ecAccount,
-    }])
-  )
+  const genesisAuthorities = authorities.slice(0, count)
+  if (genesisConfig.session) {
+    genesisConfig.session.keys = genesisAuthorities.map((
+      { srAccount, srStash, edAccount, ecAccount },
+    ) => [
+      srStash,
+      srStash,
+      {
+        grandpa: edAccount,
+        babe: srAccount,
+        im_online: srAccount,
+        para_validator: srAccount,
+        para_assignment: srAccount,
+        authority_discovery: srAccount,
+        beefy: ecAccount,
+      },
+    ])
+  } else if (genesisConfig.aura && genesisConfig.grandpa) {
+    genesisConfig.aura.authorities = genesisAuthorities.map(({ srAccount }) => srAccount)
+    genesisConfig.grandpa.authorities = genesisAuthorities.map((
+      { edAccount },
+    ) => [edAccount, 1])
+  }
 }
 
 export const authorities = [

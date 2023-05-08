@@ -4,24 +4,31 @@ export interface ChainSpec {
   genesis: {
     runtime: GenesisConfig | { runtime_genesis_config: GenesisConfig }
   }
+  [key: string]: unknown
 }
 
 export interface GenesisConfig {
   runtime_genesis_config?: never
-  paras: {
+  paras?: {
     paras: [[
       parachainId: number,
       genesis: [state: string, wasm: string, kind: boolean],
     ]]
   }
-  parachainInfo: {
+  parachainInfo?: {
     parachainId: number
   }
-  balances: {
+  balances?: {
     balances: [account: string, initialBalance: number][]
   }
   session?: {
     keys: [account: string, account: string, key: SessionKey][]
+  }
+  aura?: {
+    authorities: string[]
+  }
+  grandpa?: {
+    authorities: [string, 1][]
   }
   hrmp?: {
     preopenHrmpChannels: [

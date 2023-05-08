@@ -14,17 +14,20 @@ export interface DevNetProps {
   bin: BinaryResolver
   chain: string
   nodeCount?: number
+  customize?: (chainSpec: Record<string, unknown>) => void
 }
 
 export abstract class DevNetSpec extends NetSpec {
   readonly binary
   readonly chain
   readonly nodeCount
+  readonly customize
   constructor(props: DevNetProps) {
     super()
     this.binary = props.bin
     this.chain = props.chain
     this.nodeCount = props.nodeCount
+    this.customize = props.customize
   }
 
   abstract relay: DevRelaySpec
