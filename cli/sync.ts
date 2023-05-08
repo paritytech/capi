@@ -22,11 +22,11 @@ export default async function(...args: string[]) {
     },
   })
 
-  const config = await resolveNets(...args)
+  const netSpecs = await resolveNets(...args)
 
   const devnetTempDir = await tempDir(out, "devnet")
 
-  const baseUrl = await syncNets(server, devnetTempDir, config)
+  const baseUrl = await syncNets(server, devnetTempDir, netSpecs)
 
   if (importMapFile) {
     syncFile(importMapFile, (importMap) => {
@@ -37,7 +37,7 @@ export default async function(...args: string[]) {
   if (packageJsonFile) {
     syncFile(packageJsonFile, (packageJson) => {
       const addedPackages = new Set()
-      for (const rawName of Object.keys(config.chains ?? {})) {
+      for (const rawName of Object.keys(netSpecs ?? {})) {
         const name = normalizePackageName(rawName)
         const packageName = `@capi/${name}`
         addedPackages.add(packageName)

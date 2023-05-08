@@ -27,20 +27,22 @@ const allFiles = []
 for await (
   const { path } of fs.walkSync(".", {
     exts: [".ts"],
-    skip: [/\.test\.ts$/, /^\.\/target\//, /\/_/],
+    skip: [/\.test\.ts$/, /^(target|_tasks|examples)\//],
     includeDirs: false,
   })
 ) allFiles.push(`./${path}`)
 
 for (const pathname of allFiles) {
   if (!pathname.endsWith(".node.ts")) {
-    entryPoints.push({
-      name: pathname.slice(0, -(pathname.endsWith("mod.ts") ? "/mod.ts".length : ".ts".length)),
-      path: pathname,
-    })
     const nodePath = pathname.slice(0, -".ts".length) + ".node.ts"
     if (allFiles.includes(nodePath)) {
       mappings[pathname] = nodePath
+    }
+    if (!pathname.startsWith("./deps/")) {
+      entryPoints.push({
+        name: pathname.slice(0, -(pathname.endsWith("mod.ts") ? "/mod.ts".length : ".ts".length)),
+        path: pathname,
+      })
     }
   }
 }
@@ -68,6 +70,10 @@ await Promise.all([
       lib: ["es2022.error"],
     },
     entryPoints: [
+      {
+        name: ".",
+        path: "./mod.ts",
+      },
       {
         kind: "bin",
         name: "capi",
