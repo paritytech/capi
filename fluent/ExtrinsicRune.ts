@@ -50,7 +50,7 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
       .into(SignedExtrinsicRune, this.chain)
   }
 
-  weightRaw() {
+  dispatchInfo() {
     const extrinsic = this.chain.$extrinsic.encoded(Rune.object({
       protocolVersion: ExtrinsicRune.PROTOCOL_VERSION,
       call: this,
@@ -59,20 +59,21 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
       .fn(concat)
       .call(extrinsic, extrinsic.access("length").map((n) => $.u32.encode(n)))
       .map(hex.encodePrefixed)
-    // The TransactionPaymentApi_query_info endpoint returns a heavily-padded hex str.
-    // If we don't strip the excess before passing to other calls, we get a runtime panic.
-    return this.chain.connection
+    const info = this.chain.connection
       .call("state_call", "TransactionPaymentApi_query_info", arg)
       .map(hex.decode)
-      .map((v) => v.slice(0, 6))
-      .map(hex.encode)
+    return this.chain.metadata
+      .access("types", "DispatchInfo")
+      .into(CodecRune)
+      .decoded(info)
   }
 
+  $weight = this.chain.metadata.access("types", "Weight").into(CodecRune)
   weight() {
-    return this.chain.metadata
-      .access("paths", "sp_weights::weight_v2::Weight")
-      .into(CodecRune)
-      .decoded(this.weightRaw().map(hex.decode))
+    return this.dispatchInfo().access("weight")
+  }
+  weightRaw() {
+    return this.$weight.encoded(this.weight()).map(hex.encode)
   }
 
   estimate() {
