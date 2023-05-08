@@ -50,6 +50,9 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
       .into(SignedExtrinsicRune, this.chain)
   }
 
+  $dispatchInfo = this.chain.metadata
+    .access("paths", "frame_support::dispatch::DispatchInfo")
+    .into(CodecRune)
   dispatchInfo() {
     const extrinsic = this.chain.$extrinsic.encoded(Rune.object({
       protocolVersion: ExtrinsicRune.PROTOCOL_VERSION,
@@ -62,13 +65,10 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
     const info = this.chain.connection
       .call("state_call", "TransactionPaymentApi_query_info", arg)
       .map(hex.decode)
-    return this.chain.metadata
-      .access("types", "DispatchInfo")
-      .into(CodecRune)
-      .decoded(info)
+    return this.$dispatchInfo.decoded(info)
   }
 
-  $weight = this.chain.metadata.access("types", "Weight").into(CodecRune)
+  $weight = this.chain.metadata.access("paths", "sp_weights::weight_v2::Weight").into(CodecRune)
   weight() {
     return this.dispatchInfo().access("weight")
   }
