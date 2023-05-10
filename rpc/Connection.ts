@@ -13,7 +13,7 @@ export abstract class Connection {
   static bind<D>(
     this: new(discovery: D) => Connection,
     discovery: D,
-  ): (signal: AbortSignal) => Connection {
+  ): Connect {
     return (signal) => (Connection.connect<D>).call(this, discovery, signal)
   }
 
@@ -111,3 +111,5 @@ export abstract class Connection {
     }
   }
 }
+
+export type Connect = (signal: AbortSignal) => Connection

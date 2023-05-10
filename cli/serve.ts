@@ -13,8 +13,8 @@ import { tempDir } from "../util/tempDir.ts"
 import { resolveNets } from "./resolveNets.ts"
 
 export default async function(...args: string[]) {
-  const { port, "--": cmd, out } = flags.parse(args, {
-    string: ["port", "out"],
+  const { port, "--": cmd, out, target } = flags.parse(args, {
+    string: ["port", "out", "target"],
     default: {
       port: "4646",
       out: "target/capi",
@@ -77,6 +77,7 @@ export default async function(...args: string[]) {
         signal,
         env: {
           CAPI_SERVER: href,
+          ...target ? { CAPI_TARGET: target } : {},
         },
       })
       const status = await command.spawn().status

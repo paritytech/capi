@@ -3,11 +3,20 @@ import * as $ from "../deps/scale.ts"
 import { WsConnection } from "../rpc/mod.ts"
 import { withSignal } from "../util/mod.ts"
 
-export abstract class NetSpec {
+export interface NetProps {
+  targets?: Record<string, NetSpec>
+}
+
+export abstract class NetSpec implements NetProps {
   name!: string // set by `resolveNets.ts`
+  targets
 
   abstract connection(name: string): ConnectionSpec | undefined
   abstract metadata(signal: AbortSignal, tempDir: string): Promise<Uint8Array>
+
+  constructor({ targets }: NetProps) {
+    this.targets = targets
+  }
 }
 
 export function getMetadataFromWsUrl(url: string) {
