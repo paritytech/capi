@@ -12,9 +12,9 @@ export function detectConnect(
     if (target) spec = target
   }
   switch (spec.type) {
-    case "DevnetConnection":
-      return DevnetConnection.bind(spec.discovery)
     case "WsConnection":
       return WsConnection.bind(spec.discovery)
+    case "DevnetConnection":
+      return DevnetConnection.bind(spec.discovery)
   }
 }
