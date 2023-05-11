@@ -7,7 +7,7 @@ const $codegenEntry = $.taggedUnion("type", [
     "frame",
     $.field("metadataHash", $.sizedUint8Array(64)),
     $.field("chainName", $.str),
-    $.optionalField("connection", $connectionSpec),
+    $.field("connection", $connectionSpec),
     $.optionalField("targets", $.record($connectionSpec)),
   ),
 ])
