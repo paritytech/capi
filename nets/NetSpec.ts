@@ -11,7 +11,7 @@ export abstract class NetSpec implements NetProps {
   name!: string // set by `resolveNets.ts`
   targets
 
-  abstract connection(name: string): ConnectionSpec | undefined
+  abstract connection(name: string): ConnectionSpec
   abstract metadata(signal: AbortSignal, tempDir: string): Promise<Uint8Array>
 
   constructor({ targets }: NetProps) {
