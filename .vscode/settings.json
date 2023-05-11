@@ -5,6 +5,9 @@
   "[yaml]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "[typescript]": {
+    "editor.defaultFormatter": "dprint.dprint"
+  },
   "deno.codeLens.testArgs": ["-A", "-L=info"],
   "deno.config": "./deno.jsonc",
   "deno.suggest.imports.hosts": {
