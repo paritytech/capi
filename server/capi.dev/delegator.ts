@@ -102,10 +102,14 @@ interface GithubCommit {
 }
 
 export async function _getDeploymentUrl(sha: string) {
+  console.log("_getDeploymentUrl:start")
+  console.log("await github<GithubDeployment[]>(`deployments?sha=${sha}`)")
   const deployments = await github<GithubDeployment[]>(`deployments?sha=${sha}`)
   const deployment = deployments.find((x) => x.payload.project_id === delegateeProjectId)
   if (!deployment) return
+  console.log("await github<GithubStatus[]>(deployment.statuses_url)")
   const statuses = await github<GithubStatus[]>(deployment.statuses_url)
   const url = statuses.map((x) => x.environment_url).find((x) => x)
+  console.log("_getDeploymentUrl:end", { url })
   return url
 }
