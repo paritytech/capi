@@ -104,9 +104,9 @@ const accounts = await polkadot.System.Account.entries({ count: 10 }).run()
 ## Development Networks
 
 During development, we may want to swap out the underlying connection with that
-of a devnet. This can be achieved with the `serve` command, followed by target
-specificity (in our case `dev`), a "--" and your devnet-using command. In this
-case, we'll run the script (`main.js`) with Node.JS.
+of a devnet. This can be achieved via targets — by specifying alternate targets
+in your `nets.ts` file, you can switch to them by wrapping your command with
+`capi serve --target someTarget --`. For example:
 
 ```sh
 capi serve --target dev -- node main.js
