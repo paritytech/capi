@@ -3,7 +3,7 @@ import { getOrInit } from "../util/state.ts"
 import { EventSource, Receipt, Timeline } from "./Timeline.ts"
 
 // Hack to work around circularity issues
-// @deno-types="./mod.ts"
+// @deno-types="./_empty.d.ts"
 import * as _ from "./_empty.js"
 
 export class Batch {
@@ -138,7 +138,7 @@ export class Rune<out T, out U = never> {
     const keys = Object.keys(runes)
     const values = Object.values(runes)
     return Rune.tuple(values).map((values) => {
-      return Object.fromEntries(values.map((v, i) => [keys[i], v]))
+      return Object.fromEntries(values.map((v, i) => [keys[i], v])) as any
     })
   }
 
