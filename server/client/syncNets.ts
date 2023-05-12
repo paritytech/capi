@@ -45,7 +45,6 @@ export async function syncNets(
     )
     const sortedEntries = new Map([...entries].sort((a, b) => a[0] < b[0] ? 1 : -1))
     const codegenSpec = $codegenSpec.encode({ type: "v0", codegen: sortedEntries })
-    console.log("debugging:", { server, codegenSpec, blake2_64 })
     const codegenHash = hex.encode(await upload(server, "codegen", codegenSpec, blake2_64))
     return new URL(codegenHash + "/", server).toString()
   })
