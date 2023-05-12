@@ -1,6 +1,7 @@
 // moderate --exclude cache port.ts proxyWebSocket.ts tsFormatter.ts
 
 export * from "./ArrayOfLength.ts"
+export * from "./bytes.ts"
 export * from "./clock.ts"
 export * from "./compression.ts"
 export * from "./error.ts"
