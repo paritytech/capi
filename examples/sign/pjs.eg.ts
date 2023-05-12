@@ -51,5 +51,6 @@ await polkadotDev.Balances
   .signed(signature({ sender: sender(alexaSs58) }))
   .sent()
   .dbgStatus("Transfer:")
-  .finalized()
+  .finalizedEvents()
+  .unhandleFailed()
   .run()

@@ -38,7 +38,8 @@ await westendDev.Utility
   .signed(signature({ sender }))
   .sent()
   .dbgStatus("Batch:")
-  .finalized()
+  .finalizedEvents()
+  .unhandleFailed()
   .run()
 
 /// Retrieve the final free balances of the recipients.

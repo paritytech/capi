@@ -38,6 +38,7 @@ const createEvents = await rococoDevWestmint.Nfts
   .sent()
   .dbgStatus("Create collection:")
   .finalizedEvents()
+  .unhandleFailed()
   .run()
 
 /// Extract the collection's id from emitted events.
@@ -67,7 +68,8 @@ await rococoDevWestmint.Nfts
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Mint the NFT:")
-  .finalized()
+  .finalizedEvents()
+  .unhandleFailed()
   .run()
 
 const owner = rococoDevWestmint.Nfts.Item
@@ -99,7 +101,8 @@ await rococoDevWestmint.Utility
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Sale prep:")
-  .finalized()
+  .finalizedEvents()
+  .unhandleFailed()
   .run()
 
 /// Retrieve the price of the NFT.
@@ -119,7 +122,8 @@ await rococoDevWestmint.Nfts
   .signed(signature({ sender: billy }))
   .sent()
   .dbgStatus("Purchase:")
-  .finalized()
+  .finalizedEvents()
+  .unhandleFailed()
   .run()
 
 /// Retrieve the final owner.

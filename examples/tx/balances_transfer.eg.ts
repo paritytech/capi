@@ -31,7 +31,8 @@ await westendDev.Balances
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Transfer:")
-  .finalized()
+  .finalizedEvents()
+  .unhandleFailed()
   .run()
 
 /// Read the final free.

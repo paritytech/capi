@@ -28,7 +28,8 @@ await polkadotDev.Identity
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Set identity:")
-  .finalized()
+  .finalizedEvents()
+  .unhandleFailed()
   .run()
 
 /// Retrieve and decode the identity info.

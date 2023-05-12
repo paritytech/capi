@@ -76,7 +76,8 @@ rococoDev.XcmPallet
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Teleportation:")
-  .finalized()
+  .finalizedEvents()
+  .unhandleFailed()
   .run()
 
 /// Iterate over the parachain events until receiving a downward message processed event,

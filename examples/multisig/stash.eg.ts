@@ -26,7 +26,8 @@ await multisig
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Existential deposit:")
-  .finalized()
+  .finalizedEvents()
+  .unhandleFailed()
   .run()
 
 /// Describe the call which we wish to dispatch from the multisig account:
@@ -43,7 +44,8 @@ await multisig
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Proposal:")
-  .finalized()
+  .finalizedEvents()
+  .unhandleFailed()
   .run()
 
 /// Approve the stash creation call and extract the pure creation event, which should
@@ -54,6 +56,7 @@ const stashAccountId = await multisig
   .sent()
   .dbgStatus("Final approval:")
   .finalizedEvents()
+  .unhandleFailed()
   .pipe(filterPureCreatedEvents)
   .access(0, "pure")
   .run()
@@ -67,7 +70,8 @@ await polkadotDev.Balances
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Fund Stash:")
-  .finalized()
+  .finalizedEvents()
+  .unhandleFailed()
   .run()
 
 /// Ensure that the funds arrived successfully.

@@ -58,7 +58,8 @@ await polkadotDev.Balances
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Fund stash:")
-  .finalized()
+  .finalizedEvents()
+  .unhandleFailed()
   .run()
 
 /// Reference David's free balance.
@@ -99,5 +100,6 @@ function fundAndRatify(name: string, sender: Sr25519) {
     .signed(signature({ sender }))
     .sent()
     .dbgStatus(`${name} fund and ratify:`)
-    .finalized()
+    .finalizedEvents()
+    .unhandleFailed()
 }

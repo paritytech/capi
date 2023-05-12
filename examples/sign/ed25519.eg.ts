@@ -44,7 +44,8 @@ await westendDev.Balances
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Existential deposit:")
-  .finalized()
+  .finalizedEvents()
+  .unhandleFailed()
   .run()
 
 /// Execute a transfer from the derived user to Billy. We utilize our
@@ -58,6 +59,7 @@ await westendDev.Balances
   .sent()
   .dbgStatus("Transfer:")
   .finalizedEvents()
+  .unhandleFailed()
   .run()
 
 /// Retrieve Billy's final free.

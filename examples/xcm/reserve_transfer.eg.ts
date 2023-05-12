@@ -76,7 +76,8 @@ await rococoDevXcm.Sudo
   .signed(signature({ sender: root }))
   .sent()
   .dbgStatus("Rococo(root) > Statemine(root): Create asset")
-  .finalized()
+  .finalizedEvents()
+  .unhandleFailed()
   .run()
 
 /// Wait for the asset to be recorded in storage.
@@ -99,7 +100,8 @@ await rococoDevXcmStatemine.Assets
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Statemine(Alexa): Mint reserve asset to Billy")
-  .finalized()
+  .finalizedEvents()
+  .unhandleFailed()
   .run()
 
 const billyStatemintBalance = rococoDevXcmStatemine.Assets.Account
@@ -124,7 +126,8 @@ await rococoDevXcmTrappist.Sudo
   .signed(signature({ sender: root }))
   .sent()
   .dbgStatus("Trappist(root): Create derived asset")
-  .finalized()
+  .finalizedEvents()
+  .unhandleFailed()
   .run()
 
 const assetsPalletId = rococoDevXcmStatemine.Assets.into(ValueRune).access("id")
@@ -147,7 +150,8 @@ await rococoDevXcmTrappist.Sudo
   .signed(signature({ sender: root }))
   .sent()
   .dbgStatus("Trappist(root): Register AssetId to Reserve AssetId")
-  .finalized()
+  .finalizedEvents()
+  .unhandleFailed()
   .run()
 
 /// Reserve transfer asset id on reserve parachain to Trappist parachain.
@@ -185,6 +189,7 @@ const events = await rococoDevXcmStatemine.PolkadotXcm
   .sent()
   .dbgStatus("Statemine(Billy): Reserve transfer to Trappist")
   .finalizedEvents()
+  .unhandleFailed()
   .run()
 
 for (const { event } of events) {
