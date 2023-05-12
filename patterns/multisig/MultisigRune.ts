@@ -1,4 +1,5 @@
 import { MultiAddress } from "@capi/polkadot"
+import { equals } from "../../deps/std/bytes.ts"
 import {
   $,
   Chain,
@@ -10,7 +11,7 @@ import {
   RunicArgs,
   ValueRune,
 } from "../../mod.ts"
-import { bytes } from "../../util/mod.ts"
+import { compareBytes } from "../../util/mod.ts"
 import { multisigAccountId } from "./multisigAccountId.ts"
 
 export interface Multisig {
@@ -45,8 +46,8 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
       .tuple([this.into(ValueRune).access("signatories"), sender])
       .map(([signatories, sender]) =>
         signatories
-          .filter((value) => !bytes.equals(value, sender.value!))
-          .sort(bytes.compare)
+          .filter((value) => !equals(value, sender.value!))
+          .sort(compareBytes)
       )
   }
 

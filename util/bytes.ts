@@ -1,6 +1,4 @@
-export * from "../deps/std/bytes.ts"
-
-export function compare(a: Uint8Array, b: Uint8Array): number {
+export function compareBytes(a: Uint8Array, b: Uint8Array): number {
   for (let i = 0; i < a.byteLength; i++) {
     if (a[i]! < b[i]!) {
       return -1
