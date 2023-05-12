@@ -80,7 +80,10 @@ async function github<T>(url: string): Promise<T> {
       Authorization: `token ${githubToken}`,
     },
   })
-  if (!response.ok) throw new Error(`${url}: invalid response`)
+  if (!response.ok) {
+    console.error(await response.text())
+    throw new Error(`${url}: invalid response`)
+  }
   return await response.json()
 }
 
