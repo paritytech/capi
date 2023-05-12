@@ -23,14 +23,15 @@ export abstract class Connection {
     signal: AbortSignal,
   ) {
     const memo = getOrInit(connectionMemos, this, () => new Map<unknown, Connection>())
-    return getOrInit(memo, discovery, () => {
+    const connection = getOrInit(memo, discovery, () => {
       const connection = new this(discovery)
-      connection.ref(signal)
       connection.signal.addEventListener("abort", () => {
         memo.delete(discovery)
       })
       return connection
     })
+    connection.ref(signal)
+    return connection
   }
 
   ref(signal: AbortSignal) {
