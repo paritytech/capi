@@ -35,7 +35,8 @@ await multisig
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Existential deposit:")
-  .finalized()
+  .finalizedEvents()
+  .unhandleFailed()
   .run()
 
 /// Describe the call we wish to dispatch from the multisig.
@@ -50,7 +51,8 @@ await multisig
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Proposal:")
-  .finalized()
+  .finalizedEvents()
+  .unhandleFailed()
   .run()
 
 /// Check whether the call has been proposed.
@@ -73,7 +75,8 @@ await multisig
   .signed(signature({ sender: billy }))
   .sent()
   .dbgStatus("Final approval:")
-  .finalized()
+  .finalizedEvents()
+  .unhandleFailed()
   .run()
 
 /// Check to see whether David's balance has in fact changed

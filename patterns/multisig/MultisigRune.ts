@@ -27,7 +27,9 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
     return Rune
       .tuple([this.into(ValueRune).access("signatories"), sender])
       .map(([signatories, sender]) =>
-        signatories.filter((value) => !bytes.equals(value, sender.value!)).sort()
+        signatories
+          .filter((value) => !bytes.equals(value, sender.value!))
+          .sort(compare)
       )
   }
 
@@ -154,4 +156,18 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
 
 export class NoProposalError extends Error {
   override readonly name = "NoProposalError"
+}
+
+function compare(a: Uint8Array, b: Uint8Array): number {
+  for (let i = 0; i < a.byteLength; i++) {
+    if (a[i]! < b[i]!) {
+      return -1
+    }
+
+    if (a[i]! > b[i]!) {
+      return 1
+    }
+  }
+
+  return a.byteLength > b.byteLength ? 1 : a.byteLength < b.byteLength ? -1 : 0
 }
