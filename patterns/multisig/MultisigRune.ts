@@ -1,8 +1,8 @@
 import { MultiAddress } from "@capi/polkadot"
 import * as bytes from "../../deps/std/bytes.ts"
 import { $, Chain, ChainRune, PatternRune, Rune, RunicArgs, ValueRune } from "../../mod.ts"
+import * as util from "../../util/mod.ts"
 import { multisigAccountId } from "./multisigAccountId.ts"
-import * as util from "../../util/mod.ts";
 
 export interface Multisig {
   signatories: Uint8Array[]
