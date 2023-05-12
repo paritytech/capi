@@ -55,6 +55,7 @@ export function createCodegenHandler(dataCache: CacheBase, tempCache: CacheBase)
   }
 
   async function handleUpload(request: Request, key: string) {
+    console.log({ request, key })
     const [kind, untrustedHash] = key.split("/") as ["codegen" | "metadata", string]
     if (request.method === "HEAD") {
       const exists = await dataCache.has(key)
