@@ -4,6 +4,7 @@ import {
   $,
   Chain,
   ChainRune,
+  CodecRune,
   hex,
   MetaRune,
   PatternRune,
@@ -38,7 +39,7 @@ export class VirtualMultisigRune<out C extends Chain, out U>
     signatories: this.value.access("members").map((arr) => arr.map((a) => a[1])),
     threshold: this.value.access("threshold"),
   }).into(MultisigRune, this.chain)
-  encoded = this.value.map((m) => $virtualMultisig.encode(m))
+  encoded = Rune.constant($virtualMultisig).into(CodecRune).encoded(this.value)
   hex = this.encoded.map(hex.encode)
 
   senderProxyId<X>(...[senderAccountId]: RunicArgs<X, [senderAccountId: Uint8Array]>) {

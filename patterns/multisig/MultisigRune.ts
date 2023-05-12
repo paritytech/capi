@@ -1,6 +1,16 @@
 import { MultiAddress } from "@capi/polkadot"
 import * as bytes from "../../deps/std/bytes.ts"
-import { $, Chain, ChainRune, hex, PatternRune, Rune, RunicArgs, ValueRune } from "../../mod.ts"
+import {
+  $,
+  Chain,
+  ChainRune,
+  CodecRune,
+  hex,
+  PatternRune,
+  Rune,
+  RunicArgs,
+  ValueRune,
+} from "../../mod.ts"
 import { multisigAccountId } from "./multisigAccountId.ts"
 
 export interface Multisig {
@@ -27,7 +37,7 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
   threshold = this.value.map(({ threshold, signatories }) => threshold ?? signatories.length - 1)
   accountId = Rune.fn(multisigAccountId).call(this.value.access("signatories"), this.threshold)
   address = MultiAddress.Id(this.accountId)
-  encoded = this.value.map((m) => $multisig.encode(m))
+  encoded = Rune.constant($multisig).into(CodecRune).encoded(this.value)
   hex = this.encoded.map(hex.encode)
 
   otherSignatories<X>(...[sender]: RunicArgs<X, [sender: MultiAddress]>) {
