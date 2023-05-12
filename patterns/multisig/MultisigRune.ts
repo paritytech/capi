@@ -2,6 +2,7 @@ import { MultiAddress } from "@capi/polkadot"
 import * as bytes from "../../deps/std/bytes.ts"
 import { $, Chain, ChainRune, PatternRune, Rune, RunicArgs, ValueRune } from "../../mod.ts"
 import { multisigAccountId } from "./multisigAccountId.ts"
+import * as util from "../../util/mod.ts";
 
 export interface Multisig {
   signatories: Uint8Array[]
@@ -29,7 +30,7 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
       .map(([signatories, sender]) =>
         signatories
           .filter((value) => !bytes.equals(value, sender.value!))
-          .sort(compare)
+          .sort(util.bytes.compare)
       )
   }
 
@@ -156,18 +157,4 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
 
 export class NoProposalError extends Error {
   override readonly name = "NoProposalError"
-}
-
-function compare(a: Uint8Array, b: Uint8Array): number {
-  for (let i = 0; i < a.byteLength; i++) {
-    if (a[i]! < b[i]!) {
-      return -1
-    }
-
-    if (a[i]! > b[i]!) {
-      return 1
-    }
-  }
-
-  return a.byteLength > b.byteLength ? 1 : a.byteLength < b.byteLength ? -1 : 0
 }
