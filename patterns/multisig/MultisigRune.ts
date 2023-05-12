@@ -27,7 +27,7 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
     return Rune
       .tuple([this.into(ValueRune).access("signatories"), sender])
       .map(([signatories, sender]) =>
-        signatories.filter((value) => !bytes.equals(value, sender.value!))
+        signatories.filter((value) => !bytes.equals(value, sender.value!)).sort()
       )
   }
 
