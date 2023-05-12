@@ -37,7 +37,7 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
   threshold = this.value.map(({ threshold, signatories }) => threshold ?? signatories.length - 1)
   accountId = Rune.fn(multisigAccountId).call(this.value.access("signatories"), this.threshold)
   address = MultiAddress.Id(this.accountId)
-  encoded = CodecRune.from($multisig).encoded(this.value)
+  encoded = CodecRune.from($multisig).encoded(this.as(MultisigRune))
   hex = this.encoded.map(hex.encode)
 
   otherSignatories<X>(...[sender]: RunicArgs<X, [sender: MultiAddress]>) {
