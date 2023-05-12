@@ -1,5 +1,5 @@
 import { MultiAddress } from "@capi/polkadot"
-import { equals } from "../../deps/std/bytes.ts"
+import * as bytes from "../../deps/std/bytes.ts"
 import {
   $,
   Chain,
@@ -260,7 +260,7 @@ export class VirtualMultisigRune<out C extends Chain, out U>
           // TODO: ensure that this supports other address types / revisit source of deployer accountId
           ...memberProxies
             .map((proxy, i) => [proxy, i] as const)
-            .filter(([_, i]) => !equals(memberAccountIds[i]!, deployer.value!))
+            .filter(([_, i]) => !bytes.equals(memberAccountIds[i]!, deployer.value!))
             .flatMap(([proxy, i]) =>
               replaceDelegateCalls(
                 chain,

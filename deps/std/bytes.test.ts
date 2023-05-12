@@ -1,5 +1,5 @@
-import { assertEquals } from "../deps/std/testing/asserts.ts"
 import { compare } from "./bytes.ts"
+import { assertEquals } from "./testing/asserts.ts"
 
 Deno.test("equals", () => {
   assertEquals(compare(Uint8Array.of(1), Uint8Array.of(1)), 0)
