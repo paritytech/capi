@@ -7,7 +7,7 @@ import {
   getGenesisConfig,
 } from "./chain_spec/mod.ts"
 import { DevNet, DevNetSpec, spawnDevNet } from "./DevNetSpec.ts"
-import { DevParachainProps, DevParachainSpec } from "./DevParachainSpec.ts"
+import { DevParachainProps, DevParachainSpec, ParachainInfo } from "./DevParachainSpec.ts"
 
 export class DevRelaySpec extends DevNetSpec {
   parachains: DevParachainSpec[] = []
@@ -23,28 +23,23 @@ export class DevRelaySpec extends DevNetSpec {
     return []
   }
 
-  parachainsInfo(signal: AbortSignal, rootTempDir: string) {
-    return Promise.all(
-      this.parachains.map((parachain) => parachain.parachainInfo(signal, rootTempDir)),
-    )
-  }
-
-  async chainSpecPath(signal: AbortSignal, rootTempDir: string) {
-    const [parachainInfo, binary] = await Promise.all([
-      this.parachainsInfo(signal, rootTempDir),
-      this.binary(signal),
-    ])
-    const minValidators = Math.max(2, parachainInfo.length)
+  async chainSpecPath(
+    signal: AbortSignal,
+    rootTempDir: string,
+    parachainsInfo: ParachainInfo[],
+  ) {
+    const binary = await this.binary(signal)
+    const minValidators = Math.max(2, parachainsInfo.length)
     const tempDir = this.tempDir(rootTempDir)
     return createCustomChainSpec(tempDir, binary, this.chain, (chainSpec) => {
       const genesisConfig = getGenesisConfig(chainSpec)
-      if (parachainInfo.length) {
+      if (parachainsInfo.length) {
         genesisConfig.paras?.paras.push(
-          ...parachainInfo.map(({ id, genesis: [state, wasm] }) =>
+          ...parachainsInfo.map(({ id, genesis: [state, wasm] }) =>
             [id, [state, wasm, true]] satisfies Narrow
           ),
         )
-        addXcmHrmpChannels(genesisConfig, parachainInfo.map(({ id }) => id))
+        addXcmHrmpChannels(genesisConfig, parachainsInfo.map(({ id }) => id))
       }
       addAuthorities(genesisConfig, minValidators)
       addDevUsers(genesisConfig)
@@ -54,9 +49,11 @@ export class DevRelaySpec extends DevNetSpec {
 
   async spawnNet(signal: AbortSignal, rootTempDir: string): Promise<Map<DevNetSpec, DevNet>> {
     const relayTempDir = this.tempDir(rootTempDir)
-    const [relayChainSpecPath, parachainsInfo, binary] = await Promise.all([
-      this.chainSpecPath(signal, rootTempDir),
-      this.parachainsInfo(signal, rootTempDir),
+    const parachainsInfo = await Promise.all(
+      this.parachains.map((parachain) => parachain.parachainInfo(signal, rootTempDir)),
+    )
+    const [relayChainSpecPath, binary] = await Promise.all([
+      this.chainSpecPath(signal, rootTempDir, parachainsInfo),
       this.binary(signal),
     ])
     const nodeCount = this.nodeCount ?? Math.max(2, parachainsInfo.length)

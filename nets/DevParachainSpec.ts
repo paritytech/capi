@@ -23,7 +23,7 @@ export class DevParachainSpec extends DevNetSpec {
     return ["--", "--execution", "wasm", "--chain", relayChainSpecPath]
   }
 
-  async parachainInfo(signal: AbortSignal, tempParentDir: string) {
+  async parachainInfo(signal: AbortSignal, tempParentDir: string): Promise<ParachainInfo> {
     const tempDir = this.tempDir(tempParentDir)
     const binary = await this.binary(signal)
     const chainSpecPath = await createCustomChainSpec(
