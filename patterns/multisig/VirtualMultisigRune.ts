@@ -1,5 +1,4 @@
 import { MultiAddress } from "@capi/polkadot"
-import * as bytes from "../../deps/std/bytes.ts"
 import {
   $,
   Chain,
@@ -12,6 +11,7 @@ import {
   SignatureDataFactory,
   ValueRune,
 } from "../../mod.ts"
+import { bytes } from "../../util/mod.ts"
 import { filterPureCreatedEvents, replaceDelegateCalls } from "../proxy/mod.ts"
 import { MultisigRune } from "./MultisigRune.ts"
 
