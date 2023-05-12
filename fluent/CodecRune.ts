@@ -2,6 +2,10 @@ import * as $ from "../deps/scale.ts"
 import { Rune, RunicArgs } from "../rune/mod.ts"
 
 export class CodecRune<in out T, out U> extends Rune<$.Codec<T>, U> {
+  static from<X, T>(...[codec]: RunicArgs<X, [codec: $.Codec<T>]>) {
+    return Rune.resolve(codec).into(CodecRune)
+  }
+
   // TODO: eventually, utilize `V` to toggle runtime validation
   encoded<X>(...[value]: RunicArgs<X, [value: T]>) {
     return Rune.tuple([this, value]).map(async ([codec, value]) => {

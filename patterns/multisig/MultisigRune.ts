@@ -1,5 +1,15 @@
 import { MultiAddress } from "@capi/polkadot"
-import { $, Chain, ChainRune, PatternRune, Rune, RunicArgs, ValueRune } from "../../mod.ts"
+import {
+  $,
+  Chain,
+  ChainRune,
+  CodecRune,
+  hex,
+  PatternRune,
+  Rune,
+  RunicArgs,
+  ValueRune,
+} from "../../mod.ts"
 import { bytes } from "../../util/mod.ts"
 import { multisigAccountId } from "./multisigAccountId.ts"
 
@@ -7,6 +17,11 @@ export interface Multisig {
   signatories: Uint8Array[]
   threshold?: number
 }
+
+export const $multisig: $.Codec<Multisig> = $.object(
+  $.field("signatories", $.array($.sizedUint8Array(32))),
+  $.optionalField("threshold", $.u8),
+)
 
 // TODO: swap out `Chain` constraints upon subset gen issue resolution... same for other patterns
 export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multisig, C, U> {
@@ -22,6 +37,8 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
   threshold = this.value.map(({ threshold, signatories }) => threshold ?? signatories.length - 1)
   accountId = Rune.fn(multisigAccountId).call(this.value.access("signatories"), this.threshold)
   address = MultiAddress.Id(this.accountId)
+  encoded = CodecRune.from($multisig).encoded(this.as(MultisigRune))
+  hex = this.encoded.map(hex.encode)
 
   otherSignatories<X>(...[sender]: RunicArgs<X, [sender: MultiAddress]>) {
     return Rune
@@ -151,6 +168,15 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
         blockHash,
       )
       .map((entry) => entry !== null)
+  }
+
+  static fromHex<C extends Chain, U, X>(
+    chain: ChainRune<C, U>,
+    ...[state]: RunicArgs<X, [state: string]>
+  ) {
+    return CodecRune.from($multisig)
+      .decoded(Rune.resolve(state).into(ValueRune).map(hex.decode))
+      .into(MultisigRune, chain)
   }
 }
 
