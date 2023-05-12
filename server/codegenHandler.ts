@@ -60,6 +60,7 @@ export function createCodegenHandler(dataCache: CacheBase, tempCache: CacheBase)
       const exists = await dataCache.has(key)
       return new Response(null, { status: exists ? Status.NoContent : Status.NotFound })
     } else if (request.method === "PUT") {
+      console.log({ kind, untrustedHash, request, key })
       if (await dataCache.has(key)) {
         return new Response(null, { status: Status.NoContent })
       }
