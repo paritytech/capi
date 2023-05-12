@@ -32,7 +32,6 @@ export function createCodegenHandler(dataCache: CacheBase, tempCache: CacheBase)
   async function handle(request: Request) {
     const url = new URL(request.url)
     const { pathname } = url
-    console.log({ pathname, request })
     if (pathname === "/") return f.html(await getStatic("./static/index.html"))
     let match
     if ((match = rUploadUrl.exec(pathname))) {
