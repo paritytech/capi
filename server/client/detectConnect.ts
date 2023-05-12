@@ -3,18 +3,19 @@ import { Connect, WsConnection } from "../../rpc/mod.ts"
 import { DevnetConnection } from "./DevnetConnection.ts"
 
 export function detectConnect(
-  spec: ConnectionSpec,
+  defaultConnectionSpec: ConnectionSpec,
   targets: Record<string, ConnectionSpec>,
 ): Connect {
+  let connectionSpec = defaultConnectionSpec
   const targetName = Deno.env.get("CAPI_TARGET")
   if (targetName) {
     const target = targets[targetName]
-    if (target) spec = target
+    if (target) connectionSpec = target
   }
-  switch (spec.type) {
+  switch (connectionSpec.type) {
     case "WsConnection":
-      return WsConnection.bind(spec.discovery)
+      return WsConnection.bind(connectionSpec.discovery)
     case "DevnetConnection":
-      return DevnetConnection.bind(spec.discovery)
+      return DevnetConnection.bind(connectionSpec.discovery)
   }
 }
