@@ -105,7 +105,7 @@ export class TypeCodegen {
             export namespace ${name} {
               ${
           variants
-            .map((variant) => `export const ${variant}: C.ValueRune<${name}, never>`)
+            .map((variant) => `export const ${variant}: "${variant}"`)
             .join("\n")
         }
             }
@@ -114,8 +114,8 @@ export class TypeCodegen {
             export const ${name} = {
               ${
           variants
-            .map((variant) => `${variant}: C.Rune.constant("${variant}")`)
-            .join(",\n").concat(",")
+            .map((variant) => `${variant}: "${variant}",`)
+            .join("\n")
         }
             }
           `
