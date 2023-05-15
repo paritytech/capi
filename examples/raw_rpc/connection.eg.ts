@@ -13,8 +13,8 @@ const { signal } = controller
 /// Open the connection.
 const connection = WsConnection.connect("wss://rpc.polkadot.io/", signal)
 
-/// Use the connection to retrieve the raw FRAME metadata.
-const { result } = await connection.call("state_getMetadata", [])
+/// Use the connection to call the `system_version` RPC method.
+const { result } = await connection.call("system_version", [])
 
 /// Ensure the result is a string.
 console.log(result)
