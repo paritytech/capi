@@ -87,8 +87,7 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
   blockHash<X>(...[blockHash]: RunicArgs<X, [blockHash?: string]>) {
     return Rune
       .resolve(blockHash)
-      .unhandle(undefined)
-      .rehandle(undefined, () => this.connection.call("chain_getFinalizedHead"))
+      .handle(undefined, () => this.connection.call("chain_getFinalizedHead"))
       .into(BlockHashRune, this)
   }
 

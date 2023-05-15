@@ -24,7 +24,7 @@ export class StorageRune<
   ) {
     const storageKey = this.$key.encoded(key).map(hex.encodePrefixed)
     return this.chain.connection
-      .call("state_getStorage", storageKey, blockHash)
+      .call("state_getStorage", storageKey, this.chain.blockHash(blockHash))
       .unhandle(null)
       .rehandle(null, () => Rune.constant(undefined))
   }
@@ -51,7 +51,7 @@ export class StorageRune<
       .call(
         "state_getStorageSize",
         this.$partialKey.encoded(partialKey).map(hex.encodePrefixed),
-        blockHash,
+        this.chain.blockHash(blockHash),
       )
       .unhandle(null)
       .rehandle(null, () => Rune.constant(undefined))
@@ -68,7 +68,11 @@ export class StorageRune<
     ...[blockHash]: RunicArgs<Y, [blockHash?: string]>
   ) {
     const storageKeys = this.keysRaw(props, blockHash)
-    return this.chain.connection.call("state_queryStorageAt", storageKeys, blockHash)
+    return this.chain.connection.call(
+      "state_queryStorageAt",
+      storageKeys,
+      this.chain.blockHash(blockHash),
+    )
   }
 
   entries<X, Y>(
@@ -103,7 +107,7 @@ export class StorageRune<
       storageKey,
       Rune.resolve(props.count).handle(undefined, () => Rune.constant(100)),
       startKey,
-      blockHash,
+      this.chain.blockHash(blockHash),
     )
   }
 
