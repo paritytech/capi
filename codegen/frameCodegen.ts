@@ -124,21 +124,6 @@ export function frameCodegen(
   }
 
   files.set(
-    "pallets.d.ts",
-    `
-      ${importsCommon}
-      ${palletDeclarations.join("\n")}
-    `,
-  )
-  files.set(
-    "pallets.js",
-    `
-      ${importsCommon}
-      ${palletDefinitions.join("\n")}
-    `,
-  )
-
-  files.set(
     "chain.d.ts",
     `
       ${importsCommon}
@@ -185,7 +170,6 @@ const mod = `
   export * from "./chain.js"
   export * from "./connection.js"
   export * from "./metadata.js"
-  export * from "./pallets.js"
   export * from "./types.js"
 `
 
