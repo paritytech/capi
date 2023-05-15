@@ -11,7 +11,7 @@ import type { DevRelaySpec } from "./DevRelaySpec.ts"
 import { getMetadataFromWsUrl, NetProps, NetSpec } from "./NetSpec.ts"
 
 export interface DevNetProps extends NetProps {
-  bin: BinaryResolver
+  bin: string | BinaryResolver
   chain: string
   nodeCount?: number
   customize?: (chainSpec: Record<string, unknown>) => void
@@ -24,7 +24,8 @@ export abstract class DevNetSpec extends NetSpec {
   readonly customize
   constructor(props: DevNetProps) {
     super(props)
-    this.binary = props.bin
+    const { bin } = props
+    this.binary = typeof bin === "string" ? (() => Promise.resolve(bin)) : bin
     this.chain = props.chain
     this.nodeCount = props.nodeCount
     this.customize = props.customize
