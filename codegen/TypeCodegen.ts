@@ -97,6 +97,29 @@ export class TypeCodegen {
     .add($null, () => "null")
 
   declVisitor = new $.CodecVisitor<(name: string, isTypes: boolean) => string>()
+    .add($.literalUnion, (_codec, _variants) => (name, isTypes) => {
+      const variants = Object.values(_variants) as string[]
+      return isTypes
+        ? `
+            export type ${name} = ${this.nativeVisitor.visit(_codec)}
+            export namespace ${name} {
+              ${
+          variants
+            .map((variant) => `export const ${variant}: "${variant}"`)
+            .join("\n")
+        }
+            }
+          `
+        : `
+            export const ${name} = {
+              ${
+          variants
+            .map((variant) => `${variant}: "${variant}",`)
+            .join("\n")
+        }
+            }
+          `
+    })
     .add($.taggedUnion, (_codec, tagKey: string, variants) => (name, isTypes) => `
 ${
       isTypes

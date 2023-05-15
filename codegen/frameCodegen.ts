@@ -83,7 +83,7 @@ export function frameCodegen(
                     ) => C.ExtrinsicRune<${chainIdent}, C.RunicArgs.U<X>>
                   `,
                 )
-                palletStatements.push(extrinsicFactory(variant.tag))
+                palletStatements.push(extrinsicFactory(variant.tag, true))
               },
             ),
         )
@@ -95,17 +95,17 @@ export function frameCodegen(
             palletDeclarationStatements.push(
               `${value}: () => C.ExtrinsicRune<${chainIdent}, never>`,
             )
-            palletStatements.push(extrinsicFactory(value))
+            palletStatements.push(extrinsicFactory(value, false))
           }))
         .add($.never, () => {})
         .visit(call)
 
       // deno-lint-ignore no-inner-declarations
-      function extrinsicFactory(methodIdent: string) {
+      function extrinsicFactory(methodIdent: string, args: boolean) {
         return `
-          ${methodIdent} = (...args) => this.chain.extrinsic(C.Rune.object({
+          ${methodIdent} = (${args ? "...args" : ""}) => this.chain.extrinsic(C.Rune.object({
             type: "${pallet.name}",
-            value: ${factory}.${methodIdent}(...args),
+            value: ${factory}.${methodIdent}${args ? "(...args)" : ""},
           }))
         `
       }
