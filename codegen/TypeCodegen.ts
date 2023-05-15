@@ -115,7 +115,7 @@ export class TypeCodegen {
               ${
           variants
             .map((variant) => `${variant}: C.Rune.constant("${variant}")`)
-            .join("\n")
+            .join(",\n").concat(",")
         }
             }
           `
