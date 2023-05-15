@@ -25,15 +25,10 @@ export async function syncNets(
           `@capi/${packageName}`,
         )
         const connection = netSpec.connection(name)
-        const targets = mapEntries(netSpec.targets ?? {}, ([targetName, targetNet]) => {
-          const connection = targetNet.connection(targetNet.name)
-          if (!connection) {
-            throw new Error(
-              `Specified target "${targetName}" of "${name}" has no underlying connection.`,
-            )
-          }
-          return [targetName, connection]
-        })
+        const targets = mapEntries(
+          netSpec.targets ?? {},
+          ([targetName, targetNet]) => [targetName, targetNet.connection(targetNet.name)],
+        )
         return [packageName, {
           type: "frame",
           metadataHash,
