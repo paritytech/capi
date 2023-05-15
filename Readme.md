@@ -43,13 +43,16 @@ import { bins, net } from "capi"
 
 const bin = bins({ polkadot: ["polkadot", "v0.9.38"] })
 
-// The Polkadot relay chain
-export const polkadot = net.ws({ url: "wss://rpc.polkadot.io/" })
-
 // A Polkadot development network
 export const polkadotDev = net.dev({
   bin: bin.polkadot,
   chain: "polkadot-dev",
+})
+
+// The Polkadot relay chain
+export const polkadot = net.ws({
+  url: "wss://rpc.polkadot.io/",
+  targets: { dev: polkadotDev },
 })
 ```
 
@@ -100,30 +103,19 @@ const accounts = await polkadot.System.Account.entries({ count: 10 }).run()
 
 ## Development Networks
 
-Let's modify the usage above to target our configured devnet.
-
-```diff
-- import { polkadot } from "@capi/polkadot"
-+ import { polkadotDev } from "@capi/polkadot-dev"
-
-- const accounts = await polkadot.System.Account
-+ const accounts = await polkadotDev.System.Account
-    .entries({ count: 10 })
-    .run()
-```
-
-To run code that depends on a devnet, use the `serve` command, followed by a
-"--" and your devnet-using command. In this case, we'll run the script
-(`main.js`) with Node.JS.
+During development, we may want to swap out the underlying connection with that
+of a devnet. This can be achieved via targets — by specifying alternate targets
+in your `nets.ts` file, you can switch to them by wrapping your command with
+`capi serve --target someTarget --`. For example:
 
 ```sh
-capi serve -- node main.js
+capi serve --target dev -- node main.js
 ```
 
 > Other examples:
 >
-> - `capi serve -- npm run start`
-> - `capi serve -- deno run -A ./main.ts`
+> - `capi serve --target dev -- npm run start`
+> - `capi serve --target dev -- deno run -A ./main.ts`
 
 ## Running Examples
 

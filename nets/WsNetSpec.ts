@@ -1,6 +1,6 @@
-import { getMetadataFromWsUrl, NetSpec } from "./NetSpec.ts"
+import { getMetadataFromWsUrl, NetProps, NetSpec } from "./NetSpec.ts"
 
-export interface WsNetProps {
+export interface WsNetProps extends NetProps {
   url: string
   version?: string
 }
@@ -9,7 +9,7 @@ export class WsNetSpec extends NetSpec {
   readonly url
   readonly version
   constructor(props: WsNetProps) {
-    super()
+    super(props)
     this.url = props.url
     this.version = props.version ?? "latest"
   }

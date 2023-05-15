@@ -59,7 +59,3 @@ export const rococoDevXcmStatemine = rococoDevXcm.parachain({
   chain: "statemine-local",
   id: 1000,
 })
-
-export const polkadotFromMetadata = net.metadata({
-  metadata: await Deno.readFile("examples/raw_rpc/metadata"),
-})

@@ -1,4 +1,5 @@
 import { blake2_512, blake2_64, Hasher, hex } from "../../crypto/mod.ts"
+import { mapEntries } from "../../deps/std/collections/map_entries.ts"
 import { gray, green } from "../../deps/std/fmt/colors.ts"
 import { NetSpec } from "../../nets/mod.ts"
 import { normalizePackageName, normalizeTypeName, withSignal } from "../../util/mod.ts"
@@ -24,7 +25,17 @@ export async function syncNets(
           `@capi/${packageName}`,
         )
         const connection = netSpec.connection(name)
-        return [packageName, { type: "frame", metadataHash, chainName, connection }]
+        const targets = mapEntries(
+          netSpec.targets ?? {},
+          ([targetName, targetNet]) => [targetName, targetNet.connection(targetNet.name)],
+        )
+        return [packageName, {
+          type: "frame",
+          metadataHash,
+          chainName,
+          connection,
+          targets,
+        }]
       }),
     )
     const sortedEntries = new Map([...entries].sort((a, b) => a[0] < b[0] ? 1 : -1))

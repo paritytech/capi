@@ -8,9 +8,9 @@ import { getFreePort, portReady } from "../util/port.ts"
 import { BinaryResolver } from "./bins.ts"
 import { createRawChainSpec } from "./chain_spec/mod.ts"
 import type { DevRelaySpec } from "./DevRelaySpec.ts"
-import { getMetadataFromWsUrl, NetSpec } from "./NetSpec.ts"
+import { getMetadataFromWsUrl, NetProps, NetSpec } from "./NetSpec.ts"
 
-export interface DevNetProps {
+export interface DevNetProps extends NetProps {
   bin: BinaryResolver
   chain: string
   nodeCount?: number
@@ -23,7 +23,7 @@ export abstract class DevNetSpec extends NetSpec {
   readonly nodeCount
   readonly customize
   constructor(props: DevNetProps) {
-    super()
+    super(props)
     this.binary = props.bin
     this.chain = props.chain
     this.nodeCount = props.nodeCount

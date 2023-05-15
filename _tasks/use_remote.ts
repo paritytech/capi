@@ -33,7 +33,7 @@ if (await isUploaded(capiServer, codegenHash)) {
   console.log("codegen already uploaded")
 } else {
   console.log("uploading codegen")
-  await syncNets("https://capi.dev/", "target/capi", await resolveNets())
+  await syncNets(capiServer, "target/capi", await resolveNets())
 }
 
 async function isUploaded(server: string, hash: string) {
