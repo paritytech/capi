@@ -14,7 +14,7 @@ import { resolveNets } from "./resolveNets.ts"
 
 export const serve = new Command()
   .description("Start the Capi server")
-  .option("-n, --nets <nets:file>", "nets.ts file path", { default: "./nets.ts" })
+  .option("-n, --nets <nets:file>", "nets.ts file path")
   .option("-p, --port <port:number>", "", { default: 4646 })
   .option(
     "-o, --out <out:string>",
@@ -25,7 +25,7 @@ export const serve = new Command()
   .action(runServe)
 
 export interface RunServeOptions {
-  nets: string
+  nets?: string
   port: number
   out: string
   target?: string
