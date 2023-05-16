@@ -26,7 +26,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: denoland/setup-deno@61fe2df320078202e33d7d5ad347e7dcfa0e8f31 # v1.1.0
         with:
-          deno-version: v1.32.5
+          deno-version: v1.33.3
       - run: deno lint
 
   spellcheck:
@@ -45,7 +45,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: denoland/setup-deno@61fe2df320078202e33d7d5ad347e7dcfa0e8f31 # v1.1.0
         with:
-          deno-version: v1.32.5
+          deno-version: v1.33.3
       - uses: actions/cache@v3
         with:
           path: ~/.cache/deno
@@ -76,7 +76,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: denoland/setup-deno@61fe2df320078202e33d7d5ad347e7dcfa0e8f31 # v1.1.0
         with:
-          deno-version: v1.32.5
+          deno-version: v1.33.3
       - run: deno task sync --check
       - name: Archive target
         uses: actions/upload-artifact@v3
@@ -97,7 +97,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: denoland/setup-deno@61fe2df320078202e33d7d5ad347e7dcfa0e8f31 # v1.1.0
         with:
-          deno-version: v1.32.5
+          deno-version: v1.33.3
       - uses: actions/cache@v3
         with:
           path: ~/.cache/deno
@@ -116,7 +116,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: denoland/setup-deno@61fe2df320078202e33d7d5ad347e7dcfa0e8f31 # v1.1.0
         with:
-          deno-version: v1.32.5
+          deno-version: v1.33.3
       - uses: actions/cache@v3
         with:
           path: ~/.cache/deno
@@ -133,7 +133,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: denoland/setup-deno@61fe2df320078202e33d7d5ad347e7dcfa0e8f31 # v1.1.0
         with:
-          deno-version: v1.32.5
+          deno-version: v1.33.3
       - uses: actions/cache@v3
         with:
           path: ~/.cache/deno
