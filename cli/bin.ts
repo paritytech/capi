@@ -2,7 +2,7 @@ import { CapiBinary } from "../deps/capi_binary_builds.ts"
 import { Command } from "../deps/cliffy.ts"
 
 export const bin = new Command()
-  .description("Executes the <binary>@<version> for the current platform with [args...]")
+  .description("Execute <binary>@<version> with [args...]")
   .arguments("<binary:string> <version:string> [...args:string]")
   .stopEarly()
   .example("run a polkadot node in dev mode", "capi bin polkadot v0.9.41 --dev")

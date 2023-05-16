@@ -13,7 +13,7 @@ import { tempDir } from "../util/tempDir.ts"
 import { resolveNets } from "./resolveNets.ts"
 
 export const serve = new Command()
-  .description("Starts CAPI server")
+  .description("Start the Capi server")
   .option("-n, --nets <nets:file>", "nets.ts file path", { default: "./nets.ts" })
   .option("-p, --port <port:number>", "", { default: 4646 })
   .option(
