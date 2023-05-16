@@ -1,4 +1,4 @@
-import * as flags from "../deps/std/flags.ts"
+import { Command, EnumType } from "../deps/cliffy.ts"
 import { blue, gray } from "../deps/std/fmt/colors.ts"
 import { assertEquals } from "../deps/std/testing/asserts.ts"
 import { syncNets } from "../server/mod.ts"
@@ -6,36 +6,48 @@ import { normalizePackageName } from "../util/mod.ts"
 import { tempDir } from "../util/tempDir.ts"
 import { resolveNets } from "./resolveNets.ts"
 
-export default async function(...args: string[]) {
-  const {
-    "import-map": importMapFile,
-    "package-json": packageJsonFile,
-    check,
-    out,
-    server,
-  } = flags.parse(args, {
-    string: ["config", "import-map", "out", "package-json", "server"],
-    boolean: ["check"],
-    default: {
-      server: "https://capi.dev/",
-      out: "target/capi",
-    },
+export const sync = new Command()
+  .type("runtime", new EnumType(["deno", "node"]))
+  .description("Sync net specs and update your manifest")
+  .arguments("<runtime:runtime>")
+  .option("-n, --nets <nets:file>", "nets.ts file path", { default: "./nets.ts" })
+  .option("--check", "ensures that metadata and codegen are in sync")
+  .option("-o, --out <out:string>", "Metadata and codegen output directory", {
+    default: "target/capi",
   })
+  .option("-s, --server <server:string>", "", { default: "https://capi.dev/" })
+  .option(
+    "--runtime-config <runtimeConfig:string>",
+    "the import_map.json or package.json file path",
+  )
+  .action(runSync)
 
-  const netSpecs = await resolveNets(...args)
+export interface RunSyncOptions {
+  nets: string
+  check?: true
+  out: string
+  server: string
+  runtimeConfig?: string
+}
 
+async function runSync({
+  nets: netsFile,
+  check,
+  out,
+  server,
+  runtimeConfig,
+}: RunSyncOptions, runtime: string) {
+  const netSpecs = await resolveNets(netsFile)
   const devnetTempDir = await tempDir(out, "devnet")
-
   const baseUrl = await syncNets(server, devnetTempDir, netSpecs)
-
-  if (importMapFile) {
-    syncFile(importMapFile, (importMap) => {
+  if (runtime === "deno") {
+    runtimeConfig ??= "import_map.json"
+    syncFile(runtimeConfig, (importMap) => {
       importMap.imports["@capi/"] = baseUrl
     })
-  }
-
-  if (packageJsonFile) {
-    syncFile(packageJsonFile, (packageJson) => {
+  } else if (runtime === "node") {
+    runtimeConfig ??= "package.json"
+    syncFile(runtimeConfig, (packageJson) => {
       const addedPackages = new Set()
       for (const rawName of Object.keys(netSpecs ?? {})) {
         const name = normalizePackageName(rawName)

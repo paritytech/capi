@@ -1,6 +1,6 @@
-import * as flags from "../deps/std/flags.ts"
+import { Command } from "../deps/cliffy.ts"
 import { blue, gray, yellow } from "../deps/std/fmt/colors.ts"
-import { serve } from "../deps/std/http.ts"
+import { serve as httpServe } from "../deps/std/http.ts"
 import {
   createCodegenHandler,
   createCorsHandler,
@@ -12,33 +12,41 @@ import { gracefulExit } from "../util/mod.ts"
 import { tempDir } from "../util/tempDir.ts"
 import { resolveNets } from "./resolveNets.ts"
 
-export default async function(...args: string[]) {
-  const { port, "--": cmd, out, target } = flags.parse(args, {
-    string: ["port", "out", "target"],
-    default: {
-      port: "4646",
-      out: "target/capi",
-    },
-    "--": true,
-  })
+export const serve = new Command()
+  .description("Start the Capi server")
+  .option("-n, --nets <nets:file>", "nets.ts file path")
+  .option("-p, --port <port:number>", "", { default: 4646 })
+  .option(
+    "-o, --out <out:string>",
+    "Directory at which disk-related operations (such as storing devnet logs and caching metadata) can occur",
+    { default: "target/capi" },
+  )
+  .option("--target <target:string>", "target name in net.ts")
+  .action(runServe)
 
-  const nets = await resolveNets(...args)
+export interface RunServeOptions {
+  nets?: string
+  port: number
+  out: string
+  target?: string
+}
 
+async function runServe(
+  this: { getLiteralArgs(): string[] },
+  { nets: netsPath, port, out, target }: RunServeOptions,
+) {
+  const literalArgs = this.getLiteralArgs()
+  const nets = await resolveNets(netsPath)
   const devnetTempDir = await tempDir(out, "devnet")
-
   const href = `http://localhost:${port}/`
-
   const controller = new AbortController()
   const { signal } = controller
-
   const dataCache = new FsCache(out, signal)
   const tempCache = new InMemoryCache(signal)
-
   const running = await fetch(`${href}capi_cwd`)
     .then((r) => r.text())
     .then((r) => r === Deno.cwd())
     .catch(() => false)
-
   if (!running) {
     const devnetsHandler = createDevnetsHandler(devnetTempDir, nets, signal)
     const codegenHandler = createCodegenHandler(dataCache, tempCache)
@@ -52,7 +60,7 @@ export default async function(...args: string[]) {
       }
       return await codegenHandler(request)
     }))
-    await serve(handler, {
+    await httpServe(handler, {
       hostname: "::",
       port: +port,
       signal,
@@ -70,7 +78,7 @@ export default async function(...args: string[]) {
   }
 
   async function onReady() {
-    const [bin, ...args] = cmd
+    const [bin, ...args] = literalArgs
     if (bin) {
       const command = new Deno.Command(bin, {
         args,

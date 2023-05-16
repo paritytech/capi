@@ -1,13 +1,14 @@
 import "./deps/shims/register.ts"
+import { Command } from "./deps/cliffy.ts"
 
-import bin from "./cli/bin.ts"
-import serve from "./cli/serve.ts"
-import sync from "./cli/sync.ts"
+import { bin } from "./cli/bin.ts"
+import { serve } from "./cli/serve.ts"
+import { sync } from "./cli/sync.ts"
 
-const commands: Record<string, (...args: string[]) => void> = { bin, serve, sync }
-
-if (Deno.args[0]! in commands) {
-  commands[Deno.args[0]!]!(...Deno.args.slice(1))
-} else {
-  throw new Error("Unrecognized command")
-}
+await new Command()
+  .name("capi")
+  .description("Capi is a framework for crafting interactions with Substrate chains")
+  .command("bin", bin)
+  .command("sync", sync)
+  .command("serve", serve)
+  .parse(Deno.args)
