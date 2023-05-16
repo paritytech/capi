@@ -8,7 +8,7 @@ import { resolveNets } from "./resolveNets.ts"
 
 export const sync = new Command()
   .type("runtime", new EnumType(["deno", "node"]))
-  .description("Syncs net specs and updates your manifest")
+  .description("Sync net specs and update your manifest")
   .arguments("<runtime:runtime>")
   .option("-n, --nets <nets:file>", "nets.ts file path", { default: "./nets.ts" })
   .option("--check", "ensures that metadata and codegen are in sync")
