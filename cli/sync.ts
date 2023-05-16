@@ -1,6 +1,7 @@
 import { Command, EnumType } from "../deps/cliffy.ts"
 import { blue, gray } from "../deps/std/fmt/colors.ts"
 import { assertEquals } from "../deps/std/testing/asserts.ts"
+import { detectVersion } from "../server/detectVersion.ts"
 import { syncNets } from "../server/mod.ts"
 import { normalizePackageName } from "../util/mod.ts"
 import { tempDir } from "../util/tempDir.ts"
@@ -15,7 +16,7 @@ export const sync = new Command()
   .option("-o, --out <out:string>", "Metadata and codegen output directory", {
     default: "target/capi",
   })
-  .option("-s, --server <server:string>", "", { default: "https://capi.dev/" })
+  .option("-s, --server <server:string>", "")
   .option(
     "--runtime-config <runtimeConfig:string>",
     "the import_map.json or package.json file path",
@@ -26,7 +27,7 @@ export interface RunSyncOptions {
   nets: string
   check?: true
   out: string
-  server: string
+  server?: string
   runtimeConfig?: string
 }
 
@@ -39,7 +40,11 @@ async function runSync({
 }: RunSyncOptions, runtime: string) {
   const netSpecs = await resolveNets(netsFile)
   const devnetTempDir = await tempDir(out, "devnet")
-  const baseUrl = await syncNets(server, devnetTempDir, netSpecs)
+  const baseUrl = await syncNets(
+    server ?? `https://capi.dev/${detectVersion()}/`,
+    devnetTempDir,
+    netSpecs,
+  )
   if (runtime === "deno") {
     runtimeConfig ??= "import_map.json"
     syncFile(runtimeConfig, (importMap) => {
