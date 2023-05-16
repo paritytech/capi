@@ -10,22 +10,29 @@ export const bin = new Command()
     "build a chain spec for Rococo local",
     "capi bin polkadot v0.9.41 build-spec --chain rococo-local",
   )
-  .action(async function(_options, binary: string, version: string, ...args: string[]) {
-    const bin = new CapiBinary(binary, version)
-    if (!(await bin.exists())) {
-      console.error("Downloading", bin.key)
-      await bin.download()
-    }
-    const child = new Deno.Command(bin.path, {
-      args,
-      stdin: "inherit",
-      stdout: "inherit",
-      stderr: "inherit",
-    }).spawn()
-    for (const signal of ["SIGTERM", "SIGINT"] satisfies Deno.Signal[]) {
-      Deno.addSignalListener(signal, () => {
-        child.kill(signal)
-      })
-    }
-    Deno.exit((await child.status).code)
-  })
+  .action(runBin)
+
+async function runBin(
+  _options: void,
+  binary: string,
+  version: string,
+  ...args: string[]
+) {
+  const bin = new CapiBinary(binary, version)
+  if (!(await bin.exists())) {
+    console.error("Downloading", bin.key)
+    await bin.download()
+  }
+  const child = new Deno.Command(bin.path, {
+    args,
+    stdin: "inherit",
+    stdout: "inherit",
+    stderr: "inherit",
+  }).spawn()
+  for (const signal of ["SIGTERM", "SIGINT"] satisfies Deno.Signal[]) {
+    Deno.addSignalListener(signal, () => {
+      child.kill(signal)
+    })
+  }
+  Deno.exit((await child.status).code)
+}
