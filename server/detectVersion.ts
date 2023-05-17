@@ -1,9 +1,5 @@
 const rCapiVersion = /^https:\/\/(?:capi.dev\/|deno.land\/x\/capi)@(.+?)\//
 
-export function detectVersion(): string {
-  const version = rCapiVersion.exec(import.meta.url)?.[1]
-  if (!version) {
-    throw new Error("Could not detect version from URL. Please specify via `--version` flag.")
-  }
-  return version
+export function detectVersion(): string | undefined {
+  return rCapiVersion.exec(import.meta.url)?.[1]
 }

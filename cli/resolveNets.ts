@@ -13,14 +13,13 @@ export async function resolveNets(maybeNetsPath?: string): Promise<Record<string
 }
 
 async function resolveNetsPath(maybeNetsPath?: string): Promise<string> {
-  for (const p of [maybeNetsPath, "nets.ts", "nets.js"]) {
-    if (p) {
-      try {
-        const resolved = path.resolve(p)
-        await Deno.stat(resolved)
-        return resolved
-      } catch (_e) {}
-    }
+  if (maybeNetsPath) return path.resolve(maybeNetsPath)
+  for (const p of ["nets.ts", "nets.js"]) {
+    try {
+      const resolved = path.resolve(p)
+      await Deno.stat(resolved)
+      return resolved
+    } catch (_e) {}
   }
   throw new Error(
     "Could not resolve nets path. Create a `nets.ts` or `nets.js` file and export your net specs.",

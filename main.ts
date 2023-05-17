@@ -15,11 +15,9 @@ await new Command()
   .parse(Deno.args)
 
 function version() {
-  try {
-    return detectVersion()
-  } catch (_e) {
-    return new TextDecoder().decode(
-      new Deno.Command("git", { args: ["branch", "--show-current"] }).outputSync().stdout,
-    ) || "unknown"
-  }
+  const v = detectVersion()
+  if (v) return v
+  return new TextDecoder().decode(
+    new Deno.Command("git", { args: ["rev-parse", "HEAD"] }).outputSync().stdout,
+  ).slice(0, 8) || "unknown"
 }
