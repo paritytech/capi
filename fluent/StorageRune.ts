@@ -105,7 +105,7 @@ export class StorageRune<
     return this.chain.connection.call(
       "state_getKeysPaged",
       storageKey,
-      Rune.resolve(props.count).handle(undefined, () => Rune.constant(100)),
+      Rune.resolve(props.limit).handle(undefined, () => Rune.constant(100)),
       startKey,
       this.chain.blockHash(blockHash),
     )
@@ -127,7 +127,7 @@ export interface StoragePageProps<
   out P extends Chain.PalletName<C>,
   out S extends Chain.StorageName<C, P>,
 > {
-  count?: number
+  limit?: number
   partialKey?: Chain.Storage.PartialKey<C, P, S>
   start?: Chain.Storage.Key<C, P, S>
 }
