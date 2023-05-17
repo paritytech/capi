@@ -23,6 +23,6 @@ async function resolveNetsPath(maybeNetsPath?: string): Promise<string> {
     }
   }
   throw new Error(
-    "Could not resolve nets path. Create a `nets.ts` file and export your net specs.",
+    "Could not resolve nets path. Create a `nets.ts` or `nets.js` file and export your net specs.",
   )
 }
