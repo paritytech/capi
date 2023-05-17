@@ -137,6 +137,11 @@ await Promise.all([
 ])
 
 await Promise.all([
+  fs.copy(
+    "target/npm/src/rune/_empty.d.ts",
+    "target/npm/types/rune/_empty.d.ts",
+    { overwrite: true },
+  ),
   editFile(
     "target/npm/esm/main.js",
     (content) =>
