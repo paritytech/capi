@@ -17,7 +17,5 @@ await new Command()
 function version() {
   const v = detectVersion()
   if (v) return v
-  return new TextDecoder().decode(
-    new Deno.Command("git", { args: ["rev-parse", "HEAD"] }).outputSync().stdout,
-  ).slice(0, 8) || "unknown"
+  return "unknown"
 }
