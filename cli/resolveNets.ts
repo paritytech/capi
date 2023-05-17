@@ -5,26 +5,24 @@ import { NetSpec } from "../nets/mod.ts"
 const $nets = $.record($.instance(NetSpec as new() => NetSpec, $.tuple(), () => []))
 
 export async function resolveNets(maybeNetsPath?: string): Promise<Record<string, NetSpec>> {
-  let netsPath
-  if (maybeNetsPath) {
-    netsPath = path.resolve(maybeNetsPath)
-    await Deno.stat(netsPath)
-  } else {
-    for (const p of ["nets.ts", "nets.js"]) {
-      try {
-        const resolved = path.resolve(p)
-        await Deno.stat(resolved)
-        netsPath = resolved
-      } catch (_e) {}
-    }
-  }
-  if (!netsPath) {
-    throw new Error(
-      "Could not resolve net specs path. Create a `nets.ts` file and export a net spec.",
-    )
-  }
-  const nets = await import(path.toFileUrl(netsPath).toString())
+  const resolvedNetsPath = await resolveNetsPath(maybeNetsPath)
+  const nets = await import(path.toFileUrl(resolvedNetsPath).toString())
   $.assert($nets, nets)
   for (const key in nets) nets[key]!.name = key
   return nets
+}
+
+async function resolveNetsPath(maybeNetsPath?: string): Promise<string> {
+  for (const p of [maybeNetsPath, "nets.ts", "nets.js"]) {
+    if (p) {
+      try {
+        const resolved = path.resolve(p)
+        await Deno.stat(resolved)
+        return resolved
+      } catch (_e) {}
+    }
+  }
+  throw new Error(
+    "Could not resolve nets path. Create a `nets.ts` file and export your net specs.",
+  )
 }
