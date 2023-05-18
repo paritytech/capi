@@ -17,11 +17,13 @@ import { multisigAccountId } from "./multisigAccountId.ts"
 export interface Multisig {
   signatories: Uint8Array[]
   threshold?: number
+  stash?: Uint8Array
 }
 
 export const $multisig: $.Codec<Multisig> = $.object(
   $.field("signatories", $.array($.sizedUint8Array(32))),
   $.optionalField("threshold", $.u8),
+  $.optionalField("stash", $.sizedUint8Array(32)),
 )
 
 // TODO: swap out `Chain` constraints upon subset gen issue resolution... same for other patterns
@@ -35,6 +37,7 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
 
   private storage = this.chain.pallet("Multisig").storage("Multisigs")
   private value = this.into(ValueRune)
+  stash = this.value.access("stash")
   threshold = this.value.map(({ threshold, signatories }) => threshold ?? signatories.length - 1)
   accountId = Rune.fn(multisigAccountId).call(this.value.access("signatories"), this.threshold)
   address = MultiAddress.Id(this.accountId)
