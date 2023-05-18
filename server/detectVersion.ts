@@ -5,8 +5,7 @@ export function detectVersion(): string | undefined {
   if (match) return match
   if (new URL(import.meta.url).protocol === "file:") {
     const sha = new TextDecoder().decode(
-      new Deno.Command("git", { args: ["rev-parse", "HEAD"] 
- }).outputSync().stdout,
+      new Deno.Command("git", { args: ["rev-parse", "HEAD"] }).outputSync().stdout,
     )
     if (sha.length) return sha.slice(0, 8)
   }
