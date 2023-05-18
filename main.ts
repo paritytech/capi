@@ -7,7 +7,7 @@ import { detectVersion } from "./server/detectVersion.ts"
 
 await new Command()
   .name("capi")
-  .version(version)
+  .version(() => detectVersion() ?? "unknown")
   .description("Capi is a framework for crafting interactions with Substrate chains")
   .command("bin", bin)
   .command("sync", sync)
