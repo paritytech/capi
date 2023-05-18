@@ -8,8 +8,8 @@
 
 import { contractsDev } from "@capi/contracts-dev"
 import { $, createDevUsers, hex, Sr25519, ss58 } from "capi"
-import { InkMetadataRune } from "capi/patterns/ink/mod.ts"
-import { signature } from "capi/patterns/signature/polkadot.ts"
+import { InkMetadataRune } from "capi/patterns/ink"
+import { signature } from "capi/patterns/signature/polkadot"
 
 /// Initialize an `InkMetadataRune` with the raw Ink metadata text.
 const metadata = InkMetadataRune.fromMetadataText(

@@ -9,7 +9,7 @@
 
 import { polkadotDev } from "@capi/polkadot-dev"
 import { $ } from "capi"
-import { storageSizes } from "capi/patterns/storage_sizes.ts"
+import { storageSizes } from "capi/patterns/storage_sizes"
 
 /// Use the storageSizes factory to produce a Rune. Then execute it.
 const sizes = await storageSizes(polkadotDev).run()
