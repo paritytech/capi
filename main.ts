@@ -1,5 +1,6 @@
 import "./deps/shims/register.ts"
 import { bin } from "./cli/bin.ts"
+import { init } from "./cli/init.ts"
 import { serve } from "./cli/serve.ts"
 import { sync } from "./cli/sync.ts"
 import { Command } from "./deps/cliffy.ts"
@@ -12,4 +13,5 @@ new Command()
   .command("bin", bin)
   .command("sync", sync)
   .command("serve", serve)
+  .command("init", init)
   .parse(Deno.args)
