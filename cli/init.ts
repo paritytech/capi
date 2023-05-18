@@ -3,6 +3,8 @@ import * as fs from "../deps/std/fs.ts"
 import { parse } from "../deps/std/jsonc.ts"
 import * as path from "../deps/std/path.ts"
 
+// TODO: write to .gitignore
+
 export const init = new Command()
   .description("Configure Capi in the current working directory")
   .stopEarly()
@@ -11,11 +13,12 @@ export const init = new Command()
 
 async function runInit() {
   const packageJsonPath = path.join(Deno.cwd(), "package.json")
-  if (fs.existsSync(packageJsonPath)) runInitNode(packageJsonPath)
+  if (fs.existsSync(packageJsonPath)) return runInitNode(packageJsonPath)
   let denoJsonPath = path.join(Deno.cwd(), "deno.json")
-  if (fs.existsSync(denoJsonPath)) runInitDeno(denoJsonPath)
+  if (fs.existsSync(denoJsonPath)) return runInitDeno(denoJsonPath)
   denoJsonPath += "c"
-  if (fs.existsSync(denoJsonPath)) runInitDeno(denoJsonPath)
+  if (fs.existsSync(denoJsonPath)) return runInitDeno(denoJsonPath)
+  throw new Error("Could not find neither a `package.json` nor `deno.json`/`deno.jsonc`.")
 }
 
 function runInitNode(packageJsonPath: string) {
@@ -75,6 +78,6 @@ function assertManifest(
   inQuestion: unknown,
 ): asserts inQuestion is Record<string, Record<string, string>> {
   if (typeof inQuestion !== "object" || inQuestion === null) {
-    throw new Error("Malformed `package.json`")
+    throw new Error("Malformed manifest.")
   }
 }
