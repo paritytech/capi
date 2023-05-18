@@ -27,7 +27,7 @@ const allFiles = []
 for await (
   const { path } of fs.walkSync(".", {
     exts: [".ts"],
-    skip: [/\.test\.ts$/, /^(target|_tasks|examples)\//],
+    skip: [/\.test\.ts$/, /^(target|_tasks)\//],
     includeDirs: false,
   })
 ) allFiles.push(`./${path}`)
@@ -63,6 +63,7 @@ await Promise.all([
         }),
       ),
     },
+    importMap: "./_tasks/dnt_import_map.json",
     compilerOptions: {
       importHelpers: true,
       sourceMap: true,
