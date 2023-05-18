@@ -13,9 +13,3 @@ await new Command()
   .command("sync", sync)
   .command("serve", serve)
   .parse(Deno.args)
-
-function version() {
-  const v = detectVersion()
-  if (v) return v
-  return "unknown"
-}
