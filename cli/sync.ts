@@ -41,7 +41,7 @@ async function runSync({
   const netSpecs = await resolveNets(netsFile)
   const devnetTempDir = await tempDir(out, "devnet")
   const version = detectVersion()
-  if (!version) throw new Error("Please re-run `sync` with \`--server\` specified.")
+  if (!server && !version) throw new Error("Could not auto-detect version; please re-run `sync` with \`--server\` specified.")
   const baseUrl = await syncNets(
     server ?? `https://capi.dev/${version}/`,
     devnetTempDir,
