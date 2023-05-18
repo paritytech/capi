@@ -6,7 +6,6 @@
     "examples/": {
       "asserts": "./deps/std/testing/asserts.ts",
       "capi": "./mod.ts",
-      "capi/patterns/": "./patterns/",
       "capi/patterns/compat/pjs_sender": "./patterns/compat/pjs_sender.ts",
       "capi/patterns/consensus": "./patterns/consensus/mod.ts",
       "capi/patterns/identity": "./patterns/identity.ts",
