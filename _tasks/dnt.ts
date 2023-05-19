@@ -17,8 +17,11 @@ const server = serverVersion ? `https://capi.dev/@${serverVersion}/` : "http://l
 const hash = new URL(importMap.imports["@capi/"]).pathname.slice(1, -1)
 
 const outDir = path.join("target", "npm")
+const capiOutDir = path.join(outDir, "capi")
+const examplesOutDir = path.join(outDir, "capi-examples")
 
 await fs.emptyDir(outDir)
+await Deno.mkdir(capiOutDir)
 
 const entryPoints: EntryPoint[] = []
 const mappings: Record<string, string> = {}
@@ -47,6 +50,8 @@ for (const pathname of allFiles) {
   }
 }
 
+const capiCodegenPackageNames = Object.keys(nets).map((key) => normalizePackageName(key))
+
 await Promise.all([
   build({
     package: {
@@ -57,10 +62,9 @@ await Promise.all([
       license: "Apache-2.0",
       repository: "github:paritytech/capi",
       dependencies: Object.fromEntries(
-        Object.keys(nets).map((key) => {
-          const name = normalizePackageName(key)
-          return [`@capi/${name}`, `${server}${hash}/${name}.tar`]
-        }),
+        capiCodegenPackageNames.map((
+          packageName,
+        ) => [`@capi/${packageName}`, `${server}${hash}/${packageName}.tar`]),
       ),
     },
     compilerOptions: {
@@ -112,7 +116,7 @@ await Promise.all([
       "node:http": "node:http",
       "node:stream": "node:stream",
     },
-    outDir,
+    outDir: capiOutDir,
     scriptModule: false,
     shims: {
       deno: true,
@@ -131,25 +135,25 @@ await Promise.all([
     test: false,
     typeCheck: false,
   }),
-  fs.copy("LICENSE", path.join(outDir, "LICENSE")),
-  fs.copy("Readme.md", path.join(outDir, "Readme.md")),
-  fs.copy("server/static/", path.join(outDir, "esm/server/static/")),
+  fs.copy("LICENSE", path.join(capiOutDir, "LICENSE")),
+  fs.copy("Readme.md", path.join(capiOutDir, "Readme.md")),
+  fs.copy("server/static/", path.join(capiOutDir, "esm/server/static/")),
 ])
 
 await Promise.all([
   fs.copy(
-    "target/npm/src/rune/_empty.d.ts",
-    "target/npm/types/rune/_empty.d.ts",
+    "target/npm/capi/src/rune/_empty.d.ts",
+    "target/npm/capi/types/rune/_empty.d.ts",
     { overwrite: true },
   ),
   editFile(
-    "target/npm/esm/main.js",
+    "target/npm/capi/esm/main.js",
     (content) =>
       content
         .replace(/^#!.+/, "#!/usr/bin/env -S node --loader ts-node/esm"),
   ),
   editFile(
-    "target/npm/esm/_dnt.shims.js",
+    "target/npm/capi/esm/_dnt.shims.js",
     (content) =>
       content
         .replace(/"@deno\/shim-deno"/g, `"./deps/shims/Deno.node.js"`),
@@ -159,3 +163,50 @@ await Promise.all([
 async function editFile(path: string, modify: (content: string) => string) {
   await Deno.writeTextFile(path, modify(await Deno.readTextFile(path)))
 }
+
+const exampleEntryPoints: EntryPoint[] = []
+for await (
+  const { path } of fs.walkSync(".", {
+    exts: [".eg.ts"],
+    includeDirs: false,
+  })
+) {
+  exampleEntryPoints.push({
+    name: path,
+    path: `./${path}`,
+  })
+}
+
+await build({
+  package: {
+    name: "capi-examples",
+    version: packageVersion,
+    type: "module",
+    devDependencies: {
+      "ts-node": "^10.9.1",
+    },
+    dependencies: {
+      capi: "../capi",
+      ...Object.fromEntries(
+        capiCodegenPackageNames.map((
+          packageName,
+        ) => [`@capi/${packageName}`, `../capi/node_modules/@capi/${packageName}`]),
+      ),
+    },
+  },
+  compilerOptions: {
+    importHelpers: true,
+    sourceMap: true,
+    target: "ES2021",
+    lib: ["es2022.error", "dom.iterable"],
+  },
+  entryPoints: exampleEntryPoints,
+  importMap: "import_map.json",
+  mappings: { "./mod.ts": "capi" },
+  outDir: examplesOutDir,
+  scriptModule: false,
+  declaration: false,
+  shims: { deno: true },
+  test: false,
+  typeCheck: false,
+})
