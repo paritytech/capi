@@ -34,7 +34,7 @@ async function runInitNode(packageJsonPath: string) {
     }
   }
   const dependencies = packageJson.dependencies ??= {}
-  dependencies.capi = detectVersion()
+  dependencies.capi = detectVersion() ?? "*"
   const scripts = packageJson.scripts ??= {}
   scripts["capi:sync"] = "capi sync node"
   scripts["capi:serve"] = "capi serve"
@@ -46,11 +46,13 @@ async function runInitDeno(denoJsonPath: string) {
   const denoJson = parse(Deno.readTextFileSync(denoJsonPath))
   assertManifest(denoJson)
   const tasks = denoJson.tasks ??= {}
-  tasks["capi"] = "deno run -A http://deno.land/x/capi/main.ts"
+  const version = detectVersion()
+  const versioned = `http://deno.land/x/capi${version ? `@${version}` : ""}/main.ts`
+  tasks["capi"] = `deno run -A ${versioned}`
   tasks["capi:sync"] = "deno task capi sync node"
   tasks["capi:serve"] = "deno task capi serve"
   Deno.writeTextFileSync(denoJsonPath, JSON.stringify(denoJson, null, 2))
-  await Promise.all([netsInit("https://deno.land/x/capi/mod.ts", true), updateGitignore()])
+  await Promise.all([netsInit(versioned, true), updateGitignore()])
 }
 
 async function netsInit(specifier: string, isTs: boolean) {
