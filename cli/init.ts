@@ -22,24 +22,21 @@ async function runInit() {
 
 async function runInitNode(packageJsonPath: string) {
   const packageJson = JSON.parse(await Deno.readTextFile(packageJsonPath))
-  assertManifest(packageJson)
-  const isTs = confirm("Are you using TypeScript?")
-  const devDependencies = packageJson.devDependencies ??= {}
-  if (isTs && !devDependencies["ts-node"]) {
-    const addTsNode = confirm(
-      `To define your net specs in TypeScript, we'll need to install the \`ts-node\` loader. Can we add it to your \`package.json\`?`,
+  if (!packageJson.type || packageJson.type !== "module") {
+    throw new Error(
+      "Cannot use Capi in a non-esm project. Set `package.json`'s `type` field to `\"module\"`",
     )
-    if (addTsNode) {
-      devDependencies["ts-node"] = "*"
-    }
   }
+  assertManifest(packageJson)
+  const devDependencies = packageJson.devDependencies ??= {}
+  if (!devDependencies["ts-node"]) devDependencies["ts-node"] = "*"
   const dependencies = packageJson.dependencies ??= {}
   dependencies.capi = detectVersion() ?? "*"
   const scripts = packageJson.scripts ??= {}
   scripts["capi:sync"] = "capi sync node"
   scripts["capi:serve"] = "capi serve"
   Deno.writeTextFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2))
-  await Promise.all([netsInit("capi", isTs), updateGitignore()])
+  await Promise.all([netsInit("capi"), updateGitignore()])
 }
 
 async function runInitDeno(denoJsonPath: string) {
@@ -52,10 +49,10 @@ async function runInitDeno(denoJsonPath: string) {
   tasks["capi:sync"] = "deno task capi sync node"
   tasks["capi:serve"] = "deno task capi serve"
   Deno.writeTextFileSync(denoJsonPath, JSON.stringify(denoJson, null, 2))
-  await Promise.all([netsInit(versioned, true), updateGitignore()])
+  await Promise.all([netsInit(versioned), updateGitignore()])
 }
 
-async function netsInit(specifier: string, isTs: boolean) {
+async function netsInit(specifier: string) {
   const code = `import { bins, net } from "${specifier}"
 
 const bin = bins({
@@ -72,7 +69,7 @@ export const polkadot = net.ws({
   targets: { dev: polkadotDev },
 })
 `
-  await Deno.writeTextFile("nets." + (isTs ? "ts" : "js"), code)
+  await Deno.writeTextFile("nets.ts", code)
 }
 
 const rTarget = /^target$/gm
