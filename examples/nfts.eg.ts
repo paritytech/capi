@@ -15,7 +15,7 @@ import {
   RuntimeEvent,
 } from "@capi/rococo-dev-westmint"
 import { assertEquals } from "asserts"
-import { $, createDevUsers, Rune } from "capi"
+import { $, createDevUsers, is, Rune } from "capi"
 import { DefaultCollectionSetting, DefaultItemSetting } from "capi/patterns/nfts.ts"
 import { signature } from "capi/patterns/signature/statemint.ts"
 
@@ -72,7 +72,7 @@ await rococoDevWestmint.Nfts
 
 const owner = rococoDevWestmint.Nfts.Item
   .value([collection, item])
-  .unhandle(undefined)
+  .unhandle(is(undefined))
   .access("owner")
 
 /// Retrieve the final owner.
@@ -105,7 +105,7 @@ await rococoDevWestmint.Utility
 /// Retrieve the price of the NFT.
 const bidPrice = await rococoDevWestmint.Nfts.ItemPriceOf
   .value([collection, item])
-  .unhandle(undefined)
+  .unhandle(is(undefined))
   .access(0)
   .run()
 

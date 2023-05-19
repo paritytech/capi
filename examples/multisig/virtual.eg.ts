@@ -19,7 +19,7 @@
 
 import { MultiAddress, polkadotDev } from "@capi/polkadot-dev"
 import { assert } from "asserts"
-import { $, createDevUsers, Rune, Sr25519 } from "capi"
+import { $, createDevUsers, is, Rune, Sr25519 } from "capi"
 import { VirtualMultisigRune } from "capi/patterns/multisig/mod.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 import { parse } from "../../deps/std/flags.ts"
@@ -64,7 +64,7 @@ await polkadotDev.Balances
 /// Reference David's free balance.
 const davidFree = polkadotDev.System.Account
   .value(david.publicKey)
-  .unhandle(undefined)
+  .unhandle(is(undefined))
   .access("data", "free")
 
 /// Retrieve David's initial free.

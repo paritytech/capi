@@ -6,6 +6,7 @@ import {
   CodecRune,
   ExtrinsicRune,
   hex,
+  is,
   Rune,
   RunicArgs,
   Ss58Rune,
@@ -92,26 +93,26 @@ export class InkMetadataRune<out U> extends Rune<InkMetadata, U> {
     const { code } = props
     const salt = Rune
       .resolve(props.salt)
-      .unhandle(undefined)
-      .rehandle(undefined, this.salt)
+      .unhandle(is(undefined))
+      .rehandle(is(undefined), this.salt)
     const storageDepositLimit = Rune.resolve(props.storageDepositLimit)
     const value = Rune
       .resolve(props.value)
-      .unhandle(undefined)
-      .rehandle(undefined, () => Rune.constant(0n))
+      .unhandle(is(undefined))
+      .rehandle(is(undefined), () => Rune.constant(0n))
     const ctorMetadata = Rune.tuple([
       this
         .into(ValueRune)
         .access("spec", "constructors"),
       Rune
         .resolve(props.ctor)
-        .unhandle(undefined)
-        .rehandle(undefined, () => Rune.resolve("new")),
+        .unhandle(is(undefined))
+        .rehandle(is(undefined), () => Rune.resolve("new")),
     ])
       .map(([ctors, label]) => ctors.find((ctor) => ctor.label === label))
-      .unhandle(undefined)
-      .rehandle(undefined, () => Rune.constant(new CtorNotFoundError()))
-      .unhandle(CtorNotFoundError)
+      .unhandle(is(undefined))
+      .rehandle(is(undefined), () => Rune.constant(new CtorNotFoundError()))
+      .unhandle(is(CtorNotFoundError))
     const data = this.encodeData(ctorMetadata, props.args)
     const instantiateArgs = Rune
       .constant($contractsApiInstantiateArgs)
@@ -127,17 +128,13 @@ export class InkMetadataRune<out U> extends Rune<InkMetadata, U> {
       ]))
     const gasLimit = Rune
       .resolve(props.gasLimit)
-      .unhandle(undefined)
-      .rehandle(
-        undefined,
-        () => {
-          const args = instantiateArgs.map(hex.encode)
-          return chain.connection
-            .call("state_call", "ContractsApi_instantiate", args)
-            .map((result) => $contractsApiInstantiateResult.decode(hex.decode(result)))
-            .access("gasRequired")
-        },
-      )
+      .handle(is(undefined), () => {
+        const args = instantiateArgs.map(hex.encode)
+        return chain.connection
+          .call("state_call", "ContractsApi_instantiate", args)
+          .map((result) => $contractsApiInstantiateResult.decode(hex.decode(result)))
+          .access("gasRequired")
+      })
     return Rune
       .object({
         type: "Contracts",

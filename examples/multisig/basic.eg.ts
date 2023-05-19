@@ -22,7 +22,7 @@ const multisig = MultisigRune.from(polkadotDev, {
 /// Reference David's initial balance. We'll be executing a transfer of some funds to David.
 const davidFree = polkadotDev.System.Account
   .value(david.publicKey)
-  .unhandle(undefined)
+  .unhandle(is(undefined))
   .access("data", "free")
 
 /// Execute the `davidFree` Rune.

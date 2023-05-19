@@ -6,6 +6,7 @@ import {
   ChainRune,
   CodecRune,
   hex,
+  is,
   PatternRune,
   Rune,
   RunicArgs,
@@ -124,9 +125,9 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
   ) {
     return this
       .proposal(callHash, blockHash)
-      .unhandle(undefined)
+      .unhandle(is(undefined))
       .access("when")
-      .rehandle(undefined)
+      .rehandle(is(undefined))
   }
 
   // TODO: why the type errors?
