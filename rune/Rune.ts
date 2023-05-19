@@ -13,12 +13,24 @@ export class Batch {
     readonly wrapParent: <T, U>(rune: Run<T, U>) => Run<T, U> = (x) => x,
   ) {}
 
+  _currentTrace?: Trace
+
   primed = new Map<Rune<any, any>["_prime"], Run<any, any>>()
   prime<T, E>(rune: Rune<T, E>, signal: AbortSignal): Run<T, E> {
     const primed = getOrInit(
       this.primed,
       rune._prime,
-      () => this.getPrimed(rune) ?? rune._prime(this),
+      () => {
+        const existing = this.getPrimed(rune)
+        if (existing) return existing
+        const prevTrace = this._currentTrace
+        this._currentTrace = rune._trace
+        try {
+          return rune._prime(this)
+        } finally {
+          this._currentTrace = prevTrace
+        }
+      },
     )
     primed.reference(signal)
     return primed
@@ -58,8 +70,11 @@ export interface Rune<out T, out U = never> {
 }
 export class Rune<out T, out U = never> {
   declare private _
+  _trace: Trace
 
-  constructor(readonly _prime: (batch: Batch) => Run<T, U>) {}
+  constructor(readonly _prime: (batch: Batch) => Run<T, U>) {
+    this._trace = new Trace(`execution of the ${new.target.name} instantiated`)
+  }
 
   static new<T, U, A extends unknown[]>(
     ctor: new(batch: Batch, ...args: A) => Run<T, U>,
@@ -194,11 +209,14 @@ export class Rune<out T, out U = never> {
 
 export abstract class Run<T, U> {
   declare "": [T, U]
+  trace: Trace
 
   abortController = new AbortController()
   signal = this.abortController.signal
   constructor(readonly batch: Batch) {
     this.signal.addEventListener("abort", () => this.cleanup())
+    this.trace = batch._currentTrace
+      ?? new Trace(`execution of the ${new.target.name} instantiated`)
   }
 
   referenceCount = 0
@@ -223,7 +241,16 @@ export abstract class Run<T, U> {
         this._currentReceipt.novel = true
       }
       this._currentTime = time
-      this._currentPromise = this._evaluate(time, this._currentReceipt)
+      this._currentPromise = (async () => {
+        try {
+          return await this._evaluate(time, this._currentReceipt)
+        } catch (e) {
+          if (e instanceof Error) {
+            e.message = `${e.message.trimEnd()}\n\n${this.trace.from}\n`
+          }
+          throw e
+        }
+      })()
     }
     const _receipt = this._currentReceipt
     try {
@@ -355,7 +382,7 @@ class RunBubbleUnhandled<T, U> extends Run<T, never> {
       return await this.child.evaluate(time, receipt)
     } catch (e) {
       if (e instanceof Unhandled) {
-        throw new BubbleUnhandled(this.symbol, e.value)
+        throw new BubbleUnhandled(this.symbol, e.value, e.trace)
       }
       throw e
     }
@@ -374,7 +401,7 @@ class RunCaptureUnhandled<T, U1, U2> extends Run<T, U1 | U2> {
       return await this.child.evaluate(time, receipt)
     } catch (e) {
       if (e instanceof BubbleUnhandled && e.symbol === this.symbol) {
-        throw new Unhandled(e.value)
+        throw new Unhandled(e.value, e.trace)
       }
       throw e
     }
@@ -382,12 +409,12 @@ class RunCaptureUnhandled<T, U1, U2> extends Run<T, U1 | U2> {
 }
 
 class BubbleUnhandled<U> {
-  constructor(readonly symbol: symbol, readonly value: U) {}
+  constructor(readonly symbol: symbol, readonly value: U, readonly trace: Trace) {}
 }
 
 export class Unhandled<U = unknown> {
   declare private _
-  constructor(readonly value: U) {}
+  constructor(readonly value: U, readonly trace: Trace) {}
 }
 
 export type RunicArgs<X, A> =
@@ -403,5 +430,14 @@ export namespace RunicArgs {
     return args instanceof Array
       ? args.map(Rune.resolve)
       : Object.fromEntries(Object.entries(args).map(([k, v]) => [k, Rune.resolve(v)]))
+  }
+}
+
+export class Trace extends Error {
+  declare from: string
+  constructor(name: string) {
+    super()
+    Object.defineProperty(this, "name", { value: name })
+    Object.defineProperty(this, "from", { value: ("from " + this.stack).replace(/^/gm, "    ") })
   }
 }

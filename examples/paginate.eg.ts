@@ -14,7 +14,7 @@ const accountKeys = await polkadotDev.System.Account.keys({ limit: 10 }).run()
 console.log("Account keys:", accountKeys)
 $.assert($.sizedArray($.uint8Array, 10), accountKeys)
 
-// Reference the first 10 key-value pairs of a polkadot dev chain's system account map.
+/// Reference the first 10 key-value pairs of a polkadot dev chain's system account map.
 const accountEntries = await polkadotDev.System.Account.entries({ limit: 10 }).run()
 
 /// Each entry should be of type `[Uint8Array, AccountInfo]`

@@ -117,7 +117,6 @@ await Promise.all([
     scriptModule: false,
     shims: {
       deno: true,
-      crypto: true,
       custom: [{
         package: {
           name: "isomorphic-ws",
