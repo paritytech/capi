@@ -30,7 +30,7 @@ const allFiles = []
 for await (
   const { path } of fs.walkSync(".", {
     exts: [".ts"],
-    skip: [/\.test\.ts$/, /^(target|_tasks)\//],
+    skip: [/\.test\.ts$/, /^(target|_tasks|examples)\//],
     includeDirs: false,
   })
 ) allFiles.push(`./${path}`)
@@ -67,7 +67,6 @@ await Promise.all([
         ) => [`@capi/${packageName}`, `${server}${hash}/${packageName}.tar`]),
       ),
     },
-    importMap: "./_tasks/dnt_import_map.json",
     compilerOptions: {
       importHelpers: true,
       sourceMap: true,
@@ -146,16 +145,6 @@ await Promise.all([
     "target/npm/capi/types/rune/_empty.d.ts",
     { overwrite: true },
   ),
-  fs.copy(
-    "examples/ink/erc20.json",
-    "target/npm/esm/examples/ink/erc20.json",
-    { overwrite: true },
-  ),
-  fs.copy(
-    "examples/ink/erc20.wasm",
-    "target/npm/esm/examples/ink/erc20.wasm",
-    { overwrite: true },
-  ),
   editFile(
     "target/npm/capi/esm/main.js",
     (content) =>
@@ -220,3 +209,18 @@ await build({
   test: false,
   typeCheck: false,
 })
+
+await Promise.all(
+  [
+    fs.copy(
+      "examples/ink/erc20.json",
+      "target/npm/capi-examples/esm/examples/ink/erc20.json",
+      { overwrite: true },
+    ),
+    fs.copy(
+      "examples/ink/erc20.wasm",
+      "target/npm/m/capi-examples/esm/examples/ink/erc20.wasm",
+      { overwrite: true },
+    ),
+  ],
+)
