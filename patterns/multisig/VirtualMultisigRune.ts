@@ -6,6 +6,7 @@ import {
   ChainRune,
   CodecRune,
   hex,
+  is,
   MetaRune,
   PatternRune,
   Rune,
@@ -121,11 +122,7 @@ export class VirtualMultisigRune<out C extends Chain, out U>
     const { threshold } = props
     const existentialDepositAmount = Rune
       .resolve(props.existentialDepositAmount)
-      .unhandle(undefined)
-      .rehandle(
-        undefined,
-        () => chain.pallet("Balances").constant("ExistentialDeposit").decoded,
-      )
+      .handle(is(undefined), () => chain.pallet("Balances").constant("ExistentialDeposit").decoded)
     const suppliedStash = Rune.resolve(props.stash)
     const memberAccountIds = Rune.resolve(props.founders)
     const deployer = Rune.resolve(props.deployer)
