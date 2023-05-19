@@ -13,7 +13,7 @@ import { signature } from "capi/patterns/signature/polkadot"
 
 /// Initialize an `InkMetadataRune` with the raw Ink metadata text.
 const metadata = InkMetadataRune.fromMetadataText(
-  Deno.readTextFileSync(new URL(import.meta.resolve("./erc20.json"))),
+  Deno.readTextFileSync(new URL("./erc20.json", import.meta.url)),
 )
 
 /// Given that other examples may utilize this script, we'll allow the

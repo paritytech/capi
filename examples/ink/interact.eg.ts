@@ -23,7 +23,7 @@ await import("./deploy.eg.ts")
 const address = Deno.env.get("CONTRACT_SS58_ADDRESS")!
 
 /// Initialize an `InkMetadataRune` with the raw Ink metadata text.
-export const metadata = InkMetadataRune.fromMetadataText(
+const metadata = InkMetadataRune.fromMetadataText(
   Deno.readTextFileSync(new URL("./erc20.json", import.meta.url)),
 )
 

@@ -143,6 +143,16 @@ await Promise.all([
     "target/npm/types/rune/_empty.d.ts",
     { overwrite: true },
   ),
+  fs.copy(
+    "examples/ink/erc20.json",
+    "target/npm/esm/examples/ink/erc20.json",
+    { overwrite: true },
+  ),
+  fs.copy(
+    "examples/ink/erc20.wasm",
+    "target/npm/esm/examples/ink/erc20.wasm",
+    { overwrite: true },
+  ),
   editFile(
     "target/npm/esm/main.js",
     (content) =>

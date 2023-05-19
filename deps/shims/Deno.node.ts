@@ -1,3 +1,4 @@
+import * as fs from "fs"
 import { Command } from "./command.node.ts"
 
 declare const process: { env: Record<string, string> }
@@ -18,6 +19,9 @@ let _deno = {
     },
     toObject: () => ({ ...process.env }),
   },
+  readFileSync: (path: string | URL): Uint8Array =>
+    Buffer.from(fs.readFileSync(path, "binary"), "binary"),
+  readTextFileSync: (path: string | URL): string => fs.readFileSync(path, "utf8"),
 } as any as typeof globalThis.Deno
 
 export const Deno = new Proxy(
