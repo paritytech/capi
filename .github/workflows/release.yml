@@ -23,11 +23,11 @@ jobs:
       - name: Build NPM Package
         run: deno task dnt --version ${{steps.get_tag_version.outputs.tag_version}} --server ${{steps.get_tag_version.outputs.tag_version}}
       - run: npm pack
-        working-directory: "./target/npm"
+        working-directory: "./target/npm/capi"
       - uses: actions/upload-artifact@v3
         with:
           name: package
-          path: "./target/npm/*.tgz"
+          path: "./target/npm/capi/*.tgz"
       - uses: octokit/request-action@v2.x
         if: startsWith(github.ref, 'refs/tags/')
         with:
