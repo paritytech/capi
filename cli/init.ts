@@ -2,6 +2,7 @@ import { Command } from "../deps/cliffy.ts"
 import * as fs from "../deps/std/fs.ts"
 import { parse } from "../deps/std/jsonc.ts"
 import * as path from "../deps/std/path.ts"
+import { detectVersion } from "../server/detectVersion.ts"
 
 export const init = new Command()
   .description("Configure Capi in the current working directory")
@@ -33,7 +34,7 @@ async function runInitNode(packageJsonPath: string) {
     }
   }
   const dependencies = packageJson.dependencies ??= {}
-  dependencies.capi = "*"
+  dependencies.capi = detectVersion()
   const scripts = packageJson.scripts ??= {}
   scripts["capi:sync"] = "capi sync node"
   scripts["capi:serve"] = "capi serve"
