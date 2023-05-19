@@ -189,14 +189,18 @@ class RunHandle<T, T2 extends T, T3, U, U2> extends Run<Exclude<T, T2> | T3, U |
 
 class RunUnhandle<T, U> extends Run<T, U | T> {
   child
-  constructor(batch: Batch, child: Rune<T, U>, readonly guard: Guard<T, T>) {
+  constructor(
+    batch: Batch,
+    child: Rune<T, U>,
+    readonly guard: Guard<T, T>,
+  ) {
     super(batch)
     this.child = batch.prime(child, this.signal)
   }
 
   async _evaluate(time: number, receipt: Receipt) {
     const value = (await this.child.evaluate(time, receipt)) as T
-    if (checkGuard(value, this.guard)) throw new Unhandled(value)
+    if (checkGuard(value, this.guard)) throw new Unhandled(value, this.trace)
     return value
   }
 }
@@ -217,7 +221,7 @@ class RunThrows<T, U1, U2> extends Run<T, U1 | U2> {
       return await this.child.evaluate(time, receipt)
     } catch (e) {
       for (const guard of this.guards) {
-        if (checkGuard(e, guard)) throw new Unhandled(e)
+        if (checkGuard(e, guard)) throw new Unhandled(e, this.trace)
       }
       throw e
     }
