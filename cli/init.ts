@@ -1,7 +1,5 @@
 import { Command } from "../deps/cliffy.ts"
-import * as fs from "../deps/std/fs.ts"
 import { parse } from "../deps/std/jsonc.ts"
-import * as path from "../deps/std/path.ts"
 import { detectVersion } from "../server/detectVersion.ts"
 
 export const init = new Command()
@@ -11,17 +9,24 @@ export const init = new Command()
   .action(runInit)
 
 async function runInit() {
-  const packageJsonPath = path.join(Deno.cwd(), "package.json")
-  if (await fs.exists(packageJsonPath)) return await runInitNode(packageJsonPath)
-  let denoJsonPath = path.join(Deno.cwd(), "deno.json")
-  if (await fs.exists(denoJsonPath)) return await runInitDeno(denoJsonPath)
-  denoJsonPath += "c"
-  if (await fs.exists(denoJsonPath)) return await runInitDeno(denoJsonPath)
-  throw new Error("Could not find neither a `package.json` nor `deno.json`/`deno.jsonc`.")
+  try {
+    return await runInitNode("package.json")
+  } catch (_e) {
+    try {
+      return await runInitDeno("deno.json")
+    } catch (_e) {
+      try {
+        return await runInitDeno("deno.jsonc")
+      } catch (_e) {
+        throw new Error("Could not find neither a `package.json` nor `deno.json`/`deno.jsonc`.")
+      }
+    }
+  }
 }
 
 async function runInitNode(packageJsonPath: string) {
-  const packageJson = JSON.parse(await Deno.readTextFile(packageJsonPath))
+  const packageJsonContents = await Deno.readTextFile(packageJsonPath)
+  const packageJson = JSON.parse(packageJsonContents)
   if (!packageJson.type || packageJson.type !== "module") {
     throw new Error(
       "Cannot use Capi in a non-esm project. Set `package.json`'s `type` field to `\"module\"`",
