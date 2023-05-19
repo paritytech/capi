@@ -93,21 +93,18 @@ export class InkMetadataRune<out U> extends Rune<InkMetadata, U> {
     const { code } = props
     const salt = Rune
       .resolve(props.salt)
-      .unhandle(is(undefined))
-      .rehandle(is(undefined), this.salt)
+      .handle(is(undefined), this.salt)
     const storageDepositLimit = Rune.resolve(props.storageDepositLimit)
     const value = Rune
       .resolve(props.value)
-      .unhandle(is(undefined))
-      .rehandle(is(undefined), () => Rune.constant(0n))
+      .handle(is(undefined), () => Rune.constant(0n))
     const ctorMetadata = Rune.tuple([
       this
         .into(ValueRune)
         .access("spec", "constructors"),
       Rune
         .resolve(props.ctor)
-        .unhandle(is(undefined))
-        .rehandle(is(undefined), () => Rune.resolve("new")),
+        .handle(is(undefined), () => Rune.resolve("new")),
     ])
       .map(([ctors, label]) => ctors.find((ctor) => ctor.label === label))
       .unhandle(is(undefined))

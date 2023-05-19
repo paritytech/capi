@@ -25,8 +25,7 @@ export class StorageRune<
     const storageKey = this.$key.encoded(key).map(hex.encodePrefixed)
     return this.chain.connection
       .call("state_getStorage", storageKey, this.chain.blockHash(blockHash))
-      .unhandle(is(null))
-      .rehandle(is(null), () => Rune.constant(undefined))
+      .handle(is(null), () => Rune.constant(undefined))
   }
 
   value<X>(
@@ -53,8 +52,7 @@ export class StorageRune<
         this.$partialKey.encoded(partialKey).map(hex.encodePrefixed),
         this.chain.blockHash(blockHash),
       )
-      .unhandle(is(null))
-      .rehandle(is(null), () => Rune.constant(undefined))
+      .handle(is(null), () => Rune.constant(undefined))
   }
 
   default() {

@@ -31,7 +31,8 @@ export class IdentityInfoTranscoders<A extends Record<string, any>> {
       : []
     const pgpFingerprint = Rune
       .resolve(props.pgpFingerprint)
-      .unhandle(is(undefined)).map((v) => $.str.encode(v))
+      .unhandle(is(undefined))
+      .map((v) => $.str.encode(v))
       .rehandle(is(undefined))
     const rest = Rune
       .object(Object.fromEntries(REST_KEYS.map((key) => [
