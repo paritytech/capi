@@ -3,26 +3,24 @@ import * as fs from "../deps/std/fs.ts"
 import { parse } from "../deps/std/jsonc.ts"
 import * as path from "../deps/std/path.ts"
 
-// TODO: write to .gitignore
-
 export const init = new Command()
   .description("Configure Capi in the current working directory")
   .stopEarly()
-  .example("Configure Capi in the current directory", "capi init .")
+  .example("Configure Capi in the current directory", "capi init")
   .action(runInit)
 
 async function runInit() {
   const packageJsonPath = path.join(Deno.cwd(), "package.json")
-  if (fs.existsSync(packageJsonPath)) return runInitNode(packageJsonPath)
+  if (await fs.exists(packageJsonPath)) return await runInitNode(packageJsonPath)
   let denoJsonPath = path.join(Deno.cwd(), "deno.json")
-  if (fs.existsSync(denoJsonPath)) return runInitDeno(denoJsonPath)
+  if (await fs.exists(denoJsonPath)) return await runInitDeno(denoJsonPath)
   denoJsonPath += "c"
-  if (fs.existsSync(denoJsonPath)) return runInitDeno(denoJsonPath)
+  if (await fs.exists(denoJsonPath)) return await runInitDeno(denoJsonPath)
   throw new Error("Could not find neither a `package.json` nor `deno.json`/`deno.jsonc`.")
 }
 
-function runInitNode(packageJsonPath: string) {
-  const packageJson = JSON.parse(Deno.readTextFileSync(packageJsonPath))
+async function runInitNode(packageJsonPath: string) {
+  const packageJson = JSON.parse(await Deno.readTextFile(packageJsonPath))
   assertManifest(packageJson)
   const isTs = confirm("Are you using TypeScript?")
   const devDependencies = packageJson.devDependencies ??= {}
@@ -40,10 +38,10 @@ function runInitNode(packageJsonPath: string) {
   scripts["capi:sync"] = "capi sync node"
   scripts["capi:serve"] = "capi serve"
   Deno.writeTextFileSync(packageJsonPath, JSON.stringify(packageJsonPath, null, 2))
-  netsInit("capi", isTs)
+  await Promise.all([netsInit("capi", isTs), updateGitignore()])
 }
 
-function runInitDeno(denoJsonPath: string) {
+async function runInitDeno(denoJsonPath: string) {
   const denoJson = parse(Deno.readTextFileSync(denoJsonPath))
   assertManifest(denoJson)
   const tasks = denoJson.tasks ??= {}
@@ -51,10 +49,10 @@ function runInitDeno(denoJsonPath: string) {
   tasks["capi:sync"] = "deno task capi sync node"
   tasks["capi:serve"] = "deno task capi serve"
   Deno.writeTextFileSync(denoJsonPath, JSON.stringify(denoJson, null, 2))
-  netsInit("https://deno.land/x/capi/mod.ts", true)
+  await Promise.all([netsInit("https://deno.land/x/capi/mod.ts", true), updateGitignore()])
 }
 
-function netsInit(specifier: string, isTs: boolean) {
+async function netsInit(specifier: string, isTs: boolean) {
   const code = `import { bins, net } from "${specifier}"
 
 const bin = bins({
@@ -71,7 +69,20 @@ export const polkadot = net.ws({
   targets: { dev: polkadotDev },
 })
 `
-  Deno.writeTextFileSync("nets." + (isTs ? "ts" : "js"), code)
+  await Deno.writeTextFile("nets." + (isTs ? "ts" : "js"), code)
+}
+
+const rTarget = /^target$/gm
+
+async function updateGitignore() {
+  try {
+    const contents = await Deno.readTextFile(".gitignore")
+    if (!rTarget.test(contents)) {
+      await Deno.writeTextFile(".gitignore", contents + "\ntarget")
+    }
+  } catch (_e) {
+    await Deno.writeTextFile(".gitignore", "target\n")
+  }
 }
 
 function assertManifest(
