@@ -9,8 +9,8 @@
 import { contractsDev } from "@capi/contracts-dev"
 import { assert } from "asserts"
 import { $, createDevUsers, hex } from "capi"
-import { InkMetadataRune } from "capi/patterns/ink/mod.ts"
-import { signature } from "capi/patterns/signature/polkadot.ts"
+import { InkMetadataRune } from "capi/patterns/ink"
+import { signature } from "capi/patterns/signature/polkadot"
 
 /// Get two test users. Alexa will deploy, Billy will be the recipient of an erc20
 /// token transfer.

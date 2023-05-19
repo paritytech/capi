@@ -28,8 +28,8 @@ import {
 import { rococoDevXcmTrappist } from "@capi/rococo-dev-xcm-trappist"
 import { assert, assertNotEquals } from "asserts"
 import { $, alice as root, createDevUsers, Rune, ValueRune } from "capi"
-import { $siblId } from "capi/patterns/para_id.ts"
-import { signature } from "capi/patterns/signature/statemint.ts"
+import { $siblId } from "capi/patterns/para_id"
+import { signature } from "capi/patterns/signature/statemint"
 import { retry } from "../../deps/std/async.ts"
 
 const { alexa, billy } = await createDevUsers()

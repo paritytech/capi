@@ -8,7 +8,7 @@
 import { polkadotDev } from "@capi/polkadot-dev"
 import { assertEquals } from "asserts"
 import { createDevUsers } from "capi"
-import { signature } from "capi/patterns/signature/polkadot.ts"
+import { signature } from "capi/patterns/signature/polkadot"
 
 const { alexa } = await createDevUsers()
 
