@@ -38,7 +38,7 @@ async function runInitNode(packageJsonPath: string) {
   const scripts = packageJson.scripts ??= {}
   scripts["capi:sync"] = "capi sync node"
   scripts["capi:serve"] = "capi serve"
-  Deno.writeTextFileSync(packageJsonPath, JSON.stringify(packageJsonPath, null, 2))
+  Deno.writeTextFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2))
   await Promise.all([netsInit("capi", isTs), updateGitignore()])
 }
 
