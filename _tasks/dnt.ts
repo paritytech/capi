@@ -83,9 +83,9 @@ await Promise.all([
     ],
     mappings: {
       ...mappings,
-      "https://deno.land/x/wat_the_crypto@v0.0.1/mod.ts": {
+      "https://deno.land/x/wat_the_crypto@v0.0.2/mod.ts": {
         name: "wat-the-crypto",
-        version: "0.0.1",
+        version: "0.0.2",
       },
       "https://deno.land/x/scale@v0.11.2/mod.ts#=": {
         name: "scale-codec",
