@@ -166,6 +166,30 @@ async function editFile(path: string, modify: (content: string) => string) {
   await Deno.writeTextFile(path, modify(await Deno.readTextFile(path)))
 }
 
+await Promise.all([
+  new Deno.Command("npm", { args: ["pack"], cwd: `${Deno.cwd()}/target/npm/capi` }).output(),
+  ...capiCodegenPackageNames.map((
+    packageName,
+  ) =>
+    new Deno.Command("npm", {
+      args: ["pack"],
+      cwd: `${Deno.cwd()}/target/npm/capi/node_modules/@capi/${packageName}`,
+    }).output()
+  ),
+])
+
+await Deno.mkdir(`${Deno.cwd()}/target/npm/artifacts`, { recursive: true })
+{
+  for await (
+    const { path: file } of fs.walkSync("target/npm/capi", {
+      exts: [".tgz"],
+      includeDirs: false,
+    })
+  ) {
+    await Deno.rename(file, `${Deno.cwd()}/target/npm/artifacts/${path.parse(file).base}`)
+  }
+}
+
 const exampleEntryPoints: EntryPoint[] = []
 for await (
   const { path } of fs.walkSync(".", {
@@ -188,11 +212,11 @@ await build({
       "ts-node": "^10.9.1",
     },
     dependencies: {
-      capi: "../capi",
+      capi: "file:../artifacts/capi-v0.0.0-local.tgz",
       ...Object.fromEntries(
         capiCodegenPackageNames.map((
           packageName,
-        ) => [`@capi/${packageName}`, `../capi/node_modules/@capi/${packageName}`]),
+        ) => [`@capi/${packageName}`, `file:../artifacts/${packageName}-v0.0.0-TODO.tgz`]),
       ),
     },
   },
@@ -203,8 +227,7 @@ await build({
     lib: ["es2022.error", "dom.iterable"],
   },
   entryPoints: exampleEntryPoints,
-  importMap: "import_map.json",
-  mappings: { "./mod.ts": "capi" },
+  importMap: "import_map_examples.json",
   outDir: examplesOutDir,
   scriptModule: false,
   declaration: false,
@@ -222,7 +245,7 @@ await Promise.all(
     ),
     fs.copy(
       "examples/ink/erc20.wasm",
-      "target/npm/m/capi-examples/esm/examples/ink/erc20.wasm",
+      "target/npm/capi-examples/esm/examples/ink/erc20.wasm",
       { overwrite: true },
     ),
   ],
