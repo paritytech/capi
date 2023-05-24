@@ -87,9 +87,9 @@ await Promise.all([
     ],
     mappings: {
       ...mappings,
-      "https://deno.land/x/wat_the_crypto@v0.0.1/mod.ts": {
+      "https://deno.land/x/wat_the_crypto@v0.0.2/mod.ts": {
         name: "wat-the-crypto",
-        version: "0.0.1",
+        version: "0.0.2",
       },
       "https://deno.land/x/scale@v0.11.2/mod.ts#=": {
         name: "scale-codec",
@@ -115,6 +115,9 @@ await Promise.all([
       "node:net": "node:net",
       "node:http": "node:http",
       "node:stream": "node:stream",
+      "node:fs/promises": "node:fs/promises",
+      "https://raw.githubusercontent.com/paritytech/capi-binary-builds/f5baeca/streamToFile.ts":
+        "https://raw.githubusercontent.com/paritytech/capi-binary-builds/f5baeca/streamToFile.node.ts",
     },
     outDir: capiOutDir,
     scriptModule: false,
