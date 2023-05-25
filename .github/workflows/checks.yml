@@ -150,7 +150,7 @@ jobs:
             !target/**/db/full/*
             !target/**/paritydb/full/*
   examples-node:
-    name: Examples (Deno)
+    name: Examples (Node)
     runs-on: ubuntu-latest
     timeout-minutes: 15
     needs: cache
