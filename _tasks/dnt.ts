@@ -115,6 +115,7 @@ await Promise.all([
       "node:net": "node:net",
       "node:http": "node:http",
       "node:stream": "node:stream",
+      "node:fs": "node:fs",
       "node:fs/promises": "node:fs/promises",
       "https://raw.githubusercontent.com/paritytech/capi-binary-builds/f5baeca/streamToFile.ts":
         "https://raw.githubusercontent.com/paritytech/capi-binary-builds/f5baeca/streamToFile.node.ts",

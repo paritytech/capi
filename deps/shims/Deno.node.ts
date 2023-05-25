@@ -1,4 +1,4 @@
-import * as fs from "fs"
+import * as fs from "node:fs"
 import { Command } from "./command.node.ts"
 
 declare const process: { env: Record<string, string> }
