@@ -227,6 +227,16 @@ await build({
     lib: ["es2022.error", "dom.iterable"],
   },
   entryPoints: exampleEntryPoints,
+  mappings: {
+    "https://deno.land/x/polkadot@0.2.40/keyring/mod.ts": {
+      name: "@polkadot/keyring",
+      version: "12.2.1",
+    },
+    "https://deno.land/x/polkadot@0.2.40/types/mod.ts": {
+      name: "@polkadot/types",
+      version: "10.7.2",
+    },
+  },
   importMap: "import_map_examples.json",
   outDir: examplesOutDir,
   scriptModule: false,
