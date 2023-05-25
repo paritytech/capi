@@ -229,11 +229,11 @@ await build({
   },
   entryPoints: exampleEntryPoints,
   mappings: {
-    "https://deno.land/x/polkadot@0.2.40/keyring/mod.ts": {
+    "https://deno.land/x/polkadot@0.2.38/keyring/mod.ts": {
       name: "@polkadot/keyring",
       version: "12.2.1",
     },
-    "https://deno.land/x/polkadot@0.2.40/types/mod.ts": {
+    "https://deno.land/x/polkadot@0.2.38/types/mod.ts": {
       name: "@polkadot/types",
       version: "10.7.2",
     },
