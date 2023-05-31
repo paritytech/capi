@@ -1,6 +1,8 @@
 export function normalizeIdent(ident: string) {
   if (ident.startsWith("r#")) ident = ident.slice(2)
-  return ident.replace(/(?:[^\p{ID_Continue}]|_)+(.)/gu, (_, $1: string) => $1.toUpperCase())
+  return normalizeKeyword(
+    ident.replace(/(?:[^\p{ID_Continue}]|_)+(.)/gu, (_, $1: string) => $1.toUpperCase()),
+  )
 }
 
 export function normalizeDocs(docs: string[] | undefined): string {
@@ -17,4 +19,9 @@ export function normalizeTypeName(name: string) {
 
 export function normalizeVariableName(name: string) {
   return normalizeIdent(name).replace(/^./, (x) => x.toLowerCase())
+}
+
+const keywords = ["import"]
+function normalizeKeyword(ident: string) {
+  return keywords.includes(ident) ? ident + "_" : ident
 }
