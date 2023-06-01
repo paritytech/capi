@@ -118,7 +118,7 @@ export async function spawnDevNet({
       chainSpecPath,
       "--port",
       `${httpPort}`,
-      "--ws-port",
+      await getBinaryWsPortCliArg(binary),
       `${wsPort}`,
     ]
     if (bootnodes) {
@@ -169,4 +169,9 @@ async function spawnNode(tempDir: string, binary: string, args: string[], signal
       throw new Error(`process exited with code ${status.code} (${tempDir})`)
     }
   })
+}
+
+async function getBinaryWsPortCliArg(binary: string): Promise<string> {
+  const output = await new Deno.Command(binary, { args: ["--help"] }).output()
+  return new TextDecoder().decode(output.stdout).includes("--ws-port") ? "--ws-port" : "--rpc-port"
 }
