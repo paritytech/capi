@@ -9,19 +9,18 @@ export const init = new Command()
   .action(runInit)
 
 async function runInit() {
-  try {
-    return await runInitNode("package.json")
-  } catch (_e) {
-    try {
-      return await runInitDeno("deno.json")
-    } catch (_e) {
-      try {
-        return await runInitDeno("deno.jsonc")
-      } catch (_e) {
-        throw new Error("Could not find neither a `package.json` nor `deno.json`/`deno.jsonc`.")
-      }
+  for (
+    const [file, runInit] of [
+      ["package.json", runInitNode],
+      ["deno.json", runInitDeno],
+      ["deno.jsonc", runInitDeno],
+    ] as const
+  ) {
+    if (await isFile(file)) {
+      return await runInit(file)
     }
   }
+  throw new Error("Could not find neither a `package.json` nor `deno.json`/`deno.jsonc`.")
 }
 
 async function runInitNode(packageJsonPath: string) {
@@ -95,5 +94,13 @@ function assertManifest(
 ): asserts inQuestion is Record<string, Record<string, string>> {
   if (typeof inQuestion !== "object" || inQuestion === null) {
     throw new Error("Malformed manifest.")
+  }
+}
+
+async function isFile(path: string) {
+  try {
+    return (await Deno.stat(path)).isFile
+  } catch (_) {
+    return false
   }
 }
