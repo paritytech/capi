@@ -22,6 +22,9 @@ const syncDeno = withCommonOptions(new Command()
 
 export const sync = new Command()
   .description("Sync net specs and update your manifest")
+  .action(function() {
+    this.showHelp()
+  })
   .command("node", syncNode)
   .command("deno", syncDeno)
 
