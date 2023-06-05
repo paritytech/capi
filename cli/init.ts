@@ -32,9 +32,7 @@ async function runInitNode(packageJsonPath: string) {
     )
   }
   assertManifest(packageJson)
-  const devDependencies = packageJson.devDependencies ??= {}
   const dependencies = packageJson.dependencies ??= {}
-  if (!(dependencies["ts-node"] || devDependencies["ts-node"])) devDependencies["ts-node"] = "*"
   dependencies.capi = detectVersion() ?? "*"
   const scripts = packageJson.scripts ??= {}
   scripts["capi:sync"] = "capi sync node"

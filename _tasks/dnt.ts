@@ -56,12 +56,15 @@ await Promise.all([
       description: "Capi is a framework for crafting interactions with Substrate chains",
       license: "Apache-2.0",
       repository: "github:paritytech/capi",
-      dependencies: Object.fromEntries(
-        Object.keys(nets).map((key) => {
-          const name = normalizePackageName(key)
-          return [`@capi/${name}`, `${server}${hash}/${name}.tar`]
-        }),
-      ),
+      dependencies: {
+        ...Object.fromEntries(
+          Object.keys(nets).map((key) => {
+            const name = normalizePackageName(key)
+            return [`@capi/${name}`, `${server}${hash}/${name}.tar`]
+          }),
+        ),
+        "ts-node": "^10.9.1",
+      },
     },
     compilerOptions: {
       importHelpers: true,
