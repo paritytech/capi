@@ -106,8 +106,11 @@ export async function spawnDevNet({
     if (!keystoreAccount) throw new Error("ran out of keystore accounts")
     const nodeDir = path.join(tempDir, keystoreAccount)
     await Deno.mkdir(nodeDir, { recursive: true })
-    const httpPort = await getFreePort()
-    const wsPort = await getFreePort()
+    const [httpPort, wsPort, wsPortArgName_] = await Promise.all([
+      getFreePort(),
+      getFreePort(),
+      wsPortArgName(binary),
+    ])
     ports.push(wsPort)
     const args = [
       "--validator",
@@ -118,7 +121,7 @@ export async function spawnDevNet({
       chainSpecPath,
       "--port",
       `${httpPort}`,
-      "--ws-port",
+      wsPortArgName_,
       `${wsPort}`,
     ]
     if (bootnodes) {
@@ -169,4 +172,9 @@ async function spawnNode(tempDir: string, binary: string, args: string[], signal
       throw new Error(`process exited with code ${status.code} (${tempDir})`)
     }
   })
+}
+
+async function wsPortArgName(binary: string): Promise<string> {
+  const output = await new Deno.Command(binary, { args: ["--help"] }).output()
+  return new TextDecoder().decode(output.stdout).includes("--ws-port") ? "--ws-port" : "--rpc-port"
 }
