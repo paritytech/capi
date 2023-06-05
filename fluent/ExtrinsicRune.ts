@@ -60,7 +60,7 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
 
   $callData = this.chain.into(ValueRune).access("metadata", "extrinsic", "call").into(CodecRune)
   callData = this.$callData.encoded(this)
-  callHex = this.callData.map(hex.encode)
+  hex = this.callData.map(hex.encode)
 
   $callHash = Rune
     .fn(($inner: $.Codec<unknown>) => blake2_256.$hash($inner))
