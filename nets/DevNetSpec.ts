@@ -171,7 +171,7 @@ async function spawnNode(tempDir: string, binary: string, args: string[], signal
   })
 }
 
-async function getBinaryWsPortCliArg(binary: string): Promise<string> {
+async function wsPortArgName(binary: string): Promise<string> {
   const output = await new Deno.Command(binary, { args: ["--help"] }).output()
   return new TextDecoder().decode(output.stdout).includes("--ws-port") ? "--ws-port" : "--rpc-port"
 }
