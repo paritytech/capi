@@ -9,6 +9,7 @@ import {
   PatternRune,
   Rune,
   RunicArgs,
+  ss58,
   ValueRune,
 } from "../../mod.ts"
 import { compareBytes } from "../../util/mod.ts"
@@ -38,6 +39,9 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
   threshold = this.value.map(({ threshold, signatories }) => threshold ?? signatories.length - 1)
   accountId = Rune.fn(multisigAccountId).call(this.value.access("signatories"), this.threshold)
   address = MultiAddress.Id(this.accountId)
+  ss58 = Rune
+    .tuple([this.chain.addressPrefix(), this.accountId])
+    .map(([prefix, accountId]) => ss58.encode(prefix, accountId))
   encoded = CodecRune.from($multisig).encoded(this.as(MultisigRune))
   hex = this.encoded.map(hex.encode)
 
