@@ -152,7 +152,7 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
         undefined | {
           when: { height: number; index: number }
           approvals: Uint8Array[]
-          depositor: bigint
+          depositor: Uint8Array
         }
       >()
       .into(ValueRune)
