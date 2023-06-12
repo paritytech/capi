@@ -1,4 +1,5 @@
 import { Command } from "../deps/cliffy.ts"
+import * as fs from "../deps/std/fs.ts"
 import { parse } from "../deps/std/jsonc.ts"
 import { detectVersion } from "../server/detectVersion.ts"
 
@@ -16,7 +17,7 @@ async function runInit() {
       ["deno.jsonc", runInitDeno],
     ] as const
   ) {
-    if (await isFile(file)) {
+    if (await fs.exists(file)) {
       return await runInit(file)
     }
   }
@@ -92,13 +93,5 @@ function assertManifest(
 ): asserts inQuestion is Record<string, Record<string, string>> {
   if (typeof inQuestion !== "object" || inQuestion === null) {
     throw new Error("Malformed manifest.")
-  }
-}
-
-async function isFile(path: string) {
-  try {
-    return (await Deno.stat(path)).isFile
-  } catch (_) {
-    return false
   }
 }
