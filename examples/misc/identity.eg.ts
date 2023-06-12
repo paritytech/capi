@@ -7,7 +7,7 @@
  */
 
 import { polkadotDev } from "@capi/polkadot-dev"
-import { $, createDevUsers } from "capi"
+import { $, createDevUsers, is } from "capi"
 import { IdentityInfoTranscoders } from "capi/patterns/identity.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 
@@ -34,7 +34,7 @@ await polkadotDev.Identity
 /// Retrieve and decode the identity info.
 const infoDecoded = await polkadotDev.Identity.IdentityOf
   .value(alexa.publicKey)
-  .unhandle(undefined)
+  .unhandle(is(undefined))
   .access("info")
   .pipe((raw) => transcoders.decode(raw))
   .run()

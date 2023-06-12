@@ -1,6 +1,6 @@
 import { hex } from "../crypto/mod.ts"
 import { known } from "../rpc/mod.ts"
-import { ArrayRune, Rune } from "../rune/mod.ts"
+import { ArrayRune, is, Rune } from "../rune/mod.ts"
 import { ValueRune } from "../rune/ValueRune.ts"
 import { BlockHashRune } from "./BlockHashRune.ts"
 import { Chain } from "./ChainRune.ts"
@@ -32,9 +32,8 @@ export class BlockRune<out C extends Chain, out U>
       .pallet("System")
       .storage("Events")
       .value(undefined!, this.parent)
-      .unhandle(undefined)
-      .rehandle(
-        undefined,
+      .handle(
+        is(undefined),
         () => Rune.constant([]).unsafeAs<Chain.Storage.Value<C, "System", "Events">>(),
       )
       .into(EventsRune, this.chain)

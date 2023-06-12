@@ -7,7 +7,7 @@
 
 import { polkadotDev } from "@capi/polkadot-dev"
 import { assert } from "asserts"
-import { $, createDevUsers } from "capi"
+import { $, createDevUsers, is } from "capi"
 import { MultisigRune } from "capi/patterns/multisig/mod.ts"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 
@@ -22,7 +22,7 @@ const multisig = MultisigRune.from(polkadotDev, {
 /// Reference David's initial balance. We'll be executing a transfer of some funds to David.
 const davidFree = polkadotDev.System.Account
   .value(david.publicKey)
-  .unhandle(undefined)
+  .unhandle(is(undefined))
   .access("data", "free")
 
 /// Execute the `davidFree` Rune.
@@ -60,7 +60,7 @@ assert(isProposed)
 
 const { approvals } = await multisig
   .proposal(call.callHash)
-  .unhandle(undefined)
+  .unhandle(is(undefined))
   .run()
 
 /// `approvals` should be a list of the approvers (account ids).
