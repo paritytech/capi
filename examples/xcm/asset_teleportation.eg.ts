@@ -26,7 +26,7 @@ import {
   RuntimeEvent,
 } from "@capi/rococo-dev-westmint"
 import { assert } from "asserts"
-import { createDevUsers, Rune } from "capi"
+import { createDevUsers, is, Rune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot"
 
 const { alexa } = await createDevUsers()
@@ -34,7 +34,7 @@ const { alexa } = await createDevUsers()
 /// Reference Alexa's free balance.
 const alexaBalance = rococoDevWestmint.System.Account
   .value(alexa.publicKey)
-  .unhandle(undefined)
+  .unhandle(is(undefined))
   .access("data", "free")
 
 /// Read the initial free.

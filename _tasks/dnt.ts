@@ -103,10 +103,6 @@ await Promise.all([
         name: "@substrate/smoldot-light",
         version: "0.7.6",
       },
-      "https://esm.sh/v113/shiki@0.14.1?bundle": {
-        name: "shiki",
-        version: "0.14.1",
-      },
       "./deps/shims/ws.ts": {
         name: "ws",
         version: "8.13.0",

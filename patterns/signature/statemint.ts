@@ -3,6 +3,7 @@ import {
   ChainRune,
   Era,
   hex,
+  is,
   Rune,
   RunicArgs,
   SignatureData,
@@ -34,10 +35,9 @@ export function signature<X, C extends Chain>(_props: RunicArgs<X, StatemintSign
             throw new Error("unimplemented")
         }
       })
-      .throws(ss58.InvalidPayloadLengthError)
+      .throws(is(ss58.InvalidPayloadLengthError))
     const nonce = Rune.resolve(props.nonce)
-      .unhandle(undefined)
-      .rehandle(undefined, () => chain.connection.call("system_accountNextIndex", senderSs58))
+      .handle(is(undefined), () => chain.connection.call("system_accountNextIndex", senderSs58))
     const genesisHashHex = chain.connection.call("chain_getBlockHash", 0).unsafeAs<string>()
       .into(ValueRune)
     const genesisHash = genesisHashHex.map(hex.decode)

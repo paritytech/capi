@@ -1,7 +1,5 @@
 import { $digestItem, DigestItem } from "@capi/polkadot"
-import { hex } from "../../crypto/mod.ts"
-import { Chain, ChainRune } from "../../fluent/mod.ts"
-import { RunicArgs, ValueRune } from "../../rune/mod.ts"
+import { Chain, ChainRune, hex, is, RunicArgs, ValueRune } from "../../mod.ts"
 
 export function preRuntimeDigest<C extends Chain, U, X>(
   chain: ChainRune<C, U>,
@@ -19,7 +17,7 @@ export function preRuntimeDigest<C extends Chain, U, X>(
         .find((digestItem): digestItem is DigestItem.PreRuntime => digestItem.type === "PreRuntime")
         ?? new CouldNotRetrievePreRuntimeDigestError()
     )
-    .unhandle(CouldNotRetrievePreRuntimeDigestError)
+    .unhandle(is(CouldNotRetrievePreRuntimeDigestError))
     .map(({ value: [typeEncoded, value] }) => ({
       type: new TextDecoder().decode(typeEncoded),
       value,

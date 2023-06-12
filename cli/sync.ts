@@ -71,6 +71,8 @@ async function runSync({
           delete packageJson.dependencies[packageName]
         }
       }
+
+      packageJson.dependencies = Object.fromEntries(Object.entries(packageJson.dependencies).sort())
     })
   }
 

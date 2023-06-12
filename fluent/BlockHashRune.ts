@@ -1,3 +1,4 @@
+import { is } from "../rune/mod.ts"
 import { BlockRune } from "./BlockRune.ts"
 import { Chain } from "./ChainRune.ts"
 import { PatternRune } from "./PatternRune.ts"
@@ -6,7 +7,7 @@ export class BlockHashRune<out C extends Chain, out U> extends PatternRune<strin
   block() {
     return this.chain.connection
       .call("chain_getBlock", this.as(BlockHashRune))
-      .unhandle(null)
+      .unhandle(is(null))
       .into(BlockRune, this.chain, this)
   }
 }

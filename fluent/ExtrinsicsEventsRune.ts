@@ -1,4 +1,4 @@
-import { Rune, ValueRune } from "../rune/mod.ts"
+import { is, Rune, ValueRune } from "../rune/mod.ts"
 import { Chain } from "./ChainRune.ts"
 import { CodecRune } from "./CodecRune.ts"
 import {
@@ -17,14 +17,14 @@ export class ExtrinsicEventsRune<out C extends Chain, out U> extends EventsRune<
       .map((events) =>
         events.find(isSystemExtrinsicFailedEvent) as SystemExtrinsicFailedEvent | undefined
       )
-      .unhandle(undefined)
+      .unhandle(is(undefined))
       .access("event", "value", "dispatchError")
       .map((dispatchError) => {
         // TODO: fix
         if ((dispatchError as any).type === "Module") return (dispatchError as any).value
         return new ExtrinsicError(dispatchError as any)
       })
-      .unhandle(ExtrinsicError)
+      .unhandle(is(ExtrinsicError))
     return Rune
       .tuple([
         this.chain.metadata.into(ValueRune).access("pallets"),
@@ -32,12 +32,12 @@ export class ExtrinsicEventsRune<out C extends Chain, out U> extends EventsRune<
       ])
       .map(([pallets, id]) => Object.values(pallets).find((pallet) => pallet.id === id)!)
       .access("types", "error")
-      .unhandle(undefined)
+      .unhandle(is(undefined))
       .into(CodecRune)
       .decoded(dispatchError.access("error"))
       .map((data) => new ExtrinsicError((typeof data === "string" ? { type: data } : data) as any))
-      .unhandle(ExtrinsicError)
-      .rehandle(undefined, () => this /* TODO: type-level exclusions? */)
+      .unhandle(is(ExtrinsicError))
+      .rehandle(is(undefined), () => this /* TODO: type-level exclusions? */)
   }
 }
 

@@ -7,7 +7,7 @@
 
 import { contractsDev } from "@capi/contracts-dev"
 import { assertInstanceOf } from "asserts"
-import { createDevUsers, ExtrinsicError } from "capi"
+import { createDevUsers, ExtrinsicError, is } from "capi"
 import { signature } from "capi/patterns/signature/polkadot"
 
 const { alexa, billy } = await createDevUsers()
@@ -23,7 +23,7 @@ const extrinsicError = await contractsDev.Balances
   .dbgStatus("Transfer:")
   .inBlockEvents()
   .unhandleFailed()
-  .rehandle(ExtrinsicError)
+  .rehandle(is(ExtrinsicError))
   .run()
 
 /// Ensure `extrinsicError` is in fact an instance of `ExtrinsicError`

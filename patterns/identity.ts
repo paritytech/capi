@@ -1,6 +1,6 @@
 import { Data, type IdentityInfo } from "@capi/polkadot-dev"
 import * as $ from "../deps/scale.ts"
-import { Rune, RunicArgs } from "../rune/mod.ts"
+import { is, Rune, RunicArgs } from "../mod.ts"
 
 export interface NarrowIdentityInfo<A extends Record<string, unknown>> {
   additional: A
@@ -27,20 +27,21 @@ export class IdentityInfoTranscoders<A extends Record<string, any>> {
             .entries(additionalCodecs)
             .map(([k, $v]) => [encodeStr(k), encoder($v)(additional[k])] as [Data, Data])
         )
-        .throws(IdentityDataSizeInvalidError)
+        .throws(is(IdentityDataSizeInvalidError))
       : []
     const pgpFingerprint = Rune
       .resolve(props.pgpFingerprint)
-      .unhandle(undefined).map((v) => $.str.encode(v))
-      .rehandle(undefined)
+      .unhandle(is(undefined))
+      .map((v) => $.str.encode(v))
+      .rehandle(is(undefined))
     const rest = Rune
       .object(Object.fromEntries(REST_KEYS.map((key) => [
         key,
         Rune
           .resolve(props[key])
-          .unhandle(undefined)
+          .unhandle(is(undefined))
           .map(encodeStr)
-          .rehandle(undefined, () => Rune.resolve(Data.None())),
+          .rehandle(is(undefined), () => Rune.resolve(Data.None())),
       ])))
       .unsafeAs<Record<typeof REST_KEYS[number], Data>>()
     return Rune
@@ -80,7 +81,7 @@ export class IdentityInfoTranscoders<A extends Record<string, any>> {
         )
         return { pgpFingerprint, additional, ...rest } as NarrowIdentityInfo<A>
       })
-      .throws(CouldNotDecodeIdentityInfoAdditionalKey)
+      .throws(is(CouldNotDecodeIdentityInfoAdditionalKey))
   }
 }
 

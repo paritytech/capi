@@ -27,7 +27,7 @@ import {
 } from "@capi/rococo-dev-xcm-statemine"
 import { rococoDevXcmTrappist } from "@capi/rococo-dev-xcm-trappist"
 import { assert, assertNotEquals } from "asserts"
-import { $, alice as root, createDevUsers, Rune, ValueRune } from "capi"
+import { $, alice as root, createDevUsers, is, Rune, ValueRune } from "capi"
 import { $siblId } from "capi/patterns/para_id"
 import { signature } from "capi/patterns/signature/statemint"
 import { retry } from "../../deps/std/async.ts"
@@ -81,7 +81,7 @@ await rococoDevXcm.Sudo
 
 /// Wait for the asset to be recorded in storage.
 const assetDetails = await retry(
-  () => rococoDevXcmStatemine.Assets.Asset.value(RESERVE_ASSET_ID).unhandle(undefined).run(),
+  () => rococoDevXcmStatemine.Assets.Asset.value(RESERVE_ASSET_ID).unhandle(is(undefined)).run(),
   retryOptions,
 )
 
@@ -104,7 +104,7 @@ await rococoDevXcmStatemine.Assets
 
 const billyStatemintBalance = rococoDevXcmStatemine.Assets.Account
   .value([RESERVE_ASSET_ID, billy.publicKey])
-  .unhandle(undefined)
+  .unhandle(is(undefined))
   .access("balance")
 
 const billyStatemintBalanceInitial = await billyStatemintBalance.run()
@@ -198,7 +198,7 @@ const { balance: billyTrappistBalance } = await retry(
   () =>
     rococoDevXcmTrappist.Assets.Account
       .value([TRAPPIST_ASSET_ID, billy.publicKey])
-      .unhandle(undefined)
+      .unhandle(is(undefined))
       .run(),
   retryOptions,
 )
@@ -217,7 +217,7 @@ assertNotEquals(billyStatemintBalanceInitial, billyStatemintBalanceFinal)
 /// Retrieve the statemint sovereign account balance.
 const statemintSovereignAccountBalance = await rococoDevXcmStatemine.Assets.Account
   .value([RESERVE_ASSET_ID, $siblId.encode(TRAPPIST_CHAIN_ID)])
-  .unhandle(undefined)
+  .unhandle(is(undefined))
   .access("balance")
   .run()
 

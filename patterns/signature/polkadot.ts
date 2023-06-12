@@ -2,7 +2,7 @@ import { Polkadot } from "@capi/polkadot"
 import { AddressPrefixChain, Chain, ChainRune } from "../../fluent/ChainRune.ts"
 import { ExtrinsicSender, SignatureData } from "../../fluent/ExtrinsicRune.ts"
 import { $, hex, ss58, ValueRune } from "../../mod.ts"
-import { Rune, RunicArgs } from "../../rune/mod.ts"
+import { is, Rune, RunicArgs } from "../../rune/mod.ts"
 import { Era } from "../../scale_info/overrides/Era.ts"
 
 export interface SignatureProps<T extends Chain> {
@@ -49,10 +49,9 @@ export function signature<X>(_props: RunicArgs<X, SignatureProps<PolkadotSignatu
           }
         }
       })
-      .throws(ss58.InvalidPayloadLengthError)
+      .throws(is(ss58.InvalidPayloadLengthError))
     const nonce = Rune.resolve(props.nonce)
-      .unhandle(undefined)
-      .rehandle(undefined, () => chain.connection.call("system_accountNextIndex", senderSs58))
+      .handle(is(undefined), () => chain.connection.call("system_accountNextIndex", senderSs58))
     const genesisHashHex = chain.connection.call("chain_getBlockHash", 0).unsafeAs<string>()
       .into(ValueRune)
     const genesisHash = genesisHashHex.map(hex.decode)

@@ -1,5 +1,5 @@
 import { known } from "../rpc/mod.ts"
-import { MetaRune, Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
+import { is, MetaRune, Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { BlockHashRune } from "./BlockHashRune.ts"
 import { BlockRune } from "./BlockRune.ts"
 import { Chain } from "./ChainRune.ts"
@@ -32,7 +32,7 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
         typeof status !== "string" && status.inBlock ? status.inBlock : new NeverInBlockError()
       )
       .singular()
-      .unhandle(NeverInBlockError)
+      .unhandle(is(NeverInBlockError))
       .into(BlockHashRune, this.chain)
   }
 
@@ -44,7 +44,7 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
           : new NeverFinalizedError()
       )
       .singular()
-      .unhandle(NeverFinalizedError)
+      .unhandle(is(NeverFinalizedError))
       .into(BlockHashRune, this.chain)
   }
 
@@ -63,7 +63,7 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
         const i = hexes.indexOf("0x" + hex)
         return i === -1 ? undefined : i
       })
-      .unhandle(undefined)
+      .unhandle(is(undefined))
     return Rune
       .tuple([block.events(), txI])
       .map(([events, txI]) =>
@@ -72,7 +72,7 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
           event.phase.type === "ApplyExtrinsic" && event.phase.value === txI
         )
       )
-      .rehandle(undefined, () => Rune.constant([]))
+      .rehandle(is(undefined), () => Rune.constant([]))
       .into(ExtrinsicEventsRune, this.chain)
   }
 }

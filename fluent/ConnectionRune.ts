@@ -1,6 +1,6 @@
 import { Calls, Subscription, Subscriptions } from "../rpc/known/mod.ts"
 import { Connection, ConnectionError, RpcSubscriptionMessage, ServerError } from "../rpc/mod.ts"
-import { Batch, MetaRune, Run, Rune, RunicArgs, RunStream } from "../rune/mod.ts"
+import { Batch, is, MetaRune, Run, Rune, RunicArgs, RunStream } from "../rune/mod.ts"
 
 class RunConnection extends Run<Connection, never> {
   constructor(
@@ -32,7 +32,7 @@ export class ConnectionRune<U> extends Rune<Connection, U> {
         if (result.error) throw new ServerError(result)
         return result.result as ReturnType<Calls[K]>
       })
-      .throws(ConnectionError, ServerError)
+      .throws(is(ConnectionError), is(ServerError))
   }
 
   subscribe<K extends keyof Subscriptions, X>(
@@ -56,7 +56,7 @@ export class ConnectionRune<U> extends Rune<Connection, U> {
         if (event.error) throw new ServerError(event)
         return event.params.result as Subscription.Result<ReturnType<Subscriptions[K]>>
       })
-      .throws(ConnectionError, ServerError)
+      .throws(is(ConnectionError), is(ServerError))
   }
 }
 

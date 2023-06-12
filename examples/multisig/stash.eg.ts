@@ -7,7 +7,7 @@
 
 import { MultiAddress, polkadotDev } from "@capi/polkadot-dev"
 import { assert } from "asserts"
-import { createDevUsers } from "capi"
+import { createDevUsers, is } from "capi"
 import { MultisigRune } from "capi/patterns/multisig"
 import { filterPureCreatedEvents } from "capi/patterns/proxy"
 import { signature } from "capi/patterns/signature/polkadot"
@@ -73,7 +73,7 @@ await polkadotDev.Balances
 /// Ensure that the funds arrived successfully.
 const stashFree = await polkadotDev.System.Account
   .value(stashAccountId)
-  .unhandle(undefined)
+  .unhandle(is(undefined))
   .access("data", "free")
   .run()
 

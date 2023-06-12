@@ -31,8 +31,36 @@ export type SignatureDataFactory<C extends Chain, CU, SU> = (
 export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain.Call<C>, C, U> {
   static readonly PROTOCOL_VERSION = 4
 
+  static from<C extends Chain, U, X>(
+    chain: ChainRune<C, U>,
+    ...args: RunicArgs<X, [call: Chain.Call<C>]>
+  ): ExtrinsicRune<C, U | RunicArgs.U<X>> {
+    const [call] = RunicArgs.resolve(args)
+    return call.into(ExtrinsicRune, chain)
+  }
+
+  static fromBytes<C extends Chain, U, X>(
+    chain: ChainRune<C, U>,
+    ...args: RunicArgs<X, [callBytes: Uint8Array]>
+  ) {
+    const $call = chain
+      .into(ValueRune)
+      .access("metadata", "extrinsic", "call")
+      .into(CodecRune)
+    const call = $call.decoded(args[0])
+    return this.from(chain, call)
+  }
+
+  static fromHex<C extends Chain, U, X>(
+    chain: ChainRune<C, U>,
+    ...[value]: RunicArgs<X, [value: string]>
+  ) {
+    return this.fromBytes(chain, Rune.resolve(value).map(hex.decode))
+  }
+
   $callData = this.chain.into(ValueRune).access("metadata", "extrinsic", "call").into(CodecRune)
   callData = this.$callData.encoded(this)
+  hex = this.callData.map(hex.encode)
 
   $callHash = Rune
     .fn(($inner: $.Codec<unknown>) => blake2_256.$hash($inner))

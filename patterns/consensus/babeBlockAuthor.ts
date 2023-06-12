@@ -1,7 +1,13 @@
 import { $preDigest } from "@capi/polkadot"
-import { AddressPrefixChain, ChainRune } from "../../fluent/mod.ts"
-import { AccountIdRune } from "../../fluent/mod.ts"
-import { Rune, RunicArgs, ValueRune } from "../../rune/mod.ts"
+import {
+  AccountIdRune,
+  AddressPrefixChain,
+  ChainRune,
+  is,
+  Rune,
+  RunicArgs,
+  ValueRune,
+} from "../../mod.ts"
 import { preRuntimeDigest } from "./preRuntimeDigest.ts"
 
 export function babeBlockAuthor<C extends AddressPrefixChain, U, X>(
@@ -14,19 +20,19 @@ export function babeBlockAuthor<C extends AddressPrefixChain, U, X>(
     .value(undefined!, blockHash)
     .unsafeAs<Uint8Array[] | undefined>()
     .into(ValueRune)
-    .unhandle(undefined)
+    .unhandle(is(undefined))
   const authorityIndex = preRuntimeDigest(chain, blockHash)
     .map(({ type, value }) => {
       if (type !== "BABE") return new AuthorRetrievalNotSupportedError()
       return $preDigest.decode(value)
     })
-    .unhandle(AuthorRetrievalNotSupportedError)
+    .unhandle(is(AuthorRetrievalNotSupportedError))
     .access("value", "authorityIndex")
   return Rune
     .tuple([validators, authorityIndex])
     // TODO: swap this out upon Rune-compatible ValueRune.access
     .map(([validators, authorityIndex]) => validators[authorityIndex])
-    .unhandle(undefined)
+    .unhandle(is(undefined))
     .into(AccountIdRune)
     .ss58(chain)
 }
