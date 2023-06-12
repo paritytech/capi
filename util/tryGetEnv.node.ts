@@ -5,5 +5,5 @@ declare global {
   export const process: Process
 }
 export function tryGetEnv(name: string): string | undefined {
-  return process.env?.[name]
+  return typeof process !== "undefined" ? process.env?.[name] : undefined
 }
