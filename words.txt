@@ -37,6 +37,7 @@ hrmp
 inherents
 instanceof
 instantiator
+keypair
 kiera
 libp
 lparachain
