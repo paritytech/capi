@@ -17,5 +17,5 @@ export function addDevUsers(genesisConfig: GenesisConfig) {
 }
 
 export function devUser(userId: number) {
-  return Sr25519.fromSeed(blake2_256.hash(new TextEncoder().encode(`capi-dev-user-${userId}`)))
+  return Sr25519.fromSeed64(blake2_256.hash(new TextEncoder().encode(`capi-dev-user-${userId}`)))
 }
