@@ -7,12 +7,12 @@
  */
 
 import { $eraRewardPoints, westend } from "@capi/westend"
-import { $ } from "capi"
+import { $, is } from "capi"
 
 /// Reference the active era index.
 const idx = westend.Staking.ActiveEra
   .value()
-  .unhandle(undefined)
+  .unhandle(is(undefined))
   .access("index")
 
 /// Retrieve the reward points corresponding to `idx`.

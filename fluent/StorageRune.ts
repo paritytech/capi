@@ -1,5 +1,5 @@
 import { hex } from "../crypto/mod.ts"
-import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
+import { is, Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { Chain } from "./ChainRune.ts"
 import { CodecRune } from "./CodecRune.ts"
 import { PatternRune } from "./PatternRune.ts"
@@ -25,8 +25,7 @@ export class StorageRune<
     const storageKey = this.$key.encoded(key).map(hex.encodePrefixed)
     return this.chain.connection
       .call("state_getStorage", storageKey, this.chain.blockHash(blockHash))
-      .unhandle(null)
-      .rehandle(null, () => Rune.constant(undefined))
+      .handle(is(null), () => Rune.constant(undefined))
   }
 
   value<X>(
@@ -36,9 +35,9 @@ export class StorageRune<
     ]>
   ) {
     return this.$value
-      .decoded(this.valueRaw(key, blockHash).unhandle(undefined).map(hex.decode))
+      .decoded(this.valueRaw(key, blockHash).unhandle(is(undefined)).map(hex.decode))
       .into(ValueRune)
-      .rehandle(undefined)
+      .rehandle(is(undefined))
   }
 
   size<X>(
@@ -53,14 +52,13 @@ export class StorageRune<
         this.$partialKey.encoded(partialKey).map(hex.encodePrefixed),
         this.chain.blockHash(blockHash),
       )
-      .unhandle(null)
-      .rehandle(null, () => Rune.constant(undefined))
+      .handle(is(null), () => Rune.constant(undefined))
   }
 
   default() {
     return this.$value
-      .decoded(this.into(ValueRune).access("default").unhandle(undefined))
-      .rehandle(undefined)
+      .decoded(this.into(ValueRune).access("default").unhandle(is(undefined)))
+      .rehandle(is(undefined))
   }
 
   entriesRaw<X, Y>(
@@ -99,13 +97,13 @@ export class StorageRune<
     )
       .map(hex.encodePrefixed)
     const startKey = this.$key
-      .encoded(Rune.resolve(props.start).unhandle(undefined))
+      .encoded(Rune.resolve(props.start).unhandle(is(undefined)))
       .map(hex.encodePrefixed)
-      .rehandle(undefined)
+      .rehandle(is(undefined))
     return this.chain.connection.call(
       "state_getKeysPaged",
       storageKey,
-      Rune.resolve(props.limit).handle(undefined, () => Rune.constant(100)),
+      Rune.resolve(props.limit).handle(is(undefined), () => Rune.constant(100)),
       startKey,
       this.chain.blockHash(blockHash),
     )

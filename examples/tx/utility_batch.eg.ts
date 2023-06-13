@@ -6,7 +6,7 @@
 
 import { westendDev } from "@capi/westend-dev"
 import { assert } from "asserts"
-import { createDevUsers, Rune } from "capi"
+import { createDevUsers, is, Rune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 
 /// Create four dev users, one of whom will be the batch sender. The other
@@ -16,7 +16,7 @@ const [sender, ...recipients] = await createDevUsers(4)
 /// Reference the three recipient user free balances as a single Rune.
 const frees = Rune.tuple(
   recipients.map(({ publicKey }) =>
-    westendDev.System.Account.value(publicKey).unhandle(undefined).access("data", "free")
+    westendDev.System.Account.value(publicKey).unhandle(is(undefined)).access("data", "free")
   ),
 )
 

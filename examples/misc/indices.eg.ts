@@ -7,7 +7,7 @@
 
 import { polkadotDev } from "@capi/polkadot-dev"
 import { assertEquals } from "asserts"
-import { createDevUsers } from "capi"
+import { createDevUsers, is } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 
 const { alexa } = await createDevUsers()
@@ -26,7 +26,7 @@ const hash = await polkadotDev.Indices
 /// Use the index to key into the indices accounts map.
 const mapped = await polkadotDev.Indices.Accounts
   .value(index, hash)
-  .unhandle(undefined)
+  .unhandle(is(undefined))
   .access(0)
   .run()
 

@@ -5,6 +5,7 @@ import {
   Event,
   ExtrinsicRune,
   hex,
+  is,
   PatternRune,
   Rune,
   RunicArgs,
@@ -43,14 +44,13 @@ export class InkRune<out C extends Chain, out U>
         props.method,
       ])
       .map(([msgs, methodName]) => msgs.find((msgs) => msgs.label === methodName))
-      .unhandle(undefined)
-      .rehandle(undefined, () => Rune.constant(new MethodNotFoundError()))
-      .unhandle(MethodNotFoundError)
+      .unhandle(is(undefined))
+      .rehandle(is(undefined), () => Rune.constant(new MethodNotFoundError()))
+      .unhandle(is(MethodNotFoundError))
     const data = this.parent.encodeData(msgMetadata, props.args)
     const value = Rune
       .resolve(props.value)
-      .unhandle(undefined)
-      .rehandle(undefined, () => Rune.constant(0n))
+      .handle(is(undefined), () => Rune.constant(0n))
     const innerResult = this.innerCall(props.sender, value, data)
     return { msgMetadata, data, value, innerResult }
   }

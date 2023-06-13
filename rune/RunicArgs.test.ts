@@ -1,4 +1,4 @@
-import { Rune, RunicArgs, ValueRune } from "./mod.ts"
+import { is, Rune, RunicArgs, ValueRune } from "./mod.ts"
 
 class E1 extends Error {
   1 = 1
@@ -10,10 +10,10 @@ class E3 extends Error {
   3 = 3
 }
 
-const e1 = Rune.constant(new E1()).unhandle(E1)
-const e2 = Rune.constant(new E2()).unhandle(E2)
-const e3 = Rune.constant(new E3()).unhandle(E3)
-const e1n = Rune.constant(new E1() as E1 | number).unhandle(E1)
+const e1 = Rune.constant(new E1()).unhandle(is(E1))
+const e2 = Rune.constant(new E2()).unhandle(is(E2))
+const e3 = Rune.constant(new E3()).unhandle(is(E3))
+const e1n = Rune.constant(new E1() as E1 | number).unhandle(is(E1))
 
 const add = <X>(...[a, b]: RunicArgs<X, [a: number, b: number]>) => {
   return Rune.tuple([a, b]).map(([a, b]) => a + b)

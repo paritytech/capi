@@ -6,7 +6,7 @@
 
 import { MultiAddress, westendDev } from "@capi/westend-dev"
 import { assert } from "asserts"
-import { createDevUsers, ExtrinsicSender } from "capi"
+import { createDevUsers, ExtrinsicSender, is } from "capi"
 import { signature } from "capi/patterns/signature/polkadot.ts"
 import * as ed from "../../deps/ed25519.ts"
 
@@ -15,7 +15,7 @@ const { alexa, billy } = await createDevUsers()
 /// Reference Billy's free balance for later use.
 const billyFree = westendDev.System.Account
   .value(billy.publicKey)
-  .unhandle(undefined)
+  .unhandle(is(undefined))
   .access("data", "free")
 
 const billyFreeInitial = await billyFree.run()

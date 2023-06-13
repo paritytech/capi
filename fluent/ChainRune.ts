@@ -2,7 +2,7 @@ import { hex } from "../crypto/mod.ts"
 import * as $ from "../deps/scale.ts"
 import { $extrinsic, decodeMetadata, FrameMetadata } from "../frame_metadata/mod.ts"
 import { Connection } from "../rpc/mod.ts"
-import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
+import { is, Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { BlockHashRune } from "./BlockHashRune.ts"
 import { CodecRune } from "./CodecRune.ts"
 import { ConnectionRune } from "./ConnectionRune.ts"
@@ -87,7 +87,7 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
   blockHash<X>(...[blockHash]: RunicArgs<X, [blockHash?: string]>) {
     return Rune
       .resolve(blockHash)
-      .handle(undefined, () => this.connection.call("chain_getFinalizedHead"))
+      .handle(is(undefined), () => this.connection.call("chain_getFinalizedHead"))
       .into(BlockHashRune, this)
   }
 
