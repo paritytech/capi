@@ -143,18 +143,18 @@ await Promise.all([
 
 await Promise.all([
   fs.copy(
-    "target/npm/capi/src/rune/_empty.d.ts",
-    "target/npm/capi/types/rune/_empty.d.ts",
+    "target/npm/src/rune/_empty.d.ts",
+    "target/npm/types/rune/_empty.d.ts",
     { overwrite: true },
   ),
   editFile(
-    "target/npm/capi/esm/main.js",
+    "target/npm/esm/main.js",
     (content) =>
       content
         .replace(/^#!.+/, "#!/usr/bin/env -S node --loader ts-node/esm"),
   ),
   editFile(
-    "target/npm/capi/esm/_dnt.shims.js",
+    "target/npm/esm/_dnt.shims.js",
     (content) =>
       content
         .replace(/"@deno\/shim-deno"/g, `"./deps/shims/Deno.node.js"`),
