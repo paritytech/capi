@@ -115,3 +115,11 @@ export function $extrinsic<M extends FrameMetadata>(metadata: M): $.Codec<Extrin
     $.lenPrefixed($baseExtrinsic),
   )
 }
+
+export class SignerError extends Error {
+  override readonly name = "SignerError"
+
+  constructor(readonly inner: unknown) {
+    super()
+  }
+}

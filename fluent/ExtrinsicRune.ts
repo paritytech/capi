@@ -1,8 +1,8 @@
 import { blake2_256, hex } from "../crypto/mod.ts"
 import * as $ from "../deps/scale.ts"
 import { concat } from "../deps/std/bytes.ts"
-import { Signer } from "../frame_metadata/Extrinsic.ts"
-import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
+import { Signer, SignerError } from "../frame_metadata/Extrinsic.ts"
+import { is, Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { Chain, ChainRune } from "./ChainRune.ts"
 import { CodecRune } from "./CodecRune.ts"
 import { PatternRune } from "./PatternRune.ts"
@@ -75,6 +75,7 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
         call: this,
         signature: signatureFactory(this.chain),
       }))
+      .throws(is(SignerError))
       .into(SignedExtrinsicRune, this.chain)
   }
 
