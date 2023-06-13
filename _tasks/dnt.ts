@@ -61,11 +61,14 @@ await Promise.all([
       description: "Capi is a framework for crafting interactions with Substrate chains",
       license: "Apache-2.0",
       repository: "github:paritytech/capi",
-      dependencies: Object.fromEntries(
-        capiCodegenPackageNames.map((
-          packageName,
-        ) => [`@capi/${packageName}`, `${server}${hash}/${packageName}.tar`]),
-      ),
+      dependencies: {
+        ...Object.fromEntries(
+          capiCodegenPackageNames.map((
+            packageName,
+          ) => [`@capi/${packageName}`, `${server}${hash}/${packageName}.tar`]),
+        ),
+        "ts-node": "^10.9.1",
+      },
     },
     compilerOptions: {
       importHelpers: true,
