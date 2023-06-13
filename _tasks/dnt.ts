@@ -112,7 +112,6 @@ await Promise.all([
         "https://raw.githubusercontent.com/paritytech/capi-binary-builds/f5baeca/streamToFile.node.ts",
     },
     outDir,
-    scriptModule: false,
     shims: {
       deno: true,
       custom: [{
