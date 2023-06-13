@@ -170,12 +170,5 @@ async function editFile(path: string, modify: (content: string) => string) {
 }
 
 async function writeTsLoader(path: string) {
-  const content = `
-import tsNode from "ts-node"
-
-const service = tsNode.create({ transpileOnly: true, compilerOptions: { module: "ESNext" } })
-
-export const { resolve, load, getFormat, transformSource } = tsNode.createEsmHooks(service)
-`
-  await Deno.writeTextFile(path, content)
+  await Deno.writeTextFile(path, `export * from "ts-node/esm"`)
 }
