@@ -1,7 +1,7 @@
 import { hex, ss58 } from "../../crypto/mod.ts"
 import * as $ from "../../deps/scale.ts"
-import { AddressPrefixChain, Chain, ChainRune } from "../../fluent/ChainRune.ts"
-import { ExtrinsicSender } from "../../fluent/ExtrinsicRune.ts"
+import { AddressPrefixChain, Chain, ChainRune, ExtrinsicSender } from "../../fluent/mod.ts"
+import { SignerError } from "../../frame_metadata/mod.ts"
 import { Rune, RunicArgs } from "../../rune/mod.ts"
 
 export type PjsSigner = { signPayload(payload: any): Promise<{ signature: string }> }
@@ -41,7 +41,12 @@ export function pjsSender<C extends AddressPrefixChain, CU>(
           sign: async (_: Uint8Array, fullData: Uint8Array) => {
             const payload = $pjsExtrinsic.decode(fullData)
             payload.address = address
-            const sig = await pjsSigner.signPayload(payload)
+            let sig
+            try {
+              sig = await pjsSigner.signPayload(payload)
+            } catch (e) {
+              throw new SignerError(e)
+            }
             return $sig.decode(hex.decode(sig.signature))
           },
         }

@@ -1,4 +1,4 @@
-import { blake2_256, Sr25519, ss58 } from "../../crypto/mod.ts"
+import { blake2_512, Sr25519, ss58 } from "../../crypto/mod.ts"
 import * as $ from "../../deps/scale.ts"
 import { devUserPublicKeysData } from "../../util/_artifacts/devUserPublicKeysData.ts"
 import { GenesisConfig } from "./ChainSpec.ts"
@@ -17,5 +17,5 @@ export function addDevUsers(genesisConfig: GenesisConfig) {
 }
 
 export function devUser(userId: number) {
-  return Sr25519.fromSeed(blake2_256.hash(new TextEncoder().encode(`capi-dev-user-${userId}`)))
+  return Sr25519.fromSeed64(blake2_512.hash(new TextEncoder().encode(`capi-dev-user-${userId}`)))
 }
