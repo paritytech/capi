@@ -3,6 +3,7 @@ import { Sr25519 as WatTheSr25519 } from "../deps/wat_the_crypto.ts"
 
 const ctx = new TextEncoder().encode("substrate")
 
+/** For the time being, this should only be used for testing */
 export class Sr25519 {
   keypair: WatTheSr25519
   address
