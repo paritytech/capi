@@ -91,13 +91,13 @@ await Promise.all([
         name: "scale-codec",
         version: "0.11.2",
       },
-      "https://deno.land/x/smoldot@light-js-deno-v0.7.6/index-deno.js": {
-        name: "@substrate/smoldot-light",
-        version: "0.7.6",
+      "https://deno.land/x/smoldot2@light-js-deno-v1.0.6/index-deno.js": {
+        name: "smoldot",
+        version: "1.0.6",
       },
-      "https://deno.land/x/smoldot@light-js-deno-v0.7.6/client.d.ts": {
-        name: "@substrate/smoldot-light",
-        version: "0.7.6",
+      "https://deno.land/x/smoldot2@light-js-deno-v1.0.6/public-types.d.ts": {
+        name: "smoldot",
+        version: "1.0.6",
       },
       "./deps/shims/ws.ts": {
         name: "ws",

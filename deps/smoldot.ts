@@ -1,5 +1,5 @@
+export * from "https://deno.land/x/smoldot2@light-js-deno-v1.0.6/index-deno.js"
 export type {
   Client,
   ClientOptions,
-} from "https://deno.land/x/smoldot@light-js-deno-v0.7.6/client.d.ts"
-export * from "https://deno.land/x/smoldot@light-js-deno-v0.7.6/index-deno.js"
+} from "https://deno.land/x/smoldot2@light-js-deno-v1.0.6/public-types.d.ts"
