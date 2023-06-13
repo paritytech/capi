@@ -1,7 +1,6 @@
 import { deferred } from "../deps/std/async.ts"
 import { getOrInit } from "../util/state.ts"
 import { EventSource, Receipt, Timeline } from "./Timeline.ts"
-import { Trace } from "./Trace.ts"
 
 // Hack to work around circularity issues
 // @deno-types="./_empty.d.ts"
@@ -188,13 +187,11 @@ export class Rune<out T, out U = never> {
     return Rune.new(RunPlaceholder)
   }
 
-  into<A extends unknown[], C extends Rune<any, any>>(
+  into<A extends unknown[], C>(
     ctor: new(_prime: (batch: Batch) => Run<T, U | RunicArgs.U<A>>, ...args: A) => C,
     ...args: A
   ): C {
-    const rune = new ctor(this._prime, ...args)
-    rune._trace = this._trace
-    return rune
+    return new ctor(this._prime, ...args)
   }
 
   as<R>(this: R, _ctor: new(_prime: (batch: Batch) => Run<T, U>, ...args: any) => R): R {
@@ -244,7 +241,16 @@ export abstract class Run<T, U> {
         this._currentReceipt.novel = true
       }
       this._currentTime = time
-      this._currentPromise = this.trace.runAsync(() => this._evaluate(time, this._currentReceipt))
+      this._currentPromise = (async () => {
+        try {
+          return await this._evaluate(time, this._currentReceipt)
+        } catch (e) {
+          if (e instanceof Error) {
+            e.message = `${e.message.trimEnd()}\n\n${this.trace.from}\n`
+          }
+          throw e
+        }
+      })()
     }
     const _receipt = this._currentReceipt
     try {
@@ -424,5 +430,14 @@ export namespace RunicArgs {
     return args instanceof Array
       ? args.map(Rune.resolve)
       : Object.fromEntries(Object.entries(args).map(([k, v]) => [k, Rune.resolve(v)]))
+  }
+}
+
+export class Trace extends Error {
+  declare from: string
+  constructor(name: string) {
+    super()
+    Object.defineProperty(this, "name", { value: name })
+    Object.defineProperty(this, "from", { value: ("from " + this.stack).replace(/^/gm, "    ") })
   }
 }
