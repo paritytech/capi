@@ -25,8 +25,7 @@ async function runInit() {
 }
 
 async function runInitNode(packageJsonPath: string) {
-  const packageJsonContents = await Deno.readTextFile(packageJsonPath)
-  const packageJson = JSON.parse(packageJsonContents)
+  const packageJson = JSON.parse(await Deno.readTextFile(packageJsonPath))
   if (!packageJson.type || packageJson.type !== "module") {
     throw new Error(
       "Cannot use Capi in a non-esm project. Set `package.json`'s `type` field to `\"module\"`",
@@ -72,7 +71,8 @@ export const polkadot = net.ws({
   targets: { dev: polkadotDev },
 })
 `
-  await Deno.writeTextFile("nets.ts", code)
+  const netsExtension = await fs.exists("tsconfig.json") ? "ts" : "js"
+  await Deno.writeTextFile(`nets.${netsExtension}`, code)
 }
 
 const rTarget = /^target$/gm

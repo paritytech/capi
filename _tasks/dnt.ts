@@ -134,7 +134,6 @@ await Promise.all([
   fs.copy("LICENSE", path.join(outDir, "LICENSE")),
   fs.copy("Readme.md", path.join(outDir, "Readme.md")),
   fs.copy("server/static/", path.join(outDir, "esm/server/static/")),
-  writeTsLoader(path.join(outDir, "ts-loader.js")),
 ])
 
 await Promise.all([
@@ -147,7 +146,7 @@ await Promise.all([
     "target/npm/esm/main.js",
     (content) =>
       content
-        .replace(/^#!.+/, "#!/usr/bin/env -S node --loader capi/ts-loader"),
+        .replace(/^#!.+/, "#!/usr/bin/env -S node --loader ts-node/esm"),
   ),
   editFile(
     "target/npm/esm/_dnt.shims.js",
@@ -155,20 +154,8 @@ await Promise.all([
       content
         .replace(/"@deno\/shim-deno"/g, `"./deps/shims/Deno.node.js"`),
   ),
-  editFile(
-    "target/npm/package.json",
-    (content) => {
-      const packageJson = JSON.parse(content)
-      packageJson.exports["./ts-loader"] = "./ts-loader.js"
-      return JSON.stringify(packageJson, undefined, 2)
-    },
-  ),
 ])
 
 async function editFile(path: string, modify: (content: string) => string) {
   await Deno.writeTextFile(path, modify(await Deno.readTextFile(path)))
-}
-
-async function writeTsLoader(path: string) {
-  await Deno.writeTextFile(path, `export * from "ts-node/esm"`)
 }
