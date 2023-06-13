@@ -19,8 +19,7 @@ let _deno = {
     },
     toObject: () => ({ ...process.env }),
   },
-  readFileSync: (path: string | URL): Uint8Array =>
-    Buffer.from(fs.readFileSync(path, "binary"), "binary"),
+  readFileSync: (path: string | URL): Uint8Array => fs.readFileSync(path),
   readTextFileSync: (path: string | URL): string => fs.readFileSync(path, "utf8"),
 } as any as typeof globalThis.Deno
 
