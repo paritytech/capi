@@ -166,13 +166,13 @@ async function editFile(path: string, modify: (content: string) => string) {
 }
 
 await Promise.all([
-  new Deno.Command("npm", { args: ["pack"], cwd: `${Deno.cwd()}/target/npm/capi` }).output(),
+  new Deno.Command("npm", { args: ["pack"], cwd: `${Deno.cwd()}/target/npm` }).output(),
   ...capiCodegenPackageNames.map((
     packageName,
   ) =>
     new Deno.Command("npm", {
       args: ["pack"],
-      cwd: `${Deno.cwd()}/target/npm/capi/node_modules/@capi/${packageName}`,
+      cwd: `${Deno.cwd()}/target/npm/node_modules/@capi/${packageName}`,
     }).output()
   ),
 ])
@@ -180,7 +180,7 @@ await Promise.all([
 await Deno.mkdir(`${Deno.cwd()}/target/npm/artifacts`, { recursive: true })
 {
   for await (
-    const { path: file } of fs.walkSync("target/npm/capi", {
+    const { path: file } of fs.walkSync("target/npm", {
       exts: [".tgz"],
       includeDirs: false,
     })
