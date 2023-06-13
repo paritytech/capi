@@ -4,7 +4,7 @@ import { emptyDir } from "../deps/std/fs.ts"
 import * as path from "../deps/std/path.ts"
 import dprintConfig from "../dprint.json" assert { type: "json" }
 import { devUser } from "../nets/mod.ts"
-import { compress } from "../util/mod.ts"
+import { compress } from "../util/compression.ts"
 
 export const DEV_USER_COUNT = 100_000
 
