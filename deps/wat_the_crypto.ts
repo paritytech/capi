@@ -1,1 +1,1 @@
-export * from "https://raw.githubusercontent.com/paritytech/wat-the-crypto/c5829a1/mod.ts"
+export * from "https://deno.land/x/wat_the_crypto@v0.0.3/mod.ts"
