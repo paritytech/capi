@@ -53,10 +53,10 @@ export class Trace extends Error {
 const marker = "__capi_rune_trace_marker-"
 
 // @ts-ignore V8 special property
-const original = Error.prepareStackTrace ?? prepareStackTrace
+const original: (err: Error, sites: Site[]) => string = Error.prepareStackTrace ?? prepareStackTrace
 
 // @ts-ignore V8 special property
-Error.prepareStackTrace = (err, sites) => {
+Error.prepareStackTrace = (err: Error, sites: Site[]): string => {
   for (let i = 0; i < sites.length; i++) {
     const fnName = sites[i]!.getFunctionName()
     if (fnName?.startsWith(marker)) {
@@ -70,7 +70,7 @@ Error.prepareStackTrace = (err, sites) => {
 }
 
 // Force deno to use the custom prepareStackTrace when an error isn't handled
-if ("Deno" in globalThis) {
+if ("Deno" in globalThis && !("_isShim" in Deno)) {
   globalThis.addEventListener("error", (e) => {
     handler(e.error)
   })
@@ -91,7 +91,7 @@ if ("Deno" in globalThis) {
 
 // Adapted from https://github.com/denoland/deno/blob/53487786/core/02_error.js
 
-function prepareStackTrace(error: Error, sites: any[]) {
+function prepareStackTrace(error: Error, sites: Site[]) {
   const formattedCallSites = sites
     .map(formatCallSite)
   const message = error.message !== undefined ? error.message : ""
@@ -107,73 +107,90 @@ function prepareStackTrace(error: Error, sites: any[]) {
   return messageLine + formattedCallSites.map((s) => `\n    at ${s}`).join("")
 }
 
-function formatLocation(site: any) {
+function formatLocation(site: Site) {
   if (site.isNative()) {
     return "native"
   }
   let result = ""
-  if (site.fileName()) {
-    result += site.fileName()
+  if (site.getFileName()) {
+    result += site.getFileName()
   } else {
     if (site.isEval()) {
-      if (site.evalOrigin() == null) {
+      if (site.getEvalOrigin() == null) {
         throw new Error("assert evalOrigin")
       }
-      result += `${site.evalOrigin()}, `
+      result += `${site.getEvalOrigin()}, `
     }
     result += "<anonymous>"
   }
-  if (site.lineNumber() != null) {
-    result += `:${site.lineNumber()}`
-    if (site.columnNumber() != null) {
-      result += `:${site.columnNumber()}`
+  if (site.getLineNumber() != null) {
+    result += `:${site.getLineNumber()}`
+    if (site.getColumnNumber() != null) {
+      result += `:${site.getColumnNumber()}`
     }
   }
   return result
 }
 
-function formatCallSite(site: any) {
+interface Site {
+  getTypeName(): string | undefined
+  getFunctionName(): string | undefined
+  getMethodName(): string | undefined
+  getFileName(): string | undefined
+  getLineNumber(): string | undefined
+  getColumnNumber(): string | undefined
+  getEvalOrigin(): string | undefined
+  isToplevel(): boolean
+  isEval(): boolean
+  isNative(): boolean
+  isConstructor(): boolean
+  isAsync(): boolean
+  isPromiseAll(): boolean
+  getPromiseIndex(): number | null
+}
+
+function formatCallSite(site: Site) {
   let result = ""
   if (site.isAsync()) {
     result += "async "
   }
   if (site.isPromiseAll()) {
-    result += `Promise.all (index ${site.promiseIndex()})`
+    result += `Promise.all (index ${site.getPromiseIndex()})`
     return result
   }
   const isMethodCall = !(site.isToplevel() || site.isConstructor())
   if (isMethodCall) {
-    if (site.functionName()) {
-      if (site.typeName()) {
-        if (!site.functionName.startsWith(site.typeName())) {
-          result += `${site.typeName()}.`
+    if (site.getFunctionName()) {
+      if (site.getTypeName()) {
+        if (!site.getFunctionName()!.startsWith(site.getTypeName()!)) {
+          result += `${site.getTypeName()}.`
         }
       }
-      result += site.functionName()
-      if (site.methodName()) {
-        if (!site.functionName().endsWith(site.methodName())) {
-          result += ` [as ${site.methodName()}]`
+      result += site.getFunctionName()
+      if (site.getMethodName()) {
+        if (!site.getFunctionName()!.endsWith(site.getMethodName()!)) {
+          result += ` [as ${site.getMethodName()}]`
         }
       }
     } else {
-      if (site.typeName()) {
-        result += `${site.typeName()}.`
+      if (site.getTypeName()) {
+        result += `${site.getTypeName()}.`
       }
-      if (site.methodName()) {
-        result += site.methodName()
+      if (site.getMethodName()) {
+        result += site.getMethodName()
       } else {
         result += "<anonymous>"
       }
     }
   } else if (site.isConstructor()) {
     result += "new "
-    if (site.functionName()) {
-      result += site.functionName()
+    if (site.getFunctionName()) {
+      result += site.getFunctionName()
     } else {
       result += "<anonymous>"
     }
-  } else if (site.functionName()) {
-    result += site.functionName()
+  } else if (site.getFunctionName()) {
+    result += site.getFunctionName()
   } else {
     result += formatLocation(site)
     return result
