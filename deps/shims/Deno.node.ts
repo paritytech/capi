@@ -32,4 +32,6 @@ export const Deno = new Proxy(
 export function register(newDeno: typeof globalThis.Deno) {
   _deno = newDeno
   _deno.Command = Command
+  // @ts-ignore
+  _deno._isShim = true
 }
