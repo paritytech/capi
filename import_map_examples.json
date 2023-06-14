@@ -1,7 +1,0 @@
-{
-  "scopes": {
-    "examples/": {
-      "asserts": "./deps/std/testing/asserts.ts"
-    }
-  }
-}

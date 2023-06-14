@@ -236,7 +236,7 @@ await build({
       version: "10.7.2",
     },
   },
-  importMap: "import_map_examples.json",
+  importMap: "_tasks/dnt_examples_import_map.json",
   outDir: examplesOutDir,
   scriptModule: false,
   declaration: false,
