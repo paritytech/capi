@@ -9,7 +9,7 @@ export { BitSequence } from "./deps/scale.ts"
 export * from "./server/client/createDevUsers.ts"
 export * from "./server/client/detectConnect.ts"
 
-// moderate --exclude main.ts nets.ts util server
+// moderate --exclude main.ts nets.ts util server nets
 
 export * from "./crypto/mod.ts"
 export * from "./fluent/mod.ts"
