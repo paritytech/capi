@@ -22,7 +22,7 @@ const {
 )
 
 const server = serverVersion ? `https://capi.dev/@${serverVersion}/` : "http://localhost:4646/"
-const hash = new URL(importMap.imports["@capi/"]).pathname.slice(1, -1)
+const hash = new URL(importMap.imports["@capi/"]).pathname.split("/").at(-2)!
 
 const outDir = path.join(Deno.cwd(), "target", "npm")
 const capiOutDir = path.join(outDir, "capi")
