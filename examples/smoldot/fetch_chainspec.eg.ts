@@ -12,4 +12,7 @@ import { polkadot } from "@capi/polkadot"
 const chainSpec = await polkadot.connection.call("sync_state_genSyncSpec", true).run()
 
 /// We'll print out the chainspec here. This can be written into a file for later use.
-console.log(JSON.stringify(chainSpec, null, 2))
+console.log(chainSpec)
+
+// Let's export it for use by the `smoldot.eg.ts` example.
+export const relayChainSpec = JSON.stringify(chainSpec, null, 2)

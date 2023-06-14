@@ -9,14 +9,11 @@
 import { PolkadotDevRune } from "@capi/polkadot-dev"
 import { $, known, SmoldotConnection } from "capi"
 
-/// Bring the chainspec into scope. Here, we'll import it from a local file.
-import relayChainSpec from "./chainspec.json" assert { type: "json" }
+/// Bring the chainspec into scope. Here, we'll import it from `fetch_chainspec.eg.ts`.
+import { relayChainSpec } from "./fetch_chainspec.eg.ts"
 
 /// Use the generate chain rune with `SmoldotConnection` and the chainspec.
-const polkadot = PolkadotDevRune
-  .from(SmoldotConnection.bind({
-    relayChainSpec: JSON.stringify(relayChainSpec),
-  }))
+const polkadot = PolkadotDevRune.from(SmoldotConnection.bind({ relayChainSpec }))
 
 // Utilize the smoldot-connected `PolkadotRune` instance.
 const { block } = await polkadot.blockHash().block().run()
