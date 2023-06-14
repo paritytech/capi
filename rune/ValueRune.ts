@@ -142,6 +142,65 @@ export class ValueRune<out T, out U = never> extends Rune<T, U> {
   chain<T2, U2>(fn: (result: ValueRune<T, never>) => Rune<T2, U2>): ValueRune<T2, U | U2> {
     return ValueRune.new(RunChain, this, fn(this as never))
   }
+
+  match<T, U, T2, U2>(
+    this: ValueRune<T, U>,
+    fn: (match: Match<T, never, never>) => ExhaustiveMatch<T2, U2>,
+  ): ValueRune<T2, U | U2> {
+    const match = new Match<T, never, never>(this as any as ValueRune<T, never>)
+    if (fn(match) !== match as any) {
+      throw new Error("The callback supplied to match must return the match passed in")
+    }
+    return ValueRune.new(RunMatch, this as any as ValueRune<T, never>, match.conditions)
+  }
+}
+
+type ExhaustiveMatch<T, U> = Match<never, T, U>
+class Match<M, T, U> {
+  conditions: [(x: M) => boolean, ValueRune<T, U>][] = []
+
+  constructor(readonly value: ValueRune<M, never>) {}
+
+  when<M2 extends M, T2, U2>(
+    guard: Guard<M, M2>,
+    fn: (value: ValueRune<M2, never>) => ValueRune<T2, U2>,
+  ): Match<Exclude<M, M2>, T | T2, U | U2> {
+    this.conditions.push([guard, fn(this.value as any) as any])
+    return this as any
+  }
+
+  else<T2, U2>(
+    fn: (value: ValueRune<M, never>) => ValueRune<T2, U2>,
+  ): ExhaustiveMatch<T | T2, U | U2> {
+    this.conditions.push([() => true, fn(this.value as any) as any])
+    return this as any
+  }
+}
+
+class RunMatch<M, T, U> extends Run<T, U> {
+  value
+  conditions
+  constructor(
+    batch: Batch,
+    child: Rune<M, never>,
+    conditions: [(x: M) => boolean, ValueRune<T, U>][],
+  ) {
+    super(batch)
+    this.value = batch.prime(child, this.signal)
+    this.conditions = conditions.map(([cond, val]) =>
+      [cond, batch.prime(val, this.signal)] as const
+    )
+  }
+
+  async _evaluate(time: number, receipt: Receipt) {
+    const value = await this.value.evaluate(time, receipt) as M
+    for (const [cond, val] of this.conditions) {
+      if (cond(value)) {
+        return await val.evaluate(time, receipt)
+      }
+    }
+    throw new Error("Match was not exhaustive")
+  }
 }
 
 class RunMap<T1, U, T2> extends Run<T2, U> {
