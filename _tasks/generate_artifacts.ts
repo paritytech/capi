@@ -5,7 +5,7 @@ import * as path from "../deps/std/path.ts"
 import dprintConfig from "../dprint.json" assert { type: "json" }
 import { devUser } from "../nets/chain_spec/addDevUsers.ts"
 
-export const DEV_USER_COUNT = 100_000
+export const DEV_USER_COUNT = 10_000
 
 const artifacts: Record<string, () => Promise<Uint8Array>> = {
   async tsFormatterWasm() {
@@ -13,9 +13,6 @@ const artifacts: Record<string, () => Promise<Uint8Array>> = {
       v.startsWith("https://plugins.dprint.dev/typescript-")
     )!
     return await fetchBinary(url)
-  },
-  async shikiWasm() {
-    return await fetchBinary("https://unpkg.com/shiki@0.14.1/dist/onig.wasm")
   },
   async devUserPublicKeysData() {
     const publicKeys = []
