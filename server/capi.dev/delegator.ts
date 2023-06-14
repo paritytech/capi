@@ -81,7 +81,7 @@ async function github<T>(url: string): Promise<T> {
     },
   })
   if (!response.ok) {
-    console.error(await response.text())
+    console.error(response.status, response.headers, await response.text())
     throw new Error(`${url}: invalid response`)
   }
   return await response.json()
