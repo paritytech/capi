@@ -16,7 +16,7 @@ const { version: packageVersion, server: serverVersion } = flags.parse(Deno.args
 const server = serverVersion ? `https://capi.dev/@${serverVersion}/` : "http://localhost:4646/"
 const hash = new URL(importMap.imports["@capi/"]).pathname.slice(1, -1)
 
-const outDir = path.join("target", "npm")
+const outDir = path.join(Deno.cwd(), "target", "npm")
 const capiOutDir = path.join(outDir, "capi")
 const examplesOutDir = path.join(outDir, "capi-examples")
 
@@ -50,7 +50,11 @@ for (const pathname of allFiles) {
   }
 }
 
-const capiCodegenPackageNames = Object.keys(nets).map((key) => normalizePackageName(key))
+const capiCodegenDeps = Object.fromEntries(
+  Object.keys(nets).map((key) => normalizePackageName(key)).map((
+    packageName,
+  ) => [`@capi/${packageName}`, `${server}${hash}/${packageName}.tar`]),
+)
 
 await Promise.all([
   build({
@@ -62,11 +66,7 @@ await Promise.all([
       license: "Apache-2.0",
       repository: "github:paritytech/capi",
       dependencies: {
-        ...Object.fromEntries(
-          capiCodegenPackageNames.map((
-            packageName,
-          ) => [`@capi/${packageName}`, `${server}${hash}/${packageName}.tar`]),
-        ),
+        ...capiCodegenDeps,
         "ts-node": "^10.9.1",
       },
     },
@@ -119,7 +119,7 @@ await Promise.all([
       "https://raw.githubusercontent.com/paritytech/capi-binary-builds/f5baeca/streamToFile.ts":
         "https://raw.githubusercontent.com/paritytech/capi-binary-builds/f5baeca/streamToFile.node.ts",
     },
-    outDir,
+    outDir: capiOutDir,
     shims: {
       deno: true,
       custom: [{
@@ -143,18 +143,18 @@ await Promise.all([
 
 await Promise.all([
   fs.copy(
-    "target/npm/src/rune/_empty.d.ts",
-    "target/npm/types/rune/_empty.d.ts",
+    path.join(capiOutDir, "src/rune/_empty.d.ts"),
+    path.join(capiOutDir, "types/rune/_empty.d.ts"),
     { overwrite: true },
   ),
   editFile(
-    "target/npm/esm/main.js",
+    path.join(capiOutDir, "esm/main.js"),
     (content) =>
       content
         .replace(/^#!.+/, "#!/usr/bin/env -S node --loader ts-node/esm"),
   ),
   editFile(
-    "target/npm/esm/_dnt.shims.js",
+    path.join(capiOutDir, "esm/_dnt.shims.js"),
     (content) =>
       content
         .replace(/"@deno\/shim-deno"/g, `"./deps/shims/Deno.node.js"`),
@@ -165,29 +165,14 @@ async function editFile(path: string, modify: (content: string) => string) {
   await Deno.writeTextFile(path, modify(await Deno.readTextFile(path)))
 }
 
-await Promise.all([
-  new Deno.Command("npm", { args: ["pack"], cwd: `${Deno.cwd()}/target/npm` }).output(),
-  ...capiCodegenPackageNames.map((
-    packageName,
-  ) =>
-    new Deno.Command("npm", {
-      args: ["pack"],
-      cwd: `${Deno.cwd()}/target/npm/node_modules/@capi/${packageName}`,
-    }).output()
+console.log(
+  new TextDecoder().decode(
+    (await new Deno.Command("npm", {
+      args: ["pack", "--pack-destination", outDir],
+      cwd: capiOutDir,
+    }).output()).stderr,
   ),
-])
-
-await Deno.mkdir(`${Deno.cwd()}/target/npm/artifacts`, { recursive: true })
-{
-  for await (
-    const { path: file } of fs.walkSync("target/npm", {
-      exts: [".tgz"],
-      includeDirs: false,
-    })
-  ) {
-    await Deno.rename(file, `${Deno.cwd()}/target/npm/artifacts/${path.parse(file).base}`)
-  }
-}
+)
 
 const exampleEntryPoints: EntryPoint[] = []
 for await (
@@ -211,12 +196,8 @@ await build({
       "ts-node": "^10.9.1",
     },
     dependencies: {
-      capi: `file:../artifacts/capi-${packageVersion}.tgz`,
-      ...Object.fromEntries(
-        capiCodegenPackageNames.map((
-          packageName,
-        ) => [`@capi/${packageName}`, `file:../artifacts/${packageName}-v0.0.0-TODO.tgz`]),
-      ),
+      ...capiCodegenDeps,
+      capi: `file:../capi-${packageVersion}.tgz`,
     },
   },
   compilerOptions: {
@@ -249,12 +230,12 @@ await Promise.all(
   [
     fs.copy(
       "examples/ink/erc20.json",
-      "target/npm/capi-examples/esm/examples/ink/erc20.json",
+      path.join(examplesOutDir, "esm/examples/ink/erc20.json"),
       { overwrite: true },
     ),
     fs.copy(
       "examples/ink/erc20.wasm",
-      "target/npm/capi-examples/esm/examples/ink/erc20.wasm",
+      path.join(examplesOutDir, "esm/examples/ink/erc20.wasm"),
       { overwrite: true },
     ),
   ],
