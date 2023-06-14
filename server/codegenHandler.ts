@@ -12,7 +12,7 @@ import { $metadata } from "../frame_metadata/raw/v14.ts"
 import { CacheBase } from "../util/cache/base.ts"
 import { WeakMemo } from "../util/memo.ts"
 import { normalizePackageName, normalizeVariableName } from "../util/mod.ts"
-import { tsFormatter } from "../util/tsFormatter.ts"
+import { tsFormatterPromise } from "../util/tsFormatter.ts"
 import { $codegenSpec, CodegenEntry } from "./CodegenSpec.ts"
 import * as f from "./factories.ts"
 import { getStatic } from "./getStatic.ts"
@@ -121,7 +121,7 @@ export function createCodegenHandler(dataCache: CacheBase, tempCache: CacheBase)
           const subpath = path.slice(`/${key}/`.length)
 
           if (!files.has(subpath)) throw f.notFound()
-          return tsFormatter.formatText(path, files.get(subpath)!)
+          return (await tsFormatterPromise).formatText(path, files.get(subpath)!)
         }),
     )
   }
@@ -167,7 +167,7 @@ export function createCodegenHandler(dataCache: CacheBase, tempCache: CacheBase)
                 path = `${prefix}/${path}`
               }
               if (/\.(js|ts)$/.test(path)) {
-                content = tsFormatter.formatText(path, content)
+                content = (await tsFormatterPromise).formatText(path, content)
               }
               rootFiles.set(path, content)
             }

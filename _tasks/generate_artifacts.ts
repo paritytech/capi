@@ -4,15 +4,16 @@ import { emptyDir } from "../deps/std/fs.ts"
 import * as path from "../deps/std/path.ts"
 import dprintConfig from "../dprint.json" assert { type: "json" }
 import { devUser } from "../nets/chain_spec/addDevUsers.ts"
+import { compress } from "../util/compression.ts"
 
 export const DEV_USER_COUNT = 10_000
 
 const artifacts: Record<string, () => Promise<Uint8Array>> = {
-  async tsFormatterWasm() {
+  async tsFormatterWasmCompressed() {
     const url = dprintConfig.plugins.find((v) =>
       v.startsWith("https://plugins.dprint.dev/typescript-")
     )!
-    return await fetchBinary(url)
+    return await compress(await fetchBinary(url))
   },
   async devUserPublicKeysData() {
     const publicKeys = []
