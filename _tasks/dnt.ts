@@ -6,12 +6,20 @@ import importMap from "../import_map.json" assert { type: "json" }
 import * as nets from "../nets.ts"
 import { normalizePackageName } from "../util/normalize.ts"
 
-const { version: packageVersion, server: serverVersion } = flags.parse(Deno.args, {
-  string: ["version", "server"],
-  default: {
-    version: "v0.0.0-local",
+const {
+  version: packageVersion,
+  server: serverVersion,
+  examples: buildExamples,
+} = flags.parse(
+  Deno.args,
+  {
+    string: ["version", "server"],
+    boolean: ["examples"],
+    default: {
+      version: "v0.0.0-local",
+    },
   },
-})
+)
 
 const server = serverVersion ? `https://capi.dev/@${serverVersion}/` : "http://localhost:4646/"
 const hash = new URL(importMap.imports["@capi/"]).pathname.slice(1, -1)
@@ -165,78 +173,76 @@ async function editFile(path: string, modify: (content: string) => string) {
   await Deno.writeTextFile(path, modify(await Deno.readTextFile(path)))
 }
 
-console.log(
-  new TextDecoder().decode(
-    (await new Deno.Command("npm", {
-      args: ["pack", "--pack-destination", outDir],
-      cwd: capiOutDir,
-    }).output()).stderr,
-  ),
-)
+await new Deno.Command("npm", {
+  args: ["pack", "--pack-destination", outDir],
+  cwd: capiOutDir,
+}).output()
 
-const exampleEntryPoints: EntryPoint[] = []
-for await (
-  const { path } of fs.walkSync(".", {
-    exts: [".eg.ts"],
-    includeDirs: false,
+if (buildExamples) {
+  const exampleEntryPoints: EntryPoint[] = []
+  for await (
+    const { path } of fs.walkSync(".", {
+      exts: [".eg.ts"],
+      includeDirs: false,
+    })
+  ) {
+    exampleEntryPoints.push({
+      name: path,
+      path: `./${path}`,
+    })
+  }
+
+  await build({
+    package: {
+      name: "capi-examples",
+      version: packageVersion,
+      type: "module",
+      devDependencies: {
+        "ts-node": "^10.9.1",
+      },
+      dependencies: {
+        ...capiCodegenDeps,
+        capi: `file:../capi-${packageVersion}.tgz`,
+      },
+    },
+    compilerOptions: {
+      importHelpers: true,
+      sourceMap: true,
+      target: "ES2021",
+      lib: ["es2022.error", "dom.iterable"],
+    },
+    entryPoints: exampleEntryPoints,
+    mappings: {
+      "https://deno.land/x/polkadot@0.2.38/keyring/mod.ts": {
+        name: "@polkadot/keyring",
+        version: "12.2.1",
+      },
+      "https://deno.land/x/polkadot@0.2.38/types/mod.ts": {
+        name: "@polkadot/types",
+        version: "10.7.2",
+      },
+    },
+    importMap: "_tasks/dnt_examples_import_map.json",
+    outDir: examplesOutDir,
+    scriptModule: false,
+    declaration: false,
+    shims: { deno: true },
+    test: false,
+    typeCheck: false,
   })
-) {
-  exampleEntryPoints.push({
-    name: path,
-    path: `./${path}`,
-  })
+
+  await Promise.all(
+    [
+      fs.copy(
+        "examples/ink/erc20.json",
+        path.join(examplesOutDir, "esm/examples/ink/erc20.json"),
+        { overwrite: true },
+      ),
+      fs.copy(
+        "examples/ink/erc20.wasm",
+        path.join(examplesOutDir, "esm/examples/ink/erc20.wasm"),
+        { overwrite: true },
+      ),
+    ],
+  )
 }
-
-await build({
-  package: {
-    name: "capi-examples",
-    version: packageVersion,
-    type: "module",
-    devDependencies: {
-      "ts-node": "^10.9.1",
-    },
-    dependencies: {
-      ...capiCodegenDeps,
-      capi: `file:../capi-${packageVersion}.tgz`,
-    },
-  },
-  compilerOptions: {
-    importHelpers: true,
-    sourceMap: true,
-    target: "ES2021",
-    lib: ["es2022.error", "dom.iterable"],
-  },
-  entryPoints: exampleEntryPoints,
-  mappings: {
-    "https://deno.land/x/polkadot@0.2.38/keyring/mod.ts": {
-      name: "@polkadot/keyring",
-      version: "12.2.1",
-    },
-    "https://deno.land/x/polkadot@0.2.38/types/mod.ts": {
-      name: "@polkadot/types",
-      version: "10.7.2",
-    },
-  },
-  importMap: "_tasks/dnt_examples_import_map.json",
-  outDir: examplesOutDir,
-  scriptModule: false,
-  declaration: false,
-  shims: { deno: true },
-  test: false,
-  typeCheck: false,
-})
-
-await Promise.all(
-  [
-    fs.copy(
-      "examples/ink/erc20.json",
-      path.join(examplesOutDir, "esm/examples/ink/erc20.json"),
-      { overwrite: true },
-    ),
-    fs.copy(
-      "examples/ink/erc20.wasm",
-      path.join(examplesOutDir, "esm/examples/ink/erc20.wasm"),
-      { overwrite: true },
-    ),
-  ],
-)
