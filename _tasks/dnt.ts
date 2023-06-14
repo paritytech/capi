@@ -211,7 +211,7 @@ await build({
       "ts-node": "^10.9.1",
     },
     dependencies: {
-      capi: "file:../artifacts/capi-v0.0.0-local.tgz",
+      capi: `file:../artifacts/capi-${packageVersion}.tgz`,
       ...Object.fromEntries(
         capiCodegenPackageNames.map((
           packageName,
