@@ -2,6 +2,7 @@ import { Command } from "./command.node.ts"
 
 declare const process: { env: Record<string, string> }
 let _deno = {
+  _isShim: true,
   errors: {
     NotFound: class NotFound extends Error {},
     AlreadyExists: class AlreadyExists extends Error {},
