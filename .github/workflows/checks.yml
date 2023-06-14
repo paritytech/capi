@@ -164,7 +164,6 @@ jobs:
           path: ~/.cache/deno
           key: cache-${{ env.CAPI_SHA }}
       - run: deno run -A _tasks/use_remote.ts
-      - run: deno task sync
       - run: deno task dnt
       - uses: actions/setup-node@v3
         with:
