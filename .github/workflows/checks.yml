@@ -139,12 +139,41 @@ jobs:
           path: ~/.cache/deno
           key: cache-${{ env.CAPI_SHA }}
       - run: deno run -A _tasks/use_remote.ts
-      - run: deno task test:eg
+      - run: deno task test:eg:deno
       - name: Archive target
         uses: actions/upload-artifact@v3
         if: failure() || cancelled()
         with:
           name: examples-deno-target
+          path: |
+            target
+            !target/**/db/full/*
+            !target/**/paritydb/full/*
+  examples-node:
+    name: Examples (Node)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: cache
+    steps:
+      - uses: actions/checkout@v3
+      - uses: denoland/setup-deno@61fe2df320078202e33d7d5ad347e7dcfa0e8f31 # v1.1.0
+        with:
+          deno-version: v1.33.3
+      - uses: actions/cache@v3
+        with:
+          path: ~/.cache/deno
+          key: cache-${{ env.CAPI_SHA }}
+      - run: deno run -A _tasks/use_remote.ts
+      - run: deno task dnt --server ${{ env.CAPI_SHA }} --examples
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+      - run: deno task test:eg:node
+      - name: Archive target
+        uses: actions/upload-artifact@v3
+        if: failure() || cancelled()
+        with:
+          name: examples-node-target
           path: |
             target
             !target/**/db/full/*

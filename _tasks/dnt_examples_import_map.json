@@ -1,0 +1,5 @@
+{
+  "imports": {
+    "asserts": "../deps/std/testing/asserts.ts"
+  }
+}

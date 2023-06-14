@@ -8,8 +8,8 @@
 
 import { polkadotDev } from "@capi/polkadot-dev"
 import { $, createDevUsers, is } from "capi"
-import { IdentityInfoTranscoders } from "capi/patterns/identity.ts"
-import { signature } from "capi/patterns/signature/polkadot.ts"
+import { IdentityInfoTranscoders } from "capi/patterns/identity"
+import { signature } from "capi/patterns/signature/polkadot"
 
 const { alexa } = await createDevUsers()
 

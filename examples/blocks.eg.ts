@@ -8,7 +8,7 @@
 
 import { $eventRecord, metadata, polkadot } from "@capi/polkadot"
 import { $, $extrinsic, known, Rune } from "capi"
-import { babeBlockAuthor } from "capi/patterns/consensus/mod.ts"
+import { babeBlockAuthor } from "capi/patterns/consensus"
 
 /// Reference the latest block hash.
 const blockHash = polkadot.blockHash()

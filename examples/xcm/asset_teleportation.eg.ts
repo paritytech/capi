@@ -27,7 +27,7 @@ import {
 } from "@capi/rococo-dev-westmint"
 import { assert } from "asserts"
 import { createDevUsers, is, Rune } from "capi"
-import { signature } from "capi/patterns/signature/polkadot.ts"
+import { signature } from "capi/patterns/signature/polkadot"
 
 const { alexa } = await createDevUsers()
 

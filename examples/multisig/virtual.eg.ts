@@ -20,8 +20,8 @@
 import { MultiAddress, polkadotDev } from "@capi/polkadot-dev"
 import { assert } from "asserts"
 import { $, createDevUsers, is, Rune, Sr25519 } from "capi"
-import { VirtualMultisigRune } from "capi/patterns/multisig/mod.ts"
-import { signature } from "capi/patterns/signature/polkadot.ts"
+import { VirtualMultisigRune } from "capi/patterns/multisig"
+import { signature } from "capi/patterns/signature/polkadot"
 import { parse } from "../../deps/std/flags.ts"
 
 const { alexa, billy, carol, david } = await createDevUsers()

@@ -14,6 +14,7 @@ chelios
 chev
 childstate
 codegen
+compat
 concat
 deno
 denoland

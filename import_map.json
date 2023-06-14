@@ -6,7 +6,17 @@
     "examples/": {
       "asserts": "./deps/std/testing/asserts.ts",
       "capi": "./mod.ts",
-      "capi/patterns/": "./patterns/"
+      "capi/patterns/compat/pjs_sender": "./patterns/compat/pjs_sender.ts",
+      "capi/patterns/consensus": "./patterns/consensus/mod.ts",
+      "capi/patterns/identity": "./patterns/identity.ts",
+      "capi/patterns/ink": "./patterns/ink/mod.ts",
+      "capi/patterns/multisig": "./patterns/multisig/mod.ts",
+      "capi/patterns/nfts": "./patterns/nfts.ts",
+      "capi/patterns/para_id": "./patterns/para_id.ts",
+      "capi/patterns/proxy": "./patterns/proxy/mod.ts",
+      "capi/patterns/signature/polkadot": "./patterns/signature/polkadot.ts",
+      "capi/patterns/signature/statemint": "./patterns/signature/statemint.ts",
+      "capi/patterns/storage_sizes": "./patterns/storage_sizes.ts"
     },
     "http://localhost:4646/": {
       "http://localhost:4646/capi/": "./"

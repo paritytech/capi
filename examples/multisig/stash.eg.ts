@@ -8,9 +8,9 @@
 import { MultiAddress, polkadotDev } from "@capi/polkadot-dev"
 import { assert } from "asserts"
 import { createDevUsers, is } from "capi"
-import { MultisigRune } from "capi/patterns/multisig/mod.ts"
-import { filterPureCreatedEvents } from "capi/patterns/proxy/mod.ts"
-import { signature } from "capi/patterns/signature/polkadot.ts"
+import { MultisigRune } from "capi/patterns/multisig"
+import { filterPureCreatedEvents } from "capi/patterns/proxy"
+import { signature } from "capi/patterns/signature/polkadot"
 
 const { alexa, billy, carol } = await createDevUsers()
 

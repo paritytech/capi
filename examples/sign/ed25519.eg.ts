@@ -7,7 +7,7 @@
 import { MultiAddress, westendDev } from "@capi/westend-dev"
 import { assert } from "asserts"
 import { createDevUsers, ExtrinsicSender, is } from "capi"
-import { signature } from "capi/patterns/signature/polkadot.ts"
+import { signature } from "capi/patterns/signature/polkadot"
 import * as ed from "../../deps/ed25519.ts"
 
 const { alexa, billy } = await createDevUsers()
