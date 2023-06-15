@@ -14,7 +14,7 @@ const { alexa } = await createDevUsers()
 const scope = new Scope()
 
 /// Generate a random (but reasonably large) index.
-const index = crypto.getRandomValues(new Uint32Array([0]))[0]! | 4646
+const index = (crypto.getRandomValues(new Uint32Array([0]))[0]! | 4646) >>> 0
 
 /// Claim the index.
 const hash = await polkadotDev.Indices
