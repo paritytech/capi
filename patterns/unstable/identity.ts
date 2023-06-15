@@ -1,6 +1,6 @@
 import { Data, type IdentityInfo } from "@capi/polkadot-dev"
-import * as $ from "../deps/scale.ts"
-import { is, Rune, RunicArgs } from "../mod.ts"
+import * as $ from "../../deps/scale.ts"
+import { is, Rune, RunicArgs } from "../../mod.ts"
 
 export interface NarrowIdentityInfo<A extends Record<string, unknown>> {
   additional: A

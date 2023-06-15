@@ -1,5 +1,5 @@
 import { $digestItem, DigestItem } from "@capi/polkadot"
-import { Chain, ChainRune, hex, is, RunicArgs, ValueRune } from "../../mod.ts"
+import { Chain, ChainRune, hex, is, RunicArgs, ValueRune } from "../../../mod.ts"
 
 export function preRuntimeDigest<C extends Chain, U, X>(
   chain: ChainRune<C, U>,

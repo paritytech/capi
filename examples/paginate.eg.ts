@@ -1,6 +1,5 @@
 /**
  * @title Paginate
- * @stability unstable
  * @description Read pages (either of keys or entries) from storage maps.
  */
 

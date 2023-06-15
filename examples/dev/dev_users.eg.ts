@@ -1,6 +1,5 @@
 /**
  * @title Create Dev Users
- * @stability nearing
  * @description When developing against a dev chain, the `createDevUsers` utility
  * provides `Sr25519` instances, which correspond to dev users who are pre-seeded with
  * funds. This simplifies signing extrinsics for submission to the given dev chain.

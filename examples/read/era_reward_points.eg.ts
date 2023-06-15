@@ -1,6 +1,5 @@
 /**
  * @title Read The Era Reward Points
- * @stability nearing
  * @description Model a derived read, in which one piece of storage (the staking
  * active era index)is used as the key to another piece of storage (the corresponding
  * reward points).

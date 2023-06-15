@@ -1,6 +1,5 @@
 /**
  * @title Ed25519 Signatures
- * @stability nearing
  * @description Utilize an Ed25519 library for signing.
  */
 

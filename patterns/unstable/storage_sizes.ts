@@ -1,5 +1,5 @@
-import { mapEntries } from "../deps/std/collections/map_entries.ts"
-import { Chain, ChainRune, MetaRune, Rune, RunicArgs, ValueRune } from "../mod.ts"
+import { mapEntries } from "../../deps/std/collections/map_entries.ts"
+import { Chain, ChainRune, MetaRune, Rune, RunicArgs, ValueRune } from "../../mod.ts"
 
 export function storageSizes<U, X>(
   chain: ChainRune<Chain, U>,

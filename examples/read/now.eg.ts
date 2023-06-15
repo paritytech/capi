@@ -1,6 +1,5 @@
 /**
  * @title Current Agreed-Upon Time
- * @stability nearing
  * @description Read the current timestamp as agreed upon by validators.
  */
 

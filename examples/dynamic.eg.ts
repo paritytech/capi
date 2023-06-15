@@ -1,6 +1,5 @@
 /**
  * @title Dynamic Usage
- * @stability nearing
  * @description You may want to write code whose target chain is unknown before
  * runtime. A common example of this is block explorers. Use cases such as this
  * are "dynamic" in that they require one to read the chain's metadata at runtime

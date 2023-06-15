@@ -1,6 +1,5 @@
 /**
  * @title Weights & Estimates
- * @stability nearing
  * @description Get the timepoint and estimate the fee of a tx.
  */
 

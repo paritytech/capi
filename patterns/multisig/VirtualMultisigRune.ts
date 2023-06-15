@@ -14,7 +14,7 @@ import {
   SignatureDataFactory,
   ValueRune,
 } from "../../mod.ts"
-import { filterPureCreatedEvents, replaceDelegateCalls } from "../proxy/mod.ts"
+import { filterPureCreatedEvents, replaceDelegateCalls } from "../unstable/proxy/mod.ts"
 import { MultisigRune } from "./MultisigRune.ts"
 
 export interface VirtualMultisig {

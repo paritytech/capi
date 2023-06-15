@@ -1,6 +1,5 @@
 /**
  * @title Rune Collections
- * @stability nearing
  * @description Parallelize resolution and collect results.
  */
 

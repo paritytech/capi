@@ -10,9 +10,9 @@ import {
   Rune,
   RunicArgs,
   Ss58Rune,
+  transformTys,
   ValueRune,
-} from "../../mod.ts"
-import { transformTys } from "../../scale_info/mod.ts"
+} from "../../../mod.ts"
 import { $contractsApiInstantiateArgs, $contractsApiInstantiateResult, Weight } from "./codecs.ts"
 import { Callable, InkMetadata, parse } from "./InkMetadata.ts"
 import { InkRune } from "./InkRune.ts"
