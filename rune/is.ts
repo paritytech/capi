@@ -14,9 +14,12 @@ export function is(guard: typeof Symbol): Guard<unknown, symbol>
 export function is(guard: true): Guard<unknown, true>
 export function is(guard: false): Guard<unknown, false>
 export function is<T>(guard: abstract new(...args: any) => T): Guard<unknown, T>
-export function is<T extends { type: string }, U extends T["type"]>(
+export function is<
+  T extends string | { type: string },
+  U extends T extends { type: string } ? T["type"] : T,
+>(
   guard: U,
-): Guard<T, Extract<T, { type: U }>>
+): Guard<T, Extract<T, U | { type: U }>>
 export function is(guard: any): Guard<unknown, any> {
   switch (guard) {
     case undefined:
@@ -81,8 +84,12 @@ function isFalse(x: unknown): x is false {
   return x === false
 }
 
-function isType<T extends { type: string }, U extends T["type"]>(type: U) {
-  return (value: T): value is Extract<T, { type: U }> => value.type === type
+function isType<
+  T extends string | { type: string },
+  U extends T extends { type: string } ? T["type"] : T,
+>(type: U) {
+  return (value: T): value is Extract<T, U | { type: U }> =>
+    (value as any) === type || (value as any).type === type
 }
 
 const isInstanceMemo = new WeakMap<abstract new(...args: any) => any, Guard<unknown, any>>()
