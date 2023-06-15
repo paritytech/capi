@@ -1,6 +1,5 @@
 import { assertEquals } from "../deps/std/testing/asserts.ts"
 import { Clock } from "../util/clock.ts"
-import { ValueRune } from "./_empty.d.ts"
 import { is, MetaRune, Rune, RunicArgs } from "./mod.ts"
 
 Deno.test("constant", async () => {
