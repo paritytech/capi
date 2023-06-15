@@ -1,5 +1,5 @@
 import { MultiAddress } from "@capi/polkadot"
-import { equals } from "../../deps/std/bytes.ts"
+import { equals } from "../../../deps/std/bytes.ts"
 import {
   $,
   Chain,
@@ -13,9 +13,9 @@ import {
   RunicArgs,
   SignatureDataFactory,
   ValueRune,
-} from "../../mod.ts"
-import { filterPureCreatedEvents, replaceDelegateCalls } from "../unstable/proxy/mod.ts"
-import { MultisigRune } from "./MultisigRune.ts"
+} from "../../../mod.ts"
+import { MultisigRune } from "../../multisig/MultisigRune.ts"
+import { filterPureCreatedEvents, replaceDelegateCalls } from "../proxy/mod.ts"
 
 export interface VirtualMultisig {
   members: [Uint8Array, Uint8Array][]

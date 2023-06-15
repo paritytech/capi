@@ -14,6 +14,7 @@
       "capi/patterns/unstable/consensus": "./patterns/unstable/consensus/mod.ts",
       "capi/patterns/unstable/identity": "./patterns/unstable/identity.ts",
       "capi/patterns/unstable/ink": "./patterns/unstable/ink/mod.ts",
+      "capi/patterns/unstable/multisig": "./patterns/unstable/multisig/mod.ts",
       "capi/patterns/unstable/nfts": "./patterns/unstable/nfts.ts",
       "capi/patterns/unstable/proxy": "./patterns/unstable/proxy/mod.ts",
       "capi/patterns/unstable/storage_sizes": "./patterns/unstable/storage_sizes.ts"
