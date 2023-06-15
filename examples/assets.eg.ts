@@ -7,8 +7,9 @@ const scope = new Scope()
 const { alexa, billy } = await createDevUsers()
 
 const ASSET_ID = 0
+const textEncoder = new TextEncoder()
+const textDecoder = new TextDecoder()
 
-// Create a new class of assets
 await rococoDevWestmint.Assets.create({
   id: ASSET_ID,
   admin: alexa.address,
@@ -19,7 +20,27 @@ await rococoDevWestmint.Assets.create({
   .finalized()
   .run(scope)
 
-// Mint 1000 units to Alexa
+await rococoDevWestmint.Assets.setMetadata({
+  id: ASSET_ID,
+  name: textEncoder.encode("Capi Socks"),
+  symbol: textEncoder.encode("CAPI"),
+  decimals: 2,
+}).signed(signature({ sender: alexa }))
+  .sent()
+  .dbgStatus("Set Metadata")
+  .finalized()
+  .run(scope)
+
+await rococoDevWestmint.Assets.Metadata.value(ASSET_ID)
+  .unhandle(is(undefined))
+  .dbg("Asset Metadata")
+  .map((metadata) => ({
+    ...metadata,
+    name: textDecoder.decode(metadata.name),
+    symbol: textDecoder.decode(metadata.symbol),
+  }))
+  .run(scope)
+
 await rococoDevWestmint.Assets.mint({
   id: ASSET_ID,
   beneficiary: alexa.address,
