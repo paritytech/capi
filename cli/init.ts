@@ -38,7 +38,7 @@ async function runInitNode(packageJsonPath: string) {
   scripts["capi:sync"] = "capi sync node"
   scripts["capi:serve"] = "capi serve"
   Deno.writeTextFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2))
-  await Promise.all([netsInit("capi"), updateGitignore()])
+  await Promise.all([netsInit("capi/nets"), updateGitignore()])
 }
 
 async function runInitDeno(denoJsonPath: string) {
@@ -46,12 +46,12 @@ async function runInitDeno(denoJsonPath: string) {
   assertManifest(denoJson)
   const tasks = denoJson.tasks ??= {}
   const version = detectVersion()
-  const versioned = `http://deno.land/x/capi${version ? `@${version}` : ""}/main.ts`
-  tasks["capi"] = `deno run -A ${versioned}`
+  const versioned = `http://deno.land/x/capi${version ? `@${version}` : ""}`
+  tasks["capi"] = `deno run -A ${versioned}/main.ts`
   tasks["capi:sync"] = "deno task capi sync node"
   tasks["capi:serve"] = "deno task capi serve"
   Deno.writeTextFileSync(denoJsonPath, JSON.stringify(denoJson, null, 2))
-  await Promise.all([netsInit(versioned), updateGitignore()])
+  await Promise.all([netsInit(`${versioned}/nets/mod.ts`), updateGitignore()])
 }
 
 async function netsInit(specifier: string) {
