@@ -38,7 +38,7 @@ const allFiles = []
 for await (
   const { path } of fs.walkSync(".", {
     exts: [".ts"],
-    skip: [/\.test\.ts$/, /^(target|_tasks|examples)\//, /nets\.ts/],
+    skip: [/\.test\.ts$/, /^(target|_tasks|examples)\//, /^nets\.ts$/],
     includeDirs: false,
   })
 ) allFiles.push(`./${path}`)
