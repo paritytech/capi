@@ -102,7 +102,7 @@ await rococoDevWestmint.Assets.freeze({
   .finalized()
   .run(scope)
 
-assertRejects(async () =>
+await assertRejects(async () =>
   rococoDevWestmint.Assets.transfer({
     id: ASSET_ID,
     target: carol.address,
@@ -144,6 +144,21 @@ const carolBalance = await rococoDevWestmint.Assets.Account
   .run(scope)
 
 assertEquals(carolBalance, 1n, "Carol Balance")
+
+await rococoDevWestmint.Utility.batchAll({
+  calls: Rune.array([alexa.address, billy.address, carol.address])
+    .mapArray((addr) =>
+      rococoDevWestmint.Assets.burn({
+        id: ASSET_ID,
+        who: addr,
+        amount: 100_000_000_000_000n,
+      })
+    ),
+}).signed(signature({ sender: alexa }))
+  .sent()
+  .dbgStatus("Burn Everything:")
+  .finalized()
+  .run(scope)
 
 await rococoDevWestmint.Assets.startDestroy({
   id: ASSET_ID,
