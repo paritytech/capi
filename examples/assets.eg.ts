@@ -1,3 +1,9 @@
+/**
+ * @title Asset Palette Example
+ * @stability unstable
+ * @description Various calls utilizing the asset palette
+ */
+
 import { rococoDevWestmint } from "@capi/rococo-dev-westmint"
 import { assertEquals, assertRejects } from "asserts"
 import { createDevUsers, is, Rune, Scope } from "capi"
