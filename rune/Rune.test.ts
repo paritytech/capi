@@ -251,3 +251,41 @@ async function* iter<T>(values: T[]) {
     yield value
   }
 }
+
+Deno.test("match abc", async () => {
+  for (
+    const value of [
+      { type: "a", a: 0 },
+      { type: "b", b: "0" },
+      { type: "c", c: false },
+    ] as const
+  ) {
+    const result = await Rune.constant(value).match((_) =>
+      _
+        .when(is("a"), (x) => x.access("a"))
+        .when(is("b"), (x) => x.access("b"))
+        .else((x) => x.access("c"))
+    ).run()
+    assertEquals(+result, 0)
+  }
+})
+
+Deno.test("match u", async () => {
+  assertEquals(
+    await Rune
+      .constant("hello")
+      .unhandle(is(String))
+      .match((_) =>
+        _.else((x) =>
+          x
+            .rehandle((_: never): _ is never => true)
+            .map(() => {
+              throw new Error("unreachable")
+            })
+        )
+      )
+      .rehandle(is(String))
+      .run(),
+    "hello",
+  )
+})
