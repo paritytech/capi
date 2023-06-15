@@ -6,8 +6,10 @@
 
 import { westendDev } from "@capi/westend-dev"
 import { assert } from "asserts"
-import { createDevUsers, is, Rune } from "capi"
+import { createDevUsers, is, Rune, Scope } from "capi"
 import { signature } from "capi/patterns/signature/polkadot"
+
+const scope = new Scope()
 
 /// Create four dev users, one of whom will be the batch sender. The other
 /// three will be recipients of balance transfers described in the batch.
@@ -21,7 +23,7 @@ const frees = Rune.tuple(
 )
 
 /// Retrieve the initial free balances of the recipients.
-const initialFrees = await frees.run()
+const initialFrees = await frees.run(scope)
 console.log("Initial frees:", initialFrees)
 
 /// Create and submit the batch call. Not how we must utilize `Rune.tuple` in
@@ -39,10 +41,10 @@ await westendDev.Utility
   .sent()
   .dbgStatus("Batch:")
   .finalized()
-  .run()
+  .run(scope)
 
 /// Retrieve the final free balances of the recipients.
-const finalFrees = await frees.run()
+const finalFrees = await frees.run(scope)
 console.log("Final frees:", finalFrees)
 
 /// Ensure that the final balances are greater than the initial ones.

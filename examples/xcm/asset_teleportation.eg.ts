@@ -26,8 +26,10 @@ import {
   RuntimeEvent,
 } from "@capi/rococo-dev-westmint"
 import { assert } from "asserts"
-import { createDevUsers, is, Rune } from "capi"
+import { createDevUsers, is, Rune, Scope } from "capi"
 import { signature } from "capi/patterns/signature/polkadot"
+
+const scope = new Scope()
 
 const { alexa } = await createDevUsers()
 
@@ -38,7 +40,7 @@ const alexaBalance = rococoDevWestmint.System.Account
   .access("data", "free")
 
 /// Read the initial free.
-const alexaFreeInitial = await alexaBalance.run()
+const alexaFreeInitial = await alexaBalance.run(scope)
 console.log("Alexa initial free:", alexaFreeInitial)
 
 /// Execute the teleportation without blocking.
@@ -77,7 +79,7 @@ rococoDev.XcmPallet
   .sent()
   .dbgStatus("Teleportation:")
   .finalized()
-  .run()
+  .run(scope)
 
 /// Iterate over the parachain events until receiving a downward message processed event,
 /// at which point we can read alexa's free balance, which should be greater than the initial.
@@ -85,7 +87,7 @@ outer:
 for await (
   const e of rococoDevWestmint.System.Events
     .value(undefined, rococoDevWestmint.latestBlockHash)
-    .iter()
+    .iter(scope)
 ) {
   if (e) {
     for (const { event } of e) {
@@ -93,7 +95,7 @@ for await (
         RuntimeEvent.isParachainSystem(event)
         && CumulusPalletParachainSystemEvent.isDownwardMessagesProcessed(event.value)
       ) {
-        const alexaFreeFinal = await alexaBalance.run()
+        const alexaFreeFinal = await alexaBalance.run(scope)
         console.log("Alexa final free:", alexaFreeFinal)
         assert(alexaFreeFinal > alexaFreeInitial)
         break outer

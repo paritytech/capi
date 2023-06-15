@@ -7,7 +7,7 @@
  */
 
 import { contractsDev } from "@capi/contracts-dev"
-import { $, createDevUsers, hex, Sr25519, ss58 } from "capi"
+import { $, createDevUsers, hex, Scope, Sr25519, ss58 } from "capi"
 import { InkMetadataRune } from "capi/patterns/ink"
 import { signature } from "capi/patterns/signature/polkadot"
 
@@ -36,7 +36,7 @@ const events = await metadata
   .sent()
   .dbgStatus("Instantiation:")
   .inBlockEvents()
-  .run()
+  .run(new Scope())
 
 /// > Note: we're using `inBlockEvents` and not `finalizedEvents` because our provider
 /// > is configured with instant finality. This is optimal for testing, but not production.

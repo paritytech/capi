@@ -7,7 +7,9 @@
  */
 
 import { assert, assertEquals, assertInstanceOf } from "asserts"
-import { is, Rune, Unhandled } from "capi"
+import { is, Rune, Scope, Unhandled } from "capi"
+
+const scope = new Scope()
 
 /// Define a custom error, potentially with a constructor accepting
 /// some error-specific data (here we'll leave as is).
@@ -28,7 +30,7 @@ const start = initial.map((value) => Math.random() > .5 ? new MyError() : value)
 /// Rune's execution will throw an `Unhandled`, within which the intercepted `MyError`
 /// instance resides. The other half of the time, we'll get our initial message.
 try {
-  const unhandled = await start.unhandle(is(MyError)).run()
+  const unhandled = await start.unhandle(is(MyError)).run(scope)
   console.log("Unhandled:", unhandled)
   assertEquals(unhandled, INITIAL_MSG)
 } catch (e) {
@@ -40,7 +42,7 @@ try {
 /// A better solution might be to `handle` the error. We can use `handle` along with
 /// the error constructor or a type guard to specify some alternative execution.
 const RECOVERY_MSG = "Smooth recovery"
-const handled = await start.handle(is(MyError), () => Rune.constant(RECOVERY_MSG)).run()
+const handled = await start.handle(is(MyError), () => Rune.constant(RECOVERY_MSG)).run(scope)
 console.log("Handled:", handled)
 assert(handled === INITIAL_MSG || handled === RECOVERY_MSG)
 
@@ -49,7 +51,7 @@ const unReHandled = await start
   .unhandle(is(MyError))
   .map((msg) => `**${msg}**`)
   .rehandle(is(MyError))
-  .run()
+  .run(scope)
 console.log("(Un|Re)handled:", unReHandled)
 assert(unReHandled === `**${INITIAL_MSG}**` || unReHandled instanceof MyError)
 
@@ -57,6 +59,6 @@ assert(unReHandled === `**${INITIAL_MSG}**` || unReHandled instanceof MyError)
 const unReHandledWithFallback = await start
   .unhandle(is(MyError))
   .rehandle(is(MyError), () => Rune.constant(RECOVERY_MSG))
-  .run()
+  .run(scope)
 console.log("(Un|Re)handled with fallback:", unReHandledWithFallback)
 assert(unReHandledWithFallback === INITIAL_MSG || unReHandledWithFallback === RECOVERY_MSG)

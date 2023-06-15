@@ -7,11 +7,12 @@
  */
 
 import { polkadotDev } from "@capi/polkadot-dev"
-import { $, createDevUsers, is } from "capi"
+import { $, createDevUsers, is, Scope } from "capi"
 import { IdentityInfoTranscoders } from "capi/patterns/identity"
 import { signature } from "capi/patterns/signature/polkadot"
 
 const { alexa } = await createDevUsers()
+const scope = new Scope()
 
 /// Initialize an `IdentityInfoTranscoders` of shape `{ stars: number }`.
 const transcoders = new IdentityInfoTranscoders({ stars: $.u8 })
@@ -29,7 +30,7 @@ await polkadotDev.Identity
   .sent()
   .dbgStatus("Set identity:")
   .finalized()
-  .run()
+  .run(scope)
 
 /// Retrieve and decode the identity info.
 const infoDecoded = await polkadotDev.Identity.IdentityOf
@@ -37,7 +38,7 @@ const infoDecoded = await polkadotDev.Identity.IdentityOf
   .unhandle(is(undefined))
   .access("info")
   .pipe((raw) => transcoders.decode(raw))
-  .run()
+  .run(scope)
 
 console.log("identity info:", infoDecoded)
 $.assert($.u8, infoDecoded.additional.stars)

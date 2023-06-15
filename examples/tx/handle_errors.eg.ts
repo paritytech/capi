@@ -7,7 +7,7 @@
 
 import { contractsDev } from "@capi/contracts-dev"
 import { assertInstanceOf } from "asserts"
-import { createDevUsers, ExtrinsicError, is } from "capi"
+import { createDevUsers, ExtrinsicError, is, Scope } from "capi"
 import { signature } from "capi/patterns/signature/polkadot"
 
 const { alexa, billy } = await createDevUsers()
@@ -24,7 +24,7 @@ const extrinsicError = await contractsDev.Balances
   .inBlockEvents()
   .unhandleFailed()
   .rehandle(is(ExtrinsicError))
-  .run()
+  .run(new Scope())
 
 /// Ensure `extrinsicError` is in fact an instance of `ExtrinsicError`
 console.log("The unhandled extrinsic error:", extrinsicError)

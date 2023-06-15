@@ -84,14 +84,14 @@ export class Rune<out T, out U = never> {
     return new Rune((scope) => new ctor(scope, ...args))
   }
 
-  async run(scope = new Scope()): Promise<T> {
+  async run(scope: Scope): Promise<T> {
     for await (const value of this.iter(scope)) {
       return value
     }
     throw new Error("Rune did not yield any values")
   }
 
-  async *iter(scope = new Scope()) {
+  async *iter(scope: Scope) {
     const abortController = new AbortController()
     const primed = scope.prime(this, abortController.signal)
     let time = 0

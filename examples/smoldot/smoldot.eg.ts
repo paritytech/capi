@@ -7,7 +7,7 @@
  */
 
 import { PolkadotRune } from "@capi/polkadot"
-import { $, known, SmoldotConnection } from "capi"
+import { $, known, Scope, SmoldotConnection } from "capi"
 
 /// Bring the chainspec into scope. Here, we'll import it from `fetch_chainspec.eg.ts`.
 import { relayChainSpec } from "./fetch_chainspec.eg.ts"
@@ -16,7 +16,7 @@ import { relayChainSpec } from "./fetch_chainspec.eg.ts"
 const polkadot = PolkadotRune.from(SmoldotConnection.bind({ relayChainSpec }))
 
 // Utilize the smoldot-connected `PolkadotRune` instance.
-const { block } = await polkadot.blockHash().block().run()
+const { block } = await polkadot.blockHash().block().run(new Scope())
 
 /// Ensure the block is of the expected shape.
 console.log(block)

@@ -6,11 +6,12 @@
 
 import { westendDev } from "@capi/westend-dev"
 import { assert } from "asserts"
-import { createDevUsers, is } from "capi"
+import { createDevUsers, is, Scope } from "capi"
 import { signature } from "capi/patterns/signature/polkadot"
 
 /// Create two dev users. Alexa will send the funds to Billy.
 const { alexa, billy } = await createDevUsers()
+const scope = new Scope()
 
 /// Reference Billy's free balance.
 const billyFree = westendDev.System.Account
@@ -19,7 +20,7 @@ const billyFree = westendDev.System.Account
   .access("data", "free")
 
 /// Read the initial free.
-const initialFree = await billyFree.run()
+const initialFree = await billyFree.run(scope)
 console.log("Billy free initial:", initialFree)
 
 // Create and submit the transaction.
@@ -32,10 +33,10 @@ await westendDev.Balances
   .sent()
   .dbgStatus("Transfer:")
   .finalized()
-  .run()
+  .run(scope)
 
 /// Read the final free.
-const finalFree = await billyFree.run()
+const finalFree = await billyFree.run(scope)
 console.log("Billy free final:", finalFree)
 
 /// The final free should be greater than the initial.
