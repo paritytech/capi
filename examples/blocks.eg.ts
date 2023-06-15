@@ -1,6 +1,5 @@
 /**
  * @title Blocks
- * @stability nearing
  * @description Utilize Capi's fluent API to turn a block reference (in this
  * case the retrieved latest finalized block hash) into a block. Then access
  * various pieces of data pertaining to that block.
@@ -8,7 +7,7 @@
 
 import { $eventRecord, metadata, polkadot } from "@capi/polkadot"
 import { $, $extrinsic, known, Rune, Scope } from "capi"
-import { babeBlockAuthor } from "capi/patterns/consensus"
+import { babeBlockAuthor } from "capi/patterns/unstable/consensus"
 
 /// Reference the latest block hash.
 const blockHash = polkadot.blockHash()

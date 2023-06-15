@@ -1,6 +1,5 @@
 /**
  * @title XCM Reserve Asset Transfer
- * @stability unstable
  * @description Perform an XCM reserve asset transfer, in which two chains, which
  * do not trust one another, rely on a third chain to store assets and facilitate
  * the exchange.

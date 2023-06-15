@@ -1,6 +1,5 @@
 /**
  * @title NFTs
- * @stability unstable
  * @description An example using the upcoming NFTs pallet to create an NFT collection,
  * mint, list and purchase an NFT, as well as lock the collection and NFT as to prevent.
  * @test_skip
@@ -16,8 +15,8 @@ import {
 } from "@capi/rococo-dev-westmint"
 import { assertEquals } from "asserts"
 import { $, createDevUsers, is, Rune, Scope } from "capi"
-import { DefaultCollectionSetting, DefaultItemSetting } from "capi/patterns/nfts"
 import { signature } from "capi/patterns/signature/statemint"
+import { DefaultCollectionSetting, DefaultItemSetting } from "capi/patterns/unstable/nfts"
 
 const scope = new Scope()
 

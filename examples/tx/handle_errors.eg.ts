@@ -1,6 +1,5 @@
 /**
  * @title Decode and Unhandle Dispatch Errors
- * @stability unstable
  * @description The `unhandleFailed` method of `ExtrinsicEventsRune` enables
  * easy decoding (and handling) of dispatch errors.
  */

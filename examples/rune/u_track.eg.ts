@@ -1,6 +1,5 @@
 /**
  * @title Rune U Track
- * @stability nearing
  * @description The `U` track allows for values such as errors and empty options
  * to be moved in and out of your purview. This can drastically simplify branching,
  * such as error recovery.

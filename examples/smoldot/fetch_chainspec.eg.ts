@@ -1,6 +1,5 @@
 /**
  * @title Fetch Chainspec
- * @stability nearing
  * @description Connecting with Smoldot requires a chainspec, which needs to be
  * initially fetched from a wss server. This chain spec can be saved and used to
  * connect to the chain in the future.

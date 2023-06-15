@@ -1,15 +1,15 @@
 /**
  * @title Utilize The Identity Pallet With Fields
- * @stability experiment it's unclear how useful the identity info transcoding
- * is (or the identity pallet for that matter). We may decide we do not wish to
- * maintain this utility. For now however, it's a good way to stress-test Rune.
  * @description Set a user's identity, potentially with metadata of arbitrary user-defined shape.
+ * @note It's unclear how useful the identity info transcoding is (or the identity pallet
+ * for that matter). We may decide we do not wish to maintain this utility. For now
+ * however, it's a good way to stress-test Rune.
  */
 
 import { polkadotDev } from "@capi/polkadot-dev"
 import { $, createDevUsers, is, Scope } from "capi"
-import { IdentityInfoTranscoders } from "capi/patterns/identity"
 import { signature } from "capi/patterns/signature/polkadot"
+import { IdentityInfoTranscoders } from "capi/patterns/unstable/identity"
 
 const { alexa } = await createDevUsers()
 const scope = new Scope()

@@ -1,6 +1,5 @@
 /**
  * @title Polkadot-JS Signature Compatibility
- * @stability nearing
  * @description Utilize a Polkadot-JS signer (such as from a browser wallet
  * extension) to sign a Capi extrinsic.
  */

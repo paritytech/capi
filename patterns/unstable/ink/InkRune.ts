@@ -10,7 +10,7 @@ import {
   Rune,
   RunicArgs,
   ValueRune,
-} from "../../mod.ts"
+} from "../../../mod.ts"
 import { $contractsApiCallArgs, $contractsApiCallResult, Weight } from "./codecs.ts"
 import { isContractEmitted } from "./events.ts"
 import { InkMetadataRune } from "./InkMetadataRune.ts"

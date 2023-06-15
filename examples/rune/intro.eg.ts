@@ -1,6 +1,5 @@
 /**
  * @title Rune Intro
- * @stability nearing
  * @description Runes are our units of composition in Capi. A Rune can be thought of
  * as an interaction *component*. It is a lazy description of our data requirements.
  * Runes can model storage retrievals, conditional transaction pipelines and more.
