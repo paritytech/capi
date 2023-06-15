@@ -44,8 +44,8 @@ $.assert(
           $.object(
             $.field("free", $.u128),
             $.field("reserved", $.u128),
-            $.field("miscFrozen", $.u128),
-            $.field("feeFrozen", $.u128),
+            $.field("frozen", $.u128),
+            $.field("flags", $.u128),
           ),
         ),
       ),
