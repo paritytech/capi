@@ -6,14 +6,14 @@ if (CAPI_MARKER in globalThis) {
 
 export * as $ from "./deps/scale.ts"
 export { BitSequence } from "./deps/scale.ts"
-export * from "./server/client/mod.ts"
+export * from "./server/client/createDevUsers.ts"
+export * from "./server/client/detectConnect.ts"
 
-// moderate --exclude main.ts nets.ts util server
+// moderate --exclude main.ts nets.ts util server nets
 
 export * from "./crypto/mod.ts"
 export * from "./fluent/mod.ts"
 export * from "./frame_metadata/mod.ts"
-export * from "./nets/mod.ts"
 export * from "./rpc/mod.ts"
 export * from "./rune/mod.ts"
 export * from "./scale_info/mod.ts"

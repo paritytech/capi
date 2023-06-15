@@ -1,4 +1,4 @@
-import { bins, net } from "./mod.ts"
+import { bins, net } from "./nets/mod.ts"
 
 const bin = bins({
   polkadot: ["polkadot-fast", "v0.9.38"],

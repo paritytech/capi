@@ -1,7 +1,10 @@
-import { Sr25519 } from "../../crypto/mod.ts"
-import { devUser } from "../../nets/mod.ts"
+import { blake2_512, Sr25519 } from "../../crypto/mod.ts"
 import { ArrayOfLength } from "../../util/ArrayOfLength.ts"
 import { detectServer } from "./detectServer.ts"
+
+export function devUser(userId: number) {
+  return Sr25519.fromSeed64(blake2_512.hash(new TextEncoder().encode(`capi-dev-user-${userId}`)))
+}
 
 export function createDevUsers(): Promise<Record<typeof devUserNames[number], Sr25519>>
 export function createDevUsers<N extends number>(count: N): Promise<ArrayOfLength<Sr25519, N>>
