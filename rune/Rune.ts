@@ -27,7 +27,11 @@ export class Scope {
         const prevTrace = this._currentTrace
         this._currentTrace = rune._trace
         try {
-          return rune._prime(this)
+          const primed = rune._prime(this)
+          primed.signal.addEventListener("abort", () => {
+            this.primed.delete(rune._prime)
+          })
+          return primed
         } finally {
           this._currentTrace = prevTrace
         }
@@ -44,6 +48,9 @@ export class Scope {
     if (parent) {
       const wrapped = this.wrapParent(parent)
       this.primed.set(rune._prime, wrapped)
+      wrapped.signal.addEventListener("abort", () => {
+        this.primed.delete(rune._prime)
+      })
       return wrapped
     }
     return undefined

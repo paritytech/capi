@@ -34,10 +34,13 @@ export abstract class Connection {
     return connection
   }
 
+  alive = true
   ref(signal: AbortSignal) {
+    if (!this.alive) throw new Error("Cannot reference dead connection")
     this.references++
     signal.addEventListener("abort", () => {
       if (!--this.references) {
+        this.alive = false
         this.#controller.abort()
         this.close()
       }
