@@ -18,7 +18,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
   && apt-get update \
   && apt-get install -y unzip curl git procps \
   && curl -fsSL https://dprint.dev/install.sh | DPRINT_INSTALL=/usr/local sh \
-  && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+  && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
   && apt-get install -y nodejs \
   && npm -g install cspell@latest \
   && apt-get autoremove -y \
