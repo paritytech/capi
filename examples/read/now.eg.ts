@@ -5,10 +5,10 @@
  */
 
 import { polkadot } from "@capi/polkadot"
-import { $ } from "capi"
+import { $, Scope } from "capi"
 
 /// Retrieve the chain's current recorded time.
-const now = await polkadot.Timestamp.Now.value().run()
+const now = await polkadot.Timestamp.Now.value().run(new Scope())
 
 /// Ensure `now` is of the correct shape.
 console.log("Now:", now)

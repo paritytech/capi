@@ -7,13 +7,15 @@
  */
 
 import { assertEquals } from "asserts"
-import { Rune, RunicArgs } from "capi"
+import { Rune, RunicArgs, Scope } from "capi"
+
+const scope = new Scope()
 
 /// Lift a constant value into a Rune.
 const value = Rune.constant(3)
 
 /// Map over `value` and multiply it by itself. Then, run it.
-const a = await value.map((value) => value * value).run()
+const a = await value.map((value) => value * value).run(scope)
 
 /// Ensure `a` is as expected.
 console.log("a:", a)
@@ -29,9 +31,9 @@ function exp<X>(...[n]: RunicArgs<X, [n: number]>) {
 /// Utilize the `exp` factory and run the resulting Rune. Note we can
 /// supply either a resolved value `3` or another Rune, which resolves
 /// to the factory's parameter type.
-const b = await exp(3).run()
+const b = await exp(3).run(scope)
 console.log("b:", b)
 assertEquals(b, 9)
-const c = await exp(value).run()
+const c = await exp(value).run(scope)
 console.log("c:", c)
 assertEquals(c, 9)

@@ -12,8 +12,9 @@
  */
 
 import { polkadotDev } from "@capi/polkadot-dev"
+import { Scope } from "capi"
 
 /// Execute the metadata Rune.
-const metadata = await polkadotDev.metadata.run()
+const metadata = await polkadotDev.metadata.run(new Scope())
 
 console.log("Metadata:", metadata)

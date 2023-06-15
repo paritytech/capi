@@ -5,7 +5,9 @@
  */
 
 import { assertEquals } from "asserts"
-import { Rune } from "capi"
+import { Rune, Scope } from "capi"
+
+const scope = new Scope()
 
 /// Begin with three arbitrary Runes. These could come from anywhere.
 /// In this case, we initialize them from string constants.
@@ -21,7 +23,7 @@ const e = Rune.object({ c, d })
 
 /// Execute `e`. Note the resolution of inner Runes is parallelized,
 /// much like a `Promise.all` call.
-const result = await e.run()
+const result = await e.run(scope)
 
 /// Ensure the result is of the expected shape.
 console.log(result)

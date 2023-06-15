@@ -7,12 +7,13 @@
 
 import { MultiAddress, polkadotDev } from "@capi/polkadot-dev"
 import { assert } from "asserts"
-import { createDevUsers, is } from "capi"
+import { createDevUsers, is, Scope } from "capi"
 import { MultisigRune } from "capi/patterns/multisig"
 import { filterPureCreatedEvents } from "capi/patterns/proxy"
 import { signature } from "capi/patterns/signature/polkadot"
 
 const { alexa, billy, carol } = await createDevUsers()
+const scope = new Scope()
 
 /// Initialize the `MultisigRune` with Alexa, Billy and Carol. Set the passing threshold to 2.
 const multisig = MultisigRune.from(polkadotDev, {
@@ -27,7 +28,7 @@ await multisig
   .sent()
   .dbgStatus("Existential deposit:")
   .finalized()
-  .run()
+  .run(scope)
 
 /// Describe the call which we wish to dispatch from the multisig account:
 /// the creation of the stash / pure proxy, belonging to the multisig account itself.
@@ -44,7 +45,7 @@ await multisig
   .sent()
   .dbgStatus("Proposal:")
   .finalized()
-  .run()
+  .run(scope)
 
 /// Approve the stash creation call and extract the pure creation event, which should
 /// contain its account id.
@@ -56,7 +57,7 @@ const stashAccountId = await multisig
   .finalizedEvents()
   .pipe(filterPureCreatedEvents)
   .access(0, "pure")
-  .run()
+  .run(scope)
 
 /// Send funds to the stash (existential deposit).
 await polkadotDev.Balances
@@ -68,14 +69,14 @@ await polkadotDev.Balances
   .sent()
   .dbgStatus("Fund Stash:")
   .finalized()
-  .run()
+  .run(scope)
 
 /// Ensure that the funds arrived successfully.
 const stashFree = await polkadotDev.System.Account
   .value(stashAccountId)
   .unhandle(is(undefined))
   .access("data", "free")
-  .run()
+  .run(scope)
 
 /// The stash's free should be greater than zero.
 console.log("Stash free:", stashFree)

@@ -6,13 +6,14 @@
  */
 
 import { polkadotDev } from "@capi/polkadot-dev"
-import { createDevUsers, ss58 } from "capi"
+import { createDevUsers, Scope, ss58 } from "capi"
 import { pjsSender, PjsSigner } from "capi/patterns/compat/pjs_sender"
 import { signature } from "capi/patterns/signature/polkadot"
 import { createPair } from "https://deno.land/x/polkadot@0.2.38/keyring/mod.ts"
 import { TypeRegistry } from "https://deno.land/x/polkadot@0.2.38/types/mod.ts"
 
 const { alexa, billy } = await createDevUsers()
+const scope = new Scope()
 
 /// Here, we manually create a signer. Chances are that **you should not do this**.
 /// Instead, it's likely that you'll want to access a signer from a wallet browser
@@ -52,4 +53,4 @@ await polkadotDev.Balances
   .sent()
   .dbgStatus("Transfer:")
   .finalized()
-  .run()
+  .run(scope)

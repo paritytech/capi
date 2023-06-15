@@ -19,12 +19,13 @@
 
 import { MultiAddress, polkadotDev } from "@capi/polkadot-dev"
 import { assert } from "asserts"
-import { $, createDevUsers, is, Rune, Sr25519 } from "capi"
+import { $, createDevUsers, is, Rune, Scope, Sr25519 } from "capi"
 import { VirtualMultisigRune } from "capi/patterns/multisig"
 import { signature } from "capi/patterns/signature/polkadot"
 import { parse } from "../../deps/std/flags.ts"
 
 const { alexa, billy, carol, david } = await createDevUsers()
+const scope = new Scope()
 
 /// To reference a virtual multisig, one must have several pieces of data, including
 /// the member->proxy account id lookup, the threshold and the stash account id.
@@ -40,7 +41,7 @@ if (!state) {
       deployer: alexa.address,
     }, signature({ sender: alexa }))
     .hex
-    .run()
+    .run(scope)
 }
 
 console.log("State:", state)
@@ -59,7 +60,7 @@ await polkadotDev.Balances
   .sent()
   .dbgStatus("Fund stash:")
   .finalized()
-  .run()
+  .run(scope)
 
 /// Reference David's free balance.
 const davidFree = polkadotDev.System.Account
@@ -68,7 +69,7 @@ const davidFree = polkadotDev.System.Account
   .access("data", "free")
 
 /// Retrieve David's initial free.
-const davidFreeInitial = await davidFree.run()
+const davidFreeInitial = await davidFree.run(scope)
 console.log("David free initial:", davidFreeInitial)
 
 /// Describe the call we wish to dispatch from the virtual multisig's stash.
@@ -78,11 +79,11 @@ const call = polkadotDev.Balances.transfer({
 })
 
 /// Fund Billy and Carol's proxy accounts (existential deposits).
-await fundAndRatify("billy", billy).run()
-await fundAndRatify("carol", carol).run()
+await fundAndRatify("billy", billy).run(scope)
+await fundAndRatify("carol", carol).run(scope)
 
 /// Retrieve David's final balance.
-const davidFreeFinal = await davidFree.run()
+const davidFreeFinal = await davidFree.run(scope)
 console.log("David free final:", davidFreeFinal)
 
 // David's final balance should be greater than the initial.
