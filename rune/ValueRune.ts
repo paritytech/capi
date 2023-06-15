@@ -181,14 +181,14 @@ class RunMatch<M, T, U> extends Run<T, U> {
   value
   conditions
   constructor(
-    batch: Batch,
+    scope: Scope,
     child: Rune<M, never>,
     conditions: [(x: M) => boolean, ValueRune<T, U>][],
   ) {
-    super(batch)
-    this.value = batch.prime(child, this.signal)
+    super(scope)
+    this.value = scope.prime(child, this.signal)
     this.conditions = conditions.map(([cond, val]) =>
-      [cond, batch.prime(val, this.signal)] as const
+      [cond, scope.prime(val, this.signal)] as const
     )
   }
 

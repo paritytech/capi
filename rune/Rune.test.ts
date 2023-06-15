@@ -265,7 +265,7 @@ Deno.test("match abc", async () => {
         .when(is("a"), (x) => x.access("a"))
         .when(is("b"), (x) => x.access("b"))
         .else((x) => x.access("c"))
-    ).run()
+    ).run(new Scope())
     assertEquals(+result, 0)
   }
 })
@@ -285,7 +285,7 @@ Deno.test("match u", async () => {
         )
       )
       .rehandle(is(String))
-      .run(),
+      .run(new Scope()),
     "hello",
   )
 })
