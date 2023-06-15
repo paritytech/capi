@@ -1,6 +1,5 @@
 /**
  * @title Virtual Multisig
- * @stability unstable
  * @description Virtual multisigs simulate an editable multisig. The onchain correlates include:
  *
  * 1. Pure proxies for/administrated by each of the members.
@@ -20,8 +19,8 @@
 import { MultiAddress, polkadotDev } from "@capi/polkadot-dev"
 import { assert } from "asserts"
 import { $, createDevUsers, is, Rune, Scope, Sr25519 } from "capi"
-import { VirtualMultisigRune } from "capi/patterns/multisig"
 import { signature } from "capi/patterns/signature/polkadot"
+import { VirtualMultisigRune } from "capi/patterns/unstable/multisig"
 import { parse } from "../../deps/std/flags.ts"
 
 const { alexa, billy, carol, david } = await createDevUsers()

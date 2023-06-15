@@ -1,6 +1,5 @@
 /**
  * @title Derived-Read a List
- * @stability nearing
  * @description Model a derived read, in which a list in storage (parachain ids)
  * is retrieved and its elements used to key to another piece of storage
  * (the corresponding parachain heads).

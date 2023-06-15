@@ -2,7 +2,7 @@
  * @title Offline Signing
  * @stability nearing
  * @description Create and sign an extrinsic, then serialize it into a hex for later use.
- * Finally, rehydrate the extrinsic and submit it.
+ * Finally, hydrate the extrinsic and submit it.
  */
 
 import { $runtimeCall, westendDev } from "@capi/westend-dev"

@@ -1,5 +1,5 @@
-import { unreachable } from "../../deps/std/testing/asserts.ts"
-import { Ty } from "../../scale_info/raw/Ty.ts"
+import { unreachable } from "../../../deps/std/testing/asserts.ts"
+import { Ty } from "../../../scale_info/raw/Ty.ts"
 
 export interface InkMetadata {
   source: Source

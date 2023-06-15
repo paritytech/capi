@@ -1,15 +1,15 @@
 /**
  * @title Deploy an Ink Smart Contract
- * @stability unstable – We intend to work on an Ink provider (for static codegen)
- * in the near future. This work will likely entail large changes to the current ink patterns.
- * @description Deploying an Ink contract (instantiating) to a production contracts-enabled parachain
- * is much the same as any other extrinsic submission.
+ * @description Deploying an Ink contract (instantiating) to a production contracts-enabled
+ * parachain is much the same as any other extrinsic submission.
+ * @note We intend to work on an Ink provider (for static codegen) in the near future.
+ * This work will likely entail large changes to the current ink patterns.
  */
 
 import { contractsDev } from "@capi/contracts-dev"
 import { $, createDevUsers, hex, Scope, Sr25519, ss58 } from "capi"
-import { InkMetadataRune } from "capi/patterns/ink"
 import { signature } from "capi/patterns/signature/polkadot"
+import { InkMetadataRune } from "capi/patterns/unstable/ink"
 
 /// Initialize an `InkMetadataRune` with the raw Ink metadata text.
 const metadata = InkMetadataRune.fromMetadataText(

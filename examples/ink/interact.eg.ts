@@ -1,16 +1,16 @@
 /**
  * @title Interact With An Ink Smart Contract
- * @stability unstable – We intend to work on an Ink provider (for static codegen)
- * in the near future. This work will likely entail large changes to the current ink patterns.
  * @description The Ink patterns simplify the reading of contract instance state and events,
  * as well as the submission of transactions.
+ * @note we intend to work on an Ink provider (for static codegen) in the near future.
+ * This work will likely entail large changes to the current ink patterns.
  */
 
 import { contractsDev } from "@capi/contracts-dev"
 import { assert } from "asserts"
 import { $, createDevUsers, hex, Scope } from "capi"
-import { InkMetadataRune } from "capi/patterns/ink"
 import { signature } from "capi/patterns/signature/polkadot"
+import { InkMetadataRune } from "capi/patterns/unstable/ink"
 
 const scope = new Scope()
 

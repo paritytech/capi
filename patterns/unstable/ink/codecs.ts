@@ -1,6 +1,6 @@
 // TODO: delete this file and use codegen directly
 
-import { $ } from "../../mod.ts"
+import { $ } from "../../../mod.ts"
 
 const $balanceCodec = $.u128
 

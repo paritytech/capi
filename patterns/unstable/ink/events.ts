@@ -1,4 +1,4 @@
-import { AccountIdRune, ApplyExtrinsicEventPhase, Event, Rune, RunicArgs } from "../../mod.ts"
+import { AccountIdRune, ApplyExtrinsicEventPhase, Event, Rune, RunicArgs } from "../../../mod.ts"
 
 export interface ContractsRuntimeEvent<V = { contract?: Uint8Array }> extends
   Event<

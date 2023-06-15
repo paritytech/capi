@@ -1,5 +1,5 @@
 import { PalletProxyEvent, RuntimeEvent } from "@capi/polkadot"
-import { Rune, RunicArgs } from "../../mod.ts"
+import { Rune, RunicArgs } from "../../../mod.ts"
 
 export function filterPureCreatedEvents<X>(...[events]: RunicArgs<X, [any[]]>) {
   return Rune.resolve(events).map((events) =>

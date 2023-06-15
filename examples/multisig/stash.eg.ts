@@ -1,6 +1,5 @@
 /**
  * @title Multisig Administration of Pure Proxy Stash
- * @stability unstable
  * @description Administrate a stash account (pure proxy) through a multisig with
  * three signatories.
  */
@@ -9,8 +8,8 @@ import { MultiAddress, polkadotDev } from "@capi/polkadot-dev"
 import { assert } from "asserts"
 import { createDevUsers, is, Scope } from "capi"
 import { MultisigRune } from "capi/patterns/multisig"
-import { filterPureCreatedEvents } from "capi/patterns/proxy"
 import { signature } from "capi/patterns/signature/polkadot"
+import { filterPureCreatedEvents } from "capi/patterns/unstable/proxy"
 
 const { alexa, billy, carol } = await createDevUsers()
 const scope = new Scope()

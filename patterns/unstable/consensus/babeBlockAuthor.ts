@@ -7,7 +7,7 @@ import {
   Rune,
   RunicArgs,
   ValueRune,
-} from "../../mod.ts"
+} from "../../../mod.ts"
 import { preRuntimeDigest } from "./preRuntimeDigest.ts"
 
 export function babeBlockAuthor<C extends AddressPrefixChain, U, X>(

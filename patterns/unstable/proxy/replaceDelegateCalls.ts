@@ -1,5 +1,5 @@
 import { MultiAddress } from "@capi/polkadot"
-import { Chain, ChainRune, Rune, RunicArgs } from "../../mod.ts"
+import { Chain, ChainRune, Rune, RunicArgs } from "../../../mod.ts"
 
 // TODO: constrain
 export function replaceDelegateCalls<C extends Chain, U, X>(

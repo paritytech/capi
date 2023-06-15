@@ -1,6 +1,5 @@
 /**
  * @title Reserve an Index
- * @stability nearing
  * @description Reserve an index using the indices pallet. Then retrieve
  * the user's account id using the index.
  */
