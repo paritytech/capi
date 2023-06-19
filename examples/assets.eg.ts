@@ -4,10 +4,10 @@
  * @description Various calls utilizing the asset palette
  */
 
-import { rococoDevWestmint } from "@capi/rococo-dev-westmint"
+import { contractsDev } from "@capi/contracts-dev"
 import { assertEquals, assertRejects } from "asserts"
 import { createDevUsers, is, Rune, Scope } from "capi"
-import { signature } from "capi/patterns/signature/statemint"
+import { signature } from "capi/patterns/signature/polkadot"
 
 const scope = new Scope()
 
@@ -17,17 +17,17 @@ const ASSET_ID = 0
 const textEncoder = new TextEncoder()
 const textDecoder = new TextDecoder()
 
-await rococoDevWestmint.Assets.create({
+await contractsDev.Assets.create({
   id: ASSET_ID,
   admin: alexa.address,
   minBalance: 1n,
 }).signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Create Asset:")
-  .finalized()
+  .inBlockEvents()
   .run(scope)
 
-await rococoDevWestmint.Assets.setMetadata({
+await contractsDev.Assets.setMetadata({
   id: ASSET_ID,
   name: textEncoder.encode("Capi Socks"),
   symbol: textEncoder.encode("CAPI"),
@@ -35,10 +35,10 @@ await rococoDevWestmint.Assets.setMetadata({
 }).signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Set Metadata:")
-  .finalized()
+  .inBlockEvents()
   .run(scope)
 
-await rococoDevWestmint.Assets.Metadata.value(ASSET_ID)
+await contractsDev.Assets.Metadata.value(ASSET_ID, contractsDev.latestBlockHash)
   .unhandle(is(undefined))
   .map((metadata) => ({
     ...metadata,
@@ -48,17 +48,18 @@ await rococoDevWestmint.Assets.Metadata.value(ASSET_ID)
   .dbg("Asset Metadata:")
   .run(scope)
 
-await rococoDevWestmint.Assets.mint({
+await contractsDev.Assets.mint({
   id: ASSET_ID,
   beneficiary: alexa.address,
   amount: 1000n,
 }).signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Mint Asset:")
-  .finalized()
+  .inBlockEvents()
+  .unhandleFailed()
   .run(scope)
 
-await rococoDevWestmint.Assets.transfer({
+await contractsDev.Assets.transfer({
   id: ASSET_ID,
   target: billy.address,
   amount: 10n,
@@ -66,44 +67,45 @@ await rococoDevWestmint.Assets.transfer({
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Transfer Asset to Billy:")
-  .finalized()
+  .inBlockEvents()
+  .unhandleFailed()
   .run(scope)
 
-await rococoDevWestmint.Assets.Account
-  .value(Rune.tuple([ASSET_ID, billy.publicKey]))
+await contractsDev.Assets.Account
+  .value(Rune.tuple([ASSET_ID, billy.publicKey]), contractsDev.latestBlockHash)
   .unhandle(is(undefined))
   .map(({ balance }) => balance)
   .dbg("Billy Asset Balance:")
   .run(scope)
 
-await rococoDevWestmint.Assets.burn({
+await contractsDev.Assets.burn({
   id: ASSET_ID,
   who: billy.address,
   amount: 5n,
 }).signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Burn Billy's Assets:")
-  .finalized()
+  .inBlockEvents()
   .run(scope)
 
-await rococoDevWestmint.Assets.Account
-  .value(Rune.tuple([ASSET_ID, billy.publicKey]))
+await contractsDev.Assets.Account
+  .value(Rune.tuple([ASSET_ID, billy.publicKey]), contractsDev.latestBlockHash)
   .unhandle(is(undefined))
   .map(({ balance }) => balance)
   .dbg("Billy Asset Balance Post Burn:")
   .run(scope)
 
-await rococoDevWestmint.Assets.freeze({
+await contractsDev.Assets.freeze({
   id: ASSET_ID,
   who: billy.address,
 }).signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Freeze Billy's Assets:")
-  .finalized()
+  .inBlockEvents()
   .run(scope)
 
 await assertRejects(async () =>
-  rococoDevWestmint.Assets.transfer({
+  contractsDev.Assets.transfer({
     id: ASSET_ID,
     target: carol.address,
     amount: 1n,
@@ -111,20 +113,20 @@ await assertRejects(async () =>
     .signed(signature({ sender: billy }))
     .sent()
     .dbgStatus("Billy Transfer Frozen Assets:")
-    .finalizedEvents()
+    .inBlockEvents()
     .unhandleFailed()
     .run(scope), "Transfer Frozen Assets")
 
-await rococoDevWestmint.Assets.thaw({
+await contractsDev.Assets.thaw({
   id: ASSET_ID,
   who: billy.address,
 }).signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Thaw Billy's Assets:")
-  .finalized()
+  .inBlockEvents()
   .run(scope)
 
-await rococoDevWestmint.Assets.transfer({
+await contractsDev.Assets.transfer({
   id: ASSET_ID,
   target: carol.address,
   amount: 1n,
@@ -132,12 +134,12 @@ await rococoDevWestmint.Assets.transfer({
   .signed(signature({ sender: billy }))
   .sent()
   .dbgStatus("Billy Transfer Thawed Assets:")
-  .finalizedEvents()
+  .inBlockEvents()
   .unhandleFailed()
   .run(scope)
 
-const carolBalance = await rococoDevWestmint.Assets.Account
-  .value(Rune.tuple([ASSET_ID, carol.publicKey]))
+const carolBalance = await contractsDev.Assets.Account
+  .value(Rune.tuple([ASSET_ID, carol.publicKey]), contractsDev.latestBlockHash)
   .unhandle(is(undefined))
   .map(({ balance }) => balance)
   .dbg("Carol Asset Balance:")
@@ -145,10 +147,10 @@ const carolBalance = await rococoDevWestmint.Assets.Account
 
 assertEquals(carolBalance, 1n, "Carol Balance")
 
-await rococoDevWestmint.Utility.batchAll({
+await contractsDev.Utility.batchAll({
   calls: Rune.array([alexa.address, billy.address, carol.address])
     .mapArray((addr) =>
-      rococoDevWestmint.Assets.burn({
+      contractsDev.Assets.burn({
         id: ASSET_ID,
         who: addr,
         amount: 100_000_000_000_000n,
@@ -157,23 +159,23 @@ await rococoDevWestmint.Utility.batchAll({
 }).signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Burn Everything:")
-  .finalized()
+  .inBlockEvents()
   .run(scope)
 
-await rococoDevWestmint.Assets.startDestroy({
+await contractsDev.Assets.startDestroy({
   id: ASSET_ID,
 }).signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Destroy Asset Class Start:")
-  .finalizedEvents()
+  .inBlockEvents()
   .unhandleFailed()
   .run(scope)
 
-await rococoDevWestmint.Assets.finishDestroy({
+await contractsDev.Assets.finishDestroy({
   id: ASSET_ID,
 }).signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Destroy Asset Class Finish:")
-  .finalizedEvents()
+  .inBlockEvents()
   .unhandleFailed()
   .run(scope)
