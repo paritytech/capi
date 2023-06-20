@@ -134,9 +134,9 @@ await localDev.Assets.mint({
 
 // swap with no slippage checks
 await localDev.AssetConversion.swapExactTokensForTokens({
-  path: poolId,
+  path: Rune.tuple([NativeOrAssetId.Asset(USDT_ASSET_ID), NativeOrAssetId.Asset(DOT_ASSET_ID)]),
   amountIn: 30000n,
-  amountOutMin: 0n,
+  amountOutMin: 1n,
   sendTo: bob.publicKey,
   keepAlive: false,
 }).signed(signature({ sender: bob }))
