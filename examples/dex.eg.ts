@@ -1,4 +1,5 @@
 import { localDev, NativeOrAssetId, PalletAssetConversionEvent } from "@capi/local-dev"
+import { $, CodecRune, hex } from "capi"
 import { signature } from "capi/patterns/signature/statemint"
 import { decode } from "../crypto/hex.ts"
 import { Sr25519 } from "../crypto/Sr25519.ts"
@@ -129,8 +130,40 @@ await localDev.Assets.mint({
   .unhandleFailed()
   .run(scope)
 
-// TODO: get price
-// localDev.connection.call("state_call", "AssetConversionApi_quote_price_tokens_for_exact_tokens")
+const $assetId = await localDev.metadata.access(
+  "paths",
+  "pallet_asset_conversion::types::NativeOrAssetId",
+).run(scope)
+
+const $assetConversionApiQuoteArgs = $.tuple(
+  // asset 1
+  $assetId,
+  // asset 2
+  $assetId,
+  // asset balance
+  $.u32,
+  // include fee
+  $.bool,
+)
+
+const quoteArgs = Rune.constant($assetConversionApiQuoteArgs)
+  .into(CodecRune)
+  .encoded(
+    Rune.tuple([
+      NativeOrAssetId.Asset(USDT_ASSET_ID),
+      NativeOrAssetId.Asset(DOT_ASSET_ID),
+      30000,
+      true,
+    ]),
+  )
+
+console.log(
+  await localDev.connection.call(
+    "state_call",
+    "AssetConversionApi_quote_price_exact_tokens_for_tokens",
+    quoteArgs.map(hex.encode),
+  ).run(scope),
+)
 
 // swap with no slippage checks
 await localDev.AssetConversion.swapExactTokensForTokens({
