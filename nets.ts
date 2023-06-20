@@ -20,6 +20,9 @@ export const polkadot = net.ws({
 
 export const westend = net.ws({ url: "wss://westend-rpc.polkadot.io/" })
 export const statemint = net.ws({ url: "wss://statemint-rpc.polkadot.io/" })
+export const rococoAssetHub = net.ws({ url: "wss://rococo-asset-hub-rpc.polkadot.io/" })
+export const westmint = net.ws({ url: "wss://westmint-rpc.polkadot.io/" })
+export const localDev = net.ws({ url: "ws://127.0.0.1:9944" })
 
 export const westendDev = net.dev({
   bin: bin.polkadot,
