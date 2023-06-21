@@ -1,20 +1,8 @@
 import { localDev, NativeOrAssetId, PalletAssetConversionEvent } from "@capi/local-dev"
 import { $, CodecRune, hex } from "capi"
 import { signature } from "capi/patterns/signature/statemint"
-import { decode } from "../crypto/hex.ts"
-import { Sr25519 } from "../crypto/Sr25519.ts"
+import { alice, bob } from "../crypto/test_pairs.ts"
 import { Rune, RunicArgs, Scope } from "../rune/Rune.ts"
-
-function pair(secret: string) {
-  return Sr25519.fromSecret(decode(secret))
-}
-
-export const alice = pair(
-  "98319d4ff8a9508c4bb0cf0b5a78d760a0b2082c02775e6e82370816fedfff48925a225d97aa00682d6a59b95b18780c10d7032336e88f3442b42361f4a66011",
-)
-export const bob = pair(
-  "081ff694633e255136bdb456c20a5fc8fed21f8b964c11bb17ff534ce80ebd5941ae88f85d0c1bfc37be41c904e1dfc01de8c8067b0d6d5df25dd1ac0894a325",
-)
 
 const scope = new Scope()
 
@@ -162,7 +150,7 @@ console.log(
     "state_call",
     "AssetConversionApi_quote_price_exact_tokens_for_tokens",
     quoteArgs.map(hex.encode),
-  ).run(scope),
+  ).map(hex.decode).map((x) => $.u128.decode(x)).run(scope),
 )
 
 // swap with no slippage checks
