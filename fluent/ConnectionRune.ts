@@ -1,10 +1,10 @@
 import { Calls, Subscription, Subscriptions } from "../rpc/known/mod.ts"
 import { Connection, ConnectionError, RpcSubscriptionMessage, ServerError } from "../rpc/mod.ts"
-import { Batch, is, MetaRune, Run, Rune, RunicArgs, RunStream } from "../rune/mod.ts"
+import { is, MetaRune, Primer, Run, Rune, RunicArgs, RunStream } from "../rune/mod.ts"
 
 class RunConnection extends Run<Connection, never> {
   constructor(
-    ctx: Batch,
+    ctx: Primer,
     readonly initConnection: (signal: AbortSignal) => Connection | Promise<Connection>,
   ) {
     super(ctx)
@@ -62,7 +62,7 @@ export class ConnectionRune<U> extends Rune<Connection, U> {
 
 class RunRpcSubscription extends RunStream<RpcSubscriptionMessage> {
   constructor(
-    ctx: Batch,
+    ctx: Primer,
     connection: Connection,
     params: unknown[],
     subscribeMethod: string,

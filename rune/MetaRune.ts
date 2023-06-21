@@ -1,4 +1,4 @@
-import { Batch, Run, Rune } from "./Rune.ts"
+import { Primer, Run, Rune } from "./Rune.ts"
 import { Receipt } from "./Timeline.ts"
 import { ValueRune } from "./ValueRune.ts"
 
@@ -14,10 +14,10 @@ export class MetaRune<T, U1, U2> extends Rune<Rune<T, U1>, U2> {
 
 class RunFlat<T, U1, U2> extends Run<T, U1 | U2> {
   child
-  constructor(batch: Batch, child: Rune<Rune<T, U1>, U2>, indirect?: Rune<unknown, unknown>) {
-    super(batch)
-    this.child = batch.prime(child, this.signal)
-    if (indirect) batch.prime(indirect, this.signal)
+  constructor(primer: Primer, child: Rune<Rune<T, U1>, U2>, indirect?: Rune<unknown, unknown>) {
+    super(primer)
+    this.child = primer.prime(child, this.signal)
+    if (indirect) primer.prime(indirect, this.signal)
   }
 
   lastChildReceipt = new Receipt()
@@ -31,8 +31,8 @@ class RunFlat<T, U1, U2> extends Run<T, U1 | U2> {
     if (receipt.novel) {
       this.innerController.abort()
       this.innerController = new AbortController()
-      // const innerBatch = new Batch(this.batch.timeline, this.batch)
-      this.currentInner = this.batch.prime(rune, this.innerController.signal)
+      // const innerBatch = new Batch(this.primer.timeline, this.primer)
+      this.currentInner = this.primer.prime(rune, this.innerController.signal)
     }
     const _receipt = new Receipt()
     try {
