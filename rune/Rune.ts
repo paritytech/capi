@@ -7,61 +7,44 @@ import { Trace } from "./Trace.ts"
 // @deno-types="./_empty.d.ts"
 import * as _ from "./_empty.js"
 
-export class Primer {
-  constructor(
-    readonly timeline = new Timeline(),
-    readonly parent?: Primer,
-    readonly wrapParent: <T, U>(rune: Run<T, U>) => Run<T, U> = (x) => x,
-  ) {}
+export abstract class Primer {
+  abstract order: number
+  abstract timeline: Timeline
 
   _currentTrace?: Trace
+  protected abstract _prime<T, U>(rune: Rune<T, U>): Run<T, U>
 
-  primed = new Map<Rune<any, any>["_prime"], Run<any, any>>()
-  prime<T, E>(rune: Rune<T, E>, signal: AbortSignal): Run<T, E> {
-    const primed = getOrInit(
-      this.primed,
-      rune._prime,
-      () => {
-        const existing = this.getPrimed(rune)
-        if (existing) return existing
-        const prevTrace = this._currentTrace
-        this._currentTrace = rune._trace
-        try {
-          const primed = rune._prime(this)
-          primed.signal.addEventListener("abort", () => {
-            this.primed.delete(rune._prime)
-          })
-          return primed
-        } finally {
-          this._currentTrace = prevTrace
-        }
-      },
-    )
-    primed.reference(signal)
-    return primed
-  }
-
-  getPrimed<T, E>(rune: Rune<T, E>): Run<T, E> | undefined {
-    const existing = this.primed.get(rune._prime)
-    if (existing) return existing
-    const parent = this.parent?.getPrimed(rune)
-    if (parent) {
-      const wrapped = this.wrapParent(parent)
-      this.primed.set(rune._prime, wrapped)
-      wrapped.signal.addEventListener("abort", () => {
-        this.primed.delete(rune._prime)
+  memo = new Map<(primer: Primer) => Run<any, any>, Run<any, any>>()
+  prime<T, U>(rune: _.Rune<T, U>, signal: AbortSignal | undefined): Run<T, U> {
+    const run = getOrInit(this.memo, rune._prime, () => {
+      const old = this._currentTrace
+      this._currentTrace = rune._trace
+      const run = this._prime(rune)
+      this._currentTrace = old
+      run.signal.addEventListener("abort", () => {
+        this.memo.delete(rune._prime)
       })
-      return wrapped
-    }
-    return undefined
+      return run
+    })
+    if (signal) run.reference(signal)
+    return run
   }
 
-  spawn(time: number, receipt: Receipt) {
-    return new Primer(new Timeline(), this, (x) => new RunProxy(this, x, time, receipt))
+  getPrimed<T, U>(rune: _.Rune<T, U>): Run<T, U> | undefined {
+    return this.memo.get(rune._prime)
   }
 }
 
-const globalPrimer = new Primer()
+class RootPrimer extends Primer {
+  order = 0
+  timeline = new Timeline()
+
+  protected _prime<T, U>(rune: _.Rune<T, U>): _.Run<T, U> {
+    return rune._prime(this)
+  }
+}
+
+const globalPrimer = new RootPrimer()
 
 declare const _T: unique symbol
 declare const _U: unique symbol
@@ -90,20 +73,20 @@ export class Rune<out T, out U = never> {
     ctor: new(primer: Primer, ...args: A) => Run<T, U>,
     ...args: A
   ) {
-    return new Rune((batch) => new ctor(batch, ...args))
+    return new Rune((primer) => new ctor(primer, ...args))
   }
 
-  async run(batch = globalPrimer): Promise<T> {
+  async run(batch: Primer = globalPrimer): Promise<T> {
     for await (const value of this.iter(batch)) {
       return value
     }
     throw new Error("Rune did not yield any values")
   }
 
-  async *iter(primer = globalPrimer) {
+  async *iter(primer: Primer = globalPrimer) {
     const abortController = new AbortController()
     const primed = primer.prime(this, abortController.signal)
-    let time = 0
+    let time = primer.timeline.current
     try {
       while (time !== Infinity) {
         const receipt = new Receipt()
@@ -217,18 +200,30 @@ export class Rune<out T, out U = never> {
   pipe<R extends Rune<any, any>>(fn: (rune: this) => R): R {
     return fn(this)
   }
+
+  static pin<T, U>(rune: Rune<T, U>, pinned: Rune<unknown, unknown>): Rune<T, U> {
+    return new Rune((primer) => {
+      const run = primer.prime(rune, undefined)
+      primer.prime(pinned, run.signal)
+      return run
+    })
+  }
 }
 
 export abstract class Run<T, U> {
   declare "": [T, U]
   trace: Trace
+  order: number
+  timeline
 
   abortController = new AbortController()
   signal = this.abortController.signal
-  constructor(readonly primer: Primer) {
+  constructor(primer: Primer) {
     this.signal.addEventListener("abort", () => this.cleanup())
     this.trace = primer._currentTrace
       ?? new Trace(`execution of the ${new.target.name} instantiated`)
+    this.order = primer.order
+    this.timeline = primer.timeline
   }
 
   referenceCount = 0
@@ -270,22 +265,6 @@ export abstract class Run<T, U> {
   }
 }
 
-class RunProxy<T, E> extends Run<T, E> {
-  constructor(
-    primer: Primer,
-    readonly inner: Run<T, E>,
-    readonly innerTime: number,
-    readonly innerReceipt: Receipt,
-  ) {
-    super(primer)
-  }
-
-  _evaluate(): Promise<T> {
-    // TODO: improve
-    return this.inner.evaluate(this.innerTime, this.innerReceipt)
-  }
-}
-
 class RunConstant<T> extends Run<T, never> {
   constructor(primer: Primer, readonly value: T) {
     super(primer)
@@ -311,7 +290,7 @@ class RunLs<T, U> extends Run<T[], U> {
 export abstract class RunStream<T> extends Run<T, never> {
   initPromise = deferred<void>()
   valueQueue: [number, T][] = []
-  eventSource = new EventSource(this.primer.timeline)
+  eventSource = new EventSource(this.timeline)
   first = true
   done = false
 

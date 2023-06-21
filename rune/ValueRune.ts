@@ -123,11 +123,7 @@ export class ValueRune<out T, out U = never> extends Rune<T, U> {
     return this.reduce<T[]>([], (arr, val) => {
       arr.push(val)
       return arr
-    }).final().singular()
-  }
-
-  singular() {
-    return ValueRune.new(RunSingular, this)
+    }).final()
   }
 
   dbg<X>(...prefix: RunicArgs<X, unknown[]>) {
@@ -407,17 +403,6 @@ class RunReduce<T1, U, T2> extends Run<T2, U> {
     const source = await this.child.evaluate(time, receipt)
     if (!receipt.ready || !receipt.novel) return this.lastValue
     return this.lastValue = await this.fn(this.lastValue, source)
-  }
-}
-
-class RunSingular<T, U> extends Run<T, U> {
-  constructor(primer: Primer, readonly child: Rune<T, U>) {
-    super(primer)
-  }
-
-  result?: Promise<T>
-  _evaluate(time: number, receipt: Receipt): Promise<T> {
-    return this.result ??= this.child.run(this.primer.spawn(time, receipt))
   }
 }
 
