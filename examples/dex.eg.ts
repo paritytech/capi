@@ -141,7 +141,7 @@ const $assetConversionApiQuoteArgs = $.tuple(
   // asset 2
   $assetId,
   // asset balance
-  $.u32,
+  $.u128,
   // include fee
   $.bool,
 )
@@ -152,7 +152,7 @@ const quoteArgs = Rune.constant($assetConversionApiQuoteArgs)
     Rune.tuple([
       NativeOrAssetId.Asset(USDT_ASSET_ID),
       NativeOrAssetId.Asset(DOT_ASSET_ID),
-      30000,
+      30000n,
       true,
     ]),
   )
