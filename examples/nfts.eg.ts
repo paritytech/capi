@@ -14,11 +14,9 @@ import {
   RuntimeEvent,
 } from "@capi/rococo-dev-westmint"
 import { assertEquals } from "asserts"
-import { $, createDevUsers, is, Rune, Scope } from "capi"
+import { $, createDevUsers, is, Rune } from "capi"
 import { signature } from "capi/patterns/signature/statemint"
 import { DefaultCollectionSetting, DefaultItemSetting } from "capi/patterns/unstable/nfts"
-
-const scope = new Scope()
 
 /// Create two dev users. Alexa will mint and list the NFT. Billy will purchase it.
 const { alexa, billy } = await createDevUsers()
@@ -39,7 +37,7 @@ const createEvents = await rococoDevWestmint.Nfts
   .sent()
   .dbgStatus("Create collection:")
   .finalizedEvents()
-  .run(scope)
+  .run()
 
 /// Extract the collection's id from emitted events.
 const collection = (() => {
@@ -69,7 +67,7 @@ await rococoDevWestmint.Nfts
   .sent()
   .dbgStatus("Mint the NFT:")
   .finalized()
-  .run(scope)
+  .run()
 
 const owner = rococoDevWestmint.Nfts.Item
   .value([collection, item])
@@ -77,7 +75,7 @@ const owner = rococoDevWestmint.Nfts.Item
   .access("owner")
 
 /// Retrieve the final owner.
-const initialOwner = await owner.run(scope)
+const initialOwner = await owner.run()
 
 /// Ensure Alexa is the initial owner.
 console.log("Initial owner:", initialOwner)
@@ -101,14 +99,14 @@ await rococoDevWestmint.Utility
   .sent()
   .dbgStatus("Sale prep:")
   .finalized()
-  .run(scope)
+  .run()
 
 /// Retrieve the price of the NFT.
 const bidPrice = await rococoDevWestmint.Nfts.ItemPriceOf
   .value([collection, item])
   .unhandle(is(undefined))
   .access(0)
-  .run(scope)
+  .run()
 
 /// Ensure the `bidPrice` is the expected value.
 console.log(bidPrice)
@@ -121,10 +119,10 @@ await rococoDevWestmint.Nfts
   .sent()
   .dbgStatus("Purchase:")
   .finalized()
-  .run(scope)
+  .run()
 
 /// Retrieve the final owner.
-const finalOwner = await owner.run(scope)
+const finalOwner = await owner.run()
 
 /// Ensure Billy is the final owner.
 console.log("Final owner:", finalOwner)

@@ -4,12 +4,12 @@
  */
 
 import { polkadotDev } from "@capi/polkadot-dev"
-import { $, Scope } from "capi"
+import { $ } from "capi"
 
 /// Make a call.
 const hash = await polkadotDev.connection
   .call("chain_getFinalizedHead")
-  .run(new Scope())
+  .run()
 
 /// Ensure the result is a block hash.
 $.assert($.str, hash)

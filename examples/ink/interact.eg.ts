@@ -8,11 +8,9 @@
 
 import { contractsDev } from "@capi/contracts-dev"
 import { assert } from "asserts"
-import { $, createDevUsers, hex, Scope } from "capi"
+import { $, createDevUsers, hex } from "capi"
 import { signature } from "capi/patterns/signature/polkadot"
 import { InkMetadataRune } from "capi/patterns/unstable/ink"
-
-const scope = new Scope()
 
 /// Get two test users. Alexa will deploy, Billy will be the recipient of an erc20
 /// token transfer.
@@ -39,7 +37,7 @@ const state = contract.call({
 })
 
 /// Retrieve the initial state.
-const initialState = await state.run(scope)
+const initialState = await state.run()
 console.log("Alexa initial balance:", initialState)
 
 /// Use the `flip` method to *flip* the contract instance state.
@@ -54,7 +52,7 @@ const events = await contract
   .dbgStatus("Transfer:")
   .inBlockEvents()
   .pipe(contract.emittedEvents)
-  .run(scope)
+  .run()
 
 /// Ensure the emitted events are of the expected shape.
 /// In this case, we expect only a `Transfer` event.
@@ -72,7 +70,7 @@ $.assert(
 console.log(events)
 
 /// Retrieve the final state.
-const finalState = await state.run(scope)
+const finalState = await state.run()
 console.log("Alexa final balance:", finalState)
 
 assert(finalState < initialState)

@@ -4,9 +4,7 @@
  */
 
 import { $weight, westend } from "@capi/westend"
-import { $, alice, Rune, Scope } from "capi"
-
-const scope = new Scope()
+import { $, alice, Rune } from "capi"
 
 /// Create the call data.
 const call = westend.Balances
@@ -21,7 +19,7 @@ const collection = await Rune
     weight: call.weight(),
     estimate: call.estimate(),
   })
-  .run(scope)
+  .run()
 
 /// Ensure the data is of the expected shape.
 console.log(collection)

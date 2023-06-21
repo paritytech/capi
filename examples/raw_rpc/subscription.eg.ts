@@ -4,12 +4,12 @@
  */
 
 import { polkadotDev } from "@capi/polkadot-dev"
-import { $, known, Scope } from "capi"
+import { $, known } from "capi"
 
 /// Get an async iterator, which yields subscription events.
 const headerIter = polkadotDev.connection
   .subscribe("chain_subscribeFinalizedHeads", "chain_unsubscribeAllHeads")
-  .iter(new Scope())
+  .iter()
 
 /// Create a simple counter so that we can break iteration at 3.
 let i = 0

@@ -6,7 +6,7 @@
  */
 
 import { $eventRecord, metadata, polkadot } from "@capi/polkadot"
-import { $, $extrinsic, known, Rune, Scope } from "capi"
+import { $, $extrinsic, known, Rune } from "capi"
 import { babeBlockAuthor } from "capi/patterns/unstable/consensus"
 
 /// Reference the latest block hash.
@@ -37,7 +37,7 @@ const collection = await Rune
     events,
     author,
   })
-  .run(new Scope())
+  .run()
 
 /// Ensure that collection contains the expected shape of data.
 console.log("Collection:", collection)

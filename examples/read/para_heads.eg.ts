@@ -6,7 +6,7 @@
  */
 
 import { polkadot } from "@capi/polkadot"
-import { $, ArrayRune, is, Scope, ValueRune } from "capi"
+import { $, ArrayRune, is, ValueRune } from "capi"
 
 /// Retrieve the head for each id in the parachains storage.
 const heads = await polkadot.Paras.Parachains
@@ -16,7 +16,7 @@ const heads = await polkadot.Paras.Parachains
   .mapArray((id) => polkadot.Paras.Heads.value(id).unhandle(is(undefined)))
   .into(ValueRune)
   .rehandle(is(undefined))
-  .run(new Scope())
+  .run()
 
 /// Ensure `heads` is of the expected shape.
 console.log("Parachain heads:", heads)

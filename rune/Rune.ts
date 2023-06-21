@@ -7,10 +7,10 @@ import { Trace } from "./Trace.ts"
 // @deno-types="./_empty.d.ts"
 import * as _ from "./_empty.js"
 
-export class Scope {
+export class Batch {
   constructor(
     readonly timeline = new Timeline(),
-    readonly parent?: Scope,
+    readonly parent?: Batch,
     readonly wrapParent: <T, U>(rune: Run<T, U>) => Run<T, U> = (x) => x,
   ) {}
 
@@ -27,11 +27,7 @@ export class Scope {
         const prevTrace = this._currentTrace
         this._currentTrace = rune._trace
         try {
-          const primed = rune._prime(this)
-          primed.signal.addEventListener("abort", () => {
-            this.primed.delete(rune._prime)
-          })
-          return primed
+          return rune._prime(this)
         } finally {
           this._currentTrace = prevTrace
         }
@@ -48,16 +44,13 @@ export class Scope {
     if (parent) {
       const wrapped = this.wrapParent(parent)
       this.primed.set(rune._prime, wrapped)
-      wrapped.signal.addEventListener("abort", () => {
-        this.primed.delete(rune._prime)
-      })
       return wrapped
     }
     return undefined
   }
 
   spawn(time: number, receipt: Receipt) {
-    return new Scope(new Timeline(), this, (x) => new RunProxy(this, x, time, receipt))
+    return new Batch(new Timeline(), this, (x) => new RunProxy(this, x, time, receipt))
   }
 }
 
@@ -80,27 +73,27 @@ export class Rune<out T, out U = never> {
   declare private _
   _trace: Trace
 
-  constructor(readonly _prime: (scope: Scope) => Run<T, U>) {
+  constructor(readonly _prime: (batch: Batch) => Run<T, U>) {
     this._trace = new Trace(`execution of the ${new.target.name} instantiated`)
   }
 
   static new<T, U, A extends unknown[]>(
-    ctor: new(scope: Scope, ...args: A) => Run<T, U>,
+    ctor: new(batch: Batch, ...args: A) => Run<T, U>,
     ...args: A
   ) {
-    return new Rune((scope) => new ctor(scope, ...args))
+    return new Rune((batch) => new ctor(batch, ...args))
   }
 
-  async run(scope: Scope): Promise<T> {
-    for await (const value of this.iter(scope)) {
+  async run(batch = new Batch()): Promise<T> {
+    for await (const value of this.iter(batch)) {
       return value
     }
     throw new Error("Rune did not yield any values")
   }
 
-  async *iter(scope: Scope) {
+  async *iter(batch = new Batch()) {
     const abortController = new AbortController()
-    const primed = scope.prime(this, abortController.signal)
+    const primed = batch.prime(this, abortController.signal)
     let time = 0
     try {
       while (time !== Infinity) {
@@ -196,7 +189,7 @@ export class Rune<out T, out U = never> {
   }
 
   into<A extends unknown[], C extends Rune<any, any>>(
-    ctor: new(_prime: (scope: Scope) => Run<T, U | RunicArgs.U<A>>, ...args: A) => C,
+    ctor: new(_prime: (batch: Batch) => Run<T, U | RunicArgs.U<A>>, ...args: A) => C,
     ...args: A
   ): C {
     const rune = new ctor(this._prime, ...args)
@@ -204,7 +197,7 @@ export class Rune<out T, out U = never> {
     return rune
   }
 
-  as<R>(this: R, _ctor: new(_prime: (scope: Scope) => Run<T, U>, ...args: any) => R): R {
+  as<R>(this: R, _ctor: new(_prime: (batch: Batch) => Run<T, U>, ...args: any) => R): R {
     return this
   }
 
@@ -223,9 +216,9 @@ export abstract class Run<T, U> {
 
   abortController = new AbortController()
   signal = this.abortController.signal
-  constructor(readonly scope: Scope) {
+  constructor(readonly batch: Batch) {
     this.signal.addEventListener("abort", () => this.cleanup())
-    this.trace = scope._currentTrace
+    this.trace = batch._currentTrace
       ?? new Trace(`execution of the ${new.target.name} instantiated`)
   }
 
@@ -270,12 +263,12 @@ export abstract class Run<T, U> {
 
 class RunProxy<T, E> extends Run<T, E> {
   constructor(
-    scope: Scope,
+    batch: Batch,
     readonly inner: Run<T, E>,
     readonly innerTime: number,
     readonly innerReceipt: Receipt,
   ) {
-    super(scope)
+    super(batch)
   }
 
   _evaluate(): Promise<T> {
@@ -285,8 +278,8 @@ class RunProxy<T, E> extends Run<T, E> {
 }
 
 class RunConstant<T> extends Run<T, never> {
-  constructor(scope: Scope, readonly value: T) {
-    super(scope)
+  constructor(batch: Batch, readonly value: T) {
+    super(batch)
   }
 
   _evaluate() {
@@ -296,9 +289,9 @@ class RunConstant<T> extends Run<T, never> {
 
 class RunLs<T, U> extends Run<T[], U> {
   children
-  constructor(scope: Scope, children: Rune<T, U>[]) {
-    super(scope)
-    this.children = children.map((child) => scope.prime(child, this.signal))
+  constructor(batch: Batch, children: Rune<T, U>[]) {
+    super(batch)
+    this.children = children.map((child) => batch.prime(child, this.signal))
   }
 
   _evaluate(time: number, receipt: Receipt) {
@@ -309,15 +302,15 @@ class RunLs<T, U> extends Run<T[], U> {
 export abstract class RunStream<T> extends Run<T, never> {
   initPromise = deferred<void>()
   valueQueue: [number, T][] = []
-  eventSource = new EventSource(this.scope.timeline)
+  eventSource = new EventSource(this.batch.timeline)
   first = true
   done = false
 
   curIter = new AbortController()
 
   lastValue: T = null!
-  constructor(scope: Scope) {
-    super(scope)
+  constructor(batch: Batch) {
+    super(batch)
   }
 
   async _evaluate(time: number, receipt: Receipt): Promise<T> {
@@ -354,8 +347,8 @@ export abstract class RunStream<T> extends Run<T, never> {
 }
 
 class RunAsyncIter<T> extends RunStream<T> {
-  constructor(scope: Scope, fn: (signal: AbortSignal) => AsyncIterable<T>) {
-    super(scope)
+  constructor(batch: Batch, fn: (signal: AbortSignal) => AsyncIterable<T>) {
+    super(batch)
     ;(async () => {
       for await (const value of fn(this.signal)) {
         this.push(value)
@@ -373,9 +366,9 @@ class RunPlaceholder extends Run<never, never> {
 
 class RunBubbleUnhandled<T, U> extends Run<T, never> {
   child
-  constructor(scope: Scope, child: Rune<T, U>, readonly symbol: symbol) {
-    super(scope)
-    this.child = scope.prime(child, this.signal)
+  constructor(batch: Batch, child: Rune<T, U>, readonly symbol: symbol) {
+    super(batch)
+    this.child = batch.prime(child, this.signal)
   }
 
   async _evaluate(time: number, receipt: Receipt) {
@@ -392,9 +385,9 @@ class RunBubbleUnhandled<T, U> extends Run<T, never> {
 
 class RunCaptureUnhandled<T, U1, U2> extends Run<T, U1 | U2> {
   child
-  constructor(scope: Scope, child: Rune<T, U1>, readonly symbol: symbol) {
-    super(scope)
-    this.child = scope.prime(child, this.signal)
+  constructor(batch: Batch, child: Rune<T, U1>, readonly symbol: symbol) {
+    super(batch)
+    this.child = batch.prime(child, this.signal)
   }
 
   async _evaluate(time: number, receipt: Receipt) {

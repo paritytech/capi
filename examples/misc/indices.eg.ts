@@ -6,14 +6,12 @@
 
 import { polkadotDev } from "@capi/polkadot-dev"
 import { assertEquals } from "asserts"
-import { createDevUsers, is, Scope } from "capi"
+import { createDevUsers, is } from "capi"
 import { signature } from "capi/patterns/signature/polkadot"
 
 const { alexa } = await createDevUsers()
-const scope = new Scope()
 
-/// Generate a random (but reasonably large) index.
-const index = (crypto.getRandomValues(new Uint32Array([0]))[0]! | 4646) >>> 0
+const index = 254
 
 /// Claim the index.
 const hash = await polkadotDev.Indices
@@ -22,14 +20,14 @@ const hash = await polkadotDev.Indices
   .sent()
   .dbgStatus("Claim index:")
   .finalized()
-  .run(scope)
+  .run()
 
 /// Use the index to key into the indices accounts map.
 const mapped = await polkadotDev.Indices.Accounts
   .value(index, hash)
   .unhandle(is(undefined))
   .access(0)
-  .run(scope)
+  .run()
 
 /// The retrieved mapped account id should be Alexa's.
 console.log(`Index ${index} Mapped to:`, mapped)

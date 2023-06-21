@@ -97,11 +97,8 @@ Retrieve the first 10 entries from a storage map of Polkadot.
 
 ```ts
 import { polkadot } from "@capi/polkadot"
-import { Scope } from "capi"
 
-const accounts = await polkadot.System.Account
-  .entries({ limit: 10 })
-  .run(new Scope())
+const accounts = await polkadot.System.Account.entries({ limit: 10 }).run()
 ```
 
 ## Development Networks
