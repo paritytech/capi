@@ -1,7 +1,6 @@
 import { localDev, NativeOrAssetId, PalletAssetConversionEvent } from "@capi/local-dev"
-import { $, CodecRune, hex } from "capi"
+import { $, alice, bob, CodecRune, hex } from "capi"
 import { signature } from "capi/patterns/signature/statemint"
-import { alice, bob } from "../crypto/test_pairs.ts"
 import { Rune, RunicArgs, Scope } from "../rune/Rune.ts"
 
 const scope = new Scope()
