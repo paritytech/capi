@@ -27,7 +27,11 @@ export class Batch {
         const prevTrace = this._currentTrace
         this._currentTrace = rune._trace
         try {
-          return rune._prime(this)
+          const primed = rune._prime(this)
+          primed.signal.addEventListener("abort", () => {
+            this.primed.delete(rune._prime)
+          })
+          return primed
         } finally {
           this._currentTrace = prevTrace
         }
@@ -44,6 +48,9 @@ export class Batch {
     if (parent) {
       const wrapped = this.wrapParent(parent)
       this.primed.set(rune._prime, wrapped)
+      wrapped.signal.addEventListener("abort", () => {
+        this.primed.delete(rune._prime)
+      })
       return wrapped
     }
     return undefined
@@ -53,6 +60,8 @@ export class Batch {
     return new Batch(new Timeline(), this, (x) => new RunProxy(this, x, time, receipt))
   }
 }
+
+const globalBatch = new Batch()
 
 declare const _T: unique symbol
 declare const _U: unique symbol
@@ -84,14 +93,14 @@ export class Rune<out T, out U = never> {
     return new Rune((batch) => new ctor(batch, ...args))
   }
 
-  async run(batch = new Batch()): Promise<T> {
+  async run(batch = globalBatch): Promise<T> {
     for await (const value of this.iter(batch)) {
       return value
     }
     throw new Error("Rune did not yield any values")
   }
 
-  async *iter(batch = new Batch()) {
+  async *iter(batch = globalBatch) {
     const abortController = new AbortController()
     const primed = batch.prime(this, abortController.signal)
     let time = 0
