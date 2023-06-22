@@ -81,19 +81,13 @@ await Promise.all([
     compilerOptions: {
       importHelpers: true,
       sourceMap: true,
-      target: "ES2021",
-      lib: ["es2022.error"],
+      target: "ES2022",
+      lib: ["ES2022", "DOM"],
     },
     entryPoints: [
-      {
-        name: ".",
-        path: "./mod.ts",
-      },
-      {
-        kind: "bin",
-        name: "capi",
-        path: "./main.ts",
-      },
+      { name: ".", path: "./mod.ts" },
+      { name: "./loader", path: "./deps/shims/loader.node.ts" },
+      { kind: "bin", name: "capi", path: "./main.ts" },
       ...entryPoints,
     ],
     mappings: {
@@ -119,6 +113,7 @@ await Promise.all([
         version: "8.13.0",
       },
       "./deps/shims/shim-deno.ts": "@deno/shim-deno",
+      "./deps/shims/ts-node-esm.ts": "ts-node/esm",
       "node:net": "node:net",
       "node:http": "node:http",
       "node:stream": "node:stream",
@@ -152,14 +147,19 @@ await Promise.all([
 await Promise.all([
   fs.copy(
     path.join(capiOutDir, "src/rune/_empty.d.ts"),
-    path.join(capiOutDir, "types/rune/_empty.d.ts"),
+    path.join(capiOutDir, "esm/rune/_empty.d.ts"),
+    { overwrite: true },
+  ),
+  fs.copy(
+    path.join(capiOutDir, "src/rune/_empty.d.ts"),
+    path.join(capiOutDir, "script/rune/_empty.d.ts"),
     { overwrite: true },
   ),
   editFile(
     path.join(capiOutDir, "esm/main.js"),
     (content) =>
       content
-        .replace(/^#!.+/, "#!/usr/bin/env -S node --loader ts-node/esm"),
+        .replace(/^#!.+/, "#!/usr/bin/env -S node --loader capi/loader"),
   ),
   editFile(
     path.join(capiOutDir, "esm/_dnt.shims.js"),
@@ -209,9 +209,12 @@ if (buildExamples) {
       importHelpers: true,
       sourceMap: true,
       target: "ES2021",
-      lib: ["es2022.error", "dom.iterable"],
+      lib: ["ES2022", "DOM"],
     },
-    entryPoints: exampleEntryPoints,
+    entryPoints: [
+      ...exampleEntryPoints,
+      { name: "./deps/ed25519", path: "./deps/ed25519.ts" },
+    ],
     mappings: {
       "https://deno.land/x/polkadot@0.2.38/keyring/mod.ts": {
         name: "@polkadot/keyring",
