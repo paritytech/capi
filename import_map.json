@@ -12,6 +12,7 @@
       "capi/patterns/signature/polkadot": "./patterns/signature/polkadot.ts",
       "capi/patterns/signature/statemint": "./patterns/signature/statemint.ts",
       "capi/patterns/unstable/consensus": "./patterns/unstable/consensus/mod.ts",
+      "capi/patterns/unstable/dex": "./patterns/unstable/dex/mod.ts",
       "capi/patterns/unstable/identity": "./patterns/unstable/identity.ts",
       "capi/patterns/unstable/ink": "./patterns/unstable/ink/mod.ts",
       "capi/patterns/unstable/multisig": "./patterns/unstable/multisig/mod.ts",
