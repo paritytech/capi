@@ -211,7 +211,10 @@ if (buildExamples) {
       target: "ES2021",
       lib: ["ES2022", "DOM"],
     },
-    entryPoints: exampleEntryPoints,
+    entryPoints: [
+      ...exampleEntryPoints,
+      { name: "./deps/ed25519", path: "./deps/ed25519.ts" },
+    ],
     mappings: {
       "https://deno.land/x/polkadot@0.2.38/keyring/mod.ts": {
         name: "@polkadot/keyring",
