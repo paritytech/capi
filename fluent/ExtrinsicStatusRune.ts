@@ -17,15 +17,15 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
       .into(ExtrinsicStatusRune, this.chain, this.parent)
   }
 
-  transactionStatuses(isTerminal: (txStatus: known.TransactionStatus) => boolean) {
+  status(isTerminal: (status: known.TransactionStatus) => boolean | void) {
     return this
       .into(OrthoRune)
-      .orthoMap((events) => events.into(ValueRune).filter(isTerminal))
+      .orthoMap((events) => events.into(ValueRune).filter((status) => !!isTerminal(status)))
       .flatSingular()
   }
 
   inBlock() {
-    return this.transactionStatuses((status) =>
+    return this.status((status) =>
       known.TransactionStatus.isTerminal(status)
       || (typeof status !== "string" ? !!status.inBlock : false)
     )
@@ -37,7 +37,7 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
   }
 
   finalized() {
-    return this.transactionStatuses(known.TransactionStatus.isTerminal)
+    return this.status(known.TransactionStatus.isTerminal)
       .map((status) =>
         typeof status !== "string" && status.finalized
           ? status.finalized
