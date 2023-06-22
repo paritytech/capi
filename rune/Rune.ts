@@ -15,23 +15,26 @@ export abstract class Runner {
   protected abstract _prime<T, U>(rune: Rune<T, U>): Run<T, U>
 
   memo = new Map<(runner: Runner) => Run<any, any>, Run<any, any>>()
-  prime<T, U>(rune: _.Rune<T, U>, signal: AbortSignal | undefined): Run<T, U> {
+  prime<T, U>(rune: Rune<T, U>): Run<T, U> {
     const run = getOrInit(this.memo, rune._prime, () => {
       const old = this._currentTrace
       this._currentTrace = rune._trace
       const run = this._prime(rune)
       this._currentTrace = old
-      run.signal.addEventListener("abort", () => {
-        this.memo.delete(rune._prime)
-      })
+      run._sources.push(rune._prime)
       return run
     })
-    if (signal) run.reference(signal)
     return run
   }
 
-  getPrimed<T, U>(rune: _.Rune<T, U>): Run<T, U> | undefined {
+  getPrimed<T, U>(rune: Rune<T, U>): Run<T, U> | undefined {
     return this.memo.get(rune._prime)
+  }
+
+  onCleanup(run: Run<unknown, unknown>) {
+    for (const source of run._sources) {
+      this.memo.delete(source)
+    }
   }
 }
 
@@ -44,7 +47,7 @@ class RootRunner extends Runner {
   }
 }
 
-const globalRunner = new RootRunner()
+export const globalRunner = new RootRunner()
 
 declare const _T: unique symbol
 declare const _U: unique symbol
@@ -84,8 +87,8 @@ export class Rune<out T, out U = never> {
   }
 
   async *iter(runner: Runner = globalRunner) {
-    const abortController = new AbortController()
-    const primed = runner.prime(this, abortController.signal)
+    const primed = runner.prime(this)
+    primed.reference()
     let time = runner.timeline.current
     try {
       while (time !== Infinity) {
@@ -98,7 +101,7 @@ export class Rune<out T, out U = never> {
         time = receipt.nextTime
       }
     } finally {
-      abortController.abort()
+      primed.dereference()
     }
   }
 
@@ -172,7 +175,7 @@ export class Rune<out T, out U = never> {
     )
   }
 
-  static asyncIter<T>(fn: (signal: AbortSignal) => AsyncIterable<T>): Rune.ValueRune<T, never> {
+  static asyncIter<T>(fn: () => AsyncIterable<T>): Rune.ValueRune<T, never> {
     return Rune.ValueRune.new(RunAsyncIter, fn)
   }
 
@@ -203,8 +206,8 @@ export class Rune<out T, out U = never> {
 
   static pin<T, U>(rune: Rune<T, U>, pinned: Rune<unknown, unknown>): Rune<T, U> {
     return new Rune((runner) => {
-      const run = runner.prime(rune, undefined)
-      runner.prime(pinned, run.signal)
+      const run = runner.prime(rune)
+      run.use(pinned)
       return run
     })
   }
@@ -216,26 +219,55 @@ export abstract class Run<T, U> {
   order: number
   timeline
 
-  abortController = new AbortController()
-  signal = this.abortController.signal
-  constructor(runner: Runner) {
-    this.signal.addEventListener("abort", () => this.cleanup())
+  constructor(readonly runner: Runner) {
     this.trace = runner._currentTrace
       ?? new Trace(`execution of the ${new.target.name} instantiated`)
     this.order = runner.order
     this.timeline = runner.timeline
   }
 
+  dependencies: Run<unknown, unknown>[] = []
+
+  use<T, U>(rune: Rune<T, U>): Run<T, U> {
+    const run = this.runner.prime(rune)
+    this.useRun(run)
+    return run
+  }
+
+  useRun(run: Run<unknown, unknown>) {
+    run.reference()
+    this.dependencies.push(run)
+  }
+
   referenceCount = 0
-  reference(signal: AbortSignal) {
+  alive = true
+
+  reference() {
     if (!this.alive) throw new Error("cannot reference a dead rune")
     this.referenceCount++
-    signal.addEventListener("abort", () => {
-      if (!--this.referenceCount) {
-        this.abortController.abort()
-      }
-    })
   }
+
+  _sources: Array<(runner: Runner) => Run<any, any>> = []
+  dereference(cleanupBatches?: Run<unknown, unknown>[][]) {
+    if (!--this.referenceCount) {
+      this.alive = false
+      this.cleanup()
+      this.runner.onCleanup(this)
+      if (cleanupBatches) {
+        cleanupBatches.push(this.dependencies)
+      } else {
+        const cleanupBatches = [this.dependencies]
+        while (cleanupBatches.length) {
+          const batch = cleanupBatches.pop()!
+          for (const run of batch) {
+            run.dereference(cleanupBatches)
+          }
+        }
+      }
+    }
+  }
+
+  cleanup() {}
 
   _currentTime = -1
   _currentPromise: Promise<T> = null!
@@ -258,11 +290,6 @@ export abstract class Run<T, U> {
     }
   }
   abstract _evaluate(time: number, receipt: Receipt): Promise<T>
-
-  alive = true
-  cleanup() {
-    this.alive = false
-  }
 }
 
 class RunConstant<T> extends Run<T, never> {
@@ -279,7 +306,7 @@ class RunLs<T, U> extends Run<T[], U> {
   children
   constructor(runner: Runner, children: Rune<T, U>[]) {
     super(runner)
-    this.children = children.map((child) => runner.prime(child, this.signal))
+    this.children = children.map((child) => this.use(child))
   }
 
   _evaluate(time: number, receipt: Receipt) {
@@ -335,10 +362,10 @@ export abstract class RunStream<T> extends Run<T, never> {
 }
 
 class RunAsyncIter<T> extends RunStream<T> {
-  constructor(runner: Runner, fn: (signal: AbortSignal) => AsyncIterable<T>) {
+  constructor(runner: Runner, fn: () => AsyncIterable<T>) {
     super(runner)
     ;(async () => {
-      for await (const value of fn(this.signal)) {
+      for await (const value of fn()) {
         this.push(value)
       }
       this.finish()
@@ -356,7 +383,7 @@ class RunBubbleUnhandled<T, U> extends Run<T, never> {
   child
   constructor(runner: Runner, child: Rune<T, U>, readonly symbol: symbol) {
     super(runner)
-    this.child = runner.prime(child, this.signal)
+    this.child = this.use(child)
   }
 
   async _evaluate(time: number, receipt: Receipt) {
@@ -375,7 +402,7 @@ class RunCaptureUnhandled<T, U1, U2> extends Run<T, U1 | U2> {
   child
   constructor(runner: Runner, child: Rune<T, U1>, readonly symbol: symbol) {
     super(runner)
-    this.child = runner.prime(child, this.signal)
+    this.child = this.use(child)
   }
 
   async _evaluate(time: number, receipt: Receipt) {

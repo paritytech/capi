@@ -8,7 +8,7 @@
 
 import { contractsDev } from "@capi/contracts-dev"
 import { assert } from "asserts"
-import { $, createDevUsers, hex } from "capi"
+import { $, createDevUsers, globalRunner, hex } from "capi"
 import { signature } from "capi/patterns/signature/polkadot"
 import { InkMetadataRune } from "capi/patterns/unstable/ink"
 
@@ -68,6 +68,8 @@ $.assert(
   events,
 )
 console.log(events)
+
+console.log([...globalRunner.memo].map(([k, v]) => v._source === k))
 
 /// Retrieve the final state.
 const finalState = await state.run()

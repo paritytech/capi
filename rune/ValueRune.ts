@@ -182,10 +182,8 @@ class RunMatch<M, T, U> extends Run<T, U> {
     conditions: [(x: M) => boolean, ValueRune<T, U>][],
   ) {
     super(runner)
-    this.value = runner.prime(child, this.signal)
-    this.conditions = conditions.map(([cond, val]) =>
-      [cond, runner.prime(val, this.signal)] as const
-    )
+    this.value = this.use(child)
+    this.conditions = conditions.map(([cond, val]) => [cond, this.use(val)] as const)
   }
 
   async _evaluate(time: number, receipt: Receipt) {
@@ -207,7 +205,7 @@ class RunMap<T1, U, T2> extends Run<T2, U> {
     readonly fn: (value: T1) => T2 | Promise<T2>,
   ) {
     super(runner)
-    this.child = runner.prime(child, this.signal)
+    this.child = this.use(child)
   }
 
   lastValue: T2 = null!
@@ -231,8 +229,8 @@ class RunHandle<T, T2 extends T, T3, U, U2> extends Run<Exclude<T, T2> | T3, U |
     alt: Rune<T3, U2>,
   ) {
     super(runner)
-    this.child = runner.prime(child, this.signal)
-    this.alt = runner.prime(alt, this.signal)
+    this.child = this.use(child)
+    this.alt = this.use(alt)
   }
 
   async _evaluate(time: number, receipt: Receipt) {
@@ -251,7 +249,7 @@ class RunUnhandle<T, U> extends Run<T, U | T> {
     readonly guard: Guard<T, T>,
   ) {
     super(runner)
-    this.child = runner.prime(child, this.signal)
+    this.child = this.use(child)
   }
 
   async _evaluate(time: number, receipt: Receipt) {
@@ -269,7 +267,7 @@ class RunThrows<T, U1, U2> extends Run<T, U1 | U2> {
     readonly guards: Array<Guard<unknown, U2>>,
   ) {
     super(runner)
-    this.child = runner.prime(child, this.signal)
+    this.child = this.use(child)
   }
 
   async _evaluate(time: number, receipt: Receipt) {
@@ -288,7 +286,7 @@ class RunGetUnhandled<T, U> extends Run<Unhandled<U> | null, never> {
   child
   constructor(runner: Runner, child: Rune<T, U>) {
     super(runner)
-    this.child = runner.prime(child, this.signal)
+    this.child = this.use(child)
   }
 
   async _evaluate(time: number, receipt: Receipt) {
@@ -314,8 +312,8 @@ class RunRehandle<T1, U1, U2 extends U1, T3, U3> extends Run<T1 | T3, Exclude<U1
     alt: Rune<T3, U3>,
   ) {
     super(runner)
-    this.child = runner.prime(child, this.signal)
-    this.alt = runner.prime(alt, this.signal)
+    this.child = this.use(child)
+    this.alt = this.use(alt)
   }
 
   async _evaluate(time: number, receipt: Receipt) {
@@ -334,7 +332,7 @@ class RunLazy<T, U> extends Run<T, U> {
   child
   constructor(runner: Runner, child: Rune<T, U>) {
     super(runner)
-    this.child = runner.prime(child, this.signal)
+    this.child = this.use(child)
   }
 
   async _evaluate(time: number, _receipt: Receipt): Promise<T> {
@@ -346,7 +344,7 @@ class RunFilter<T, U> extends Run<T, U> {
   child
   constructor(runner: Runner, child: Rune<T, U>, readonly fn: (value: T) => boolean) {
     super(runner)
-    this.child = runner.prime(child, this.signal)
+    this.child = this.use(child)
   }
 
   first = true
@@ -375,7 +373,7 @@ class RunFinal<T, U> extends Run<T, U> {
   child
   constructor(runner: Runner, child: Rune<T, U>) {
     super(runner)
-    this.child = runner.prime(child, this.signal)
+    this.child = this.use(child)
   }
 
   async _evaluate(time: number, receipt: Receipt): Promise<T> {
@@ -395,7 +393,7 @@ class RunReduce<T1, U, T2> extends Run<T2, U> {
     readonly fn: (last: T2, value: T1) => T2 | Promise<T2>,
   ) {
     super(runner)
-    this.child = runner.prime(child, this.signal)
+    this.child = this.use(child)
   }
 
   async _evaluate(time: number, receipt: Receipt) {
@@ -415,8 +413,8 @@ class RunChain<T1, U1, T2, U2> extends Run<T2, U1 | U2> {
     second: Rune<T2, U2>,
   ) {
     super(runner)
-    this.first = runner.prime(first, this.signal)
-    this.second = runner.prime(second, this.signal)
+    this.first = this.use(first)
+    this.second = this.use(second)
   }
 
   lastValue: T2 = null!
