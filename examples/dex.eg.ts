@@ -91,7 +91,7 @@ await localDev.Assets.mint({
   .unhandleFailed()
   .run(scope)
 
-await localDev.AssetConversion.addLiquidity({
+const lpTokenAmount = await localDev.AssetConversion.addLiquidity({
   asset1: NativeOrAssetId.Asset(DOT_ASSET_ID),
   asset2: NativeOrAssetId.Asset(USDT_ASSET_ID),
   amount1Desired: 218173n,
@@ -104,6 +104,8 @@ await localDev.AssetConversion.addLiquidity({
   .dbgStatus("Add Liquidity to DOT/USDT Pool:")
   .finalizedEvents()
   .unhandleFailed()
+  .pipe(filterLiquidityAddedEvent)
+  .access(0, "lpTokenMinted")
   .run(scope)
 
 await localDev.Assets.mint({
@@ -124,6 +126,10 @@ await quotePriceExactTokensForTokens(
   true,
 )
   .dbg("DOT/USDT Quote:")
+  .run(scope)
+
+await getReserves(NativeOrAssetId.Asset(USDT_ASSET_ID), NativeOrAssetId.Asset(DOT_ASSET_ID))
+  .dbg("DOT/USDT Reserves Before:")
   .run(scope)
 
 // swap with no slippage checks
@@ -148,7 +154,25 @@ await localDev.Assets.Account
   .run(scope)
 
 await getReserves(NativeOrAssetId.Asset(USDT_ASSET_ID), NativeOrAssetId.Asset(DOT_ASSET_ID))
-  .dbg("DOT/USDT Reserves:")
+  .dbg("DOT/USDT Reserves After:")
+  .run(scope)
+
+await localDev.AssetConversion.removeLiquidity({
+  asset1: NativeOrAssetId.Asset(DOT_ASSET_ID),
+  asset2: NativeOrAssetId.Asset(USDT_ASSET_ID),
+  lpTokenBurn: lpTokenAmount / 2n,
+  amount1MinReceive: 1n,
+  amount2MinReceive: 1n,
+  withdrawTo: alice.publicKey,
+}).signed(signature({ sender: alice }))
+  .sent()
+  .dbgStatus("Remove Half Liquidity to DOT/USDT Pool:")
+  .finalizedEvents()
+  .unhandleFailed()
+  .run(scope)
+
+await getReserves(NativeOrAssetId.Asset(USDT_ASSET_ID), NativeOrAssetId.Asset(DOT_ASSET_ID))
+  .dbg("DOT/USDT Reserves After:")
   .run(scope)
 
 function filterPoolCreatedEvents<X>(...[events]: RunicArgs<X, [any[]]>) {
@@ -162,7 +186,18 @@ function filterPoolCreatedEvents<X>(...[events]: RunicArgs<X, [any[]]>) {
   )
 }
 
-export function quotePriceExactTokensForTokens<X>(
+function filterLiquidityAddedEvent<X>(...[events]: RunicArgs<X, [any[]]>) {
+  return Rune.resolve(events).map((events) =>
+    events
+      .map((e) => e.event)
+      .map((e) => e.value)
+      .filter((event): event is PalletAssetConversionEvent.LiquidityAdded =>
+        event.type === "LiquidityAdded"
+      )
+  )
+}
+
+function quotePriceExactTokensForTokens<X>(
   ...[asset1, asset2, amount, includeFee]: RunicArgs<
     X,
     [asset1: NativeOrAssetId, asset2: NativeOrAssetId, amount: bigint, includeFee: boolean]
@@ -194,7 +229,7 @@ export function quotePriceExactTokensForTokens<X>(
     .map((x) => $.u128.decode(x))
 }
 
-export function getReserves<X>(
+function getReserves<X>(
   ...[asset1, asset2]: RunicArgs<
     X,
     [asset1: NativeOrAssetId, asset2: NativeOrAssetId]
