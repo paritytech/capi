@@ -7,59 +7,44 @@ import { Trace } from "./Trace.ts"
 // @deno-types="./_empty.d.ts"
 import * as _ from "./_empty.js"
 
-export class Scope {
-  constructor(
-    readonly timeline = new Timeline(),
-    readonly parent?: Scope,
-    readonly wrapParent: <T, U>(rune: Run<T, U>) => Run<T, U> = (x) => x,
-  ) {}
+export abstract class Runner {
+  abstract order: number
+  abstract timeline: Timeline
 
   _currentTrace?: Trace
+  protected abstract _prime<T, U>(rune: Rune<T, U>): Run<T, U>
 
-  primed = new Map<Rune<any, any>["_prime"], Run<any, any>>()
-  prime<T, E>(rune: Rune<T, E>, signal: AbortSignal): Run<T, E> {
-    const primed = getOrInit(
-      this.primed,
-      rune._prime,
-      () => {
-        const existing = this.getPrimed(rune)
-        if (existing) return existing
-        const prevTrace = this._currentTrace
-        this._currentTrace = rune._trace
-        try {
-          const primed = rune._prime(this)
-          primed.signal.addEventListener("abort", () => {
-            this.primed.delete(rune._prime)
-          })
-          return primed
-        } finally {
-          this._currentTrace = prevTrace
-        }
-      },
-    )
-    primed.reference(signal)
-    return primed
-  }
-
-  getPrimed<T, E>(rune: Rune<T, E>): Run<T, E> | undefined {
-    const existing = this.primed.get(rune._prime)
-    if (existing) return existing
-    const parent = this.parent?.getPrimed(rune)
-    if (parent) {
-      const wrapped = this.wrapParent(parent)
-      this.primed.set(rune._prime, wrapped)
-      wrapped.signal.addEventListener("abort", () => {
-        this.primed.delete(rune._prime)
+  memo = new Map<(runner: Runner) => Run<any, any>, Run<any, any>>()
+  prime<T, U>(rune: _.Rune<T, U>, signal: AbortSignal | undefined): Run<T, U> {
+    const run = getOrInit(this.memo, rune._prime, () => {
+      const old = this._currentTrace
+      this._currentTrace = rune._trace
+      const run = this._prime(rune)
+      this._currentTrace = old
+      run.signal.addEventListener("abort", () => {
+        this.memo.delete(rune._prime)
       })
-      return wrapped
-    }
-    return undefined
+      return run
+    })
+    if (signal) run.reference(signal)
+    return run
   }
 
-  spawn(time: number, receipt: Receipt) {
-    return new Scope(new Timeline(), this, (x) => new RunProxy(this, x, time, receipt))
+  getPrimed<T, U>(rune: _.Rune<T, U>): Run<T, U> | undefined {
+    return this.memo.get(rune._prime)
   }
 }
+
+class RootRunner extends Runner {
+  order = 0
+  timeline = new Timeline()
+
+  protected _prime<T, U>(rune: _.Rune<T, U>): _.Run<T, U> {
+    return rune._prime(this)
+  }
+}
+
+const globalRunner = new RootRunner()
 
 declare const _T: unique symbol
 declare const _U: unique symbol
@@ -80,28 +65,28 @@ export class Rune<out T, out U = never> {
   declare private _
   _trace: Trace
 
-  constructor(readonly _prime: (scope: Scope) => Run<T, U>) {
+  constructor(readonly _prime: (runner: Runner) => Run<T, U>) {
     this._trace = new Trace(`execution of the ${new.target.name} instantiated`)
   }
 
   static new<T, U, A extends unknown[]>(
-    ctor: new(scope: Scope, ...args: A) => Run<T, U>,
+    ctor: new(runner: Runner, ...args: A) => Run<T, U>,
     ...args: A
   ) {
-    return new Rune((scope) => new ctor(scope, ...args))
+    return new Rune((runner) => new ctor(runner, ...args))
   }
 
-  async run(scope: Scope): Promise<T> {
-    for await (const value of this.iter(scope)) {
+  async run(runner: Runner = globalRunner): Promise<T> {
+    for await (const value of this.iter(runner)) {
       return value
     }
     throw new Error("Rune did not yield any values")
   }
 
-  async *iter(scope: Scope) {
+  async *iter(runner: Runner = globalRunner) {
     const abortController = new AbortController()
-    const primed = scope.prime(this, abortController.signal)
-    let time = 0
+    const primed = runner.prime(this, abortController.signal)
+    let time = runner.timeline.current
     try {
       while (time !== Infinity) {
         const receipt = new Receipt()
@@ -196,7 +181,7 @@ export class Rune<out T, out U = never> {
   }
 
   into<A extends unknown[], C extends Rune<any, any>>(
-    ctor: new(_prime: (scope: Scope) => Run<T, U | RunicArgs.U<A>>, ...args: A) => C,
+    ctor: new(_prime: (runner: Runner) => Run<T, U | RunicArgs.U<A>>, ...args: A) => C,
     ...args: A
   ): C {
     const rune = new ctor(this._prime, ...args)
@@ -204,7 +189,7 @@ export class Rune<out T, out U = never> {
     return rune
   }
 
-  as<R>(this: R, _ctor: new(_prime: (scope: Scope) => Run<T, U>, ...args: any) => R): R {
+  as<R>(this: R, _ctor: new(_prime: (runner: Runner) => Run<T, U>, ...args: any) => R): R {
     return this
   }
 
@@ -215,18 +200,30 @@ export class Rune<out T, out U = never> {
   pipe<R extends Rune<any, any>>(fn: (rune: this) => R): R {
     return fn(this)
   }
+
+  static pin<T, U>(rune: Rune<T, U>, pinned: Rune<unknown, unknown>): Rune<T, U> {
+    return new Rune((runner) => {
+      const run = runner.prime(rune, undefined)
+      runner.prime(pinned, run.signal)
+      return run
+    })
+  }
 }
 
 export abstract class Run<T, U> {
   declare "": [T, U]
   trace: Trace
+  order: number
+  timeline
 
   abortController = new AbortController()
   signal = this.abortController.signal
-  constructor(readonly scope: Scope) {
+  constructor(runner: Runner) {
     this.signal.addEventListener("abort", () => this.cleanup())
-    this.trace = scope._currentTrace
+    this.trace = runner._currentTrace
       ?? new Trace(`execution of the ${new.target.name} instantiated`)
+    this.order = runner.order
+    this.timeline = runner.timeline
   }
 
   referenceCount = 0
@@ -268,25 +265,9 @@ export abstract class Run<T, U> {
   }
 }
 
-class RunProxy<T, E> extends Run<T, E> {
-  constructor(
-    scope: Scope,
-    readonly inner: Run<T, E>,
-    readonly innerTime: number,
-    readonly innerReceipt: Receipt,
-  ) {
-    super(scope)
-  }
-
-  _evaluate(): Promise<T> {
-    // TODO: improve
-    return this.inner.evaluate(this.innerTime, this.innerReceipt)
-  }
-}
-
 class RunConstant<T> extends Run<T, never> {
-  constructor(scope: Scope, readonly value: T) {
-    super(scope)
+  constructor(runner: Runner, readonly value: T) {
+    super(runner)
   }
 
   _evaluate() {
@@ -296,9 +277,9 @@ class RunConstant<T> extends Run<T, never> {
 
 class RunLs<T, U> extends Run<T[], U> {
   children
-  constructor(scope: Scope, children: Rune<T, U>[]) {
-    super(scope)
-    this.children = children.map((child) => scope.prime(child, this.signal))
+  constructor(runner: Runner, children: Rune<T, U>[]) {
+    super(runner)
+    this.children = children.map((child) => runner.prime(child, this.signal))
   }
 
   _evaluate(time: number, receipt: Receipt) {
@@ -309,15 +290,15 @@ class RunLs<T, U> extends Run<T[], U> {
 export abstract class RunStream<T> extends Run<T, never> {
   initPromise = deferred<void>()
   valueQueue: [number, T][] = []
-  eventSource = new EventSource(this.scope.timeline)
+  eventSource = new EventSource(this.timeline)
   first = true
   done = false
 
   curIter = new AbortController()
 
   lastValue: T = null!
-  constructor(scope: Scope) {
-    super(scope)
+  constructor(runner: Runner) {
+    super(runner)
   }
 
   async _evaluate(time: number, receipt: Receipt): Promise<T> {
@@ -354,8 +335,8 @@ export abstract class RunStream<T> extends Run<T, never> {
 }
 
 class RunAsyncIter<T> extends RunStream<T> {
-  constructor(scope: Scope, fn: (signal: AbortSignal) => AsyncIterable<T>) {
-    super(scope)
+  constructor(runner: Runner, fn: (signal: AbortSignal) => AsyncIterable<T>) {
+    super(runner)
     ;(async () => {
       for await (const value of fn(this.signal)) {
         this.push(value)
@@ -373,9 +354,9 @@ class RunPlaceholder extends Run<never, never> {
 
 class RunBubbleUnhandled<T, U> extends Run<T, never> {
   child
-  constructor(scope: Scope, child: Rune<T, U>, readonly symbol: symbol) {
-    super(scope)
-    this.child = scope.prime(child, this.signal)
+  constructor(runner: Runner, child: Rune<T, U>, readonly symbol: symbol) {
+    super(runner)
+    this.child = runner.prime(child, this.signal)
   }
 
   async _evaluate(time: number, receipt: Receipt) {
@@ -392,9 +373,9 @@ class RunBubbleUnhandled<T, U> extends Run<T, never> {
 
 class RunCaptureUnhandled<T, U1, U2> extends Run<T, U1 | U2> {
   child
-  constructor(scope: Scope, child: Rune<T, U1>, readonly symbol: symbol) {
-    super(scope)
-    this.child = scope.prime(child, this.signal)
+  constructor(runner: Runner, child: Rune<T, U1>, readonly symbol: symbol) {
+    super(runner)
+    this.child = runner.prime(child, this.signal)
   }
 
   async _evaluate(time: number, receipt: Receipt) {

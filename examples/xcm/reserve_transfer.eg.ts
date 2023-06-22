@@ -26,13 +26,12 @@ import {
 } from "@capi/rococo-dev-xcm-statemine"
 import { rococoDevXcmTrappist } from "@capi/rococo-dev-xcm-trappist"
 import { assert, assertNotEquals } from "asserts"
-import { $, alice as root, createDevUsers, is, Rune, Scope, ValueRune } from "capi"
+import { $, alice as root, createDevUsers, is, Rune, ValueRune } from "capi"
 import { $siblId } from "capi/patterns/para_id"
 import { signature } from "capi/patterns/signature/statemint"
 import { retry } from "../../deps/std/async.ts"
 
 const { alexa, billy } = await createDevUsers()
-const scope = new Scope()
 
 /// Define some constants for later use.
 const RESERVE_ASSET_ID = 1
@@ -77,12 +76,11 @@ await rococoDevXcm.Sudo
   .sent()
   .dbgStatus("Rococo(root) > Statemine(root): Create asset")
   .finalized()
-  .run(scope)
+  .run()
 
 /// Wait for the asset to be recorded in storage.
 const assetDetails = await retry(
-  () =>
-    rococoDevXcmStatemine.Assets.Asset.value(RESERVE_ASSET_ID).unhandle(is(undefined)).run(scope),
+  () => rococoDevXcmStatemine.Assets.Asset.value(RESERVE_ASSET_ID).unhandle(is(undefined)).run(),
   retryOptions,
 )
 
@@ -101,14 +99,14 @@ await rococoDevXcmStatemine.Assets
   .sent()
   .dbgStatus("Statemine(Alexa): Mint reserve asset to Billy")
   .finalized()
-  .run(scope)
+  .run()
 
 const billyStatemintBalance = rococoDevXcmStatemine.Assets.Account
   .value([RESERVE_ASSET_ID, billy.publicKey])
   .unhandle(is(undefined))
   .access("balance")
 
-const billyStatemintBalanceInitial = await billyStatemintBalance.run(scope)
+const billyStatemintBalanceInitial = await billyStatemintBalance.run()
 console.log("Statemine(Billy): asset balance", billyStatemintBalanceInitial)
 $.assert($.u128, billyStatemintBalanceInitial)
 
@@ -126,7 +124,7 @@ await rococoDevXcmTrappist.Sudo
   .sent()
   .dbgStatus("Trappist(root): Create derived asset")
   .finalized()
-  .run(scope)
+  .run()
 
 const assetsPalletId = rococoDevXcmStatemine.Assets.into(ValueRune).access("id")
 
@@ -149,7 +147,7 @@ await rococoDevXcmTrappist.Sudo
   .sent()
   .dbgStatus("Trappist(root): Register AssetId to Reserve AssetId")
   .finalized()
-  .run(scope)
+  .run()
 
 /// Reserve transfer asset id on reserve parachain to Trappist parachain.
 const events = await rococoDevXcmStatemine.PolkadotXcm
@@ -186,7 +184,7 @@ const events = await rococoDevXcmStatemine.PolkadotXcm
   .sent()
   .dbgStatus("Statemine(Billy): Reserve transfer to Trappist")
   .finalizedEvents()
-  .run(scope)
+  .run()
 
 for (const { event } of events) {
   if (
@@ -200,7 +198,7 @@ const { balance: billyTrappistBalance } = await retry(
     rococoDevXcmTrappist.Assets.Account
       .value([TRAPPIST_ASSET_ID, billy.publicKey])
       .unhandle(is(undefined))
-      .run(scope),
+      .run(),
   retryOptions,
 )
 
@@ -209,7 +207,7 @@ console.log("Trappist(Billy): asset balance:", billyTrappistBalance)
 assert(billyTrappistBalance > 0)
 
 /// Retrieve Billy's balance on statemint.
-const billyStatemintBalanceFinal = await billyStatemintBalance.run(scope)
+const billyStatemintBalanceFinal = await billyStatemintBalance.run()
 
 /// Ensure the balance is different from the initial.
 console.log("Statemine(Billy): asset balance:", billyStatemintBalanceFinal)
@@ -220,7 +218,7 @@ const statemintSovereignAccountBalance = await rococoDevXcmStatemine.Assets.Acco
   .value([RESERVE_ASSET_ID, $siblId.encode(TRAPPIST_CHAIN_ID)])
   .unhandle(is(undefined))
   .access("balance")
-  .run(scope)
+  .run()
 
 /// Ensure the balance is greater than zero.
 console.log("Statemine(TrappistSovereignAccount): asset balance", statemintSovereignAccountBalance)

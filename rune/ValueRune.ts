@@ -1,5 +1,5 @@
 import { Guard, SmartExclude } from "./is.ts"
-import { Run, Rune, RunicArgs, Scope, Unhandled } from "./Rune.ts"
+import { Run, Rune, RunicArgs, Runner, Unhandled } from "./Rune.ts"
 import { Receipt } from "./Timeline.ts"
 
 type NonIndexSignatureKeys<T> = T extends T ? keyof {
@@ -27,10 +27,10 @@ type EnsurePath<T, P> = never extends P ? P extends [infer K, ...infer Q] ?
 
 export class ValueRune<out T, out U = never> extends Rune<T, U> {
   static override new<T, U, A extends unknown[]>(
-    ctor: new(scope: Scope, ...args: A) => Run<T, U>,
+    ctor: new(runner: Runner, ...args: A) => Run<T, U>,
     ...args: A
   ) {
-    return new ValueRune((scope) => new ctor(scope, ...args))
+    return new ValueRune((runner) => new ctor(runner, ...args))
   }
 
   map<T2>(fn: (value: T) => T2 | Promise<T2>): ValueRune<T2, U> {
@@ -123,11 +123,7 @@ export class ValueRune<out T, out U = never> extends Rune<T, U> {
     return this.reduce<T[]>([], (arr, val) => {
       arr.push(val)
       return arr
-    }).final().singular()
-  }
-
-  singular() {
-    return ValueRune.new(RunSingular, this)
+    }).final()
   }
 
   dbg<X>(...prefix: RunicArgs<X, unknown[]>) {
@@ -181,14 +177,14 @@ class RunMatch<M, T, U> extends Run<T, U> {
   value
   conditions
   constructor(
-    scope: Scope,
+    runner: Runner,
     child: Rune<M, never>,
     conditions: [(x: M) => boolean, ValueRune<T, U>][],
   ) {
-    super(scope)
-    this.value = scope.prime(child, this.signal)
+    super(runner)
+    this.value = runner.prime(child, this.signal)
     this.conditions = conditions.map(([cond, val]) =>
-      [cond, scope.prime(val, this.signal)] as const
+      [cond, runner.prime(val, this.signal)] as const
     )
   }
 
@@ -206,12 +202,12 @@ class RunMatch<M, T, U> extends Run<T, U> {
 class RunMap<T1, U, T2> extends Run<T2, U> {
   child
   constructor(
-    scope: Scope,
+    runner: Runner,
     child: Rune<T1, U>,
     readonly fn: (value: T1) => T2 | Promise<T2>,
   ) {
-    super(scope)
-    this.child = scope.prime(child, this.signal)
+    super(runner)
+    this.child = runner.prime(child, this.signal)
   }
 
   lastValue: T2 = null!
@@ -229,14 +225,14 @@ class RunHandle<T, T2 extends T, T3, U, U2> extends Run<Exclude<T, T2> | T3, U |
   child
   alt
   constructor(
-    scope: Scope,
+    runner: Runner,
     child: Rune<T, U>,
     readonly guard: Guard<T, T2>,
     alt: Rune<T3, U2>,
   ) {
-    super(scope)
-    this.child = scope.prime(child, this.signal)
-    this.alt = scope.prime(alt, this.signal)
+    super(runner)
+    this.child = runner.prime(child, this.signal)
+    this.alt = runner.prime(alt, this.signal)
   }
 
   async _evaluate(time: number, receipt: Receipt) {
@@ -250,12 +246,12 @@ class RunHandle<T, T2 extends T, T3, U, U2> extends Run<Exclude<T, T2> | T3, U |
 class RunUnhandle<T, U> extends Run<T, U | T> {
   child
   constructor(
-    scope: Scope,
+    runner: Runner,
     child: Rune<T, U>,
     readonly guard: Guard<T, T>,
   ) {
-    super(scope)
-    this.child = scope.prime(child, this.signal)
+    super(runner)
+    this.child = runner.prime(child, this.signal)
   }
 
   async _evaluate(time: number, receipt: Receipt) {
@@ -268,12 +264,12 @@ class RunUnhandle<T, U> extends Run<T, U | T> {
 class RunThrows<T, U1, U2> extends Run<T, U1 | U2> {
   child
   constructor(
-    scope: Scope,
+    runner: Runner,
     child: Rune<T, U1>,
     readonly guards: Array<Guard<unknown, U2>>,
   ) {
-    super(scope)
-    this.child = scope.prime(child, this.signal)
+    super(runner)
+    this.child = runner.prime(child, this.signal)
   }
 
   async _evaluate(time: number, receipt: Receipt) {
@@ -290,9 +286,9 @@ class RunThrows<T, U1, U2> extends Run<T, U1 | U2> {
 
 class RunGetUnhandled<T, U> extends Run<Unhandled<U> | null, never> {
   child
-  constructor(scope: Scope, child: Rune<T, U>) {
-    super(scope)
-    this.child = scope.prime(child, this.signal)
+  constructor(runner: Runner, child: Rune<T, U>) {
+    super(runner)
+    this.child = runner.prime(child, this.signal)
   }
 
   async _evaluate(time: number, receipt: Receipt) {
@@ -312,14 +308,14 @@ class RunRehandle<T1, U1, U2 extends U1, T3, U3> extends Run<T1 | T3, Exclude<U1
   child
   alt
   constructor(
-    scope: Scope,
+    runner: Runner,
     child: Rune<T1, U1>,
     readonly fn: (value: U1) => value is U2,
     alt: Rune<T3, U3>,
   ) {
-    super(scope)
-    this.child = scope.prime(child, this.signal)
-    this.alt = scope.prime(alt, this.signal)
+    super(runner)
+    this.child = runner.prime(child, this.signal)
+    this.alt = runner.prime(alt, this.signal)
   }
 
   async _evaluate(time: number, receipt: Receipt) {
@@ -336,9 +332,9 @@ class RunRehandle<T1, U1, U2 extends U1, T3, U3> extends Run<T1 | T3, Exclude<U1
 
 class RunLazy<T, U> extends Run<T, U> {
   child
-  constructor(scope: Scope, child: Rune<T, U>) {
-    super(scope)
-    this.child = scope.prime(child, this.signal)
+  constructor(runner: Runner, child: Rune<T, U>) {
+    super(runner)
+    this.child = runner.prime(child, this.signal)
   }
 
   async _evaluate(time: number, _receipt: Receipt): Promise<T> {
@@ -348,9 +344,9 @@ class RunLazy<T, U> extends Run<T, U> {
 
 class RunFilter<T, U> extends Run<T, U> {
   child
-  constructor(scope: Scope, child: Rune<T, U>, readonly fn: (value: T) => boolean) {
-    super(scope)
-    this.child = scope.prime(child, this.signal)
+  constructor(runner: Runner, child: Rune<T, U>, readonly fn: (value: T) => boolean) {
+    super(runner)
+    this.child = runner.prime(child, this.signal)
   }
 
   first = true
@@ -377,9 +373,9 @@ class RunFilter<T, U> extends Run<T, U> {
 
 class RunFinal<T, U> extends Run<T, U> {
   child
-  constructor(scope: Scope, child: Rune<T, U>) {
-    super(scope)
-    this.child = scope.prime(child, this.signal)
+  constructor(runner: Runner, child: Rune<T, U>) {
+    super(runner)
+    this.child = runner.prime(child, this.signal)
   }
 
   async _evaluate(time: number, receipt: Receipt): Promise<T> {
@@ -393,13 +389,13 @@ class RunFinal<T, U> extends Run<T, U> {
 class RunReduce<T1, U, T2> extends Run<T2, U> {
   child
   constructor(
-    scope: Scope,
+    runner: Runner,
     child: Rune<T1, U>,
     public lastValue: T2,
     readonly fn: (last: T2, value: T1) => T2 | Promise<T2>,
   ) {
-    super(scope)
-    this.child = scope.prime(child, this.signal)
+    super(runner)
+    this.child = runner.prime(child, this.signal)
   }
 
   async _evaluate(time: number, receipt: Receipt) {
@@ -410,28 +406,17 @@ class RunReduce<T1, U, T2> extends Run<T2, U> {
   }
 }
 
-class RunSingular<T, U> extends Run<T, U> {
-  constructor(scope: Scope, readonly child: Rune<T, U>) {
-    super(scope)
-  }
-
-  result?: Promise<T>
-  _evaluate(time: number, receipt: Receipt): Promise<T> {
-    return this.result ??= this.child.run(this.scope.spawn(time, receipt))
-  }
-}
-
 class RunChain<T1, U1, T2, U2> extends Run<T2, U1 | U2> {
   first
   second
   constructor(
-    scope: Scope,
+    runner: Runner,
     first: Rune<T1, U1>,
     second: Rune<T2, U2>,
   ) {
-    super(scope)
-    this.first = scope.prime(first, this.signal)
-    this.second = scope.prime(second, this.signal)
+    super(runner)
+    this.first = runner.prime(first, this.signal)
+    this.second = runner.prime(second, this.signal)
   }
 
   lastValue: T2 = null!

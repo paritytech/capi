@@ -5,12 +5,11 @@
 
 import { MultiAddress, westendDev } from "@capi/westend-dev"
 import { assert } from "asserts"
-import { createDevUsers, ExtrinsicSender, is, Scope } from "capi"
+import { createDevUsers, ExtrinsicSender, is } from "capi"
 import { signature } from "capi/patterns/signature/polkadot"
 import * as ed from "../../deps/ed25519.ts"
 
 const { alexa, billy } = await createDevUsers()
-const scope = new Scope()
 
 /// Reference Billy's free balance for later use.
 const billyFree = westendDev.System.Account
@@ -18,7 +17,7 @@ const billyFree = westendDev.System.Account
   .unhandle(is(undefined))
   .access("data", "free")
 
-const billyFreeInitial = await billyFree.run(scope)
+const billyFreeInitial = await billyFree.run()
 console.log("Billy free initial:", billyFreeInitial)
 
 /// Initialize a secret with the `crypto.getRandomValues` builtin.
@@ -45,7 +44,7 @@ await westendDev.Balances
   .sent()
   .dbgStatus("Existential deposit:")
   .finalized()
-  .run(scope)
+  .run()
 
 /// Execute a transfer from the derived user to Billy. We utilize our
 /// derived ed25519 `sign` function for this.
@@ -58,10 +57,10 @@ await westendDev.Balances
   .sent()
   .dbgStatus("Transfer:")
   .finalizedEvents()
-  .run(scope)
+  .run()
 
 /// Retrieve Billy's final free.
-const billyFreeFinal = await billyFree.run(scope)
+const billyFreeFinal = await billyFree.run()
 console.log("Billy free final:", billyFreeFinal)
 
 /// Ensure that the final is greater than the initial.

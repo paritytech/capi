@@ -4,19 +4,17 @@
  */
 
 import { $accountInfo, polkadotDev } from "@capi/polkadot-dev"
-import { $, Scope } from "capi"
-
-const scope = new Scope()
+import { $ } from "capi"
 
 // Reference the first 10 keys of a polkadot dev chain's system account map.
-const accountKeys = await polkadotDev.System.Account.keys({ limit: 10 }).run(scope)
+const accountKeys = await polkadotDev.System.Account.keys({ limit: 10 }).run()
 
 /// Each key should be of type `Uint8Array`.
 console.log("Account keys:", accountKeys)
 $.assert($.sizedArray($.uint8Array, 10), accountKeys)
 
 /// Reference the first 10 key-value pairs of a polkadot dev chain's system account map.
-const accountEntries = await polkadotDev.System.Account.entries({ limit: 10 }).run(scope)
+const accountEntries = await polkadotDev.System.Account.entries({ limit: 10 }).run()
 
 /// Each entry should be of type `[Uint8Array, AccountInfo]`
 console.log("Account entries:", accountEntries)

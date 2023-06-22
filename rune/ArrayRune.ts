@@ -10,7 +10,8 @@ export class ArrayRune<T, U> extends Rune<T[], U> {
       .into(ValueRune)
       .map((arr) => Rune.tuple(arr.map((val) => fn(Rune.constant(val)))))
       .into(MetaRune)
-      .flat(fn(Rune._placeholder().into(ValueRune)))
+      .pin(fn(Rune._placeholder().into(ValueRune)))
+      .flat()
       .into(ArrayRune)
   }
 }

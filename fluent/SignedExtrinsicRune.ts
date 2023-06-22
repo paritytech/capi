@@ -1,4 +1,5 @@
 import { hex } from "../crypto/mod.ts"
+import { MetaRune } from "../mod.ts"
 import { Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { Chain, ChainRune } from "./ChainRune.ts"
 import { ExtrinsicRune } from "./ExtrinsicRune.ts"
@@ -41,6 +42,9 @@ export class SignedExtrinsicRune<out C extends Chain, out U> extends PatternRune
           hex,
         )
       )
+      .into(MetaRune)
+      .asOrtho()
+      .pin(this.chain.connection)
       .into(ExtrinsicStatusRune, this.chain, this)
   }
 }

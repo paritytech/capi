@@ -7,11 +7,11 @@
  */
 
 import { polkadotDev } from "@capi/polkadot-dev"
-import { $, Scope } from "capi"
+import { $ } from "capi"
 import { storageSizes } from "capi/patterns/unstable/storage_sizes"
 
 /// Use the storageSizes factory to produce a Rune. Then execute it.
-const sizes = await storageSizes(polkadotDev).run(new Scope())
+const sizes = await storageSizes(polkadotDev).run()
 
 /// Ensure `sizes` is of the expected shape.
 console.log("Sizes:", sizes)

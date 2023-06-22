@@ -5,9 +5,7 @@
  */
 
 import { assertEquals } from "asserts"
-import { Rune, RunicArgs, Scope } from "capi"
-
-const scope = new Scope()
+import { Rune, RunicArgs } from "capi"
 
 /// The following is a Rune of `number`.
 const num = Rune.constant(46)
@@ -26,7 +24,7 @@ class MyNumRune<U> extends Rune<number, U> {
 const myNum = num.into(MyNumRune)
 
 /// This allows us to operate on `num` with the `MyNumRune`-defined fluent API.
-const result0 = await myNum.add(100).run(scope)
+const result0 = await myNum.add(100).run()
 
 /// Ensure that `result0` is equal to 146.
 console.log(result0)
@@ -48,6 +46,6 @@ class MyRuneWithArgs<U> extends Rune<number, U> {
 const myNumWithArgs = num.into(MyRuneWithArgs, 100)
 
 /// Ensure that `result1` is equal to 146.
-const result1 = await myNumWithArgs.added().run(scope)
+const result1 = await myNumWithArgs.added().run()
 console.log(result1)
 assertEquals(result1, 146)

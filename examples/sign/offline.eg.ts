@@ -6,11 +6,10 @@
  */
 
 import { $runtimeCall, westendDev } from "@capi/westend-dev"
-import { $, createDevUsers, Scope, SignedExtrinsicRune } from "capi"
+import { $, createDevUsers, SignedExtrinsicRune } from "capi"
 import { signature } from "capi/patterns/signature/polkadot"
 
 const { alexa, billy } = await createDevUsers()
-const scope = new Scope()
 
 /// Create and sign the extrinsic. Extract the hex.
 const hex = await westendDev.Balances
@@ -20,7 +19,7 @@ const hex = await westendDev.Balances
   })
   .signed(signature({ sender: alexa }))
   .hex()
-  .run(scope)
+  .run()
 
 /// Save `hex` however you'd like (potentially sending to a relayer service,
 /// writing to disk, etc.).
@@ -30,7 +29,7 @@ save(hex)
 const signedExtrinsic = SignedExtrinsicRune.fromHex(westendDev, hex)
 
 /// Get an `ExtrinsicRune` (resolves to call data) from the `SignedExtrinsicRune`.
-const call = await signedExtrinsic.call().run(scope)
+const call = await signedExtrinsic.call().run()
 
 /// Ensure the call data is what we expect.
 console.log(call)
@@ -42,7 +41,7 @@ const hash = await SignedExtrinsicRune
   .sent()
   .dbgStatus("Tx status:")
   .finalized()
-  .run(scope)
+  .run()
 
 /// Ensure the extrinsic has been finalized.
 $.assert($.str, hash)

@@ -1,13 +1,13 @@
 import { Calls, Subscription, Subscriptions } from "../rpc/known/mod.ts"
 import { Connection, ConnectionError, RpcSubscriptionMessage, ServerError } from "../rpc/mod.ts"
-import { is, MetaRune, Run, Rune, RunicArgs, RunStream, Scope } from "../rune/mod.ts"
+import { is, MetaRune, Run, Rune, RunicArgs, Runner, RunStream } from "../rune/mod.ts"
 
 class RunConnection extends Run<Connection, never> {
   constructor(
-    scope: Scope,
+    ctx: Runner,
     readonly initConnection: (signal: AbortSignal) => Connection | Promise<Connection>,
   ) {
-    super(scope)
+    super(ctx)
   }
 
   connection?: Connection
@@ -62,13 +62,13 @@ export class ConnectionRune<U> extends Rune<Connection, U> {
 
 class RunRpcSubscription extends RunStream<RpcSubscriptionMessage> {
   constructor(
-    scope: Scope,
+    ctx: Runner,
     connection: Connection,
     params: unknown[],
     subscribeMethod: string,
     unsubscribeMethod: string,
   ) {
-    super(scope)
+    super(ctx)
     connection.subscription(
       subscribeMethod,
       unsubscribeMethod,

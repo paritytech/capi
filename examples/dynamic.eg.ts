@@ -12,7 +12,7 @@
  * 3. Chain-specifics are untyped (be wary to supply the correct data, as the checker is on vacation).
  */
 
-import { $, ChainRune, Scope, WsConnection } from "capi"
+import { $, ChainRune, WsConnection } from "capi"
 
 /// We could also initialize a `ChainRune` with `WsConnection` and an RPC node WebSocket URL.
 const chain = ChainRune.from(WsConnection.bind("wss://rpc.polkadot.io"))
@@ -25,7 +25,7 @@ const Account = System.storage("Account")
 
 /// Read the first ten entries of the `Account` storage map.
 /// Note how the lack of partial key is communicated via `null`.
-const entries = await Account.entries({ limit: 10 }).run(new Scope())
+const entries = await Account.entries({ limit: 10 }).run()
 
 /// The result should contain a `[Uint8Array, AccountInfo]` tuple of length 10.
 console.log("Entries page:", entries)
