@@ -1,5 +1,5 @@
 export function detectVersion(): string | undefined {
-  const packageJsonPath = new URL("../package.json", import.meta.url)
+  const packageJsonPath = new URL("../../package.json", import.meta.url)
   try {
     Deno.statSync(packageJsonPath)
     const packageJson = Deno.readTextFileSync(packageJsonPath)

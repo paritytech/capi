@@ -35,7 +35,7 @@ function withCommonOptions(command: Command) {
     .option("-o, --out <out:string>", "Metadata and codegen output directory", {
       default: "target/capi",
     })
-    .option("-s, --server <server:string>", "", { default: "https://capi.dev/" })
+    .option("-s, --server <server:string>", "")
 }
 
 interface SyncProps {
@@ -83,7 +83,7 @@ async function setup(props: SyncProps) {
     )
   }
   const baseUrl = await syncNets(
-    props.server ?? `https://capi.dev/${version}/`,
+    props.server ?? `https://capi.dev/@${version}/`,
     devnetTempDir,
     netSpecs,
   )
