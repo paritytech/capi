@@ -1,5 +1,5 @@
 import { localDev, NativeOrAssetId, PalletAssetConversionEvent } from "@capi/local-dev"
-import { $, alice, bob, CodecRune, hex } from "capi"
+import { $, alice, bob, charlie, CodecRune, hex, is } from "capi"
 import { signature } from "capi/patterns/signature/statemint"
 import { Rune, RunicArgs, Scope } from "../rune/Rune.ts"
 
@@ -117,40 +117,14 @@ await localDev.Assets.mint({
   .unhandleFailed()
   .run(scope)
 
-const $assetId = await localDev.metadata.access(
-  "paths",
-  "pallet_asset_conversion::types::NativeOrAssetId",
-).run(scope)
-
-const $assetConversionApiQuoteArgs = $.tuple(
-  // asset 1
-  $assetId,
-  // asset 2
-  $assetId,
-  // asset balance
-  $.u128,
-  // include fee
-  $.bool,
+await quotePriceExactTokensForTokens(
+  NativeOrAssetId.Asset(USDT_ASSET_ID),
+  NativeOrAssetId.Asset(DOT_ASSET_ID),
+  30000n,
+  true,
 )
-
-const quoteArgs = Rune.constant($assetConversionApiQuoteArgs)
-  .into(CodecRune)
-  .encoded(
-    Rune.tuple([
-      NativeOrAssetId.Asset(USDT_ASSET_ID),
-      NativeOrAssetId.Asset(DOT_ASSET_ID),
-      30000n,
-      true,
-    ]),
-  )
-
-console.log(
-  await localDev.connection.call(
-    "state_call",
-    "AssetConversionApi_quote_price_exact_tokens_for_tokens",
-    quoteArgs.map(hex.encode),
-  ).map(hex.decode).map((x) => $.u128.decode(x)).run(scope),
-)
+  .dbg("DOT/USDT Quote:")
+  .run(scope)
 
 // swap with no slippage checks
 await localDev.AssetConversion.swapExactTokensForTokens({
@@ -166,6 +140,17 @@ await localDev.AssetConversion.swapExactTokensForTokens({
   .unhandleFailed()
   .run(scope)
 
+await localDev.Assets.Account
+  .value(Rune.tuple([DOT_ASSET_ID, bob.publicKey]))
+  .unhandle(is(undefined))
+  .map(({ balance }) => balance)
+  .dbg("Bob's Dot Balance:")
+  .run(scope)
+
+await getReserves(NativeOrAssetId.Asset(USDT_ASSET_ID), NativeOrAssetId.Asset(DOT_ASSET_ID))
+  .dbg("DOT/USDT Reserves:")
+  .run(scope)
+
 function filterPoolCreatedEvents<X>(...[events]: RunicArgs<X, [any[]]>) {
   return Rune.resolve(events).map((events) =>
     events
@@ -175,4 +160,66 @@ function filterPoolCreatedEvents<X>(...[events]: RunicArgs<X, [any[]]>) {
         event.type === "PoolCreated"
       )
   )
+}
+
+export function quotePriceExactTokensForTokens<X>(
+  ...[asset1, asset2, amount, includeFee]: RunicArgs<
+    X,
+    [asset1: NativeOrAssetId, asset2: NativeOrAssetId, amount: bigint, includeFee: boolean]
+  >
+) {
+  const $assetId = localDev.metadata.access(
+    "paths",
+    "pallet_asset_conversion::types::NativeOrAssetId",
+  )
+
+  const args = $assetId.map(($assetId) => $.tuple($assetId, $assetId, $.u128, $.bool))
+    .into(CodecRune)
+    .encoded(
+      Rune.tuple([
+        asset1,
+        asset2,
+        amount,
+        includeFee,
+      ]),
+    )
+
+  return localDev.connection
+    .call(
+      "state_call",
+      "AssetConversionApi_quote_price_exact_tokens_for_tokens",
+      args.map(hex.encode),
+    )
+    .map(hex.decode)
+    .map((x) => $.u128.decode(x))
+}
+
+export function getReserves<X>(
+  ...[asset1, asset2]: RunicArgs<
+    X,
+    [asset1: NativeOrAssetId, asset2: NativeOrAssetId]
+  >
+) {
+  const $assetId = localDev.metadata.access(
+    "paths",
+    "pallet_asset_conversion::types::NativeOrAssetId",
+  )
+
+  const args = $assetId.map(($assetId) => $.tuple($assetId, $assetId))
+    .into(CodecRune)
+    .encoded(
+      Rune.tuple([
+        asset1,
+        asset2,
+      ]),
+    )
+
+  return localDev.connection
+    .call(
+      "state_call",
+      "AssetConversionApi_get_reserves",
+      args.map(hex.encode),
+    )
+    .map(hex.decode)
+    .map((x) => $.tuple($.u128, $.u128).decode(x))
 }
