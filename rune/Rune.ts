@@ -7,14 +7,14 @@ import { Trace } from "./Trace.ts"
 // @deno-types="./_empty.d.ts"
 import * as _ from "./_empty.js"
 
-export abstract class Primer {
+export abstract class Runner {
   abstract order: number
   abstract timeline: Timeline
 
   _currentTrace?: Trace
   protected abstract _prime<T, U>(rune: Rune<T, U>): Run<T, U>
 
-  memo = new Map<(primer: Primer) => Run<any, any>, Run<any, any>>()
+  memo = new Map<(runner: Runner) => Run<any, any>, Run<any, any>>()
   prime<T, U>(rune: _.Rune<T, U>, signal: AbortSignal | undefined): Run<T, U> {
     const run = getOrInit(this.memo, rune._prime, () => {
       const old = this._currentTrace
@@ -35,7 +35,7 @@ export abstract class Primer {
   }
 }
 
-class RootPrimer extends Primer {
+class RootRunner extends Runner {
   order = 0
   timeline = new Timeline()
 
@@ -44,7 +44,7 @@ class RootPrimer extends Primer {
   }
 }
 
-const globalPrimer = new RootPrimer()
+const globalRunner = new RootRunner()
 
 declare const _T: unique symbol
 declare const _U: unique symbol
@@ -65,28 +65,28 @@ export class Rune<out T, out U = never> {
   declare private _
   _trace: Trace
 
-  constructor(readonly _prime: (primer: Primer) => Run<T, U>) {
+  constructor(readonly _prime: (runner: Runner) => Run<T, U>) {
     this._trace = new Trace(`execution of the ${new.target.name} instantiated`)
   }
 
   static new<T, U, A extends unknown[]>(
-    ctor: new(primer: Primer, ...args: A) => Run<T, U>,
+    ctor: new(runner: Runner, ...args: A) => Run<T, U>,
     ...args: A
   ) {
-    return new Rune((primer) => new ctor(primer, ...args))
+    return new Rune((runner) => new ctor(runner, ...args))
   }
 
-  async run(batch: Primer = globalPrimer): Promise<T> {
-    for await (const value of this.iter(batch)) {
+  async run(runner: Runner = globalRunner): Promise<T> {
+    for await (const value of this.iter(runner)) {
       return value
     }
     throw new Error("Rune did not yield any values")
   }
 
-  async *iter(primer: Primer = globalPrimer) {
+  async *iter(runner: Runner = globalRunner) {
     const abortController = new AbortController()
-    const primed = primer.prime(this, abortController.signal)
-    let time = primer.timeline.current
+    const primed = runner.prime(this, abortController.signal)
+    let time = runner.timeline.current
     try {
       while (time !== Infinity) {
         const receipt = new Receipt()
@@ -181,7 +181,7 @@ export class Rune<out T, out U = never> {
   }
 
   into<A extends unknown[], C extends Rune<any, any>>(
-    ctor: new(_prime: (primer: Primer) => Run<T, U | RunicArgs.U<A>>, ...args: A) => C,
+    ctor: new(_prime: (runner: Runner) => Run<T, U | RunicArgs.U<A>>, ...args: A) => C,
     ...args: A
   ): C {
     const rune = new ctor(this._prime, ...args)
@@ -189,7 +189,7 @@ export class Rune<out T, out U = never> {
     return rune
   }
 
-  as<R>(this: R, _ctor: new(_prime: (primer: Primer) => Run<T, U>, ...args: any) => R): R {
+  as<R>(this: R, _ctor: new(_prime: (runner: Runner) => Run<T, U>, ...args: any) => R): R {
     return this
   }
 
@@ -202,9 +202,9 @@ export class Rune<out T, out U = never> {
   }
 
   static pin<T, U>(rune: Rune<T, U>, pinned: Rune<unknown, unknown>): Rune<T, U> {
-    return new Rune((primer) => {
-      const run = primer.prime(rune, undefined)
-      primer.prime(pinned, run.signal)
+    return new Rune((runner) => {
+      const run = runner.prime(rune, undefined)
+      runner.prime(pinned, run.signal)
       return run
     })
   }
@@ -218,12 +218,12 @@ export abstract class Run<T, U> {
 
   abortController = new AbortController()
   signal = this.abortController.signal
-  constructor(primer: Primer) {
+  constructor(runner: Runner) {
     this.signal.addEventListener("abort", () => this.cleanup())
-    this.trace = primer._currentTrace
+    this.trace = runner._currentTrace
       ?? new Trace(`execution of the ${new.target.name} instantiated`)
-    this.order = primer.order
-    this.timeline = primer.timeline
+    this.order = runner.order
+    this.timeline = runner.timeline
   }
 
   referenceCount = 0
@@ -266,8 +266,8 @@ export abstract class Run<T, U> {
 }
 
 class RunConstant<T> extends Run<T, never> {
-  constructor(primer: Primer, readonly value: T) {
-    super(primer)
+  constructor(runner: Runner, readonly value: T) {
+    super(runner)
   }
 
   _evaluate() {
@@ -277,9 +277,9 @@ class RunConstant<T> extends Run<T, never> {
 
 class RunLs<T, U> extends Run<T[], U> {
   children
-  constructor(primer: Primer, children: Rune<T, U>[]) {
-    super(primer)
-    this.children = children.map((child) => primer.prime(child, this.signal))
+  constructor(runner: Runner, children: Rune<T, U>[]) {
+    super(runner)
+    this.children = children.map((child) => runner.prime(child, this.signal))
   }
 
   _evaluate(time: number, receipt: Receipt) {
@@ -297,8 +297,8 @@ export abstract class RunStream<T> extends Run<T, never> {
   curIter = new AbortController()
 
   lastValue: T = null!
-  constructor(primer: Primer) {
-    super(primer)
+  constructor(runner: Runner) {
+    super(runner)
   }
 
   async _evaluate(time: number, receipt: Receipt): Promise<T> {
@@ -335,8 +335,8 @@ export abstract class RunStream<T> extends Run<T, never> {
 }
 
 class RunAsyncIter<T> extends RunStream<T> {
-  constructor(primer: Primer, fn: (signal: AbortSignal) => AsyncIterable<T>) {
-    super(primer)
+  constructor(runner: Runner, fn: (signal: AbortSignal) => AsyncIterable<T>) {
+    super(runner)
     ;(async () => {
       for await (const value of fn(this.signal)) {
         this.push(value)
@@ -354,9 +354,9 @@ class RunPlaceholder extends Run<never, never> {
 
 class RunBubbleUnhandled<T, U> extends Run<T, never> {
   child
-  constructor(primer: Primer, child: Rune<T, U>, readonly symbol: symbol) {
-    super(primer)
-    this.child = primer.prime(child, this.signal)
+  constructor(runner: Runner, child: Rune<T, U>, readonly symbol: symbol) {
+    super(runner)
+    this.child = runner.prime(child, this.signal)
   }
 
   async _evaluate(time: number, receipt: Receipt) {
@@ -373,9 +373,9 @@ class RunBubbleUnhandled<T, U> extends Run<T, never> {
 
 class RunCaptureUnhandled<T, U1, U2> extends Run<T, U1 | U2> {
   child
-  constructor(primer: Primer, child: Rune<T, U1>, readonly symbol: symbol) {
-    super(primer)
-    this.child = primer.prime(child, this.signal)
+  constructor(runner: Runner, child: Rune<T, U1>, readonly symbol: symbol) {
+    super(runner)
+    this.child = runner.prime(child, this.signal)
   }
 
   async _evaluate(time: number, receipt: Receipt) {
