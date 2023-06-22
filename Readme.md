@@ -1,13 +1,10 @@
 # Capi
 
-> Capi is a work in progress. The documentation may not reflect the current
-> implementation. **Expect a stable release and proper documentation in early
-> 2023**.
-
 Capi is a framework for crafting interactions with Substrate chains. It consists
 of a development server and fluent API, which facilitates multichain
 interactions without compromising either performance or ease of use.
 
+- [Manual &rarr;](https://docs.capi.dev)<br />Guides to get up and running
 - [Examples &rarr;](./examples)<br />SHOW ME THE CODE
 - [API Reference &rarr;](https://deno.land/x/capi/mod.ts)<br />A generated API
   reference, based on type signatures and TSDocs.
@@ -27,7 +24,8 @@ npm i capi
 ```json
 {
   "imports": {
-    "capi": "https://deno.land/x/capi/mod.ts"
+    "capi": "https://deno.land/x/capi/mod.ts",
+    "capi/nets": "https://deno.land/x/capi/nets/mod.ts"
   }
 }
 ```
@@ -39,7 +37,7 @@ npm i capi
 Create a `nets.ts` and specify the chains with which you'd like to interact.
 
 ```ts
-import { bins, net } from "capi"
+import { bins, net } from "capi/nets"
 
 const bin = bins({ polkadot: ["polkadot", "v0.9.38"] })
 
@@ -78,7 +76,7 @@ deno run -A https://deno.land/x/capi/main.ts
 ## Codegen Chain-specific APIs
 
 ```sh
-capi sync --package-json package.json
+capi sync node
 ```
 
 <details>
@@ -86,7 +84,52 @@ capi sync --package-json package.json
 <br>
 
 ```sh
-capi sync --import-map import_map.json
+capi sync deno
+```
+
+</details>
+
+## Build Tool Integration
+
+If you use a build tool such as Vite or Webpack during development, you'll need
+to configure two environment variables.
+
+<details>
+<summary><code>vite.config.ts</code> example</summary>
+<br>
+
+```ts
+import { defineConfig } from "vite"
+
+export default defineConfig({
+  define: {
+    "process.env.CAPI_SERVER": process.env.CAPI_SERVER,
+    "process.env.CAPI_TARGET": process.env.CAPI_TARGET,
+  },
+})
+```
+
+</details>
+
+<details>
+<summary><code>webpack.config.js</code> example</summary>
+<br>
+
+```ts
+import webpack from "webpack"
+
+export default {
+  plugins: [
+    new webpack.DefinePlugin({
+      process: {
+        env: {
+          CAPI_SERVER: JSON.stringify(process.env.CAPI_SERVER),
+          CAPI_TARGET: JSON.stringify(process.env.CAPI_TARGET),
+        },
+      },
+    }),
+  ],
+}
 ```
 
 </details>
@@ -97,11 +140,8 @@ Retrieve the first 10 entries from a storage map of Polkadot.
 
 ```ts
 import { polkadot } from "@capi/polkadot"
-import { Scope } from "capi"
 
-const accounts = await polkadot.System.Account
-  .entries({ limit: 10 })
-  .run(new Scope())
+const accounts = await polkadot.System.Account.entries({ limit: 10 }).run()
 ```
 
 ## Development Networks
