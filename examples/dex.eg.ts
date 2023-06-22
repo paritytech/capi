@@ -152,7 +152,7 @@ await localDev.AssetConversion.swapExactTokensForTokens({
   .unhandleFailed()
   .run(scope)
 
-await localDev.Assets.Account
+const bobDotBalance = await localDev.Assets.Account
   .value(Rune.tuple([DOT_ASSET_ID, bob.publicKey]))
   .unhandle(is(undefined))
   .map(({ balance }) => balance)
@@ -180,13 +180,20 @@ await localDev.AssetConversion.removeLiquidity({
 // Should not get back 30k - fees since liquidity was reduced
 await localDev.AssetConversion.swapExactTokensForTokens({
   path: Rune.tuple([NativeOrAssetId.Asset(DOT_ASSET_ID), NativeOrAssetId.Asset(USDT_ASSET_ID)]),
-  amountIn: 30000n,
+  amountIn: bobDotBalance,
   amountOutMin: 1n,
   sendTo: bob.publicKey,
   keepAlive: false,
 }).signed(signature({ sender: bob }))
   .sent()
-  .dbgStatus("Bob Swap 30k USDT for DOT:")
+  .dbgStatus(`Bob Swap ${bobDotBalance} USDT for DOT:`)
   .finalizedEvents()
   .unhandleFailed()
+  .run(scope)
+
+await localDev.Assets.Account
+  .value(Rune.tuple([USDT_ASSET_ID, bob.publicKey]))
+  .unhandle(is(undefined))
+  .map(({ balance }) => balance)
+  .dbg("Bob's USDT Balance:")
   .run(scope)
