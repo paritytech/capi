@@ -81,8 +81,8 @@ await Promise.all([
     compilerOptions: {
       importHelpers: true,
       sourceMap: true,
-      target: "ES2021",
-      lib: ["ES2022.Error"],
+      target: "ES2022",
+      lib: ["ES2022", "DOM"],
     },
     entryPoints: [
       { name: ".", path: "./mod.ts" },
@@ -204,7 +204,7 @@ if (buildExamples) {
       importHelpers: true,
       sourceMap: true,
       target: "ES2021",
-      lib: ["ES2022.Error", "DOM.Iterable"],
+      lib: ["ES2022", "DOM"],
     },
     entryPoints: exampleEntryPoints,
     mappings: {
