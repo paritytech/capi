@@ -4,7 +4,7 @@ import { AddressPrefixChain, Chain, ChainRune, ExtrinsicSender } from "../../flu
 import { SignerError } from "../../frame_metadata/mod.ts"
 import { Rune, RunicArgs } from "../../rune/mod.ts"
 
-export type PjsSigner = { signPayload(payload: any): Promise<{ signature: string }> }
+export type PjsSigner = { signPayload?(payload: any): Promise<{ signature: string }> }
 
 export function pjsSender<C extends AddressPrefixChain, CU>(
   chain: ChainRune<C, CU>,
@@ -43,7 +43,7 @@ export function pjsSender<C extends AddressPrefixChain, CU>(
             payload.address = address
             let sig
             try {
-              sig = await pjsSigner.signPayload(payload)
+              sig = await pjsSigner.signPayload!(payload)
             } catch (e) {
               throw new SignerError(e)
             }
