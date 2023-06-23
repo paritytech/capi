@@ -138,6 +138,7 @@ await Promise.all([
     },
     test: false,
     typeCheck: false,
+    declaration: "separate",
   }),
   fs.copy("LICENSE", path.join(capiOutDir, "LICENSE")),
   fs.copy("Readme.md", path.join(capiOutDir, "Readme.md")),
