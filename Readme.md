@@ -167,7 +167,8 @@ Within a fresh clone of this repository...
 <!-- TODO: track https://github.com/denoland/dotland/issues/2650#issuecomment-1437015262 -->
 
 ```sh
-deno task run examples/<example_file>
+deno task sync # only needed once
+deno task run examples/<example_path>
 ```
 
 ## Rationale
