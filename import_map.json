@@ -1,6 +1,6 @@
 {
   "imports": {
-    "@capi/": "http://localhost:4646/d5de72ca4087cd41/"
+    "@capi/": "http://localhost:4646/353331e84ae4dc5a/"
   },
   "scopes": {
     "examples/": {
@@ -12,6 +12,7 @@
       "capi/patterns/signature/polkadot": "./patterns/signature/polkadot.ts",
       "capi/patterns/signature/statemint": "./patterns/signature/statemint.ts",
       "capi/patterns/unstable/consensus": "./patterns/unstable/consensus/mod.ts",
+      "capi/patterns/unstable/dex": "./patterns/unstable/dex/mod.ts",
       "capi/patterns/unstable/identity": "./patterns/unstable/identity.ts",
       "capi/patterns/unstable/ink": "./patterns/unstable/ink/mod.ts",
       "capi/patterns/unstable/multisig": "./patterns/unstable/multisig/mod.ts",
