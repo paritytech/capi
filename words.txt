@@ -48,6 +48,7 @@ multihash
 multisigs
 noninteractive
 offchain
+onfinality
 parachain
 parachains
 paritydb
