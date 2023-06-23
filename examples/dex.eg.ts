@@ -177,6 +177,15 @@ await localDev.AssetConversion.removeLiquidity({
   .unhandleFailed()
   .run(scope)
 
+await quotePriceExactTokensForTokens(
+  NativeOrAssetId.Asset(DOT_ASSET_ID),
+  NativeOrAssetId.Asset(USDT_ASSET_ID),
+  bobDotBalance,
+  true,
+)
+  .dbg("USDT/DOT Quote:")
+  .run(scope)
+
 // Should not get back 30k - fees since liquidity was reduced
 await localDev.AssetConversion.swapExactTokensForTokens({
   path: Rune.tuple([NativeOrAssetId.Asset(DOT_ASSET_ID), NativeOrAssetId.Asset(USDT_ASSET_ID)]),
