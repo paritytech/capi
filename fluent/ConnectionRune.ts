@@ -3,6 +3,7 @@ import { Connection, ConnectionError, RpcSubscriptionMessage, ServerError } from
 import { is, MetaRune, Run, Rune, RunicArgs, Runner, RunStream } from "../rune/mod.ts"
 
 class RunConnection extends Run<Connection, never> {
+  controller = new AbortController()
   constructor(
     ctx: Runner,
     readonly initConnection: (signal: AbortSignal) => Connection | Promise<Connection>,
@@ -12,7 +13,11 @@ class RunConnection extends Run<Connection, never> {
 
   connection?: Connection
   async _evaluate(): Promise<Connection> {
-    return this.connection ??= await this.initConnection(this.signal)
+    return this.connection ??= await this.initConnection(this.controller.signal)
+  }
+
+  override cleanup(): void {
+    this.controller.abort()
   }
 }
 
@@ -61,6 +66,7 @@ export class ConnectionRune<U> extends Rune<Connection, U> {
 }
 
 class RunRpcSubscription extends RunStream<RpcSubscriptionMessage> {
+  controller = new AbortController()
   constructor(
     ctx: Runner,
     connection: Connection,
@@ -74,7 +80,11 @@ class RunRpcSubscription extends RunStream<RpcSubscriptionMessage> {
       unsubscribeMethod,
       params,
       (value) => this.push(value),
-      this.signal,
+      this.controller.signal,
     )
+  }
+
+  override cleanup(): void {
+    this.controller.abort()
   }
 }

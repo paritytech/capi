@@ -46,11 +46,11 @@ export class OrthoRune<T, U1, U2> extends Rune<Run<T, U1>, U2> {
 class RunFlat<T, U1, U2> extends Run<T, U1 | U2> {
   child
   constructor(
-    readonly runner: Runner,
+    runner: Runner,
     child: Rune<Rune<T, U1>, U2>,
   ) {
     super(runner)
-    this.child = runner.prime(child, this.signal)
+    this.child = this.use(child)
   }
 
   lastChildReceipt = new Receipt()
@@ -62,10 +62,12 @@ class RunFlat<T, U1, U2> extends Run<T, U1 | U2> {
     const rune = await this.child.evaluate(time, receipt)
     if (!receipt.ready) return null!
     if (receipt.novel) {
-      // TODO: prime before aborting?
-      this.innerController.abort()
-      this.innerController = new AbortController()
-      this.currentInner = this.runner.prime(rune, this.innerController.signal)
+      // TODO: prime before dereferencing?
+      if (this.currentInner) {
+        this.currentInner.dereference()
+      }
+      this.currentInner = this.runner.prime(rune)
+      this.currentInner.reference()
     }
     const _receipt = new Receipt()
     try {
@@ -84,7 +86,9 @@ class RunFlat<T, U1, U2> extends Run<T, U1 | U2> {
   }
 
   override cleanup(): void {
-    this.innerController.abort()
+    if (this.currentInner) {
+      this.dependencies.push(this.currentInner)
+    }
     super.cleanup()
   }
 }
@@ -112,13 +116,20 @@ class OrthoRunner extends Runner {
     this.parent.memo.set(rune._prime, run)
     return run
   }
+
+  override onCleanup(run: Run<unknown, unknown>): void {
+    super.onCleanup(run)
+    if (run._sources.length) {
+      this.parent.onCleanup(run)
+    }
+  }
 }
 
 class RunFlatSingular<T, U1, U2> extends Run<T, U1 | U2> {
   child
-  constructor(readonly runner: Runner, child: Rune<Run<T, U1>, U2>) {
+  constructor(runner: Runner, child: Rune<Run<T, U1>, U2>) {
     super(runner)
-    this.child = runner.prime(child, this.signal)
+    this.child = this.use(child)
   }
 
   async _evaluate(time: number, receipt: Receipt) {
@@ -129,22 +140,24 @@ class RunFlatSingular<T, U1, U2> extends Run<T, U1 | U2> {
 
 class RunAsOrtho<T, U1, U2> extends Run<Run<T, U1>, U2> {
   child
-  constructor(readonly runner: Runner, child: Rune<Rune<T, U1>, U2>) {
+  constructor(runner: Runner, child: Rune<Rune<T, U1>, U2>) {
     super(runner)
-    this.child = runner.prime(child, this.signal)
+    this.child = this.use(child)
   }
 
   async _evaluate(time: number, receipt: Receipt) {
     const orthoRunner = new OrthoRunner(this.runner, time)
     const rune = await this.child.evaluate(time, receipt)
-    return orthoRunner.prime(rune, undefined)
+    return orthoRunner.prime(rune)
   }
 }
 
 class RunWrapOrtho<T, U> extends Run<T, U> {
-  constructor(readonly runner: OrthoRunner, readonly child: Run<T, U>) {
+  declare runner: OrthoRunner
+
+  constructor(runner: OrthoRunner, readonly child: Run<T, U>) {
     super(runner)
-    child.reference(this.signal)
+    this.useRun(child)
   }
 
   _evaluate(): Promise<T> {
