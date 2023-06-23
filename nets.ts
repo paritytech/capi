@@ -59,3 +59,7 @@ export const rococoDevXcmStatemine = rococoDevXcm.parachain({
   chain: "statemine-local",
   id: 1000,
 })
+
+export const collectives = net.ws({
+  url: "wss://collectives.api.onfinality.io/public-ws",
+})
