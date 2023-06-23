@@ -148,12 +148,7 @@ await Promise.all([
 await Promise.all([
   fs.copy(
     path.join(capiOutDir, "src/rune/_empty.d.ts"),
-    path.join(capiOutDir, "esm/rune/_empty.d.ts"),
-    { overwrite: true },
-  ),
-  fs.copy(
-    path.join(capiOutDir, "src/rune/_empty.d.ts"),
-    path.join(capiOutDir, "script/rune/_empty.d.ts"),
+    path.join(capiOutDir, "types/rune/_empty.d.ts"),
     { overwrite: true },
   ),
   editFile(
