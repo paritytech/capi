@@ -55,14 +55,18 @@ export function pjsSender<C extends AddressPrefixChain, CU>(
   }
 }
 
-const convertExtensionCodec = (keyMap: Record<string, string>) => {
+type KeyHandler = (codec: $.Codec<any>) => $.Codec<any>
+
+const simpleKeyHandler = (pjsKey: string): KeyHandler => (value) => $.field(pjsKey, $pjs(value))
+
+const convertExtensionCodec = (keyMap: Record<string, KeyHandler>) => {
   const visitor: $.CodecVisitor<$.Codec<any>> = new $.CodecVisitor<$.Codec<any>>()
     .add($.field, (_, key: string, value) => {
-      const pjsKey = keyMap[key]
-      if (pjsKey === undefined) {
+      const handler = keyMap[key]
+      if (handler === undefined) {
         throw new Error(`pjs signer: unknown extension ${key}`)
       }
-      return $.field(pjsKey, $pjs(value))
+      return handler(value)
     })
     .add($.object, (_, ...fields) => $.object(...fields.map((x) => visitor.visit(x))))
   return visitor
@@ -72,20 +76,30 @@ const keys: $.CodecVisitor<string[]> = new $.CodecVisitor<string[]>()
   .add($.field, (_, key: string, _v) => [key])
   .add($.object, (_, ...fields) => fields.flatMap((x) => keys.visit(x)))
 
-const pjsExtraKeyMap: Record<string, string> = {
-  CheckEra: "era",
-  CheckMortality: "era",
-  ChargeTransactionPayment: "tip",
-  CheckNonce: "nonce",
+// https://github.com/polkadot-js/api/tree/8282159/packages/types/src/extrinsic/signedExtensions
+
+const pjsExtraKeyMap: Record<string, KeyHandler> = {
+  CheckEra: simpleKeyHandler("era"),
+  CheckMortality: simpleKeyHandler("era"),
+  ChargeTransactionPayment: simpleKeyHandler("tip"),
+  CheckNonce: simpleKeyHandler("nonce"),
+  ChargeAssetTxPayment: (value) => {
+    // https://github.com/polkadot-js/api/blob/8282159/packages/types/src/extrinsic/signedExtensions/statemint.ts
+    // pjs essentially spreads this into the extrinsic
+    const visitor: $.CodecVisitor<$.Codec<any>> = new $.CodecVisitor<$.Codec<any>>()
+      .add($.field, (_, key, value) => $.field(key, $pjs(value)))
+      .add($.object, (_, ...fields) => $.object(...fields.map((x) => visitor.visit(x))))
+    return visitor.visit(value)
+  },
 }
 
-const pjsAdditionalKeyMap: Record<string, string> = {
-  CheckEra: "blockHash",
-  CheckMortality: "blockHash",
-  CheckSpecVersion: "specVersion",
-  CheckTxVersion: "transactionVersion",
-  CheckVersion: "specVersion",
-  CheckGenesis: "genesisHash",
+const pjsAdditionalKeyMap: Record<string, KeyHandler> = {
+  CheckEra: simpleKeyHandler("blockHash"),
+  CheckMortality: simpleKeyHandler("blockHash"),
+  CheckSpecVersion: simpleKeyHandler("specVersion"),
+  CheckTxVersion: simpleKeyHandler("transactionVersion"),
+  CheckVersion: simpleKeyHandler("specVersion"),
+  CheckGenesis: simpleKeyHandler("genesisHash"),
 }
 
 function $pjs<T>($inner: $.Codec<T>): $.Codec<(T & number) | string> {
