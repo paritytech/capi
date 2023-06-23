@@ -47,7 +47,7 @@ class RootRunner extends Runner {
   }
 }
 
-export const globalRunner = new RootRunner()
+const globalRunner = new RootRunner()
 
 declare const _T: unique symbol
 declare const _U: unique symbol
