@@ -15,6 +15,7 @@ const shaAbbrevLength = 8
 const rTagVersion = /^v(\d+\.\d+\.\d+(?:-.+)?)$/
 const rPrVersion = /^pr:(\d+)$/
 const rVersionedUrl = /^(?:\/@(.+?))?(\/.*)?$/
+const rCapiPath = /^\/capi\/(.+)$/
 
 const delegateeProjectId = "70eddd08-c9b0-4cb3-b100-8c6facf52f1e"
 const githubApiBase = "https://api.github.com/repos/paritytech/capi/"
@@ -34,6 +35,12 @@ async function handler(request: Request) {
   }
   if (version !== normalizedVersion) {
     return f.redirect(`/@${normalizedVersion}${path}`)
+  }
+  if (rTagVersion.test(version)) {
+    const match = rCapiPath.exec(path)
+    if (match) {
+      return f.redirect(`https://deno.land/x/capi@${version}/${match[1]}`)
+    }
   }
   const deploymentUrl = await getDeployment(sha)
   return await fetch(new URL(path, deploymentUrl), {
