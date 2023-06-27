@@ -9,11 +9,13 @@ import { ConnectionRune } from "./ConnectionRune.ts"
 import { ExtrinsicRune } from "./ExtrinsicRune.ts"
 import { PalletRune } from "./PalletRune.ts"
 
+/** A container for the inner connection and FRAME metadata of a given chain */
 export interface Chain<M extends FrameMetadata = FrameMetadata> {
   connection: Connection
   metadata: M
 }
 
+/** Contains type utilities pertaining to the `Chain` type */
 export namespace Chain {
   export type Call<C extends Chain> = $.Output<C["metadata"]["extrinsic"]["call"]>
   export type Address<C extends Chain> = $.Output<C["metadata"]["extrinsic"]["address"]>
@@ -21,26 +23,39 @@ export namespace Chain {
   export type Extra<C extends Chain> = $.Output<C["metadata"]["extrinsic"]["extra"]>
   export type Additional<C extends Chain> = $.Output<C["metadata"]["extrinsic"]["additional"]>
 
+  /** Extract a lookup of the chain's `Pallet`s */
   export type Pallets<C extends Chain> = C["metadata"]["pallets"]
+  /** Extract a union of the `Chain`'s pallet names */
   export type PalletName<C extends Chain> = keyof Pallets<C>
+  /** Extract the specified `Pallet` of the `Chain` */
   export type Pallet<C extends Chain, P extends PalletName<C>> = Pallets<C>[P]
 
+  /** Extract a lookup of the `Chain`'s `Constant`s */
   export type Constants<C extends Chain, P extends PalletName<C>> = Pallet<C, P>["constants"]
+  /** Extract a union of the `Chain`'s constant names */
   export type ConstantName<C extends Chain, P extends PalletName<C>> = keyof Constants<C, P>
+  /** Extract the codec that represents a specified constant of the `Chain` */
   export type Constant<C extends Chain, P extends PalletName<C>, K extends ConstantName<C, P>> =
     Constants<C, P>[K]
 
+  /** Contains type utilities pertaining to `Constants` in `FrameMetadata` */
   export namespace Constant {
+    /** Get the native TypeScript type of the constant corresponding to the `Chain`, pallet name and constant name */
     export type Value<C extends Chain, P extends PalletName<C>, K extends ConstantName<C, P>> =
       $.Output<Constant<C, P, K>["codec"]>
   }
 
+  /** Extract a lookup of the `Chain`'s `StorageEntry`s */
   export type StorageEntries<C extends Chain, P extends PalletName<C>> = Pallet<C, P>["storage"]
+  /** Extract a union of the `Chain`'s storage names */
   export type StorageName<C extends Chain, P extends PalletName<C>> = keyof StorageEntries<C, P>
+  /** Extract the codec that represents a specified storage of the `Chain` */
   export type Storage<C extends Chain, P extends PalletName<C>, S extends StorageName<C, P>> =
     StorageEntries<C, P>[S]
 
+  /** Contains type utilities pertaining to `Storage` in `FrameMetadata` */
   export namespace Storage {
+    /** Get the native TypeScript type of the storage key corresponding to the `Chain`, pallet name and storage name */
     export type Key<C extends Chain, P extends PalletName<C>, S extends StorageName<C, P>> =
       $.Output<Storage<C, P, S>["key"]>
     export type PartialKey<C extends Chain, P extends PalletName<C>, S extends StorageName<C, P>> =
@@ -50,7 +65,7 @@ export namespace Chain {
   }
 }
 
-// TODO: do we want to represent the discovery value and conn type within the type system?
+/** The root Rune of Capi's fluent API, with which other core Runes can be created */
 export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
   static from<M extends FrameMetadata>(
     connect: (signal: AbortSignal) => Connection,
