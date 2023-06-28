@@ -1,6 +1,5 @@
 /**
- * @title Kilt decentralized identifier (DID)
- * @description Get the first user public key based on the user Kilt DID.
+ * @title Read Kilt first owner DID public key details
  */
 
 import { $didPublicKeyDetails, spiritnet } from "@capi/spiritnet"
