@@ -112,6 +112,10 @@ await Promise.all([
         name: "ws",
         version: "8.13.0",
       },
+      "./deps/ts_node.ts": {
+        name: "ts-node",
+        version: "10.9.1",
+      },
       "./deps/shims/shim-deno.ts": "@deno/shim-deno",
       "./deps/shims/ts-node-esm.ts": "ts-node/esm",
       "node:net": "node:net",
@@ -150,12 +154,6 @@ await Promise.all([
     path.join(capiOutDir, "src/rune/_empty.d.ts"),
     path.join(capiOutDir, "types/rune/_empty.d.ts"),
     { overwrite: true },
-  ),
-  editFile(
-    path.join(capiOutDir, "esm/main.js"),
-    (content) =>
-      content
-        .replace(/^#!.+/, "#!/usr/bin/env -S node --loader capi/loader"),
   ),
   editFile(
     path.join(capiOutDir, "esm/_dnt.shims.js"),

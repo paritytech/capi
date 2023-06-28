@@ -6,6 +6,13 @@ const $nets = $.record($.instance(NetSpec as new() => NetSpec, $.tuple(), () => 
 
 export async function resolveNets(maybeNetsPath?: string): Promise<Record<string, NetSpec>> {
   const resolvedNetsPath = await resolveNetsPath(maybeNetsPath)
+  if (resolvedNetsPath.endsWith(".ts")) {
+    ;(await import("../deps/ts_node.ts")).register({
+      compilerOptions: {
+        module: "Node16",
+      },
+    })
+  }
   const nets = await import(path.toFileUrl(resolvedNetsPath).toString())
   $.assert($nets, nets)
   for (const key in nets) nets[key]!.name = key
