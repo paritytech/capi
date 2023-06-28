@@ -1,3 +1,8 @@
+/**
+ * @title Kilt decentralized identifier (DID)
+ * @description Get a user public key based on the web3name alias of a Kilt DID.
+ */
+
 import { spiritnet } from "@capi/spiritnet"
 import { $, is } from "capi"
 import { equals } from "../../deps/std/bytes.ts"
