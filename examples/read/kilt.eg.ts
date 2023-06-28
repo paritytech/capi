@@ -1,16 +1,16 @@
 /**
  * @title Kilt decentralized identifier (DID)
- * @description Get a user public key based on the web3name alias of a Kilt DID.
+ * @description Get the first user public key based on the user Kilt DID.
  */
 
 import { $didPublicKeyDetails, spiritnet } from "@capi/spiritnet"
-import { $, is } from "capi"
+import { $, is, ValueRune } from "capi"
 import { equals } from "../../deps/std/bytes.ts"
 
-const { owner } = await spiritnet.Web3Names.Owner
-  .value(new TextEncoder().encode("ingo"))
-  .unhandle(is(undefined))
-  .run()
+const owner = spiritnet.Web3Names.Owner
+  .entries({ limit: 1 })
+  .into(ValueRune)
+  .access(0, 1, "owner")
 
 const [_, didPublicKeyDetails] = await spiritnet.Did.Did
   .value(owner)
