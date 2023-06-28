@@ -2,16 +2,18 @@ import * as $ from "../../deps/scale.ts"
 
 /** Describes the longevity of a transaction */
 export type Era = Era.Mortal | Era.Immortal
+/** Contains member types and factories of the `Era` union */
 export namespace Era {
-  /** Allow the transaction to remain valid forever. Drink the mercury. It's shiny. */
+  /** A reusable instance of `Era.Immortal`, which will allow the transaction to remain forever valid */
   export const Immortal: Immortal = { type: "Immortal" }
+  /** Allow the transaction to remain forever valid. Drink the mercury. It's shiny. */
   export interface Immortal {
     type: "Immortal"
   }
 
   /**
-   * Specify `period` and `current` as to restrict the range within which the transaction
-   * should be considered as valid.
+   * Creates an `Era.Mortal`, which is useful for the creation of signature restrict period
+   * and phase range of transaction validity.
    */
   export function Mortal(period: bigint, current: bigint): Mortal {
     const adjustedPeriod = minN(maxN(nextPowerOfTwo(period), 4n), 1n << 16n)
@@ -20,6 +22,7 @@ export namespace Era {
     const quantizedPhase = phase / quantizeFactor * quantizeFactor
     return { type: "Mortal", period: adjustedPeriod, phase: quantizedPhase }
   }
+  /** Restrict the validity  */
   export interface Mortal {
     type: "Mortal"
     period: bigint
