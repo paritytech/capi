@@ -1,5 +1,4 @@
 import { build, EntryPoint } from "../deps/dnt.ts"
-import { mapEntries } from "../deps/std/collections/map_entries.ts"
 import * as flags from "../deps/std/flags.ts"
 import * as fs from "../deps/std/fs.ts"
 import * as path from "../deps/std/path.ts"
