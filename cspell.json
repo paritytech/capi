@@ -21,6 +21,7 @@
     "examples/raw_rpc/metadata",
     "examples/smoldot/chainspec.json",
     "target",
-    "util/_artifacts"
+    "util/_artifacts",
+    "deps/shims/ed25519.js"
   ]
 }
