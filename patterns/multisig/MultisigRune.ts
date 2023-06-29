@@ -42,7 +42,7 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
   address = MultiAddress.Id(this.accountId)
   ss58 = Rune
     .tuple([this.chain.addressPrefix(), this.accountId])
-    .map(([prefix, accountId]) => ss58.encode(prefix, accountId))
+    .map(([prefix, accountId]: any) => ss58.encode(prefix, accountId))
   encoded = CodecRune.from($multisig).encoded(this.as(MultisigRune))
   hex = this.encoded.map(hex.encode)
 
@@ -102,7 +102,7 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
             threshold: this.threshold,
             callHash,
             otherSignatories: this.otherSignatories(sender),
-            timepoint: this.maybeTimepoint(callHash).map((x) => x ?? new NoProposalError()),
+            timepoint: this.maybeTimepoint(callHash).map((x: any) => x ?? new NoProposalError()),
           }),
         })
         .unsafeAs<Chain.Call<C>>(),
@@ -150,7 +150,7 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
       .value(
         Rune
           .tuple([this.accountId, callHash])
-          .unsafeAs<$.Native<Chain.Storage<C, "Multisig", "Multisigs">["key"]>>(),
+          .unsafeAs<$.Output<Chain.Storage<C, "Multisig", "Multisigs">["key"]>>(),
         blockHash,
       )
       .unsafeAs<
@@ -170,7 +170,7 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
       .valueRaw(
         Rune
           .tuple([this.accountId, callHash])
-          .unsafeAs<$.Native<Chain.Storage<C, "Multisig", "Multisigs">["key"]>>(),
+          .unsafeAs<$.Output<Chain.Storage<C, "Multisig", "Multisigs">["key"]>>(),
         blockHash,
       )
       .map((entry) => entry !== null)

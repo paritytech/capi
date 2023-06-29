@@ -12,6 +12,7 @@ export class ConstantRune<
   $value = this
     .into(ValueRune)
     .access("codec")
-    .into(CodecRune<Chain.Constant.Value<C, P, K>, U>)
+    .unsafeAs<any>()
+    .into(CodecRune<Chain.Constant.Value<C, P, K>, Chain.Constant.Value<C, P, K>, U>)
   decoded = this.$value.decoded(this.into(ValueRune).access("value"))
 }

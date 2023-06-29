@@ -65,13 +65,16 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
       .unhandle(is(undefined))
     return Rune
       .tuple([block.events(), txI])
-      .map(([events, txI]) =>
+      .unsafeAs<any>()
+      .into(ValueRune)
+      .map(([events, txI]: [any[], number]) =>
         // TODO: narrow
         events.filter((event: any) =>
           event.phase.type === "ApplyExtrinsic" && event.phase.value === txI
         )
       )
       .rehandle(is(undefined), () => Rune.constant([]))
+      .unsafeAs<any>()
       .into(ExtrinsicEventsRune, this.chain)
   }
 }

@@ -48,7 +48,7 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
       .access("metadata", "extrinsic", "call")
       .into(CodecRune)
     const call = $call.decoded(args[0])
-    return this.from(chain, call)
+    return this.from(chain, call.unsafeAs())
   }
 
   static fromHex<C extends Chain, U, X>(
@@ -59,12 +59,12 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
   }
 
   $callData = this.chain.into(ValueRune).access("metadata", "extrinsic", "call").into(CodecRune)
-  callData = this.$callData.encoded(this)
+  callData = this.$callData.encoded(this.unsafeAs())
   hex = this.callData.map(hex.encode)
 
   $callHash = Rune
     .fn(($inner: $.Codec<unknown>) => blake2_256.$hash($inner))
-    .call(this.$callData)
+    .call(this.$callData.unsafeAs())
     .into(CodecRune)
   callHash = this.$callHash.encoded(this)
 
@@ -99,10 +99,10 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
 
   $weight = this.chain.metadata.access("paths", "sp_weights::weight_v2::Weight").into(CodecRune)
   weight() {
-    return this.dispatchInfo().access("weight")
+    return this.dispatchInfo().unsafeAs<any>().into(ValueRune).access("weight")
   }
   weightRaw() {
-    return this.$weight.encoded(this.weight()).map(hex.encode)
+    return this.$weight.encoded(this.weight().unsafeAs<never>()).map(hex.encode)
   }
 
   estimate() {

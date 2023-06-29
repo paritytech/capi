@@ -1,4 +1,5 @@
 import { blake2_512, blake2_64, Hasher, hex } from "../../crypto/mod.ts"
+import * as $ from "../../deps/scale.ts"
 import { mapEntries } from "../../deps/std/collections/map_entries.ts"
 import { gray, green } from "../../deps/std/fmt/colors.ts"
 import { NetSpec } from "../../nets/mod.ts"
@@ -38,7 +39,7 @@ export async function syncNets(
         }]
       }),
     )
-    const sortedEntries = new Map([...entries].sort((a, b) => a[0] < b[0] ? 1 : -1))
+    const sortedEntries = new $.ScaleMap($.str, [...entries].sort((a, b) => a[0] < b[0] ? 1 : -1))
     const codegenSpec = $codegenSpec.encode({ type: "v0", codegen: sortedEntries })
     const codegenHash = hex.encode(await upload(server, "codegen", codegenSpec, blake2_64))
     return new URL(codegenHash + "/", server).toString()

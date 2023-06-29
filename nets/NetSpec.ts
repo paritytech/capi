@@ -28,7 +28,7 @@ export function getMetadataFromWsUrl(url: string) {
   })
 }
 
-export type ConnectionSpec = $.Native<typeof $connectionSpec>
+export type ConnectionSpec = $.Output<typeof $connectionSpec>
 export const $connectionSpec = $.taggedUnion("type", [
   $.variant("WsConnection", $.field("discovery", $.str)),
   $.variant("DevnetConnection", $.field("discovery", $.str)),

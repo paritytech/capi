@@ -1,5 +1,5 @@
 import * as $ from "../deps/scale.ts"
-import { Codec } from "../deps/scale.ts"
+import { AnyCodec, Codec } from "../deps/scale.ts"
 import { getOrInit } from "../util/mod.ts"
 import { normalizeDocs, normalizeIdent, normalizeTypeName } from "../util/normalize.ts"
 import { overrides } from "./overrides/mod.ts"
@@ -12,14 +12,14 @@ import { $field, Ty } from "./raw/Ty.ts"
 export const $null = $.withMetadata($.metadata("$null"), $.constant(null))
 
 export interface ScaleInfo {
-  ids: Codec<any>[]
-  types: Record<string, Codec<any>>
-  paths: Record<string, Codec<any>>
+  ids: AnyCodec[]
+  types: Record<string, AnyCodec>
+  paths: Record<string, AnyCodec>
 }
 export function transformTys(tys: Ty[]): ScaleInfo {
-  const memo = new Map<number, Codec<any>>()
-  const types: Record<string, Codec<any>> = {}
-  const paths: Record<string, Codec<any>> = {}
+  const memo = new Map<number, AnyCodec>()
+  const types: Record<string, AnyCodec> = {}
+  const paths: Record<string, AnyCodec> = {}
   const seenPaths = new Map<string, Ty | null>()
   const includePaths = new Set<string>()
   const names = new Map<string, string>()
@@ -62,7 +62,7 @@ export function transformTys(tys: Ty[]): ScaleInfo {
 
   return { ids: tys.map((_, i) => visit(i)), types, paths }
 
-  function visit(i: number): Codec<any> {
+  function visit(i: number): $.AnyCodec {
     return getOrInit(memo, i, () => {
       memo.set(i, $.deferred(() => memo.get(i)!))
       const ty = tys[i]!
@@ -76,7 +76,7 @@ export function transformTys(tys: Ty[]): ScaleInfo {
     })
   }
 
-  function _visit(ty: Ty): Codec<any> {
+  function _visit(ty: Ty): $.AnyCodec {
     const overrideFn = overrides[ty.path.join("::")]
     if (overrideFn) return overrideFn(ty, visit)
     if (ty.type === "Struct") {
@@ -113,9 +113,9 @@ export function transformTys(tys: Ty[]): ScaleInfo {
         }
         return $.literalUnion(members)
       } else {
-        const members: Record<number, $.Variant<any, any>> = {}
+        const members: Record<number, $.Variant<any, never, unknown>> = {}
         for (const { fields, name, index } of ty.members) {
-          let member: $.Variant<any, any>
+          let member: $.Variant<any, never, unknown>
           const type = normalizeIdent(name)
           if (fields.length === 0) {
             member = $.variant(type)
@@ -163,7 +163,7 @@ export function transformTys(tys: Ty[]): ScaleInfo {
   }
 }
 
-function withDocs<T>(_docs: string[], codec: Codec<T>): Codec<T> {
+function withDocs<I, O>(_docs: string[], codec: Codec<I, O>): Codec<I, O> {
   const docs = normalizeDocs(_docs)
   if (docs) return $.withMetadata($.docs(docs), codec)
   return codec
@@ -229,7 +229,7 @@ function eqTy(tys: Ty[], a: number, b: number) {
     return false
   }
 
-  function eqField(a: $.Native<typeof $field>, b: $.Native<typeof $field>) {
+  function eqField(a: $.Output<typeof $field>, b: $.Output<typeof $field>) {
     return a.name === b.name
       && a.typeName === b.typeName
       && eqDocs(a.docs, b.docs)

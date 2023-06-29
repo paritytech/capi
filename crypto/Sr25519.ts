@@ -43,5 +43,5 @@ export const $sr25519 = $.instance(
     $.field("secretKey", $.sizedUint8Array(64)),
     $.field("publicKey", $.sizedUint8Array(32)),
   )),
-  (sr25519) => [sr25519.keypair],
+  (sr25519: Sr25519) => [sr25519.keypair],
 )

@@ -15,11 +15,11 @@ export interface Chain<M extends FrameMetadata = FrameMetadata> {
 }
 
 export namespace Chain {
-  export type Call<C extends Chain> = $.Native<C["metadata"]["extrinsic"]["call"]>
-  export type Address<C extends Chain> = $.Native<C["metadata"]["extrinsic"]["address"]>
-  export type Signature<C extends Chain> = $.Native<C["metadata"]["extrinsic"]["signature"]>
-  export type Extra<C extends Chain> = $.Native<C["metadata"]["extrinsic"]["extra"]>
-  export type Additional<C extends Chain> = $.Native<C["metadata"]["extrinsic"]["additional"]>
+  export type Call<C extends Chain> = $.Output<C["metadata"]["extrinsic"]["call"]>
+  export type Address<C extends Chain> = $.Output<C["metadata"]["extrinsic"]["address"]>
+  export type Signature<C extends Chain> = $.Output<C["metadata"]["extrinsic"]["signature"]>
+  export type Extra<C extends Chain> = $.Output<C["metadata"]["extrinsic"]["extra"]>
+  export type Additional<C extends Chain> = $.Output<C["metadata"]["extrinsic"]["additional"]>
 
   export type Pallets<C extends Chain> = C["metadata"]["pallets"]
   export type PalletName<C extends Chain> = keyof Pallets<C>
@@ -32,7 +32,7 @@ export namespace Chain {
 
   export namespace Constant {
     export type Value<C extends Chain, P extends PalletName<C>, K extends ConstantName<C, P>> =
-      $.Native<Constant<C, P, K>["codec"]>
+      $.Output<Constant<C, P, K>["codec"]>
   }
 
   export type StorageEntries<C extends Chain, P extends PalletName<C>> = Pallet<C, P>["storage"]
@@ -42,11 +42,11 @@ export namespace Chain {
 
   export namespace Storage {
     export type Key<C extends Chain, P extends PalletName<C>, S extends StorageName<C, P>> =
-      $.Native<Storage<C, P, S>["key"]>
+      $.Output<Storage<C, P, S>["key"]>
     export type PartialKey<C extends Chain, P extends PalletName<C>, S extends StorageName<C, P>> =
-      $.Native<Storage<C, P, S>["partialKey"]>
+      $.Output<Storage<C, P, S>["partialKey"]>
     export type Value<C extends Chain, P extends PalletName<C>, S extends StorageName<C, P>> =
-      $.Native<Storage<C, P, S>["value"]>
+      $.Output<Storage<C, P, S>["value"]>
   }
 }
 

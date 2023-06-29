@@ -1,18 +1,17 @@
-import { Codec } from "../../deps/scale.ts"
 import * as $ from "../../deps/scale.ts"
 import { Ty } from "../raw/Ty.ts"
 import { ChainError } from "./ChainError.ts"
 import { $era } from "./Era.ts"
 
 const isResult = new $.CodecVisitor<boolean>()
-  .add($.result<any, any>, () => true)
+  .add($.result<any, any, any, any>, () => true)
   .fallback(() => false)
 
 const isOption = new $.CodecVisitor<boolean>()
-  .add($.option<any>, () => true)
+  .add($.option<any, any>, () => true)
   .fallback(() => false)
 
-export const overrides: Record<string, (ty: Ty, visit: (i: number) => Codec<any>) => Codec<any>> = {
+export const overrides: Record<string, (ty: Ty, visit: (i: number) => $.AnyCodec) => $.AnyCodec> = {
   Option: (ty, visit) => {
     let $some = visit(ty.params[0]!.ty!)
     if (isOption.visit($some)) {
@@ -35,10 +34,10 @@ export const overrides: Record<string, (ty: Ty, visit: (i: number) => Codec<any>
     )
   },
   BTreeMap: (ty, visit) => {
-    return $.map(visit(ty.params[0]!.ty!), visit(ty.params[1]!.ty!))
+    return $.map(visit(ty.params[0]!.ty!) as any, visit(ty.params[1]!.ty!))
   },
   BTreeSet: (ty, visit) => {
-    return $.set(visit(ty.params[0]!.ty!))
+    return $.set(visit(ty.params[0]!.ty!) as any)
   },
   "frame_support::traits::misc::WrapperOpaque": (ty, visit) => {
     return $.lenPrefixed(visit(ty.params[0]!.ty!))

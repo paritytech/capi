@@ -49,7 +49,7 @@ export const $tyDef = $.taggedUnion("type", [
   $.variant("BitSequence", $.field("bitOrderType", $tyId), $.field("bitStoreType", $tyId)),
 ])
 
-export type Ty = $.Native<typeof $ty>
+export type Ty = $.Output<typeof $ty>
 export const $ty = $.object(
   $.field("id", $.compact($.u32)),
   $.field("path", $.array($.str)),

@@ -10,11 +10,15 @@ export class StorageRune<
   out S extends Chain.StorageName<C, P>,
   out U,
 > extends PatternRune<Chain.Storage<C, P, S>, C, U> {
-  $key = this.into(ValueRune).access("key").into(CodecRune<Chain.Storage.Key<C, P, S>, U>)
-  $partialKey = this.into(ValueRune).access("partialKey").into(
-    CodecRune<Chain.Storage.PartialKey<C, P, S>, U>,
+  $key = this.into(ValueRune).access("key").unsafeAs<any>().into(
+    CodecRune<Chain.Storage.Key<C, P, S>, Chain.Storage.Key<C, P, S>, U>,
   )
-  $value = this.into(ValueRune).access("value").into(CodecRune<Chain.Storage.Value<C, P, S>, U>)
+  $partialKey = this.into(ValueRune).access("partialKey").unsafeAs<any>().into(
+    CodecRune<Chain.Storage.PartialKey<C, P, S>, Chain.Storage.PartialKey<C, P, S>, U>,
+  )
+  $value = this.into(ValueRune).access("value").unsafeAs<any>().into(
+    CodecRune<Chain.Storage.Value<C, P, S>, Chain.Storage.Value<C, P, S>, U>,
+  )
 
   valueRaw<X>(
     ...[key, blockHash]: RunicArgs<X, [
@@ -97,7 +101,7 @@ export class StorageRune<
     )
       .map(hex.encodePrefixed)
     const startKey = this.$key
-      .encoded(Rune.resolve(props.start).unhandle(is(undefined)))
+      .encoded(Rune.resolve(props.start).unhandle(is(undefined)).unsafeAs())
       .map(hex.encodePrefixed)
       .rehandle(is(undefined))
     return this.chain.connection.call(

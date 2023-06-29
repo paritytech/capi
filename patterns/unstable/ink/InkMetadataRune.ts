@@ -51,7 +51,9 @@ export class InkMetadataRune<out U> extends Rune<InkMetadata, U> {
         events.map((event) =>
           $.variant(
             event.label,
-            $.object(...event.args.map((arg) => $.field(arg.label, codecs[arg.type.type]!))),
+            $.object(
+              ...event.args.map((arg) => $.field(arg.label, codecs[arg.type.type]!)) as any,
+            ) as any,
           )
         ),
       )
@@ -82,7 +84,8 @@ export class InkMetadataRune<out U> extends Rune<InkMetadata, U> {
       .encoded(
         Rune
           .tuple([selector, args])
-          .map(([selector, args]) => [selector, ...args ?? []]),
+          .map(([selector, args]) => [selector, ...args ?? []])
+          .unsafeAs<any>(),
       )
   }
 

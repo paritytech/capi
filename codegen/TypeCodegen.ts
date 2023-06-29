@@ -12,7 +12,7 @@ import { stringifyKey, stringifyPropertyAccess } from "../util/mod.ts"
 import { CodecCodegen } from "./CodecCodegen.ts"
 
 export class TypeCodegen {
-  constructor(readonly codecCodegen: CodecCodegen, readonly types: Record<string, $.Codec<any>>) {
+  constructor(readonly codecCodegen: CodecCodegen, readonly types: Record<string, $.AnyCodec>) {
     this.codecCodegen.visit(types)
     for (const path in types) {
       this.typeNames.set(types[path]!, `t.${path}`)
@@ -63,11 +63,11 @@ export class TypeCodegen {
       (_codec, ...entries) => `C.PartialMultiKey<${this.native($.tuple(...entries))}>`,
     )
     .add(
-      $.field<string, any>,
+      $.field<string, any, any>,
       (_codec, key, value) => `{ ${stringifyKey(key)}: ${this.native(value)} }`,
     )
     .add(
-      $.optionalField<string, any>,
+      $.optionalField<string, any, any>,
       (_codec, key, value) => `{ ${stringifyKey(key)}?: ${this.native(value)} }`,
     )
     .add(
@@ -76,7 +76,7 @@ export class TypeCodegen {
         entries.map((x) => this.native(x)).join(" & ").replace(/} & {/g, ", ") || "{}",
     )
     .add(
-      $.taggedUnion<string, $.Variant<any, any>[]>,
+      $.taggedUnion<string, $.AnyVariant[]>,
       (_codec, tagKey, variants) =>
         `(${
           Object.values(variants).map((v) =>
@@ -201,9 +201,9 @@ export ${isTypes ? `namespace ${name}` : `const ${name} =`} {
       isTypes ? `export type ${name} = ${this.nativeVisitor.visit(codec)}` : ""
     )
 
-  typeNames = new Map<$.Codec<any>, string>()
+  typeNames = new Map<$.AnyCodec, string>()
 
-  native(codec: $.Codec<any>): string {
+  native(codec: $.AnyCodec): string {
     return this.typeNames.get(codec) ?? this.nativeVisitor.visit(codec)
   }
 
