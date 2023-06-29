@@ -38,7 +38,7 @@ const state = contract.call({
 
 /// Retrieve the initial state.
 const initialState = await state.run()
-$.assert($.u32, initialState)
+$.assert($.u64, initialState)
 console.log("Alexa initial balance:", initialState)
 
 /// Use the `flip` method to *flip* the contract instance state.
@@ -72,7 +72,7 @@ console.log(events)
 
 /// Retrieve the final state.
 const finalState = await state.run()
-$.assert($.u32, finalState)
+$.assert($.u64, finalState)
 console.log("Alexa final balance:", finalState)
 
 assert(finalState < initialState)
