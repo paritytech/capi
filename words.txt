@@ -46,6 +46,7 @@ multiaddress
 multichain
 multihash
 multisigs
+nocheck
 noninteractive
 offchain
 onfinality
