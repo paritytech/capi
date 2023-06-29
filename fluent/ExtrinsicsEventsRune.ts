@@ -14,7 +14,7 @@ export class ExtrinsicEventsRune<out C extends Chain, out U> extends EventsRune<
   unhandleFailed() {
     const dispatchError = this
       .into(ValueRune)
-      .map((events) =>
+      .map((events: any) =>
         events.find(isSystemExtrinsicFailedEvent) as SystemExtrinsicFailedEvent | undefined
       )
       .unhandle(is(undefined))

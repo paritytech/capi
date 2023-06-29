@@ -162,7 +162,7 @@ export class VirtualMultisigRune<out C extends Chain, out U>
       .finalizedEvents()
       .unhandleFailed()
       .pipe(filterPureCreatedEvents)
-      .map((events) =>
+      .map((events: any[]) =>
         events
           .sort((a, b) => a.disambiguationIndex > b.disambiguationIndex ? 1 : -1)
           .map(({ pure }) => pure)

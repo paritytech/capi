@@ -1,7 +1,7 @@
 import * as $ from "../deps/scale.ts"
 import { $connectionSpec } from "../nets/mod.ts"
 
-export type CodegenEntry = $.Native<typeof $codegenEntry>
+export type CodegenEntry = $.Output<typeof $codegenEntry>
 const $codegenEntry = $.taggedUnion("type", [
   $.variant(
     "frame",
@@ -12,7 +12,7 @@ const $codegenEntry = $.taggedUnion("type", [
   ),
 ])
 
-export type CodegenSpec = $.Native<typeof $codegenSpec>
+export type CodegenSpec = $.Output<typeof $codegenSpec>
 export const $codegenSpec = $.taggedUnion("type", [
   $.variant(
     "v0",

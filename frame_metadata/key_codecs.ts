@@ -1,11 +1,11 @@
 import { twox128 } from "../crypto/mod.ts"
 import * as $ from "../deps/scale.ts"
 
-export function $storageKey<T>(
+export function $storageKey<I, O>(
   palletName: string,
   entryName: string,
-  $key: $.Codec<T>,
-): $.Codec<T> {
+  $key: $.Codec<I, O>,
+): $.Codec<I, O> {
   const palletHash = twox128.hash(new TextEncoder().encode(palletName))
   const entryHash = twox128.hash(new TextEncoder().encode(entryName))
   return $.createCodec({
@@ -43,7 +43,7 @@ export const $partialEmptyKey = $.createCodec<void | null>({
   },
 })
 
-export function $partialSingleKey<T>($inner: $.Codec<T>): $.Codec<T | null> {
+export function $partialSingleKey<I, O>($inner: $.Codec<I, O>): $.Codec<I | null, O | null> {
   return $.createCodec({
     _metadata: $.metadata("$partialSingleKey", $partialSingleKey, $inner),
     _staticSize: $inner._staticSize,
@@ -66,7 +66,7 @@ export type PartialMultiKey<T extends unknown[]> = T extends [...infer A, any]
 
 export function $partialMultiKey<T extends $.AnyCodec[]>(
   ...keys: [...T]
-): $.Codec<PartialMultiKey<$.NativeTuple<T>>>
+): $.Codec<PartialMultiKey<$.OutputTuple<T>>>
 export function $partialMultiKey<T>(...codecs: $.Codec<T>[]): $.Codec<T[] | null> {
   return $.createCodec({
     _metadata: $.metadata("$partialMultiKey", $partialMultiKey, ...codecs),

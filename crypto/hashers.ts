@@ -7,7 +7,7 @@ export abstract class Hasher {
   abstract digestLength: number
   abstract concat: boolean
 
-  $hash<T>($inner: $.Codec<T>): $.Codec<T> {
+  $hash<I, O>($inner: $.Codec<I, O>): $.Codec<I, O> {
     return $hash(this, $inner)
   }
 
@@ -24,7 +24,7 @@ export abstract class Hasher {
   }
 }
 
-export function $hash<T>(hasher: Hasher, $inner: $.Codec<T>): $.Codec<T> {
+export function $hash<I, O>(hasher: Hasher, $inner: $.Codec<I, O>): $.Codec<I, O> {
   return $.createCodec({
     _metadata: $.metadata("$hash", $hash, hasher, $inner),
     _staticSize: hasher.digestLength + $inner._staticSize,
@@ -77,7 +77,7 @@ export class IdentityHasher extends Hasher {
     }
   }
 
-  override $hash<T>($inner: $.Codec<T>): $.Codec<T> {
+  override $hash<I, O>($inner: $.Codec<I, O>): $.Codec<I, O> {
     return $inner
   }
 

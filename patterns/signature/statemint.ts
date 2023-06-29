@@ -21,6 +21,7 @@ export function signature<X, C extends Chain>(_props: RunicArgs<X, StatemintSign
     const props = RunicArgs.resolve(_props)
     const addrPrefix = chain.addressPrefix()
     const versions = chain.pallet("System").constant("Version").decoded
+      .unsafeAs<any>().into(ValueRune)
     const specVersion = versions.access("specVersion")
     const transactionVersion = versions.access("transactionVersion")
     // TODO: create union rune (with `matchTag` method) and utilize here
@@ -28,9 +29,9 @@ export function signature<X, C extends Chain>(_props: RunicArgs<X, StatemintSign
     const senderSs58 = Rune
       .tuple([addrPrefix, props.sender])
       .map(([addrPrefix, sender]) => {
-        switch (sender.address.type) {
+        switch ((sender.address as any).type) {
           case "Id":
-            return ss58.encode(addrPrefix, sender.address.value)
+            return ss58.encode(addrPrefix as any, (sender.address as any).value)
           default:
             throw new Error("unimplemented")
         }

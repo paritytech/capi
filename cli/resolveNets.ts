@@ -3,7 +3,7 @@ import { register } from "../deps/shims/register-ts-node.ts"
 import * as path from "../deps/std/path.ts"
 import { NetSpec } from "../nets/mod.ts"
 
-const $nets = $.record($.instance(NetSpec as new() => NetSpec, $.tuple(), () => []))
+const $nets = $.record($.instance(NetSpec as new() => NetSpec, $.tuple(), (_: NetSpec) => []))
 
 export async function resolveNets(maybeNetsPath?: string): Promise<Record<string, NetSpec>> {
   const resolvedNetsPath = await resolveNetsPath(maybeNetsPath)

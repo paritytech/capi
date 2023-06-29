@@ -39,7 +39,7 @@ export function pjsSender<C extends AddressPrefixChain, CU>(
         return {
           address: { type: "Id" as const, value: pubKey } as any,
           sign: async (_: Uint8Array, fullData: Uint8Array) => {
-            const payload = $pjsExtrinsic.decode(fullData)
+            const payload: any = $pjsExtrinsic.decode(fullData)
             payload.address = address
             let sig
             try {
@@ -102,7 +102,7 @@ const pjsAdditionalKeyMap: Record<string, KeyHandler> = {
   CheckGenesis: simpleKeyHandler("genesisHash"),
 }
 
-function $pjs<T>($inner: $.Codec<T>): $.Codec<(T & number) | string> {
+function $pjs<I, O>($inner: $.Codec<I, O>): $.Codec<(I & number) | string, (O & number) | string> {
   return $.createCodec({
     _metadata: $.metadata("$pjs", $pjs, $inner),
     _staticSize: $inner._staticSize,

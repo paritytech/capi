@@ -6,33 +6,33 @@ export interface Extrinsic<M extends FrameMetadata> {
   protocolVersion: number
   signature?:
     | {
-      sender: { address: $.Native<M["extrinsic"]["address"]>; sign: Signer<M> }
-      extra: $.Native<M["extrinsic"]["extra"]>
-      additional: $.Native<M["extrinsic"]["additional"]>
+      sender: { address: $.Output<M["extrinsic"]["address"]>; sign: Signer<M> }
+      extra: $.Output<M["extrinsic"]["extra"]>
+      additional: $.Output<M["extrinsic"]["additional"]>
       sig?: never
     }
     | {
-      sender: { address: $.Native<M["extrinsic"]["address"]>; sign?: Signer<M> }
-      extra: $.Native<M["extrinsic"]["extra"]>
+      sender: { address: $.Output<M["extrinsic"]["address"]>; sign?: Signer<M> }
+      extra: $.Output<M["extrinsic"]["extra"]>
       additional?: never
-      sig: $.Native<M["extrinsic"]["signature"]>
+      sig: $.Output<M["extrinsic"]["signature"]>
     }
-  call: $.Native<M["extrinsic"]["call"]>
+  call: $.Output<M["extrinsic"]["call"]>
 }
 
 export type Signer<M extends FrameMetadata> = (
   message: Uint8Array,
   fullData: Uint8Array,
-) => $.Native<M["extrinsic"]["signature"]> | Promise<$.Native<M["extrinsic"]["signature"]>>
+) => $.Output<M["extrinsic"]["signature"]> | Promise<$.Output<M["extrinsic"]["signature"]>>
 
 export function $extrinsic<M extends FrameMetadata>(metadata: M): $.Codec<Extrinsic<M>> {
-  const $sig = metadata.extrinsic.signature as $.Codec<$.Native<M["extrinsic"]["signature"]>>
+  const $sig = metadata.extrinsic.signature as $.Codec<$.Output<M["extrinsic"]["signature"]>>
   const $sigPromise = $.promise($sig)
-  const $call = metadata.extrinsic.call as $.Codec<$.Native<M["extrinsic"]["call"]>>
-  const $address = metadata.extrinsic.address as $.Codec<$.Native<M["extrinsic"]["address"]>>
-  const $extra = metadata.extrinsic.extra as $.Codec<$.Native<M["extrinsic"]["extra"]>>
+  const $call = metadata.extrinsic.call as $.Codec<$.Output<M["extrinsic"]["call"]>>
+  const $address = metadata.extrinsic.address as $.Codec<$.Output<M["extrinsic"]["address"]>>
+  const $extra = metadata.extrinsic.extra as $.Codec<$.Output<M["extrinsic"]["extra"]>>
   const $additional = metadata.extrinsic.additional as $.Codec<
-    $.Native<M["extrinsic"]["additional"]>
+    $.Output<M["extrinsic"]["additional"]>
   >
 
   const toSignSize = $call._staticSize + $extra._staticSize + $additional._staticSize

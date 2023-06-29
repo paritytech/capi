@@ -105,7 +105,7 @@ export const $metadata = $.object(
   $.field("runtime", $tyId),
 )
 
-export function transformMetadata(metadata: $.Native<typeof $metadata>): FrameMetadata {
+export function transformMetadata(metadata: $.Output<typeof $metadata>): FrameMetadata {
   const { ids, types, paths } = transformTys(metadata.tys)
   return {
     types,
@@ -174,7 +174,7 @@ export function transformMetadata(metadata: $.Native<typeof $metadata>): FrameMe
       const codec = ids[ext[key]]!
       if (codec === $null) return []
       return [$.field(normalizeIdent(ext.ident), codec)]
-    }))
+    }) as any)
   }
 }
 
