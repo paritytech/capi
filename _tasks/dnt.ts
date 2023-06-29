@@ -78,7 +78,7 @@ await Promise.all([
         "ts-node": "^10.9.1",
       },
       bin: {
-        capi: "./script/main.js",
+        capi: "./esm/main.js",
       },
     },
     compilerOptions: {
@@ -145,11 +145,11 @@ await Promise.all([
     test: false,
     typeCheck: false,
     declaration: "separate",
-    esModule: false,
+    scriptModule: false,
   }),
   fs.copy("LICENSE", path.join(capiOutDir, "LICENSE")),
   fs.copy("Readme.md", path.join(capiOutDir, "Readme.md")),
-  fs.copy("server/static/", path.join(capiOutDir, "script/server/static/")),
+  fs.copy("server/static/", path.join(capiOutDir, "esm/server/static/")),
 ])
 
 await Promise.all([
@@ -159,30 +159,16 @@ await Promise.all([
     { overwrite: true },
   ),
   editFile(
-    path.join(capiOutDir, "script/main.js"),
+    path.join(capiOutDir, "esm/main.js"),
     (content) =>
       content
         .replace(/^#!.+/, "#!/usr/bin/env -S node --loader capi/loader"),
   ),
   editFile(
-    path.join(capiOutDir, "script/_dnt.shims.js"),
+    path.join(capiOutDir, "esm/_dnt.shims.js"),
     (content) =>
       content
         .replace(/"@deno\/shim-deno"/g, `"./deps/shims/Deno.node.js"`),
-  ),
-  editFile(
-    path.join(capiOutDir, "script/cli/resolveNets.js"),
-    (content) =>
-      content
-        .replace(/\b_import\b/, "import"),
-  ),
-  editFile(
-    path.join(capiOutDir, "package.json"),
-    (content) => {
-      const pkg = JSON.parse(content)
-      pkg.exports = mapEntries(pkg.exports, ([k, v]: any) => [k, v.require])
-      return JSON.stringify(pkg, null, 2)
-    },
   ),
 ])
 
