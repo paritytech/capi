@@ -7,9 +7,11 @@ import { ExtrinsicEventsRune } from "./ExtrinsicsEventsRune.ts"
 import { PatternRune } from "./PatternRune.ts"
 import { SignedExtrinsicRune } from "./SignedExtrinsicRune.ts"
 
+/** A rune representing the state of a sent signed extrinsic */
 export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
   extends PatternRune<Run<known.TransactionStatus, U1>, C, U2, SignedExtrinsicRune<C, U2>>
 {
+  /** @returns the very same Rune, but with incoming transaction statuses `console.log`ged */
   dbgStatus<X>(...prefix: RunicArgs<X, unknown[]>): ExtrinsicStatusRune<C, U1, U2> {
     return this
       .into(OrthoRune)
@@ -17,13 +19,14 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
       .into(ExtrinsicStatusRune, this.chain, this.parent)
   }
 
-  transactionStatuses(isTerminal: (txStatus: known.TransactionStatus) => boolean) {
+  private transactionStatuses(isTerminal: (txStatus: known.TransactionStatus) => boolean) {
     return this
       .into(OrthoRune)
       .orthoMap((events) => events.into(ValueRune).filter(isTerminal))
       .flatSingular()
   }
 
+  /** @returns a rune resolving to the hash of the block in which the extrinsic is included */
   inBlock() {
     return this.transactionStatuses((status) =>
       known.TransactionStatus.isTerminal(status)
@@ -36,6 +39,7 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
       .into(BlockHashRune, this.chain)
   }
 
+  /** @returns a rune resolving to the hash of the block in which the extrinsic is finalized */
   finalized() {
     return this.transactionStatuses(known.TransactionStatus.isTerminal)
       .map((status) =>
@@ -47,10 +51,12 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
       .into(BlockHashRune, this.chain)
   }
 
+  /** @returns a rune resolving to the events of the in-block block */
   inBlockEvents() {
     return this.events(this.inBlock().block())
   }
 
+  /** @returns a rune resolving to the events of the finalized block */
   finalizedEvents() {
     return this.events(this.finalized().block())
   }
@@ -79,5 +85,12 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
   }
 }
 
-export class NeverInBlockError extends Error {}
-export class NeverFinalizedError extends Error {}
+/** Occurs when the transaction does not get included before a terminal transaction status */
+export class NeverInBlockError extends Error {
+  override readonly name = "NeverInBlockError"
+}
+
+/** Occurs when the transaction does not get finalized before a terminal transaction status */
+export class NeverFinalizedError extends Error {
+  override readonly name = "NeverFinalizedError"
+}

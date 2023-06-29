@@ -68,6 +68,7 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
     .into(CodecRune)
   callHash = this.$callHash.encoded(this)
 
+  /** Apply the supplied signature factory to call, therein producing a `SignedExtrinsicRune` */
   signed<SU>(signatureFactory: SignatureDataFactory<C, U, SU>) {
     return this.chain.$extrinsic
       .encoded(Rune.object({

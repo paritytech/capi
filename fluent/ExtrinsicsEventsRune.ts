@@ -1,16 +1,12 @@
 import { is, Rune, ValueRune } from "../rune/mod.ts"
 import { Chain } from "./ChainRune.ts"
 import { CodecRune } from "./CodecRune.ts"
-import {
-  EventsRune,
-  isSystemExtrinsicFailedEvent,
-  SystemExtrinsicFailedEvent,
-} from "./EventsRune.ts"
+import { Event, EventsRune } from "./EventsRune.ts"
 
 export class ExtrinsicEventsRune<out C extends Chain, out U> extends EventsRune<C, U> {
-  // TODO:
-  // handleFailed
+  // TODO: handleFailed
 
+  /** Turn any runtime System ExtrinsicFailed event into an error and unhandle it */
   unhandleFailed() {
     const dispatchError = this
       .into(ValueRune)
@@ -47,4 +43,38 @@ export class ExtrinsicError<D extends { type: string }> extends Error {
   constructor(data: D) {
     super(data.type)
   }
+}
+
+// TODO: delete this
+export type SystemExtrinsicFailedEvent = Event<{
+  type: "System"
+  value: {
+    type: "ExtrinsicFailed"
+    dispatchError: DispatchError
+    dispatchInfo: any // TODO
+  }
+}>
+export type DispatchError =
+  | "Other"
+  | "CannotLookup"
+  | "BadOrigin"
+  | "Module"
+  | "ConsumerRemaining"
+  | "NoProviders"
+  | "TooManyConsumers"
+  | "Token"
+  | "Arithmetic"
+  | "Transactional"
+  | "Exhausted"
+  | "Corruption"
+  | "Unavailable"
+  | { type: "Module"; value: number }
+
+export function isSystemExtrinsicFailedEvent(event: Event): event is SystemExtrinsicFailedEvent {
+  if (event.event.type === "System") {
+    const { value } = event.event
+    return typeof value === "object" && value !== null && "type" in value
+      && value.type === "ExtrinsicFailed"
+  }
+  return false
 }

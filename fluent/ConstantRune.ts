@@ -3,6 +3,7 @@ import { Chain } from "./ChainRune.ts"
 import { CodecRune } from "./CodecRune.ts"
 import { PatternRune } from "./PatternRune.ts"
 
+/** a rune representing an on-chain constant */
 export class ConstantRune<
   out C extends Chain,
   out P extends Chain.PalletName<C>,

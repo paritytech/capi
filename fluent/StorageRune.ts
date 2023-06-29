@@ -4,6 +4,7 @@ import { Chain } from "./ChainRune.ts"
 import { CodecRune } from "./CodecRune.ts"
 import { PatternRune } from "./PatternRune.ts"
 
+/** a rune representing an item or map in storage */
 export class StorageRune<
   out C extends Chain,
   out P extends Chain.PalletName<C>,
@@ -20,6 +21,7 @@ export class StorageRune<
     CodecRune<Chain.Storage.Value<C, P, S>, Chain.Storage.Value<C, P, S>, U>,
   )
 
+  /** Get a rune representing the scale-encoded value of the current storage */
   valueRaw<X>(
     ...[key, blockHash]: RunicArgs<X, [
       key: Chain.Storage.Key<C, P, S>,
@@ -32,6 +34,7 @@ export class StorageRune<
       .handle(is(null), () => Rune.constant(undefined))
   }
 
+  /** Get a rune representing the value of the current storage */
   value<X>(
     ...[key, blockHash]: RunicArgs<X, [
       key: Chain.Storage.Key<C, P, S>,
@@ -44,6 +47,7 @@ export class StorageRune<
       .rehandle(is(undefined))
   }
 
+  /** Get a rune representing the size of the current storage */
   size<X>(
     ...[partialKey, blockHash]: RunicArgs<X, [
       partialKey: Chain.Storage.PartialKey<C, P, S>,
@@ -59,12 +63,14 @@ export class StorageRune<
       .handle(is(null), () => Rune.constant(undefined))
   }
 
+  /** Get a rune representing the default value of the current storage */
   default() {
     return this.$value
       .decoded(this.into(ValueRune).access("default").unhandle(is(undefined)))
       .rehandle(is(undefined))
   }
 
+  /** Get a rune representing scale-encoded storage entries */
   entriesRaw<X, Y>(
     props: RunicArgs<X, StoragePageProps<C, P, S>>,
     ...[blockHash]: RunicArgs<Y, [blockHash?: string]>
@@ -77,6 +83,7 @@ export class StorageRune<
     )
   }
 
+  /** Get a rune representing storage entries */
   entries<X, Y>(
     props: RunicArgs<X, StoragePageProps<C, P, S>>,
     ...[blockHash]: RunicArgs<Y, [blockHash?: string]>
@@ -92,6 +99,7 @@ export class StorageRune<
       .unsafeAs<[Chain.Storage.Key<C, P, S>, Chain.Storage.Value<C, P, S>][]>()
   }
 
+  /** Get a rune representing scale-encoded storage keys */
   keysRaw<X, Y>(
     props: RunicArgs<X, StoragePageProps<C, P, S>>,
     ...[blockHash]: RunicArgs<Y, [blockHash?: string]>
@@ -113,6 +121,7 @@ export class StorageRune<
     )
   }
 
+  /** Get a rune representing storage keys */
   keys<X, Y>(
     props: RunicArgs<X, StoragePageProps<C, P, S>>,
     ...[blockHash]: RunicArgs<Y, [blockHash?: string]>
@@ -124,12 +133,16 @@ export class StorageRune<
   }
 }
 
+/** properties one can use to specify pagination to storage rune factories */
 export interface StoragePageProps<
   out C extends Chain,
   out P extends Chain.PalletName<C>,
   out S extends Chain.StorageName<C, P>,
 > {
+  /** the maximum number of items to include in the page */
   limit?: number
+  /** the partial key with which to match items */
   partialKey?: Chain.Storage.PartialKey<C, P, S>
+  /** the key at which to begin retrieval */
   start?: Chain.Storage.Key<C, P, S>
 }

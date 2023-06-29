@@ -67,6 +67,7 @@ export namespace Chain {
 
 /** The root Rune of Capi's fluent API, with which other core Runes can be created */
 export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
+  /** Get a rune representing the a chain with the specified connection and (optionally) static metadata */
   static from<M extends FrameMetadata>(
     connect: (signal: AbortSignal) => Connection,
     staticMetadata?: M,
@@ -79,26 +80,33 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
     return Rune.object({ connection, metadata }).into(this)
   }
 
+  /** Get the current rune, but with a new inner connection */
   with(connect: (signal: AbortSignal) => Connection) {
     const connection = ConnectionRune.from(connect)
     return Rune.object({ connection, metadata: this.metadata }).into(ChainRune) as ChainRune<C, U>
   }
 
+  /** The connection with which to communicate with the chain itself */
   connection = this.into(ValueRune<Chain, U>).access("connection").into(ConnectionRune)
 
+  /** a rune representing the chain's metadata */
   metadata = this.into(ValueRune).access("metadata")
 
+  /** a rune representing the extrinsics of the current chain */
   $extrinsic = Rune.fn($extrinsic).call(this.metadata).into(CodecRune)
 
+  /** a rune representing a stream of latest block numbers */
   latestBlockNum = this.connection
     .subscribe("chain_subscribeNewHeads", "chain_unsubscribeNewHeads")
     .access("number")
 
+  /** a rune representing the latest block hash */
   latestBlockHash = this.connection
     .call("chain_getBlockHash", this.latestBlockNum)
     .unsafeAs<string>()
     .into(BlockHashRune, this)
 
+  /** get a rune representing the specified block hash or the latest finalized block hash */
   blockHash<X>(...[blockHash]: RunicArgs<X, [blockHash?: string]>) {
     return Rune
       .resolve(blockHash)
@@ -106,11 +114,13 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
       .into(BlockHashRune, this)
   }
 
+  /** get a rune representing the specified call data */
   extrinsic<X>(...args: RunicArgs<X, [call: Chain.Call<C>]>) {
     const [call] = RunicArgs.resolve(args)
     return call.into(ExtrinsicRune, this.as(ChainRune))
   }
 
+  /** get a rune representing the specified pallet */
   pallet<P extends Chain.PalletName<C>, X>(...[palletName]: RunicArgs<X, [P]>) {
     return this.metadata
       .access("pallets", palletName)
@@ -118,6 +128,7 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
       .into(PalletRune, this.as(ChainRune))
   }
 
+  /** get a rune representing the prefix of the current chain */
   addressPrefix() {
     return this
       .pallet("System")
@@ -125,9 +136,14 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
       .decoded
   }
 
+  /** a rune representing the system version */
   chainVersion = this.connection.call("system_version")
 }
 
+/**
+ * a chain constraint that will likely be removed upon resolution of
+ * [#811](https://github.com/paritytech/capi/issues/811)
+ */
 export interface AddressPrefixChain extends Chain {
   metadata: FrameMetadata & {
     pallets: {
