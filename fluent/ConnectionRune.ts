@@ -27,7 +27,7 @@ export class ConnectionRune<U> extends Rune<Connection, U> {
     return Rune.new(RunConnection, init).into(ConnectionRune)
   }
 
-  /** get a rune representing a specific RPC call */
+  /** Get a rune representing a specific RPC call */
   call<K extends keyof Calls, X>(
     callMethod: K,
     ...args: RunicArgs<X, [...Parameters<Calls[K]>]>
@@ -42,7 +42,7 @@ export class ConnectionRune<U> extends Rune<Connection, U> {
       .throws(is(ConnectionError), is(ServerError))
   }
 
-  /** get a rune representing a specific RPC subscription */
+  /** Get a rune representing a specific RPC subscription */
   subscribe<K extends keyof Subscriptions, X>(
     subscribeMethod: K,
     unsubscribeMethod: Subscription.UnsubscribeMethod<ReturnType<Subscriptions[K]>>,

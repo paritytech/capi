@@ -14,7 +14,7 @@ export class CodecRune<in I, out O, out U> extends Rune<$.Codec<I, O>, U> {
     }).throws(is($.ScaleError))
   }
 
-  /** a rune representing the scale-decoded value of the specified scale encoding */
+  /** A rune representing the scale-decoded equivalent of the specified scale-encoded value */
   decoded<X>(...[value]: RunicArgs<X, [value: Uint8Array]>) {
     return Rune
       .tuple([this, value]).map(([codec, value]) => codec.decode(value))

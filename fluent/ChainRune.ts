@@ -124,6 +124,14 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
 
   /** A rune representing the system version */
   chainVersion = this.connection.call("system_version")
+
+  /** A rune representing the chain's dispatch info codec */
+  $dispatchInfo = this.metadata
+    .access("paths", "frame_support::dispatch::DispatchInfo")
+    .into(CodecRune)
+
+  /** A rune representing the chain's weight v2 codec */
+  $weight = this.metadata.access("paths", "sp_weights::weight_v2::Weight").into(CodecRune)
 }
 
 // TODO: rework upon resolution of [#811](https://github.com/paritytech/capi/issues/811)

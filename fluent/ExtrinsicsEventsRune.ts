@@ -6,7 +6,7 @@ import { Event, EventsRune } from "./EventsRune.ts"
 export class ExtrinsicEventsRune<out C extends Chain, out U> extends EventsRune<C, U> {
   // TODO: handleFailed
 
-  /** Turn any runtime System ExtrinsicFailed event into an error and unhandle it */
+  /** Get a rune representing the same list, but with any `System.ExtrinsicFailed` events moved to the U track */
   unhandleFailed() {
     const dispatchError = this
       .into(ValueRune)
@@ -37,6 +37,7 @@ export class ExtrinsicEventsRune<out C extends Chain, out U> extends EventsRune<
   }
 }
 
+/** An error that wraps the chain's system error event data */
 export class ExtrinsicError<D extends { type: string }> extends Error {
   override readonly name = "ExtrinsicError"
 

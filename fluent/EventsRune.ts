@@ -1,12 +1,11 @@
 import { Chain } from "./ChainRune.ts"
 import { PatternRune } from "./PatternRune.ts"
 
-/** a rune representing a list of events in system storage */
+/** A rune representing a list of events in system storage */
 export class EventsRune<out C extends Chain, out U>
   extends PatternRune<Chain.Storage.Value<C, "System", "Events">, C, U>
 {}
 
-/** a Substrate runtime event */
 export interface Event<RE = any> {
   phase: EventPhase
   event: RE

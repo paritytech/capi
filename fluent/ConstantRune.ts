@@ -3,13 +3,14 @@ import { Chain } from "./ChainRune.ts"
 import { CodecRune } from "./CodecRune.ts"
 import { PatternRune } from "./PatternRune.ts"
 
-/** a rune representing an on-chain constant */
+/** A rune representing an on-chain constant */
 export class ConstantRune<
   out C extends Chain,
   out P extends Chain.PalletName<C>,
   out K extends Chain.ConstantName<C, P>,
   out U,
 > extends PatternRune<Chain.Constant<C, P, K>, C, U> {
+  /** A rune representing the codec of constant's type  */
   $value = this
     .into(ValueRune)
     .access("codec")

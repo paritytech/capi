@@ -11,7 +11,7 @@ import { SignedExtrinsicRune } from "./SignedExtrinsicRune.ts"
 export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
   extends PatternRune<Run<known.TransactionStatus, U1>, C, U2, SignedExtrinsicRune<C, U2>>
 {
-  /** @returns the very same Rune, but with incoming transaction statuses `console.log`ged */
+  /** Get the very same rune, but with incoming transaction statuses `console.log`ged */
   dbgStatus<X>(...prefix: RunicArgs<X, unknown[]>): ExtrinsicStatusRune<C, U1, U2> {
     return this
       .into(OrthoRune)
@@ -26,7 +26,7 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
       .flatSingular()
   }
 
-  /** @returns a rune resolving to the hash of the block in which the extrinsic is included */
+  /** Get a rune representing the hash of the block in which the extrinsic is included */
   inBlock() {
     return this.transactionStatuses((status) =>
       known.TransactionStatus.isTerminal(status)
@@ -39,7 +39,7 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
       .into(BlockHashRune, this.chain)
   }
 
-  /** @returns a rune resolving to the hash of the block in which the extrinsic is finalized */
+  /** Get a rune representing the hash of the block in which the extrinsic is finalized */
   finalized() {
     return this.transactionStatuses(known.TransactionStatus.isTerminal)
       .map((status) =>
@@ -51,12 +51,12 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
       .into(BlockHashRune, this.chain)
   }
 
-  /** @returns a rune resolving to the events of the in-block block */
+  /** Get a rune resolving to the events of the in-block block */
   inBlockEvents() {
     return this.events(this.inBlock().block())
   }
 
-  /** @returns a rune resolving to the events of the finalized block */
+  /** Get a rune resolving to the events of the finalized block */
   finalizedEvents() {
     return this.events(this.finalized().block())
   }
@@ -85,12 +85,12 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
   }
 }
 
-/** Occurs when the transaction does not get included before a terminal transaction status */
+/** An error describing cases in which the transaction does not get included in a block before a terminal transaction status */
 export class NeverInBlockError extends Error {
   override readonly name = "NeverInBlockError"
 }
 
-/** Occurs when the transaction does not get finalized before a terminal transaction status */
+/** An error describing cases in which the transaction does not get finalized before a terminal transaction status */
 export class NeverFinalizedError extends Error {
   override readonly name = "NeverFinalizedError"
 }
