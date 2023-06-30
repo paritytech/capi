@@ -4,7 +4,6 @@ import { RpcCallMessage, RpcIngressMessage, RpcSubscriptionHandler } from "./rpc
 
 const connectionMemos = new Map<new(discovery: any) => Connection, Map<unknown, Connection>>()
 
-/** A container for common RPC-related functionality */
 export abstract class Connection {
   nextId = 0
   references = 0

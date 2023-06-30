@@ -64,7 +64,6 @@ export interface Rune<out T, out U = never> {
   [_T]: T
   [_U]: U
 }
-/** the subclass from which the entire Capi fluent DX stems */
 export class Rune<out T, out U = never> {
   declare private _
   _trace: Trace
@@ -80,7 +79,6 @@ export class Rune<out T, out U = never> {
     return new Rune((runner) => new ctor(runner, ...args))
   }
 
-  /** trigger the execution of the current rune */
   async run(runner: Runner = globalRunner): Promise<T> {
     for await (const value of this.iter(runner)) {
       return value
@@ -88,7 +86,6 @@ export class Rune<out T, out U = never> {
     throw new Error("Rune did not yield any values")
   }
 
-  /** run the current rune as a stream */
   async *iter(runner: Runner = globalRunner) {
     let time = runner.timeline.current
     const primed = runner.prime(this)
@@ -108,23 +105,14 @@ export class Rune<out T, out U = never> {
     }
   }
 
-  /** get a rune representing the supplied constant*/
   static constant<T>(value: T) {
     return Rune.ValueRune.new(RunConstant, value)
   }
 
-  /**
-   * get a rune representing the supplied value if it is not a rune––
-   * otherwise, return the supplied value
-   */
   static resolve<V>(value: V): Rune.ValueRune<Rune.T<V>, Rune.U<V>> {
     return value instanceof Rune ? value.into(Rune.ValueRune) : Rune.constant(value)
   }
 
-  /**
-   * a tagged template function which produces a rune from any string-interpolated
-   * values (including other runes!)
-   */
   static str<X>(strings: TemplateStringsArray, ..._values: RunicArgs<X, unknown[]>) {
     const values = RunicArgs.resolve(_values)
     return Rune
@@ -138,7 +126,6 @@ export class Rune<out T, out U = never> {
       )
   }
 
-  /** get a rune representing a tuple of the supplied runes' values */
   static tuple<R extends unknown[]>(
     runes: [...R],
   ): Rune.ValueRune<{ [K in keyof R]: Rune.T<R[K]> }, Rune.U<R[number]>>
@@ -148,20 +135,14 @@ export class Rune<out T, out U = never> {
     return Rune.ValueRune.new(RunLs, runes.map(Rune.resolve))
   }
 
-  /** get a rune representing an array of the supplied runes' values */
   static array<T, X>(runes: RunicArgs<X, T[]>) {
     return Rune.ValueRune.new(RunLs, RunicArgs.resolve(runes)).into(Rune.ArrayRune)
   }
 
-  /**
-   * get a rune which has a call method, allowing one to call the supplied
-   * function with the runic equivalent of its parameters
-   */
   static fn<A extends any[], T, X>(...[fn]: RunicArgs<X, [(...args: A) => T]>) {
     return Rune.resolve(fn).into(Rune.FnRune)
   }
 
-  /** get a rune representing the object formed from the runic fields of the props */
   static object<R extends {}>(
     runes: R,
   ): Rune.ValueRune<{ [K in keyof R]: Rune.T<R[K]> }, Rune.U<R[keyof R]>> {
@@ -202,7 +183,6 @@ export class Rune<out T, out U = never> {
     return Rune.new(RunPlaceholder)
   }
 
-  /** get the current rune as a rune of the supplied subclass */
   into<A extends unknown[], C extends Rune<any, any>>(
     ctor: new(_prime: (runner: Runner) => Run<T, U | RunicArgs.U<A>>, ...args: A) => C,
     ...args: A
@@ -212,15 +192,10 @@ export class Rune<out T, out U = never> {
     return rune
   }
 
-  /** a handy utility for times when the checker gets arrogant */
   as<R>(this: R, _ctor: new(_prime: (runner: Runner) => Run<T, U>, ...args: any) => R): R {
     return this
   }
 
-  /**
-   * ideally not something we'll be using once we've resolved constraints
-   * ([#811](https://github.com/paritytech/capi/issues/811))
-   */
   unsafeAs<T2, U2 = U>(): Rune<T2, U2> {
     return this as never
   }
