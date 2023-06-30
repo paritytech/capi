@@ -6,7 +6,6 @@ const cleanUpLookup = new FinalizationRegistry((key: string) => {
   traceLookup.delete(key)
 })
 
-/** a means of finding the rune instantiations responsible for that which is unhandled */
 export class Trace extends Error {
   declare from: string
   declare id: string

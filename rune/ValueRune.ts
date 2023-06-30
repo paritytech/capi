@@ -25,7 +25,6 @@ type EnsurePath<T, P> = never extends P ? P extends [infer K, ...infer Q] ?
   : [(keyof T)?]
   : P
 
-/** a rune containing methods that are commonly useful across runes of different types */
 export class ValueRune<out T, out U = never> extends Rune<T, U> {
   static override new<T, U, A extends unknown[]>(
     ctor: new(runner: Runner, ...args: A) => Run<T, U>,
@@ -34,12 +33,10 @@ export class ValueRune<out T, out U = never> extends Rune<T, U> {
     return new ValueRune((runner) => new ctor(runner, ...args))
   }
 
-  /** get a rune representing the current rune's value applied to the supplied callback */
   map<T2>(fn: (value: T) => T2 | Promise<T2>): ValueRune<T2, U> {
     return ValueRune.new(RunMap, this, fn)
   }
 
-  /** get a rune representing the result of indexing into the current rune's value at the specified path */
   access<P extends (string & {} | "" | number & {} | 0 | symbol)[], T, U, X>(
     this: ValueRune<T, U>,
     ...keys: never extends P ? RunicArgs<X, [...EnsurePath<T, P>]>
@@ -57,10 +54,6 @@ export class ValueRune<out T, out U = never> extends Rune<T, U> {
     })
   }
 
-  /**
-   * get a rune whose execution will fall back to the supplied alternative
-   * rune should the resolved step ever match the supplied guard
-   */
   handle<T2 extends T, T3, U2>(
     guard: Guard<T, T2>,
     alt: (rune: ValueRune<T2, never>) => Rune<T3, U2>,
@@ -68,20 +61,11 @@ export class ValueRune<out T, out U = never> extends Rune<T, U> {
     return ValueRune.new(RunHandle, this, guard, alt(this as never))
   }
 
-  /**
-   * get a rune whose execution will halt (can be later-recovered with `handle`)
-   * the resolved step ever match the supplied guard
-   */
   unhandle<U2 extends T>(fn: Guard<T, U2>): ValueRune<SmartExclude<T, U2>, U | U2>
   unhandle(fn: Guard<T, T>): ValueRune<T, U | T> {
     return ValueRune.new(RunUnhandle, this, fn)
   }
 
-  /**
-   * get a rune whose execution will pass any untyped throws into
-   * the U channel typed in accordance with the supplied guard (assuming
-   * they're matched).
-   */
   throws<U2 extends unknown[]>(
     ...guards: { [K in keyof U2]: Guard<unknown, U2[K]> }
   ): ValueRune<T, U | U2[number]>
@@ -89,10 +73,6 @@ export class ValueRune<out T, out U = never> extends Rune<T, U> {
     return ValueRune.new(RunThrows, this, guards)
   }
 
-  /**
-   * Get a rune whose execution will move any matches of the supplied guard from
-   * the U channel back to the T channel.
-   */
   rehandle<U2 extends U>(
     guard: Guard<U, U2>,
   ): ValueRune<T | U2, Exclude<U, U2>>
@@ -141,7 +121,6 @@ export class ValueRune<out T, out U = never> extends Rune<T, U> {
     }).final()
   }
 
-  /** get a rune which––when executed––will produce a log of the value at its point of execution */
   dbg<X>(...prefix: RunicArgs<X, unknown[]>) {
     return Rune
       .tuple([this, Rune.tuple(prefix).lazy()])
@@ -155,10 +134,6 @@ export class ValueRune<out T, out U = never> extends Rune<T, U> {
     return ValueRune.new(RunChain, this, fn(this as never))
   }
 
-  /**
-   * create a new rune, which will branch into guard-described runes depending on the
-   * execution value.
-   */
   match<T, U, T2, U2>(
     this: ValueRune<T, U>,
     fn: (match: Match<T, never, never>) => ExhaustiveMatch<T2, U2>,
@@ -171,15 +146,12 @@ export class ValueRune<out T, out U = never> extends Rune<T, U> {
   }
 }
 
-/** a builder with which one can define handling for all members of a union */
 type ExhaustiveMatch<T, U> = Match<never, T, U>
-/** a builder with which one can define handlers for members of a union */
 class Match<M, T, U> {
   conditions: [(x: M) => boolean, ValueRune<T, U>][] = []
 
   constructor(readonly value: ValueRune<M, never>) {}
 
-  /** add a guard and handler to the current builder conditions */
   when<M2 extends M, T2, U2>(
     guard: Guard<M, M2>,
     fn: (value: ValueRune<M2, never>) => ValueRune<T2, U2>,
@@ -188,7 +160,6 @@ class Match<M, T, U> {
     return this as any
   }
 
-  /** add a default (no match found) handler to the current builder conditions */
   else<T2, U2>(
     fn: (value: ValueRune<M, never>) => ValueRune<T2, U2>,
   ): ExhaustiveMatch<T | T2, U | U2> {
