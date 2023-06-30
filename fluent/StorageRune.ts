@@ -4,7 +4,7 @@ import { Chain } from "./ChainRune.ts"
 import { CodecRune } from "./CodecRune.ts"
 import { PatternRune } from "./PatternRune.ts"
 
-/** a rune representing an item or map in storage */
+/** A rune representing an item or map in storage */
 export class StorageRune<
   out C extends Chain,
   out P extends Chain.PalletName<C>,
@@ -133,7 +133,6 @@ export class StorageRune<
   }
 }
 
-/** properties one can use to specify pagination to storage rune factories */
 export interface StoragePageProps<
   out C extends Chain,
   out P extends Chain.PalletName<C>,
