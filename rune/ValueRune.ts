@@ -58,7 +58,12 @@ export class ValueRune<out T, out U = never> extends Rune<T, U> {
     guard: Guard<T, T2>,
     alt: (rune: ValueRune<T2, never>) => Rune<T3, U2>,
   ): ValueRune<Exclude<T, T2> | T3, U | U2> {
-    return ValueRune.new(RunHandle, this, guard, alt(this as never))
+    return ValueRune.new(
+      RunHandle,
+      this,
+      guard,
+      alt(this as never),
+    )
   }
 
   unhandle<U2 extends T>(fn: Guard<T, U2>): ValueRune<SmartExclude<T, U2>, U | U2>
