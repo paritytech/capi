@@ -15,7 +15,6 @@ export interface Chain<M extends FrameMetadata = FrameMetadata> {
   metadata: M
 }
 
-/** Contains type utilities pertaining to the `Chain` type */
 export namespace Chain {
   export type Call<C extends Chain> = $.Output<C["metadata"]["extrinsic"]["call"]>
   export type Address<C extends Chain> = $.Output<C["metadata"]["extrinsic"]["address"]>
@@ -23,39 +22,26 @@ export namespace Chain {
   export type Extra<C extends Chain> = $.Output<C["metadata"]["extrinsic"]["extra"]>
   export type Additional<C extends Chain> = $.Output<C["metadata"]["extrinsic"]["additional"]>
 
-  /** Extract a lookup of the chain's `Pallet`s */
   export type Pallets<C extends Chain> = C["metadata"]["pallets"]
-  /** Extract a union of the `Chain`'s pallet names */
   export type PalletName<C extends Chain> = keyof Pallets<C>
-  /** Extract the specified `Pallet` of the `Chain` */
   export type Pallet<C extends Chain, P extends PalletName<C>> = Pallets<C>[P]
 
-  /** Extract a lookup of the `Chain`'s `Constant`s */
   export type Constants<C extends Chain, P extends PalletName<C>> = Pallet<C, P>["constants"]
-  /** Extract a union of the `Chain`'s constant names */
   export type ConstantName<C extends Chain, P extends PalletName<C>> = keyof Constants<C, P>
-  /** Extract the codec that represents a specified constant of the `Chain` */
   export type Constant<C extends Chain, P extends PalletName<C>, K extends ConstantName<C, P>> =
     Constants<C, P>[K]
 
-  /** Contains type utilities pertaining to `Constants` in `FrameMetadata` */
   export namespace Constant {
-    /** Get the native TypeScript type of the constant corresponding to the `Chain`, pallet name and constant name */
     export type Value<C extends Chain, P extends PalletName<C>, K extends ConstantName<C, P>> =
       $.Output<Constant<C, P, K>["codec"]>
   }
 
-  /** Extract a lookup of the `Chain`'s `StorageEntry`s */
   export type StorageEntries<C extends Chain, P extends PalletName<C>> = Pallet<C, P>["storage"]
-  /** Extract a union of the `Chain`'s storage names */
   export type StorageName<C extends Chain, P extends PalletName<C>> = keyof StorageEntries<C, P>
-  /** Extract the codec that represents a specified storage of the `Chain` */
   export type Storage<C extends Chain, P extends PalletName<C>, S extends StorageName<C, P>> =
     StorageEntries<C, P>[S]
 
-  /** Contains type utilities pertaining to `Storage` in `FrameMetadata` */
   export namespace Storage {
-    /** Get the native TypeScript type of the storage key corresponding to the `Chain`, pallet name and storage name */
     export type Key<C extends Chain, P extends PalletName<C>, S extends StorageName<C, P>> =
       $.Output<Storage<C, P, S>["key"]>
     export type PartialKey<C extends Chain, P extends PalletName<C>, S extends StorageName<C, P>> =
@@ -65,9 +51,9 @@ export namespace Chain {
   }
 }
 
-/** The root Rune of Capi's fluent API, with which other core Runes can be created */
+/** The root Rune of Capi's fluent API, with which other core runes can be created */
 export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
-  /** Get a rune representing the a chain with the specified connection and (optionally) static metadata */
+  /** Get a rune representing a chain with the specified connection and (optionally) static metadata */
   static from<M extends FrameMetadata>(
     connect: (signal: AbortSignal) => Connection,
     staticMetadata?: M,
@@ -80,7 +66,7 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
     return Rune.object({ connection, metadata }).into(this)
   }
 
-  /** Get the current rune, but with a new inner connection */
+  /** Get the current chain rune, but with a new inner connection */
   with(connect: (signal: AbortSignal) => Connection) {
     const connection = ConnectionRune.from(connect)
     return Rune.object({ connection, metadata: this.metadata }).into(ChainRune) as ChainRune<C, U>
@@ -89,24 +75,24 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
   /** The connection with which to communicate with the chain itself */
   connection = this.into(ValueRune<Chain, U>).access("connection").into(ConnectionRune)
 
-  /** a rune representing the chain's metadata */
+  /** A rune representing the chain's metadata */
   metadata = this.into(ValueRune).access("metadata")
 
-  /** a rune representing the extrinsics of the current chain */
+  /** A rune representing the extrinsics of the current chain */
   $extrinsic = Rune.fn($extrinsic).call(this.metadata).into(CodecRune)
 
-  /** a rune representing a stream of latest block numbers */
+  /** A rune representing a stream of latest block numbers */
   latestBlockNum = this.connection
     .subscribe("chain_subscribeNewHeads", "chain_unsubscribeNewHeads")
     .access("number")
 
-  /** a rune representing the latest block hash */
+  /** A rune representing the latest block hash */
   latestBlockHash = this.connection
     .call("chain_getBlockHash", this.latestBlockNum)
     .unsafeAs<string>()
     .into(BlockHashRune, this)
 
-  /** get a rune representing the specified block hash or the latest finalized block hash */
+  /** Get a rune representing the specified block hash or the latest finalized block hash */
   blockHash<X>(...[blockHash]: RunicArgs<X, [blockHash?: string]>) {
     return Rune
       .resolve(blockHash)
@@ -114,13 +100,13 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
       .into(BlockHashRune, this)
   }
 
-  /** get a rune representing the specified call data */
+  /** Get a rune representing the specified call data */
   extrinsic<X>(...args: RunicArgs<X, [call: Chain.Call<C>]>) {
     const [call] = RunicArgs.resolve(args)
     return call.into(ExtrinsicRune, this.as(ChainRune))
   }
 
-  /** get a rune representing the specified pallet */
+  /** Get a rune representing the specified pallet */
   pallet<P extends Chain.PalletName<C>, X>(...[palletName]: RunicArgs<X, [P]>) {
     return this.metadata
       .access("pallets", palletName)
@@ -128,7 +114,7 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
       .into(PalletRune, this.as(ChainRune))
   }
 
-  /** get a rune representing the prefix of the current chain */
+  /** Get a rune representing the prefix of the current chain */
   addressPrefix() {
     return this
       .pallet("System")
@@ -136,14 +122,11 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
       .decoded
   }
 
-  /** a rune representing the system version */
+  /** A rune representing the system version */
   chainVersion = this.connection.call("system_version")
 }
 
-/**
- * a chain constraint that will likely be removed upon resolution of
- * [#811](https://github.com/paritytech/capi/issues/811)
- */
+// TODO: rework upon resolution of [#811](https://github.com/paritytech/capi/issues/811)
 export interface AddressPrefixChain extends Chain {
   metadata: FrameMetadata & {
     pallets: {
