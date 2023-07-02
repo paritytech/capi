@@ -1,9 +1,14 @@
+import {
+  DispatchError,
+  isSystemExtrinsicFailedEvent,
+  SystemExtrinsicFailedEvent,
+} from "../frame_metadata/mod.ts"
 import { known } from "../rpc/mod.ts"
 import { is, OrthoRune, Run, Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { BlockHashRune } from "./BlockHashRune.ts"
 import { BlockRune } from "./BlockRune.ts"
 import { Chain } from "./ChainRune.ts"
-import { ExtrinsicEventsRune } from "./ExtrinsicsEventsRune.ts"
+import { CodecRune } from "./CodecRune.ts"
 import { PatternRune } from "./PatternRune.ts"
 import { SignedExtrinsicRune } from "./SignedExtrinsicRune.ts"
 
@@ -17,7 +22,7 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
       .into(ExtrinsicStatusRune, this.chain, this.parent)
   }
 
-  transactionStatuses(isTerminal: (txStatus: known.TransactionStatus) => boolean) {
+  statuses(isTerminal: (txStatus: known.TransactionStatus) => boolean) {
     return this
       .into(OrthoRune)
       .orthoMap((events) => events.into(ValueRune).filter(isTerminal))
@@ -25,7 +30,7 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
   }
 
   inBlock() {
-    return this.transactionStatuses((status) =>
+    return this.statuses((status) =>
       known.TransactionStatus.isTerminal(status)
       || (typeof status !== "string" ? !!status.inBlock : false)
     )
@@ -37,7 +42,7 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
   }
 
   finalized() {
-    return this.transactionStatuses(known.TransactionStatus.isTerminal)
+    return this.statuses(known.TransactionStatus.isTerminal)
       .map((status) =>
         typeof status !== "string" && status.finalized
           ? status.finalized
@@ -47,12 +52,31 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
       .into(BlockHashRune, this.chain)
   }
 
-  inBlockEvents() {
-    return this.events(this.inBlock().block())
+  inBlockEvents<P extends Chain.PalletName<C>, N extends Chain.RuntimeEventName<C, P>, X>(
+    ...[palletName, eventName]: RunicArgs<X, [palletName?: P, eventName?: N]>
+  ) {
+    return Rune
+      .tuple([this.events(this.inBlock().block()), palletName, eventName])
+      .map(([events, palletName, eventName]) =>
+        (typeof palletName === "string"
+          ? ((events as Event[]).filter((event): event is Chain.Event<C, P, N> =>
+            event.event.type === palletName && event.event.value.type === eventName
+          ))
+          : events) as Chain.Event<C, P, N>[]
+      )
   }
-
-  finalizedEvents() {
-    return this.events(this.finalized().block())
+  finalizedEvents<P extends Chain.PalletName<C>, N extends Chain.RuntimeEventName<C, P>, X>(
+    ...[palletName, eventName]: RunicArgs<X, [palletName?: P, eventName?: N]>
+  ) {
+    return Rune
+      .tuple([this.events(this.finalized().block()), palletName, eventName])
+      .map(([events, palletName, eventName]) =>
+        (typeof palletName === "string"
+          ? ((events as Event[]).filter((event): event is Chain.Event<C, P, N> =>
+            event.event.type === palletName && event.event.value.type === eventName
+          ))
+          : events) as Chain.Event<C, P, N>[]
+      )
   }
 
   private events<EU>(block: BlockRune<C, EU>) {
@@ -65,17 +89,43 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
       .unhandle(is(undefined))
     return Rune
       .tuple([block.events(), txI])
-      .unsafeAs<any>()
       .into(ValueRune)
-      .map(([events, txI]: [any[], number]) =>
-        // TODO: narrow
-        events.filter((event: any) =>
-          event.phase.type === "ApplyExtrinsic" && event.phase.value === txI
-        )
+      .map(([events, txI]) =>
+        events.filter((event) => event.phase.type === "ApplyExtrinsic" && event.phase.value === txI)
       )
       .rehandle(is(undefined), () => Rune.constant([]))
-      .unsafeAs<any>()
-      .into(ExtrinsicEventsRune, this.chain)
+      .unsafeAs<Chain.Event<C>[]>()
+  }
+
+  // TODO: turn into `errors` and perform decoding for all (?)... or should there only ever be one?
+  error() {
+    return this
+      .inBlockEvents()
+      .map((events) => events.find(isSystemExtrinsicFailedEvent))
+      .unhandle(is(undefined))
+      .unsafeAs<SystemExtrinsicFailedEvent>()
+      .into(ValueRune)
+      .access("event", "value", "dispatchError")
+      .match((_) =>
+        _
+          .when(
+            (value: DispatchError): value is Extract<DispatchError, string> =>
+              typeof value === "string",
+            (value) => value,
+          )
+          .else((value) =>
+            Rune
+              .tuple([
+                this.chain.metadata.into(ValueRune).access("pallets"),
+                value.access("value", "index"),
+              ])
+              .map(([pallets, id]) => Object.values(pallets).find((pallet) => pallet.id === id)!)
+              .access("types", "error")
+              .unhandle(is(undefined))
+              .into(CodecRune)
+              .decoded(value.access("value", "error"))
+          )
+      )
   }
 }
 

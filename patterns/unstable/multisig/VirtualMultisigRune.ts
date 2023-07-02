@@ -15,7 +15,7 @@ import {
   ValueRune,
 } from "../../../mod.ts"
 import { MultisigRune } from "../../multisig/MultisigRune.ts"
-import { filterPureCreatedEvents, replaceDelegateCalls } from "../proxy/mod.ts"
+import { replaceDelegateCalls } from "../proxy/mod.ts"
 
 export interface VirtualMultisig {
   members: [Uint8Array, Uint8Array][]

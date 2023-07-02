@@ -25,8 +25,8 @@ const sender = senderSecret
   : (await createDevUsers(1))[0]
 
 /// Instantiate `code.wasm` with `alice` and––upon block inclusion––return the
-/// list of system events specific to this instantiation.
-const events = await metadata
+/// contract public key (inside of the instantiated event).
+const accountId = await metadata
   .instantiation(contractsDev, {
     sender: sender.publicKey,
     code: Deno.readFileSync(new URL("./erc20.wasm", import.meta.url)),
@@ -35,23 +35,19 @@ const events = await metadata
   .signed(signature({ sender }))
   .sent()
   .dbgStatus("Instantiation:")
-  .inBlockEvents()
+  .inBlockEvents("Contracts", "Instantiated")
+  .access(0, "event", "value", "contract")
   .run()
 
-/// > Note: we're using `inBlockEvents` and not `finalizedEvents` because our provider
+/// > Note: we're using `inBlockEvent` and not `finalizedEvent` because our provider
 /// > is configured with instant finality. This is optimal for testing, but not production.
 
-/// Find the event corresponding to instantiation, and extract the instance's `accountId`.
-/// We'll convert this to an Ss58 address and place it within an environment variable. This
-/// way we can easy deploy from other scripts with a simple `await import("./deploy.ts")`.
-for (const { event } of events) {
-  if (event.type === "Contracts" && event.value.type === "Instantiated") {
-    const accountId = event.value.contract
-    console.log("Account id:", accountId)
-    $.assert($.sizedUint8Array(32), accountId)
-    const address = ss58.encode(contractsDev.System.SS58Prefix, accountId)
-    console.log("Contract ss58 address:", address)
-    Deno.env.set("CONTRACT_SS58_ADDRESS", address)
-    break
-  }
-}
+/// Ensure that the account ID is of the expected shape.
+console.log("Account id:", accountId)
+$.assert($.sizedUint8Array(32), accountId)
+
+// /// We'll convert this to an Ss58 address and place it within an environment variable. This
+// /// way we can easy deploy from other scripts with a simple `await import("./deploy.ts")`.
+const address = ss58.encode(contractsDev.System.SS58Prefix, accountId)
+console.log("Contract ss58 address:", address)
+Deno.env.set("CONTRACT_SS58_ADDRESS", address)

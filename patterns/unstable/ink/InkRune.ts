@@ -1,3 +1,4 @@
+import { PalletContractsEvent, RuntimeEvent } from "@capi/contracts-dev"
 import {
   ArrayRune,
   Chain,
@@ -12,7 +13,6 @@ import {
   ValueRune,
 } from "../../../mod.ts"
 import { $contractsApiCallArgs, $contractsApiCallResult, Weight } from "./codecs.ts"
-import { isContractEmitted } from "./events.ts"
 import { InkMetadataRune } from "./InkMetadataRune.ts"
 
 export interface MsgProps {
@@ -89,7 +89,14 @@ export class InkRune<out C extends Chain, out U>
   emittedEvents = <X>(...[events]: RunicArgs<X, [events: Event[]]>) => {
     return Rune
       .resolve(events)
-      .map((events) => events.filter(isContractEmitted))
+      .map((events) =>
+        // TODO: clean this up
+        events.filter(({ event }) => {
+          const event_ = event as RuntimeEvent
+          return RuntimeEvent.isContracts(event_)
+            && PalletContractsEvent.isContractEmitted(event_.value)
+        }) as Event<RuntimeEvent.Contracts & { value: PalletContractsEvent.ContractEmitted }>[]
+      )
       .into(ArrayRune)
       .mapArray((event) => this.parent.$event.decoded(event.access("event", "value", "data")))
   }

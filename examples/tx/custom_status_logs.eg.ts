@@ -23,4 +23,4 @@ const sent = westendDev.Balances
 sent.inBlock().run().then((hash) => console.log("In block", hash))
 
 // Log the events when it is finalized.
-sent.finalizedEvents().run().then((hash) => console.log("Finalized events", hash))
+sent.finalizedEvents().run().then((events) => console.log("Finalized events", events))

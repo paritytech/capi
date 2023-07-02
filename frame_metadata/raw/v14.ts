@@ -11,7 +11,7 @@ import * as $ from "../../deps/scale.ts"
 import { $ty, $tyId } from "../../scale_info/raw/Ty.ts"
 import { $null, transformTys } from "../../scale_info/transformTys.ts"
 import { normalizeDocs, normalizeIdent } from "../../util/normalize.ts"
-import { Constant, FrameMetadata, Pallet, StorageEntry } from "../FrameMetadata.ts"
+import { FrameMetadata } from "../FrameMetadata.ts"
 import {
   $emptyKey,
   $partialEmptyKey,
@@ -110,52 +110,54 @@ export function transformMetadata(metadata: $.Output<typeof $metadata>): FrameMe
   return {
     types,
     paths,
-    pallets: Object.fromEntries(metadata.pallets.map((pallet): [string, Pallet] => [pallet.name, {
-      id: pallet.id,
-      name: pallet.name,
-      storagePrefix: pallet.storage?.prefix ?? pallet.name,
-      storage: Object.fromEntries(
-        pallet.storage?.entries.map((storage): [string, StorageEntry] => {
-          let key, partialKey
-          if (storage.type === "Plain") {
-            key = $emptyKey
-            partialKey = $partialEmptyKey
-          } else if (storage.hashers.length === 1) {
-            key = hashers[storage.hashers[0]!].$hash(ids[storage.key]!)
-            partialKey = $partialSingleKey(key)
-          } else {
-            const codecs = extractTupleMembersVisitor.visit(ids[storage.key]!).map((codec, i) =>
-              hashers[storage.hashers[i]!].$hash(codec)
-            )
-            key = $.tuple(...codecs)
-            partialKey = $partialMultiKey(...codecs)
-          }
-          return [storage.name, {
-            singular: storage.type === "Plain",
-            name: storage.name,
-            key: $storageKey(pallet.name, storage.name, key),
-            partialKey: $storageKey(pallet.name, storage.name, partialKey),
-            value: ids[storage.value]!,
-            docs: normalizeDocs(storage.docs),
-            default: storage.modifier === "Default" ? storage.default : undefined,
-          }]
-        }) ?? [],
-      ),
-      constants: Object.fromEntries(
-        pallet.constants.map((constant): [string, Constant] => [constant.name, {
-          name: constant.name,
-          codec: ids[constant.ty]!,
-          value: constant.value,
-          docs: normalizeDocs(constant.docs),
-        }]),
-      ),
-      types: {
-        call: ids[pallet.calls!],
-        error: ids[pallet.error!],
-        event: ids[pallet.event!],
-      },
-      docs: "",
-    }])),
+    pallets: Object.fromEntries(
+      metadata.pallets.map((pallet): [string, FrameMetadata.Pallet] => [pallet.name, {
+        id: pallet.id,
+        name: pallet.name,
+        storagePrefix: pallet.storage?.prefix ?? pallet.name,
+        storage: Object.fromEntries(
+          pallet.storage?.entries.map((storage): [string, FrameMetadata.StorageEntries] => {
+            let key, partialKey
+            if (storage.type === "Plain") {
+              key = $emptyKey
+              partialKey = $partialEmptyKey
+            } else if (storage.hashers.length === 1) {
+              key = hashers[storage.hashers[0]!].$hash(ids[storage.key]!)
+              partialKey = $partialSingleKey(key)
+            } else {
+              const codecs = extractTupleMembersVisitor.visit(ids[storage.key]!).map((codec, i) =>
+                hashers[storage.hashers[i]!].$hash(codec)
+              )
+              key = $.tuple(...codecs)
+              partialKey = $partialMultiKey(...codecs)
+            }
+            return [storage.name, {
+              singular: storage.type === "Plain",
+              name: storage.name,
+              key: $storageKey(pallet.name, storage.name, key),
+              partialKey: $storageKey(pallet.name, storage.name, partialKey),
+              value: ids[storage.value]!,
+              docs: normalizeDocs(storage.docs),
+              default: storage.modifier === "Default" ? storage.default : undefined,
+            }]
+          }) ?? [],
+        ),
+        constants: Object.fromEntries(
+          pallet.constants.map((constant): [string, FrameMetadata.Constant] => [constant.name, {
+            name: constant.name,
+            codec: ids[constant.ty]!,
+            value: constant.value,
+            docs: normalizeDocs(constant.docs),
+          }]),
+        ),
+        types: {
+          call: ids[pallet.calls!],
+          error: ids[pallet.error!],
+          event: ids[pallet.event!],
+        },
+        docs: "",
+      }]),
+    ),
     extrinsic: {
       call: getExtrinsicParameter("call"),
       signature: getExtrinsicParameter("signature"),

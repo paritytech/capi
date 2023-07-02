@@ -4,7 +4,6 @@ import { ArrayRune, is, Rune } from "../rune/mod.ts"
 import { ValueRune } from "../rune/ValueRune.ts"
 import { BlockHashRune } from "./BlockHashRune.ts"
 import { Chain } from "./ChainRune.ts"
-import { EventsRune } from "./EventsRune.ts"
 import { PatternRune } from "./PatternRune.ts"
 
 export class BlockRune<out C extends Chain, out U>
@@ -32,10 +31,7 @@ export class BlockRune<out C extends Chain, out U>
       .pallet("System")
       .storage("Events")
       .value(undefined!, this.parent)
-      .handle(
-        is(undefined),
-        () => Rune.constant([]).unsafeAs<Chain.Storage.Value<C, "System", "Events">>(),
-      )
-      .into(EventsRune, this.chain)
+      .handle(is(undefined), () => Rune.constant([]))
+      .unsafeAs<Chain.Event<C>[]>()
   }
 }

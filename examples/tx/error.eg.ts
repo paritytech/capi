@@ -5,14 +5,14 @@
  */
 
 import { contractsDev } from "@capi/contracts-dev"
-import { assertInstanceOf } from "asserts"
-import { createDevUsers, ExtrinsicError, is } from "capi"
+import { assert } from "asserts"
+import { createDevUsers } from "capi"
 import { signature } from "capi/patterns/signature/polkadot"
 
 const { alexa, billy } = await createDevUsers()
 
 /// The following should reject with an `ExtrinsicError`.
-const extrinsicError = await contractsDev.Balances
+const error = await contractsDev.Balances
   .transfer({
     value: 1_000_000_000_000_000_000_000_000_000_000_000_000n,
     dest: billy.address,
@@ -20,11 +20,9 @@ const extrinsicError = await contractsDev.Balances
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Transfer:")
-  .inBlockEvents()
-  .unhandleFailed()
-  .rehandle(is(ExtrinsicError))
+  .error()
   .run()
 
 /// Ensure `extrinsicError` is in fact an instance of `ExtrinsicError`
-console.log("The unhandled extrinsic error:", extrinsicError)
-assertInstanceOf(extrinsicError, ExtrinsicError)
+console.log("The decoded extrinsic error:", error)
+assert(error === "InsufficientBalance")
