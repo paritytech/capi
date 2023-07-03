@@ -1,7 +1,7 @@
 import { hex } from "../crypto/mod.ts"
 import * as $ from "../deps/scale.ts"
 import { $extrinsic, decodeMetadata, FrameMetadata } from "../frame_metadata/mod.ts"
-import { Connection, known } from "../rpc/mod.ts"
+import { Connection } from "../rpc/mod.ts"
 import { is, Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { BlockHashRune } from "./BlockHashRune.ts"
 import { CodecRune } from "./CodecRune.ts"
