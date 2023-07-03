@@ -64,7 +64,11 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
 
   /** A rune representing the call data codec */
   $callData = this.chain.into(ValueRune).access("metadata", "extrinsic", "call").into(CodecRune)
+
+  /** A rune representing the scale-encoded call data */
   callData = this.$callData.encoded(this.unsafeAs())
+
+  /** A rune representing the hex-encoded scale-encoded call data */
   hex = this.callData.map(hex.encode)
 
   /** A rune representing the call hash codec */

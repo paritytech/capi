@@ -1,7 +1,7 @@
 import { hex } from "../crypto/mod.ts"
 import * as $ from "../deps/scale.ts"
 import { $extrinsic, decodeMetadata, FrameMetadata } from "../frame_metadata/mod.ts"
-import { Connection } from "../rpc/mod.ts"
+import { Connection, known } from "../rpc/mod.ts"
 import { is, Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { BlockHashRune } from "./BlockHashRune.ts"
 import { CodecRune } from "./CodecRune.ts"
@@ -72,13 +72,13 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
     return Rune.object({ connection, metadata: this.metadata }).into(ChainRune) as ChainRune<C, U>
   }
 
-  /** The connection with which to communicate with the chain itself */
+  /** A rune representing the connection with which to communicate with the chain */
   connection = this.into(ValueRune<Chain, U>).access("connection").into(ConnectionRune)
 
   /** A rune representing the chain's metadata */
   metadata = this.into(ValueRune).access("metadata")
 
-  /** A rune representing the extrinsics of the current chain */
+  /** A rune representing the codec for extrinsics of the current chain */
   $extrinsic = Rune.fn($extrinsic).call(this.metadata).into(CodecRune)
 
   /** A rune representing a stream of latest block numbers */
@@ -86,7 +86,7 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
     .subscribe("chain_subscribeNewHeads", "chain_unsubscribeNewHeads")
     .access("number")
 
-  /** A rune representing the latest block hash */
+  /** A rune representing a stream of latest block hashes */
   latestBlockHash = this.connection
     .call("chain_getBlockHash", this.latestBlockNum)
     .unsafeAs<string>()
@@ -125,13 +125,16 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
   /** A rune representing the system version */
   chainVersion = this.connection.call("system_version")
 
+  // TODO: narrow type in event selection PR (will include the manually-typed `DispatchInfo`)
   /** A rune representing the chain's dispatch info codec */
   $dispatchInfo = this.metadata
     .access("paths", "frame_support::dispatch::DispatchInfo")
     .into(CodecRune)
 
   /** A rune representing the chain's weight v2 codec */
-  $weight = this.metadata.access("paths", "sp_weights::weight_v2::Weight").into(CodecRune)
+  $weight = this.metadata
+    .access("paths", "sp_weights::weight_v2::Weight")
+    .into(CodecRune)
 }
 
 // TODO: rework upon resolution of [#811](https://github.com/paritytech/capi/issues/811)

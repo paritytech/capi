@@ -21,7 +21,7 @@ export class StorageRune<
     CodecRune<Chain.Storage.Value<C, P, S>, Chain.Storage.Value<C, P, S>, U>,
   )
 
-  /** Get a rune representing the scale-encoded value of the current storage */
+  /** Get a rune representing the  hex-encoded scale-encoded value of the current storage */
   valueRaw<X>(
     ...[key, blockHash]: RunicArgs<X, [
       key: Chain.Storage.Key<C, P, S>,
@@ -70,7 +70,7 @@ export class StorageRune<
       .rehandle(is(undefined))
   }
 
-  /** Get a rune representing scale-encoded storage entries */
+  /** Get a rune representing hex-encoded scale-encoded storage entries */
   entriesRaw<X, Y>(
     props: RunicArgs<X, StoragePageProps<C, P, S>>,
     ...[blockHash]: RunicArgs<Y, [blockHash?: string]>
@@ -99,7 +99,7 @@ export class StorageRune<
       .unsafeAs<[Chain.Storage.Key<C, P, S>, Chain.Storage.Value<C, P, S>][]>()
   }
 
-  /** Get a rune representing scale-encoded storage keys */
+  /** Get a rune representing hex-encoded scale-encoded storage keys */
   keysRaw<X, Y>(
     props: RunicArgs<X, StoragePageProps<C, P, S>>,
     ...[blockHash]: RunicArgs<Y, [blockHash?: string]>
@@ -138,10 +138,10 @@ export interface StoragePageProps<
   out P extends Chain.PalletName<C>,
   out S extends Chain.StorageName<C, P>,
 > {
-  /** the maximum number of items to include in the page */
+  /** The maximum number of items to include in the page */
   limit?: number
-  /** the partial key with which to match items */
+  /** The partial key with which to match items */
   partialKey?: Chain.Storage.PartialKey<C, P, S>
-  /** the key at which to begin retrieval */
+  /** The key at which to begin retrieval */
   start?: Chain.Storage.Key<C, P, S>
 }

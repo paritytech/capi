@@ -10,7 +10,7 @@ export class ConstantRune<
   out K extends Chain.ConstantName<C, P>,
   out U,
 > extends PatternRune<Chain.Constant<C, P, K>, C, U> {
-  /** A rune representing the codec of constant's type  */
+  /** A rune representing the codec of the constant's type  */
   $value = this
     .into(ValueRune)
     .access("codec")
