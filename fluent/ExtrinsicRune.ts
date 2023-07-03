@@ -111,7 +111,7 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
 
   /** Get a rune resolving to the hex-encoded scale-encoded value of the current extrinsic's weight */
   weightRaw() {
-    return this.$weight.encoded(this.weight().unsafeAs<never>()).map(hex.encode)
+    return this.chain.$weight.encoded(this.weight().unsafeAs<never>()).map(hex.encode)
   }
 
   /** Get a rune resolving to the fee estimation for the current extrinsic rune */
