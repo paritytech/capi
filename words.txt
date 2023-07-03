@@ -34,7 +34,6 @@ harrysolovay
 hasher
 hashers
 hrmp
-ingo
 inherents
 keypair
 kiera
