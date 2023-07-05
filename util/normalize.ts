@@ -6,7 +6,17 @@ export function normalizeIdent(ident: string) {
 }
 
 export function normalizeDocs(docs: string[] | undefined): string {
-  return docs?.join("\n") ?? ""
+  let str = docs?.join("\n") ?? ""
+  str = str
+    .replace(/[^\S\n]+$/gm, "") // strip trailing whitespace
+    .replace(/^\n+|\n+$/g, "") // strip leading and trailing newlines
+  const match = /^([^\S\n]+).*(?:\n\1.*)*$/.exec(str) // find a common indent
+  if (match) {
+    const { 1: prefix } = match
+    str = str.replace(new RegExp(`^${prefix}`, "gm"), "") // strip the common indent
+    // this `new RegExp` is safe because `prefix` must be whitespace
+  }
+  return str
 }
 
 export function normalizePackageName(name: string) {
