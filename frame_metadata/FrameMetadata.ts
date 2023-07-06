@@ -1,5 +1,4 @@
 import * as $ from "../deps/scale.ts"
-import { RuntimeEventValue } from "./Event.ts"
 
 export interface FrameMetadata {
   types: Record<string, $.AnyCodec>
@@ -16,7 +15,7 @@ export namespace FrameMetadata {
     constants: Record<string, Constant>
     types: {
       call?: $.AnyCodec
-      event?: $.Codec<never, RuntimeEventValue>
+      event?: $.AnyCodec
       error?: $.AnyCodec
     }
     docs: string

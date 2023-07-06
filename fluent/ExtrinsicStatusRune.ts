@@ -1,5 +1,6 @@
 import {
   DispatchError,
+  Event,
   isSystemExtrinsicFailedEvent,
   SystemExtrinsicFailedEvent,
 } from "../frame_metadata/mod.ts"

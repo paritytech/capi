@@ -55,8 +55,9 @@ export namespace Chain {
       $.Output<Storage<C, P, S>["value"]>
   }
 
-  type PalletRuntimeEvent<C extends Chain, P extends PalletName<C>> = $.Output<
-    Exclude<Pallet<C, P>["types"]["event"], undefined>
+  type PalletRuntimeEvent<C extends Chain, P extends PalletName<C>> = Extract<
+    $.Output<Exclude<Pallet<C, P>["types"]["event"], undefined>>,
+    { type: any }
   >
   export type RuntimeEventName<C extends Chain, P extends PalletName<C>> = PalletRuntimeEvent<
     C,
