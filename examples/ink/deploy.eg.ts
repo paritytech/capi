@@ -39,7 +39,7 @@ const accountId = await metadata
   .access(0, "event", "value", "contract")
   .run()
 
-/// > Note: we're using `inBlockEvent` and not `finalizedEvent` because our provider
+/// > Note: we're using `inBlockEvents` and not `finalizedEvents` because our provider
 /// > is configured with instant finality. This is optimal for testing, but not production.
 
 /// Ensure that the account ID is of the expected shape.

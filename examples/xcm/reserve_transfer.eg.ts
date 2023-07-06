@@ -185,7 +185,9 @@ const messageHash = await rococoDevXcmStatemine.PolkadotXcm
   .access(0, "event", "value", "messageHash")
   .run()
 
+/// Ensure that `messageHash` is of type `Uint8Array`
 console.log("XcmpMessageSent.messageHash:", messageHash)
+$.assert($.str, messageHash)
 
 /// Retrieve billy's balance on Trappist.
 const { balance: billyTrappistBalance } = await retry(
