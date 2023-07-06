@@ -20,6 +20,6 @@ const details = await spiritnet.Did.Did
   .map(({ authenticationKey, publicKeys }) => publicKeys.get(authenticationKey))
   .run()
 
-/// Ensure `details` is of the expected shape
+/// Ensure `details` is of the expected shape.
 console.log("DID public key details:", details)
 $.assert($didPublicKeyDetails, details)
