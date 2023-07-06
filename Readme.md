@@ -91,51 +91,6 @@ capi sync deno
 
 </details>
 
-## Build Tool Integration
-
-If you use a build tool such as Vite or Webpack during development, you'll need
-to configure two environment variables.
-
-<details>
-<summary><code>vite.config.ts</code> example</summary>
-<br>
-
-```ts
-import { defineConfig } from "vite"
-
-export default defineConfig({
-  define: {
-    "process.env.CAPI_SERVER": process.env.CAPI_SERVER,
-    "process.env.CAPI_TARGET": process.env.CAPI_TARGET,
-  },
-})
-```
-
-</details>
-
-<details>
-<summary><code>webpack.config.js</code> example</summary>
-<br>
-
-```ts
-import webpack from "webpack"
-
-export default {
-  plugins: [
-    new webpack.DefinePlugin({
-      process: {
-        env: {
-          CAPI_SERVER: JSON.stringify(process.env.CAPI_SERVER),
-          CAPI_TARGET: JSON.stringify(process.env.CAPI_TARGET),
-        },
-      },
-    }),
-  ],
-}
-```
-
-</details>
-
 ## At a Glance
 
 Retrieve the first 10 entries from a storage map of Polkadot.
@@ -188,6 +143,10 @@ As you read through this documentation, please consider use cases over which you
 might like to abstract; if you wish to add your use case to
 [Capi's standard library](patterns), please
 [submit an issue](https://github.com/paritytech/capi/issues/new?title=pattern%20idea:%20).
+
+## Additional Resources
+
+- [Build Tool Integration](https://docs.capi.dev/setup/build_tool_integration)
 
 ## Code of Conduct
 
