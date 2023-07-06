@@ -144,10 +144,6 @@ might like to abstract; if you wish to add your use case to
 [Capi's standard library](patterns), please
 [submit an issue](https://github.com/paritytech/capi/issues/new?title=pattern%20idea:%20).
 
-## Additional Resources
-
-- [Build Tool Integration](https://docs.capi.dev/setup/build_tool_integration)
-
 ## Code of Conduct
 
 Everyone interacting in this repo is expected to follow the
