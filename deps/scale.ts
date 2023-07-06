@@ -1,1 +1,1 @@
-export * from "https://raw.githubusercontent.com/paritytech/scale-ts/fe9517b/mod.ts"
+export * from "https://deno.land/x/scale@v0.13.0/mod.ts#="
