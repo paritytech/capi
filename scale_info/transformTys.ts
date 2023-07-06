@@ -91,7 +91,9 @@ export function transformTys(tys: Ty[]): ScaleInfo {
         }
       } else {
         return $.object(
-          ...ty.fields.map((x) => maybeOptionalField(normalizeIdent(x.name!), visit(x.ty))),
+          ...ty.fields.map((x) =>
+            withDocs(x.docs, maybeOptionalField(normalizeIdent(x.name!), visit(x.ty)))
+          ),
         )
       }
     } else if (ty.type === "Tuple") {
@@ -128,7 +130,10 @@ export function transformTys(tys: Ty[]): ScaleInfo {
           } else {
             // Object variant
             const memberFields = fields.map((field) => {
-              return maybeOptionalField(normalizeIdent(field.name!), visit(field.ty))
+              return withDocs(
+                field.docs,
+                maybeOptionalField(normalizeIdent(field.name!), visit(field.ty)),
+              )
             })
             member = $.variant(type, ...memberFields)
           }
@@ -165,7 +170,7 @@ export function transformTys(tys: Ty[]): ScaleInfo {
 
 function withDocs<I, O>(_docs: string[], codec: Codec<I, O>): Codec<I, O> {
   const docs = normalizeDocs(_docs)
-  if (docs) return $.withMetadata($.docs(docs), codec)
+  if (docs) return $.documented(docs, codec)
   return codec
 }
 

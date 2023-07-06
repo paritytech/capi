@@ -27,6 +27,8 @@ export class TypeCodegen {
   )
 
   isTuple = new $.CodecVisitor<boolean>().add($.tuple, () => true).fallback(() => false)
+  isField = new $.CodecVisitor<boolean>()
+    .add($.field<any, any, any>, () => true).fallback(() => false)
 
   nativeVisitor = new $.CodecVisitor<string>()
     .add($.int, (_codec, _signed, size) => size > 32 ? "bigint" : "number")
@@ -93,10 +95,28 @@ export class TypeCodegen {
       (_codec, variants) =>
         Object.values(variants).map((v) => this.codecCodegen.print(v)).join(" | "),
     )
+    .add(
+      $.documented,
+      (_codec, docs, inner) => {
+        if (this.isField.visit(inner)) {
+          return `{\n${formatDocComment(docs)}\n${this.native(inner).slice(1)}`
+        }
+        return `${formatDocComment(docs)}\n` + this.native(inner)
+      },
+    )
     .add($.never, () => "never")
     .add($null, () => "null")
 
   declVisitor = new $.CodecVisitor<(name: string, isTypes: boolean) => string>()
+    .generic((visitor) =>
+      visitor.add(
+        $.documented,
+        (_codec, docs, inner) => (name, isTypes) =>
+          (isTypes
+            ? formatDocComment(docs) + "\n"
+            : "") + visitor.visit(inner)(name, isTypes).trim(),
+      )
+    )
     .add($.literalUnion, (_codec, _variants) => (name, isTypes) => {
       const variants = Object.values(_variants) as string[]
       return isTypes
@@ -243,7 +263,8 @@ export ${isTypes ? `namespace ${name}` : `const ${name} =`} {
         const trailing = isTypes ? `: C.$.Codec<${name}>` : `= ${this.codecCodegen.print(codec)}`
         return `
           export const $${name.replace(/^./, (x) => x.toLowerCase())}${trailing}
-          ${this.declVisitor.visit(codec)(name, isTypes)}
+
+          ${this.declVisitor.visit(codec)(name, isTypes).trim()}
         `
       }).join("\n")
       files.set(
@@ -269,4 +290,10 @@ export ${isTypes ? `namespace ${name}` : `const ${name} =`} {
       `,
     )
   }
+}
+
+function formatDocComment(docs: string) {
+  if (!docs) return ""
+  if (!docs.includes("\n")) return `/** ${docs} */`
+  return `/**\n${docs.replace(/^/gm, " * ")}\n*/`
 }
