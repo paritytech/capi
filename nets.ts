@@ -63,3 +63,7 @@ export const rococoDevXcmStatemine = rococoDevXcm.parachain({
 export const collectives = net.ws({
   url: "wss://collectives.api.onfinality.io/public-ws",
 })
+
+export const spiritnet = net.ws({
+  url: "wss://kilt-rpc.dwellir.com",
+})
