@@ -5,7 +5,7 @@ import { RpcCallMessage, RpcIngressMessage, RpcSubscriptionHandler } from "./rpc
 const connectionMemos = new Map<new(discovery: any) => Connection, Map<unknown, Connection>>()
 
 export abstract class Connection {
-  nextId = 0
+  nextId = 1
   references = 0
   #controller = new AbortController()
   signal = this.#controller.signal
