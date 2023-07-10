@@ -128,6 +128,19 @@ deno task sync # only needed once
 deno task run examples/<example_path>
 ```
 
+To run them all at once:
+
+```sh
+deno task test:eg:deno
+```
+
+Node Equivalent:
+
+```sh
+deno task dnt --examples
+deno task test:eg:node
+```
+
 ## Rationale
 
 In a likely future of specialized, interoperable chains, developers will need to
