@@ -88,6 +88,7 @@ const pjsExtraKeyMap: Record<string, KeyHandler> = {
     // pjs essentially spreads this into the extrinsic
     const visitor: $.CodecVisitor<$.Codec<any>> = new $.CodecVisitor<$.Codec<any>>()
       .add($.field, (_, key, value) => $.field(key, $pjs(value)))
+      .add($.optionalField, (_, key, value) => $.optionalField(key, $pjs(value)))
       .add($.object, (_, ...fields) => $.object(...fields.map((x) => visitor.visit(x))))
     return visitor.visit(value)
   },
