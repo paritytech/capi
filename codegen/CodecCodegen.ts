@@ -40,9 +40,7 @@ export class CodecCodegen {
       if (existing === null) {
         this.codecIds.set(value, this.nextCodecId++)
       } else if (existing === undefined) {
-        const meta = value._metadata.find((x): x is typeof x & { type: "atomic" | "factory" } =>
-          x.type === "atomic" || x.type === "factory"
-        )
+        const meta = value._metadata[0]
         if (!meta || meta.type === "atomic") return
         if (meta.factory === $.deferred) {
           this.codecIds.set(value, this.nextCodecId++)
@@ -86,9 +84,7 @@ export class CodecCodegen {
         }
         if (value === null) return "null"
         if (value instanceof $.Codec) {
-          const meta = value._metadata.find((x): x is typeof x & { type: "atomic" | "factory" } =>
-            x.type === "atomic" || x.type === "factory"
-          )
+          const meta = value._metadata[0]
           if (!meta) throw new Error("Cannot serialize metadata-less codec")
           if (meta.type === "atomic") return `C.${meta.name}`
           const id = this.codecIds.get(value)

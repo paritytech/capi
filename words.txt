@@ -23,6 +23,7 @@ devnet
 devnets
 dispatchable
 dprint
+dwellir
 esbenp
 extrinsics
 ferdie
@@ -67,6 +68,7 @@ ryann
 serde
 sibl
 smoldot
+spiritnet
 statemigration
 statemine
 statemint

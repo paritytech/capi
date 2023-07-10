@@ -98,9 +98,9 @@ await Promise.all([
         name: "wat-the-crypto",
         version: "0.0.3",
       },
-      "https://deno.land/x/scale@v0.12.2/mod.ts#=": {
+      "https://deno.land/x/scale@v0.13.0/mod.ts#=": {
         name: "scale-codec",
-        version: "0.12.2",
+        version: "0.13.0",
       },
       "https://deno.land/x/smoldot2@light-js-deno-v1.0.6/index-deno.js": {
         name: "smoldot",

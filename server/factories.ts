@@ -1,3 +1,4 @@
+import { escapeHtml } from "../deps/escape.ts"
 import { Status } from "../deps/std/http.ts"
 import { CacheBase } from "../util/cache/base.ts"
 
@@ -57,7 +58,7 @@ export function acceptsHtml(request: Request): boolean {
 export async function renderCode(code: string) {
   return `
     <body>
-      <pre>${code}</pre>
+      <pre>${escapeHtml(code)}</pre>
     </body>
   `
 }
