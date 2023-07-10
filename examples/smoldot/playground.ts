@@ -1,86 +1,12 @@
-import { Connection, known, SmoldotConnection } from "../../rpc/mod.ts"
+// import { ExperimentalConsumer, SmoldotConnection } from "capi"
 
-abstract class ConnectionConsumer {
-  constructor(readonly connection: Connection) {}
+// const relayChainSpec = Deno.readTextFileSync("examples/smoldot/spec.json")
 
-  abstract blockHash(number?: string): Promise<string>
+// const client = new ExperimentalConsumer(new SmoldotConnection({ relayChainSpec }))
 
-  abstract block(hash?: string): Promise<known.SignedBlock>
-
-  abstract submitExtrinsic(
-    extrinsic: string,
-    cb: (status: known.TransactionStatus) => void,
-  ): void
-}
-
-class SmoldotConnectionConsumer extends ConnectionConsumer {
-  followSubscriptionId?: string
-
-  follow(signal: AbortSignal) {
-    this.connection.subscription(
-      "chainHead_unstable_follow",
-      "chainHead_unstable_unfollow",
-      [true],
-      async (message) => {
-        const params = message.params!
-        const event = params.result as known.ChainHeadUnstableFollowEvent
-        switch (event.event) {
-          case "initialized": {
-            const { finalizedBlockRuntime, finalizedBlockHash } = event
-            if (!finalizedBlockRuntime || finalizedBlockRuntime.type === "invalid") {
-              throw new FinalizedBlockRuntimeInvalidError()
-            }
-            const value = finalizedBlockRuntime.spec.apis["0xd2bc9897eed08f15"]
-            if (value !== 3) {
-              throw new IncompatibleRuntimeError()
-            }
-            await this.connection.subscription(
-              "chainHead_unstable_call",
-              "chainHead_unstable_stopCall",
-              [
-                params.subscription,
-                finalizedBlockHash,
-                "Metadata_metadata",
-                "",
-              ],
-              (message) => {
-                console.log({ message })
-                controller.abort()
-              },
-              signal,
-            )
-            // console.log(result)
-            break
-          }
-          case "newBlock": {
-            break
-          }
-          case "bestBlockChanged": {
-            break
-          }
-          case "finalized": {
-            break
-          }
-          case "stop": {
-            this.follow(signal)
-            break
-          }
-        }
-      },
-      signal,
-    )
-  }
-}
-
-const relayChainSpec = Deno.readTextFileSync("examples/smoldot/spec.json")
-
-const client = new SmoldotConnectionConsumer(
-  new SmoldotConnection({ relayChainSpec }),
-)
-
-const controller = new AbortController()
-const { signal } = controller
-client.follow(signal)
+// const controller = new AbortController()
+// const { signal } = controller
+// client.follow(signal)
 
 // const signal = new AbortSignal()
 // const connection = SmoldotConnection.connect({ relayChainSpec }, signal)

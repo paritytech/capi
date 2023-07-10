@@ -1,3 +1,5 @@
+import * as $ from "../deps/scale.ts"
+
 export interface RpcEgressMessage extends RpcBaseMessage {
   id: number
   method: string
@@ -18,6 +20,7 @@ export namespace RpcEgressMessage {
 export type RpcIngressMessage = RpcOkMessage | RpcErrorMessage | RpcNotificationMessage
 
 export type RpcCallMessage = RpcOkMessage | RpcErrorMessage
+
 export type RpcSubscriptionMessage = RpcNotificationMessage | RpcErrorMessage
 
 export type RpcSubscriptionHandler = (message: RpcSubscriptionMessage) => void
