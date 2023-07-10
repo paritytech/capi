@@ -13,9 +13,6 @@ npm run example <path-to-example>
 # eg. npm run example src/dev/dev_users.eg.ts
 ```
 
-
-
-
 Table for macbook pro 2019 with 2,6 GHz 6-Core Intel Core i7
 
 | example | deno | ts-node |
