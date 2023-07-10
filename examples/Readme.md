@@ -4,7 +4,7 @@
 
 ```sh
 deno task sync # only needed once
-deno task run examples/<example_path>
+deno task run <path-to-example>
 ```
 
 Or, to run them all in Node:
