@@ -128,7 +128,7 @@ deno task sync # only needed once
 deno task run examples/<example_path>
 ```
 
-To run them all at once:
+Or, to run them all in Node:
 
 ```sh
 deno task test:eg:deno
@@ -137,7 +137,7 @@ deno task test:eg:deno
 Node Equivalent:
 
 ```sh
-deno task dnt --examples
+deno task dnt --examples # only needed once
 deno task test:eg:node
 ```
 
