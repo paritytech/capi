@@ -17,6 +17,10 @@ interactions without compromising either performance or ease of use.
 npm i capi
 ```
 
+> Note: The minimum supported Node version is 20, as we require the
+> [Web Crypto API](https://nodejs.org/docs/latest-v20.x/api/webcrypto.html#web-crypto-api)
+> be accessible from `globalThis.crypto` for the sake of browser compatibility.
+
 <details>
 <summary>Deno Equivalent</summary>
 <br>
@@ -31,6 +35,10 @@ npm i capi
   }
 }
 ```
+
+> Note: The minimum supported Deno version is v1.33.0, as we require the
+> [Command API](https://deno.land/api@v1.35.0?s=Deno.Command) be accessible for
+> the sake of spawning child processes.
 
 </details>
 
