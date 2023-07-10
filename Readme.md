@@ -128,17 +128,12 @@ deno task sync # only needed once
 deno task run examples/<example_path>
 ```
 
-Or, to run them all in Node:
+Or, to run an example with Node:
 
 ```sh
-deno task test:eg:deno
-```
-
-Node Equivalent:
-
-```sh
+deno task sync # only needed once
 deno task dnt --examples # only needed once
-deno task test:eg:node
+deno task capi serve -- node target/npm/capi-examples/esm/examples/<example_path>
 ```
 
 ## Rationale
