@@ -36,7 +36,7 @@ npm i capi
 }
 ```
 
-> Note: For now, we only support the latest 1.x version Deno.
+> Note: For now, we only support the latest 1.x version of Deno.
 
 </details>
 
