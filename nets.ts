@@ -54,11 +54,11 @@ export const rococoDevXcmTrappist = rococoDevXcm.parachain({
   chain: "local",
   id: 2000,
 })
-export const rococoDevXcmStatemine = rococoDevXcm.parachain({
-  bin: bin.trappistPolkadotParachain,
-  chain: "statemine-local",
-  id: 1000,
-})
+// export const rococoDevXcmStatemine = rococoDevXcm.parachain({
+//   bin: bin.trappistPolkadotParachain,
+//   chain: "statemine-local",
+//   id: 1000,
+// })
 
 export const collectives = net.ws({
   url: "wss://collectives.api.onfinality.io/public-ws",
