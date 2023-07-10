@@ -36,7 +36,7 @@ npm i capi
 }
 ```
 
-> Note: The minimum supported Deno version is v1.33.0, as we require the
+> Note: The minimum supported Deno version is 1.33.0, as we require the
 > [Command API](https://deno.land/api@v1.35.0?s=Deno.Command) be accessible for
 > the sake of spawning child processes.
 
