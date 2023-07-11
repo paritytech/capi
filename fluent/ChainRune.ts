@@ -74,7 +74,15 @@ export namespace Chain {
     N extends RuntimeEventName<C, P> = RuntimeEventName<C, P>,
   > = Event_<RuntimeEvent<C, P, N>>
 
-  export type Error<C extends Chain> = $.Output<C["metadata"]["types"]["DispatchError"]>
+  // TODO: revisit this type and ensure it aligns with `ExtrinsicStatusRune`'s private `error` method's behavior
+  export type Error<C extends Chain> =
+    | Exclude<
+      $.Output<C["metadata"]["types"]["DispatchError"]>,
+      { type: "Module" }
+    >
+    | {
+      [K in PalletName<C>]: $.Output<Exclude<Pallet<C, K>["types"]["error"], undefined>>
+    }[PalletName<C>]
 }
 
 // TODO: do we want to represent the discovery value and conn type within the type system?
