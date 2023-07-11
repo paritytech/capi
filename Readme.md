@@ -63,7 +63,7 @@ export const polkadot = net.ws({
 ```
 
 > Note: if the type declarations for `capi/nets` are not resolved, chances are
-> your tsconfig doesn't reflect the following requirements.
+> your tsconfig does not reflect the following requirements.
 >
 > ```json
 > {
@@ -72,9 +72,9 @@ export const polkadot = net.ws({
 > }
 > ```
 >
-> See [Node's `exports` docs](https://nodejs.org/api/packages.html#exports) and
-> [TypeScript's module resolution docs](https://www.typescriptlang.org/tsconfig#moduleResolution)
-> for more info.
+> For more information, see
+> [Node's `exports` docs](https://nodejs.org/api/packages.html#exports) and
+> [TypeScript's module resolution docs](https://www.typescriptlang.org/tsconfig#moduleResolution).
 
 ## Command Line Tool
 
