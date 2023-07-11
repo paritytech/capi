@@ -87,9 +87,9 @@ export class Rune<out T, out U = never> {
   }
 
   async *iter(runner: Runner = globalRunner) {
+    let time = runner.timeline.current
     const primed = runner.prime(this)
     primed.reference()
-    let time = runner.timeline.current
     try {
       while (time !== Infinity) {
         const receipt = new Receipt()
