@@ -13,24 +13,23 @@ import { MultisigRune } from "capi/patterns/multisig"
 
 const { alexa, billy, carol } = await createDevUsers()
 
-const multisigParams = {
+/// Create the multisig.
+const multisig = MultisigRune.from(polkadotDev, {
   signatories: [alexa, billy, carol].map(({ publicKey }) => publicKey),
   threshold: 2,
-}
-/// Create the multisig. Extract the hex.
-const multisig = MultisigRune.from(polkadotDev, multisigParams)
+})
 
-assertEquals(await multisig.run(), multisigParams)
-
+/// Serialize the multisig's state into a hex for later use.
 const hex = await multisig.hex.run()
+
 /// Save `hex` however you'd like (i.e. writing to disk, etc.).
 save(hex)
 
-// Hydrate the multisig
+// Hydrate a multisig with the hex from before.
 const hydratedMultisig = MultisigRune.fromHex(polkadotDev, hex)
 
 // Test hydration
-assertEquals(await hydratedMultisig.run(), multisigParams)
+assertEquals(await multisig.run(), await hydratedMultisig.run())
 
 // hide-start
 // The following noop is solely for explanation. Swap this out with your
