@@ -134,6 +134,14 @@ deno task sync # only needed once
 deno task run examples/<example_path>
 ```
 
+Or, to run an example with Node:
+
+```sh
+deno task sync # only needed once
+deno task dnt --examples # only needed once
+deno task capi serve -- node target/npm/capi-examples/esm/examples/<example_path>
+```
+
 ## Rationale
 
 In a likely future of specialized, interoperable chains, developers will need to
