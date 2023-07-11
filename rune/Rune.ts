@@ -366,6 +366,7 @@ class RunAsyncIter<T> extends RunStream<T> {
     super(runner)
     ;(async () => {
       for await (const value of fn()) {
+        if (!this.alive) break
         this.push(value)
       }
       this.finish()
