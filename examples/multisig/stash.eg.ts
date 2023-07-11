@@ -14,10 +14,11 @@ import { filterPureCreatedEvents } from "capi/patterns/unstable/proxy"
 const { alexa, billy, carol } = await createDevUsers()
 
 /// Initialize the `MultisigRune` with Alexa, Billy and Carol. Set the passing threshold to 2.
-const multisig = MultisigRune.from(polkadotDev, {
-  signatories: [alexa, billy, carol].map(({ publicKey }) => publicKey),
-  threshold: 2,
-})
+const multisig = MultisigRune
+  .from(polkadotDev, {
+    signatories: [alexa, billy, carol].map(({ publicKey }) => publicKey),
+    threshold: 2,
+  })
 
 /// Send funds to the multisig (existential deposit).
 await multisig
@@ -30,11 +31,12 @@ await multisig
 
 /// Describe the call which we wish to dispatch from the multisig account:
 /// the creation of the stash / pure proxy, belonging to the multisig account itself.
-const call = polkadotDev.Proxy.createPure({
-  proxyType: "Any",
-  delay: 0,
-  index: 0,
-})
+const call = polkadotDev.Proxy
+  .createPure({
+    proxyType: "Any",
+    delay: 0,
+    index: 0,
+  })
 
 /// Propose the stash creation call.
 await multisig

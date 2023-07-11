@@ -71,10 +71,11 @@ const davidFreeInitial = await davidFree.run()
 console.log("David free initial:", davidFreeInitial)
 
 /// Describe the call we wish to dispatch from the virtual multisig's stash.
-const call = polkadotDev.Balances.transfer({
-  dest: david.address,
-  value: 1_234_000_000_000n,
-})
+const call = polkadotDev.Balances
+  .transfer({
+    dest: david.address,
+    value: 1_234_000_000_000n,
+  })
 
 /// Fund Billy and Carol's proxy accounts (existential deposits).
 await fundAndRatify("billy", billy).run()

@@ -13,10 +13,11 @@ import { signature } from "capi/patterns/signature/polkadot"
 const { alexa, billy, carol, david } = await createDevUsers()
 
 /// Initialize the `MultisigRune` with Alexa, Billy and Carol. Set the passing threshold to 2.
-const multisig = MultisigRune.from(polkadotDev, {
-  signatories: [alexa, billy, carol].map(({ publicKey }) => publicKey),
-  threshold: 2,
-})
+const multisig = MultisigRune
+  .from(polkadotDev, {
+    signatories: [alexa, billy, carol].map(({ publicKey }) => publicKey),
+    threshold: 2,
+  })
 
 /// Reference David's initial balance. We'll be executing a transfer of some funds to David.
 const davidFree = polkadotDev.System.Account
@@ -38,10 +39,11 @@ await multisig
   .run()
 
 /// Describe the call we wish to dispatch from the multisig.
-const call = polkadotDev.Balances.transferKeepAlive({
-  dest: david.address,
-  value: 1_230_000_000_000n,
-})
+const call = polkadotDev.Balances
+  .transferKeepAlive({
+    dest: david.address,
+    value: 1_230_000_000_000n,
+  })
 
 /// Propose the call.
 await multisig
