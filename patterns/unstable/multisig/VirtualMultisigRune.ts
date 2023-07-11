@@ -162,8 +162,10 @@ export class VirtualMultisigRune<in out C extends Chain, out U>
       .finalizedEvents("Proxy", "PureCreated")
       .map((events: any[]) =>
         events
-          .sort((a, b) => a.disambiguationIndex > b.disambiguationIndex ? 1 : -1)
-          .map(({ pure }) => pure)
+          .sort((a, b) =>
+            a.event.value.disambiguationIndex > b.event.value.disambiguationIndex ? 1 : -1
+          )
+          .map(({ event }) => event.value.pure)
       )
 
     const proxiesGrouped = Rune

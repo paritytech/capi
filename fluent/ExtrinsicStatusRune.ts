@@ -86,6 +86,7 @@ export class ExtrinsicStatusRune<in out C extends Chain, out U1, out U2>
       )
       .rehandle(is(undefined), () => Rune.constant([]))
       .unsafeAs<Chain.Event<C, P, N>[]>()
+      .into(ValueRune)
   }
 
   inBlockErrors() {
