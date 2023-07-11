@@ -1,110 +1,103 @@
-export {}
+import { hex } from "../crypto/mod.ts"
+import { deferred } from "../deps/std/async.ts"
+import { Connection } from "./Connection.ts"
+import { Consumer } from "./Consumer.ts"
+import * as known from "./known/mod.ts"
 
-// import { deferred } from "../deps/std/async.ts"
-// import { Consumer } from "./Consumer.ts"
-// import * as known from "./known/mod.ts"
-// import { RpcSubscriptionMessage } from "./rpc_messages.ts"
+export class ExperimentalConsumer extends Consumer {
+  followId?: string
+  finalizedBlockHash?: string
 
-// export class ExperimentalConsumer extends Consumer {
-//   declare followId?: string
-//   follow(signal: AbortSignal) {
-//     this.connection.subscription(
-//       "chainHead_unstable_follow",
-//       "chainHead_unstable_unfollow",
-//       [true],
-//       (message) => {
-//         const event = RpcSubscriptionMessage.unwrap<known.ChainHeadUnstableFollowEvent>(message)
-//         switch (event.event) {
-//           case "initialized": {
-//             this.followId = message.params?.subscription
-//             return this.initialized(event, signal)
-//           }
-//           case "newBlock":
-//             return this.newBlock(event)
-//           case "bestBlockChanged":
-//             return this.bestBlockChanged(event)
-//           case "finalized":
-//             return this.finalized(event)
-//           case "stop": {
-//             delete this.followId
-//             this.stop(event, signal)
-//           }
-//         }
-//       },
-//       signal,
-//     )
-//   }
+  constructor(connection: Connection) {
+    super(connection)
+    this.follow()
+  }
 
-//   _metadata = deferred<string>()
-//   initialized(event: known.ChainHeadUnstableFollowEvent.Initialized, signal: AbortSignal) {
-//     const { finalizedBlockRuntime } = event
-//     if (!finalizedBlockRuntime || finalizedBlockRuntime.type === "invalid") {
-//       throw new FinalizedBlockRuntimeInvalidError()
-//     }
-//     if (finalizedBlockRuntime.spec.apis["0xd2bc9897eed08f15"] !== 3) {
-//       throw new IncompatibleRuntimeError()
-//     }
-//     this.connection.subscription(
-//       "chainHead_unstable_call",
-//       "chainHead_unstable_stopCall",
-//       [this.followId, event.finalizedBlockHash, "Metadata_metadata", ""],
-//       (callMessage) => {
-//         // TODO: type these
-//         const event = RpcSubscriptionMessage.unwrap<{ event: "done"; output: string }>(callMessage)
-//         if (event.event !== "done") {} // TODO: retries
-//         this._metadata.resolve(event.output)
-//       },
-//       signal,
-//     )
-//   }
+  follow() {
+    const controller = new AbortController()
+    this.subscription<known.ChainHeadUnstableFollowEvent>(
+      "chainHead_unstable_follow",
+      "chainHead_unstable_unfollow",
+      [true],
+      (event, subscriptionId) => this[event.event](event as never, subscriptionId),
+      controller.signal,
+    )
+  }
 
-//   newBlock(event: known.ChainHeadUnstableFollowEvent.NewBlock) {
-//     console.log(event)
-//   }
+  initialized(event: known.ChainHeadUnstableFollowEvent.Initialized, subscriptionId: string) {
+    const { finalizedBlockRuntime, finalizedBlockHash } = event
+    if (!finalizedBlockRuntime || finalizedBlockRuntime.type === "invalid") {
+      throw new FinalizedBlockRuntimeInvalidError()
+    }
+    if (finalizedBlockRuntime.spec.apis["0xd2bc9897eed08f15"] !== 3) {
+      throw new IncompatibleRuntimeError()
+    }
+    this.followId = subscriptionId
+    this.finalizedBlockHash = finalizedBlockHash
+  }
 
-//   bestBlockChanged(event: known.ChainHeadUnstableFollowEvent.BestBlockChanged) {
-//     console.log(event)
-//   }
+  newBlock(_event: known.ChainHeadUnstableFollowEvent.NewBlock) {}
+  bestBlockChanged(_: known.ChainHeadUnstableFollowEvent.BestBlockChanged) {}
 
-//   _finalized = deferred<string>()
-//   finalized(event: known.ChainHeadUnstableFollowEvent.Finalized) {
-//     console.log(event)
-//     const finalizedBlockHashLeading = event.finalizedBlockHashes.slice(0, -1)
-//     ;[
-//       ...finalizedBlockHashLeading,
-//       ...event.prunedBlockHashes,
-//     ].map((blockHash) =>
-//       this.connection.call("chainHead_unstable_unpin", [this.followId, blockHash])
-//     )
-//     this._finalized.resolve(event.finalizedBlockHashes.at(-1)!)
-//   }
+  finalized(event: known.ChainHeadUnstableFollowEvent.Finalized) {
+    const finalizedBlockHashLeading = event.finalizedBlockHashes.slice(0, -1)
+    ;[
+      ...finalizedBlockHashLeading,
+      ...event.prunedBlockHashes,
+    ].map((blockHash) =>
+      this.connection.call("chainHead_unstable_unpin", [this.followId, blockHash])
+    )
+    this.finalizedBlockHash = event.finalizedBlockHashes.at(-1)!
+  }
 
-//   stop(event: known.ChainHeadUnstableFollowEvent.Stop, signal: AbortSignal) {
-//     console.log(event)
-//     this.followId = undefined!
-//     this.follow(signal)
-//   }
-// }
+  stop() {
+    this.followId = undefined!
+    this.finalizedBlockHash = undefined!
+    this.follow()
+  }
 
-// class FinalizedBlockRuntimeInvalidError extends Error {
-//   override readonly name = "FinalizedBlockRuntimeInvalidError"
-// }
-// class IncompatibleRuntimeError extends Error {
-//   override readonly name = "IncompatibleRuntimeError"
-// }
+  metadata() {
+    const pending = deferred<Uint8Array>()
+    const controller = new AbortController()
+    this.subscription<{ event: "done"; output: string }>(
+      "chainHead_unstable_call",
+      "chainHead_unstable_stopCall",
+      [this.followId, this.finalizedBlockHash],
+      (event) => {
+        if (event.event === "done") return pending.resolve(hex.decode(event.output))
+        pending.reject("TODO: retries")
+      },
+      controller.signal,
+    )
+    return pending
+  }
 
-// // this.connection.subscription(
-// //   "chainHead_unstable_storage",
-// //   "chainHead_unstable_stopStorage",
-// //   [
-// //     this.followId,
-// //     finalizedBlockHash,
-// //     [{
-// //       key: "0xf0c365c3cf59d671eb72da0e7a4113c49f1f0515f462cdcf84e0f1d6045dfcbb",
-// //       type: "value",
-// //     }],
-// //     null,
-// //   ],
-// //   (message) => {},
-// //   this.signal,
-// // )
+  values(keys: Uint8Array[], _blockHash?: string) {
+    const pending = deferred<unknown>()
+    const controller = new AbortController()
+    this.subscription(
+      "chainHead_unstable_storage",
+      "chainHead_unstable_stopStorage",
+      [
+        this.followId,
+        this.finalizedBlockHash,
+        keys.map((key) => ({ key: hex.encodePrefixed(key), type: "value" })),
+        null,
+      ],
+      (message) => {
+        console.log(message)
+        pending.resolve(message)
+        controller.abort()
+      },
+      controller.signal,
+    )
+    return pending as any
+  }
+}
+
+class FinalizedBlockRuntimeInvalidError extends Error {
+  override readonly name = "FinalizedBlockRuntimeInvalidError"
+}
+class IncompatibleRuntimeError extends Error {
+  override readonly name = "IncompatibleRuntimeError"
+}

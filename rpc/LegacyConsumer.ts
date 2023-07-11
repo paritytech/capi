@@ -1,3 +1,4 @@
+import { hex } from "../crypto/mod.ts"
 import { Consumer } from "./Consumer.ts"
 import { SignedBlock, StorageChangeSet, TransactionStatus } from "./known/mod.ts"
 
@@ -7,32 +8,43 @@ export class LegacyConsumer extends Consumer {
     "author_unwatchExtrinsic",
     "chain_getBlock",
     "chain_getBlockHash",
+    "state_call",
     "state_getKeysPaged",
-    "state_getMetadata",
     "state_queryStorageAt",
     "system_accountNextIndex",
   ]
 
   metadata(blockHash?: string) {
-    return this.call<string>("state_getMetadata", [blockHash])
+    return this.stateCall("Metadata_metadata", new Uint8Array(), blockHash)
   }
 
-  // TODO: latest finalized block number if undefined
-  blockHash(blockNumber?: string) {
-    return this.call<string>("chain_getBlockHash", [blockNumber])
+  async stateCall(method: string, args: Uint8Array, blockHash?: string) {
+    return hex.decode(await this.call("state_call", [method, hex.encodePrefixed(args), blockHash]))
+  }
+
+  async blockHash(blockNumber?: number) {
+    return await this.call<string>("chain_getBlockHash", [blockNumber])
   }
 
   block(blockHash?: string) {
     return this.call<SignedBlock>("chain_getBlock", [blockHash])
   }
 
-  keys(key: string, limit: number, start?: string, blockHash?: string) {
-    return this.call<string[]>("state_getKeysPaged", [key, limit, start, blockHash])
+  async keys(key: Uint8Array, limit: number, start?: Uint8Array, blockHash?: string) {
+    return (await this.call<string[]>("state_getKeysPaged", [
+      hex.encodePrefixed(key),
+      limit,
+      start ? hex.encodePrefixed(start) : undefined,
+      blockHash,
+    ])).map(hex.decode)
   }
 
-  async values(keys: string[], blockHash?: string) {
-    const message = await this.call<StorageChangeSet>("state_queryStorageAt", [keys, blockHash])
-    return message.changes.map(([_key, value]) => value ?? undefined)
+  async values(keys: Uint8Array[], blockHash?: string) {
+    const message = await this.call<[StorageChangeSet]>("state_queryStorageAt", [
+      keys.map(hex.encodePrefixed),
+      blockHash,
+    ])
+    return message[0].changes.map(([_key, value]) => value ? hex.decode(value) : undefined)
   }
 
   nonce(ss58Address: string) {
@@ -40,14 +52,14 @@ export class LegacyConsumer extends Consumer {
   }
 
   submitExtrinsic(
-    extrinsic: string,
+    extrinsic: Uint8Array,
     handler: (status: TransactionStatus) => void,
     signal: AbortSignal,
   ) {
     this.subscription(
       "author_submitAndWatchExtrinsic",
       "author_unwatchExtrinsic",
-      [extrinsic],
+      [hex.encodePrefixed(extrinsic)],
       handler,
       signal,
     )

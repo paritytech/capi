@@ -6,7 +6,6 @@ export abstract class Consumer {
   constructor(readonly connection: Connection) {}
 
   abstract requirements: string[]
-
   async assertRequirementsMet() {
     const methods = new Set(await this.call<string[]>("rpc_methods", []))
     const missing: string[] = []
@@ -16,7 +15,9 @@ export abstract class Consumer {
     if (missing.length) throw new RpcRequirementsUnmet(missing)
   }
 
-  abstract stateCall(call: Uint8Array): void
+  abstract stateCall(method: string, args: Uint8Array, blockHash?: string): Promise<Uint8Array>
+
+  abstract metadata(blockHash?: string): Promise<Uint8Array>
 
   abstract blockHash(blockNumber?: number): Promise<string>
 
@@ -25,9 +26,9 @@ export abstract class Consumer {
   abstract keys(
     key: Uint8Array,
     limit: number,
-    start?: string,
+    start?: Uint8Array,
     blockHash?: string,
-  ): Promise<string[]>
+  ): Promise<Uint8Array[]>
 
   abstract values(keys: Uint8Array[], blockHash?: string): Promise<(Uint8Array | undefined)[]>
 
@@ -35,7 +36,7 @@ export abstract class Consumer {
   abstract nonce(ss58Address: string): Promise<number>
 
   abstract submitExtrinsic(
-    extrinsic: string,
+    extrinsic: Uint8Array,
     cb: (status: known.TransactionStatus) => void,
     signal: AbortSignal,
   ): void
@@ -50,12 +51,13 @@ export abstract class Consumer {
     subscribe: string,
     unsubscribe: string,
     params: unknown[],
-    handler: (result: R) => void,
+    handler: (result: R, subscriptionId: string) => void,
     signal: AbortSignal,
   ) {
     this.connection.subscription(subscribe, unsubscribe, params, (message) => {
       if (message.error) throw new ServerError(message)
-      handler(message.result as R)
+      const { result, subscription } = message.params
+      handler(result as R, subscription)
     }, signal)
   }
 }
