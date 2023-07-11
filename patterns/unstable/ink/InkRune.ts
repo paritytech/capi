@@ -1,9 +1,8 @@
-import { PalletContractsEvent, RuntimeEvent } from "@capi/contracts-dev"
+import { ContractsDev } from "@capi/contracts-dev"
 import {
   ArrayRune,
   Chain,
   CodecRune,
-  Event,
   ExtrinsicRune,
   hex,
   is,
@@ -23,7 +22,7 @@ export interface MsgProps {
   gasLimit?: Weight
 }
 
-export class InkRune<out C extends Chain, out U>
+export class InkRune<in out C extends Chain, out U>
   extends PatternRune<Uint8Array, C, U, InkMetadataRune<U>>
 {
   innerCall<X>(...args_: RunicArgs<X, [sender: Uint8Array, value: bigint, data: Uint8Array]>) {
@@ -86,17 +85,11 @@ export class InkRune<out C extends Chain, out U>
       .into(ExtrinsicRune, this.chain)
   }
 
-  emittedEvents = <X>(...[events]: RunicArgs<X, [events: Event[]]>) => {
+  decodeEvents = <X>(
+    ...[events]: RunicArgs<X, [events: Chain.Event<ContractsDev, "Contracts", "ContractEmitted">[]]>
+  ) => {
     return Rune
       .resolve(events)
-      .map((events) =>
-        // TODO: clean this up
-        events.filter(({ event }) => {
-          const event_ = event as RuntimeEvent
-          return RuntimeEvent.isContracts(event_)
-            && PalletContractsEvent.isContractEmitted(event_.value)
-        }) as Event<RuntimeEvent.Contracts & { value: PalletContractsEvent.ContractEmitted }>[]
-      )
       .into(ArrayRune)
       .mapArray((event) => this.parent.$event.decoded(event.access("event", "value", "data")))
   }

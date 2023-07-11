@@ -9,7 +9,6 @@ import { assert } from "asserts"
 import { createDevUsers, is } from "capi"
 import { MultisigRune } from "capi/patterns/multisig"
 import { signature } from "capi/patterns/signature/polkadot"
-import { filterPureCreatedEvents } from "capi/patterns/unstable/proxy"
 
 const { alexa, billy, carol } = await createDevUsers()
 
@@ -52,9 +51,8 @@ const stashAccountId = await multisig
   .signed(signature({ sender: billy }))
   .sent()
   .dbgStatus("Final approval:")
-  .finalizedEvents()
-  .pipe(filterPureCreatedEvents)
-  .access(0, "pure")
+  .finalizedEvents("Proxy", "PureCreated")
+  .access(0, "event", "value", "pure")
   .run()
 
 /// Send funds to the stash (existential deposit).

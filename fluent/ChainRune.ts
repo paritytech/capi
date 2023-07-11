@@ -76,7 +76,7 @@ export namespace Chain {
 }
 
 // TODO: do we want to represent the discovery value and conn type within the type system?
-export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
+export class ChainRune<in out C extends Chain, out U> extends Rune<C, U> {
   static from<M extends FrameMetadata>(
     connect: (signal: AbortSignal) => Connection,
     staticMetadata?: M,

@@ -51,8 +51,8 @@ const events = await contract
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Transfer:")
-  .inBlockEvents()
-  .pipe(contract.emittedEvents)
+  .inBlockEvents("Contracts", "ContractEmitted")
+  .pipe(contract.decodeEvents)
   .run()
 
 /// Ensure the emitted events are of the expected shape.

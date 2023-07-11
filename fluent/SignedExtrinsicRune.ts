@@ -6,7 +6,9 @@ import { ExtrinsicRune } from "./ExtrinsicRune.ts"
 import { ExtrinsicStatusRune } from "./ExtrinsicStatusRune.ts"
 import { PatternRune } from "./PatternRune.ts"
 
-export class SignedExtrinsicRune<out C extends Chain, out U> extends PatternRune<Uint8Array, C, U> {
+export class SignedExtrinsicRune<in out C extends Chain, out U>
+  extends PatternRune<Uint8Array, C, U>
+{
   static from<C extends Chain, U, X>(
     chain: ChainRune<C, U>,
     ...[value]: RunicArgs<X, [value: Uint8Array]>

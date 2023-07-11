@@ -28,7 +28,7 @@ export const $virtualMultisig: $.Codec<VirtualMultisig> = $.object(
   $.field("stash", $accountId32),
 )
 
-export class VirtualMultisigRune<out C extends Chain, out U>
+export class VirtualMultisigRune<in out C extends Chain, out U>
   extends PatternRune<VirtualMultisig, C, U>
 {
   value = this.into(ValueRune)
@@ -159,9 +159,7 @@ export class VirtualMultisigRune<out C extends Chain, out U>
       .signed(signature)
       .sent()
       .dbgStatus("Proxy creations:")
-      .finalizedEvents()
-      .unhandleFailed()
-      .pipe(filterPureCreatedEvents)
+      .finalizedEvents("Proxy", "PureCreated")
       .map((events: any[]) =>
         events
           .sort((a, b) => a.disambiguationIndex > b.disambiguationIndex ? 1 : -1)
