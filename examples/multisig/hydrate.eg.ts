@@ -1,7 +1,7 @@
 /**
  * @title Multisig Serialization and Hydration
  * @description Create a multisig and encode its state into a hex string. Then
- * use this hex string to hydrate a new MultisigRune. This is useful if you
+ * use this hex string to hydrate a new multisig. This is useful if you
  * want to share the multisig setup info with the other signatories or a database.
  */
 
@@ -22,7 +22,7 @@ const multisig = MultisigRune.from(polkadotDev, {
 /// Serialize the multisig's state into a hex for later use.
 const hex = await multisig.hex.run()
 
-/// Save `hex` however you'd like (i.e. writing to disk, etc.).
+/// Save `hex` however you'd like (for instance, writing it to a database).
 save(hex)
 
 /// Hydrate a multisig with the hex from before.
