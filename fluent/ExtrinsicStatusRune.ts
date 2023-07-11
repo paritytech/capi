@@ -17,13 +17,6 @@ export class ExtrinsicStatusRune<in out C extends Chain, out U1, out U2>
       .into(ExtrinsicStatusRune, this.chain, this.parent)
   }
 
-  statuses(isTerminal: (txStatus: known.TransactionStatus) => boolean) {
-    return this
-      .into(OrthoRune)
-      .orthoMap((events) => events.into(ValueRune).filter(isTerminal))
-      .flatSingular()
-  }
-
   inBlock() {
     return this.statuses((status) =>
       known.TransactionStatus.isTerminal(status)
@@ -34,6 +27,16 @@ export class ExtrinsicStatusRune<in out C extends Chain, out U1, out U2>
       )
       .unhandle(is(NeverInBlockError))
       .into(BlockHashRune, this.chain)
+  }
+
+  inBlockEvents<P extends Chain.PalletName<C>, N extends Chain.RuntimeEventName<C, P>, X>(
+    ...[palletName, eventName]: RunicArgs<X, [palletName?: P, eventName?: N]>
+  ) {
+    return this.events(this.inBlock().block(), palletName, eventName)
+  }
+
+  inBlockErrors() {
+    return this.errors(this.inBlockEvents("System", "ExtrinsicFailed"))
   }
 
   finalized() {
@@ -47,16 +50,21 @@ export class ExtrinsicStatusRune<in out C extends Chain, out U1, out U2>
       .into(BlockHashRune, this.chain)
   }
 
-  inBlockEvents<P extends Chain.PalletName<C>, N extends Chain.RuntimeEventName<C, P>, X>(
-    ...[palletName, eventName]: RunicArgs<X, [palletName?: P, eventName?: N]>
-  ) {
-    return this.events(this.inBlock().block(), palletName, eventName)
-  }
-
   finalizedEvents<P extends Chain.PalletName<C>, N extends Chain.RuntimeEventName<C, P>, X>(
     ...[palletName, eventName]: RunicArgs<X, [palletName?: P, eventName?: N]>
   ) {
     return this.events(this.finalized().block(), palletName, eventName)
+  }
+
+  finalizedErrors() {
+    return this.errors(this.finalizedEvents("System", "ExtrinsicFailed"))
+  }
+
+  private statuses(isTerminal: (txStatus: known.TransactionStatus) => boolean) {
+    return this
+      .into(OrthoRune)
+      .orthoMap((events) => events.into(ValueRune).filter(isTerminal))
+      .flatSingular()
   }
 
   private events<
@@ -80,8 +88,8 @@ export class ExtrinsicStatusRune<in out C extends Chain, out U1, out U2>
       .map(([events, txI, palletName, eventName]) =>
         events.filter((event): event is Chain.Event<C, P, N> =>
           event.phase.type === "ApplyExtrinsic" && event.phase.value === txI
-          && (palletName ? event.event.type === palletName : true)
-          && (eventName ? event.event.value.type === eventName : true)
+          && (palletName === undefined || event.event.type === palletName)
+          && (eventName === undefined || event.event.value.type === eventName)
         )
       )
       .rehandle(is(undefined), () => Rune.constant([]))
@@ -89,12 +97,12 @@ export class ExtrinsicStatusRune<in out C extends Chain, out U1, out U2>
       .into(ValueRune)
   }
 
-  inBlockErrors() {
-    const failedEvents = this
-      .inBlockEvents("System", "ExtrinsicFailed")
-      .unsafeAs<SystemExtrinsicFailedEvent[]>()
+  private errors<X>(...[failedEvents]: RunicArgs<X, [events: Event[]]>) {
     return Rune
-      .tuple([failedEvents, this.chain.metadata])
+      .tuple([
+        Rune.resolve(failedEvents).unsafeAs<SystemExtrinsicFailedEvent[]>(),
+        this.chain.metadata,
+      ])
       .map(([failedEvents, metadata]) => {
         const pallets = Object.fromEntries(
           Object
@@ -107,15 +115,15 @@ export class ExtrinsicStatusRune<in out C extends Chain, out U1, out U2>
           else {
             const { index, error } = dispatchError.value
             const pallet = pallets[index]
-            if (!pallet || !pallet.types.error) throw new CannotDecodeFailedError()
+            if (!pallet || !pallet.types.error) throw new CannotDecodeExtrinsicFailureError()
             return pallet.types.error.decode(error)
           }
         })
       })
-      .throws(is(CannotDecodeFailedError))
+      .throws(is(CannotDecodeExtrinsicFailureError))
   }
 }
 
-export class CannotDecodeFailedError extends Error {}
+export class CannotDecodeExtrinsicFailureError extends Error {}
 export class NeverInBlockError extends Error {}
 export class NeverFinalizedError extends Error {}
