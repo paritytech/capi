@@ -87,9 +87,9 @@ export class Rune<out T, out U = never> {
   }
 
   async *iter(runner: Runner = globalRunner) {
+    let time = runner.timeline.current
     const primed = runner.prime(this)
     primed.reference()
-    let time = runner.timeline.current
     try {
       while (time !== Infinity) {
         const receipt = new Receipt()
@@ -366,6 +366,7 @@ class RunAsyncIter<T> extends RunStream<T> {
     super(runner)
     ;(async () => {
       for await (const value of fn()) {
+        if (!this.alive) break
         this.push(value)
       }
       this.finish()
