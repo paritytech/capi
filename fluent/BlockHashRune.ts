@@ -5,7 +5,7 @@ import { PatternRune } from "./PatternRune.ts"
 
 /** A rune representing a block hash */
 export class BlockHashRune<out C extends Chain, out U> extends PatternRune<string, C, U> {
-  /** Get a rune representing the block at the current block hash */
+  /** Get the block at the current block hash */
   block() {
     return this.chain.connection
       .call("chain_getBlock", this.as(BlockHashRune))

@@ -53,7 +53,7 @@ export namespace Chain {
 
 /** The root Rune of Capi's fluent API, with which other core runes can be created */
 export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
-  /** Get a rune representing a chain with the specified connection and (optionally) static metadata */
+  /** Get a chain with the specified connection and (optionally) static metadata */
   static from<M extends FrameMetadata>(
     connect: (signal: AbortSignal) => Connection,
     staticMetadata?: M,
@@ -66,33 +66,33 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
     return Rune.object({ connection, metadata }).into(this)
   }
 
-  /** Get the current chain rune, but with a new inner connection */
+  /** Get the current chain, but with a new inner connection */
   with(connect: (signal: AbortSignal) => Connection) {
     const connection = ConnectionRune.from(connect)
     return Rune.object({ connection, metadata: this.metadata }).into(ChainRune) as ChainRune<C, U>
   }
 
-  /** A rune representing the connection with which to communicate with the chain */
+  /** The connection with which to communicate with the chain */
   connection = this.into(ValueRune<Chain, U>).access("connection").into(ConnectionRune)
 
-  /** A rune representing the chain's metadata */
+  /** The chain's metadata */
   metadata = this.into(ValueRune).access("metadata")
 
-  /** A rune representing the codec for extrinsics of the current chain */
+  /** The codec for extrinsics of the current chain */
   $extrinsic = Rune.fn($extrinsic).call(this.metadata).into(CodecRune)
 
-  /** A rune representing a stream of latest block numbers */
+  /** A stream of latest block numbers */
   latestBlockNum = this.connection
     .subscribe("chain_subscribeNewHeads", "chain_unsubscribeNewHeads")
     .access("number")
 
-  /** A rune representing a stream of latest block hashes */
+  /** A stream of latest block hashes */
   latestBlockHash = this.connection
     .call("chain_getBlockHash", this.latestBlockNum)
     .unsafeAs<string>()
     .into(BlockHashRune, this)
 
-  /** Get a rune representing the specified block hash or the latest finalized block hash */
+  /** The specified block hash or the latest finalized block hash */
   blockHash<X>(...[blockHash]: RunicArgs<X, [blockHash?: string]>) {
     return Rune
       .resolve(blockHash)
@@ -100,13 +100,13 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
       .into(BlockHashRune, this)
   }
 
-  /** Get a rune representing the specified call data */
+  /** The specified call data */
   extrinsic<X>(...args: RunicArgs<X, [call: Chain.Call<C>]>) {
     const [call] = RunicArgs.resolve(args)
     return call.into(ExtrinsicRune, this.as(ChainRune))
   }
 
-  /** Get a rune representing the specified pallet */
+  /** The specified pallet */
   pallet<P extends Chain.PalletName<C>, X>(...[palletName]: RunicArgs<X, [P]>) {
     return this.metadata
       .access("pallets", palletName)
@@ -114,7 +114,7 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
       .into(PalletRune, this.as(ChainRune))
   }
 
-  /** Get a rune representing the prefix of the current chain */
+  /** The prefix of the current chain */
   addressPrefix() {
     return this
       .pallet("System")
@@ -122,16 +122,16 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
       .decoded
   }
 
-  /** A rune representing the system version */
+  /** The system version */
   chainVersion = this.connection.call("system_version")
 
   // TODO: narrow type in event selection PR (will include the manually-typed `DispatchInfo`)
-  /** A rune representing the chain's dispatch info codec */
+  /** The chain's dispatch info codec */
   $dispatchInfo = this.metadata
     .access("paths", "frame_support::dispatch::DispatchInfo")
     .into(CodecRune)
 
-  /** A rune representing the chain's weight v2 codec */
+  /** The chain's weight v2 codec */
   $weight = this.metadata
     .access("paths", "sp_weights::weight_v2::Weight")
     .into(CodecRune)

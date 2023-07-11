@@ -6,7 +6,7 @@ import { PatternRune } from "./PatternRune.ts"
 
 /** A rune representing an SS58 address of a given chain */
 export class Ss58Rune<out C extends Chain, U> extends PatternRune<string, C, U> {
-  /** Get a rune representing the account ID corresponding to the current SS58 address */
+  /** Get the account ID corresponding to the current SS58 address */
   accountId() {
     return this
       .into(ValueRune)

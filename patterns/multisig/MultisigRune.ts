@@ -35,28 +35,26 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
     return Rune.resolve(multisig).into(MultisigRune, chain)
   }
 
-  /** A rune representing the storage in which multisig-related info lives */
   private storage = this.chain.pallet("Multisig").storage("Multisigs")
-
   private value = this.into(ValueRune)
 
-  /** A rune representing the current multisig account's signatory threshold */
+  /** The current multisig account's signatory threshold */
   threshold = this.value.map(({ threshold, signatories }) => threshold ?? signatories.length - 1)
 
-  /** A rune representing the current multisig account's ID */
+  /** The current multisig account's ID */
   accountId = Rune.fn(multisigAccountId).call(this.value.access("signatories"), this.threshold)
 
-  /** A rune representing the current multisig account's multiaddress */
+  /** The current multisig account's multiaddress */
   address = MultiAddress.Id(this.accountId)
 
-  /** A rune representing the current multisig account's SS58 address */
+  /** The current multisig account's SS58 address */
   ss58 = Rune
     .tuple([this.chain.addressPrefix(), this.accountId])
     .map(([prefix, accountId]: any) => ss58.encode(prefix, accountId))
   encoded = CodecRune.from($multisig).encoded(this.as(MultisigRune))
   hex = this.encoded.map(hex.encode)
 
-  /** Get a rune representing all signatories except for the one specified */
+  /** Get all signatories except for the one specified */
   otherSignatories<X>(...[sender]: RunicArgs<X, [sender: MultiAddress]>) {
     return Rune
       .tuple([this.into(ValueRune).access("signatories"), sender])
@@ -67,7 +65,7 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
       )
   }
 
-  /** Get an extrinsic rune of the specified call, wrapped with the appropriate multisig method */
+  /** Get an extrinsic of the specified call, wrapped with the appropriate multisig method */
   ratify<X>(
     ...[sender, call_, nonExecuting]: RunicArgs<
       X,
@@ -105,7 +103,7 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
   }
 
   // TODO: should this accept call data instead of a call hash?
-  /** Get an extrinsic rune of a multisig proposal's explicit cancellation */
+  /** Get an extrinsic of a multisig proposal's explicit cancellation */
   cancel<X>(...[sender, callHash]: RunicArgs<X, [sender: MultiAddress, callHash: Uint8Array]>) {
     return this.chain.extrinsic(
       Rune
@@ -123,7 +121,7 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
     )
   }
 
-  /** Get an extrinsic rune of a transfer of the specified amount to the multisig account */
+  /** Get an extrinsic of a transfer of the specified amount to the multisig account */
   fund<X>(...[amount]: RunicArgs<X, [amount: bigint]>) {
     return this.chain.extrinsic(
       Rune
@@ -139,7 +137,7 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
     )
   }
 
-  /** Get a rune representing the timepoint recorded for the specified call hash */
+  /** Get the timepoint recorded for the specified call hash */
   maybeTimepoint<X>(
     ...[callHash, blockHash]: RunicArgs<X, [callHash: Uint8Array, blockHash?: string]>
   ) {
@@ -150,7 +148,7 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
       .rehandle(is(undefined))
   }
 
-  /** Get a rune representing a list of proposals of the current multisig account */
+  /** Get the list of proposals of the current multisig account */
   proposals<X>(
     ...[limit, blockHash]: RunicArgs<X, [limit: number, blockHash?: string]>
   ): ValueRune<Chain.Storage.Key<C, "Multisig", "multisigs">[], RunicArgs.U<X> | U> {
@@ -161,7 +159,7 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
     }, blockHash) as never
   }
 
-  /** Get a rune representing the state associated with a specific proposal */
+  /** Get the state associated with a specific proposal */
   proposal<X>(...[callHash, blockHash]: RunicArgs<X, [callHash: Uint8Array, blockHash?: string]>) {
     return this.storage
       .value(
@@ -181,7 +179,7 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
   }
 
   // TODO: should this accept call data instead
-  /** Get a rune resolving to (a boolean) whether there is a proposal associated with the specified call hash */
+  /** Get (a boolean) whether there is a proposal associated with the specified call hash */
   isProposed<X>(
     ...[callHash, blockHash]: RunicArgs<X, [callHash: Uint8Array, blockHash?: string]>
   ) {
@@ -195,7 +193,7 @@ export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multis
       .map((entry) => entry !== null)
   }
 
-  /** Hydrate a multisig rune from its hex-encoded scale-encoded string representation */
+  /** Hydrate a multisig from its hex-encoded scale-encoded string representation */
   static fromHex<C extends Chain, U, X>(
     chain: ChainRune<C, U>,
     ...[state]: RunicArgs<X, [state: string]>

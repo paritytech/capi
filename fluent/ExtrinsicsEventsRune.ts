@@ -6,7 +6,7 @@ import { Event, EventsRune } from "./EventsRune.ts"
 export class ExtrinsicEventsRune<out C extends Chain, out U> extends EventsRune<C, U> {
   // TODO: handleFailed
 
-  /** Get a rune representing the same list, but with any `System.ExtrinsicFailed` events moved to the U track */
+  /** Get the same list, but with any `System.ExtrinsicFailed` events moved to the U track */
   unhandleFailed() {
     const dispatchError = this
       .into(ValueRune)

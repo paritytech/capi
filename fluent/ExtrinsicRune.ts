@@ -92,7 +92,7 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
       .into(SignedExtrinsicRune, this.chain)
   }
 
-  /** Get a rune representing the dispatch info of the current extrinsic */
+  /** Get the dispatch info of the current extrinsic */
   dispatchInfo() {
     const extrinsic = this.chain.$extrinsic.encoded(Rune.object({
       protocolVersion: ExtrinsicRune.PROTOCOL_VERSION,
@@ -108,17 +108,17 @@ export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain
     return this.chain.$dispatchInfo.decoded(info)
   }
 
-  /** Get a rune resolving to the current extrinsic's weight */
+  /** Get the current extrinsic's weight */
   weight() {
     return this.dispatchInfo().unsafeAs<any>().into(ValueRune).access("weight")
   }
 
-  /** Get a rune resolving to the hex-encoded scale-encoded value of the current extrinsic's weight */
+  /** Get the hex-encoded scale-encoded value of the current extrinsic's weight */
   weightRaw() {
     return this.chain.$weight.encoded(this.weight().unsafeAs<never>()).map(hex.encode)
   }
 
-  /** Get a rune resolving to the fee estimation for the current extrinsic rune */
+  /** Get the fee estimation for the current extrinsic rune */
   estimate() {
     const encoded = this.chain.connection
       .call("state_call", "TransactionPaymentApi_query_weight_to_fee", this.weightRaw())
