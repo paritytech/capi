@@ -27,7 +27,7 @@ export const $multisig: $.Codec<Multisig> = $.object(
 )
 
 // TODO: swap out `Chain` constraints upon subset gen issue resolution... same for other patterns
-export class MultisigRune<out C extends Chain, out U> extends PatternRune<Multisig, C, U> {
+export class MultisigRune<in out C extends Chain, out U> extends PatternRune<Multisig, C, U> {
   static from<C extends Chain, U, X>(
     chain: ChainRune<C, U>,
     ...[multisig]: RunicArgs<X, [multisig: Multisig]>

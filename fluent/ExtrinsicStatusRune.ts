@@ -1,15 +1,9 @@
-import {
-  DispatchError,
-  Event,
-  isSystemExtrinsicFailedEvent,
-  SystemExtrinsicFailedEvent,
-} from "../frame_metadata/mod.ts"
+import { Event, FrameMetadata, SystemExtrinsicFailedEvent } from "../frame_metadata/mod.ts"
 import { known } from "../rpc/mod.ts"
 import { is, OrthoRune, Run, Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { BlockHashRune } from "./BlockHashRune.ts"
 import { BlockRune } from "./BlockRune.ts"
 import { Chain } from "./ChainRune.ts"
-import { CodecRune } from "./CodecRune.ts"
 import { PatternRune } from "./PatternRune.ts"
 import { SignedExtrinsicRune } from "./SignedExtrinsicRune.ts"
 
@@ -56,31 +50,24 @@ export class ExtrinsicStatusRune<in out C extends Chain, out U1, out U2>
   inBlockEvents<P extends Chain.PalletName<C>, N extends Chain.RuntimeEventName<C, P>, X>(
     ...[palletName, eventName]: RunicArgs<X, [palletName?: P, eventName?: N]>
   ) {
-    return Rune
-      .tuple([this.events(this.inBlock().block()), palletName, eventName])
-      .map(([events, palletName, eventName]) =>
-        (typeof palletName === "string"
-          ? ((events as Event[]).filter((event): event is Chain.Event<C, P, N> =>
-            event.event.type === palletName && event.event.value.type === eventName
-          ))
-          : events) as Chain.Event<C, P, N>[]
-      )
+    return this.events(this.inBlock().block(), palletName, eventName)
   }
+
   finalizedEvents<P extends Chain.PalletName<C>, N extends Chain.RuntimeEventName<C, P>, X>(
     ...[palletName, eventName]: RunicArgs<X, [palletName?: P, eventName?: N]>
   ) {
-    return Rune
-      .tuple([this.events(this.finalized().block()), palletName, eventName])
-      .map(([events, palletName, eventName]) =>
-        (typeof palletName === "string"
-          ? ((events as Event[]).filter((event): event is Chain.Event<C, P, N> =>
-            event.event.type === palletName && event.event.value.type === eventName
-          ))
-          : events) as Chain.Event<C, P, N>[]
-      )
+    return this.events(this.finalized().block(), palletName, eventName)
   }
 
-  private events<EU>(block: BlockRune<C, EU>) {
+  private events<
+    EU,
+    X,
+    P extends Chain.PalletName<C>,
+    N extends Chain.RuntimeEventName<C, P>,
+  >(
+    block: BlockRune<C, EU>,
+    ...[palletName, eventName]: RunicArgs<X, [palletName?: P, eventName?: N]>
+  ) {
     const txI = Rune
       .tuple([block.into(ValueRune).access("block", "extrinsics"), this.parent.hex()])
       .map(([hexes, hex]) => {
@@ -89,42 +76,45 @@ export class ExtrinsicStatusRune<in out C extends Chain, out U1, out U2>
       })
       .unhandle(is(undefined))
     return Rune
-      .tuple([block.events(), txI])
-      .into(ValueRune)
-      .map(([events, txI]) =>
-        events.filter((event) => event.phase.type === "ApplyExtrinsic" && event.phase.value === txI)
+      .tuple([block.events(), txI, palletName, eventName])
+      .map(([events, txI, palletName, eventName]) =>
+        events.filter((event): event is Chain.Event<C, P, N> =>
+          event.phase.type === "ApplyExtrinsic" && event.phase.value === txI
+          && (palletName ? event.event.type === palletName : true)
+          && (eventName ? event.event.value.type === eventName : true)
+        )
       )
       .rehandle(is(undefined), () => Rune.constant([]))
-      .unsafeAs<Chain.Event<C>[]>()
+      .unsafeAs<Chain.Event<C, P, N>[]>()
   }
 
-  // TODO: turn into `errors` and perform decoding for all (?)... or should there only ever be one?
-  error() {
-    return this
-      .inBlockEvents()
-      .map((events) => events.find(isSystemExtrinsicFailedEvent))
-      .unhandle(is(undefined))
-      .unsafeAs<SystemExtrinsicFailedEvent>()
-      .into(ValueRune)
-      .access("event", "value", "dispatchError")
-      .match((_) =>
-        _
-          .when(is(String), (value) => value)
-          .else((value) =>
-            Rune
-              .tuple([
-                this.chain.metadata.into(ValueRune).access("pallets"),
-                value.access("value", "index"),
-              ])
-              .map(([pallets, id]) => Object.values(pallets).find((pallet) => pallet.id === id)!)
-              .access("types", "error")
-              .unhandle(is(undefined))
-              .into(CodecRune)
-              .decoded(value.access("value", "error"))
-          )
-      )
+  inBlockErrors() {
+    const failedEvents = this
+      .inBlockEvents("System", "ExtrinsicFailed")
+      .unsafeAs<SystemExtrinsicFailedEvent[]>()
+    return Rune
+      .tuple([failedEvents, this.chain.metadata])
+      .map(([failedEvents, metadata]) => {
+        const pallets = Object.fromEntries(
+          Object
+            .values(metadata.pallets)
+            .map((pallet): [number, FrameMetadata.Pallet] => [pallet.id, pallet]),
+        ) as Record<number, FrameMetadata.Pallet>
+        return failedEvents.map((failedEvent) => {
+          const { dispatchError } = failedEvent.event.value
+          if (typeof dispatchError === "string") return dispatchError
+          else {
+            const { index, error } = dispatchError.value
+            const pallet = pallets[index]
+            if (!pallet || !pallet.types.error) throw new CannotDecodeFailedError()
+            return pallet.types.error.decode(error)
+          }
+        })
+      })
+      .throws(is(CannotDecodeFailedError))
   }
 }
 
+export class CannotDecodeFailedError extends Error {}
 export class NeverInBlockError extends Error {}
 export class NeverFinalizedError extends Error {}

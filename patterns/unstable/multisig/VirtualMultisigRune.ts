@@ -196,12 +196,13 @@ export class VirtualMultisigRune<in out C extends Chain, out U>
       )
       .into(MetaRune)
       .flat()
-    const multisig = Rune
-      .object({
+    const multisig = MultisigRune.from(
+      chain,
+      Rune.object({
         signatories: memberProxies,
         threshold,
-      })
-      .into(MultisigRune, chain)
+      }),
+    )
     const multisigExistentialDepositCall = chain.extrinsic(
       Rune
         .object({
