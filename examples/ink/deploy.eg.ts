@@ -46,8 +46,8 @@ const accountId = await metadata
 console.log("Account id:", accountId)
 $.assert($.sizedUint8Array(32), accountId)
 
-// /// We'll convert this to an Ss58 address and place it within an environment variable. This
-// /// way we can easy deploy from other scripts with a simple `await import("./deploy.ts")`.
+/// We'll convert this to an Ss58 address and place it within an environment variable. This
+/// way we can easy deploy from other scripts with a simple `await import("./deploy.ts")`.
 const address = ss58.encode(contractsDev.System.SS58Prefix, accountId)
 console.log("Contract ss58 address:", address)
 Deno.env.set("CONTRACT_SS58_ADDRESS", address)

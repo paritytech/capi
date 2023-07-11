@@ -1,7 +1,7 @@
 /**
- * @title Get The Events And Errors Of An Extrinsic
- * @description Use both `finalizedEvents` and `finalizedErrors` to get the
- * events and errors of an extrinsic.
+ * @title Get the Events and Errors of an Extrinsic
+ * @description Use `finalizedEvents` and `finalizedErrors` to get the
+ * events and the errors of an extrinsic.
  */
 
 import { $palletBalancesError, $runtimeEvent, polkadotDev } from "@capi/polkadot-dev"

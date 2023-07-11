@@ -1,7 +1,7 @@
 /**
- * @title Get The Errors Of An Errors
+ * @title Get the Errors of an Errors
  * @description The `inBlockErrors` and `finalizedErrors` methods of
- * `ExtrinsicEventsRune` enable easy extraction and decoding of dispatch errors.
+ * `ExtrinsicEventsRune` simplify the decoding of error event data.
  */
 
 import { $palletBalancesError, polkadotDev } from "@capi/polkadot-dev"

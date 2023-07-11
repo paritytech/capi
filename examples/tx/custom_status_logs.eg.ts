@@ -10,7 +10,7 @@ import { signature } from "capi/patterns/signature/polkadot"
 /// Create two dev users. Alexa will send the funds to Billy.
 const { alexa, billy } = await createDevUsers()
 
-// Create and submit the transaction.
+/// Create and submit the transaction.
 const sent = westendDev.Balances
   .transfer({
     value: 12345n,
@@ -19,8 +19,8 @@ const sent = westendDev.Balances
   .signed(signature({ sender: alexa }))
   .sent()
 
-// Log the hash once it is in a block.
+/// Log the hash once it is in a block.
 sent.inBlock().run().then((hash) => console.log("In block", hash))
 
-// Log the events when it is finalized.
+/// Log the events when it is finalized.
 sent.finalizedEvents().run().then((events) => console.log("Finalized events", events))

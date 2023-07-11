@@ -85,7 +85,7 @@ export class InkRune<in out C extends Chain, out U>
       .into(ExtrinsicRune, this.chain)
   }
 
-  decodeEvents = <X>(
+  events = <X>(
     ...[events]: RunicArgs<X, [events: Chain.Event<ContractsDev, "Contracts", "ContractEmitted">[]]>
   ) => {
     return Rune

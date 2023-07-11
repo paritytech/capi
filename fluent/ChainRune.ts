@@ -73,6 +73,8 @@ export namespace Chain {
     P extends PalletName<C> = PalletName<C>,
     N extends RuntimeEventName<C, P> = RuntimeEventName<C, P>,
   > = Event_<RuntimeEvent<C, P, N>>
+
+  export type Error<C extends Chain> = $.Output<C["metadata"]["types"]["DispatchError"]>
 }
 
 // TODO: do we want to represent the discovery value and conn type within the type system?

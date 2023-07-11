@@ -121,6 +121,8 @@ export class ExtrinsicStatusRune<in out C extends Chain, out U1, out U2>
         })
       })
       .throws(is(CannotDecodeExtrinsicFailureError))
+      .unsafeAs<Chain.Error<C>[]>()
+      .into(ValueRune)
   }
 }
 

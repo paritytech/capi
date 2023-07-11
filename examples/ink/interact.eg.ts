@@ -52,7 +52,7 @@ const events = await contract
   .sent()
   .dbgStatus("Transfer:")
   .inBlockEvents("Contracts", "ContractEmitted")
-  .pipe(contract.decodeEvents)
+  .pipe(contract.events)
   .run()
 
 /// Ensure the emitted events are of the expected shape.
