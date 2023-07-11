@@ -6,7 +6,7 @@ import { BlockHashRune } from "./BlockHashRune.ts"
 import { Chain } from "./ChainRune.ts"
 import { PatternRune } from "./PatternRune.ts"
 
-export class BlockRune<out C extends Chain, out U>
+export class BlockRune<in out C extends Chain, out U>
   extends PatternRune<known.SignedBlock, C, U, BlockHashRune<C, U>>
 {
   hash = this.parent

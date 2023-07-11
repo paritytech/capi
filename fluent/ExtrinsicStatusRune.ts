@@ -13,7 +13,7 @@ import { CodecRune } from "./CodecRune.ts"
 import { PatternRune } from "./PatternRune.ts"
 import { SignedExtrinsicRune } from "./SignedExtrinsicRune.ts"
 
-export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
+export class ExtrinsicStatusRune<in out C extends Chain, out U1, out U2>
   extends PatternRune<Run<known.TransactionStatus, U1>, C, U2, SignedExtrinsicRune<C, U2>>
 {
   dbgStatus<X>(...prefix: RunicArgs<X, unknown[]>): ExtrinsicStatusRune<C, U1, U2> {
@@ -109,11 +109,7 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
       .access("event", "value", "dispatchError")
       .match((_) =>
         _
-          .when(
-            (value: DispatchError): value is Extract<DispatchError, string> =>
-              typeof value === "string",
-            (value) => value,
-          )
+          .when(is(String), (value) => value)
           .else((value) =>
             Rune
               .tuple([
