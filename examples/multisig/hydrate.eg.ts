@@ -1,5 +1,5 @@
 /**
- * @title Multisig Hydration
+ * @title Multisig Serialization and Hydration
  * @description Creates a multisig and encodes it into a hex string. This hex
  * string is then used to hydrate a new MultisigRune. This is useful if you
  * want to use it at a later date or if you want to send it to the other signatories.
