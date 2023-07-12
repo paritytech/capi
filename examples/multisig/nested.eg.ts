@@ -56,6 +56,6 @@ const multisigBFree = await polkadotDev.System.Account
   .run()
 console.log("Multisig B free:", multisigBFree)
 
-/// Verify existential deposit on both multisigs
+/// Verify existential deposit on both multisigs.
 assertEquals(multisigAFree, 2_000_000_000_000n)
 assertEquals(multisigBFree, 2_000_000_000_000n)
