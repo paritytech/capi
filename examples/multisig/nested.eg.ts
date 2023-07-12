@@ -1,7 +1,6 @@
 /**
  * @title Nested Multisig
- * @description Create a multisig account and use it as a signatory for another
- * multisig.
+ * @description Create a multisig and use it as a signatory for another multisig.
  */
 import { polkadotDev } from "@capi/polkadot-dev"
 import { assertEquals } from "asserts"
@@ -11,13 +10,13 @@ import { signature } from "capi/patterns/signature/polkadot"
 
 const { alexa, billy, carol, david, ellie } = await createDevUsers()
 
-// Create first multisig.
+/// Create first multisig.
 const multisigA = MultisigRune.from(polkadotDev, {
   signatories: [alexa, billy, carol].map(({ publicKey }) => publicKey),
   threshold: 2,
 })
 
-// Create second multisig with first multisig as a signatory
+/// Create second multisig with first multisig as a signatory.
 const multisigB = MultisigRune.from(
   polkadotDev,
   Rune.object({
@@ -29,7 +28,7 @@ const multisigB = MultisigRune.from(
   }),
 )
 
-// Fund both multisigs
+/// Fund both multisigs.
 await polkadotDev.Utility
   .batchAll({
     calls: Rune.array([
@@ -57,5 +56,6 @@ const multisigBFree = await polkadotDev.System.Account
   .run()
 console.log("Multisig B free:", multisigBFree)
 
+/// Verify existential deposit on both multisigs
 assertEquals(multisigAFree, 2_000_000_000_000n)
 assertEquals(multisigBFree, 2_000_000_000_000n)
