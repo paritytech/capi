@@ -1,5 +1,5 @@
 /**
- * @title Read Some Era Exposures
+ * @title Read Exposures of the Current Era
  * @description Model a derived read, in which one piece of storage (the staking
  * active era index) is used as a partial key to get a list of exposures.
  */
