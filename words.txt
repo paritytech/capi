@@ -85,6 +85,7 @@ twox
 unfollow
 unhandle
 vadimcn
+webcrypto
 westend
 westmint
 xcmp
