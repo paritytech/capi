@@ -69,6 +69,7 @@ serde
 sibl
 smoldot
 spiritnet
+stakers
 statemigration
 statemine
 statemint

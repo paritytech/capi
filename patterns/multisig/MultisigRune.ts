@@ -1,4 +1,4 @@
-import { MultiAddress } from "@capi/polkadot"
+import { $accountId32, MultiAddress } from "@capi/polkadot"
 import { equals } from "../../deps/std/bytes.ts"
 import {
   $,
@@ -22,7 +22,7 @@ export interface Multisig {
 }
 
 export const $multisig: $.Codec<Multisig> = $.object(
-  $.field("signatories", $.array($.sizedUint8Array(32))),
+  $.field("signatories", $.array($accountId32)),
   $.optionalField("threshold", $.u8),
 )
 
