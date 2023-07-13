@@ -24,6 +24,14 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
       .flatSingular()
   }
 
+  ready() {
+    return this.transactionStatuses((status) =>
+      known.TransactionStatus.isTerminal(status) || status === "ready"
+    )
+      .map((status) => status === "ready" || new NeverInBlockError())
+      .unhandle(is(NeverInBlockError))
+  }
+
   inBlock() {
     return this.transactionStatuses((status) =>
       known.TransactionStatus.isTerminal(status)
