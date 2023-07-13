@@ -11,7 +11,7 @@ import { signature } from "capi/patterns/signature/polkadot"
 /// Create two dev users. Alexa will send the funds to Billy.
 const { alexa, billy } = await createDevUsers()
 
-// Create and submit the transaction.
+/// Create and submit the transaction.
 const sent = westendDev.Balances
   .transfer({
     value: 12345n,
