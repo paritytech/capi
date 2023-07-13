@@ -21,6 +21,6 @@ const sent = westendDev.Balances
   .sent()
 
 /// Attach callbacks to the pending status-specific promises.
-sent.ready().run().then(() => console.log(`Ready`))
+sent.ready().run().then(() => console.log("Ready"))
 sent.inBlock().run().then((hash) => console.log(`In block ${hash}`))
 sent.finalized().run().then((hash) => console.log(`Finalized ${hash}`))
