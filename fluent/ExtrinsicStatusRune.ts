@@ -28,8 +28,8 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
     return this.transactionStatuses((status) =>
       known.TransactionStatus.isTerminal(status) || status === "ready"
     )
-      .map((status) => status === "ready" || new NeverInBlockError())
-      .unhandle(is(NeverInBlockError))
+      .map((status) => status === "ready" || new NeverReadyError())
+      .unhandle(is(NeverReadyError))
   }
 
   inBlock() {
@@ -87,5 +87,6 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
   }
 }
 
+export class NeverReadyError extends Error {}
 export class NeverInBlockError extends Error {}
 export class NeverFinalizedError extends Error {}
