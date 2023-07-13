@@ -46,10 +46,12 @@ await polkadotDev.Utility
   .run()
 
 /// Read both multisig free balances from storage.
-const [childFree, parentFree] = await Rune.tuple([
-  readFree(child.accountId).dbg("Child free:"),
-  readFree(parent.accountId).dbg("Parent free:"),
-]).run()
+const [childFree, parentFree] = await Rune
+  .tuple([
+    readFree(child.accountId).dbg("Child free:"),
+    readFree(parent.accountId).dbg("Parent free:"),
+  ])
+  .run()
 
 /// Verify existential deposit on both multisigs.
 assertEquals(childFree, 2_000_000_000_000n)
