@@ -9,23 +9,23 @@ import { MultisigRune } from "capi/patterns/multisig"
 import { signature } from "capi/patterns/signature/polkadot"
 
 /// Create five dev users. The first three serve as signatories of
-/// the first multisig and the latter serve as signatories of the
-/// second multisig.
+/// the first multisig (`child`) and the latter serve as
+/// signatories of the second multisig (`parent`).
 const { alexa, billy, carol, david, ellie } = await createDevUsers()
 
-/// Create the first multisig.
-const nestedMultisig = MultisigRune.from(polkadotDev, {
+/// Create the child multisig.
+const child = MultisigRune.from(polkadotDev, {
   signatories: [alexa, billy, carol].map(({ publicKey }) => publicKey),
   threshold: 2,
 })
 
-/// Create second multisig with first multisig as a signatory.
-const multisig = MultisigRune.from(
+/// Create the parent multisig with the child multisig as the third signatory.
+const parent = MultisigRune.from(
   polkadotDev,
   Rune.object({
     signatories: Rune.array([
-      nestedMultisig.accountId,
       ...[david, ellie].map(({ publicKey }) => publicKey),
+      child.accountId,
     ]),
     threshold: 2,
   }),
@@ -35,8 +35,8 @@ const multisig = MultisigRune.from(
 await polkadotDev.Utility
   .batchAll({
     calls: Rune.array([
-      nestedMultisig.fund(2_000_000_000_000n),
-      multisig.fund(2_000_000_000_000n),
+      child.fund(2_000_000_000_000n),
+      parent.fund(2_000_000_000_000n),
     ]),
   })
   .signed(signature({ sender: alexa }))
@@ -46,14 +46,14 @@ await polkadotDev.Utility
   .run()
 
 /// Read both multisig free balances from storage.
-const [nestedMultisigFree, multisigFree] = await Rune.tuple([
-  readFree(nestedMultisig.accountId).dbg("Nested Multisig free:"),
-  readFree(multisig.accountId).dbg("Multisig free:"),
+const [childFree, parentFree] = await Rune.tuple([
+  readFree(child.accountId).dbg("Child free:"),
+  readFree(parent.accountId).dbg("Parent free:"),
 ]).run()
 
 /// Verify existential deposit on both multisigs.
-assertEquals(nestedMultisigFree, 2_000_000_000_000n)
-assertEquals(multisigFree, 2_000_000_000_000n)
+assertEquals(childFree, 2_000_000_000_000n)
+assertEquals(parentFree, 2_000_000_000_000n)
 
 function readFree<X>(...[publicKey]: RunicArgs<X, [Uint8Array]>) {
   return polkadotDev.System.Account
