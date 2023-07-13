@@ -84,12 +84,10 @@ export class StorageRune<
     return Rune
       .tuple([this.entriesRaw(props, blockHash).access(0), this.$key, this.$value])
       .map(([changeset, $key, $value]) =>
-        changeset
-          ? changeset.changes.map(([k, v]) => [
-            $key.decode(hex.decode(k)),
-            v ? $value.decode(hex.decode(v)) : undefined,
-          ])
-          : []
+        changeset?.changes.map(([k, v]) => [
+          $key.decode(hex.decode(k)),
+          v ? $value.decode(hex.decode(v)) : undefined,
+        ]) ?? []
       )
       .unsafeAs<[Chain.Storage.Key<C, P, S>, Chain.Storage.Value<C, P, S>][]>()
       .into(ValueRune)
