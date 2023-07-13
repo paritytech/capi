@@ -92,6 +92,7 @@ export class StorageRune<
           : []
       )
       .unsafeAs<[Chain.Storage.Key<C, P, S>, Chain.Storage.Value<C, P, S>][]>()
+      .into(ValueRune)
   }
 
   keysRaw<X, Y>(
