@@ -47,7 +47,7 @@ export namespace ChainHeadUnstableFollowEvent {
   }
   export type Finalized = {
     event: "finalized"
-    finalizedHashes: string[]
+    finalizedBlockHashes: string[]
     prunedBlockHashes: string[]
   }
   export type Stop = { event: "stop" }

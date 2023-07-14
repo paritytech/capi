@@ -26,7 +26,7 @@ export class ExperimentalConsumer extends Consumer {
       [true],
       (event, subscriptionId) => {
         if (event.event === "initialized") {
-          const { finalizedBlockRuntime, finalizedHash } = event
+          const { finalizedBlockRuntime } = event
           if (!finalizedBlockRuntime || finalizedBlockRuntime.type === "invalid") {
             throw new FinalizedBlockRuntimeInvalidError()
           }
@@ -34,23 +34,20 @@ export class ExperimentalConsumer extends Consumer {
             ([k, v]) => k === "0xd2bc9897eed08f15" && v === 3,
           )
           if (incompatibleRuntime) throw new IncompatibleRuntimeError()
-          this.flushQueue(finalizedHash, subscriptionId)
         } else if (event.event === "finalized") {
-          const finalizedHashesLeading = event.finalizedHashes.slice(0, -1)
+          const finalizedHashesLeading = event.finalizedBlockHashes.slice(0, -1)
           ;[...finalizedHashesLeading, ...event.prunedBlockHashes].map((blockHash) =>
             this.connection.call("chainHead_unstable_unpin", [subscriptionId, blockHash])
           )
-          const finalizedHash = event.finalizedHashes.at(-1)!
-          this.flushQueue(finalizedHash, subscriptionId)
+          const finalizedHash = event.finalizedBlockHashes.at(-1)!
+          this.stateCallFlush(subscriptionId, finalizedHash)
+          this.blockHashPendings.forEach((pending) => pending.resolve(finalizedHash))
+          this.blockFlush(subscriptionId, finalizedHash)
+          this.valuesFlush(subscriptionId, finalizedHash)
         } else if (event.event === "stop") this.follow()
       },
       this.signal,
     )
-  }
-
-  flushQueue(hash: string, followId: string) {
-    this.blockHashPendings.forEach((pending) => pending.resolve(hash))
-    this.flushHeadMetadataPending(hash, followId, this.signal)
   }
 
   stateCallPendings: Record<string, Record<string, Deferred<unknown>[]>> = {}
@@ -62,13 +59,32 @@ export class ExperimentalConsumer extends Consumer {
     argsPendings.push(pending)
     return pending
   }
+  stateCallFlush(followId: string, blockHash: string) {
+    Object.entries(this.stateCallPendings).forEach(([method, argPendings]) => {
+      Object.entries(argPendings).forEach(([args, pendings]) => {
+        const controller = new AbortController()
+        this.subscription<{ event: "done"; output: string }>(
+          "chainHead_unstable_call",
+          undefined,
+          [followId, blockHash, method, args],
+          (event) => {
+            delete argPendings[args]
+            if (!Object.values(argPendings).length) delete this.stateCallPendings[method]
+            if (event.event === "done") {
+              const metadata = hex.decode(event.output)
+              pendings.forEach((pending) => pending.resolve(metadata))
+            } else pendings.forEach((pending) => pending.reject())
+            controller.abort()
+          },
+          controller.signal,
+        )
+      })
+    })
+  }
 
-  metadataPendings: Deferred<Uint8Array>[] = []
   metadata(blockHash?: string) {
     if (blockHash) return this.archiveConsumer.metadata(blockHash)
-    const pending = deferred<Uint8Array>()
-    this.metadataPendings.push(pending)
-    return pending
+    return this.stateCall("Metadata_metadata", new Uint8Array())
   }
 
   blockHashPendings: Deferred<string>[] = []
@@ -86,17 +102,84 @@ export class ExperimentalConsumer extends Consumer {
     this.blockPendings.push(pending)
     return pending
   }
+  blockFlush(followId: string, blockHash: string) {
+    if (this.blockPendings.length) {
+      const controller = new AbortController()
+      // TODO: why not emitting?
+      this.subscription("chainHead_unstable_body", undefined, [followId, blockHash], (_result) => {
+        while (this.blockPendings.length) {
+          const blockPending = this.blockPendings.shift()!
+          blockPending.resolve(null!)
+        }
+      }, controller.signal)
+    }
+  }
+
+  extrinsicsPendings: Deferred<Uint8Array>[] = []
+  extrinsics(blockHash?: string) {
+    if (blockHash) return this.archiveConsumer.block(blockHash)
+    const pending = deferred<Uint8Array>()
+    this.extrinsicsPendings.push(pending)
+    return pending
+  }
+  extrinsicsFlush(followId: string, blockHash: string) {
+    if (this.extrinsicsPendings.length) {
+      const controller = new AbortController()
+      this.subscription<{ event: "done"; result: string }>(
+        "chainHead_unstable_body",
+        undefined,
+        [followId, blockHash],
+        (result) => {
+          console.log(result)
+          while (this.extrinsicsPendings.length) {
+            const blockPending = this.extrinsicsPendings.shift()!
+            blockPending.resolve(hex.decode(result.result))
+          }
+        },
+        controller.signal,
+      )
+    }
+  }
 
   keys(key: Uint8Array, limit: number, start?: Uint8Array, blockHash?: string) {
     return this.archiveConsumer.keys(key, limit, start, blockHash)
   }
 
-  valuesPendings: Deferred<Uint8Array[]>[] = []
+  valuesKeys: Record<string, true> = {}
+  valuesPendings: [keys: string[], pending: Deferred<Uint8Array[]>][] = []
   values(keys: Uint8Array[], blockHash?: string) {
     if (blockHash) return this.archiveConsumer.values(keys, blockHash)
+    const keysEncoded = keys.map((key) => {
+      const encoded = hex.encodePrefixed(key)
+      this.valuesKeys[encoded] = true
+      return encoded
+    })
     const pending = deferred<Uint8Array[]>()
-    this.valuesPendings.push(pending)
+    this.valuesPendings.push([keysEncoded, pending])
     return pending
+  }
+  valuesFlush(followId: string, blockHash: string) {
+    const keys = Object.entries(this.valuesKeys)
+    if (keys.length) {
+      const items = keys.map((key) => ({ key, type: "value" }))
+      const controller = new AbortController()
+      this.subscription<{ event: "items"; items: { key: string; value: string }[] }>(
+        "chainHead_unstable_storage",
+        "chainHead_unstable_stopStorage",
+        [followId, blockHash, items, null],
+        (message) => {
+          const lookup = Object.fromEntries(message.items.map(({ key, value }) => [key, value]))
+          while (this.valuesPendings.length) {
+            const valuesPending = this.valuesPendings.shift()!
+            const [keys, pending] = valuesPending
+            pending.resolve(keys.map((key) => hex.decode(lookup[key]!)))
+          }
+          this.valuesKeys = {}
+          controller.abort()
+        },
+        controller.signal,
+      )
+    }
   }
 
   nonce(ss58Address: string) {
@@ -153,71 +236,6 @@ export class ExperimentalConsumer extends Consumer {
       },
       signal,
     )
-  }
-
-  // stateCall(method: string, args: Uint8Array, blockHash?: string) {
-  //   if (blockHash) return this.archiveConsumer.stateCall(method, args, blockHash)
-  //   const controller = new AbortController()
-  //   this.subscription<{ event: "done"; output: string }>(
-  //     "chainHead_unstable_call",
-  //     undefined,
-  //     [followId, blockHash],
-  //     (event) => {
-  //       if (event.event === "done") {
-  //         const metadata = hex.decode(event.output)
-  //         this.headMetadataPending.forEach((pending) => pending.resolve(metadata))
-  //       } else {
-  //         this.headMetadataPending.forEach((pending) => pending.reject())
-  //       }
-  //       controller.abort()
-  //     },
-  //     controller.signal,
-  //   )
-  // }
-
-  flushHeadMetadataPending(
-    blockHash: string,
-    followId: string,
-    signal: AbortSignal,
-  ) {
-    if (this.metadataPendings.length) {
-      this.subscription<{ event: "done"; output: string }>(
-        "chainHead_unstable_call",
-        "chainHead_unstable_stopCall",
-        [followId, blockHash],
-        (event) => {
-          if (event.event === "done") {
-            const metadata = hex.decode(event.output)
-            this.metadataPendings.forEach((pending) => pending.resolve(metadata))
-          } else {
-            this.metadataPendings.forEach((pending) => pending.reject())
-          }
-        },
-        signal,
-      )
-    }
-  }
-
-  private async valuesLatest(keys: Uint8Array[]) {
-    return null!
-    // const pending = deferred<unknown>()
-    // const controller = new AbortController()
-    // this.subscription(
-    //   "chainHead_unstable_storage",
-    //   "chainHead_unstable_stopStorage",
-    //   [
-    //     this.followId,
-    //     this.#finalizedBlockHash,
-    //     keys.map((key) => ({ key: hex.encodePrefixed(key), type: "value" })),
-    //     null,
-    //   ],
-    //   (message) => {
-    //     pending.resolve(message)
-    //     controller.abort()
-    //   },
-    //   controller.signal,
-    // )
-    // return pending as any
   }
 }
 
