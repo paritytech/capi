@@ -1,19 +1,10 @@
+import { hex } from "../crypto/mod.ts"
 import { Connection } from "./Connection.ts"
 import * as known from "./known/mod.ts"
 import { ServerError } from "./rpc_messages.ts"
 
 export abstract class Consumer {
   constructor(readonly connection: Connection) {}
-
-  abstract requirements: string[]
-  async assertRequirementsMet() {
-    const methods = new Set(await this.call<string[]>("rpc_methods", []))
-    const missing: string[] = []
-    this.requirements.forEach((requirement) => {
-      if (!methods.has(requirement)) missing.push(requirement)
-    })
-    if (missing.length) throw new RpcRequirementsUnmet(missing)
-  }
 
   abstract stateCall(method: string, args: Uint8Array, blockHash?: string): Promise<Uint8Array>
 
@@ -23,12 +14,19 @@ export abstract class Consumer {
 
   abstract block(blockHash?: string): Promise<known.SignedBlock>
 
-  abstract keys(
+  async keys(
     key: Uint8Array,
     limit: number,
     start?: Uint8Array,
     blockHash?: string,
-  ): Promise<Uint8Array[]>
+  ): Promise<Uint8Array[]> {
+    return (await this.call<string[]>("state_getKeysPaged", [
+      hex.encodePrefixed(key),
+      limit,
+      start ? hex.encodePrefixed(start) : undefined,
+      blockHash,
+    ])).map(hex.decode)
+  }
 
   abstract values(keys: Uint8Array[], blockHash?: string): Promise<(Uint8Array | undefined)[]>
 
@@ -59,13 +57,5 @@ export abstract class Consumer {
       const { result, subscription } = message.params
       handler(result as R, subscription)
     }, signal)
-  }
-}
-
-class RpcRequirementsUnmet extends Error {
-  override readonly name = "RpcRequirementsUnmet"
-
-  constructor(readonly unmet: string[]) {
-    super(`The following RPC methods are unavailable: "${unmet.join(`", "`)}"`)
   }
 }

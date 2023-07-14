@@ -3,17 +3,6 @@ import { Consumer } from "./Consumer.ts"
 import { SignedBlock, StorageChangeSet, TransactionStatus } from "./known/mod.ts"
 
 export class LegacyConsumer extends Consumer {
-  requirements = [
-    "author_submitAndWatchExtrinsic",
-    "author_unwatchExtrinsic",
-    "chain_getBlock",
-    "chain_getBlockHash",
-    "state_call",
-    "state_getKeysPaged",
-    "state_queryStorageAt",
-    "system_accountNextIndex",
-  ]
-
   metadata(blockHash?: string) {
     return this.stateCall("Metadata_metadata", new Uint8Array(), blockHash)
   }
@@ -28,15 +17,6 @@ export class LegacyConsumer extends Consumer {
 
   block(blockHash?: string) {
     return this.call<SignedBlock>("chain_getBlock", [blockHash])
-  }
-
-  async keys(key: Uint8Array, limit: number, start?: Uint8Array, blockHash?: string) {
-    return (await this.call<string[]>("state_getKeysPaged", [
-      hex.encodePrefixed(key),
-      limit,
-      start ? hex.encodePrefixed(start) : undefined,
-      blockHash,
-    ])).map(hex.decode)
   }
 
   async values(keys: Uint8Array[], blockHash?: string) {

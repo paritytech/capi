@@ -20,7 +20,7 @@ export type RuntimeSpec = {
   specVersion: number
   implVersion: number
   transactionVersion?: number
-  apis: Record<string, number>
+  apis: [string, number][]
 }
 
 export type ChainHeadUnstableFollowEvent =
