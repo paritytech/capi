@@ -17,18 +17,8 @@ interactions without compromising either performance or ease of use.
 npm i capi
 ```
 
-> Note: The minimum supported Node version is 20.3.1. We prioritize browser
-> support, and thus we require the
-> [Web Crypto API](https://nodejs.org/docs/latest-v20.x/api/webcrypto.html#web-crypto-api)
-> to be accessible from `globalThis.crypto`. Node version 18 exposes this api
-> from `require("node:crypto").webcrypto`.
->
-> If you need to use Capi with a lower version of Node, you can shim
-> `globalThis.crypto`:
->
-> ```ts
-> globalThis.crypto = require("node:crypto").webcrypto
-> ```
+> Note: Capi depends on the standard Web Crypto API (Node 20.3.1 and above). See
+> [shimming instructions](https://docs.capi.dev/setup/#web-crypto-api).
 
 <details>
 <summary>Deno Equivalent</summary>
