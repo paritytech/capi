@@ -6,7 +6,9 @@ import { ExtrinsicRune } from "./ExtrinsicRune.ts"
 import { ExtrinsicStatusRune } from "./ExtrinsicStatusRune.ts"
 import { PatternRune } from "./PatternRune.ts"
 
+/** A signed extrinsic of the current chain */
 export class SignedExtrinsicRune<out C extends Chain, out U> extends PatternRune<Uint8Array, C, U> {
+  /** Get a signed extrinsic rune from of the specified chain and bytes */
   static from<C extends Chain, U, X>(
     chain: ChainRune<C, U>,
     ...[value]: RunicArgs<X, [value: Uint8Array]>
@@ -14,6 +16,7 @@ export class SignedExtrinsicRune<out C extends Chain, out U> extends PatternRune
     return Rune.resolve(value).into(SignedExtrinsicRune, chain)
   }
 
+  /** Get a signed extrinsic rune from the specified chain and hex-encoded bytes */
   static fromHex<C extends Chain, U, X>(
     chain: ChainRune<C, U>,
     ...[value]: RunicArgs<X, [value: string]>
@@ -21,6 +24,7 @@ export class SignedExtrinsicRune<out C extends Chain, out U> extends PatternRune
     return this.from(chain, Rune.resolve(value).map(hex.decode))
   }
 
+  /** Get the call of the current signed extrinsic */
   call() {
     return this.chain.$extrinsic
       .decoded(this.as(SignedExtrinsicRune))
@@ -29,10 +33,12 @@ export class SignedExtrinsicRune<out C extends Chain, out U> extends PatternRune
       .into(ExtrinsicRune, this.chain)
   }
 
+  /** Get the hex-encoded scale-encoded string of the current signed extrinsic */
   hex() {
     return this.into(ValueRune).map(hex.encode)
   }
 
+  /** Get an extrinsic status rune, which represents a submitted extrinsic */
   sent() {
     return this
       .hex()

@@ -1,21 +1,23 @@
 import * as $ from "../../deps/scale.ts"
 
-export type Era =
-  | { type: "Immortal" }
-  | {
-    type: "Mortal"
-    period: bigint
-    phase: bigint
+export type Era = Era.Mortal | Era.Immortal
+export namespace Era {
+  export const Immortal: Immortal = { type: "Immortal" }
+  export interface Immortal {
+    type: "Immortal"
   }
 
-export namespace Era {
-  export const Immortal: Era = { type: "Immortal" }
-  export function Mortal(period: bigint, current: bigint): Era {
+  export function Mortal(period: bigint, current: bigint): Mortal {
     const adjustedPeriod = minN(maxN(nextPowerOfTwo(period), 4n), 1n << 16n)
     const phase = current % adjustedPeriod
     const quantizeFactor = maxN(adjustedPeriod >> 12n, 1n)
     const quantizedPhase = phase / quantizeFactor * quantizeFactor
     return { type: "Mortal", period: adjustedPeriod, phase: quantizedPhase }
+  }
+  export interface Mortal {
+    type: "Mortal"
+    period: bigint
+    phase: bigint
   }
 }
 

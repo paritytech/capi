@@ -16,8 +16,8 @@ const now = polkadot.Timestamp.Now.value(undefined, polkadot.latestBlockHash)
 /// Create a simple counter so that we can break iteration at 3.
 let i = 0
 
-/// Use the `watch` method to retrieve an async iterable, which will
-/// gather and yield the `collection`-described data upon new blocks.
+/// Use the `iter` method to get an async iterable, which will
+/// gather and yield the storage value upon new blocks.
 for await (const item of now.iter()) {
   console.log(item)
   $.assert($.u64, item)

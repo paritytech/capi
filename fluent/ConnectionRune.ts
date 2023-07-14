@@ -21,11 +21,13 @@ class RunConnection extends Run<Connection, never> {
   }
 }
 
+/** a rune representing an RPC connection */
 export class ConnectionRune<U> extends Rune<Connection, U> {
   static from(init: (signal: AbortSignal) => Connection | Promise<Connection>) {
     return Rune.new(RunConnection, init).into(ConnectionRune)
   }
 
+  /** Make an RPC call */
   call<K extends keyof Calls, X>(
     callMethod: K,
     ...args: RunicArgs<X, [...Parameters<Calls[K]>]>
@@ -40,6 +42,7 @@ export class ConnectionRune<U> extends Rune<Connection, U> {
       .throws(is(ConnectionError), is(ServerError))
   }
 
+  /** Create an RPC subscription */
   subscribe<K extends keyof Subscriptions, X>(
     subscribeMethod: K,
     unsubscribeMethod: Subscription.UnsubscribeMethod<ReturnType<Subscriptions[K]>>,

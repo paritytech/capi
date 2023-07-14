@@ -7,6 +7,7 @@ export class CodecRune<in I, out O, out U> extends Rune<$.Codec<I, O>, U> {
   }
 
   // TODO: eventually, utilize `V` to toggle runtime validation
+  /** A rune representing the scale-encoded equivalent of the specified value */
   encoded<X>(...[value]: RunicArgs<X, [value: I]>) {
     return Rune.tuple([this, value]).map(async ([codec, value]) => {
       $.assert(codec, value)
@@ -14,6 +15,7 @@ export class CodecRune<in I, out O, out U> extends Rune<$.Codec<I, O>, U> {
     }).throws(is($.ScaleError))
   }
 
+  /** A rune representing the scale-decoded equivalent of the specified scale-encoded value */
   decoded<X>(...[value]: RunicArgs<X, [value: Uint8Array]>) {
     return Rune
       .tuple([this, value]).map(([codec, value]) => codec.decode(value))

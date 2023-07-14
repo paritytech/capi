@@ -9,6 +9,7 @@ import { ConnectionRune } from "./ConnectionRune.ts"
 import { ExtrinsicRune } from "./ExtrinsicRune.ts"
 import { PalletRune } from "./PalletRune.ts"
 
+/** A container for the inner connection and FRAME metadata of a given chain */
 export interface Chain<M extends FrameMetadata = FrameMetadata> {
   connection: Connection
   metadata: M
@@ -50,8 +51,9 @@ export namespace Chain {
   }
 }
 
-// TODO: do we want to represent the discovery value and conn type within the type system?
+/** The root Rune of Capi's fluent API, with which other core runes can be created */
 export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
+  /** Get a chain with the specified connection and (optionally) static metadata */
   static from<M extends FrameMetadata>(
     connect: (signal: AbortSignal) => Connection,
     staticMetadata?: M,
@@ -64,26 +66,33 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
     return Rune.object({ connection, metadata }).into(this)
   }
 
+  /** Get the current chain, but with a new inner connection */
   with(connect: (signal: AbortSignal) => Connection) {
     const connection = ConnectionRune.from(connect)
     return Rune.object({ connection, metadata: this.metadata }).into(ChainRune) as ChainRune<C, U>
   }
 
+  /** The connection with which to communicate with the chain */
   connection = this.into(ValueRune<Chain, U>).access("connection").into(ConnectionRune)
 
+  /** The chain's metadata */
   metadata = this.into(ValueRune).access("metadata")
 
+  /** The codec for extrinsics of the current chain */
   $extrinsic = Rune.fn($extrinsic).call(this.metadata).into(CodecRune)
 
+  /** A stream of latest block numbers */
   latestBlockNum = this.connection
     .subscribe("chain_subscribeNewHeads", "chain_unsubscribeNewHeads")
     .access("number")
 
+  /** A stream of latest block hashes */
   latestBlockHash = this.connection
     .call("chain_getBlockHash", this.latestBlockNum)
     .unsafeAs<string>()
     .into(BlockHashRune, this)
 
+  /** The specified block hash or the latest finalized block hash */
   blockHash<X>(...[blockHash]: RunicArgs<X, [blockHash?: string]>) {
     return Rune
       .resolve(blockHash)
@@ -91,11 +100,13 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
       .into(BlockHashRune, this)
   }
 
+  /** The specified call data */
   extrinsic<X>(...args: RunicArgs<X, [call: Chain.Call<C>]>) {
     const [call] = RunicArgs.resolve(args)
     return call.into(ExtrinsicRune, this.as(ChainRune))
   }
 
+  /** The specified pallet */
   pallet<P extends Chain.PalletName<C>, X>(...[palletName]: RunicArgs<X, [P]>) {
     return this.metadata
       .access("pallets", palletName)
@@ -103,6 +114,7 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
       .into(PalletRune, this.as(ChainRune))
   }
 
+  /** The prefix of the current chain */
   addressPrefix() {
     return this
       .pallet("System")
@@ -110,9 +122,22 @@ export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
       .decoded
   }
 
+  /** The system version */
   chainVersion = this.connection.call("system_version")
+
+  // TODO: narrow type in event selection PR (will include the manually-typed `DispatchInfo`)
+  /** The chain's dispatch info codec */
+  $dispatchInfo = this.metadata
+    .access("paths", "frame_support::dispatch::DispatchInfo")
+    .into(CodecRune)
+
+  /** The chain's weight v2 codec */
+  $weight = this.metadata
+    .access("paths", "sp_weights::weight_v2::Weight")
+    .into(CodecRune)
 }
 
+// TODO: rework upon resolution of [#811](https://github.com/paritytech/capi/issues/811)
 export interface AddressPrefixChain extends Chain {
   metadata: FrameMetadata & {
     pallets: {
