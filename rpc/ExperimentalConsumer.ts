@@ -70,10 +70,8 @@ export class ExperimentalConsumer extends Consumer {
           (event) => {
             delete argPendings[args]
             if (!Object.values(argPendings).length) delete this.stateCallPendings[method]
-            if (event.event === "done") {
-              const metadata = hex.decode(event.output)
-              pendings.forEach((pending) => pending.resolve(metadata))
-            } else pendings.forEach((pending) => pending.reject())
+            const metadata = hex.decode(event.output)
+            pendings.forEach((pending) => pending.resolve(metadata))
             controller.abort()
           },
           controller.signal,
