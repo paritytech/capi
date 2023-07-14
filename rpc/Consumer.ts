@@ -1,6 +1,6 @@
-import { hex } from "../crypto/mod.ts"
 import { Connection } from "./Connection.ts"
-import * as known from "./known/mod.ts"
+import { ExtrinsicStatus } from "./ExtrinsicStatus.ts"
+import { SignedBlock } from "./known/mod.ts"
 import { ServerError } from "./rpc_messages.ts"
 
 export abstract class Consumer {
@@ -12,21 +12,14 @@ export abstract class Consumer {
 
   abstract blockHash(blockNumber?: number): Promise<string>
 
-  abstract block(blockHash?: string): Promise<known.SignedBlock>
+  abstract block(blockHash?: string): Promise<SignedBlock>
 
-  async keys(
+  abstract keys(
     key: Uint8Array,
     limit: number,
     start?: Uint8Array,
     blockHash?: string,
-  ): Promise<Uint8Array[]> {
-    return (await this.call<string[]>("state_getKeysPaged", [
-      hex.encodePrefixed(key),
-      limit,
-      start ? hex.encodePrefixed(start) : undefined,
-      blockHash,
-    ])).map(hex.decode)
-  }
+  ): Promise<Uint8Array[]>
 
   abstract values(keys: Uint8Array[], blockHash?: string): Promise<(Uint8Array | undefined)[]>
 
@@ -35,7 +28,7 @@ export abstract class Consumer {
 
   abstract submitExtrinsic(
     extrinsic: Uint8Array,
-    cb: (status: known.TransactionStatus) => void,
+    cb: (status: ExtrinsicStatus) => void,
     signal: AbortSignal,
   ): void
 
@@ -47,7 +40,7 @@ export abstract class Consumer {
 
   protected subscription<R>(
     subscribe: string,
-    unsubscribe: string,
+    unsubscribe: string | undefined,
     params: unknown[],
     handler: (result: R, subscriptionId: string) => void,
     signal: AbortSignal,

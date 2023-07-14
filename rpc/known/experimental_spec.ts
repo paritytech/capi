@@ -32,7 +32,7 @@ export type ChainHeadUnstableFollowEvent =
 export namespace ChainHeadUnstableFollowEvent {
   export type Initialized = {
     event: "initialized"
-    finalizedBlockHash: string
+    finalizedHash: string
     finalizedBlockRuntime?: MaybeRuntimeSpec
   }
   export type NewBlock = {
@@ -47,7 +47,7 @@ export namespace ChainHeadUnstableFollowEvent {
   }
   export type Finalized = {
     event: "finalized"
-    finalizedBlockHashes: string[]
+    finalizedHashes: string[]
     prunedBlockHashes: string[]
   }
   export type Stop = { event: "stop" }

@@ -1,5 +1,6 @@
 import { hex } from "../crypto/mod.ts"
 import { Consumer } from "./Consumer.ts"
+import { ExtrinsicStatus } from "./ExtrinsicStatus.ts"
 import { SignedBlock, StorageChangeSet, TransactionStatus } from "./known/mod.ts"
 
 export class LegacyConsumer extends Consumer {
@@ -19,6 +20,15 @@ export class LegacyConsumer extends Consumer {
     return this.call<SignedBlock>("chain_getBlock", [blockHash])
   }
 
+  async keys(key: Uint8Array, limit: number, start?: Uint8Array, blockHash?: string) {
+    return (await this.call<string[]>("state_getKeysPaged", [
+      hex.encodePrefixed(key),
+      limit,
+      start ? hex.encodePrefixed(start) : undefined,
+      blockHash,
+    ])).map(hex.decode)
+  }
+
   async values(keys: Uint8Array[], blockHash?: string) {
     const message = await this.call<[StorageChangeSet]>("state_queryStorageAt", [
       keys.map(hex.encodePrefixed),
@@ -33,14 +43,51 @@ export class LegacyConsumer extends Consumer {
 
   submitExtrinsic(
     extrinsic: Uint8Array,
-    handler: (status: TransactionStatus) => void,
+    handler: (status: ExtrinsicStatus) => void,
     signal: AbortSignal,
   ) {
-    this.subscription(
+    this.subscription<TransactionStatus>(
       "author_submitAndWatchExtrinsic",
       "author_unwatchExtrinsic",
       [hex.encodePrefixed(extrinsic)],
-      handler,
+      (event) => {
+        handler(((): ExtrinsicStatus => {
+          if (typeof event === "string") {
+            switch (event) {
+              case "ready":
+                return { type: "validated" }
+              case "invalid":
+                return { type: "invalidated" }
+              case "dropped":
+                return { type: "dropped" }
+              case "future":
+                throw new Error("TODO")
+            }
+          } else {
+            if (event.broadcast) {
+              return {
+                type: "broadcasted",
+                numPeers: event.broadcast.length,
+              }
+            } else if (event.inBlock) {
+              return {
+                type: "included",
+                block: { hash: event.inBlock },
+              }
+            } else if (event.finalized) {
+              return {
+                type: "finalized",
+                block: { hash: event.finalized },
+              }
+            } else {
+              return {
+                type: "errored",
+                message: JSON.stringify(event),
+              }
+            }
+          }
+        })())
+      },
       signal,
     )
   }

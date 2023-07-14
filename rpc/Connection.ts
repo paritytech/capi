@@ -72,7 +72,7 @@ export abstract class Connection {
   subscriptionPendingInits: Record<number, (subscriptionId: string) => void> = {}
   async subscription(
     subscribe: string,
-    unsubscribe: string,
+    unsubscribe: string | undefined,
     params: unknown[],
     handler: RpcSubscriptionHandler,
     signal: AbortSignal,
@@ -83,7 +83,7 @@ export abstract class Connection {
       if (signal.aborted) return
       signal.addEventListener("abort", () => {
         delete this.subscriptionHandlers[subscriptionId]
-        this.send(this.nextId++, unsubscribe, [subscriptionId])
+        if (unsubscribe) this.send(this.nextId++, unsubscribe, [subscriptionId])
       })
       this.subscriptionHandlers[subscriptionId] = handler
     }
