@@ -1,6 +1,6 @@
 import { hex } from "../crypto/mod.ts"
 import { Deferred, deferred } from "../deps/std/async.ts"
-import { Connection } from "./Connection.ts"
+import { Connect } from "./Connection.ts"
 import { Consumer } from "./Consumer.ts"
 import { ExtrinsicStatus } from "./ExtrinsicStatus.ts"
 import * as known from "./known/mod.ts"
@@ -10,12 +10,12 @@ export class ExperimentalConsumer extends Consumer {
   archiveConsumer
 
   constructor(
-    connection: Connection,
-    readonly archiveConnection: Connection,
-    readonly signal: AbortSignal,
+    connection: Connect,
+    signal: AbortSignal,
+    readonly archiveConnect: Connect,
   ) {
-    super(connection)
-    this.archiveConsumer = new LegacyConsumer(archiveConnection)
+    super(connection, signal)
+    this.archiveConsumer = new LegacyConsumer(archiveConnect, signal)
     this.follow()
   }
 
@@ -43,6 +43,7 @@ export class ExperimentalConsumer extends Consumer {
           this.stateCallFlush(subscriptionId, finalizedHash)
           this.blockHashPendings.forEach((pending) => pending.resolve(finalizedHash))
           this.blockFlush(subscriptionId, finalizedHash)
+          this.extrinsicsFlush(subscriptionId, finalizedHash)
           this.valuesFlush(subscriptionId, finalizedHash)
         } else if (event.event === "stop") this.follow()
       },
@@ -128,7 +129,6 @@ export class ExperimentalConsumer extends Consumer {
         undefined,
         [followId, blockHash],
         (result) => {
-          console.log(result)
           while (this.extrinsicsPendings.length) {
             const blockPending = this.extrinsicsPendings.shift()!
             blockPending.resolve(hex.decode(result.result))

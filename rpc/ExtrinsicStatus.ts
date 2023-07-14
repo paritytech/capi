@@ -1,7 +1,7 @@
 export type ExtrinsicStatus =
   | ExtrinsicStatus.Validated
   | ExtrinsicStatus.Invalidated
-  | ExtrinsicStatus.Broadcast
+  | ExtrinsicStatus.Broadcasted
   | ExtrinsicStatus.Dropped
   | ExtrinsicStatus.Included
   | ExtrinsicStatus.Finalized
@@ -14,7 +14,7 @@ export namespace ExtrinsicStatus {
     type: "invalidated"
     reason?: string
   }
-  export interface Broadcast {
+  export interface Broadcasted {
     type: "broadcasted"
     numPeers: number
   }

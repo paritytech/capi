@@ -1,9 +1,12 @@
 import { connect } from "@capi/polkadot"
-import { ExperimentalConsumer, hex } from "capi"
+import { ExperimentalConsumer } from "capi"
 
 const controller = new AbortController()
 const { signal } = controller
-const consumer = new ExperimentalConsumer(connect(signal), connect(signal), signal)
+const consumer = new ExperimentalConsumer(connect, signal, connect)
+const x = await consumer.extrinsics()
+console.log(x)
+controller.abort()
 
 // const metadata = await consumer.metadata()
 // console.log(metadata)

@@ -1,10 +1,14 @@
-import { Connection } from "./Connection.ts"
+import { Connect } from "./Connection.ts"
 import { ExtrinsicStatus } from "./ExtrinsicStatus.ts"
 import { SignedBlock } from "./known/mod.ts"
 import { ServerError } from "./rpc_messages.ts"
 
 export abstract class Consumer {
-  constructor(readonly connection: Connection) {}
+  connection
+
+  constructor(readonly connect: Connect, readonly signal: AbortSignal) {
+    this.connection = connect(signal)
+  }
 
   abstract stateCall(method: string, args: Uint8Array, blockHash?: string): Promise<Uint8Array>
 
