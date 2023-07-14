@@ -19,7 +19,7 @@ npm i capi
 
 > Note: Capi depends on the standard
 > [Web Crypto API](https://nodejs.org/docs/latest-v20.x/api/webcrypto.html#web-crypto-api)
-> (**Node 20.3.1** and above). See
+> (**Node 20.3.1 and above**). See
 > [shimming instructions](https://docs.capi.dev/setup/#web-crypto-api).
 
 <details>
