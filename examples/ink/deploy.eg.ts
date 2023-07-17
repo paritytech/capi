@@ -44,7 +44,7 @@ const accountId = await metadata
 
 /// Ensure that the account ID is of the expected shape.
 console.log("Account id:", accountId)
-$.assert($.sizedUint8Array(32), accountId)
+$.assert($accountId32, accountId)
 
 /// We'll convert this to an Ss58 address and place it within an environment variable. This
 /// way we can easy deploy from other scripts with a simple `await import("./deploy.ts")`.
