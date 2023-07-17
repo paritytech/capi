@@ -8,19 +8,16 @@
 
 import { $accountId32, contractsDev } from "@capi/contracts-dev"
 import { assert } from "asserts"
-import { $, createDevUsers, hex } from "capi"
+import { $, createDevUsers } from "capi"
 import { signature } from "capi/patterns/signature/polkadot"
 import { InkMetadataRune } from "capi/patterns/unstable/ink"
 
 /// Get two test users. Alexa will deploy, Billy will be the recipient of an erc20
 /// token transfer.
-const { alexa, billy } = await createDevUsers()
+const { alexa } = await createDevUsers()
 
-/// If no such argument was supplied, run the `deploy.ts` script and extract
-/// the address from the `CONTRACT_ADDRESS` environment variable (set by `deploy.ts`).
-Deno.env.set("DEPLOYER_SECRET", hex.encode(alexa.secretKey))
-await import("./deploy.eg.ts")
-const address = Deno.env.get("CONTRACT_SS58_ADDRESS")!
+/// Retrieve the deployed contract address and its sender's `Sr25519`
+import { contractAddress, sender } from "./deploy.eg.ts"
 
 /// Initialize an `InkMetadataRune` with the raw Ink metadata text.
 const metadata = InkMetadataRune.fromMetadataText(
@@ -28,7 +25,7 @@ const metadata = InkMetadataRune.fromMetadataText(
 )
 
 /// Initialize an `InkRune` with `metadata`, `chain` and the deployed contract address.
-const contract = metadata.instanceFromSs58(contractsDev, address)
+const contract = metadata.instanceFromSs58(contractsDev, contractAddress)
 
 const state = contract.call({
   sender: alexa.publicKey,
@@ -44,11 +41,11 @@ console.log("Alexa initial balance:", initialState)
 /// Use the `flip` method to *flip* the contract instance state.
 const events = await contract
   .tx({
-    sender: alexa.publicKey,
+    sender: sender.publicKey,
     method: "transfer",
-    args: [billy.publicKey, 1_000n],
+    args: [alexa.publicKey, 1_000n],
   })
-  .signed(signature({ sender: alexa }))
+  .signed(signature({ sender }))
   .sent()
   .dbgStatus("Transfer:")
   .inBlockEvents("Contracts", "ContractEmitted")
@@ -74,5 +71,4 @@ console.log(events)
 const finalState = await state.run()
 $.assert($.u64, finalState)
 console.log("Alexa final balance:", finalState)
-
-assert(finalState < initialState)
+assert(finalState > initialState)
