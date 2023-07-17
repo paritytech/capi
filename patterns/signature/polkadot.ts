@@ -29,7 +29,7 @@ export interface PolkadotSignatureChain extends AddressPrefixChain {
 }
 
 export function signature<X>(_props: RunicArgs<X, SignatureProps<PolkadotSignatureChain>>) {
-  return <CU>(chain: ChainRune<PolkadotSignatureChain, CU>) => {
+  return <C extends PolkadotSignatureChain, CU>(chain: ChainRune<C, CU>) => {
     const props = RunicArgs.resolve(_props)
     const addrPrefix = chain.addressPrefix()
     const versions = chain.pallet("System").constant("Version").decoded

@@ -73,7 +73,7 @@ export class InkRune<in out C extends Chain, out U>
           type: "call",
           dest: Rune.object({
             type: "Id",
-            value: this.as(InkRune),
+            value: this.as(Rune),
           }),
           value,
           data,

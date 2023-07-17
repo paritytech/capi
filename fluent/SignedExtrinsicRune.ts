@@ -25,7 +25,7 @@ export class SignedExtrinsicRune<in out C extends Chain, out U>
 
   call() {
     return this.chain.$extrinsic
-      .decoded(this.as(SignedExtrinsicRune))
+      .decoded(this.as(Rune))
       .access("call")
       .unsafeAs<any>()
       .into(ExtrinsicRune, this.chain)
