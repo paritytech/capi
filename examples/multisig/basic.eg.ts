@@ -4,7 +4,7 @@
  * that multisig.
  */
 
-import { polkadotDev } from "@capi/polkadot-dev"
+import { $accountId32, polkadotDev } from "@capi/polkadot-dev"
 import { assert } from "asserts"
 import { $, createDevUsers, is } from "capi"
 import { MultisigRune } from "capi/patterns/multisig"
@@ -64,7 +64,7 @@ const { approvals } = await multisig
 
 /// `approvals` should be a list of the approvers (account ids).
 console.log("Approvals:", approvals)
-$.assert($.array($.sizedUint8Array(32)), approvals)
+$.assert($.array($accountId32), approvals)
 
 /// Approve proposal as Billy.
 await multisig

@@ -1,4 +1,4 @@
-import { MultiAddress } from "@capi/polkadot"
+import { $accountId32, MultiAddress } from "@capi/polkadot"
 import { equals } from "../../../deps/std/bytes.ts"
 import {
   $,
@@ -23,9 +23,9 @@ export interface VirtualMultisig {
   stash: Uint8Array
 }
 export const $virtualMultisig: $.Codec<VirtualMultisig> = $.object(
-  $.field("members", $.array($.tuple($.sizedUint8Array(32), $.sizedUint8Array(32)))),
+  $.field("members", $.array($.tuple($accountId32, $accountId32))),
   $.optionalField("threshold", $.u8),
-  $.field("stash", $.sizedUint8Array(32)),
+  $.field("stash", $accountId32),
 )
 
 export class VirtualMultisigRune<out C extends Chain, out U>
