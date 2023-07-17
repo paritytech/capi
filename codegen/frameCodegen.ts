@@ -2,6 +2,7 @@ import { hex } from "../crypto/mod.ts"
 import * as $ from "../deps/scale.ts"
 import { FrameMetadata } from "../frame_metadata/mod.ts"
 import { CodecCodegen } from "./CodecCodegen.ts"
+import { formatDocComment } from "./common.ts"
 import { TypeCodegen } from "./TypeCodegen.ts"
 
 export function frameCodegen(
@@ -52,14 +53,18 @@ export function frameCodegen(
     const palletStatements: string[] = []
 
     for (const storage of Object.values(pallet.storage)) {
-      palletDeclarationStatements.push(
-        `${storage.name}: C.StorageRune<${chainIdent}, "${pallet.name}", "${storage.name}", never>`,
-      )
+      palletDeclarationStatements.push(`
+        ${formatDocComment(storage.docs)}
+        ${storage.name}: C.StorageRune<${chainIdent}, "${pallet.name}", "${storage.name}", never>
+      `)
       palletStatements.push(`${storage.name} = this.storage("${storage.name}")`)
     }
 
     for (const constant of Object.values(pallet.constants)) {
-      palletDeclarationStatements.push(`${constant.name}: ${typeCodegen.native(constant.codec)}`)
+      palletDeclarationStatements.push(`
+        ${formatDocComment(constant.docs)}
+        ${constant.name}: ${typeCodegen.native(constant.codec)}
+      `)
       palletStatements.push(
         `${constant.name} = ${codecCodegen.print(constant.codec)}.decode(C.hex.decode("${
           hex.encode(constant.value)

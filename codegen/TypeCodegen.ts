@@ -10,6 +10,7 @@ import {
 import { $era, $null, ChainError } from "../scale_info/mod.ts"
 import { stringifyKey, stringifyPropertyAccess } from "../util/mod.ts"
 import { CodecCodegen } from "./CodecCodegen.ts"
+import { formatDocComment } from "./common.ts"
 
 export class TypeCodegen {
   constructor(readonly codecCodegen: CodecCodegen, readonly types: Record<string, $.AnyCodec>) {
@@ -290,10 +291,4 @@ export ${isTypes ? `namespace ${name}` : `const ${name} =`} {
       `,
     )
   }
-}
-
-function formatDocComment(docs: string) {
-  if (!docs) return ""
-  if (!docs.includes("\n")) return `/** ${docs} */`
-  return `/**\n${docs.replace(/^/gm, " * ")}\n*/`
 }
