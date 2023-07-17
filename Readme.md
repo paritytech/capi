@@ -62,6 +62,20 @@ export const polkadot = net.ws({
 })
 ```
 
+> Note: if the type declarations for `capi/nets` are not resolved, chances are
+> your tsconfig does not reflect the following requirements.
+>
+> ```json
+> {
+>   "target": "ESNext",
+>   "module": "NodeNext"
+> }
+> ```
+>
+> For more information, see
+> [Node's `exports` docs](https://nodejs.org/api/packages.html#exports) and
+> [TypeScript's module resolution docs](https://www.typescriptlang.org/tsconfig#moduleResolution).
+
 ## Command Line Tool
 
 In this documentation, we use Capi's CLI via the alias "capi", instead of via
