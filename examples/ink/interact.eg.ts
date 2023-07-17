@@ -6,7 +6,7 @@
  * This work will likely entail large changes to the current ink patterns.
  */
 
-import { contractsDev } from "@capi/contracts-dev"
+import { $accountId32, contractsDev } from "@capi/contracts-dev"
 import { assert } from "asserts"
 import { $, createDevUsers, hex } from "capi"
 import { signature } from "capi/patterns/signature/polkadot"
@@ -61,8 +61,8 @@ $.assert(
   $.array($.taggedUnion("type", [
     $.variant(
       "Transfer",
-      $.field("from", $.sizedUint8Array(32)),
-      $.field("to", $.sizedUint8Array(32)),
+      $.field("from", $accountId32),
+      $.field("to", $accountId32),
       $.field("value", $.u128),
     ),
   ])),
