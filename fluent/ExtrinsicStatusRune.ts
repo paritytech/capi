@@ -24,6 +24,60 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
       .flatSingular()
   }
 
+  ready() {
+    return this.transactionStatuses((status) =>
+      known.TransactionStatus.isTerminal(status) || status === "ready"
+    )
+      .map((status) => status === "ready" || new NeverReadyError())
+      .unhandle(is(NeverReadyError))
+  }
+
+  future() {
+    return this.transactionStatuses((status) =>
+      known.TransactionStatus.isTerminal(status) || status === "ready"
+    ).map((status) => status === "future")
+  }
+
+  broadcast() {
+    return this.transactionStatuses((status) =>
+      known.TransactionStatus.isTerminal(status)
+      || (typeof status !== "string" && "broadcast" in status)
+    ).map((status) => typeof status !== "string" ? status.broadcast : undefined)
+  }
+
+  retracted() {
+    return this.transactionStatuses((status) =>
+      known.TransactionStatus.isTerminal(status)
+      || typeof status !== "string" && "retracted" in status
+    ).map((status) => typeof status !== "string" ? status.retracted : undefined)
+  }
+
+  finalityTimeout() {
+    return this.transactionStatuses((status) =>
+      known.TransactionStatus.isTerminal(status)
+      || typeof status !== "string" && "finalityTimeout" in status
+    ).map((status) => typeof status !== "string" ? status.finalityTimeout : undefined)
+  }
+
+  usurped() {
+    return this.transactionStatuses((status) =>
+      known.TransactionStatus.isTerminal(status)
+      || typeof status !== "string" && "usurped" in status
+    ).map((status) => typeof status !== "string" ? status.usurped : undefined)
+  }
+
+  dropped() {
+    return this.transactionStatuses((status) =>
+      known.TransactionStatus.isTerminal(status) || status === "dropped"
+    ).map((status) => status === "dropped")
+  }
+
+  invalid() {
+    return this.transactionStatuses((status) =>
+      known.TransactionStatus.isTerminal(status) || status === "invalid"
+    ).map((status) => status === "invalid")
+  }
+
   inBlock() {
     return this.transactionStatuses((status) =>
       known.TransactionStatus.isTerminal(status)
@@ -79,5 +133,6 @@ export class ExtrinsicStatusRune<out C extends Chain, out U1, out U2>
   }
 }
 
+export class NeverReadyError extends Error {}
 export class NeverInBlockError extends Error {}
 export class NeverFinalizedError extends Error {}
