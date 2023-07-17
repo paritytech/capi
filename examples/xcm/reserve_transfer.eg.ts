@@ -10,12 +10,10 @@ import { DoubleEncoded, Instruction, rococoDevXcm } from "@capi/rococo-dev-xcm"
 import {
   $assetDetails,
   AssetId,
-  CumulusPalletXcmpQueueEvent,
   Fungibility,
   Junctions,
   NetworkId,
   rococoDevXcmStatemine,
-  RuntimeEvent,
   VersionedMultiAssets,
   VersionedMultiLocation,
   VersionedXcm,
@@ -150,7 +148,7 @@ await rococoDevXcmTrappist.Sudo
   .run()
 
 /// Reserve transfer asset id on reserve parachain to Trappist parachain.
-const events = await rococoDevXcmStatemine.PolkadotXcm
+const messageHash = await rococoDevXcmStatemine.PolkadotXcm
   .limitedReserveTransferAssets({
     dest: VersionedMultiLocation.V1(XcmV1MultiLocation({
       parents: 1,
@@ -183,14 +181,13 @@ const events = await rococoDevXcmStatemine.PolkadotXcm
   .signed(signature({ sender: billy }))
   .sent()
   .dbgStatus("Statemine(Billy): Reserve transfer to Trappist")
-  .finalizedEvents()
+  .finalizedEvents("XcmpQueue", "XcmpMessageSent")
+  .access(0, "event", "value", "messageHash")
   .run()
 
-for (const { event } of events) {
-  if (
-    RuntimeEvent.isXcmpQueue(event) && CumulusPalletXcmpQueueEvent.isXcmpMessageSent(event.value)
-  ) console.log("XcmpMessageSent.messageHash:", event.value)
-}
+/// Ensure that `messageHash` is of type `Uint8Array`
+console.log("XcmpMessageSent.messageHash:", messageHash)
+$.assert($.str, messageHash)
 
 /// Retrieve billy's balance on Trappist.
 const { balance: billyTrappistBalance } = await retry(

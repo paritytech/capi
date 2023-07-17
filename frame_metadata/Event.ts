@@ -1,30 +1,34 @@
-import { Chain } from "./ChainRune.ts"
-import { PatternRune } from "./PatternRune.ts"
-
-export class EventsRune<out C extends Chain, out U>
-  extends PatternRune<Chain.Storage.Value<C, "System", "Events">, C, U>
-{}
-
-export interface Event<RE = any> {
+export interface Event<E extends RuntimeEvent = RuntimeEvent> {
   phase: EventPhase
-  event: RE
+  event: E
   topics: Uint8Array[]
+}
+export interface RuntimeEvent<
+  P extends string = string,
+  V extends RuntimeEventValue = RuntimeEventValue,
+> {
+  type: P
+  value: V
+}
+export interface RuntimeEventValue {
+  type: string
 }
 
 export type EventPhase =
-  | ApplyExtrinsicEventPhase
-  | FinalizationEventPhase
-  | InitializationEventPhase
-
-export interface ApplyExtrinsicEventPhase {
-  type: "ApplyExtrinsic"
-  value: number
-}
-export interface FinalizationEventPhase {
-  type: "Finalization"
-}
-export interface InitializationEventPhase {
-  type: "Initialization"
+  | EventPhase.ApplyExtrinsic
+  | EventPhase.Finalization
+  | EventPhase.Initialization
+export namespace EventPhase {
+  export interface ApplyExtrinsic {
+    type: "ApplyExtrinsic"
+    value: number
+  }
+  export interface Finalization {
+    type: "Finalization"
+  }
+  export interface Initialization {
+    type: "Initialization"
+  }
 }
 
 // TODO: delete this
@@ -33,7 +37,7 @@ export type SystemExtrinsicFailedEvent = Event<{
   value: {
     type: "ExtrinsicFailed"
     dispatchError: DispatchError
-    dispatchInfo: any // TODO
+    dispatchInfo: unknown // TODO
   }
 }>
 export type DispatchError =
@@ -50,7 +54,13 @@ export type DispatchError =
   | "Exhausted"
   | "Corruption"
   | "Unavailable"
-  | { type: "Module"; value: number }
+  | {
+    type: "Module"
+    value: {
+      index: number
+      error: Uint8Array
+    }
+  }
 
 export function isSystemExtrinsicFailedEvent(event: Event): event is SystemExtrinsicFailedEvent {
   if (event.event.type === "System") {

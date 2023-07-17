@@ -4,7 +4,7 @@ import { AccountIdRune } from "./AccountIdRune.ts"
 import { Chain } from "./ChainRune.ts"
 import { PatternRune } from "./PatternRune.ts"
 
-export class Ss58Rune<out C extends Chain, U> extends PatternRune<string, C, U> {
+export class Ss58Rune<in out C extends Chain, U> extends PatternRune<string, C, U> {
   accountId() {
     return this
       .into(ValueRune)

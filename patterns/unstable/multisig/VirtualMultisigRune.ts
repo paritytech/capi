@@ -15,7 +15,7 @@ import {
   ValueRune,
 } from "../../../mod.ts"
 import { MultisigRune } from "../../multisig/MultisigRune.ts"
-import { filterPureCreatedEvents, replaceDelegateCalls } from "../proxy/mod.ts"
+import { replaceDelegateCalls } from "../proxy/mod.ts"
 
 export interface VirtualMultisig {
   members: [Uint8Array, Uint8Array][]
@@ -28,7 +28,7 @@ export const $virtualMultisig: $.Codec<VirtualMultisig> = $.object(
   $.field("stash", $accountId32),
 )
 
-export class VirtualMultisigRune<out C extends Chain, out U>
+export class VirtualMultisigRune<in out C extends Chain, out U>
   extends PatternRune<VirtualMultisig, C, U>
 {
   value = this.into(ValueRune)
@@ -40,7 +40,7 @@ export class VirtualMultisigRune<out C extends Chain, out U>
     signatories: this.value.access("members").map((arr) => arr.map((a) => a[1])),
     threshold: this.value.access("threshold"),
   }).into(MultisigRune, this.chain)
-  encoded = CodecRune.from($virtualMultisig).encoded(this.as(VirtualMultisigRune))
+  encoded = CodecRune.from($virtualMultisig).encoded(this.as(Rune))
   hex = this.encoded.map(hex.encode)
 
   senderProxyId<X>(...[senderAccountId]: RunicArgs<X, [senderAccountId: Uint8Array]>) {
@@ -159,13 +159,13 @@ export class VirtualMultisigRune<out C extends Chain, out U>
       .signed(signature)
       .sent()
       .dbgStatus("Proxy creations:")
-      .finalizedEvents()
-      .unhandleFailed()
-      .pipe(filterPureCreatedEvents)
+      .finalizedEvents("Proxy", "PureCreated")
       .map((events: any[]) =>
         events
-          .sort((a, b) => a.disambiguationIndex > b.disambiguationIndex ? 1 : -1)
-          .map(({ pure }) => pure)
+          .sort((a, b) =>
+            a.event.value.disambiguationIndex > b.event.value.disambiguationIndex ? 1 : -1
+          )
+          .map(({ event }) => event.value.pure)
       )
 
     const proxiesGrouped = Rune
@@ -198,12 +198,13 @@ export class VirtualMultisigRune<out C extends Chain, out U>
       )
       .into(MetaRune)
       .flat()
-    const multisig = Rune
-      .object({
+    const multisig = MultisigRune.from(
+      chain,
+      Rune.object({
         signatories: memberProxies,
         threshold,
-      })
-      .into(MultisigRune, chain)
+      }),
+    )
     const multisigExistentialDepositCall = chain.extrinsic(
       Rune
         .object({

@@ -1,8 +1,8 @@
+import { ContractsDev } from "@capi/contracts-dev"
 import {
   ArrayRune,
   Chain,
   CodecRune,
-  Event,
   ExtrinsicRune,
   hex,
   is,
@@ -12,7 +12,6 @@ import {
   ValueRune,
 } from "../../../mod.ts"
 import { $contractsApiCallArgs, $contractsApiCallResult, Weight } from "./codecs.ts"
-import { isContractEmitted } from "./events.ts"
 import { InkMetadataRune } from "./InkMetadataRune.ts"
 
 export interface MsgProps {
@@ -23,7 +22,7 @@ export interface MsgProps {
   gasLimit?: Weight
 }
 
-export class InkRune<out C extends Chain, out U>
+export class InkRune<in out C extends Chain, out U>
   extends PatternRune<Uint8Array, C, U, InkMetadataRune<U>>
 {
   innerCall<X>(...args_: RunicArgs<X, [sender: Uint8Array, value: bigint, data: Uint8Array]>) {
@@ -74,7 +73,7 @@ export class InkRune<out C extends Chain, out U>
           type: "call",
           dest: Rune.object({
             type: "Id",
-            value: this.as(InkRune),
+            value: this.as(Rune),
           }),
           value,
           data,
@@ -86,10 +85,11 @@ export class InkRune<out C extends Chain, out U>
       .into(ExtrinsicRune, this.chain)
   }
 
-  emittedEvents = <X>(...[events]: RunicArgs<X, [events: Event[]]>) => {
+  events = <X>(
+    ...[events]: RunicArgs<X, [events: Chain.Event<ContractsDev, "Contracts", "ContractEmitted">[]]>
+  ) => {
     return Rune
       .resolve(events)
-      .map((events) => events.filter(isContractEmitted))
       .into(ArrayRune)
       .mapArray((event) => this.parent.$event.decoded(event.access("event", "value", "data")))
   }

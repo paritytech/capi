@@ -28,7 +28,7 @@ export type SignatureDataFactory<C extends Chain, CU, SU> = (
   chain: ChainRune<C, CU>,
 ) => Rune<SignatureData<C>, SU>
 
-export class ExtrinsicRune<out C extends Chain, out U> extends PatternRune<Chain.Call<C>, C, U> {
+export class ExtrinsicRune<in out C extends Chain, out U> extends PatternRune<Chain.Call<C>, C, U> {
   static readonly PROTOCOL_VERSION = 4
 
   static from<C extends Chain, U, X>(

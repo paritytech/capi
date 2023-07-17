@@ -9,9 +9,7 @@ import {
   CollectionConfig,
   MintSettings,
   MintType,
-  PalletNftsEvent,
   rococoDevWestmint,
-  RuntimeEvent,
 } from "@capi/rococo-dev-westmint"
 import { assertEquals } from "asserts"
 import { $, createDevUsers, is, Rune } from "capi"
@@ -21,8 +19,8 @@ import { DefaultCollectionSetting, DefaultItemSetting } from "capi/patterns/unst
 /// Create two dev users. Alexa will mint and list the NFT. Billy will purchase it.
 const { alexa, billy } = await createDevUsers()
 
-/// Create a collection and get the resulting events.
-const createEvents = await rococoDevWestmint.Nfts
+/// Create a collection and get the resulting collection ID.
+const collection = await rococoDevWestmint.Nfts
   .create({
     config: CollectionConfig({
       settings: DefaultCollectionSetting.AllOff,
@@ -36,18 +34,9 @@ const createEvents = await rococoDevWestmint.Nfts
   .signed(signature({ sender: alexa }))
   .sent()
   .dbgStatus("Create collection:")
-  .finalizedEvents()
+  .finalizedEvents("Nfts", "Created")
+  .access(0, "event", "value", "collection")
   .run()
-
-/// Extract the collection's id from emitted events.
-const collection = (() => {
-  for (const { event } of createEvents) {
-    if (RuntimeEvent.isNfts(event) && PalletNftsEvent.isCreated(event.value)) {
-      return event.value.collection
-    }
-  }
-  return
-})()
 
 /// Ensure the collection id is a number.
 $.assert($.u32, collection)

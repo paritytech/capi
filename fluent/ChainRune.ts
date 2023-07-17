@@ -1,6 +1,12 @@
 import { hex } from "../crypto/mod.ts"
 import * as $ from "../deps/scale.ts"
-import { $extrinsic, decodeMetadata, FrameMetadata } from "../frame_metadata/mod.ts"
+import {
+  $extrinsic,
+  decodeMetadata,
+  Event as Event_,
+  FrameMetadata,
+  RuntimeEvent as RuntimeEvent_,
+} from "../frame_metadata/mod.ts"
 import { Connection } from "../rpc/mod.ts"
 import { is, Rune, RunicArgs, ValueRune } from "../rune/mod.ts"
 import { BlockHashRune } from "./BlockHashRune.ts"
@@ -48,10 +54,39 @@ export namespace Chain {
     export type Value<C extends Chain, P extends PalletName<C>, S extends StorageName<C, P>> =
       $.Output<Storage<C, P, S>["value"]>
   }
+
+  type PalletRuntimeEvent<C extends Chain, P extends PalletName<C>> = Extract<
+    $.Output<Exclude<Pallet<C, P>["types"]["event"], undefined>>,
+    { type: any }
+  >
+  export type RuntimeEventName<C extends Chain, P extends PalletName<C>> = PalletRuntimeEvent<
+    C,
+    P
+  >["type"]
+  export type RuntimeEvent<
+    C extends Chain,
+    P extends PalletName<C>,
+    N extends RuntimeEventName<C, P>,
+  > = RuntimeEvent_<Extract<P, string>, Extract<PalletRuntimeEvent<C, P>, { type: N }>>
+  export type Event<
+    C extends Chain,
+    P extends PalletName<C> = PalletName<C>,
+    N extends RuntimeEventName<C, P> = RuntimeEventName<C, P>,
+  > = Event_<RuntimeEvent<C, P, N>>
+
+  // TODO: revisit this type and ensure it aligns with `ExtrinsicStatusRune`'s private `error` method's behavior
+  export type Error<C extends Chain> =
+    | Exclude<
+      $.Output<C["metadata"]["types"]["DispatchError"]>,
+      { type: "Module" }
+    >
+    | {
+      [K in PalletName<C>]: $.Output<Exclude<Pallet<C, K>["types"]["error"], undefined>>
+    }[PalletName<C>]
 }
 
 // TODO: do we want to represent the discovery value and conn type within the type system?
-export class ChainRune<out C extends Chain, out U> extends Rune<C, U> {
+export class ChainRune<in out C extends Chain, out U> extends Rune<C, U> {
   static from<M extends FrameMetadata>(
     connect: (signal: AbortSignal) => Connection,
     staticMetadata?: M,

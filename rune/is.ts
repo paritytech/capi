@@ -6,13 +6,13 @@ export interface Guard<T, Y extends T> {
 
 export function is(guard: undefined): Guard<unknown, undefined>
 export function is(guard: null): Guard<unknown, null>
-export function is(guard: typeof Number): Guard<unknown, number>
-export function is(guard: typeof String): Guard<unknown, string>
-export function is(guard: typeof Boolean): Guard<unknown, boolean>
-export function is(guard: typeof BigInt): Guard<unknown, bigint>
-export function is(guard: typeof Symbol): Guard<unknown, symbol>
-export function is(guard: true): Guard<unknown, true>
-export function is(guard: false): Guard<unknown, false>
+export function is<T>(guard: typeof Number): Guard<T, T & number>
+export function is<T>(guard: typeof String): Guard<T, T & string>
+export function is<T>(guard: typeof Boolean): Guard<T, T & boolean>
+export function is<T>(guard: typeof BigInt): Guard<T, T & bigint>
+export function is<T>(guard: typeof Symbol): Guard<T, T & symbol>
+export function is<T>(guard: true): Guard<T, T & true>
+export function is<T>(guard: false): Guard<T, T & false>
 export function is<T>(guard: abstract new(...args: any) => T): Guard<unknown, T>
 export function is<
   T extends string | { type: string },

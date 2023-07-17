@@ -5,7 +5,7 @@ import { PatternRune } from "./PatternRune.ts"
 import { StorageRune } from "./StorageRune.ts"
 
 export class PalletRune<
-  out C extends Chain,
+  in out C extends Chain,
   out P extends Chain.PalletName<C>,
   out U,
 > extends PatternRune<Chain.Pallet<C, P>, C, U> {
