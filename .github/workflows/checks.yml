@@ -35,7 +35,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v3
-      - uses: streetsidesoftware/cspell-action@c5eae96241f654d2437c16bdfad146ff33a025cc # v2.7.0
+      - uses: streetsidesoftware/cspell-action@c8855adc59d29c3fc73b5453b16717947c3f050c # v2.7.0
 
   cache:
     name: Cache
